@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Maintenance Compliance – Interactive Chart</title>
+<style>
+  body{margin:0;background:#0b1220;color:#e5e7eb;font-family:system-ui,Segoe UI,Roboto,Arial}
+  .wrap{max-width:980px;margin:26px auto;padding:0 16px}
+  h2{margin:0 0 6px;font-size:20px}
+  p{margin:0 0 16px;color:#94a3b8;font-size:13px;line-height:1.45}
+  .card{background:linear-gradient(135deg,#0f172a,#0b1220);border:1px solid rgba(148,163,184,.18);border-radius:16px;padding:14px;box-shadow:0 10px 22px rgba(0,0,0,.28)}
+  canvas{width:100%;height:auto;display:block}
+  .row{display:grid;grid-template-columns:1fr;gap:12px}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  input[type=range]{width:260px}
+  .badge{padding:6px 10px;border-radius:999px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.28);color:#bfdbfe;font-weight:650;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>Maintenance Compliance Trend (Before → After)</h2>
+    <p>Interactive illustration: as workflow friction decreases and governance visibility increases, compliance becomes stable and evidence quality improves. Replace with your real data later.</p>
+
+    <div class="row">
+      <div class="card">
+        <canvas id="c" width="940" height="420"></canvas>
+        <div class="controls">
+          <span class="badge">Simulated model</span>
+          <label>Workflow friction:</label>
+          <input id="friction" type="range" min="0" max="100" value="65"/>
+          <span id="frVal" class="badge">65</span>
+          <label>Evidence standard:</label>
+          <input id="evidence" type="range" min="0" max="100" value="40"/>
+          <span id="evVal" class="badge">40</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function drawAxes(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = 'rgba(148,163,184,.55)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(70,40); ctx.lineTo(70,360); ctx.lineTo(900,360);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(148,163,184,.9)';
+  ctx.font = '12px system-ui, Segoe UI, Roboto, Arial';
+  ctx.fillText('Compliance (%)', 20, 50);
+  ctx.fillText('Weeks →', 830, 392);
+
+  // y ticks
+  for(let i=0;i<=5;i++){
+    const y = 360 - i*60;
+    ctx.strokeStyle='rgba(148,163,184,.18)';
+    ctx.beginPath(); ctx.moveTo(70,y); ctx.lineTo(900,y); ctx.stroke();
+    ctx.fillStyle='rgba(148,163,184,.85)';
+    ctx.fillText(String(i*20), 40, y+4);
+  }
+}
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+function simulateSeries(friction, evidence){
+  // 12-week model: first 6 weeks "before", next 6 weeks "after"
+  // friction high -> lower baseline and more variance
+  // evidence standard -> improves "evidence quality" secondary line
+  const weeks = 12;
+  let comp = [];
+  let evq = [];
+  for(let w=0; w<weeks; w++){
+    const phase = (w<6) ? 0 : 1;
+    const fr = friction/100;
+    const ev = evidence/100;
+
+    // compliance baseline
+    let baseBefore = 62 - 18*fr;            // 62% down with friction
+    let baseAfter  = 85 - 10*fr + 8*(1-fr); // higher after system fixes, still affected by friction
+    let base = phase===0 ? baseBefore : baseAfter;
+
+    // variance: more friction -> more volatility; after phase -> reduced volatility
+    let varAmp = (phase===0 ? 14 : 7) * (0.4 + fr);
+    let noise = (Math.sin((w+1)*1.7)+Math.cos((w+2)*1.1))*0.5*varAmp;
+
+    let v = clamp(base + noise + (phase===1 ? 8*(1-fr) : 0), 20, 98);
+    comp.push(v);
+
+    // evidence quality: depends strongly on evidence standard; improved in after phase
+    let evBase = 35 + 40*ev + (phase===1 ? 15 : 0) - 10*fr;
+    let evNoise = (Math.sin((w+3)*1.3))*6*(1-0.4*ev);
+    evq.push(clamp(evBase + evNoise, 10, 98));
+  }
+  return {comp, evq};
+}
+
+function plotLine(series, color){
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for(let i=0;i<series.length;i++){
+    const x = 70 + i*(830/(series.length-1));
+    const y = 360 - (series[i]/100)*300;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function annotate(series, label, color, yOffset){
+  ctx.fillStyle = color;
+  ctx.font = '12px system-ui, Segoe UI, Roboto, Arial';
+  ctx.fillText(label, 730, 60 + yOffset);
+  // last point label
+  const i = series.length-1;
+  const x = 70 + i*(830/(series.length-1));
+  const y = 360 - (series[i]/100)*300;
+  ctx.fillText(Math.round(series[i])+'%', x-10, y-10);
+}
+
+function draw(friction, evidence){
+  drawAxes();
+
+  // phase divider
+  ctx.strokeStyle='rgba(96,165,250,.35)';
+  ctx.setLineDash([6,6]);
+  const xMid = 70 + 5*(830/11);
+  ctx.beginPath(); ctx.moveTo(xMid,40); ctx.lineTo(xMid,360); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(191,219,254,.9)';
+  ctx.fillText('Before (system not engineered)', 90, 28);
+  ctx.fillText('After (workflow engineered)', xMid+20, 28);
+
+  const {comp, evq} = simulateSeries(friction, evidence);
+  plotLine(comp, '#60a5fa');
+  plotLine(evq, '#94a3b8');
+
+  annotate(comp, 'Compliance', '#60a5fa', 0);
+  annotate(evq, 'Evidence quality (sampled)', '#94a3b8', 18);
+
+  // x labels
+  ctx.fillStyle='rgba(148,163,184,.85)';
+  ctx.font='11px system-ui, Segoe UI, Roboto, Arial';
+  for(let i=0;i<12;i++){
+    const x = 70 + i*(830/11);
+    ctx.fillText(String(i+1), x-3, 382);
+  }
+}
+
+const fr = document.getElementById('friction');
+const ev = document.getElementById('evidence');
+const frVal = document.getElementById('frVal');
+const evVal = document.getElementById('evVal');
+
+function refresh(){
+  frVal.textContent = fr.value;
+  evVal.textContent = ev.value;
+  draw(Number(fr.value), Number(ev.value));
+}
+fr.addEventListener('input', refresh);
+ev.addEventListener('input', refresh);
+refresh();
+</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enterprise BMS - Fire System & N2 Purge Control FINAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --fire-red: #ff0000;
+            --jockey-green: #3dfc16;
+            --supply-blue: #00f2ff;
+            --n2-yellow: #fde047;
+            --bg-deep: #05070a;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pipe-base { fill: none; stroke: #1e293b; stroke-width: 5; stroke-linecap: round; }
+        
+        /* Laser Flows - Dotted Line Effects */
+        .flow-fire { stroke: var(--fire-red); stroke-dasharray: 4, 12; animation: flowMove 0.5s linear infinite; filter: drop-shadow(0 0 8px var(--fire-red)); }
+        .flow-supply { stroke: var(--supply-blue); stroke-dasharray: 2, 10; animation: flowMove 0.8s linear infinite; filter: drop-shadow(0 0 10px var(--supply-blue)); }
+        .flow-n2 { stroke: var(--n2-yellow); stroke-dasharray: 3, 15; animation: flowMove 1.5s linear infinite; filter: drop-shadow(0 0 8px var(--n2-yellow)); }
+        
+        @keyframes flowMove { to { stroke-dashoffset: -24; } }
+
+        .impeller { transform-box: fill-box; transform-origin: center; }
+        .spinning { animation: rotateImp 0.4s linear infinite; }
+        @keyframes rotateImp { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .tank-overflow { overflow: hidden; }
+        .liquid-anim { transition: height 1s linear, y 1s linear; }
+        
+        .emergency-blink { animation: subtleRed 1.5s infinite; }
+        @keyframes subtleRed { 0%, 100% { background: transparent; } 50% { background: rgba(153, 27, 27, 0.1); } }
+
+        .font-tech { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+        .valve-label { fill: #64748b; font-size: 8px; font-weight: bold; }
+    </style>
+</head>
+<body class="p-4 h-screen flex flex-col">
+
+    <div id="alarm-overlay" class="fixed inset-0 pointer-events-none z-50 transition-colors duration-500"></div>
+
+    <div class="grid grid-cols-6 gap-3 mb-6 z-10 no-print">
+        <div class="glass-panel p-3 rounded-2xl border-l-4 border-cyan-500 shadow-xl">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">WUE Efficiency</h3>
+            <p id="kpi-wue" class="text-xl font-black text-cyan-400 font-tech">1.02 <span class="text-[10px] opacity-60">L/kW</span></p>
+        </div>
+        <div class="glass-panel p-3 rounded-2xl border-l-4 border-emerald-500 shadow-xl">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">OPEX Analysis</h3>
+            <p id="kpi-opex" class="text-xl font-black text-emerald-400 font-tech">Rp 2.450 <span class="text-[10px] opacity-60">/m³</span></p>
+        </div>
+        <div class="glass-panel p-3 rounded-2xl border-l-4 border-yellow-500 shadow-xl">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">N2 Status</h3>
+            <p id="kpi-n2-status" class="text-xl font-black text-yellow-500 font-tech">STANDBY</p>
+        </div>
+        <div class="glass-panel p-3 rounded-2xl border-l-4 border-white shadow-xl">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Header Press</h3>
+            <p class="text-xl font-black text-white font-tech" id="header-press">12.5 <span class="text-[10px] opacity-60">BAR</span></p>
+        </div>
+        <div class="glass-panel p-3 rounded-2xl border-l-4 border-purple-500 shadow-xl">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">CO2 Footprint</h3>
+            <p class="text-xl font-black text-purple-400 font-tech">0.85 <span class="text-[10px] opacity-60">kg/m³</span></p>
+        </div>
+        <div class="flex flex-col gap-2">
+            <button onclick="location.href='index.html'" class="bg-slate-600 hover:bg-slate-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"><i class="fas fa-arrow-left"></i> PORTFOLIO</button>
+            <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all">RESET MATRIX</button>
+            <button onclick="window.print()" class="glass-panel text-white text-[10px] font-bold py-2 rounded-xl hover:bg-slate-800 transition-all">EXPORT PDF</button>
+        </div>
+    </div>
+
+    <div class="glass-panel rounded-[45px] p-10 relative border border-slate-800 flex-grow overflow-hidden shadow-2xl">
+        <svg viewBox="0 0 1400 650" class="w-full h-full">
+            <defs>
+                <linearGradient id="tankBlue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#1e3a8a" />
+                </linearGradient>
+            </defs>
+
+            <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" />
+            <g transform="translate(130, 280)">
+                <rect id="v-landlord" width="40" height="25" fill="#1e293b" stroke="#00f2ff" rx="2" />
+                <text x="20" y="45" text-anchor="middle" class="fill-slate-500 text-[9px] font-bold uppercase">Landlord Supply</text>
+                <text id="landlord-flow" x="20" y="60" text-anchor="middle" class="fill-cyan-400 text-[10px] font-bold font-tech" style="opacity: 0; transition: opacity 0.3s;">0.0 m³/h</text>
+            </g>
+
+            <g transform="translate(250, 100)" class="tank-overflow">
+                <rect width="300" height="420" fill="#0f172a" stroke="#475569" stroke-width="3" rx="10" />
+                <clipPath id="tankClip"><rect x="3" y="3" width="294" height="414" rx="8" /></clipPath>
+                <g clip-path="url(#tankClip)">
+                    <rect id="tank-water" x="0" y="50" width="300" height="370" fill="url(#tankBlue)" class="liquid-anim" />
+                </g>
+                <text x="150" y="-18" text-anchor="middle" class="fill-slate-400 font-black text-[11px] uppercase tracking-widest">RC FIRE TANK (114m³)</text>
+                <text id="tank-level-txt" x="150" y="240" text-anchor="middle" class="text-7xl font-black fill-white/10 font-tech">92%</text>
+            </g>
+
+            <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" />
+
+            <g transform="translate(750, 150)" id="grp-main1">
+                <circle r="40" fill="#020617" stroke="#3b82f6" stroke-width="2" id="node-m1" />
+                <g id="spin-m1" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#3b82f6" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#3b82f6" stroke-width="4" /></g>
+                <text x="55" y="-15" class="fill-slate-400 text-[11px] font-black uppercase">Pompa Main 1</text>
+            </g>
+
+            <g transform="translate(750, 400)" id="grp-jockey">
+                <circle r="25" fill="#020617" stroke="#3dfc16" stroke-width="2" id="node-j" />
+                <g id="spin-j" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#3dfc16" stroke-width="3" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#3dfc16" stroke-width="3" /></g>
+                <text x="45" y="-12" class="fill-slate-400 text-[11px] font-black uppercase">Pompa Jockey</text>
+            </g>
+
+            <g transform="translate(750, 540)" id="grp-main2">
+                <circle r="40" fill="#020617" stroke="#3b82f6" stroke-width="2" id="node-m2" />
+                <g id="spin-m2" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#3b82f6" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#3b82f6" stroke-width="4" /></g>
+                <text x="55" y="-15" class="fill-slate-400 text-[11px] font-black uppercase">Pompa Main 2</text>
+            </g>
+
+            <g transform="translate(850, 560)">
+                <rect width="145" height="75" fill="#1e293b" stroke="#fde047" rx="5" />
+                <circle cx="30" cy="38" r="20" fill="#020617" stroke="#fde047" id="node-n2" />
+                <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#fde047" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#fde047" stroke-width="2" /></g>
+                <text x="60" y="30" class="fill-yellow-400 font-black text-[10px] uppercase">N2 GENERATOR</text>
+                <text x="60" y="45" class="fill-slate-500 text-[8px]">N2-GEN-UNIT-01</text>
+                <text x="60" y="58" class="fill-slate-400 text-[9px] font-bold">PRESS: 2.4 BAR</text>
+                <path id="path-n2" d="M 67 0 L 67 -210 L 350 -210" class="pipe-base" transform="translate(850, 560)" />
+            </g>
+
+            <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" />
+            <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" />
+            <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" />
+
+            <g transform="translate(1020, 375)">
+                <rect width="50" height="30" fill="#1e293b" stroke="#94a3b8" />
+                <circle cx="85" cy="15" r="22" fill="#0f172a" stroke="#fff" />
+                <line id="gauge-pin" x1="85" y1="15" x2="85" y2="0" stroke="red" stroke-width="3" style="transform-origin: 85px 15px; transform: rotate(45deg); transition: 0.5s;" />
+                <text id="flow-val" x="85" y="75" text-anchor="middle" class="fill-white text-[12px] font-tech font-bold">0.0 m³/h</text>
+            </g>
+
+            <path id="path-to-wet" d="M 1150 400 L 1150 100 L 1200 100" class="pipe-base" />
+            <path id="path-to-pre" d="M 1150 400 L 1150 540 L 1200 540" class="pipe-base" />
+
+            <g transform="translate(1200, 50)">
+                <rect id="wv-1" x="0" y="0" width="45" height="70" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="22.5" y="35" text-anchor="middle" class="valve-label">WAV-01</text>
+                <rect id="wv-2" x="55" y="0" width="45" height="70" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="77.5" y="35" text-anchor="middle" class="valve-label">WAV-02</text>
+                <rect id="wv-3" x="110" y="0" width="45" height="70" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="132.5" y="35" text-anchor="middle" class="valve-label">WAV-03</text>
+            </g>
+
+            <g transform="translate(1200, 500)">
+                <rect id="pv-1" x="0" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="17.5" y="30" text-anchor="middle" class="valve-label">PACV-01</text>
+                <rect id="pv-2" x="45" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="62.5" y="30" text-anchor="middle" class="valve-label">PACV-02</text>
+                <rect id="pv-3" x="90" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="107.5" y="30" text-anchor="middle" class="valve-label">PACV-03</text>
+                <rect id="pv-4" x="135" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="152.5" y="30" text-anchor="middle" class="valve-label">PACV-04</text>
+                <rect id="pv-5" x="180" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
+                <text x="197.5" y="30" text-anchor="middle" class="valve-label">PACV-05</text>
+            </g>
+
+            <g transform="translate(1180, 260)" onclick="triggerResponse()" class="cursor-pointer">
+                <rect width="180" height="90" rx="25" fill="#7f1d1d" stroke="#ef4444" stroke-width="2" />
+                <text x="90" y="52" text-anchor="middle" class="fill-white font-black uppercase text-[13px] animate-pulse">Break Sprinkler</text>
+            </g>
+        </svg>
+
+        <div class="absolute bottom-12 left-12 w-[450px] glass-panel p-6 rounded-[32px] border-l-8 border-slate-700 shadow-2xl">
+            <div id="log-view" class="h-44 overflow-y-auto space-y-2 text-[11px] font-tech pr-2 leading-relaxed">
+                <p class="text-emerald-500/70 border-b border-emerald-500/10 pb-1">System healthy. Static pressure stable at 12.5 BAR.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logs = document.getElementById('log-view');
+        const pressTxt = document.getElementById('header-press');
+        const tankWater = document.getElementById('tank-water');
+        const tankTxt = document.getElementById('tank-level-txt');
+        const flowTxt = document.getElementById('flow-val');
+        const pin = document.getElementById('gauge-pin');
+        const overlay = document.getElementById('alarm-overlay');
+        const n2Kpi = document.getElementById('kpi-n2-status');
+        const n2Imp = document.getElementById('spin-n2');
+        const n2Path = document.getElementById('path-n2');
+        const wueKpi = document.getElementById('kpi-wue');
+        const opexKpi = document.getElementById('kpi-opex');
+        const landlordFlow = document.getElementById('landlord-flow');
+
+        let press = 12.5;
+        let tank = 92;
+        let running = false;
+        let landlordSupplyActive = false;
+        let landlordFlowRate = 0;
+
+        // Base values
+        const baseWUE = 1.02;
+        const baseOPEX = 2450;
+
+        function n2DutyCycle() {
+            if (running) return;
+            n2Kpi.textContent = "RUNNING";
+            n2Kpi.style.color = "#3dfc16";
+            n2Imp.classList.add('spinning');
+            n2Path.classList.add('flow-n2');
+            
+            setTimeout(() => {
+                n2Kpi.textContent = "STANDBY";
+                n2Kpi.style.color = "#fde047";
+                n2Imp.classList.remove('spinning');
+                n2Path.classList.remove('flow-n2');
+                if(!running) setTimeout(n2DutyCycle, 4000);
+            }, 2000);
+        }
+        n2DutyCycle();
+
+        function updateLandlordMetrics(active, flowRate) {
+            landlordSupplyActive = active;
+            landlordFlowRate = flowRate;
+
+            if (active) {
+                // Show flow rate
+                landlordFlow.textContent = flowRate.toFixed(1) + " m³/h";
+                landlordFlow.style.opacity = "1";
+
+                // Calculate dynamic WUE (increases with water usage)
+                const wueValue = baseWUE + (flowRate * 0.015);
+                wueKpi.innerHTML = wueValue.toFixed(2) + ' <span class="text-[10px] opacity-60">L/kW</span>';
+                wueKpi.style.color = "#22d3ee"; // Brighter cyan when active
+
+                // Calculate dynamic OPEX (increases with water consumption)
+                const opexValue = baseOPEX + (flowRate * 85);
+                opexKpi.innerHTML = 'Rp ' + opexValue.toLocaleString('id-ID') + ' <span class="text-[10px] opacity-60">/m³</span>';
+                opexKpi.style.color = "#34d399"; // Brighter green when active
+            } else {
+                // Reset to base values
+                landlordFlow.style.opacity = "0";
+                wueKpi.innerHTML = baseWUE.toFixed(2) + ' <span class="text-[10px] opacity-60">L/kW</span>';
+                wueKpi.style.color = "";
+                opexKpi.innerHTML = 'Rp ' + baseOPEX.toLocaleString('id-ID') + ' <span class="text-[10px] opacity-60">/m³</span>';
+                opexKpi.style.color = "";
+            }
+        }
+
+        function updateTankUI(lvl) {
+            const h = (lvl / 100) * 370;
+            tankWater.setAttribute('height', h);
+            tankWater.setAttribute('y', 50 + (370 - h));
+            tankTxt.textContent = Math.round(lvl) + "%";
+
+            const v = document.getElementById('v-landlord');
+            const p = document.getElementById('path-landlord');
+
+            if (lvl <= 50) {
+                v.style.fill = "var(--supply-blue)";
+                p.classList.add('flow-supply'); // ACTIVATING SUPPLY ANIMATION
+
+                // Calculate flow rate based on tank level (more flow when tank is lower)
+                const flowRate = 12.5 + ((50 - lvl) * 0.5) + (Math.random() * 2);
+                updateLandlordMetrics(true, flowRate);
+            } else if (lvl >= 95) {
+                v.style.fill = "#1e293b";
+                p.classList.remove('flow-supply');
+                updateLandlordMetrics(false, 0);
+            }
+        }
+
+        function triggerResponse() {
+            if(running) return;
+            running = true;
+            overlay.classList.add('emergency-blink');
+            n2Kpi.textContent = "LOCKED";
+            n2Path.classList.remove('flow-n2');
+            n2Imp.classList.remove('spinning');
+
+            const sim = setInterval(() => {
+                if(press > 8.0) press -= 0.15;
+                if(tank > 10) tank -= 0.35;
+
+                pressTxt.innerText = press.toFixed(1) + " BAR";
+                updateTankUI(tank);
+                
+                const angle = 45 - (12.5 - press) * 18;
+                pin.style.transform = `rotate(${angle}deg)`;
+
+                if(press <= 11.5) {
+                    const node = document.getElementById('node-j');
+                    if(!node.classList.contains('active-j')) {
+                        node.classList.add('active-j');
+                        node.style.stroke = "var(--jockey-green)";
+                        node.style.filter = "drop-shadow(0 0 10px var(--jockey-green))";
+                        document.getElementById('spin-j').classList.add('spinning');
+                        document.getElementById('path-j-discharge').classList.add('flow-fire');
+                        // ACTIVATING DISCHARGE FLOWS
+                        document.getElementById('path-discharge').classList.add('flow-fire');
+                        document.getElementById('path-to-wet').classList.add('flow-fire');
+                        document.getElementById('wv-1').style.fill = "var(--fire-red)";
+                        flowTxt.textContent = (18.5 + (Math.random() * 2)).toFixed(1) + " m³/h";
+                    }
+                }
+
+                if(press <= 10.5) {
+                    const node = document.getElementById('node-m1');
+                    if(!node.classList.contains('active-m1')) {
+                        node.classList.add('active-m1');
+                        node.style.stroke = "var(--fire-red)";
+                        node.style.filter = "drop-shadow(0 0 15px var(--fire-red))";
+                        document.getElementById('spin-m1').classList.add('spinning');
+                        document.getElementById('path-suction').classList.add('flow-fire');
+                        document.getElementById('path-to-pre').classList.add('flow-fire');
+                        document.getElementById('pv-1').style.fill = "var(--fire-red)";
+                        flowTxt.textContent = (224.8 + (Math.random() * 5)).toFixed(1) + " m³/h";
+                    }
+                }
+
+                if(tank <= 10) {
+                    clearInterval(sim);
+                    flowTxt.textContent = "0.0 m³/h";
+                }
+            }, 700);
+        }
+    </script>
+</body>
+</html>

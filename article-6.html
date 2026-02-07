@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article 6 - Why Post-Incident RCA Fails Without Design Authority | Bagus Dwi Permana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .article-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('assets/article-6-cover.png') center/cover no-repeat;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        .article-hero > * { position: relative; z-index: 1; }
+        .article-hero .container { max-width: 900px; }
+        .article-category {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.2);
+            color: #7dd3fc;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #fff;
+        }
+        .article-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+        }
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-content {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+        .article-content .container { max-width: 800px; }
+        .article-body {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: #374151;
+        }
+        .article-body p { margin-bottom: 1.75rem; }
+        .article-body h2 {
+            font-size: 1.75rem;
+            color: #1e3a5f;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e5e7eb;
+        }
+        .article-body h3 {
+            font-size: 1.375rem;
+            color: #2d5a87;
+            margin: 2rem 0 1rem;
+        }
+        .article-body blockquote {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #38bdf8;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #0369a1;
+        }
+        .article-body ul, .article-body ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .article-body li { margin-bottom: 0.75rem; }
+        .highlight-box {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        .highlight-box p {
+            margin: 0;
+            color: #991b1b;
+            font-weight: 500;
+        }
+        .result-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #10b981;
+        }
+        .result-box h4 {
+            color: #065f46;
+            margin-bottom: 0.75rem;
+        }
+        .result-box p, .result-box ul {
+            margin: 0.5rem 0;
+            color: #047857;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: #fff; }
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2d5a87;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .article-nav a:hover { color: #1e3a5f; }
+        .references {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        .references h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .references ul {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* Interactive Chart */
+        .chart-container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-title {
+            text-align: center;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .chart-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-wrapper {
+            background: rgba(2, 6, 23, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .control-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .control-slider {
+            width: 200px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+        }
+        .control-value {
+            background: rgba(56, 189, 248, 0.2);
+            color: #7dd3fc;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .callout-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .callout-card {
+            background: rgba(30, 58, 95, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(56, 189, 248, 0.15);
+        }
+        .callout-label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .callout-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        @media (max-width: 768px) {
+            .article-hero { padding: 6rem 1rem 3rem; }
+            .article-meta { flex-direction: column; gap: 1rem; }
+            .article-content { padding: 3rem 1rem; }
+            .article-body { font-size: 1rem; }
+            .chart-container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li><a href="articles.html" class="nav-link">Articles</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="article-hero">
+        <div class="container">
+            <a href="articles.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Articles
+            </a>
+            <span class="article-category">Incident Learning</span>
+            <h1 class="article-title">Why Post-Incident RCA Fails Without Design Authority</h1>
+            <p class="article-subtitle">Root cause analysis as ritual versus RCA as a learning and redesign engine.</p>
+            <div class="article-meta">
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    9 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    November 15, 2025
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Bagus Dwi Permana
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <article class="article-content">
+        <div class="container">
+            <div class="article-body">
+                <h2>Abstract</h2>
+                <p>Root Cause Analysis (RCA) is widely practiced in data centers, yet repeated incidents continue to occur with familiar patterns. This article argues that the failure is not analytical capability, but structural: RCA is performed without design authority. When findings cannot modify system architecture, workflows, or decision boundaries, RCA becomes a reporting ritual rather than a learning mechanism.</p>
+
+                <blockquote>
+                    "Most RCAs are technically correct. Most RCAs also change nothing. If the same incident returns in a new form, the organization has not failed to analyze. It has failed to redesign."
+                </blockquote>
+
+                <h2>1. RCA Popularity and Its Paradox</h2>
+                <p>RCA is one of the most standardized practices in critical environments. Templates, fishbone diagrams, and timelines are well understood. Yet recurrence rates remain high. The paradox is clear: analysis quality increases, but system behavior does not change.</p>
+
+                <h2>2. RCA as Ritualized Compliance</h2>
+                <p>In many organizations, RCA primarily serves governance needs: to demonstrate diligence, to satisfy audit expectations, to close incident tickets. This transforms RCA into a ritual. The output is documentation, not system change.</p>
+
+                <div class="highlight-box">
+                    <p><strong>The Trap:</strong> RCA that does not alter control structures cannot address system-level causes. The deeper the system issue, the less effective isolated fixes become.</p>
+                </div>
+
+                <h2>3. Design Authority as the Missing Control</h2>
+                <p>Design authority is the ability to modify system constraints: architecture, interfaces, decision rights, and standards. Without design authority:</p>
+                <ul>
+                    <li>Findings are downgraded to recommendations</li>
+                    <li>Systemic issues are reframed as human error</li>
+                    <li>Corrective actions focus on reminders and retraining</li>
+                </ul>
+                <p>Learning stops at the document boundary.</p>
+
+                <h2>4. Interactive: RCA Authority vs Recurrence</h2>
+                <p>This simulation demonstrates how design authority level affects incident recurrence probability:</p>
+
+                <!-- Interactive Chart -->
+                <div class="chart-container">
+                    <div class="chart-title">RCA Design Authority vs Incident Recurrence</div>
+                    <div class="chart-subtitle">Higher authority enables systemic fixes and reduces recurrence</div>
+
+                    <div class="chart-wrapper">
+                        <canvas id="rcaChart" class="chart-canvas" width="800" height="380"></canvas>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="control-label">Design Authority Level:</span>
+                        <input type="range" id="authSlider" class="control-slider" min="0" max="100" value="30">
+                        <span class="control-value" id="authValue">30%</span>
+                    </div>
+
+                    <div class="callout-row">
+                        <div class="callout-card">
+                            <div class="callout-label">Avg Recurrence</div>
+                            <div class="callout-value" id="avgRecurrence">65%</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">RCA Effectiveness</div>
+                            <div class="callout-value" id="effectiveness">Low</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Learning Velocity</div>
+                            <div class="callout-value" id="velocity">Slow</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>5. Systems Thinking Perspective</h2>
+                <p>Nancy Leveson emphasizes that accidents emerge from inadequate control, not component failure. RCA that does not alter control structures cannot address system-level causes. The deeper the system issue, the less effective isolated fixes become.</p>
+
+                <h2>6. Case Pattern: RCA Without Redesign</h2>
+                <p>Across repeated events, a familiar pattern appears:</p>
+                <ol>
+                    <li>Incident occurs</li>
+                    <li>RCA identifies procedural deviation</li>
+                    <li>Training is reinforced</li>
+                    <li>Similar incident reappears months later</li>
+                </ol>
+                <p>The loop closes without modifying the conditions that made deviation likely.</p>
+
+                <h2>7. Human Factors and Normalization</h2>
+                <p>From a human factors view, people adapt to make work succeed. If RCA punishes adaptation instead of redesigning constraints, it encourages workarounds and silence. Safety-II reframes this: success and failure share the same mechanisms.</p>
+
+                <h2>8. What Effective RCA Enables</h2>
+                <div class="result-box">
+                    <h4>Effective RCA has one defining property: it can change the system</h4>
+                    <ul>
+                        <li>Modifying alarm logic</li>
+                        <li>Redefining authority boundaries</li>
+                        <li>Changing maintenance workflows</li>
+                        <li>Redesigning interfaces</li>
+                        <li>Retiring unsafe assumptions</li>
+                    </ul>
+                    <p>Without this power, RCA cannot mature.</p>
+                </div>
+
+                <h2>9. Designing an RCA-to-Design Pipeline</h2>
+                <p>Resilient organizations formalize the transition from RCA to redesign:</p>
+                <ul>
+                    <li><strong>Explicit classification</strong> of findings (local vs systemic)</li>
+                    <li><strong>Pre-approved redesign scopes</strong></li>
+                    <li><strong>Design review ownership</strong></li>
+                    <li><strong>Change authority</strong> embedded in ops leadership</li>
+                </ul>
+                <p>RCA becomes input, not endpoint.</p>
+
+                <h2>10. Conclusion</h2>
+                <blockquote>
+                    "RCA does not fail because teams are incompetent. It fails because organizations separate analysis from authority. When RCA gains the power to redesign, learning becomes real and recurrence declines."
+                </blockquote>
+
+                <div class="references">
+                    <h3>References</h3>
+                    <ul>
+                        <li>Leveson, N. (2011). Engineering a Safer World.</li>
+                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents.</li>
+                        <li>Hollnagel, E. (2014). Safety-I and Safety-II.</li>
+                        <li>ISO 55000. (2014). Asset Management.</li>
+                        <li>ISO 31000. (2018). Risk Management.</li>
+                    </ul>
+                </div>
+
+                <div class="article-nav">
+                    <a href="article-5.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Previous Article
+                    </a>
+                    <a href="article-7.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
+                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+    (function() {
+        const canvas = document.getElementById('rcaChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const authSlider = document.getElementById('authSlider');
+        const authValue = document.getElementById('authValue');
+        const avgRecurrence = document.getElementById('avgRecurrence');
+        const effectiveness = document.getElementById('effectiveness');
+        const velocity = document.getElementById('velocity');
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+
+        const W = rect.width;
+        const H = rect.height;
+        const padding = { top: 50, right: 60, bottom: 60, left: 80 };
+        const chartW = W - padding.left - padding.right;
+        const chartH = H - padding.top - padding.bottom;
+
+        function simulate(authority) {
+            let recurrence = [];
+            let base = 80 - authority * 0.5;
+            for (let i = 0; i < 10; i++) {
+                let risk = Math.max(5, base + Math.sin(i) * 5);
+                recurrence.push(risk);
+            }
+            return recurrence;
+        }
+
+        function drawChart(authority) {
+            ctx.clearRect(0, 0, W, H);
+
+            // Background
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.5)';
+            ctx.fillRect(0, 0, W, H);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(W - padding.right, y);
+                ctx.stroke();
+            }
+
+            // Y-axis labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            ctx.font = '12px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                const val = 100 - i * 20;
+                ctx.fillText(val + '%', padding.left - 10, y + 4);
+            }
+
+            // Y-axis title
+            ctx.save();
+            ctx.translate(25, H / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Recurrence Probability (%)', 0, 0);
+            ctx.restore();
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            for (let i = 0; i < 10; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                ctx.fillText('Inc ' + (i + 1), x, H - padding.bottom + 25);
+            }
+
+            // X-axis title
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Incidents', W / 2, H - 15);
+
+            // Get data
+            const recurrence = simulate(authority);
+
+            // Draw area
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+            for (let i = 0; i < recurrence.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (recurrence[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.lineTo(padding.left + chartW, H - padding.bottom);
+            ctx.lineTo(padding.left, H - padding.bottom);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw line
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            for (let i = 0; i < recurrence.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (recurrence[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw points with values
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            for (let i = 0; i < recurrence.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (recurrence[i] / 100) * chartH;
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillText(Math.round(recurrence[i]) + '%', x, y - 12);
+            }
+
+            // Update callouts
+            const avg = recurrence.reduce((a, b) => a + b, 0) / recurrence.length;
+            avgRecurrence.textContent = Math.round(avg) + '%';
+
+            if (authority >= 70) {
+                effectiveness.textContent = 'High';
+                effectiveness.style.color = '#10b981';
+                velocity.textContent = 'Fast';
+                velocity.style.color = '#10b981';
+            } else if (authority >= 40) {
+                effectiveness.textContent = 'Medium';
+                effectiveness.style.color = '#f59e0b';
+                velocity.textContent = 'Moderate';
+                velocity.style.color = '#f59e0b';
+            } else {
+                effectiveness.textContent = 'Low';
+                effectiveness.style.color = '#ef4444';
+                velocity.textContent = 'Slow';
+                velocity.style.color = '#ef4444';
+            }
+        }
+
+        function refresh() {
+            const auth = parseInt(authSlider.value);
+            authValue.textContent = auth + '%';
+            drawChart(auth);
+        }
+
+        authSlider.addEventListener('input', refresh);
+        refresh();
+
+        window.addEventListener('resize', function() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            refresh();
+        });
+    })();
+    </script>
+</body>
+</html>

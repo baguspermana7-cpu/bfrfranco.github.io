@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Capability vs MTTR Simulation</title>
+<style>
+body{background:#0b1220;color:#e5e7eb;font-family:system-ui,Segoe UI,Roboto}
+.wrap{max-width:960px;margin:30px auto;padding:0 16px}
+canvas{background:#020617;border-radius:12px}
+.controls{margin-top:12px}
+label{margin-right:10px}
+input{margin-right:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h2>In-House Capability vs Mean Time To Recover (MTTR)</h2>
+<p>Simulated model: increasing in-house capability reduces dependency delay and recovery time.</p>
+<canvas id="c" width="900" height="420"></canvas>
+<div class="controls">
+<label>In-house capability level:</label>
+<input type="range" id="cap" min="0" max="100" value="40"/>
+<span id="capv">40</span>
+</div>
+</div>
+
+<script>
+const ctx = document.getElementById("c").getContext("2d");
+const cap = document.getElementById("cap");
+const capv = document.getElementById("capv");
+
+function drawAxes(){
+  ctx.clearRect(0,0,900,420);
+  ctx.strokeStyle="#334155";
+  ctx.beginPath();
+  ctx.moveTo(60,40); ctx.lineTo(60,360); ctx.lineTo(860,360);
+  ctx.stroke();
+  ctx.fillText("MTTR (hours)", 10, 50);
+  ctx.fillText("Incidents →", 780, 395);
+}
+
+function simulate(capability){
+  let mttr = [];
+  for(let i=0;i<10;i++){
+    let base = 12;
+    let vendorDelay = (100-capability)/10;
+    let noise = Math.sin(i)*1.2;
+    mttr.push(Math.max(2, base + vendorDelay + noise));
+  }
+  return mttr;
+}
+
+function plot(mttr){
+  ctx.strokeStyle="#60a5fa";
+  ctx.beginPath();
+  for(let i=0;i<mttr.length;i++){
+    let x = 60 + i*(800/9);
+    let y = 360 - mttr[i]*20;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    ctx.fillText(mttr[i].toFixed(1)+"h", x-10, y-10);
+  }
+  ctx.stroke();
+}
+
+function redraw(){
+  capv.textContent = cap.value;
+  drawAxes();
+  plot(simulate(cap.value));
+}
+
+cap.addEventListener("input", redraw);
+redraw();
+</script>
+</body>
+</html>

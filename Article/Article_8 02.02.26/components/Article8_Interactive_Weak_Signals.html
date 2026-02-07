@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Weak Signal Accumulation</title>
+<style>
+body{background:#0b1220;color:#e5e7eb;font-family:system-ui}
+.wrap{max-width:960px;margin:30px auto;padding:0 16px}
+canvas{background:#020617;border-radius:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h2>Weak Signals vs Perceived Safety</h2>
+<p>Simulation showing how weak signals accumulate while perceived safety remains high.</p>
+<canvas id="c" width="900" height="420"></canvas>
+<div>
+<label>Signal accumulation rate:</label>
+<input type="range" id="s" min="0" max="100" value="40"/>
+<span id="sv">40</span>
+</div>
+</div>
+
+<script>
+const ctx=document.getElementById("c").getContext("2d");
+const s=document.getElementById("s");
+const sv=document.getElementById("sv");
+
+function draw(){
+ ctx.clearRect(0,0,900,420);
+ ctx.strokeStyle="#475569";
+ ctx.beginPath();
+ ctx.moveTo(60,40);ctx.lineTo(60,360);ctx.lineTo(860,360);ctx.stroke();
+ ctx.fillText("Level",10,50);
+ ctx.fillText("Time →",800,395);
+
+ let rate=s.value;
+ let perceived=90;
+ let weak=10;
+
+ ctx.strokeStyle="#22c55e";
+ ctx.beginPath();
+ for(let i=0;i<10;i++){
+   let x=60+i*(800/9);
+   let y=360-(perceived);
+   if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+ }
+ ctx.stroke();
+
+ ctx.strokeStyle="#f59e0b";
+ ctx.beginPath();
+ for(let i=0;i<10;i++){
+   weak += rate/15;
+   let x=60+i*(800/9);
+   let y=360-(weak*3);
+   if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+ }
+ ctx.stroke();
+
+ sv.textContent=rate;
+}
+
+s.addEventListener("input",draw);
+draw();
+</script>
+</body>
+</html>

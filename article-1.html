@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article 1 - When Nothing Happens, Engineering Is Working | Bagus Dwi Permana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Article Specific Styles */
+        .article-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/article-1-cover.png') center/cover no-repeat;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .article-hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .article-hero .container {
+            max-width: 900px;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: rgba(96, 165, 250, 0.2);
+            color: #93c5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        .article-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+        }
+
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .article-content {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+
+        .article-content .container {
+            max-width: 800px;
+        }
+
+        .article-body {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: #374151;
+        }
+
+        .article-body p {
+            margin-bottom: 1.75rem;
+        }
+
+        .article-body h2 {
+            font-size: 1.75rem;
+            color: #1e3a5f;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e5e7eb;
+        }
+
+        .article-body h3 {
+            font-size: 1.375rem;
+            color: #2d5a87;
+            margin: 2rem 0 1rem;
+        }
+
+        .article-body blockquote {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #1e40af;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .article-body li {
+            margin-bottom: 0.75rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        /* ==========================================
+           RESPONSIVE FLOW DIAGRAM - HTML/CSS Based
+           ========================================== */
+        .diagram-section {
+            background: linear-gradient(135deg, #0b1220 0%, #111827 100%);
+            padding: 3rem 1.5rem;
+            margin: 3rem -2rem;
+            border-radius: 0;
+        }
+
+        @media (min-width: 900px) {
+            .diagram-section {
+                margin: 3rem 0;
+                border-radius: 20px;
+                padding: 3rem 2rem;
+            }
+        }
+
+        .diagram-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .diagram-title {
+            color: #e5e7eb;
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .diagram-subtitle {
+            color: #94a3b8;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+
+        /* Flow Container */
+        .flow-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Phase Section */
+        .flow-phase {
+            margin-bottom: 2rem;
+        }
+
+        .flow-phase:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Phase Header with Chip */
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .phase-chip {
+            background: rgba(96, 165, 250, 0.15);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            color: #93c5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .phase-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(96, 165, 250, 0.3) 0%, transparent 100%);
+        }
+
+        /* Cards Grid */
+        .flow-cards {
+            display: grid;
+            gap: 1rem;
+        }
+
+        /* Row 1: 4 cards */
+        .flow-row-1 {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        /* Row 2: 4 cards */
+        .flow-row-2 {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        /* Flow Card */
+        .flow-card {
+            background: linear-gradient(145deg, #1a2332 0%, #0f172a 100%);
+            border: 1px solid #2a3a50;
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .flow-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .flow-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .flow-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(96, 165, 250, 0.1);
+        }
+
+        .flow-card:hover::before {
+            width: 6px;
+            opacity: 1;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            font-weight: 800;
+            color: rgba(96, 165, 250, 0.15);
+            line-height: 1;
+        }
+
+        .card-title {
+            color: #e5e7eb;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-right: 2rem;
+        }
+
+        .card-desc {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(96, 165, 250, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: #60a5fa;
+        }
+
+        /* Flow Arrow Between Rows */
+        .flow-connector {
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem 0;
+            position: relative;
+        }
+
+        .connector-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: #60a5fa;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.5s ease;
+        }
+
+        .connector-arrow.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .connector-arrow svg {
+            width: 24px;
+            height: 24px;
+            animation: bounceDown 1.5s ease-in-out infinite;
+        }
+
+        .connector-text {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        /* Horizontal Flow Arrows (Desktop) */
+        .flow-arrows {
+            display: none;
+            justify-content: space-around;
+            padding: 0.5rem 2rem;
+            margin: -0.5rem 0;
+        }
+
+        @media (min-width: 900px) {
+            .flow-arrows {
+                display: flex;
+            }
+        }
+
+        .h-arrow {
+            color: #60a5fa;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.5s ease;
+        }
+
+        .h-arrow.visible {
+            opacity: 0.7;
+            transform: translateX(0);
+        }
+
+        .h-arrow svg {
+            width: 30px;
+            height: 30px;
+            animation: pulseRight 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseRight {
+            0%, 100% { transform: translateX(0); opacity: 0.7; }
+            50% { transform: translateX(5px); opacity: 1; }
+        }
+
+        /* Feedback Loop */
+        .feedback-loop {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(96, 165, 250, 0.05);
+            border: 1px dashed rgba(96, 165, 250, 0.3);
+            border-radius: 16px;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.6s ease;
+        }
+
+        .feedback-loop.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .feedback-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(96, 165, 250, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: rotate 8s linear infinite;
+        }
+
+        .feedback-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: #60a5fa;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .feedback-title {
+            color: #93c5fd;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-desc {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        /* Animation Delays */
+        .flow-card:nth-child(1) { transition-delay: 0.1s; }
+        .flow-card:nth-child(2) { transition-delay: 0.2s; }
+        .flow-card:nth-child(3) { transition-delay: 0.3s; }
+        .flow-card:nth-child(4) { transition-delay: 0.4s; }
+
+        .h-arrow:nth-child(1) { transition-delay: 0.3s; }
+        .h-arrow:nth-child(2) { transition-delay: 0.5s; }
+        .h-arrow:nth-child(3) { transition-delay: 0.7s; }
+
+        /* Phase Labels for Mobile */
+        .mobile-phase-label {
+            display: block;
+            color: #60a5fa;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        @media (min-width: 600px) {
+            .mobile-phase-label {
+                display: none;
+            }
+        }
+
+        /* Article Navigation */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 3rem;
+        }
+
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2d5a87;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .article-nav a:hover {
+            color: #1e3a5f;
+        }
+
+        /* Back to Articles */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .article-hero {
+                padding: 6rem 1rem 3rem;
+            }
+
+            .article-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .article-content {
+                padding: 3rem 1rem;
+            }
+
+            .article-body {
+                font-size: 1rem;
+            }
+
+            .flow-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .diagram-section {
+                padding: 2rem 1rem;
+                margin: 2rem -1rem;
+            }
+
+            .flow-card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li><a href="articles.html" class="nav-link">Articles</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Hero -->
+    <section class="article-hero">
+        <div class="container">
+            <a href="articles.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Articles
+            </a>
+            <span class="article-category">Data Center Operations</span>
+            <h1 class="article-title">When Nothing Happens, Engineering Is Working</h1>
+            <p class="article-subtitle">In critical infrastructure, success is defined by the absence of events. This journal documents the work required to make that absence possible.</p>
+            <div class="article-meta">
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    8 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    December 6, 2025
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Bagus Dwi Permana
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
+    <article class="article-content">
+        <div class="container">
+            <div class="article-body">
+                <p>A data center that operates reliably does not announce itself. No alarms. No outages. No drama. Yet these non-events are engineered through continuous operational decisions.</p>
+
+                <blockquote>
+                    "Reliability is not a feature. It is a process. Systems do not remain reliable by design alone, but by daily human and organizational effort."
+                </blockquote>
+
+                <p>This journal bridges operational reality with engineering theory—showing how principles from safety science, resilience engineering, and international standards are applied in live environments.</p>
+
+                <h2>The Operational Journal Concept</h2>
+
+                <p>Understanding how data center operations flow from design to reality requires a systematic view. The following diagram illustrates this journey—from initial design standards through commissioning, into live operations, and ultimately back into organizational learning.</p>
+
+                <!-- Responsive Flow Diagram -->
+                <div class="diagram-section" id="flowDiagram">
+                    <div class="diagram-header">
+                        <h3 class="diagram-title">Operational Journal Concept Flow</h3>
+                        <p class="diagram-subtitle">From design assumptions to operational truth — then captured back into learning</p>
+                    </div>
+
+                    <div class="flow-container">
+                        <!-- Phase 1: Design & Build -->
+                        <div class="flow-phase">
+                            <div class="phase-header">
+                                <span class="phase-chip">Phase 1: As Designed & Commissioned</span>
+                                <div class="phase-line"></div>
+                            </div>
+                            <div class="flow-cards flow-row-1">
+                                <div class="flow-card" data-step="1">
+                                    <span class="card-number">01</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Design & Standards</h4>
+                                    <p class="card-desc">Intent, topology, codes & assumptions that define the facility blueprint</p>
+                                </div>
+                                <div class="flow-card" data-step="2">
+                                    <span class="card-number">02</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                            <polyline points="22 4 12 14.01 9 11.01"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Commissioning & Handover</h4>
+                                    <p class="card-desc">Configuration, testing, documentation & identifying known gaps</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Horizontal Arrows -->
+                        <div class="flow-arrows">
+                            <div class="h-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Vertical Connector -->
+                        <div class="flow-connector">
+                            <div class="connector-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 5v14M5 12l7 7 7-7"/>
+                                </svg>
+                                <span class="connector-text">Transition to Live</span>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2: Operations -->
+                        <div class="flow-phase">
+                            <div class="phase-header">
+                                <span class="phase-chip">Phase 2: As Operated</span>
+                                <div class="phase-line"></div>
+                            </div>
+                            <div class="flow-cards flow-row-1">
+                                <div class="flow-card" data-step="3">
+                                    <span class="card-number">03</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                            <line x1="8" y1="21" x2="16" y2="21"/>
+                                            <line x1="12" y1="17" x2="12" y2="21"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Live Operations Reality</h4>
+                                    <p class="card-desc">Constraints, load patterns, people factors & real-world variability</p>
+                                </div>
+                                <div class="flow-card" data-step="4">
+                                    <span class="card-number">04</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                            <line x1="12" y1="9" x2="12" y2="13"/>
+                                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Operational Problem</h4>
+                                    <p class="card-desc">Signal emerges from noise — risk identified requiring attention</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vertical Connector -->
+                        <div class="flow-connector">
+                            <div class="connector-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 5v14M5 12l7 7 7-7"/>
+                                </svg>
+                                <span class="connector-text">Analysis & Response</span>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3: Resolution -->
+                        <div class="flow-phase">
+                            <div class="phase-header">
+                                <span class="phase-chip">Phase 3: Verified & Improved</span>
+                                <div class="phase-line"></div>
+                            </div>
+                            <div class="flow-cards flow-row-2">
+                                <div class="flow-card" data-step="5">
+                                    <span class="card-number">05</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"/>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Structured Analysis</h4>
+                                    <p class="card-desc">RCA, human factors assessment & risk-based thinking</p>
+                                </div>
+                                <div class="flow-card" data-step="6">
+                                    <span class="card-number">06</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Controlled Intervention</h4>
+                                    <p class="card-desc">MOC process, procedures update & validated controls</p>
+                                </div>
+                                <div class="flow-card" data-step="7">
+                                    <span class="card-number">07</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                            <polyline points="9 12 11 14 15 10"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Verified Outcome</h4>
+                                    <p class="card-desc">Evidence-based testing & acceptance criteria met</p>
+                                </div>
+                                <div class="flow-card" data-step="8">
+                                    <span class="card-number">08</span>
+                                    <div class="card-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="card-title">Knowledge Capture</h4>
+                                    <p class="card-desc">SOP updates, training revision & feedback integration</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Horizontal Arrows for Row 2 -->
+                        <div class="flow-arrows" style="margin-top: -0.5rem;">
+                            <div class="h-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <div class="h-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <div class="h-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Loop -->
+                        <div class="feedback-loop">
+                            <div class="feedback-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <polyline points="1 20 1 14 7 14"/>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                                </svg>
+                            </div>
+                            <h4 class="feedback-title">Continuous Improvement Feedback Loop</h4>
+                            <p class="feedback-desc">Knowledge captured feeds back into Design & Standards, improving future operations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>The Eight Stages Explained</h2>
+
+                <h3>1. Design & Standards</h3>
+                <p>Every data center begins with intent. Design documents capture topology, capacity planning, redundancy schemes, and code compliance. These represent assumptions about how the facility will perform—but they are not yet reality.</p>
+
+                <h3>2. Commissioning & Handover</h3>
+                <p>During commissioning, systems are configured, tested, and documented. Known gaps are identified. This phase validates that equipment meets specifications, but it cannot predict how systems will behave under real operational stress.</p>
+
+                <h3>3. Live Operations Reality</h3>
+                <p>Once a facility goes live, operational constraints emerge. Load patterns, human factors, maintenance windows, and unexpected variables create the true operating environment. This is where design meets reality.</p>
+
+                <h3>4. Operational Problem</h3>
+                <p>Problems surface as signals in noise. A recurring alarm, an efficiency drop, or a near-miss incident indicates that something requires attention. Recognizing these signals early is critical to preventing escalation.</p>
+
+                <div class="highlight-box">
+                    <p><strong>Key Insight:</strong> The gap between "as designed" and "as operated" is where operational engineering truly matters. Bridging this gap requires continuous learning and adaptation.</p>
+                </div>
+
+                <h3>5. Structured Analysis</h3>
+                <p>Root cause analysis, human factors assessment, and risk-based thinking drive understanding. This isn't about blame—it's about learning. Why did this happen? What conditions allowed it? How can we prevent recurrence?</p>
+
+                <h3>6. Controlled Intervention</h3>
+                <p>Changes are implemented through Management of Change (MOC) processes. Procedures are updated. Validation ensures that interventions don't introduce new risks. Control is maintained throughout.</p>
+
+                <h3>7. Verified Outcome</h3>
+                <p>Evidence confirms success. Testing validates that changes achieved their intended effect. Acceptance criteria are met. The problem is resolved—not assumed resolved, but proven resolved.</p>
+
+                <h3>8. Knowledge Capture & Feedback</h3>
+                <p>Finally, lessons learned are documented. SOPs are updated. Training materials are revised. This knowledge feeds back into design standards, completing the cycle and improving future operations.</p>
+
+                <h2>Why This Matters</h2>
+
+                <p>In critical infrastructure, the work of keeping things running is largely invisible. When everything works, no one notices. But this absence of failure is not accidental—it is the result of disciplined operational engineering.</p>
+
+                <blockquote>
+                    "The measure of operational excellence is not the problems you solve, but the problems you prevent."
+                </blockquote>
+
+                <p>This journal will continue to document real operational cases, applying these principles to show how theory translates into practice. Each entry will bridge the gap between academic frameworks and the daily decisions that keep critical infrastructure running.</p>
+
+                <div class="article-nav">
+                    <a href="articles.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        All Articles
+                    </a>
+                    <span style="color: #9ca3af;">Article 1 of 1</span>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 Bagus Dwi Permana. All rights reserved.</p>
+                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Intersection Observer for Flow Diagram Animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const flowDiagram = document.getElementById('flowDiagram');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.2
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Animate cards
+                        const cards = entry.target.querySelectorAll('.flow-card');
+                        cards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.classList.add('visible');
+                            }, index * 150);
+                        });
+
+                        // Animate connectors
+                        const connectors = entry.target.querySelectorAll('.connector-arrow');
+                        connectors.forEach((connector, index) => {
+                            setTimeout(() => {
+                                connector.classList.add('visible');
+                            }, 400 + index * 300);
+                        });
+
+                        // Animate horizontal arrows
+                        const hArrows = entry.target.querySelectorAll('.h-arrow');
+                        hArrows.forEach((arrow, index) => {
+                            setTimeout(() => {
+                                arrow.classList.add('visible');
+                            }, 300 + index * 200);
+                        });
+
+                        // Animate feedback loop
+                        const feedback = entry.target.querySelector('.feedback-loop');
+                        if (feedback) {
+                            setTimeout(() => {
+                                feedback.classList.add('visible');
+                            }, 1500);
+                        }
+
+                        // Stop observing after animation
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            if (flowDiagram) {
+                observer.observe(flowDiagram);
+            }
+        });
+    </script>
+</body>
+</html>

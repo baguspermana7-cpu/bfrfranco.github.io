@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles | Bagus Dwi Permana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Articles Page Styles */
+        .articles-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 50%, #2d5a87 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .articles-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(96, 165, 250, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .articles-hero > * { position: relative; z-index: 1; }
+        .articles-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            color: #fff;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        .articles-hero p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        /* Philosophy Section */
+        .philosophy-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 4rem 2rem;
+        }
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .philosophy-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #2d5a87;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        .philosophy-card:nth-child(1) { animation-delay: 0.1s; }
+        .philosophy-card:nth-child(2) { animation-delay: 0.2s; }
+        .philosophy-card:nth-child(3) { animation-delay: 0.3s; }
+        .philosophy-card h3 {
+            color: #1e3a5f;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .philosophy-card h3 span {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2d5a87 0%, #3a7ca5 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.25rem;
+        }
+        .philosophy-card p {
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        /* Framework Section */
+        .framework-section {
+            background: linear-gradient(135deg, #0b1220 0%, #1e293b 100%);
+            padding: 4rem 2rem;
+            color: #fff;
+        }
+        .framework-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .framework-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 3rem;
+        }
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .framework-item {
+            background: rgba(45, 90, 135, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        .framework-item:nth-child(1) { animation-delay: 0.1s; }
+        .framework-item:nth-child(2) { animation-delay: 0.2s; }
+        .framework-item:nth-child(3) { animation-delay: 0.3s; }
+        .framework-item:nth-child(4) { animation-delay: 0.4s; }
+        .framework-item:hover {
+            background: rgba(45, 90, 135, 0.5);
+            transform: translateY(-4px);
+            border-color: #60a5fa;
+        }
+        .framework-item .num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+        .framework-item .label {
+            font-size: 0.9rem;
+            color: #e5e7eb;
+            font-weight: 600;
+        }
+        .framework-item .desc {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* Articles Section */
+        .articles-section {
+            padding: 4rem 2rem;
+            background: var(--gray-100);
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-header h2 {
+            font-size: 2rem;
+            color: #1e3a5f;
+            margin-bottom: 0.5rem;
+        }
+        .section-header p {
+            color: #64748b;
+        }
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .article-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        .article-card:nth-child(1) { animation-delay: 0.1s; }
+        .article-card:nth-child(2) { animation-delay: 0.15s; }
+        .article-card:nth-child(3) { animation-delay: 0.2s; }
+        .article-card:nth-child(4) { animation-delay: 0.25s; }
+        .article-card:nth-child(5) { animation-delay: 0.3s; }
+        .article-card:nth-child(6) { animation-delay: 0.35s; }
+        .article-card:nth-child(7) { animation-delay: 0.4s; }
+        .article-card:nth-child(8) { animation-delay: 0.45s; }
+        .article-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        .article-card-image {
+            height: 180px;
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .article-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .article-card:hover .article-card-image img {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .article-card-number {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .article-card-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .article-card-category {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+        .cat-operations { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+        .cat-alarm { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .cat-asset { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        .cat-capability { background: rgba(99, 102, 241, 0.1); color: #4f46e5; }
+        .cat-risk { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+        .cat-learning { background: rgba(56, 189, 248, 0.1); color: #0284c7; }
+        .cat-resilience { background: rgba(34, 197, 94, 0.1); color: #16a34a; }
+        .cat-safety { background: rgba(168, 85, 247, 0.1); color: #9333ea; }
+        .article-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        .article-card-excerpt {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+        .article-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+        .article-card-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-card-link {
+            color: #2d5a87;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: color 0.3s ease;
+        }
+        .article-card-link:hover { color: #1e3a5f; }
+        .article-card-link svg { transition: transform 0.3s ease; }
+        .article-card:hover .article-card-link svg { transform: translateX(4px); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .articles-hero { padding: 6rem 1rem 3rem; }
+            .articles-grid { grid-template-columns: 1fr; }
+            .framework-grid { grid-template-columns: repeat(2, 1fr); }
+            .philosophy-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="#" class="nav-link">
+                        Telemetry
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="EPMS_Telemetry.html">EPMS</a></li>
+                        <li><a href="datahall.html">Datahall</a></li>
+                        <li><a href="chiller-plant.html">Chiller Plant</a></li>
+                        <li><a href="fire-system.html">Fire System</a></li>
+                        <li><a href="fuel-system.html">Fuel System</a></li>
+                        <li><a href="water-system.html">Water System</a></li>
+                        <li><a href="ict.html">ICT</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li><a href="articles.html" class="nav-link active">Articles</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="articles-hero">
+        <div class="container">
+            <h1>Operations Engineering Journal</h1>
+            <p>A systematic exploration of reliability, resilience, and human factors in mission-critical data center operations. Each article connects real operational challenges with safety science and engineering principles.</p>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="philosophy-section">
+        <div class="container">
+            <div class="philosophy-grid">
+                <div class="philosophy-card">
+                    <h3><span>1</span> Systems Over Symptoms</h3>
+                    <p>When problems recur, we look beyond individual events to the system conditions that made them possible. Sustainable improvement comes from redesigning systems, not blaming people.</p>
+                </div>
+                <div class="philosophy-card">
+                    <h3><span>2</span> Evidence Over Intuition</h3>
+                    <p>Every claim is grounded in operational data, safety science literature, or documented case patterns. We distinguish what we know from what we assume.</p>
+                </div>
+                <div class="philosophy-card">
+                    <h3><span>3</span> Practice Over Theory</h3>
+                    <p>These articles emerge from live operations—real constraints, real decisions, real consequences. Theory informs practice; practice validates theory.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Framework Section -->
+    <section class="framework-section">
+        <div class="container">
+            <h2 class="framework-title">The Operational Excellence Framework</h2>
+            <p class="framework-subtitle">Four pillars that connect all articles in this journal</p>
+            <div class="framework-grid">
+                <div class="framework-item">
+                    <div class="num">I</div>
+                    <div class="label">Human Factors</div>
+                    <div class="desc">Cognitive load, attention, and human-system interaction</div>
+                </div>
+                <div class="framework-item">
+                    <div class="num">II</div>
+                    <div class="label">System Design</div>
+                    <div class="desc">Workflows, governance, and control structures</div>
+                </div>
+                <div class="framework-item">
+                    <div class="num">III</div>
+                    <div class="label">Risk Management</div>
+                    <div class="desc">Technical debt, latent conditions, and drift</div>
+                </div>
+                <div class="framework-item">
+                    <div class="num">IV</div>
+                    <div class="label">Organizational Learning</div>
+                    <div class="desc">RCA, feedback loops, and continuous improvement</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles Section -->
+    <section class="articles-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Published Articles</h2>
+                <p>Click any article to read the full analysis with interactive diagrams</p>
+            </div>
+
+            <div class="articles-grid">
+                <!-- Article 1 -->
+                <a href="article-1.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-1-cover.png" alt="Data Center Operations">
+                        <span class="article-card-number">01</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-operations">Data Center Operations</span>
+                        <h3 class="article-card-title">When Nothing Happens, Engineering Is Working</h3>
+                        <p class="article-card-excerpt">In critical infrastructure, success is defined by the absence of events. This documents the work required to make that absence possible.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Dec 6, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 2 -->
+                <a href="article-2.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-2-cover.png" alt="Alarm Management">
+                        <span class="article-card-number">02</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-alarm">Alarm Management</span>
+                        <h3 class="article-card-title">Alarm Fatigue Is Not a Human Problem</h3>
+                        <p class="article-card-excerpt">Alarm fatigue is often misattributed to human negligence. In mission-critical environments, this interpretation is both inaccurate and dangerous.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Dec 7, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 3 -->
+                <a href="article-3.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-3-cover.png" alt="Maintenance Compliance">
+                        <span class="article-card-number">03</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-asset">Asset Management</span>
+                        <h3 class="article-card-title">Maintenance Compliance Is Not a Technician Problem</h3>
+                        <p class="article-card-excerpt">Sustained compliance is an emergent property of workflow engineering, human factors, and asset governance—not individual discipline.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Nov 30, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 4 -->
+                <a href="article-4.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-4-cover.png" alt="In-House Capability">
+                        <span class="article-card-number">04</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-capability">Capability Development</span>
+                        <h3 class="article-card-title">In-House Capability Is a Reliability Strategy</h3>
+                        <p class="article-card-excerpt">Excessive vendor dependency increases latent risk. Decision latency becomes the real failure mode—not component failure.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Nov 25, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 5 -->
+                <a href="article-5.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-5-cover.png" alt="Technical Debt">
+                        <span class="article-card-number">05</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-risk">Risk Management</span>
+                        <h3 class="article-card-title">Technical Debt in Live Data Centers Is Operational Risk</h3>
+                        <p class="article-card-excerpt">Temporary fixes, deferred decisions, and workaround culture silently erode resilience. Debt accrues interest over time.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Nov 20, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 6 -->
+                <a href="article-6.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-6-cover.png" alt="RCA Design Authority">
+                        <span class="article-card-number">06</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-learning">Incident Learning</span>
+                        <h3 class="article-card-title">Why Post-Incident RCA Fails Without Design Authority</h3>
+                        <p class="article-card-excerpt">When RCA findings cannot modify system architecture, workflows, or decision boundaries, RCA becomes reporting ritual.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Nov 15, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 7 -->
+                <a href="article-7.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-7-cover.png" alt="Reliability to Resilience">
+                        <span class="article-card-number">07</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-resilience">Resilience Engineering</span>
+                        <h3 class="article-card-title">From Reliability to Resilience: Why Tier Ratings Stop at Design</h3>
+                        <p class="article-card-excerpt">Tier ratings describe what systems can survive, not how organizations will respond. Resilience is an operational achievement.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Nov 10, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Article 8 -->
+                <a href="article-8.html" class="article-card">
+                    <div class="article-card-image">
+                        <img src="assets/article-8-cover.png" alt="No Incident Not Safety">
+                        <span class="article-card-number">08</span>
+                    </div>
+                    <div class="article-card-content">
+                        <span class="article-card-category cat-safety">Safety Science</span>
+                        <h3 class="article-card-title">Why "No Incident" Is Not Evidence of Safety</h3>
+                        <p class="article-card-excerpt">Safety lives in signals that precede failure, not in the absence of visible harm. Weak signals accumulate while dashboards stay green.</p>
+                        <div class="article-card-meta">
+                            <span class="article-card-date">Nov 5, 2025</span>
+                            <span class="article-card-link">Read Article <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
+                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

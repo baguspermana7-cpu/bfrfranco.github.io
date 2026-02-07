@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article 7 - From Reliability to Resilience: Why Tier Ratings Stop at Design | Bagus Dwi Permana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .article-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('assets/article-7-cover.png') center/cover no-repeat;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        .article-hero > * { position: relative; z-index: 1; }
+        .article-hero .container { max-width: 900px; }
+        .article-category {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #fff;
+        }
+        .article-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+        }
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-content {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+        .article-content .container { max-width: 800px; }
+        .article-body {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: #374151;
+        }
+        .article-body p { margin-bottom: 1.75rem; }
+        .article-body h2 {
+            font-size: 1.75rem;
+            color: #1e3a5f;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e5e7eb;
+        }
+        .article-body h3 {
+            font-size: 1.375rem;
+            color: #2d5a87;
+            margin: 2rem 0 1rem;
+        }
+        .article-body blockquote {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left: 4px solid #22c55e;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #166534;
+        }
+        .article-body ul, .article-body ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .article-body li { margin-bottom: 0.75rem; }
+        .highlight-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .highlight-box p {
+            margin: 0;
+            color: #1e40af;
+            font-weight: 500;
+        }
+        .comparison-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border: 1px solid #e2e8f0;
+        }
+        .comparison-box h4 {
+            color: #1e3a5f;
+            margin-bottom: 1rem;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .comparison-col h5 {
+            color: #2d5a87;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .comparison-col ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            font-size: 0.95rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: #fff; }
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2d5a87;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .article-nav a:hover { color: #1e3a5f; }
+        .references {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        .references h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .references ul {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* Interactive Chart */
+        .chart-container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-title {
+            text-align: center;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .chart-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-wrapper {
+            background: rgba(2, 6, 23, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .control-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .control-slider {
+            width: 200px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #22c55e;
+            cursor: pointer;
+        }
+        .control-value {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .callout-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .callout-card {
+            background: rgba(30, 58, 95, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(34, 197, 94, 0.15);
+        }
+        .callout-label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .callout-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #22c55e;
+        }
+
+        @media (max-width: 768px) {
+            .article-hero { padding: 6rem 1rem 3rem; }
+            .article-meta { flex-direction: column; gap: 1rem; }
+            .article-content { padding: 3rem 1rem; }
+            .article-body { font-size: 1rem; }
+            .chart-container { padding: 1rem; }
+            .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li><a href="articles.html" class="nav-link">Articles</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="article-hero">
+        <div class="container">
+            <a href="articles.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Articles
+            </a>
+            <span class="article-category">Resilience Engineering</span>
+            <h1 class="article-title">From Reliability to Resilience: Why Tier Ratings Stop at Design</h1>
+            <p class="article-subtitle">How operational resilience emerges beyond redundancy, uptime metrics, and static architectures.</p>
+            <div class="article-meta">
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    10 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    November 10, 2025
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Bagus Dwi Permana
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <article class="article-content">
+        <div class="container">
+            <div class="article-body">
+                <h2>Abstract</h2>
+                <p>Data center reliability has traditionally been framed through design constructs: redundancy, fault tolerance, and tier certification. While these constructs are necessary, they are insufficient to explain why similarly designed facilities perform very differently under stress.</p>
+
+                <blockquote>
+                    "Two Tier III data centers can pass the same certification, share the same topology, and meet identical SLAs. Yet when reality intrudes—weather, human error, partial failures—one bends and recovers, while the other breaks. The difference is not reliability. It is resilience."
+                </blockquote>
+
+                <h2>1. Reliability: A Design-Time Promise</h2>
+                <p>Reliability is fundamentally a probabilistic promise made at design time. Redundancy, fault tolerance, and component availability define how often systems are expected to fail under assumed conditions. Tier ratings formalize this promise.</p>
+
+                <p>They describe what the system <em>can</em> survive, not how the organization <em>will</em> respond.</p>
+
+                <h2>2. The Blind Spot in Tier-Based Thinking</h2>
+                <p>Tier certification evaluates topology, maintainability, and separation. It does not evaluate:</p>
+                <ul>
+                    <li>Decision latency</li>
+                    <li>Operational cognition</li>
+                    <li>Recovery adaptability</li>
+                    <li>Learning capability</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>Critical Gap:</strong> Tier ratings end precisely where real operations begin.</p>
+                </div>
+
+                <h2>3. Resilience Engineering Perspective</h2>
+                <p>Resilience engineering defines success not as absence of failure, but as the ability to sustain function under varying conditions. Hollnagel identifies four core abilities:</p>
+                <ul>
+                    <li><strong>Respond</strong> — to the actual</li>
+                    <li><strong>Monitor</strong> — the critical</li>
+                    <li><strong>Anticipate</strong> — the potential</li>
+                    <li><strong>Learn</strong> — from the past</li>
+                </ul>
+                <p>None of these can be fully specified in drawings. They must be enacted in real time.</p>
+
+                <h2>4. Reliability vs Resilience Comparison</h2>
+
+                <div class="comparison-box">
+                    <h4>Two Paradigms</h4>
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h5>Reliability (Design)</h5>
+                            <ul>
+                                <li>Minimize failure probability</li>
+                                <li>Static architecture focus</li>
+                                <li>Component-level thinking</li>
+                                <li>Predictable scenarios</li>
+                                <li>Certification-driven</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h5>Resilience (Operations)</h5>
+                            <ul>
+                                <li>Minimize failure impact</li>
+                                <li>Adaptive response focus</li>
+                                <li>System-level thinking</li>
+                                <li>Unanticipated scenarios</li>
+                                <li>Capability-driven</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>5. Interactive: Disturbance vs Recovery Performance</h2>
+                <p>This simulation compares how reliable-only systems vs resilient systems perform under varying disturbance intensities:</p>
+
+                <!-- Interactive Chart -->
+                <div class="chart-container">
+                    <div class="chart-title">Disturbance Intensity vs Recovery Performance</div>
+                    <div class="chart-subtitle">Resilient systems maintain performance better under stress</div>
+
+                    <div class="chart-wrapper">
+                        <canvas id="resilienceChart" class="chart-canvas" width="800" height="380"></canvas>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="control-label">Disturbance Intensity:</span>
+                        <input type="range" id="disturbSlider" class="control-slider" min="0" max="100" value="40">
+                        <span class="control-value" id="disturbValue">40%</span>
+                    </div>
+
+                    <div class="legend-row">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #38bdf8;"></span>
+                            Reliable-Only System
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #22c55e;"></span>
+                            Resilient System
+                        </div>
+                    </div>
+
+                    <div class="callout-row">
+                        <div class="callout-card">
+                            <div class="callout-label">Reliable-Only Avg</div>
+                            <div class="callout-value" id="relAvg" style="color: #38bdf8;">56%</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Resilient Avg</div>
+                            <div class="callout-value" id="resAvg">78%</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Performance Gap</div>
+                            <div class="callout-value" id="perfGap">+22pp</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>6. Case Pattern: Identical Design, Divergent Outcomes</h2>
+                <p>Across comparable sites, the same pattern repeats: identical redundancy, identical vendors, identical maintenance plans. Yet under stress: one site isolates faults decisively, the other escalates uncertainty.</p>
+
+                <p>The differentiator is not equipment. It is operational coherence.</p>
+
+                <h2>7. Human Factors and Adaptive Capacity</h2>
+                <p>Human operators are often framed as reliability risks. Resilience reframes them as adaptive resources. When systems are designed to support adaptation, human performance stabilizes the system. When systems constrain adaptation, human performance becomes a liability.</p>
+
+                <h2>8. Measuring Resilience</h2>
+                <p>Traditional KPIs focus on uptime and incident counts. Resilience metrics focus on:</p>
+                <ul>
+                    <li><strong>MTTR distribution</strong> — not just averages</li>
+                    <li><strong>Decision latency</strong> — time to first action</li>
+                    <li><strong>Recurrence suppression</strong> — learning effectiveness</li>
+                    <li><strong>Learning velocity</strong> — time from incident to improvement</li>
+                </ul>
+                <p>These metrics reveal behavior under stress, not just performance at rest.</p>
+
+                <h2>9. Designing for Resilience</h2>
+                <p>Resilience does not replace reliability. It extends it. Robust organizations:</p>
+                <ul>
+                    <li>Treat tier design as a foundation</li>
+                    <li>Engineer operational cognition</li>
+                    <li>Manage technical debt</li>
+                    <li>Empower redesign through RCA</li>
+                </ul>
+
+                <h2>10. Conclusion</h2>
+                <blockquote>
+                    "Tier ratings are necessary. They are not sufficient. Reliability is a design attribute. Resilience is an operational achievement. Organizations that recognize this distinction move from uptime-focused thinking to sustained performance under uncertainty."
+                </blockquote>
+
+                <div class="references">
+                    <h3>References</h3>
+                    <ul>
+                        <li>Hollnagel, E. (2014). Safety-I and Safety-II: The Past and Future of Safety Management.</li>
+                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents.</li>
+                        <li>Leveson, N. (2011). Engineering a Safer World.</li>
+                        <li>ISO 22301. (2019). Business Continuity Management Systems.</li>
+                        <li>Weick, K. E., & Sutcliffe, K. M. (2015). Managing the Unexpected.</li>
+                    </ul>
+                </div>
+
+                <div class="article-nav">
+                    <a href="article-6.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Previous Article
+                    </a>
+                    <a href="article-8.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
+                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+    (function() {
+        const canvas = document.getElementById('resilienceChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const disturbSlider = document.getElementById('disturbSlider');
+        const disturbValue = document.getElementById('disturbValue');
+        const relAvg = document.getElementById('relAvg');
+        const resAvg = document.getElementById('resAvg');
+        const perfGap = document.getElementById('perfGap');
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+
+        const W = rect.width;
+        const H = rect.height;
+        const padding = { top: 50, right: 60, bottom: 60, left: 80 };
+        const chartW = W - padding.left - padding.right;
+        const chartH = H - padding.top - padding.bottom;
+
+        function simulate(disturbance) {
+            let reliable = [], resilient = [];
+            let relBase = 80 - disturbance * 0.6;
+            let resBase = 90 - disturbance * 0.3;
+
+            for (let i = 0; i < 10; i++) {
+                reliable.push(relBase + Math.sin(i) * 5);
+                resilient.push(resBase + Math.sin(i) * 2);
+            }
+            return { reliable, resilient };
+        }
+
+        function drawChart(disturbance) {
+            ctx.clearRect(0, 0, W, H);
+
+            // Background
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.5)';
+            ctx.fillRect(0, 0, W, H);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(W - padding.right, y);
+                ctx.stroke();
+            }
+
+            // Y-axis labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            ctx.font = '12px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                const val = 100 - i * 20;
+                ctx.fillText(val + '%', padding.left - 10, y + 4);
+            }
+
+            // Y-axis title
+            ctx.save();
+            ctx.translate(25, H / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Recovery Quality (%)', 0, 0);
+            ctx.restore();
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            for (let i = 0; i < 10; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                ctx.fillText('T' + (i + 1), x, H - padding.bottom + 25);
+            }
+
+            // X-axis title
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Time', W / 2, H - 15);
+
+            // Get data
+            const { reliable, resilient } = simulate(disturbance);
+
+            // Draw reliable line (blue)
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            for (let i = 0; i < reliable.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (reliable[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw resilient line (green)
+            ctx.strokeStyle = '#22c55e';
+            ctx.beginPath();
+            for (let i = 0; i < resilient.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (resilient[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw points
+            ctx.fillStyle = '#38bdf8';
+            for (let i = 0; i < reliable.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (reliable[i] / 100) * chartH;
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = '#22c55e';
+            for (let i = 0; i < resilient.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (resilient[i] / 100) * chartH;
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // End labels
+            const lastRel = reliable[reliable.length - 1];
+            const lastRes = resilient[resilient.length - 1];
+            const lastX = padding.left + chartW;
+
+            ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText(Math.round(lastRel) + '%', lastX + 8, padding.top + chartH - (lastRel / 100) * chartH + 4);
+            ctx.fillStyle = '#22c55e';
+            ctx.fillText(Math.round(lastRes) + '%', lastX + 8, padding.top + chartH - (lastRes / 100) * chartH + 4);
+
+            // Update callouts
+            const avgRel = reliable.reduce((a, b) => a + b, 0) / reliable.length;
+            const avgRes = resilient.reduce((a, b) => a + b, 0) / resilient.length;
+            relAvg.textContent = Math.round(avgRel) + '%';
+            resAvg.textContent = Math.round(avgRes) + '%';
+            perfGap.textContent = '+' + Math.round(avgRes - avgRel) + 'pp';
+        }
+
+        function refresh() {
+            const disturb = parseInt(disturbSlider.value);
+            disturbValue.textContent = disturb + '%';
+            drawChart(disturb);
+        }
+
+        disturbSlider.addEventListener('input', refresh);
+        refresh();
+
+        window.addEventListener('resize', function() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            refresh();
+        });
+    })();
+    </script>
+</body>
+</html>

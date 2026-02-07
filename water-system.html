@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Water Treatment Room - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --neon-blue: #00f2ff; --neon-green: #3dfc16; }
+        body { background: #020617; color: #f8fafc; font-family: 'JetBrains Mono', monospace; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .flow-path { fill: none; stroke: #1e293b; stroke-width: 4; }
+        .flow-active { stroke: var(--neon-blue); stroke-dasharray: 10; animation: flowAnim 1s linear infinite; filter: drop-shadow(0 0 5px var(--neon-blue)); }
+        @keyframes flowAnim { to { stroke-dashoffset: -20; } }
+        /* Fix Spinner Poros Tengah */
+        .pump-spinner { transform-box: fill-box; transform-origin: center; animation: spin 3s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .tech-label { fill: #94a3b8; font-size: 9px; text-transform: uppercase; font-weight: bold; }
+        .tech-val { fill: var(--neon-green); font-size: 10px; font-weight: bold; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 uppercase tracking-tighter">
+                Water Treatment Room
+            </h1>
+            <p class="text-[10px] text-slate-500 font-mono">FACILITY MANAGEMENT DASHBOARD | CDFOM CERTIFIED</p>
+        </div>
+        <div class="flex gap-4">
+            <a href="index.html" class="glass px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> BACK TO PORTOFOLIO
+            </a>
+            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2 rounded-xl transition">
+                <i class="fas fa-file-pdf mr-2"></i> EXPORT REPORT
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-5 gap-4 mb-6">
+        <div class="glass p-3 rounded-2xl border-l-4 border-cyan-500">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase">WUE Index</h3>
+            <p class="text-xl font-black text-cyan-400">1.28 <small class="text-[10px]">L/kWh</small></p>
+        </div>
+        <div class="glass p-3 rounded-2xl border-l-4 border-emerald-500">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase">OPEX / m³</h3>
+            <p class="text-xl font-black text-emerald-400">Rp 4.150</p>
+        </div>
+        <div class="glass p-3 rounded-2xl border-l-4 border-green-500">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase">Spec. Power (SEC)</h3>
+            <p class="text-xl font-black text-green-400">0.42 <small class="text-[10px]">kWh/m³</small></p>
+        </div>
+        <div class="glass p-3 rounded-2xl border-l-4 border-blue-500">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase">Yield</h3>
+            <p class="text-xl font-black text-blue-400">1.284 <small class="text-[10px]">m³</small></p>
+        </div>
+        <div class="glass p-3 rounded-2xl border-l-4 border-green-400 text-center">
+            <h3 class="text-[9px] text-slate-500 font-bold uppercase">Status</h3>
+            <p class="text-xs font-bold text-emerald-400 mt-2 tracking-widest">OPTIMAL</p>
+        </div>
+    </div>
+
+    <div class="glass rounded-[40px] p-8 relative border border-slate-800 shadow-2xl mb-6 overflow-hidden">
+        <svg viewBox="0 0 1400 480" class="w-full h-full">
+            <path d="M 0 450 L 120 450 L 120 150 L 250 150 L 250 180" class="flow-path flow-active" />
+            <path d="M 300 330 L 300 420 L 450 420" class="flow-path flow-active" />
+            <path d="M 510 420 L 580 420 L 580 320" class="flow-path flow-active" />
+            <path d="M 640 280 L 720 280 L 720 230" class="flow-path flow-active" />
+            <path d="M 780 190 L 880 190 L 880 220" class="flow-path flow-active" />
+            <path d="M 930 350 L 1050 350" class="flow-path flow-active" /> 
+            <path d="M 1110 350 L 1180 350" class="flow-path flow-active" /> 
+            <path d="M 1280 350 L 1400 350" class="flow-path flow-active" /> 
+
+            <g transform="translate(80, 380)">
+                <rect width="80" height="90" rx="5" fill="#0f172a" stroke="#334155" />
+                <text x="40" y="-10" text-anchor="middle" class="tech-label">Tenant Meter</text>
+                <text x="5" y="25" class="tech-val">F1: 45.2 m³/h</text>
+                <text x="5" y="45" class="tech-val">TDS: 145 ppm</text>
+                <text x="5" y="65" class="tech-val">PRESS: 2.1 bar</text>
+            </g>
+
+            <g transform="translate(250, 180)">
+                <rect width="100" height="150" rx="2" fill="#0f172a" stroke="#475569" stroke-width="2" />
+                <rect width="96" height="118" x="2" y="30" fill="rgba(0, 242, 255, 0.2)" />
+                <text x="50" y="-10" text-anchor="middle" class="tech-label">Raw Tank (SS316)</text>
+                <text x="50" y="85" text-anchor="middle" class="text-xl font-black fill-white">82%</text>
+                <text x="5" y="165" class="tech-label">Temp: 28.4°C</text>
+            </g>
+
+            <g transform="translate(480, 420)">
+                <circle r="30" fill="#020617" stroke="#3dfc16" stroke-width="2" />
+                <g class="pump-spinner">
+                    <line x1="-15" y1="0" x2="15" y2="0" stroke="#3dfc16" stroke-width="3" />
+                    <line x1="0" y1="-15" x2="0" y2="15" stroke="#3dfc16" stroke-width="3" />
+                </g>
+                <text x="40" y="-15" class="tech-label">PB-01: ACTIVE</text>
+                <text x="40" y="0" class="tech-val">SEC: 0.42 kWh/m³</text>
+                <text x="40" y="15" class="tech-val">12.8A | 2950 RPM</text>
+                <text x="40" y="30" class="tech-val">VIB: 0.45 mm/s</text>
+            </g>
+
+            <g transform="translate(550, 240)">
+                <rect width="60" height="80" rx="4" fill="#1e293b" stroke="#3b82f6" />
+                <text x="30" y="-10" text-anchor="middle" class="tech-label">Auto Backwash</text>
+                <text x="5" y="45" class="tech-val">dP: 0.12 Bar</text>
+            </g>
+            <g transform="translate(720, 150)">
+                <rect width="60" height="80" rx="4" fill="#1e293b" stroke="#3b82f6" />
+                <text x="30" y="-10" text-anchor="middle" class="tech-label">Carbon Filter</text>
+                <text x="5" y="45" class="tech-val">pH: 7.2</text>
+            </g>
+            <g transform="translate(850, 180)">
+                <circle r="12" fill="#854d0e" stroke="#eab308" class="animate-pulse" />
+                <text x="15" y="-5" class="tech-label">Cl2 Doser</text>
+                <text x="15" y="10" class="tech-val">0.85 L/h</text>
+            </g>
+
+            <g transform="translate(880, 220)">
+                <rect width="100" height="150" rx="2" fill="#0f172a" stroke="#475569" stroke-width="2" />
+                <rect width="96" height="128" x="2" y="20" fill="rgba(61, 252, 22, 0.2)" />
+                <text x="50" y="-10" text-anchor="middle" class="tech-label">Domestic (SS304)</text>
+                <text x="50" y="85" text-anchor="middle" class="text-xl font-black fill-white">88%</text>
+                <text x="5" y="165" class="tech-label">ORP: 650 mV</text>
+            </g>
+
+            <g transform="translate(1050, 310)">
+                <rect width="60" height="90" rx="30" fill="#1e293b" stroke="#0ea5e9" stroke-width="2" />
+                <text x="30" y="-10" text-anchor="middle" class="tech-label">300L Vessel</text>
+                <text x="10" y="50" class="tech-val">P: 4.2 bar</text>
+            </g>
+            <g transform="translate(1180, 330)">
+                <rect width="100" height="40" rx="20" fill="rgba(188, 19, 254, 0.2)" stroke="#bc13fe" stroke-width="2" class="animate-pulse" />
+                <text x="50" y="-10" text-anchor="middle" class="tech-label">UV Sterilizer</text>
+                <text x="50" y="25" text-anchor="middle" class="tech-val">INT: 99.8%</text>
+            </g>
+        </svg>
+    </div>
+
+    <div class="glass p-6 rounded-[32px] border border-slate-800 shadow-xl">
+        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">
+            <i class="fas fa-chart-line mr-2"></i> System Pressure & Flow Trend (24h)
+        </h3>
+        <canvas id="pressureTrend" height="80"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('pressureTrend').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                datasets: [{
+                    label: 'Pressure (Bar)',
+                    data: [4.1, 4.2, 4.1, 4.0, 4.2, 4.3, 4.5, 4.4, 4.2, 4.2, 4.3, 4.4, 4.5, 4.6, 4.5, 4.3, 4.2, 4.1, 4.2, 4.3, 4.4, 4.3, 4.2, 4.1],
+                    borderColor: '#00f2ff',
+                    backgroundColor: 'rgba(0, 242, 255, 0.1)',
+                    fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#475569', size: 9 } },
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#475569', size: 9 } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

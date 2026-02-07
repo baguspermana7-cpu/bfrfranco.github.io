@@ -1,0 +1,98 @@
+<svg viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maintenance Operating System lifecycle">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+    <style>
+      .title{font:700 22px system-ui,Segoe UI,Roboto,Arial;fill:#e5e7eb}
+      .sub{font:500 13px system-ui,Segoe UI,Roboto,Arial;fill:#94a3b8}
+      .box{fill:#0f172a;stroke:#60a5fa;stroke-width:2;rx:16;filter:url(#shadow)}
+      .txt{font:650 14px system-ui,Segoe UI,Roboto,Arial;fill:#e5e7eb}
+      .hint{font:500 12px system-ui,Segoe UI,Roboto,Arial;fill:#a3b0c2}
+      .arrow{stroke:#94a3b8;stroke-width:2.2;marker-end:url(#arrow);opacity:.95}
+      .loop{stroke:#94a3b8;stroke-width:2.2;fill:none;opacity:.75;marker-end:url(#arrow)}
+      .step{opacity:0}
+      @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+      @keyframes draw{from{stroke-dashoffset:220}to{stroke-dashoffset:0}}
+      .s1{animation:pop .7s ease forwards;animation-delay:.1s}
+      .s2{animation:pop .7s ease forwards;animation-delay:.8s}
+      .s3{animation:pop .7s ease forwards;animation-delay:1.5s}
+      .s4{animation:pop .7s ease forwards;animation-delay:2.2s}
+      .s5{animation:pop .7s ease forwards;animation-delay:2.9s}
+      .s6{animation:pop .7s ease forwards;animation-delay:3.6s}
+      .a1,.a2,.a3,.a4,.a5{stroke-dasharray:220;stroke-dashoffset:220;animation:draw .7s ease forwards}
+      .a1{animation-delay:.55s}
+      .a2{animation-delay:1.25s}
+      .a3{animation-delay:1.95s}
+      .a4{animation-delay:2.65s}
+      .a5{animation-delay:3.35s}
+      .loopPath{stroke-dasharray:520;stroke-dashoffset:520;animation:draw 1.2s ease forwards;animation-delay:4.2s}
+      .loopLbl{opacity:0;animation:pop .7s ease forwards;animation-delay:4.8s}
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="420" fill="url(#bg)"/>
+  <text class="title" x="60" y="62">Maintenance Operating System (MOS) – Lifecycle</text>
+  <text class="sub" x="60" y="86">Designed to preserve ownership, evidence, and control across shift boundaries.</text>
+
+  <!-- Boxes -->
+  <g class="step s1" transform="translate(60,120)">
+    <rect class="box" width="180" height="90"/>
+    <text class="txt" x="18" y="34">Identify Work</text>
+    <text class="hint" x="18" y="58">RCM / criticality</text>
+    <text class="hint" x="18" y="76">OEM intent</text>
+  </g>
+
+  <g class="step s2" transform="translate(260,120)">
+    <rect class="box" width="180" height="90"/>
+    <text class="txt" x="18" y="34">Plan & Schedule</text>
+    <text class="hint" x="18" y="58">windows + risk</text>
+    <text class="hint" x="18" y="76">resource readiness</text>
+  </g>
+
+  <g class="step s3" transform="translate(460,120)">
+    <rect class="box" width="180" height="90"/>
+    <text class="txt" x="18" y="34">Permit & Access</text>
+    <text class="hint" x="18" y="58">PTW, isolation</text>
+    <text class="hint" x="18" y="76">parts/tools ready</text>
+  </g>
+
+  <g class="step s4" transform="translate(660,120)">
+    <rect class="box" width="180" height="90"/>
+    <text class="txt" x="18" y="34">Execute</text>
+    <text class="hint" x="18" y="58">step-by-step SOP</text>
+    <text class="hint" x="18" y="76">named owner</text>
+  </g>
+
+  <g class="step s5" transform="translate(860,120)">
+    <rect class="box" width="180" height="90"/>
+    <text class="txt" x="18" y="34">Verify & Evidence</text>
+    <text class="hint" x="18" y="58">readings + photos</text>
+    <text class="hint" x="18" y="76">acceptance criteria</text>
+  </g>
+
+  <g class="step s6" transform="translate(1060,120)">
+    <rect class="box" width="180" height="90"/>
+    <text class="txt" x="18" y="34">Close & Learn</text>
+    <text class="hint" x="18" y="58">sampling audits</text>
+    <text class="hint" x="18" y="76">update standards</text>
+  </g>
+
+  <!-- Arrows -->
+  <line class="arrow a1" x1="240" y1="165" x2="260" y2="165"/>
+  <line class="arrow a2" x1="440" y1="165" x2="460" y2="165"/>
+  <line class="arrow a3" x1="640" y1="165" x2="660" y2="165"/>
+  <line class="arrow a4" x1="840" y1="165" x2="860" y2="165"/>
+  <line class="arrow a5" x1="1040" y1="165" x2="1060" y2="165"/>
+
+  <!-- Feedback loop -->
+  <path class="loop loopPath" d="M 1140 210 C 1140 330, 180 330, 180 210" />
+  <text class="sub loopLbl" x="420" y="360">Feedback loop: blockers, repeat defects, RCA patterns → improve planning, standards, spares, and access rules</text>
+</svg>

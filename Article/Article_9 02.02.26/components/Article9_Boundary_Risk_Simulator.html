@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Boundary Distance vs Risk</title>
+</head>
+<body>
+<h2>Boundary Distance vs Risk Simulator</h2>
+<p>Move the slider to simulate drift toward system boundaries.</p>
+<input type="range" min="0" max="100" value="30" id="slider"/>
+<canvas id="canvas" width="900" height="300"></canvas>
+<script>
+const c = document.getElementById("canvas");
+const ctx = c.getContext("2d");
+const s = document.getElementById("slider");
+
+function draw(){
+  ctx.clearRect(0,0,900,300);
+  const d = s.value;
+  ctx.fillText("Risk Level", 20, 30);
+  ctx.fillStyle = d<40 ? "green" : d<70 ? "orange" : "red";
+  ctx.fillRect(100,150,d*6,40);
+  ctx.strokeRect(100,150,600,40);
+}
+s.oninput = draw;
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,1740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DC Cooling | BMS Mimic (CH-1..CH-4)</title>
+<style>
+  :root{
+    --bg:#02040a;
+    --panel:rgba(10, 15, 25, 0.95);
+    --grid:rgba(255,255,255,.04);
+
+    --text:#d6e2ff;
+    --muted:rgba(214,226,255,.72);
+
+    --chws:#0077be;
+    --chwr:#20b2aa;
+    --run:#00ff9a;
+
+    --warn:#ffd166;
+    --alarm:#ff4d6d;
+
+    --shadow:0 18px 60px rgba(0,0,0,.55);
+    --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+
+    /* Outer texts on mimic 50% */
+    --outerScale: .50;
+  }
+
+  html,body{
+    height:100%;
+    background:var(--bg);
+    margin:0;
+    font-family:var(--font);
+    color:var(--text);
+  }
+
+  .wrap{
+    height:100%;
+    display:grid;
+    grid-template-columns:420px 1fr;
+    gap:14px;
+    padding:14px;
+    box-sizing:border-box;
+  }
+
+  /* LEFT */
+  .left{
+    border-radius:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.06);
+    display:flex;
+    flex-direction:column;
+    min-width:360px;
+  }
+  .left .hdr{
+    padding:14px 14px 12px 14px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    background:rgba(0,0,0,.25);
+  }
+  .title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-weight:900;
+    letter-spacing:.3px;
+  }
+  .badge{
+    font-size:11px;
+    padding:4px 8px;
+    border-radius:999px;
+    background:rgba(0,255,255,.10);
+    border:1px solid rgba(0,255,255,.25);
+    color:#7ffcff;
+  }
+  .sub{
+    margin-top:6px;
+    font-size:12px;
+    color:rgba(214,226,255,.75);
+    line-height:1.25;
+  }
+
+  .kpi{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    padding:12px 14px 14px 14px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .kcard{
+    background:rgba(10,15,25,.75);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:14px;
+    padding:10px 10px 9px 10px;
+    position:relative;
+    overflow:hidden;
+  }
+  .klabel{font-size:11px; color:rgba(214,226,255,.70);}
+  .kval{margin-top:6px; font-size:18px; font-weight:900; letter-spacing:.2px;}
+  .kval small{font-size:12px; opacity:.75; font-weight:900;}
+  .kmeta{margin-top:6px; font-size:11px; color:rgba(214,226,255,.60); display:flex; justify-content:space-between;}
+
+  .sparkWrap{
+    margin-top:8px;
+    height:34px;
+    border-radius:10px;
+    background:rgba(255,255,255,.02);
+    border:1px solid rgba(255,255,255,.06);
+    overflow:hidden;
+    position:relative;
+  }
+  canvas.spark{width:100%;height:100%;display:block;}
+  .sparkLegend{
+    position:absolute;
+    right:8px;
+    top:6px;
+    font-size:10px;
+    color:rgba(214,226,255,.65);
+    letter-spacing:.2px;
+    user-select:none;
+  }
+
+  .stack{
+    padding:12px 14px 14px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    overflow:auto;
+    flex:1;
+  }
+  .unit{
+    background:rgba(10,15,25,.75);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:16px;
+    padding:12px;
+  }
+  .uTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .name{font-weight:900; letter-spacing:.3px;}
+  .meta{font-size:11px; color:rgba(214,226,255,.65); margin-top:3px;}
+  .pill{
+    font-size:11px; padding:4px 8px; border-radius:999px;
+    border:1px solid rgba(0,255,154,.25);
+    background:rgba(0,255,154,.08); color:var(--run); white-space:nowrap;
+  }
+  .pill.off{
+    border-color: rgba(120,140,180,.25);
+    background: rgba(120,140,180,.10);
+    color: rgba(214,226,255,.72);
+  }
+  .grid2{margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .kv{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:12px; color:rgba(214,226,255,.72);
+    border-bottom:1px dashed rgba(255,255,255,.08);
+    padding-bottom:6px;
+  }
+  .kv b{color:#d6e2ff;}
+  .kv .ok{color:var(--run); font-weight:900;}
+  .kv .bad{color:var(--alarm); font-weight:900;}
+
+  .compressors{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;}
+  .comp{
+    flex:1; min-width:92px; border-radius:10px;
+    padding:7px 8px; border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.03); font-size:11px;
+    display:flex; align-items:center; justify-content:space-between; gap:6px;
+  }
+  .lamp{width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.15); outline:1px solid rgba(255,255,255,.10);}
+  .lamp.run{background:var(--run); box-shadow:0 0 12px rgba(0,255,154,.55);}
+  .lamp.off{background:rgba(120,140,180,.35); box-shadow:none;}
+
+  /* RIGHT */
+  .right{
+    border-radius:16px;
+    background:radial-gradient(1200px 700px at 50% 15%, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(0,0,0,.15) 100%);
+    box-shadow:var(--shadow);
+    border:1px solid rgba(255,255,255,.06);
+    position:relative;
+    overflow:auto;
+  }
+  .right::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size:40px 40px;
+    opacity:.55;
+    pointer-events:none;
+  }
+
+  .topbar{
+    position:sticky;
+    top:0;
+    margin:12px 14px 0 14px;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .topbar .h1{
+    font-weight:900;
+    letter-spacing:.2px;
+    text-shadow:0 8px 18px rgba(0,0,0,.55);
+    pointer-events:none;
+  }
+  .topbar .hint{
+    font-size:12px;
+    color:rgba(214,226,255,.72);
+    padding:8px 10px;
+    border-radius:12px;
+    background:rgba(10,15,25,.55);
+    border:1px solid rgba(255,255,255,.06);
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .btn{
+    cursor:pointer;
+    user-select:none;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.2px;
+    padding:8px 10px;
+    border-radius:12px;
+    background:rgba(0,255,255,.08);
+    border:1px solid rgba(0,255,255,.22);
+    color:#a6feff;
+    text-decoration:none;
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+  }
+  .btn:hover{
+    background:rgba(0,255,255,.12);
+    border-color:rgba(0,255,255,.35);
+  }
+  .btn.ghost{
+    background:rgba(255,255,255,.04);
+    border-color:rgba(255,255,255,.08);
+    color:rgba(214,226,255,.85);
+  }
+  .btn.ghost:hover{
+    background:rgba(255,255,255,.06);
+    border-color:rgba(255,255,255,.12);
+  }
+
+  .toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.03);
+  }
+  .toggle small{color:rgba(214,226,255,.70); font-weight:900; letter-spacing:.2px;}
+  .switch{
+    width:44px; height:24px;
+    border-radius:999px;
+    background:rgba(120,140,180,.22);
+    border:1px solid rgba(255,255,255,.10);
+    position:relative;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  .knob{
+    width:18px;height:18px;border-radius:50%;
+    position:absolute; top:2px; left:2px;
+    background:rgba(214,226,255,.85);
+    box-shadow:0 8px 20px rgba(0,0,0,.35);
+    transition:.16s ease;
+  }
+  .switch.on{ background:rgba(0,255,154,.18); border-color:rgba(0,255,154,.25); }
+  .switch.on .knob{ left:22px; background:rgba(0,255,154,.95); }
+
+  svg{display:block; width:100%; height:auto; min-height:1180px;}
+
+  .panelBox{
+    fill: var(--panel);
+    stroke: rgba(255,255,255,.08);
+    stroke-width:1;
+  }
+
+  /* Pipes */
+  .pipeBase{
+    fill:none;
+    stroke: rgba(90,110,150,.32);
+    stroke-width: 12;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+  }
+  .pipeFlow{
+    fill:none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 22 18;
+  }
+
+  .flow-chws{
+    stroke: var(--chws);
+    animation: dashChws 1.0s linear infinite;
+    filter: drop-shadow(0 0 12px rgba(0,119,190,.35));
+  }
+  .flow-chwr{
+    stroke: var(--chwr);
+    animation: dashChwr 1.0s linear infinite;
+    filter: drop-shadow(0 0 12px rgba(32,178,170,.32));
+  }
+  @keyframes dashChws { from{stroke-dashoffset: 0;} to{stroke-dashoffset: -86;} }
+  @keyframes dashChwr { from{stroke-dashoffset: 0;} to{stroke-dashoffset: 86;} }
+
+  /* Subtle particles */
+  .pipeParticles{
+    fill:none;
+    stroke-width:2.2;
+    stroke-linecap:round;
+    stroke-dasharray: 1 26;
+    opacity:.65;
+  }
+  .p-chws{ stroke: rgba(0,255,255,.55); animation: dotsChws 1.2s linear infinite; }
+  .p-chwr{ stroke: rgba(98,255,225,.45); animation: dotsChwr 1.2s linear infinite; }
+  @keyframes dotsChws { from{stroke-dashoffset: 0;} to{stroke-dashoffset: -90;} }
+  @keyframes dotsChwr { from{stroke-dashoffset: 0;} to{stroke-dashoffset: 90;} }
+
+  /* Disconnected/broken indicator */
+  .pipeBrokenBase{ stroke: rgba(255,77,109,.55) !important; }
+  .pipeBrokenFlow{
+    stroke: rgba(255,77,109,.95) !important;
+    stroke-dasharray: 10 14 !important;
+    animation: brokenDash .7s linear infinite !important;
+    filter: drop-shadow(0 0 14px rgba(255,77,109,.35)) !important;
+  }
+  .pipeBrokenParticles{
+    stroke: rgba(255,180,195,.85) !important;
+    stroke-dasharray: 1 18 !important;
+    animation: brokenDots .55s linear infinite !important;
+    opacity:.9 !important;
+  }
+  @keyframes brokenDash { from{stroke-dashoffset:0} to{stroke-dashoffset:-48} }
+  @keyframes brokenDots { from{stroke-dashoffset:0} to{stroke-dashoffset:-38} }
+
+  /* Pause animation when sim off */
+  body.simOff .flow-chws,
+  body.simOff .flow-chwr,
+  body.simOff .p-chws,
+  body.simOff .p-chwr{
+    animation-play-state: paused !important;
+    opacity:.35;
+    filter:none;
+  }
+
+  /* Text */
+  .oStrong{font-size: calc(12px * var(--outerScale)); fill:var(--text); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .oLbl{font-size: calc(12px * var(--outerScale)); fill: rgba(214,226,255,.82); letter-spacing:.2px; font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .oTiny{font-size: calc(11px * var(--outerScale)); fill: rgba(214,226,255,.72); paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .iStrong{font-size:12px; fill:var(--text); font-weight:900;}
+  .iTiny{font-size:10px; fill: rgba(214,226,255,.70);}
+
+  /* Label backplates */
+  .plate{
+    fill: rgba(10,15,25,.90);
+    stroke: rgba(255,255,255,.14);
+    stroke-width:1;
+  }
+  .tag{
+    fill: rgba(10,15,25,.94);
+    stroke: rgba(255,255,255,.18);
+    stroke-width:1;
+  }
+  .tagTxt{font-size: calc(10.8px * var(--outerScale)); fill: rgba(214,226,255,.92); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+
+  .instBox{fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.14); stroke-width:1;}
+  .instTxt{font-size: calc(11px * var(--outerScale)); fill: rgba(214,226,255,.84); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .instVal{font-size: calc(12px * var(--outerScale)); fill:var(--text); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+
+  .arrow{ stroke:rgba(255,255,255,.38); stroke-width:1; fill:none; }
+
+  /* Pump symbol */
+  .pumpCircle{ fill: rgba(255,255,255,.03); stroke: rgba(255,255,255,.14); stroke-width:1.2; }
+  .pumpTri{ fill: rgba(120,140,180,.35); }
+  .pumpRun .pumpCircle{ stroke: rgba(0,255,154,.75); }
+  .pumpRun .pumpTri{ fill: var(--run); filter: drop-shadow(0 0 12px rgba(0,255,154,.45)); }
+  .pumpOff .pumpTri{ fill: rgba(120,140,180,.40); }
+  .impeller{ transform-origin: center; animation: spin 1.05s linear infinite; }
+  .pumpOff .impeller{ animation:none; opacity:.30; }
+  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  /* Compressor dots + RUN label */
+  .cDot{fill: rgba(120,140,180,.35); stroke: rgba(255,255,255,.18); stroke-width:1;}
+  .cRun{fill: var(--run); stroke: rgba(0,255,154,.75); stroke-width:1.2; filter: drop-shadow(0 0 12px rgba(0,255,154,.55));}
+  .cTxt{font-size:10px; fill: rgba(214,226,255,.75); font-weight:900;}
+  .cTxt.on{fill: rgba(0,255,154,.92);}
+  .cTxt.off{fill: rgba(214,226,255,.55);}
+
+  /* Hover inspect */
+  .hoverGlow:hover .instBox,
+  .hoverGlow:hover .plate,
+  .hoverGlow:hover .tag{
+    stroke: rgba(0,255,255,.30);
+  }
+  .hoverGlow:hover{
+    filter: drop-shadow(0 0 12px rgba(0,255,255,.14));
+  }
+
+  /* Alarm highlight for loops */
+  .loopNormal .panelBox{ stroke: rgba(255,255,255,.08); }
+  .loopWarn .panelBox{ stroke: rgba(255,209,102,.65); filter: drop-shadow(0 0 14px rgba(255,209,102,.18)); }
+  .loopAlarm .panelBox{ stroke: rgba(255,77,109,.75); filter: drop-shadow(0 0 16px rgba(255,77,109,.20)); }
+
+  /* Alarm strip overlay */
+  .alarmStrip{
+    position:sticky;
+    bottom:0;
+    z-index:30;
+    margin:0 14px 14px 14px;
+    border-radius:14px;
+    background:rgba(10,15,25,.75);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 18px 60px rgba(0,0,0,.45);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    backdrop-filter: blur(6px);
+  }
+  .alarmLeft{display:flex; align-items:center; gap:10px;}
+  .alarmDot{
+    width:10px;height:10px;border-radius:50%;
+    background:rgba(120,140,180,.35);
+    outline:1px solid rgba(255,255,255,.12);
+  }
+  .alarmDot.normal{ background: var(--run); box-shadow:0 0 16px rgba(0,255,154,.30); outline-color: rgba(0,255,154,.35); }
+  .alarmDot.warn{ background: var(--warn); box-shadow:0 0 16px rgba(255,209,102,.25); outline-color: rgba(255,209,102,.35); }
+  .alarmDot.alarm{ background: var(--alarm); box-shadow:0 0 18px rgba(255,77,109,.25); outline-color: rgba(255,77,109,.35); }
+
+  .alarmTitle{font-weight:900; letter-spacing:.2px;}
+  .alarmMsg{font-size:12px; color:rgba(214,226,255,.72);}
+  .alarmRight{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+  .chip{
+    font-size:11px;
+    padding:5px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.03);
+    color:rgba(214,226,255,.82);
+    white-space:nowrap;
+  }
+  .chip.warn{ border-color: rgba(255,209,102,.35); background: rgba(255,209,102,.10); color: rgba(255,230,170,.92); }
+  .chip.alarm{ border-color: rgba(255,77,109,.38); background: rgba(255,77,109,.10); color: rgba(255,180,195,.92); }
+
+  /* Tooltip */
+  .tip{
+    position:fixed;
+    z-index:9999;
+    pointer-events:none;
+    opacity:0;
+    transform:translateY(6px);
+    transition:.12s ease;
+    padding:10px 10px;
+    border-radius:12px;
+    background:rgba(10,15,25,.92);
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 16px 50px rgba(0,0,0,.55);
+    max-width:300px;
+    font-size:12px;
+    color:rgba(214,226,255,.86);
+    line-height:1.25;
+  }
+  .tip b{color:#d6e2ff;}
+  .tip .k{color:rgba(214,226,255,.65);}
+
+  /* Modal - Points */
+  .modal{
+    position:fixed; inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9998;
+    background:rgba(0,0,0,.55);
+    backdrop-filter: blur(6px);
+  }
+  .modal.show{display:flex;}
+  .modalCard{
+    width:min(980px, 92vw);
+    max-height:78vh;
+    overflow:hidden;
+    border-radius:16px;
+    background:rgba(10,15,25,.92);
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 22px 70px rgba(0,0,0,.60);
+    display:flex;
+    flex-direction:column;
+  }
+  .modalHdr{
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .modalHdr b{letter-spacing:.2px;}
+  .searchRow{
+    padding:10px 14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  input.search{
+    flex:1;
+    min-width:240px;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.03);
+    color:rgba(214,226,255,.90);
+    outline:none;
+    font-weight:800;
+  }
+  .tableWrap{overflow:auto; padding:0 14px 14px 14px;}
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:12px;
+  }
+  th,td{
+    padding:10px 10px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    vertical-align:top;
+    white-space:nowrap;
+  }
+  th{
+    position:sticky; top:0;
+    background:rgba(10,15,25,.98);
+    text-align:left;
+    color:rgba(214,226,255,.80);
+    font-weight:900;
+    letter-spacing:.2px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+  }
+  td{
+    color:rgba(214,226,255,.86);
+  }
+  td .muted{color:rgba(214,226,255,.60); font-weight:800;}
+  .sev{font-weight:900;}
+  .sev.normal{color:rgba(0,255,154,.90);}
+  .sev.warn{color:rgba(255,209,102,.95);}
+  .sev.alarm{color:rgba(255,77,109,.95);}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="left">
+    <div class="hdr">
+      <div class="title">
+        <div>DC Cooling • BMS Mimic</div>
+        <div class="badge">ISA-5.5 / HPHMI</div>
+      </div>
+      <div class="sub">
+        CH-1..CH-4 • Parallel CHWP per chiller • Orthogonal headers • Trends • Alarm strip • Loop highlight • Broken-pipe indicator • Points list • Maintenance PID mode.
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="kcard">
+        <div class="klabel">CHWS Header Temp</div>
+        <div class="kval"><span id="k_chws">X</span> <small>°C</small></div>
+        <div class="kmeta"><span>Supply</span><span>Header</span></div>
+        <div class="sparkWrap">
+          <div class="sparkLegend">60s</div>
+          <canvas class="spark" id="trend_chws"></canvas>
+        </div>
+      </div>
+
+      <div class="kcard">
+        <div class="klabel">CHWR Header Temp</div>
+        <div class="kval"><span id="k_chwr">X</span> <small>°C</small></div>
+        <div class="kmeta"><span>Return</span><span>Header</span></div>
+        <div class="sparkWrap">
+          <div class="sparkLegend">60s</div>
+          <canvas class="spark" id="trend_chwr"></canvas>
+        </div>
+      </div>
+
+      <div class="kcard">
+        <div class="klabel">Header Flow (MFM1)</div>
+        <div class="kval"><span id="k_flow">X</span> <small>L/s</small></div>
+        <div class="kmeta"><span>Total</span><span>CHW</span></div>
+      </div>
+
+      <div class="kcard">
+        <div class="klabel">ΔP (Ctrl)</div>
+        <div class="kval"><span id="k_dp">X</span> <small>kPa</small></div>
+        <div class="kmeta"><span>DPS</span><span>Avg</span></div>
+      </div>
+    </div>
+
+    <div class="stack" id="unitStack"></div>
+  </div>
+
+  <div class="right">
+    <div class="topbar">
+      <div class="h1">Chiller Plant (CH-1..CH-4) • CHWS/CHWR Headers</div>
+      <div class="hint">
+        <a class="btn" href="index.html" title="Back to portfolio">⟵ Back to Portfolio</a>
+
+        <div class="toggle" title="Simulation ON/OFF (freeze values + pause animation)">
+          <small>SIM</small>
+          <div class="switch on" id="swSim"><div class="knob"></div></div>
+        </div>
+
+        <div class="toggle" title="Maintenance mode: PID settles to setpoints (auto adjust)">
+          <small>MAINT</small>
+          <div class="switch" id="swMaint"><div class="knob"></div></div>
+        </div>
+
+        <button class="btn ghost" id="btnPoints" title="Open points list">☰ Points</button>
+        <button class="btn ghost" id="btnExport" title="Export mimic as PNG">⤓ Export PNG</button>
+
+        <span style="opacity:.75;pointer-events:none;">Simulation only • with Maintenance PID option</span>
+      </div>
+    </div>
+
+    <svg id="mimicSvg" viewBox="0 0 1400 1180" aria-label="Cooling mimic">
+      <defs>
+        <marker id="mArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,.45)"></path>
+        </marker>
+
+        <!-- TEMPLATE IN DEFS: ALL IDS PREFIXED WITH tpl_ (prevents duplicate-ID bugs) -->
+        <g id="loopTemplate" class="hoverGlow loopNormal">
+          <rect class="panelBox" x="0" y="0" rx="18" ry="18" width="760" height="185"></rect>
+
+          <g transform="translate(14,18)">
+            <rect class="plate" x="0" y="0" rx="10" ry="10" width="610" height="22"></rect>
+            <text class="oStrong" x="10" y="15">CH-01 • ACC-01 • CHWP-01A/01B • DPS • MFM • Header Conn.</text>
+          </g>
+
+          <g transform="translate(640,52)">
+            <rect class="plate" x="0" y="-16" rx="8" ry="8" width="104" height="22"></rect>
+            <text class="oTiny" x="10" y="0">CHWS OUT →</text>
+          </g>
+          <g transform="translate(640,158)">
+            <rect class="plate" x="0" y="-16" rx="8" ry="8" width="104" height="22"></rect>
+            <text class="oTiny" x="10" y="0">← CHWR IN</text>
+          </g>
+
+          <!-- to header ports -->
+          <path class="pipeBase" d="M 600 64 H 750" data-seg="tpl_chws_to_hdr_base"></path>
+          <path class="pipeFlow flow-chws" d="M 600 64 H 750" data-seg="tpl_chws_to_hdr_flow"></path>
+          <path class="pipeParticles p-chws" d="M 600 64 H 750" data-seg="tpl_chws_to_hdr_part"></path>
+          <path class="arrow" d="M 640 64 H 710" marker-end="url(#mArrow)"></path>
+
+          <path class="pipeBase" d="M 750 132 H 420" data-seg="tpl_chwr_from_hdr_base"></path>
+          <path class="pipeFlow flow-chwr" d="M 750 132 H 420" data-seg="tpl_chwr_from_hdr_flow"></path>
+          <path class="pipeParticles p-chwr" d="M 750 132 H 420" data-seg="tpl_chwr_from_hdr_part"></path>
+          <path class="arrow" d="M 700 132 H 640" marker-end="url(#mArrow)"></path>
+
+          <!-- T1/P1/P2 (supply rail) -->
+          <g transform="translate(410, 30)">
+            <rect class="tag" x="0" y="-16" rx="8" ry="8" width="112" height="24"></rect>
+            <text class="tagTxt" x="10" y="2">T1</text>
+            <text class="tagTxt" x="34" y="2"><tspan id="tpl_t1">19.2</tspan>°C</text>
+          </g>
+          <g transform="translate(530, 30)">
+            <rect class="tag" x="0" y="-16" rx="8" ry="8" width="60" height="24"></rect>
+            <text class="tagTxt" x="10" y="2">P1</text>
+          </g>
+          <g transform="translate(597, 30)">
+            <rect class="tag" x="0" y="-16" rx="8" ry="8" width="60" height="24"></rect>
+            <text class="tagTxt" x="10" y="2">P2</text>
+          </g>
+
+          <!-- T2 (return rail) -->
+          <g transform="translate(510, 154)">
+            <rect class="tag" x="0" y="0" rx="8" ry="8" width="112" height="24"></rect>
+            <text class="tagTxt" x="10" y="16">T2</text>
+            <text class="tagTxt" x="34" y="16"><tspan id="tpl_t2">22.6</tspan>°C</text>
+          </g>
+
+          <!-- Instruments -->
+          <g transform="translate(245, 78)">
+            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="155" height="54"></rect>
+            <text class="instTxt" x="10" y="22">MFM1</text>
+            <text class="instVal" x="10" y="45"><tspan id="tpl_flow">X</tspan> L/s</text>
+          </g>
+
+          <g transform="translate(410, 88)">
+            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="140" height="46"></rect>
+            <text class="instTxt" x="10" y="20">DPS1</text>
+            <text class="instVal" x="10" y="40">ΔP <tspan id="tpl_dp1">X</tspan> kPa</text>
+          </g>
+
+          <g transform="translate(560, 88)">
+            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="140" height="46"></rect>
+            <text class="instTxt" x="10" y="20">DPS2</text>
+            <text class="instVal" x="10" y="40">ΔP <tspan id="tpl_dp2">X</tspan> kPa</text>
+          </g>
+
+          <!-- ACC block -->
+          <g transform="translate(18, 52)">
+            <rect class="instBox" x="0" y="0" rx="14" ry="14" width="210" height="110"></rect>
+            <text class="iStrong" x="12" y="22">ACC / CHILLER-01</text>
+            <text class="iTiny" x="12" y="40">Air Cooled Chiller (ACC)</text>
+            <text class="iTiny" x="12" y="62">CHWS OUT</text>
+            <text class="iTiny" x="12" y="80">CHWR IN</text>
+            <text class="iTiny" x="12" y="100">Compressors</text>
+
+            <circle id="tpl_c1" class="cDot" cx="130" cy="98" r="7"></circle>
+            <circle id="tpl_c2" class="cDot" cx="154" cy="98" r="7"></circle>
+            <circle id="tpl_c3" class="cDot" cx="178" cy="98" r="7"></circle>
+
+            <text id="tpl_ct1" class="cTxt off" x="122" y="118">OFF</text>
+            <text id="tpl_ct2" class="cTxt off" x="146" y="118">OFF</text>
+            <text id="tpl_ct3" class="cTxt off" x="170" y="118">OFF</text>
+          </g>
+
+          <!-- CHWS OUT lane -->
+          <path class="pipeBase" d="M 228 64 H 600" data-seg="tpl_chws_lane_base"></path>
+          <path class="pipeFlow flow-chws" d="M 228 64 H 600" data-seg="tpl_chws_lane_flow"></path>
+          <path class="pipeParticles p-chws" d="M 228 64 H 600" data-seg="tpl_chws_lane_part"></path>
+
+          <!-- CHWR IN lane -->
+          <path class="pipeBase" d="M 300 132 H 228" data-seg="tpl_chwr_lane_base"></path>
+          <path class="pipeFlow flow-chwr" d="M 300 132 H 228" data-seg="tpl_chwr_lane_flow"></path>
+          <path class="pipeParticles p-chwr" d="M 300 132 H 228" data-seg="tpl_chwr_lane_part"></path>
+          <path class="arrow" d="M 280 132 H 250" marker-end="url(#mArrow)"></path>
+
+          <!-- CHWR to pump suction -->
+          <path class="pipeBase" d="M 420 132 H 360"></path>
+          <path class="pipeFlow flow-chwr" d="M 420 132 H 360"></path>
+          <path class="pipeParticles p-chwr" d="M 420 132 H 360"></path>
+
+          <!-- parallel pump manifold -->
+          <path class="pipeBase" d="M 360 132 V 108"></path>
+          <path class="pipeFlow flow-chwr" d="M 360 132 V 108"></path>
+          <path class="pipeParticles p-chwr" d="M 360 132 V 108"></path>
+
+          <path class="pipeBase" d="M 360 132 V 156"></path>
+          <path class="pipeFlow flow-chwr" d="M 360 132 V 156"></path>
+          <path class="pipeParticles p-chwr" d="M 360 132 V 156"></path>
+
+          <path class="pipeBase" d="M 360 108 H 300"></path>
+          <path class="pipeFlow flow-chwr" d="M 360 108 H 300"></path>
+          <path class="pipeParticles p-chwr" d="M 360 108 H 300"></path>
+
+          <path class="pipeBase" d="M 360 156 H 300"></path>
+          <path class="pipeFlow flow-chwr" d="M 360 156 H 300"></path>
+          <path class="pipeParticles p-chwr" d="M 360 156 H 300"></path>
+
+          <path class="pipeBase" d="M 300 108 V 132"></path>
+          <path class="pipeFlow flow-chwr" d="M 300 108 V 132"></path>
+          <path class="pipeParticles p-chwr" d="M 300 108 V 132"></path>
+
+          <path class="pipeBase" d="M 300 156 V 132"></path>
+          <path class="pipeFlow flow-chwr" d="M 300 156 V 132"></path>
+          <path class="pipeParticles p-chwr" d="M 300 156 V 132"></path>
+
+          <!-- Pump A -->
+          <g id="tpl_pA" class="pumpRun" transform="translate(318, 108)">
+            <circle class="pumpCircle" cx="-18" cy="0" r="20"></circle>
+            <polygon class="pumpTri" points="-28,-10 -28,10 -6,0"></polygon>
+            <g class="impeller">
+              <line x1="-18" y1="-12" x2="-18" y2="12" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
+              <line x1="-31" y1="0" x2="-5" y2="0" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
+            </g>
+            <g transform="translate(-78,-24)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
+              <text class="oTiny" x="8" y="14">CHWP-01A</text>
+            </g>
+            <g transform="translate(-78,18)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
+              <text class="oTiny" x="8" y="14"><tspan id="tpl_spdA">X</tspan>%</text>
+            </g>
+          </g>
+
+          <!-- Pump B -->
+          <g id="tpl_pB" class="pumpOff" transform="translate(318, 156)">
+            <circle class="pumpCircle" cx="-18" cy="0" r="20"></circle>
+            <polygon class="pumpTri" points="-28,-10 -28,10 -6,0"></polygon>
+            <g class="impeller">
+              <line x1="-18" y1="-12" x2="-18" y2="12" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
+              <line x1="-31" y1="0" x2="-5" y2="0" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
+            </g>
+            <g transform="translate(-78,-24)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
+              <text class="oTiny" x="8" y="14">CHWP-01B</text>
+            </g>
+            <g transform="translate(-78,18)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
+              <text class="oTiny" x="8" y="14"><tspan id="tpl_spdB">X</tspan>%</text>
+            </g>
+          </g>
+        </g>
+      </defs>
+
+      <!-- Master frame -->
+      <rect class="panelBox" x="22" y="56" rx="18" ry="18" width="1356" height="1090"></rect>
+      <text class="oStrong" x="46" y="90">CHILLER PLANT / WATER SIDE (P&amp;ID Mimic)</text>
+
+      <!-- Headers -->
+      <path class="pipeBase" d="M 860 150 H 1340"></path>
+      <path class="pipeFlow flow-chws" d="M 860 150 H 1340"></path>
+      <path class="pipeParticles p-chws" d="M 860 150 H 1340"></path>
+
+      <path class="pipeBase" d="M 860 210 H 1340"></path>
+      <path class="pipeFlow flow-chwr" d="M 860 210 H 1340"></path>
+      <path class="pipeParticles p-chwr" d="M 860 210 H 1340"></path>
+
+      <g transform="translate(860,122)">
+        <rect class="plate" x="0" y="0" rx="10" ry="10" width="190" height="24"></rect>
+        <text class="oLbl" x="10" y="17">CHWS (SUPPLY) HEADER →</text>
+      </g>
+      <g transform="translate(860,182)">
+        <rect class="plate" x="0" y="0" rx="10" ry="10" width="190" height="24"></rect>
+        <text class="oLbl" x="10" y="17">← CHWR (RETURN) HEADER</text>
+      </g>
+
+      <path class="arrow" d="M 1040 150 H 1140" marker-end="url(#mArrow)"></path>
+      <path class="arrow" d="M 1140 210 H 1040" marker-end="url(#mArrow)"></path>
+
+      <g class="hoverGlow" transform="translate(860, 248)" data-tip="Header Flow Meter (MFM1)\nTracks combined CHW flow to plant header.">
+        <rect class="instBox" x="0" y="0" rx="10" ry="10" width="180" height="56"></rect>
+        <text class="instTxt" x="12" y="22">MFM1 (Header)</text>
+        <text class="instVal" x="12" y="45"><tspan id="mfm_val">X</tspan> L/s</text>
+      </g>
+      <g class="hoverGlow" transform="translate(1050, 248)" data-tip="ΔP Control (Avg)\nRepresents DP control for CHW distribution.">
+        <rect class="instBox" x="0" y="0" rx="10" ry="10" width="180" height="56"></rect>
+        <text class="instTxt" x="12" y="22">ΔP Ctrl (Avg)</text>
+        <text class="instVal" x="12" y="45"><tspan id="dp_hdr">X</tspan> kPa</text>
+      </g>
+
+      <!-- Branches -->
+      <g id="branches">
+        <!-- CH-1 -->
+        <path class="pipeBase" d="M 980 150 V 184 H 810"></path>
+        <path class="pipeFlow flow-chws" d="M 980 150 V 184 H 810"></path>
+        <path class="pipeParticles p-chws" d="M 980 150 V 184 H 810"></path>
+
+        <path class="pipeBase" d="M 996 210 V 252 H 810"></path>
+        <path class="pipeFlow flow-chwr" d="M 996 210 V 252 H 810"></path>
+        <path class="pipeParticles p-chwr" d="M 996 210 V 252 H 810"></path>
+
+        <g transform="translate(958,168)">
+          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
+          <text class="oTiny" x="10" y="0">CH-1</text>
+        </g>
+
+        <!-- CH-2 -->
+        <path class="pipeBase" d="M 1070 150 V 404 H 810"></path>
+        <path class="pipeFlow flow-chws" d="M 1070 150 V 404 H 810"></path>
+        <path class="pipeParticles p-chws" d="M 1070 150 V 404 H 810"></path>
+
+        <path class="pipeBase" d="M 1086 210 V 472 H 810"></path>
+        <path class="pipeFlow flow-chwr" d="M 1086 210 V 472 H 810"></path>
+        <path class="pipeParticles p-chwr" d="M 1086 210 V 472 H 810"></path>
+
+        <g transform="translate(1048,388)">
+          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
+          <text class="oTiny" x="10" y="0">CH-2</text>
+        </g>
+
+        <!-- CH-3 -->
+        <path class="pipeBase" d="M 1160 150 V 624 H 810"></path>
+        <path class="pipeFlow flow-chws" d="M 1160 150 V 624 H 810"></path>
+        <path class="pipeParticles p-chws" d="M 1160 150 V 624 H 810"></path>
+
+        <path class="pipeBase" d="M 1176 210 V 692 H 810"></path>
+        <path class="pipeFlow flow-chwr" d="M 1176 210 V 692 H 810"></path>
+        <path class="pipeParticles p-chwr" d="M 1176 210 V 692 H 810"></path>
+
+        <g transform="translate(1138,608)">
+          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
+          <text class="oTiny" x="10" y="0">CH-3</text>
+        </g>
+
+        <!-- CH-4 -->
+        <path class="pipeBase" d="M 1250 150 V 844 H 810"></path>
+        <path class="pipeFlow flow-chws" d="M 1250 150 V 844 H 810"></path>
+        <path class="pipeParticles p-chws" d="M 1250 150 V 844 H 810"></path>
+
+        <path class="pipeBase" d="M 1266 210 V 912 H 810"></path>
+        <path class="pipeFlow flow-chwr" d="M 1266 210 V 912 H 810"></path>
+        <path class="pipeParticles p-chwr" d="M 1266 210 V 912 H 810"></path>
+
+        <g transform="translate(1228,828)">
+          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
+          <text class="oTiny" x="10" y="0">CH-4</text>
+        </g>
+      </g>
+
+      <!-- Loop hosts (snap spacing) -->
+      <g id="loop1" transform="translate(60,120)"></g>
+      <g id="loop2" transform="translate(60,340)"></g>
+      <g id="loop3" transform="translate(60,560)"></g>
+      <g id="loop4" transform="translate(60,780)"></g>
+    </svg>
+
+    <!-- Alarm strip -->
+    <div class="alarmStrip" id="alarmStrip">
+      <div class="alarmLeft">
+        <div class="alarmDot normal" id="alarmDot"></div>
+        <div>
+          <div class="alarmTitle" id="alarmTitle">NORMAL</div>
+          <div class="alarmMsg" id="alarmMsg">All loops within expected operating envelope.</div>
+        </div>
+      </div>
+      <div class="alarmRight" id="alarmChips"></div>
+    </div>
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<!-- Points Modal -->
+<div class="modal" id="pointsModal" aria-hidden="true">
+  <div class="modalCard">
+    <div class="modalHdr">
+      <b>Points List (Simulation)</b>
+      <button class="btn ghost" id="btnClosePoints">✕ Close</button>
+    </div>
+    <div class="searchRow">
+      <input class="search" id="pointsSearch" placeholder="Search: CH-1, DP, Flow, Temp, Alarm, Pump..." />
+      <button class="btn ghost" id="btnCopyPoints">⎘ Copy CSV</button>
+    </div>
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Point Name</th>
+            <th>Value</th>
+            <th>Unit</th>
+            <th>Quality</th>
+            <th>Severity</th>
+            <th class="muted">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="pointsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id)=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const r=(a,b)=>a+Math.random()*(b-a);
+const round1=(x)=>Math.round(x*10)/10;
+
+/* ---------------- SIM / MAINT TOGGLES ---------------- */
+const ui = {
+  simOn: true,
+  maint: false
+};
+function setSwitch(swEl, on){
+  swEl.classList.toggle("on", !!on);
+}
+function applySimState(){
+  document.body.classList.toggle("simOff", !ui.simOn);
+}
+
+/* ---------------- PID ----------------
+Simple discrete PID used only in Maintenance Mode.
+Targets:
+- Header CHWS setpoint (°C)
+- Header DP setpoint (kPa)
+- Each loop flow setpoint (L/s)
+We adjust: pump speed (0-100%), dp, flow, temps "settle" with time constants
+------------------------------------- */
+function makePID(kp, ki, kd, outMin, outMax){
+  return {kp,ki,kd,outMin,outMax, i:0, prevE:0};
+}
+function pidStep(pid, sp, pv, dt){
+  const e = sp - pv;
+  pid.i = clamp(pid.i + e*dt, -999, 999);
+  const d = (e - pid.prevE)/dt;
+  pid.prevE = e;
+  const u = pid.kp*e + pid.ki*pid.i + pid.kd*d;
+  return clamp(u, pid.outMin, pid.outMax);
+}
+
+/* ---------------- SIM STATE ---------------- */
+const state = {
+  header: { chws: 19.4, chwr: 22.7, flow: 0, dp: 85 },
+  chillers: [
+    { id:1, pumpA:true,  spdA:72, spdB:0,  flow:18.5, dp1:102, dp2:65, comps:[1,1,0], t1:19.2, t2:22.6 },
+    { id:2, pumpA:false, spdA:0,  spdB:68, flow:17.2, dp1:84,  dp2:83, comps:[1,0,1], t1:19.6, t2:22.9 },
+    { id:3, pumpA:true,  spdA:64, spdB:0,  flow:19.8, dp1:67,  dp2:96, comps:[0,1,1], t1:19.0, t2:22.4 },
+    { id:4, pumpA:false, spdA:0,  spdB:70, flow:16.9, dp1:78,  dp2:77, comps:[1,1,0], t1:19.8, t2:23.0 },
+  ],
+  trends: {
+    chws: Array(60).fill(19.4),
+    chwr: Array(60).fill(22.7),
+  },
+  alarm: { level:"NORMAL", issues:[] },
+
+  /* MAINT setpoints */
+  sp: {
+    chws: 18.8,
+    dp: 90,
+    flowEach: 18.0
+  },
+
+  /* PID controllers */
+  pid: {
+    headerChws: makePID(18, 0.20, 0.0, -3, +3),      // output is delta temp bias
+    headerDp:   makePID(1.2, 0.04, 0.0, -25, +25),   // output is delta dp bias
+    loopFlow:   [makePID(1.8,0.06,0.0, 0, 100), makePID(1.8,0.06,0.0, 0, 100), makePID(1.8,0.06,0.0, 0, 100), makePID(1.8,0.06,0.0, 0, 100)]
+  }
+};
+
+/* ---------------- LEFT CARDS ---------------- */
+function buildLeftCards(){
+  const host = $("unitStack");
+  host.innerHTML = "";
+  state.chillers.forEach(ch=>{
+    const el = document.createElement("div");
+    el.className = "unit";
+    el.innerHTML = `
+      <div class="uTop">
+        <div>
+          <div class="name">ACC / CHILLER-${String(ch.id).padStart(2,"0")}</div>
+          <div class="meta">CHWP-${String(ch.id).padStart(2,"0")}A/B • Parallel (one RUN, one STBY)</div>
+        </div>
+        <div class="pill" id="pill_${ch.id}">SIM</div>
+      </div>
+
+      <div class="grid2">
+        <div class="kv"><span>T1 (Supply)</span><b id="card_t1_${ch.id}">X</b></div>
+        <div class="kv"><span>T2 (Return)</span><b id="card_t2_${ch.id}">X</b></div>
+        <div class="kv"><span>Flow</span><b class="ok" id="card_flow_${ch.id}">X</b></div>
+        <div class="kv"><span>DP Avg</span><b id="card_dp_${ch.id}">X</b></div>
+        <div class="kv"><span>Pump Active</span><b id="card_pump_${ch.id}">X</b></div>
+        <div class="kv"><span>Speed</span><b id="card_spd_${ch.id}">X</b></div>
+      </div>
+
+      <div class="compressors">
+        <div class="comp"><span>Comp-1</span><span class="lamp" id="lamp_${ch.id}_1"></span></div>
+        <div class="comp"><span>Comp-2</span><span class="lamp" id="lamp_${ch.id}_2"></span></div>
+        <div class="comp"><span>Comp-3</span><span class="lamp" id="lamp_${ch.id}_3"></span></div>
+      </div>
+    `;
+    host.appendChild(el);
+  });
+}
+
+/* ---------------- SVG TEMPLATE CLONE ---------------- */
+function cloneTemplateInto(loopHostId, chId){
+  const host = document.getElementById(loopHostId);
+  host.innerHTML = "";
+
+  const tpl = document.getElementById("loopTemplate");
+  const clone = tpl.cloneNode(true);
+  clone.removeAttribute("id");
+
+  clone.setAttribute("id", `loop_group_${chId}`);
+  clone.classList.add("loopNormal");
+
+  // header label
+  const headerText = clone.querySelector("text.oStrong");
+  headerText.textContent =
+    `CH-${String(chId).padStart(2,"0")} • ACC-${String(chId).padStart(2,"0")} • CHWP-${String(chId).padStart(2,"0")}A/${String(chId).padStart(2,"0")}B • DPS • MFM • Header Conn.`;
+
+  // chiller title in ACC block
+  const accTitle = clone.querySelector("text.iStrong");
+  accTitle.textContent = `ACC / CHILLER-${String(chId).padStart(2,"0")}`;
+
+  // update pump label text
+  clone.querySelectorAll("text.oTiny").forEach(t=>{
+    if(t.textContent.includes("CHWP-01A")) t.textContent = `CHWP-${String(chId).padStart(2,"0")}A`;
+    if(t.textContent.includes("CHWP-01B")) t.textContent = `CHWP-${String(chId).padStart(2,"0")}B`;
+  });
+
+  // map template ids -> unique ids per chiller
+  const idMap = [
+    ["tpl_pA",   `ch${chId}_pA`],
+    ["tpl_pB",   `ch${chId}_pB`],
+    ["tpl_spdA", `ch${chId}_spdA`],
+    ["tpl_spdB", `ch${chId}_spdB`],
+    ["tpl_flow", `ch${chId}_flow`],
+    ["tpl_dp1",  `ch${chId}_dp1`],
+    ["tpl_dp2",  `ch${chId}_dp2`],
+    ["tpl_c1",   `ch${chId}_c1`],
+    ["tpl_c2",   `ch${chId}_c2`],
+    ["tpl_c3",   `ch${chId}_c3`],
+    ["tpl_ct1",  `ch${chId}_ct1`],
+    ["tpl_ct2",  `ch${chId}_ct2`],
+    ["tpl_ct3",  `ch${chId}_ct3`],
+    ["tpl_t1",   `ch${chId}_t1`],
+    ["tpl_t2",   `ch${chId}_t2`],
+  ];
+  idMap.forEach(([oldId,newId])=>{
+    const el = clone.querySelector(`#${oldId}`);
+    if(el) el.setAttribute("id", newId);
+  });
+
+  // tag pipe segments with ch id for broken-mode toggle
+  clone.querySelectorAll("[data-seg]").forEach(p=>{
+    const base = p.getAttribute("data-seg");
+    p.setAttribute("data-seg", `ch${chId}_${base}`);
+  });
+
+  // tooltip payload
+  clone.setAttribute("data-tip",
+    `CH-${String(chId).padStart(2,"0")} Loop\n`+
+    `CHWS OUT: Header\n`+
+    `CHWR IN: Header\n`+
+    `CHWP: Parallel A/B\n`+
+    `DPS: ΔP points\n`+
+    `MFM: Flow measurement`
+  );
+
+  host.appendChild(clone);
+}
+
+/* ---------------- VISUAL HELPERS ---------------- */
+function setCompressorDots(chId, comps){
+  // Sidebar lamps
+  for(let i=1;i<=3;i++){
+    const lamp = $(`lamp_${chId}_${i}`);
+    if(lamp) lamp.className = "lamp " + (comps[i-1]===1 ? "run":"off");
+  }
+  // Mimic dots + RUN/OFF label
+  const dots = [ $(`ch${chId}_c1`), $(`ch${chId}_c2`), $(`ch${chId}_c3`) ];
+  const txts = [ $(`ch${chId}_ct1`), $(`ch${chId}_ct2`), $(`ch${chId}_ct3`) ];
+  dots.forEach((d, idx)=>{
+    if(!d) return;
+    d.setAttribute("class", comps[idx]===1 ? "cRun" : "cDot");
+  });
+  txts.forEach((t, idx)=>{
+    if(!t) return;
+    const on = comps[idx]===1;
+    t.textContent = on ? "RUN" : "OFF";
+    t.setAttribute("class", "cTxt " + (on ? "on" : "off"));
+  });
+}
+
+function setPumpVisual(chId, pumpA, spdA, spdB){
+  const A = $(`ch${chId}_pA`);
+  const B = $(`ch${chId}_pB`);
+  if(A) A.setAttribute("class", pumpA ? "pumpRun" : "pumpOff");
+  if(B) B.setAttribute("class", pumpA ? "pumpOff" : "pumpRun");
+  const sA = $(`ch${chId}_spdA`);
+  const sB = $(`ch${chId}_spdB`);
+  if(sA) sA.textContent = Math.round(spdA);
+  if(sB) sB.textContent = Math.round(spdB);
+}
+
+function writeLoopValues(ch){
+  const f = $(`ch${ch.id}_flow`); if(f) f.textContent = round1(ch.flow);
+  const d1 = $(`ch${ch.id}_dp1`); if(d1) d1.textContent = Math.round(ch.dp1);
+  const d2 = $(`ch${ch.id}_dp2`); if(d2) d2.textContent = Math.round(ch.dp2);
+  const t1 = $(`ch${ch.id}_t1`); if(t1) t1.textContent = round1(ch.t1);
+  const t2 = $(`ch${ch.id}_t2`); if(t2) t2.textContent = round1(ch.t2);
+}
+
+function updateCard(ch){
+  $(`card_t1_${ch.id}`).textContent   = `${round1(ch.t1)}°C`;
+  $(`card_t2_${ch.id}`).textContent   = `${round1(ch.t2)}°C`;
+
+  const flowEl = $(`card_flow_${ch.id}`);
+  flowEl.textContent = `${round1(ch.flow)} L/s`;
+  flowEl.className = (ch.flow < 1.5 ? "bad" : "ok");
+
+  $(`card_dp_${ch.id}`).textContent   = `${Math.round((ch.dp1+ch.dp2)/2)} kPa`;
+  $(`card_pump_${ch.id}`).textContent = ch.pumpA ? "A (RUN)" : "B (RUN)";
+  $(`card_spd_${ch.id}`).textContent  = ch.pumpA ? `${Math.round(ch.spdA)}%` : `${Math.round(ch.spdB)}%`;
+
+  const pill = $(`pill_${ch.id}`);
+  if(pill){
+    pill.textContent = ui.maint ? "MAINT" : (ui.simOn ? "SIM" : "HOLD");
+    pill.classList.toggle("off", !ui.simOn);
+  }
+}
+
+function updateKPI(){
+  $("k_chws").textContent = round1(state.header.chws);
+  $("k_chwr").textContent = round1(state.header.chwr);
+  $("k_flow").textContent = round1(state.header.flow);
+  $("k_dp").textContent   = Math.round(state.header.dp);
+  $("mfm_val").textContent = round1(state.header.flow);
+  $("dp_hdr").textContent  = Math.round(state.header.dp);
+}
+
+/* ---------------- BROKEN PIPE LOGIC ----------------
+If loop is "disconnected", show red broken indicator on key segments & stop normal flow animation there.
+Rule:
+- disconnected if loop flow < 1.5 L/s OR (spdA==0 && spdB==0)
+------------------------------------- */
+function setLoopDisconnected(chId, disconnected){
+  const segKeys = [
+    "tpl_chws_lane_base","tpl_chws_lane_flow","tpl_chws_lane_part",
+    "tpl_chws_to_hdr_base","tpl_chws_to_hdr_flow","tpl_chws_to_hdr_part",
+    "tpl_chwr_lane_base","tpl_chwr_lane_flow","tpl_chwr_lane_part",
+    "tpl_chwr_from_hdr_base","tpl_chwr_from_hdr_flow","tpl_chwr_from_hdr_part",
+  ];
+  segKeys.forEach(k=>{
+    const el = document.querySelector(`[data-seg="ch${chId}_`+k+`"]`);
+    if(!el) return;
+    const isFlow = el.classList.contains("pipeFlow");
+    const isPart = el.classList.contains("pipeParticles");
+    const isBase = el.classList.contains("pipeBase");
+
+    // reset first
+    el.classList.remove("pipeBrokenBase","pipeBrokenFlow","pipeBrokenParticles");
+
+    if(disconnected){
+      if(isBase) el.classList.add("pipeBrokenBase");
+      if(isFlow) el.classList.add("pipeBrokenFlow");
+      if(isPart) el.classList.add("pipeBrokenParticles");
+    }
+  });
+
+  // also set tooltip hint
+  const g = $(`loop_group_${chId}`);
+  if(g){
+    const baseTip = g.getAttribute("data-tip") || "";
+    const add = disconnected ? "\nSTATUS: DISCONNECTED (no/low flow)" : "\nSTATUS: CONNECTED";
+    g.setAttribute("data-tip", baseTip.split("\nSTATUS:")[0] + add);
+  }
+}
+
+/* ---------------- MINIMAL SPARKLINES (60s) ---------------- */
+function pushTrend(arr, v){
+  arr.push(v);
+  while(arr.length > 60) arr.shift();
+}
+function drawSpark(canvas, series){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+
+  let mn = Math.min(...series), mx = Math.max(...series);
+  if(mx - mn < 0.2){ mx = mn + 0.2; }
+
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, h-1);
+  ctx.lineTo(w, h-1);
+  ctx.stroke();
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(0,255,255,0.65)";
+  ctx.beginPath();
+  series.forEach((v,i)=>{
+    const x = (i/(series.length-1)) * (w-2) + 1;
+    const y = h - ((v - mn) / (mx - mn)) * (h-6) - 3;
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(0,255,255,0.18)";
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  series.forEach((v,i)=>{
+    const x = (i/(series.length-1)) * (w-2) + 1;
+    const y = h - ((v - mn) / (mx - mn)) * (h-6) - 3;
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+function fitCanvasToCSS(canvas){
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* ---------------- ALARM MANAGER (HPHMI) ---------------- */
+function computeAlarm(){
+  const issues = [];
+
+  state.chillers.forEach(ch=>{
+    const dpAvg = (ch.dp1 + ch.dp2)/2;
+    let lvl = "NORMAL";
+
+    // Add disconnected as ALARM quality issue
+    const disconnected = (ch.flow < 1.5) || ((Math.round(ch.spdA)+Math.round(ch.spdB))===0);
+    if(disconnected){
+      issues.push({id: ch.id, level:"ALARM", msg:"disconnected / no flow"});
+      lvl = "ALARM";
+    } else if(dpAvg > 135 || ch.flow < 10 || ch.t2 > 24.0){
+      issues.push({id: ch.id, level:"ALARM", msg:"envelope breach"});
+      lvl = "ALARM";
+    } else if(dpAvg > 120 || ch.flow < 14 || ch.t2 > 23.2){
+      issues.push({id: ch.id, level:"WARNING", msg:"nearing limit"});
+      lvl = "WARNING";
+    }
+
+    const g = $(`loop_group_${ch.id}`);
+    if(g){
+      g.classList.remove("loopNormal","loopWarn","loopAlarm");
+      g.classList.add(lvl==="ALARM" ? "loopAlarm" : (lvl==="WARNING" ? "loopWarn" : "loopNormal"));
+    }
+
+    setLoopDisconnected(ch.id, disconnected);
+  });
+
+  let global = "NORMAL";
+  if(issues.some(x=>x.level==="ALARM")) global="ALARM";
+  else if(issues.some(x=>x.level==="WARNING")) global="WARNING";
+
+  state.alarm.level = global;
+  state.alarm.issues = issues;
+}
+
+function renderAlarmStrip(){
+  const dot = $("alarmDot");
+  const title = $("alarmTitle");
+  const msg = $("alarmMsg");
+  const chips = $("alarmChips");
+  chips.innerHTML = "";
+
+  dot.classList.remove("normal","warn","alarm");
+
+  if(state.alarm.level === "NORMAL"){
+    dot.classList.add("normal");
+    title.textContent = "NORMAL";
+    msg.textContent = ui.maint
+      ? "Maintenance PID settling active. Loops within expected envelope."
+      : "All loops within expected operating envelope.";
+  } else if(state.alarm.level === "WARNING"){
+    dot.classList.add("warn");
+    title.textContent = "WARNING";
+    msg.textContent = "One or more loops approaching operational limits. Check highlighted loops.";
+  } else {
+    dot.classList.add("alarm");
+    title.textContent = "ALARM";
+    msg.textContent = "Issue detected. Review highlighted loop(s). Disconnected/no-flow shown in RED.";
+  }
+
+  state.alarm.issues.forEach(it=>{
+    const c = document.createElement("div");
+    c.className = "chip " + (it.level==="ALARM" ? "alarm" : "warn");
+    c.textContent = `${it.level}: CH-${it.id} • ${it.msg}`;
+    chips.appendChild(c);
+  });
+
+  if(state.alarm.issues.length===0){
+    const c = document.createElement("div");
+    c.className = "chip";
+    c.textContent = "No active issues";
+    chips.appendChild(c);
+  }
+}
+
+/* ---------------- MAINTENANCE PID STEP (1s) ---------------- */
+function stepMaintenance(dt){
+  // header CHWS temp: settle toward setpoint with bias u
+  const uT = pidStep(state.pid.headerChws, state.sp.chws, state.header.chws, dt);
+  state.header.chws = round1(clamp(state.header.chws + (uT*0.05) + r(-0.03,0.03), 16.0, 22.0));
+
+  // header dp settle
+  const uDP = pidStep(state.pid.headerDp, state.sp.dp, state.header.dp, dt);
+  state.header.dp = Math.round(clamp(state.header.dp + uDP*0.08 + r(-1.2,1.2), 50, 150));
+
+  // for each loop: target flowEach -> adjust pump speed (active pump)
+  state.chillers.forEach((ch, idx)=>{
+    // keep one pump active, one standby
+    if(ch.pumpA){
+      ch.spdA = pidStep(state.pid.loopFlow[idx], state.sp.flowEach, ch.flow, dt);
+      ch.spdB = 0;
+    } else {
+      ch.spdB = pidStep(state.pid.loopFlow[idx], state.sp.flowEach, ch.flow, dt);
+      ch.spdA = 0;
+    }
+
+    // flow responds to speed + small disturbance
+    const spd = ch.pumpA ? ch.spdA : ch.spdB;
+    const flowTarget = clamp((spd/100)*24.0, 0, 24.0);
+    ch.flow = round1(clamp(ch.flow + (flowTarget - ch.flow)*0.35 + r(-0.25,0.25), 0, 26));
+
+    // dp responds to speed and header dp
+    const dpBase = state.header.dp + (spd*0.40);
+    ch.dp1 = Math.round(clamp(ch.dp1 + (dpBase - ch.dp1)*0.25 + r(-2,2), 40, 160));
+    ch.dp2 = Math.round(clamp(ch.dp2 + (dpBase - ch.dp2)*0.23 + r(-2,2), 40, 160));
+
+    // temps: T1 follow header CHWS, T2 depends on load proxy (compressor count)
+    ch.t1 = round1(clamp(ch.t1 + (state.header.chws - ch.t1)*0.45 + r(-0.05,0.05), 17.5, 21.0));
+
+    const load = (ch.comps[0]+ch.comps[1]+ch.comps[2]); // 0..3
+    const t2Target = clamp(ch.t1 + 3.2 + load*0.25, 21.5, 24.0);
+    ch.t2 = round1(clamp(ch.t2 + (t2Target - ch.t2)*0.30 + r(-0.06,0.06), 21.0, 25.0));
+
+    // compressor staging: maintain 2 running normally, but can drift
+    // (maintenance typically stable)
+    const roll = Math.random();
+    let onCount = 2;
+    if(roll < 0.10) onCount = 1;
+    else if(roll > 0.95) onCount = 3;
+    const idxs = [0,1,2].sort(()=>Math.random()-0.5);
+    ch.comps = [0,0,0];
+    for(let i=0;i<onCount;i++) ch.comps[idxs[i]] = 1;
+  });
+
+  // header flow = sum loops
+  state.header.flow = round1(state.chillers.reduce((s,c)=>s+c.flow,0));
+
+  // header CHWR follows average return
+  const avgT2 = state.chillers.reduce((s,c)=>s+c.t2,0)/state.chillers.length;
+  state.header.chwr = round1(clamp(state.header.chwr + (avgT2 - state.header.chwr)*0.35 + r(-0.03,0.03), 20.5, 26.0));
+}
+
+/* ---------------- NORMAL RANDOM SIM STEP (5s) ---------------- */
+function stepEvery5s(){
+  if(!ui.simOn) return;
+
+  if(ui.maint){
+    // in maint mode we do not random-walk every 5s; we use 1s PID loop
+    return;
+  }
+
+  state.chillers.forEach(ch=>{
+    // swap active pump A/B
+    ch.pumpA = !ch.pumpA;
+    if(ch.pumpA){ ch.spdA = clamp(r(55,85),0,100); ch.spdB = 0; }
+    else        { ch.spdB = clamp(r(55,85),0,100); ch.spdA = 0; }
+
+    ch.flow = round1(r(15,25));
+    ch.dp1  = clamp(Math.round(r(60,130)), 40, 160);
+    ch.dp2  = clamp(Math.round(r(55,125)), 40, 160);
+
+    // enforce your ranges:
+    ch.t1 = round1(r(18.0, 20.0));  // T1 18–20
+    ch.t2 = round1(r(22.0, 23.0));  // T2 22–23
+
+    // compressor rotation: usually 2/3 running
+    let onCount = 2;
+    const roll = Math.random();
+    if(roll < 0.15) onCount = 1;
+    else if(roll > 0.92) onCount = 3;
+
+    const idx = [0,1,2].sort(()=>Math.random()-0.5);
+    ch.comps = [0,0,0];
+    for(let i=0;i<onCount;i++) ch.comps[idx[i]] = 1;
+
+    // occasional simulated disconnect event (rare) - professional scenario
+    if(Math.random() < 0.03){
+      ch.flow = round1(r(0, 1.0)); // triggers red broken
+      ch.spdA = 0; ch.spdB = 0;
+    }
+  });
+
+  state.header.flow = round1(state.chillers.reduce((s,c)=>s+c.flow,0));
+  state.header.chws = round1(r(18.2, 20.0));
+  state.header.chwr = round1(r(22.0, 23.0));
+  state.header.dp   = clamp(Math.round(r(70,120)), 55, 150);
+
+  renderAll();
+}
+
+/* 1s loop - trends + maint PID */
+function stepEvery1s(){
+  if(ui.simOn && ui.maint){
+    stepMaintenance(1.0);
+    renderAll();
+  }
+
+  // trends always show last known values (even if sim off)
+  pushTrend(state.trends.chws, state.header.chws);
+  pushTrend(state.trends.chwr, state.header.chwr);
+  drawSpark($("trend_chws"), state.trends.chws);
+  drawSpark($("trend_chwr"), state.trends.chwr);
+}
+
+/* ---------------- RENDER ALL ---------------- */
+function renderAll(){
+  state.chillers.forEach(ch=>{
+    setPumpVisual(ch.id, ch.pumpA, ch.spdA, ch.spdB);
+    setCompressorDots(ch.id, ch.comps);
+    writeLoopValues(ch);
+    updateCard(ch);
+  });
+
+  computeAlarm();
+  renderAlarmStrip();
+  updateKPI();
+  refreshPointsIfOpen();
+}
+
+/* ---------------- Tooltip ---------------- */
+const tip = $("tip");
+function showTip(x,y, text){
+  if(!text) return;
+  tip.innerHTML = text
+    .split("\n")
+    .map(line=>{
+      const parts = line.split(":");
+      if(parts.length>1) return `<div><span class="k">${parts[0]}:</span> <b>${parts.slice(1).join(":").trim()}</b></div>`;
+      return `<div>${line}</div>`;
+    }).join("");
+  tip.style.left = (x+14)+"px";
+  tip.style.top  = (y+14)+"px";
+  tip.style.opacity = 1;
+  tip.style.transform = "translateY(0)";
+}
+function hideTip(){
+  tip.style.opacity = 0;
+  tip.style.transform = "translateY(6px)";
+}
+document.addEventListener("mousemove",(e)=>{
+  const t = e.target.closest?.("[data-tip]");
+  if(t) showTip(e.clientX, e.clientY, t.getAttribute("data-tip"));
+  else hideTip();
+});
+
+/* ---------------- POINTS LIST ---------------- */
+function buildPoints(){
+  const pts = [];
+  const quality = (v)=> (Number.isFinite(v) ? "GOOD" : "BAD");
+  const sevFromAlarm = (chId)=>{
+    const hit = state.alarm.issues.find(x=>x.id===chId);
+    if(!hit) return {s:"NORMAL", cls:"normal", note:"Within envelope"};
+    return {s:hit.level, cls: hit.level==="ALARM" ? "alarm" : "warn", note:hit.msg};
+  };
+
+  // Header points
+  pts.push({name:"HDR.CHWS.TEMP", value:state.header.chws, unit:"°C", q:quality(state.header.chws), sev:state.alarm.level, note:"CHWS header temperature"});
+  pts.push({name:"HDR.CHWR.TEMP", value:state.header.chwr, unit:"°C", q:quality(state.header.chwr), sev:state.alarm.level, note:"CHWR header temperature"});
+  pts.push({name:"HDR.MFM1.FLOW", value:state.header.flow, unit:"L/s", q:quality(state.header.flow), sev:state.alarm.level, note:"Plant header flow"});
+  pts.push({name:"HDR.DP.CTRL",   value:state.header.dp, unit:"kPa", q:quality(state.header.dp), sev:state.alarm.level, note:"DP control average"});
+
+  // Loop points
+  state.chillers.forEach(ch=>{
+    const s = sevFromAlarm(ch.id);
+    const chTag = `CH${String(ch.id).padStart(2,"0")}`;
+
+    pts.push({name:`${chTag}.T1.SUPPLY`, value:ch.t1, unit:"°C", q:quality(ch.t1), sev:s.s, note:"Supply temp at loop"});
+    pts.push({name:`${chTag}.T2.RETURN`, value:ch.t2, unit:"°C", q:quality(ch.t2), sev:s.s, note:"Return temp at loop"});
+    pts.push({name:`${chTag}.MFM1.FLOW`, value:ch.flow, unit:"L/s", q:quality(ch.flow), sev:s.s, note:"Loop flow"});
+    pts.push({name:`${chTag}.DPS1.DP`, value:ch.dp1, unit:"kPa", q:quality(ch.dp1), sev:s.s, note:"DP sensor 1"});
+    pts.push({name:`${chTag}.DPS2.DP`, value:ch.dp2, unit:"kPa", q:quality(ch.dp2), sev:s.s, note:"DP sensor 2"});
+
+    pts.push({name:`${chTag}.PUMP.A.SPD`, value:Math.round(ch.spdA), unit:"%", q:"GOOD", sev:s.s, note:"Pump A VSD speed"});
+    pts.push({name:`${chTag}.PUMP.B.SPD`, value:Math.round(ch.spdB), unit:"%", q:"GOOD", sev:s.s, note:"Pump B VSD speed"});
+    pts.push({name:`${chTag}.PUMP.ACTIVE`, value:(ch.pumpA?"A":"B"), unit:"", q:"GOOD", sev:s.s, note:"Active pump selection"});
+
+    pts.push({name:`${chTag}.COMP1.RUN`, value:(ch.comps[0]===1?"ON":"OFF"), unit:"", q:"GOOD", sev:s.s, note:"Compressor 1 status"});
+    pts.push({name:`${chTag}.COMP2.RUN`, value:(ch.comps[1]===1?"ON":"OFF"), unit:"", q:"GOOD", sev:s.s, note:"Compressor 2 status"});
+    pts.push({name:`${chTag}.COMP3.RUN`, value:(ch.comps[2]===1?"ON":"OFF"), unit:"", q:"GOOD", sev:s.s, note:"Compressor 3 status"});
+  });
+
+  return pts;
+}
+function renderPoints(filter=""){
+  const tbody = $("pointsTbody");
+  const f = filter.trim().toLowerCase();
+  const pts = buildPoints().filter(p=>{
+    if(!f) return true;
+    return (p.name.toLowerCase().includes(f) ||
+            String(p.value).toLowerCase().includes(f) ||
+            (p.unit||"").toLowerCase().includes(f) ||
+            (p.note||"").toLowerCase().includes(f) ||
+            (p.sev||"").toLowerCase().includes(f));
+  });
+
+  tbody.innerHTML = pts.map(p=>{
+    const sevCls = (String(p.sev).toUpperCase()==="ALARM") ? "alarm" : ((String(p.sev).toUpperCase()==="WARNING") ? "warn" : "normal");
+    return `
+      <tr>
+        <td><b>${p.name}</b></td>
+        <td>${p.value}</td>
+        <td class="muted">${p.unit||""}</td>
+        <td class="muted">${p.q}</td>
+        <td class="sev ${sevCls}">${String(p.sev).toUpperCase()}</td>
+        <td class="muted">${p.note||""}</td>
+      </tr>`;
+  }).join("");
+}
+function openPoints(){
+  $("pointsModal").classList.add("show");
+  $("pointsModal").setAttribute("aria-hidden","false");
+  renderPoints($("pointsSearch").value);
+}
+function closePoints(){
+  $("pointsModal").classList.remove("show");
+  $("pointsModal").setAttribute("aria-hidden","true");
+}
+function refreshPointsIfOpen(){
+  if($("pointsModal").classList.contains("show")){
+    renderPoints($("pointsSearch").value);
+  }
+}
+function pointsToCSV(){
+  const pts = buildPoints();
+  const header = ["Point Name","Value","Unit","Quality","Severity","Notes"];
+  const rows = pts.map(p=>[
+    p.name, p.value, p.unit||"", p.q, String(p.sev).toUpperCase(), p.note||""
+  ]);
+  const csv = [header, ...rows]
+    .map(row=>row.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(","))
+    .join("\n");
+  return csv;
+}
+
+/* ---------------- EXPORT PNG ---------------- */
+async function exportPNG(){
+  const svg = $("mimicSvg");
+  const clone = svg.cloneNode(true);
+
+  // Inline computed styles into the clone via foreignObject is messy; for this mimic, serializing works fine in modern Chromium.
+  const serializer = new XMLSerializer();
+  const svgStr = serializer.serializeToString(clone);
+
+  const svgBlob = new Blob([svgStr], {type:"image/svg+xml;charset=utf-8"});
+  const url = URL.createObjectURL(svgBlob);
+
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  await new Promise((res, rej)=>{
+    img.onload = res;
+    img.onerror = rej;
+    img.src = url;
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1400 * 2; // 2x for sharper export
+  canvas.height = 1180 * 2;
+  const ctx = canvas.getContext("2d");
+
+  // background
+  ctx.fillStyle = "#02040a";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  URL.revokeObjectURL(url);
+
+  canvas.toBlob((blob)=>{
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    const ts = new Date().toISOString().replace(/[:.]/g,"-");
+    a.download = `BMS_Cooling_Mimic_${ts}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }, "image/png");
+}
+
+/* ---------------- INIT ---------------- */
+function init(){
+  buildLeftCards();
+
+  cloneTemplateInto("loop1", 1);
+  cloneTemplateInto("loop2", 2);
+  cloneTemplateInto("loop3", 3);
+  cloneTemplateInto("loop4", 4);
+
+  state.header.flow = round1(state.chillers.reduce((s,c)=>s+c.flow,0));
+
+  // fit sparklines
+  fitCanvasToCSS($("trend_chws"));
+  fitCanvasToCSS($("trend_chwr"));
+  window.addEventListener("resize", ()=>{
+    fitCanvasToCSS($("trend_chws"));
+    fitCanvasToCSS($("trend_chwr"));
+  });
+
+  // UI buttons
+  $("btnPoints").addEventListener("click", openPoints);
+  $("btnClosePoints").addEventListener("click", closePoints);
+  $("pointsModal").addEventListener("click", (e)=>{
+    if(e.target === $("pointsModal")) closePoints();
+  });
+  $("pointsSearch").addEventListener("input", ()=>renderPoints($("pointsSearch").value));
+  $("btnCopyPoints").addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText(pointsToCSV());
+      $("btnCopyPoints").textContent = "✓ Copied";
+      setTimeout(()=>$("btnCopyPoints").textContent="⎘ Copy CSV", 900);
+    }catch{
+      alert("Clipboard blocked by browser. Copy manually from console.");
+      console.log(pointsToCSV());
+    }
+  });
+
+  $("btnExport").addEventListener("click", exportPNG);
+
+  // Switches
+  const swSim = $("swSim");
+  const swMaint = $("swMaint");
+
+  swSim.addEventListener("click", ()=>{
+    ui.simOn = !ui.simOn;
+    setSwitch(swSim, ui.simOn);
+    applySimState();
+    renderAll();
+  });
+  swMaint.addEventListener("click", ()=>{
+    ui.maint = !ui.maint;
+    setSwitch(swMaint, ui.maint);
+
+    // when enabling maint, stop aggressive randomization and settle; keep pump selection stable
+    if(ui.maint){
+      // ensure each loop has an active pump (keep current selection)
+      state.chillers.forEach((ch, idx)=>{
+        // also reset pid integrators for clean settle
+        state.pid.loopFlow[idx].i = 0; state.pid.loopFlow[idx].prevE = 0;
+      });
+      state.pid.headerChws.i = 0; state.pid.headerChws.prevE = 0;
+      state.pid.headerDp.i = 0; state.pid.headerDp.prevE = 0;
+    }
+    renderAll();
+  });
+
+  // initial
+  setSwitch(swSim, ui.simOn);
+  setSwitch(swMaint, ui.maint);
+  applySimState();
+
+  renderAll();
+
+  // timers
+  setInterval(stepEvery5s, 5000);
+  setInterval(stepEvery1s, 1000);
+  stepEvery1s();
+}
+init();
+</script>
+</body>
+</html>

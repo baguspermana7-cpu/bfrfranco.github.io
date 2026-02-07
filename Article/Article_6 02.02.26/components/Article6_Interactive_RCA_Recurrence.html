@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>RCA Depth vs Recurrence</title>
+<style>
+body{background:#0b1220;color:#e5e7eb;font-family:system-ui}
+.wrap{max-width:960px;margin:30px auto;padding:0 16px}
+canvas{background:#020617;border-radius:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h2>RCA Authority vs Incident Recurrence</h2>
+<p>Simulation showing how redesign authority reduces recurrence probability.</p>
+<canvas id="c" width="900" height="420"></canvas>
+<div>
+<label>Design authority level:</label>
+<input type="range" id="auth" min="0" max="100" value="30"/>
+<span id="av">30</span>
+</div>
+</div>
+
+<script>
+const ctx=document.getElementById("c").getContext("2d");
+const auth=document.getElementById("auth");
+const av=document.getElementById("av");
+
+function draw(){
+ ctx.clearRect(0,0,900,420);
+ ctx.strokeStyle="#475569";
+ ctx.beginPath();
+ ctx.moveTo(60,40);ctx.lineTo(60,360);ctx.lineTo(860,360);ctx.stroke();
+ ctx.fillText("Recurrence Probability",10,50);
+ ctx.fillText("Incidents →",800,395);
+
+ let base=80-auth.value*0.5;
+ ctx.strokeStyle="#38bdf8";
+ ctx.beginPath();
+ for(let i=0;i<10;i++){
+   let risk=Math.max(5, base + Math.sin(i)*5);
+   let x=60+i*(800/9);
+   let y=360-risk*3;
+   if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+   ctx.fillText(risk.toFixed(1)+"%",x-12,y-10);
+ }
+ ctx.stroke();
+ av.textContent=auth.value;
+}
+
+auth.addEventListener("input",draw);
+draw();
+</script>
+</body>
+</html>

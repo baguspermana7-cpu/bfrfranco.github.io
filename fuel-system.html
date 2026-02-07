@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Enterprise SCADA Responsive | Bagus Dwi Permana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b1118; 
+            --panel-bg: #151e2b;
+            --border-color: #2a384b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            
+            --ok: #10b981;
+            --warn: #f59e0b;
+            --crit: #ef4444;
+            --off: #334155;
+
+            --diesel-main: #d97706; 
+            --diesel-bright: #fbbf24;
+            --elec-blue: #3b82f6;
+        }
+
+        /* --- BASE STYLES (PC FIRST) --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0; padding: 10px;
+            /* Default PC: Full Height, No Scroll bar body */
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden; 
+            box-sizing: border-box;
+        }
+
+        /* Scrollbar Kustom */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* HEADER */
+        .scada-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--panel-bg); border-bottom: 3px solid var(--diesel-main);
+            padding: 10px 20px; border-radius: 6px; margin-bottom: 10px; flex-shrink: 0;
+            z-index: 50;
+        }
+        .header-title h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        .header-title small { color: var(--text-secondary); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
+        .sys-badge { 
+            background: rgba(16, 185, 129, 0.1); color: var(--ok); 
+            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid var(--ok);
+            font-weight: bold; white-space: nowrap;
+        }
+
+        /* MAIN LAYOUT GRID (PC) */
+        .main-grid {
+            display: grid;
+            /* 4 Kolom Proporsional */
+            grid-template-columns: 280px 300px 450px 1fr; 
+            gap: 15px; 
+            flex-grow: 1; 
+            position: relative;
+            height: 100%; /* Penting untuk menjaga layout PC */
+        }
+
+        .panel {
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 6px; padding: 12px; display: flex; flex-direction: column;
+            position: relative; z-index: 2;
+            overflow-y: auto; /* Agar isi panel bisa discroll jika terlalu panjang di layar pendek */
+        }
+        .panel-header {
+            font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* --- VISUAL COMPONENTS --- */
+        .data-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 0.75rem; }
+        .data-val { 
+            font-family: 'JetBrains Mono', monospace; color: var(--diesel-bright); 
+            font-weight: bold; background: #000; padding: 2px 6px; border-radius: 2px;
+            min-width: 60px; text-align: right; border: 1px solid #333;
+        }
+        .data-unit { color: #64748b; margin-left: 4px; font-size: 0.7rem; }
+        .data-lbl { color: #94a3b8; }
+
+        .led {
+            width: 10px; height: 10px; border-radius: 50%; background: var(--off);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5); border: 1px solid #444;
+            display: inline-block; margin-right: 6px;
+        }
+        .led.on { background: var(--ok); box-shadow: 0 0 6px var(--ok); border-color: var(--ok); }
+        .led.err { background: var(--crit); box-shadow: 0 0 6px var(--crit); border-color: var(--crit); animation: blink 0.5s infinite; }
+
+        .chart-container {
+            height: 50px; background: rgba(0,0,0,0.3); border: 1px solid #333;
+            margin: 10px 0; position: relative; overflow: hidden;
+        }
+        .sparkline-path {
+            fill: none; stroke: var(--diesel-main); stroke-width: 2;
+            vector-effect: non-scaling-stroke;
+        }
+
+        /* TANKS */
+        .tank-wrapper {
+            position: relative; border: 2px solid #475569; background: #0f172a;
+            overflow: hidden; margin-top: 5px;
+        }
+        .ust-shape { height: 140px; border-radius: 0 0 8px 8px; border-top: none; }
+        .dt-shape { height: 60px; width: 45px; margin: 0 auto; border-radius: 4px; }
+        .liquid {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(180deg, var(--diesel-bright) 0%, var(--diesel-main) 100%);
+            opacity: 0.9; transition: height 0.5s ease;
+        }
+
+        /* EQUIPMENT */
+        .pump-unit {
+            border: 1px solid var(--border-color); padding: 8px; border-radius: 4px;
+            background: rgba(0,0,0,0.2); margin-bottom: 8px;
+        }
+        .pump-icon {
+            font-size: 1.5rem; color: var(--off); border: 2px solid var(--off);
+            border-radius: 50%; padding: 6px; transition: 0.3s;
+        }
+        .pump-icon.running { color: var(--ok); border-color: var(--ok); animation: spin 0.8s linear infinite; }
+        
+        /* PIPING (SVG LAYER) - PC ONLY */
+        .piping-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+            /* Tampil di PC */
+            display: block; 
+        }
+        .pipe-line {
+            fill: none; stroke: var(--off); stroke-width: 3;
+            stroke-linejoin: round; stroke-linecap: round; opacity: 0.6;
+        }
+        .pipe-line.active {
+            stroke: var(--diesel-main); opacity: 1; stroke-width: 4;
+            stroke-dasharray: 6 4; animation: flow 0.5s linear infinite;
+        }
+
+
+        /* =========================================
+           RESPONSIVE MEDIA QUERIES (MAGIC HAPPENS HERE)
+           ========================================= */
+
+        /* TABLET & LAPTOP KECIL (Max Width 1200px) */
+        @media (max-width: 1200px) {
+            body {
+                overflow-y: auto; /* Izinkan scroll vertikal */
+                height: auto; 
+                display: block;
+            }
+            .main-grid {
+                /* Ubah jadi 2 kolom grid */
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto; /* Baris menyesuaikan konten */
+                height: auto;
+            }
+            .piping-layer {
+                display: none; /* Sembunyikan pipa karena layout berubah */
+            }
+            .scada-header h1 { font-size: 1rem; }
+        }
+
+        /* MOBILE PHONE (Max Width 768px) */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            .scada-header {
+                flex-direction: column; /* Header jadi tumpuk */
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .scada-header > div:last-child {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 5px;
+            }
+            
+            .main-grid {
+                /* Ubah jadi 1 kolom (Stack ke bawah) */
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .panel {
+                min-height: auto; /* Tinggi panel fleksibel */
+            }
+            
+            /* Sembunyikan Pipa di HP agar tidak berantakan */
+            .piping-layer { display: none; }
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes flow { to { stroke-dashoffset: -10; } }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+    </style>
+</head>
+<body>
+
+    <header class="scada-header">
+        <div class="header-title">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <i class="fas fa-network-wired fa-lg" style="color: var(--diesel-main);"></i>
+                <div>
+                    <h1>Enterprise Fuel SCADA</h1>
+                    <small>ID: EPMS-BKS-01 | REMOTE VIEW</small>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="data-row" style="margin:0;">
+                <span class="data-val" id="clock" style="width:auto; min-width:60px;">12:00:00</span>
+            </div>
+            <div class="sys-badge"><i class="fas fa-wifi"></i> ONLINE</div>
+            <a href="index.html" style="color: #64748b; text-decoration: none; padding: 5px 10px; border:1px solid #334155; border-radius:4px;"><i class="fas fa-sign-out-alt"></i> EXIT</a>
+        </div>
+    </header>
+
+    <div class="main-grid">
+
+        <svg class="piping-layer" viewBox="0 0 1300 700" preserveAspectRatio="none">
+            <path id="pipe-suc" d="M 140 500 L 140 380 L 330 380" class="pipe-line" />
+            <path id="pipe-dis" d="M 430 340 L 430 250 L 430 80" class="pipe-line" />
+            <path id="pipe-head" d="M 430 80 L 580 80" class="pipe-line" />
+            <path id="pipe-rise" d="M 580 80 L 580 600" class="pipe-line" />
+            <path id="pipe-br-a" d="M 580 150 L 650 150" class="pipe-line" />
+            <path id="pipe-br-b" d="M 580 320 L 650 320" class="pipe-line" />
+            <path id="pipe-br-c" d="M 580 490 L 650 490" class="pipe-line" />
+        </svg>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>BULK STORAGE (UST)</span>
+                <i class="fas fa-database"></i>
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-secondary);">LEVEL TREND (1H)</div>
+            <div class="chart-container">
+                <svg width="100%" height="100%" preserveAspectRatio="none">
+                    <polyline id="ust-sparkline" class="sparkline-path" points="0,50 100,50" />
+                </svg>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-grow:1;">
+                <div style="width:60%;">
+                    <div class="data-row"><span class="data-lbl">LIT-101</span><div><span class="data-val" id="val-ust-lvl">85.0</span><span class="data-unit">%</span></div></div>
+                    <div class="data-row"><span class="data-lbl">TIT-101</span><div><span class="data-val" id="val-ust-tmp">28.4</span><span class="data-unit">°C</span></div></div>
+                    <div class="data-row"><span class="data-lbl">Volume</span><div><span class="data-val" id="val-ust-vol">85,000</span><span class="data-unit">L</span></div></div>
+                </div>
+                <div style="width:35%; text-align:center;">
+                    <div class="tank-wrapper ust-shape"><div id="liq-ust" class="liquid" style="height:85%;"></div></div>
+                    <span style="font-size:0.7rem; font-weight:bold;">UST-01</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>TRANSFER & QUALITY</span>
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div style="background:#000; padding:8px; border-radius:4px; border:1px solid #333; margin-bottom:10px;">
+                <div style="font-size:0.7rem; color:#64748b; margin-bottom:5px;">FUEL QUALITY (FPU-01)</div>
+                <div class="data-row"><span class="data-lbl">Diff Press</span><div><span class="data-val" id="val-dp">0.21</span><span class="data-unit">Bar</span></div></div>
+                <div class="data-row"><span class="data-lbl">Water Cont</span><div><span class="data-val" style="color:var(--elec-blue);">45</span><span class="data-unit">ppm</span></div></div>
+            </div>
+            <div class="pump-unit">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <div style="display:flex; align-items:center;">
+                        <i id="icon-p1" class="fas fa-fan pump-icon"></i>
+                        <div style="margin-left:8px;">
+                            <div style="font-size:0.8rem; font-weight:bold;">P-101 (Main)</div>
+                            <div style="font-size:0.65rem; color:var(--ok);">AUTO</div>
+                        </div>
+                    </div>
+                    <div class="led" id="led-p1"></div>
+                </div>
+                <div class="data-row"><span class="data-lbl">Current</span><div><span class="data-val" style="color:var(--elec-blue);" id="val-p1-amp">0.0</span><span class="data-unit">A</span></div></div>
+                <div class="data-row"><span class="data-lbl">Vibration</span><div><span class="data-val" id="val-p1-vib">0.0</span><span class="data-unit">mm/s</span></div></div>
+            </div>
+            <div style="margin-top:auto;">
+                 <div class="data-row"><span class="data-lbl">Disch Press</span><div><span class="data-val" id="val-pit-dis">0.1</span><span class="data-unit">Bar</span></div></div>
+                 <div class="data-row"><span class="data-lbl">Main Flow</span><div><span class="data-val" id="val-fit-main">0</span><span class="data-unit">L/m</span></div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>POWER GENERATION</span>
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div style="display:flex; align-items:center; margin-bottom:15px;">
+                <i id="vlv-a" class="fas fa-caret-right" style="color:var(--crit); font-size:1.2rem; margin-right:5px; transition:0.3s;"></i>
+                <div style="text-align:center; margin-right:10px;">
+                    <div class="tank-wrapper dt-shape"><div id="liq-a" class="liquid" style="height:92%;"></div></div>
+                    <span style="font-size:0.65rem; font-weight:bold;">DT-A</span>
+                </div>
+                <div style="flex-grow:1; border:1px solid #333; padding:5px; border-radius:4px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span style="font-size:0.75rem; font-weight:bold;">GENSET A</span>
+                        <span class="sys-badge" style="background:transparent; border:none; padding:0;">STBY</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div class="data-row"><span class="data-lbl">Lvl</span><span class="data-val" id="val-a-lvl">92.0</span></div>
+                        <div class="data-row"><span class="data-lbl">Tmp</span><span class="data-val" id="val-a-tmp">30.1</span></div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; margin-bottom:15px;">
+                <i id="vlv-b" class="fas fa-caret-right" style="color:var(--crit); font-size:1.2rem; margin-right:5px; transition:0.3s;"></i>
+                <div style="text-align:center; margin-right:10px;">
+                    <div class="tank-wrapper dt-shape"><div id="liq-b" class="liquid" style="height:45%;"></div></div>
+                    <span style="font-size:0.65rem; font-weight:bold;">DT-B</span>
+                </div>
+                <div style="flex-grow:1; border:1px solid var(--warn); padding:5px; border-radius:4px; background:rgba(245, 158, 11, 0.05);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span style="font-size:0.75rem; font-weight:bold; color:var(--warn);"><i class="fas fa-cog fa-spin"></i> GENSET B</span>
+                        <span style="font-size:0.65rem; color:var(--warn); font-weight:bold;">RUN</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div class="data-row"><span class="data-lbl">Lvl</span><span class="data-val" id="val-b-lvl" style="color:var(--warn);">45.0</span></div>
+                        <div class="data-row"><span class="data-lbl">Tmp</span><span class="data-val" id="val-b-tmp" style="color:var(--warn);">38.2</span></div>
+                    </div>
+                </div>
+            </div>
+             <div style="display:flex; align-items:center;">
+                <i id="vlv-c" class="fas fa-caret-right" style="color:var(--crit); font-size:1.2rem; margin-right:5px; transition:0.3s;"></i>
+                <div style="text-align:center; margin-right:10px;">
+                    <div class="tank-wrapper dt-shape"><div id="liq-c" class="liquid" style="height:88%;"></div></div>
+                    <span style="font-size:0.65rem; font-weight:bold;">DT-C</span>
+                </div>
+                <div style="flex-grow:1; border:1px solid #333; padding:5px; border-radius:4px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span style="font-size:0.75rem; font-weight:bold;">GENSET C</span>
+                        <span class="sys-badge" style="background:transparent; border:none; padding:0;">STBY</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div class="data-row"><span class="data-lbl">Lvl</span><span class="data-val" id="val-c-lvl">88.0</span></div>
+                        <div class="data-row"><span class="data-lbl">Tmp</span><span class="data-val" id="val-c-tmp">29.5</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>EVENTS & SAFETY</span>
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div style="border:1px solid #333; padding:8px; border-radius:4px; margin-bottom:15px;">
+                <div style="font-size:0.7rem; font-weight:bold; color:#fff; margin-bottom:8px;">LEAK DETECTION (LDS)</div>
+                <div class="data-row"><span>Zone 1: UST</span><div class="led on" id="lds-1"></div></div>
+                <div class="data-row"><span>Zone 2: Pump</span><div class="led on" id="lds-2"></div></div>
+                <div class="data-row"><span>Zone 3: Header</span><div class="led on" id="lds-3"></div></div>
+                <div class="data-row"><span>Zone 4: Genset</span><div class="led on" id="lds-4"></div></div>
+            </div>
+            <div style="font-size:0.7rem; font-weight:bold; color:var(--crit); margin-bottom:5px;">ACTIVE ALARMS</div>
+            <div id="alarm-box" style="flex-grow:1; overflow-y:auto; font-size:0.75rem; color:#fff; min-height:100px;">
+                </div>
+            <button onclick="ack()" style="background:#334155; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer; margin-top:10px; font-weight:bold; width:100%;">ACKNOWLEDGE</button>
+        </div>
+
+    </div>
+
+    <script>
+        let sys = {
+            ust: 85.00, dtA: 92.00, dtB: 45.00, dtC: 88.00,
+            pumpRunning: false, amps: 0.0, vib: 0.2, flow: 0,
+            history: new Array(50).fill(50)
+        };
+        const LOW_LIMIT = 30.0; const HIGH_LIMIT = 90.0;
+        const rand = (min, max) => Math.random() * (max - min) + min;
+        const fmt = (n) => n.toFixed(1);
+
+        setInterval(() => {
+            updateClock(); simulatePhysics(); updateUI();
+        }, 200);
+
+        function simulatePhysics() {
+            if(sys.dtB > 0) sys.dtB -= 0.1;
+            if(sys.dtB <= LOW_LIMIT) sys.pumpRunning = true;
+            if(sys.dtB >= HIGH_LIMIT) sys.pumpRunning = false;
+
+            if(sys.pumpRunning) {
+                sys.dtB += 0.4; sys.ust -= 0.02; 
+                if(sys.amps < 14.5) sys.amps += 1.0;
+                if(sys.flow < 180) sys.flow += 10;
+                sys.vib = rand(2.1, 2.4);
+            } else {
+                if(sys.amps > 0) sys.amps -= 0.5;
+                if(sys.flow > 0) sys.flow -= 5;
+                sys.vib = rand(0.1, 0.3);
+            }
+            if(sys.amps < 0) sys.amps = 0;
+            if(sys.flow < 0) sys.flow = 0;
+
+            sys.history.shift();
+            let chartVal = 100 - ((sys.ust - 80) * 10); 
+            sys.history.push(chartVal);
+        }
+
+        function updateUI() {
+            document.getElementById('val-ust-lvl').innerText = fmt(sys.ust);
+            document.getElementById('val-ust-vol').innerText = Math.round(sys.ust * 1000).toLocaleString();
+            document.getElementById('val-a-lvl').innerText = fmt(sys.dtA);
+            document.getElementById('val-b-lvl').innerText = fmt(sys.dtB);
+            document.getElementById('val-c-lvl').innerText = fmt(sys.dtC);
+
+            document.getElementById('liq-ust').style.height = sys.ust + '%';
+            document.getElementById('liq-a').style.height = sys.dtA + '%';
+            document.getElementById('liq-b').style.height = sys.dtB + '%';
+            document.getElementById('liq-c').style.height = sys.dtC + '%';
+
+            document.getElementById('val-p1-amp').innerText = fmt(sys.amps);
+            document.getElementById('val-p1-vib').innerText = fmt(sys.vib);
+            document.getElementById('val-fit-main').innerText = Math.round(sys.flow);
+            let press = sys.flow > 0 ? rand(4.1, 4.3) : rand(0.1, 0.2);
+            document.getElementById('val-pit-dis').innerText = fmt(press);
+
+            const pumpIcon = document.getElementById('icon-p1');
+            const led = document.getElementById('led-p1');
+            const vlvB = document.getElementById('vlv-b');
+            // Pipe animation only visible on PC
+            const pipes = ['pipe-suc', 'pipe-dis', 'pipe-head', 'pipe-rise', 'pipe-br-b'];
+
+            if(sys.pumpRunning) {
+                pumpIcon.classList.add('running');
+                led.className = "led on";
+                vlvB.style.transform = "rotate(90deg)"; vlvB.style.color = "var(--ok)";
+                pipes.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active');
+                });
+            } else {
+                pumpIcon.classList.remove('running');
+                led.className = "led";
+                vlvB.style.transform = "rotate(0deg)"; vlvB.style.color = "var(--crit)";
+                document.querySelectorAll('.pipe-line').forEach(p => p.classList.remove('active'));
+            }
+
+            let pointsStr = sys.history.map((val, i) => `${i * 2},${val}`).join(' '); 
+            document.getElementById('ust-sparkline').setAttribute('points', pointsStr);
+
+            const alarmBox = document.getElementById('alarm-box');
+            if(sys.dtB <= LOW_LIMIT) {
+                if(alarmBox.innerHTML.length < 50) { 
+                    alarmBox.innerHTML = `<div style="background:rgba(239,68,68,0.2); padding:5px; border-left:3px solid red; margin-bottom:5px;">
+                        <strong>LIT-402 LOLO</strong><br>DT-B Level Critical
+                    </div>`;
+                }
+            } else {
+                alarmBox.innerHTML = `<div style="color:#64748b; text-align:center; padding-top:20px;">No Active Alarms</div>`;
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }
+        
+        function ack() {
+            document.getElementById('alarm-box').innerHTML = `<div style="color:#64748b; text-align:center; padding-top:20px;">Alarms Acknowledged</div>`;
+        }
+    </script>
+</body>
+</html>

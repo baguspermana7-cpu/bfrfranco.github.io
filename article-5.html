@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article 5 - Technical Debt in Live Data Centers Is Operational Risk | Bagus Dwi Permana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .article-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('assets/article-5-cover.png') center/cover no-repeat;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        .article-hero > * { position: relative; z-index: 1; }
+        .article-hero .container { max-width: 900px; }
+        .article-category {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #fff;
+        }
+        .article-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+        }
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-content {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+        .article-content .container { max-width: 800px; }
+        .article-body {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: #374151;
+        }
+        .article-body p { margin-bottom: 1.75rem; }
+        .article-body h2 {
+            font-size: 1.75rem;
+            color: #1e3a5f;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e5e7eb;
+        }
+        .article-body h3 {
+            font-size: 1.375rem;
+            color: #2d5a87;
+            margin: 2rem 0 1rem;
+        }
+        .article-body blockquote {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #92400e;
+        }
+        .article-body ul, .article-body ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .article-body li { margin-bottom: 0.75rem; }
+        .highlight-box {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        .highlight-box p {
+            margin: 0;
+            color: #991b1b;
+            font-weight: 500;
+        }
+        .result-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #10b981;
+        }
+        .result-box h4 {
+            color: #065f46;
+            margin-bottom: 0.75rem;
+        }
+        .result-box p {
+            margin: 0.5rem 0;
+            color: #047857;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: #fff; }
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2d5a87;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .article-nav a:hover { color: #1e3a5f; }
+        .references {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        .references h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .references ul {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* Interactive Chart */
+        .chart-container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-title {
+            text-align: center;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .chart-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-wrapper {
+            background: rgba(2, 6, 23, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .control-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .control-slider {
+            width: 200px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f59e0b;
+            cursor: pointer;
+        }
+        .control-value {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .callout-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .callout-card {
+            background: rgba(30, 58, 95, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(245, 158, 11, 0.15);
+        }
+        .callout-label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .callout-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #f59e0b;
+        }
+
+        @media (max-width: 768px) {
+            .article-hero { padding: 6rem 1rem 3rem; }
+            .article-meta { flex-direction: column; gap: 1rem; }
+            .article-content { padding: 3rem 1rem; }
+            .article-body { font-size: 1rem; }
+            .chart-container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li><a href="articles.html" class="nav-link">Articles</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="article-hero">
+        <div class="container">
+            <a href="articles.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Articles
+            </a>
+            <span class="article-category">Risk Management</span>
+            <h1 class="article-title">Technical Debt in Live Data Centers Is Operational Risk</h1>
+            <p class="article-subtitle">Why temporary fixes, deferred decisions, and workaround culture silently erode resilience.</p>
+            <div class="article-meta">
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    10 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    November 20, 2025
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Bagus Dwi Permana
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <article class="article-content">
+        <div class="container">
+            <div class="article-body">
+                <h2>Abstract</h2>
+                <p>In live data centers, technical debt does not appear as broken equipment or failed SLAs. It appears as temporary fixes that never get reversed, undocumented deviations, and growing reliance on tribal knowledge to keep systems running.</p>
+
+                <blockquote>
+                    "Every data center accumulates technical debt. The difference between resilient sites and fragile ones is not whether debt exists, but whether it is visible, bounded, and actively serviced. The most dangerous words in critical operations are: 'Temporary solution—will fix later.'"
+                </blockquote>
+
+                <h2>1. From Software Metaphor to Physical Reality</h2>
+                <p>The term "technical debt" originated in software engineering, describing the future cost of quick fixes made today. In data centers, the metaphor becomes literal. A temporary bypass, a non-standard configuration, or an undocumented parameter change behaves exactly like debt: it accrues interest over time.</p>
+
+                <p>Unlike software, however, physical technical debt interacts with thermal limits, electrical tolerances, and human memory. The consequences are therefore nonlinear and harder to reverse.</p>
+
+                <h2>2. What Technical Debt Looks Like in Live Facilities</h2>
+                <p>Operational technical debt rarely appears as a single major deviation. It accumulates as small, reasonable decisions:</p>
+                <ul>
+                    <li>Temporary bypasses left in place after incidents</li>
+                    <li>PM scopes adjusted without updating acceptance criteria</li>
+                    <li>Alarm thresholds modified but not rationalized</li>
+                    <li>Vendor workarounds undocumented in SOPs</li>
+                    <li>Redundancy assumptions drifting from as-built reality</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>The Hidden Risk:</strong> Individually, each change feels low risk. Collectively, they redefine system behavior in ways that are no longer documented or understood.</p>
+                </div>
+
+                <h2>3. Latent Conditions and Drift Toward Failure</h2>
+                <p>James Reason describes accidents as the alignment of latent conditions. Technical debt is a systematic way of creating latent conditions. As debt accumulates:</p>
+                <ul>
+                    <li>System margins shrink</li>
+                    <li>Operator mental models diverge from reality</li>
+                    <li>Recovery paths become less certain</li>
+                </ul>
+
+                <p>Drift toward failure does not require incompetence. It requires time, success, and lack of visibility.</p>
+
+                <h2>4. Interactive: Technical Debt Accumulation vs Risk</h2>
+                <p>This simulation demonstrates how technical debt accumulation correlates with operational risk over time:</p>
+
+                <!-- Interactive Chart -->
+                <div class="chart-container">
+                    <div class="chart-title">Technical Debt Accumulation vs Operational Risk</div>
+                    <div class="chart-subtitle">Higher debt accumulation rate increases risk exposure over time</div>
+
+                    <div class="chart-wrapper">
+                        <canvas id="debtChart" class="chart-canvas" width="800" height="380"></canvas>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="control-label">Debt Accumulation Rate:</span>
+                        <input type="range" id="debtSlider" class="control-slider" min="0" max="100" value="40">
+                        <span class="control-value" id="debtValue">40%</span>
+                    </div>
+
+                    <div class="legend-row">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #f59e0b;"></span>
+                            Operational Risk Level
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #ef4444;"></span>
+                            Critical Threshold
+                        </div>
+                    </div>
+
+                    <div class="callout-row">
+                        <div class="callout-card">
+                            <div class="callout-label">Final Risk Level</div>
+                            <div class="callout-value" id="finalRisk">45</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Risk Trajectory</div>
+                            <div class="callout-value" id="trajectory">Rising</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Debt Status</div>
+                            <div class="callout-value" id="debtStatus">Moderate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>5. Case Pattern: How Debt Amplifies Incidents</h2>
+                <p>Across multiple incidents, the same amplification pattern appears:</p>
+                <ol>
+                    <li>Incident occurs in a non-standard configuration</li>
+                    <li>Documentation does not reflect actual state</li>
+                    <li>Engineers lose time reconstructing history</li>
+                    <li>Recovery actions are conservative or delayed</li>
+                    <li>MTTR extends beyond design expectations</li>
+                </ol>
+
+                <p>In post-incident reviews, the root cause is often labeled as "complexity" or "unexpected interaction". Technical debt is the missing name.</p>
+
+                <h2>6. Why Redundancy Does Not Cancel Technical Debt</h2>
+                <p>Redundancy protects against component failure, not against misunderstanding of system state. A redundant system operating under undocumented constraints can fail faster than a simpler, well-understood one. Technical debt undermines the assumptions redundancy relies on.</p>
+
+                <h2>7. Asset Management Perspective (ISO 55000)</h2>
+                <p>ISO 55000 emphasizes assurance, governance, and lifecycle thinking. Unmanaged technical debt violates all three:</p>
+                <ul>
+                    <li><strong>Assurance:</strong> cannot be provided without truthful system state</li>
+                    <li><strong>Governance:</strong> decisions made without traceability</li>
+                    <li><strong>Lifecycle:</strong> temporary changes become permanent without review</li>
+                </ul>
+
+                <p>From an asset management view, technical debt is unmanaged lifecycle risk.</p>
+
+                <h2>8. Designing a Technical Debt Control System</h2>
+                <p>Resilient sites treat technical debt as a controlled backlog, not as an embarrassment to hide. Key elements:</p>
+                <ul>
+                    <li><strong>Explicit classification:</strong> temporary, tolerated, prohibited</li>
+                    <li><strong>Time-bound approvals:</strong> with expiry dates</li>
+                    <li><strong>Centralized deviation register:</strong> linked to assets</li>
+                    <li><strong>Mandatory reversal:</strong> or formal redesign paths</li>
+                    <li><strong>Review cadence:</strong> aligned with risk, not convenience</li>
+                </ul>
+
+                <div class="result-box">
+                    <h4>Key Principle</h4>
+                    <p>Debt must be visible to be payable. Hidden debt compounds silently until it manifests as an incident.</p>
+                </div>
+
+                <h2>9. Leading Indicators of Debt Saturation</h2>
+                <p>While debt itself is abstract, its effects are measurable:</p>
+                <ul>
+                    <li>Increasing MTTR variance</li>
+                    <li>Rising number of "known unknowns" during incidents</li>
+                    <li>Growing dependency on specific individuals</li>
+                    <li>Repeated PM findings on the same assets</li>
+                    <li>Escalation delays due to uncertainty</li>
+                </ul>
+
+                <h2>10. Conclusion</h2>
+                <blockquote>
+                    "Technical debt is inevitable in live operations. Ignoring it converts short-term stability into long-term fragility. Resilient data centers do not eliminate debt. They make it visible, bounded, and continuously repaid."
+                </blockquote>
+
+                <div class="references">
+                    <h3>References</h3>
+                    <ul>
+                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents. Ashgate.</li>
+                        <li>Hollnagel, E. (2014). Safety-I and Safety-II: The Past and Future of Safety Management. Ashgate.</li>
+                        <li>ISO 55000. (2014). Asset Management — Overview, Principles and Terminology.</li>
+                        <li>Weick, K. E., & Sutcliffe, K. M. (2015). Managing the Unexpected.</li>
+                        <li>Leveson, N. (2011). Engineering a Safer World: Systems Thinking Applied to Safety.</li>
+                    </ul>
+                </div>
+
+                <div class="article-nav">
+                    <a href="article-4.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Previous Article
+                    </a>
+                    <a href="article-6.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
+                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+    (function() {
+        const canvas = document.getElementById('debtChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const debtSlider = document.getElementById('debtSlider');
+        const debtValue = document.getElementById('debtValue');
+        const finalRisk = document.getElementById('finalRisk');
+        const trajectory = document.getElementById('trajectory');
+        const debtStatus = document.getElementById('debtStatus');
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+
+        const W = rect.width;
+        const H = rect.height;
+        const padding = { top: 50, right: 60, bottom: 60, left: 80 };
+        const chartW = W - padding.left - padding.right;
+        const chartH = H - padding.top - padding.bottom;
+
+        function simulate(rate) {
+            let risk = [];
+            let base = 10;
+            for (let i = 0; i < 12; i++) {
+                base += rate / 20;
+                let spike = Math.max(0, Math.sin(i) * 5);
+                risk.push(base + spike);
+            }
+            return risk;
+        }
+
+        function drawChart(rate) {
+            ctx.clearRect(0, 0, W, H);
+
+            // Background
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.5)';
+            ctx.fillRect(0, 0, W, H);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(W - padding.right, y);
+                ctx.stroke();
+            }
+
+            // Critical threshold line
+            const threshold = 60;
+            const thresholdY = padding.top + chartH - (threshold / 100) * chartH;
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(padding.left, thresholdY);
+            ctx.lineTo(W - padding.right, thresholdY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#ef4444';
+            ctx.font = '11px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Critical Threshold', W - padding.right - 100, thresholdY - 8);
+
+            // Y-axis labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            ctx.font = '12px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                const val = 100 - i * 20;
+                ctx.fillText(val, padding.left - 10, y + 4);
+            }
+
+            // Y-axis title
+            ctx.save();
+            ctx.translate(25, H / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Operational Risk Level', 0, 0);
+            ctx.restore();
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            for (let i = 0; i < 12; i++) {
+                const x = padding.left + (chartW / 11) * i;
+                ctx.fillText('M' + (i + 1), x, H - padding.bottom + 25);
+            }
+
+            // X-axis title
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Time (Months)', W / 2, H - 15);
+
+            // Get data
+            const risk = simulate(rate);
+
+            // Draw area
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
+            for (let i = 0; i < risk.length; i++) {
+                const x = padding.left + (chartW / 11) * i;
+                const y = padding.top + chartH - (risk[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.lineTo(padding.left + chartW, H - padding.bottom);
+            ctx.lineTo(padding.left, H - padding.bottom);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw line
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            for (let i = 0; i < risk.length; i++) {
+                const x = padding.left + (chartW / 11) * i;
+                const y = padding.top + chartH - (risk[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw points
+            ctx.fillStyle = '#f59e0b';
+            for (let i = 0; i < risk.length; i++) {
+                const x = padding.left + (chartW / 11) * i;
+                const y = padding.top + chartH - (risk[i] / 100) * chartH;
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // End value label
+            const lastRisk = risk[risk.length - 1];
+            const lastX = padding.left + chartW;
+            const lastY = padding.top + chartH - (lastRisk / 100) * chartH;
+            ctx.font = 'bold 12px Inter, system-ui, sans-serif';
+            ctx.fillStyle = '#f59e0b';
+            ctx.textAlign = 'left';
+            ctx.fillText(Math.round(lastRisk), lastX + 8, lastY + 4);
+
+            // Update callouts
+            finalRisk.textContent = Math.round(lastRisk);
+
+            const growth = risk[risk.length - 1] - risk[0];
+            if (growth > 20) {
+                trajectory.textContent = 'Rising';
+                trajectory.style.color = '#ef4444';
+            } else if (growth > 10) {
+                trajectory.textContent = 'Climbing';
+                trajectory.style.color = '#f59e0b';
+            } else {
+                trajectory.textContent = 'Stable';
+                trajectory.style.color = '#10b981';
+            }
+
+            if (rate >= 70) {
+                debtStatus.textContent = 'Critical';
+                debtStatus.style.color = '#ef4444';
+            } else if (rate >= 40) {
+                debtStatus.textContent = 'Moderate';
+                debtStatus.style.color = '#f59e0b';
+            } else {
+                debtStatus.textContent = 'Managed';
+                debtStatus.style.color = '#10b981';
+            }
+        }
+
+        function refresh() {
+            const rate = parseInt(debtSlider.value);
+            debtValue.textContent = rate + '%';
+            drawChart(rate);
+        }
+
+        debtSlider.addEventListener('input', refresh);
+        refresh();
+
+        window.addEventListener('resize', function() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            refresh();
+        });
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Technical Debt vs Risk Simulation</title>
+<style>
+body{background:#0b1220;color:#e5e7eb;font-family:system-ui}
+.wrap{max-width:960px;margin:30px auto;padding:0 16px}
+canvas{background:#020617;border-radius:12px}
+.controls{margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h2>Technical Debt Accumulation vs Operational Risk</h2>
+<p>Simulated relationship between accumulated technical debt and incident severity.</p>
+<canvas id="c" width="900" height="420"></canvas>
+<div class="controls">
+<label>Debt accumulation rate:</label>
+<input type="range" id="debt" min="0" max="100" value="40"/>
+<span id="dv">40</span>
+</div>
+</div>
+
+<script>
+const ctx=document.getElementById("c").getContext("2d");
+const debt=document.getElementById("debt");
+const dv=document.getElementById("dv");
+
+function drawAxes(){
+  ctx.clearRect(0,0,900,420);
+  ctx.strokeStyle="#475569";
+  ctx.beginPath();
+  ctx.moveTo(60,40); ctx.lineTo(60,360); ctx.lineTo(860,360);
+  ctx.stroke();
+  ctx.fillText("Operational Risk",10,50);
+  ctx.fillText("Time →",800,395);
+}
+
+function simulate(rate){
+  let risk=[];
+  let base=10;
+  for(let i=0;i<10;i++){
+    base += rate/20;
+    let spike = Math.max(0, Math.sin(i)*5);
+    risk.push(base + spike);
+  }
+  return risk;
+}
+
+function plot(risk){
+  ctx.strokeStyle="#fbbf24";
+  ctx.beginPath();
+  for(let i=0;i<risk.length;i++){
+    let x=60+i*(800/9);
+    let y=360-risk[i]*3;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    ctx.fillText(risk[i].toFixed(1),x-10,y-10);
+  }
+  ctx.stroke();
+}
+
+function redraw(){
+  dv.textContent=debt.value;
+  drawAxes();
+  plot(simulate(debt.value));
+}
+
+debt.addEventListener("input",redraw);
+redraw();
+</script>
+</body>
+</html>

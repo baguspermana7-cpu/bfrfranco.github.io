@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BKS01 MASTER COMMAND NODE | v12.0 FINAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&family=Roboto:wght@400;500;700&family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    /* --- CORE VARIABLES --- */
+    :root {
+        --bg-deep: #020203;
+        --bg-panel: rgba(10, 12, 16, 0.95);
+        --border-color: #1f2533;
+        
+        --neon-cyan: #00f3ff;
+        --neon-green: #00ff41;
+        --neon-red: #ff003c;
+        --neon-amber: #ffb300;
+        --neon-purple: #bd00ff;
+        
+        --grid-pattern: rgba(0, 243, 255, 0.03);
+    }
+
+    /* --- GLOBAL RESET --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+    body { 
+        height: 100vh; width: 100vw; overflow: hidden; display: flex; 
+        background-color: var(--bg-deep); 
+        background-image: 
+            linear-gradient(var(--grid-pattern) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-pattern) 1px, transparent 1px);
+        background-size: 30px 30px;
+        color: #c0c5ce;
+    }
+
+    /* --- CRT SCANLINE EFFECT (The "Vibe") --- */
+    body::after {
+        content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 9999; background-size: 100% 2px, 3px 100%; pointer-events: none;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+        width: 65px; background: #050608; border-right: 1px solid #1f2533;
+        display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100;
+    }
+    .brand-icon {
+        width: 42px; height: 42px; background: linear-gradient(135deg, #00f3ff, #0066ff);
+        border-radius: 6px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center;
+        font-weight: 800; color: #000; font-family: 'Chakra Petch'; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); font-size: 11px; cursor: pointer;
+    }
+    .nav-item {
+        width: 45px; height: 45px; margin-bottom: 15px; border-radius: 6px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s; color: #555; font-size: 9px; font-weight: bold; font-family: 'Segoe UI'; border: 1px solid transparent;
+    }
+    .nav-item svg { width: 22px; height: 22px; margin-bottom: 3px; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { background: rgba(0, 243, 255, 0.05); color: var(--neon-cyan); border: 1px solid rgba(0, 243, 255, 0.2); box-shadow: 0 0 10px rgba(0,243,255,0.1); }
+    
+    .nav-back { margin-top: auto; margin-bottom: 20px; color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
+    .nav-back:hover { background: var(--neon-red); color: #000; box-shadow: 0 0 10px var(--neon-red); }
+
+    /* --- VIEW CONTAINER --- */
+    .main-view { flex: 1; position: relative; overflow: hidden; }
+    .page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
+    .page.active { display: flex; }
+
+    /* ================================================================================= */
+    /* === VIEW 1: NOC DASHBOARD (MAXIMUM DENSITY - DARK SCI-FI) === */
+    /* ================================================================================= */
+    #view-noc { font-family: 'Rajdhani', sans-serif; }
+
+    /* Header */
+    .noc-header { 
+        height: 45px; background: #08090b; border-bottom: 1px solid var(--neon-cyan); 
+        display: flex; align-items: center; justify-content: space-between; padding: 0 15px; 
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); z-index: 10;
+    }
+    .noc-brand { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 2px; text-shadow: 0 0 8px var(--neon-cyan); font-family: 'Chakra Petch'; }
+    .noc-top-stat { display: flex; gap: 15px; font-family: 'Share Tech Mono'; font-size: 11px; align-items: center; color: #888; }
+    .noc-pill { padding: 4px 10px; border: 1px solid #222; background: #0f1116; display: flex; align-items: center; gap: 6px; border-radius: 4px; }
+    .btn-exit { 
+        background: var(--neon-cyan); color: #000; border: none; padding: 5px 15px; font-weight: 800; cursor: pointer; 
+        font-family: 'Chakra Petch'; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%); transition: 0.2s;
+    }
+    .btn-exit:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+
+    /* Grid Layout */
+    .noc-grid { 
+        flex: 1; padding: 8px; display: grid; gap: 6px; overflow-y: auto;
+        grid-template-columns: 240px 1fr 1fr 300px; 
+        grid-template-rows: 80px 280px 200px 1fr 30px; 
+    }
+    
+    /* Widgets */
+    .noc-widget { 
+        background: var(--bg-panel); border: 1px solid var(--border-color); position: relative; 
+        display: flex; flex-direction: column; overflow: hidden; 
+    }
+    .noc-widget-head { 
+        background: rgba(0, 243, 255, 0.03); padding: 4px 10px; font-size: 10px; font-weight: 700; 
+        color: var(--neon-cyan); border-bottom: 1px solid var(--border-color); display: flex; 
+        justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 1px; font-family: 'Chakra Petch'; 
+    }
+    .noc-widget-body { flex: 1; padding: 6px; position: relative; overflow: hidden; }
+    
+    /* HUD Corner Accents */
+    .noc-widget::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
+    .noc-widget::after { content: ""; position: absolute; bottom: 0; right: 0; width: 6px; height: 6px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+    
+    /* Utils */
+    .col-2 { grid-column: span 2; } .col-3 { grid-column: span 3; } .row-2 { grid-row: span 2; } .no-pad { padding: 0; }
+    .text-val { font-family: 'Share Tech Mono'; font-weight: bold; font-size: 24px; color: #fff; }
+    .text-lbl { font-size: 9px; color: #545b66; text-transform: uppercase; font-family: 'Chakra Petch'; font-weight: bold; }
+    .blink-green { animation: blink 1s infinite; color: var(--neon-green); }
+    .blink-red { animation: blink 0.5s infinite; color: var(--neon-red); }
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    /* Map & Radar */
+    .map-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 5px #000); }
+    .map-path { fill: #13151a; stroke: #2a2f3a; stroke-width: 0.5; }
+    .map-path:hover { fill: #1a2634; stroke: var(--neon-cyan); }
+    .threat-line { fill: none; stroke: var(--neon-red); stroke-width: 1; stroke-dasharray: 5; animation: dash 1s linear infinite; }
+    .radar-circle { fill: none; stroke: var(--neon-green); stroke-width: 1; opacity: 0; animation: radar 3s infinite; }
+    .packet { r: 2; fill: #fff; animation: travel 3s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -20; } }
+    @keyframes radar { 0% { r: 0; opacity: 1; } 100% { r: 50; opacity: 0; } }
+    @keyframes travel { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
+
+    /* Charts */
+    .chart-cvs { width: 100%; height: 100%; }
+
+    /* Complex Widgets */
+    .rack-stack { display: flex; flex-direction: column-reverse; height: 100%; gap: 1px; background: #000; overflow-y: auto; }
+    .u-slot { height: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; font-family: 'Share Tech Mono'; font-size: 8px; color: #444; border-bottom: 1px solid #111; }
+    .u-slot.on { background: #0f131a; color: #bbb; border-left: 2px solid var(--neon-cyan); }
+    .u-slot.err { background: #220a0a; border-left: 2px solid var(--neon-red); color: var(--neon-red); }
+    
+    .cctv-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; height: 100%; }
+    .cam { background: #000; border: 1px solid #222; position: relative; overflow: hidden; }
+    .cam-ov { position: absolute; top: 3px; left: 3px; color: #fff; font-size: 8px; font-family: 'Share Tech Mono'; z-index: 2; background: rgba(0,0,0,0.5); padding: 1px 3px; }
+    
+    .raid-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; height: 100%; padding: 5px; }
+    .raid-block { background: #1a1a1a; border: 1px solid #333; }
+    .raid-block.ok { background: var(--neon-green); box-shadow: 0 0 2px var(--neon-green); }
+    .raid-block.bad { background: var(--neon-red); animation: blink 0.5s infinite; }
+    .raid-block.read { background: var(--neon-cyan); }
+
+    .spectrum { display: flex; align-items: flex-end; gap: 1px; height: 100%; }
+    .spec-bar { flex: 1; background: var(--neon-cyan); opacity: 0.6; transition: height 0.1s; }
+
+    .dense-table { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono'; font-size: 9px; }
+    .dense-table th { text-align: left; color: #555; border-bottom: 1px solid #333; padding: 4px; }
+    .dense-table td { border-bottom: 1px solid #222; padding: 4px; color: #aaa; }
+    .dense-table tr:hover td { background: #111; color: #fff; }
+
+    /* ========================================================================== */
+    /* === VIEW 2: PRTG DASHBOARD (100% IMAGE REPLICA) === */
+    /* ========================================================================== */
+    #view-prtg {
+        background-color: #ffffff; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-y: auto;
+    }
+    .prtg-header-bar { background: #f0f0f0; border-bottom: 1px solid #ccc; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .prtg-title { font-size: 18px; color: #003366; font-weight: bold; }
+    
+    .prtg-layout { display: grid; grid-template-columns: 1fr 1fr 1fr; height: calc(100% - 50px); position: relative; }
+    .prtg-col { padding: 20px; border-right: 2px solid #003366; display: flex; flex-direction: column; gap: 20px; }
+    .prtg-col:last-child { border-right: none; }
+    .prtg-h2 { font-size: 22px; color: #003366; font-weight: 700; text-align: center; margin-bottom: 10px; }
+
+    /* PRTG Components */
+    .prtg-chart-box { border: 1px solid #ccc; background: #fdfdfd; padding: 5px; height: 130px; position: relative; }
+    .prtg-chart-label { font-size: 11px; color: #444; position: absolute; top: 5px; left: 5px; font-weight: bold; }
+    .prtg-status-row { display: flex; align-items: center; justify-content: space-between; }
+    .prtg-label-left { font-size: 13px; color: #555; width: 40%; font-weight: 500; }
+    .prtg-box-ok { background: #9abf36; color: #fff; font-weight: bold; text-align: center; padding: 10px 0; width: 55%; font-size: 13px; box-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+    .prtg-box-ok span { font-size: 11px; font-weight: normal; display: block; }
+
+    .sunburst-wrapper { width: 220px; height: 220px; margin: 0 auto; position: relative; }
+    .infra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+    .infra-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .infra-icon { width: 40px; height: 40px; background: #bbb; mask-size: contain; -webkit-mask-size: contain; background-color: #666; margin-bottom: 5px; }
+    .infra-name { font-size: 12px; font-weight: bold; color: #333; margin-bottom: 2px; }
+    .infra-badges { display: flex; gap: 1px; }
+    .ib { font-size: 9px; color: white; padding: 1px 3px; font-weight: bold; min-width: 15px; text-align: center; border:1px solid #fff; }
+    .ib-red { background: #d71920; } .ib-yel { background: #ffcc00; color: black; } .ib-grn { background: #9abf36; } .ib-blu { background: #0070c0; } .ib-gry { background: #aaa; }
+
+    .host-table { width: 100%; border-collapse: collapse; font-size: 10px; font-family: 'Segoe UI', sans-serif; }
+    .host-table td { padding: 4px; border: 1px solid #ddd; background: #fff; vertical-align: middle; }
+    .check { color: #9abf36; font-weight: bold; font-size: 14px; margin-right: 3px; }
+
+    .service-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #ccc; padding-bottom: 10px; margin-bottom: 10px; }
+    .service-info { font-size: 11px; line-height: 1.4; color: #333; }
+    .gauge-mini { width: 40px; height: 40px; border: 4px solid #9abf36; border-radius: 50%; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-45deg); }
+    .treemap { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-bottom: 20px; }
+    .tm-box { height: 80px; color: white; padding: 5px; font-size: 10px; font-weight: bold; position: relative; }
+    .tm-grn { background: #9abf36; } .tm-red { background: #e05d5d; }
+    .traffic-row { display: flex; justify-content: space-around; text-align: center; margin-top: 20px; }
+    .tl-container { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .tl-body { background: #eee; padding: 5px; border-radius: 20px; border:1px solid #ccc; }
+    .tl-light { width: 25px; height: 25px; border-radius: 50%; background: #ccc; margin: 2px 0; border:1px solid #bbb; }
+    .tl-light.on { background: #9abf36; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); border-color:#88b800; }
+    .tl-label { font-size: 11px; color: #555; font-weight: bold; }
+
+</style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="index.html" class="brand-icon">IMS</a>
+        <div class="nav-item active" onclick="switchView('noc', this)" title="NOC Dashboard">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg> NOC
+        </div>
+        <div class="nav-item" onclick="switchView('prtg', this)" title="PRTG Monitor">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> PRTG
+        </div>
+        <a href="index.html" class="nav-item nav-back" title="Exit to Portfolio">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> EXIT
+        </a>
+    </div>
+
+    <div class="main-view">
+
+        <div id="view-noc" class="page active">
+            <header class="noc-header">
+                <div class="noc-brand">BKS01 <span style="color:var(--neon-cyan)">COMMAND CENTER</span></div>
+                <div class="noc-top-stat">
+                    <div class="noc-pill"><span class="blink-green">●</span> SYSTEM ONLINE</div>
+                    <div class="noc-pill">DEFCON 3</div>
+                    <div class="noc-pill" id="noc-clock">00:00:00</div>
+                    <a href="index.html" class="btn-exit">BACK TO PORTFOLIO</a>
+                </div>
+            </header>
+
+            <div class="noc-grid">
+                <div class="noc-widget row-2">
+                    <div class="noc-widget-head">RACK A-01 [PHYSICAL]</div>
+                    <div class="noc-widget-body no-pad">
+                        <div class="rack-stack" id="rack-view"></div>
+                    </div>
+                </div>
+
+                <div class="noc-widget">
+                    <div class="noc-widget-head">UPS LOAD</div>
+                    <div class="noc-widget-body" style="display:flex; justify-content:space-around; align-items:center;">
+                        <svg viewBox="0 0 36 36" width="50" height="50"><path d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" fill="none" stroke="#222" stroke-width="3"/><path stroke-dasharray="60, 100" d="M18 2 a 16 16 0 0 1 0 32" fill="none" stroke="#00ff41" stroke-width="3"/><text x="18" y="22" fill="#fff" font-size="8" text-anchor="middle">UPS A</text></svg>
+                        <svg viewBox="0 0 36 36" width="50" height="50"><path d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" fill="none" stroke="#222" stroke-width="3"/><path stroke-dasharray="45, 100" d="M18 2 a 16 16 0 0 1 0 32" fill="none" stroke="#00f3ff" stroke-width="3"/><text x="18" y="22" fill="#fff" font-size="8" text-anchor="middle">UPS B</text></svg>
+                    </div>
+                </div>
+                <div class="noc-widget">
+                    <div class="noc-widget-head">ENVIRONMENT</div>
+                    <div class="noc-widget-body" style="display:grid; grid-template-columns:1fr 1fr; gap:2px;">
+                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="color:var(--neon-cyan); font-size:14px;">19°C</div><div class="text-lbl">COLD</div></div>
+                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="color:var(--neon-amber); font-size:14px;">27°C</div><div class="text-lbl">HOT</div></div>
+                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="color:var(--neon-green); font-size:14px;">42%</div><div class="text-lbl">HUM</div></div>
+                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="font-size:14px;">OK</div><div class="text-lbl">LEAK</div></div>
+                    </div>
+                </div>
+
+                <div class="noc-widget"><div class="noc-widget-head">HEALTH</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" style="font-size:28px; color:var(--neon-green)">98%</div><div class="text-lbl">OPTIMAL</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">ALERTS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val blink-red" style="font-size:28px;">3</div><div class="text-lbl">CRITICAL</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">TRAFFIC</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" style="color:var(--neon-cyan); font-size:28px;">14 G</div><div class="text-lbl">AGGREGATE</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">BLOCKS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" style="color:var(--neon-amber); font-size:28px;">2.4k</div><div class="text-lbl">PER SEC</div></div></div>
+
+                <div class="noc-widget col-2 row-2">
+                    <div class="noc-widget-head">WAN TOPOLOGY <span style="color:var(--neon-green)">● CONNECTED</span></div>
+                    <div class="noc-widget-body no-pad" style="background:#080a0f;">
+                        <svg class="map-svg" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
+                            <path d="M40,50 L90,60 L110,110 L100,150 L70,130 L40,80 Z" fill="#1a1d26" stroke="#333"/> <path d="M110,170 L260,180 L280,190 L250,200 L120,190 Z" fill="#1a1d26" stroke="#333"/> <path d="M170,60 L230,60 L250,90 L230,130 L190,130 Z" fill="#1a1d26" stroke="#333"/> <path d="M270,80 L290,80 L300,110 L320,100 L310,140 L280,130 Z" fill="#1a1d26" stroke="#333"/> <path d="M390,100 L490,110 L500,150 L410,140 Z" fill="#1a1d26" stroke="#333"/> <path d="M290,180 L320,185 L310,195 L290,190 Z" fill="#1a1d26" stroke="#333"/> <line x1="140" y1="180" x2="240" y2="185" stroke="#00f3ff" stroke-width="2"/>
+                            <text x="180" y="175" fill="#aaa" font-family="Share Tech Mono" font-size="8">12ms</text>
+                            
+                            <line x1="240" y1="185" x2="290" y2="130" stroke="#00f3ff" stroke-width="1" stroke-dasharray="2"/>
+                            <line x1="240" y1="185" x2="420" y2="130" stroke="#00f3ff" stroke-width="1" stroke-dasharray="2"/>
+
+                            <circle cx="140" cy="180" r="2" fill="#fff"/>
+                            <text x="140" y="165" fill="#888" font-size="8" text-anchor="middle" font-family="Share Tech Mono">JKT</text>
+                            
+                            <circle cx="240" cy="185" r="4" fill="#00f3ff"/>
+                            <circle cx="240" cy="185" r="10" class="radar-circle"/>
+                            <text x="240" y="200" fill="#00f3ff" font-size="10" font-weight="bold" text-anchor="middle" font-family="Chakra Petch">BKS01</text>
+                            
+                            <circle cx="290" cy="130" r="3" fill="#ffb300"/>
+                            <text x="305" y="125" fill="#ffb300" font-size="8" text-anchor="middle" font-family="Share Tech Mono">MKS</text>
+                            
+                            <circle cx="420" cy="130" r="2" fill="#888"/>
+                            <text x="420" y="120" fill="#888" font-size="8" text-anchor="middle" font-family="Share Tech Mono">PAP</text>
+
+                            <circle r="2" fill="#fff"><animateMotion dur="2s" repeatCount="indefinite" path="M140,180 L240,185" /></circle>
+                            <circle r="2" fill="#fff"><animateMotion dur="3s" repeatCount="indefinite" path="M290,130 L240,185" /></circle>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="noc-widget"><div class="noc-widget-head">THROUGHPUT</div><div class="noc-widget-body"><canvas id="noc-chart-1" class="chart-cvs"></canvas></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">DB LATENCY</div><div class="noc-widget-body"><canvas id="noc-chart-2" class="chart-cvs"></canvas></div></div>
+                
+                <div class="noc-widget"><div class="noc-widget-head">RAID STATUS</div><div class="noc-widget-body no-pad"><div class="raid-grid" id="raid-view"></div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">SPECTRUM</div><div class="noc-widget-body no-pad"><div class="spectrum" id="spectrum-view"></div></div></div>
+                <div class="noc-widget" style="grid-row:4/6"><div class="noc-widget-head">SYSLOG</div><div class="noc-widget-body no-pad" style="background:#000"><div id="noc-syslog" style="padding:5px; font-family:'Share Tech Mono'; font-size:9px; color:#aaa; overflow:hidden; display:flex; flex-direction:column-reverse; height:100%;"></div></div></div>
+
+                <div class="noc-widget col-2"><div class="noc-widget-head">NETFLOW</div><div class="noc-widget-body no-pad"><table class="dense-table"><tr><th>SRC</th><th>DST</th><th>VOL</th></tr><tr><td>10.5.1.2</td><td>192.168.1.5</td><td>5G</td></tr><tr><td>172.16.0.4</td><td>8.8.8.8</td><td>2G</td></tr></table></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">BACKUP</div><div class="noc-widget-body"><div style="font-size:8px;">VM_DAILY</div><div style="height:4px;background:#222"><div style="width:100%;height:100%;background:var(--neon-green)"></div></div><div style="font-size:8px; margin-top:5px;">DB_LOGS</div><div style="height:4px;background:#222"><div style="width:65%;height:100%;background:var(--neon-blue)"></div></div></div></div>
+            </div>
+            <div style="grid-column:1/-1; background:#08090b; border-top:1px solid #333; height:30px; display:flex; align-items:center; overflow:hidden;">
+                <div class="marquee" style="white-space:nowrap; animation: scroll 20s linear infinite; font-family:'Share Tech Mono'; color:var(--neon-amber); font-size:11px;">⚠ CRITICAL: RACK A-04 TEMP HIGH [32C] /// SYSTEM BACKUP STARTED /// VPN GATEWAY: 84% LOAD /// UNAUTHORIZED ACCESS ATTEMPT FIREWALL-01</div>
+            </div>
+        </div>
+
+        <div id="view-prtg" class="page">
+            <div class="prtg-header-bar">
+                <div class="prtg-title">BKS01 PRTG Monitor</div>
+                <a href="index.html" style="background:#004b87; color:white; padding:5px 15px; border-radius:3px; font-size:12px; font-weight:bold; font-family: 'Segoe UI';">BACK TO PORTFOLIO</a>
+            </div>
+            <div class="prtg-layout">
+                <div class="prtg-col">
+                    <h2 class="prtg-h2">Building Facilities</h2>
+                    <div class="prtg-chart-box">
+                        <span class="prtg-chart-label">Temperature - Air Conditioning System/ 10 Hours</span>
+                        <canvas id="prtg-chart-1" class="chart-cvs"></canvas>
+                        <div style="position:absolute; top:25px; right:5px; font-size:9px; color:#555;">Max: 76.54 °F</div>
+                        <div style="position:absolute; bottom:5px; right:5px; font-size:9px; color:#555;">Min: 75.02 °F</div>
+                    </div>
+                    <div class="prtg-chart-box">
+                        <span class="prtg-chart-label">Humidity / 10 Hours</span>
+                        <canvas id="prtg-chart-2" class="chart-cvs"></canvas>
+                        <div style="position:absolute; bottom:5px; left:5px; font-size:9px; color:#555;">Min: 25.40 %</div>
+                        <div style="position:absolute; top:25px; right:5px; font-size:9px; color:#555;">Max: 27.60 %</div>
+                    </div>
+                    <div class="prtg-status-row"><div class="prtg-label-left">Access Management System</div><div class="prtg-box-ok">Digital IO <span>OK</span></div></div>
+                    <div class="prtg-status-row"><div class="prtg-label-left">Security-cameras System</div><div class="prtg-box-ok">Surveillance <span>OK</span></div></div>
+                    <div class="prtg-status-row"><div class="prtg-label-left">Electric System</div><div class="prtg-box-ok">Uptime <span>OK</span></div></div>
+                </div>
+
+                <div class="prtg-col">
+                    <h2 class="prtg-h2">IT Infrastructure</h2>
+                    <div class="sunburst-wrapper">
+                        <svg viewBox="0 0 200 200" width="220" height="220">
+                            <path d="M100,100 L100,10 A90,90 0 1,1 10,100 Z" fill="#9abf36" stroke="#fff" stroke-width="1.5"/>
+                            <path d="M100,100 L100,40 A60,60 0 0,1 140,140 Z" fill="#d71920" stroke="#fff"/>
+                            <path d="M100,100 L140,140 A60,60 0 0,1 60,140 Z" fill="#ffcc00" stroke="#fff"/>
+                            <path d="M100,100 L60,140 A60,60 0 0,1 100,40 Z" fill="#9abf36" stroke="#fff"/>
+                            <circle cx="100" cy="100" r="30" fill="white"/>
+                            <text x="100" y="103" text-anchor="middle" font-size="9" font-weight="bold">Playground</text>
+                        </svg>
+                    </div>
+                    <div class="infra-grid">
+                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/server.png'); background:#666;"></div><div class="infra-name">Server</div><div class="infra-badges"><span class="ib ib-yel">2</span><span class="ib ib-grn">98</span></div></div>
+                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/database.png'); background:#666;"></div><div class="infra-name">Storage</div><div class="infra-badges"><span class="ib ib-red">7</span><span class="ib ib-yel">6</span><span class="ib ib-grn">144</span><span class="ib ib-blu">36</span><span class="ib ib-gry">?</span></div></div>
+                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/cloud.png'); background:#666;"></div><div class="infra-name">Virtual Hosting</div><div class="infra-badges"><span class="ib ib-yel">9</span><span class="ib ib-grn">134</span><span class="ib ib-blu">7</span></div></div>
+                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/workstation.png'); background:#666;"></div><div class="infra-name">Network</div><div class="infra-badges"><span class="ib ib-yel">5</span><span class="ib ib-grn">134</span><span class="ib ib-blu">3</span><span class="ib ib-gry">10</span></div></div>
+                    </div>
+                    <div style="font-weight:bold; font-size:11px; margin-bottom:5px;">Host (WBEM)</div>
+                    <table class="host-table">
+                        <tr style="background:#eee;"><td colspan="4" style="font-weight:bold;">Fan</td></tr>
+                        <tr><td><span class="check">✔</span> Ping 1msec</td><td><span class="check">✔</span> Fan1 3,240 RPM</td><td><span class="check">✔</span> Fan2 3,240 RPM</td><td><span class="check">✔</span> Fan8 3,120 RPM</td></tr>
+                        <tr style="background:#eee;"><td colspan="4" style="font-weight:bold;">Power Supply</td></tr>
+                        <tr><td><span class="check">✔</span> Ping 0msec</td><td><span class="check">✔</span> PS1 400mA</td><td><span class="check">✔</span> PS1 232V</td><td><span class="check">✔</span> PS2 200mA</td></tr>
+                    </table>
+                </div>
+
+                <div class="prtg-col">
+                    <h2 class="prtg-h2">Services & Apps</h2>
+                    <div style="font-size:10px; font-weight:bold;">Services:</div>
+                    <div class="service-item"><div class="service-info"><span class="check">✔</span> Terminal Services<br><span style="color:#9abf36">OK</span><br>Total Sessions: 8</div><div class="gauge-mini"></div></div>
+                    <div class="service-item"><div class="service-info"><span class="check">✔</span> Print Spooler<br><span style="color:#9abf36">OK</span><br>Exec: 139 msec</div><div class="gauge-mini"></div></div>
+                    <div class="treemap">
+                        <div class="tm-box tm-grn" style="height:100px;">MS SQL 2016</div>
+                        <div class="tm-box tm-grn" style="height:100px;">IIS</div>
+                        <div class="tm-box tm-red" style="height:60px;">POP3</div>
+                        <div class="tm-box tm-red" style="height:60px;">SMTP</div>
+                        <div class="tm-box tm-grn" style="grid-column: span 2; height:30px;">IMAP</div>
+                    </div>
+                    <div style="text-align:right;"><div style="font-size:10px;">Backup System</div><div style="font-size:9px;">XenServer VM <span class="ib ib-grn">2</span></div></div>
+                    <div class="traffic-row">
+                        <div class="tl-container"><div class="tl-label">File</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
+                        <div class="tl-container"><div class="tl-label">WWW</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
+                        <div class="tl-container"><div class="tl-label">eCom</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
+                        <div class="tl-container"><div class="tl-label">E-Mail</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
+                    </div>
+                    <div style="text-align:right; margin-top:20px;"><div style="font-size:10px;">Cloud Services</div><span class="ib ib-yel">2</span><span class="ib ib-grn">36</span><span class="ib ib-blu">1</span><span class="ib ib-gry">2</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // VIEW SWITCHING
+        function switchView(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('view-'+id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // NOC RACK
+        const rack = document.getElementById('rack-view');
+        for(let i=1; i<=42; i++){
+            let d = document.createElement('div');
+            let cls='on'; let txt=`SVR-ESX-${i}`;
+            if(i>38) { cls=''; txt='---'; } if(i==15) { cls='err'; txt='RAID-FL'; }
+            d.className=`u-slot ${cls}`;
+            d.innerHTML=`<span>U${i}</span><span>${txt}</span>`;
+            rack.appendChild(d);
+        }
+        
+        // RAID GRID
+        const raid = document.getElementById('raid-view');
+        for(let i=0; i<100; i++){
+            let d = document.createElement('div');
+            d.className = 'raid-block ok';
+            raid.appendChild(d);
+        }
+        setInterval(()=>{
+            let blocks = document.querySelectorAll('.raid-block');
+            blocks[Math.floor(Math.random()*blocks.length)].className = 'raid-block read';
+            setTimeout(()=>{ blocks.forEach(b=>b.className='raid-block ok') }, 200);
+        }, 300);
+
+        // SPECTRUM
+        const spec = document.getElementById('spectrum-view');
+        for(let i=0; i<30; i++){
+            let b = document.createElement('div');
+            b.className = 'spec-bar';
+            spec.appendChild(b);
+        }
+        setInterval(()=>{
+            document.querySelectorAll('.spec-bar').forEach(b => b.style.height = Math.random()*100 + "%");
+        }, 100);
+
+        // CLOCK
+        setInterval(() => document.getElementById('noc-clock').innerText = new Date().toLocaleTimeString('en-GB'), 1000);
+
+        // SYSLOG
+        const logs = ["Port Eth0/1 UP", "BGP Peer Est.", "Auth Success: admin", "Backup Started", "SNMP Timeout", "User Logout", "Config Saved"];
+        setInterval(() => {
+            let l = document.getElementById('noc-syslog');
+            let d = document.createElement('div');
+            d.innerHTML = `> ${logs[Math.floor(Math.random()*logs.length)]}`;
+            l.prepend(d);
+            if(l.children.length > 8) l.lastChild.remove();
+        }, 1500);
+        
+        // CANVAS CHART ENGINE WITH AXIS & INTERPOLATION
+        function initChart(id, color, type='line') {
+            const cvs = document.getElementById(id);
+            if(!cvs) return;
+            cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
+            const ctx = cvs.getContext('2d');
+            let data = new Array(20).fill(50);
+            let targetData = new Array(20).fill(50);
+
+            // Data Update
+            setInterval(() => {
+                targetData.shift();
+                targetData.push(Math.random()*60 + 20);
+                data.shift();
+                data.push(data[data.length-1]);
+            }, 2000);
+
+            // Animation Loop
+            function animate() {
+                // Interpolate
+                for(let i=0; i<data.length; i++) data[i] += (targetData[i] - data[i]) * 0.05;
+
+                const w = cvs.width, h = cvs.height;
+                ctx.clearRect(0,0,w,h);
+                
+                // Grid & Labels
+                if(type === 'prtg') {
+                    ctx.fillStyle = "#fcfcfc"; ctx.fillRect(0,0,w,h);
+                    ctx.strokeStyle="#e0e0e0"; ctx.lineWidth=1;
+                    ctx.beginPath();
+                    for(let i=0; i<w; i+=30) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
+                    for(let i=0; i<h; i+=30) { ctx.moveTo(0,i); ctx.lineTo(w,i); }
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle="#222"; ctx.lineWidth=1;
+                    ctx.beginPath();
+                    ctx.moveTo(30, h-20); ctx.lineTo(w, h-20);
+                    ctx.moveTo(30, 0); ctx.lineTo(30, h-20);
+                    ctx.stroke();
+                    ctx.fillStyle = "#555"; ctx.font = "9px monospace";
+                    ctx.fillText("100", 5, 10); ctx.fillText("50", 10, h/2); ctx.fillText("0", 15, h-20);
+                }
+
+                // Line
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = type==='prtg' ? 1.5 : 2;
+                
+                const step = (w - (type==='prtg'?0:30)) / (data.length-1);
+                const startX = type==='prtg' ? 0 : 30;
+                const bottomY = type==='prtg' ? h : h-20;
+
+                data.forEach((v, i) => {
+                    const x = startX + i*step;
+                    const y = bottomY - (v/100 * (type==='prtg'?h:h-20));
+                    if(i==0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+
+                // Area Fill
+                ctx.lineTo(w, bottomY); ctx.lineTo(startX, bottomY);
+                ctx.fillStyle = type==='prtg' ? "rgba(0,75,135,0.1)" : color + "33";
+                ctx.fill();
+                
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // INIT
+        setTimeout(() => {
+            initChart('noc-chart-1', '#00f3ff');
+            initChart('noc-chart-2', '#ffb300');
+            initChart('prtg-chart-1', '#004b87', 'prtg');
+            initChart('prtg-chart-2', '#004b87', 'prtg');
+        }, 500);
+
+    </script>
+</body>
+</html>

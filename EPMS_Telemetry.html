@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPMS V1.0 - Telemetry</title>
+<style>
+    :root {
+        --bg-core: #02040a;
+        --panel-bg: rgba(12, 20, 35, 0.95);
+        --text-main: #e2e8f0;
+        
+        /* Engineering Colors */
+        --col-A: #ff3333; /* Red */
+        --col-B: #22c55e; /* Green */
+        --col-C: #d946ef; /* Purple */
+        --col-G: #eab308; /* Gold */
+        
+        /* Status */
+        --st-ok: #22c55e;
+        --st-bad: #ef4444;
+        --st-warn: #eab308;
+    }
+
+    body { margin: 0; background: var(--bg-core); color: var(--text-main); font-family: 'Segoe UI', monospace; overflow: hidden; user-select: none; }
+
+    /* UI Overlay */
+    .ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; z-index: 100; }
+    .pointer { pointer-events: auto; }
+
+    .topbar {
+        height: 50px; background: var(--panel-bg); border-bottom: 1px solid #333;
+        display: flex; align-items: center; padding: 0 20px; gap: 20px;
+    }
+    .brand { font-weight: 800; font-size: 18px; color: #fff; letter-spacing: 1px; }
+    
+    .sidebar {
+        width: 320px; background: var(--panel-bg); border-right: 1px solid #333;
+        display: flex; flex-direction: column; padding: 15px; gap: 10px; height: 100%;
+    }
+
+    .ctrl-box {
+        background: rgba(255,255,255,0.03); border: 1px solid #333;
+        padding: 12px; border-radius: 6px;
+    }
+    .ctrl-title { font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 10px; font-weight: 700; border-bottom: 1px solid #444; padding-bottom: 4px; }
+
+    .btn {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255,255,255,0.05); border: 1px solid #444;
+        color: #fff; padding: 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+        margin-bottom: 6px; transition: all 0.1s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .btn.active { border-left: 4px solid var(--st-ok); background: rgba(34, 197, 94, 0.15); }
+    .btn.off { border-left: 4px solid var(--st-bad); background: rgba(239, 68, 68, 0.15); }
+    .led { width: 10px; height: 10px; border-radius: 50%; background: #333; box-shadow: inset 0 0 2px #000; }
+    .active .led { background: var(--st-ok); box-shadow: 0 0 8px var(--st-ok); }
+    .gen-run .led { background: var(--st-warn); box-shadow: 0 0 8px var(--st-warn); animation: pulse 1s infinite; }
+    
+    @keyframes pulse { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }
+
+    /* SVG Canvas */
+    #viewport { width: 100%; height: 100%; cursor: grab; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 40px 40px; }
+    #viewport:active { cursor: grabbing; }
+
+    /* Wires */
+    .wire { fill: none; stroke: #334155; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    
+    /* ANIMATION FLOW */
+    .flow {
+        fill: none; stroke-width: 3; 
+        stroke-dasharray: 10 20; 
+        stroke-linecap: round;
+        opacity: 0; 
+        pointer-events: none;
+    }
+    
+    @keyframes laser { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }
+
+    .energized-A { stroke: var(--col-A); opacity: 1; animation: laser 0.5s linear infinite; filter: drop-shadow(0 0 4px var(--col-A)); }
+    .energized-B { stroke: var(--col-B); opacity: 1; animation: laser 0.5s linear infinite; filter: drop-shadow(0 0 4px var(--col-B)); }
+    .energized-C { stroke: var(--col-C); opacity: 1; animation: laser 0.5s linear infinite; filter: drop-shadow(0 0 4px var(--col-C)); }
+    
+    .energized-A-gen { stroke: var(--col-A); opacity: 1; animation: laser 0.3s linear infinite; filter: drop-shadow(0 0 6px var(--col-G)); }
+    .energized-B-gen { stroke: var(--col-B); opacity: 1; animation: laser 0.3s linear infinite; filter: drop-shadow(0 0 6px var(--col-G)); }
+    .energized-C-gen { stroke: var(--col-C); opacity: 1; animation: laser 0.3s linear infinite; filter: drop-shadow(0 0 6px var(--col-G)); }
+    
+    /* Devices */
+    .dev-rect { fill: #0f172a; stroke: #64748b; stroke-width: 1.5; }
+    .dev-lbl { fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; pointer-events: none; }
+    .dev-sub { fill: #94a3b8; font-size: 8px; text-anchor: middle; pointer-events: none; }
+    .dev-spec { fill: #fbbf24; font-size: 10px; font-family: monospace; font-weight: bold; }
+
+    /* Telemetry */
+    .tele-bg { fill: rgba(0,0,0,0.85); stroke: #444; stroke-width: 0.5; }
+    .tele-txt { fill: #fff; font-family: 'Consolas', monospace; font-size: 10px; font-weight: bold; pointer-events: none; }
+
+    /* IEC Breaker */
+    .br-group { cursor: pointer; }
+    .br-box { fill: none; stroke: #e2e8f0; stroke-width: 1.5; }
+    .closed .br-box { fill: var(--st-ok); stroke: var(--st-ok); }
+    .open .br-box { fill: #000; stroke: var(--st-warn); }
+    .trip .br-box { stroke: var(--st-bad); }
+    .trip .br-x { display: block; stroke: var(--st-bad); stroke-width: 2; }
+    .br-x { display: none; }
+
+    /* Transformer */
+    .tx-circle { fill: none; stroke: #e2e8f0; stroke-width: 1.5; }
+
+    /* Toast */
+    .toast {
+        position: absolute; bottom: 20px; right: 20px;
+        background: #0f172a; color: #fff; padding: 12px 24px;
+        border: 1px solid #444; border-radius: 4px; pointer-events: none;
+        opacity: 0; transition: opacity 0.3s; z-index: 200; font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<svg id="viewport" viewBox="0 0 3600 2600">
+    <defs>
+        <g id="sym-tx">
+            <circle cx="0" cy="-8" r="8" class="tx-circle"/>
+            <circle cx="0" cy="8" r="8" class="tx-circle"/>
+        </g>
+    </defs>
+    <g id="scene">
+        <g id="l-wires"></g>
+        <g id="l-flow"></g>
+        <g id="l-devices"></g>
+        <g id="l-breakers"></g>
+        <g id="l-tele"></g>
+    </g>
+</svg>
+
+<div class="ui">
+    <div class="topbar pointer">
+        <a href="index.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Portfolio
+        </a>
+        <div class="brand">EPMS V1.0 - Telemetry</div>
+        <div style="flex:1"></div>
+        <div style="font-size:11px; color:#94a3b8; font-family: monospace;">
+
+        </div>
+    </div>
+    <div style="flex:1; display:flex;">
+        <div class="sidebar pointer">
+            
+            <div class="ctrl-box">
+                <div class="ctrl-title">Utility Sources (20kV)</div>
+                <div class="btn active" id="btn-u-a" onclick="toggleSource('A')">
+                    <span>Utility A</span><div class="led"></div>
+                </div>
+                <div class="btn active" id="btn-u-b" onclick="toggleSource('B')">
+                    <span>Utility B</span><div class="led"></div>
+                </div>
+                <div class="btn off" id="btn-tie" onclick="toggleTie()">
+                    <span>MV Bus Coupler (Tie)</span><div class="led"></div>
+                </div>
+            </div>
+
+            <div class="ctrl-box">
+                <div class="ctrl-title">Generators</div>
+                <div class="btn off" id="btn-gen-a"><span>GEN A</span><div class="led"></div></div>
+                <div class="btn off" id="btn-gen-b"><span>GEN B</span><div class="led"></div></div>
+                <div class="btn off" id="btn-gen-c"><span>GEN C</span><div class="led"></div></div>
+            </div>
+
+            <div class="ctrl-box">
+                <div class="ctrl-title">Status</div>
+                <div id="logs" style="height: 250px; overflow-y: auto; font-size: 10px; color: #94a3b8; font-family: monospace; padding-right:5px;">
+                    <div>> System Init V15.</div>
+                </div>
+            </div>
+
+            <div class="btn" onclick="resetView()" style="margin-top: auto;">Reset View</div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">Ready</div>
+
+<script>
+/* ==============================================
+   1. CONFIGURATION
+   ============================================== */
+const GRID = {
+    SRC: 50, MV: 150, RMU: 300, TX: 450, LVSB: 650, ATSDB: 850, UPS: 1050, 
+    PDU: 1250,  
+    RACK_ATS: 1400, 
+    RACK: 1500,
+    MECH_ROW: 1750, // Pushed DOWN significantly for clearance
+    A: 600, C: 1800, B: 3000 // Widened center for Racks
+};
+
+const SIM = {
+    sources: { A: true, B: true },
+    genRunning: { A: false, B: false, C: false },
+    breakers: {},
+    energizedNodes: {} 
+};
+
+/* ==============================================
+   2. DATA MODEL
+   ============================================== */
+const DEVICES = [
+    // STREAM A (Left Side)
+    { id:'MV_A', lbl:'MV-A', sub:'Incomer', x:GRID.A, y:GRID.MV, w:140, type:'BOX' },
+    { id:'RMU_A', lbl:'RMU-A', sub:'Ring Unit', x:GRID.A, y:GRID.RMU, w:140, type:'BOX' },
+    { id:'TX_A', lbl:'Tx-A', sub:'20kV/400V', spec:'DYN5, 3150KVA', x:GRID.A, y:GRID.TX, w:0, type:'TX' },
+    { id:'LVSB_A', lbl:'LVSB-A', sub:'Main Board', x:GRID.A, y:GRID.LVSB, w:160, type:'BOX' },
+    { id:'GEN_A', lbl:'GEN-A', sub:'Standby', spec:'2.5 MW', x:GRID.A-250, y:GRID.LVSB, w:100, type:'GEN' },
+    
+    // Split ATSDB A
+    { id:'ATSDB_IT_A', lbl:'ATSDB-IT-A', sub:'Dist Board', x:GRID.A-120, y:GRID.ATSDB, w:120, type:'BOX' },
+    { id:'ATSDB_M_A', lbl:'ATSDB-Mech-A', sub:'Dist Board', x:GRID.A+120, y:GRID.ATSDB, w:120, type:'BOX' },
+    
+    // UPS A (IT & Mech)
+    { id:'UPS_A', lbl:'UPS-IT-A', sub:'Online', x:GRID.A-120, y:GRID.UPS, w:120, type:'BOX' },
+    { id:'UPS_M_A', lbl:'UPS-M-A', sub:'Cooling Support', x:GRID.A+120, y:GRID.UPS, w:120, type:'BOX' }, 
+
+    // STREAM B (Right Side)
+    { id:'MV_B', lbl:'MV-B', sub:'Incomer', x:GRID.B, y:GRID.MV, w:140, type:'BOX' },
+    { id:'RMU_B', lbl:'RMU-B', sub:'Ring Unit', x:GRID.B, y:GRID.RMU, w:140, type:'BOX' },
+    { id:'TX_B', lbl:'Tx-B', sub:'20kV/400V', spec:'DYN5, 3150KVA', x:GRID.B, y:GRID.TX, w:0, type:'TX' },
+    { id:'LVSB_B', lbl:'LVSB-B', sub:'Main Board', x:GRID.B, y:GRID.LVSB, w:160, type:'BOX' },
+    { id:'GEN_B', lbl:'GEN-B', sub:'Standby', spec:'2.5 MW', x:GRID.B+250, y:GRID.LVSB, w:100, type:'GEN' },
+    
+    // Split ATSDB B
+    { id:'ATSDB_IT_B', lbl:'ATSDB-IT-B', sub:'Dist Board', x:GRID.B+120, y:GRID.ATSDB, w:120, type:'BOX' },
+    { id:'ATSDB_M_B', lbl:'ATSDB-Mech-B', sub:'Dist Board', x:GRID.B-120, y:GRID.ATSDB, w:120, type:'BOX' },
+    
+    // UPS B (IT & Mech)
+    { id:'UPS_B', lbl:'UPS-IT-B', sub:'Online', x:GRID.B+120, y:GRID.UPS, w:120, type:'BOX' },
+    { id:'UPS_M_B', lbl:'UPS-M-B', sub:'Cooling Support', x:GRID.B-120, y:GRID.UPS, w:120, type:'BOX' }, 
+
+    // STREAM C (Center)
+    { id:'RMU_C', lbl:'RMU-C', sub:'Catcher Ring', x:GRID.C, y:GRID.RMU, w:140, type:'BOX' },
+    { id:'TX_C', lbl:'Tx-C', sub:'20kV/400V', spec:'DYN5, 3150KVA', x:GRID.C, y:GRID.TX, w:0, type:'TX' },
+    { id:'LVSB_C', lbl:'LVSB-C', sub:'Catcher Main', x:GRID.C, y:GRID.LVSB, w:160, type:'BOX' },
+    { id:'GEN_C', lbl:'GEN-C', sub:'Standby', spec:'2.5 MW', x:GRID.C+250, y:GRID.LVSB, w:100, type:'GEN' },
+    { id:'ATSDB_IT_C', lbl:'ATSDB-IT-C', sub:'Dist Board', x:GRID.C-100, y:GRID.ATSDB, w:120, type:'BOX' },
+    { id:'ATSDB_M_C', lbl:'ATSDB-Mech-C', sub:'Dist Board', x:GRID.C+100, y:GRID.ATSDB, w:120, type:'BOX' },
+    { id:'UPS_C', lbl:'UPS-IT-C', sub:'Online', x:GRID.C-100, y:GRID.UPS, w:120, type:'BOX' },
+
+    // COUPLERS (ATS PANELS)
+    { id:'ATS_PNL1', lbl:'ATS PNL 1', sub:'Tie A-C', x:GRID.A+380, y:GRID.ATSDB+50, w:100, type:'BOX' },
+    { id:'ATS_PNL2', lbl:'ATS PNL 2', sub:'Tie B-C', x:GRID.B-380, y:GRID.ATSDB+50, w:100, type:'BOX' },
+    
+    // CDP
+    { id:'CDP', lbl:'CDP PANEL', sub:'Controls', x:GRID.C+100, y:GRID.PDU, w:100, type:'BOX' },
+
+    // --- MECHANICAL LOADS ZONE A (FAR LEFT) ---
+    { id:'CH_1', lbl:'CHILLER 1', sub:'Mech Load', x:150, y:GRID.MECH_ROW, w:100, type:'BOX' },
+    { id:'CH_3', lbl:'CHILLER 3', sub:'Mech Load', x:270, y:GRID.MECH_ROW, w:100, type:'BOX' },
+    { id:'AHU_1', lbl:'AHU SYS 1', sub:'Ventilation', x:390, y:GRID.MECH_ROW, w:100, type:'BOX' },
+
+    // --- MECHANICAL LOADS ZONE B (FAR RIGHT) ---
+    { id:'CH_2', lbl:'CHILLER 2', sub:'Mech Load', x:3200, y:GRID.MECH_ROW, w:100, type:'BOX' },
+    { id:'CH_4', lbl:'CHILLER 4', sub:'Mech Load', x:3320, y:GRID.MECH_ROW, w:100, type:'BOX' },
+    { id:'AHU_2', lbl:'AHU SYS 2', sub:'Ventilation', x:3440, y:GRID.MECH_ROW, w:100, type:'BOX' },
+];
+
+// DAHU UNITS (A Side Left, B Side Right)
+for(let i=0; i<5; i++){
+    // Zone A DAHU: 500 onwards
+    DEVICES.push({ 
+        id:`DAHU_A_${i}`, lbl:`DAHU A${i+1}`, sub:'Crit Cool', 
+        x: 550 + (i*110), y: GRID.MECH_ROW, w:90, type:'BOX' 
+    });
+    // Zone B DAHU: 2600 onwards
+    DEVICES.push({ 
+        id:`DAHU_B_${i}`, lbl:`DAHU B${i+1}`, sub:'Crit Cool', 
+        x: 2600 + (i*110), y: GRID.MECH_ROW, w:90, type:'BOX' 
+    });
+}
+
+// RACKS (CENTERED: 1100 to 2500)
+// 10 Racks
+const RACK_START_X = 1100;
+const RACK_GAP = 140;
+
+for(let i=0; i<10; i++){
+    let rx = RACK_START_X + (i * RACK_GAP);
+    DEVICES.push({ id:`rATS_${i}`, lbl:`ATS`, sub:``, x:rx, y:GRID.RACK_ATS, w:50, type:'ATS_BOX' });
+    DEVICES.push({ id:`RACK_${i}`, lbl:`RACK ${i+1}`, sub:`6kW`, x:rx, y:GRID.RACK, w:100, type:'BOX' });
+    
+    let isStreamA = i < 5;
+    let pduMainId = `PDU_${isStreamA?'A':'B'}_${i}`;
+    let pduCatchId = `PDU_C_${i}`;
+    
+    // Create Row PDU Devices
+    DEVICES.push({ id:pduMainId, lbl:`PDU ${isStreamA?'A':'B'}`, sub:'', x:rx - 35, y:GRID.PDU, w:60, type:'BOX' });
+    DEVICES.push({ id:pduCatchId, lbl:`PDU C`, sub:'', x:rx + 35, y:GRID.PDU, w:60, type:'BOX' });
+}
+
+/* ==============================================
+   3. WIRE DATABASE
+   ============================================== */
+const WIRES = [
+    // --- HV A ---
+    { id:'w_mv_a', from:'SRC_A', to:'MV_A', br:'br_mv_a', col:'A', v:20000 },
+    { id:'w_rmu_a', from:'MV_A', to:'RMU_A', br:'br_rmu_a', col:'A', v:20000 },
+    { id:'w_tx_a', from:'RMU_A', to:'TX_A', br:'br_tx_a', col:'A', v:20000 },
+    { id:'w_lvsb_a', from:'TX_A', to:'LVSB_A', br:'br_util_a', col:'A', v:400 },
+    { id:'w_gen_a', from:'GEN_A', to:'LVSB_A', br:'br_gen_a', col:'A', def:'open', v:400 },
+    { id:'w_mv_tie', from:'MV_A', to:'MV_B', br:'br_mv_tie', col:'A', def:'open', v:20000 },
+
+    // DIST A
+    { id:'w_db_a', from:'LVSB_A', to:'ATSDB_IT_A', br:'br_db_a', col:'A', v:400 },
+    { id:'w_ups_a', from:'ATSDB_IT_A', to:'UPS_A', br:'br_ups_a', col:'A', v:400 },
+    
+    // MECH A (UPS-M path)
+    { id:'w_db_m_a', from:'LVSB_A', to:'ATSDB_M_A', br:'br_db_m_a', col:'A', v:400 },
+    { id:'w_ups_m_a_in', from:'ATSDB_M_A', to:'UPS_M_A', br:'br_ups_m_a_in', col:'A', v:400 },
+    { id:'w_ats1_a', from:'ATSDB_M_A', to:'ATS_PNL1', br:'br_ats1_a', col:'A', v:400 },
+
+    // --- HV B ---
+    { id:'w_mv_b', from:'SRC_B', to:'MV_B', br:'br_mv_b', col:'B', v:20000 },
+    { id:'w_rmu_b', from:'MV_B', to:'RMU_B', br:'br_rmu_b', col:'B', v:20000 },
+    { id:'w_tx_b', from:'RMU_B', to:'TX_B', br:'br_tx_b', col:'B', v:20000 },
+    { id:'w_lvsb_b', from:'TX_B', to:'LVSB_B', br:'br_util_b', col:'B', v:400 },
+    { id:'w_gen_b', from:'GEN_B', to:'LVSB_B', br:'br_gen_b', col:'B', def:'open', v:400 },
+
+    // DIST B
+    { id:'w_db_b', from:'LVSB_B', to:'ATSDB_IT_B', br:'br_db_b', col:'B', v:400 },
+    { id:'w_ups_b', from:'ATSDB_IT_B', to:'UPS_B', br:'br_ups_b', col:'B', v:400 },
+
+    // MECH B
+    { id:'w_db_m_b', from:'LVSB_B', to:'ATSDB_M_B', br:'br_db_m_b', col:'B', v:400 },
+    { id:'w_ups_m_b_in', from:'ATSDB_M_B', to:'UPS_M_B', br:'br_ups_m_b_in', col:'B', v:400 },
+    { id:'w_ats2_b', from:'ATSDB_M_B', to:'ATS_PNL2', br:'br_ats2_b', col:'B', v:400 },
+
+    // --- HV C ---
+    { id:'w_ring_ac', from:'RMU_A', to:'RMU_C', br:'br_ring_ac', col:'A', v:20000 },
+    { id:'w_ring_bc', from:'RMU_B', to:'RMU_C', br:'br_ring_bc', col:'B', def:'open', v:20000 },
+    { id:'w_tx_c', from:'RMU_C', to:'TX_C', br:'br_tx_c', col:'C', v:20000 },
+    { id:'w_lvsb_c', from:'TX_C', to:'LVSB_C', br:'br_util_c', col:'C', v:400 },
+    { id:'w_gen_c', from:'GEN_C', to:'LVSB_C', br:'br_gen_c', col:'C', def:'open', v:400 },
+    { id:'w_db_c', from:'LVSB_C', to:'ATSDB_IT_C', br:'br_db_c', col:'C', v:400 },
+    { id:'w_ups_c', from:'ATSDB_IT_C', to:'UPS_C', br:'br_ups_c', col:'C', v:400 },
+    { id:'w_db_m_c', from:'LVSB_C', to:'ATSDB_M_C', br:'br_db_m_c', col:'C', v:400 },
+    { id:'w_ats1_c', from:'ATSDB_M_C', to:'ATS_PNL1', br:'br_ats1_c', col:'C', def:'open', v:400 },
+    { id:'w_ats2_c', from:'ATSDB_M_C', to:'ATS_PNL2', br:'br_ats2_c', col:'C', def:'open', v:400 },
+
+    // MECH & CONTROL (Routed to Far Left/Right)
+    { id:'w_ch1', from:'ATS_PNL1', to:'CH_1', br:'br_ch1', col:'A', v:400, route:'mech_left' },
+    { id:'w_ch3', from:'ATS_PNL1', to:'CH_3', br:'br_ch3', col:'A', v:400, route:'mech_left' },
+    { id:'w_ahu1', from:'ATSDB_M_A', to:'AHU_1', br:'br_ahu1', col:'A', v:400, route:'mech_left' },
+
+    { id:'w_ch2', from:'ATS_PNL2', to:'CH_2', br:'br_ch2', col:'B', v:400, route:'mech_right' },
+    { id:'w_ch4', from:'ATS_PNL2', to:'CH_4', br:'br_ch4', col:'B', v:400, route:'mech_right' },
+    { id:'w_ahu2', from:'ATSDB_M_B', to:'AHU_2', br:'br_ahu2', col:'B', v:400, route:'mech_right' },
+    
+    { id:'w_cdp', from:'UPS_C', to:'CDP', br:'br_cdp', col:'C', v:230 }
+];
+
+// WIRE DAHUs
+for(let i=0; i<5; i++){
+    // Route from UPS-M-A (approx x=720) to DAHU A (x=550+)
+    // Needs direct orthogonal drop
+    WIRES.push({ id:`w_dahu_a_${i}`, from:'UPS_M_A', to:`DAHU_A_${i}`, br:`br_dahu_a_${i}`, col:'A', v:400, route:'mech_drop' });
+}
+for(let i=0; i<5; i++){
+    WIRES.push({ id:`w_dahu_b_${i}`, from:'UPS_M_B', to:`DAHU_B_${i}`, br:`br_dahu_b_${i}`, col:'B', v:400, route:'mech_drop' });
+}
+
+// WIRE RACKS
+for(let i=0; i<10; i++){
+    const isA = i < 5;
+    const srcUPS = isA ? 'UPS_A' : 'UPS_B';
+    const srcCol = isA ? 'A' : 'B';
+    const pduMainId = `PDU_${srcCol}_${i}`;
+    const pduCatchId = `PDU_C_${i}`;
+    const atsId = `rATS_${i}`;
+    const rackId = `RACK_${i}`;
+
+    // UPS -> PDU Row (No Tele to save clutter)
+    WIRES.push({ id:`w_ups_pdu_m_${i}`, from:srcUPS, to:pduMainId, br:`br_pdu_m_${i}`, col:srcCol, v:400, noTele:true });
+    WIRES.push({ id:`w_ups_pdu_c_${i}`, from:'UPS_C', to:pduCatchId, br:`br_pdu_c_${i}`, col:'C', v:400, noTele:true });
+    // PDU -> ATS
+    WIRES.push({ id:`w_pdu_ats_m_${i}`, from:pduMainId, to:atsId, br:`br_ats_m_${i}`, col:srcCol, v:230, route:'left' });
+    WIRES.push({ id:`w_pdu_ats_c_${i}`, from:pduCatchId, to:atsId, br:`br_ats_c_${i}`, col:'C', v:230, route:'right' });
+    // ATS -> Rack
+    WIRES.push({ id:`w_ats_rack_${i}`, from:atsId, to:rackId, br:`br_rack_${i}`, col:srcCol, v:230 });
+}
+
+/* ==============================================
+   LOGIC & RENDER
+   ============================================== */
+function init(){
+    WIRES.forEach(w => SIM.breakers[w.br] = w.def || 'closed');
+    drawLayout();
+    setInterval(() => {
+        try {
+            runATSLogic();
+            calcPowerFlow();
+            updateUI();
+        } catch(e) { console.error(e); }
+    }, 500); 
+}
+
+function runATSLogic(){
+    ['A', 'B', 'C'].forEach(stream => {
+        const utilBr = `br_util_${stream.toLowerCase()}`;
+        const genBr = `br_gen_${stream.toLowerCase()}`;
+        let utilHealthy = false;
+        
+        if(stream === 'A') {
+            const direct = SIM.sources.A && SIM.breakers['br_mv_a'] === 'closed';
+            const viaTie = SIM.sources.B && SIM.breakers['br_mv_b'] === 'closed' && SIM.breakers['br_mv_tie'] === 'closed';
+            utilHealthy = (direct || viaTie);
+        } 
+        else if (stream === 'B') {
+            const direct = SIM.sources.B && SIM.breakers['br_mv_b'] === 'closed';
+            const viaTie = SIM.sources.A && SIM.breakers['br_mv_a'] === 'closed' && SIM.breakers['br_mv_tie'] === 'closed';
+            utilHealthy = (direct || viaTie);
+        }
+        else if (stream === 'C') {
+            const aLive = (SIM.sources.A || (SIM.sources.B && SIM.breakers['br_mv_tie'] === 'closed'));
+            const bLive = (SIM.sources.B || (SIM.sources.A && SIM.breakers['br_mv_tie'] === 'closed'));
+            const ringA = aLive && SIM.breakers['br_rmu_a'] === 'closed' && SIM.breakers['br_ring_ac'] === 'closed';
+            const ringB = bLive && SIM.breakers['br_rmu_b'] === 'closed' && SIM.breakers['br_ring_bc'] === 'closed';
+            utilHealthy = ringA || ringB;
+        }
+
+        if(utilHealthy){
+            if(SIM.breakers[genBr] === 'closed'){
+                log(`ATS ${stream}: Utility Restored. Syncing...`);
+                SIM.breakers[genBr] = 'open'; 
+                setTimeout(() => { 
+                    SIM.breakers[utilBr] = 'closed'; 
+                    SIM.genRunning[stream] = false;
+                }, 1000);
+            }
+        } else {
+            if(SIM.breakers[utilBr] === 'closed'){
+                log(`ATS ${stream}: Power Lost! Starting Gen...`);
+                SIM.breakers[utilBr] = 'open';
+                SIM.genRunning[stream] = true;
+                setTimeout(() => {
+                    SIM.breakers[genBr] = 'closed';
+                    log(`ATS ${stream}: Generator Online`);
+                }, 2000);
+            }
+        }
+    });
+}
+
+function calcPowerFlow(){
+    SIM.energizedNodes = {};
+    document.querySelectorAll('.flow').forEach(el => el.setAttribute('class', 'flow'));
+    document.querySelectorAll('.tele-txt').forEach(el => el.textContent = '0V 0A 0kW');
+
+    const energize = (nodeId, color, sourceType) => {
+        if(SIM.energizedNodes[nodeId]) return;
+        SIM.energizedNodes[nodeId] = color;
+
+        const wires = WIRES.filter(w => {
+            if(w.from === nodeId) return true;
+            if(w.from.x && nodeId === 'SRC_' + w.col) return true;
+            if(w.id === 'w_mv_tie' && w.to === nodeId) return true;
+            return false;
+        });
+
+        wires.forEach(w => {
+            let nextNode = w.to;
+            if(w.id === 'w_mv_tie' && w.to === nodeId) nextNode = w.from;
+
+            if(SIM.breakers[w.br] === 'closed'){
+                const flowEl = document.getElementById(`flow-${w.id}`);
+                if(flowEl){
+                    let visualClass = `energized-${color}`;
+                    if(sourceType === 'GEN') visualClass += '-gen';
+                    flowEl.setAttribute('class', `flow ${visualClass}`);
+                }
+                
+                const tele = document.getElementById(`tele-${w.id}`);
+                if(tele){
+                    let kw = 2400; 
+                    if(w.to.includes('RACK')) kw = 6;
+                    else if(w.to.includes('PDU')) kw = 60;
+                    else if(w.to.includes('UPS')) kw = 300;
+                    else if(w.to.includes('ATSDB')) kw = 1000;
+                    else if(w.to.includes('DAHU')) kw = 30;
+                    if(w.id === 'w_mv_tie') kw = 2450; 
+
+                    let amps = Math.floor((kw * 1000) / (1.732 * w.v * 0.9));
+                    tele.textContent = `${w.v}V ${amps}A ${kw}kW`;
+                }
+                energize(nextNode, color, sourceType);
+            }
+        });
+    };
+
+    if(SIM.sources.A) energize('SRC_A', 'A', 'UTIL');
+    if(SIM.sources.B) energize('SRC_B', 'B', 'UTIL');
+    if(SIM.genRunning.A && SIM.breakers['br_gen_a'] === 'closed') energize('GEN_A', 'A', 'GEN');
+    if(SIM.genRunning.B && SIM.breakers['br_gen_b'] === 'closed') energize('GEN_B', 'B', 'GEN');
+    if(SIM.genRunning.C && SIM.breakers['br_gen_c'] === 'closed') energize('GEN_C', 'C', 'GEN');
+}
+
+/* ==============================================
+   UI & RENDER
+   ============================================== */
+function updateUI(){
+    ['A','B'].forEach(s => {
+        const b = document.getElementById(`btn-u-${s.toLowerCase()}`);
+        if(SIM.sources[s]) { b.classList.add('active'); b.classList.remove('off'); }
+        else { b.classList.add('off'); b.classList.remove('active'); }
+    });
+    ['A','B','C'].forEach(s => {
+        const b = document.getElementById(`btn-gen-${s.toLowerCase()}`);
+        if(SIM.genRunning[s]) { b.classList.add('active', 'gen-run'); b.classList.remove('off'); }
+        else { b.classList.remove('active', 'gen-run'); b.classList.add('off'); }
+    });
+    const tieBtn = document.getElementById('btn-tie');
+    if(SIM.breakers['br_mv_tie'] === 'closed') { tieBtn.classList.add('active'); tieBtn.classList.remove('off'); }
+    else { tieBtn.classList.add('off'); tieBtn.classList.remove('active'); }
+}
+
+const layers = { w: document.getElementById('l-wires'), f: document.getElementById('l-flow'), d: document.getElementById('l-devices'), b: document.getElementById('l-breakers'), t: document.getElementById('l-tele') };
+
+function drawLayout(){
+    DEVICES.forEach(d => {
+        const g = createSVG('g', {transform:`translate(${d.x},${d.y})`});
+        if(d.type === 'TX') {
+            const sym = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+            sym.setAttribute('href', '#sym-tx'); sym.setAttribute('transform', 'scale(2.5)');
+            sym.setAttribute('fill', 'none'); sym.setAttribute('stroke', '#e2e8f0');
+            g.append(sym);
+            const spec = createSVG('text', {x:35, y:5, class:'dev-spec', 'text-anchor':'start'});
+            spec.textContent = d.spec || ""; g.append(spec);
+            const lbl = createSVG('text', {x:0, y:-25, class:'dev-lbl'});
+            lbl.textContent = d.lbl; g.append(lbl);
+        } else if (d.type === 'ATS_BOX') {
+            const r = createSVG('rect', {x:-20, y:-10, width:40, height:20, class:'dev-rect', fill:'#1e293b'});
+            const t = createSVG('text', {x:0, y:4, class:'dev-lbl', 'font-size':'8px'});
+            t.textContent = "ATS"; g.append(r,t);
+        } else {
+            const r = createSVG('rect', {x:-d.w/2, y:-15, width:d.w, height:30, rx:4, class:'dev-rect'});
+            const t = createSVG('text', {x:0, y:5, class:'dev-lbl'}); t.textContent = d.lbl;
+            const s = createSVG('text', {x:0, y:22, class:'dev-sub'}); s.textContent = d.sub;
+            g.append(r,t,s);
+            if(d.spec && d.type !== 'TX'){
+               const sp = createSVG('text', {x:0, y:-25, class:'dev-spec'}); sp.textContent = d.spec; g.append(sp);
+            }
+        }
+        layers.d.appendChild(g);
+    });
+
+    WIRES.forEach(w => {
+        const src = getCoords(w.from); const dst = getCoords(w.to);
+        let path = ''; let midY = (src.y + dst.y) / 2; let brX = src.x, brY = midY;
+
+        if(w.route === 'left' || w.route === 'right'){
+            const channelX = w.route === 'left' ? dst.x - 15 : dst.x + 15;
+            path = `M ${src.x} ${src.y+15} L ${src.x} ${midY} L ${channelX} ${midY} L ${channelX} ${dst.y-10}`;
+            brX = channelX; brY = midY;
+        } else if (w.route === 'mech_left' || w.route === 'mech_right') {
+            // Complex routing for mechanical to avoid crossing
+            path = `M ${src.x} ${src.y+15} L ${src.x} ${midY} L ${dst.x} ${midY} L ${dst.x} ${dst.y-15}`;
+            if(src.x !== dst.x) brX = dst.x;
+        } else if (w.route === 'mech_drop') {
+            path = `M ${src.x} ${src.y+15} L ${src.x} ${dst.y-30} L ${dst.x} ${dst.y-30} L ${dst.x} ${dst.y-15}`;
+            brX = dst.x; brY = dst.y-30;
+        } else if(src.x === dst.x) {
+            path = `M ${src.x} ${src.y+15} L ${dst.x} ${dst.y-15}`;
+        } else if(src.y === dst.y) {
+            path = `M ${src.x+70} ${src.y} L ${dst.x-70} ${dst.y}`;
+            brX = (src.x+dst.x)/2; brY = src.y;
+        } else {
+            path = `M ${src.x} ${src.y+15} L ${src.x} ${midY} L ${dst.x} ${midY} L ${dst.x} ${dst.y-15}`;
+            if(src.x !== dst.x) brX = dst.x;
+        }
+        if(w.from.startsWith('SRC')) path = `M ${src.x} ${src.y} L ${dst.x} ${dst.y-15}`;
+
+        const wireEl = createSVG('path', {d:path, class:'wire', id:`wire-${w.id}`});
+        const flowEl = createSVG('path', {d:path, class:`flow`, id:`flow-${w.id}`});
+        layers.w.appendChild(wireEl); layers.f.appendChild(flowEl);
+
+        drawBreaker(w.br, brX, brY);
+
+        if(!w.noTele){
+            const tx = brX + 20; const ty = brY - 12;
+            const teleG = createSVG('g', {transform:`translate(${tx}, ${ty})`});
+            const bg = createSVG('rect', {x:-2, y:-8, width:95, height:10, class:'tele-bg'});
+            const teleTxt = createSVG('text', {class:'tele-txt', id:`tele-${w.id}`});
+            teleTxt.textContent = "0V 0A 0kW";
+            teleG.append(bg, teleTxt); layers.t.appendChild(teleG);
+        }
+    });
+}
+
+function drawBreaker(id, x, y){
+    const g = createSVG('g', {transform:`translate(${x},${y})`, class:'br-group', id:`br-grp-${id}`, onmousedown:`handleBreakerClick(event, '${id}')`});
+    const box = createSVG('rect', {x:-6, y:-8, width:12, height:16, class:'br-box'});
+    const hit = createSVG('rect', {x:-15, y:-15, width:30, height:30, fill:'transparent'});
+    const trip = createSVG('path', {d:'M -8 -8 L 8 8 M 8 -8 L -8 8', class:'br-x'});
+    g.append(box, trip, hit); layers.b.appendChild(g);
+}
+
+function toggleSource(s){ SIM.sources[s] = !SIM.sources[s]; log(`Source ${s} Toggled`); }
+function toggleTie(){ SIM.breakers['br_mv_tie'] = (SIM.breakers['br_mv_tie']==='closed'?'open':'closed'); log('Tie Toggled'); }
+function handleBreakerClick(e, id){
+    e.stopPropagation(); 
+    if(e.shiftKey) SIM.breakers[id] = 'trip';
+    else if(e.altKey) SIM.breakers[id] = 'open';
+    else SIM.breakers[id] = (SIM.breakers[id]==='closed'?'open':'closed');
+    updateView();
+}
+function updateView(){
+    for(let id in SIM.breakers){
+        const el = document.getElementById(`br-grp-${id}`);
+        if(el) {
+            el.setAttribute('class', `br-group ${SIM.breakers[id]}`);
+            const tx = el.querySelector('.br-x');
+            if(tx) tx.style.display = (SIM.breakers[id] === 'trip' ? 'block' : 'none');
+        }
+    }
+}
+function getCoords(idOrObj){
+    if(typeof idOrObj === 'object') return idOrObj;
+    const d = DEVICES.find(x => x.id === idOrObj);
+    if(d) return {x:d.x, y:d.y};
+    if(idOrObj === 'SRC_A') return {x:GRID.A, y:GRID.SRC};
+    if(idOrObj === 'SRC_B') return {x:GRID.B, y:GRID.SRC};
+    return {x:0, y:0};
+}
+function createSVG(tag, attrs){
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for(let k in attrs) {
+        if(k==='onmousedown') el.setAttribute(k, attrs[k]);
+        else if(k==='textContent') el.textContent = attrs[k];
+        else el.setAttribute(k, attrs[k]);
+    }
+    return el;
+}
+function log(msg){ const l=document.getElementById('logs'); const d=document.createElement('div'); d.textContent=`> ${msg}`; l.prepend(d); }
+
+let scale = 0.5; let px = 50, py = 50;
+const scene = document.getElementById('scene');
+function setTransform(){ scene.setAttribute('transform', `translate(${px},${py}) scale(${scale})`); }
+setTransform();
+document.getElementById('viewport').onwheel = (e) => { e.preventDefault(); scale += e.deltaY * -0.001; scale = Math.min(Math.max(0.2, scale), 3); setTransform(); };
+document.getElementById('viewport').onmousedown = (e) => {
+    if(e.target.tagName !== 'svg') return;
+    let sx = e.clientX, sy = e.clientY;
+    document.onmousemove = (m) => { px += m.clientX - sx; py += m.clientY - sy; sx = m.clientX; sy = m.clientY; setTransform(); };
+    document.onmouseup = () => document.onmousemove = null;
+};
+function resetView(){ scale=0.5; px=50; py=50; setTransform(); }
+
+init();
+</script>
+</body>
+</html>

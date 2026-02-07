@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article 4 - In-House Capability Is a Reliability Strategy | Bagus Dwi Permana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .article-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('assets/article-4-cover.png') center/cover no-repeat;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        .article-hero > * { position: relative; z-index: 1; }
+        .article-hero .container { max-width: 900px; }
+        .article-category {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #fff;
+        }
+        .article-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+        }
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-content {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+        .article-content .container { max-width: 800px; }
+        .article-body {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: #374151;
+        }
+        .article-body p { margin-bottom: 1.75rem; }
+        .article-body h2 {
+            font-size: 1.75rem;
+            color: #1e3a5f;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e5e7eb;
+        }
+        .article-body h3 {
+            font-size: 1.375rem;
+            color: #2d5a87;
+            margin: 2rem 0 1rem;
+        }
+        .article-body blockquote {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #1e40af;
+        }
+        .article-body ul, .article-body ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .article-body li { margin-bottom: 0.75rem; }
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #f59e0b;
+        }
+        .highlight-box p {
+            margin: 0;
+            color: #92400e;
+            font-weight: 500;
+        }
+        .result-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid #10b981;
+        }
+        .result-box h4 {
+            color: #065f46;
+            margin-bottom: 0.75rem;
+        }
+        .result-box p {
+            margin: 0.5rem 0;
+            color: #047857;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: #fff; }
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2d5a87;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .article-nav a:hover { color: #1e3a5f; }
+        .references {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        .references h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .references ul {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* Interactive Chart */
+        .chart-container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-title {
+            text-align: center;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .chart-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-wrapper {
+            background: rgba(2, 6, 23, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .control-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .control-slider {
+            width: 200px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+        }
+        .control-value {
+            background: rgba(96, 165, 250, 0.2);
+            color: #93c5fd;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .callout-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .callout-card {
+            background: rgba(30, 58, 95, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(96, 165, 250, 0.15);
+        }
+        .callout-label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .callout-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #60a5fa;
+        }
+
+        @media (max-width: 768px) {
+            .article-hero { padding: 6rem 1rem 3rem; }
+            .article-meta { flex-direction: column; gap: 1rem; }
+            .article-content { padding: 3rem 1rem; }
+            .article-body { font-size: 1rem; }
+            .chart-container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li><a href="articles.html" class="nav-link">Articles</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="article-hero">
+        <div class="container">
+            <a href="articles.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Articles
+            </a>
+            <span class="article-category">Capability Development</span>
+            <h1 class="article-title">In-House Capability Is a Reliability Strategy</h1>
+            <p class="article-subtitle">Why excessive vendor dependency increases latent risk in mission-critical data centers.</p>
+            <div class="article-meta">
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    10 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    November 25, 2025
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Bagus Dwi Permana
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <article class="article-content">
+        <div class="container">
+            <div class="article-body">
+                <h2>Abstract</h2>
+                <p>Many data centers treat in-house capability as a cost decision rather than a reliability control. This article argues that over-reliance on vendors introduces structural fragility: delayed response, knowledge dilution, and decision paralysis during abnormal conditions.</p>
+
+                <blockquote>
+                    "When a critical alarm occurs at 02:17 in the morning, the question that matters is not 'Which vendor supports this system?' The question is: Who on site can understand the system well enough to make a safe decision right now?"
+                </blockquote>
+
+                <h2>1. Vendor Dependency as an Invisible Design Choice</h2>
+                <p>Outsourcing is often justified by specialization, compliance, and cost predictability. However, in mission-critical environments, outsourcing is not neutral—it is a design choice that reshapes how risk is detected, interpreted, and controlled.</p>
+
+                <p>Vendor dependency affects three reliability dimensions:</p>
+                <ul>
+                    <li><strong>Speed</strong> — time to diagnose and act during abnormal conditions</li>
+                    <li><strong>Continuity</strong> — preservation of system knowledge across shifts and years</li>
+                    <li><strong>Authority</strong> — clarity of who is allowed to decide when procedures no longer fit reality</li>
+                </ul>
+
+                <h2>2. The Failure Mode: Single Point of Understanding</h2>
+                <p>A common but dangerous pattern emerges: Vendors perform maintenance and testing, reports are delivered and archived, in-house teams operate systems they did not deeply maintain. Over time, the site accumulates equipment without accumulating understanding.</p>
+
+                <div class="highlight-box">
+                    <p><strong>The Paradox:</strong> Documentation increases while confidence decreases. The system appears compliant until it is required to adapt.</p>
+                </div>
+
+                <h2>3. Human Factors and Decision Latency</h2>
+                <p>Hollnagel's resilience engineering highlights that safety depends on the ability to respond, monitor, learn, and anticipate. Excessive vendor dependency weakens all four:</p>
+
+                <ul>
+                    <li><strong>Respond</strong> — waiting for vendor confirmation delays containment</li>
+                    <li><strong>Monitor</strong> — alarms are seen but not fully interpreted</li>
+                    <li><strong>Learn</strong> — lessons remain with vendors, not the site</li>
+                    <li><strong>Anticipate</strong> — early signals are missed without system intuition</li>
+                </ul>
+
+                <p>Decision latency becomes the real failure mode—not component failure.</p>
+
+                <h2>4. Interactive: Capability vs MTTR Simulation</h2>
+                <p>This simulation demonstrates how in-house capability affects Mean Time To Recover (MTTR). Adjust the capability level to see the impact on incident response times:</p>
+
+                <!-- Interactive Chart -->
+                <div class="chart-container">
+                    <div class="chart-title">In-House Capability vs Mean Time To Recover</div>
+                    <div class="chart-subtitle">Higher capability reduces vendor dependency delay and recovery time</div>
+
+                    <div class="chart-wrapper">
+                        <canvas id="mttrChart" class="chart-canvas" width="800" height="380"></canvas>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="control-label">In-House Capability Level:</span>
+                        <input type="range" id="capSlider" class="control-slider" min="0" max="100" value="40">
+                        <span class="control-value" id="capValue">40%</span>
+                    </div>
+
+                    <div class="callout-row">
+                        <div class="callout-card">
+                            <div class="callout-label">Avg MTTR</div>
+                            <div class="callout-value" id="avgMttr">18.2h</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Vendor Delay</div>
+                            <div class="callout-value" id="vendorDelay">6.0h</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Decision Speed</div>
+                            <div class="callout-value" id="decisionSpeed">Slow</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>5. Case Context: Live Operations Under Vendor-Heavy Model</h2>
+                <p>In the observed environment, most critical systems (UPS, MV/LV switchgear, chillers, protection relays) were vendor-maintained. In-house engineers were competent operators but rarely involved in intrusive work.</p>
+
+                <p>Symptoms observed:</p>
+                <ul>
+                    <li>Troubleshooting required phone escalation even for first-level diagnostics</li>
+                    <li>Incident bridges focused on "waiting for vendor advice" rather than stabilizing the system</li>
+                    <li>Temporary operational workarounds became normalized</li>
+                    <li>Post-incident reports lacked deep causal insight</li>
+                </ul>
+
+                <h2>6. The Intervention: Capability Layering</h2>
+                <p>The objective was not to replace vendors, but to rebalance the operating model.</p>
+
+                <h3>6.1 Define Minimum In-House Capability Per System</h3>
+                <p>For each critical system, a minimum internal capability was defined:</p>
+                <ul>
+                    <li>System architecture understanding</li>
+                    <li>Normal vs abnormal behavior recognition</li>
+                    <li>Safe isolation and stabilization actions</li>
+                    <li>Ability to challenge vendor conclusions with evidence</li>
+                </ul>
+
+                <h3>6.2 Redesign Vendor Engagement</h3>
+                <p>Vendor activities were reframed as joint execution for critical tasks, mandatory explanation of findings (not just reports), and structured handover of test results and failure modes.</p>
+
+                <h3>6.3 Incident Authority Clarity</h3>
+                <p>During incidents: In-house engineering leads diagnosis and containment, vendors provide advisory and specialist support, decision authority remains on site.</p>
+
+                <div class="result-box">
+                    <h4>Results After Capability Layering</h4>
+                    <p><strong>MTTD reduced significantly</strong> — Faster initial diagnosis</p>
+                    <p><strong>Early containment improved</strong> — Better system stability</p>
+                    <p><strong>Incident bridges shortened</strong> — More decisive responses</p>
+                    <p><strong>Engineer confidence increased</strong> — Greater ownership</p>
+                </div>
+
+                <h2>7. Practical Framework: In-House Capability Baseline (ICB)</h2>
+                <ol>
+                    <li>Architecture literacy per critical system</li>
+                    <li>First-response diagnostic authority</li>
+                    <li>Vendor knowledge capture as a formal deliverable</li>
+                    <li>Incident decision rights defined and trained</li>
+                    <li>Periodic stress-testing via drills and tabletop scenarios</li>
+                </ol>
+
+                <p><strong>Leading indicators to watch:</strong></p>
+                <ul>
+                    <li>% incidents requiring vendor confirmation for first action</li>
+                    <li>Repeated vendor findings without internal understanding</li>
+                    <li>"We are waiting for vendor" as a common incident phrase</li>
+                </ul>
+
+                <h2>8. Conclusion</h2>
+                <blockquote>
+                    "In-house capability is not about replacing vendors. It is about ensuring that, when the unexpected occurs, the site retains the ability to think, decide, and act safely. Reliability is not outsourced. It is owned."
+                </blockquote>
+
+                <div class="references">
+                    <h3>References</h3>
+                    <ul>
+                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents. Ashgate.</li>
+                        <li>Hollnagel, E. (2014). Safety-I and Safety-II: The Past and Future of Safety Management. Ashgate.</li>
+                        <li>ISO 55000. (2014). Asset Management — Overview, Principles and Terminology.</li>
+                        <li>Weick, K. E., & Sutcliffe, K. M. (2015). Managing the Unexpected: Sustained Performance in a Complex World.</li>
+                        <li>IEEE Std 3007.2 – Recommended Practice for Operation and Management of Industrial and Commercial Power Systems.</li>
+                    </ul>
+                </div>
+
+                <div class="article-nav">
+                    <a href="article-3.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Previous Article
+                    </a>
+                    <a href="article-5.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
+                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+    (function() {
+        const canvas = document.getElementById('mttrChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const capSlider = document.getElementById('capSlider');
+        const capValue = document.getElementById('capValue');
+        const avgMttr = document.getElementById('avgMttr');
+        const vendorDelay = document.getElementById('vendorDelay');
+        const decisionSpeed = document.getElementById('decisionSpeed');
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+
+        const W = rect.width;
+        const H = rect.height;
+        const padding = { top: 50, right: 60, bottom: 60, left: 80 };
+        const chartW = W - padding.left - padding.right;
+        const chartH = H - padding.top - padding.bottom;
+
+        function simulate(capability) {
+            let mttr = [];
+            for (let i = 0; i < 10; i++) {
+                let base = 12;
+                let vDelay = (100 - capability) / 10;
+                let noise = Math.sin(i) * 1.2;
+                mttr.push(Math.max(2, base + vDelay + noise));
+            }
+            return mttr;
+        }
+
+        function drawChart(capability) {
+            ctx.clearRect(0, 0, W, H);
+
+            // Background
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.5)';
+            ctx.fillRect(0, 0, W, H);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(W - padding.right, y);
+                ctx.stroke();
+            }
+
+            // Y-axis labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            ctx.font = '12px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'right';
+            const maxMttr = 25;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartH / 5) * i;
+                const val = maxMttr - i * 5;
+                ctx.fillText(val + 'h', padding.left - 10, y + 4);
+            }
+
+            // Y-axis title
+            ctx.save();
+            ctx.translate(25, H / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('MTTR (hours)', 0, 0);
+            ctx.restore();
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            for (let i = 0; i < 10; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                ctx.fillText('Inc ' + (i + 1), x, H - padding.bottom + 25);
+            }
+
+            // X-axis title
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.fillText('Incidents', W / 2, H - 15);
+
+            // Get data
+            const mttr = simulate(capability);
+
+            // Draw area
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.15)';
+            for (let i = 0; i < mttr.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (mttr[i] / maxMttr) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.lineTo(padding.left + chartW, H - padding.bottom);
+            ctx.lineTo(padding.left, H - padding.bottom);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw line
+            ctx.strokeStyle = '#60a5fa';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            for (let i = 0; i < mttr.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (mttr[i] / maxMttr) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw points with values
+            ctx.fillStyle = '#60a5fa';
+            ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            for (let i = 0; i < mttr.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (mttr[i] / maxMttr) * chartH;
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillText(mttr[i].toFixed(1) + 'h', x, y - 12);
+            }
+
+            // Update callouts
+            const avg = mttr.reduce((a, b) => a + b, 0) / mttr.length;
+            const vDelay = (100 - capability) / 10;
+            avgMttr.textContent = avg.toFixed(1) + 'h';
+            vendorDelay.textContent = vDelay.toFixed(1) + 'h';
+
+            if (capability >= 70) {
+                decisionSpeed.textContent = 'Fast';
+                decisionSpeed.style.color = '#10b981';
+            } else if (capability >= 40) {
+                decisionSpeed.textContent = 'Medium';
+                decisionSpeed.style.color = '#f59e0b';
+            } else {
+                decisionSpeed.textContent = 'Slow';
+                decisionSpeed.style.color = '#ef4444';
+            }
+        }
+
+        function refresh() {
+            const cap = parseInt(capSlider.value);
+            capValue.textContent = cap + '%';
+            drawChart(cap);
+        }
+
+        capSlider.addEventListener('input', refresh);
+        refresh();
+
+        window.addEventListener('resize', function() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            refresh();
+        });
+    })();
+    </script>
+</body>
+</html>

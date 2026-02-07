@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-NOC: High Density SCADA (10 Zones)</title>
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root {
+            --bg-core: #050505;
+            --bg-panel: rgba(20, 22, 25, 0.9);
+            --border: #333;
+            
+            --c-blue: #00d2ff; 
+            --c-cyan: #00fff2;
+            --c-green: #00ff9d; 
+            --c-red: #ff3838;   
+            --c-orange: #ff9f43;
+            
+            --rack-blue: #2980b9;
+            --rack-grey: #444;
+        }
+
+        * { box-sizing: border-box; user-select: none; cursor: default; }
+
+        body {
+            background-color: var(--bg-core);
+            color: #ecf0f1;
+            font-family: 'Segoe UI', 'Roboto', monospace;
+            margin: 0; padding: 0;
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- VFX LAYERS --- */
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none; z-index: 9999; opacity: 0.5;
+        }
+        .red-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.4) 100%);
+            z-index: 9998; pointer-events: none; opacity: 0; transition: opacity 0.5s;
+        }
+        .global-alarm .red-alert-overlay { animation: alarmPulse 1s infinite; opacity: 1; }
+
+        /* --- HEADER --- */
+        .top-bar {
+            height: 40px; background: #080808; border-bottom: 2px solid var(--c-blue);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
+            z-index: 100;
+        }
+        .logo { font-size: 1rem; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
+        .logo span { color: var(--c-blue); }
+        .clock { font-family: 'Consolas', monospace; color: var(--c-green); font-size: 0.9rem; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-grid {
+            display: flex; flex: 1; height: calc(100vh - 160px); 
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar {
+            width: 240px; background: var(--bg-panel); 
+            border-right: 1px solid #333; backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; gap: 8px; padding: 10px; overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .sidebar-right { border-left: 1px solid #333; border-right: none; }
+        
+        .widget { 
+            background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 8px; border-radius: 4px; 
+        }
+        .widget-title { font-size: 0.65rem; color: var(--c-cyan); margin-bottom: 5px; border-bottom: 1px solid #444; padding-bottom: 3px; font-weight: bold;}
+
+        /* --- CENTER STAGE --- */
+        .center-stage {
+            flex: 1; position: relative; display: flex; flex-direction: column;
+            background: #000;
+            background-image: 
+                linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            padding: 5px; overflow: hidden; /* Compact padding */
+        }
+
+        .facility-wrapper {
+            display: grid;
+            grid-template-rows: auto 60px 1fr 60px auto; 
+            gap: 4px; height: 100%; width: 100%;
+        }
+
+        /* UPDATED: 10 Columns Grid */
+        .grid-row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        
+        /* --- UNIT CARD (Compact for 10 cols) --- */
+        .unit-complex {
+            display: flex; gap: 2px; height: 100%; transition: all 0.3s;
+        }
+        
+        .pipes-container { display: flex; gap: 1px; width: 18px; background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 1px; border-radius: 2px; }
+        .pipe-col { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; }
+        .pipe-label { font-size: 0.35rem; color: #888; margin-bottom: 1px; }
+        .pipe-val { font-size: 0.4rem; color: #fff; font-family: monospace; font-weight: bold; background: #000; padding: 0 1px; z-index:2; margin-top:-2px;}
+        
+        .pipe { width: 3px; flex: 1; position: relative; border-radius: 1px; overflow: hidden; background: #111; }
+        .p-chws { background: #002b55; }
+        .p-chwr { background: #004d4d; }
+        
+        .pipe::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent, #fff, transparent);
+            background-size: 100% 30%; opacity: 0;
+        }
+        .flowing .p-chws::after { animation: flowDown 1s linear infinite; opacity: 0.8; }
+        .flowing .p-chwr::after { animation: flowUp 1s linear infinite; opacity: 0.6; }
+
+        .unit-card {
+            flex: 1; 
+            background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+            border: 1px solid #444; border-top: 2px solid var(--c-green);
+            padding: 3px; display: flex; flex-direction: column; justify-content: space-between; position: relative;
+            min-width: 0; /* Allow shrinking */
+        }
+        .unit-card.alarm { border-color: var(--c-red); border-top-color: var(--c-red); animation: shake 0.5s infinite; }
+        .unit-card.off { border-top-color: #555; opacity: 0.5; filter: grayscale(100%); }
+
+        .unit-header { 
+            display: flex; justify-content: space-between; font-size: 0.55rem; font-weight: bold; 
+            border-bottom: 1px solid #333; padding-bottom: 1px; color: #fff; margin-bottom: 2px; 
+            white-space: nowrap; overflow: hidden;
+        }
+        .fan-icon { font-size: 0.6rem; color: var(--c-green); }
+        .spinning { animation: spin 0.8s linear infinite; }
+
+        .spark-container { height: 20px; background: rgba(0,0,0,0.5); border: 1px solid #333; margin-bottom: 2px; position: relative; }
+        canvas.sparkline { width: 100%; height: 100%; display: block; }
+
+        .param-grid { display: grid; grid-template-columns: 1fr; font-size: 0.5rem; color: #888; gap: 1px; }
+        .val { color: #fff; text-align: right; font-family: monospace; font-weight: bold; }
+        
+        /* Toggle Switch (Adjusted for small size) */
+        .toggle-sw {
+            position: absolute; top: 18px; right: 2px; width: 14px; height: 8px; 
+            background: #222; border-radius: 4px; cursor: pointer; border: 1px solid #555; z-index: 10;
+        }
+        .toggle-knob {
+            width: 4px; height: 4px; background: #888; border-radius: 50%; 
+            position: absolute; top: 1px; left: 1px; transition: 0.2s;
+        }
+        .toggle-active { border-color: var(--c-green); background: rgba(0,255,157,0.1); }
+        .toggle-active .toggle-knob { left: 7px; background: var(--c-green); }
+
+        /* --- AIRFLOW --- */
+        .duct-col { position: relative; overflow: hidden; display: flex; justify-content: center; }
+        
+        .supply-stream {
+            width: 60%; height: 100%; 
+            background: linear-gradient(to bottom, transparent, rgba(0, 210, 255, 0.2), transparent);
+            position: relative; overflow: hidden;
+        }
+        .supply-laser {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: repeating-linear-gradient(transparent 0, transparent 5px, rgba(0, 255, 255, 0.1) 5px, rgba(0, 255, 255, 0.1) 8px);
+            animation: laserRain 0.8s linear infinite; opacity: 0;
+        }
+        .flowing .supply-laser { opacity: 1; }
+
+        .return-stream-left, .return-stream-right {
+            position: absolute; top:0; bottom:0; width: 15%; 
+            background: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 50, 50, 0.1) 2px, rgba(255, 50, 50, 0.1) 4px);
+            opacity: 0; filter: blur(0.5px);
+        }
+        .return-stream-left { left: 0%; }
+        .return-stream-right { right: 0%; }
+        
+        .flowing .return-stream-left { opacity: 0.6; animation: flowUp 2s linear infinite; }
+        .flowing .return-stream-right { opacity: 0.6; animation: flowUp 2s linear infinite; }
+        .duct-bottom .flowing .return-stream-left { animation: flowDown 2s linear infinite; }
+        .duct-bottom .flowing .return-stream-right { animation: flowDown 2s linear infinite; }
+
+        /* --- FLOOR PLAN --- */
+        .floor-zone { 
+            display: grid; grid-template-columns: 0.2fr 1fr 1.6fr 1fr 0.2fr; 
+            background: #0a0a0a; border-right: 1px dashed #333; position: relative;
+        }
+
+        .aisle { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 2px 0; }
+        
+        .cold-aisle { 
+            background: rgba(0, 20, 30, 0.5);
+            border-left: 1px solid rgba(0,210,255,0.2); border-right: 1px solid rgba(0,210,255,0.2); 
+            overflow: hidden;
+        }
+        .cold-flow-fx {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(180deg, transparent, rgba(0,255,242,0.1), transparent);
+            background-size: 100% 50%;
+            animation: scanDown 1s linear infinite; pointer-events: none; opacity: 0.5;
+        }
+        .sensor-node { 
+            background: #000; color: var(--c-cyan); padding: 0 2px; font-size: 0.45rem; 
+            border: 1px solid #333; border-radius: 2px; z-index: 5; font-family: monospace;
+        }
+
+        .hot-aisle { 
+            background: rgba(40, 10, 10, 0.3);
+            border-top: 4px solid #555; border-bottom: 4px solid #555;
+            position: relative; overflow: hidden;
+        }
+        .hot-flow-fx {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background-image: radial-gradient(rgba(255, 50, 50, 0.2) 1px, transparent 1px);
+            background-size: 5px 5px;
+            animation: riseUp 1.5s linear infinite; opacity: 0.6;
+        }
+
+        .rack-col-wrapper { display: flex; flex-direction: column; background: #000; }
+        .row-label { font-size: 0.4rem; color: #666; text-align: center; background: #111; border-bottom: 1px solid #222; padding: 1px; }
+        .rack-col { display: grid; grid-template-rows: repeat(10, 1fr); gap: 1px; padding: 1px; flex: 1; }
+        
+        .rack { 
+            position: relative; border-radius: 1px; transition: 0.2s; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .rack:hover { border: 1px solid #fff; z-index: 20; }
+        .rack-id { font-size: 0.35rem; color: rgba(255,255,255,0.7); z-index: 2; pointer-events: none; text-shadow: 0 0 2px #000; display:none; }
+        .rack:hover .rack-id { display:block; }
+
+        .rk-green { background: var(--c-green); opacity: 0.6; }
+        .rk-blue { background: var(--rack-blue); opacity: 0.8; animation: pulseRack 2s infinite; }
+        .rk-grey { background: var(--rack-grey); opacity: 0.4; border: 1px solid #444; }
+
+        /* --- UI ELEMENTS --- */
+        #tooltip {
+            position: absolute; background: rgba(10, 10, 10, 0.95); border: 1px solid var(--c-blue);
+            padding: 6px; font-size: 0.65rem; color: #fff; display: none; pointer-events: none; z-index: 9999;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3); border-radius: 3px; min-width: 100px;
+        }
+
+        .bottom-panel {
+            height: 120px; background: #080808; border-top: 1px solid #333;
+            display: flex; flex-direction: column; font-family: 'Consolas', monospace;
+        }
+        .log-header { padding: 4px 10px; background: #111; color: #666; font-size: 0.65rem; border-bottom: 1px solid #222; }
+        .log-container { flex: 1; overflow-y: auto; padding: 5px; font-size: 0.7rem; }
+        .log-entry { margin-bottom: 2px; display: flex; gap: 8px; }
+        .l-time { color: var(--c-blue); } .l-crit { color: var(--c-red); } .l-info { color: #ccc; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 10000; display: none;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-box {
+            background: #111; border: 1px solid var(--c-blue); width: 350px;
+            padding: 15px; box-shadow: 0 0 40px rgba(0, 210, 255, 0.2);
+            position: relative; color: #fff;
+        }
+        .close-modal { position: absolute; top: 8px; right: 12px; cursor: pointer; font-size: 1.2rem; color: #aaa; }
+
+        /* ANIMATIONS */
+        @keyframes flowDown { from {background-position: 0 -30px;} to {background-position: 0 0;} }
+        @keyframes flowUp { from {background-position: 0 30px;} to {background-position: 0 0;} }
+        @keyframes scanDown { 0% { background-position: 0 0; } 100% { background-position: 0 100px; } }
+        @keyframes riseUp { 0% { background-position: 0 0; } 100% { background-position: 0 -50px; } }
+        @keyframes laserRain { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes alarmPulse { 0% { opacity: 0.2; } 50% { opacity: 0.6; } 100% { opacity: 0.2; } }
+        @keyframes pulseRack { 0% { filter: brightness(1); } 50% { filter: brightness(1.3); } 100% { filter: brightness(1); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="crt-overlay"></div>
+    <div class="red-alert-overlay"></div>
+    <div id="tooltip"></div>
+
+    <div class="modal-overlay" id="unitModal">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeModal()">×</span>
+            <h3 style="color:var(--c-blue); margin-top:0; border-bottom:1px solid #333; padding-bottom:10px;">UNIT DETAIL</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem;">
+                <div style="color:#888">Asset ID:</div> <div id="m-id" style="font-family:monospace"></div>
+                <div style="color:#888">Status:</div> <div style="color:var(--c-green)">ONLINE</div>
+                <div style="color:#888">Load:</div> <div>85%</div>
+                <div style="color:#888">Run Hours:</div> <div>12,450h</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <a href="index.html" style="display:flex; align-items:center; gap:6px; text-decoration:none; color:#888; font-size:0.75rem; padding:4px 10px; border:1px solid #444; border-radius:3px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff';this.style.borderColor='var(--c-blue)'" onmouseout="this.style.background='transparent';this.style.color='#888';this.style.borderColor='#444'">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Portfolio
+        </a>
+        <div class="logo">G-NOC <span>CRITICAL</span> INFRA</div>
+        <div class="clock" id="clock">00:00:00</div>
+    </div>
+
+    <div class="main-grid">
+        
+        <div class="sidebar">
+            <div class="widget">
+                <div class="widget-title">CHILLER PLANT</div>
+                <div style="font-size:0.7rem; display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>CH-01</span> <span style="color:var(--c-green)">RUN</span>
+                </div>
+                <div style="font-size:0.7rem; display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>CH-02</span> <span style="color:var(--c-green)">RUN</span>
+                </div>
+                 <div style="font-size:0.7rem; display:flex; justify-content:space-between;">
+                    <span>CH-03</span> <span style="color:#555">STBY</span>
+                </div>
+                <div style="margin-top:8px; font-size:0.65rem; color:#888; border-top:1px solid #333; padding-top:4px;">
+                    LWT: <span style="color:var(--c-blue)">6.5°C</span> | EWT: <span style="color:var(--c-orange)">12.5°C</span>
+                </div>
+            </div>
+            <div class="widget">
+                <div class="widget-title">PUE METRICS</div>
+                <div style="text-align:center; font-size:1.5rem; font-weight:bold; color:var(--c-green);">1.42</div>
+            </div>
+             <div class="widget">
+                <div class="widget-title">POWER</div>
+                <div style="font-size:0.7rem; color:#ccc;">Total Load: 1.2 MW</div>
+                <div style="height:5px; width:100%; background:#222; margin-top:5px;"><div style="width:75%; height:100%; background:var(--c-orange);"></div></div>
+            </div>
+        </div>
+
+        <div class="center-stage">
+            <div class="facility-wrapper">
+                <div class="grid-row" id="dahu-row"></div>
+                <div class="grid-row duct-col" id="duct-top"></div>
+                <div class="grid-row" id="floor-row" style="flex:1;"></div>
+                <div class="grid-row duct-col duct-bottom" id="duct-bottom"></div>
+                <div class="grid-row" id="ahu-row"></div>
+            </div>
+        </div>
+
+        <div class="sidebar sidebar-right">
+            <div class="widget">
+                <div class="widget-title">ENVIRONMENT</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem;">
+                    <span>Outdoor</span> <span style="color:var(--c-orange)">32.5°C</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem;">
+                    <span>RH</span> <span style="color:var(--c-blue)">65%</span>
+                </div>
+            </div>
+            <div class="widget" style="flex:1;">
+                <div class="widget-title">ACTIVE ALARMS</div>
+                <div id="alarm-list" style="font-size:0.65rem; color:#888;">No Active Alarms</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-panel">
+        <div class="log-header">EVENT LOG</div>
+        <div class="log-container" id="log-box"></div>
+    </div>
+
+    <script>
+        // CONFIG FOR 10 ZONES (20 UNITS TOTAL)
+        const ZONES = 10;
+        const DAHU_IDS = [];
+        const AHU_IDS = [];
+        
+        // Generate IDs automatically: DAHU (Odd 1..19), AHU (Even 2..20)
+        for(let i=0; i<ZONES; i++) {
+            const numDahu = i*2 + 1;
+            const strDahu = numDahu < 10 ? `0${numDahu}` : `${numDahu}`;
+            DAHU_IDS.push(`1.1-${strDahu}`);
+            
+            const numAhu = i*2 + 2;
+            const strAhu = numAhu < 10 ? `0${numAhu}` : `${numAhu}`;
+            AHU_IDS.push(`1.1-${strAhu}`);
+        }
+
+        const unitState = {};
+
+        function init() {
+            [...DAHU_IDS, ...AHU_IDS].forEach(id => {
+                unitState[id] = {
+                    temp: 21.5, rat: 28.0, status: 'NORMAL', isOn: true,
+                    history: new Array(15).fill(21.5), alarmTimer: 0
+                };
+            });
+            renderGrid();
+            setInterval(() => {
+                updateClock();
+                simulationLoop();
+            }, 1000);
+            log("System Initialized (10 Zones Configured).", "info");
+        }
+
+        function renderGrid() {
+            document.getElementById('dahu-row').innerHTML = DAHU_IDS.map(id => createUnitHTML(id, 'DAHU')).join('');
+            document.getElementById('ahu-row').innerHTML  = AHU_IDS.map(id => createUnitHTML(id, 'AHU')).join('');
+            
+            const ductHTML = `
+                <div class="return-stream-left"></div>
+                <div class="supply-stream"><div class="supply-laser"></div></div>
+                <div class="return-stream-right"></div>
+            `;
+            document.getElementById('duct-top').innerHTML = Array(ZONES).fill(ductHTML).join('');
+            document.getElementById('duct-bottom').innerHTML = Array(ZONES).fill(ductHTML).join('');
+            document.getElementById('floor-row').innerHTML = Array(ZONES).fill(0).map((_, i) => createFloorZone(i)).join('');
+        }
+
+        function createUnitHTML(id, type) {
+            return `
+            <div class="unit-complex flowing" id="complex-${id}">
+                <div class="pipes-container">
+                    <div class="pipe-col"><div class="pipe-label">S</div><div class="pipe p-chws"></div></div>
+                    <div class="pipe-col"><div class="pipe-label">R</div><div class="pipe p-chwr"></div></div>
+                </div>
+                <div class="unit-card" id="card-${id}" onclick="openModal('${id}')">
+                    <div class="unit-header">
+                        <span>${id}</span> <span id="fan-${id}" class="fan-icon spinning">❄</span>
+                    </div>
+                    <div class="toggle-sw toggle-active" id="sw-${id}" onclick="event.stopPropagation(); toggleUnit('${id}')">
+                        <div class="toggle-knob"></div>
+                    </div>
+                    <div class="spark-container">
+                        <canvas id="spark-${id}" class="sparkline"></canvas>
+                    </div>
+                    <div class="param-grid">
+                        <span class="val" id="sat-${id}" style="color:var(--c-blue)">21.5</span>
+                        <span class="val" id="rat-${id}" style="color:var(--c-orange)">28.0</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function createFloorZone(idx) {
+            const aisleCode = `C${idx < 9 ? '0'+(idx+1) : (idx+1)}`;
+            let sensors = '';
+            // Reduced to 3 sensors due to height constraints
+            for(let i=0; i<3; i++) sensors += `<div class="sensor-node" id="tt-${aisleCode}-${i}">22.0</div>`;
+
+            const createRackCol = (rowLabel) => {
+                let html = `<div class="rack-col-wrapper"><div class="row-label">${rowLabel}</div><div class="rack-col">`;
+                let racks = Array(10).fill('rk-green');
+                let blueCount = Math.floor(Math.random()*2)+1;
+                for(let b=0; b<blueCount; b++) racks[Math.floor(Math.random()*10)] = 'rk-blue';
+                let greyCount = Math.floor(Math.random()*3);
+                for(let g=0; g<greyCount; g++) if(racks[g]!=='rk-blue') racks[g] = 'rk-grey';
+
+                racks.forEach((cls, rIdx) => {
+                    let load = (Math.random()*5+3).toFixed(1);
+                    if(cls==='rk-blue') load=(Math.random()*5+8).toFixed(1);
+                    if(cls==='rk-grey') load=0;
+                    html += `<div class="rack ${cls}" onmouseenter="showTooltip(event, '${load} kW')" onmouseleave="hideTooltip()">
+                                <span class="rack-id">${idx+1}.${rIdx}</span>
+                             </div>`;
+                });
+                html += '</div></div>';
+                return html;
+            }
+
+            // Using alphabet for rows (A, B, C...)
+            const rowChar1 = String.fromCharCode(65 + (idx*2));     // A, C, E...
+            const rowChar2 = String.fromCharCode(65 + (idx*2) + 1); // B, D, F...
+
+            return `
+            <div class="floor-zone">
+                <div class="aisle hot-aisle"><div class="hot-flow-fx"></div></div>
+                ${createRackCol(`Row ${rowChar1}`)}
+                <div class="aisle cold-aisle">
+                    <div class="cold-flow-fx"></div>
+                    <span style="font-size:0.5rem; font-weight:bold; background:#000; color:var(--c-cyan); padding:1px; z-index:2; border-radius:2px;">${aisleCode}</span>
+                    ${sensors}
+                </div>
+                ${createRackCol(`Row ${rowChar2}`)}
+                <div class="aisle hot-aisle"><div class="hot-flow-fx"></div></div>
+            </div>`;
+        }
+
+        function simulationLoop() {
+            let activeAlarms = 0;
+            [...DAHU_IDS, ...AHU_IDS].forEach(id => {
+                const state = unitState[id];
+                const card = document.getElementById(`card-${id}`);
+                const complex = document.getElementById(`complex-${id}`);
+
+                if(!state.isOn) {
+                    state.temp += 0.5; if(state.temp > 35) state.temp=35;
+                    state.rat = state.temp + 4;
+                    complex.classList.remove('flowing');
+                    card.classList.add('off');
+                    document.getElementById(`fan-${id}`).classList.remove('spinning');
+                } else {
+                    complex.classList.add('flowing');
+                    card.classList.remove('off');
+                    document.getElementById(`fan-${id}`).classList.add('spinning');
+                    
+                    if(state.status==='NORMAL' && Math.random()<0.002) { // Lower prob for 20 units
+                        state.status='ALARM'; state.alarmTimer=15;
+                        card.classList.add('alarm');
+                        log(`[CRITICAL] ${id} High Temp Alarm!`, 'crit');
+                    }
+                    if(state.status==='ALARM') {
+                        activeAlarms++;
+                        state.temp = 30 + Math.random()*2;
+                        state.alarmTimer--;
+                        if(state.alarmTimer<=0) { state.status='NORMAL'; card.classList.remove('alarm'); }
+                    } else {
+                        state.temp = state.temp*0.9 + (21.5+(Math.random()-0.5))*0.1;
+                        state.rat = 28 + Math.random();
+                    }
+                }
+                
+                state.history.shift(); state.history.push(state.temp);
+                drawSparkline(id, state.history);
+
+                document.getElementById(`sat-${id}`).innerText = state.temp.toFixed(1);
+                document.getElementById(`rat-${id}`).innerText = state.rat.toFixed(1);
+            });
+
+            if(activeAlarms > 0) document.body.classList.add('global-alarm');
+            else document.body.classList.remove('global-alarm');
+
+            for(let i=0; i<ZONES; i++) {
+                const aisle = `C${i < 9 ? '0'+(i+1) : (i+1)}`;
+                for(let k=0; k<3; k++) {
+                    const val = (21.5 + Math.random()).toFixed(1);
+                    document.getElementById(`tt-${aisle}-${k}`).innerText = val;
+                }
+            }
+        }
+
+        function drawSparkline(id, data) {
+            const canvas = document.getElementById(`spark-${id}`);
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.offsetWidth;
+            const h = canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0,0,w,h); ctx.beginPath();
+            ctx.strokeStyle = data[data.length-1]>25 ? '#ff3838':'#00d2ff';
+            ctx.lineWidth=1.5;
+            const step = w/(data.length-1);
+            data.forEach((val, i) => {
+                const y = h - ((val-15)/(35-15)*h);
+                if(i===0) ctx.moveTo(0,y); else ctx.lineTo(i*step, y);
+            });
+            ctx.stroke();
+        }
+
+        function toggleUnit(id) {
+            unitState[id].isOn = !unitState[id].isOn;
+            const sw = document.getElementById(`sw-${id}`);
+            if(unitState[id].isOn) sw.classList.add('toggle-active');
+            else sw.classList.remove('toggle-active');
+        }
+
+        function openModal(id) { 
+            document.getElementById('unitModal').style.display = 'flex'; 
+            document.getElementById('m-id').innerText = id;
+        }
+        function closeModal() { document.getElementById('unitModal').style.display = 'none'; }
+        
+        function showTooltip(e, load) {
+            const tt = document.getElementById('tooltip');
+            tt.style.display = 'block';
+            tt.style.left = (e.pageX + 10) + 'px';
+            tt.style.top = (e.pageY + 10) + 'px';
+            tt.innerHTML = `Load: <span style="color:var(--c-green)">${load} kW</span>`;
+        }
+        function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
+
+        function log(msg, type) {
+            const box = document.getElementById('log-box');
+            const time = new Date().toLocaleTimeString('id-ID');
+            let cls = 'l-info'; if(type==='crit') cls='l-crit';
+            box.insertAdjacentHTML('afterbegin', `<div class="log-entry"><span class="l-time">[${time}]</span> <span class="${cls}">${msg}</span></div>`);
+        }
+
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }
+
+        init();
+    </script>
+</body>
+</html>
