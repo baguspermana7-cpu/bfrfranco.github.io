@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Center CAPEX Calculator | Construction Cost Estimator</title>
+    <meta name="description" content="Data Center CAPEX Calculator for construction cost estimation. Calculate comprehensive capital expenditure with detailed breakdown of electrical, cooling, civil, and infrastructure costs.">
+    <meta name="keywords" content="Data Center CAPEX, Construction Cost Calculator, Data Center Cost, Tier III Cost, UPS Cost, Generator Cost, Cooling System Cost">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0066cc">
+    <link rel="canonical" href="https://resistancezero.com/capex-calculator.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/capex-calculator.html">
+    <meta property="og:title" content="Data Center CAPEX Calculator">
+    <meta property="og:description" content="Construction cost estimation with detailed breakdown of all infrastructure components.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Center CAPEX Calculator">
+    <meta name="twitter:description" content="Construction cost estimation with infrastructure breakdown.">
+
+    <!-- WebApplication Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Data Center CAPEX Calculator",
+        "applicationCategory": "FinanceApplication",
+        "description": "Calculate comprehensive data center construction costs with detailed breakdown of electrical, cooling, civil, UPS, generator, fire suppression, and infrastructure components.",
+        "url": "https://resistancezero.com/capex-calculator.html",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "IT load capacity sizing (100 kW - 100 MW)",
+            "Multiple cooling types (Air, In-Row, RDHX, DLC)",
+            "Redundancy configurations (N, N+1, 2N, 2N+1)",
+            "Seismic zone adjustments",
+            "Building type cost factors",
+            "Fire suppression system options",
+            "UPS and generator configurations",
+            "Location factor adjustments"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
+            --secondary-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a5f 100%);
+            --dark-blue: #1e3a5f;
+            --medium-blue: #2d5a87;
+            --light-blue: #4a90b8;
+            --accent-gold: #f59e0b;
+            --accent-amber: #fbbf24;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg-dark: rgba(30, 58, 95, 0.95);
+            --glass-border: rgba(30, 58, 95, 0.1);
+            --glass-blur: blur(20px);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Background */
+        .page-background {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at top right, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(30, 58, 95, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 58, 95, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--dark-blue);
+        }
+
+        .nav-logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
+        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
+
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 0;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover { color: var(--dark-blue); }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+        }
+
+        .nav-back:hover { transform: translateY(-2px); }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding-top: 80px;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Calculator Container */
+        .calculator-section {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulator-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-label i {
+            color: var(--accent-gold);
+        }
+
+        /* Tooltip Styles - Fixed positioning to escape overflow */
+        .tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 50%;
+            font-size: 10px;
+            color: var(--accent-gold);
+            cursor: help;
+            margin-left: auto;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .tooltip-trigger:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Global tooltip container */
+        #tooltip-container {
+            position: fixed;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            z-index: 999999;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease;
+            color: white;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        #tooltip-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #tooltip-container .tooltip-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #tooltip-container .tooltip-desc {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 10px;
+        }
+
+        #tooltip-container .tooltip-table {
+            width: 100%;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+
+        #tooltip-container .tooltip-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.6);
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #tooltip-container .tooltip-table td {
+            padding: 4px 0;
+        }
+
+        #tooltip-container .tooltip-table td:last-child {
+            text-align: right;
+            color: #22d3ee;
+        }
+
+        /* Hide inline tooltip content */
+        .tooltip-trigger .tooltip-content {
+            display: none;
+        }
+
+        .tooltip-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-amber);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tooltip-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .tooltip-table {
+            width: 100%;
+            font-size: 10px;
+            border-collapse: collapse;
+        }
+
+        .tooltip-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tooltip-table td {
+            padding: 4px 0;
+            color: white;
+        }
+
+        .tooltip-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+
+        .tooltip-impact {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 6px;
+            font-size: 10px;
+            color: var(--accent-amber);
+        }
+
+        .input-field {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+
+        select.input-field {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .radio-option input {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .radio-option label small {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .radio-option input:checked + label {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .radio-option label:hover {
+            border-color: var(--accent-gold);
+        }
+
+        /* Cost Results */
+        .simulator-results {
+            background: linear-gradient(135deg, var(--dark-blue), var(--medium-blue));
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .results-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-total {
+            text-align: right;
+        }
+
+        .total-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .total-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+
+        .cost-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .cost-breakdown::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cost-breakdown::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .cost-breakdown::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .cost-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .cost-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .cost-bar-container {
+            flex: 1;
+            margin: 0 12px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .cost-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .cost-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .cost-percent {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            min-width: 35px;
+            text-align: right;
+        }
+
+        /* Metrics Display */
+        .per-kw-display {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .per-kw-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .per-kw-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-box {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-value.tier { color: #a78bfa; }
+        .metric-value.pue { color: #22d3ee; }
+        .metric-value.uptime { color: #34d399; }
+        .metric-value.energy { color: #fbbf24; }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-blue);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .calculator-section { padding: 1rem; }
+            .simulator-container { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">CAPEX</div>
+                <div>
+                    <div class="nav-title">CAPEX Calculator</div>
+                    <div class="nav-subtitle">Capital Expenditure Analysis</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
+                <a href="datahallAI.html" class="nav-link" style="color: #8b5cf6;">DC AI/HPC</a>
+                <a href="dc-conventional.html" class="nav-link">DC Conventional</a>
+                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
+                <a href="index.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Portfolio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-calculator"></i>
+                Capital Expenditure Analysis
+            </div>
+            <h1>Data Center CAPEX Calculator</h1>
+            <p>Calculate comprehensive construction costs with detailed breakdown of electrical, cooling, civil, and infrastructure components</p>
+        </section>
+
+        <!-- Calculator -->
+        <section class="calculator-section">
+            <div class="simulator-container">
+                <!-- Input Side -->
+                <div class="simulator-inputs">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-bolt"></i> IT Load (kW)
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
+                                        <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Category</th><th>Range</th></tr>
+                                            <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
+                                            <tr><td>Medium</td><td>500-2,000 kW</td></tr>
+                                            <tr><td>Large</td><td>2-10 MW</td></tr>
+                                            <tr><td>Hyperscale</td><td>10+ MW</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-gas-pump"></i> Fuel Autonomy</div>
+                                        <div class="tooltip-desc">Duration generators can operate without refueling during utility power outage.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Tier Level</th><th>Typical Hours</th></tr>
+                                            <tr><td>Minimum</td><td>8 hours</td></tr>
+                                            <tr><td>Standard</td><td>24 hours</td></tr>
+                                            <tr><td>Tier III</td><td>48 hours</td></tr>
+                                            <tr><td>Mission Critical</td><td>72+ hours</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="number" class="input-field" id="fuelHours" value="48" min="8" max="168">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-building"></i> Building Type
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-building"></i> Building Type</div>
+                                        <div class="tooltip-desc">The type of structure affects construction costs significantly. Purpose-built facilities are optimized for data centers.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Type</th><th>Cost Factor</th></tr>
+                                            <tr><td>Warehouse Conversion</td><td>0.70x (lowest)</td></tr>
+                                            <tr><td>Modular / Prefab</td><td>0.85x</td></tr>
+                                            <tr><td>Purpose-Built</td><td>1.00x (baseline)</td></tr>
+                                            <tr><td>High-Rise Multi-Story</td><td>1.40x (highest)</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="buildingType">
+                                <option value="warehouse">Warehouse Conversion (0.70x)</option>
+                                <option value="modular">Modular / Prefab (0.85x)</option>
+                                <option value="purpose" selected>Purpose-Built (1.00x)</option>
+                                <option value="highrise">High-Rise Multi-Story (1.40x)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-mountain"></i> Seismic Zone
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-mountain"></i> Seismic Zone</div>
+                                        <div class="tooltip-desc">Earthquake risk zones require additional structural reinforcement. Indonesia is typically Zone 2-4.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Zone</th><th>Cost Impact</th></tr>
+                                            <tr><td>Zone 0 - No Risk</td><td>+0%</td></tr>
+                                            <tr><td>Zone 1 - Low</td><td>+3%</td></tr>
+                                            <tr><td>Zone 2 - Moderate</td><td>+6%</td></tr>
+                                            <tr><td>Zone 3 - High</td><td>+10%</td></tr>
+                                            <tr><td>Zone 4 - Very High</td><td>+15%</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="seismicZone">
+                                <option value="zone0">Zone 0 - No Seismic Risk</option>
+                                <option value="zone1">Zone 1 - Low Risk</option>
+                                <option value="zone2" selected>Zone 2 - Moderate Risk</option>
+                                <option value="zone3">Zone 3 - High Risk</option>
+                                <option value="zone4">Zone 4 - Very High Risk</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-server"></i> Rack Density
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-server"></i> Rack Density</div>
+                                    <div class="tooltip-desc">Power consumption per rack affects cooling requirements and infrastructure costs. AI/HPC racks require specialized cooling.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Density</th><th>Cooling Needs</th></tr>
+                                        <tr><td>Standard (5-7 kW)</td><td>Air cooling adequate</td></tr>
+                                        <tr><td>Medium (10-15 kW)</td><td>Enhanced airflow</td></tr>
+                                        <tr><td>High (20-30 kW)</td><td>In-row or RDHX required</td></tr>
+                                        <tr><td>AI/HPC (50-100 kW)</td><td>Direct liquid cooling</td></tr>
+                                    </table>
+                                </div>
+                            </span>
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackStd" value="standard" checked>
+                                <label for="rackStd">Standard<small>5-7 kW</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackMid" value="medium">
+                                <label for="rackMid">Medium<small>10-15 kW</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackHigh" value="high">
+                                <label for="rackHigh">High Density<small>20-30 kW</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackAI" value="ai">
+                                <label for="rackAI">AI/HPC<small>50-100 kW</small></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-snowflake"></i> Cooling Type
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Type</div>
+                                    <div class="tooltip-desc">Cooling technology affects both CAPEX and operational efficiency. Higher density requires more advanced cooling.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Type</th><th>Best For</th></tr>
+                                        <tr><td>Air (CRAC/CRAH)</td><td>Standard &lt;10 kW/rack</td></tr>
+                                        <tr><td>In-Row Precision</td><td>Medium 10-20 kW/rack</td></tr>
+                                        <tr><td>RDHX (Rear Door)</td><td>High 20-40 kW/rack</td></tr>
+                                        <tr><td>DLC (Direct Liquid)</td><td>AI/HPC 50+ kW/rack</td></tr>
+                                    </table>
+                                </div>
+                            </span>
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolAir" value="air" checked>
+                                <label for="coolAir">Air<small>CRAC/CRAH</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolInrow" value="inrow">
+                                <label for="coolInrow">In-Row<small>Precision</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolRDHX" value="rdhx">
+                                <label for="coolRDHX">RDHX<small>Rear Door</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolLiquid" value="liquid">
+                                <label for="coolLiquid">DLC<small>Direct Liquid</small></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-shield-alt"></i> Redundancy
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-shield-alt"></i> Redundancy Level</div>
+                                    <div class="tooltip-desc">Higher redundancy = higher uptime but significantly more cost. 2N doubles infrastructure.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Level</th><th>Uptime SLA</th></tr>
+                                        <tr><td>N (Basic)</td><td>99.671% (~28.8hr/yr)</td></tr>
+                                        <tr><td>N+1 (Standard)</td><td>99.982% (~1.6hr/yr)</td></tr>
+                                        <tr><td>2N (Full)</td><td>99.995% (~26min/yr)</td></tr>
+                                        <tr><td>2N+1 (Premium)</td><td>99.9995% (~2.6min/yr)</td></tr>
+                                    </table>
+                                </div>
+                            </span>
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="redN" value="n">
+                                <label for="redN">N<small>Basic</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="redN1" value="n1" checked>
+                                <label for="redN1">N+1<small>Standard</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="red2N" value="2n">
+                                <label for="red2N">2N<small>Full</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="red2N1" value="2n1">
+                                <label for="red2N1">2N+1<small>Premium</small></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-fire-extinguisher"></i> Fire Suppression
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-fire-extinguisher"></i> Fire Suppression</div>
+                                        <div class="tooltip-desc">Clean agent fire suppression systems that don't damage IT equipment.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Agent</th><th>Notes</th></tr>
+                                            <tr><td>FM200/HFC-227ea</td><td>Common, being phased out</td></tr>
+                                            <tr><td>Novec 1230</td><td>Low GWP, safest choice</td></tr>
+                                            <tr><td>Inergen (IG-541)</td><td>Inert gas, unlimited</td></tr>
+                                            <tr><td>Nitrogen Inerting</td><td>For sealed rooms</td></tr>
+                                            <tr><td>Water Mist</td><td>Green alternative</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="fireType">
+                                <option value="fm200">FM200 / HFC-227ea</option>
+                                <option value="novec" selected>Novec 1230</option>
+                                <option value="inergen">Inergen (IG-541)</option>
+                                <option value="n2">Nitrogen Inerting</option>
+                                <option value="water">Water Mist</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-bell"></i> Fire Alarm System
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-bell"></i> Fire Alarm System</div>
+                                        <div class="tooltip-desc">Early detection is critical for data centers. VESDA provides earliest warning.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Type</th><th>Detection Time</th></tr>
+                                            <tr><td>Conventional</td><td>Late stage smoke</td></tr>
+                                            <tr><td>Addressable</td><td>Point location ID</td></tr>
+                                            <tr><td>VESDA</td><td>Pre-combustion</td></tr>
+                                            <tr><td>Hybrid</td><td>Best of both</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="alarmType">
+                                <option value="conventional">Conventional</option>
+                                <option value="addressable" selected>Addressable</option>
+                                <option value="vesda">VESDA (Aspirating)</option>
+                                <option value="hybrid">Hybrid VESDA + Addressable</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-battery-full"></i> UPS Type
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-battery-full"></i> UPS Type</div>
+                                        <div class="tooltip-desc">Uninterruptible Power Supply provides backup during generator startup (10-15 seconds).</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Type</th><th>Best For</th></tr>
+                                            <tr><td>Standalone</td><td>Small, fixed capacity</td></tr>
+                                            <tr><td>Modular</td><td>Scalable, N+1 within</td></tr>
+                                            <tr><td>Distributed/Rack</td><td>Edge, distributed</td></tr>
+                                            <tr><td>Rotary UPS</td><td>Ultra-reliable, diesel</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="upsType">
+                                <option value="standalone">Standalone</option>
+                                <option value="modular" selected>Modular</option>
+                                <option value="distributed">Distributed / Rack</option>
+                                <option value="rotary">Rotary UPS</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-plug"></i> Generator Type
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-plug"></i> Generator Type</div>
+                                        <div class="tooltip-desc">Backup power generation fuel type affects maintenance and sustainability.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Fuel</th><th>Notes</th></tr>
+                                            <tr><td>Diesel</td><td>Standard, reliable</td></tr>
+                                            <tr><td>Natural Gas</td><td>Lower emissions</td></tr>
+                                            <tr><td>Dual Fuel</td><td>Flexibility</td></tr>
+                                            <tr><td>HVO/Biodiesel</td><td>90% lower CO2</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="genType">
+                                <option value="diesel" selected>Diesel</option>
+                                <option value="gas">Natural Gas</option>
+                                <option value="dualfuel">Dual Fuel</option>
+                                <option value="hvo">HVO / Biodiesel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-map-marker-alt"></i> Location Factor
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-map-marker-alt"></i> Location Factor</div>
+                                    <div class="tooltip-desc">Regional cost multiplier based on labor rates, materials, and logistics costs.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Region</th><th>Multiplier</th></tr>
+                                        <tr><td>India</td><td>0.55x (lowest)</td></tr>
+                                        <tr><td>SE Asia (Indonesia)</td><td>0.65x</td></tr>
+                                        <tr><td>China</td><td>0.70x</td></tr>
+                                        <tr><td>USA (baseline)</td><td>1.00x</td></tr>
+                                        <tr><td>Europe</td><td>1.15x (highest)</td></tr>
+                                    </table>
+                                </div>
+                            </span>
+                        </label>
+                        <select class="input-field" id="locationFactor">
+                            <option value="sea">Southeast Asia - Indonesia, Malaysia (0.65x)</option>
+                            <option value="india">India (0.55x)</option>
+                            <option value="china">China (0.70x)</option>
+                            <option value="japan">Japan / Korea (1.10x)</option>
+                            <option value="australia">Australia (1.05x)</option>
+                            <option value="europe">Europe (1.15x)</option>
+                            <option value="usa" selected>USA (1.00x)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Results Side -->
+                <div class="simulator-results">
+                    <div class="results-header">
+                        <span class="results-title"><i class="fas fa-chart-pie"></i> Cost Breakdown</span>
+                        <div class="results-total">
+                            <div class="total-label">Total CAPEX <span class="tooltip-trigger" style="font-size: 0.7rem;">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Total CAPEX</div>
+                                    <div class="tooltip-desc">Capital Expenditure - Total upfront investment required to build the data center including construction, equipment, and commissioning.</div>
+                                </div>
+                            </span></div>
+                            <div class="total-value" id="totalCost">$12,500,000</div>
+                        </div>
+                    </div>
+
+                    <div class="cost-breakdown" id="costBreakdown">
+                        <!-- Cost items populated by JS -->
+                    </div>
+
+                    <div class="per-kw-display">
+                        <span class="per-kw-label">Cost per kW IT Load <span class="tooltip-trigger" style="font-size: 0.7rem;">?
+                            <div class="tooltip-content">
+                                <div class="tooltip-title"><i class="fas fa-calculator"></i> Cost per kW</div>
+                                <div class="tooltip-desc">Industry benchmark metric: Total CAPEX divided by IT Load capacity. Typical ranges: $8,000-15,000/kW for Tier III, $15,000-25,000/kW for Tier IV.</div>
+                            </div>
+                        </span></span>
+                        <span class="per-kw-value" id="perKwCost">$12,500/kW</span>
+                    </div>
+
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-label">Tier Classification <span class="tooltip-trigger" style="font-size: 0.6rem;">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-layer-group"></i> Uptime Tier</div>
+                                    <div class="tooltip-desc">Uptime Institute classification based on redundancy level: Tier I (N) = 99.671%, Tier II = 99.741%, Tier III (N+1) = 99.982%, Tier IV (2N) = 99.995%.</div>
+                                </div>
+                            </span></div>
+                            <div class="metric-value tier" id="tierClass">Tier III</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Estimated PUE <span class="tooltip-trigger" style="font-size: 0.6rem;">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-leaf"></i> Power Usage Effectiveness</div>
+                                    <div class="tooltip-desc">PUE = Total Facility Power ÷ IT Equipment Power. Industry average: 1.55. Efficient DC: 1.2-1.4. Best-in-class: &lt;1.2. Lower is better.</div>
+                                </div>
+                            </span></div>
+                            <div class="metric-value pue" id="pueValue">1.45</div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-label">Expected Uptime <span class="tooltip-trigger" style="font-size: 0.6rem;">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-clock"></i> Expected Uptime</div>
+                                    <div class="tooltip-desc">Percentage of time the facility is expected to be operational per year. 99.982% = ~1.6 hours downtime/year. 99.995% = ~26 minutes/year.</div>
+                                </div>
+                            </span></div>
+                            <div class="metric-value uptime" id="uptimeValue">99.982%</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Annual Energy <span class="tooltip-trigger" style="font-size: 0.6rem;">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-plug"></i> Annual Energy Cost</div>
+                                    <div class="tooltip-desc">Estimated yearly electricity cost based on IT Load × PUE × 8,760 hours × electricity rate. This is an OPEX cost, not included in CAPEX.</div>
+                                </div>
+                            </span></div>
+                            <div class="metric-value energy" id="energyCost">$1.2M</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Bagus Dwi Permana. Data Center CAPEX Calculator.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">Comprehensive capital expenditure estimation for data center construction.</p>
+    </footer>
+
+    <script>
+        // Cost Simulator Logic
+        const costFactors = {
+            building: { base: 800, label: 'Building & Civil', icon: 'fa-building', color: '#64748b' },
+            seismic: { base: 100, label: 'Seismic Protection', icon: 'fa-mountain', color: '#78716c' },
+            electrical: { base: 1200, label: 'Electrical (MV/LV)', icon: 'fa-bolt', color: '#3b82f6' },
+            ups: { base: 600, label: 'UPS Systems', icon: 'fa-battery-full', color: '#8b5cf6' },
+            generator: { base: 400, label: 'Generator & Fuel', icon: 'fa-gas-pump', color: '#f59e0b' },
+            cooling: { base: 700, label: 'Cooling Systems', icon: 'fa-snowflake', color: '#06b6d4' },
+            fireSuppression: { base: 150, label: 'Fire Suppression', icon: 'fa-fire-extinguisher', color: '#ef4444' },
+            fireAlarm: { base: 80, label: 'Fire Alarm System', icon: 'fa-bell', color: '#f97316' },
+            bms: { base: 120, label: 'BMS / DCIM', icon: 'fa-desktop', color: '#10b981' },
+            network: { base: 250, label: 'Network Infra', icon: 'fa-network-wired', color: '#a855f7' },
+            security: { base: 80, label: 'Security Systems', icon: 'fa-shield-alt', color: '#6366f1' },
+            commissioning: { base: 200, label: 'Commissioning', icon: 'fa-clipboard-check', color: '#14b8a6' }
+        };
+
+        const redundancyMultipliers = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
+        const coolingMultipliers = { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6 };
+        const rackMultipliers = { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.6 };
+        const buildingMultipliers = { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 };
+        const seismicMultipliers = { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 };
+        const fireSuppressionMultipliers = { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6 };
+        const fireAlarmMultipliers = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 };
+        const upsMultipliers = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
+        const genMultipliers = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
+        const locationMultipliers = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0 };
+
+        const tierMapping = {
+            n: { tier: 'Tier I', uptime: '99.671%' },
+            n1: { tier: 'Tier II', uptime: '99.741%' },
+            '2n': { tier: 'Tier III', uptime: '99.982%' },
+            '2n1': { tier: 'Tier IV', uptime: '99.995%' }
+        };
+
+        const pueMapping = {
+            air: { standard: 1.8, medium: 1.7, high: 1.6, ai: 1.5 },
+            inrow: { standard: 1.6, medium: 1.5, high: 1.45, ai: 1.4 },
+            rdhx: { standard: 1.45, medium: 1.4, high: 1.35, ai: 1.3 },
+            liquid: { standard: 1.3, medium: 1.25, high: 1.2, ai: 1.15 }
+        };
+
+        function getSelectedValue(name) {
+            const selected = document.querySelector(`input[name="${name}"]:checked`);
+            return selected ? selected.value : null;
+        }
+
+        function formatCurrency(amount) {
+            if (amount >= 1000000000) {
+                return '$' + (amount / 1000000000).toFixed(2) + 'B';
+            } else if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(2) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(0) + 'K';
+            }
+            return '$' + amount.toFixed(0);
+        }
+
+        function calculateCosts() {
+            const itLoad = parseInt(document.getElementById('itLoad').value) || 1000;
+            const rackType = getSelectedValue('rackType');
+            const coolingType = getSelectedValue('coolingType');
+            const redundancy = getSelectedValue('redundancy');
+            const fuelHours = parseInt(document.getElementById('fuelHours').value) || 48;
+            const buildingType = document.getElementById('buildingType').value;
+            const seismicZone = document.getElementById('seismicZone').value;
+            const fireType = document.getElementById('fireType').value;
+            const alarmType = document.getElementById('alarmType').value;
+            const upsType = document.getElementById('upsType').value;
+            const genType = document.getElementById('genType').value;
+            const location = document.getElementById('locationFactor').value;
+
+            const redMult = redundancyMultipliers[redundancy];
+            const coolMult = coolingMultipliers[coolingType];
+            const rackMult = rackMultipliers[rackType];
+            const buildMult = buildingMultipliers[buildingType];
+            const seismicMult = seismicMultipliers[seismicZone];
+            const fireSupMult = fireSuppressionMultipliers[fireType];
+            const alarmMult = fireAlarmMultipliers[alarmType];
+            const upsMult = upsMultipliers[upsType];
+            const genMult = genMultipliers[genType];
+            const locMult = locationMultipliers[location];
+            const fuelMult = 1 + (fuelHours - 24) * 0.008;
+
+            const costs = {};
+            let total = 0;
+
+            for (const [key, factor] of Object.entries(costFactors)) {
+                let multiplier = locMult;
+
+                if (key === 'building') {
+                    multiplier *= buildMult * rackMult;
+                } else if (key === 'seismic') {
+                    multiplier *= seismicMult * buildMult;
+                } else if (key === 'electrical') {
+                    multiplier *= redMult * rackMult;
+                } else if (key === 'ups') {
+                    multiplier *= redMult * rackMult * upsMult;
+                } else if (key === 'generator') {
+                    multiplier *= redMult * fuelMult * genMult;
+                } else if (key === 'cooling') {
+                    multiplier *= coolMult * rackMult;
+                } else if (key === 'fireSuppression') {
+                    multiplier *= fireSupMult;
+                } else if (key === 'fireAlarm') {
+                    multiplier *= alarmMult;
+                }
+
+                costs[key] = factor.base * itLoad * multiplier;
+                total += costs[key];
+            }
+
+            // Add contingency (5%)
+            const contingency = total * 0.05;
+            total += contingency;
+
+            // Update UI
+            document.getElementById('totalCost').textContent = formatCurrency(total);
+            document.getElementById('perKwCost').textContent = formatCurrency(total / itLoad) + '/kW';
+
+            const tierInfo = tierMapping[redundancy];
+            document.getElementById('tierClass').textContent = tierInfo.tier;
+            document.getElementById('uptimeValue').textContent = tierInfo.uptime;
+
+            const pue = pueMapping[coolingType][rackType];
+            document.getElementById('pueValue').textContent = pue.toFixed(2);
+
+            // Annual energy cost
+            const energyRate = location === 'sea' ? 0.08 : location === 'india' ? 0.07 : location === 'usa' ? 0.10 : 0.12;
+            const annualEnergy = itLoad * pue * 8760 * energyRate;
+            document.getElementById('energyCost').textContent = formatCurrency(annualEnergy);
+
+            // Render breakdown
+            const breakdownEl = document.getElementById('costBreakdown');
+            breakdownEl.innerHTML = '';
+
+            const sortedCosts = Object.entries(costs).sort((a, b) => b[1] - a[1]);
+            const maxCost = Math.max(...Object.values(costs));
+
+            for (const [key, cost] of sortedCosts) {
+                const factor = costFactors[key];
+                const percent = ((cost / total) * 100).toFixed(1);
+                const barWidth = (cost / maxCost) * 100;
+
+                breakdownEl.innerHTML += `
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: ${factor.color}30; color: ${factor.color};">
+                                <i class="fas ${factor.icon}"></i>
+                            </div>
+                            ${factor.label}
+                        </div>
+                        <div class="cost-bar-container">
+                            <div class="cost-bar" style="width: ${barWidth}%; background: ${factor.color};"></div>
+                        </div>
+                        <span class="cost-value">${formatCurrency(cost)}</span>
+                        <span class="cost-percent">${percent}%</span>
+                    </div>
+                `;
+            }
+
+            // Add contingency row
+            breakdownEl.innerHTML += `
+                <div class="cost-item" style="opacity: 0.7;">
+                    <div class="cost-name">
+                        <div class="cost-icon" style="background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        Contingency (5%)
+                    </div>
+                    <div class="cost-bar-container">
+                        <div class="cost-bar" style="width: ${(contingency / maxCost) * 100}%; background: rgba(255,255,255,0.5);"></div>
+                    </div>
+                    <span class="cost-value">${formatCurrency(contingency)}</span>
+                    <span class="cost-percent">5.0%</span>
+                </div>
+            `;
+        }
+
+        // Event Listeners
+        document.getElementById('itLoad').addEventListener('input', calculateCosts);
+        document.getElementById('fuelHours').addEventListener('input', calculateCosts);
+        document.getElementById('buildingType').addEventListener('change', calculateCosts);
+        document.getElementById('seismicZone').addEventListener('change', calculateCosts);
+        document.getElementById('fireType').addEventListener('change', calculateCosts);
+        document.getElementById('alarmType').addEventListener('change', calculateCosts);
+        document.getElementById('upsType').addEventListener('change', calculateCosts);
+        document.getElementById('genType').addEventListener('change', calculateCosts);
+        document.getElementById('locationFactor').addEventListener('change', calculateCosts);
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', calculateCosts);
+        });
+
+        // Initial calculation
+        calculateCosts();
+        initTooltipSystem();
+
+        // Global Tooltip System
+        function initTooltipSystem() {
+            const tooltipEl = document.createElement('div');
+            tooltipEl.id = 'tooltip-container';
+            document.body.appendChild(tooltipEl);
+
+            document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+                const content = trigger.querySelector('.tooltip-content');
+                if (!content) return;
+
+                trigger.addEventListener('mouseenter', () => {
+                    tooltipEl.innerHTML = content.innerHTML;
+
+                    const rect = trigger.getBoundingClientRect();
+                    const tooltipWidth = 320;
+                    const tooltipHeight = tooltipEl.offsetHeight || 200;
+                    const padding = 15;
+
+                    let left = rect.right + padding;
+                    let top = rect.top + rect.height / 2;
+
+                    if (left + tooltipWidth > window.innerWidth - 20) {
+                        left = rect.left - tooltipWidth - padding;
+                    }
+                    if (left < 20) left = 20;
+
+                    top = top - tooltipHeight / 2;
+                    if (top < 20) top = 20;
+                    if (top + tooltipHeight > window.innerHeight - 20) {
+                        top = window.innerHeight - tooltipHeight - 20;
+                    }
+
+                    tooltipEl.style.left = left + 'px';
+                    tooltipEl.style.top = top + 'px';
+                    tooltipEl.classList.add('visible');
+                });
+
+                trigger.addEventListener('mouseleave', () => {
+                    tooltipEl.classList.remove('visible');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Center Engineering & Telemetry Solutions | Bagus Dwi Permana</title>
+    <meta name="description" content="Comprehensive data center solutions: Conventional DC, AI/HPC Datahall, Cost Simulator, and Technical Research. Expert in electrical safety (Ahli K3 Listrik) and critical infrastructure.">
+    <meta name="keywords" content="Data Center, Telemetry, DCIM, BMS, Cost Calculator, AI Datacenter, Liquid Cooling, PUE, Ahli K3 Listrik, Critical Infrastructure">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/datacenter-solutions.html">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/datacenter-solutions.html">
+    <meta property="og:title" content="Data Center Engineering & Telemetry Solutions">
+    <meta property="og:description" content="Comprehensive data center solutions with interactive cost simulator and telemetry dashboards.">
+    <meta property="og:image" content="https://resistancezero.com/assets/DashboardDC_80.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Data Center Solutions Dashboard - DCIM, BMS, Telemetry">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Center Engineering Solutions">
+    <meta name="twitter:description" content="Conventional DC, AI Datahall, Cost Simulator & Technical Research">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/DashboardDC_80.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Match index.html color scheme */
+            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
+            --secondary-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a5f 100%);
+            --dark-blue: #1e3a5f;
+            --medium-blue: #2d5a87;
+            --light-blue: #4a90b8;
+            --accent-blue: #5ba3cb;
+
+            /* Accent Colors - Gold/Amber like index.html */
+            --accent-gold: #f59e0b;
+            --accent-amber: #fbbf24;
+            --accent-orange: #ff6b35;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+
+            /* Light Mode Base */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+
+            /* Text Colors */
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+
+            /* Glassmorphism - Light Mode */
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg-dark: rgba(30, 58, 95, 0.95);
+            --glass-border: rgba(30, 58, 95, 0.1);
+            --glass-blur: blur(20px);
+            --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+
+            /* Glow Effects */
+            --glow-gold: rgba(245, 158, 11, 0.4);
+            --glow-blue: rgba(74, 144, 184, 0.3);
+            --glow-emerald: rgba(16, 185, 129, 0.3);
+
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dark Mode Theme */
+        [data-theme="dark"] {
+            --bg-primary: #0a0a14;
+            --bg-secondary: #12121e;
+            --bg-tertiary: #1a1a2e;
+
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --glass-bg: rgba(18, 18, 30, 0.9);
+            --glass-bg-dark: rgba(10, 10, 20, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        [data-theme="dark"] body {
+            background: var(--bg-primary);
+        }
+
+        [data-theme="dark"] .page-background {
+            background:
+                radial-gradient(ellipse at top right, rgba(74, 144, 184, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(245, 158, 11, 0.1) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+
+        [data-theme="dark"] .navbar.scrolled {
+            background: rgba(18, 18, 30, 0.98);
+            border-bottom-color: rgba(245, 158, 11, 0.2);
+        }
+
+        [data-theme="dark"] .nav-brand,
+        [data-theme="dark"] .nav-title {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .dropdown-menu {
+            background: var(--glass-bg);
+            border-color: var(--glass-border);
+        }
+
+        [data-theme="dark"] .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="dark"] .section-card,
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .solution-card {
+            background: var(--bg-secondary);
+            border-color: var(--glass-border);
+        }
+
+        [data-theme="dark"] .solution-card:hover {
+            background: var(--bg-tertiary);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        [data-theme="dark"] .footer {
+            background: var(--bg-secondary);
+            border-top-color: var(--glass-border);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(30, 58, 95, 0.1);
+            color: var(--dark-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-gold);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover i {
+            transform: rotate(15deg);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-gold);
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background - Subtle Grid */
+        .page-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at top right, rgba(74, 144, 184, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(30, 58, 95, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 58, 95, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatParticle 25s linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Navigation - Consistent with index.html */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-lg), 0 0 20px var(--glow-gold);
+            border-bottom-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--dark-blue);
+        }
+
+        .nav-logo {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.4);
+        }
+
+        .nav-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark-blue);
+        }
+
+        .nav-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--dark-blue);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Dropdown Navigation */
+        .nav-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown > .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-dropdown > .nav-link i {
+            font-size: 0.7rem;
+            transition: transform 0.3s;
+        }
+
+        .nav-dropdown:hover > .nav-link i {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.5rem;
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            margin-top: 8px;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            margin-top: 0;
+        }
+
+        .dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid var(--glass-border);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(74, 144, 184, 0.1), rgba(45, 90, 135, 0.1));
+            color: var(--dark-blue);
+        }
+
+        .dropdown-item i {
+            width: 18px;
+            text-align: center;
+            color: var(--light-blue);
+            font-size: 0.85rem;
+        }
+
+        .dropdown-item.overview {
+            background: linear-gradient(135deg, rgba(74, 144, 184, 0.08), rgba(45, 90, 135, 0.05));
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .dropdown-item.overview i {
+            color: var(--medium-blue);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 0.5rem 0;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+        }
+
+        .nav-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.35);
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding-top: 80px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 5rem 2rem 4rem;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+        }
+
+        .hero-badge i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            min-width: 140px;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg), 0 0 20px var(--glow-gold);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-blue);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Section Cards Grid */
+        .solutions-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .solution-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl), 0 0 30px var(--card-glow);
+            border-color: var(--card-border);
+        }
+
+        .solution-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-conventional {
+            --card-gradient: linear-gradient(90deg, #1e3a5f, #4a90b8);
+            --card-glow: rgba(74, 144, 184, 0.2);
+            --card-border: rgba(74, 144, 184, 0.4);
+            --card-accent: var(--light-blue);
+        }
+        .card-ai {
+            --card-gradient: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            --card-glow: rgba(139, 92, 246, 0.2);
+            --card-border: rgba(139, 92, 246, 0.4);
+            --card-accent: var(--accent-purple);
+        }
+        .card-cost {
+            --card-gradient: linear-gradient(90deg, #10b981, #34d399);
+            --card-glow: rgba(16, 185, 129, 0.2);
+            --card-border: rgba(16, 185, 129, 0.4);
+            --card-accent: var(--accent-emerald);
+        }
+        .card-papers {
+            --card-gradient: linear-gradient(90deg, #f59e0b, #fbbf24);
+            --card-glow: rgba(245, 158, 11, 0.2);
+            --card-border: rgba(245, 158, 11, 0.4);
+            --card-accent: var(--accent-gold);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, rgba(var(--card-rgb), 0.15), rgba(var(--card-rgb), 0.05));
+            color: var(--card-accent);
+            transition: transform 0.3s;
+        }
+
+        .solution-card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--dark-blue);
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .card-features li:last-child {
+            border-bottom: none;
+        }
+
+        .card-features li i {
+            color: var(--card-accent);
+            font-size: 0.75rem;
+        }
+
+        .card-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--card-accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: gap 0.3s;
+        }
+
+        .solution-card:hover .card-action {
+            gap: 12px;
+        }
+
+        /* Telemetry Links Grid - For Conventional DC */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .telemetry-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(30, 58, 95, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .telemetry-link:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+        }
+
+        .telemetry-link i {
+            font-size: 1rem;
+        }
+
+        /* Cost Simulator Section */
+        .simulator-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulator-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-label i {
+            color: var(--accent-emerald);
+        }
+
+        /* Tooltip Styles */
+        .tooltip-trigger {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            font-size: 10px;
+            color: var(--light-blue);
+            cursor: help;
+            margin-left: auto;
+            transition: all 0.3s;
+        }
+
+        .tooltip-trigger:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--light-blue);
+            transform: scale(1.1);
+        }
+
+        .tooltip-content {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #2d5a87;
+        }
+
+        .tooltip-trigger:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tooltip-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-amber);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tooltip-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .tooltip-table {
+            width: 100%;
+            font-size: 10px;
+            border-collapse: collapse;
+        }
+
+        .tooltip-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tooltip-table td {
+            padding: 4px 0;
+            color: white;
+        }
+
+        .tooltip-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+
+        .tooltip-impact {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 6px;
+            font-size: 10px;
+            color: var(--accent-amber);
+        }
+
+        .tooltip-impact strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .input-field {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-emerald);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+        }
+
+        select.input-field {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .radio-option input {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .radio-option label small {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .radio-option input:checked + label {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        .radio-option label:hover {
+            border-color: var(--accent-emerald);
+        }
+
+        /* Cost Results */
+        .simulator-results {
+            background: linear-gradient(135deg, var(--dark-blue), var(--medium-blue));
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .results-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-total {
+            text-align: right;
+        }
+
+        .total-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .total-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+
+        .cost-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .cost-breakdown::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cost-breakdown::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .cost-breakdown::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+
+        .cost-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .cost-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .cost-bar-container {
+            flex: 1;
+            margin: 0 12px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .cost-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .cost-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .cost-percent {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            min-width: 35px;
+            text-align: right;
+        }
+
+        /* Metrics Display */
+        .per-kw-display {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .per-kw-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .per-kw-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-box {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-value.tier { color: #a78bfa; }
+        .metric-value.pue { color: #22d3ee; }
+        .metric-value.uptime { color: #34d399; }
+        .metric-value.energy { color: #fbbf24; }
+
+        /* Technical Papers Section */
+        .papers-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .papers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .paper-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .paper-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg), 0 0 20px var(--glow-gold);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .paper-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .paper-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .paper-icon.whitepaper { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .paper-icon.standard { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .paper-icon.guide { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .paper-icon.research { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+        .paper-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 4px;
+        }
+
+        .paper-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .paper-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .paper-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .paper-tag {
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Coming Soon Badge */
+        .coming-soon-card {
+            position: relative;
+            opacity: 0.75;
+        }
+
+        .coming-soon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.05) 100%);
+            border-radius: 16px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .coming-soon-card:hover {
+            opacity: 0.85;
+        }
+
+        /* Tools Section */
+        .tools-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .tool-card:hover {
+            border-color: var(--light-blue);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .tool-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .tool-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .tool-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 4rem;
+            background: var(--bg-secondary);
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--light-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            color: var(--dark-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-stats {
+                gap: 1rem;
+            }
+
+            .stat-item {
+                min-width: 120px;
+                padding: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .solutions-section,
+            .simulator-section,
+            .papers-section,
+            .tools-section {
+                padding: 2rem 1rem;
+            }
+
+            .simulator-container {
+                padding: 1.5rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .radio-option {
+                min-width: 100%;
+            }
+
+            .telemetry-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in { transform: translateY(20px); }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Mobile Nav Toggle */
+        .mobile-nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-nav-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="page-background"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">DC</div>
+                <div>
+                    <div class="nav-title">Data Center Solutions</div>
+                    <div class="nav-subtitle">Engineering & Telemetry</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="datahallAI.html" class="nav-link" style="color: var(--accent-purple);">
+                    <i class="fas fa-microchip"></i> DC AI/HPC
+                </a>
+                <div class="nav-dropdown">
+                    <a href="dc-conventional.html" class="nav-link">
+                        <i class="fas fa-server"></i> DC Conventional <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="dc-conventional.html" class="dropdown-item overview">
+                            <i class="fas fa-th-large"></i> Overview
+                        </a>
+                        <a href="EPMS_Telemetry.html" class="dropdown-item">
+                            <i class="fas fa-bolt"></i> EPMS
+                        </a>
+                        <a href="datahall.html" class="dropdown-item">
+                            <i class="fas fa-server"></i> Data Hall
+                        </a>
+                        <a href="chiller-plant.html" class="dropdown-item">
+                            <i class="fas fa-snowflake"></i> Cooling
+                        </a>
+                        <a href="fire-system.html" class="dropdown-item">
+                            <i class="fas fa-fire-extinguisher"></i> Fire
+                        </a>
+                        <a href="fuel-system.html" class="dropdown-item">
+                            <i class="fas fa-gas-pump"></i> Fuel
+                        </a>
+                        <a href="water-system.html" class="dropdown-item">
+                            <i class="fas fa-tint"></i> Water
+                        </a>
+                        <a href="ict.html" class="dropdown-item">
+                            <i class="fas fa-network-wired"></i> ICT
+                        </a>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <a href="capex-calculator.html" class="nav-link" style="color: var(--accent-gold);">
+                        <i class="fas fa-calculator"></i> Calculators <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="capex-calculator.html" class="dropdown-item" style="color: var(--accent-gold);">
+                            <i class="fas fa-building"></i> CAPEX Calculator
+                        </a>
+                        <a href="opex-calculator.html" class="dropdown-item" style="color: var(--accent-emerald);">
+                            <i class="fas fa-coins"></i> OPEX Calculator
+                        </a>
+                    </div>
+                </div>
+                <a href="index.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Portfolio
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <button class="mobile-nav-toggle" id="mobileNavToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero fade-in">
+            <div class="hero-badge">
+                <i class="fas fa-circle"></i>
+                Enterprise Data Center Engineering
+            </div>
+            <h1>Data Center Engineering & Telemetry Solutions</h1>
+            <p>Comprehensive solutions for conventional and AI-powered data centers.
+               Interactive cost simulation, real-time telemetry dashboards, and technical research
+               from an Ahli K3 Listrik certified engineer.</p>
+
+            <div class="hero-stats">
+                <div class="stat-item fade-in delay-1">
+                    <div class="stat-value">50+</div>
+                    <div class="stat-label">MW Managed</div>
+                </div>
+                <div class="stat-item fade-in delay-2">
+                    <div class="stat-value">99.99%</div>
+                    <div class="stat-label">Uptime Target</div>
+                </div>
+                <div class="stat-item fade-in delay-3">
+                    <div class="stat-value">&lt;1.4</div>
+                    <div class="stat-label">PUE Achieved</div>
+                </div>
+                <div class="stat-item fade-in delay-4">
+                    <div class="stat-value">Tier III+</div>
+                    <div class="stat-label">Design Standard</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solutions Grid -->
+        <section id="solutions" class="solutions-section">
+            <div class="section-header">
+                <h2>Solutions & Services</h2>
+                <p>End-to-end data center engineering from design to operations</p>
+            </div>
+
+            <div class="solutions-grid">
+                <!-- AI Datahall - First -->
+                <a href="datahallAI.html" class="solution-card card-ai fade-in delay-1">
+                    <div class="card-icon" style="background: rgba(139, 92, 246, 0.15);">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="card-title">AI / HPC Datahall</h3>
+                    <p class="card-desc">High-density computing infrastructure optimized for AI/ML workloads with advanced liquid cooling and GPU cluster management.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> Direct Liquid Cooling (DLC)</li>
+                        <li><i class="fas fa-check"></i> High-Density Racks (30-100kW)</li>
+                        <li><i class="fas fa-check"></i> GPU Cluster Thermal Management</li>
+                        <li><i class="fas fa-check"></i> Real-time Power Analytics</li>
+                    </ul>
+                    <span class="card-action">
+                        View AI Dashboard <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <!-- Conventional DC - Second -->
+                <a href="dc-conventional.html" class="solution-card card-conventional fade-in delay-2">
+                    <div class="card-icon" style="background: rgba(74, 144, 184, 0.15);">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 class="card-title">Conventional Data Center</h3>
+                    <p class="card-desc">Enterprise-grade infrastructure for cloud computing, storage, and network operations with traditional cooling and power systems.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> EPMS & Power Monitoring</li>
+                        <li><i class="fas fa-check"></i> Chiller / HVAC Systems</li>
+                        <li><i class="fas fa-check"></i> Fire & Safety Systems</li>
+                        <li><i class="fas fa-check"></i> Data Hall Telemetry</li>
+                    </ul>
+                    <span class="card-action">
+                        View Systems <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <!-- CAPEX Calculator -->
+                <a href="capex-calculator.html" class="solution-card card-cost fade-in delay-3">
+                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.15);">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="card-title">CAPEX Calculator</h3>
+                    <p class="card-desc">Interactive capital expenditure calculator for data center construction with comprehensive breakdown of all infrastructure components.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> Building & Civil Works</li>
+                        <li><i class="fas fa-check"></i> Electrical & Mechanical</li>
+                        <li><i class="fas fa-check"></i> Fire Alarm & Suppression</li>
+                        <li><i class="fas fa-check"></i> Tier Classification & PUE</li>
+                    </ul>
+                    <span class="card-action">
+                        Calculate Now <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <!-- OPEX Calculator - NEW -->
+                <a href="opex-calculator.html" class="solution-card fade-in delay-4" style="border: 2px solid rgba(16, 185, 129, 0.3);">
+                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.15);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.65rem; font-weight: 700;">NEW</div>
+                    <h3 class="card-title">OPEX Calculator</h3>
+                    <p class="card-desc">Comprehensive operational cost analysis with 30+ countries, climate zones, cooling types, and flexible staffing models.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> In-House / Partial / Contractor</li>
+                        <li><i class="fas fa-check"></i> Country-Specific Labor Rates</li>
+                        <li><i class="fas fa-check"></i> Energy & Maintenance Costs</li>
+                        <li><i class="fas fa-check"></i> Detailed Staffing Breakdown</li>
+                    </ul>
+                    <span class="card-action" style="color: #10b981;">
+                        Calculate OPEX <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <!-- Technical Papers -->
+                <a href="#papers" class="solution-card card-papers fade-in delay-5">
+                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.15);">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="card-title">Technical Papers</h3>
+                    <p class="card-desc">Research documents, technical specifications, and industry standards for data center design and operations.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> White Papers & Case Studies</li>
+                        <li><i class="fas fa-check"></i> TIA-942 & Uptime Standards</li>
+                        <li><i class="fas fa-check"></i> PUIL & SNI Compliance</li>
+                        <li><i class="fas fa-check"></i> K3 Listrik Documentation</li>
+                    </ul>
+                    <span class="card-action">
+                        View Documents <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Cost Simulator -->
+        <section id="simulator" class="simulator-section">
+            <div class="section-header">
+                <h2>Data Center Cost Simulator</h2>
+                <p>Calculate comprehensive CAPEX for your data center project with detailed breakdown</p>
+            </div>
+
+            <div class="simulator-container">
+                <!-- Input Side -->
+                <div class="simulator-inputs">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-bolt"></i> IT Load (kW)
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
+                                        <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices. This is the primary cost driver for all data center systems.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Category</th><th>Range</th></tr>
+                                            <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
+                                            <tr><td>Medium</td><td>500-2,000 kW</td></tr>
+                                            <tr><td>Large</td><td>2-10 MW</td></tr>
+                                            <tr><td>Hyperscale</td><td>10+ MW</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> All infrastructure scales from IT load - electrical, cooling, UPS, generators.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-gas-pump"></i> Fuel Autonomy</div>
+                                        <div class="tooltip-desc">Duration generators can operate without refueling during utility power outage. Determines fuel tank sizing and containment requirements.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Tier Level</th><th>Typical Hours</th></tr>
+                                            <tr><td>Minimum</td><td>8 hours</td></tr>
+                                            <tr><td>Standard</td><td>24 hours</td></tr>
+                                            <tr><td>Tier III</td><td>48 hours</td></tr>
+                                            <tr><td>Mission Critical</td><td>72+ hours</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> Affects tank size, secondary containment, fuel system piping, and fill station.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="number" class="input-field" id="fuelHours" value="48" min="8" max="168">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-building"></i> Building Type
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-building"></i> Building Type</div>
+                                        <div class="tooltip-desc">Construction methodology significantly impacts civil and structural costs, timeline, and flexibility.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Type</th><th>Cost Factor</th></tr>
+                                            <tr><td>Warehouse Conversion</td><td>0.70x (lowest)</td></tr>
+                                            <tr><td>Modular / Prefab</td><td>0.85x</td></tr>
+                                            <tr><td>Purpose-Built</td><td>1.00x (baseline)</td></tr>
+                                            <tr><td>High-Rise Multi-Story</td><td>1.40x (highest)</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> 30-40% variance in civil/structural costs. Purpose-built offers best long-term flexibility.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="buildingType">
+                                <option value="warehouse">Warehouse Conversion</option>
+                                <option value="modular">Modular / Prefab</option>
+                                <option value="purpose" selected>Purpose-Built Facility</option>
+                                <option value="highrise">High-Rise / Multi-Story</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-mountain"></i> Seismic Zone
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-mountain"></i> Seismic Zone</div>
+                                        <div class="tooltip-desc">Earthquake risk level determines structural reinforcement, equipment anchoring, seismic bracing, and isolation requirements.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Zone</th><th>PGA (g)</th><th>Cost Factor</th></tr>
+                                            <tr><td>Zone 0 - None</td><td>&lt;0.05g</td><td>1.00x</td></tr>
+                                            <tr><td>Zone 1 - Low</td><td>0.05-0.10g</td><td>1.05x</td></tr>
+                                            <tr><td>Zone 2 - Moderate</td><td>0.10-0.20g</td><td>1.15x</td></tr>
+                                            <tr><td>Zone 3 - High</td><td>0.20-0.40g</td><td>1.30x</td></tr>
+                                            <tr><td>Zone 4 - Very High</td><td>&gt;0.40g</td><td>1.50x</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> Seismic bracing, isolation floors, reinforced foundations, flexible connections.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="seismicZone">
+                                <option value="zone0">Zone 0 - No Seismic Risk</option>
+                                <option value="zone1">Zone 1 - Low Risk</option>
+                                <option value="zone2" selected>Zone 2 - Moderate Risk</option>
+                                <option value="zone3">Zone 3 - High Risk</option>
+                                <option value="zone4">Zone 4 - Very High Risk</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-server"></i> Rack Density
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-server"></i> Rack Density</div>
+                                    <div class="tooltip-desc">Power consumption per rack determines cooling requirements and infrastructure design. Higher density requires advanced cooling solutions.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Density</th><th>kW/Rack</th><th>Cooling</th></tr>
+                                        <tr><td>Standard</td><td>5-7 kW</td><td>Air (CRAC)</td></tr>
+                                        <tr><td>Medium</td><td>10-15 kW</td><td>In-Row</td></tr>
+                                        <tr><td>High Density</td><td>20-30 kW</td><td>RDHX/DLC</td></tr>
+                                        <tr><td>AI/HPC</td><td>50-100 kW</td><td>Direct Liquid</td></tr>
+                                    </table>
+                                    <div class="tooltip-impact"><strong>Cost Impact:</strong> Significantly affects cooling infrastructure - higher density = more cooling cost per kW.</div>
+                                </div>
+                            </span>
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackStd" value="standard" checked>
+                                <label for="rackStd">Standard<small>5-7 kW</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackMid" value="medium">
+                                <label for="rackMid">Medium<small>10-15 kW</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackHigh" value="high">
+                                <label for="rackHigh">High Density<small>20-30 kW</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="rackType" id="rackAI" value="ai">
+                                <label for="rackAI">AI/HPC<small>50-100 kW</small></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-snowflake"></i> Cooling Type
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Type</div>
+                                    <div class="tooltip-desc">Heat rejection method must match rack density. Higher density requires more efficient cooling with lower PUE.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Type</th><th>Max kW/Rack</th><th>PUE</th></tr>
+                                        <tr><td>Air (CRAC/CRAH)</td><td>~10 kW</td><td>1.6-1.8</td></tr>
+                                        <tr><td>In-Row Precision</td><td>~20 kW</td><td>1.4-1.6</td></tr>
+                                        <tr><td>RDHX (Rear Door)</td><td>~35 kW</td><td>1.3-1.45</td></tr>
+                                        <tr><td>DLC (Direct Liquid)</td><td>100+ kW</td><td>1.1-1.3</td></tr>
+                                    </table>
+                                    <div class="tooltip-impact"><strong>Cost Impact:</strong> DLC costs 60% more but achieves best PUE and enables highest density.</div>
+                                </div>
+                            </span>
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolAir" value="air" checked>
+                                <label for="coolAir">Air<small>CRAC/CRAH</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolInrow" value="inrow">
+                                <label for="coolInrow">In-Row<small>Precision</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolRDHX" value="rdhx">
+                                <label for="coolRDHX">RDHX<small>Rear Door</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coolingType" id="coolLiquid" value="liquid">
+                                <label for="coolLiquid">DLC<small>Direct Liquid</small></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-shield-alt"></i> Redundancy
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-shield-alt"></i> Redundancy Level</div>
+                                    <div class="tooltip-desc">Fault tolerance configuration determines Uptime Institute Tier classification and expected availability.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Config</th><th>Tier</th><th>Uptime</th></tr>
+                                        <tr><td>N (No backup)</td><td>Tier I</td><td>99.671%</td></tr>
+                                        <tr><td>N+1 (One backup)</td><td>Tier II</td><td>99.741%</td></tr>
+                                        <tr><td>2N (Full duplicate)</td><td>Tier III</td><td>99.982%</td></tr>
+                                        <tr><td>2N+1 (Duplicate + backup)</td><td>Tier IV</td><td>99.995%</td></tr>
+                                    </table>
+                                    <div class="tooltip-impact"><strong>Cost Impact:</strong> 2N costs ~85% more than N, but provides concurrent maintainability.</div>
+                                </div>
+                            </span>
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="redN" value="n">
+                                <label for="redN">N<small>Basic</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="redN1" value="n1" checked>
+                                <label for="redN1">N+1<small>Standard</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="red2N" value="2n">
+                                <label for="red2N">2N<small>Full</small></label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="redundancy" id="red2N1" value="2n1">
+                                <label for="red2N1">2N+1<small>Premium</small></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-fire-extinguisher"></i> Fire Suppression
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-fire-extinguisher"></i> Fire Suppression</div>
+                                        <div class="tooltip-desc">Clean agent gaseous suppression systems for IT spaces. Selection based on environmental impact, safety, and effectiveness.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Agent</th><th>GWP</th><th>Cost</th></tr>
+                                            <tr><td>FM200 (HFC-227ea)</td><td>3,220</td><td>1.0x</td></tr>
+                                            <tr><td>Novec 1230</td><td>1</td><td>1.3x</td></tr>
+                                            <tr><td>Inergen (IG-541)</td><td>0</td><td>1.2x</td></tr>
+                                            <tr><td>N2 Inerting</td><td>0</td><td>1.8x</td></tr>
+                                            <tr><td>Water Mist</td><td>0</td><td>0.6x</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> N2 inerting most expensive but provides continuous protection.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="fireType">
+                                <option value="fm200">FM200 / HFC-227ea</option>
+                                <option value="novec" selected>Novec 1230</option>
+                                <option value="inergen">Inergen (IG-541)</option>
+                                <option value="n2">Nitrogen Inerting</option>
+                                <option value="water">Water Mist</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-bell"></i> Fire Alarm System
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-bell"></i> Fire Detection System</div>
+                                        <div class="tooltip-desc">Detection technology determines response time and false alarm rates. Early detection critical for data center protection.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>System</th><th>Detection</th><th>Cost</th></tr>
+                                            <tr><td>Conventional</td><td>Zone only</td><td>0.6x</td></tr>
+                                            <tr><td>Addressable</td><td>Device level</td><td>1.0x</td></tr>
+                                            <tr><td>VESDA (Aspirating)</td><td>Very early</td><td>1.8x</td></tr>
+                                            <tr><td>Hybrid</td><td>Combined</td><td>2.2x</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> VESDA provides earliest detection - critical for clean agent effectiveness.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="alarmType">
+                                <option value="conventional">Conventional</option>
+                                <option value="addressable" selected>Addressable</option>
+                                <option value="vesda">VESDA (Aspirating)</option>
+                                <option value="hybrid">Hybrid VESDA + Addressable</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-battery-full"></i> UPS Type
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-battery-full"></i> UPS Topology</div>
+                                        <div class="tooltip-desc">Uninterruptible Power Supply configuration affects efficiency, scalability, and maintenance approach.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Type</th><th>Efficiency</th><th>Cost</th></tr>
+                                            <tr><td>Standalone</td><td>94-96%</td><td>0.9x</td></tr>
+                                            <tr><td>Modular</td><td>96-97%</td><td>1.0x</td></tr>
+                                            <tr><td>Distributed</td><td>97-98%</td><td>1.2x</td></tr>
+                                            <tr><td>Rotary</td><td>95-97%</td><td>1.5x</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> Modular offers best balance of efficiency, scalability, and serviceability.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="upsType">
+                                <option value="standalone">Standalone</option>
+                                <option value="modular" selected>Modular</option>
+                                <option value="distributed">Distributed / Rack</option>
+                                <option value="rotary">Rotary UPS</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-plug"></i> Generator Type
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-plug"></i> Generator Fuel Type</div>
+                                        <div class="tooltip-desc">Standby power fuel source affects emissions, availability, and operational costs.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Fuel</th><th>Emissions</th><th>Cost</th></tr>
+                                            <tr><td>Diesel</td><td>Standard</td><td>1.0x</td></tr>
+                                            <tr><td>Natural Gas</td><td>Lower</td><td>1.15x</td></tr>
+                                            <tr><td>Dual Fuel</td><td>Flexible</td><td>1.3x</td></tr>
+                                            <tr><td>HVO/Biodiesel</td><td>~Zero net</td><td>1.2x</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact"><strong>Cost Impact:</strong> HVO reduces carbon footprint with minimal cost premium over diesel.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="genType">
+                                <option value="diesel" selected>Diesel</option>
+                                <option value="gas">Natural Gas</option>
+                                <option value="dualfuel">Dual Fuel</option>
+                                <option value="hvo">HVO / Biodiesel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-map-marker-alt"></i> Location Factor
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-map-marker-alt"></i> Regional Cost Index</div>
+                                    <div class="tooltip-desc">Location significantly affects labor rates, material costs, and regulatory requirements. USA baseline = 1.0x.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Region</th><th>Factor</th><th>Notes</th></tr>
+                                        <tr><td>India</td><td>0.55x</td><td>Lowest labor</td></tr>
+                                        <tr><td>Southeast Asia</td><td>0.65x</td><td>Growing market</td></tr>
+                                        <tr><td>China</td><td>0.70x</td><td>Scale advantage</td></tr>
+                                        <tr><td>USA</td><td>1.00x</td><td>Baseline</td></tr>
+                                        <tr><td>Europe</td><td>1.15x</td><td>Regulations</td></tr>
+                                    </table>
+                                    <div class="tooltip-impact"><strong>Cost Impact:</strong> Up to 2x difference between lowest and highest cost regions.</div>
+                                </div>
+                            </span>
+                        </label>
+                        <select class="input-field" id="locationFactor">
+                            <option value="sea">Southeast Asia (Indonesia, Malaysia)</option>
+                            <option value="india">India</option>
+                            <option value="china">China</option>
+                            <option value="japan">Japan / Korea</option>
+                            <option value="australia">Australia</option>
+                            <option value="europe">Europe</option>
+                            <option value="usa" selected>USA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Results Side -->
+                <div class="simulator-results">
+                    <div class="results-header">
+                        <span class="results-title"><i class="fas fa-chart-pie"></i> Cost Breakdown</span>
+                        <div class="results-total">
+                            <div class="total-label">Total CAPEX</div>
+                            <div class="total-value" id="totalCost">$12,500,000</div>
+                        </div>
+                    </div>
+
+                    <div class="cost-breakdown" id="costBreakdown">
+                        <!-- Cost items populated by JS -->
+                    </div>
+
+                    <div class="per-kw-display">
+                        <span class="per-kw-label">Cost per kW IT Load</span>
+                        <span class="per-kw-value" id="perKwCost">$12,500/kW</span>
+                    </div>
+
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-label">Tier Classification</div>
+                            <div class="metric-value tier" id="tierClass">Tier III</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Estimated PUE</div>
+                            <div class="metric-value pue" id="pueValue">1.45</div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-label">Expected Uptime</div>
+                            <div class="metric-value uptime" id="uptimeValue">99.982%</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Annual Energy</div>
+                            <div class="metric-value energy" id="energyCost">$1.2M</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Papers Section -->
+        <section id="papers" class="papers-section">
+            <div class="section-header">
+                <h2>Technical Papers & Research</h2>
+                <p>Industry standards, best practices, and technical documentation</p>
+            </div>
+
+            <div class="papers-grid">
+                <a href="article-13.html" class="paper-card fade-in" style="text-decoration: none; color: inherit;">
+                    <span class="new-badge" style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">New</span>
+                    <div class="paper-header">
+                        <div class="paper-icon whitepaper">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="paper-info">
+                            <h4>Data Center Power Distribution Design</h4>
+                            <div class="paper-meta">Technical Paper • 2026</div>
+                        </div>
+                    </div>
+                    <p class="paper-desc">Ultra-comprehensive hyperscaler architecture deep dive. Covers AWS, Google, Microsoft, xAI Colossus, and Anthropic power systems. Includes failure scenarios, arc flash calculations, and reliability engineering.</p>
+                    <div class="paper-tags">
+                        <span class="paper-tag">Hyperscaler</span>
+                        <span class="paper-tag">48V/800V DC</span>
+                        <span class="paper-tag">15,000+ words</span>
+                    </div>
+                </a>
+
+                <div class="paper-card fade-in delay-1 coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="paper-header">
+                        <div class="paper-icon standard">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="paper-info">
+                            <h4>TIA-942 Compliance Checklist</h4>
+                            <div class="paper-meta">Standard Reference • 2023</div>
+                        </div>
+                    </div>
+                    <p class="paper-desc">Complete checklist for TIA-942-B compliance verification. Includes architectural, electrical, mechanical, and telecommunications requirements by tier level.</p>
+                    <div class="paper-tags">
+                        <span class="paper-tag">TIA-942</span>
+                        <span class="paper-tag">Compliance</span>
+                        <span class="paper-tag">Audit</span>
+                    </div>
+                </div>
+
+                <div class="paper-card fade-in delay-2 coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="paper-header">
+                        <div class="paper-icon guide">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="paper-info">
+                            <h4>Liquid Cooling Implementation Guide</h4>
+                            <div class="paper-meta">Technical Guide • 2024</div>
+                        </div>
+                    </div>
+                    <p class="paper-desc">Step-by-step implementation guide for Direct Liquid Cooling (DLC) systems. Covers CDU sizing, piping design, water quality, and maintenance procedures.</p>
+                    <div class="paper-tags">
+                        <span class="paper-tag">Cooling</span>
+                        <span class="paper-tag">DLC</span>
+                        <span class="paper-tag">AI/HPC</span>
+                    </div>
+                </div>
+
+                <div class="paper-card fade-in delay-3 coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="paper-header">
+                        <div class="paper-icon research">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="paper-info">
+                            <h4>PUE Optimization Strategies</h4>
+                            <div class="paper-meta">Research Paper • 2024</div>
+                        </div>
+                    </div>
+                    <p class="paper-desc">Research on achieving sub-1.3 PUE through advanced cooling techniques, economizer modes, and AI-driven optimization. Includes case studies from operational facilities.</p>
+                    <div class="paper-tags">
+                        <span class="paper-tag">PUE</span>
+                        <span class="paper-tag">Efficiency</span>
+                        <span class="paper-tag">Sustainability</span>
+                    </div>
+                </div>
+
+                <div class="paper-card fade-in delay-4 coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="paper-header">
+                        <div class="paper-icon whitepaper">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="paper-info">
+                            <h4>K3 Listrik - Electrical Safety Standards</h4>
+                            <div class="paper-meta">Compliance Guide • 2024</div>
+                        </div>
+                    </div>
+                    <p class="paper-desc">Indonesian electrical safety standards (K3 Listrik) implementation guide for data centers. Covers PUIL 2020, arc flash analysis, and PPE requirements.</p>
+                    <div class="paper-tags">
+                        <span class="paper-tag">K3 Listrik</span>
+                        <span class="paper-tag">Safety</span>
+                        <span class="paper-tag">Indonesia</span>
+                    </div>
+                </div>
+
+                <div class="paper-card fade-in delay-4 coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="paper-header">
+                        <div class="paper-icon standard">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="paper-info">
+                            <h4>Fire Suppression System Selection</h4>
+                            <div class="paper-meta">Technical Comparison • 2024</div>
+                        </div>
+                    </div>
+                    <p class="paper-desc">Comparative analysis of clean agent fire suppression systems: FM200, Novec 1230, Inergen, and N2 inerting. Includes cost, environmental impact, and effectiveness metrics.</p>
+                    <div class="paper-tags">
+                        <span class="paper-tag">Fire Safety</span>
+                        <span class="paper-tag">NFPA</span>
+                        <span class="paper-tag">Clean Agent</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="tools-section" id="tools">
+            <div class="section-header">
+                <h2>Engineering Tools</h2>
+                <p>Additional calculators and compliance checkers</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(6,182,212,0.15); color: #06b6d4;">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <span class="tool-title">PUE Calculator</span>
+                    </div>
+                    <p class="tool-desc">Calculate Power Usage Effectiveness based on cooling type, climate zone, and IT load distribution.</p>
+                </div>
+
+                <div class="tool-card coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <span class="tool-title">Tier Advisor</span>
+                    </div>
+                    <p class="tool-desc">Determine Uptime Institute Tier classification based on your redundancy and infrastructure configuration.</p>
+                </div>
+
+                <div class="tool-card coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(16,185,129,0.15); color: #10b981;">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <span class="tool-title">Compliance Checker</span>
+                    </div>
+                    <p class="tool-desc">Verify compliance with PUIL 2020, SNI standards, TIA-942, and ASHRAE guidelines.</p>
+                </div>
+
+                <div class="tool-card coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <span class="tool-title">Carbon Footprint</span>
+                    </div>
+                    <p class="tool-desc">Estimate CO2 emissions based on power consumption and regional grid energy mix.</p>
+                </div>
+
+                <div class="tool-card coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <span class="tool-title">Comparison Mode</span>
+                    </div>
+                    <p class="tool-desc">Side-by-side comparison of different configurations: Air vs Liquid, N+1 vs 2N, and more.</p>
+                </div>
+
+                <div class="tool-card coming-soon-card">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="tool-title">ROI Calculator</span>
+                    </div>
+                    <p class="tool-desc">Calculate return on investment timeline based on operational costs and revenue projections.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                Designed & Developed by <a href="index.html">Bagus Dwi Permana</a> |
+                Ahli K3 Listrik Certified |
+                <a href="https://linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">LinkedIn</a>
+            </p>
+        </footer>
+    </main>
+
+    <script>
+        // Floating Particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (20 + Math.random() * 20) + 's';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.width = (3 + Math.random() * 5) + 'px';
+                particle.style.height = particle.style.width;
+
+                // Colors matching the theme
+                const colors = ['#4a90b8', '#f59e0b', '#10b981', '#8b5cf6'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Cost Simulator Logic
+        const costFactors = {
+            building: { base: 800, label: 'Building & Civil', icon: 'fa-building', color: '#64748b' },
+            seismic: { base: 100, label: 'Seismic Protection', icon: 'fa-mountain', color: '#78716c' },
+            electrical: { base: 1200, label: 'Electrical (MV/LV)', icon: 'fa-bolt', color: '#3b82f6' },
+            ups: { base: 600, label: 'UPS Systems', icon: 'fa-battery-full', color: '#8b5cf6' },
+            generator: { base: 400, label: 'Generator & Fuel', icon: 'fa-gas-pump', color: '#f59e0b' },
+            cooling: { base: 700, label: 'Cooling Systems', icon: 'fa-snowflake', color: '#06b6d4' },
+            fireSuppression: { base: 150, label: 'Fire Suppression', icon: 'fa-fire-extinguisher', color: '#ef4444' },
+            fireAlarm: { base: 80, label: 'Fire Alarm System', icon: 'fa-bell', color: '#f97316' },
+            bms: { base: 120, label: 'BMS / DCIM', icon: 'fa-desktop', color: '#10b981' },
+            network: { base: 250, label: 'Network Infra', icon: 'fa-network-wired', color: '#a855f7' },
+            security: { base: 80, label: 'Security Systems', icon: 'fa-shield-alt', color: '#6366f1' },
+            commissioning: { base: 200, label: 'Commissioning', icon: 'fa-clipboard-check', color: '#14b8a6' }
+        };
+
+        const redundancyMultipliers = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
+        const coolingMultipliers = { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6 };
+        const rackMultipliers = { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.6 };
+        const buildingMultipliers = { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 };
+        const seismicMultipliers = { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 };
+        const fireSuppressionMultipliers = { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6 };
+        const fireAlarmMultipliers = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 };
+        const upsMultipliers = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
+        const genMultipliers = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
+        const locationMultipliers = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0 };
+
+        const tierMapping = {
+            n: { tier: 'Tier I', uptime: '99.671%' },
+            n1: { tier: 'Tier II', uptime: '99.741%' },
+            '2n': { tier: 'Tier III', uptime: '99.982%' },
+            '2n1': { tier: 'Tier IV', uptime: '99.995%' }
+        };
+
+        const pueMapping = {
+            air: { standard: 1.8, medium: 1.7, high: 1.6, ai: 1.5 },
+            inrow: { standard: 1.6, medium: 1.5, high: 1.45, ai: 1.4 },
+            rdhx: { standard: 1.45, medium: 1.4, high: 1.35, ai: 1.3 },
+            liquid: { standard: 1.3, medium: 1.25, high: 1.2, ai: 1.15 }
+        };
+
+        function getSelectedValue(name) {
+            const selected = document.querySelector(`input[name="${name}"]:checked`);
+            return selected ? selected.value : null;
+        }
+
+        function formatCurrency(amount) {
+            if (amount >= 1000000000) {
+                return '$' + (amount / 1000000000).toFixed(2) + 'B';
+            } else if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(2) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(0) + 'K';
+            }
+            return '$' + amount.toFixed(0);
+        }
+
+        function calculateCosts() {
+            const itLoad = parseInt(document.getElementById('itLoad').value) || 1000;
+            const rackType = getSelectedValue('rackType');
+            const coolingType = getSelectedValue('coolingType');
+            const redundancy = getSelectedValue('redundancy');
+            const fuelHours = parseInt(document.getElementById('fuelHours').value) || 48;
+            const buildingType = document.getElementById('buildingType').value;
+            const seismicZone = document.getElementById('seismicZone').value;
+            const fireType = document.getElementById('fireType').value;
+            const alarmType = document.getElementById('alarmType').value;
+            const upsType = document.getElementById('upsType').value;
+            const genType = document.getElementById('genType').value;
+            const location = document.getElementById('locationFactor').value;
+
+            const redMult = redundancyMultipliers[redundancy];
+            const coolMult = coolingMultipliers[coolingType];
+            const rackMult = rackMultipliers[rackType];
+            const buildMult = buildingMultipliers[buildingType];
+            const seismicMult = seismicMultipliers[seismicZone];
+            const fireSupMult = fireSuppressionMultipliers[fireType];
+            const alarmMult = fireAlarmMultipliers[alarmType];
+            const upsMult = upsMultipliers[upsType];
+            const genMult = genMultipliers[genType];
+            const locMult = locationMultipliers[location];
+            const fuelMult = 1 + (fuelHours - 24) * 0.008;
+
+            const costs = {};
+            let total = 0;
+
+            for (const [key, factor] of Object.entries(costFactors)) {
+                let multiplier = locMult;
+
+                if (key === 'building') {
+                    multiplier *= buildMult * rackMult;
+                } else if (key === 'seismic') {
+                    multiplier *= seismicMult * buildMult;
+                } else if (key === 'electrical') {
+                    multiplier *= redMult * rackMult;
+                } else if (key === 'ups') {
+                    multiplier *= redMult * rackMult * upsMult;
+                } else if (key === 'generator') {
+                    multiplier *= redMult * fuelMult * genMult;
+                } else if (key === 'cooling') {
+                    multiplier *= coolMult * rackMult;
+                } else if (key === 'fireSuppression') {
+                    multiplier *= fireSupMult;
+                } else if (key === 'fireAlarm') {
+                    multiplier *= alarmMult;
+                }
+
+                costs[key] = factor.base * itLoad * multiplier;
+                total += costs[key];
+            }
+
+            // Add contingency (5%)
+            const contingency = total * 0.05;
+            total += contingency;
+
+            // Update UI
+            document.getElementById('totalCost').textContent = formatCurrency(total);
+            document.getElementById('perKwCost').textContent = formatCurrency(total / itLoad) + '/kW';
+
+            const tierInfo = tierMapping[redundancy];
+            document.getElementById('tierClass').textContent = tierInfo.tier;
+            document.getElementById('uptimeValue').textContent = tierInfo.uptime;
+
+            const pue = pueMapping[coolingType][rackType];
+            document.getElementById('pueValue').textContent = pue.toFixed(2);
+
+            // Annual energy cost
+            const energyRate = location === 'sea' ? 0.08 : location === 'india' ? 0.07 : location === 'usa' ? 0.10 : 0.12;
+            const annualEnergy = itLoad * pue * 8760 * energyRate;
+            document.getElementById('energyCost').textContent = formatCurrency(annualEnergy);
+
+            // Render breakdown
+            const breakdownEl = document.getElementById('costBreakdown');
+            breakdownEl.innerHTML = '';
+
+            const sortedCosts = Object.entries(costs).sort((a, b) => b[1] - a[1]);
+            const maxCost = Math.max(...Object.values(costs));
+
+            for (const [key, cost] of sortedCosts) {
+                const factor = costFactors[key];
+                const percent = ((cost / total) * 100).toFixed(1);
+                const barWidth = (cost / maxCost) * 100;
+
+                breakdownEl.innerHTML += `
+                    <div class="cost-item">
+                        <div class="cost-name">
+                            <div class="cost-icon" style="background: ${factor.color}30; color: ${factor.color};">
+                                <i class="fas ${factor.icon}"></i>
+                            </div>
+                            ${factor.label}
+                        </div>
+                        <div class="cost-bar-container">
+                            <div class="cost-bar" style="width: ${barWidth}%; background: ${factor.color};"></div>
+                        </div>
+                        <span class="cost-value">${formatCurrency(cost)}</span>
+                        <span class="cost-percent">${percent}%</span>
+                    </div>
+                `;
+            }
+
+            // Add contingency row
+            breakdownEl.innerHTML += `
+                <div class="cost-item" style="opacity: 0.7;">
+                    <div class="cost-name">
+                        <div class="cost-icon" style="background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        Contingency (5%)
+                    </div>
+                    <div class="cost-bar-container">
+                        <div class="cost-bar" style="width: ${(contingency / maxCost) * 100}%; background: rgba(255,255,255,0.5);"></div>
+                    </div>
+                    <span class="cost-value">${formatCurrency(contingency)}</span>
+                    <span class="cost-percent">5.0%</span>
+                </div>
+            `;
+        }
+
+        // Event Listeners
+        document.getElementById('itLoad').addEventListener('input', calculateCosts);
+        document.getElementById('fuelHours').addEventListener('input', calculateCosts);
+        document.getElementById('buildingType').addEventListener('change', calculateCosts);
+        document.getElementById('seismicZone').addEventListener('change', calculateCosts);
+        document.getElementById('fireType').addEventListener('change', calculateCosts);
+        document.getElementById('alarmType').addEventListener('change', calculateCosts);
+        document.getElementById('upsType').addEventListener('change', calculateCosts);
+        document.getElementById('genType').addEventListener('change', calculateCosts);
+        document.getElementById('locationFactor').addEventListener('change', calculateCosts);
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', calculateCosts);
+        });
+
+        // Initial calculation
+        calculateCosts();
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Dark Mode Toggle
+        (function initDarkMode() {
+            const themeToggle = document.getElementById('themeToggle');
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+            function getPreferredTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) return savedTheme;
+                return prefersDarkScheme.matches ? 'dark' : 'light';
+            }
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+
+                // Update toggle icon
+                const icon = themeToggle.querySelector('i');
+                if (icon) {
+                    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                }
+
+                // Update meta theme-color
+                const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+                if (metaThemeColor) {
+                    metaThemeColor.setAttribute('content', theme === 'dark' ? '#0a0a14' : '#ffffff');
+                }
+            }
+
+            // Initialize theme
+            applyTheme(getPreferredTheme());
+
+            // Toggle on click
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    applyTheme(newTheme);
+
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => { this.style.transform = ''; }, 150);
+                });
+            }
+
+            // Listen for system theme changes
+            prefersDarkScheme.addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

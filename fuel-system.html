@@ -2,7 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Enterprise SCADA Responsive | Bagus Dwi Permana</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<title>Fuel System SCADA Dashboard | Generator & Tank Monitoring</title>
+    <meta name="description" content="Enterprise SCADA dashboard for fuel system monitoring. Track diesel tank levels, generator fuel consumption, and transfer pump status in real-time.">
+    <meta name="keywords" content="Fuel System SCADA, Generator Monitoring, Diesel Tank Level, Fuel Management, Data Center Backup Power, Critical Infrastructure">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/fuel-system.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/fuel-system.html">
+    <meta property="og:title" content="Fuel System SCADA | Generator & Tank Monitoring">
+    <meta property="og:description" content="Enterprise fuel system monitoring for data center backup power infrastructure.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fuel System SCADA Dashboard">
+    <meta name="twitter:description" content="Generator and fuel tank monitoring for critical infrastructure.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Fuel System SCADA Dashboard","applicationCategory":"MonitoringApplication","description":"Enterprise SCADA dashboard for fuel system monitoring including diesel tank levels and generator fuel consumption.","url":"https://resistancezero.com/fuel-system.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"}}
+</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -62,11 +89,12 @@
         .main-grid {
             display: grid;
             /* 4 Kolom Proporsional */
-            grid-template-columns: 280px 300px 450px 1fr; 
-            gap: 15px; 
-            flex-grow: 1; 
+            grid-template-columns: 280px 300px 450px 1fr;
+            gap: 15px;
+            flex-grow: 1;
             position: relative;
-            height: 100%; /* Penting untuk menjaga layout PC */
+            height: calc(100% - 50px); /* Reserve space for status bar */
+            margin-bottom: 50px; /* Space for status bar */
         }
 
         .panel {
@@ -206,9 +234,157 @@
         @keyframes flow { to { stroke-dashoffset: -10; } }
         @keyframes blink { 50% { opacity: 0.3; } }
 
+        /* Control Buttons */
+        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.active { background: rgba(217, 119, 6, 0.2); border-color: var(--diesel-main); color: var(--diesel-bright); }
+        .kbd-hint { background: #1e293b; padding: 2px 5px; border-radius: 3px; font-size: 9px; color: #64748b; margin-left: 4px; }
+
+        /* Zoom Controls */
+        .zoom-controls { display: flex; gap: 4px; align-items: center; }
+        .zoom-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; transition: all 0.2s; }
+        .zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .zoom-btn.active { background: rgba(217, 119, 6, 0.2); border-color: var(--diesel-main); color: var(--diesel-bright); }
+
+        /* Fullscreen Mode */
+        body.fullscreen .scada-header { display: none !important; }
+        body.fullscreen .control-bar { display: none !important; }
+        body.fullscreen { padding: 0; }
+        body.fullscreen .main-grid { height: 100vh; border-radius: 0; }
+
+        /* Equipment Tooltip */
+        .equipment-tooltip { position: fixed; background: rgba(21, 30, 43, 0.98); border: 1px solid var(--diesel-main); border-radius: 8px; padding: 12px 16px; font-size: 11px; z-index: 200; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 240px; }
+        .equipment-tooltip.visible { opacity: 1; }
+        .tooltip-title { color: var(--diesel-bright); font-weight: bold; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 6px; }
+        .tooltip-row { display: flex; justify-content: space-between; margin: 4px 0; }
+        .tooltip-label { color: #94a3b8; }
+        .tooltip-value { color: #fff; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+
+        /* Bottom Status Bar */
+        .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel-bg); border-top: 2px solid var(--diesel-main); padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .status-section { display: flex; gap: 20px; align-items: center; }
+        .status-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+        .status-led { width: 8px; height: 8px; border-radius: 50%; }
+        .status-led.green { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+        .status-led.yellow { background: var(--warn); box-shadow: 0 0 6px var(--warn); }
+        .status-led.red { background: var(--crit); box-shadow: 0 0 6px var(--crit); }
+
+        /* Control Bar */
+        .control-bar { display: flex; justify-content: space-between; align-items: center; background: var(--panel-bg); padding: 8px 15px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+
+        /* Fuel Truck Filling Station */
+        .filling-station {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.3);
+            margin-top: 10px;
+        }
+        .filling-header {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .truck-icon {
+            font-size: 1.5rem;
+            color: var(--off);
+            transition: all 0.3s;
+        }
+        .truck-icon.connected {
+            color: var(--diesel-bright);
+            filter: drop-shadow(0 0 8px var(--diesel-main));
+            animation: truckPulse 1s infinite;
+        }
+        @keyframes truckPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .hose-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .hose-line {
+            flex: 1;
+            height: 4px;
+            background: var(--off);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hose-line.active {
+            background: var(--diesel-main);
+        }
+        .hose-line.active::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: var(--diesel-bright);
+            animation: hoseFlow 0.5s linear infinite;
+        }
+        @keyframes hoseFlow {
+            0% { left: -20px; }
+            100% { left: 100%; }
+        }
+        .fill-rate {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--diesel-bright);
+            font-weight: bold;
+        }
+
+        /* Fullscreen controls for fuel */
+        body.fullscreen .fullscreen-nav { display: flex !important; }
+        .fullscreen-nav {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 200;
+            gap: 10px;
+        }
+        .fs-nav-btn {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .fs-nav-btn:hover { border-color: var(--diesel-main); }
+        .fs-nav-btn.back { border-color: var(--crit); }
+        .fs-nav-btn.back:hover { background: var(--crit); }
+
+
     </style>
 </head>
 <body>
+
+    <!-- Equipment Tooltip -->
+    <div id="equipment-tooltip" class="equipment-tooltip">
+        <div class="tooltip-title" id="tooltip-title">Equipment</div>
+        <div id="tooltip-content"></div>
+    </div>
+
+    <!-- Fullscreen Navigation Controls -->
+    <div class="fullscreen-nav">
+        <button class="fs-nav-btn" onclick="resetSimulation()"><i class="fas fa-redo"></i> RESET</button>
+        <button class="fs-nav-btn" onclick="toggleFullscreen()"><i class="fas fa-compress"></i> EXIT</button>
+        <a href="dc-conventional.html" class="fs-nav-btn back"><i class="fas fa-arrow-left"></i> BACK</a>
+        <a href="index.html" class="fs-nav-btn back"><i class="fas fa-home"></i> PORTFOLIO</a>
+    </div>
 
     <header class="scada-header">
         <div class="header-title">
@@ -225,9 +401,31 @@
                 <span class="data-val" id="clock" style="width:auto; min-width:60px;">12:00:00</span>
             </div>
             <div class="sys-badge"><i class="fas fa-wifi"></i> ONLINE</div>
-            <a href="index.html" style="color: #64748b; text-decoration: none; padding: 5px 10px; border:1px solid #334155; border-radius:4px;"><i class="fas fa-sign-out-alt"></i> EXIT</a>
+            <a href="dc-conventional.html" style="color: #94a3b8; text-decoration: none; padding: 10px 14px; border:1px solid #334155; border-radius:6px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)';this.style.borderColor='#06b6d4';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.borderColor='#334155';this.style.color='#94a3b8'"><i class="fas fa-arrow-left"></i> Back</a>
+            <a href="index.html" style="color: #a78bfa; text-decoration: none; padding: 10px 14px; border:1px solid rgba(139,92,246,0.3); border-radius:6px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; transition: all 0.2s;" onmouseover="this.style.background='rgba(139,92,246,0.1)';this.style.borderColor='#a78bfa';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(139,92,246,0.3)';this.style.color='#a78bfa'"><i class="fas fa-home"></i> Portfolio</a>
         </div>
     </header>
+
+    <!-- Control Bar -->
+    <div class="control-bar">
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen">
+                <i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span>
+            </button>
+            <button onclick="resetSimulation()" class="ctrl-btn">
+                <i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span>
+            </button>
+            <button onclick="togglePump()" class="ctrl-btn" id="btn-pump">
+                <i class="fas fa-power-off mr-1"></i> PUMP <span class="kbd-hint">P</span>
+            </button>
+        </div>
+        <div class="zoom-controls">
+            <span style="color: #64748b; font-size: 10px; margin-right: 8px;">ZOOM:</span>
+            <button onclick="setZoom(0.8)" class="zoom-btn" data-zoom="0.8">80%</button>
+            <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
+            <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
+        </div>
+    </div>
 
     <div class="main-grid">
 
@@ -252,7 +450,7 @@
                     <polyline id="ust-sparkline" class="sparkline-path" points="0,50 100,50" />
                 </svg>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-grow:1;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                 <div style="width:60%;">
                     <div class="data-row"><span class="data-lbl">LIT-101</span><div><span class="data-val" id="val-ust-lvl">85.0</span><span class="data-unit">%</span></div></div>
                     <div class="data-row"><span class="data-lbl">TIT-101</span><div><span class="data-val" id="val-ust-tmp">28.4</span><span class="data-unit">°C</span></div></div>
@@ -262,6 +460,27 @@
                     <div class="tank-wrapper ust-shape"><div id="liq-ust" class="liquid" style="height:85%;"></div></div>
                     <span style="font-size:0.7rem; font-weight:bold;">UST-01</span>
                 </div>
+            </div>
+
+            <!-- Fuel Truck Filling Station -->
+            <div class="filling-station">
+                <div class="filling-header">
+                    <i class="fas fa-truck truck-icon" id="truck-icon"></i>
+                    <span>FILLING STATION</span>
+                    <span id="fill-status" style="margin-left:auto; font-size:0.65rem; color:var(--off);">DISCONNECTED</span>
+                </div>
+                <div class="hose-indicator">
+                    <i class="fas fa-gas-pump" style="color:var(--diesel-main);"></i>
+                    <div class="hose-line" id="hose-line"></div>
+                    <i class="fas fa-truck" style="color:#555;" id="truck-small"></i>
+                </div>
+                <div class="data-row">
+                    <span class="data-lbl">Fill Rate</span>
+                    <span class="fill-rate" id="fill-rate">0 L/min</span>
+                </div>
+                <button onclick="toggleFilling()" class="ctrl-btn" id="btn-fill" style="width:100%; margin-top:8px; justify-content:center;">
+                    <i class="fas fa-plug"></i> CONNECT HOSE
+                </button>
             </div>
         </div>
 
@@ -373,27 +592,103 @@
 
     </div>
 
+    <!-- Bottom Status Bar -->
+    <div class="status-bar">
+        <div class="status-section">
+            <div class="status-item">
+                <div class="status-led green" id="led-system"></div>
+                <span style="color: #64748b;">SYSTEM:</span>
+                <span style="color: #fff; font-weight: bold;" id="status-system">NORMAL</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led green" id="led-ust"></div>
+                <span style="color: #64748b;">UST:</span>
+                <span style="color: #fff; font-weight: bold;" id="status-ust">85%</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led yellow" id="led-pump"></div>
+                <span style="color: #64748b;">PUMP:</span>
+                <span style="color: #fff; font-weight: bold;" id="status-pump">STANDBY</span>
+            </div>
+        </div>
+        <div class="status-section">
+            <div class="status-item">
+                <span style="color: #64748b;">FLOW:</span>
+                <span style="color: var(--diesel-bright); font-weight: bold;" id="status-flow">0 L/m</span>
+            </div>
+            <div class="status-item">
+                <span style="color: #64748b;">UPTIME:</span>
+                <span style="color: var(--elec-blue); font-weight: bold;" id="status-uptime">00:00:00</span>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let sys = {
+        var sys = {
             ust: 85.00, dtA: 92.00, dtB: 45.00, dtC: 88.00,
             pumpRunning: false, amps: 0.0, vib: 0.2, flow: 0,
-            history: new Array(50).fill(50)
+            history: new Array(50).fill(50),
+            manualPump: false
         };
-        const LOW_LIMIT = 30.0; const HIGH_LIMIT = 90.0;
-        const rand = (min, max) => Math.random() * (max - min) + min;
-        const fmt = (n) => n.toFixed(1);
+        var LOW_LIMIT = 30.0;
+        var HIGH_LIMIT = 90.0;
+        var currentZoom = 1;
+        var uptimeSeconds = 0;
 
-        setInterval(() => {
-            updateClock(); simulatePhysics(); updateUI();
+        var tooltip = document.getElementById('equipment-tooltip');
+        var tooltipTitle = document.getElementById('tooltip-title');
+        var tooltipContent = document.getElementById('tooltip-content');
+
+        // Equipment specifications
+        var equipmentSpecs = {
+            'pump-p101': {
+                title: 'Transfer Pump P-101',
+                specs: [
+                    { label: 'Model', value: 'Viking L124A' },
+                    { label: 'Capacity', value: '180 L/min' },
+                    { label: 'Head', value: '25m' },
+                    { label: 'Power', value: '5.5 kW' },
+                    { label: 'Motor', value: '3-Phase 380V' }
+                ]
+            },
+            'tank-ust': {
+                title: 'Underground Storage Tank',
+                specs: [
+                    { label: 'Capacity', value: '100,000 L' },
+                    { label: 'Material', value: 'Double-wall Steel' },
+                    { label: 'Fuel Type', value: 'Diesel B30' },
+                    { label: 'Leak Detect', value: 'Interstitial' }
+                ]
+            }
+        };
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+        function fmt(n) { return n.toFixed(1); }
+
+        setInterval(function() {
+            updateClock(); simulatePhysics(); updateUI(); updateStatusBar();
         }, 200);
+
+        // Uptime counter
+        setInterval(function() {
+            uptimeSeconds++;
+            var h = Math.floor(uptimeSeconds / 3600);
+            var m = Math.floor((uptimeSeconds % 3600) / 60);
+            var s = uptimeSeconds % 60;
+            document.getElementById('status-uptime').textContent =
+                String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }, 1000);
 
         function simulatePhysics() {
             if(sys.dtB > 0) sys.dtB -= 0.1;
-            if(sys.dtB <= LOW_LIMIT) sys.pumpRunning = true;
-            if(sys.dtB >= HIGH_LIMIT) sys.pumpRunning = false;
+
+            if (!sys.manualPump) {
+                if(sys.dtB <= LOW_LIMIT) sys.pumpRunning = true;
+                if(sys.dtB >= HIGH_LIMIT) sys.pumpRunning = false;
+            }
 
             if(sys.pumpRunning) {
-                sys.dtB += 0.4; sys.ust -= 0.02; 
+                sys.dtB += 0.4; sys.ust -= 0.02;
                 if(sys.amps < 14.5) sys.amps += 1.0;
                 if(sys.flow < 180) sys.flow += 10;
                 sys.vib = rand(2.1, 2.4);
@@ -406,7 +701,7 @@
             if(sys.flow < 0) sys.flow = 0;
 
             sys.history.shift();
-            let chartVal = 100 - ((sys.ust - 80) * 10); 
+            var chartVal = 100 - ((sys.ust - 80) * 10);
             sys.history.push(chartVal);
         }
 
@@ -425,53 +720,237 @@
             document.getElementById('val-p1-amp').innerText = fmt(sys.amps);
             document.getElementById('val-p1-vib').innerText = fmt(sys.vib);
             document.getElementById('val-fit-main').innerText = Math.round(sys.flow);
-            let press = sys.flow > 0 ? rand(4.1, 4.3) : rand(0.1, 0.2);
+            var press = sys.flow > 0 ? rand(4.1, 4.3) : rand(0.1, 0.2);
             document.getElementById('val-pit-dis').innerText = fmt(press);
 
-            const pumpIcon = document.getElementById('icon-p1');
-            const led = document.getElementById('led-p1');
-            const vlvB = document.getElementById('vlv-b');
-            // Pipe animation only visible on PC
-            const pipes = ['pipe-suc', 'pipe-dis', 'pipe-head', 'pipe-rise', 'pipe-br-b'];
+            var pumpIcon = document.getElementById('icon-p1');
+            var led = document.getElementById('led-p1');
+            var vlvB = document.getElementById('vlv-b');
+            var pipes = ['pipe-suc', 'pipe-dis', 'pipe-head', 'pipe-rise', 'pipe-br-b'];
 
             if(sys.pumpRunning) {
                 pumpIcon.classList.add('running');
                 led.className = "led on";
                 vlvB.style.transform = "rotate(90deg)"; vlvB.style.color = "var(--ok)";
-                pipes.forEach(id => {
-                    const el = document.getElementById(id);
+                pipes.forEach(function(id) {
+                    var el = document.getElementById(id);
                     if(el) el.classList.add('active');
                 });
             } else {
                 pumpIcon.classList.remove('running');
                 led.className = "led";
                 vlvB.style.transform = "rotate(0deg)"; vlvB.style.color = "var(--crit)";
-                document.querySelectorAll('.pipe-line').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.pipe-line').forEach(function(p) { p.classList.remove('active'); });
             }
 
-            let pointsStr = sys.history.map((val, i) => `${i * 2},${val}`).join(' '); 
+            var pointsStr = sys.history.map(function(val, i) { return (i * 2) + ',' + val; }).join(' ');
             document.getElementById('ust-sparkline').setAttribute('points', pointsStr);
 
-            const alarmBox = document.getElementById('alarm-box');
+            var alarmBox = document.getElementById('alarm-box');
             if(sys.dtB <= LOW_LIMIT) {
-                if(alarmBox.innerHTML.length < 50) { 
-                    alarmBox.innerHTML = `<div style="background:rgba(239,68,68,0.2); padding:5px; border-left:3px solid red; margin-bottom:5px;">
-                        <strong>LIT-402 LOLO</strong><br>DT-B Level Critical
-                    </div>`;
+                if(alarmBox.innerHTML.length < 50) {
+                    alarmBox.innerHTML = '<div style="background:rgba(239,68,68,0.2); padding:5px; border-left:3px solid red; margin-bottom:5px;"><strong>LIT-402 LOLO</strong><br>DT-B Level Critical</div>';
                 }
             } else {
-                alarmBox.innerHTML = `<div style="color:#64748b; text-align:center; padding-top:20px;">No Active Alarms</div>`;
+                alarmBox.innerHTML = '<div style="color:#64748b; text-align:center; padding-top:20px;">No Active Alarms</div>';
+            }
+        }
+
+        function updateStatusBar() {
+            document.getElementById('status-ust').textContent = fmt(sys.ust) + '%';
+            document.getElementById('status-flow').textContent = Math.round(sys.flow) + ' L/m';
+
+            var ledUst = document.getElementById('led-ust');
+            ledUst.className = 'status-led';
+            if (sys.ust >= 50) ledUst.classList.add('green');
+            else if (sys.ust >= 25) ledUst.classList.add('yellow');
+            else ledUst.classList.add('red');
+
+            var ledPump = document.getElementById('led-pump');
+            var statusPump = document.getElementById('status-pump');
+            ledPump.className = 'status-led';
+            if (sys.pumpRunning) {
+                ledPump.classList.add('green');
+                statusPump.textContent = 'RUNNING';
+            } else {
+                ledPump.classList.add('yellow');
+                statusPump.textContent = 'STANDBY';
+            }
+
+            var ledSystem = document.getElementById('led-system');
+            var statusSystem = document.getElementById('status-system');
+            ledSystem.className = 'status-led';
+            if (sys.dtB <= LOW_LIMIT) {
+                ledSystem.classList.add('red');
+                statusSystem.textContent = 'ALARM';
+            } else {
+                ledSystem.classList.add('green');
+                statusSystem.textContent = 'NORMAL';
             }
         }
 
         function updateClock() {
-            const now = new Date();
+            var now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString();
         }
-        
+
         function ack() {
-            document.getElementById('alarm-box').innerHTML = `<div style="color:#64748b; text-align:center; padding-top:20px;">Alarms Acknowledged</div>`;
+            document.getElementById('alarm-box').innerHTML = '<div style="color:#64748b; text-align:center; padding-top:20px;">Alarms Acknowledged</div>';
         }
+
+        // Fullscreen toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(function(err) {
+                    console.log('Fullscreen error:', err);
+                });
+                document.body.classList.add('fullscreen');
+                document.getElementById('btn-fullscreen').classList.add('active');
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('fullscreen');
+                document.getElementById('btn-fullscreen').classList.remove('active');
+            }
+        }
+
+        // Reset simulation
+        function resetSimulation() {
+            sys.ust = 85.00;
+            sys.dtA = 92.00;
+            sys.dtB = 45.00;
+            sys.dtC = 88.00;
+            sys.pumpRunning = false;
+            sys.manualPump = false;
+            sys.amps = 0.0;
+            sys.vib = 0.2;
+            sys.flow = 0;
+            sys.history = new Array(50).fill(50);
+
+            document.getElementById('btn-pump').classList.remove('active');
+            document.getElementById('alarm-box').innerHTML = '<div style="color:#64748b; text-align:center; padding-top:20px;">No Active Alarms</div>';
+        }
+
+        // Manual pump toggle
+        function togglePump() {
+            sys.manualPump = true;
+            sys.pumpRunning = !sys.pumpRunning;
+            var btn = document.getElementById('btn-pump');
+            if (sys.pumpRunning) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        // Filling Station Control
+        var fillingActive = false;
+        var fillInterval = null;
+
+        function toggleFilling() {
+            fillingActive = !fillingActive;
+            var truckIcon = document.getElementById('truck-icon');
+            var truckSmall = document.getElementById('truck-small');
+            var hoseLine = document.getElementById('hose-line');
+            var fillStatus = document.getElementById('fill-status');
+            var fillRate = document.getElementById('fill-rate');
+            var btnFill = document.getElementById('btn-fill');
+
+            if (fillingActive) {
+                truckIcon.classList.add('connected');
+                truckSmall.style.color = 'var(--diesel-bright)';
+                hoseLine.classList.add('active');
+                fillStatus.textContent = 'CONNECTED';
+                fillStatus.style.color = 'var(--ok)';
+                btnFill.innerHTML = '<i class="fas fa-plug"></i> DISCONNECT';
+                btnFill.classList.add('active');
+
+                // Start filling simulation
+                fillInterval = setInterval(function() {
+                    if (sys.ust < 98) {
+                        sys.ust += 0.2;
+                        var rate = 180 + Math.floor(Math.random() * 40);
+                        fillRate.textContent = rate + ' L/min';
+                    } else {
+                        // Tank full
+                        fillRate.textContent = '0 L/min';
+                        toggleFilling(); // Auto disconnect
+                    }
+                }, 500);
+            } else {
+                truckIcon.classList.remove('connected');
+                truckSmall.style.color = '#555';
+                hoseLine.classList.remove('active');
+                fillStatus.textContent = 'DISCONNECTED';
+                fillStatus.style.color = 'var(--off)';
+                fillRate.textContent = '0 L/min';
+                btnFill.innerHTML = '<i class="fas fa-plug"></i> CONNECT HOSE';
+                btnFill.classList.remove('active');
+
+                if (fillInterval) {
+                    clearInterval(fillInterval);
+                    fillInterval = null;
+                }
+            }
+        }
+
+        // Zoom control
+        function setZoom(level) {
+            currentZoom = level;
+            var mainGrid = document.querySelector('.main-grid');
+            mainGrid.style.transform = 'scale(' + level + ')';
+            mainGrid.style.transformOrigin = 'top left';
+            document.querySelectorAll('.zoom-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+                if (btn.dataset.zoom == level) btn.classList.add('active');
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
+            if (e.key === 'r' || e.key === 'R') { if (!e.ctrlKey && !e.metaKey) resetSimulation(); }
+            if (e.key === 'p' || e.key === 'P') { togglePump(); }
+            if (e.key === 'Escape') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                    document.body.classList.remove('fullscreen');
+                }
+            }
+        });
+
+        // Tooltip functions
+        function showTooltip(e, equipId) {
+            var spec = equipmentSpecs[equipId];
+            if (!spec) return;
+
+            tooltipTitle.textContent = spec.title;
+            var html = '';
+            spec.specs.forEach(function(item) {
+                html += '<div class="tooltip-row"><span class="tooltip-label">' + item.label + '</span><span class="tooltip-value">' + item.value + '</span></div>';
+            });
+            tooltipContent.innerHTML = html;
+
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY - 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
+        // Add tooltip to pump element
+        var pumpUnit = document.querySelector('.pump-unit');
+        if (pumpUnit) {
+            pumpUnit.style.cursor = 'pointer';
+            pumpUnit.addEventListener('mouseenter', function(e) { showTooltip(e, 'pump-p101'); });
+            pumpUnit.addEventListener('mousemove', function(e) {
+                tooltip.style.left = (e.clientX + 15) + 'px';
+                tooltip.style.top = (e.clientY - 10) + 'px';
+            });
+            pumpUnit.addEventListener('mouseleave', hideTooltip);
+        }
+
     </script>
 </body>
 </html>

@@ -3,7 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BKS01 MASTER COMMAND NODE | v12.0 FINAL</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- SEO Meta Tags -->
+<link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<title>ICT Master Command Node | Network Operations Center</title>
+<meta name="description" content="Master command node dashboard for ICT infrastructure monitoring. Real-time network status, server health, connectivity metrics, and NOC operations visualization.">
+<meta name="keywords" content="ICT Dashboard, Network Operations Center, NOC Monitoring, Server Health, Network Infrastructure, Data Center ICT, Command Node">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://resistancezero.com/ict.html">
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://resistancezero.com/ict.html">
+<meta property="og:title" content="ICT Master Command Node | NOC Dashboard">
+<meta property="og:description" content="Network operations center dashboard for ICT infrastructure monitoring.">
+<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ICT Master Command Node">
+<meta name="twitter:description" content="NOC dashboard for network and server infrastructure monitoring.">
+<meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"ICT Master Command Node","applicationCategory":"MonitoringApplication","description":"Master command node dashboard for ICT infrastructure monitoring with real-time network status and server health.","url":"https://resistancezero.com/ict.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"}}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&family=Roboto:wght@400;500;700&family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
     /* --- CORE VARIABLES --- */
@@ -81,11 +107,55 @@
     .noc-brand { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 2px; text-shadow: 0 0 8px var(--neon-cyan); font-family: 'Chakra Petch'; }
     .noc-top-stat { display: flex; gap: 15px; font-family: 'Share Tech Mono'; font-size: 11px; align-items: center; color: #888; }
     .noc-pill { padding: 4px 10px; border: 1px solid #222; background: #0f1116; display: flex; align-items: center; gap: 6px; border-radius: 4px; }
-    .btn-exit { 
-        background: var(--neon-cyan); color: #000; border: none; padding: 5px 15px; font-weight: 800; cursor: pointer; 
+    .btn-exit {
+        background: var(--neon-cyan); color: #000; border: none; padding: 10px 18px; font-weight: 800; cursor: pointer;
         font-family: 'Chakra Petch'; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%); transition: 0.2s;
+        min-height: 40px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center;
     }
     .btn-exit:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+
+    /* Control Buttons */
+    .ctrl-btn {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid #333;
+        color: #888;
+        padding: 5px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 10px;
+        font-family: 'Share Tech Mono';
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+    }
+    .ctrl-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        border-color: var(--neon-cyan);
+    }
+    .ctrl-btn.active {
+        background: rgba(0, 243, 255, 0.1);
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+    }
+    .ctrl-btn svg { width: 14px; height: 14px; }
+
+    /* Keyboard Shortcut Hints */
+    .kbd {
+        background: #222;
+        border: 1px solid #444;
+        padding: 1px 4px;
+        border-radius: 2px;
+        font-size: 8px;
+        color: #666;
+        margin-left: 4px;
+    }
+
+    /* Fullscreen Mode */
+    body.fullscreen .sidebar { display: none; }
+    body.fullscreen .main-view { width: 100vw; }
+    body.fullscreen .noc-header { border-radius: 0; }
 
     /* Grid Layout */
     .noc-grid { 
@@ -129,8 +199,55 @@
     @keyframes radar { 0% { r: 0; opacity: 1; } 100% { r: 50; opacity: 0; } }
     @keyframes travel { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
 
-    /* Charts */
+    /* Charts - Enhanced */
     .chart-cvs { width: 100%; height: 100%; }
+    .chart-glow { filter: drop-shadow(0 0 8px var(--neon-cyan)); }
+
+    /* Enhanced Widget Styles */
+    .live-indicator { display: inline-block; width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; animation: pulse 1s infinite; margin-right: 5px; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+
+    /* Network Stats Grid */
+    .net-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .net-stat-item { background: rgba(0,0,0,0.3); padding: 6px; text-align: center; border-left: 2px solid var(--neon-cyan); }
+    .net-stat-val { font-family: 'Share Tech Mono'; font-size: 16px; color: #fff; }
+    .net-stat-lbl { font-size: 8px; color: #555; text-transform: uppercase; }
+
+    /* Progress Bars */
+    .progress-bar { height: 6px; background: #111; border-radius: 3px; overflow: hidden; margin: 4px 0; }
+    .progress-fill { height: 100%; transition: width 0.5s ease; }
+    .progress-fill.cpu { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green)); box-shadow: 0 0 8px var(--neon-cyan); }
+    .progress-fill.mem { background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)); box-shadow: 0 0 8px var(--neon-purple); }
+    .progress-fill.disk { background: linear-gradient(90deg, var(--neon-amber), var(--neon-green)); box-shadow: 0 0 8px var(--neon-amber); }
+    .progress-fill.net { background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan)); box-shadow: 0 0 8px var(--neon-green); }
+
+    /* Resource Monitor Widget */
+    .resource-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .resource-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .resource-info { flex: 1; }
+    .resource-name { font-size: 9px; color: #666; text-transform: uppercase; }
+    .resource-val { font-family: 'Share Tech Mono'; font-size: 11px; color: #fff; float: right; }
+
+    /* Network Interface Widget */
+    .nic-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #222; }
+    .nic-name { font-size: 9px; color: #888; }
+    .nic-status { font-size: 8px; padding: 2px 6px; border-radius: 2px; }
+    .nic-up { background: rgba(0,255,65,0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
+    .nic-down { background: rgba(255,0,60,0.2); color: var(--neon-red); border: 1px solid var(--neon-red); }
+    .nic-speed { font-family: 'Share Tech Mono'; font-size: 9px; color: var(--neon-cyan); }
+
+    /* Ping Monitor */
+    .ping-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+    .ping-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .ping-dot.ok { background: var(--neon-green); box-shadow: 0 0 4px var(--neon-green); }
+    .ping-dot.warn { background: var(--neon-amber); box-shadow: 0 0 4px var(--neon-amber); }
+    .ping-dot.err { background: var(--neon-red); box-shadow: 0 0 4px var(--neon-red); animation: blink 0.5s infinite; }
+    .ping-host { font-size: 9px; color: #888; flex: 1; }
+    .ping-val { font-family: 'Share Tech Mono'; font-size: 9px; color: var(--neon-cyan); }
+
+    /* Enhanced Charts */
+    .chart-gradient { position: relative; }
+    .chart-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, transparent, rgba(0,243,255,0.1)); pointer-events: none; }
 
     /* Complex Widgets */
     .rack-stack { display: flex; flex-direction: column-reverse; height: 100%; gap: 1px; background: #000; overflow-y: auto; }
@@ -204,6 +321,38 @@
     .tl-light.on { background: #9abf36; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); border-color:#88b800; }
     .tl-label { font-size: 11px; color: #555; font-weight: bold; }
 
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .sidebar { width: 50px; padding: 8px 4px; }
+        .nav-item { width: 40px; height: 40px; font-size: 7px; }
+        .nav-item svg { width: 18px; height: 18px; }
+        .brand-icon { width: 35px; height: 35px; font-size: 10px; }
+        .noc-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    }
+    @media (max-width: 768px) {
+        body { flex-direction: column; }
+        .sidebar {
+            width: 100%; height: auto; flex-direction: row;
+            justify-content: flex-start; padding: 8px; gap: 8px;
+            border-right: none; border-bottom: 1px solid var(--neon-cyan);
+        }
+        .nav-item { width: 50px; height: 44px; margin: 0; }
+        .nav-back { margin-top: 0; margin-left: auto; margin-bottom: 0; }
+        .brand-icon { margin: 0; }
+        .noc-header { flex-direction: column; gap: 8px; padding: 10px; }
+        .noc-brand { font-size: 16px; }
+        .noc-top-stat { flex-wrap: wrap; gap: 6px; }
+        .btn-exit { padding: 8px 14px; font-size: 10px; }
+        .noc-grid { grid-template-columns: 1fr; gap: 6px; padding: 10px; }
+    }
+    @media (max-width: 480px) {
+        .nav-item { width: 44px; height: 40px; font-size: 6px; }
+        .nav-item svg { width: 16px; height: 16px; }
+        .noc-pill { font-size: 9px; padding: 3px 8px; }
+        .ctrl-btn { padding: 6px 8px; font-size: 10px; }
+    }
+
+
 </style>
 </head>
 <body>
@@ -216,8 +365,11 @@
         <div class="nav-item" onclick="switchView('prtg', this)" title="PRTG Monitor">
             <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> PRTG
         </div>
+        <a href="dc-conventional.html" class="nav-item nav-back" title="Back to Dashboard">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> BACK
+        </a>
         <a href="index.html" class="nav-item nav-back" title="Exit to Portfolio">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> EXIT
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> EXIT
         </a>
     </div>
 
@@ -230,6 +382,14 @@
                     <div class="noc-pill"><span class="blink-green">●</span> SYSTEM ONLINE</div>
                     <div class="noc-pill">DEFCON 3</div>
                     <div class="noc-pill" id="noc-clock">00:00:00</div>
+                    <button class="ctrl-btn" onclick="refreshData()" title="Refresh Data">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span class="kbd">R</span>
+                    </button>
+                    <button class="ctrl-btn" id="btn-fullscreen" onclick="toggleFullscreen()" title="Fullscreen Mode">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                        <span class="kbd">F11</span>
+                    </button>
                     <a href="index.html" class="btn-exit">BACK TO PORTFOLIO</a>
                 </div>
             </header>
@@ -259,10 +419,10 @@
                     </div>
                 </div>
 
-                <div class="noc-widget"><div class="noc-widget-head">HEALTH</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" style="font-size:28px; color:var(--neon-green)">98%</div><div class="text-lbl">OPTIMAL</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">ALERTS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val blink-red" style="font-size:28px;">3</div><div class="text-lbl">CRITICAL</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">TRAFFIC</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" style="color:var(--neon-cyan); font-size:28px;">14 G</div><div class="text-lbl">AGGREGATE</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">BLOCKS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" style="color:var(--neon-amber); font-size:28px;">2.4k</div><div class="text-lbl">PER SEC</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>HEALTH</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" id="val-health" style="font-size:28px; color:var(--neon-green)">98%</div><div class="text-lbl">OPTIMAL</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">ALERTS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val blink-red" id="val-alerts" style="font-size:28px;">3</div><div class="text-lbl">CRITICAL</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>TRAFFIC</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" id="val-traffic" style="color:var(--neon-cyan); font-size:28px;">14.2 G</div><div class="text-lbl">AGGREGATE</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">BLOCKS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" id="val-blocks" style="color:var(--neon-amber); font-size:28px;">2.4k</div><div class="text-lbl">PER SEC</div></div></div>
 
                 <div class="noc-widget col-2 row-2">
                     <div class="noc-widget-head">WAN TOPOLOGY <span style="color:var(--neon-green)">● CONNECTED</span></div>
@@ -274,12 +434,13 @@
                             <line x1="240" y1="185" x2="290" y2="130" stroke="#00f3ff" stroke-width="1" stroke-dasharray="2"/>
                             <line x1="240" y1="185" x2="420" y2="130" stroke="#00f3ff" stroke-width="1" stroke-dasharray="2"/>
 
-                            <circle cx="140" cy="180" r="2" fill="#fff"/>
-                            <text x="140" y="165" fill="#888" font-size="8" text-anchor="middle" font-family="Share Tech Mono">JKT</text>
-                            
-                            <circle cx="240" cy="185" r="4" fill="#00f3ff"/>
+                            <circle cx="140" cy="180" r="3" fill="#00f3ff"/>
+                            <circle cx="140" cy="180" r="8" class="radar-circle" style="animation-delay: 0.5s;"/>
+                            <text x="140" y="165" fill="#00f3ff" font-size="9" font-weight="bold" text-anchor="middle" font-family="Chakra Petch">BKS01</text>
+
+                            <circle cx="240" cy="185" r="4" fill="#00ff41"/>
                             <circle cx="240" cy="185" r="10" class="radar-circle"/>
-                            <text x="240" y="200" fill="#00f3ff" font-size="10" font-weight="bold" text-anchor="middle" font-family="Chakra Petch">BKS01</text>
+                            <text x="240" y="200" fill="#00ff41" font-size="10" font-weight="bold" text-anchor="middle" font-family="Chakra Petch">SBY01</text>
                             
                             <circle cx="290" cy="130" r="3" fill="#ffb300"/>
                             <text x="305" y="125" fill="#ffb300" font-size="8" text-anchor="middle" font-family="Share Tech Mono">MKS</text>
@@ -293,15 +454,72 @@
                     </div>
                 </div>
 
-                <div class="noc-widget"><div class="noc-widget-head">THROUGHPUT</div><div class="noc-widget-body"><canvas id="noc-chart-1" class="chart-cvs"></canvas></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">DB LATENCY</div><div class="noc-widget-body"><canvas id="noc-chart-2" class="chart-cvs"></canvas></div></div>
+                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>THROUGHPUT <span style="color:#555; font-size:8px;">Gbps</span></div><div class="noc-widget-body" style="position:relative;"><canvas id="noc-chart-1" class="chart-cvs chart-glow"></canvas><div style="position:absolute; bottom:5px; right:5px; font-size:18px; color:var(--neon-cyan); font-family:'Share Tech Mono';" id="tp-live">14.2</div></div></div>
+                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>DB LATENCY <span style="color:#555; font-size:8px;">ms</span></div><div class="noc-widget-body" style="position:relative;"><canvas id="noc-chart-2" class="chart-cvs"></canvas><div style="position:absolute; bottom:5px; right:5px; font-size:18px; color:var(--neon-amber); font-family:'Share Tech Mono';" id="db-live">2.4</div></div></div>
                 
                 <div class="noc-widget"><div class="noc-widget-head">RAID STATUS</div><div class="noc-widget-body no-pad"><div class="raid-grid" id="raid-view"></div></div></div>
                 <div class="noc-widget"><div class="noc-widget-head">SPECTRUM</div><div class="noc-widget-body no-pad"><div class="spectrum" id="spectrum-view"></div></div></div>
                 <div class="noc-widget" style="grid-row:4/6"><div class="noc-widget-head">SYSLOG</div><div class="noc-widget-body no-pad" style="background:#000"><div id="noc-syslog" style="padding:5px; font-family:'Share Tech Mono'; font-size:9px; color:#aaa; overflow:hidden; display:flex; flex-direction:column-reverse; height:100%;"></div></div></div>
 
-                <div class="noc-widget col-2"><div class="noc-widget-head">NETFLOW</div><div class="noc-widget-body no-pad"><table class="dense-table"><tr><th>SRC</th><th>DST</th><th>VOL</th></tr><tr><td>10.5.1.2</td><td>192.168.1.5</td><td>5G</td></tr><tr><td>172.16.0.4</td><td>8.8.8.8</td><td>2G</td></tr></table></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">BACKUP</div><div class="noc-widget-body"><div style="font-size:8px;">VM_DAILY</div><div style="height:4px;background:#222"><div style="width:100%;height:100%;background:var(--neon-green)"></div></div><div style="font-size:8px; margin-top:5px;">DB_LOGS</div><div style="height:4px;background:#222"><div style="width:65%;height:100%;background:var(--neon-blue)"></div></div></div></div>
+                <!-- Resource Monitor Widget -->
+                <div class="noc-widget">
+                    <div class="noc-widget-head"><span class="live-indicator"></span>RESOURCES</div>
+                    <div class="noc-widget-body">
+                        <div class="resource-item">
+                            <div class="resource-icon" style="color:var(--neon-cyan);">⚡</div>
+                            <div class="resource-info">
+                                <div class="resource-name">CPU <span class="resource-val" id="res-cpu">67%</span></div>
+                                <div class="progress-bar"><div class="progress-fill cpu" id="bar-cpu" style="width:67%"></div></div>
+                            </div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-icon" style="color:var(--neon-purple);">◉</div>
+                            <div class="resource-info">
+                                <div class="resource-name">MEM <span class="resource-val" id="res-mem">82%</span></div>
+                                <div class="progress-bar"><div class="progress-fill mem" id="bar-mem" style="width:82%"></div></div>
+                            </div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-icon" style="color:var(--neon-amber);">▣</div>
+                            <div class="resource-info">
+                                <div class="resource-name">DISK <span class="resource-val" id="res-disk">54%</span></div>
+                                <div class="progress-bar"><div class="progress-fill disk" id="bar-disk" style="width:54%"></div></div>
+                            </div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-icon" style="color:var(--neon-green);">↔</div>
+                            <div class="resource-info">
+                                <div class="resource-name">NET <span class="resource-val" id="res-net">45%</span></div>
+                                <div class="progress-bar"><div class="progress-fill net" id="bar-net" style="width:45%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Interface Widget -->
+                <div class="noc-widget">
+                    <div class="noc-widget-head">INTERFACES</div>
+                    <div class="noc-widget-body" style="padding:4px;">
+                        <div class="nic-item"><span class="nic-name">eth0 (WAN)</span><span class="nic-speed" id="nic-eth0">1.2 Gbps</span><span class="nic-status nic-up">UP</span></div>
+                        <div class="nic-item"><span class="nic-name">eth1 (LAN)</span><span class="nic-speed" id="nic-eth1">845 Mbps</span><span class="nic-status nic-up">UP</span></div>
+                        <div class="nic-item"><span class="nic-name">bond0 (HA)</span><span class="nic-speed" id="nic-bond0">2.1 Gbps</span><span class="nic-status nic-up">UP</span></div>
+                        <div class="nic-item"><span class="nic-name">vlan100</span><span class="nic-speed">--</span><span class="nic-status nic-down">DOWN</span></div>
+                    </div>
+                </div>
+
+                <!-- Ping Monitor Widget -->
+                <div class="noc-widget">
+                    <div class="noc-widget-head"><span class="live-indicator"></span>PING MONITOR</div>
+                    <div class="noc-widget-body" style="padding:4px;">
+                        <div class="ping-row"><div class="ping-dot ok" id="ping-gw"></div><span class="ping-host">Gateway</span><span class="ping-val" id="ping-gw-val">1ms</span></div>
+                        <div class="ping-row"><div class="ping-dot ok" id="ping-dns"></div><span class="ping-host">DNS (8.8.8.8)</span><span class="ping-val" id="ping-dns-val">12ms</span></div>
+                        <div class="ping-row"><div class="ping-dot ok" id="ping-dc"></div><span class="ping-host">DC-PRIMARY</span><span class="ping-val" id="ping-dc-val">3ms</span></div>
+                        <div class="ping-row"><div class="ping-dot warn" id="ping-bkp"></div><span class="ping-host">BACKUP-SRV</span><span class="ping-val" id="ping-bkp-val">45ms</span></div>
+                    </div>
+                </div>
+
+                <div class="noc-widget"><div class="noc-widget-head">NETFLOW</div><div class="noc-widget-body no-pad"><table class="dense-table" id="netflow-table"><tr><th>SRC</th><th>DST</th><th>VOL</th><th>PROTO</th></tr><tr><td>10.5.1.2</td><td>192.168.1.5</td><td id="nf-vol1">5.2G</td><td>TCP</td></tr><tr><td>172.16.0.4</td><td>8.8.8.8</td><td id="nf-vol2">2.1G</td><td>UDP</td></tr><tr><td>10.0.0.15</td><td>10.0.0.1</td><td id="nf-vol3">892M</td><td>ICMP</td></tr></table></div></div>
+                <div class="noc-widget"><div class="noc-widget-head">BACKUP</div><div class="noc-widget-body"><div style="font-size:8px;">VM_DAILY <span style="float:right;color:var(--neon-green);" id="bkp-vm">100%</span></div><div class="progress-bar"><div class="progress-fill cpu" id="bar-bkp-vm" style="width:100%"></div></div><div style="font-size:8px; margin-top:5px;">DB_LOGS <span style="float:right;color:var(--neon-cyan);" id="bkp-db">65%</span></div><div class="progress-bar"><div class="progress-fill mem" id="bar-bkp-db" style="width:65%"></div></div><div style="font-size:8px; margin-top:5px;">CONFIG <span style="float:right;color:var(--neon-amber);" id="bkp-cfg">32%</span></div><div class="progress-bar"><div class="progress-fill disk" id="bar-bkp-cfg" style="width:32%"></div></div></div></div>
             </div>
             <div style="grid-column:1/-1; background:#08090b; border-top:1px solid #333; height:30px; display:flex; align-items:center; overflow:hidden;">
                 <div class="marquee" style="white-space:nowrap; animation: scroll 20s linear infinite; font-family:'Share Tech Mono'; color:var(--neon-amber); font-size:11px;">⚠ CRITICAL: RACK A-04 TEMP HIGH [32C] /// SYSTEM BACKUP STARTED /// VPN GATEWAY: 84% LOAD /// UNAUTHORIZED ACCESS ATTEMPT FIREWALL-01</div>
@@ -519,6 +737,270 @@
             initChart('prtg-chart-1', '#004b87', 'prtg');
             initChart('prtg-chart-2', '#004b87', 'prtg');
         }, 500);
+
+        // =============================================
+        // FULLSCREEN & KEYBOARD SHORTCUTS
+        // =============================================
+        function toggleFullscreen() {
+            var elem = document.documentElement;
+            var btn = document.getElementById('btn-fullscreen');
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) elem.requestFullscreen();
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+                document.body.classList.add('fullscreen');
+                btn.classList.add('active');
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+                document.body.classList.remove('fullscreen');
+                btn.classList.remove('active');
+            }
+        }
+
+        function refreshData() {
+            // Simulate data refresh with visual feedback
+            var pills = document.querySelectorAll('.noc-pill');
+            pills.forEach(function(p) {
+                p.style.borderColor = 'var(--neon-cyan)';
+                setTimeout(function() { p.style.borderColor = '#222'; }, 300);
+            });
+            // Re-trigger some animations
+            var raidBlocks = document.querySelectorAll('.raid-block');
+            raidBlocks.forEach(function(b, i) {
+                setTimeout(function() {
+                    b.className = 'raid-block read';
+                    setTimeout(function() { b.className = 'raid-block ok'; }, 100);
+                }, i * 10);
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F11 - Fullscreen
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            // R - Refresh
+            if (e.key === 'r' || e.key === 'R') {
+                if (!e.ctrlKey && !e.metaKey) {
+                    refreshData();
+                }
+            }
+            // Escape - Exit fullscreen
+            if (e.key === 'Escape' && document.fullscreenElement) {
+                document.body.classList.remove('fullscreen');
+                document.getElementById('btn-fullscreen').classList.remove('active');
+            }
+            // 1 - Switch to NOC view
+            if (e.key === '1') {
+                switchView('noc', document.querySelector('.nav-item'));
+            }
+            // 2 - Switch to PRTG view
+            if (e.key === '2') {
+                var prtgNav = document.querySelectorAll('.nav-item')[1];
+                switchView('prtg', prtgNav);
+            }
+        });
+
+        // Handle fullscreen change event
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('fullscreen');
+                document.getElementById('btn-fullscreen').classList.remove('active');
+            }
+        });
+
+        // =============================================
+        // LIVE DATA UPDATES
+        // =============================================
+        var liveData = {
+            health: 98,
+            traffic: 14.2,
+            blocks: 2400,
+            throughput: 14.2,
+            latency: 2.4
+        };
+
+        setInterval(function() {
+            // Simulate live data changes
+            liveData.health = Math.min(100, Math.max(90, liveData.health + (Math.random() - 0.5) * 2));
+            liveData.traffic = Math.max(8, Math.min(20, liveData.traffic + (Math.random() - 0.5) * 0.5));
+            liveData.blocks = Math.max(1800, Math.min(3200, liveData.blocks + Math.floor((Math.random() - 0.5) * 200)));
+            liveData.throughput = liveData.traffic + (Math.random() - 0.5) * 0.3;
+            liveData.latency = Math.max(1, Math.min(5, liveData.latency + (Math.random() - 0.5) * 0.3));
+
+            // Update UI
+            document.getElementById('val-health').textContent = Math.round(liveData.health) + '%';
+            document.getElementById('val-traffic').textContent = liveData.traffic.toFixed(1) + ' G';
+            document.getElementById('val-blocks').textContent = (liveData.blocks / 1000).toFixed(1) + 'k';
+            document.getElementById('tp-live').textContent = liveData.throughput.toFixed(1);
+            document.getElementById('db-live').textContent = liveData.latency.toFixed(1);
+        }, 2000);
+
+        // =============================================
+        // RESOURCE MONITOR LIVE DATA
+        // =============================================
+        var resourceData = {
+            cpu: 67,
+            mem: 82,
+            disk: 54,
+            net: 45
+        };
+
+        setInterval(function() {
+            // Simulate resource fluctuations
+            resourceData.cpu = Math.min(95, Math.max(30, resourceData.cpu + (Math.random() - 0.5) * 10));
+            resourceData.mem = Math.min(95, Math.max(60, resourceData.mem + (Math.random() - 0.5) * 5));
+            resourceData.disk = Math.min(80, Math.max(40, resourceData.disk + (Math.random() - 0.5) * 2));
+            resourceData.net = Math.min(90, Math.max(20, resourceData.net + (Math.random() - 0.5) * 15));
+
+            // Update UI
+            document.getElementById('res-cpu').textContent = Math.round(resourceData.cpu) + '%';
+            document.getElementById('res-mem').textContent = Math.round(resourceData.mem) + '%';
+            document.getElementById('res-disk').textContent = Math.round(resourceData.disk) + '%';
+            document.getElementById('res-net').textContent = Math.round(resourceData.net) + '%';
+
+            document.getElementById('bar-cpu').style.width = resourceData.cpu + '%';
+            document.getElementById('bar-mem').style.width = resourceData.mem + '%';
+            document.getElementById('bar-disk').style.width = resourceData.disk + '%';
+            document.getElementById('bar-net').style.width = resourceData.net + '%';
+        }, 1500);
+
+        // =============================================
+        // NETWORK INTERFACE LIVE DATA
+        // =============================================
+        setInterval(function() {
+            var eth0 = (1.0 + Math.random() * 0.5).toFixed(1) + ' Gbps';
+            var eth1 = Math.floor(700 + Math.random() * 300) + ' Mbps';
+            var bond0 = (1.8 + Math.random() * 0.5).toFixed(1) + ' Gbps';
+
+            document.getElementById('nic-eth0').textContent = eth0;
+            document.getElementById('nic-eth1').textContent = eth1;
+            document.getElementById('nic-bond0').textContent = bond0;
+        }, 2000);
+
+        // =============================================
+        // PING MONITOR LIVE DATA
+        // =============================================
+        setInterval(function() {
+            var gw = Math.floor(1 + Math.random() * 2);
+            var dns = Math.floor(10 + Math.random() * 8);
+            var dc = Math.floor(2 + Math.random() * 3);
+            var bkp = Math.floor(30 + Math.random() * 40);
+
+            document.getElementById('ping-gw-val').textContent = gw + 'ms';
+            document.getElementById('ping-dns-val').textContent = dns + 'ms';
+            document.getElementById('ping-dc-val').textContent = dc + 'ms';
+            document.getElementById('ping-bkp-val').textContent = bkp + 'ms';
+
+            // Update ping status dots
+            var bkpDot = document.getElementById('ping-bkp');
+            if (bkp > 50) {
+                bkpDot.className = 'ping-dot warn';
+            } else if (bkp > 100) {
+                bkpDot.className = 'ping-dot err';
+            } else {
+                bkpDot.className = 'ping-dot ok';
+            }
+        }, 1000);
+
+        // =============================================
+        // NETFLOW LIVE DATA
+        // =============================================
+        setInterval(function() {
+            var vol1 = (4.5 + Math.random() * 1.5).toFixed(1) + 'G';
+            var vol2 = (1.8 + Math.random() * 0.8).toFixed(1) + 'G';
+            var vol3 = Math.floor(700 + Math.random() * 400) + 'M';
+
+            document.getElementById('nf-vol1').textContent = vol1;
+            document.getElementById('nf-vol2').textContent = vol2;
+            document.getElementById('nf-vol3').textContent = vol3;
+        }, 3000);
+
+        // =============================================
+        // BACKUP PROGRESS LIVE DATA
+        // =============================================
+        var backupData = { vm: 100, db: 65, cfg: 32 };
+
+        setInterval(function() {
+            // Simulate backup progress
+            if (backupData.db < 100) backupData.db += Math.random() * 2;
+            if (backupData.cfg < 100) backupData.cfg += Math.random() * 3;
+            if (backupData.db >= 100) backupData.db = 100;
+            if (backupData.cfg >= 100) backupData.cfg = 100;
+
+            document.getElementById('bkp-db').textContent = Math.round(backupData.db) + '%';
+            document.getElementById('bkp-cfg').textContent = Math.round(backupData.cfg) + '%';
+            document.getElementById('bar-bkp-db').style.width = backupData.db + '%';
+            document.getElementById('bar-bkp-cfg').style.width = backupData.cfg + '%';
+
+            // Reset when complete
+            if (backupData.db >= 100 && backupData.cfg >= 100) {
+                setTimeout(function() {
+                    backupData.db = 0;
+                    backupData.cfg = 0;
+                }, 5000);
+            }
+        }, 1000);
+
+        // =============================================
+        // PRTG LIVE DATA UPDATES
+        // =============================================
+        var prtgData = {
+            temp: 76.0,
+            humidity: 26.5,
+            sessions: 8,
+            execTime: 139
+        };
+
+        setInterval(function() {
+            prtgData.temp = 75 + Math.random() * 2;
+            prtgData.humidity = 25 + Math.random() * 3;
+            prtgData.sessions = Math.floor(5 + Math.random() * 8);
+            prtgData.execTime = Math.floor(120 + Math.random() * 40);
+
+            // Update PRTG UI elements
+            var tempMax = document.querySelector('.prtg-chart-box:first-child div[style*="top:25px"]');
+            var tempMin = document.querySelector('.prtg-chart-box:first-child div[style*="bottom:5px"]');
+            if (tempMax) tempMax.textContent = 'Max: ' + (prtgData.temp + 0.5).toFixed(2) + ' °F';
+            if (tempMin) tempMin.textContent = 'Min: ' + (prtgData.temp - 1).toFixed(2) + ' °F';
+
+            // Update sessions
+            var sessionsEl = document.querySelector('.service-info');
+            if (sessionsEl) {
+                var html = sessionsEl.innerHTML;
+                html = html.replace(/Total Sessions: \d+/, 'Total Sessions: ' + prtgData.sessions);
+                sessionsEl.innerHTML = html;
+            }
+
+            // Update exec time
+            var execEls = document.querySelectorAll('.service-info');
+            if (execEls[1]) {
+                var html = execEls[1].innerHTML;
+                html = html.replace(/Exec: \d+ msec/, 'Exec: ' + prtgData.execTime + ' msec');
+                execEls[1].innerHTML = html;
+            }
+        }, 3000);
+
+        // =============================================
+        // ENVIRONMENT LIVE DATA
+        // =============================================
+        setInterval(function() {
+            var coldTemp = 18 + Math.random() * 3;
+            var hotTemp = 25 + Math.random() * 4;
+            var humidity = 40 + Math.random() * 8;
+
+            var envCells = document.querySelectorAll('.noc-widget-body[style*="grid-template-columns"] .text-val');
+            if (envCells.length >= 3) {
+                envCells[0].textContent = Math.round(coldTemp) + '°C';
+                envCells[1].textContent = Math.round(hotTemp) + '°C';
+                envCells[2].textContent = Math.round(humidity) + '%';
+            }
+        }, 4000);
+
 
     </script>
 </body>

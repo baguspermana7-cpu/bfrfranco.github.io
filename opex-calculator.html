@@ -1,0 +1,2786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Center OPEX Calculator | Comprehensive Operational Cost Analysis</title>
+    <meta name="description" content="Data Center OPEX Calculator with 30+ countries, Indonesia baseline, climate-adjusted calculations, flexible staffing models, and comprehensive cost breakdown.">
+    <meta name="keywords" content="Data Center OPEX, Operational Cost Calculator, Staffing Cost, Energy Cost, Indonesia Data Center, Ahli K3 Listrik, Facility Management Cost">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0066cc">
+    <link rel="canonical" href="https://resistancezero.com/opex-calculator.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/opex-calculator.html">
+    <meta property="og:title" content="Data Center OPEX Calculator">
+    <meta property="og:description" content="Comprehensive operational cost analysis with country-specific rates and flexible staffing models.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Center OPEX Calculator">
+    <meta name="twitter:description" content="OPEX calculator with 30+ countries, climate zones, and flexible staffing models.">
+
+    <!-- WebApplication Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Data Center OPEX Calculator",
+        "applicationCategory": "FinanceApplication",
+        "description": "Calculate comprehensive data center operational costs with country-specific rates, climate adjustments, and flexible staffing models for 30+ countries including Indonesia with Ahli K3 Listrik baseline.",
+        "url": "https://resistancezero.com/opex-calculator.html",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "30+ country support with local currency",
+            "Climate-adjusted energy calculations",
+            "Flexible staffing models (In-house, Hybrid, Outsourced)",
+            "Indonesia baseline with UMK rates",
+            "Real-time cost breakdown",
+            "Generator maintenance scheduling",
+            "Tier I-IV redundancy configurations"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
+            --secondary-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a5f 100%);
+            --dark-blue: #1e3a5f;
+            --medium-blue: #2d5a87;
+            --light-blue: #4a90b8;
+            --accent-gold: #f59e0b;
+            --accent-amber: #fbbf24;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg-dark: rgba(30, 58, 95, 0.95);
+            --glass-border: rgba(30, 58, 95, 0.1);
+            --glass-blur: blur(20px);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Background */
+        .page-background {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at top right, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(30, 58, 95, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 58, 95, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--dark-blue);
+        }
+
+        .nav-logo {
+            width: 44px; height: 44px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
+        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
+
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover { color: var(--dark-blue); }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+        }
+
+        .nav-back:hover { transform: translateY(-2px); }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding-top: 80px;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent-emerald);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Calculator Layout */
+        .calculator-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .calculator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Input Panel */
+        .input-panel {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--glass-border);
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .input-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+
+        .input-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--accent-emerald);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-emerald);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Country Select with Flag */
+        .country-select-wrapper {
+            position: relative;
+        }
+
+        .country-select {
+            width: 100%;
+            padding: 12px 14px 12px 45px;
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .country-flag {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .country-select-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Slider */
+        .slider-container {
+            padding: 0.5rem 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-value {
+            font-weight: 700;
+            color: var(--accent-emerald);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Staffing Model Cards */
+        .staffing-models {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .model-card {
+            padding: 1rem 0.75rem;
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .model-card:hover {
+            border-color: var(--light-blue);
+        }
+
+        .model-card.active {
+            border-color: var(--accent-emerald);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02));
+        }
+
+        .model-card i {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .model-card.active i {
+            color: var(--accent-emerald);
+        }
+
+        .model-card .model-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .model-card .model-desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Partial Slider */
+        .partial-controls {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .partial-controls.active {
+            display: block;
+        }
+
+        .partial-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .partial-labels .inhouse { color: var(--accent-emerald); }
+        .partial-labels .contractor { color: var(--accent-purple); }
+
+        /* Results Panel */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Summary Cards */
+        .summary-card {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .country-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .total-opex {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title i {
+            color: var(--accent-emerald);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        /* Breakdown Table */
+        .breakdown-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+
+        .breakdown-table th {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--bg-secondary);
+        }
+
+        .breakdown-table th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .breakdown-table th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .breakdown-table td {
+            font-size: 0.9rem;
+        }
+
+        .breakdown-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .breakdown-table .category-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+
+        .breakdown-table .amount {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .breakdown-table .percent {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            min-width: 100px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Staffing Table */
+        .staffing-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .staffing-table th,
+        .staffing-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+
+        .staffing-table th {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            background: var(--bg-secondary);
+        }
+
+        .staffing-table .role-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .staffing-table .fte-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .staffing-table .fte-inhouse {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+        }
+
+        .staffing-table .fte-contractor {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+        }
+
+        .staffing-table .cost {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .staffing-table tfoot td {
+            font-weight: 700;
+            background: var(--bg-secondary);
+            border-top: 2px solid var(--dark-blue);
+        }
+
+        /* Scenario Comparison */
+        .scenario-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+        }
+
+        .scenario-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 800px) {
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scenario-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .scenario-card.current {
+            border-color: var(--accent-emerald);
+        }
+
+        .scenario-card .scenario-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .scenario-card .scenario-total {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .scenario-card .scenario-diff {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .scenario-card .scenario-diff.savings {
+            color: var(--accent-emerald);
+        }
+
+        .scenario-card .scenario-diff.increase {
+            color: var(--accent-red);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-blue);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .calculator-container { padding: 1rem; }
+            .input-panel { position: static; max-height: none; }
+            .summary-metrics { grid-template-columns: repeat(2, 1fr); }
+            .staffing-models { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Enhanced Tooltip - Fixed positioning to escape overflow containers */
+        .info-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50%;
+            font-size: 10px;
+            color: var(--accent-emerald);
+            cursor: help;
+            margin-left: auto;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .info-tooltip:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: scale(1.1);
+        }
+
+        .info-tooltip i {
+            font-size: 8px;
+        }
+
+        /* Global tooltip container - appended to body */
+        #tooltip-container {
+            position: fixed;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            z-index: 999999;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease;
+            color: white;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        #tooltip-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #tooltip-container .tooltip-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #tooltip-container .tooltip-desc {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 10px;
+        }
+
+        #tooltip-container .tooltip-table {
+            width: 100%;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+
+        #tooltip-container .tooltip-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #tooltip-container .tooltip-table td {
+            padding: 4px 0;
+            color: white;
+        }
+
+        #tooltip-container .tooltip-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            color: #22d3ee;
+        }
+
+        #tooltip-container .tooltip-note {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 6px;
+            font-size: 10px;
+            color: #10b981;
+        }
+
+        /* Hide inline tooltip content - we use JS to show in global container */
+        .info-tooltip .tooltip-content {
+            display: none;
+        }
+
+        .tooltip-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-amber);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tooltip-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .tooltip-table {
+            width: 100%;
+            font-size: 10px;
+            border-collapse: collapse;
+        }
+
+        .tooltip-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tooltip-table td {
+            padding: 4px 0;
+            color: white;
+        }
+
+        .tooltip-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+
+        .tooltip-note {
+            margin-top: 8px;
+            padding: 6px 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 6px;
+            font-size: 10px;
+            color: var(--accent-emerald);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">OPEX</div>
+                <div>
+                    <div class="nav-title">OPEX Calculator</div>
+                    <div class="nav-subtitle">Operational Cost Analysis</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
+                <a href="datahallAI.html" class="nav-link" style="color: #8b5cf6;">DC AI/HPC</a>
+                <a href="dc-conventional.html" class="nav-link">DC Conventional</a>
+                <a href="capex-calculator.html" class="nav-link" style="color: #f59e0b;">CAPEX Calc</a>
+                <a href="index.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Portfolio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-calculator"></i>
+                Operational Cost Analysis
+            </div>
+            <h1>Data Center OPEX Calculator</h1>
+            <p>Comprehensive operational expenditure analysis with 30+ countries, climate-adjusted calculations, and flexible staffing models</p>
+        </section>
+
+        <!-- Calculator -->
+        <div class="calculator-container">
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <!-- Country Selection -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <i class="fas fa-globe"></i>
+                        Location
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Country / Region
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-globe"></i> Country / Region</div>
+                                    <div class="tooltip-desc">Location affects labor costs, electricity rates, and climate factors.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Factor</th><th>Impact</th></tr>
+                                        <tr><td>Labor Rate</td><td>0.2x - 2.5x baseline</td></tr>
+                                        <tr><td>Energy Rate</td><td>$0.03 - $0.25/kWh</td></tr>
+                                        <tr><td>Climate</td><td>Affects cooling costs</td></tr>
+                                    </table>
+                                </span>
+                            </span>
+                        </label>
+                        <div class="country-select-wrapper">
+                            <span class="country-flag" id="selectedFlag">🇮🇩</span>
+                            <select class="country-select input-field" id="countrySelect" onchange="updateCalculation()">
+                                <optgroup label="ASEAN">
+                                    <option value="ID" selected>Indonesia</option>
+                                    <option value="MY">Malaysia</option>
+                                    <option value="SG">Singapore</option>
+                                    <option value="TH">Thailand</option>
+                                    <option value="VN">Vietnam</option>
+                                    <option value="PH">Philippines</option>
+                                </optgroup>
+                                <optgroup label="Asia Pacific">
+                                    <option value="JP">Japan</option>
+                                    <option value="KR">South Korea</option>
+                                    <option value="TW">Taiwan</option>
+                                    <option value="HK">Hong Kong</option>
+                                    <option value="CN">China (Tier 1)</option>
+                                    <option value="CN2">China (Tier 2)</option>
+                                    <option value="IN">India</option>
+                                    <option value="AU">Australia</option>
+                                </optgroup>
+                                <optgroup label="Middle East">
+                                    <option value="AE">UAE (Dubai)</option>
+                                    <option value="SA">Saudi Arabia</option>
+                                    <option value="QA">Qatar</option>
+                                </optgroup>
+                                <optgroup label="Europe">
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="IE">Ireland</option>
+                                    <option value="FR">France</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="CH">Switzerland</option>
+                                </optgroup>
+                                <optgroup label="Americas">
+                                    <option value="US-VA">USA (Virginia)</option>
+                                    <option value="US-TX">USA (Texas)</option>
+                                    <option value="US-CA">USA (California)</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="BR">Brazil</option>
+                                    <option value="MX">Mexico</option>
+                                </optgroup>
+                            </select>
+                            <i class="fas fa-chevron-down country-select-arrow"></i>
+                        </div>
+                    </div>
+                    <div id="countryInfo" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 8px;">
+                        <div><strong>Labor:</strong> <span id="laborMult">1.00x</span> | <strong>Energy:</strong> <span id="energyRate">$0.075/kWh</span></div>
+                    </div>
+                </div>
+
+                <!-- Facility Parameters -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <i class="fas fa-building"></i>
+                        Facility Parameters
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            IT Load (kW)
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
+                                    <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage, and network devices.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Category</th><th>Range</th></tr>
+                                        <tr><td>Small/Edge DC</td><td>100-500 kW</td></tr>
+                                        <tr><td>Medium DC</td><td>500-2,000 kW</td></tr>
+                                        <tr><td>Large DC</td><td>2-10 MW</td></tr>
+                                        <tr><td>Hyperscale</td><td>10+ MW</td></tr>
+                                    </table>
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000" onchange="updateCalculation()">
+                    </div>
+
+                    <div class="input-group">
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <label class="input-label">
+                                    PUE
+                                    <span class="info-tooltip">
+                                        <i class="fas fa-question"></i>
+                                        <span class="tooltip-content">
+                                            <div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> Power Usage Effectiveness</div>
+                                            <div class="tooltip-desc">Ratio of total facility power to IT equipment power. Lower = more efficient.</div>
+                                            <table class="tooltip-table">
+                                                <tr><th>PUE Range</th><th>Rating</th></tr>
+                                                <tr><td>1.1 - 1.3</td><td>Excellent</td></tr>
+                                                <tr><td>1.3 - 1.5</td><td>Good</td></tr>
+                                                <tr><td>1.5 - 1.8</td><td>Average</td></tr>
+                                                <tr><td>1.8 - 2.0</td><td>Legacy</td></tr>
+                                            </table>
+                                            <div class="tooltip-note">Formula: PUE = Total Facility Power / IT Equipment Power</div>
+                                        </span>
+                                    </span>
+                                </label>
+                                <span class="slider-value" id="pueValue">1.50</span>
+                            </div>
+                            <input type="range" class="slider" id="pueSlider" min="1.1" max="2.0" step="0.05" value="1.5" onchange="updatePUE()">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+                                <span>1.1 (Best)</span>
+                                <span>2.0 (Legacy)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Tier Classification
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-layer-group"></i> Uptime Institute Tier</div>
+                                    <div class="tooltip-desc">Industry standard classification for data center availability and redundancy.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Tier</th><th>Uptime</th></tr>
+                                        <tr><td>Tier I - Basic</td><td>99.67%</td></tr>
+                                        <tr><td>Tier II - Redundant</td><td>99.74%</td></tr>
+                                        <tr><td>Tier III - Concurrent</td><td>99.98%</td></tr>
+                                        <tr><td>Tier IV - Fault Tolerant</td><td>99.99%</td></tr>
+                                    </table>
+                                    <div class="tooltip-note">Higher tier = more redundancy = higher staffing & maintenance costs</div>
+                                </span>
+                            </span>
+                        </label>
+                        <select class="input-field" id="tierLevel" onchange="updateCalculation()">
+                            <option value="1">Tier I - Basic (99.67%)</option>
+                            <option value="2">Tier II - Redundant (99.74%)</option>
+                            <option value="3" selected>Tier III - Concurrent (99.98%)</option>
+                            <option value="4">Tier IV - Fault Tolerant (99.99%)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Facility Age
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Facility Age</div>
+                                    <div class="tooltip-desc">Age of facility affects maintenance costs due to equipment wear and warranty status.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Age</th><th>Cost Factor</th></tr>
+                                        <tr><td>New (0-3 yrs)</td><td>0.6x</td></tr>
+                                        <tr><td>Mid-Life (4-10 yrs)</td><td>1.0x</td></tr>
+                                        <tr><td>Mature (10+ yrs)</td><td>1.5x</td></tr>
+                                    </table>
+                                    <div class="tooltip-note">Older facilities require more maintenance & spare parts</div>
+                                </span>
+                            </span>
+                        </label>
+                        <select class="input-field" id="facilityAge" onchange="updateCalculation()">
+                            <option value="new">New (0-3 years)</option>
+                            <option value="mid" selected>Mid-Life (4-10 years)</option>
+                            <option value="mature">Mature (10+ years)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <label class="input-label">
+                                    Utilization
+                                    <span class="info-tooltip">
+                                        <i class="fas fa-question"></i>
+                                        <span class="tooltip-content">
+                                            <div class="tooltip-title"><i class="fas fa-chart-line"></i> Capacity Utilization</div>
+                                            <div class="tooltip-desc">Percentage of installed IT capacity currently in use. Affects energy consumption calculations.</div>
+                                            <table class="tooltip-table">
+                                                <tr><th>Utilization</th><th>Status</th></tr>
+                                                <tr><td>30-50%</td><td>Low / Growing</td></tr>
+                                                <tr><td>50-70%</td><td>Optimal</td></tr>
+                                                <tr><td>70-85%</td><td>High</td></tr>
+                                                <tr><td>85-95%</td><td>Near Capacity</td></tr>
+                                            </table>
+                                        </span>
+                                    </span>
+                                </label>
+                                <span class="slider-value" id="utilizationValue">70%</span>
+                            </div>
+                            <input type="range" class="slider" id="utilizationSlider" min="30" max="95" step="5" value="70" onchange="updateUtilization()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Climate & System Configuration -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <i class="fas fa-temperature-high"></i>
+                        Climate & System Config
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Climate Zone
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-globe"></i> Climate Zone</div>
+                                    <div class="tooltip-desc">Climate significantly affects cooling energy consumption and free cooling potential.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Zone</th><th>Cooling Factor</th></tr>
+                                        <tr><td>Tropical Humid</td><td>1.00x (baseline)</td></tr>
+                                        <tr><td>Tropical Dry</td><td>0.92x</td></tr>
+                                        <tr><td>Subtropical</td><td>0.88x</td></tr>
+                                        <tr><td>Temperate</td><td>0.75x</td></tr>
+                                        <tr><td>Cold Climate</td><td>0.55x</td></tr>
+                                    </table>
+                                    <div class="tooltip-note">Cold climates enable economizer/free cooling hours</div>
+                                </span>
+                            </span>
+                        </label>
+                        <select class="input-field" id="climateZone" onchange="updateCalculation()">
+                            <option value="tropical_humid" selected>Tropical Humid (Indonesia, MY, SG)</option>
+                            <option value="tropical_dry">Tropical Dry (UAE, Saudi)</option>
+                            <option value="subtropical">Subtropical (HK, TW, AU-QLD)</option>
+                            <option value="temperate">Temperate (EU, JP, KR)</option>
+                            <option value="continental">Continental (US-Central, CA)</option>
+                            <option value="cold">Cold Climate (Nordic, US-North)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Cooling System Type
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Technology</div>
+                                    <div class="tooltip-desc">Primary cooling technology affects efficiency, water usage, and maintenance costs.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Type</th><th>Efficiency</th></tr>
+                                        <tr><td>Air-Cooled Chiller</td><td>Standard</td></tr>
+                                        <tr><td>Water-Cooled Chiller</td><td>Good</td></tr>
+                                        <tr><td>In-Row (CRAC)</td><td>Good</td></tr>
+                                        <tr><td>RDHX</td><td>Better</td></tr>
+                                        <tr><td>DLC / Immersion</td><td>Best</td></tr>
+                                    </table>
+                                    <div class="tooltip-note">DLC = Direct Liquid Cooling, RDHX = Rear Door Heat Exchanger</div>
+                                </span>
+                            </span>
+                        </label>
+                        <select class="input-field" id="coolingType" onchange="updateCalculation()">
+                            <option value="air_chiller">Air-Cooled Chiller (Standard)</option>
+                            <option value="water_chiller" selected>Water-Cooled Chiller (Efficient)</option>
+                            <option value="free_cooling">Hybrid Free Cooling</option>
+                            <option value="inrow">In-Row Cooling (CRAC)</option>
+                            <option value="rdhx">Rear-Door Heat Exchanger (RDHX)</option>
+                            <option value="dlc">Direct Liquid Cooling (DLC)</option>
+                            <option value="immersion">Immersion Cooling</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Generator Configuration
+                            <span class="info-tooltip">
+                                <i class="fas fa-question"></i>
+                                <span class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-car-battery"></i> Generator Redundancy</div>
+                                    <div class="tooltip-desc">Backup power configuration determines maintenance scope and fuel reserve requirements.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Config</th><th>Maint. Factor</th></tr>
+                                        <tr><td>N (No backup)</td><td>1.0x</td></tr>
+                                        <tr><td>N+1 (Standard)</td><td>1.3x</td></tr>
+                                        <tr><td>2N (Full)</td><td>2.1x</td></tr>
+                                        <tr><td>2N+1 (Tier IV)</td><td>2.4x</td></tr>
+                                    </table>
+                                    <div class="tooltip-note">All configs: Monthly warming + 6M/12M overhaul</div>
+                                </span>
+                            </span>
+                        </label>
+                        <select class="input-field" id="genConfig" onchange="updateCalculation()">
+                            <option value="N">N (No Redundancy)</option>
+                            <option value="N1" selected>N+1 (Standard Tier III)</option>
+                            <option value="2N">2N (Full Redundancy)</option>
+                            <option value="2N1">2N+1 (Tier IV)</option>
+                        </select>
+                    </div>
+
+                    <div id="climateInfo" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 8px;">
+                        <div><strong>Cooling Energy:</strong> <span id="coolingEnergyFactor">1.00x</span> | <strong>Free Cooling:</strong> <span id="freeCoolingHours">0 hrs/yr</span></div>
+                    </div>
+                </div>
+
+                <!-- Staffing Model -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <i class="fas fa-users"></i>
+                        Staffing Model
+                        <span class="info-tooltip" style="margin-left: 8px;">
+                            <i class="fas fa-question" style="font-size: 0.7rem;"></i>
+                            <span class="tooltip-content">
+                                <div class="tooltip-title"><i class="fas fa-users-cog"></i> Staffing Model</div>
+                                <div class="tooltip-desc">Choose how to staff your data center operations.</div>
+                                <table class="tooltip-table">
+                                    <tr><th>Model</th><th>Cost Factor</th></tr>
+                                    <tr><td>In-House</td><td>1.0x (lowest)</td></tr>
+                                    <tr><td>Partial (Hybrid)</td><td>1.2-1.5x</td></tr>
+                                    <tr><td>Full Contractor</td><td>2.0-2.5x (OEM rates)</td></tr>
+                                </table>
+                                <div class="tooltip-note">Contractor model always needs 1 internal admin for supervision & permits</div>
+                            </span>
+                        </span>
+                    </div>
+
+                    <div class="staffing-models">
+                        <div class="model-card active" data-model="inhouse" onclick="selectStaffingModel('inhouse')">
+                            <i class="fas fa-building"></i>
+                            <div class="model-name">In-House</div>
+                            <div class="model-desc">100% Own Staff</div>
+                        </div>
+                        <div class="model-card" data-model="partial" onclick="selectStaffingModel('partial')">
+                            <i class="fas fa-handshake"></i>
+                            <div class="model-name">Partial</div>
+                            <div class="model-desc">Hybrid Mix</div>
+                        </div>
+                        <div class="model-card" data-model="contractor" onclick="selectStaffingModel('contractor')">
+                            <i class="fas fa-user-tie"></i>
+                            <div class="model-name">Contractor</div>
+                            <div class="model-desc">100% Outsource</div>
+                        </div>
+                    </div>
+
+                    <div class="partial-controls" id="partialControls">
+                        <div class="partial-labels">
+                            <span class="inhouse">In-House: <span id="inhousePercent">70</span>%</span>
+                            <span class="contractor">Contractor: <span id="contractorPercent">30</span>%</span>
+                        </div>
+                        <input type="range" class="slider" id="partialSlider" min="10" max="90" step="5" value="70" onchange="updatePartialSplit()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel">
+                <!-- Summary Card -->
+                <div class="summary-card fade-in">
+                    <div class="summary-header">
+                        <span class="summary-title">ANNUAL OPEX SUMMARY</span>
+                        <div class="country-badge">
+                            <span id="summaryFlag">🇮🇩</span>
+                            <span id="summaryCountry">Indonesia</span>
+                        </div>
+                    </div>
+                    <div class="total-opex" id="totalOpex">$1,245,000</div>
+                    <div class="total-label">Total Annual Operational Expenditure
+                        <span class="info-tooltip" style="margin-left: 4px;">
+                            <i class="fas fa-question" style="font-size: 0.7rem;"></i>
+                            <span class="tooltip-content">
+                                <div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Total OPEX</div>
+                                <div class="tooltip-desc">Annual operational expenditure including staffing, maintenance, energy, insurance, and other recurring costs to run the facility.</div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="summary-metrics">
+                        <div class="metric-item">
+                            <div class="metric-value" id="monthlyOpex">$103.8K</div>
+                            <div class="metric-label">Per Month
+                                <span class="info-tooltip" style="margin-left: 2px;">
+                                    <i class="fas fa-question" style="font-size: 0.6rem;"></i>
+                                    <span class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Monthly OPEX</div>
+                                        <div class="tooltip-desc">Total annual OPEX divided by 12 months. Useful for budgeting and cash flow planning.</div>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="perKwOpex">$1,245</div>
+                            <div class="metric-label">Per kW/Year
+                                <span class="info-tooltip" style="margin-left: 2px;">
+                                    <i class="fas fa-question" style="font-size: 0.6rem;"></i>
+                                    <span class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-calculator"></i> OPEX per kW/Year</div>
+                                        <div class="tooltip-desc">Industry benchmark: Total OPEX ÷ IT Load. Typical range: $800-2,000/kW/year depending on location and tier level.</div>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="perKwhOpex">$0.14</div>
+                            <div class="metric-label">Per kWh
+                                <span class="info-tooltip" style="margin-left: 2px;">
+                                    <i class="fas fa-question" style="font-size: 0.6rem;"></i>
+                                    <span class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-plug"></i> Effective $/kWh</div>
+                                        <div class="tooltip-desc">Total OPEX divided by annual energy consumption. Combines electricity cost with all other operating costs per kWh delivered.</div>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="totalFte">24</div>
+                            <div class="metric-label">Total FTE
+                                <span class="info-tooltip" style="margin-left: 2px;">
+                                    <i class="fas fa-question" style="font-size: 0.6rem;"></i>
+                                    <span class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-users"></i> Full-Time Equivalent</div>
+                                        <div class="tooltip-desc">Total staff headcount required. Includes management, engineers, technicians, operators, and support staff. Covers 24/7 shift operations.</div>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card fade-in">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Cost Breakdown
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="breakdownChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card fade-in">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Category Comparison
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cost Breakdown Table -->
+                <div class="breakdown-card fade-in">
+                    <div class="chart-title">
+                        <i class="fas fa-list-alt"></i>
+                        Detailed Cost Breakdown
+                    </div>
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Annual Cost</th>
+                                <th>% of Total</th>
+                                <th>$/kW/Year</th>
+                                <th>Distribution</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Staffing Breakdown -->
+                <div class="breakdown-card fade-in">
+                    <div class="chart-title">
+                        <i class="fas fa-users-cog"></i>
+                        Staffing Breakdown
+                        <span style="margin-left: auto; font-size: 0.8rem; font-weight: 500; color: var(--text-muted);" id="staffingModelLabel">Full In-House</span>
+                    </div>
+                    <table class="staffing-table">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>FTE</th>
+                                <th>In-House</th>
+                                <th>Contractor</th>
+                                <th>Annual Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffingTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>TOTAL</strong></td>
+                                <td id="totalFteCell">24</td>
+                                <td id="totalInhouseCell">24</td>
+                                <td id="totalContractorCell">0</td>
+                                <td id="totalStaffingCost">$485,000</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Detailed Maintenance Breakdown -->
+                <div class="breakdown-card fade-in">
+                    <div class="chart-title">
+                        <i class="fas fa-tools"></i>
+                        Detailed Maintenance Breakdown
+                        <span style="margin-left: auto; font-size: 0.8rem; font-weight: 500; color: var(--text-muted);" id="maintConfigLabel">N+1 | Water-Cooled</span>
+                    </div>
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>System</th>
+                                <th>Annual Cost</th>
+                                <th>$/kW/Year</th>
+                                <th>Frequency</th>
+                                <th>Distribution</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>TOTAL MAINTENANCE</strong></td>
+                                <td id="totalMaintCost" class="amount">$420,000</td>
+                                <td id="totalMaintPerKw">$420</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Detailed Utilities Breakdown -->
+                <div class="breakdown-card fade-in">
+                    <div class="chart-title">
+                        <i class="fas fa-tint"></i>
+                        Utilities & Consumables Breakdown
+                    </div>
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Utility Type</th>
+                                <th>Annual Cost</th>
+                                <th>$/kW/Year</th>
+                                <th>Notes</th>
+                                <th>Distribution</th>
+                            </tr>
+                        </thead>
+                        <tbody id="utilitiesTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>TOTAL UTILITIES</strong></td>
+                                <td id="totalUtilitiesCost" class="amount">$78,000</td>
+                                <td id="totalUtilitiesPerKw">$78</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Insurance & Compliance Breakdown -->
+                <div class="breakdown-card fade-in">
+                    <div class="chart-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Insurance & Compliance Breakdown
+                        <span style="margin-left: auto; font-size: 0.8rem; font-weight: 500; color: var(--text-muted);" id="complianceCountryLabel">Indonesia Standards</span>
+                    </div>
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Annual Cost</th>
+                                <th>Notes</th>
+                                <th>Renewal</th>
+                                <th>Distribution</th>
+                            </tr>
+                        </thead>
+                        <tbody id="complianceTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>TOTAL INSURANCE & COMPLIANCE</strong></td>
+                                <td id="totalComplianceCost" class="amount">$63,000</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Scenario Comparison -->
+                <div class="scenario-section fade-in">
+                    <div class="scenario-title">
+                        <i class="fas fa-balance-scale"></i>
+                        Staffing Model Comparison
+                    </div>
+                    <div class="scenario-grid">
+                        <div class="scenario-card" id="scenarioInhouse">
+                            <div class="scenario-name">Full In-House</div>
+                            <div class="scenario-total" id="inhouseTotal">$1,312,000</div>
+                            <div class="scenario-diff" id="inhouseDiff">Baseline</div>
+                        </div>
+                        <div class="scenario-card current" id="scenarioPartial">
+                            <div class="scenario-name">Partial (70/30)</div>
+                            <div class="scenario-total" id="partialTotal">$1,245,000</div>
+                            <div class="scenario-diff savings" id="partialDiff">-5.1% vs In-House</div>
+                        </div>
+                        <div class="scenario-card" id="scenarioContractor">
+                            <div class="scenario-name">Full Contractor</div>
+                            <div class="scenario-total" id="contractorTotal">$1,198,000</div>
+                            <div class="scenario-diff savings" id="contractorDiff">-8.7% vs In-House</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Bagus Dwi Permana. Data Center OPEX Calculator.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">Calculations based on Indonesia baseline with climate zone, cooling type, and generator configuration adjustments.</p>
+    </footer>
+
+    <script>
+        // =====================================================
+        // COUNTRY DATABASE
+        // =====================================================
+        const countryData = {
+            // ASEAN
+            'ID': { name: 'Indonesia', flag: '🇮🇩', laborMult: 1.00, energyRate: 0.075, maintMult: 1.00, workerTax: 1.00 },
+            'MY': { name: 'Malaysia', flag: '🇲🇾', laborMult: 1.40, energyRate: 0.085, maintMult: 1.15, workerTax: 1.00 },
+            'SG': { name: 'Singapore', flag: '🇸🇬', laborMult: 3.50, energyRate: 0.180, maintMult: 1.50, workerTax: 1.05 },
+            'TH': { name: 'Thailand', flag: '🇹🇭', laborMult: 1.25, energyRate: 0.095, maintMult: 1.10, workerTax: 1.00 },
+            'VN': { name: 'Vietnam', flag: '🇻🇳', laborMult: 0.80, energyRate: 0.075, maintMult: 0.95, workerTax: 1.00 },
+            'PH': { name: 'Philippines', flag: '🇵🇭', laborMult: 0.95, energyRate: 0.120, maintMult: 1.05, workerTax: 1.00 },
+            // Asia Pacific
+            'JP': { name: 'Japan', flag: '🇯🇵', laborMult: 4.20, energyRate: 0.220, maintMult: 1.80, workerTax: 1.10 },
+            'KR': { name: 'South Korea', flag: '🇰🇷', laborMult: 3.00, energyRate: 0.110, maintMult: 1.40, workerTax: 1.05 },
+            'TW': { name: 'Taiwan', flag: '🇹🇼', laborMult: 2.50, energyRate: 0.090, maintMult: 1.30, workerTax: 1.00 },
+            'HK': { name: 'Hong Kong', flag: '🇭🇰', laborMult: 3.80, energyRate: 0.150, maintMult: 1.60, workerTax: 1.00 },
+            'CN': { name: 'China (Tier 1)', flag: '🇨🇳', laborMult: 2.20, energyRate: 0.085, maintMult: 1.20, workerTax: 1.00 },
+            'CN2': { name: 'China (Tier 2)', flag: '🇨🇳', laborMult: 1.50, energyRate: 0.070, maintMult: 1.00, workerTax: 1.00 },
+            'IN': { name: 'India', flag: '🇮🇳', laborMult: 0.65, energyRate: 0.080, maintMult: 0.85, workerTax: 1.00 },
+            'AU': { name: 'Australia', flag: '🇦🇺', laborMult: 4.50, energyRate: 0.200, maintMult: 1.70, workerTax: 1.10 },
+            // Middle East
+            'AE': { name: 'UAE (Dubai)', flag: '🇦🇪', laborMult: 2.80, energyRate: 0.065, maintMult: 1.40, workerTax: 1.00 },
+            'SA': { name: 'Saudi Arabia', flag: '🇸🇦', laborMult: 2.40, energyRate: 0.048, maintMult: 1.30, workerTax: 1.00 },
+            'QA': { name: 'Qatar', flag: '🇶🇦', laborMult: 3.00, energyRate: 0.040, maintMult: 1.45, workerTax: 1.00 },
+            // Europe
+            'GB': { name: 'United Kingdom', flag: '🇬🇧', laborMult: 4.50, energyRate: 0.280, maintMult: 1.80, workerTax: 1.15 },
+            'DE': { name: 'Germany', flag: '🇩🇪', laborMult: 4.80, energyRate: 0.350, maintMult: 1.90, workerTax: 1.20 },
+            'NL': { name: 'Netherlands', flag: '🇳🇱', laborMult: 4.20, energyRate: 0.280, maintMult: 1.70, workerTax: 1.15 },
+            'IE': { name: 'Ireland', flag: '🇮🇪', laborMult: 4.00, energyRate: 0.220, maintMult: 1.65, workerTax: 1.10 },
+            'FR': { name: 'France', flag: '🇫🇷', laborMult: 4.00, energyRate: 0.180, maintMult: 1.60, workerTax: 1.25 },
+            'SE': { name: 'Sweden', flag: '🇸🇪', laborMult: 4.00, energyRate: 0.080, maintMult: 1.55, workerTax: 1.30 },
+            'NO': { name: 'Norway', flag: '🇳🇴', laborMult: 4.50, energyRate: 0.070, maintMult: 1.65, workerTax: 1.25 },
+            'CH': { name: 'Switzerland', flag: '🇨🇭', laborMult: 5.50, energyRate: 0.120, maintMult: 2.00, workerTax: 1.15 },
+            // Americas
+            'US-VA': { name: 'USA (Virginia)', flag: '🇺🇸', laborMult: 4.50, energyRate: 0.075, maintMult: 1.70, workerTax: 1.30 },
+            'US-TX': { name: 'USA (Texas)', flag: '🇺🇸', laborMult: 4.20, energyRate: 0.085, maintMult: 1.60, workerTax: 1.25 },
+            'US-CA': { name: 'USA (California)', flag: '🇺🇸', laborMult: 5.50, energyRate: 0.220, maintMult: 1.90, workerTax: 1.35 },
+            'CA': { name: 'Canada', flag: '🇨🇦', laborMult: 4.00, energyRate: 0.090, maintMult: 1.55, workerTax: 1.20 },
+            'BR': { name: 'Brazil', flag: '🇧🇷', laborMult: 1.50, energyRate: 0.140, maintMult: 1.15, workerTax: 1.40 },
+            'MX': { name: 'Mexico', flag: '🇲🇽', laborMult: 1.30, energyRate: 0.095, maintMult: 1.05, workerTax: 1.20 },
+        };
+
+        // =====================================================
+        // INDONESIA SALARY DATABASE (Monthly Gross in IDR, 13-month basis with THR)
+        // Based on actual Indonesia DC industry rates 2026
+        // =====================================================
+        const salaryData = {
+            facilityMgr: { name: 'Facility/Operations Manager', baseSalaryIDR: 50000000, category: 'management' },      // Manager level
+            maintMgr: { name: 'Maintenance Supervisor', baseSalaryIDR: 37000000, category: 'management' },              // SPV level
+            shiftLead: { name: 'Maintenance Team Lead (MTL)', baseSalaryIDR: 30000000, category: 'operations' },        // Team Lead
+            elecHV: { name: 'Electrical Engineer (HV/ME)', baseSalaryIDR: 20000000, category: 'technician' },           // ME level
+            elecLV: { name: 'Electrical Technician (LV)', baseSalaryIDR: 10000000, category: 'technician' },            // MT level
+            hvacTech: { name: 'HVAC/Mechanical Engineer', baseSalaryIDR: 20000000, category: 'technician' },            // ME level
+            mechTech: { name: 'Mechanical Technician', baseSalaryIDR: 10000000, category: 'technician' },               // MT level
+            genTech: { name: 'Generator Technician', baseSalaryIDR: 10000000, category: 'technician' },                 // MT level
+            bmsOp: { name: 'BMS/Control Room Operator', baseSalaryIDR: 10000000, category: 'operations' },              // Operator
+            security: { name: 'Security Guard', baseSalaryIDR: 6000000, category: 'support' },                          // UMK+
+            cleaning: { name: 'Cleaning Staff', baseSalaryIDR: 5500000, category: 'outsource' },                        // UMK
+            contractAdmin: { name: 'Contract Admin/Permit Coordinator', baseSalaryIDR: 15000000, category: 'management' }, // For contractor supervision
+        };
+
+        // Exchange rate
+        const USD_IDR = 15850;
+
+        // =====================================================
+        // CLIMATE ZONE DATABASE
+        // =====================================================
+        const climateFactors = {
+            'tropical_humid': {
+                name: 'Tropical Humid',
+                coolingEnergyMult: 1.00,
+                coolingMaintMult: 1.00,
+                waterMult: 1.00,
+                freeCoolingHours: 0,
+                description: 'Indonesia, Malaysia, Singapore'
+            },
+            'tropical_dry': {
+                name: 'Tropical Dry',
+                coolingEnergyMult: 0.92,
+                coolingMaintMult: 1.15,
+                waterMult: 1.30,
+                freeCoolingHours: 500,
+                description: 'UAE, Saudi Arabia'
+            },
+            'subtropical': {
+                name: 'Subtropical',
+                coolingEnergyMult: 0.88,
+                coolingMaintMult: 0.95,
+                waterMult: 0.90,
+                freeCoolingHours: 1500,
+                description: 'Hong Kong, Taiwan, Australia-QLD'
+            },
+            'temperate': {
+                name: 'Temperate',
+                coolingEnergyMult: 0.75,
+                coolingMaintMult: 0.85,
+                waterMult: 0.75,
+                freeCoolingHours: 4000,
+                description: 'Europe, Japan, South Korea'
+            },
+            'continental': {
+                name: 'Continental',
+                coolingEnergyMult: 0.70,
+                coolingMaintMult: 0.80,
+                waterMult: 0.70,
+                freeCoolingHours: 5000,
+                description: 'US Central, Canada'
+            },
+            'cold': {
+                name: 'Cold Climate',
+                coolingEnergyMult: 0.55,
+                coolingMaintMult: 0.75,
+                waterMult: 0.50,
+                freeCoolingHours: 7000,
+                description: 'Nordic, Northern US'
+            },
+        };
+
+        // =====================================================
+        // COOLING SYSTEM TYPE DATABASE
+        // =====================================================
+        const coolingTypes = {
+            'air_chiller': {
+                name: 'Air-Cooled Chiller',
+                efficiencyMult: 1.15,
+                maintCostPerKw: 18,
+                waterUsage: 0,
+                pueImpact: 0.15
+            },
+            'water_chiller': {
+                name: 'Water-Cooled Chiller',
+                efficiencyMult: 1.00,
+                maintCostPerKw: 32,
+                waterUsage: 1.0,
+                pueImpact: 0
+            },
+            'free_cooling': {
+                name: 'Hybrid Free Cooling',
+                efficiencyMult: 0.80,
+                maintCostPerKw: 28,
+                waterUsage: 0.6,
+                pueImpact: -0.10
+            },
+            'inrow': {
+                name: 'In-Row Cooling (CRAC)',
+                efficiencyMult: 1.05,
+                maintCostPerKw: 22,
+                waterUsage: 0.3,
+                pueImpact: 0.05
+            },
+            'rdhx': {
+                name: 'Rear-Door Heat Exchanger',
+                efficiencyMult: 0.90,
+                maintCostPerKw: 20,
+                waterUsage: 0.8,
+                pueImpact: -0.05
+            },
+            'dlc': {
+                name: 'Direct Liquid Cooling',
+                efficiencyMult: 0.70,
+                maintCostPerKw: 45,
+                waterUsage: 0.2,
+                pueImpact: -0.15
+            },
+            'immersion': {
+                name: 'Immersion Cooling',
+                efficiencyMult: 0.60,
+                maintCostPerKw: 55,
+                waterUsage: 0,
+                pueImpact: -0.25
+            },
+        };
+
+        // =====================================================
+        // GENERATOR CONFIGURATION DATABASE
+        // =====================================================
+        const genConfigs = {
+            'N': {
+                name: 'N (No Redundancy)',
+                unitMult: 1.0,
+                maintMult: 1.0,
+                fuelReserveDays: 3,
+                testFrequency: 'Monthly + 6M/12M OH'
+            },
+            'N1': {
+                name: 'N+1 (Standard)',
+                unitMult: 1.25,
+                maintMult: 1.30,
+                fuelReserveDays: 5,
+                testFrequency: 'Monthly + 6M/12M OH'
+            },
+            '2N': {
+                name: '2N (Full Redundancy)',
+                unitMult: 2.0,
+                maintMult: 2.10,
+                fuelReserveDays: 7,
+                testFrequency: 'Monthly + 6M/12M OH'
+            },
+            '2N1': {
+                name: '2N+1 (Tier IV)',
+                unitMult: 2.25,
+                maintMult: 2.40,
+                fuelReserveDays: 10,
+                testFrequency: 'Monthly + 6M/12M OH'
+            },
+        };
+
+        // =====================================================
+        // INDONESIA COMPLIANCE COSTS DATABASE
+        // =====================================================
+        const complianceCosts = {
+            'ID': {
+                slo: { name: 'SLO (Sertifikat Laik Operasi)', baseCost: 5000, perMW: 1500, renewal: 'Annual' },
+                amdal: { name: 'AMDAL/UKL-UPL Monitoring', baseCost: 3000, perMW: 500, renewal: 'Quarterly' },
+                bpjsTK: { name: 'BPJS TK Audit', baseCost: 1500, perMW: 0, renewal: 'Annual' },
+                fireAudit: { name: 'Fire Safety Audit', baseCost: 2500, perMW: 500, renewal: 'Annual' },
+                iso27001: { name: 'ISO 27001 Surveillance', baseCost: 8000, perMW: 1000, renewal: 'Annual' },
+                uptime: { name: 'Uptime Institute (Optional)', baseCost: 15000, perMW: 2000, renewal: 'Annual' },
+            },
+            'default': {
+                electrical: { name: 'Electrical Compliance', baseCost: 5000, perMW: 1500, renewal: 'Annual' },
+                safety: { name: 'Safety Certification', baseCost: 4000, perMW: 1000, renewal: 'Annual' },
+                environmental: { name: 'Environmental Audit', baseCost: 3000, perMW: 500, renewal: 'Annual' },
+                iso27001: { name: 'ISO 27001 Surveillance', baseCost: 8000, perMW: 1000, renewal: 'Annual' },
+            }
+        };
+
+        // =====================================================
+        // MAINTENANCE COST RATES ($/kW/Year) - Indonesia Baseline
+        // Generator: ~1 Billion IDR/year for 2MW = $31.50/kW (incl fuel system, aux, 6M/12M OH)
+        // OEM Contractor typically 2-3x more expensive than in-house
+        // =====================================================
+        const maintenanceRates = {
+            generator: {
+                name: 'Generator System',
+                icon: 'fa-car-battery',
+                color: '#ef4444',
+                baseCostPerKw: 31.50,           // ~1B IDR/2MW = includes genset, fuel system, aux systems, 6M/12M OH
+                oemMultiplier: 2.5,              // OEM contractor premium
+                frequency: 'Monthly + 6M/12M OH'
+            },
+            cooling: {
+                name: 'Cooling/HVAC System',
+                icon: 'fa-snowflake',
+                color: '#06b6d4',
+                baseCostPerKw: 38.00,            // Chiller maintenance + consumables
+                oemMultiplier: 2.2,
+                frequency: 'Monthly PM'
+            },
+            electrical: {
+                name: 'Electrical (UPS/PDU/STS)',
+                icon: 'fa-bolt',
+                color: '#f59e0b',
+                baseCostPerKw: 28.50,            // UPS battery, PDU, STS maintenance
+                oemMultiplier: 2.0,
+                frequency: 'Quarterly'
+            },
+            fire: {
+                name: 'Fire Suppression System',
+                icon: 'fa-fire-extinguisher',
+                color: '#ec4899',
+                baseCostPerKw: 10.00,
+                oemMultiplier: 1.8,
+                frequency: 'Semi-Annual'
+            },
+            bms: {
+                name: 'BMS/DCIM/Controls',
+                icon: 'fa-server',
+                color: '#8b5cf6',
+                baseCostPerKw: 14.00,
+                oemMultiplier: 2.0,
+                frequency: 'Continuous'
+            },
+            building: {
+                name: 'Building/Facility',
+                icon: 'fa-building',
+                color: '#6b7280',
+                baseCostPerKw: 7.50,
+                oemMultiplier: 1.5,
+                frequency: 'Quarterly'
+            },
+        };
+
+        // =====================================================
+        // STAFFING CALCULATOR
+        // Note: Even full contractor model needs internal supervision for:
+        // - Contract administration
+        // - Permit/work order approval
+        // - Quality oversight
+        // =====================================================
+        function calculateStaffingFTE(itLoadKW, tierLevel) {
+            const mw = itLoadKW / 1000;
+            const tier = parseInt(tierLevel);
+
+            // Tier multiplier for staffing
+            const tierMult = tier === 4 ? 1.3 : tier === 3 ? 1.15 : tier === 2 ? 1.0 : 0.85;
+
+            return {
+                facilityMgr: 1, // Combined Facility + Operations Manager
+                maintMgr: mw >= 2 ? 1 : 0, // Maintenance Supervisor for larger sites
+                shiftLead: Math.max(5, Math.ceil(mw / 2) * 5), // MTL - 5 for 24/7 rotation
+                elecHV: Math.ceil(mw * 1.0 * tierMult), // ME - Electrical Engineer
+                elecLV: Math.ceil(mw * 1.0 * tierMult), // MT - Electrical Technician
+                hvacTech: Math.ceil(mw * 0.8 * tierMult), // ME - HVAC/Mech Engineer
+                mechTech: Math.ceil(mw * 0.5 * tierMult), // MT - Mechanical Technician
+                genTech: Math.max(1, Math.ceil(mw * 0.3)), // MT - Generator Technician
+                bmsOp: 2, // Fixed 2 for control room (24/7)
+                security: Math.max(5, Math.ceil(mw * 0.4) * 5), // 5 for 24/7 rotation
+                cleaning: 3, // Fixed 3, always outsourced
+                contractAdmin: 0, // Added dynamically for contractor model
+            };
+        }
+
+        // =====================================================
+        // MAIN CALCULATION
+        // =====================================================
+        let currentStaffingModel = 'inhouse';
+        let currentPartialPercent = 70;
+        let breakdownChart = null;
+        let comparisonChart = null;
+
+        function calculateOPEX() {
+            // Get inputs
+            const country = document.getElementById('countrySelect').value;
+            const itLoadKW = parseFloat(document.getElementById('itLoad').value) || 1000;
+            const basePue = parseFloat(document.getElementById('pueSlider').value) || 1.5;
+            const tierLevel = document.getElementById('tierLevel').value;
+            const facilityAge = document.getElementById('facilityAge').value;
+            const utilization = parseFloat(document.getElementById('utilizationSlider').value) / 100 || 0.7;
+            const climateZone = document.getElementById('climateZone').value;
+            const coolingType = document.getElementById('coolingType').value;
+            const genConfig = document.getElementById('genConfig').value;
+
+            const cf = countryData[country];
+            const climate = climateFactors[climateZone];
+            const cooling = coolingTypes[coolingType];
+            const generator = genConfigs[genConfig];
+
+            // Adjust PUE based on cooling type
+            const effectivePue = basePue + cooling.pueImpact;
+
+            // 1. ENERGY COST (with climate adjustment)
+            const totalPowerKW = itLoadKW * effectivePue;
+            const coolingPowerKW = itLoadKW * (effectivePue - 1) * cooling.efficiencyMult * climate.coolingEnergyMult;
+            const adjustedTotalPowerKW = itLoadKW + coolingPowerKW;
+            const annualKWh = adjustedTotalPowerKW * 8760 * utilization;
+            const energyCost = annualKWh * cf.energyRate;
+
+            // 2. STAFFING COST
+            const staffingFTE = calculateStaffingFTE(itLoadKW, tierLevel);
+            const staffingDetail = calculateStaffingDetail(staffingFTE, cf);
+            const staffingCost = staffingDetail.totalCost;
+
+            // 3. DETAILED MAINTENANCE BREAKDOWN
+            // In-house: Lower cost (self-maintained), Contractor: OEM premium pricing
+            // OEM contractors charge 2-3x more due to: travel, profit margin, specialized parts, SLA guarantees
+            const ageFactor = facilityAge === 'new' ? 0.6 : facilityAge === 'mid' ? 1.0 : 1.5;
+
+            // Calculate OEM factor based on staffing model
+            // In-house: baseline, Partial: blended, Contractor: full OEM premium
+            const getOemFactor = (system) => {
+                const oemMult = maintenanceRates[system]?.oemMultiplier || 2.0;
+                if (currentStaffingModel === 'inhouse') return 1.0;
+                if (currentStaffingModel === 'contractor') return oemMult;
+                // Partial: blend based on contractor percentage
+                const contractorPct = (100 - currentPartialPercent) / 100;
+                return 1.0 + (oemMult - 1.0) * contractorPct;
+            };
+
+            const maintenanceDetail = {
+                generator: {
+                    cost: itLoadKW * maintenanceRates.generator.baseCostPerKw * generator.maintMult * ageFactor * cf.maintMult * getOemFactor('generator'),
+                    perKw: maintenanceRates.generator.baseCostPerKw * generator.maintMult * ageFactor * cf.maintMult * getOemFactor('generator'),
+                    frequency: generator.testFrequency + ' + 6M/12M OH',
+                    oemFactor: getOemFactor('generator')
+                },
+                cooling: {
+                    cost: itLoadKW * cooling.maintCostPerKw * climate.coolingMaintMult * ageFactor * cf.maintMult * getOemFactor('cooling'),
+                    perKw: cooling.maintCostPerKw * climate.coolingMaintMult * ageFactor * cf.maintMult * getOemFactor('cooling'),
+                    frequency: maintenanceRates.cooling.frequency,
+                    oemFactor: getOemFactor('cooling')
+                },
+                electrical: {
+                    cost: itLoadKW * maintenanceRates.electrical.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('electrical'),
+                    perKw: maintenanceRates.electrical.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('electrical'),
+                    frequency: maintenanceRates.electrical.frequency,
+                    oemFactor: getOemFactor('electrical')
+                },
+                fire: {
+                    cost: itLoadKW * maintenanceRates.fire.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('fire'),
+                    perKw: maintenanceRates.fire.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('fire'),
+                    frequency: maintenanceRates.fire.frequency,
+                    oemFactor: getOemFactor('fire')
+                },
+                bms: {
+                    cost: itLoadKW * maintenanceRates.bms.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('bms'),
+                    perKw: maintenanceRates.bms.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('bms'),
+                    frequency: maintenanceRates.bms.frequency,
+                    oemFactor: getOemFactor('bms')
+                },
+                building: {
+                    cost: itLoadKW * maintenanceRates.building.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('building'),
+                    perKw: maintenanceRates.building.baseCostPerKw * ageFactor * cf.maintMult * getOemFactor('building'),
+                    frequency: maintenanceRates.building.frequency,
+                    oemFactor: getOemFactor('building')
+                },
+            };
+
+            const totalMaintenanceCost = Object.values(maintenanceDetail).reduce((sum, m) => sum + m.cost, 0);
+
+            // 4. DETAILED UTILITIES BREAKDOWN
+            const mw = itLoadKW / 1000;
+            const waterBaseCost = 2.50; // $/m³
+            const waterUsageM3 = itLoadKW * 0.5 * cooling.waterUsage * climate.waterMult * 8760 / 1000; // m³/year
+            const waterCost = waterUsageM3 * waterBaseCost * cf.laborMult;
+
+            const fuelLitersPerHour = (itLoadKW / 4) * generator.unitMult; // ~0.25L/kW/hr
+            const fuelTestHoursPerYear = 12; // Monthly warming up (all configs)
+            const fuelCostPerLiter = country === 'ID' ? 0.85 : 1.20; // Indonesia subsidized diesel
+            const fuelCost = fuelLitersPerHour * fuelTestHoursPerYear * fuelCostPerLiter;
+            const fuelReserveCost = (itLoadKW * generator.fuelReserveDays * 24 * 0.25 * fuelCostPerLiter) * 0.05; // Storage cost
+
+            const telecomCost = 4000 + (mw * 1500); // Base + per MW
+            const securitySystemsCost = 2000 + (mw * 500);
+            const consumablesCost = itLoadKW * 8;
+
+            const utilitiesDetail = {
+                water: { cost: waterCost, perKw: waterCost / itLoadKW, notes: `${Math.round(waterUsageM3).toLocaleString()} m³/yr` },
+                fuel: { cost: fuelCost + fuelReserveCost, perKw: (fuelCost + fuelReserveCost) / itLoadKW, notes: `${generator.testFrequency} testing` },
+                telecom: { cost: telecomCost * 12, perKw: (telecomCost * 12) / itLoadKW, notes: 'Internet + MPLS' },
+                security: { cost: securitySystemsCost * 12, perKw: (securitySystemsCost * 12) / itLoadKW, notes: 'CCTV, Access Control' },
+                consumables: { cost: consumablesCost, perKw: consumablesCost / itLoadKW, notes: 'Filters, batteries, etc.' },
+            };
+
+            const totalUtilitiesCost = Object.values(utilitiesDetail).reduce((sum, u) => sum + u.cost, 0);
+
+            // 5. DETAILED INSURANCE & COMPLIANCE BREAKDOWN
+            const estimatedCAPEX = itLoadKW * 12000;
+            const complianceData = country === 'ID' ? complianceCosts['ID'] : complianceCosts['default'];
+
+            const complianceDetail = {};
+            Object.keys(complianceData).forEach(key => {
+                const item = complianceData[key];
+                complianceDetail[key] = {
+                    name: item.name,
+                    cost: item.baseCost + (mw * item.perMW),
+                    renewal: item.renewal
+                };
+            });
+
+            // Insurance breakdown
+            const insuranceDetail = {
+                property: { name: 'Property Insurance', cost: estimatedCAPEX * 0.0025, renewal: 'Annual' },
+                businessInt: { name: 'Business Interruption', cost: estimatedCAPEX * 0.0010, renewal: 'Annual' },
+                liability: { name: 'Liability Insurance', cost: 5000 + (mw * 1000), renewal: 'Annual' },
+                cyber: { name: 'Cyber Insurance', cost: 8000 + (mw * 2000), renewal: 'Annual' },
+            };
+
+            const totalInsuranceCost = Object.values(insuranceDetail).reduce((sum, i) => sum + i.cost, 0);
+            const totalComplianceCertCost = Object.values(complianceDetail).reduce((sum, c) => sum + c.cost, 0);
+            const totalInsuranceComplianceCost = totalInsuranceCost + totalComplianceCertCost;
+
+            // 6. OTHER COSTS
+            const trainingCost = staffingCost * 0.025;
+            const miscCost = (energyCost + staffingCost) * 0.02;
+            const otherCosts = trainingCost + miscCost;
+
+            // TOTAL
+            const totalOPEX = energyCost + staffingCost + totalMaintenanceCost +
+                             totalInsuranceComplianceCost + totalUtilitiesCost + otherCosts;
+
+            return {
+                total: totalOPEX,
+                monthly: totalOPEX / 12,
+                perKW: totalOPEX / itLoadKW,
+                perKWh: totalOPEX / annualKWh,
+                breakdown: {
+                    energy: { value: energyCost, color: '#f59e0b' },
+                    staffing: { value: staffingCost, color: '#10b981' },
+                    maintenance: { value: totalMaintenanceCost, color: '#3b82f6' },
+                    insurance: { value: totalInsuranceComplianceCost, color: '#8b5cf6' },
+                    utilities: { value: totalUtilitiesCost, color: '#06b6d4' },
+                    compliance: { value: 0, color: '#ec4899' }, // Merged into insurance
+                    other: { value: otherCosts, color: '#6b7280' },
+                },
+                maintenanceDetail: maintenanceDetail,
+                utilitiesDetail: utilitiesDetail,
+                insuranceDetail: insuranceDetail,
+                complianceDetail: complianceDetail,
+                staffingDetail: staffingDetail,
+                itLoadKW: itLoadKW,
+                country: cf,
+                climate: climate,
+                cooling: cooling,
+                generator: generator,
+                effectivePue: effectivePue,
+            };
+        }
+
+        function calculateStaffingDetail(staffingFTE, cf) {
+            const inhouseMultiplier = 1.42; // Benefits + overhead (BPJS, THR, leave, training)
+            const contractorMultiplier = 1.85; // Contractor margin (OEM margin + overhead + profit)
+
+            const details = [];
+            let totalFTE = 0;
+            let totalInhouse = 0;
+            let totalContractor = 0;
+            let totalCost = 0;
+
+            // For contractor model: always need 1 internal admin for supervision/permit
+            // This person handles: work permits, contractor oversight, admin, quality checks
+            if (currentStaffingModel === 'contractor') {
+                staffingFTE.contractAdmin = 1;
+            } else if (currentStaffingModel === 'partial' && currentPartialPercent < 50) {
+                staffingFTE.contractAdmin = 1;
+            } else {
+                staffingFTE.contractAdmin = 0;
+            }
+
+            Object.keys(staffingFTE).forEach(roleId => {
+                const fte = staffingFTE[roleId];
+                if (fte === 0) return;
+
+                const role = salaryData[roleId];
+                if (!role) return; // Skip if role not defined
+
+                const annualSalaryUSD = (role.baseSalaryIDR * 13) / USD_IDR; // 13 months (inc THR)
+                const countryAdjustedSalary = annualSalaryUSD * cf.laborMult;
+
+                let inhouseFTE, contractorFTE, inhouseCost, contractorCost;
+
+                // Contract admin is always in-house (internal supervision requirement)
+                if (roleId === 'contractAdmin') {
+                    inhouseFTE = fte;
+                    contractorFTE = 0;
+                } else if (currentStaffingModel === 'inhouse') {
+                    inhouseFTE = fte;
+                    contractorFTE = 0;
+                } else if (currentStaffingModel === 'contractor') {
+                    // Full contractor: management stays in-house, technicians outsourced
+                    if (role.category === 'management') {
+                        inhouseFTE = fte;
+                        contractorFTE = 0;
+                    } else {
+                        inhouseFTE = 0;
+                        contractorFTE = fte;
+                    }
+                } else {
+                    // Partial - different splits by category
+                    let categoryPct = currentPartialPercent;
+                    if (role.category === 'management') categoryPct = Math.min(100, currentPartialPercent + 20);
+                    if (role.category === 'support') categoryPct = Math.max(0, currentPartialPercent - 20);
+
+                    inhouseFTE = Math.round(fte * categoryPct / 100);
+                    contractorFTE = fte - inhouseFTE;
+                }
+
+                inhouseCost = inhouseFTE * countryAdjustedSalary * inhouseMultiplier;
+                contractorCost = contractorFTE * countryAdjustedSalary * contractorMultiplier;
+
+                details.push({
+                    roleId,
+                    name: role.name,
+                    fte,
+                    inhouseFTE,
+                    contractorFTE,
+                    inhouseCost,
+                    contractorCost,
+                    totalCost: inhouseCost + contractorCost,
+                });
+
+                totalFTE += fte;
+                totalInhouse += inhouseFTE;
+                totalContractor += contractorFTE;
+                totalCost += inhouseCost + contractorCost;
+            });
+
+            return {
+                details,
+                totalFTE,
+                totalInhouse,
+                totalContractor,
+                totalCost,
+            };
+        }
+
+        // =====================================================
+        // UI UPDATE FUNCTIONS
+        // =====================================================
+        function updateCalculation() {
+            const result = calculateOPEX();
+            const cf = countryData[document.getElementById('countrySelect').value];
+            const country = document.getElementById('countrySelect').value;
+
+            // Update country info
+            document.getElementById('selectedFlag').textContent = cf.flag;
+            document.getElementById('laborMult').textContent = cf.laborMult.toFixed(2) + 'x';
+            document.getElementById('energyRate').textContent = '$' + cf.energyRate.toFixed(3) + '/kWh';
+
+            // Update climate info
+            document.getElementById('coolingEnergyFactor').textContent = result.climate.coolingEnergyMult.toFixed(2) + 'x';
+            document.getElementById('freeCoolingHours').textContent = result.climate.freeCoolingHours.toLocaleString() + ' hrs/yr';
+
+            // Update summary
+            document.getElementById('summaryFlag').textContent = cf.flag;
+            document.getElementById('summaryCountry').textContent = cf.name;
+            document.getElementById('totalOpex').textContent = formatCurrency(result.total);
+            document.getElementById('monthlyOpex').textContent = formatCurrency(result.monthly, true);
+            document.getElementById('perKwOpex').textContent = '$' + Math.round(result.perKW).toLocaleString();
+            document.getElementById('perKwhOpex').textContent = '$' + result.perKWh.toFixed(3);
+            document.getElementById('totalFte').textContent = result.staffingDetail.totalFTE;
+
+            // Update breakdown table
+            updateBreakdownTable(result);
+
+            // Update staffing table
+            updateStaffingTable(result.staffingDetail);
+
+            // Update detailed maintenance table
+            updateMaintenanceTable(result);
+
+            // Update utilities table
+            updateUtilitiesTable(result);
+
+            // Update insurance & compliance table
+            updateComplianceTable(result, country);
+
+            // Update charts
+            updateCharts(result);
+
+            // Update scenario comparison
+            updateScenarioComparison(result);
+        }
+
+        function formatCurrency(value, compact = false) {
+            if (compact) {
+                if (value >= 1000000) return '$' + (value / 1000000).toFixed(1) + 'M';
+                if (value >= 1000) return '$' + (value / 1000).toFixed(1) + 'K';
+            }
+            return '$' + Math.round(value).toLocaleString();
+        }
+
+        function updateBreakdownTable(result) {
+            const tbody = document.getElementById('breakdownTableBody');
+            const categories = [
+                { key: 'energy', name: 'Energy (Electricity)', icon: 'fa-bolt' },
+                { key: 'staffing', name: 'Staffing & Labor', icon: 'fa-users' },
+                { key: 'maintenance', name: 'Maintenance', icon: 'fa-wrench' },
+                { key: 'insurance', name: 'Insurance & Compliance', icon: 'fa-shield-alt' },
+                { key: 'utilities', name: 'Utilities & Consumables', icon: 'fa-water' },
+                { key: 'other', name: 'Other Costs', icon: 'fa-ellipsis-h' },
+            ];
+
+            tbody.innerHTML = categories.map(cat => {
+                const data = result.breakdown[cat.key];
+                if (data.value === 0) return ''; // Skip zero values
+                const percent = (data.value / result.total * 100).toFixed(1);
+                const perKW = (data.value / result.itLoadKW).toFixed(0);
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="category-icon" style="background: ${data.color}20; color: ${data.color}">
+                                <i class="fas ${cat.icon}"></i>
+                            </span>
+                            ${cat.name}
+                        </td>
+                        <td class="amount">${formatCurrency(data.value)}</td>
+                        <td class="percent">${percent}%</td>
+                        <td>$${perKW}</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percent}%; background: ${data.color}"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStaffingTable(staffingDetail) {
+            const tbody = document.getElementById('staffingTableBody');
+
+            // Update model label
+            const modelLabel = currentStaffingModel === 'inhouse' ? 'Full In-House' :
+                              currentStaffingModel === 'contractor' ? 'Full Contractor' :
+                              `Partial (${currentPartialPercent}% In-House)`;
+            document.getElementById('staffingModelLabel').textContent = modelLabel;
+
+            tbody.innerHTML = staffingDetail.details.map(role => `
+                <tr>
+                    <td class="role-name">${role.name}</td>
+                    <td>${role.fte}</td>
+                    <td>${role.inhouseFTE > 0 ? `<span class="fte-badge fte-inhouse">${role.inhouseFTE}</span>` : '-'}</td>
+                    <td>${role.contractorFTE > 0 ? `<span class="fte-badge fte-contractor">${role.contractorFTE}</span>` : '-'}</td>
+                    <td class="cost">${formatCurrency(role.totalCost)}</td>
+                </tr>
+            `).join('');
+
+            // Update totals
+            document.getElementById('totalFteCell').textContent = staffingDetail.totalFTE;
+            document.getElementById('totalInhouseCell').textContent = staffingDetail.totalInhouse;
+            document.getElementById('totalContractorCell').textContent = staffingDetail.totalContractor;
+            document.getElementById('totalStaffingCost').textContent = formatCurrency(staffingDetail.totalCost);
+        }
+
+        function updateMaintenanceTable(result) {
+            const tbody = document.getElementById('maintTableBody');
+            const maintData = result.maintenanceDetail;
+            let totalCost = 0;
+
+            // Update config label
+            document.getElementById('maintConfigLabel').textContent =
+                `${result.generator.name.split(' ')[0]} | ${result.cooling.name}`;
+
+            const systems = [
+                { key: 'generator', icon: 'fa-car-battery', color: '#ef4444' },
+                { key: 'cooling', icon: 'fa-snowflake', color: '#06b6d4' },
+                { key: 'electrical', icon: 'fa-bolt', color: '#f59e0b' },
+                { key: 'fire', icon: 'fa-fire-extinguisher', color: '#ec4899' },
+                { key: 'bms', icon: 'fa-server', color: '#8b5cf6' },
+                { key: 'building', icon: 'fa-building', color: '#6b7280' },
+            ];
+
+            tbody.innerHTML = systems.map(sys => {
+                const data = maintData[sys.key];
+                const rate = maintenanceRates[sys.key];
+                totalCost += data.cost;
+                const maxCost = Math.max(...Object.values(maintData).map(d => d.cost));
+                const percent = (data.cost / maxCost * 100).toFixed(0);
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="category-icon" style="background: ${sys.color}20; color: ${sys.color}">
+                                <i class="fas ${sys.icon}"></i>
+                            </span>
+                            ${rate.name}
+                        </td>
+                        <td class="amount">${formatCurrency(data.cost)}</td>
+                        <td>$${data.perKw.toFixed(2)}</td>
+                        <td>${data.frequency}</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percent}%; background: ${sys.color}"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('totalMaintCost').textContent = formatCurrency(totalCost);
+            document.getElementById('totalMaintPerKw').textContent = '$' + (totalCost / result.itLoadKW).toFixed(2);
+        }
+
+        function updateUtilitiesTable(result) {
+            const tbody = document.getElementById('utilitiesTableBody');
+            const utilData = result.utilitiesDetail;
+            let totalCost = 0;
+
+            const utilities = [
+                { key: 'water', name: 'Water (Cooling Tower/Chiller)', icon: 'fa-tint', color: '#06b6d4' },
+                { key: 'fuel', name: 'Diesel Fuel (Generator)', icon: 'fa-gas-pump', color: '#ef4444' },
+                { key: 'telecom', name: 'Telecom / Internet', icon: 'fa-wifi', color: '#3b82f6' },
+                { key: 'security', name: 'Security Systems', icon: 'fa-shield-alt', color: '#8b5cf6' },
+                { key: 'consumables', name: 'Consumables & Spares', icon: 'fa-box', color: '#f59e0b' },
+            ];
+
+            tbody.innerHTML = utilities.map(util => {
+                const data = utilData[util.key];
+                totalCost += data.cost;
+                const maxCost = Math.max(...Object.values(utilData).map(d => d.cost));
+                const percent = (data.cost / maxCost * 100).toFixed(0);
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="category-icon" style="background: ${util.color}20; color: ${util.color}">
+                                <i class="fas ${util.icon}"></i>
+                            </span>
+                            ${util.name}
+                        </td>
+                        <td class="amount">${formatCurrency(data.cost)}</td>
+                        <td>$${data.perKw.toFixed(2)}</td>
+                        <td>${data.notes}</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percent}%; background: ${util.color}"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('totalUtilitiesCost').textContent = formatCurrency(totalCost);
+            document.getElementById('totalUtilitiesPerKw').textContent = '$' + (totalCost / result.itLoadKW).toFixed(2);
+        }
+
+        function updateComplianceTable(result, countryCode) {
+            const tbody = document.getElementById('complianceTableBody');
+            const insuranceData = result.insuranceDetail;
+            const complianceData = result.complianceDetail;
+            let totalCost = 0;
+
+            // Update country label
+            const countryName = countryCode === 'ID' ? 'Indonesia Standards' : 'International Standards';
+            document.getElementById('complianceCountryLabel').textContent = countryName;
+
+            let rows = '';
+
+            // Insurance items
+            const insuranceItems = [
+                { key: 'property', icon: 'fa-building', color: '#3b82f6' },
+                { key: 'businessInt', icon: 'fa-chart-line', color: '#10b981' },
+                { key: 'liability', icon: 'fa-user-shield', color: '#f59e0b' },
+                { key: 'cyber', icon: 'fa-lock', color: '#ef4444' },
+            ];
+
+            insuranceItems.forEach(item => {
+                const data = insuranceData[item.key];
+                totalCost += data.cost;
+                rows += `
+                    <tr>
+                        <td>
+                            <span class="category-icon" style="background: ${item.color}20; color: ${item.color}">
+                                <i class="fas ${item.icon}"></i>
+                            </span>
+                            ${data.name}
+                        </td>
+                        <td class="amount">${formatCurrency(data.cost)}</td>
+                        <td>Insurance Premium</td>
+                        <td>${data.renewal}</td>
+                        <td>
+                            <span style="font-size: 0.75rem; color: var(--accent-emerald);">
+                                <i class="fas fa-shield-alt"></i> Insurance
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Compliance items
+            const complianceColors = ['#8b5cf6', '#ec4899', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#3b82f6'];
+            let colorIndex = 0;
+
+            Object.keys(complianceData).forEach(key => {
+                const data = complianceData[key];
+                totalCost += data.cost;
+                const color = complianceColors[colorIndex % complianceColors.length];
+                colorIndex++;
+
+                rows += `
+                    <tr>
+                        <td>
+                            <span class="category-icon" style="background: ${color}20; color: ${color}">
+                                <i class="fas fa-certificate"></i>
+                            </span>
+                            ${data.name}
+                        </td>
+                        <td class="amount">${formatCurrency(data.cost)}</td>
+                        <td>${countryCode === 'ID' ? 'Indonesia Regulation' : 'International Standard'}</td>
+                        <td>${data.renewal}</td>
+                        <td>
+                            <span style="font-size: 0.75rem; color: var(--accent-purple);">
+                                <i class="fas fa-file-certificate"></i> Compliance
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rows;
+            document.getElementById('totalComplianceCost').textContent = formatCurrency(totalCost);
+        }
+
+        function updateCharts(result) {
+            const labels = ['Energy', 'Staffing', 'Maintenance', 'Insurance & Compliance', 'Utilities', 'Other'];
+            const data = [
+                result.breakdown.energy.value,
+                result.breakdown.staffing.value,
+                result.breakdown.maintenance.value,
+                result.breakdown.insurance.value,
+                result.breakdown.utilities.value,
+                result.breakdown.other.value,
+            ];
+            const colors = [
+                '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#06b6d4', '#6b7280'
+            ];
+
+            // Pie Chart
+            if (breakdownChart) breakdownChart.destroy();
+            breakdownChart = new Chart(document.getElementById('breakdownChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { font: { size: 11 }, padding: 15 }
+                        }
+                    },
+                    cutout: '60%',
+                }
+            });
+
+            // Bar Chart
+            if (comparisonChart) comparisonChart.destroy();
+            comparisonChart = new Chart(document.getElementById('comparisonChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Annual Cost ($)',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + (value/1000).toFixed(0) + 'K'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateScenarioComparison(currentResult) {
+            // Save current model
+            const savedModel = currentStaffingModel;
+            const savedPercent = currentPartialPercent;
+
+            // Calculate In-House
+            currentStaffingModel = 'inhouse';
+            const inhouseResult = calculateOPEX();
+
+            // Calculate Contractor
+            currentStaffingModel = 'contractor';
+            const contractorResult = calculateOPEX();
+
+            // Calculate Partial (70/30)
+            currentStaffingModel = 'partial';
+            currentPartialPercent = 70;
+            const partialResult = calculateOPEX();
+
+            // Restore
+            currentStaffingModel = savedModel;
+            currentPartialPercent = savedPercent;
+
+            // Update UI
+            document.getElementById('inhouseTotal').textContent = formatCurrency(inhouseResult.total);
+            document.getElementById('partialTotal').textContent = formatCurrency(partialResult.total);
+            document.getElementById('contractorTotal').textContent = formatCurrency(contractorResult.total);
+
+            const partialDiff = ((partialResult.total - inhouseResult.total) / inhouseResult.total * 100).toFixed(1);
+            const contractorDiff = ((contractorResult.total - inhouseResult.total) / inhouseResult.total * 100).toFixed(1);
+
+            document.getElementById('inhouseDiff').textContent = 'Baseline';
+            document.getElementById('inhouseDiff').className = 'scenario-diff';
+
+            document.getElementById('partialDiff').textContent = `${partialDiff}% vs In-House`;
+            document.getElementById('partialDiff').className = 'scenario-diff ' + (parseFloat(partialDiff) < 0 ? 'savings' : 'increase');
+
+            document.getElementById('contractorDiff').textContent = `${contractorDiff}% vs In-House`;
+            document.getElementById('contractorDiff').className = 'scenario-diff ' + (parseFloat(contractorDiff) < 0 ? 'savings' : 'increase');
+
+            // Highlight current
+            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('current'));
+            if (savedModel === 'inhouse') document.getElementById('scenarioInhouse').classList.add('current');
+            else if (savedModel === 'contractor') document.getElementById('scenarioContractor').classList.add('current');
+            else document.getElementById('scenarioPartial').classList.add('current');
+        }
+
+        // =====================================================
+        // EVENT HANDLERS
+        // =====================================================
+        function updatePUE() {
+            const value = document.getElementById('pueSlider').value;
+            document.getElementById('pueValue').textContent = parseFloat(value).toFixed(2);
+            updateCalculation();
+        }
+
+        function updateUtilization() {
+            const value = document.getElementById('utilizationSlider').value;
+            document.getElementById('utilizationValue').textContent = value + '%';
+            updateCalculation();
+        }
+
+        function selectStaffingModel(model) {
+            currentStaffingModel = model;
+
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.model === model) card.classList.add('active');
+            });
+
+            const partialControls = document.getElementById('partialControls');
+            if (model === 'partial') {
+                partialControls.classList.add('active');
+            } else {
+                partialControls.classList.remove('active');
+            }
+
+            updateCalculation();
+        }
+
+        function updatePartialSplit() {
+            currentPartialPercent = parseInt(document.getElementById('partialSlider').value);
+            document.getElementById('inhousePercent').textContent = currentPartialPercent;
+            document.getElementById('contractorPercent').textContent = 100 - currentPartialPercent;
+            updateCalculation();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCalculation();
+            initTooltipSystem();
+        });
+
+        // Global Tooltip System - escapes overflow containers
+        function initTooltipSystem() {
+            // Create global tooltip container
+            const tooltipEl = document.createElement('div');
+            tooltipEl.id = 'tooltip-container';
+            document.body.appendChild(tooltipEl);
+
+            // Attach listeners to all tooltip triggers
+            document.querySelectorAll('.info-tooltip').forEach(trigger => {
+                const content = trigger.querySelector('.tooltip-content');
+                if (!content) return;
+
+                trigger.addEventListener('mouseenter', (e) => {
+                    // Copy content to global tooltip
+                    tooltipEl.innerHTML = content.innerHTML;
+
+                    // Position tooltip
+                    const rect = trigger.getBoundingClientRect();
+                    const tooltipWidth = 320;
+                    const tooltipHeight = tooltipEl.offsetHeight || 200;
+                    const padding = 15;
+
+                    let left = rect.right + padding;
+                    let top = rect.top + rect.height / 2;
+
+                    // Check right edge - flip to left if needed
+                    if (left + tooltipWidth > window.innerWidth - 20) {
+                        left = rect.left - tooltipWidth - padding;
+                    }
+
+                    // Check left edge
+                    if (left < 20) {
+                        left = 20;
+                    }
+
+                    // Vertical centering with bounds check
+                    top = top - tooltipHeight / 2;
+                    if (top < 20) top = 20;
+                    if (top + tooltipHeight > window.innerHeight - 20) {
+                        top = window.innerHeight - tooltipHeight - 20;
+                    }
+
+                    tooltipEl.style.left = left + 'px';
+                    tooltipEl.style.top = top + 'px';
+                    tooltipEl.classList.add('visible');
+                });
+
+                trigger.addEventListener('mouseleave', () => {
+                    tooltipEl.classList.remove('visible');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

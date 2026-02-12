@@ -2,7 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Enterprise BMS - Fire System & N2 Purge Control FINAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<title>Fire System & N2 Purge Control | Data Center Safety BMS</title>
+    <meta name="description" content="Enterprise BMS dashboard for fire suppression and N2 purge control systems. Monitor fire detection, sprinkler status, and nitrogen inerting for data center safety.">
+    <meta name="keywords" content="Fire Suppression System, N2 Purge Control, Data Center Fire Safety, BMS Dashboard, Fire Detection, VESDA, Ahli K3 Listrik">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/fire-system.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/fire-system.html">
+    <meta property="og:title" content="Fire System & N2 Purge Control | Safety BMS">
+    <meta property="og:description" content="Enterprise fire suppression and N2 purge control for data center safety.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fire System & N2 Purge Control">
+    <meta name="twitter:description" content="Data center fire safety and nitrogen inerting control dashboard.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Fire System & N2 Purge Control","applicationCategory":"MonitoringApplication","description":"Enterprise BMS dashboard for fire suppression and N2 purge control systems in data center environments.","url":"https://resistancezero.com/fire-system.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"}}
+</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -18,7 +45,6 @@
             background-color: var(--bg-deep);
             color: #e2e8f0;
             font-family: 'JetBrains Mono', monospace;
-            overflow: hidden;
         }
 
         .glass-panel {
@@ -28,12 +54,12 @@
         }
 
         .pipe-base { fill: none; stroke: #1e293b; stroke-width: 5; stroke-linecap: round; }
-        
+
         /* Laser Flows - Dotted Line Effects */
         .flow-fire { stroke: var(--fire-red); stroke-dasharray: 4, 12; animation: flowMove 0.5s linear infinite; filter: drop-shadow(0 0 8px var(--fire-red)); }
         .flow-supply { stroke: var(--supply-blue); stroke-dasharray: 2, 10; animation: flowMove 0.8s linear infinite; filter: drop-shadow(0 0 10px var(--supply-blue)); }
         .flow-n2 { stroke: var(--n2-yellow); stroke-dasharray: 3, 15; animation: flowMove 1.5s linear infinite; filter: drop-shadow(0 0 8px var(--n2-yellow)); }
-        
+
         @keyframes flowMove { to { stroke-dashoffset: -24; } }
 
         .impeller { transform-box: fill-box; transform-origin: center; }
@@ -42,19 +68,117 @@
 
         .tank-overflow { overflow: hidden; }
         .liquid-anim { transition: height 1s linear, y 1s linear; }
-        
+
         .emergency-blink { animation: subtleRed 1.5s infinite; }
         @keyframes subtleRed { 0%, 100% { background: transparent; } 50% { background: rgba(153, 27, 27, 0.1); } }
 
         .font-tech { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
         .valve-label { fill: #64748b; font-size: 8px; font-weight: bold; }
+
+        /* Control Buttons */
+        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--supply-blue); color: var(--supply-blue); }
+        .kbd-hint { background: #222; padding: 2px 6px; border-radius: 3px; font-size: 9px; color: #666; margin-left: 4px; }
+
+        /* Legend Panel */
+        .legend-panel { position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1px solid #333; border-radius: 12px; padding: 12px 16px; z-index: 20; }
+        .legend-item { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 10px; }
+        .legend-line { width: 30px; height: 3px; border-radius: 2px; }
+        .legend-fire { background: var(--fire-red); box-shadow: 0 0 8px var(--fire-red); }
+        .legend-supply { background: var(--supply-blue); box-shadow: 0 0 8px var(--supply-blue); }
+        .legend-n2 { background: var(--n2-yellow); box-shadow: 0 0 8px var(--n2-yellow); }
+
+        /* Zoom Controls */
+        .zoom-controls { display: flex; gap: 4px; align-items: center; }
+        .zoom-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; transition: all 0.2s; }
+        .zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .zoom-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--supply-blue); color: var(--supply-blue); }
+
+        /* Fullscreen Mode */
+        body.fullscreen .no-print { display: none !important; }
+        body.fullscreen .glass-panel.main-svg { border-radius: 0; height: 100vh; }
+        body.fullscreen .fullscreen-controls { display: flex !important; }
+
+        /* Fullscreen Floating Controls */
+        .fullscreen-controls {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            gap: 10px;
+        }
+        .fs-btn {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 16px;
+            min-height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+        .fs-btn:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--supply-blue); }
+        .fs-btn.back { border-color: var(--fire-red); }
+        .fs-btn.back:hover { background: var(--fire-red); }
+
+        /* Tooltips */
+        .equipment-tooltip { position: absolute; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--supply-blue); border-radius: 8px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 220px; }
+        .equipment-tooltip.visible { opacity: 1; }
+        .tooltip-title { color: var(--supply-blue); font-weight: bold; font-size: 11px; margin-bottom: 6px; text-transform: uppercase; }
+        .tooltip-row { display: flex; justify-content: space-between; margin: 3px 0; }
+        .tooltip-label { color: #64748b; }
+        .tooltip-value { color: #fff; font-weight: bold; }
+
+        /* Bottom Status Bar */
+        .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 1px solid #333; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
+        .status-section { display: flex; gap: 16px; align-items: center; }
+        .status-item { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+        .status-led { width: 8px; height: 8px; border-radius: 50%; }
+        .led-green { background: var(--jockey-green); box-shadow: 0 0 6px var(--jockey-green); }
+        .led-yellow { background: var(--n2-yellow); box-shadow: 0 0 6px var(--n2-yellow); }
+        .led-red { background: var(--fire-red); box-shadow: 0 0 6px var(--fire-red); animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Log Panel */
+        .log-panel { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 20px; margin-bottom: 60px; }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            body { padding: 12px !important; }
+            .main-svg { padding: 16px !important; border-radius: 24px !important; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px !important; }
+            .main-svg { padding: 12px !important; border-radius: 16px !important; overflow-x: auto !important; }
+            .legend-panel { position: static !important; margin-bottom: 8px; display: inline-flex; gap: 16px; padding: 8px 12px !important; border-radius: 8px !important; }
+            .legend-panel .legend-item { margin: 0; }
+            .status-bar { flex-direction: column; gap: 6px; padding: 6px 12px; }
+            .status-section { flex-wrap: wrap; gap: 8px; }
+        }
+
     </style>
 </head>
-<body class="p-4 h-screen flex flex-col">
+<body class="p-4">
 
     <div id="alarm-overlay" class="fixed inset-0 pointer-events-none z-50 transition-colors duration-500"></div>
 
-    <div class="grid grid-cols-6 gap-3 mb-6 z-10 no-print">
+    <!-- Fullscreen Floating Controls -->
+    <div class="fullscreen-controls">
+        <button class="fs-btn" onclick="resetSimulation()"><i class="fas fa-redo"></i> RESET</button>
+        <button class="fs-btn" onclick="toggleFullscreen()"><i class="fas fa-compress"></i> EXIT FULLSCREEN</button>
+        <a href="dc-conventional.html" class="fs-btn back"><i class="fas fa-arrow-left"></i> BACK</a>
+        <a href="index.html" class="fs-btn back"><i class="fas fa-home"></i> PORTFOLIO</a>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-4 z-10 no-print">
         <div class="glass-panel p-3 rounded-2xl border-l-4 border-cyan-500 shadow-xl">
             <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">WUE Efficiency</h3>
             <p id="kpi-wue" class="text-xl font-black text-cyan-400 font-tech">1.02 <span class="text-[10px] opacity-60">L/kW</span></p>
@@ -76,14 +200,58 @@
             <p class="text-xl font-black text-purple-400 font-tech">0.85 <span class="text-[10px] opacity-60">kg/m³</span></p>
         </div>
         <div class="flex flex-col gap-2">
-            <button onclick="location.href='index.html'" class="bg-slate-600 hover:bg-slate-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"><i class="fas fa-arrow-left"></i> PORTFOLIO</button>
-            <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all">RESET MATRIX</button>
+            <button onclick="location.href='dc-conventional.html'" class="bg-slate-600 hover:bg-slate-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"><i class="fas fa-arrow-left"></i> BACK</button>
+            <button onclick="location.href='index.html'" class="bg-slate-600 hover:bg-slate-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"><i class="fas fa-home"></i> PORTFOLIO</button>
+            <button onclick="resetSimulation()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all"><i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span></button>
             <button onclick="window.print()" class="glass-panel text-white text-[10px] font-bold py-2 rounded-xl hover:bg-slate-800 transition-all">EXPORT PDF</button>
         </div>
     </div>
 
-    <div class="glass-panel rounded-[45px] p-10 relative border border-slate-800 flex-grow overflow-hidden shadow-2xl">
-        <svg viewBox="0 0 1400 650" class="w-full h-full">
+    <!-- Control Bar -->
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-3 no-print">
+        <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen">
+                <i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span>
+            </button>
+            <button onclick="triggerResponse()" class="ctrl-btn" id="btn-trigger" style="border-color: var(--fire-red); color: var(--fire-red);">
+                <i class="fas fa-fire mr-1"></i> TRIGGER FIRE <span class="kbd-hint">F</span>
+            </button>
+        </div>
+        <div class="zoom-controls">
+            <span class="text-slate-500 text-[10px] mr-2">ZOOM:</span>
+            <button onclick="setZoom(0.5)" class="zoom-btn" data-zoom="0.5">50%</button>
+            <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75">75%</button>
+            <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
+            <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
+            <button onclick="fitToScreen()" class="zoom-btn"><i class="fas fa-compress-arrows-alt"></i> FIT</button>
+        </div>
+    </div>
+
+    <div class="glass-panel main-svg rounded-[45px] p-10 relative border border-slate-800 overflow-hidden shadow-2xl mb-4">
+        <!-- Legend Panel -->
+        <div class="legend-panel no-print">
+            <div class="text-[9px] text-slate-400 font-bold uppercase mb-2 tracking-widest">Flow Legend</div>
+            <div class="legend-item">
+                <div class="legend-line legend-fire"></div>
+                <span class="text-slate-300">Fire / Emergency</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line legend-supply"></div>
+                <span class="text-slate-300">Water Supply</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line legend-n2"></div>
+                <span class="text-slate-300">N2 Inerting</span>
+            </div>
+        </div>
+
+        <!-- Tooltip Container -->
+        <div id="equipment-tooltip" class="equipment-tooltip">
+            <div class="tooltip-title" id="tooltip-title">Equipment</div>
+            <div id="tooltip-content"></div>
+        </div>
+
+        <svg id="fire-svg" viewBox="0 0 1400 650" class="w-full h-full" style="transition: transform 0.3s;">
             <defs>
                 <linearGradient id="tankBlue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#1e3a8a" />
@@ -160,6 +328,14 @@
                 <text x="132.5" y="35" text-anchor="middle" class="valve-label">WAV-03</text>
             </g>
 
+            <!-- N2 Distribution Header to PACV -->
+            <path id="path-n2-header" d="M 1200 350 L 1400 350" class="pipe-base" />
+            <path id="path-n2-pv1" d="M 1217 350 L 1217 500" class="pipe-base" />
+            <path id="path-n2-pv2" d="M 1262 350 L 1262 500" class="pipe-base" />
+            <path id="path-n2-pv3" d="M 1307 350 L 1307 500" class="pipe-base" />
+            <path id="path-n2-pv4" d="M 1352 350 L 1352 500" class="pipe-base" />
+            <path id="path-n2-pv5" d="M 1397 350 L 1397 500" class="pipe-base" />
+
             <g transform="translate(1200, 500)">
                 <rect id="pv-1" x="0" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
                 <text x="17.5" y="30" text-anchor="middle" class="valve-label">PACV-01</text>
@@ -179,9 +355,45 @@
             </g>
         </svg>
 
-        <div class="absolute bottom-12 left-12 w-[450px] glass-panel p-6 rounded-[32px] border-l-8 border-slate-700 shadow-2xl">
-            <div id="log-view" class="h-44 overflow-y-auto space-y-2 text-[11px] font-tech pr-2 leading-relaxed">
-                <p class="text-emerald-500/70 border-b border-emerald-500/10 pb-1">System healthy. Static pressure stable at 12.5 BAR.</p>
+    </div>
+
+    <!-- System Log Panel -->
+    <div class="log-panel glass-panel border-l-4 border-slate-700">
+        <h3 class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-2">
+            <i class="fas fa-terminal mr-1"></i> System Log
+        </h3>
+        <div id="log-view" class="h-36 overflow-y-auto space-y-1 text-[11px] font-tech pr-2 leading-relaxed">
+            <p class="text-emerald-500/70 border-b border-emerald-500/10 pb-1">System healthy. Static pressure stable at 12.5 BAR.</p>
+        </div>
+    </div>
+
+    <!-- Bottom Status Bar -->
+    <div class="status-bar no-print">
+        <div class="status-section">
+            <div class="status-item">
+                <div class="status-led led-green" id="led-system"></div>
+                <span class="text-slate-400">SYSTEM:</span>
+                <span class="text-white font-bold" id="status-system">NORMAL</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led led-green" id="led-tank"></div>
+                <span class="text-slate-400">TANK:</span>
+                <span class="text-white font-bold" id="status-tank">92%</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led led-green" id="led-pressure"></div>
+                <span class="text-slate-400">PRESSURE:</span>
+                <span class="text-white font-bold" id="status-pressure">12.5 BAR</span>
+            </div>
+        </div>
+        <div class="status-section">
+            <div class="status-item">
+                <span class="text-slate-500">UPTIME:</span>
+                <span class="text-cyan-400 font-bold" id="status-uptime">00:00:00</span>
+            </div>
+            <div class="status-item">
+                <span class="text-slate-500">LAST UPDATE:</span>
+                <span class="text-slate-300" id="status-time">--:--:--</span>
             </div>
         </div>
     </div>
@@ -200,16 +412,308 @@
         const wueKpi = document.getElementById('kpi-wue');
         const opexKpi = document.getElementById('kpi-opex');
         const landlordFlow = document.getElementById('landlord-flow');
+        const fireSvg = document.getElementById('fire-svg');
+        const tooltip = document.getElementById('equipment-tooltip');
+        const tooltipTitle = document.getElementById('tooltip-title');
+        const tooltipContent = document.getElementById('tooltip-content');
 
         let press = 12.5;
         let tank = 92;
         let running = false;
         let landlordSupplyActive = false;
         let landlordFlowRate = 0;
+        let currentZoom = 1;
+        let simInterval = null;
+        let uptimeSeconds = 0;
 
         // Base values
         const baseWUE = 1.02;
         const baseOPEX = 2450;
+
+        // Equipment specs for tooltips
+        const equipmentSpecs = {
+            'grp-main1': {
+                title: 'Pompa Main 1 (P-01)',
+                specs: [
+                    { label: 'Capacity', value: '227 m³/h' },
+                    { label: 'Head', value: '120m' },
+                    { label: 'Power', value: '75 kW' },
+                    { label: 'Type', value: 'Centrifugal' },
+                    { label: 'Status', value: 'STANDBY' }
+                ]
+            },
+            'grp-main2': {
+                title: 'Pompa Main 2 (P-02)',
+                specs: [
+                    { label: 'Capacity', value: '227 m³/h' },
+                    { label: 'Head', value: '120m' },
+                    { label: 'Power', value: '75 kW' },
+                    { label: 'Type', value: 'Centrifugal' },
+                    { label: 'Status', value: 'STANDBY' }
+                ]
+            },
+            'grp-jockey': {
+                title: 'Pompa Jockey (JP-01)',
+                specs: [
+                    { label: 'Capacity', value: '18 m³/h' },
+                    { label: 'Head', value: '140m' },
+                    { label: 'Power', value: '5.5 kW' },
+                    { label: 'Type', value: 'Multi-stage' },
+                    { label: 'Function', value: 'Pressure maintain' }
+                ]
+            }
+        };
+
+        // Zoom Functions
+        function setZoom(level) {
+            currentZoom = level;
+            fireSvg.style.transform = 'scale(' + level + ')';
+            fireSvg.style.transformOrigin = 'center center';
+            document.querySelectorAll('.zoom-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+                if (btn.dataset.zoom == level) btn.classList.add('active');
+            });
+        }
+
+        function fitToScreen() {
+            setZoom(1);
+            document.querySelectorAll('.zoom-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        }
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(function(err) {
+                    console.log('Fullscreen error:', err);
+                });
+                document.body.classList.add('fullscreen');
+                document.getElementById('btn-fullscreen').classList.add('active');
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('fullscreen');
+                document.getElementById('btn-fullscreen').classList.remove('active');
+            }
+        }
+
+        // Reset Simulation (without page reload)
+        function resetSimulation() {
+            if (simInterval) {
+                clearInterval(simInterval);
+                simInterval = null;
+            }
+
+            running = false;
+            press = 12.5;
+            tank = 92;
+
+            // Reset UI
+            pressTxt.innerText = press.toFixed(1) + " BAR";
+            updateTankUI(tank);
+            flowTxt.textContent = "0.0 m³/h";
+            pin.style.transform = 'rotate(45deg)';
+
+            // Reset overlay
+            overlay.classList.remove('emergency-blink');
+
+            // Reset N2
+            n2Kpi.textContent = "STANDBY";
+            n2Kpi.style.color = "#fde047";
+            n2Imp.classList.remove('spinning');
+            n2Path.classList.remove('flow-n2');
+
+            // Reset pumps
+            var nodeJ = document.getElementById('node-j');
+            nodeJ.classList.remove('active-j');
+            nodeJ.style.stroke = "#3dfc16";
+            nodeJ.style.filter = "";
+            document.getElementById('spin-j').classList.remove('spinning');
+
+            var nodeM1 = document.getElementById('node-m1');
+            nodeM1.classList.remove('active-m1');
+            nodeM1.style.stroke = "#3b82f6";
+            nodeM1.style.filter = "";
+            document.getElementById('spin-m1').classList.remove('spinning');
+
+            var nodeM2 = document.getElementById('node-m2');
+            nodeM2.classList.remove('active-m2');
+            nodeM2.style.stroke = "#3b82f6";
+            nodeM2.style.filter = "";
+            document.getElementById('spin-m2').classList.remove('spinning');
+
+            // Reset flow paths
+            document.getElementById('path-j-discharge').classList.remove('flow-fire');
+            document.getElementById('path-discharge').classList.remove('flow-fire');
+            document.getElementById('path-to-wet').classList.remove('flow-fire');
+            document.getElementById('path-to-pre').classList.remove('flow-fire');
+            document.getElementById('path-suction').classList.remove('flow-fire');
+
+            // Reset valves
+            document.getElementById('wv-1').style.fill = "#1e293b";
+            document.getElementById('pv-1').style.fill = "#1e293b";
+
+            // Reset landlord supply
+            var vLandlord = document.getElementById('v-landlord');
+            vLandlord.style.fill = "#1e293b";
+            document.getElementById('path-landlord').classList.remove('flow-supply');
+            updateLandlordMetrics(false, 0);
+
+            // Update status bar
+            updateStatusBar('NORMAL', 'green');
+
+            // Log reset
+            addLog('SYSTEM RESET - All parameters restored to normal', 'info');
+
+            // Restart N2 duty cycle
+            setTimeout(n2DutyCycle, 2000);
+        }
+
+        // Status Bar Updates
+        function updateStatusBar(status, level) {
+            var ledSystem = document.getElementById('led-system');
+            var statusSystem = document.getElementById('status-system');
+
+            statusSystem.textContent = status;
+            ledSystem.className = 'status-led';
+
+            if (level === 'green') {
+                ledSystem.classList.add('led-green');
+                statusSystem.style.color = '#3dfc16';
+            } else if (level === 'yellow') {
+                ledSystem.classList.add('led-yellow');
+                statusSystem.style.color = '#fde047';
+            } else if (level === 'red') {
+                ledSystem.classList.add('led-red');
+                statusSystem.style.color = '#ff0000';
+            }
+        }
+
+        function updateStatusPressure(value) {
+            var el = document.getElementById('status-pressure');
+            var led = document.getElementById('led-pressure');
+            el.textContent = value.toFixed(1) + ' BAR';
+            led.className = 'status-led';
+            if (value >= 11) led.classList.add('led-green');
+            else if (value >= 9) led.classList.add('led-yellow');
+            else led.classList.add('led-red');
+        }
+
+        function updateStatusTank(value) {
+            var el = document.getElementById('status-tank');
+            var led = document.getElementById('led-tank');
+            el.textContent = Math.round(value) + '%';
+            led.className = 'status-led';
+            if (value >= 50) led.classList.add('led-green');
+            else if (value >= 25) led.classList.add('led-yellow');
+            else led.classList.add('led-red');
+        }
+
+        // Add log entry
+        function addLog(message, type) {
+            var p = document.createElement('p');
+            var time = new Date().toLocaleTimeString('id-ID');
+            p.innerHTML = '<span class="text-slate-500">[' + time + ']</span> ' + message;
+            if (type === 'error') p.className = 'text-red-400';
+            else if (type === 'warning') p.className = 'text-yellow-400';
+            else if (type === 'success') p.className = 'text-emerald-400';
+            else p.className = 'text-slate-400';
+            logs.appendChild(p);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // Uptime counter
+        setInterval(function() {
+            uptimeSeconds++;
+            var h = Math.floor(uptimeSeconds / 3600);
+            var m = Math.floor((uptimeSeconds % 3600) / 60);
+            var s = uptimeSeconds % 60;
+            document.getElementById('status-uptime').textContent =
+                String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            document.getElementById('status-time').textContent = new Date().toLocaleTimeString('id-ID');
+        }, 1000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
+            if (e.key === 'r' || e.key === 'R') { if (!e.ctrlKey && !e.metaKey) resetSimulation(); }
+            if (e.key === 'f' || e.key === 'F') { if (!e.ctrlKey && !e.metaKey) triggerResponse(); }
+            if (e.key === 'Escape') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                    document.body.classList.remove('fullscreen');
+                }
+            }
+            // Zoom shortcuts
+            if (e.key === '1') setZoom(0.5);
+            if (e.key === '2') setZoom(0.75);
+            if (e.key === '3') setZoom(1);
+            if (e.key === '4') setZoom(1.2);
+        });
+
+        // Tooltip functions
+        function showTooltip(e, equipId) {
+            var spec = equipmentSpecs[equipId];
+            if (!spec) return;
+
+            tooltipTitle.textContent = spec.title;
+            var html = '';
+            spec.specs.forEach(function(item) {
+                html += '<div class="tooltip-row"><span class="tooltip-label">' + item.label + '</span><span class="tooltip-value">' + item.value + '</span></div>';
+            });
+            tooltipContent.innerHTML = html;
+
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY - 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
+        // Add tooltip event listeners to equipment
+        document.querySelectorAll('#grp-main1, #grp-main2, #grp-jockey').forEach(function(el) {
+            el.style.cursor = 'pointer';
+            el.addEventListener('mouseenter', function(e) { showTooltip(e, this.id); });
+            el.addEventListener('mousemove', function(e) {
+                tooltip.style.left = (e.clientX + 15) + 'px';
+                tooltip.style.top = (e.clientY - 10) + 'px';
+            });
+            el.addEventListener('mouseleave', hideTooltip);
+        });
+
+        // N2 Distribution Paths
+        var n2Paths = ['path-n2-header', 'path-n2-pv1', 'path-n2-pv2', 'path-n2-pv3', 'path-n2-pv4', 'path-n2-pv5'];
+        var pacvValves = ['pv-1', 'pv-2', 'pv-3', 'pv-4', 'pv-5'];
+
+        function activateN2Distribution() {
+            // Activate header and all PACV lines
+            n2Paths.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.add('flow-n2');
+            });
+            // Highlight PACV valves
+            pacvValves.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.style.stroke = '#fde047';
+                    el.style.fill = 'rgba(253, 224, 71, 0.15)';
+                }
+            });
+        }
+
+        function deactivateN2Distribution() {
+            n2Paths.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.remove('flow-n2');
+            });
+            pacvValves.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.style.stroke = '#475569';
+                    el.style.fill = '#1e293b';
+                }
+            });
+        }
 
         function n2DutyCycle() {
             if (running) return;
@@ -217,12 +721,14 @@
             n2Kpi.style.color = "#3dfc16";
             n2Imp.classList.add('spinning');
             n2Path.classList.add('flow-n2');
-            
-            setTimeout(() => {
+            activateN2Distribution();
+
+            setTimeout(function() {
                 n2Kpi.textContent = "STANDBY";
                 n2Kpi.style.color = "#fde047";
                 n2Imp.classList.remove('spinning');
                 n2Path.classList.remove('flow-n2');
+                deactivateN2Distribution();
                 if(!running) setTimeout(n2DutyCycle, 4000);
             }, 2000);
         }
@@ -287,34 +793,40 @@
             n2Path.classList.remove('flow-n2');
             n2Imp.classList.remove('spinning');
 
-            const sim = setInterval(() => {
+            // Update status bar to emergency
+            updateStatusBar('FIRE ALARM', 'red');
+            addLog('FIRE DETECTED - Emergency response initiated', 'error');
+
+            simInterval = setInterval(function() {
                 if(press > 8.0) press -= 0.15;
                 if(tank > 10) tank -= 0.35;
 
                 pressTxt.innerText = press.toFixed(1) + " BAR";
                 updateTankUI(tank);
-                
-                const angle = 45 - (12.5 - press) * 18;
-                pin.style.transform = `rotate(${angle}deg)`;
+                updateStatusPressure(press);
+                updateStatusTank(tank);
+
+                var angle = 45 - (12.5 - press) * 18;
+                pin.style.transform = 'rotate(' + angle + 'deg)';
 
                 if(press <= 11.5) {
-                    const node = document.getElementById('node-j');
+                    var node = document.getElementById('node-j');
                     if(!node.classList.contains('active-j')) {
                         node.classList.add('active-j');
                         node.style.stroke = "var(--jockey-green)";
                         node.style.filter = "drop-shadow(0 0 10px var(--jockey-green))";
                         document.getElementById('spin-j').classList.add('spinning');
                         document.getElementById('path-j-discharge').classList.add('flow-fire');
-                        // ACTIVATING DISCHARGE FLOWS
                         document.getElementById('path-discharge').classList.add('flow-fire');
                         document.getElementById('path-to-wet').classList.add('flow-fire');
                         document.getElementById('wv-1').style.fill = "var(--fire-red)";
                         flowTxt.textContent = (18.5 + (Math.random() * 2)).toFixed(1) + " m³/h";
+                        addLog('Jockey Pump ACTIVATED - Pressure maintenance', 'warning');
                     }
                 }
 
                 if(press <= 10.5) {
-                    const node = document.getElementById('node-m1');
+                    var node = document.getElementById('node-m1');
                     if(!node.classList.contains('active-m1')) {
                         node.classList.add('active-m1');
                         node.style.stroke = "var(--fire-red)";
@@ -324,15 +836,19 @@
                         document.getElementById('path-to-pre').classList.add('flow-fire');
                         document.getElementById('pv-1').style.fill = "var(--fire-red)";
                         flowTxt.textContent = (224.8 + (Math.random() * 5)).toFixed(1) + " m³/h";
+                        addLog('Main Pump 1 ACTIVATED - Full suppression mode', 'error');
                     }
                 }
 
                 if(tank <= 10) {
-                    clearInterval(sim);
+                    clearInterval(simInterval);
+                    simInterval = null;
                     flowTxt.textContent = "0.0 m³/h";
+                    addLog('TANK CRITICAL - Water supply depleted', 'error');
                 }
             }, 700);
         }
+
     </script>
 </body>
 </html>

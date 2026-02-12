@@ -1,45 +1,150 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Water Treatment Room - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<title>Water Treatment System Dashboard | Facility Management</title>
+    <meta name="description" content="Water treatment room dashboard for facility management. Monitor water quality, pump status, filtration systems, and treatment processes in real-time.">
+    <meta name="keywords" content="Water Treatment, Facility Management, Water Quality Monitoring, Pump Control, Data Center Utilities, CDFOM Certified">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/water-system.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/water-system.html">
+    <meta property="og:title" content="Water Treatment System | Facility Dashboard">
+    <meta property="og:description" content="Water treatment and quality monitoring for facility management.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Water Treatment Dashboard">
+    <meta name="twitter:description" content="Facility water treatment and quality monitoring system.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Water Treatment System Dashboard","applicationCategory":"MonitoringApplication","description":"Water treatment room dashboard for facility management with water quality and pump status monitoring.","url":"https://resistancezero.com/water-system.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"}}
+</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --neon-blue: #00f2ff; --neon-green: #3dfc16; }
+        :root { --neon-blue: #00f2ff; --neon-green: #3dfc16; --neon-yellow: #fde047; }
         body { background: #020617; color: #f8fafc; font-family: 'JetBrains Mono', monospace; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .flow-path { fill: none; stroke: #1e293b; stroke-width: 4; }
         .flow-active { stroke: var(--neon-blue); stroke-dasharray: 10; animation: flowAnim 1s linear infinite; filter: drop-shadow(0 0 5px var(--neon-blue)); }
         @keyframes flowAnim { to { stroke-dashoffset: -20; } }
-        /* Fix Spinner Poros Tengah */
         .pump-spinner { transform-box: fill-box; transform-origin: center; animation: spin 3s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .tech-label { fill: #94a3b8; font-size: 9px; text-transform: uppercase; font-weight: bold; }
         .tech-val { fill: var(--neon-green); font-size: 10px; font-weight: bold; }
+
+        /* Control Buttons */
+        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
+        .kbd-hint { background: #222; padding: 2px 6px; border-radius: 3px; font-size: 9px; color: #666; margin-left: 4px; }
+
+        /* Zoom Controls */
+        .zoom-controls { display: flex; gap: 4px; align-items: center; }
+        .zoom-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; transition: all 0.2s; }
+        .zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .zoom-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
+
+        /* Fullscreen Mode */
+        body.fullscreen .no-print { opacity: 0; pointer-events: none; }
+        body.fullscreen .main-panel { border-radius: 0; }
+
+        /* Bottom Status Bar */
+        .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 1px solid #333; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
+        .status-section { display: flex; gap: 16px; align-items: center; }
+        .status-item { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+        .status-led { width: 8px; height: 8px; border-radius: 50%; }
+        .led-green { background: var(--neon-green); box-shadow: 0 0 6px var(--neon-green); }
+        .led-yellow { background: var(--neon-yellow); box-shadow: 0 0 6px var(--neon-yellow); }
+        .led-red { background: #ff0000; box-shadow: 0 0 6px #ff0000; }
+
+        /* Equipment Tooltip */
+        .equipment-tooltip { position: absolute; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--neon-blue); border-radius: 8px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 220px; }
+        .equipment-tooltip.visible { opacity: 1; }
+        .tooltip-title { color: var(--neon-blue); font-weight: bold; font-size: 11px; margin-bottom: 6px; text-transform: uppercase; }
+        .tooltip-row { display: flex; justify-content: space-between; margin: 3px 0; }
+        .tooltip-label { color: #64748b; }
+        .tooltip-value { color: #fff; font-weight: bold; }
+
+        /* Flow Control Panel */
+        .sim-panel { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 20px; margin-bottom: 16px; }
+        .sim-slider { width: 160px; accent-color: var(--neon-blue); }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            body { padding: 12px !important; }
+            .main-panel { padding: 16px !important; border-radius: 24px !important; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px !important; }
+            .main-panel { padding: 12px !important; border-radius: 16px !important; overflow-x: auto !important; }
+            .status-bar { flex-direction: column; gap: 6px; padding: 6px 12px; }
+            .status-section { flex-wrap: wrap; gap: 8px; }
+            .sim-slider { width: 120px; }
+        }
+        @media (max-width: 480px) {
+            .sim-slider { width: 80px; }
+        }
+
     </style>
 </head>
 <body class="p-6">
 
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-3 no-print">
         <div>
-            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 uppercase tracking-tighter">
+            <h1 class="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 uppercase tracking-tighter">
                 Water Treatment Room
             </h1>
             <p class="text-[10px] text-slate-500 font-mono">FACILITY MANAGEMENT DASHBOARD | CDFOM CERTIFIED</p>
         </div>
-        <div class="flex gap-4">
-            <a href="index.html" class="glass px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> BACK TO PORTOFOLIO
+        <div class="flex flex-wrap gap-2">
+            <a href="dc-conventional.html" class="glass px-4 py-3 rounded-xl text-sm font-bold text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition flex items-center gap-2" style="min-height:44px; border: 1px solid rgba(6,182,212,0.3);">
+                <i class="fas fa-arrow-left"></i> ← Back
             </a>
+            <a href="index.html" class="glass px-4 py-3 rounded-xl text-sm font-bold text-purple-400 hover:text-white hover:bg-purple-500/20 transition flex items-center gap-2" style="min-height:44px; border: 1px solid rgba(139,92,246,0.3);">
+                <i class="fas fa-home"></i> Portfolio
+            </a>
+            <button onclick="resetSimulation()" class="ctrl-btn"><i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span></button>
+            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen"><i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span></button>
             <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2 rounded-xl transition">
-                <i class="fas fa-file-pdf mr-2"></i> EXPORT REPORT
+                <i class="fas fa-file-pdf mr-2"></i> EXPORT
             </button>
         </div>
     </div>
 
-    <div class="grid grid-cols-5 gap-4 mb-6">
+    <!-- Control Bar -->
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-3 no-print">
+        <div class="flex flex-wrap gap-2 items-center">
+            <button onclick="toggleSimulation()" class="ctrl-btn" id="btn-sim">
+                <i class="fas fa-play mr-1" id="sim-icon"></i> <span id="sim-text">START SIM</span> <span class="kbd-hint">S</span>
+            </button>
+            <button onclick="triggerBackwash()" class="ctrl-btn" style="border-color: #3b82f6; color: #3b82f6;">
+                <i class="fas fa-sync mr-1"></i> BACKWASH <span class="kbd-hint">B</span>
+            </button>
+        </div>
+        <div class="zoom-controls">
+            <span class="text-slate-500 text-[10px] mr-2">ZOOM:</span>
+            <button onclick="setZoom(0.5)" class="zoom-btn" data-zoom="0.5">50%</button>
+            <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75">75%</button>
+            <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
+            <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
+            <button onclick="fitToScreen()" class="zoom-btn"><i class="fas fa-compress-arrows-alt"></i> FIT</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
         <div class="glass p-3 rounded-2xl border-l-4 border-cyan-500">
             <h3 class="text-[9px] text-slate-500 font-bold uppercase">WUE Index</h3>
             <p class="text-xl font-black text-cyan-400">1.28 <small class="text-[10px]">L/kWh</small></p>
@@ -62,8 +167,14 @@
         </div>
     </div>
 
-    <div class="glass rounded-[40px] p-8 relative border border-slate-800 shadow-2xl mb-6 overflow-hidden">
-        <svg viewBox="0 0 1400 480" class="w-full h-full">
+    <div class="glass main-panel rounded-[40px] p-8 relative border border-slate-800 shadow-2xl mb-4 overflow-hidden">
+        <!-- Equipment Tooltip -->
+        <div id="equipment-tooltip" class="equipment-tooltip">
+            <div class="tooltip-title" id="tooltip-title">Equipment</div>
+            <div id="tooltip-content"></div>
+        </div>
+
+        <svg id="water-svg" viewBox="0 0 1400 480" class="w-full h-full" style="transition: transform 0.3s;">
             <path d="M 0 450 L 120 450 L 120 150 L 250 150 L 250 180" class="flow-path flow-active" />
             <path d="M 300 330 L 300 420 L 450 420" class="flow-path flow-active" />
             <path d="M 510 420 L 580 420 L 580 320" class="flow-path flow-active" />
@@ -138,19 +249,74 @@
         </svg>
     </div>
 
-    <div class="glass p-6 rounded-[32px] border border-slate-800 shadow-xl">
+    <!-- Flow Control Panel -->
+    <div class="sim-panel glass no-print">
+        <div class="flex items-center gap-6 flex-wrap">
+            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                <i class="fas fa-sliders-h mr-1"></i> Flow Control
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] text-slate-500 font-bold">INLET</span>
+                <input type="range" min="0" max="100" value="75" class="sim-slider" id="inlet-slider" oninput="updateInletFlow(this.value)">
+                <span class="text-[10px] text-cyan-400 font-bold" id="inlet-val">75%</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] text-slate-500 font-bold">PUMP</span>
+                <input type="range" min="0" max="100" value="80" class="sim-slider" id="pump-slider" oninput="updatePumpSpeed(this.value)">
+                <span class="text-[10px] text-green-400 font-bold" id="pump-val">80%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass p-6 rounded-[32px] border border-slate-800 shadow-xl" style="margin-bottom: 60px;">
         <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">
             <i class="fas fa-chart-line mr-2"></i> System Pressure & Flow Trend (24h)
         </h3>
         <canvas id="pressureTrend" height="80"></canvas>
     </div>
 
+    <!-- Bottom Status Bar -->
+    <div class="status-bar no-print">
+        <div class="status-section">
+            <div class="status-item">
+                <div class="status-led led-green" id="led-system"></div>
+                <span class="text-slate-400">SYSTEM:</span>
+                <span class="text-white font-bold" id="status-system">OPTIMAL</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led led-green" id="led-tank"></div>
+                <span class="text-slate-400">RAW TANK:</span>
+                <span class="text-white font-bold" id="status-tank">82%</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led led-green" id="led-pump"></div>
+                <span class="text-slate-400">PUMP:</span>
+                <span class="text-white font-bold" id="status-pump">RUNNING</span>
+            </div>
+        </div>
+        <div class="status-section">
+            <div class="status-item">
+                <span class="text-slate-500">FLOW:</span>
+                <span class="text-cyan-400 font-bold" id="status-flow">45.2 m³/h</span>
+            </div>
+            <div class="status-item">
+                <span class="text-slate-500">UPTIME:</span>
+                <span class="text-cyan-400 font-bold" id="status-uptime">00:00:00</span>
+            </div>
+            <div class="status-item">
+                <span class="text-slate-500">LAST UPDATE:</span>
+                <span class="text-slate-300" id="status-time">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const ctx = document.getElementById('pressureTrend').getContext('2d');
-        new Chart(ctx, {
+        // Chart initialization
+        var ctx = document.getElementById('pressureTrend').getContext('2d');
+        var pressureChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                labels: Array.from({length: 24}, function(_, i) { return i + ':00'; }),
                 datasets: [{
                     label: 'Pressure (Bar)',
                     data: [4.1, 4.2, 4.1, 4.0, 4.2, 4.3, 4.5, 4.4, 4.2, 4.2, 4.3, 4.4, 4.5, 4.6, 4.5, 4.3, 4.2, 4.1, 4.2, 4.3, 4.4, 4.3, 4.2, 4.1],
@@ -167,6 +333,201 @@
                 }
             }
         });
+
+        // State variables
+        var waterSvg = document.getElementById('water-svg');
+        var tooltip = document.getElementById('equipment-tooltip');
+        var tooltipTitle = document.getElementById('tooltip-title');
+        var tooltipContent = document.getElementById('tooltip-content');
+        var currentZoom = 1;
+        var simRunning = false;
+        var simInterval = null;
+        var uptimeSeconds = 0;
+        var inletFlow = 75;
+        var pumpSpeed = 80;
+
+        // Equipment specifications
+        var equipmentSpecs = {
+            'pump-pb01': {
+                title: 'Booster Pump PB-01',
+                specs: [
+                    { label: 'Model', value: 'Grundfos CR 45-3' },
+                    { label: 'Flow Rate', value: '45 m³/h' },
+                    { label: 'Head', value: '35m' },
+                    { label: 'Power', value: '7.5 kW' },
+                    { label: 'SEC', value: '0.42 kWh/m³' }
+                ]
+            }
+        };
+
+        // Zoom functions
+        function setZoom(level) {
+            currentZoom = level;
+            waterSvg.style.transform = 'scale(' + level + ')';
+            waterSvg.style.transformOrigin = 'center center';
+            document.querySelectorAll('.zoom-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+                if (btn.dataset.zoom == level) btn.classList.add('active');
+            });
+        }
+
+        function fitToScreen() {
+            setZoom(1);
+            document.querySelectorAll('.zoom-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        }
+
+        // Fullscreen toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(function(err) {
+                    console.log('Fullscreen error:', err);
+                });
+                document.body.classList.add('fullscreen');
+                document.getElementById('btn-fullscreen').classList.add('active');
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('fullscreen');
+                document.getElementById('btn-fullscreen').classList.remove('active');
+            }
+        }
+
+        // Simulation control
+        function toggleSimulation() {
+            simRunning = !simRunning;
+            var btn = document.getElementById('btn-sim');
+            var icon = document.getElementById('sim-icon');
+            var text = document.getElementById('sim-text');
+
+            if (simRunning) {
+                btn.classList.add('active');
+                icon.className = 'fas fa-pause mr-1';
+                text.textContent = 'PAUSE';
+                startSimulation();
+            } else {
+                btn.classList.remove('active');
+                icon.className = 'fas fa-play mr-1';
+                text.textContent = 'START SIM';
+                if (simInterval) { clearInterval(simInterval); simInterval = null; }
+            }
+        }
+
+        function startSimulation() {
+            simInterval = setInterval(function() {
+                // Simulate varying values
+                var flowVariation = 45 + (Math.random() * 5 - 2.5) * (inletFlow / 75);
+                var tdsVariation = 140 + Math.floor(Math.random() * 10);
+
+                document.getElementById('status-flow').textContent = flowVariation.toFixed(1) + ' m³/h';
+
+                // Update chart with new data point
+                if (pressureChart.data.datasets[0].data.length > 24) {
+                    pressureChart.data.datasets[0].data.shift();
+                }
+                pressureChart.data.datasets[0].data.push(4.0 + Math.random() * 0.6);
+                pressureChart.update('none');
+            }, 2000);
+        }
+
+        function updateInletFlow(val) {
+            inletFlow = parseInt(val);
+            document.getElementById('inlet-val').textContent = val + '%';
+        }
+
+        function updatePumpSpeed(val) {
+            pumpSpeed = parseInt(val);
+            document.getElementById('pump-val').textContent = val + '%';
+        }
+
+        function triggerBackwash() {
+            var autoBackwash = document.querySelector('[transform="translate(550, 240)"]');
+            if (autoBackwash) {
+                autoBackwash.querySelector('rect').style.stroke = '#fde047';
+                autoBackwash.querySelector('rect').style.filter = 'drop-shadow(0 0 10px #fde047)';
+                document.getElementById('status-system').textContent = 'BACKWASH';
+                document.getElementById('led-system').className = 'status-led led-yellow';
+
+                setTimeout(function() {
+                    autoBackwash.querySelector('rect').style.stroke = '#3b82f6';
+                    autoBackwash.querySelector('rect').style.filter = '';
+                    document.getElementById('status-system').textContent = 'OPTIMAL';
+                    document.getElementById('led-system').className = 'status-led led-green';
+                }, 5000);
+            }
+        }
+
+        function resetSimulation() {
+            if (simInterval) { clearInterval(simInterval); simInterval = null; }
+            simRunning = false;
+
+            var btn = document.getElementById('btn-sim');
+            var icon = document.getElementById('sim-icon');
+            var text = document.getElementById('sim-text');
+            btn.classList.remove('active');
+            icon.className = 'fas fa-play mr-1';
+            text.textContent = 'START SIM';
+
+            document.getElementById('inlet-slider').value = 75;
+            document.getElementById('pump-slider').value = 80;
+            document.getElementById('inlet-val').textContent = '75%';
+            document.getElementById('pump-val').textContent = '80%';
+            inletFlow = 75;
+            pumpSpeed = 80;
+
+            document.getElementById('status-system').textContent = 'OPTIMAL';
+            document.getElementById('led-system').className = 'status-led led-green';
+            document.getElementById('status-flow').textContent = '45.2 m³/h';
+        }
+
+        // Uptime counter
+        setInterval(function() {
+            uptimeSeconds++;
+            var h = Math.floor(uptimeSeconds / 3600);
+            var m = Math.floor((uptimeSeconds % 3600) / 60);
+            var s = uptimeSeconds % 60;
+            document.getElementById('status-uptime').textContent =
+                String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            document.getElementById('status-time').textContent = new Date().toLocaleTimeString('id-ID');
+        }, 1000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
+            if (e.key === 'r' || e.key === 'R') { if (!e.ctrlKey && !e.metaKey) resetSimulation(); }
+            if (e.key === 's' || e.key === 'S') { if (!e.ctrlKey && !e.metaKey) { e.preventDefault(); toggleSimulation(); } }
+            if (e.key === 'b' || e.key === 'B') { triggerBackwash(); }
+            if (e.key === 'Escape') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                    document.body.classList.remove('fullscreen');
+                }
+            }
+            if (e.key === '1') setZoom(0.5);
+            if (e.key === '2') setZoom(0.75);
+            if (e.key === '3') setZoom(1);
+            if (e.key === '4') setZoom(1.2);
+        });
+
+        // Tooltip functionality
+        function showTooltip(e, equipId) {
+            var spec = equipmentSpecs[equipId];
+            if (!spec) return;
+
+            tooltipTitle.textContent = spec.title;
+            var html = '';
+            spec.specs.forEach(function(item) {
+                html += '<div class="tooltip-row"><span class="tooltip-label">' + item.label + '</span><span class="tooltip-value">' + item.value + '</span></div>';
+            });
+            tooltipContent.innerHTML = html;
+
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY - 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
     </script>
 </body>
 </html>

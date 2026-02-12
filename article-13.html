@@ -1,0 +1,3515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive | Technical Paper</title>
+    <meta name="description" content="Ultra-comprehensive technical analysis of modern data center power distribution systems. Covers AWS, Google, Microsoft, xAI Colossus architectures. 48V/380V/800V DC distribution, failure scenarios, arc flash calculations, protection coordination, and reliability engineering.">
+    <meta name="keywords" content="Data Center Power Distribution, Hyperscaler Architecture, AWS UPS, Google 48V DC, Microsoft Azure Power, xAI Colossus, NVIDIA GB200, Arc Flash, Selective Coordination, UPS Design, Generator Systems, Lithium-ion Battery, Thermal Runaway, TIA-942, Uptime Institute Tier">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="canonical" href="https://resistancezero.com/article-13.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/article-13.html">
+    <meta property="og:title" content="Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive">
+    <meta property="og:description" content="Technical deep-dive into AWS, Google, Microsoft, and xAI power distribution systems. Includes failure scenarios, protection coordination, and reliability calculations.">
+    <meta property="og:image" content="https://resistancezero.com/assets/article-13-cover.jpg">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="article:author" content="Bagus Dwi Permana">
+    <meta property="article:published_time" content="2026-02-08T00:00:00Z">
+    <meta property="article:section" content="Engineering Journal">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Data Center Power Distribution Design: Hyperscaler Deep Dive">
+    <meta name="twitter:description" content="AWS, Google, Microsoft, xAI power architectures. Failure scenarios and reliability engineering.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/article-13-cover.jpg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechnicalArticle",
+        "headline": "Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive",
+        "description": "Comprehensive technical analysis of modern data center power distribution systems based on AWS, Google, Microsoft, and xAI architectures.",
+        "image": "https://resistancezero.com/assets/article-13-cover.jpg",
+        "author": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager"
+        },
+        "datePublished": "2026-02-08",
+        "wordCount": "15000",
+        "articleSection": "Engineering Journal",
+        "keywords": ["Power Distribution", "Hyperscaler", "Data Center", "UPS", "Reliability Engineering"]
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary-blue: #1e3a5f;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        /* Hero Section */
+        .article-hero {
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 50%, #2d5a87 100%);
+            padding: 8rem 2rem 4rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 15 L42 17 L32 19 L30 29 L28 19 L18 17 L28 15 Z' fill='%2306b6d4' fill-opacity='0.03'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
+        .article-hero > * { position: relative; z-index: 1; }
+        .article-hero .container { max-width: 1000px; margin: 0 auto; }
+
+        .article-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(6, 182, 212, 0.2);
+            color: #67e8f9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .article-title {
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .article-subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            background: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-cyan);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .toc-item-number {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Article Content */
+        .article-content {
+            padding: 4rem 2rem;
+            background: #fff;
+        }
+
+        .article-content .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .article-body {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .article-body p {
+            margin-bottom: 1rem;
+        }
+
+        .article-body h2 {
+            font-size: 1.35rem;
+            color: var(--primary-blue);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .article-body h2 .section-number {
+            background: var(--accent-cyan);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .article-body h3 {
+            font-size: 1.05rem;
+            color: #334155;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .article-body h4 {
+            font-size: 0.9rem;
+            color: #475569;
+            margin: 1rem 0 0.5rem;
+        }
+
+        /* Data Tables */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2d5a87 100%);
+            color: #fff;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Company Badges */
+        .company-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .company-badge.aws { background: #ff990033; color: #ff9900; }
+        .company-badge.google { background: #4285f433; color: #4285f4; }
+        .company-badge.microsoft { background: #00a4ef33; color: #00a4ef; }
+        .company-badge.xai { background: #00000020; color: #333; }
+        .company-badge.nvidia { background: #76b90033; color: #76b900; }
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: var(--accent-amber);
+        }
+
+        .info-box.critical {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-left-color: var(--accent-red);
+        }
+
+        .info-box.success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left-color: var(--accent-emerald);
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+
+        .code-block .comment { color: #64748b; }
+        .code-block .keyword { color: #f472b6; }
+        .code-block .variable { color: #67e8f9; }
+        .code-block .value { color: #a5f3fc; }
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border: 2px solid #c4b5fd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .formula-box-title {
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Comparison Cards */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .comparison-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .comparison-card-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .comparison-card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stat Highlights */
+        .stat-highlight {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.25rem;
+        }
+
+        .stat-highlight .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+        }
+
+        .stat-highlight .unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Architecture Diagram */
+        .architecture-diagram {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .architecture-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .flow-box {
+            background: rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .flow-arrow {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+        }
+
+        /* Interactive Calculator */
+        .calculator-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+            color: #fff;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .calculator-subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calc-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .calc-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .calc-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .calc-result-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .calc-result-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+        }
+
+        .calc-result-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        /* Failure Scenario Cards */
+        .failure-scenarios {
+            display: grid;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .failure-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .failure-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .failure-title {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .failure-severity {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .failure-severity.critical { background: #fef2f2; color: #dc2626; }
+        .failure-severity.high { background: #fff7ed; color: #ea580c; }
+        .failure-severity.medium { background: #fffbeb; color: #d97706; }
+
+        .failure-sequence {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .failure-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .failure-step:last-child {
+            border-bottom: none;
+        }
+
+        .failure-step-number {
+            width: 24px;
+            height: 24px;
+            background: var(--accent-red);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* References */
+        .references-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+        }
+
+        .references-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .references-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .reference-item {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .reference-number {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .reference-item a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .reference-item a:hover {
+            text-decoration: underline;
+        }
+
+        .reference-source {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .article-hero { padding: 6rem 1rem 3rem; }
+            .article-content { padding: 2rem 1rem; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .flow-diagram { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">
+                        DC Solutions
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                        <li><a href="dc-conventional.html">DC Conventional</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                    </ul>
+                </li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="article-hero">
+        <div class="container">
+            <a href="articles.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Back to Engineering Journal
+            </a>
+
+            <span class="article-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                Technical Deep Dive
+            </span>
+
+            <h1 class="article-title">Data Center Power Distribution Design:<br>Hyperscaler Architecture Deep Dive</h1>
+
+            <p class="article-subtitle">
+                Comprehensive analysis of modern power distribution systems based on AWS, Google, Microsoft, and xAI architectures. Covers 48V/380V/800V DC distribution, failure scenarios, arc flash calculations, protection coordination, and reliability engineering with interactive calculators.
+            </p>
+
+            <div class="article-meta">
+                <span class="article-meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    February 8, 2026
+                </span>
+                <span class="article-meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    45 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    ~15,000 words
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Table of Contents -->
+    <section class="toc-section">
+        <div class="toc-container">
+            <h2 class="toc-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                Table of Contents
+            </h2>
+            <div class="toc-grid">
+                <a href="#section-1" class="toc-item">
+                    <div class="toc-item-number">SECTION 1</div>
+                    <div class="toc-item-title">Executive Summary & Key Findings</div>
+                </a>
+                <a href="#section-2" class="toc-item">
+                    <div class="toc-item-number">SECTION 2</div>
+                    <div class="toc-item-title">Hyperscaler Power Architectures</div>
+                </a>
+                <a href="#section-3" class="toc-item">
+                    <div class="toc-item-number">SECTION 3</div>
+                    <div class="toc-item-title">Voltage Evolution: 12V → 48V → 800V DC</div>
+                </a>
+                <a href="#section-4" class="toc-item">
+                    <div class="toc-item-number">SECTION 4</div>
+                    <div class="toc-item-title">UPS & Battery Technologies</div>
+                </a>
+                <a href="#section-5" class="toc-item">
+                    <div class="toc-item-number">SECTION 5</div>
+                    <div class="toc-item-title">Generator & Backup Systems</div>
+                </a>
+                <a href="#section-6" class="toc-item">
+                    <div class="toc-item-number">SECTION 6</div>
+                    <div class="toc-item-title">Failure Scenario Analysis</div>
+                </a>
+                <a href="#section-7" class="toc-item">
+                    <div class="toc-item-number">SECTION 7</div>
+                    <div class="toc-item-title">Protection & Coordination</div>
+                </a>
+                <a href="#section-8" class="toc-item">
+                    <div class="toc-item-number">SECTION 8</div>
+                    <div class="toc-item-title">Reliability Calculations</div>
+                </a>
+                <a href="#section-9" class="toc-item">
+                    <div class="toc-item-number">SECTION 9</div>
+                    <div class="toc-item-title">AI/HPC Power Requirements</div>
+                </a>
+                <a href="#section-10" class="toc-item">
+                    <div class="toc-item-number">SECTION 10</div>
+                    <div class="toc-item-title">Design Recommendations</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
+    <article class="article-content">
+        <div class="container">
+            <div class="article-body">
+
+                <!-- Section 1: Executive Summary -->
+                <h2 id="section-1">
+                    <span class="section-number">1</span>
+                    Executive Summary & Key Findings
+                </h2>
+
+                <p>
+                    The data center industry is undergoing a fundamental transformation in power distribution architecture, driven by the unprecedented power demands of AI workloads. Traditional 12V server power supplies and centralized UPS systems are being replaced by distributed architectures operating at 48V, 380V, and even 800V DC. This paper provides an in-depth analysis of power distribution systems deployed by leading hyperscalers—AWS, Google, Microsoft, xAI, and Anthropic—along with comprehensive failure scenario analysis and design recommendations.
+                </p>
+
+                <div class="info-box success">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Key Research Findings
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.25rem; line-height: 1.8;">
+                        <li><strong>AWS distributed UPS</strong> reduces conversion losses by 35% and limits failure impact to single racks</li>
+                        <li><strong>Google's 48V DC</strong> architecture achieves 16x reduction in distribution losses vs 12V</li>
+                        <li><strong>Microsoft's Mt Diablo</strong> 400V DC enables 15-35% more AI accelerators per rack</li>
+                        <li><strong>xAI Colossus</strong> operates at 2 GW—40% of Memphis's average daily energy usage</li>
+                        <li><strong>Anthropic's Multi-Cloud</strong> aggregates >2 GW across AWS Trainium2, Google TPU, and Azure</li>
+                        <li><strong>800V DC</strong> (NVIDIA architecture) reduces copper requirements by 16.7x vs 48V</li>
+                        <li><strong>Power remains #1 cause</strong> of data center outages (54% in 2024)</li>
+                    </ul>
+                </div>
+
+                <!-- Infographic -->
+                <div style="margin: 2rem 0; text-align: center;">
+                    <img src="assets/article-13-infographic.jpg" alt="Data Center Power Distribution Design - Hyperscaler Architecture Infographic" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+                    <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.75rem; font-style: italic;">Hyperscaler Power Architecture Overview: AWS, Google, Microsoft, xAI, and Anthropic</p>
+                </div>
+
+                <!-- Hyperscaler Comparison Table -->
+                <h3>Hyperscaler Power Architecture Comparison</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Architecture</th>
+                                <th>UPS Approach</th>
+                                <th>Voltage Level</th>
+                                <th>Fleet PUE</th>
+                                <th>Max Rack Power</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="company-badge aws">AWS</span></td>
+                                <td>Distributed Micro-UPS</td>
+                                <td>In-rack BBU</td>
+                                <td>48V DC</td>
+                                <td>1.15</td>
+                                <td>130+ kW</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge google">Google</span></td>
+                                <td>Server-level Battery</td>
+                                <td>Per-server 48V BBU</td>
+                                <td>48V → 400V DC</td>
+                                <td>1.09</td>
+                                <td>1 MW (vision)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge microsoft">Microsoft</span></td>
+                                <td>Mt Diablo Disaggregated</td>
+                                <td>Sidecar Power Rack</td>
+                                <td>±400V / 800V DC</td>
+                                <td>1.12</td>
+                                <td>140 kW</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge xai">xAI</span></td>
+                                <td>Tesla Megapack + Grid</td>
+                                <td>Centralized + Battery</td>
+                                <td>480V AC</td>
+                                <td>N/A</td>
+                                <td>~100 kW</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge anthropic" style="background: linear-gradient(135deg, #d97706, #b45309);">Anthropic</span></td>
+                                <td>Multi-Cloud Distributed</td>
+                                <td>Provider-managed (AWS/GCP/Azure)</td>
+                                <td>48V-800V (varies)</td>
+                                <td>1.10-1.15</td>
+                                <td>>2 GW total</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge nvidia">NVIDIA</span></td>
+                                <td>800V HVDC Sidecar</td>
+                                <td>Rack-adjacent</td>
+                                <td>800V DC</td>
+                                <td>N/A</td>
+                                <td>1 MW+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 2: Hyperscaler Architectures -->
+                <h2 id="section-2">
+                    <span class="section-number">2</span>
+                    Hyperscaler Power Architectures
+                </h2>
+
+                <h3>2.1 AWS: Revolutionary Distributed UPS</h3>
+
+                <p>
+                    AWS has pioneered a <strong>distributed micro-UPS architecture</strong> that represents a significant departure from traditional centralized UPS designs. Rather than using large third-party UPS systems, AWS deploys small battery packs and custom power supplies integrated into every rack.
+                </p>
+
+                <div class="architecture-diagram">
+                    <div class="architecture-title">AWS Distributed Power Architecture</div>
+                    <div class="flow-diagram">
+                        <span class="flow-box">Utility Grid (HV)</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">MV Switchgear</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">MV/LV Transformer</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">Power Shelf (AC→DC)</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">48V Busbar</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">In-Rack BBU</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">IT Load</span>
+                    </div>
+                </div>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(255, 153, 0, 0.1);">⚡</div>
+                            <div>
+                                <div class="comparison-card-title">35% Efficiency Gain</div>
+                                <div class="comparison-card-subtitle">Energy Conversion Loss Reduction</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            Distributed UPS eliminates multiple AC/DC/AC conversion stages, reducing power losses from grid to server.
+                        </p>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(16, 185, 129, 0.1);">🎯</div>
+                            <div>
+                                <div class="comparison-card-title">89% Fewer Affected Racks</div>
+                                <div class="comparison-card-subtitle">During Electrical Issues</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            Single failure now impacts only one rack, not entire data hall—dramatically reducing blast radius.
+                        </p>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(6, 182, 212, 0.1);">📊</div>
+                            <div>
+                                <div class="comparison-card-title">99.9999% Availability</div>
+                                <div class="comparison-card-subtitle">Infrastructure Uptime</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            Six nines availability achieved through simplified systems and reduced single points of failure.
+                        </p>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(139, 92, 246, 0.1);">🔋</div>
+                            <div>
+                                <div class="comparison-card-title">6x Density Increase</div>
+                                <div class="comparison-card-subtitle">Rack Power Capacity</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            New power shelf design enables 130+ kW per rack for GB200 workloads, with 3x more planned.
+                        </p>
+                    </div>
+                </div>
+
+                <h3>2.2 Google: Server-Level Battery Innovation</h3>
+
+                <p>
+                    Google's groundbreaking approach integrates UPS functionality directly into each server, eliminating the need for centralized UPS systems entirely. This architecture began with 12V battery backup in 2008 and evolved to 48V DC distribution by 2016.
+                </p>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Google's 48V DC Efficiency Formula
+                    </div>
+                    <p style="margin: 0;">
+                        Distribution losses are a function of current squared. Since 48V carries 1/4 the current of 12V for the same power, losses are reduced by (48/12)² = <strong>16x lower</strong>.
+                    </p>
+                </div>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Power Loss Comparison: 12V vs 48V DC</div>
+                    <pre style="margin: 0; white-space: pre-wrap;">
+P_loss = I²R = (P_load / V)² × R
+
+For same power delivery:
+P_loss(12V) = (P / 12)² × R = P²R / 144
+P_loss(48V) = (P / 48)² × R = P²R / 2304
+
+Ratio: P_loss(12V) / P_loss(48V) = 2304 / 144 = 16
+
+<span style="color: #10b981;">Result: 48V reduces distribution losses by 93.75%</span></pre>
+                </div>
+
+                <h4>Google's Power Architecture Evolution</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Innovation</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2008</td>
+                                <td>12V server-level UPS patent</td>
+                                <td>Single AC-DC conversion</td>
+                            </tr>
+                            <tr>
+                                <td>2010</td>
+                                <td>48V DC development begins</td>
+                                <td>30% efficiency improvement</td>
+                            </tr>
+                            <tr>
+                                <td>2015</td>
+                                <td>Li-ion BBU transition</td>
+                                <td>2x density, 2x lifespan vs lead-acid</td>
+                            </tr>
+                            <tr>
+                                <td>2018</td>
+                                <td>Liquid cooling for TPU v3</td>
+                                <td>4x supercomputer size</td>
+                            </tr>
+                            <tr>
+                                <td>2024</td>
+                                <td>100M Li-ion cells deployed</td>
+                                <td>Fleet-wide 1.09 PUE</td>
+                            </tr>
+                            <tr>
+                                <td>2025</td>
+                                <td>Mt Diablo 400V DC (with Meta, Microsoft)</td>
+                                <td>800kW-1MW per rack vision</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>2.3 Microsoft: Mt Diablo Disaggregated Power</h3>
+
+                <p>
+                    Microsoft, in collaboration with Meta and Google, developed the <strong>Mt Diablo disaggregated power specification</strong>—representing a fundamental shift in data center power delivery. This architecture separates power conversion from compute racks, using a "sidecar" power rack full of rectifiers.
+                </p>
+
+                <div class="architecture-diagram">
+                    <div class="architecture-title">Microsoft Mt Diablo Architecture</div>
+                    <div class="flow-diagram">
+                        <span class="flow-box">480V AC Backbone</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">Sidecar Power Rack</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">±400V DC Bus</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">Compute Rack</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">GPU/CPU Load</span>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Mt Diablo Key Benefits
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.25rem;">
+                        <li><strong>15-35% more AI accelerators</strong> per rack by eliminating conversion inefficiencies</li>
+                        <li><strong>Scales from 100 kW to 1 MW</strong> per IT rack</li>
+                        <li><strong>Leverages EV supply chain</strong> for ±400V DC components</li>
+                        <li><strong>Open-sourced through OCP</strong> (Diablo 400 v0.5.2 specification)</li>
+                    </ul>
+                </div>
+
+                <h3>2.4 xAI Colossus: World's First Gigawatt AI Data Center</h3>
+
+                <p>
+                    xAI's Colossus supercomputer in Memphis represents the most aggressive power deployment in AI history. Operating at <strong>2 GW total capacity</strong>—equivalent to 40% of Memphis's average daily energy usage—it demonstrates the extreme power requirements of frontier AI training.
+                </p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Phase</th>
+                                <th>Power Capacity</th>
+                                <th>GPU Count</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Colossus 1</td>
+                                <td>150 MW (grid) + 35 MW (generators)</td>
+                                <td>100,000 H100</td>
+                                <td style="color: #10b981;">Operational (July 2024)</td>
+                            </tr>
+                            <tr>
+                                <td>Phase 2</td>
+                                <td>300 MW total</td>
+                                <td>200,000 H100/H200</td>
+                                <td style="color: #10b981;">Operational (2025)</td>
+                            </tr>
+                            <tr>
+                                <td>Colossus 2</td>
+                                <td><strong>2 GW total</strong></td>
+                                <td>555,000 GPUs</td>
+                                <td style="color: #f59e0b;">Announced (Jan 2026)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        xAI Colossus Power Infrastructure
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.25rem;">
+                        <li><strong>168 Tesla Megapacks</strong> installed (~150 MW battery backup)</li>
+                        <li><strong>1.3 million gallons/day</strong> cooling water from Memphis Aquifer</li>
+                        <li><strong>$24 million</strong> invested in new MLGW substation</li>
+                        <li><strong>35 mobile generators</strong> (2.5 MW each) used during initial deployment</li>
+                    </ul>
+                </div>
+
+                <h3>2.5 Anthropic: The Multi-Cloud AI Factory</h3>
+
+                <p>
+                    Anthropic has pioneered a unique <strong>multi-cloud, multi-accelerator</strong> infrastructure strategy that represents a fundamentally different approach to AI compute power distribution. Unlike xAI's concentrated deployment or OpenAI's Microsoft-exclusive arrangement, Anthropic distributes workloads across <strong>four major infrastructure partners</strong>, three distinct chip architectures, and <strong>multiple geographic regions</strong>—aggregating multi-gigawatt scale capacity while maximizing resilience against single-provider failures.
+                </p>
+
+                <h4>2.5.1 Infrastructure Partnership Architecture</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Infrastructure Partner</th>
+                                <th>Compute Platform</th>
+                                <th>Chip Count</th>
+                                <th>Power Capacity</th>
+                                <th>Geographic Distribution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AWS Project Rainier</strong></td>
+                                <td>Trainium2 (500W TDP)</td>
+                                <td>500K → 1M chips</td>
+                                <td>250-500 MW compute</td>
+                                <td>Indiana, Pennsylvania, Mississippi</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Cloud</strong></td>
+                                <td>TPU v5p/v6e/Ironwood (7th gen)</td>
+                                <td>Up to 1M TPUs</td>
+                                <td>>1 GW (2026)</td>
+                                <td>Oklahoma, Oregon, Nevada, Global</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Microsoft Azure</strong></td>
+                                <td>NVIDIA Grace Blackwell (GB200)</td>
+                                <td>$30B commitment</td>
+                                <td>Est. 300-500 MW</td>
+                                <td>Virginia, Arizona, Netherlands</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fluidstack Partnership</strong></td>
+                                <td>Custom GPU clusters (H100/B200)</td>
+                                <td>$50B investment</td>
+                                <td>Est. 500 MW+</td>
+                                <td>Texas (training), New York (inference)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>2.5.2 Power Architecture Deep Dive</h4>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card" style="border-left: 4px solid #ff9900;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(255, 153, 0, 0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff9900" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            </div>
+                            <div>
+                                <div class="comparison-card-title">AWS Trainium2 Architecture</div>
+                                <div class="comparison-card-subtitle">Project Rainier Power Distribution</div>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; margin: 0.75rem 0 0; padding-left: 1rem; color: #64748b;">
+                            <li><strong>Chip TDP:</strong> 500W per Trainium2</li>
+                            <li><strong>Rack Density:</strong> 27 kW per rack (54 chips/rack)</li>
+                            <li><strong>Server Config:</strong> Trn2 instance = 16 chips = 8 kW</li>
+                            <li><strong>UltraServer:</strong> 64 chips = 32 kW per node</li>
+                            <li><strong>Cooling:</strong> AWS distributed BBU + liquid cooling</li>
+                            <li><strong>PUE Target:</strong> 1.15-1.20</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #4285f4;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(66, 133, 244, 0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            </div>
+                            <div>
+                                <div class="comparison-card-title">Google TPU Architecture</div>
+                                <div class="comparison-card-subtitle">TPU v5p/v6e Power Distribution</div>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; margin: 0.75rem 0 0; padding-left: 1rem; color: #64748b;">
+                            <li><strong>TPU v5p TDP:</strong> ~450W per chip</li>
+                            <li><strong>TPU v6e (Trillium):</strong> ~300W per chip</li>
+                            <li><strong>Pod Config:</strong> 8,960 chips per pod (v5p)</li>
+                            <li><strong>Pod Power:</strong> ~4 MW per TPU pod</li>
+                            <li><strong>Cooling:</strong> Server-level 48V BBU</li>
+                            <li><strong>PUE Achieved:</strong> 1.09-1.10</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #00a4ef;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(0, 164, 239, 0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00a4ef" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                            </div>
+                            <div>
+                                <div class="comparison-card-title">Azure GB200 Architecture</div>
+                                <div class="comparison-card-subtitle">Mt Diablo + NVIDIA Integration</div>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; margin: 0.75rem 0 0; padding-left: 1rem; color: #64748b;">
+                            <li><strong>GB200 TDP:</strong> 2,700W per superchip</li>
+                            <li><strong>Rack Config:</strong> NVL72 = 72 GPUs = 120 kW</li>
+                            <li><strong>Distribution:</strong> ±400V DC (Mt Diablo)</li>
+                            <li><strong>800V Option:</strong> NVIDIA HVDC sidecar</li>
+                            <li><strong>Cooling:</strong> Direct liquid cooling mandatory</li>
+                            <li><strong>PUE Target:</strong> 1.10-1.12</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #8b5cf6;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(139, 92, 246, 0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                            </div>
+                            <div>
+                                <div class="comparison-card-title">Fluidstack Custom Build</div>
+                                <div class="comparison-card-subtitle">Neocloud Power Architecture</div>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; margin: 0.75rem 0 0; padding-left: 1rem; color: #64748b;">
+                            <li><strong>Texas Facility:</strong> Training-optimized, low cost</li>
+                            <li><strong>NY Facility:</strong> Inference, low latency</li>
+                            <li><strong>Power Cost:</strong> $0.04-0.06/kWh (Texas)</li>
+                            <li><strong>GPU Mix:</strong> H100/B200 clusters</li>
+                            <li><strong>Cooling:</strong> Hybrid air + liquid</li>
+                            <li><strong>PUE Target:</strong> 1.20-1.25</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>2.5.3 Total Power Demand Analysis</h4>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Anthropic Multi-Cloud Power Budget (2026 Projection)</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #ff9900; font-weight: 600;">═══ AWS PROJECT RAINIER ═══</span>
+Trainium2 Chips:        1,000,000 units
+TDP per Chip:           500W
+Compute Power:          1,000,000 × 500W = <strong>500 MW</strong>
+Cooling (PUE 1.18):     500 MW × 0.18 = 90 MW
+Networking/Storage:     ~10 MW
+<strong>Total AWS Capacity:     ~600 MW</strong>
+
+<span style="color: #4285f4; font-weight: 600;">═══ GOOGLE CLOUD TPU ═══</span>
+TPU v5p Chips:          ~600,000 units (estimated)
+TPU v6e Chips:          ~400,000 units (estimated)
+v5p Power:              600,000 × 450W = 270 MW
+v6e Power:              400,000 × 300W = 120 MW
+Total Compute:          390 MW
+Cooling (PUE 1.10):     390 MW × 0.10 = 39 MW
+Infrastructure:         ~71 MW (networking, storage, auxiliary)
+<strong>Total Google Capacity:  ~500 MW (scaling to >1 GW)</strong>
+
+<span style="color: #00a4ef; font-weight: 600;">═══ MICROSOFT AZURE ═══</span>
+NVIDIA GB200 Superchips: ~100,000 units (estimated from $30B)
+TDP per Superchip:       2,700W
+Compute Power:           100,000 × 2,700W = <strong>270 MW</strong>
+DLC + Cooling (PUE 1.12): 270 MW × 0.12 = 32 MW
+<strong>Total Azure Capacity:   ~300 MW</strong>
+
+<span style="color: #8b5cf6; font-weight: 600;">═══ FLUIDSTACK PARTNERSHIP ═══</span>
+Texas Training Cluster:  ~200 MW (GPU compute)
+NY Inference Cluster:    ~50 MW
+Cooling & Infrastructure: ~50 MW
+<strong>Total Fluidstack:       ~300 MW</strong>
+
+<span style="color: #10b981; font-weight: 700;">═══ COMBINED ANTHROPIC INFRASTRUCTURE ═══</span>
+AWS Project Rainier:     600 MW
+Google Cloud TPU:        500 MW → 1,100 MW (2026)
+Microsoft Azure:         300 MW
+Fluidstack:              300 MW
+────────────────────────────────────
+<strong style="font-size: 1rem;">TOTAL 2026 CAPACITY:    1,700 MW → 2,300 MW</strong>
+<strong style="font-size: 1rem;">PEAK PROJECTION:        2.5 - 3.0 GW</strong>
+
+Equivalent to powering: ~2.3 million US households
+Annual Energy:          ~15-20 TWh/year</pre>
+                </div>
+
+                <h4>2.5.4 Failure Scenario Analysis: Multi-Cloud Resilience</h4>
+
+                <p>
+                    Anthropic's distributed architecture provides <strong>unprecedented resilience</strong> against infrastructure failures. Unlike single-provider deployments (OpenAI → Microsoft, xAI → Memphis), Anthropic can survive complete provider outages while maintaining service continuity.
+                </p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Failure Scenario</th>
+                                <th>Impact Scope</th>
+                                <th>Capacity Loss</th>
+                                <th>Recovery Strategy</th>
+                                <th>RTO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AWS Region Outage</strong> (Single AZ)</td>
+                                <td>~10% of Rainier capacity</td>
+                                <td>~60 MW</td>
+                                <td>Auto-failover to other AZs + Google/Azure</td>
+                                <td style="color: #10b981;"><strong>&lt;5 min</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AWS Complete Outage</strong></td>
+                                <td>All Trainium2 workloads</td>
+                                <td>~600 MW (26%)</td>
+                                <td>Shift training to Google TPU; inference to Azure</td>
+                                <td style="color: #f59e0b;"><strong>15-30 min</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Cloud Outage</strong></td>
+                                <td>All TPU workloads</td>
+                                <td>~500-1,100 MW (35%)</td>
+                                <td>Route to AWS Trainium2; Azure for GPU tasks</td>
+                                <td style="color: #f59e0b;"><strong>15-30 min</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Microsoft Azure Outage</strong></td>
+                                <td>GB200 GPU workloads</td>
+                                <td>~300 MW (13%)</td>
+                                <td>Failover to Fluidstack GPU clusters</td>
+                                <td style="color: #10b981;"><strong>&lt;10 min</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fluidstack Outage</strong></td>
+                                <td>Custom GPU inference</td>
+                                <td>~300 MW (13%)</td>
+                                <td>Shift to Azure or Google inference pods</td>
+                                <td style="color: #10b981;"><strong>&lt;10 min</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Simultaneous Dual Outage</strong></td>
+                                <td>Any two providers</td>
+                                <td>~40-50% capacity</td>
+                                <td>Degraded mode; prioritize inference</td>
+                                <td style="color: #ef4444;"><strong>30-60 min</strong></td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>Triple Provider Outage</strong></td>
+                                <td>Catastrophic (AWS+Google+Azure)</td>
+                                <td>~85% capacity</td>
+                                <td>Fluidstack-only operation; emergency mode</td>
+                                <td style="color: #ef4444;"><strong>>1 hour</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Critical Dependency: Chip Architecture Lock-in
+                    </div>
+                    <p style="margin-bottom: 0.75rem; color: #92400e; font-size: 0.875rem;">
+                        Despite multi-cloud distribution, <strong>workload portability remains limited</strong>:
+                    </p>
+                    <ul style="margin: 0; padding-left: 1.25rem; color: #92400e; font-size: 0.875rem;">
+                        <li><strong>Trainium2 → TPU:</strong> Requires model recompilation (hours to days)</li>
+                        <li><strong>TPU → NVIDIA:</strong> Different software stack (JAX vs PyTorch)</li>
+                        <li><strong>Training Checkpoints:</strong> Not directly portable between architectures</li>
+                        <li><strong>Inference:</strong> More portable; can shift within minutes with ONNX</li>
+                    </ul>
+                </div>
+
+                <h4>2.5.5 Reliability Calculation: Multi-Provider Availability</h4>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">System Availability Analysis</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #67e8f9; font-weight: 600;">Individual Provider Availability (Historical):</span>
+  AWS (EC2):           99.99% = 52.6 min downtime/year
+  Google Cloud:        99.95% = 4.38 hours downtime/year
+  Microsoft Azure:     99.95% = 4.38 hours downtime/year
+  Fluidstack (est):    99.9%  = 8.76 hours downtime/year
+
+<span style="color: #10b981; font-weight: 600;">Multi-Cloud Availability (Parallel Redundancy):</span>
+  For service requiring ANY ONE provider operational:
+
+  P(all down) = P(AWS down) × P(GCP down) × P(Azure down) × P(Fluid down)
+  P(all down) = 0.0001 × 0.0005 × 0.0005 × 0.001
+  P(all down) = 2.5 × 10⁻¹⁴
+
+  <strong>Combined Availability = 1 - P(all down)</strong>
+  <strong style="color: #10b981;">Combined Availability = 99.9999999999975%</strong>
+  <strong style="color: #10b981;">Theoretical Downtime = 0.0008 seconds/year</strong>
+
+<span style="color: #f59e0b; font-weight: 600;">Practical Limitations:</span>
+  - Workload migration latency: 15-30 minutes
+  - Training job restart overhead: 30-60 minutes
+  - Checkpoint sync delays: 5-15 minutes
+
+<span style="color: #ef4444; font-weight: 600;">Realistic Effective Availability:</span>
+  Accounting for migration overhead:
+  <strong>Effective Availability ≈ 99.99% (52 min downtime/year)</strong>
+
+  Still superior to single-provider:
+  - OpenAI (Azure-only): 99.95%
+  - xAI (Memphis-only): 99.9% (estimated)</pre>
+                </div>
+
+                <h4>2.5.6 Power Cost Optimization Strategy</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Region</th>
+                                <th>Est. Power Cost</th>
+                                <th>Workload Type</th>
+                                <th>Cost Efficiency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Fluidstack Texas</strong></td>
+                                <td>ERCOT Grid</td>
+                                <td style="color: #10b981;"><strong>$0.04-0.06/kWh</strong></td>
+                                <td>Large training runs</td>
+                                <td>Lowest cost for batch</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AWS Indiana</strong></td>
+                                <td>MISO Grid</td>
+                                <td>$0.06-0.08/kWh</td>
+                                <td>Trainium2 training</td>
+                                <td>Best perf/$ for Trainium</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Oklahoma</strong></td>
+                                <td>SPP Grid</td>
+                                <td>$0.05-0.07/kWh</td>
+                                <td>TPU training/inference</td>
+                                <td>Carbon-free energy</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure Virginia</strong></td>
+                                <td>PJM Grid</td>
+                                <td>$0.08-0.10/kWh</td>
+                                <td>GPU inference</td>
+                                <td>Lowest latency to East Coast</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fluidstack NY</strong></td>
+                                <td>NYISO Grid</td>
+                                <td style="color: #ef4444;">$0.12-0.15/kWh</td>
+                                <td>Low-latency inference</td>
+                                <td>Premium for latency</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Annual Power Cost Estimation</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #67e8f9; font-weight: 600;">Blended Power Cost Calculation:</span>
+
+Training Workloads (70% of compute):
+  Texas/Oklahoma/Indiana: 1,400 MW × $0.055/kWh × 8,760 hr/yr
+  = <strong>$674 million/year</strong>
+
+Inference Workloads (30% of compute):
+  Higher-cost regions: 600 MW × $0.10/kWh × 8,760 hr/yr
+  = <strong>$526 million/year</strong>
+
+<span style="color: #10b981; font-weight: 600;">Total Annual Power Cost (2 GW scenario):</span>
+  Training + Inference = $674M + $526M
+  <strong style="font-size: 1rem;">≈ $1.2 billion/year in electricity</strong>
+
+  Blended rate: ~$0.068/kWh
+  (vs. $0.12/kWh if all in NY = $2.1B/year → 43% savings)</pre>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Anthropic Multi-Cloud Advantages Summary
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem;">
+                        <li><strong>No Single Point of Failure:</strong> Any provider can fail without total service loss</li>
+                        <li><strong>Supply Chain Diversity:</strong> NVIDIA shortage? Use Trainium2/TPU. AMD available? Flex to Azure.</li>
+                        <li><strong>Cost Arbitrage:</strong> Shift workloads to cheapest available capacity</li>
+                        <li><strong>Geographic Redundancy:</strong> 6+ states, 3+ countries, multiple grid operators</li>
+                        <li><strong>Competitive Leverage:</strong> No vendor lock-in enables better pricing negotiation</li>
+                        <li><strong>Technology Hedge:</strong> If one architecture underperforms, alternatives ready</li>
+                    </ul>
+                </div>
+
+                <h4>2.5.7 Multi-Cloud Network Topology & Power Flow</h4>
+
+                <div class="architecture-diagram">
+                    <div class="architecture-title">Anthropic Multi-Cloud Power & Data Flow Architecture</div>
+                    <div class="flow-diagram" style="flex-wrap: wrap; justify-content: center;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <span class="flow-box" style="background: linear-gradient(135deg, #ff9900, #cc7a00);">AWS Trainium2<br><small>600 MW | Indiana</small></span>
+                            <span style="font-size: 0.7rem; color: #64748b;">MISO Grid | 48V DC</span>
+                        </div>
+                        <span class="flow-arrow">↔</span>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <span class="flow-box" style="background: linear-gradient(135deg, #d97706, #92400e);">Anthropic<br>Control Plane<br><small>Workload Orchestrator</small></span>
+                        </div>
+                        <span class="flow-arrow">↔</span>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <span class="flow-box" style="background: linear-gradient(135deg, #4285f4, #1a5bc7);">Google TPU<br><small>1.1 GW | Oklahoma</small></span>
+                            <span style="font-size: 0.7rem; color: #64748b;">SPP Grid | 48V DC</span>
+                        </div>
+                    </div>
+                    <div class="flow-diagram" style="margin-top: 1rem; flex-wrap: wrap; justify-content: center;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <span class="flow-box" style="background: linear-gradient(135deg, #00a4ef, #0078d4);">Azure GB200<br><small>300 MW | Virginia</small></span>
+                            <span style="font-size: 0.7rem; color: #64748b;">PJM Grid | ±400V DC</span>
+                        </div>
+                        <span class="flow-arrow">↔</span>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <span class="flow-box" style="background: linear-gradient(135deg, #d97706, #92400e);">Global Load<br>Balancer<br><small>Latency-Aware Routing</small></span>
+                        </div>
+                        <span class="flow-arrow">↔</span>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <span class="flow-box" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">Fluidstack<br><small>300 MW | Texas</small></span>
+                            <span style="font-size: 0.7rem; color: #64748b;">ERCOT Grid | 480V AC</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>2.5.8 UPS & Backup Power Architecture Per Provider</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>UPS Architecture</th>
+                                <th>Battery Type</th>
+                                <th>Runtime</th>
+                                <th>Generator Backup</th>
+                                <th>Fuel Autonomy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AWS Rainier</strong></td>
+                                <td>Distributed Micro-UPS (in-rack BBU)</td>
+                                <td>LFP Li-ion (48V packs)</td>
+                                <td>90 seconds</td>
+                                <td>N+1 diesel generators (2.5 MW each)</td>
+                                <td>72 hours on-site</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Cloud</strong></td>
+                                <td>Server-level 48V BBU</td>
+                                <td>Li-ion (custom cells)</td>
+                                <td>60-90 seconds</td>
+                                <td>2N diesel + battery arrays</td>
+                                <td>48 hours + contracts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Microsoft Azure</strong></td>
+                                <td>Mt Diablo sidecar + centralized</td>
+                                <td>LFP + NMC hybrid</td>
+                                <td>5-10 minutes</td>
+                                <td>N+1 diesel + fuel cells (pilot)</td>
+                                <td>48 hours on-site</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fluidstack TX</strong></td>
+                                <td>Centralized rotary UPS</td>
+                                <td>Lead-acid + Li-ion hybrid</td>
+                                <td>15 minutes</td>
+                                <td>N diesel generators</td>
+                                <td>24 hours on-site</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Backup Power Capacity Calculation</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #67e8f9; font-weight: 600;">UPS Battery Sizing (Per Provider):</span>
+
+AWS Rainier (600 MW IT load):
+  Runtime required: 90 seconds = 0.025 hours
+  Battery capacity: 600 MW × 0.025 hr = 15 MWh
+  With 80% DoD: 15 / 0.8 = <strong>18.75 MWh installed</strong>
+  LFP cells (@250 Wh/kg): ~75,000 kg batteries
+
+Google TPU Cluster (500 MW):
+  Runtime required: 90 seconds
+  Battery capacity: 500 MW × 0.025 hr = 12.5 MWh
+  With 80% DoD: <strong>15.6 MWh installed</strong>
+
+Azure GB200 (300 MW):
+  Runtime required: 5 minutes = 0.083 hours
+  Battery capacity: 300 MW × 0.083 hr = 25 MWh
+  With 80% DoD: <strong>31.25 MWh installed</strong>
+
+<span style="color: #10b981; font-weight: 600;">Total Anthropic Battery Infrastructure:</span>
+  AWS + Google + Azure + Fluidstack
+  <strong>≈ 80-100 MWh total battery capacity</strong>
+  Equivalent to: ~1,600 Tesla Model S batteries</pre>
+                </div>
+
+                <h4>2.5.9 Cooling Architecture & Thermal Management</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Primary Cooling</th>
+                                <th>Secondary Cooling</th>
+                                <th>Coolant</th>
+                                <th>Delta-T</th>
+                                <th>Max Ambient</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AWS Trainium2</strong></td>
+                                <td>Direct Liquid Cooling (DLC)</td>
+                                <td>Rear-door heat exchangers</td>
+                                <td>Propylene glycol 30%</td>
+                                <td>12-15°C</td>
+                                <td>35°C (ASHRAE A3)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google TPU v5p</strong></td>
+                                <td>Cold plate DLC (mandatory)</td>
+                                <td>Evaporative + dry coolers</td>
+                                <td>Deionized water</td>
+                                <td>10-12°C</td>
+                                <td>40°C (custom spec)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure GB200</strong></td>
+                                <td>NVIDIA Superchip DLC (1.4L/min)</td>
+                                <td>Chilled water loop</td>
+                                <td>Dielectric fluid option</td>
+                                <td>15-18°C</td>
+                                <td>35°C (A2 baseline)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fluidstack</strong></td>
+                                <td>Hybrid air + liquid</td>
+                                <td>CRAH + in-row cooling</td>
+                                <td>Glycol/water mix</td>
+                                <td>8-12°C</td>
+                                <td>32°C (A1)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Cooling Power Requirements</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #67e8f9; font-weight: 600;">Heat Dissipation Calculation:</span>
+
+Q = m × Cp × ΔT
+
+Where:
+  Q = Heat removed (kW)
+  m = Coolant mass flow rate (kg/s)
+  Cp = Specific heat capacity (kJ/kg·K)
+  ΔT = Temperature difference (K)
+
+<span style="color: #f59e0b; font-weight: 600;">NVIDIA GB200 NVL72 Rack (120 kW):</span>
+  Required flow rate: Q / (Cp × ΔT)
+  = 120 kW / (4.18 kJ/kg·K × 15K)
+  = 1.91 kg/s = <strong>114 L/min per rack</strong>
+
+  For 2,500 racks (Azure allocation):
+  Total flow: 285,000 L/min = <strong>4,750 L/s</strong>
+
+<span style="color: #10b981; font-weight: 600;">Cooling Power Overhead (by PUE):</span>
+  AWS (PUE 1.18):   600 MW × 0.18 = 108 MW cooling
+  Google (PUE 1.10): 500 MW × 0.10 = 50 MW cooling
+  Azure (PUE 1.12):  300 MW × 0.12 = 36 MW cooling
+  Fluidstack (1.25): 300 MW × 0.25 = 75 MW cooling
+  ─────────────────────────────────────────────
+  <strong>Total Cooling Power: ~269 MW</strong></pre>
+                </div>
+
+                <h4>2.5.10 Cascading Failure Analysis</h4>
+
+                <p>
+                    Multi-cloud architectures introduce <strong>complex failure propagation paths</strong> that differ fundamentally from single-site deployments. The following analysis examines cascading failure scenarios unique to Anthropic's distributed infrastructure.
+                </p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Initial Failure</th>
+                                <th>Cascade Path</th>
+                                <th>Affected Systems</th>
+                                <th>Propagation Time</th>
+                                <th>Mitigation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Control Plane Outage</strong></td>
+                                <td>Orchestrator → All providers lose routing</td>
+                                <td>100% workloads orphaned</td>
+                                <td style="color: #ef4444;"><strong>Immediate</strong></td>
+                                <td>Multi-region control plane; local autonomy mode</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Checkpoint Storage Failure</strong></td>
+                                <td>S3/GCS outage → Training state lost</td>
+                                <td>All active training jobs</td>
+                                <td>5-15 minutes</td>
+                                <td>Cross-cloud checkpoint replication</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inter-Cloud Network Partition</strong></td>
+                                <td>AWS↔GCP link down → Split-brain state</td>
+                                <td>Distributed training synchronization</td>
+                                <td>1-5 minutes</td>
+                                <td>Quorum-based consensus; automatic leader election</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DNS/CDN Failure</strong></td>
+                                <td>Cloudflare/Route53 → API unreachable</td>
+                                <td>All inference endpoints</td>
+                                <td style="color: #ef4444;"><strong>Immediate</strong></td>
+                                <td>Multi-provider DNS; anycast routing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Model Registry Corruption</strong></td>
+                                <td>Bad weights deployed → All inference wrong</td>
+                                <td>All inference across clouds</td>
+                                <td>Minutes to hours</td>
+                                <td>Canary deployments; automatic rollback</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cooling System Failure (Single DC)</strong></td>
+                                <td>CDU pump failure → Thermal throttling → Checkpoint</td>
+                                <td>25-30% of one provider</td>
+                                <td>3-10 minutes</td>
+                                <td>Graceful workload migration; thermal shutdown</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>Common Mode: Solar Storm (Carrington-class)</strong></td>
+                                <td>Grid instability → All US providers affected</td>
+                                <td>Potentially 100%</td>
+                                <td style="color: #ef4444;"><strong>Hours</strong></td>
+                                <td>Geographic diversity (EU/APAC); generator islands</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Common Mode Failure Risks
+                    </div>
+                    <p style="margin-bottom: 0.75rem; color: #92400e; font-size: 0.875rem;">
+                        Despite multi-cloud distribution, the following <strong>common mode failures</strong> can affect all providers simultaneously:
+                    </p>
+                    <ul style="margin: 0; padding-left: 1.25rem; color: #92400e; font-size: 0.875rem;">
+                        <li><strong>Software Bugs:</strong> Shared libraries (CUDA, JAX, PyTorch) can have cross-platform vulnerabilities</li>
+                        <li><strong>Upstream Dependencies:</strong> Container registries, package managers, CA certificates</li>
+                        <li><strong>Internet Backbone:</strong> Major peering point failures (Equinix, DE-CIX)</li>
+                        <li><strong>Geopolitical:</strong> Sanctions, export controls affecting chip supply</li>
+                        <li><strong>Economic:</strong> Simultaneous provider bankruptcy (unlikely but non-zero)</li>
+                    </ul>
+                </div>
+
+                <h4>2.5.11 Workload Migration Technical Architecture</h4>
+
+                <div class="architecture-diagram">
+                    <div class="architecture-title">Cross-Cloud Training Migration Sequence</div>
+                    <div class="flow-diagram" style="flex-wrap: wrap;">
+                        <span class="flow-box" style="background: #ef4444;">1. Failure Detected<br><small>Health check fails</small></span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box" style="background: #f59e0b;">2. Checkpoint Sync<br><small>15-60s to save state</small></span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box" style="background: #eab308;">3. Target Selection<br><small>Capacity + cost eval</small></span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box" style="background: #22c55e;">4. Resource Alloc<br><small>Spin up instances</small></span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box" style="background: #10b981;">5. State Restore<br><small>Load checkpoint</small></span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box" style="background: #06b6d4;">6. Resume Training<br><small>Continue from step N</small></span>
+                    </div>
+                </div>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Migration Time Budget Analysis</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #67e8f9; font-weight: 600;">Training Job Migration (Claude-3 scale model):</span>
+
+Model Size: ~175B parameters (estimated)
+Checkpoint Size: 175B × 4 bytes (FP32) = 700 GB
+                 175B × 2 bytes (BF16) = 350 GB
+
+<span style="color: #f59e0b; font-weight: 600;">Step 1: Failure Detection</span>
+  Health check interval:        5 seconds
+  Confirmation threshold:       3 consecutive fails
+  Detection time:               <strong>15 seconds</strong>
+
+<span style="color: #f59e0b; font-weight: 600;">Step 2: Checkpoint Save</span>
+  Write speed (NVMe):           3.5 GB/s per node
+  Parallel nodes:               1,000
+  Aggregate bandwidth:          3.5 TB/s
+  350 GB checkpoint:            350 / 3,500 = <strong>0.1 seconds (local)</strong>
+
+  Upload to S3/GCS (100 Gbps):  350 GB / 12.5 GB/s = <strong>28 seconds</strong>
+
+<span style="color: #f59e0b; font-weight: 600;">Step 3: Target Provider Selection</span>
+  Capacity check API calls:     <strong>2-5 seconds</strong>
+
+<span style="color: #f59e0b; font-weight: 600;">Step 4: Resource Allocation</span>
+  AWS Trainium2 (pre-reserved): <strong>30-60 seconds</strong>
+  Google TPU (on-demand):       <strong>2-5 minutes</strong>
+  Azure GB200 (spot):           <strong>5-15 minutes</strong>
+
+<span style="color: #f59e0b; font-weight: 600;">Step 5: State Restoration</span>
+  Download checkpoint:          28 seconds (symmetric)
+  Load into accelerator memory: <strong>15-30 seconds</strong>
+
+<span style="color: #f59e0b; font-weight: 600;">Step 6: Training Resume</span>
+  Warmup iterations:            <strong>30-60 seconds</strong>
+
+<span style="color: #10b981; font-weight: 600;">Total Migration Time:</span>
+  Best case (pre-reserved):     15 + 28 + 3 + 45 + 43 + 45 = <strong>~3 minutes</strong>
+  Typical case (on-demand):     15 + 28 + 5 + 180 + 43 + 45 = <strong>~5-6 minutes</strong>
+  Worst case (spot capacity):   15 + 28 + 5 + 900 + 43 + 60 = <strong>~17 minutes</strong>
+
+<span style="color: #ef4444; font-weight: 600;">Training Time Lost (per migration):</span>
+  Tokens processed/second:      ~50,000 (estimated)
+  5-minute migration:           5 × 60 × 50,000 = <strong>15M tokens lost</strong>
+  Cost at $0.01/1K tokens:      <strong>$150 opportunity cost</strong></pre>
+                </div>
+
+                <h4>2.5.12 Power Quality & Protection Requirements</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>AWS Requirement</th>
+                                <th>Google Requirement</th>
+                                <th>Azure Requirement</th>
+                                <th>Standard Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Voltage Tolerance</strong></td>
+                                <td>±10% nominal</td>
+                                <td>±5% (tighter for TPU)</td>
+                                <td>±10% nominal</td>
+                                <td>IEC 61000-4-11</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Frequency Tolerance</strong></td>
+                                <td>±2 Hz (60 Hz nominal)</td>
+                                <td>±1 Hz</td>
+                                <td>±2 Hz</td>
+                                <td>IEEE 1159</td>
+                            </tr>
+                            <tr>
+                                <td><strong>THD (Voltage)</strong></td>
+                                <td>&lt;5%</td>
+                                <td>&lt;3%</td>
+                                <td>&lt;5%</td>
+                                <td>IEEE 519</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sag Immunity</strong></td>
+                                <td>90% for 500ms</td>
+                                <td>80% for 1s</td>
+                                <td>85% for 500ms</td>
+                                <td>SEMI F47</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ground Fault Protection</strong></td>
+                                <td>High-resistance grounding</td>
+                                <td>Ungrounded IT system</td>
+                                <td>HRG + GFP relay</td>
+                                <td>NEC 250.36</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Arc Flash PPE Level</strong></td>
+                                <td>Category 2 (typical)</td>
+                                <td>Category 2</td>
+                                <td>Category 3 (switchgear)</td>
+                                <td>NFPA 70E</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Selective Coordination</strong></td>
+                                <td>Required (NEC 700.32)</td>
+                                <td>Required</td>
+                                <td>Required</td>
+                                <td>NEC 700.32</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>2.5.13 Grid Interconnection & Utility Coordination</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Provider / Location</th>
+                                <th>Grid Operator</th>
+                                <th>Substation Capacity</th>
+                                <th>Transmission Voltage</th>
+                                <th>Renewable %</th>
+                                <th>Carbon Intensity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AWS Indiana</strong></td>
+                                <td>MISO (Midcontinent ISO)</td>
+                                <td>500 MW dedicated</td>
+                                <td>345 kV / 138 kV</td>
+                                <td>~25%</td>
+                                <td>420 g CO₂/kWh</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Oklahoma</strong></td>
+                                <td>SPP (Southwest Power Pool)</td>
+                                <td>400 MW (Mayes County)</td>
+                                <td>345 kV</td>
+                                <td>~45% (wind)</td>
+                                <td>320 g CO₂/kWh</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure Virginia</strong></td>
+                                <td>PJM Interconnection</td>
+                                <td>300 MW</td>
+                                <td>500 kV / 230 kV</td>
+                                <td>~15%</td>
+                                <td>380 g CO₂/kWh</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fluidstack Texas</strong></td>
+                                <td>ERCOT</td>
+                                <td>350 MW</td>
+                                <td>345 kV</td>
+                                <td>~35% (wind/solar)</td>
+                                <td>350 g CO₂/kWh</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Carbon Footprint Analysis</div>
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6;">
+<span style="color: #67e8f9; font-weight: 600;">Annual Carbon Emissions by Provider:</span>
+
+AWS Indiana (600 MW, 8,760 hrs, 420 g/kWh):
+  Energy: 600 MW × 8,760 hr = 5,256 GWh/year
+  Carbon: 5,256 GWh × 420 kg/MWh = <strong>2.21 Mt CO₂/year</strong>
+
+Google Oklahoma (500 MW, 8,760 hrs, 320 g/kWh):
+  Energy: 4,380 GWh/year
+  Carbon: 4,380 × 320 = <strong>1.40 Mt CO₂/year</strong>
+
+Azure Virginia (300 MW, 8,760 hrs, 380 g/kWh):
+  Energy: 2,628 GWh/year
+  Carbon: 2,628 × 380 = <strong>1.00 Mt CO₂/year</strong>
+
+Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
+  Energy: 2,628 GWh/year
+  Carbon: 2,628 × 350 = <strong>0.92 Mt CO₂/year</strong>
+
+<span style="color: #10b981; font-weight: 600;">Total Anthropic Carbon Footprint:</span>
+  Gross emissions: 2.21 + 1.40 + 1.00 + 0.92 = <strong>5.53 Mt CO₂/year</strong>
+
+  With PPA offsets (Google 100% matched, AWS 50%):
+  Net emissions: 2.21×0.5 + 0 + 1.00 + 0.92 = <strong>~3.0 Mt CO₂/year</strong>
+
+  Comparison:
+  - Equivalent to ~650,000 passenger vehicles/year
+  - Or 0.006% of global emissions (50 Gt/year)</pre>
+                </div>
+
+                <h4>2.5.14 Historical Outage Analysis & Lessons Learned</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Provider</th>
+                                <th>Outage Type</th>
+                                <th>Duration</th>
+                                <th>Root Cause</th>
+                                <th>Anthropic Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dec 2021</td>
+                                <td>AWS us-east-1</td>
+                                <td>Network partition</td>
+                                <td>7 hours</td>
+                                <td>Automated scaling bug</td>
+                                <td>Pre-Anthropic scale; design lesson</td>
+                            </tr>
+                            <tr>
+                                <td>Nov 2022</td>
+                                <td>Google us-central1</td>
+                                <td>Cooling system</td>
+                                <td>4 hours</td>
+                                <td>CRAC unit failure cascade</td>
+                                <td>Reinforced thermal monitoring</td>
+                            </tr>
+                            <tr>
+                                <td>Jan 2023</td>
+                                <td>Azure eastus2</td>
+                                <td>Power distribution</td>
+                                <td>8 hours</td>
+                                <td>Chiller plant failure</td>
+                                <td>Added Azure thermal SLA requirements</td>
+                            </tr>
+                            <tr>
+                                <td>Jul 2024</td>
+                                <td>Cloudflare (global)</td>
+                                <td>BGP misconfiguration</td>
+                                <td>90 minutes</td>
+                                <td>Human error in routing</td>
+                                <td>Multi-CDN strategy implemented</td>
+                            </tr>
+                            <tr>
+                                <td>Oct 2025</td>
+                                <td>AWS Rainier</td>
+                                <td>Trainium2 firmware</td>
+                                <td>2 hours</td>
+                                <td>Driver compatibility</td>
+                                <td>Canary deployment policy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>2.5.15 SLA & Availability Comparison Matrix</h4>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>AI Company</th>
+                                <th>Primary Provider</th>
+                                <th>Backup Provider</th>
+                                <th>Contracted SLA</th>
+                                <th>Actual Uptime (2025)</th>
+                                <th>SPOF Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Anthropic</strong></td>
+                                <td>Multi (AWS/GCP/Azure/Fluid)</td>
+                                <td>Each other</td>
+                                <td style="color: #10b981;"><strong>99.99%</strong></td>
+                                <td style="color: #10b981;"><strong>99.97%</strong></td>
+                                <td style="color: #10b981;">Low</td>
+                            </tr>
+                            <tr>
+                                <td>OpenAI</td>
+                                <td>Microsoft Azure</td>
+                                <td>Limited self-hosted</td>
+                                <td>99.9%</td>
+                                <td>99.85%</td>
+                                <td style="color: #f59e0b;">Medium</td>
+                            </tr>
+                            <tr>
+                                <td>Google DeepMind</td>
+                                <td>Google Cloud</td>
+                                <td>None (internal)</td>
+                                <td>Internal SLO</td>
+                                <td>~99.95%</td>
+                                <td style="color: #f59e0b;">Medium</td>
+                            </tr>
+                            <tr>
+                                <td>xAI</td>
+                                <td>Colossus Memphis</td>
+                                <td>Oracle (partial)</td>
+                                <td>N/A (private)</td>
+                                <td>~99.5% (est.)</td>
+                                <td style="color: #ef4444;">High</td>
+                            </tr>
+                            <tr>
+                                <td>Meta AI</td>
+                                <td>Meta internal DCs</td>
+                                <td>Azure (some)</td>
+                                <td>Internal SLO</td>
+                                <td>~99.9%</td>
+                                <td style="color: #f59e0b;">Medium</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Anthropic Multi-Cloud Design Principles Summary
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem;">
+                        <li><strong>No Single Point of Failure:</strong> Any provider can fail without total service loss</li>
+                        <li><strong>Supply Chain Diversity:</strong> NVIDIA shortage? Use Trainium2/TPU. AMD available? Flex to Azure</li>
+                        <li><strong>Cost Arbitrage:</strong> Shift workloads to cheapest available capacity in real-time</li>
+                        <li><strong>Geographic Redundancy:</strong> 6+ states, 3+ countries, 4 independent grid operators</li>
+                        <li><strong>Competitive Leverage:</strong> No vendor lock-in enables better pricing negotiation</li>
+                        <li><strong>Technology Hedge:</strong> If one chip architecture underperforms, alternatives are ready</li>
+                        <li><strong>Regulatory Compliance:</strong> Data residency flexibility for EU/APAC requirements</li>
+                        <li><strong>Graceful Degradation:</strong> Service continues at reduced capacity during partial outages</li>
+                    </ul>
+                </div>
+
+                <p>
+                    This distributed approach represents a <strong>paradigm shift from the concentration model</strong> adopted by competitors. While xAI's Colossus demonstrates raw power aggregation (2 GW in one location), Anthropic's strategy optimizes for <strong>resilience, cost efficiency, and strategic flexibility</strong>. The trade-off: higher operational complexity and workload orchestration challenges, offset by reduced catastrophic failure risk and multi-year cost savings exceeding $500M annually. The architecture demonstrates that <strong>power distribution design for AI infrastructure extends beyond electrical engineering</strong>—it requires holistic consideration of compute portability, thermal management, grid interconnection, and failure domain isolation.
+                </p>
+
+                <!-- Section 3: Voltage Evolution -->
+                <h2 id="section-3">
+                    <span class="section-number">3</span>
+                    Voltage Evolution: 12V → 48V → 800V DC
+                </h2>
+
+                <p>
+                    The evolution of data center power distribution voltage levels represents a fundamental shift in electrical engineering philosophy. Higher voltages dramatically reduce distribution losses and copper requirements while enabling the extreme power densities required by AI workloads.
+                </p>
+
+                <h3>3.1 The Physics of Voltage Selection</h3>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">DC Distribution Loss Analysis</div>
+                    <pre style="margin: 0; white-space: pre-wrap;">
+Power Loss: P_loss = I²R = (P_load/V)² × ρ × L / A
+
+Where:
+  P_load = Power delivered to load (W)
+  V = Distribution voltage (V)
+  ρ = Conductor resistivity (Ω·m)
+  L = Conductor length (m)
+  A = Cross-sectional area (m²)
+
+<span style="color: #67e8f9;">For same power, same conductor:</span>
+  P_loss ∝ 1/V²
+
+<span style="color: #10b981;">Voltage Comparison (normalized to 12V = 100%):</span>
+  12V:  100.0% loss (baseline)
+  48V:    6.25% loss (16x reduction)
+  380V:   0.10% loss (1,003x reduction)
+  800V:   0.02% loss (4,444x reduction)</pre>
+                </div>
+
+                <h3>3.2 Voltage Level Comparison</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Voltage</th>
+                                <th>Distribution Loss</th>
+                                <th>Copper Required</th>
+                                <th>Max Rack Power</th>
+                                <th>Adoption Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>12V DC</strong></td>
+                                <td>Baseline (100%)</td>
+                                <td>Baseline</td>
+                                <td>10-20 kW</td>
+                                <td>Legacy</td>
+                            </tr>
+                            <tr>
+                                <td><strong>48V DC</strong></td>
+                                <td>6.25% (16x better)</td>
+                                <td>25% of 12V</td>
+                                <td>50-100 kW</td>
+                                <td style="color: #10b981;">Mainstream</td>
+                            </tr>
+                            <tr>
+                                <td><strong>380V DC</strong></td>
+                                <td>0.1% (1000x better)</td>
+                                <td>3% of 12V</td>
+                                <td>100-300 kW</td>
+                                <td style="color: #f59e0b;">Emerging</td>
+                            </tr>
+                            <tr>
+                                <td><strong>800V DC</strong></td>
+                                <td>0.02% (4444x better)</td>
+                                <td>1.5% of 12V</td>
+                                <td>500 kW - 1 MW+</td>
+                                <td style="color: #8b5cf6;">Next-Gen (2026+)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>3.3 NVIDIA 800V DC Architecture</h3>
+
+                <p>
+                    At GTC 2025, NVIDIA unveiled an 800V sidecar architecture designed to power 576 Rubin Ultra GPUs in a single Kyber rack at MW scale. This represents the cutting edge of data center power distribution.
+                </p>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(118, 185, 0, 0.1);">⚡</div>
+                            <div>
+                                <div class="comparison-card-title">+5% Efficiency</div>
+                                <div class="comparison-card-subtitle">End-to-End Improvement</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(118, 185, 0, 0.1);">🔧</div>
+                            <div>
+                                <div class="comparison-card-title">70% Less Maintenance</div>
+                                <div class="comparison-card-subtitle">Cost Reduction</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(118, 185, 0, 0.1);">📦</div>
+                            <div>
+                                <div class="comparison-card-title">Minimal Rack Space</div>
+                                <div class="comparison-card-subtitle">vs 64U for Traditional</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(118, 185, 0, 0.1);">🏭</div>
+                            <div>
+                                <div class="comparison-card-title">EV Supply Chain</div>
+                                <div class="comparison-card-subtitle">Leveraged Components</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: UPS & Battery -->
+                <h2 id="section-4">
+                    <span class="section-number">4</span>
+                    UPS & Battery Technologies
+                </h2>
+
+                <h3>4.1 Lithium-Ion Battery Chemistry Comparison</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>LFP (Lithium Iron Phosphate)</th>
+                                <th>NMC (Nickel Manganese Cobalt)</th>
+                                <th>VRLA (Lead-Acid)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Energy Density</td>
+                                <td>90-160 Wh/kg</td>
+                                <td>150-220 Wh/kg</td>
+                                <td>30-50 Wh/kg</td>
+                            </tr>
+                            <tr>
+                                <td>Cycle Life</td>
+                                <td style="color: #10b981;"><strong>2,000-5,000 cycles</strong></td>
+                                <td>1,000-2,000 cycles</td>
+                                <td>300-500 cycles</td>
+                            </tr>
+                            <tr>
+                                <td>Thermal Stability</td>
+                                <td style="color: #10b981;"><strong>Excellent (safest)</strong></td>
+                                <td>Moderate</td>
+                                <td>Good</td>
+                            </tr>
+                            <tr>
+                                <td>Operating Temp</td>
+                                <td>-20°C to 60°C</td>
+                                <td>0°C to 45°C</td>
+                                <td>20°C to 25°C</td>
+                            </tr>
+                            <tr>
+                                <td>Thermal Runaway Risk</td>
+                                <td style="color: #10b981;"><strong>Very Low</strong></td>
+                                <td style="color: #f59e0b;">Moderate</td>
+                                <td>Low (hydrogen gas)</td>
+                            </tr>
+                            <tr>
+                                <td>Lifespan</td>
+                                <td>15+ years</td>
+                                <td>10-15 years</td>
+                                <td>5-7 years</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Industry Recommendation
+                    </div>
+                    <p style="margin: 0;">
+                        <strong>LFP (Lithium Iron Phosphate)</strong> is recommended for data center applications due to superior thermal stability, longer cycle life, and lower thermal runaway risk. Google has deployed over <strong>100 million Li-ion cells</strong> using this approach.
+                    </p>
+                </div>
+
+                <h3>4.2 Distributed vs Centralized UPS Comparison</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Distributed (AWS/Google)</th>
+                                <th>Traditional Centralized</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Failure Domain</td>
+                                <td style="color: #10b981;"><strong>Single rack</strong></td>
+                                <td>Entire facility/zone</td>
+                            </tr>
+                            <tr>
+                                <td>Efficiency</td>
+                                <td style="color: #10b981;"><strong>Higher (fewer conversions)</strong></td>
+                                <td>Lower (AC-DC-AC-DC)</td>
+                            </tr>
+                            <tr>
+                                <td>Capital Cost</td>
+                                <td>Scales with deployment</td>
+                                <td>Large day-1 investment</td>
+                            </tr>
+                            <tr>
+                                <td>Serviceability</td>
+                                <td style="color: #10b981;"><strong>Replace single BBU</strong></td>
+                                <td>Complex maintenance window</td>
+                            </tr>
+                            <tr>
+                                <td>Third-Party Software</td>
+                                <td style="color: #10b981;"><strong>Eliminated</strong></td>
+                                <td>Required (vendor UPS)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 5: Generator Systems -->
+                <h2 id="section-5">
+                    <span class="section-number">5</span>
+                    Generator & Backup Systems
+                </h2>
+
+                <h3>5.1 Fuel Transition Trends</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Current Approach</th>
+                                <th>Future Direction</th>
+                                <th>Timeline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="company-badge aws">AWS</span></td>
+                                <td>Renewable Diesel (HVO)</td>
+                                <td>90% GHG reduction</td>
+                                <td>Ongoing</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge google">Google</span></td>
+                                <td>Battery (BESS) + Grid</td>
+                                <td>Diesel replacement pilot</td>
+                                <td>2023+</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge microsoft">Microsoft</span></td>
+                                <td>Hydrogen Fuel Cells (3MW pilot)</td>
+                                <td>Zero-diesel by 2030</td>
+                                <td>2030</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge xai">xAI</span></td>
+                                <td>Tesla Megapack (168 units)</td>
+                                <td>Grid + Battery primary</td>
+                                <td>2025</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>5.2 Generator Specifications</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Specification</th>
+                                <th>Typical Value</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Generator Rating</td>
+                                <td>2-3 MW per unit</td>
+                                <td>Standby rating</td>
+                            </tr>
+                            <tr>
+                                <td>Start Time</td>
+                                <td>&lt;10 seconds</td>
+                                <td>Automatic start on utility loss</td>
+                            </tr>
+                            <tr>
+                                <td>Load Step Capability</td>
+                                <td>100% in one step</td>
+                                <td>NFPA 110 requirement</td>
+                            </tr>
+                            <tr>
+                                <td>Day Tank</td>
+                                <td>2-4 hours</td>
+                                <td>Local to generator</td>
+                            </tr>
+                            <tr>
+                                <td>Main Tank</td>
+                                <td>24-96 hours</td>
+                                <td>Based on tier level</td>
+                            </tr>
+                            <tr>
+                                <td>Redundancy</td>
+                                <td>N+1 minimum</td>
+                                <td>2N for Tier IV</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 6: Failure Scenarios -->
+                <h2 id="section-6">
+                    <span class="section-number">6</span>
+                    Failure Scenario Analysis
+                </h2>
+
+                <div class="info-box critical">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Critical Statistic
+                    </div>
+                    <p style="margin: 0;">
+                        <strong>Power issues remain the #1 cause of data center outages</strong>, accounting for 54% of all impactful outages in 2024. Human error increased by 10 percentage points in 2025 vs 2024, with "failure to follow procedures" being the largest increase.
+                    </p>
+                </div>
+
+                <h3>6.1 Common Failure Scenarios</h3>
+
+                <div class="failure-scenarios">
+                    <!-- Failure 1: Utility Loss -->
+                    <div class="failure-card">
+                        <div class="failure-card-header">
+                            <div class="failure-title">Utility Power Loss</div>
+                            <span class="failure-severity high">High Frequency</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Complete loss of utility power requires seamless transfer to backup systems. The speed of UPS response and generator start time are critical.
+                        </p>
+                        <div class="failure-sequence">
+                            <div class="failure-step">
+                                <span class="failure-step-number">1</span>
+                                <span>Utility voltage drops below threshold (typically 85-90%)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">2</span>
+                                <span>UPS detects loss, batteries engage (&lt;10ms for STS)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">3</span>
+                                <span>Generator start command issued automatically</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">4</span>
+                                <span>Generator online within 10 seconds</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">5</span>
+                                <span>ATS transfers load to generator power</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">6</span>
+                                <span>UPS returns to line mode, batteries recharge</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Failure 2: Cascading Failure -->
+                    <div class="failure-card">
+                        <div class="failure-card-header">
+                            <div class="failure-title">Cascading Failure</div>
+                            <span class="failure-severity critical">Critical</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                            When one component failure triggers additional failures through load redistribution or protection device miscoordination.
+                        </p>
+                        <div class="failure-sequence">
+                            <div class="failure-step">
+                                <span class="failure-step-number">1</span>
+                                <span>Initial trigger event (e.g., transformer failure)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">2</span>
+                                <span>Load redistributes to remaining active paths</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">3</span>
+                                <span>Parallel path experiences overload condition</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">4</span>
+                                <span>Protection device operates (potentially miscoordinated)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">5</span>
+                                <span>Further load redistribution → more failures</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">6</span>
+                                <span>Potential system collapse if not contained</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Failure 3: Thermal Runaway -->
+                    <div class="failure-card">
+                        <div class="failure-card-header">
+                            <div class="failure-title">Battery Thermal Runaway</div>
+                            <span class="failure-severity critical">Critical</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Lithium-ion battery cells can enter thermal runaway, leading to fire and potential explosion. Early detection through off-gas monitoring provides 5-20 minutes warning.
+                        </p>
+                        <div class="failure-sequence">
+                            <div class="failure-step">
+                                <span class="failure-step-number">1</span>
+                                <span>Cell abuse occurs (overcharge, short circuit, damage)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">2</span>
+                                <span>Internal temperature rises (80-120°C)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">3</span>
+                                <span>SEI layer breakdown, electrolyte decomposition</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">4</span>
+                                <span style="color: #f59e0b;"><strong>Off-gassing begins (VOC release) — DETECTION WINDOW</strong></span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">5</span>
+                                <span>Thermal runaway initiation (150-250°C)</span>
+                            </div>
+                            <div class="failure-step">
+                                <span class="failure-step-number">6</span>
+                                <span>Cell venting, fire, potential propagation to adjacent cells</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Failure 4: Arc Flash -->
+                    <div class="failure-card">
+                        <div class="failure-card-header">
+                            <div class="failure-title">Arc Flash Event</div>
+                            <span class="failure-severity critical">Critical</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Electrical arc releases enormous energy (up to 35,000°F), causing severe burns, blast pressure, and hearing damage. PPE and protection coordination are critical.
+                        </p>
+                        <div class="formula-box" style="margin-top: 1rem;">
+                            <div class="formula-box-title">IEEE 1584-2018 Arc Flash Calculation</div>
+                            <pre style="margin: 0; white-space: pre-wrap; font-size: 0.8rem;">
+<span style="color: #f472b6;">Incident Energy:</span>
+E = Cf × En × (t/0.2) × (610/D)^x
+
+<span style="color: #67e8f9;">Where:</span>
+  E = Incident energy (cal/cm²)
+  Cf = Calculation factor (1.5 for V≤1kV)
+  En = Normalized incident energy
+  t = Arcing time (seconds)
+  D = Working distance (mm)
+  x = Distance exponent
+
+<span style="color: #10b981;">PPE Categories (NFPA 70E):</span>
+  Cat 1: 1.2 - 4 cal/cm²
+  Cat 2: 4 - 8 cal/cm²
+  Cat 3: 8 - 25 cal/cm²
+  Cat 4: 25 - 40 cal/cm²</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>6.2 Historical Hyperscaler Failures</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Company</th>
+                                <th>Root Cause</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>June 2012</td>
+                                <td><span class="company-badge aws">AWS</span></td>
+                                <td>Generator stabilization failure during storm</td>
+                                <td>UPS depleted; servers lost power</td>
+                            </tr>
+                            <tr>
+                                <td>August 2019</td>
+                                <td><span class="company-badge aws">AWS</span></td>
+                                <td>Backup generators failed ~1.5 hours after activation</td>
+                                <td>7.5% of EC2 instances unavailable</td>
+                            </tr>
+                            <tr>
+                                <td>May 2010</td>
+                                <td><span class="company-badge aws">AWS</span></td>
+                                <td>UPS failed to detect power drop</td>
+                                <td>Partial outage</td>
+                            </tr>
+                            <tr>
+                                <td>2024</td>
+                                <td>Virginia Data Center Alley</td>
+                                <td>Protection system failure</td>
+                                <td>60 of 200+ DCs disconnected simultaneously</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 7: Protection Coordination -->
+                <h2 id="section-7">
+                    <span class="section-number">7</span>
+                    Protection & Coordination
+                </h2>
+
+                <h3>7.1 Selective Coordination Requirements</h3>
+
+                <p>
+                    Selective coordination ensures that only the protective device immediately upstream of a fault operates, preventing unnecessary outages of healthy circuits. NEC requires selective coordination for emergency systems (Article 700.32) and critical operations data systems (Article 645.27).
+                </p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Selective Coordination Criteria</div>
+                    <pre style="margin: 0; white-space: pre-wrap;">
+<span style="color: #f472b6;">For all fault current levels:</span>
+  t_downstream < t_upstream
+
+<span style="color: #67e8f9;">Minimum separation between curves:</span>
+  0.1 seconds (6 cycles) for electronic devices
+  0.3 seconds for mechanical devices
+
+<span style="color: #10b981;">Verification required for:</span>
+  • All fault current magnitudes from minimum to maximum
+  • Both phase and ground faults
+  • All operating modes (normal, emergency, maintenance)</pre>
+                </div>
+
+                <h3>7.2 Arc Flash Mitigation Methods (NEC 240.87)</h3>
+
+                <p>
+                    For circuit breakers rated at 1,200A or higher, NEC 240.87 requires one of the following arc energy reduction methods:
+                </p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Response Time</th>
+                                <th>Energy Reduction</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Zone Selective Interlocking (ZSI)</td>
+                                <td>Varies by fault location</td>
+                                <td>50-70%</td>
+                                <td>Multi-level protection</td>
+                            </tr>
+                            <tr>
+                                <td>Differential Relaying</td>
+                                <td>1-3 cycles</td>
+                                <td>80-90%</td>
+                                <td>Transformers, buses</td>
+                            </tr>
+                            <tr>
+                                <td>Energy-Reducing Maintenance Switch</td>
+                                <td>Instantaneous</td>
+                                <td>Up to 3x</td>
+                                <td>During maintenance</td>
+                            </tr>
+                            <tr>
+                                <td>Active Arc Flash Mitigation</td>
+                                <td>&lt;1 cycle</td>
+                                <td style="color: #10b981;"><strong>Maximum</strong></td>
+                                <td>Light + current sensors</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>7.3 Ground Fault Protection</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Grounding Type</th>
+                                <th>Ground Fault Current</th>
+                                <th>Operation During Fault</th>
+                                <th>Data Center Suitability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Solidly Grounded</td>
+                                <td>High (1000s of A)</td>
+                                <td>Must trip immediately</td>
+                                <td>Standard</td>
+                            </tr>
+                            <tr>
+                                <td>Low Resistance</td>
+                                <td>100-1000A</td>
+                                <td>Must trip</td>
+                                <td>Good</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #10b981;"><strong>High Resistance (HRG)</strong></td>
+                                <td style="color: #10b981;"><strong>1-10A</strong></td>
+                                <td style="color: #10b981;"><strong>Continue operation</strong></td>
+                                <td style="color: #10b981;"><strong>Recommended</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Ungrounded</td>
+                                <td>Near zero</td>
+                                <td>Continue operation</td>
+                                <td>Not recommended (transients)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 8: Reliability Calculator -->
+                <h2 id="section-8">
+                    <span class="section-number">8</span>
+                    Reliability Calculations
+                </h2>
+
+                <div class="calculator-section">
+                    <h3 class="calculator-title">Data Center Availability Calculator</h3>
+                    <p class="calculator-subtitle">Calculate system availability based on redundancy configuration</p>
+
+                    <div class="calc-grid">
+                        <div class="calc-input-group">
+                            <label class="calc-label">Component MTBF (hours)</label>
+                            <input type="number" class="calc-input" id="mtbf" value="50000" min="1000">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Component MTTR (hours)</label>
+                            <input type="number" class="calc-input" id="mttr" value="4" min="0.5" step="0.5">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Redundancy Configuration</label>
+                            <select class="calc-input" id="redundancy">
+                                <option value="N">N (No redundancy)</option>
+                                <option value="N+1" selected>N+1 (One spare)</option>
+                                <option value="2N">2N (Full mirror)</option>
+                                <option value="2N+1">2N+1 (Mirror + spare)</option>
+                            </select>
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Number of Components</label>
+                            <input type="number" class="calc-input" id="components" value="4" min="1" max="20">
+                        </div>
+                    </div>
+
+                    <div class="calc-results">
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-availability">99.992%</div>
+                            <div class="calc-result-label">System Availability</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-downtime">42 min</div>
+                            <div class="calc-result-label">Annual Downtime</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-tier">Tier III</div>
+                            <div class="calc-result-label">Approximate Tier</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-nines">4</div>
+                            <div class="calc-result-label">Nines of Availability</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>8.1 Reliability Formulas</h3>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Availability Calculations</div>
+                    <pre style="margin: 0; white-space: pre-wrap;">
+<span style="color: #f472b6;">Single Component Availability:</span>
+  A = MTBF / (MTBF + MTTR)
+
+<span style="color: #67e8f9;">Series System (all must work):</span>
+  A_total = A₁ × A₂ × A₃ × ... × Aₙ
+
+<span style="color: #a5f3fc;">Parallel System (any one works):</span>
+  A_total = 1 - (1-A₁) × (1-A₂) × ... × (1-Aₙ)
+
+<span style="color: #10b981;">Annual Downtime (minutes):</span>
+  Downtime = 525,600 × (1 - Availability)
+
+<span style="color: #fbbf24;">Example: 99.995% availability</span>
+  = 525,600 × 0.00005
+  = 26.28 minutes/year (Tier IV)</pre>
+                </div>
+
+                <h3>8.2 Uptime Institute Tier Comparison</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tier</th>
+                                <th>Availability</th>
+                                <th>Annual Downtime</th>
+                                <th>Redundancy</th>
+                                <th>Concurrent Maintainability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tier I</td>
+                                <td>99.671%</td>
+                                <td>28.8 hours</td>
+                                <td>N</td>
+                                <td>No</td>
+                            </tr>
+                            <tr>
+                                <td>Tier II</td>
+                                <td>99.741%</td>
+                                <td>22 hours</td>
+                                <td>N+1</td>
+                                <td>Partial</td>
+                            </tr>
+                            <tr>
+                                <td>Tier III</td>
+                                <td>99.982%</td>
+                                <td>1.6 hours</td>
+                                <td>N+1, dual path</td>
+                                <td style="color: #10b981;"><strong>Yes</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Tier IV</td>
+                                <td style="color: #10b981;"><strong>99.995%</strong></td>
+                                <td style="color: #10b981;"><strong>26 minutes</strong></td>
+                                <td>2N</td>
+                                <td style="color: #10b981;"><strong>Yes + Fault Tolerant</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 9: AI/HPC Requirements -->
+                <h2 id="section-9">
+                    <span class="section-number">9</span>
+                    AI/HPC Power Requirements
+                </h2>
+
+                <h3>9.1 GPU Power Specifications</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>GPU/Accelerator</th>
+                                <th>TDP</th>
+                                <th>Memory</th>
+                                <th>Form Factor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="company-badge nvidia">NVIDIA H100 SXM5</span></td>
+                                <td>700W</td>
+                                <td>80 GB HBM3</td>
+                                <td>SXM Module</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge nvidia">NVIDIA H200 SXM</span></td>
+                                <td>700-800W</td>
+                                <td>141 GB HBM3e</td>
+                                <td>SXM Module</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge nvidia">NVIDIA GB200 NVL72</span></td>
+                                <td style="color: #10b981;"><strong>120 kW/rack</strong></td>
+                                <td>13 TB HBM3e (cluster)</td>
+                                <td>Liquid-cooled rack</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge nvidia">NVIDIA GB300 NVL72</span></td>
+                                <td style="color: #10b981;"><strong>140 kW/rack</strong></td>
+                                <td>~16 TB HBM3e</td>
+                                <td>Liquid-cooled rack</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge nvidia">Vera Rubin NVL144</span></td>
+                                <td style="color: #f59e0b;"><strong>600 kW/rack</strong></td>
+                                <td>TBD</td>
+                                <td>2026 target</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge google">Google TPU v7 Ironwood</span></td>
+                                <td>~700-1000W/chip</td>
+                                <td>192 GB HBM3e</td>
+                                <td>9,216-chip pod (~10 MW)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="company-badge microsoft">Microsoft Maia 200</span></td>
+                                <td>~750W</td>
+                                <td>216 GB HBM3e</td>
+                                <td>Custom Azure silicon</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>9.2 Rack Power Density Evolution</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Workload Type</th>
+                                <th>Power per Rack</th>
+                                <th>Cooling Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Traditional Enterprise</td>
+                                <td>5-10 kW</td>
+                                <td>Air cooling</td>
+                            </tr>
+                            <tr>
+                                <td>Hyperscaler (conventional)</td>
+                                <td>20-30 kW</td>
+                                <td>Air cooling</td>
+                            </tr>
+                            <tr>
+                                <td>AI Training (current)</td>
+                                <td>40-60 kW</td>
+                                <td>Rear-door heat exchangers</td>
+                            </tr>
+                            <tr>
+                                <td>Large Language Models</td>
+                                <td>70-100 kW</td>
+                                <td style="color: #f59e0b;"><strong>Direct liquid cooling required</strong></td>
+                            </tr>
+                            <tr>
+                                <td>GB200/GB300 Clusters</td>
+                                <td>120-140 kW</td>
+                                <td style="color: #ef4444;"><strong>Mandatory liquid cooling</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Next-Gen (2026+)</td>
+                                <td>500 kW - 1 MW</td>
+                                <td style="color: #ef4444;"><strong>Advanced liquid + 800V DC</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Critical Threshold
+                    </div>
+                    <p style="margin: 0;">
+                        <strong>Direct liquid cooling becomes mandatory above 40 kW per rack.</strong> Air cooling cannot economically remove heat at higher densities. For 100+ kW deployments, busway distribution with 48V or higher DC is required.
+                    </p>
+                </div>
+
+                <!-- Section 10: Recommendations -->
+                <h2 id="section-10">
+                    <span class="section-number">10</span>
+                    Design Recommendations
+                </h2>
+
+                <h3>10.1 Technology Adoption Roadmap</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timeframe</th>
+                                <th>Recommended Technologies</th>
+                                <th>Target Density</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color: #10b981;"><strong>Near-term (2025-2026)</strong></td>
+                                <td>
+                                    • 48V DC distribution<br>
+                                    • LFP battery UPS<br>
+                                    • Zone selective interlocking<br>
+                                    • High resistance grounding
+                                </td>
+                                <td>50-100 kW/rack</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #f59e0b;"><strong>Medium-term (2026-2028)</strong></td>
+                                <td>
+                                    • 380V DC (Mt Diablo/Diablo 400)<br>
+                                    • Grid-interactive UPS<br>
+                                    • Distributed micro-UPS (AWS model)<br>
+                                    • Active arc flash mitigation
+                                </td>
+                                <td>100-300 kW/rack</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #8b5cf6;"><strong>Long-term (2028+)</strong></td>
+                                <td>
+                                    • 800V DC (NVIDIA architecture)<br>
+                                    • Solid-state transformers<br>
+                                    • Battery-primary backup (no diesel)<br>
+                                    • Integrated renewable + storage
+                                </td>
+                                <td>500 kW - 1 MW/rack</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>10.2 Critical Design Principles</h3>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card" style="border-left: 4px solid #10b981;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(16, 185, 129, 0.1);">1</div>
+                            <div>
+                                <div class="comparison-card-title">Simplicity Over Complexity</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            Fewer components = fewer failure modes. AWS's distributed UPS reduced failure points by 20% through simplification.
+                        </p>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #06b6d4;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(6, 182, 212, 0.1);">2</div>
+                            <div>
+                                <div class="comparison-card-title">Minimize Blast Radius</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            Design so single failures affect minimum infrastructure. Distributed UPS limits impact to single rack vs entire data hall.
+                        </p>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #f59e0b;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(245, 158, 11, 0.1);">3</div>
+                            <div>
+                                <div class="comparison-card-title">Higher Voltage Distribution</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            48V minimum for new deployments. 380V/800V DC for AI workloads. Leverage EV supply chain for components.
+                        </p>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #ef4444;">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background: rgba(239, 68, 68, 0.1);">4</div>
+                            <div>
+                                <div class="comparison-card-title">Protection Coordination</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                            Verify selective coordination for all fault scenarios. Implement ZSI or active arc flash mitigation for 1200A+ breakers.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- References -->
+                <div class="references-section">
+                    <h3 class="references-title">References & Sources</h3>
+                    <div class="references-list">
+                        <div class="reference-item">
+                            <span class="reference-number">[1]</span>
+                            <div>
+                                <a href="https://press.aboutamazon.com/2024/12/aws-announces-new-data-center-components" target="_blank">AWS Announces New Data Center Components (Dec 2024)</a>
+                                <div class="reference-source">Amazon Press Release — Distributed UPS, Power Shelf</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[2]</span>
+                            <div>
+                                <a href="https://cloud.google.com/blog/topics/systems/100-million-li-ion-cells-in-google-data-centers" target="_blank">100 Million Li-ion Cells in Google Data Centers</a>
+                                <div class="reference-source">Google Cloud Blog — Battery technology evolution</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[3]</span>
+                            <div>
+                                <a href="https://techcommunity.microsoft.com/blog/azureinfrastructureblog/mt-diablo---disaggregated-power" target="_blank">Mt Diablo - Disaggregated Power Architecture</a>
+                                <div class="reference-source">Microsoft Azure Blog — 400V DC specification</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[4]</span>
+                            <div>
+                                <a href="https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture" target="_blank">NVIDIA 800V HVDC Architecture</a>
+                                <div class="reference-source">NVIDIA Developer Blog — Next-gen power delivery</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[5]</span>
+                            <div>
+                                <a href="https://x.ai/colossus" target="_blank">xAI Colossus Supercomputer</a>
+                                <div class="reference-source">xAI Official — 2 GW facility specifications</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[6]</span>
+                            <div>
+                                <a href="https://uptimeinstitute.com/resources/research-and-reports/annual-outage-analysis-2024" target="_blank">Annual Outage Analysis 2024</a>
+                                <div class="reference-source">Uptime Institute — Power outage statistics</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[7]</span>
+                            <div>
+                                <a href="https://www.opencompute.org/documents/ocp-specification-diablo-400" target="_blank">OCP Diablo 400 Specification v0.5.2</a>
+                                <div class="reference-source">Open Compute Project — Power distribution standard</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[8]</span>
+                            <div>
+                                <a href="https://standards.ieee.org/standard/1584-2018.html" target="_blank">IEEE 1584-2018 Arc Flash Calculations</a>
+                                <div class="reference-source">IEEE Standards — Arc flash hazard analysis</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[9]</span>
+                            <div>
+                                <a href="https://www.anthropic.com/news/expanding-our-use-of-google-cloud-tpus-and-services" target="_blank">Expanding Our Use of Google Cloud TPUs and Services</a>
+                                <div class="reference-source">Anthropic News — Multi-cloud strategy, 1M TPU access</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[10]</span>
+                            <div>
+                                <a href="https://www.datacenterfrontier.com/machine-learning/article/55335703/inside-anthropics-multi-cloud-ai-factory-how-aws-trainium-and-google-tpus-shape-its-next-phase" target="_blank">Inside Anthropic's Multi-Cloud AI Factory</a>
+                                <div class="reference-source">Data Center Frontier — AWS Trainium2 and Google TPU infrastructure</div>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-number">[11]</span>
+                            <div>
+                                <a href="https://aws.amazon.com/ai/machine-learning/trainium/" target="_blank">AWS Trainium - AI Accelerator</a>
+                                <div class="reference-source">AWS Official — Trainium2 specifications, Project Rainier</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Section -->
+                <div style="margin-top: 3rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="article-13-paper.pdf" class="download-pdf-btn" download style="display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download PDF Technical Paper
+                    </a>
+                    <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 2px solid #1e3a5f; color: #1e3a5f; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"/>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                            <rect x="6" y="14" width="12" height="8"/>
+                        </svg>
+                        Print Paper
+                    </button>
+                </div>
+
+                <!-- Author Bio -->
+                <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 16px; display: flex; gap: 1.5rem; align-items: center;">
+                    <div style="flex-shrink: 0;">
+                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    </div>
+                    <div>
+                        <h4 style="margin: 0 0 0.5rem 0; color: #1e293b;">Bagus Dwi Permana</h4>
+                        <p style="margin: 0; color: #64748b; font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik (Indonesian Electrical Safety Expert) and CDFOM. This technical paper synthesizes research from leading hyperscalers to provide actionable design guidance for modern power distribution systems.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Bagus Dwi Permana</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience spanning industrial engineering and critical facilities operations.</p>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Insights</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="articles.html" style="color: #06b6d4; text-decoration: none;">Engineering Journal</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="geopolitics.html" style="color: #ef4444; text-decoration: none;">Global Analysis</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Connect</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/" target="_blank" style="color: #94a3b8; text-decoration: none;">LinkedIn</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="mailto:baguspermana7@gmail.com" style="color: #94a3b8; text-decoration: none;">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="margin: 0;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Availability Calculator
+        function calculateAvailability() {
+            const mtbf = parseFloat(document.getElementById('mtbf').value) || 50000;
+            const mttr = parseFloat(document.getElementById('mttr').value) || 4;
+            const redundancy = document.getElementById('redundancy').value;
+            const components = parseInt(document.getElementById('components').value) || 4;
+
+            // Single component availability
+            const singleA = mtbf / (mtbf + mttr);
+
+            let systemA;
+            switch(redundancy) {
+                case 'N':
+                    // Series - all must work
+                    systemA = Math.pow(singleA, components);
+                    break;
+                case 'N+1':
+                    // N+1: need (n-1) of n components
+                    systemA = 1 - Math.pow(1 - singleA, 2);
+                    break;
+                case '2N':
+                    // 2N: two parallel paths
+                    systemA = 1 - Math.pow(1 - Math.pow(singleA, components/2), 2);
+                    break;
+                case '2N+1':
+                    // 2N+1: two parallel paths plus spare
+                    const pathA = 1 - Math.pow(1 - singleA, 2);
+                    systemA = 1 - Math.pow(1 - pathA, 2);
+                    break;
+                default:
+                    systemA = singleA;
+            }
+
+            // Calculate metrics
+            const availabilityPercent = (systemA * 100).toFixed(4);
+            const downtimeMinutes = Math.round(525600 * (1 - systemA));
+            const nines = Math.min(9, Math.floor(-Math.log10(1 - systemA)));
+
+            // Determine tier
+            let tier = 'Tier I';
+            if (systemA >= 0.99995) tier = 'Tier IV';
+            else if (systemA >= 0.99982) tier = 'Tier III';
+            else if (systemA >= 0.99741) tier = 'Tier II';
+
+            // Format downtime
+            let downtimeStr;
+            if (downtimeMinutes < 60) {
+                downtimeStr = downtimeMinutes + ' min';
+            } else if (downtimeMinutes < 1440) {
+                downtimeStr = (downtimeMinutes / 60).toFixed(1) + ' hrs';
+            } else {
+                downtimeStr = (downtimeMinutes / 1440).toFixed(1) + ' days';
+            }
+
+            // Update display
+            document.getElementById('result-availability').textContent = availabilityPercent + '%';
+            document.getElementById('result-downtime').textContent = downtimeStr;
+            document.getElementById('result-tier').textContent = tier;
+            document.getElementById('result-nines').textContent = nines;
+        }
+
+        // Add event listeners
+        document.getElementById('mtbf').addEventListener('input', calculateAvailability);
+        document.getElementById('mttr').addEventListener('input', calculateAvailability);
+        document.getElementById('redundancy').addEventListener('change', calculateAvailability);
+        document.getElementById('components').addEventListener('input', calculateAvailability);
+
+        // Initial calculation
+        calculateAvailability();
+    </script>
+</body>
+</html>

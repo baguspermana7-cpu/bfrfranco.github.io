@@ -3,7 +3,33 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>DC Cooling | BMS Mimic (CH-1..CH-4)</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- SEO Meta Tags -->
+<link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<title>Chiller Plant BMS Mimic | Data Center Cooling System</title>
+<meta name="description" content="Interactive BMS mimic for chiller plant monitoring (CH-1 to CH-4). Visualize chilled water supply/return, compressor status, and cooling efficiency in real-time.">
+<meta name="keywords" content="Chiller Plant, BMS Mimic, Data Center Cooling, HVAC Monitoring, Chilled Water System, Cooling Efficiency, CDFOM Certified">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://resistancezero.com/chiller-plant.html">
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://resistancezero.com/chiller-plant.html">
+<meta property="og:title" content="Chiller Plant BMS Mimic | DC Cooling System">
+<meta property="og:description" content="Interactive chiller plant monitoring for data center cooling infrastructure.">
+<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chiller Plant BMS Mimic">
+<meta name="twitter:description" content="Data center cooling system monitoring and visualization.">
+<meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Chiller Plant BMS Mimic","applicationCategory":"MonitoringApplication","description":"Interactive BMS mimic for chiller plant monitoring with chilled water supply/return and cooling efficiency visualization.","url":"https://resistancezero.com/chiller-plant.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"}}
+</script>
 <style>
   :root{
     --bg:#02040a;
@@ -23,8 +49,8 @@
     --shadow:0 18px 60px rgba(0,0,0,.55);
     --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 
-    /* Outer texts on mimic 50% */
-    --outerScale: .50;
+    /* Outer texts on mimic - increased for readability */
+    --outerScale: .85;
   }
 
   html,body{
@@ -38,9 +64,9 @@
   .wrap{
     height:100%;
     display:grid;
-    grid-template-columns:420px 1fr;
-    gap:14px;
-    padding:14px;
+    grid-template-columns:400px 1fr;
+    gap:16px;
+    padding:16px;
     box-sizing:border-box;
   }
 
@@ -226,7 +252,8 @@
     font-size:12px;
     font-weight:900;
     letter-spacing:.2px;
-    padding:8px 10px;
+    padding:10px 14px;
+    min-height:40px;
     border-radius:12px;
     background:rgba(0,255,255,.08);
     border:1px solid rgba(0,255,255,.22);
@@ -235,6 +262,7 @@
     display:inline-flex;
     gap:8px;
     align-items:center;
+    transition:all 0.2s;
   }
   .btn:hover{
     background:rgba(0,255,255,.12);
@@ -279,7 +307,7 @@
   .switch.on{ background:rgba(0,255,154,.18); border-color:rgba(0,255,154,.25); }
   .switch.on .knob{ left:22px; background:rgba(0,255,154,.95); }
 
-  svg{display:block; width:100%; height:auto; min-height:1180px;}
+  svg{display:block; width:100%; height:auto; min-height:900px;}
 
   .panelBox{
     fill: var(--panel);
@@ -357,12 +385,12 @@
     filter:none;
   }
 
-  /* Text */
-  .oStrong{font-size: calc(12px * var(--outerScale)); fill:var(--text); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
-  .oLbl{font-size: calc(12px * var(--outerScale)); fill: rgba(214,226,255,.82); letter-spacing:.2px; font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
-  .oTiny{font-size: calc(11px * var(--outerScale)); fill: rgba(214,226,255,.72); paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
-  .iStrong{font-size:12px; fill:var(--text); font-weight:900;}
-  .iTiny{font-size:10px; fill: rgba(214,226,255,.70);}
+  /* Text - increased base sizes for readability */
+  .oStrong{font-size: calc(14px * var(--outerScale)); fill:var(--text); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .oLbl{font-size: calc(14px * var(--outerScale)); fill: rgba(214,226,255,.82); letter-spacing:.2px; font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .oTiny{font-size: calc(13px * var(--outerScale)); fill: rgba(214,226,255,.72); paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .iStrong{font-size:13px; fill:var(--text); font-weight:900;}
+  .iTiny{font-size:11px; fill: rgba(214,226,255,.70);}
 
   /* Label backplates */
   .plate{
@@ -375,11 +403,11 @@
     stroke: rgba(255,255,255,.18);
     stroke-width:1;
   }
-  .tagTxt{font-size: calc(10.8px * var(--outerScale)); fill: rgba(214,226,255,.92); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .tagTxt{font-size: calc(13px * var(--outerScale)); fill: rgba(214,226,255,.92); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
 
   .instBox{fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.14); stroke-width:1;}
-  .instTxt{font-size: calc(11px * var(--outerScale)); fill: rgba(214,226,255,.84); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
-  .instVal{font-size: calc(12px * var(--outerScale)); fill:var(--text); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .instTxt{font-size: calc(13px * var(--outerScale)); fill: rgba(214,226,255,.84); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
+  .instVal{font-size: calc(14px * var(--outerScale)); fill:var(--text); font-weight:900; paint-order: stroke; stroke: rgba(0,0,0,.55); stroke-width:2px;}
 
   .arrow{ stroke:rgba(255,255,255,.38); stroke-width:1; fill:none; }
 
@@ -396,7 +424,7 @@
   /* Compressor dots + RUN label */
   .cDot{fill: rgba(120,140,180,.35); stroke: rgba(255,255,255,.18); stroke-width:1;}
   .cRun{fill: var(--run); stroke: rgba(0,255,154,.75); stroke-width:1.2; filter: drop-shadow(0 0 12px rgba(0,255,154,.55));}
-  .cTxt{font-size:10px; fill: rgba(214,226,255,.75); font-weight:900;}
+  .cTxt{font-size:11px; fill: rgba(214,226,255,.75); font-weight:900;}
   .cTxt.on{fill: rgba(0,255,154,.92);}
   .cTxt.off{fill: rgba(214,226,255,.55);}
 
@@ -558,6 +586,83 @@
   .sev.normal{color:rgba(0,255,154,.90);}
   .sev.warn{color:rgba(255,209,102,.95);}
   .sev.alarm{color:rgba(255,77,109,.95);}
+
+  /* Responsive Design */
+  @media (max-width: 1400px) {
+    .wrap { grid-template-columns: 380px 1fr; }
+    .left { min-width: 320px; }
+  }
+  @media (max-width: 1200px) {
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      min-height: 100vh;
+    }
+    .left {
+      width: 100%;
+      max-height: 320px;
+      overflow-y: auto;
+      min-width: unset;
+    }
+    .right {
+      width: 100%;
+      height: auto;
+      min-height: 600px;
+      flex: 1;
+    }
+    #mimicSvg { min-height: 600px; }
+    .topbar .h1 { font-size: 14px; }
+  }
+  @media (max-width: 900px) {
+    :root { --outerScale: 0.95; }
+    .wrap { padding: 10px; gap: 10px; }
+    .topbar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .topbar .h1 { font-size: 13px; text-align: center; }
+    .hint { justify-content: center; }
+    #mimicSvg { min-height: 550px; }
+  }
+  @media (max-width: 768px) {
+    :root { --outerScale: 1.0; }
+    .wrap { padding: 8px; gap: 8px; }
+    .left { max-height: 280px; }
+    .hdr { padding: 10px; }
+    .hdr .title { font-size: 14px; flex-wrap: wrap; gap: 8px; }
+    .hdr .sub { font-size: 11px; }
+    .kpi { gap: 8px; }
+    .kcard { padding: 10px; }
+    .klabel { font-size: 11px; }
+    .kval { font-size: 18px; }
+    .topbar { margin: 8px 10px 0 10px; }
+    .hint { flex-wrap: wrap; gap: 8px; padding: 10px; }
+    .btn { padding: 10px 14px; font-size: 11px; min-height: 40px; }
+    #mimicSvg { min-height: 500px; }
+    .alarmStrip {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin: 0 8px 8px 8px;
+    }
+    .alarmRight { justify-content: center; }
+  }
+  @media (max-width: 600px) {
+    :root { --outerScale: 1.1; }
+    .kpi { grid-template-columns: 1fr; }
+    .topbar .h1 { font-size: 12px; }
+    .btn { padding: 8px 12px; font-size: 10px; }
+    #mimicSvg { min-height: 450px; }
+  }
+  @media (max-width: 480px) {
+    :root { --outerScale: 1.2; }
+    .left { max-height: 250px; }
+    .kcard { padding: 8px; }
+    .klabel { font-size: 10px; }
+    .kval { font-size: 16px; }
+    .btn { padding: 8px 10px; font-size: 10px; min-height: 36px; }
+    .topbar .h1 { font-size: 11px; }
+    #mimicSvg { min-height: 400px; }
+    .badge { font-size: 10px; padding: 3px 6px; }
+  }
 </style>
 </head>
 
@@ -615,8 +720,8 @@
     <div class="topbar">
       <div class="h1">Chiller Plant (CH-1..CH-4) • CHWS/CHWR Headers</div>
       <div class="hint">
-        <a class="btn" href="index.html" title="Back to portfolio">⟵ Back to Portfolio</a>
-
+        <a class="btn" href="dc-conventional.html" title="Back to Dashboard">⟵ Back</a>
+        <a class="btn" href="index.html" title="Back to portfolio">⟵ Portfolio</a>
         <div class="toggle" title="Simulation ON/OFF (freeze values + pause animation)">
           <small>SIM</small>
           <div class="switch on" id="swSim"><div class="knob"></div></div>
@@ -634,7 +739,7 @@
       </div>
     </div>
 
-    <svg id="mimicSvg" viewBox="0 0 1400 1180" aria-label="Cooling mimic">
+    <svg id="mimicSvg" viewBox="0 0 1500 1200" aria-label="Cooling mimic">
       <defs>
         <marker id="mArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,.45)"></path>
@@ -642,19 +747,19 @@
 
         <!-- TEMPLATE IN DEFS: ALL IDS PREFIXED WITH tpl_ (prevents duplicate-ID bugs) -->
         <g id="loopTemplate" class="hoverGlow loopNormal">
-          <rect class="panelBox" x="0" y="0" rx="18" ry="18" width="760" height="185"></rect>
+          <rect class="panelBox" x="0" y="0" rx="18" ry="18" width="780" height="195"></rect>
 
-          <g transform="translate(14,18)">
-            <rect class="plate" x="0" y="0" rx="10" ry="10" width="610" height="22"></rect>
-            <text class="oStrong" x="10" y="15">CH-01 • ACC-01 • CHWP-01A/01B • DPS • MFM • Header Conn.</text>
+          <g transform="translate(14,20)">
+            <rect class="plate" x="0" y="0" rx="10" ry="10" width="680" height="26"></rect>
+            <text class="oStrong" x="10" y="17">CH-01 • ACC-01 • CHWP-01A/01B • DPS • MFM • Header Conn.</text>
           </g>
 
-          <g transform="translate(640,52)">
-            <rect class="plate" x="0" y="-16" rx="8" ry="8" width="104" height="22"></rect>
+          <g transform="translate(650,56)">
+            <rect class="plate" x="0" y="-18" rx="8" ry="8" width="120" height="26"></rect>
             <text class="oTiny" x="10" y="0">CHWS OUT →</text>
           </g>
-          <g transform="translate(640,158)">
-            <rect class="plate" x="0" y="-16" rx="8" ry="8" width="104" height="22"></rect>
+          <g transform="translate(650,164)">
+            <rect class="plate" x="0" y="-18" rx="8" ry="8" width="120" height="26"></rect>
             <text class="oTiny" x="10" y="0">← CHWR IN</text>
           </g>
 
@@ -670,62 +775,62 @@
           <path class="arrow" d="M 700 132 H 640" marker-end="url(#mArrow)"></path>
 
           <!-- T1/P1/P2 (supply rail) -->
-          <g transform="translate(410, 30)">
-            <rect class="tag" x="0" y="-16" rx="8" ry="8" width="112" height="24"></rect>
+          <g transform="translate(400, 32)">
+            <rect class="tag" x="0" y="-18" rx="8" ry="8" width="130" height="28"></rect>
             <text class="tagTxt" x="10" y="2">T1</text>
-            <text class="tagTxt" x="34" y="2"><tspan id="tpl_t1">19.2</tspan>°C</text>
+            <text class="tagTxt" x="38" y="2"><tspan id="tpl_t1">19.2</tspan>°C</text>
           </g>
-          <g transform="translate(530, 30)">
-            <rect class="tag" x="0" y="-16" rx="8" ry="8" width="60" height="24"></rect>
+          <g transform="translate(540, 32)">
+            <rect class="tag" x="0" y="-18" rx="8" ry="8" width="50" height="28"></rect>
             <text class="tagTxt" x="10" y="2">P1</text>
           </g>
-          <g transform="translate(597, 30)">
-            <rect class="tag" x="0" y="-16" rx="8" ry="8" width="60" height="24"></rect>
+          <g transform="translate(600, 32)">
+            <rect class="tag" x="0" y="-18" rx="8" ry="8" width="50" height="28"></rect>
             <text class="tagTxt" x="10" y="2">P2</text>
           </g>
 
           <!-- T2 (return rail) -->
-          <g transform="translate(510, 154)">
-            <rect class="tag" x="0" y="0" rx="8" ry="8" width="112" height="24"></rect>
-            <text class="tagTxt" x="10" y="16">T2</text>
-            <text class="tagTxt" x="34" y="16"><tspan id="tpl_t2">22.6</tspan>°C</text>
+          <g transform="translate(510, 160)">
+            <rect class="tag" x="0" y="0" rx="8" ry="8" width="130" height="28"></rect>
+            <text class="tagTxt" x="10" y="18">T2</text>
+            <text class="tagTxt" x="38" y="18"><tspan id="tpl_t2">22.6</tspan>°C</text>
           </g>
 
           <!-- Instruments -->
-          <g transform="translate(245, 78)">
-            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="155" height="54"></rect>
-            <text class="instTxt" x="10" y="22">MFM1</text>
-            <text class="instVal" x="10" y="45"><tspan id="tpl_flow">X</tspan> L/s</text>
+          <g transform="translate(245, 82)">
+            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="145" height="58"></rect>
+            <text class="instTxt" x="10" y="24">MFM1</text>
+            <text class="instVal" x="10" y="48"><tspan id="tpl_flow">X</tspan> L/s</text>
           </g>
 
-          <g transform="translate(410, 88)">
-            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="140" height="46"></rect>
-            <text class="instTxt" x="10" y="20">DPS1</text>
-            <text class="instVal" x="10" y="40">ΔP <tspan id="tpl_dp1">X</tspan> kPa</text>
+          <g transform="translate(400, 92)">
+            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="130" height="52"></rect>
+            <text class="instTxt" x="10" y="22">DPS1</text>
+            <text class="instVal" x="10" y="44">ΔP <tspan id="tpl_dp1">X</tspan> kPa</text>
           </g>
 
-          <g transform="translate(560, 88)">
-            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="140" height="46"></rect>
-            <text class="instTxt" x="10" y="20">DPS2</text>
-            <text class="instVal" x="10" y="40">ΔP <tspan id="tpl_dp2">X</tspan> kPa</text>
+          <g transform="translate(540, 92)">
+            <rect class="instBox" x="0" y="0" rx="10" ry="10" width="130" height="52"></rect>
+            <text class="instTxt" x="10" y="22">DPS2</text>
+            <text class="instVal" x="10" y="44">ΔP <tspan id="tpl_dp2">X</tspan> kPa</text>
           </g>
 
           <!-- ACC block -->
           <g transform="translate(18, 52)">
-            <rect class="instBox" x="0" y="0" rx="14" ry="14" width="210" height="110"></rect>
-            <text class="iStrong" x="12" y="22">ACC / CHILLER-01</text>
-            <text class="iTiny" x="12" y="40">Air Cooled Chiller (ACC)</text>
-            <text class="iTiny" x="12" y="62">CHWS OUT</text>
-            <text class="iTiny" x="12" y="80">CHWR IN</text>
-            <text class="iTiny" x="12" y="100">Compressors</text>
+            <rect class="instBox" x="0" y="0" rx="14" ry="14" width="220" height="120"></rect>
+            <text class="iStrong" x="12" y="24">ACC / CHILLER-01</text>
+            <text class="iTiny" x="12" y="44">Air Cooled Chiller (ACC)</text>
+            <text class="iTiny" x="12" y="64">CHWS OUT</text>
+            <text class="iTiny" x="12" y="84">CHWR IN</text>
+            <text class="iTiny" x="12" y="104">Compressors</text>
 
-            <circle id="tpl_c1" class="cDot" cx="130" cy="98" r="7"></circle>
-            <circle id="tpl_c2" class="cDot" cx="154" cy="98" r="7"></circle>
-            <circle id="tpl_c3" class="cDot" cx="178" cy="98" r="7"></circle>
+            <circle id="tpl_c1" class="cDot" cx="135" cy="102" r="8"></circle>
+            <circle id="tpl_c2" class="cDot" cx="162" cy="102" r="8"></circle>
+            <circle id="tpl_c3" class="cDot" cx="189" cy="102" r="8"></circle>
 
-            <text id="tpl_ct1" class="cTxt off" x="122" y="118">OFF</text>
-            <text id="tpl_ct2" class="cTxt off" x="146" y="118">OFF</text>
-            <text id="tpl_ct3" class="cTxt off" x="170" y="118">OFF</text>
+            <text id="tpl_ct1" class="cTxt off" x="127" y="124">OFF</text>
+            <text id="tpl_ct2" class="cTxt off" x="153" y="124">OFF</text>
+            <text id="tpl_ct3" class="cTxt off" x="180" y="124">OFF</text>
           </g>
 
           <!-- CHWS OUT lane -->
@@ -777,13 +882,13 @@
               <line x1="-18" y1="-12" x2="-18" y2="12" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
               <line x1="-31" y1="0" x2="-5" y2="0" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
             </g>
-            <g transform="translate(-78,-24)">
-              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
-              <text class="oTiny" x="8" y="14">CHWP-01A</text>
+            <g transform="translate(-82,-26)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="82" height="24"></rect>
+              <text class="oTiny" x="8" y="16">CHWP-01A</text>
             </g>
-            <g transform="translate(-78,18)">
-              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
-              <text class="oTiny" x="8" y="14"><tspan id="tpl_spdA">X</tspan>%</text>
+            <g transform="translate(-82,16)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="60" height="24"></rect>
+              <text class="oTiny" x="8" y="16"><tspan id="tpl_spdA">X</tspan>%</text>
             </g>
           </g>
 
@@ -795,110 +900,110 @@
               <line x1="-18" y1="-12" x2="-18" y2="12" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
               <line x1="-31" y1="0" x2="-5" y2="0" stroke="rgba(255,255,255,.20)" stroke-width="2.2"/>
             </g>
-            <g transform="translate(-78,-24)">
-              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
-              <text class="oTiny" x="8" y="14">CHWP-01B</text>
+            <g transform="translate(-82,-26)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="82" height="24"></rect>
+              <text class="oTiny" x="8" y="16">CHWP-01B</text>
             </g>
-            <g transform="translate(-78,18)">
-              <rect class="plate" x="0" y="0" rx="8" ry="8" width="72" height="20"></rect>
-              <text class="oTiny" x="8" y="14"><tspan id="tpl_spdB">X</tspan>%</text>
+            <g transform="translate(-82,16)">
+              <rect class="plate" x="0" y="0" rx="8" ry="8" width="60" height="24"></rect>
+              <text class="oTiny" x="8" y="16"><tspan id="tpl_spdB">X</tspan>%</text>
             </g>
           </g>
         </g>
       </defs>
 
       <!-- Master frame -->
-      <rect class="panelBox" x="22" y="56" rx="18" ry="18" width="1356" height="1090"></rect>
-      <text class="oStrong" x="46" y="90">CHILLER PLANT / WATER SIDE (P&amp;ID Mimic)</text>
+      <rect class="panelBox" x="22" y="56" rx="18" ry="18" width="1456" height="1110"></rect>
+      <text class="oStrong" x="46" y="92">CHILLER PLANT / WATER SIDE (P&amp;ID Mimic)</text>
 
       <!-- Headers -->
-      <path class="pipeBase" d="M 860 150 H 1340"></path>
-      <path class="pipeFlow flow-chws" d="M 860 150 H 1340"></path>
-      <path class="pipeParticles p-chws" d="M 860 150 H 1340"></path>
+      <path class="pipeBase" d="M 880 150 H 1440"></path>
+      <path class="pipeFlow flow-chws" d="M 880 150 H 1440"></path>
+      <path class="pipeParticles p-chws" d="M 880 150 H 1440"></path>
 
-      <path class="pipeBase" d="M 860 210 H 1340"></path>
-      <path class="pipeFlow flow-chwr" d="M 860 210 H 1340"></path>
-      <path class="pipeParticles p-chwr" d="M 860 210 H 1340"></path>
+      <path class="pipeBase" d="M 880 210 H 1440"></path>
+      <path class="pipeFlow flow-chwr" d="M 880 210 H 1440"></path>
+      <path class="pipeParticles p-chwr" d="M 880 210 H 1440"></path>
 
-      <g transform="translate(860,122)">
-        <rect class="plate" x="0" y="0" rx="10" ry="10" width="190" height="24"></rect>
-        <text class="oLbl" x="10" y="17">CHWS (SUPPLY) HEADER →</text>
+      <g transform="translate(880,118)">
+        <rect class="plate" x="0" y="0" rx="10" ry="10" width="220" height="28"></rect>
+        <text class="oLbl" x="10" y="19">CHWS (SUPPLY) HEADER →</text>
       </g>
-      <g transform="translate(860,182)">
-        <rect class="plate" x="0" y="0" rx="10" ry="10" width="190" height="24"></rect>
-        <text class="oLbl" x="10" y="17">← CHWR (RETURN) HEADER</text>
+      <g transform="translate(880,182)">
+        <rect class="plate" x="0" y="0" rx="10" ry="10" width="220" height="28"></rect>
+        <text class="oLbl" x="10" y="19">← CHWR (RETURN) HEADER</text>
       </g>
 
-      <path class="arrow" d="M 1040 150 H 1140" marker-end="url(#mArrow)"></path>
-      <path class="arrow" d="M 1140 210 H 1040" marker-end="url(#mArrow)"></path>
+      <path class="arrow" d="M 1100 150 H 1200" marker-end="url(#mArrow)"></path>
+      <path class="arrow" d="M 1200 210 H 1100" marker-end="url(#mArrow)"></path>
 
-      <g class="hoverGlow" transform="translate(860, 248)" data-tip="Header Flow Meter (MFM1)\nTracks combined CHW flow to plant header.">
-        <rect class="instBox" x="0" y="0" rx="10" ry="10" width="180" height="56"></rect>
-        <text class="instTxt" x="12" y="22">MFM1 (Header)</text>
-        <text class="instVal" x="12" y="45"><tspan id="mfm_val">X</tspan> L/s</text>
+      <g class="hoverGlow" transform="translate(880, 252)" data-tip="Header Flow Meter (MFM1)\nTracks combined CHW flow to plant header.">
+        <rect class="instBox" x="0" y="0" rx="10" ry="10" width="200" height="62"></rect>
+        <text class="instTxt" x="12" y="24">MFM1 (Header)</text>
+        <text class="instVal" x="12" y="50"><tspan id="mfm_val">X</tspan> L/s</text>
       </g>
-      <g class="hoverGlow" transform="translate(1050, 248)" data-tip="ΔP Control (Avg)\nRepresents DP control for CHW distribution.">
-        <rect class="instBox" x="0" y="0" rx="10" ry="10" width="180" height="56"></rect>
-        <text class="instTxt" x="12" y="22">ΔP Ctrl (Avg)</text>
-        <text class="instVal" x="12" y="45"><tspan id="dp_hdr">X</tspan> kPa</text>
+      <g class="hoverGlow" transform="translate(1100, 252)" data-tip="ΔP Control (Avg)\nRepresents DP control for CHW distribution.">
+        <rect class="instBox" x="0" y="0" rx="10" ry="10" width="200" height="62"></rect>
+        <text class="instTxt" x="12" y="24">ΔP Ctrl (Avg)</text>
+        <text class="instVal" x="12" y="50"><tspan id="dp_hdr">X</tspan> kPa</text>
       </g>
 
       <!-- Branches -->
       <g id="branches">
         <!-- CH-1 -->
-        <path class="pipeBase" d="M 980 150 V 184 H 810"></path>
-        <path class="pipeFlow flow-chws" d="M 980 150 V 184 H 810"></path>
-        <path class="pipeParticles p-chws" d="M 980 150 V 184 H 810"></path>
+        <path class="pipeBase" d="M 1000 150 V 184 H 850"></path>
+        <path class="pipeFlow flow-chws" d="M 1000 150 V 184 H 850"></path>
+        <path class="pipeParticles p-chws" d="M 1000 150 V 184 H 850"></path>
 
-        <path class="pipeBase" d="M 996 210 V 252 H 810"></path>
-        <path class="pipeFlow flow-chwr" d="M 996 210 V 252 H 810"></path>
-        <path class="pipeParticles p-chwr" d="M 996 210 V 252 H 810"></path>
+        <path class="pipeBase" d="M 1016 210 V 252 H 850"></path>
+        <path class="pipeFlow flow-chwr" d="M 1016 210 V 252 H 850"></path>
+        <path class="pipeParticles p-chwr" d="M 1016 210 V 252 H 850"></path>
 
-        <g transform="translate(958,168)">
-          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
-          <text class="oTiny" x="10" y="0">CH-1</text>
+        <g transform="translate(978,168)">
+          <rect class="plate" x="0" y="-18" rx="8" ry="8" width="58" height="26"></rect>
+          <text class="oTiny" x="10" y="2">CH-1</text>
         </g>
 
         <!-- CH-2 -->
-        <path class="pipeBase" d="M 1070 150 V 404 H 810"></path>
-        <path class="pipeFlow flow-chws" d="M 1070 150 V 404 H 810"></path>
-        <path class="pipeParticles p-chws" d="M 1070 150 V 404 H 810"></path>
+        <path class="pipeBase" d="M 1120 150 V 404 H 850"></path>
+        <path class="pipeFlow flow-chws" d="M 1120 150 V 404 H 850"></path>
+        <path class="pipeParticles p-chws" d="M 1120 150 V 404 H 850"></path>
 
-        <path class="pipeBase" d="M 1086 210 V 472 H 810"></path>
-        <path class="pipeFlow flow-chwr" d="M 1086 210 V 472 H 810"></path>
-        <path class="pipeParticles p-chwr" d="M 1086 210 V 472 H 810"></path>
+        <path class="pipeBase" d="M 1136 210 V 472 H 850"></path>
+        <path class="pipeFlow flow-chwr" d="M 1136 210 V 472 H 850"></path>
+        <path class="pipeParticles p-chwr" d="M 1136 210 V 472 H 850"></path>
 
-        <g transform="translate(1048,388)">
-          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
-          <text class="oTiny" x="10" y="0">CH-2</text>
+        <g transform="translate(1098,388)">
+          <rect class="plate" x="0" y="-18" rx="8" ry="8" width="58" height="26"></rect>
+          <text class="oTiny" x="10" y="2">CH-2</text>
         </g>
 
         <!-- CH-3 -->
-        <path class="pipeBase" d="M 1160 150 V 624 H 810"></path>
-        <path class="pipeFlow flow-chws" d="M 1160 150 V 624 H 810"></path>
-        <path class="pipeParticles p-chws" d="M 1160 150 V 624 H 810"></path>
+        <path class="pipeBase" d="M 1240 150 V 624 H 850"></path>
+        <path class="pipeFlow flow-chws" d="M 1240 150 V 624 H 850"></path>
+        <path class="pipeParticles p-chws" d="M 1240 150 V 624 H 850"></path>
 
-        <path class="pipeBase" d="M 1176 210 V 692 H 810"></path>
-        <path class="pipeFlow flow-chwr" d="M 1176 210 V 692 H 810"></path>
-        <path class="pipeParticles p-chwr" d="M 1176 210 V 692 H 810"></path>
+        <path class="pipeBase" d="M 1256 210 V 692 H 850"></path>
+        <path class="pipeFlow flow-chwr" d="M 1256 210 V 692 H 850"></path>
+        <path class="pipeParticles p-chwr" d="M 1256 210 V 692 H 850"></path>
 
-        <g transform="translate(1138,608)">
-          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
-          <text class="oTiny" x="10" y="0">CH-3</text>
+        <g transform="translate(1218,608)">
+          <rect class="plate" x="0" y="-18" rx="8" ry="8" width="58" height="26"></rect>
+          <text class="oTiny" x="10" y="2">CH-3</text>
         </g>
 
         <!-- CH-4 -->
-        <path class="pipeBase" d="M 1250 150 V 844 H 810"></path>
-        <path class="pipeFlow flow-chws" d="M 1250 150 V 844 H 810"></path>
-        <path class="pipeParticles p-chws" d="M 1250 150 V 844 H 810"></path>
+        <path class="pipeBase" d="M 1360 150 V 844 H 850"></path>
+        <path class="pipeFlow flow-chws" d="M 1360 150 V 844 H 850"></path>
+        <path class="pipeParticles p-chws" d="M 1360 150 V 844 H 850"></path>
 
-        <path class="pipeBase" d="M 1266 210 V 912 H 810"></path>
-        <path class="pipeFlow flow-chwr" d="M 1266 210 V 912 H 810"></path>
-        <path class="pipeParticles p-chwr" d="M 1266 210 V 912 H 810"></path>
+        <path class="pipeBase" d="M 1376 210 V 912 H 850"></path>
+        <path class="pipeFlow flow-chwr" d="M 1376 210 V 912 H 850"></path>
+        <path class="pipeParticles p-chwr" d="M 1376 210 V 912 H 850"></path>
 
-        <g transform="translate(1228,828)">
-          <rect class="plate" x="0" y="-16" rx="8" ry="8" width="54" height="22"></rect>
-          <text class="oTiny" x="10" y="0">CH-4</text>
+        <g transform="translate(1338,828)">
+          <rect class="plate" x="0" y="-18" rx="8" ry="8" width="58" height="26"></rect>
+          <text class="oTiny" x="10" y="2">CH-4</text>
         </g>
       </g>
 
@@ -1734,6 +1839,7 @@ function init(){
   setInterval(stepEvery1s, 1000);
   stepEvery1s();
 }
+
 init();
 </script>
 </body>

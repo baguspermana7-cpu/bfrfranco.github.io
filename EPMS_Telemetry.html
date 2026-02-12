@@ -3,7 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EPMS V1.0 - Telemetry</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+
+<!-- SEO Meta Tags -->
+<title>EPMS Telemetry Dashboard | Electrical Power Monitoring System</title>
+<meta name="description" content="Real-time EPMS telemetry dashboard for data center electrical power monitoring. Track voltage, current, power factor, and energy consumption across all distribution panels.">
+<meta name="keywords" content="EPMS, Electrical Power Monitoring, Data Center Telemetry, Power Distribution, BMS Dashboard, Ahli K3 Listrik, Critical Infrastructure">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://resistancezero.com/EPMS_Telemetry.html">
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://resistancezero.com/EPMS_Telemetry.html">
+<meta property="og:title" content="EPMS Telemetry Dashboard | Electrical Power Monitoring">
+<meta property="og:description" content="Real-time electrical power monitoring system for data center infrastructure.">
+<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EPMS Telemetry Dashboard">
+<meta name="twitter:description" content="Real-time electrical power monitoring for data center infrastructure.">
+<meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"EPMS Telemetry Dashboard","applicationCategory":"MonitoringApplication","description":"Real-time EPMS telemetry dashboard for data center electrical power monitoring across all distribution panels.","url":"https://resistancezero.com/EPMS_Telemetry.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"}}
+</script>
 <style>
     :root {
         --bg-core: #02040a;
@@ -115,6 +141,179 @@
         border: 1px solid #444; border-radius: 4px; pointer-events: none;
         opacity: 0; transition: opacity 0.3s; z-index: 200; font-weight: bold;
     }
+
+    /* Zoom Controls */
+    .zoom-btn {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid #444;
+        color: #94a3b8;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .zoom-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        border-color: #666;
+    }
+    .zoom-btn.active {
+        background: rgba(34, 197, 94, 0.2);
+        border-color: #22c55e;
+        color: #22c55e;
+    }
+    .zoom-indicator {
+        font-size: 11px;
+        color: #64748b;
+        font-family: monospace;
+        min-width: 50px;
+        text-align: center;
+    }
+
+    /* Export Dropdown */
+    .export-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    .export-btn {
+        background: rgba(59, 130, 246, 0.2);
+        border: 1px solid #3b82f6;
+        color: #3b82f6;
+        padding: 6px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .export-btn:hover {
+        background: rgba(59, 130, 246, 0.3);
+        color: #60a5fa;
+    }
+    .export-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 4px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        min-width: 180px;
+        z-index: 1000;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .export-dropdown:hover .export-menu {
+        display: block;
+    }
+    .export-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        color: #94a3b8;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+        border-bottom: 1px solid #1e293b;
+    }
+    .export-item:last-child { border-bottom: none; }
+    .export-item:hover {
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+    }
+    .export-item svg { width: 16px; height: 16px; }
+
+    /* Bottom Status Bar - Matching Sidebar Style */
+    .status-bar {
+        position: absolute;
+        bottom: 0;
+        left: 320px;
+        right: 0;
+        height: 50px;
+        background: var(--panel-bg);
+        border-top: 1px solid #333;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        gap: 8px;
+        z-index: 100;
+        pointer-events: auto;
+    }
+    .status-box {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid #333;
+        padding: 6px 12px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .status-box.active {
+        border-left: 3px solid var(--st-ok);
+        background: rgba(34, 197, 94, 0.08);
+    }
+    .status-box.warning {
+        border-left: 3px solid var(--st-warn);
+        background: rgba(234, 179, 8, 0.08);
+    }
+    .status-box.error {
+        border-left: 3px solid var(--st-bad);
+        background: rgba(239, 68, 68, 0.08);
+        animation: pulse 1s infinite;
+    }
+    .status-label {
+        font-size: 9px;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .status-value {
+        font-family: 'Consolas', monospace;
+        font-size: 12px;
+        font-weight: bold;
+        color: #fff;
+    }
+    .status-value.ok { color: var(--st-ok); }
+    .status-value.warning { color: var(--st-warn); }
+    .status-value.error { color: var(--st-bad); }
+    .status-led {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--st-ok);
+        box-shadow: 0 0 6px var(--st-ok);
+    }
+    .status-led.off { background: #333; box-shadow: none; }
+    .status-led.warning { background: var(--st-warn); box-shadow: 0 0 6px var(--st-warn); }
+    .status-led.error { background: var(--st-bad); box-shadow: 0 0 6px var(--st-bad); animation: blink 0.5s infinite; }
+    .status-spacer { flex: 1; }
+    .status-clock {
+        font-family: 'Consolas', monospace;
+        font-size: 11px;
+        color: #64748b;
+        padding: 4px 10px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid #333;
+        border-radius: 4px;
+    }
+
+    /* Print Styles */
+    @media print {
+        body { background: white !important; }
+        .ui, .status-bar { display: none !important; }
+        #viewport { width: 100% !important; height: auto !important; }
+    }
+
 </style>
 </head>
 <body>
@@ -137,14 +336,48 @@
 
 <div class="ui">
     <div class="topbar pointer">
-        <a href="index.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+        <a href="dc-conventional.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back
+        </a>
+        <a href="index.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
             Portfolio
         </a>
         <div class="brand">EPMS V1.0 - Telemetry</div>
         <div style="flex:1"></div>
-        <div style="font-size:11px; color:#94a3b8; font-family: monospace;">
-
+        <div style="display:flex; gap:8px; align-items:center;">
+            <span style="font-size:10px; color:#64748b; margin-right:4px;">ZOOM:</span>
+            <span id="zoomIndicator" class="zoom-indicator">50%</span>
+            <button class="zoom-btn" onclick="setZoom(0.5)" title="50%">50%</button>
+            <button class="zoom-btn" onclick="setZoom(0.75)" title="75%">75%</button>
+            <button class="zoom-btn" onclick="setZoom(1.2)" title="120%">120%</button>
+            <button class="zoom-btn" onclick="fitScreen()" title="Fit to Screen" style="background:rgba(34,197,94,0.2); border-color:#22c55e;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                FIT
+            </button>
+            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
+            <div class="export-dropdown">
+                <button class="export-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    EXPORT
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="export-menu">
+                    <div class="export-item" onclick="exportPDF()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <span>Export PDF Report</span>
+                    </div>
+                    <div class="export-item" onclick="exportCSV()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                        <span>Export CSV Data</span>
+                    </div>
+                    <div class="export-item" onclick="exportJSON()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <span>Export JSON</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div style="flex:1; display:flex;">
@@ -179,6 +412,49 @@
 
             <div class="btn" onclick="resetView()" style="margin-top: auto;">Reset View</div>
         </div>
+    </div>
+
+    <!-- Bottom Status Bar -->
+    <div class="status-bar">
+        <div class="status-box active" id="box-system">
+            <div class="status-led" id="ind-system"></div>
+            <div>
+                <div class="status-label">System</div>
+                <div class="status-value ok" id="val-system">ONLINE</div>
+            </div>
+        </div>
+        <div class="status-box">
+            <div>
+                <div class="status-label">Total Load</div>
+                <div class="status-value" id="val-total-load">0 kW</div>
+            </div>
+        </div>
+        <div class="status-box">
+            <div>
+                <div class="status-label">Power Factor</div>
+                <div class="status-value" id="val-pf">0.92</div>
+            </div>
+        </div>
+        <div class="status-box">
+            <div>
+                <div class="status-label">Frequency</div>
+                <div class="status-value" id="val-freq">50.0 Hz</div>
+            </div>
+        </div>
+        <div class="status-box">
+            <div>
+                <div class="status-label">Breakers</div>
+                <div class="status-value" id="val-breakers">0 / 0</div>
+            </div>
+        </div>
+        <div class="status-box" id="box-alarms">
+            <div>
+                <div class="status-label">Alarms</div>
+                <div class="status-value ok" id="val-alarms">0</div>
+            </div>
+        </div>
+        <div class="status-spacer"></div>
+        <div class="status-clock" id="val-timestamp">--:--:--</div>
     </div>
 </div>
 
@@ -395,13 +671,20 @@ for(let i=0; i<10; i++){
 function init(){
     WIRES.forEach(w => SIM.breakers[w.br] = w.def || 'closed');
     drawLayout();
+
+    // Auto-center the diagram after layout is drawn
+    setTimeout(() => {
+        fitScreen();
+        updateStatusBar();
+    }, 50);
+
     setInterval(() => {
         try {
             runATSLogic();
             calcPowerFlow();
             updateUI();
         } catch(e) { console.error(e); }
-    }, 500); 
+    }, 500);
 }
 
 function runATSLogic(){
@@ -642,18 +925,297 @@ function createSVG(tag, attrs){
 }
 function log(msg){ const l=document.getElementById('logs'); const d=document.createElement('div'); d.textContent=`> ${msg}`; l.prepend(d); }
 
-let scale = 0.5; let px = 50, py = 50;
+let scale = 0.5; let px = 0, py = 0;
 const scene = document.getElementById('scene');
-function setTransform(){ scene.setAttribute('transform', `translate(${px},${py}) scale(${scale})`); }
-setTransform();
-document.getElementById('viewport').onwheel = (e) => { e.preventDefault(); scale += e.deltaY * -0.001; scale = Math.min(Math.max(0.2, scale), 3); setTransform(); };
-document.getElementById('viewport').onmousedown = (e) => {
-    if(e.target.tagName !== 'svg') return;
-    let sx = e.clientX, sy = e.clientY;
-    document.onmousemove = (m) => { px += m.clientX - sx; py += m.clientY - sy; sx = m.clientX; sy = m.clientY; setTransform(); };
-    document.onmouseup = () => document.onmousemove = null;
+const viewportEl = document.getElementById('viewport');
+
+// Layout constants (screen pixels)
+const SIDEBAR_WIDTH_PX = 320;
+const TOPBAR_HEIGHT_PX = 50;
+
+// Content bounds in SVG units (based on GRID configuration)
+const CONTENT_MIN_X = 80;
+const CONTENT_MAX_X = 3520;
+const CONTENT_MIN_Y = 20;
+const CONTENT_MAX_Y = 1820;
+const CONTENT_WIDTH = CONTENT_MAX_X - CONTENT_MIN_X;
+const CONTENT_HEIGHT = CONTENT_MAX_Y - CONTENT_MIN_Y;
+const CONTENT_CENTER_X = (CONTENT_MIN_X + CONTENT_MAX_X) / 2;
+const CONTENT_CENTER_Y = (CONTENT_MIN_Y + CONTENT_MAX_Y) / 2;
+
+// Convert screen pixels to SVG units using the transformation matrix
+function screenToSVG(screenX, screenY) {
+    const ctm = viewportEl.getScreenCTM();
+    if (!ctm) return { x: screenX, y: screenY };
+    const pt = viewportEl.createSVGPoint();
+    pt.x = screenX;
+    pt.y = screenY;
+    const svgPt = pt.matrixTransform(ctm.inverse());
+    return { x: svgPt.x, y: svgPt.y };
+}
+
+function setTransform(){
+    scene.setAttribute('transform', `translate(${px},${py}) scale(${scale})`);
+    updateZoomIndicator();
+}
+
+function updateZoomIndicator() {
+    const indicator = document.getElementById('zoomIndicator');
+    if(indicator) indicator.textContent = Math.round(scale * 100) + '%';
+}
+
+function fitScreen() {
+    // Get visible area in screen pixels
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    // Visible area (excluding sidebar and topbar)
+    const visibleLeft = SIDEBAR_WIDTH_PX;
+    const visibleTop = TOPBAR_HEIGHT_PX;
+    const visibleWidth = screenWidth - SIDEBAR_WIDTH_PX;
+    const visibleHeight = screenHeight - TOPBAR_HEIGHT_PX;
+
+    // Convert visible area corners to SVG coordinates
+    const topLeft = screenToSVG(visibleLeft, visibleTop);
+    const bottomRight = screenToSVG(screenWidth, screenHeight);
+
+    // Available space in SVG units
+    const availableSvgWidth = bottomRight.x - topLeft.x;
+    const availableSvgHeight = bottomRight.y - topLeft.y;
+
+    // Calculate scale to fit content
+    const scaleX = availableSvgWidth / CONTENT_WIDTH;
+    const scaleY = availableSvgHeight / CONTENT_HEIGHT;
+    scale = Math.min(scaleX, scaleY) * 0.85;
+
+    // Calculate center of visible area in SVG coordinates
+    const visibleCenterSvg = screenToSVG(
+        visibleLeft + visibleWidth / 2,
+        visibleTop + visibleHeight / 2
+    );
+
+    // Position: move content center to visible center
+    px = visibleCenterSvg.x - CONTENT_CENTER_X * scale;
+    py = visibleCenterSvg.y - CONTENT_CENTER_Y * scale;
+
+    setTransform();
+    log('View: Fit to Screen');
+}
+
+function setZoom(newScale) {
+    // Get center of visible area in screen coords
+    const visibleCenterX = SIDEBAR_WIDTH_PX + (window.innerWidth - SIDEBAR_WIDTH_PX) / 2;
+    const visibleCenterY = TOPBAR_HEIGHT_PX + (window.innerHeight - TOPBAR_HEIGHT_PX) / 2;
+
+    // Convert to SVG coords
+    const centerSvg = screenToSVG(visibleCenterX, visibleCenterY);
+
+    // Find what diagram point is currently at this center
+    const diagramX = (centerSvg.x - px) / scale;
+    const diagramY = (centerSvg.y - py) / scale;
+
+    // Set new scale
+    scale = newScale;
+
+    // Reposition to keep same point at center
+    px = centerSvg.x - diagramX * scale;
+    py = centerSvg.y - diagramY * scale;
+
+    setTransform();
+    log(`Zoom: ${Math.round(scale * 100)}%`);
+}
+
+function resetView(){
+    fitScreen();
+}
+
+// Mouse wheel zoom
+viewportEl.onwheel = (e) => {
+    e.preventDefault();
+    const oldScale = scale;
+    scale += e.deltaY * -0.0008;
+    scale = Math.min(Math.max(0.15, scale), 2);
+
+    // Convert mouse position to SVG coords
+    const mouseSvg = screenToSVG(e.clientX, e.clientY);
+
+    // Find what diagram point is under mouse
+    const diagramX = (mouseSvg.x - px) / oldScale;
+    const diagramY = (mouseSvg.y - py) / oldScale;
+
+    // Reposition to keep same point under mouse
+    px = mouseSvg.x - diagramX * scale;
+    py = mouseSvg.y - diagramY * scale;
+
+    setTransform();
 };
-function resetView(){ scale=0.5; px=50; py=50; setTransform(); }
+
+// Pan with mouse drag
+viewportEl.onmousedown = (e) => {
+    if(e.target.closest('.br-group')) return;
+    e.preventDefault();
+
+    let lastSvg = screenToSVG(e.clientX, e.clientY);
+    viewportEl.style.cursor = 'grabbing';
+
+    document.onmousemove = (m) => {
+        const currentSvg = screenToSVG(m.clientX, m.clientY);
+        px += currentSvg.x - lastSvg.x;
+        py += currentSvg.y - lastSvg.y;
+        lastSvg = currentSvg;
+        setTransform();
+    };
+    document.onmouseup = () => {
+        document.onmousemove = null;
+        viewportEl.style.cursor = 'grab';
+    };
+};
+
+// Re-fit on window resize (debounced)
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(fitScreen, 150);
+});
+
+// =============================================
+// STATUS BAR UPDATES
+// =============================================
+function updateStatusBar() {
+    var closedCount = 0;
+    var totalCount = 0;
+    for (var id in SIM.breakers) {
+        totalCount++;
+        if (SIM.breakers[id] === 'closed') closedCount++;
+    }
+    document.getElementById('val-breakers').textContent = closedCount + ' / ' + totalCount;
+
+    var totalLoad = 0;
+    if (SIM.sources.A || SIM.sources.B) {
+        totalLoad = 2400 + Math.floor(Math.random() * 100);
+    }
+    document.getElementById('val-total-load').textContent = totalLoad.toLocaleString() + ' kW';
+
+    var pf = (0.92 + Math.random() * 0.03).toFixed(2);
+    document.getElementById('val-pf').textContent = pf;
+
+    var freq = (50.0 + (Math.random() - 0.5) * 0.1).toFixed(1);
+    document.getElementById('val-freq').textContent = freq + ' Hz';
+
+    var sysBox = document.getElementById('box-system');
+    var sysLed = document.getElementById('ind-system');
+    var sysValue = document.getElementById('val-system');
+    if (!SIM.sources.A && !SIM.sources.B) {
+        sysBox.className = 'status-box warning';
+        sysLed.className = 'status-led warning';
+        sysValue.textContent = 'GEN MODE';
+        sysValue.className = 'status-value warning';
+    } else {
+        sysBox.className = 'status-box active';
+        sysLed.className = 'status-led';
+        sysValue.textContent = 'ONLINE';
+        sysValue.className = 'status-value ok';
+    }
+
+    var alarmCount = 0;
+    for (var id in SIM.breakers) {
+        if (SIM.breakers[id] === 'trip') alarmCount++;
+    }
+    var alarmBox = document.getElementById('box-alarms');
+    var alarmEl = document.getElementById('val-alarms');
+    alarmEl.textContent = alarmCount;
+    if (alarmCount > 0) {
+        alarmBox.className = 'status-box error';
+        alarmEl.className = 'status-value error';
+    } else {
+        alarmBox.className = 'status-box';
+        alarmEl.className = 'status-value ok';
+    }
+
+    document.getElementById('val-timestamp').textContent = new Date().toLocaleTimeString();
+}
+
+setInterval(updateStatusBar, 1000);
+
+// =============================================
+// EXPORT FUNCTIONS
+// =============================================
+function getSystemData() {
+    var data = {
+        timestamp: new Date().toISOString(),
+        sources: {A: SIM.sources.A, B: SIM.sources.B},
+        generators: {A: SIM.genRunning.A, B: SIM.genRunning.B, C: SIM.genRunning.C},
+        breakers: {},
+        totalLoad: document.getElementById('val-total-load').textContent,
+        powerFactor: document.getElementById('val-pf').textContent,
+        frequency: document.getElementById('val-freq').textContent
+    };
+    for (var id in SIM.breakers) {
+        data.breakers[id] = SIM.breakers[id];
+    }
+    return data;
+}
+
+function exportPDF() {
+    var data = getSystemData();
+    var html = '<!DOCTYPE html><html><head><title>EPMS Report</title>';
+    html += '<style>body{font-family:Arial;padding:40px}h1{color:#1e3a5f;border-bottom:3px solid #1e3a5f}';
+    html += 'h2{color:#475569;margin-top:30px}table{width:100%;border-collapse:collapse;margin:15px 0}';
+    html += 'th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#f1f5f9}';
+    html += '.ok{color:#22c55e;font-weight:bold}.off{color:#94a3b8}</style></head><body>';
+    html += '<h1>EPMS Telemetry Report</h1>';
+    html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+    html += '<h2>System Metrics</h2>';
+    html += '<table><tr><th>Metric</th><th>Value</th></tr>';
+    html += '<tr><td>Total Load</td><td>' + data.totalLoad + '</td></tr>';
+    html += '<tr><td>Power Factor</td><td>' + data.powerFactor + '</td></tr>';
+    html += '<tr><td>Frequency</td><td>' + data.frequency + '</td></tr></table>';
+    html += '<h2>Power Sources</h2><table><tr><th>Source</th><th>Status</th></tr>';
+    html += '<tr><td>Utility A</td><td class="' + (data.sources.A ? 'ok' : 'off') + '">' + (data.sources.A ? 'ACTIVE' : 'OFF') + '</td></tr>';
+    html += '<tr><td>Utility B</td><td class="' + (data.sources.B ? 'ok' : 'off') + '">' + (data.sources.B ? 'ACTIVE' : 'OFF') + '</td></tr>';
+    html += '<tr><td>Generator A</td><td class="' + (data.generators.A ? 'ok' : 'off') + '">' + (data.generators.A ? 'RUNNING' : 'STANDBY') + '</td></tr>';
+    html += '<tr><td>Generator B</td><td class="' + (data.generators.B ? 'ok' : 'off') + '">' + (data.generators.B ? 'RUNNING' : 'STANDBY') + '</td></tr>';
+    html += '<tr><td>Generator C</td><td class="' + (data.generators.C ? 'ok' : 'off') + '">' + (data.generators.C ? 'RUNNING' : 'STANDBY') + '</td></tr></table>';
+    html += '</body></html>';
+
+    var win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.print();
+    log('Export: PDF Report');
+}
+
+function exportCSV() {
+    var data = getSystemData();
+    var csv = 'Category,Item,Value,Status\n';
+    csv += 'Metrics,Total Load,' + data.totalLoad + ',\n';
+    csv += 'Metrics,Power Factor,' + data.powerFactor + ',\n';
+    csv += 'Metrics,Frequency,' + data.frequency + ',\n';
+    csv += 'Source,Utility A,20kV,' + (data.sources.A ? 'ACTIVE' : 'OFF') + '\n';
+    csv += 'Source,Utility B,20kV,' + (data.sources.B ? 'ACTIVE' : 'OFF') + '\n';
+    csv += 'Generator,GEN A,2.5MW,' + (data.generators.A ? 'RUNNING' : 'STANDBY') + '\n';
+    csv += 'Generator,GEN B,2.5MW,' + (data.generators.B ? 'RUNNING' : 'STANDBY') + '\n';
+    csv += 'Generator,GEN C,2.5MW,' + (data.generators.C ? 'RUNNING' : 'STANDBY') + '\n';
+    for (var id in data.breakers) {
+        csv += 'Breaker,' + id + ',,' + data.breakers[id].toUpperCase() + '\n';
+    }
+    var blob = new Blob([csv], {type: 'text/csv'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'EPMS_Data.csv';
+    a.click();
+    log('Export: CSV Downloaded');
+}
+
+function exportJSON() {
+    var data = getSystemData();
+    var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'EPMS_Data.json';
+    a.click();
+    log('Export: JSON Downloaded');
+}
 
 init();
 </script>
