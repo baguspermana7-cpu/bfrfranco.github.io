@@ -783,32 +783,73 @@
         .calc-label-row { display: flex; align-items: center; gap: 2px; }
         .calc-methodology {
             margin-top: 1.5rem;
-            padding: 1.25rem;
-            background: rgba(0,0,0,0.25);
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.35);
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.08);
         }
         .calc-methodology summary {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #6ee7b7;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             padding: 0.25rem 0;
         }
-        .calc-methodology p, .calc-methodology ul {
-            font-size: 0.75rem;
-            color: #a8a29e;
-            margin: 0.5rem 0;
-            line-height: 1.5;
+        .calc-methodology p {
+            font-size: 0.8rem;
+            color: #d6d3d1;
+            margin: 0.75rem 0 0.25rem;
+            font-weight: 600;
         }
-        .calc-methodology ul { padding-left: 1.25rem; }
-        .calc-methodology li { margin-bottom: 0.3rem; }
+        .calc-methodology ul {
+            font-size: 0.8rem;
+            margin: 0.5rem 0;
+            line-height: 1.6;
+            padding-left: 1.25rem;
+        }
+        .calc-methodology li { margin-bottom: 0.4rem; color: #d6d3d1; }
+        .calc-methodology li strong { color: #6ee7b7; }
         .calc-methodology code {
-            background: rgba(255,255,255,0.08);
-            padding: 1px 4px;
-            border-radius: 3px;
+            background: rgba(16,185,129,0.12);
+            color: #a7f3d0;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
+            border: 1px solid rgba(16,185,129,0.15);
+        }
+        .term-tip {
+            position: relative;
+            border-bottom: 1px dashed rgba(110,231,183,0.5);
+            cursor: help;
+            color: #6ee7b7;
+            font-weight: 600;
+        }
+        .term-tip .term-def {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1c1917;
+            color: #e7e5e4;
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 400;
+            line-height: 1.5;
+            width: 240px;
+            z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            border: 1px solid rgba(16,185,129,0.2);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            text-align: left;
+        }
+        .term-tip:hover .term-def {
+            visibility: visible;
+            opacity: 1;
         }
         .sensitivity-grid {
             display: grid;
@@ -1774,29 +1815,29 @@
                             <summary>Calculation Methodology &amp; Assumptions</summary>
                             <p><strong>Demand Model:</strong></p>
                             <ul>
-                                <li><strong>Baseline demand</strong> = Current operational capacity (already absorbed)</li>
-                                <li><strong>Digital economy growth</strong>: <code>operational * ((1 + growth)^4 - 1) * 0.8</code> &mdash; 80% of digital growth translates to DC demand (Jevons multiplier)</li>
-                                <li><strong>Enterprise migration</strong>: <code>pipeline * migration% * 0.5</code> &mdash; enterprises fill ~50% of their migration through colo/cloud in target markets</li>
-                                <li><strong>Inference demand</strong>: <code>operational * 0.15 * (1 + CAGR)^4</code> &mdash; current AI base is ~15% of operational; inference compounds at given CAGR</li>
-                                <li><strong>Sovereign AI</strong>: Direct input based on government announcements and regulatory analysis</li>
+                                <li><strong>Baseline demand</strong> = Current operational capacity (already absorbed by existing tenants)</li>
+                                <li><strong>Digital economy growth</strong>: <code>operational &times; ((1 + growth)^4 - 1) &times; 0.8</code> &mdash; 80% of digital growth translates to DC demand via the <span class="term-tip">Jevons Paradox<span class="term-def">When technology becomes more efficient, total consumption increases rather than decreases. Applied to AI: cheaper models lead to more users, more applications, and ultimately more compute demand &mdash; not less.</span></span> multiplier</li>
+                                <li><strong>Enterprise migration</strong>: <code>pipeline &times; migration% &times; 0.5</code> &mdash; enterprises fill ~50% of their migration through <span class="term-tip">colo/cloud<span class="term-def">Colocation (colo) = renting space, power, and cooling in a shared data center. Cloud = using virtualized infrastructure from hyperscalers (AWS, Azure, GCP). Both drive DC demand.</span></span> in target markets</li>
+                                <li><strong><span class="term-tip">Inference demand<span class="term-def">AI Inference is the process of running a trained AI model to generate predictions or outputs. Unlike training (which happens once), inference happens billions of times per day and MUST be local for latency-sensitive applications.</span></span></strong>: <code>operational &times; 0.15 &times; (1 + <span class="term-tip">CAGR<span class="term-def">Compound Annual Growth Rate. The annualized average rate of growth over a period. A 35% CAGR means the value roughly triples over 4 years.</span></span>)^4</code> &mdash; current AI base is ~15% of operational; inference compounds at given CAGR</li>
+                                <li><strong>Sovereign AI</strong>: Direct MW input based on government mandates and <span class="term-tip">data sovereignty<span class="term-def">Laws requiring that data generated within a country must be stored and processed within its borders. All 6 major SEA nations have enacted some form of data sovereignty legislation, creating non-discretionary demand for local DC capacity.</span></span> regulatory analysis</li>
                             </ul>
                             <p><strong>Financial Model:</strong></p>
                             <ul>
-                                <li><strong>Occupancy</strong>: Modeled as <code>min(98%, totalDemand/pipeline * 70%)</code> &mdash; capped at practical maximum</li>
-                                <li><strong>Revenue</strong>: <code>pipeline * occupancy * revenue/MW</code></li>
-                                <li><strong>EBITDA</strong>: <code>revenue * (1 - OPEX%)</code></li>
-                                <li><strong>NPV</strong>: 10-year DCF using EBITDA with 3-year linear ramp-up from 40% to full occupancy, discounted at WACC</li>
-                                <li><strong>IRR</strong>: Approximated from NPV/capex ratio with occupancy and payback timing</li>
-                                <li><strong>Payback</strong>: <code>totalCapex / annualEBITDA</code> at stabilized occupancy</li>
+                                <li><strong>Occupancy</strong>: <code>min(98%, totalDemand/pipeline &times; 70%)</code> &mdash; capped at 98% practical maximum</li>
+                                <li><strong>Revenue</strong>: <code>pipeline &times; occupancy &times; revenue/MW</code> &mdash; annual colocation revenue at projected fill rate</li>
+                                <li><strong><span class="term-tip">EBITDA<span class="term-def">Earnings Before Interest, Taxes, Depreciation &amp; Amortization. The primary profitability metric for data centers. Calculated as Revenue minus Operating Expenses. Typical DC EBITDA margins: 35-45%.</span></span></strong>: <code>revenue &times; (1 - OPEX%)</code> &mdash; operating profit before financing costs</li>
+                                <li><strong><span class="term-tip">NPV<span class="term-def">Net Present Value. The total value of future cash flows discounted to today using WACC. Positive NPV = investment creates value; negative NPV = destroys value. The gold standard metric for infrastructure investment decisions.</span></span></strong>: 10-year <span class="term-tip">DCF<span class="term-def">Discounted Cash Flow. Projects future cash flows and discounts them to present value. Uses a 3-year linear ramp-up from 40% to stabilized occupancy, reflecting real-world lease-up timelines.</span></span> using EBITDA, discounted at <span class="term-tip">WACC<span class="term-def">Weighted Average Cost of Capital. The blended cost of debt and equity financing. Represents the minimum return an investment must generate. SEA infrastructure: typically 8-12%, reflecting higher emerging-market risk premiums.</span></span></li>
+                                <li><strong><span class="term-tip">IRR<span class="term-def">Internal Rate of Return. The discount rate at which NPV equals zero. If IRR exceeds WACC, the investment creates value. A 15%+ IRR is considered strong for infrastructure; below WACC signals the project may not justify its risk.</span></span></strong>: Computed via Newton-Raphson iteration on the 10-year cash flow series</li>
+                                <li><strong>Payback</strong>: <code>totalCapex / annualEBITDA</code> at stabilized occupancy. Under 6 years = strong; 6-9 = acceptable; over 10 = elevated risk</li>
                             </ul>
-                            <p><strong>Socioeconomic:</strong></p>
+                            <p><strong>Socioeconomic Impact:</strong></p>
                             <ul>
-                                <li><strong>Construction jobs</strong>: ~1,500 per 50 MW facility (industry benchmark)</li>
-                                <li><strong>Permanent jobs</strong>: ~50-80 per 50 MW facility</li>
-                                <li><strong>Ecosystem multiplier</strong>: 3-5x direct jobs (Loudoun County model)</li>
-                                <li><strong>Tax revenue</strong>: ~2-3% of revenue (property + corporate, varies by jurisdiction)</li>
+                                <li><strong>Construction jobs</strong>: ~1,500 per 50 MW facility (industry benchmark from Loudoun County / Northern Virginia studies)</li>
+                                <li><strong>Permanent jobs</strong>: ~50-80 per 50 MW facility (operations, maintenance, security, management)</li>
+                                <li><strong>Ecosystem multiplier</strong>: 3-5x direct jobs &mdash; includes fiber contractors, cooling specialists, equipment vendors, food services, housing</li>
+                                <li><strong>Tax revenue</strong>: ~2-3% of annual revenue (property tax + corporate tax, varies by jurisdiction)</li>
                             </ul>
-                            <p style="color: #78716c; font-size: 0.7rem; margin-top: 0.75rem;">Disclaimer: This calculator provides directional estimates for educational purposes. Actual investment decisions require detailed feasibility studies, site-specific analysis, and professional advisory. Past performance and projections do not guarantee future results.</p>
+                            <p style="color: #a8a29e; font-size: 0.72rem; margin-top: 0.75rem; font-weight: 400;">Disclaimer: This calculator provides directional estimates for educational purposes. Actual investment decisions require detailed feasibility studies, site-specific analysis, and professional advisory. Past performance and projections do not guarantee future results.</p>
                         </details>
                     </div>
                 </div>

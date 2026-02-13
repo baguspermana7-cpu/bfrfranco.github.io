@@ -612,27 +612,70 @@
             gap: 2px;
         }
         .calc-methodology {
-            background: rgba(0,0,0,0.25);
+            background: rgba(0,0,0,0.35);
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1.5rem;
             margin-top: 1.5rem;
-            font-size: 0.75rem;
-            color: #a8a29e;
+            font-size: 0.8rem;
+            color: #e7e5e4;
+            border: 1px solid rgba(255,255,255,0.08);
         }
         .calc-methodology summary {
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
+            color: #fbbf24;
+            font-size: 0.9rem;
+            padding: 0.25rem 0;
+        }
+        .calc-methodology p {
             color: #d6d3d1;
-            font-size: 0.8rem;
+            margin: 0.75rem 0 0.25rem;
+            font-weight: 600;
         }
         .calc-methodology ul { margin: 0.5rem 0; padding-left: 1.2rem; }
-        .calc-methodology li { margin-bottom: 0.3rem; }
+        .calc-methodology li { margin-bottom: 0.4rem; color: #d6d3d1; line-height: 1.6; }
+        .calc-methodology li strong { color: #fbbf24; }
         .calc-methodology code {
-            background: rgba(255,255,255,0.08);
-            padding: 0.1rem 0.3rem;
-            border-radius: 3px;
+            background: rgba(251,191,36,0.12);
+            color: #fde68a;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
+            border: 1px solid rgba(251,191,36,0.15);
+        }
+        .term-tip {
+            position: relative;
+            border-bottom: 1px dashed rgba(251,191,36,0.5);
+            cursor: help;
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .term-tip .term-def {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1c1917;
+            color: #e7e5e4;
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 400;
+            line-height: 1.5;
+            width: 240px;
+            z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            border: 1px solid rgba(251,191,36,0.2);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            text-align: left;
+        }
+        .term-tip:hover .term-def {
+            visibility: visible;
+            opacity: 1;
         }
         .sensitivity-grid {
             display: grid;
@@ -1651,26 +1694,30 @@
                     <div class="calc-methodology">
                         <details>
                             <summary>Calculation Methodology &amp; Assumptions</summary>
-                            <p><strong>Supply-Demand:</strong></p>
+                            <p><strong>Supply-Demand Analysis:</strong></p>
                             <ul>
-                                <li><strong>S/D ratio</strong>: <code>pipeline / (absorption * 5)</code> &mdash; pipeline vs 5-year demand projection</li>
-                                <li><strong>Vacancy 2028</strong>: Based on 3-year absorption vs 60% of new capacity coming online</li>
-                                <li><strong>Pipeline/Population</strong>: <code>pipeline / population</code> &mdash; MW per million people, compared against mature markets</li>
+                                <li><strong><span class="term-tip">S/D Ratio<span class="term-def">Supply-to-Demand Ratio. Compares total pipeline capacity against projected 5-year demand. A ratio above 1.5x typically signals oversupply risk; above 2.0x is a red flag.</span></span></strong>: <code>pipeline / (absorption &times; 5)</code> &mdash; total pipeline divided by 5-year cumulative demand projection</li>
+                                <li><strong>Vacancy 2028</strong>: Based on 3-year <span class="term-tip">absorption<span class="term-def">Absorption Rate is the amount of new data center capacity (MW) that gets leased/filled by tenants each year. Higher absorption = healthier market.</span></span> vs 60% of new capacity expected to come online by 2028</li>
+                                <li><strong>Pipeline/Population</strong>: <code>pipeline / population</code> &mdash; MW per million people. Helps identify disproportionate builds (e.g., Johor's 1,526 MW/M vs Indonesia's 15 MW/M)</li>
                             </ul>
-                            <p><strong>Financial:</strong></p>
+                            <p><strong>Financial Risk Metrics:</strong></p>
                             <ul>
-                                <li><strong>Break-even</strong>: <code>OPEX% + speculative% * 15</code> &mdash; higher spec builds require higher occupancy to break even</li>
-                                <li><strong>Projected occupancy</strong>: <code>max(40%, 95% - S/D ratio * 15%)</code> &mdash; higher oversupply = lower average occupancy</li>
-                                <li><strong>Revenue</strong>: <code>rev/MW * pipeline * occupancy</code></li>
-                                <li><strong>EBITDA</strong>: <code>revenue * (1 - OPEX%)</code></li>
-                                <li><strong>NPV</strong>: 10-year DCF with 3-year ramp-up from 30% to stabilized occupancy</li>
-                                <li><strong>Payback</strong>: <code>totalCapex / annualEBITDA</code> at projected occupancy</li>
+                                <li><strong><span class="term-tip">Break-even Occupancy<span class="term-def">The minimum occupancy rate at which a data center covers its operating expenses (OPEX). Below this threshold, the facility operates at a cash-flow loss even if it has some tenants.</span></span></strong>: <code>OPEX% + speculative% &times; 15</code> &mdash; higher speculative builds need higher fill rates to survive</li>
+                                <li><strong>Projected Occupancy</strong>: <code>max(40%, 95% - S/D ratio &times; 15%)</code> &mdash; oversupplied markets push average occupancy down</li>
+                                <li><strong>Revenue</strong>: <code>rev/MW &times; pipeline &times; occupancy</code> &mdash; annual colocation revenue at projected fill rate</li>
+                                <li><strong><span class="term-tip">EBITDA<span class="term-def">Earnings Before Interest, Taxes, Depreciation &amp; Amortization. The primary profitability metric for data centers. Calculated as Revenue minus Operating Expenses. Typical DC EBITDA margins: 35-45%.</span></span></strong>: <code>revenue &times; (1 - OPEX%)</code> &mdash; operating profit before financing costs</li>
+                                <li><strong><span class="term-tip">NPV<span class="term-def">Net Present Value. The total value of future cash flows discounted back to today using the WACC. Positive NPV = the investment creates value; negative NPV = it destroys value. Accounts for the time value of money.</span></span></strong>: 10-year <span class="term-tip">DCF<span class="term-def">Discounted Cash Flow. A valuation method that projects future cash flows and discounts them to present value using a discount rate (WACC). Standard methodology for infrastructure investment analysis.</span></span> with 3-year ramp-up from 30% to stabilized occupancy, discounted at <span class="term-tip">WACC<span class="term-def">Weighted Average Cost of Capital. The blended cost of debt and equity financing. Represents the minimum return an investment must generate to create value. SEA infrastructure typically: 8-12%.</span></span></li>
+                                <li><strong>Payback Period</strong>: <code>totalCapex / annualEBITDA</code> &mdash; years to recover initial investment. Under 7 years = attractive; over 10 years = high risk</li>
                             </ul>
-                            <p><strong>Risk Score (0-100):</strong></p>
+                            <p><strong>Bubble Risk Score (0-100):</strong></p>
                             <ul>
-                                <li>S/D ratio weight: 30 pts, Speculative %: 25 pts, Low pre-commit: 20 pts, Absorption time: 15 pts, Payback: 10 pts</li>
+                                <li>S/D ratio weight: <strong>30 pts</strong> &mdash; the dominant risk factor</li>
+                                <li>Speculative build %: <strong>25 pts</strong> &mdash; builds without tenants</li>
+                                <li>Low pre-commitment: <strong>20 pts</strong> &mdash; lack of hyperscaler contracts</li>
+                                <li>Absorption timeline: <strong>15 pts</strong> &mdash; penalty if >3 years to fill</li>
+                                <li>Extended payback: <strong>10 pts</strong> &mdash; penalty if >6 years ROI</li>
                             </ul>
-                            <p style="color: #78716c; font-size: 0.7rem; margin-top: 0.75rem;">Disclaimer: This calculator provides directional estimates for educational purposes. Actual investment decisions require detailed feasibility studies, site-specific analysis, and professional advisory.</p>
+                            <p style="color: #a8a29e; font-size: 0.72rem; margin-top: 0.75rem; font-weight: 400;">Disclaimer: This calculator provides directional estimates for educational purposes. Actual investment decisions require detailed feasibility studies, site-specific analysis, and professional advisory.</p>
                         </details>
                     </div>
                 </div>
