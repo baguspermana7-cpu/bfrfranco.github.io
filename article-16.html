@@ -562,6 +562,90 @@
         .result-item .value.amber { color: #fbbf24; }
         .result-item .value.red { color: #f87171; }
         .result-item .subtext { font-size: 0.7rem; color: #a8a29e; margin-top: 0.25rem; }
+        .result-item .value.blue { color: #60a5fa; }
+
+        /* Tooltips */
+        .calc-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(255,255,255,0.15);
+            color: #fbbf24;
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: help;
+            position: relative;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .calc-tooltip .tip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1c1917;
+            color: #d6d3d1;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 400;
+            line-height: 1.5;
+            width: 260px;
+            z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .calc-tooltip:hover .tip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .calc-label-row {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .calc-methodology {
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #a8a29e;
+        }
+        .calc-methodology summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #d6d3d1;
+            font-size: 0.8rem;
+        }
+        .calc-methodology ul { margin: 0.5rem 0; padding-left: 1.2rem; }
+        .calc-methodology li { margin-bottom: 0.3rem; }
+        .calc-methodology code {
+            background: rgba(255,255,255,0.08);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+        .sensitivity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .sensitivity-card {
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
 
         /* Risk Gauge */
         .risk-gauge {
@@ -1378,11 +1462,13 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     SEA Data Center Bubble Risk Analyzer
                 </div>
-                <p class="calc-subtitle">Select a market and adjust parameters to model supply-demand dynamics and risk exposure</p>
+                <p class="calc-subtitle">Model supply-demand dynamics and risk exposure for any SEA market. Hover <span class="calc-tooltip" style="display:inline-flex;">?<span class="tip-text">Hover over any ? icon for detailed explanations of each input parameter and how it affects the risk calculation.</span></span> icons for parameter explanations.</p>
 
+                <!-- Supply & Market -->
+                <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem;">Supply &amp; Market Parameters</div>
                 <div class="calc-grid">
                     <div class="calc-input-group">
-                        <label>Market</label>
+                        <div class="calc-label-row"><label>Market</label><span class="calc-tooltip">?<span class="tip-text">Pre-loaded with real market data from Cushman &amp; Wakefield, Arizton, and CBRE H1 2025 reports. Select "Custom" to model a hypothetical market.</span></span></div>
                         <select id="calcMarket" onchange="prefillMarket()">
                             <option value="johor">Malaysia (Johor)</option>
                             <option value="indonesia">Indonesia (Greater Jakarta)</option>
@@ -1394,32 +1480,58 @@
                         </select>
                     </div>
                     <div class="calc-input-group">
-                        <label>Current Operational (MW)</label>
+                        <div class="calc-label-row"><label>Current Operational (MW)</label><span class="calc-tooltip">?<span class="tip-text">Currently live and energized IT load capacity in the market. This is the baseline that represents proven, absorbed demand. Source: Cushman &amp; Wakefield H1 2025.</span></span></div>
                         <input type="number" id="calcOperational" value="487" min="0" max="10000">
                     </div>
                     <div class="calc-input-group">
-                        <label>Total Pipeline (MW)</label>
+                        <div class="calc-label-row"><label>Total Pipeline (MW)</label><span class="calc-tooltip">?<span class="tip-text">Total announced + under construction + planned capacity through 2030. Includes committed builds (with LOIs/PPAs) and speculative builds (no anchor tenants). Source: Arizton 2025-2030.</span></span></div>
                         <input type="number" id="calcPipeline" value="5800" min="0" max="50000">
                     </div>
                     <div class="calc-input-group">
-                        <label>Annual Absorption Rate (MW/yr)</label>
+                        <div class="calc-label-row"><label>Population (millions)</label><span class="calc-tooltip">?<span class="tip-text">Market population for computing pipeline-to-population ratio. Helps contextualize whether the pipeline is proportional to the addressable market or wildly excessive.</span></span></div>
+                        <input type="number" id="calcPopulation" value="3.8" min="0.1" max="2000" step="0.1">
+                    </div>
+                </div>
+
+                <!-- Demand & Absorption -->
+                <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 1.5rem 0 0.75rem;">Demand &amp; Absorption Dynamics</div>
+                <div class="calc-grid">
+                    <div class="calc-input-group">
+                        <div class="calc-label-row"><label>Annual Absorption Rate (MW/yr)</label><span class="calc-tooltip">?<span class="tip-text">How much new DC capacity the market actually fills per year. Based on historical take-up rates. SG: ~150 MW/yr, ID: ~300 MW/yr, Johor: ~200 MW/yr (optimistic). This is the most critical input — it determines how fast supply gets absorbed.</span></span></div>
                         <input type="number" id="calcAbsorption" value="200" min="10" max="5000">
                     </div>
                     <div class="calc-input-group">
-                        <label>Hyperscaler Pre-Committed (%)</label>
+                        <div class="calc-label-row"><label>Hyperscaler Pre-Committed (%)</label><span class="calc-tooltip">?<span class="tip-text">Percentage of pipeline with signed hyperscaler LOIs, PPAs, or build-to-suit contracts. Pre-committed capacity is "safe" — it has guaranteed demand. Higher % = lower bubble risk. AWS, Google, Microsoft, and Meta are the primary hyperscaler tenants.</span></span></div>
                         <input type="number" id="calcPrecommit" value="40" min="0" max="100">
                     </div>
                     <div class="calc-input-group">
-                        <label>Speculative Build (%)</label>
+                        <div class="calc-label-row"><label>Speculative Build (%)</label><span class="calc-tooltip">?<span class="tip-text">Percentage of pipeline built WITHOUT anchor tenants or signed LOIs. These are carrier-neutral facilities betting that "demand will come." Speculative builds are the first casualties in a correction — they bear the most risk. Higher % = higher bubble risk.</span></span></div>
                         <input type="number" id="calcSpec" value="35" min="0" max="100">
                     </div>
                     <div class="calc-input-group">
-                        <label>Avg Build Cost ($/MW, millions)</label>
+                        <div class="calc-label-row"><label>Demand Growth Rate (%/yr)</label><span class="calc-tooltip">?<span class="tip-text">Annual organic demand growth rate for data center capacity, driven by digital economy expansion, cloud adoption, and enterprise migration. SEA average: 15-20%. Used to model whether absorption will accelerate over time.</span></span></div>
+                        <input type="number" id="calcDemandGrowth" value="15" min="0" max="50">
+                    </div>
+                </div>
+
+                <!-- Financial Parameters -->
+                <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 1.5rem 0 0.75rem;">Financial &amp; Investment Parameters</div>
+                <div class="calc-grid">
+                    <div class="calc-input-group">
+                        <div class="calc-label-row"><label>Avg Build Cost ($M/MW)</label><span class="calc-tooltip">?<span class="tip-text">Greenfield construction cost per MW of IT load. Includes land, building, MEP, commissioning. Ranges: $7-8M (VN/PH), $8-10M (ID/MY/TH), $12-15M (SG). AI-ready with liquid cooling adds 15-20%. Used to compute total capital at risk.</span></span></div>
                         <input type="number" id="calcCostMW" value="9" min="1" max="30" step="0.5">
                     </div>
                     <div class="calc-input-group">
-                        <label>Avg Revenue per MW/Year ($M)</label>
+                        <div class="calc-label-row"><label>Avg Revenue/MW/Year ($M)</label><span class="calc-tooltip">?<span class="tip-text">Annual colocation revenue per MW. Includes power pass-through, space rental, cross-connects, and managed services. SG: $2.5-3.5M, ID/MY: $1.5-2.2M, VN/TH: $1.4-2.0M. Used for break-even and payback calculations.</span></span></div>
                         <input type="number" id="calcRevMW" value="2.0" min="0.5" max="5" step="0.1">
+                    </div>
+                    <div class="calc-input-group">
+                        <div class="calc-label-row"><label>OPEX Ratio (%)</label><span class="calc-tooltip">?<span class="tip-text">Operating expenses as % of revenue. Includes electricity (40-55%), staff (8-12%), maintenance (5-8%), insurance, land lease, and SGA. Typical range: 55-70% for SEA operators. Used to calculate break-even occupancy and EBITDA margin.</span></span></div>
+                        <input type="number" id="calcOpexRatio" value="62" min="40" max="85">
+                    </div>
+                    <div class="calc-input-group">
+                        <div class="calc-label-row"><label>Discount Rate / WACC (%)</label><span class="calc-tooltip">?<span class="tip-text">Weighted average cost of capital for NPV calculations. Reflects risk premium for the market. Infrastructure funds: 8-10%, SEA premium: 2-4% above US/EU. Higher WACC = more conservative assessment of whether the investment returns justify the risk.</span></span></div>
+                        <input type="number" id="calcWACC" value="10" min="5" max="20" step="0.5">
                     </div>
                 </div>
 
@@ -1429,6 +1541,8 @@
                 </button>
 
                 <div class="calc-results" id="calcResults">
+                    <!-- Supply-Demand Metrics -->
+                    <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem;">Supply-Demand Analysis</div>
                     <div class="results-grid">
                         <div class="result-item">
                             <div class="label">Supply-to-Demand Ratio</div>
@@ -1446,19 +1560,54 @@
                             <div class="subtext" id="rVacNote">-</div>
                         </div>
                         <div class="result-item">
+                            <div class="label">Pipeline / Population</div>
+                            <div class="value" id="rPipePerPop">-</div>
+                            <div class="subtext" id="rPipePopNote">-</div>
+                        </div>
+                        <div class="result-item">
                             <div class="label">Capital at Risk</div>
                             <div class="value" id="rCapitalRisk">-</div>
                             <div class="subtext">Speculative builds only</div>
                         </div>
+                        <div class="result-item">
+                            <div class="label">Total Pipeline Capex</div>
+                            <div class="value" id="rTotalCapex">-</div>
+                            <div class="subtext">Full pipeline build cost</div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Risk Metrics -->
+                    <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 1.25rem 0 0.75rem;">Financial Risk Metrics</div>
+                    <div class="results-grid">
                         <div class="result-item">
                             <div class="label">Break-Even Occupancy</div>
                             <div class="value" id="rBreakeven">-</div>
                             <div class="subtext">OPEX coverage threshold</div>
                         </div>
                         <div class="result-item">
+                            <div class="label">Projected Avg Occupancy</div>
+                            <div class="value" id="rProjOcc">-</div>
+                            <div class="subtext" id="rOccNote">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Annual Revenue (Proj.)</div>
+                            <div class="value" id="rRevenue">-</div>
+                            <div class="subtext" id="rRevNote">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Annual EBITDA</div>
+                            <div class="value" id="rEBITDA">-</div>
+                            <div class="subtext" id="rEBITDANote">-</div>
+                        </div>
+                        <div class="result-item">
                             <div class="label">Payback Period</div>
                             <div class="value" id="rPayback">-</div>
                             <div class="subtext" id="rPayNote">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">10-Year NPV</div>
+                            <div class="value" id="rNPV">-</div>
+                            <div class="subtext" id="rNPVNote">At given WACC</div>
                         </div>
                     </div>
 
@@ -1492,6 +1641,37 @@
                             <div class="sd-bar-label"><span>3-Year Absorption (Projected)</span><span id="rBarAbsVal">-</span></div>
                             <div class="sd-bar committed" id="rBarAbsorb" style="width: 0%;">-</div>
                         </div>
+                    </div>
+
+                    <!-- Sensitivity Analysis -->
+                    <div style="font-size: 0.8rem; color: #d6d3d1; margin: 1.25rem 0 0.75rem;">SENSITIVITY ANALYSIS (OPTIMISTIC / BASE / PESSIMISTIC)</div>
+                    <div class="sensitivity-grid" id="sensitivityGrid"></div>
+
+                    <!-- Methodology -->
+                    <div class="calc-methodology">
+                        <details>
+                            <summary>Calculation Methodology &amp; Assumptions</summary>
+                            <p><strong>Supply-Demand:</strong></p>
+                            <ul>
+                                <li><strong>S/D ratio</strong>: <code>pipeline / (absorption * 5)</code> &mdash; pipeline vs 5-year demand projection</li>
+                                <li><strong>Vacancy 2028</strong>: Based on 3-year absorption vs 60% of new capacity coming online</li>
+                                <li><strong>Pipeline/Population</strong>: <code>pipeline / population</code> &mdash; MW per million people, compared against mature markets</li>
+                            </ul>
+                            <p><strong>Financial:</strong></p>
+                            <ul>
+                                <li><strong>Break-even</strong>: <code>OPEX% + speculative% * 15</code> &mdash; higher spec builds require higher occupancy to break even</li>
+                                <li><strong>Projected occupancy</strong>: <code>max(40%, 95% - S/D ratio * 15%)</code> &mdash; higher oversupply = lower average occupancy</li>
+                                <li><strong>Revenue</strong>: <code>rev/MW * pipeline * occupancy</code></li>
+                                <li><strong>EBITDA</strong>: <code>revenue * (1 - OPEX%)</code></li>
+                                <li><strong>NPV</strong>: 10-year DCF with 3-year ramp-up from 30% to stabilized occupancy</li>
+                                <li><strong>Payback</strong>: <code>totalCapex / annualEBITDA</code> at projected occupancy</li>
+                            </ul>
+                            <p><strong>Risk Score (0-100):</strong></p>
+                            <ul>
+                                <li>S/D ratio weight: 30 pts, Speculative %: 25 pts, Low pre-commit: 20 pts, Absorption time: 15 pts, Payback: 10 pts</li>
+                            </ul>
+                            <p style="color: #78716c; font-size: 0.7rem; margin-top: 0.75rem;">Disclaimer: This calculator provides directional estimates for educational purposes. Actual investment decisions require detailed feasibility studies, site-specific analysis, and professional advisory.</p>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -1546,15 +1726,15 @@
 
 <script src="script.js"></script>
 <script>
-// Market presets
+// Market presets — enhanced with all new fields
 const marketData = {
-    johor: { op: 487, pipe: 5800, absorb: 200, precommit: 40, spec: 35, cost: 9, rev: 2.0 },
-    indonesia: { op: 1717, pipe: 4145, absorb: 300, precommit: 55, spec: 25, cost: 8, rev: 1.8 },
-    singapore: { op: 780, pipe: 900, absorb: 150, precommit: 70, spec: 15, cost: 12, rev: 3.0 },
-    thailand: { op: 200, pipe: 1092, absorb: 120, precommit: 50, spec: 30, cost: 8.5, rev: 1.9 },
-    vietnam: { op: 150, pipe: 560, absorb: 80, precommit: 45, spec: 30, cost: 7, rev: 1.6 },
-    philippines: { op: 100, pipe: 500, absorb: 50, precommit: 35, spec: 40, cost: 9, rev: 2.1 },
-    custom: { op: 500, pipe: 2000, absorb: 150, precommit: 50, spec: 30, cost: 9, rev: 2.0 }
+    johor:      { op: 487,  pipe: 5800, pop: 3.8,  absorb: 200, precommit: 40, spec: 35, growth: 19, cost: 9, rev: 2.0, opex: 58, wacc: 10 },
+    indonesia:  { op: 1717, pipe: 4145, pop: 280,   absorb: 300, precommit: 55, spec: 25, growth: 15, cost: 8, rev: 1.8, opex: 60, wacc: 10 },
+    singapore:  { op: 780,  pipe: 900,  pop: 5.9,   absorb: 150, precommit: 70, spec: 15, growth: 12, cost: 14, rev: 3.0, opex: 55, wacc: 8 },
+    thailand:   { op: 200,  pipe: 1092, pop: 72,    absorb: 120, precommit: 50, spec: 30, growth: 14, cost: 8.5, rev: 1.9, opex: 62, wacc: 11 },
+    vietnam:    { op: 150,  pipe: 560,  pop: 100,   absorb: 80,  precommit: 45, spec: 30, growth: 18, cost: 7, rev: 1.6, opex: 65, wacc: 12 },
+    philippines:{ op: 100,  pipe: 500,  pop: 115,   absorb: 50,  precommit: 35, spec: 40, growth: 12, cost: 9, rev: 2.1, opex: 63, wacc: 12 },
+    custom:     { op: 500,  pipe: 2000, pop: 50,    absorb: 150, precommit: 50, spec: 30, growth: 15, cost: 9, rev: 2.0, opex: 60, wacc: 10 }
 };
 
 function prefillMarket() {
@@ -1562,36 +1742,42 @@ function prefillMarket() {
     const d = marketData[m];
     document.getElementById('calcOperational').value = d.op;
     document.getElementById('calcPipeline').value = d.pipe;
+    document.getElementById('calcPopulation').value = d.pop;
     document.getElementById('calcAbsorption').value = d.absorb;
     document.getElementById('calcPrecommit').value = d.precommit;
     document.getElementById('calcSpec').value = d.spec;
+    document.getElementById('calcDemandGrowth').value = d.growth;
     document.getElementById('calcCostMW').value = d.cost;
     document.getElementById('calcRevMW').value = d.rev;
+    document.getElementById('calcOpexRatio').value = d.opex;
+    document.getElementById('calcWACC').value = d.wacc;
 }
 
-function calculateBubbleRisk() {
-    const op = parseFloat(document.getElementById('calcOperational').value) || 0;
-    const pipe = parseFloat(document.getElementById('calcPipeline').value) || 0;
-    const absorb = parseFloat(document.getElementById('calcAbsorption').value) || 1;
-    const precommit = parseFloat(document.getElementById('calcPrecommit').value) / 100;
-    const spec = parseFloat(document.getElementById('calcSpec').value) / 100;
-    const costMW = parseFloat(document.getElementById('calcCostMW').value) || 9;
-    const revMW = parseFloat(document.getElementById('calcRevMW').value) || 2;
+function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'B' : n.toFixed(0) + 'M'; }
 
+function runBubbleModel(op, pipe, pop, absorb, precommit, spec, demandGrowth, costMW, revMW, opexRatio, wacc) {
     const newCapacity = pipe - op;
     const sdRatio = (newCapacity > 0) ? pipe / (absorb * 5) : 1;
-    const yearsAbsorb = newCapacity / absorb;
+    const yearsAbsorb = newCapacity / Math.max(1, absorb);
     const threeYrAbsorb = absorb * 3;
-    const totalBy2028 = op + Math.min(newCapacity * 0.6, threeYrAbsorb);
-    const vacancy2028 = Math.max(0, Math.min(80, ((totalBy2028 - (op + threeYrAbsorb)) / totalBy2028) * 100));
-    const actualVacancy = Math.max(5, Math.min(60, (1 - (threeYrAbsorb / (newCapacity * 0.6))) * 50));
+    const actualVacancy = Math.max(5, Math.min(60, (1 - (threeYrAbsorb / Math.max(1, newCapacity * 0.6))) * 50));
     const specMW = newCapacity * spec;
     const capitalRisk = specMW * costMW;
-    const breakeven = 60 + (spec * 15);
-    const avgOccupancy = Math.max(40, 95 - (sdRatio * 15));
-    const annualRev = revMW * pipe * (avgOccupancy / 100);
-    const totalCost = newCapacity * costMW;
-    const paybackYears = totalCost / annualRev;
+    const totalCapex = newCapacity * costMW;
+    const breakeven = opexRatio * 100 + (spec * 15);
+    const avgOccupancy = Math.max(40, 95 - (sdRatio * 15)) / 100;
+    const annualRev = revMW * pipe * avgOccupancy;
+    const annualEBITDA = annualRev * (1 - opexRatio);
+    const paybackYears = annualEBITDA > 0 ? totalCapex / annualEBITDA : 99;
+    const pipePerPop = pop > 0 ? pipe / pop : 0;
+
+    // NPV with 3-year ramp
+    let npv = -totalCapex;
+    for (let yr = 1; yr <= 10; yr++) {
+        let occYear = yr <= 3 ? (0.30 + (avgOccupancy - 0.30) * (yr / 3)) : avgOccupancy;
+        let ebitdaYear = revMW * pipe * occYear * (1 - opexRatio);
+        npv += ebitdaYear / Math.pow(1 + wacc, yr);
+    }
 
     // Risk score 0-100
     let riskScore = 0;
@@ -1602,69 +1788,136 @@ function calculateBubbleRisk() {
     riskScore += Math.min(10, Math.max(0, paybackYears - 6) * 2);
     riskScore = Math.min(100, Math.max(0, riskScore));
 
-    // Display results
+    return {
+        sdRatio, yearsAbsorb, actualVacancy, specMW, capitalRisk, totalCapex,
+        breakeven, avgOccupancy, annualRev, annualEBITDA, paybackYears,
+        pipePerPop, npv, riskScore, newCapacity, threeYrAbsorb
+    };
+}
+
+function calculateBubbleRisk() {
+    const op = parseFloat(document.getElementById('calcOperational').value) || 0;
+    const pipe = parseFloat(document.getElementById('calcPipeline').value) || 0;
+    const pop = parseFloat(document.getElementById('calcPopulation').value) || 1;
+    const absorb = parseFloat(document.getElementById('calcAbsorption').value) || 1;
+    const precommit = parseFloat(document.getElementById('calcPrecommit').value) / 100;
+    const spec = parseFloat(document.getElementById('calcSpec').value) / 100;
+    const demandGrowth = parseFloat(document.getElementById('calcDemandGrowth').value) / 100;
+    const costMW = parseFloat(document.getElementById('calcCostMW').value) || 9;
+    const revMW = parseFloat(document.getElementById('calcRevMW').value) || 2;
+    const opexRatio = parseFloat(document.getElementById('calcOpexRatio').value) / 100;
+    const wacc = parseFloat(document.getElementById('calcWACC').value) / 100;
+
+    const r = runBubbleModel(op, pipe, pop, absorb, precommit, spec, demandGrowth, costMW, revMW, opexRatio, wacc);
+
+    // Show results
     document.getElementById('calcResults').classList.add('show');
 
-    // Supply-demand ratio
+    // --- SUPPLY-DEMAND ---
     const sdEl = document.getElementById('rSupplyDemand');
-    sdEl.textContent = sdRatio.toFixed(1) + 'x';
-    sdEl.className = 'value ' + (sdRatio > 2 ? 'red' : sdRatio > 1.3 ? 'amber' : 'green');
-    document.getElementById('rSDNote').textContent = sdRatio > 2 ? 'Significant oversupply risk' : sdRatio > 1.3 ? 'Moderate oversupply risk' : 'Supply-demand balanced';
+    sdEl.textContent = r.sdRatio.toFixed(1) + 'x';
+    sdEl.className = 'value ' + (r.sdRatio > 2 ? 'red' : r.sdRatio > 1.3 ? 'amber' : 'green');
+    document.getElementById('rSDNote').textContent = r.sdRatio > 2 ? 'Significant oversupply risk' : r.sdRatio > 1.3 ? 'Moderate oversupply risk' : 'Supply-demand balanced';
 
-    // Years to absorb
     const yaEl = document.getElementById('rYearsAbsorb');
-    yaEl.textContent = yearsAbsorb.toFixed(1) + ' yrs';
-    yaEl.className = 'value ' + (yearsAbsorb > 10 ? 'red' : yearsAbsorb > 5 ? 'amber' : 'green');
+    yaEl.textContent = r.yearsAbsorb.toFixed(1) + ' yrs';
+    yaEl.className = 'value ' + (r.yearsAbsorb > 10 ? 'red' : r.yearsAbsorb > 5 ? 'amber' : 'green');
 
-    // Vacancy
     const vacEl = document.getElementById('rVacancy2028');
-    vacEl.textContent = actualVacancy.toFixed(0) + '%';
-    vacEl.className = 'value ' + (actualVacancy > 25 ? 'red' : actualVacancy > 15 ? 'amber' : 'green');
-    document.getElementById('rVacNote').textContent = actualVacancy > 25 ? 'Pricing pressure likely' : actualVacancy > 15 ? 'Manageable but watch closely' : 'Healthy vacancy range';
+    vacEl.textContent = r.actualVacancy.toFixed(0) + '%';
+    vacEl.className = 'value ' + (r.actualVacancy > 25 ? 'red' : r.actualVacancy > 15 ? 'amber' : 'green');
+    document.getElementById('rVacNote').textContent = r.actualVacancy > 25 ? 'Pricing pressure likely' : r.actualVacancy > 15 ? 'Manageable but watch closely' : 'Healthy vacancy range';
 
-    // Capital at risk
+    const ppEl = document.getElementById('rPipePerPop');
+    ppEl.textContent = r.pipePerPop.toFixed(0) + ' MW/M';
+    ppEl.className = 'value ' + (r.pipePerPop > 500 ? 'red' : r.pipePerPop > 50 ? 'amber' : 'green');
+    document.getElementById('rPipePopNote').textContent = r.pipePerPop > 500 ? 'Extreme — vastly exceeds population needs' : r.pipePerPop > 50 ? 'High — watch absorption carefully' : 'Proportional to market size';
+
     const crEl = document.getElementById('rCapitalRisk');
-    crEl.textContent = '$' + (capitalRisk / 1000).toFixed(1) + 'B';
-    crEl.className = 'value ' + (capitalRisk > 10000 ? 'red' : capitalRisk > 3000 ? 'amber' : 'green');
+    crEl.textContent = '$' + fmt(r.capitalRisk);
+    crEl.className = 'value ' + (r.capitalRisk > 10000 ? 'red' : r.capitalRisk > 3000 ? 'amber' : 'green');
 
-    // Break-even
+    document.getElementById('rTotalCapex').textContent = '$' + fmt(r.totalCapex);
+    document.getElementById('rTotalCapex').className = 'value';
+
+    // --- FINANCIAL ---
     const beEl = document.getElementById('rBreakeven');
-    beEl.textContent = breakeven.toFixed(0) + '%';
-    beEl.className = 'value ' + (breakeven > 75 ? 'red' : breakeven > 65 ? 'amber' : 'green');
+    beEl.textContent = r.breakeven.toFixed(0) + '%';
+    beEl.className = 'value ' + (r.breakeven > 75 ? 'red' : r.breakeven > 65 ? 'amber' : 'green');
 
-    // Payback
+    const occEl = document.getElementById('rProjOcc');
+    occEl.textContent = (r.avgOccupancy * 100).toFixed(0) + '%';
+    occEl.className = 'value ' + (r.avgOccupancy * 100 > r.breakeven ? 'green' : 'red');
+    document.getElementById('rOccNote').textContent = (r.avgOccupancy * 100) > r.breakeven ? 'Above break-even' : 'BELOW break-even — losses likely';
+
+    const revEl = document.getElementById('rRevenue');
+    revEl.textContent = '$' + fmt(r.annualRev) + '/yr';
+    revEl.className = 'value';
+    document.getElementById('rRevNote').textContent = 'At ' + (r.avgOccupancy * 100).toFixed(0) + '% avg occupancy';
+
+    const ebitdaEl = document.getElementById('rEBITDA');
+    ebitdaEl.textContent = '$' + fmt(r.annualEBITDA) + '/yr';
+    ebitdaEl.className = 'value ' + (r.annualEBITDA > 0 ? 'green' : 'red');
+    document.getElementById('rEBITDANote').textContent = ((1 - opexRatio) * 100).toFixed(0) + '% EBITDA margin';
+
     const pbEl = document.getElementById('rPayback');
-    pbEl.textContent = paybackYears.toFixed(1) + ' yrs';
-    pbEl.className = 'value ' + (paybackYears > 10 ? 'red' : paybackYears > 7 ? 'amber' : 'green');
-    document.getElementById('rPayNote').textContent = 'At ' + avgOccupancy.toFixed(0) + '% avg occupancy';
+    pbEl.textContent = r.paybackYears < 50 ? r.paybackYears.toFixed(1) + ' yrs' : 'N/A';
+    pbEl.className = 'value ' + (r.paybackYears > 10 ? 'red' : r.paybackYears > 7 ? 'amber' : 'green');
+    document.getElementById('rPayNote').textContent = r.paybackYears <= 7 ? 'Attractive payback' : r.paybackYears <= 10 ? 'Acceptable for infra' : 'Extended — elevated risk';
 
-    // Gauge
-    document.getElementById('rGaugeNeedle').style.left = riskScore + '%';
+    const npvEl = document.getElementById('rNPV');
+    npvEl.textContent = (r.npv >= 0 ? '+' : '') + '$' + fmt(Math.abs(r.npv));
+    npvEl.className = 'value ' + (r.npv > 0 ? 'green' : 'red');
+    document.getElementById('rNPVNote').textContent = r.npv > 0 ? 'Positive NPV — value-creating' : 'Negative NPV — destroys value';
+
+    // --- GAUGE ---
+    document.getElementById('rGaugeNeedle').style.left = r.riskScore + '%';
     const vEl = document.getElementById('rVerdict');
-    if (riskScore >= 70) { vEl.textContent = 'CRITICAL RISK — Strong bubble indicators present'; vEl.className = 'risk-verdict critical'; }
-    else if (riskScore >= 50) { vEl.textContent = 'HIGH RISK — Multiple warning signs detected'; vEl.className = 'risk-verdict high'; }
-    else if (riskScore >= 30) { vEl.textContent = 'MODERATE RISK — Monitor closely for deterioration'; vEl.className = 'risk-verdict medium'; }
+    if (r.riskScore >= 70) { vEl.textContent = 'CRITICAL RISK — Strong bubble indicators present'; vEl.className = 'risk-verdict critical'; }
+    else if (r.riskScore >= 50) { vEl.textContent = 'HIGH RISK — Multiple warning signs detected'; vEl.className = 'risk-verdict high'; }
+    else if (r.riskScore >= 30) { vEl.textContent = 'MODERATE RISK — Monitor closely for deterioration'; vEl.className = 'risk-verdict medium'; }
     else { vEl.textContent = 'LOW RISK — Market fundamentals appear sound'; vEl.className = 'risk-verdict low'; }
 
-    // Bars
+    // --- BARS ---
     const maxVal = pipe;
-    const committedMW = newCapacity * precommit;
-    const absorbMW3 = threeYrAbsorb;
+    const committedMW = r.newCapacity * precommit;
+    const absorbMW3 = r.threeYrAbsorb;
 
     document.getElementById('rBarPipeline').textContent = pipe.toLocaleString() + ' MW';
     document.getElementById('rBarSupply').style.width = '100%';
     document.getElementById('rBarSupply').textContent = pipe.toLocaleString() + ' MW';
 
-    document.getElementById('rBarDemandVal').textContent = committedMW.toLocaleString() + ' MW';
+    document.getElementById('rBarDemandVal').textContent = Math.round(committedMW).toLocaleString() + ' MW';
     document.getElementById('rBarDemand').style.width = Math.min(100, (committedMW / maxVal) * 100) + '%';
-    document.getElementById('rBarDemand').textContent = committedMW.toLocaleString() + ' MW';
+    document.getElementById('rBarDemand').textContent = Math.round(committedMW).toLocaleString() + ' MW';
 
     document.getElementById('rBarAbsVal').textContent = absorbMW3.toLocaleString() + ' MW';
     document.getElementById('rBarAbsorb').style.width = Math.min(100, (absorbMW3 / maxVal) * 100) + '%';
     document.getElementById('rBarAbsorb').textContent = absorbMW3.toLocaleString() + ' MW';
+
+    // --- SENSITIVITY ---
+    const grid = document.getElementById('sensitivityGrid');
+    const scenarios = [
+        { label: 'Optimistic', absorbMult: 1.3, specMult: 0.7, cls: 'green' },
+        { label: 'Base Case', absorbMult: 1.0, specMult: 1.0, cls: 'amber' },
+        { label: 'Pessimistic', absorbMult: 0.7, specMult: 1.3, cls: 'red' }
+    ];
+    let html = '';
+    scenarios.forEach(s => {
+        const sr = runBubbleModel(op, pipe, pop, absorb * s.absorbMult, precommit, spec * s.specMult, demandGrowth, costMW, revMW, opexRatio, wacc);
+        html += '<div class="sensitivity-card">';
+        html += '<div style="font-weight:700;color:' + (s.cls === 'green' ? '#34d399' : s.cls === 'amber' ? '#fbbf24' : '#f87171') + ';margin-bottom:0.5rem;">' + s.label + '</div>';
+        html += '<div style="font-size:0.75rem;color:#a8a29e;line-height:1.6;">';
+        html += 'Risk Score: <strong style="color:' + (sr.riskScore >= 70 ? '#f87171' : sr.riskScore >= 50 ? '#fb923c' : sr.riskScore >= 30 ? '#fbbf24' : '#34d399') + ';">' + sr.riskScore.toFixed(0) + '/100</strong><br>';
+        html += 'Vacancy: <strong style="color:#e7e5e4;">' + sr.actualVacancy.toFixed(0) + '%</strong><br>';
+        html += 'NPV: <strong style="color:' + (sr.npv > 0 ? '#34d399' : '#f87171') + ';">' + (sr.npv >= 0 ? '+$' : '-$') + fmt(Math.abs(sr.npv)) + '</strong><br>';
+        html += 'Payback: <strong style="color:#e7e5e4;">' + (sr.paybackYears < 50 ? sr.paybackYears.toFixed(1) + ' yrs' : 'N/A') + '</strong>';
+        html += '</div></div>';
+    });
+    grid.innerHTML = html;
 }
 
-// Auto-calculate on load
+// Auto-prefill on load
 window.addEventListener('DOMContentLoaded', function() {
     prefillMarket();
 });
