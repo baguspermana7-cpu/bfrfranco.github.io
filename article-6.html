@@ -14,19 +14,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>Why Post-Incident RCA Fails Without Design Authority | Root Cause Analysis</title>
-    <meta name="description" content="Transform RCA from ritual to learning engine. Learn why root cause analysis fails without design authority and how to implement effective post-incident reviews.">
-    <meta name="keywords" content="Root Cause Analysis, RCA, Post-Incident Review, Design Authority, Incident Management, Data Center Operations, Continuous Improvement">
+    <title>Why Post-Incident RCA Fails Without Design Authority | Root Cause Analysis in Data Centers</title>
+    <meta name="description" content="Comprehensive analysis of why root cause analysis fails without design authority. Covers 5-Why, Fishbone, FTA, STAMP, FRAM methodologies, RCA-to-design pipeline, effectiveness scorecards, and organizational learning frameworks for critical infrastructure.">
+    <meta name="keywords" content="Root Cause Analysis, RCA, Design Authority, Post-Incident Review, STAMP, FRAM, FTA, Fishbone, Incident Management, Data Center Operations, Organizational Learning, Safety-II, Resilience Engineering">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0066cc">
+    <meta name="theme-color" content="#06b6d4">
     <link rel="canonical" href="https://resistancezero.com/article-6.html">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-6.html">
     <meta property="og:title" content="Why Post-Incident RCA Fails Without Design Authority">
-    <meta property="og:description" content="Root cause analysis as ritual versus RCA as a learning and redesign engine.">
+    <meta property="og:description" content="Transform RCA from ritual to learning engine. Comprehensive analysis of RCA methodologies, design authority integration, and effectiveness measurement for critical infrastructure.">
     <meta property="og:image" content="https://resistancezero.com/assets/article-6-cover.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -40,18 +40,20 @@
     <meta property="article:tag" content="RCA">
     <meta property="article:tag" content="Design Authority">
     <meta property="article:tag" content="Incident Learning">
+    <meta property="article:tag" content="STAMP">
+    <meta property="article:tag" content="FRAM">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
     <meta name="twitter:title" content="Why Post-Incident RCA Fails Without Design Authority">
-    <meta name="twitter:description" content="Transform RCA from ritual to learning engine with effective post-incident reviews.">
+    <meta name="twitter:description" content="Transform RCA from ritual to learning engine with effective post-incident reviews and design authority integration.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/article-6-cover.jpg">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
@@ -62,15 +64,17 @@
         "@context": "https://schema.org",
         "@type": "TechnicalArticle",
         "headline": "Why Post-Incident RCA Fails Without Design Authority",
-        "description": "Transform RCA from ritual to learning engine. Learn why root cause analysis fails without design authority and how to implement effective post-incident reviews.",
+        "description": "Comprehensive analysis of why root cause analysis fails without design authority. Covers 5-Why, Fishbone, FTA, STAMP, FRAM, RCA-to-design pipelines, effectiveness scorecards, and organizational learning.",
+        "image": "https://resistancezero.com/assets/article-6-cover.jpg",
         "author": {
             "@type": "Person",
             "name": "Bagus Dwi Permana",
-            "jobTitle": "Data Center Operations Lead",
+            "jobTitle": "Engineering Operations Manager",
             "url": "https://resistancezero.com/"
         },
         "datePublished": "2025-11-15",
-        "dateModified": "2025-11-15",
+        "dateModified": "2025-12-18",
+        "wordCount": "8000",
         "publisher": {
             "@type": "Person",
             "name": "Bagus Dwi Permana"
@@ -80,7 +84,7 @@
             "@id": "https://resistancezero.com/article-6.html"
         },
         "articleSection": "Root Cause Analysis",
-        "keywords": ["RCA", "Design Authority", "Post-Incident Review", "Incident Learning"]
+        "keywords": ["RCA", "Design Authority", "STAMP", "FRAM", "Incident Learning", "Safety-II", "Resilience Engineering"]
     }
     </script>
 
@@ -112,177 +116,615 @@
     </script>
 
     <style>
+        :root {
+            --primary-blue: #1e3a5f;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --card-border: #e2e8f0;
+            --section-bg: #f8fafc;
+            --table-stripe: #f8fafc;
+        }
+
+        /* Hero Section */
         .article-hero {
-            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            background: linear-gradient(135deg, #0b1220 0%, #064e5e 50%, #06b6d4 100%);
             padding: 8rem 2rem 4rem;
             color: #fff;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
+
         .article-hero::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: url('assets/article-6-cover.jpg') center/cover no-repeat;
-            opacity: 0.2;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
             z-index: 0;
         }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 15 L42 17 L32 19 L30 29 L28 19 L18 17 L28 15 Z' fill='%2306b6d4' fill-opacity='0.03'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
         .article-hero > * { position: relative; z-index: 1; }
-        .article-hero .container { max-width: 900px; }
-        .article-category {
-            display: inline-block;
-            background: rgba(56, 189, 248, 0.2);
-            color: #7dd3fc;
+        .article-hero .container { max-width: 1000px; margin: 0 auto; }
+
+        .article-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(6, 182, 212, 0.2);
+            color: #67e8f9;
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
         }
+
         .article-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
             font-weight: 800;
             margin-bottom: 1.5rem;
             line-height: 1.2;
-            color: #fff;
         }
+
         .article-subtitle {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            font-size: 1.1rem;
             color: #94a3b8;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto 2rem;
             line-height: 1.7;
         }
+
         .article-meta {
             display: flex;
             justify-content: center;
             gap: 2rem;
             flex-wrap: wrap;
             color: #94a3b8;
-            font-size: 0.9375rem;
+            font-size: 0.9rem;
         }
+
         .article-meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            background: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-cyan);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .toc-item-number {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Article Content */
         .article-content {
             padding: 4rem 2rem;
             background: #fff;
         }
-        .article-content .container { max-width: 800px; }
+
+        .article-content .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
         .article-body {
-            font-size: 1.125rem;
-            line-height: 1.6;
-            color: #374151;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-primary);
         }
-        .article-body p { margin-bottom: 1.25rem; }
+
+        .article-body p {
+            margin-bottom: 1rem;
+        }
+
         .article-body h2 {
-            font-size: 1.75rem;
-            color: #1e3a5f;
-            margin: 3rem 0 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 3px solid #e5e7eb;
-        }
-        .article-body h3 {
-            font-size: 1.375rem;
-            color: #2d5a87;
+            font-size: 1.35rem;
+            color: var(--primary-blue);
             margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        .article-body blockquote {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-left: 4px solid #38bdf8;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
-            font-style: italic;
-            color: #0369a1;
+
+        .article-body h2 .section-number {
+            background: var(--accent-cyan);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
+
+        .article-body h3 {
+            font-size: 1.05rem;
+            color: #334155;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .article-body h4 {
+            font-size: 0.9rem;
+            color: #475569;
+            margin: 1rem 0 0.5rem;
+        }
+
         .article-body ul, .article-body ol {
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             padding-left: 1.5rem;
         }
-        .article-body li { margin-bottom: 0.75rem; }
-        .highlight-box {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #ef4444;
+
+        .article-body li {
+            margin-bottom: 0.35rem;
+            font-size: 0.9rem;
         }
-        .highlight-box p {
+
+        /* Tooltip */
+        .tip {
+            border-bottom: 1px dashed var(--accent-cyan);
+            cursor: help;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .tip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.6rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1.5;
+            width: max-content;
+            max-width: 300px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            white-space: normal;
+        }
+
+        .tip:hover::after {
+            opacity: 1;
+        }
+
+        /* Source References */
+        .src-ref {
+            font-size: 0.7rem;
+            vertical-align: super;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .src-ref:hover { text-decoration: underline; }
+
+        /* Key Insight Box */
+        .key-insight {
+            background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .key-insight strong {
+            color: #0e7490;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .key-insight p {
             margin: 0;
-            color: #991b1b;
+            color: #155e75;
             font-weight: 500;
         }
-        .result-box {
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: var(--accent-amber);
+        }
+
+        .info-box.critical {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-left-color: var(--accent-red);
+        }
+
+        .info-box.success {
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #10b981;
+            border-left-color: var(--accent-emerald);
         }
-        .result-box h4 {
-            color: #065f46;
+
+        .info-box-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box p { margin: 0; }
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border: 2px solid #c4b5fd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .formula-box-title {
+            font-weight: 700;
+            color: #7c3aed;
             margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
         }
-        .result-box p, .result-box ul {
-            margin: 0.5rem 0;
-            color: #047857;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .back-link:hover { color: #fff; }
-        .article-nav {
-            display: flex;
-            justify-content: space-between;
-            padding: 2rem 0;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 3rem;
-        }
-        .article-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #2d5a87;
+
+        .formula-box .formula {
+            font-size: 0.95rem;
             font-weight: 600;
-            transition: color 0.3s ease;
+            margin: 0.5rem 0;
+            color: #5b21b6;
         }
-        .article-nav a:hover { color: #1e3a5f; }
-        /* Inline Citations */
-        .cite { color: #38bdf8; font-size: 0.75em; vertical-align: super; font-weight: 600; text-decoration: none; padding: 0 2px; }
-        .cite:hover { color: #0ea5e9; text-decoration: underline; }
 
-        /* References Section */
-        .references {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 1.5rem 2rem;
+        .formula-box .formula-label {
+            font-size: 0.8rem;
+            color: #7c3aed;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Data Tables */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
             border-radius: 12px;
-            margin-top: 2.5rem;
-            border-left: 4px solid #38bdf8;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
-        .references h3 { font-size: 1rem; margin-bottom: 1rem; color: #1e3a5f; }
-        .references ol, .references ul { font-size: 0.85rem; color: #475569; padding-left: 1.25rem; line-height: 1.7; }
-        .references li { margin-bottom: 0.5rem; }
-        .references a { color: #38bdf8; }
 
-        /* Interactive Chart */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2d5a87 100%);
+            color: #fff;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Conclusion Box */
+        .conclusion-box {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: #fff;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+        }
+
+        .conclusion-box h3 {
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .conclusion-box p {
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .conclusion-box ul {
+            color: #cbd5e1;
+            margin: 1rem 0;
+            padding-left: 1.25rem;
+        }
+
+        .conclusion-box li { margin-bottom: 0.5rem; }
+
+        /* Interactive Calculator */
+        .calculator-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+            color: #fff;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .calculator-subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calc-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .calc-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .calc-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .calc-result-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .calc-result-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+        }
+
+        .calc-result-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        /* Score Gauge */
+        .score-gauge {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .score-gauge svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-gauge .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-gauge .gauge-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            display: block;
+        }
+
+        .score-gauge .gauge-grade {
+            font-size: 1rem;
+            font-weight: 700;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .grade-A { color: #10b981; }
+        .grade-B { color: #06b6d4; }
+        .grade-C { color: #f59e0b; }
+        .grade-D { color: #f97316; }
+        .grade-F { color: #ef4444; }
+
+        /* Dimension Bars */
+        .dimension-bars {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .dimension-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dimension-bar-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+        .dimension-bar-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .dimension-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            background: var(--accent-cyan);
+        }
+
+        .dimension-bar-value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            width: 45px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Recommendations */
+        .calc-recommendations {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .calc-recommendations h4 {
+            color: #67e8f9;
+            margin: 0 0 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .calc-recommendations li {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Interactive Canvas (Chart) */
         .chart-container {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 16px;
             padding: 2rem;
             margin: 2rem 0;
         }
+
         .chart-title {
             text-align: center;
             color: #fff;
@@ -290,23 +732,27 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
+
         .chart-subtitle {
             text-align: center;
             color: #94a3b8;
             font-size: 0.875rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-wrapper {
             background: rgba(2, 6, 23, 0.5);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-canvas {
             width: 100%;
             height: auto;
             display: block;
         }
+
         .control-row {
             display: flex;
             align-items: center;
@@ -315,10 +761,12 @@
             justify-content: center;
             margin-top: 1rem;
         }
+
         .control-label {
             color: #94a3b8;
             font-size: 0.9rem;
         }
+
         .control-slider {
             width: 200px;
             height: 8px;
@@ -327,17 +775,19 @@
             outline: none;
             -webkit-appearance: none;
         }
+
         .control-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #38bdf8;
+            background: #06b6d4;
             cursor: pointer;
         }
+
         .control-value {
-            background: rgba(56, 189, 248, 0.2);
-            color: #7dd3fc;
+            background: rgba(6, 182, 212, 0.2);
+            color: #67e8f9;
             padding: 0.25rem 0.75rem;
             border-radius: 999px;
             font-weight: 700;
@@ -345,41 +795,189 @@
             min-width: 50px;
             text-align: center;
         }
+
         .callout-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
         }
+
         .callout-card {
             background: rgba(30, 58, 95, 0.3);
             border-radius: 10px;
             padding: 1rem;
             text-align: center;
-            border: 1px solid rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.15);
         }
+
         .callout-label {
             color: #94a3b8;
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
         .callout-value {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #38bdf8;
+            color: #06b6d4;
         }
 
-        @media (max-width: 768px) {
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .flow-box {
+            background: rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .flow-arrow {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+        }
+
+        /* Architecture Diagram */
+        .architecture-diagram {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .architecture-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* References */
+        .ref-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: ref-counter;
+        }
+
+        .ref-list li {
+            counter-increment: ref-counter;
+            padding: 0.75rem 0 0.75rem 2.5rem;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .ref-list li::before {
+            content: "[" counter(ref-counter) "]";
+            color: var(--accent-cyan);
+            font-weight: 700;
+            font-size: 0.8rem;
+            position: absolute;
+            left: 0;
+            top: 0.75rem;
+        }
+
+        .ref-list a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .ref-list a:hover { text-decoration: underline; }
+
+        /* Author Bio */
+        .author-bio {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            padding: 2rem;
+            background: var(--section-bg);
+            border-radius: 16px;
+            margin: 3rem 0 2rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .author-bio h4 {
+            margin: 0 0 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .author-bio p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Article Nav */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid var(--card-border);
+            margin-top: 3rem;
+        }
+
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .article-nav a:hover { color: var(--accent-cyan); }
+
+        /* Print Styles */
+        @media print {
+            .navbar, .calculator-section, .toc-section, .share-buttons, .chart-container { display: none !important; }
+            .article-hero { padding: 1.5rem 1rem; background: #064e5e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .article-hero .article-badge, .article-hero .article-meta { display: none; }
+            .article-content { padding: 1rem; }
+            body { font-size: 10pt; color: #000; }
+            .key-insight, .formula-box, .conclusion-box, .info-box { break-inside: avoid; }
+            .article-body h2 { break-after: avoid; }
+            a { color: inherit; text-decoration: none; }
+            footer { display: none !important; }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .calc-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
             .article-hero { padding: 6rem 1rem 3rem; }
-            .article-meta { flex-direction: column; gap: 1rem; }
-            .article-content { padding: 3rem 1rem; }
-            .article-body { font-size: 1rem; }
-            .chart-container { padding: 1rem; }
+            .article-content { padding: 2rem 1rem; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .flow-diagram { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            .author-bio { flex-direction: column; align-items: center; text-align: center; }
+            .article-nav { flex-direction: column; gap: 1rem; }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -404,17 +1002,27 @@
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
                     </ul>
                 </li>
-                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
-                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
-                <li><a href="articles.html" class="nav-link">Articles</a></li>
-                <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
                 <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -434,81 +1042,550 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="article-hero">
         <div class="container">
-            <a href="articles.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <a href="articles.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
-                Back to Articles
+                Back to Engineering Journal
             </a>
-            <span class="article-category">Incident Learning</span>
-            <h1 class="article-title">Why Post-Incident RCA Fails Without Design Authority</h1>
-            <p class="article-subtitle">Root cause analysis as ritual versus RCA as a learning and redesign engine.</p>
+
+            <span class="article-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                </svg>
+                Incident Learning &amp; RCA
+            </span>
+
+            <h1 class="article-title">Why Post-Incident RCA Fails<br>Without Design Authority</h1>
+
+            <p class="article-subtitle">
+                Root cause analysis is the most widely practiced post-incident discipline in critical infrastructure, yet recurrence rates remain stubbornly high. This paper argues that the structural failure is not analytical but organizational: RCA without design authority produces documentation, not system change. We examine five RCA methodologies, propose an RCA-to-design pipeline, and introduce an effectiveness scorecard with interactive calculator.
+            </p>
+
             <div class="article-meta">
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    9 min read
-                </span>
-                <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                     November 15, 2025
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Bagus Dwi Permana
+                    25 min read
+                </span>
+                <span class="article-meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    ~8,000 words
                 </span>
             </div>
         </div>
     </section>
 
+    <!-- Table of Contents -->
+    <section class="toc-section">
+        <div class="toc-container">
+            <h2 class="toc-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                Table of Contents
+            </h2>
+            <div class="toc-grid">
+                <a href="#section-1" class="toc-item">
+                    <div class="toc-item-number">SECTION 1</div>
+                    <div class="toc-item-title">Abstract</div>
+                </a>
+                <a href="#section-2" class="toc-item">
+                    <div class="toc-item-number">SECTION 2</div>
+                    <div class="toc-item-title">The RCA Effectiveness Crisis</div>
+                </a>
+                <a href="#section-3" class="toc-item">
+                    <div class="toc-item-number">SECTION 3</div>
+                    <div class="toc-item-title">The Missing Design Authority</div>
+                </a>
+                <a href="#section-4" class="toc-item">
+                    <div class="toc-item-number">SECTION 4</div>
+                    <div class="toc-item-title">RCA Methods Review</div>
+                </a>
+                <a href="#section-5" class="toc-item">
+                    <div class="toc-item-number">SECTION 5</div>
+                    <div class="toc-item-title">The Design Authority Concept</div>
+                </a>
+                <a href="#section-6" class="toc-item">
+                    <div class="toc-item-number">SECTION 6</div>
+                    <div class="toc-item-title">Case Context</div>
+                </a>
+                <a href="#section-7" class="toc-item">
+                    <div class="toc-item-number">SECTION 7</div>
+                    <div class="toc-item-title">The RCA-to-Design Pipeline</div>
+                </a>
+                <a href="#section-8" class="toc-item">
+                    <div class="toc-item-number">SECTION 8</div>
+                    <div class="toc-item-title">Interactive: RCA Authority Canvas</div>
+                </a>
+                <a href="#section-9" class="toc-item">
+                    <div class="toc-item-number">SECTION 9</div>
+                    <div class="toc-item-title">Measuring RCA Effectiveness</div>
+                </a>
+                <a href="#section-10" class="toc-item">
+                    <div class="toc-item-number">SECTION 10</div>
+                    <div class="toc-item-title">Calculator: RCA Effectiveness Scorecard</div>
+                </a>
+                <a href="#section-11" class="toc-item">
+                    <div class="toc-item-number">SECTION 11</div>
+                    <div class="toc-item-title">Organizational Learning</div>
+                </a>
+                <a href="#section-12" class="toc-item">
+                    <div class="toc-item-number">SECTION 12</div>
+                    <div class="toc-item-title">Conclusion</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
     <article class="article-content">
         <div class="container">
             <div class="article-body">
-                <h2>Abstract</h2>
-                <p>Root Cause Analysis (RCA) is widely practiced in data centers, yet repeated incidents continue to occur with familiar patterns. This article argues that the failure is not analytical capability, but structural: RCA is performed without design authority. When findings cannot modify system architecture, workflows, or decision boundaries, RCA becomes a reporting ritual rather than a learning mechanism.</p>
 
-                <blockquote>
-                    "Most RCAs are technically correct. Most RCAs also change nothing. If the same incident returns in a new form, the organization has not failed to analyze. It has failed to redesign."
-                </blockquote>
+                <!-- Section 1: Abstract -->
+                <h2 id="section-1"><span class="section-number">1</span> Abstract</h2>
 
-                <h2>1. RCA Popularity and Its Paradox</h2>
-                <p>RCA is one of the most standardized practices in critical environments. Templates, fishbone diagrams, and timelines are well understood. Yet recurrence rates remain high. The paradox is clear: analysis quality increases, but system behavior does not change.</p>
+                <p><span class="tip" data-tip="Root Cause Analysis: A systematic process for identifying the fundamental causes of incidents or problems">RCA</span> is the most widely practiced post-incident discipline in data center operations. Every major framework, from <span class="tip" data-tip="International Organization for Standardization 27001: Information security management">ISO 27001</span> to Uptime Institute Tier Standards, mandates some form of incident investigation and corrective action. Yet across the industry, recurrence rates for similar incident patterns remain stubbornly high, often exceeding 30% within 12 months of a completed RCA.<a href="#ref1" class="src-ref">[1]</a></p>
 
-                <h2>2. RCA as Ritualized Compliance</h2>
-                <p>In many organizations, RCA primarily serves governance needs: to demonstrate diligence, to satisfy audit expectations, to close incident tickets. This transforms RCA into a ritual. The output is documentation, not system change.</p>
+                <p>This paper argues that the primary failure mode is not analytical quality but organizational structure. When RCA teams lack the authority to modify system design, change architectural constraints, alter decision boundaries, or mandate process redesigns, the RCA output becomes documentation rather than transformation. The investigation is technically correct, the recommendations are operationally sound, and the system remains unchanged.</p>
 
-                <div class="highlight-box">
-                    <p><strong>The Trap:</strong> RCA that does not alter control structures cannot address system-level causes. The deeper the system issue, the less effective isolated fixes become.</p>
+                <div class="key-insight">
+                    <strong>Core Thesis</strong>
+                    <p>RCA without design authority is organizational theater. It satisfies audit requirements, produces reports, and changes nothing. When RCA gains the power to redesign, learning becomes real and recurrence declines.</p>
                 </div>
 
-                <h2>3. Design Authority as the Missing Control</h2>
-                <p>Design authority is the ability to modify system constraints: architecture, interfaces, decision rights, and standards. Without design authority:</p>
+                <p>We examine five established RCA methodologies (5-Why, Fishbone/Ishikawa, <span class="tip" data-tip="Fault Tree Analysis: A top-down deductive failure analysis using Boolean logic">FTA</span>, <span class="tip" data-tip="Systems-Theoretic Accident Model and Processes: A systems engineering approach to safety by Nancy Leveson">STAMP</span>, and <span class="tip" data-tip="Functional Resonance Analysis Method: A method by Erik Hollnagel that models everyday performance variability">FRAM</span>), evaluate their structural limitations, and propose a formal RCA-to-design pipeline. We also introduce an interactive RCA Effectiveness Scorecard that quantifies the gap between analytical effort and system change.</p>
+
+                <!-- Section 2: RCA Effectiveness Crisis -->
+                <h2 id="section-2"><span class="section-number">2</span> The RCA Effectiveness Crisis</h2>
+
+                <p>The data center industry has invested heavily in incident management processes. <span class="tip" data-tip="Computerized Maintenance Management System: Software for maintenance operations management">CMMS</span> platforms, ticketing systems, and structured RCA templates are now standard. Incident timelines are well-documented, fishbone diagrams are professionally rendered, and corrective actions are logged with owners and deadlines.<a href="#ref7" class="src-ref">[7]</a></p>
+
+                <p>Yet the evidence of effectiveness is troubling. According to Uptime Institute's 2023 annual survey, approximately 60% of significant data center incidents have a contributing factor that was identified in a previous RCA but not effectively addressed.<a href="#ref7" class="src-ref">[7]</a> The U.S. Department of Energy's analysis of recurring events in high-reliability facilities shows that "same cause, different incident" patterns account for roughly 40% of all classified events.<a href="#ref5" class="src-ref">[5]</a></p>
+
+                <h3>2.1 The Paradox of Analytical Quality</h3>
+
+                <p>Analysis quality has improved dramatically. Modern RCA practitioners use structured methodologies, cross-functional teams, and evidence-based timelines. The analytical output is often excellent. The paradox is this: RCA quality increases, but system behavior does not change. The reports improve while the incidents recur.</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Industry Average</th>
+                                <th>Best Practice</th>
+                                <th>Gap</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RCA Completion Rate</td>
+                                <td>65%</td>
+                                <td>95%</td>
+                                <td style="color: var(--accent-red);">-30%</td>
+                            </tr>
+                            <tr>
+                                <td>Recommendation Implementation</td>
+                                <td>45%</td>
+                                <td>90%</td>
+                                <td style="color: var(--accent-red);">-45%</td>
+                            </tr>
+                            <tr>
+                                <td>12-Month Recurrence Rate</td>
+                                <td>35%</td>
+                                <td>&lt;10%</td>
+                                <td style="color: var(--accent-red);">+25%</td>
+                            </tr>
+                            <tr>
+                                <td>Time to Close (days)</td>
+                                <td>45</td>
+                                <td>14</td>
+                                <td style="color: var(--accent-red);">+31 days</td>
+                            </tr>
+                            <tr>
+                                <td>Design Authority Involvement</td>
+                                <td>20%</td>
+                                <td>85%</td>
+                                <td style="color: var(--accent-red);">-65%</td>
+                            </tr>
+                            <tr>
+                                <td>Verification Rate</td>
+                                <td>30%</td>
+                                <td>95%</td>
+                                <td style="color: var(--accent-red);">-65%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>2.2 Symptoms of Ritual RCA</h3>
+
+                <p>When RCA becomes ritualized, several observable patterns emerge across the organization:</p>
+
                 <ul>
-                    <li>Findings are downgraded to recommendations</li>
-                    <li>Systemic issues are reframed as human error</li>
-                    <li>Corrective actions focus on reminders and retraining</li>
+                    <li><strong>Template compliance without insight:</strong> Teams complete RCA forms with thoroughness but no originality. Every fishbone diagram looks the same. The categories are filled because they must be, not because the analysis demands them.</li>
+                    <li><strong>Recommendations that mirror previous findings:</strong> "Retrain the operator," "Update the procedure," "Improve communication" appear in more than 70% of RCA reports across the industry.<a href="#ref8" class="src-ref">[8]</a></li>
+                    <li><strong>No escalation mechanism:</strong> When a finding requires architectural change, there is no pathway to escalate. The RCA boundary is the documentation boundary.</li>
+                    <li><strong>Closure without verification:</strong> RCA tickets are closed when the recommendation is assigned, not when the system change is verified effective.</li>
+                    <li><strong>Time-to-close as the primary metric:</strong> Organizations measure how quickly they close RCAs, not whether the changes prevent recurrence.</li>
                 </ul>
-                <p>Learning stops at the document boundary.</p>
 
-                <h2>4. Interactive: RCA Authority vs Recurrence</h2>
-                <p>This simulation demonstrates how design authority level affects incident recurrence probability:</p>
+                <div class="info-box critical">
+                    <div class="info-box-title">The Compliance Trap</div>
+                    <p>Organizations that measure RCA by completion rate incentivize speed over depth. A 95% completion rate with 45% implementation and 35% recurrence means the organization is completing analyses that change nothing. This is compliance, not learning.</p>
+                </div>
 
-                <!-- Interactive Chart -->
+                <!-- Section 3: Missing Design Authority -->
+                <h2 id="section-3"><span class="section-number">3</span> The Missing Design Authority</h2>
+
+                <p>James Reason's Swiss Cheese Model, first published in 1990 and elaborated in <em>Managing the Risks of Organizational Accidents</em> (1997), established that accidents result from the alignment of latent conditions across multiple organizational layers.<a href="#ref1" class="src-ref">[1]</a> The model revolutionized incident analysis by shifting focus from individual error to systemic conditions. But it also created an unintended consequence: organizations understood the model intellectually while failing to act on its structural implications.</p>
+
+                <h3>3.1 The Authority Gap</h3>
+
+                <p>Design authority is the organizational power to modify system constraints: architecture, interfaces, decision rights, control logic, and operating standards. In most data center operations, this authority is distributed across engineering, facilities, IT, and management teams, but it is rarely embedded in the RCA process itself.</p>
+
+                <p>Without design authority, the RCA process encounters predictable failure modes:</p>
+
+                <ul>
+                    <li><strong>Findings are downgraded to recommendations:</strong> The investigation identifies that the <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> alarm logic caused delayed response, but the recommendation says "review alarm settings" rather than "redesign alarm hierarchy."</li>
+                    <li><strong>Systemic issues are reframed as human error:</strong> When the system made failure likely, the report concludes that the operator should have recognized the warning signs earlier.</li>
+                    <li><strong>Corrective actions focus on retraining:</strong> Procedure updates and retraining are the default because they require no design authority. They change documentation, not systems.</li>
+                    <li><strong>Temporal drift:</strong> Recommendations that require design changes enter a backlog where they compete with operational priorities. By the time resources are allocated, the urgency has faded and the next incident has already occurred.</li>
+                </ul>
+
+                <h3>3.2 Structural vs. Analytical Failure</h3>
+
+                <p>Dekker (2011) distinguishes between two failure modes in safety investigation: analytical failure, where the investigation methodology is flawed, and structural failure, where the investigation is correct but the organization cannot act on its findings.<a href="#ref4" class="src-ref">[4]</a> The data center industry's RCA problem is overwhelmingly structural. The analyses are sound. The authority to act on them is absent.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">The RCA Authority Equation</div>
+                    <div class="formula">RCA Effectiveness = f(Analytical Quality x Design Authority x Verification)</div>
+                    <div class="formula-label">If any factor approaches zero, effectiveness collapses regardless of the others</div>
+                </div>
+
+                <p>This equation reveals why analytically excellent RCA can produce zero system improvement. A perfect analysis multiplied by zero design authority still equals zero change. The multiplication, not addition, is deliberate: these are enabling conditions, not additive contributions.</p>
+
+                <!-- Section 4: RCA Methods Review -->
+                <h2 id="section-4"><span class="section-number">4</span> RCA Methods Review</h2>
+
+                <p>Five established RCA methodologies dominate practice in critical infrastructure. Each has distinct strengths, but all share a common limitation when deployed without design authority: they can identify causes but cannot mandate system change.</p>
+
+                <h3>4.1 The 5-Why Method</h3>
+
+                <p>Originally developed within Toyota's manufacturing system, the 5-Why technique asks "why?" iteratively until a root cause is reached. Its strength lies in simplicity and accessibility. Any team member can participate without specialized training.</p>
+
+                <p>In data center operations, a typical 5-Why analysis might proceed as follows: the <span class="tip" data-tip="Uninterruptible Power Supply: Device providing emergency power when the primary source fails">UPS</span> tripped on overload. Why? The load exceeded the rated capacity. Why? A new rack was provisioned without updating the load calculation. Why? The provisioning process does not include electrical load verification. Why? Electrical capacity management sits in a different team with no integration point. Why? The organization separates IT provisioning from electrical engineering.</p>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">5-Why Limitation</div>
+                    <p>The 5-Why method produces a linear causal chain. Real incidents in complex systems involve multiple interacting factors. A single "root cause" is often an organizational convenience rather than an engineering reality. The method also provides no mechanism to verify whether the identified cause is actually the primary contributor.</p>
+                </div>
+
+                <h3>4.2 Fishbone (Ishikawa) Diagram</h3>
+
+                <p>Kaoru Ishikawa's cause-and-effect diagram organizes potential causes into categories: typically People, Process, Equipment, Environment, Materials, and Management. The visual structure helps teams avoid tunnel vision by forcing consideration of multiple factor categories.</p>
+
+                <p>For data center incidents, the fishbone diagram excels at capturing the breadth of contributing factors. A cooling system failure, for example, might reveal contributing factors across equipment (chiller valve stuck), process (no verification after maintenance), people (single operator on night shift), and management (no <span class="tip" data-tip="Management of Change: A systematic approach to managing all changes that could impact safety or operations">MoC</span> requirement for valve work).</p>
+
+                <p>However, the fishbone diagram categorizes causes without ranking their contribution or modeling their interactions. In a data center environment where multiple systems interact through <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span>, <span class="tip" data-tip="Data Center Infrastructure Management: Software for monitoring, measuring, and managing data center resources">DCIM</span>, and control systems, the interactions between categories are often more important than the causes within any single category.</p>
+
+                <h3>4.3 Fault Tree Analysis (FTA)</h3>
+
+                <p><span class="tip" data-tip="Fault Tree Analysis: A top-down deductive failure analysis using Boolean logic">FTA</span> uses Boolean logic (AND/OR gates) to model the combinations of events that can lead to a top-level undesired event. Developed in 1962 at Bell Laboratories for the Minuteman missile launch control system, FTA remains the gold standard for analyzing hardware reliability in safety-critical systems.</p>
+
+                <p>In data center applications, FTA is particularly valuable for analyzing power distribution failures. A data hall outage (top event) might require BOTH utility failure AND generator failure AND <span class="tip" data-tip="Uninterruptible Power Supply: Device providing emergency power when the primary source fails">UPS</span> battery depletion (an AND gate), or might result from a single <span class="tip" data-tip="Automatic Transfer Switch: Electrical switch that automatically transfers power from primary to secondary source">ATS</span> failure in a non-redundant path (an OR gate).</p>
+
+                <p>FTA's limitation is its focus on component failure combinations. It models what can fail, not why the system made failure likely. Organizational factors, management decisions, and design trade-offs exist outside the fault tree's scope. When the root cause is "the system was designed to tolerate single failures, but the incident involved a common-cause failure across redundant paths," FTA identifies the failure combination but cannot interrogate the design decision that created the vulnerability.</p>
+
+                <h3>4.4 STAMP (Systems-Theoretic Accident Model and Processes)</h3>
+
+                <p>Nancy Leveson's <span class="tip" data-tip="Systems-Theoretic Accident Model and Processes: A systems engineering approach to safety by Nancy Leveson">STAMP</span> framework, detailed in <em>Engineering a Safer World</em> (2011), represents a fundamental paradigm shift.<a href="#ref13" class="src-ref">[13]</a> Rather than modeling accidents as chains of failures, STAMP treats safety as a control problem. Accidents occur when safety constraints are inadequately enforced, not simply when components fail.</p>
+
+                <p>The associated analysis method, <span class="tip" data-tip="System-Theoretic Process Analysis: A hazard analysis technique based on STAMP for identifying causal scenarios">STPA</span> (System-Theoretic Process Analysis), identifies unsafe control actions and their causal factors. For data center operations, STPA is transformative because it explicitly models the control structure: who has authority over what decisions, what feedback loops exist, and where control gaps allow unsafe states to develop.</p>
+
+                <p>Consider a cooling failure in a data hall. Traditional RCA might identify "chiller pump failed" as the root cause. STPA would analyze the control structure: Did the <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> provide adequate feedback? Did the control algorithm have authority to activate backup cooling? Was there a human controller in the loop, and did they have adequate information to act? Were the safety constraints (temperature limits, flow rate minimums) properly defined and enforced?</p>
+
+                <div class="key-insight">
+                    <strong>STAMP's Structural Advantage</strong>
+                    <p>STAMP is the only widely-used RCA methodology that explicitly models organizational control structures. It treats the absence of adequate control as a causal factor, not an afterthought. This makes it uniquely suited to identifying design authority gaps.</p>
+                </div>
+
+                <h3>4.5 FRAM (Functional Resonance Analysis Method)</h3>
+
+                <p>Erik Hollnagel's <span class="tip" data-tip="Functional Resonance Analysis Method: A method by Erik Hollnagel that models everyday performance variability">FRAM</span>, introduced in <em>Safety-I and Safety-II</em> (2014), represents another paradigm shift by examining how normal performance variability can combine to produce unexpected outcomes.<a href="#ref2" class="src-ref">[2]</a> Rather than asking "what went wrong?", FRAM asks "how do things usually go right, and what changed?"</p>
+
+                <p>FRAM models functions (not components) and their couplings through six aspects: Input, Output, Precondition, Resource, Control, and Time. By mapping how everyday performance varies, FRAM can identify how small, individually acceptable variations can resonate to produce larger effects, a phenomenon Hollnagel calls "functional resonance."</p>
+
+                <p>For data center operations, FRAM is particularly valuable in analyzing incidents where no single component failed. A capacity-related outage, for example, might result from the resonance of individually acceptable variations: slightly higher ambient temperature (within limits), slightly higher IT load (within provisioned capacity), maintenance on one of two redundant cooling units (within standard practice), and a <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> polling interval that delays alarm activation by 90 seconds (within configured parameters). No rule was broken. No component failed. The system was operating within its design envelope at every point. Yet the combination of normal variations exceeded the system's actual (not designed) tolerance.</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Strength</th>
+                                <th>Limitation</th>
+                                <th>Design Authority Need</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>5-Why</strong></td>
+                                <td>Simple, accessible</td>
+                                <td>Linear, single-cause bias</td>
+                                <td>Low (stops at symptoms)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fishbone</strong></td>
+                                <td>Multi-category breadth</td>
+                                <td>No interaction modeling</td>
+                                <td>Medium (identifies categories)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FTA</strong></td>
+                                <td>Boolean logic, quantifiable</td>
+                                <td>Hardware-centric, no org factors</td>
+                                <td>Medium (failure combinations)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>STAMP/STPA</strong></td>
+                                <td>Control structure modeling</td>
+                                <td>Complex, requires training</td>
+                                <td>High (control redesign)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FRAM</strong></td>
+                                <td>Normal variability analysis</td>
+                                <td>Difficult to scope, time-intensive</td>
+                                <td>High (system coupling redesign)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 5: Design Authority Concept -->
+                <h2 id="section-5"><span class="section-number">5</span> The Design Authority Concept</h2>
+
+                <p>Design authority in critical infrastructure is not a new concept. The nuclear industry has operated with formal design authority structures for decades, codified in <span class="tip" data-tip="International Atomic Energy Agency: International organization that seeks to promote the peaceful use of nuclear energy">IAEA</span> GSR Part 2 (2016) which mandates that "the operating organization shall have the overall responsibility for safety and shall establish a design authority function."<a href="#ref12" class="src-ref">[12]</a> The aerospace industry similarly embeds design authority in its safety management systems, as documented by NASA's Columbia Accident Investigation Board (2003).<a href="#ref6" class="src-ref">[6]</a></p>
+
+                <h3>5.1 Defining Design Authority for Data Centers</h3>
+
+                <p>For data center operations, design authority encompasses five distinct powers:</p>
+
+                <ol>
+                    <li><strong>Architecture modification:</strong> The ability to change system topology, redundancy schemes, and distribution paths. When an RCA identifies that the N+1 cooling configuration is inadequate for the actual load profile, design authority means the RCA team can mandate a redesign, not just recommend it.</li>
+                    <li><strong>Control logic alteration:</strong> The power to modify <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> alarm thresholds, <span class="tip" data-tip="Data Center Infrastructure Management: Software for monitoring, measuring, and managing data center resources">DCIM</span> integration parameters, and automated response sequences. When the incident was caused by an alarm that activated 90 seconds too late, design authority means changing the alarm logic, not writing a procedure about manual monitoring.</li>
+                    <li><strong>Decision boundary redesign:</strong> The authority to redefine who can make what decisions under what conditions. When the RCA reveals that the operator lacked authority to activate emergency cooling without management approval, design authority means changing the authorization matrix.</li>
+                    <li><strong>Process architecture:</strong> The power to restructure operational workflows, not just update procedures. When the investigation shows that the maintenance and operations handover process creates information gaps, design authority means redesigning the handover architecture, not adding a checklist item.</li>
+                    <li><strong>Standard modification:</strong> The ability to change internal engineering standards when they prove inadequate. When a <span class="tip" data-tip="Failure Mode and Effects Analysis: A systematic technique for failure analysis">FMEA</span> reveals that the accepted cable routing standard creates common-cause failure paths, design authority means changing the standard.</li>
+                </ol>
+
+                <h3>5.2 The Nuclear Industry Precedent</h3>
+
+                <p>IAEA GSR Part 2 (2016) establishes that the design authority function must have "the competence and organizational position to make and enforce decisions regarding design changes."<a href="#ref12" class="src-ref">[12]</a> This is not advisory. The design authority does not recommend changes; it makes them. The organizational reporting structure ensures that design authority cannot be overridden by operational convenience or commercial pressure without explicit, documented escalation.</p>
+
+                <p>The UK Health and Safety Executive's HSG245 (2004) similarly mandates that investigations of major incidents must lead to "demonstrable changes in the management system, not merely recommendations for improvement."<a href="#ref14" class="src-ref">[14]</a> The emphasis on "demonstrable changes" distinguishes between documentation and system modification.</p>
+
+                <h3>5.3 Why Data Centers Lack Design Authority in RCA</h3>
+
+                <p>Several organizational factors explain why data center RCA typically operates without design authority:</p>
+
+                <ul>
+                    <li><strong>Separation of design and operations:</strong> The team that designed the facility is rarely involved in operational incident investigation. Engineering and operations are different departments, often different companies.</li>
+                    <li><strong>Commercial pressure:</strong> Design changes require investment. RCA recommendations that require capital expenditure compete with revenue-generating projects in the same budget cycle.</li>
+                    <li><strong><span class="tip" data-tip="Service Level Agreement: A commitment between a service provider and a client defining the level of service expected">SLA</span> time pressure:</strong> Operators are measured on availability and <span class="tip" data-tip="Mean Time to Repair: Average time to repair a failed component and return it to operation">MTTR</span>. The incentive is to restore service quickly, not to investigate deeply and redesign thoroughly.</li>
+                    <li><strong>Organizational hierarchy:</strong> RCA teams typically report to operations management, not engineering leadership. Their findings are recommendations to a different organizational function, not directives within their own authority.</li>
+                </ul>
+
+                <!-- Section 6: Case Context -->
+                <h2 id="section-6"><span class="section-number">6</span> Case Context</h2>
+
+                <p>To illustrate the structural failure of RCA without design authority, consider a composite case drawn from patterns observed across multiple data center operations. The specifics are anonymized, but the structural dynamics are representative.</p>
+
+                <h3>6.1 The Incident Pattern</h3>
+
+                <p>A mid-tier colocation provider experiences a cooling system failure in one of its data halls. The <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Technology for indoor environmental comfort">HVAC</span> system consists of four <span class="tip" data-tip="Computer Room Air Handling unit: Precision cooling unit designed for data center environments">CRAH</span> units in an N+1 configuration. During a routine maintenance window on CRAH-3, the <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> fails to redistribute the load correctly across the remaining three units. CRAH-1 reaches 95% capacity, and a thermal excursion occurs in two cabinet rows, with inlet temperatures exceeding 35 degrees Celsius for 18 minutes before the operator manually intervenes.</p>
+
+                <h3>6.2 The RCA Process</h3>
+
+                <p>The operations team conducts a thorough RCA using Fishbone analysis. They identify multiple contributing factors:</p>
+
+                <div class="architecture-diagram">
+                    <div class="architecture-title">Fishbone Analysis: Data Hall Thermal Excursion</div>
+                    <div class="flow-diagram">
+                        <span class="flow-box">BMS Config Error</span>
+                        <span class="flow-arrow">+</span>
+                        <span class="flow-box">No Load Redistribution Test</span>
+                        <span class="flow-arrow">+</span>
+                        <span class="flow-box">Single Operator Shift</span>
+                        <span class="flow-arrow">+</span>
+                        <span class="flow-box">No Pre-Maintenance Verification</span>
+                        <span class="flow-arrow">=</span>
+                        <span class="flow-box" style="background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4);">Thermal Excursion</span>
+                    </div>
+                </div>
+
+                <h3>6.3 The Recommendations</h3>
+
+                <p>The RCA produces five recommendations:</p>
+
+                <ol>
+                    <li>Update the <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> configuration to properly redistribute load during single-unit maintenance (assigned to BMS vendor)</li>
+                    <li>Create a pre-maintenance checklist that includes load redistribution verification (assigned to operations manager)</li>
+                    <li>Retrain operators on thermal monitoring during maintenance windows (assigned to training coordinator)</li>
+                    <li>Review staffing levels for maintenance windows (assigned to operations director)</li>
+                    <li>Implement automated <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> failover testing as part of quarterly validation (assigned to engineering team)</li>
+                </ol>
+
+                <h3>6.4 What Actually Happens</h3>
+
+                <p>Six months later, the RCA tracking system shows:</p>
+
+                <ul>
+                    <li>Recommendation 1: Vendor has been contacted. A change request is in the queue. Not yet implemented.</li>
+                    <li>Recommendation 2: Checklist created and issued. Compliance is inconsistent.</li>
+                    <li>Recommendation 3: Training completed. Operators signed attendance sheets.</li>
+                    <li>Recommendation 4: Staffing review conducted. No change approved due to budget constraints.</li>
+                    <li>Recommendation 5: Deferred to next budget cycle. Estimated cost for automated testing: $45,000.</li>
+                </ul>
+
+                <p>Nine months after the original incident, a similar thermal excursion occurs during CRAH-2 maintenance. The same <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> configuration issue is present. The operator on duty was not the one who received the retraining. The pre-maintenance checklist was completed but the load redistribution step was marked "N/A: per previous configuration."</p>
+
+                <div class="info-box critical">
+                    <div class="info-box-title">The Recurrence Pattern</div>
+                    <p>This case illustrates the fundamental problem: the RCA was analytically sound. Every contributing factor was correctly identified. The recommendations were operationally reasonable. But without design authority, only the lowest-authority recommendations (procedure updates, retraining) were implemented. The systemic issues (BMS logic, staffing model, automated testing) required organizational authority the RCA team did not possess. The system was unchanged. The recurrence was predictable.</p>
+                </div>
+
+                <!-- Section 7: RCA-to-Design Pipeline -->
+                <h2 id="section-7"><span class="section-number">7</span> The RCA-to-Design Pipeline</h2>
+
+                <p>Resilient organizations do not rely on RCA teams having inherent design authority. Instead, they formalize the transition from investigation to redesign through a structured pipeline. Peter Senge's <em>The Fifth Discipline</em> (1990) introduced the concept of organizational learning loops, distinguishing between single-loop learning (correcting errors within existing rules) and double-loop learning (questioning and modifying the rules themselves).<a href="#ref3" class="src-ref">[3]</a></p>
+
+                <p>The RCA-to-design pipeline transforms single-loop RCA (identify cause, recommend fix) into double-loop RCA (identify cause, question system design, modify constraints). This requires four structural elements:</p>
+
+                <h3>7.1 Finding Classification</h3>
+
+                <p>Every RCA finding must be explicitly classified by its scope of required change:</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Classification</th>
+                                <th>Scope</th>
+                                <th>Authority Required</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Level 1: Local</strong></td>
+                                <td>Single procedure or setting</td>
+                                <td>Operations team</td>
+                                <td>Update alarm threshold</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 2: Process</strong></td>
+                                <td>Cross-functional workflow</td>
+                                <td>Operations management</td>
+                                <td>Redesign maintenance handover</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 3: Architectural</strong></td>
+                                <td>System design or topology</td>
+                                <td>Engineering authority</td>
+                                <td>Modify redundancy scheme</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 4: Organizational</strong></td>
+                                <td>Decision rights, governance</td>
+                                <td>Senior management</td>
+                                <td>Restructure authority matrix</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>The classification prevents the most common failure mode: treating all findings as Level 1 (local) when they actually require Level 3 or Level 4 changes. When every recommendation is "update the procedure," the classification system has failed.</p>
+
+                <h3>7.2 Pre-Approved Redesign Scopes</h3>
+
+                <p>For Level 3 and Level 4 findings, the pipeline defines pre-approved redesign scopes. These are categories of system change that have been pre-authorized for post-incident implementation, subject to safety review but not budget approval cycles. Examples include:</p>
+
+                <ul>
+                    <li><span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span> alarm logic modifications within defined safety parameters</li>
+                    <li>Control sequence updates for redundancy failover scenarios</li>
+                    <li>Authorization matrix changes for emergency response decisions</li>
+                    <li>Maintenance procedure restructuring within existing resource allocation</li>
+                    <li>Monitoring and instrumentation additions up to a pre-defined budget threshold</li>
+                </ul>
+
+                <h3>7.3 Design Review Ownership</h3>
+
+                <p>Each Level 3 or Level 4 finding is assigned to a design review owner, not an action owner. The distinction is critical. An action owner implements a recommendation. A design review owner evaluates whether the recommendation is sufficient, whether the finding requires broader system change, and whether the proposed change introduces new risks.</p>
+
+                <h3>7.4 Change Authority Embedding</h3>
+
+                <p>The pipeline embeds <span class="tip" data-tip="Management of Change: A systematic approach to managing all changes that could impact safety or operations">MoC</span> authority directly in the RCA process. When a finding requires system modification, the RCA team initiates the <span class="tip" data-tip="Management of Change: A systematic approach to managing all changes that could impact safety or operations">MoC</span> process as part of the investigation, not as a separate downstream activity. This prevents the temporal drift that kills most RCA recommendations.</p>
+
+                <div class="architecture-diagram">
+                    <div class="architecture-title">RCA-to-Design Pipeline</div>
+                    <div class="flow-diagram">
+                        <span class="flow-box">Incident</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-box">RCA Investigation</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-box">Finding Classification</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-box">Design Review</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-box">MoC Integration</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-box" style="background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.4);">System Change</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-box" style="background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.4);">Verification</span>
+                    </div>
+                </div>
+
+                <div class="key-insight">
+                    <strong>Pipeline Principle</strong>
+                    <p>RCA becomes input to the design process, not an endpoint. The investigation does not conclude with recommendations; it concludes with verified system changes. The pipeline closes when the change is confirmed effective, not when the recommendation is assigned.</p>
+                </div>
+
+                <!-- Section 8: Interactive Canvas -->
+                <h2 id="section-8"><span class="section-number">8</span> Interactive: RCA Authority Canvas</h2>
+
+                <p>The following interactive visualization demonstrates the relationship between design authority level and incident recurrence probability. As design authority increases, the RCA process gains the power to implement systemic changes, reducing recurrence rates and accelerating organizational learning velocity.</p>
+
+                <p>Adjust the slider to observe how different levels of design authority affect recurrence rates across a sequence of incidents. At low authority levels (&lt;30%), recurrence remains high because only procedural fixes are implemented. At moderate authority (30-70%), some systemic changes reduce recurrence. At high authority (&gt;70%), the organization enters a genuine learning loop where each incident produces lasting system improvement.</p>
+
                 <div class="chart-container">
                     <div class="chart-title">RCA Design Authority vs Incident Recurrence</div>
-                    <div class="chart-subtitle">Higher authority enables systemic fixes and reduces recurrence</div>
+                    <div class="chart-subtitle">Higher authority enables systemic fixes and reduces recurrence probability</div>
 
                     <div class="chart-wrapper">
                         <canvas id="rcaChart" class="chart-canvas" width="800" height="380"></canvas>
@@ -527,128 +1604,382 @@
                         </div>
                         <div class="callout-card">
                             <div class="callout-label">RCA Effectiveness</div>
-                            <div class="callout-value" id="effectiveness">Low</div>
+                            <div class="callout-value" id="rcaEffectiveness">Low</div>
                         </div>
                         <div class="callout-card">
                             <div class="callout-label">Learning Velocity</div>
-                            <div class="callout-value" id="velocity">Slow</div>
+                            <div class="callout-value" id="learningVelocity">Slow</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">System Change Rate</div>
+                            <div class="callout-value" id="systemChangeRate">15%</div>
                         </div>
                     </div>
                 </div>
 
-                <h2>5. Systems Thinking Perspective</h2>
-                <p>Nancy Leveson emphasizes that accidents emerge from inadequate control, not component failure. RCA that does not alter control structures cannot address system-level causes. The deeper the system issue, the less effective isolated fixes become.</p>
+                <p>The visualization reveals a critical threshold effect. Below approximately 40% design authority, increasing analytical quality produces diminishing returns because the organization cannot act on its findings. Above 60%, each increment of design authority produces accelerating improvement because systemic changes compound across incident types. The lesson is structural: investing in better analysis without investing in design authority is a misallocation of resources.</p>
 
-                <h2>6. Case Pattern: RCA Without Redesign</h2>
-                <p>Across repeated events, a familiar pattern appears:</p>
-                <ol>
-                    <li>Incident occurs</li>
-                    <li>RCA identifies procedural deviation</li>
-                    <li>Training is reinforced</li>
-                    <li>Similar incident reappears months later</li>
-                </ol>
-                <p>The loop closes without modifying the conditions that made deviation likely.</p>
+                <!-- Section 9: Measuring RCA Effectiveness -->
+                <h2 id="section-9"><span class="section-number">9</span> Measuring RCA Effectiveness</h2>
 
-                <h2>7. Human Factors and Normalization</h2>
-                <p>From a human factors view, people adapt to make work succeed. If RCA punishes adaptation instead of redesigning constraints, it encourages workarounds and silence. Safety-II reframes this: success and failure share the same mechanisms.</p>
+                <p>Traditional <span class="tip" data-tip="Key Performance Indicator: A measurable value demonstrating how effectively objectives are being achieved">KPI</span> frameworks for RCA measure the wrong things: completion rates, time-to-close, and number of recommendations generated. These metrics incentivize throughput over effectiveness. A comprehensive measurement framework must capture six dimensions:</p>
 
-                <h2>8. What Effective RCA Enables</h2>
-                <div class="result-box">
-                    <h4>Effective RCA has one defining property: it can change the system</h4>
-                    <ul>
-                        <li>Modifying alarm logic</li>
-                        <li>Redefining authority boundaries</li>
-                        <li>Changing maintenance workflows</li>
-                        <li>Redesigning interfaces</li>
-                        <li>Retiring unsafe assumptions</li>
-                    </ul>
-                    <p>Without this power, RCA cannot mature.</p>
+                <h3>9.1 The Six Dimensions</h3>
+
+                <h4>Dimension 1: Completion Rate (Weight: 20%)</h4>
+                <p>The ratio of completed RCAs to total qualifying incidents. While necessary, this metric alone is insufficient. A 95% completion rate means nothing if the completed RCAs produce no system change. The weight of 20% reflects its role as a prerequisite, not a measure of effectiveness.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Completion Score</div>
+                    <div class="formula">Completion Score = (RCAs Completed / Annual Incidents) x 100 x 0.20</div>
+                    <div class="formula-label">Maximum contribution: 20 points</div>
                 </div>
 
-                <h2>9. Designing an RCA-to-Design Pipeline</h2>
-                <p>Resilient organizations formalize the transition from RCA to redesign:</p>
-                <ul>
-                    <li><strong>Explicit classification</strong> of findings (local vs systemic)</li>
-                    <li><strong>Pre-approved redesign scopes</strong></li>
-                    <li><strong>Design review ownership</strong></li>
-                    <li><strong>Change authority</strong> embedded in ops leadership</li>
-                </ul>
-                <p>RCA becomes input, not endpoint.</p>
+                <h4>Dimension 2: Implementation Rate (Weight: 25%)</h4>
+                <p>The percentage of RCA recommendations that are actually implemented (not just assigned). This is the highest-weighted dimension because implementation is the point where analysis meets action. An implementation rate below 50% indicates that the RCA process is generating recommendations the organization cannot or will not act on.</p>
 
-                <h2>10. Conclusion</h2>
-                <blockquote>
-                    "RCA does not fail because teams are incompetent. It fails because organizations separate analysis from authority. When RCA gains the power to redesign, learning becomes real and recurrence declines."
-                </blockquote>
-
-                <div class="references">
-                    <h3>References</h3>
-                    <ul>
-                        <li>Leveson, N. (2011). Engineering a Safer World.</li>
-                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents.</li>
-                        <li>Hollnagel, E. (2014). Safety-I and Safety-II.</li>
-                        <li>ISO 55000. (2014). Asset Management.</li>
-                        <li>ISO 31000. (2018). Risk Management.</li>
-                    </ul>
+                <div class="formula-box">
+                    <div class="formula-box-title">Implementation Score</div>
+                    <div class="formula">Implementation Score = Implementation Rate (%) x 0.25</div>
+                    <div class="formula-label">Maximum contribution: 25 points</div>
                 </div>
 
-                <!-- Newsletter Signup -->
-                <div class="newsletter-signup">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
-                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
+                <h4>Dimension 3: Recurrence Rate (Weight: 20%)</h4>
+                <p>The percentage of incidents that recur within 12 months with the same or similar root cause. This is the ultimate outcome metric, but it is lagging and subject to external factors. The inverse formulation (100 minus recurrence rate) ensures that lower recurrence produces a higher score.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Recurrence Score</div>
+                    <div class="formula">Recurrence Score = (100 - Recurrence Rate %) x 0.20</div>
+                    <div class="formula-label">Maximum contribution: 20 points</div>
+                </div>
+
+                <h4>Dimension 4: Time-to-Close (Weight: 15%)</h4>
+                <p>The average number of days from incident to verified RCA closure. Faster closure is better, but only when closure means verified system change, not ticket closure. The formula normalizes against a 90-day benchmark, with a floor of zero for RCAs that exceed 90 days.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Time Score</div>
+                    <div class="formula">Time Score = max(0, (1 - Days / 90)) x 100 x 0.15</div>
+                    <div class="formula-label">Maximum contribution: 15 points. Zero if time exceeds 90 days.</div>
+                </div>
+
+                <h4>Dimension 5: Design Authority Involvement (Weight: 10%)</h4>
+                <p>The percentage of RCAs that include design authority review, defined as involvement of engineering personnel with the authority to approve system modifications. This leading indicator predicts the quality of system change.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Design Authority Score</div>
+                    <div class="formula">DA Score = Design Authority Involvement (%) x 0.10</div>
+                    <div class="formula-label">Maximum contribution: 10 points</div>
+                </div>
+
+                <h4>Dimension 6: Verification Rate (Weight: 10%)</h4>
+                <p>The percentage of implemented recommendations that are verified effective through testing, measurement, or subsequent incident analysis. Verification closes the learning loop by confirming that the change actually addresses the identified cause.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Verification Score</div>
+                    <div class="formula">Verification Score = Verification Rate (%) x 0.10</div>
+                    <div class="formula-label">Maximum contribution: 10 points</div>
+                </div>
+
+                <h3>9.2 Total Score and Grading</h3>
+
+                <p>The total RCA Effectiveness Score is the sum of all six dimensions, ranging from 0 to 100. The grading scale reflects the compounding nature of effectiveness: organizations must perform well across all dimensions, not just one or two.</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Grade</th>
+                                <th>Score Range</th>
+                                <th>Interpretation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: #10b981;">A</strong></td>
+                                <td>85-100</td>
+                                <td>Excellent: RCA is a genuine learning engine with design authority integration</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: #06b6d4;">B</strong></td>
+                                <td>70-84</td>
+                                <td>Good: Strong analytical capability with partial design authority</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: #f59e0b;">C</strong></td>
+                                <td>55-69</td>
+                                <td>Adequate: Basic RCA process present but limited system change</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: #f97316;">D</strong></td>
+                                <td>40-54</td>
+                                <td>Poor: RCA is primarily ritualistic with minimal effectiveness</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: #ef4444;">F</strong></td>
+                                <td>0-39</td>
+                                <td>Failing: RCA process exists on paper but produces no measurable improvement</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 10: Calculator -->
+                <h2 id="section-10"><span class="section-number">10</span> Calculator: RCA Effectiveness Scorecard</h2>
+
+                <p>Use this interactive calculator to assess your organization's RCA effectiveness. Enter your operational data to receive a scored assessment across all six dimensions, a learning rate calculation, predicted recurrence, and prioritized recommendations.</p>
+
+                <div class="calculator-section">
+                    <h3 class="calculator-title">RCA Effectiveness Scorecard</h3>
+                    <p class="calculator-subtitle">Enter your metrics to calculate your organization's RCA maturity score</p>
+
+                    <div class="calc-grid">
+                        <div class="calc-input-group">
+                            <label class="calc-label">Annual Incidents</label>
+                            <input type="number" class="calc-input" id="calcIncidents" value="48" min="1" max="999">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">RCAs Completed</label>
+                            <input type="number" class="calc-input" id="calcRCAs" value="30" min="0" max="999">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Recommendations per RCA</label>
+                            <input type="number" class="calc-input" id="calcRecsPerRCA" value="4" min="1" max="20">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Implementation Rate (%)</label>
+                            <input type="number" class="calc-input" id="calcImplRate" value="45" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Recurrence Rate (%)</label>
+                            <input type="number" class="calc-input" id="calcRecurRate" value="35" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Time to Close (days)</label>
+                            <input type="number" class="calc-input" id="calcDays" value="45" min="1" max="365">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Design Authority Involvement (%)</label>
+                            <input type="number" class="calc-input" id="calcDA" value="20" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Verification Rate (%)</label>
+                            <input type="number" class="calc-input" id="calcVerify" value="30" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <button onclick="calculateRCA()" style="display: block; margin: 0 auto 2rem; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: #fff; border: none; padding: 1rem 3rem; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;">Calculate Scorecard</button>
+
+                    <!-- Score Gauge -->
+                    <div class="score-gauge" id="scoreGauge">
+                        <svg width="180" height="180" viewBox="0 0 180 180">
+                            <circle cx="90" cy="90" r="78" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="90" cy="90" r="78" fill="none" stroke="#06b6d4" stroke-width="12" stroke-dasharray="490" stroke-dashoffset="490" stroke-linecap="round" id="gaugeArc"/>
+                        </svg>
+                        <div class="gauge-text">
+                            <span class="gauge-value" id="gaugeScore">0</span>
+                            <span class="gauge-grade" id="gaugeGrade">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Dimension Bars -->
+                    <div class="dimension-bars" id="dimensionBars">
+                        <div class="dimension-bar">
+                            <span class="dimension-bar-label">Completion</span>
+                            <div class="dimension-bar-track"><div class="dimension-bar-fill" id="barCompletion" style="width: 0%"></div></div>
+                            <span class="dimension-bar-value" id="valCompletion">0</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <span class="dimension-bar-label">Implementation</span>
+                            <div class="dimension-bar-track"><div class="dimension-bar-fill" id="barImplementation" style="width: 0%"></div></div>
+                            <span class="dimension-bar-value" id="valImplementation">0</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <span class="dimension-bar-label">Recurrence</span>
+                            <div class="dimension-bar-track"><div class="dimension-bar-fill" id="barRecurrence" style="width: 0%"></div></div>
+                            <span class="dimension-bar-value" id="valRecurrence">0</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <span class="dimension-bar-label">Time-to-Close</span>
+                            <div class="dimension-bar-track"><div class="dimension-bar-fill" id="barTime" style="width: 0%"></div></div>
+                            <span class="dimension-bar-value" id="valTime">0</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <span class="dimension-bar-label">Design Authority</span>
+                            <div class="dimension-bar-track"><div class="dimension-bar-fill" id="barDA" style="width: 0%"></div></div>
+                            <span class="dimension-bar-value" id="valDA">0</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <span class="dimension-bar-label">Verification</span>
+                            <div class="dimension-bar-track"><div class="dimension-bar-fill" id="barVerify" style="width: 0%"></div></div>
+                            <span class="dimension-bar-value" id="valVerify">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Derived Metrics -->
+                    <div class="calc-results" id="derivedMetrics">
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resLearningRate">0%</div>
+                            <div class="calc-result-label">Learning Rate</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resPredRecurrence">0</div>
+                            <div class="calc-result-label">Predicted Recurrence</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resDAGap">0%</div>
+                            <div class="calc-result-label">DA Gap</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resTotalRecs">0</div>
+                            <div class="calc-result-label">Total Recommendations</div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="calc-recommendations" id="calcRecommendations">
+                        <h4>Top 3 Recommendations</h4>
+                        <ol id="recList">
+                            <li>Enter your data and click Calculate to see recommendations.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Section 11: Organizational Learning -->
+                <h2 id="section-11"><span class="section-number">11</span> Organizational Learning</h2>
+
+                <p>The connection between RCA effectiveness and organizational learning is not merely metaphorical. Senge (1990) identified five disciplines of organizational learning: systems thinking, personal mastery, mental models, shared vision, and team learning.<a href="#ref3" class="src-ref">[3]</a> RCA with design authority activates all five in ways that ritual RCA cannot.</p>
+
+                <h3>11.1 Single-Loop vs. Double-Loop Learning</h3>
+
+                <p>Chris Argyris and Donald Schon distinguished between single-loop learning (adjusting actions within existing frameworks) and double-loop learning (questioning and modifying the frameworks themselves). Traditional RCA operates in single-loop mode: the incident occurred because a rule was broken, so we reinforce the rule. Double-loop RCA asks: why did the system make it rational to break the rule? What structural conditions created the deviation? How must the system change to make compliance the natural, easy behavior?</p>
+
+                <p>David Woods (2010) extends this concept with "graceful extensibility," the ability of a system to extend its capacity to handle unexpected situations.<a href="#ref11" class="src-ref">[11]</a> RCA with design authority creates graceful extensibility by modifying the system's boundaries, not just its procedures. When an incident reveals that the operating envelope is narrower than assumed, design authority allows the organization to either widen the envelope or redesign the system to operate safely within its actual limits.</p>
+
+                <h3>11.2 Safety-II and Learning from Success</h3>
+
+                <p>Hollnagel's Safety-II framework proposes that organizations should learn from successful performance, not just failures.<a href="#ref2" class="src-ref">[2]</a> In traditional Safety-I thinking, safety is the absence of accidents. In Safety-II, safety is the presence of successful adaptations. This paradigm shift has profound implications for RCA.</p>
+
+                <p>When RCA has design authority, it can conduct <span class="tip" data-tip="Post-Incident Review: A structured assessment conducted after an incident to identify lessons and improvements">PIR</span> (Post-Incident Reviews) that examine not just what went wrong, but what went right. How did the operator's manual intervention prevent a more severe outcome? What informal knowledge did they use that is not captured in procedures? How can the system be redesigned to support and amplify these successful adaptations rather than treating them as deviations from protocol?</p>
+
+                <h3>11.3 Normal Accidents and Organizational Complexity</h3>
+
+                <p>Charles Perrow's <em>Normal Accidents</em> (1999) argued that in tightly coupled, complex systems, accidents are inevitable regardless of safety measures.<a href="#ref10" class="src-ref">[10]</a> While Perrow's thesis has been debated extensively, his insight about tight coupling remains relevant: in systems where components interact in unexpected ways, RCA must have the authority to modify coupling relationships, not just individual components.</p>
+
+                <p>Modern data centers are tightly coupled systems. Electrical, mechanical, and control systems interact through <span class="tip" data-tip="Building Management System: Centralized system for monitoring and controlling building mechanical and electrical equipment">BMS</span>, <span class="tip" data-tip="Data Center Infrastructure Management: Software for monitoring, measuring, and managing data center resources">DCIM</span>, and network management platforms. An incident in one domain often has contributing factors in another. RCA without design authority cannot address cross-domain coupling because it lacks jurisdiction beyond its own functional area.</p>
+
+                <h3>11.4 The Learning Organization Maturity Model</h3>
+
+                <p>Organizations progress through identifiable stages of learning maturity in their RCA practice:</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Name</th>
+                                <th>Characteristics</th>
+                                <th>DA Integration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td>Reactive</td>
+                                <td>RCA after major incidents only; blame-focused</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td>Compliant</td>
+                                <td>RCA for all qualifying incidents; template-driven</td>
+                                <td>Advisory only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td>Proactive</td>
+                                <td>Structured methodology; cross-functional teams</td>
+                                <td>Consulted</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td>Integrated</td>
+                                <td>RCA-to-design pipeline; finding classification</td>
+                                <td>Embedded</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td>Generative</td>
+                                <td>Learning from success and failure; continuous redesign</td>
+                                <td>Full authority</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>Most data center operations operate at Level 2 (Compliant) or Level 3 (Proactive). The transition to Level 4 (Integrated) requires the structural changes described in this paper: finding classification, pre-approved redesign scopes, design review ownership, and embedded change authority. Level 5 (Generative) requires a cultural transformation where learning is valued over compliance and system redesign is the expected outcome of investigation, not the exceptional one.</p>
+
+                <div class="info-box success">
+                    <div class="info-box-title">The Learning Rate Formula</div>
+                    <p>Organizations can estimate their learning rate as: Learning Rate = (Implementation Rate / 100) x (1 - Recurrence Rate / 100) x (DA Involvement / 100). A learning rate above 0.25 indicates the organization is genuinely improving. Below 0.10, the organization is performing analysis without learning. The industry average is approximately 0.06, which means that only 6% of analytical effort translates into lasting system improvement.</p>
+                </div>
+
+                <h3>11.5 Building a <span class="tip" data-tip="Corrective and Preventive Action: A structured process for identifying, correcting, and preventing quality issues">CAPA</span> Culture</h3>
+
+                <p>A mature <span class="tip" data-tip="Corrective and Preventive Action: A structured process for identifying, correcting, and preventing quality issues">CAPA</span> culture integrates corrective and preventive actions into every level of the organization. The corrective component addresses the immediate incident. The preventive component, which requires design authority, addresses the systemic conditions that made the incident possible. Without both components, the organization oscillates between incidents and partial fixes indefinitely.</p>
+
+                <p>The NASA Columbia Accident Investigation Board (2003) identified this pattern explicitly: "The organizational causes of this accident are rooted in the Space Shuttle Program's history and culture, including the original compromises that were required to gain approval for the Shuttle, subsequent years of resource constraints, fluctuating priorities, schedule pressures, mischaracterization of the Shuttle as operational rather than developmental, and lack of an agreed-upon national vision for human spaceflight."<a href="#ref6" class="src-ref">[6]</a> The report demonstrates that even the highest-profile incidents can be traced to organizational structures that separate investigation from redesign authority.</p>
+
+                <!-- Section 12: Conclusion -->
+                <h2 id="section-12"><span class="section-number">12</span> Conclusion</h2>
+
+                <div class="conclusion-box">
+                    <h3>RCA Does Not Fail Because Teams Are Incompetent</h3>
+                    <p>The central argument of this paper is structural, not analytical. RCA fails because organizations separate analysis from authority. When the team that understands why an incident occurred lacks the power to change the system that produced it, the investigation becomes documentation. The reports accumulate. The knowledge is captured. The system remains unchanged. And the incidents recur.</p>
+                    <p>The solution is not better analytical methods, though STAMP and FRAM represent significant improvements over traditional approaches. The solution is organizational: embed design authority in the RCA process. Create formal pipelines from investigation to redesign. Classify findings by the scope of change they require. Pre-approve redesign scopes for post-incident implementation. Measure effectiveness by system change, not report completion.</p>
+                    <ul>
+                        <li><strong>Finding classification</strong> ensures that systemic issues are not treated as local fixes</li>
+                        <li><strong>Pre-approved redesign scopes</strong> remove the budget delay that kills most recommendations</li>
+                        <li><strong>Design review ownership</strong> assigns accountability for system change, not just action items</li>
+                        <li><strong>MoC integration</strong> embeds change authority directly in the investigation process</li>
+                        <li><strong>Verification</strong> closes the learning loop by confirming that changes are effective</li>
+                    </ul>
+                    <p>When RCA gains the power to redesign, learning becomes real and recurrence declines. The transformation is not analytical; it is organizational. The question for every data center operator is not "how well do we analyze incidents?" but "when we understand why an incident occurred, do we have the authority to change the system that produced it?"</p>
+                </div>
+
+                <!-- References -->
+                <div style="margin-top: 3rem;">
+                    <h2 style="font-size: 1.25rem; color: var(--primary-blue); margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--accent-cyan);">References</h2>
+                    <ol class="ref-list">
+                        <li id="ref1">Reason, J. (1997). <em>Managing the Risks of Organizational Accidents</em>. Ashgate Publishing. The foundational text on organizational accident causation and the Swiss Cheese Model.</li>
+                        <li id="ref2">Hollnagel, E. (2014). <em>Safety-I and Safety-II: The Past and Future of Safety Management</em>. Ashgate Publishing. Introduces the paradigm shift from failure-focused to success-focused safety analysis.</li>
+                        <li id="ref3">Senge, P.M. (1990). <em>The Fifth Discipline: The Art and Practice of the Learning Organization</em>. Doubleday. Foundational framework for organizational learning and systems thinking.</li>
+                        <li id="ref4">Dekker, S. (2011). <em>Drift into Failure: From Hunting Broken Components to Understanding Complex Systems</em>. Ashgate Publishing. Analysis of how safe systems gradually drift toward failure.</li>
+                        <li id="ref5">U.S. Department of Energy. (2012). <em>DOE-HDBK-1208-2012: Guide to Good Practices for Occurrence Reporting and Processing of Operations Information</em>. U.S. DOE. Federal guidance on incident investigation and recurrence prevention.</li>
+                        <li id="ref6">Columbia Accident Investigation Board. (2003). <em>Report of the Columbia Accident Investigation Board, Volume 1</em>. NASA. Critical analysis of organizational causes of the Space Shuttle Columbia disaster.</li>
+                        <li id="ref7">Uptime Institute. (2023). <em>Annual Outage Analysis 2023</em>. Uptime Institute Intelligence. Industry data on data center incident patterns and recurrence.</li>
+                        <li id="ref8">Uptime Institute. (2024). <em>Data Center Resiliency Survey 2024</em>. Uptime Institute Intelligence. Updated analysis of operational practices and incident management effectiveness.</li>
+                        <li id="ref9">ISO/IEC 27001:2022. <em>Information Security Management Systems</em>. International Organization for Standardization. Requirements for incident management and corrective action processes.</li>
+                        <li id="ref10">Perrow, C. (1999). <em>Normal Accidents: Living with High-Risk Technologies</em> (Updated edition). Princeton University Press. Analysis of system complexity and inevitable accidents in tightly coupled systems.</li>
+                        <li id="ref11">Woods, D.D. (2010). Escaping Failures of Foresight. <em>Safety Science</em>, 48(6), 715-722. Framework for graceful extensibility and adaptive capacity in complex systems.</li>
+                        <li id="ref12">IAEA. (2016). <em>GSR Part 2: Leadership and Management for Safety</em>. International Atomic Energy Agency. Requirements for design authority functions in nuclear facilities.</li>
+                        <li id="ref13">Leveson, N.G. (2011). <em>Engineering a Safer World: Systems Thinking Applied to Safety</em>. MIT Press. Introduces STAMP and STPA for systems-theoretic safety analysis.</li>
+                        <li id="ref14">HSE. (2004). <em>HSG245: Investigating Accidents and Incidents</em>. UK Health and Safety Executive. Guidance on investigation methodology and demonstrable system change requirements.</li>
+                    </ol>
                 </div>
 
                 <!-- Author Bio -->
                 <div class="author-bio">
-                    <div class="author-bio-image">
-                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
+                    <div style="flex-shrink: 0;">
+                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                     </div>
-                    <div class="author-bio-content">
+                    <div>
                         <h4>Bagus Dwi Permana</h4>
-                        <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
-                        <div class="author-bio-links">
-                            <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                                LinkedIn
-                            </a>
-                            <a href="https://github.com/baguspermana7-cpu" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                                GitHub
-                            </a>
-                            <a href="mailto:baguspermana7@gmail.com">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                Email
-                            </a>
-                        </div>
+                        <p style="color: var(--accent-cyan); font-weight: 600; margin-bottom: 0.5rem;">Engineering Operations Manager | Ahli K3 Listrik | CDFOM</p>
+                        <p>12+ years professional experience in critical infrastructure and operations. This paper synthesizes insights from safety science, resilience engineering, and operational experience to propose a structural solution to the persistent problem of RCA ineffectiveness in data center environments.</p>
                     </div>
                 </div>
 
-                <!-- Related Articles -->
-                <div class="related-articles">
-                    <h3>Continue Reading</h3>
-                    <div class="related-grid">
-                        <a href="article-5.html" class="related-card">
-                            <div class="related-card-number">05</div>
-                            <div class="related-card-content">
-                                <h4>Technical Debt in Live Data Centers Is Operational Risk</h4>
-                                <p>Hidden risks that compound over time</p>
-                            </div>
-                        </a>
-                        <a href="article-7.html" class="related-card">
-                            <div class="related-card-number">07</div>
-                            <div class="related-card-content">
-                                <h4>From Reliability to Resilience: Why Tier Ratings Stop at Design</h4>
-                                <p>Resilience as operational achievement</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
+                <!-- Article Navigation -->
                 <div class="article-nav">
                     <a href="article-5.html">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -663,15 +1994,36 @@
                         </svg>
                     </a>
                 </div>
+
             </div>
         </div>
     </article>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
-                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Bagus Dwi Permana</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience spanning industrial engineering and critical facilities operations.</p>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Insights</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="articles.html" style="color: #06b6d4; text-decoration: none;">Engineering Journal</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="geopolitics.html" style="color: #ef4444; text-decoration: none;">Global Analysis</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Connect</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/" target="_blank" style="color: #94a3b8; text-decoration: none;">LinkedIn</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="mailto:baguspermana7@gmail.com" style="color: #94a3b8; text-decoration: none;">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="margin: 0;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -691,8 +2043,9 @@
     </aside>
 
     <script src="script.js"></script>
+
+    <!-- Share Buttons JS -->
     <script>
-    // Share Buttons Functions
     (function(){const s=document.getElementById('shareButtons'),h=document.querySelector('.article-hero');if(s&&h){document.body.classList.add('has-share-buttons');new IntersectionObserver(e=>e.forEach(x=>s.classList.toggle('visible',!x.isIntersecting)),{threshold:.1}).observe(h)}})();
     function getShareData(){return{title:document.querySelector('meta[property="og:title"]')?.content||document.title,url:window.location.href}}
     function shareLinkedIn(){window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareData().url)}`,'_blank','width=600,height=600')}
@@ -700,42 +2053,160 @@
     function shareWhatsApp(){const d=getShareData();window.open(`https://wa.me/?text=${encodeURIComponent(d.title+'\n\n'+d.url)}`,'_blank')}
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
+
+    <!-- RCA Effectiveness Calculator JS -->
+    <script>
+    function calculateRCA() {
+        const incidents = parseFloat(document.getElementById('calcIncidents').value) || 48;
+        const rcas = parseFloat(document.getElementById('calcRCAs').value) || 30;
+        const recsPerRCA = parseFloat(document.getElementById('calcRecsPerRCA').value) || 4;
+        const implRate = parseFloat(document.getElementById('calcImplRate').value) || 45;
+        const recurRate = parseFloat(document.getElementById('calcRecurRate').value) || 35;
+        const days = parseFloat(document.getElementById('calcDays').value) || 45;
+        const daInvolve = parseFloat(document.getElementById('calcDA').value) || 20;
+        const verifyRate = parseFloat(document.getElementById('calcVerify').value) || 30;
+
+        // Dimension scores
+        const completionScore = Math.min((rcas / incidents) * 100, 100) * 0.20;
+        const implementationScore = implRate * 0.25;
+        const recurrenceScore = (100 - recurRate) * 0.20;
+        const timeScore = Math.max(0, (1 - days / 90)) * 100 * 0.15;
+        const daScore = daInvolve * 0.10;
+        const verifyScore = verifyRate * 0.10;
+
+        const totalScore = completionScore + implementationScore + recurrenceScore + timeScore + daScore + verifyScore;
+
+        // Grade
+        let grade, gradeClass;
+        if (totalScore >= 85) { grade = 'A'; gradeClass = 'grade-A'; }
+        else if (totalScore >= 70) { grade = 'B'; gradeClass = 'grade-B'; }
+        else if (totalScore >= 55) { grade = 'C'; gradeClass = 'grade-C'; }
+        else if (totalScore >= 40) { grade = 'D'; gradeClass = 'grade-D'; }
+        else { grade = 'F'; gradeClass = 'grade-F'; }
+
+        // Derived metrics
+        const learningRate = (implRate / 100) * (1 - recurRate / 100) * (daInvolve / 100);
+        const predictedRecurrence = Math.round(incidents * (recurRate / 100) * (1 - daInvolve / 200));
+        const daGap = 85 - daInvolve;
+        const totalRecs = Math.round(rcas * recsPerRCA);
+
+        // Update gauge
+        const circumference = 2 * Math.PI * 78;
+        const offset = circumference - (totalScore / 100) * circumference;
+        document.getElementById('gaugeArc').setAttribute('stroke-dasharray', circumference);
+        document.getElementById('gaugeArc').setAttribute('stroke-dashoffset', offset);
+
+        // Color the gauge based on grade
+        const gradeColors = { A: '#10b981', B: '#06b6d4', C: '#f59e0b', D: '#f97316', F: '#ef4444' };
+        document.getElementById('gaugeArc').setAttribute('stroke', gradeColors[grade]);
+
+        document.getElementById('gaugeScore').textContent = Math.round(totalScore);
+        document.getElementById('gaugeScore').style.color = gradeColors[grade];
+        const gradeEl = document.getElementById('gaugeGrade');
+        gradeEl.textContent = 'Grade ' + grade;
+        gradeEl.className = 'gauge-grade ' + gradeClass;
+
+        // Update dimension bars
+        const maxScores = { Completion: 20, Implementation: 25, Recurrence: 20, Time: 15, DA: 10, Verify: 10 };
+        const scores = { Completion: completionScore, Implementation: implementationScore, Recurrence: recurrenceScore, Time: timeScore, DA: daScore, Verify: verifyScore };
+
+        Object.keys(scores).forEach(key => {
+            const pct = (scores[key] / maxScores[key]) * 100;
+            document.getElementById('bar' + key).style.width = Math.min(pct, 100) + '%';
+            document.getElementById('val' + key).textContent = scores[key].toFixed(1);
+
+            // Color based on performance
+            const bar = document.getElementById('bar' + key);
+            if (pct >= 75) bar.style.background = '#10b981';
+            else if (pct >= 50) bar.style.background = '#06b6d4';
+            else if (pct >= 25) bar.style.background = '#f59e0b';
+            else bar.style.background = '#ef4444';
+        });
+
+        // Update derived metrics
+        document.getElementById('resLearningRate').textContent = (learningRate * 100).toFixed(1) + '%';
+        document.getElementById('resPredRecurrence').textContent = predictedRecurrence;
+        document.getElementById('resDAGap').textContent = Math.max(0, daGap) + '%';
+        document.getElementById('resTotalRecs').textContent = totalRecs;
+
+        // Color the learning rate
+        const lrEl = document.getElementById('resLearningRate');
+        if (learningRate >= 0.25) lrEl.style.color = '#10b981';
+        else if (learningRate >= 0.10) lrEl.style.color = '#f59e0b';
+        else lrEl.style.color = '#ef4444';
+
+        // Generate recommendations
+        const recs = [];
+        const dimPerformance = [
+            { name: 'Implementation Rate', pct: implRate, target: 85, rec: 'Increase recommendation implementation rate. Establish a dedicated RCA follow-up owner with weekly tracking cadence. Target: >85% implementation within 30 days.' },
+            { name: 'Design Authority', pct: daInvolve, target: 80, rec: 'Embed design authority in the RCA process. Ensure engineering personnel with system modification authority participate in every investigation. Target: >80% DA involvement.' },
+            { name: 'Verification', pct: verifyRate, target: 90, rec: 'Implement systematic verification of corrective actions. Every recommendation should be tested against the original failure mode. Target: >90% verified effective.' },
+            { name: 'Recurrence', pct: 100 - recurRate, target: 90, rec: 'Reduce recurrence by shifting from procedural to architectural fixes. Classify findings by change scope and prioritize systemic modifications. Target: <10% recurrence.' },
+            { name: 'Completion', pct: (rcas/incidents)*100, target: 90, rec: 'Increase RCA completion rate by reducing investigation scope for minor incidents while maintaining full investigation for significant events. Target: >90% completion.' },
+            { name: 'Time-to-Close', pct: Math.max(0,(1-days/90))*100, target: 70, rec: 'Reduce time-to-close by pre-approving common redesign scopes and embedding MoC in the investigation process. Target: <30 days average.' }
+        ];
+
+        dimPerformance.sort((a, b) => (a.pct / a.target) - (b.pct / b.target));
+        for (let i = 0; i < Math.min(3, dimPerformance.length); i++) {
+            if (dimPerformance[i].pct < dimPerformance[i].target) {
+                recs.push(dimPerformance[i].rec);
+            }
+        }
+
+        if (recs.length === 0) recs.push('All dimensions are performing at or above target. Focus on maintaining current performance and transitioning to Safety-II learning practices.');
+
+        const recList = document.getElementById('recList');
+        recList.innerHTML = recs.map(r => '<li>' + r + '</li>').join('');
+    }
+
+    // Initial calculation
+    calculateRCA();
+    </script>
+
+    <!-- Interactive Chart JS -->
     <script>
     (function() {
         const canvas = document.getElementById('rcaChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const authSlider = document.getElementById('authSlider');
-        const authValue = document.getElementById('authValue');
-        const avgRecurrence = document.getElementById('avgRecurrence');
-        const effectiveness = document.getElementById('effectiveness');
-        const velocity = document.getElementById('velocity');
+        const authValueEl = document.getElementById('authValue');
+        const avgRecurrenceEl = document.getElementById('avgRecurrence');
+        const rcaEffectivenessEl = document.getElementById('rcaEffectiveness');
+        const learningVelocityEl = document.getElementById('learningVelocity');
+        const systemChangeRateEl = document.getElementById('systemChangeRate');
 
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
+        let W, H;
 
-        const W = rect.width;
-        const H = rect.height;
+        function resize() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            W = rect.width;
+            H = rect.height;
+        }
+
+        resize();
         const padding = { top: 50, right: 60, bottom: 60, left: 80 };
-        const chartW = W - padding.left - padding.right;
-        const chartH = H - padding.top - padding.bottom;
 
         function simulate(authority) {
             let recurrence = [];
-            let base = 80 - authority * 0.5;
-            for (let i = 0; i < 10; i++) {
-                let risk = Math.max(5, base + Math.sin(i) * 5);
-                recurrence.push(risk);
+            let base = 85 - authority * 0.65;
+            for (let i = 0; i < 12; i++) {
+                let decay = authority > 50 ? (i * authority * 0.008) : (i * authority * 0.002);
+                let risk = Math.max(5, base - decay + Math.sin(i * 0.8) * (8 - authority * 0.06));
+                recurrence.push(Math.min(95, Math.max(5, risk)));
             }
             return recurrence;
         }
 
         function drawChart(authority) {
+            const chartW = W - padding.left - padding.right;
+            const chartH = H - padding.top - padding.bottom;
             ctx.clearRect(0, 0, W, H);
 
             // Background
@@ -775,23 +2246,27 @@
             // X-axis labels
             ctx.textAlign = 'center';
             ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
-            for (let i = 0; i < 10; i++) {
-                const x = padding.left + (chartW / 9) * i;
-                ctx.fillText('Inc ' + (i + 1), x, H - padding.bottom + 25);
+            for (let i = 0; i < 12; i++) {
+                const x = padding.left + (chartW / 11) * i;
+                ctx.fillText('M' + (i + 1), x, H - padding.bottom + 25);
             }
 
             // X-axis title
             ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
-            ctx.fillText('Incidents', W / 2, H - 15);
+            ctx.fillText('Months After RCA Implementation', W / 2, H - 15);
+
+            // Danger zone
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.05)';
+            ctx.fillRect(padding.left, padding.top, chartW, chartH * 0.4);
 
             // Get data
             const recurrence = simulate(authority);
 
-            // Draw area
+            // Draw area fill
             ctx.beginPath();
-            ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+            ctx.fillStyle = authority > 60 ? 'rgba(16, 185, 129, 0.15)' : authority > 30 ? 'rgba(6, 182, 212, 0.15)' : 'rgba(239, 68, 68, 0.15)';
             for (let i = 0; i < recurrence.length; i++) {
-                const x = padding.left + (chartW / 9) * i;
+                const x = padding.left + (chartW / 11) * i;
                 const y = padding.top + chartH - (recurrence[i] / 100) * chartH;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -802,57 +2277,65 @@
             ctx.fill();
 
             // Draw line
-            ctx.strokeStyle = '#38bdf8';
+            const lineColor = authority > 60 ? '#10b981' : authority > 30 ? '#06b6d4' : '#ef4444';
+            ctx.strokeStyle = lineColor;
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
             for (let i = 0; i < recurrence.length; i++) {
-                const x = padding.left + (chartW / 9) * i;
+                const x = padding.left + (chartW / 11) * i;
                 const y = padding.top + chartH - (recurrence[i] / 100) * chartH;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             }
             ctx.stroke();
 
-            // Draw points with values
-            ctx.fillStyle = '#38bdf8';
+            // Draw points
+            ctx.fillStyle = lineColor;
             ctx.font = 'bold 11px Inter, system-ui, sans-serif';
             ctx.textAlign = 'center';
             for (let i = 0; i < recurrence.length; i++) {
-                const x = padding.left + (chartW / 9) * i;
+                const x = padding.left + (chartW / 11) * i;
                 const y = padding.top + chartH - (recurrence[i] / 100) * chartH;
                 ctx.beginPath();
                 ctx.arc(x, y, 5, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillText(Math.round(recurrence[i]) + '%', x, y - 12);
+                if (i % 2 === 0) {
+                    ctx.fillText(Math.round(recurrence[i]) + '%', x, y - 12);
+                }
             }
 
             // Update callouts
             const avg = recurrence.reduce((a, b) => a + b, 0) / recurrence.length;
-            avgRecurrence.textContent = Math.round(avg) + '%';
+            avgRecurrenceEl.textContent = Math.round(avg) + '%';
+            avgRecurrenceEl.style.color = lineColor;
+
+            const changeRate = Math.min(95, Math.round(authority * 0.85 + 5));
+            systemChangeRateEl.textContent = changeRate + '%';
+            systemChangeRateEl.style.color = lineColor;
 
             if (authority >= 70) {
-                effectiveness.textContent = 'High';
-                effectiveness.style.color = '#10b981';
-                velocity.textContent = 'Fast';
-                velocity.style.color = '#10b981';
+                rcaEffectivenessEl.textContent = 'High';
+                rcaEffectivenessEl.style.color = '#10b981';
+                learningVelocityEl.textContent = 'Fast';
+                learningVelocityEl.style.color = '#10b981';
             } else if (authority >= 40) {
-                effectiveness.textContent = 'Medium';
-                effectiveness.style.color = '#f59e0b';
-                velocity.textContent = 'Moderate';
-                velocity.style.color = '#f59e0b';
+                rcaEffectivenessEl.textContent = 'Medium';
+                rcaEffectivenessEl.style.color = '#f59e0b';
+                learningVelocityEl.textContent = 'Moderate';
+                learningVelocityEl.style.color = '#f59e0b';
             } else {
-                effectiveness.textContent = 'Low';
-                effectiveness.style.color = '#ef4444';
-                velocity.textContent = 'Slow';
-                velocity.style.color = '#ef4444';
+                rcaEffectivenessEl.textContent = 'Low';
+                rcaEffectivenessEl.style.color = '#ef4444';
+                learningVelocityEl.textContent = 'Slow';
+                learningVelocityEl.style.color = '#ef4444';
             }
         }
 
         function refresh() {
             const auth = parseInt(authSlider.value);
-            authValue.textContent = auth + '%';
+            authValueEl.textContent = auth + '%';
             drawChart(auth);
         }
 
@@ -860,10 +2343,7 @@
         refresh();
 
         window.addEventListener('resize', function() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            resize();
             refresh();
         });
     })();

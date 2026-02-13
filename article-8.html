@@ -14,23 +14,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>Why "No Incident" Is Not Evidence of Safety | Data Center Operations</title>
-    <meta name="description" content="Lagging indicators create illusion of stability. Learn to identify weak signals and leading indicators for true safety in critical data center operations.">
-    <meta name="keywords" content="Safety Indicators, Lagging Indicators, Leading Indicators, Weak Signals, Data Center Safety, Ahli K3 Listrik, Risk Assessment, Proactive Safety">
+    <title>Why "No Incident" Is Not Evidence of Safety | Data Center Safety Science</title>
+    <meta name="description" content="Comprehensive analysis of safety indicators in critical infrastructure. Explores why incident-free periods mask systemic drift, weak signal taxonomy, leading indicators framework, and the Safety Health Index calculator for data center operations.">
+    <meta name="keywords" content="Safety Indicators, Lagging Indicators, Leading Indicators, Weak Signals, Data Center Safety, Drift to Failure, Normalization of Deviance, Proactive Safety Culture, Westrum Typology, Rasmussen, Safety Health Index, HRO, Near Miss Reporting">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0066cc">
+    <meta name="theme-color" content="#8b5cf6">
     <link rel="canonical" href="https://resistancezero.com/article-8.html">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-8.html">
     <meta property="og:title" content="Why 'No Incident' Is Not Evidence of Safety">
-    <meta property="og:description" content="Lagging indicators, weak signals, and the illusion of stability in critical data center operations.">
+    <meta property="og:description" content="Lagging indicators create the illusion of stability. Learn to identify weak signals, implement leading indicators, and build proactive safety culture in critical data center operations.">
     <meta property="og:image" content="https://resistancezero.com/assets/article-8-cover.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Why No Incident Is Not Evidence of Safety - Data Center Operations Article">
+    <meta property="og:image:alt" content="Why No Incident Is Not Evidence of Safety - Data Center Safety Science">
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="article:author" content="Bagus Dwi Permana">
@@ -40,18 +40,19 @@
     <meta property="article:tag" content="Leading Indicators">
     <meta property="article:tag" content="Weak Signals">
     <meta property="article:tag" content="Safety Culture">
+    <meta property="article:tag" content="Drift to Failure">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
     <meta name="twitter:title" content="Why 'No Incident' Is Not Evidence of Safety">
-    <meta name="twitter:description" content="Identify weak signals and leading indicators for true safety in data center operations.">
+    <meta name="twitter:description" content="Identify weak signals and leading indicators for true safety in data center operations. Includes Safety Health Index calculator.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/article-8-cover.jpg">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
@@ -62,15 +63,16 @@
         "@context": "https://schema.org",
         "@type": "TechnicalArticle",
         "headline": "Why 'No Incident' Is Not Evidence of Safety",
-        "description": "Lagging indicators create illusion of stability. Learn to identify weak signals and leading indicators for true safety in critical data center operations.",
+        "description": "Comprehensive analysis of safety indicators in critical infrastructure. Explores drift-to-failure theory, weak signal taxonomy, leading indicators, and proactive safety culture.",
+        "image": "https://resistancezero.com/assets/article-8-cover.jpg",
         "author": {
             "@type": "Person",
             "name": "Bagus Dwi Permana",
-            "jobTitle": "Data Center Operations Lead",
+            "jobTitle": "Engineering Operations Manager",
             "url": "https://resistancezero.com/"
         },
-        "datePublished": "2025-11-02",
-        "dateModified": "2025-11-02",
+        "datePublished": "2025-12-28",
+        "dateModified": "2025-12-28",
         "publisher": {
             "@type": "Person",
             "name": "Bagus Dwi Permana"
@@ -79,8 +81,9 @@
             "@type": "WebPage",
             "@id": "https://resistancezero.com/article-8.html"
         },
+        "wordCount": "9500",
         "articleSection": "Safety Management",
-        "keywords": ["Leading Indicators", "Weak Signals", "Safety Culture", "Proactive Safety"]
+        "keywords": ["Leading Indicators", "Weak Signals", "Safety Culture", "Drift to Failure", "Normalization of Deviance", "Westrum Typology", "HRO"]
     }
     </script>
 
@@ -112,181 +115,408 @@
     </script>
 
     <style>
+        :root {
+            --primary-blue: #1e3a5f;
+            --accent-purple: #8b5cf6;
+            --accent-purple-light: #a78bfa;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        /* Hero Section */
         .article-hero {
-            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            background: linear-gradient(135deg, #0b1220 0%, #2d1b69 50%, #4c1d95 100%);
             padding: 8rem 2rem 4rem;
             color: #fff;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
+
         .article-hero::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: url('assets/article-8-cover.jpg') center/cover no-repeat;
-            opacity: 0.2;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.1) 0%, transparent 50%);
             z-index: 0;
         }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 15 L42 17 L32 19 L30 29 L28 19 L18 17 L28 15 Z' fill='%238b5cf6' fill-opacity='0.03'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
         .article-hero > * { position: relative; z-index: 1; }
-        .article-hero .container { max-width: 900px; }
-        .article-category {
-            display: inline-block;
-            background: rgba(168, 85, 247, 0.2);
-            color: #d8b4fe;
+        .article-hero .container { max-width: 1000px; margin: 0 auto; }
+
+        .article-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
+
         .article-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
             font-weight: 800;
             margin-bottom: 1.5rem;
             line-height: 1.2;
-            color: #fff;
         }
+
         .article-subtitle {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            font-size: 1.1rem;
             color: #94a3b8;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto 2rem;
             line-height: 1.7;
         }
+
         .article-meta {
             display: flex;
             justify-content: center;
             gap: 2rem;
             flex-wrap: wrap;
             color: #94a3b8;
-            font-size: 0.9375rem;
+            font-size: 0.9rem;
         }
+
         .article-meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            background: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-purple);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .toc-item-number {
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Article Content */
         .article-content {
             padding: 4rem 2rem;
             background: #fff;
         }
-        .article-content .container { max-width: 800px; }
+
+        .article-content .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
         .article-body {
-            font-size: 1.125rem;
-            line-height: 1.6;
-            color: #374151;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-primary);
         }
-        .article-body p { margin-bottom: 1.25rem; }
+
+        .article-body p {
+            margin-bottom: 1rem;
+        }
+
         .article-body h2 {
-            font-size: 1.75rem;
-            color: #1e3a5f;
-            margin: 3rem 0 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 3px solid #e5e7eb;
-        }
-        .article-body h3 {
-            font-size: 1.375rem;
-            color: #2d5a87;
+            font-size: 1.35rem;
+            color: var(--primary-blue);
             margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-purple);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        .article-body blockquote {
-            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-            border-left: 4px solid #a855f7;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
-            font-style: italic;
-            color: #7e22ce;
+
+        .article-body h2 .section-number {
+            background: var(--accent-purple);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
+
+        .article-body h3 {
+            font-size: 1.05rem;
+            color: #334155;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .article-body h4 {
+            font-size: 0.9rem;
+            color: #475569;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .article-body li {
+            margin-bottom: 0.35rem;
+            font-size: 0.9rem;
+        }
+
         .article-body ul, .article-body ol {
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             padding-left: 1.5rem;
         }
-        .article-body li { margin-bottom: 0.75rem; }
-        .highlight-box {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #ef4444;
-        }
-        .highlight-box p {
-            margin: 0;
-            color: #991b1b;
-            font-weight: 500;
-        }
-        .warning-box {
-            background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #eab308;
-        }
-        .warning-box p {
-            margin: 0;
-            color: #854d0e;
-            font-weight: 500;
-        }
-        .result-box {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #10b981;
-        }
-        .result-box h4 {
-            color: #065f46;
-            margin-bottom: 0.75rem;
-        }
-        .result-box ul {
-            margin: 0.5rem 0;
-            color: #047857;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .back-link:hover { color: #fff; }
-        .article-nav {
-            display: flex;
-            justify-content: space-between;
-            padding: 2rem 0;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 3rem;
-        }
-        .article-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #2d5a87;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        .article-nav a:hover { color: #1e3a5f; }
-        /* Inline Citations */
-        .cite { color: #a855f7; font-size: 0.75em; vertical-align: super; font-weight: 600; text-decoration: none; padding: 0 2px; }
-        .cite:hover { color: #9333ea; text-decoration: underline; }
 
-        /* References Section */
-        .references {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            margin-top: 2.5rem;
-            border-left: 4px solid #a855f7;
+        /* Tooltips */
+        .tip {
+            position: relative;
+            border-bottom: 1px dashed var(--accent-purple);
+            cursor: help;
+            color: var(--accent-purple);
+            font-weight: 500;
         }
-        .references h3 { font-size: 1rem; margin-bottom: 1rem; color: #1e3a5f; }
-        .references ol, .references ul { font-size: 0.85rem; color: #475569; padding-left: 1.25rem; line-height: 1.7; }
-        .references li { margin-bottom: 0.5rem; }
-        .references a { color: #a855f7; }
+
+        .tip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 300px;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        .tip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e293b;
+            z-index: 100;
+        }
+
+        /* Source References */
+        .src-ref {
+            color: var(--accent-purple);
+            font-size: 0.75em;
+            vertical-align: super;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0 2px;
+            cursor: pointer;
+        }
+
+        .src-ref:hover {
+            color: #7c3aed;
+            text-decoration: underline;
+        }
+
+        /* Key Insight Boxes */
+        .key-insight {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border-left: 4px solid var(--accent-purple);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .key-insight-title {
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .key-insight p {
+            margin: 0;
+            color: #4c1d95;
+            font-size: 0.88rem;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: var(--accent-amber);
+        }
+
+        .info-box.critical {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-left-color: var(--accent-red);
+        }
+
+        .info-box.success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left-color: var(--accent-emerald);
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border: 2px solid #c4b5fd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .formula-box-title {
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .formula-box code {
+            font-size: 0.82rem;
+            line-height: 1.8;
+            color: #4c1d95;
+        }
+
+        /* Data Tables */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%);
+            color: #fff;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
 
         /* Interactive Chart */
         .chart-container {
@@ -295,30 +525,35 @@
             padding: 2rem;
             margin: 2rem 0;
         }
+
         .chart-title {
             text-align: center;
             color: #fff;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
+
         .chart-subtitle {
             text-align: center;
             color: #94a3b8;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-wrapper {
             background: rgba(2, 6, 23, 0.5);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-canvas {
             width: 100%;
             height: auto;
             display: block;
         }
+
         .control-row {
             display: flex;
             align-items: center;
@@ -327,10 +562,12 @@
             justify-content: center;
             margin-top: 1rem;
         }
+
         .control-label {
             color: #94a3b8;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
+
         .control-slider {
             width: 200px;
             height: 8px;
@@ -339,24 +576,27 @@
             outline: none;
             -webkit-appearance: none;
         }
+
         .control-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #a855f7;
+            background: var(--accent-purple);
             cursor: pointer;
         }
+
         .control-value {
-            background: rgba(168, 85, 247, 0.2);
-            color: #d8b4fe;
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
             padding: 0.25rem 0.75rem;
             border-radius: 999px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             min-width: 50px;
             text-align: center;
         }
+
         .legend-row {
             display: flex;
             justify-content: center;
@@ -364,6 +604,7 @@
             margin-top: 1rem;
             flex-wrap: wrap;
         }
+
         .legend-item {
             display: flex;
             align-items: center;
@@ -371,46 +612,358 @@
             color: #94a3b8;
             font-size: 0.8rem;
         }
+
         .legend-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
         }
+
         .callout-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
         }
+
         .callout-card {
             background: rgba(30, 58, 95, 0.3);
             border-radius: 10px;
             padding: 1rem;
             text-align: center;
-            border: 1px solid rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.15);
         }
+
         .callout-label {
             color: #94a3b8;
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
         .callout-value {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #a855f7;
+            color: var(--accent-purple);
         }
 
-        @media (max-width: 768px) {
+        /* Calculator Section */
+        .calculator-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+            color: #fff;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .calculator-subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calc-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .calc-input, .calc-select {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .calc-input:focus, .calc-select:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .calc-select option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .calc-result-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .calc-result-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent-purple-light);
+        }
+
+        .calc-result-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        /* Dimension Bars */
+        .dimension-bars {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .dimension-bar-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dimension-bar-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .dimension-bar-track {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .dimension-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            background: var(--accent-purple);
+        }
+
+        .dimension-bar-value {
+            font-size: 0.8rem;
+            color: #a78bfa;
+            font-weight: 700;
+            min-width: 40px;
+        }
+
+        /* Gauge */
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Paradox Warning */
+        .paradox-warning {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .paradox-warning.visible {
+            display: block;
+        }
+
+        .paradox-warning-title {
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .paradox-warning p {
+            color: #fca5a5;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* Culture Badge */
+        .culture-badge {
+            display: inline-flex;
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .culture-badge.generative { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .culture-badge.bureaucratic { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .culture-badge.pathological { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        /* Trajectory Arrow */
+        .trajectory-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .trajectory-arrow {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .trajectory-arrow.improving { color: #10b981; }
+        .trajectory-arrow.stagnant { color: #f59e0b; }
+        .trajectory-arrow.deteriorating { color: #ef4444; }
+
+        /* Conclusion Box */
+        .conclusion-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+            border: 2px solid #c4b5fd;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .conclusion-box h3 {
+            color: #7c3aed;
+            margin-top: 0;
+        }
+
+        /* References */
+        .references-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+        }
+
+        .references-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        ol.ref-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            counter-reset: ref-counter;
+        }
+
+        ol.ref-list li {
+            counter-increment: ref-counter;
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        ol.ref-list li::before {
+            content: "[" counter(ref-counter) "]";
+            color: var(--accent-purple);
+            font-weight: 700;
+            flex-shrink: 0;
+            min-width: 28px;
+        }
+
+        /* Author Bio */
+        .author-bio-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 16px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .author-bio-section img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+
+        .author-bio-section h4 {
+            margin: 0 0 0.5rem 0;
+            color: #1e293b;
+        }
+
+        .author-bio-section p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        /* Print CSS */
+        @media print {
+            .navbar, .share-buttons, .toc-section, .calculator-section, .chart-container { display: none !important; }
+            .article-hero { padding: 2rem; background: #4c1d95 !important; }
+            .article-content { padding: 1rem; }
+            .article-body { font-size: 10pt; }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .calc-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+            .dimension-bar-label { min-width: 90px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 600px) {
             .article-hero { padding: 6rem 1rem 3rem; }
-            .article-meta { flex-direction: column; gap: 1rem; }
-            .article-content { padding: 3rem 1rem; }
-            .article-body { font-size: 1rem; }
-            .chart-container { padding: 1rem; }
+            .article-content { padding: 2rem 1rem; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .article-meta { flex-direction: column; gap: 0.75rem; align-items: center; }
+            .dimension-bar-group { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+            .dimension-bar-label { text-align: left; min-width: auto; }
+            .author-bio-section { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -435,17 +988,27 @@
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
                     </ul>
                 </li>
-                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
-                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
-                <li><a href="articles.html" class="nav-link">Articles</a></li>
-                <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
                 <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -465,267 +1028,875 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="article-hero">
         <div class="container">
-            <a href="articles.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="articles.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem; text-decoration: none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
                 Back to Articles
             </a>
-            <span class="article-category">Safety Science</span>
-            <h1 class="article-title">Why "No Incident" Is Not Evidence of Safety</h1>
-            <p class="article-subtitle">Lagging indicators, weak signals, and the illusion of stability in critical data center operations.</p>
+            <div class="article-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Safety Science &mdash; Article #08
+            </div>
+            <h1 class="article-title">Why &ldquo;No Incident&rdquo; Is Not Evidence of Safety</h1>
+            <p class="article-subtitle">Lagging indicators create the illusion of stability. This paper dissects drift-to-failure theory, weak signal taxonomy, leading indicator frameworks, and the paradox of incident-free periods in critical data center operations.</p>
             <div class="article-meta">
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    9 min read
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    22 min read
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                    November 2, 2025
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    December 28, 2025
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    ~9,500 words
+                </span>
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     Bagus Dwi Permana
                 </span>
             </div>
         </div>
     </section>
 
+    <!-- Table of Contents -->
+    <section class="toc-section">
+        <div class="toc-container">
+            <div class="toc-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Table of Contents
+            </div>
+            <div class="toc-grid">
+                <a href="#abstract" class="toc-item"><div class="toc-item-number">Section 01</div><div class="toc-item-title">Abstract</div></a>
+                <a href="#dangerous-comfort" class="toc-item"><div class="toc-item-number">Section 02</div><div class="toc-item-title">The Dangerous Comfort of Zero</div></a>
+                <a href="#lagging-vs-leading" class="toc-item"><div class="toc-item-number">Section 03</div><div class="toc-item-title">Lagging vs Leading Indicators</div></a>
+                <a href="#drift-to-failure" class="toc-item"><div class="toc-item-number">Section 04</div><div class="toc-item-title">Drift-to-Failure Theory</div></a>
+                <a href="#normalization" class="toc-item"><div class="toc-item-number">Section 05</div><div class="toc-item-title">Normalization of Deviance</div></a>
+                <a href="#weak-signals" class="toc-item"><div class="toc-item-number">Section 06</div><div class="toc-item-title">Weak Signals Taxonomy</div></a>
+                <a href="#case-context" class="toc-item"><div class="toc-item-number">Section 07</div><div class="toc-item-title">Case Context: Silent Drift</div></a>
+                <a href="#interactive" class="toc-item"><div class="toc-item-number">Section 08</div><div class="toc-item-title">Interactive Safety Health Chart</div></a>
+                <a href="#detection-system" class="toc-item"><div class="toc-item-number">Section 09</div><div class="toc-item-title">Detection System Design</div></a>
+                <a href="#effective-leading" class="toc-item"><div class="toc-item-number">Section 10</div><div class="toc-item-title">Effective Leading Indicators</div></a>
+                <a href="#calculator" class="toc-item"><div class="toc-item-number">Section 11</div><div class="toc-item-title">Safety Health Index Calculator</div></a>
+                <a href="#proactive-culture" class="toc-item"><div class="toc-item-number">Section 12</div><div class="toc-item-title">Proactive Safety Culture</div></a>
+                <a href="#conclusion" class="toc-item"><div class="toc-item-number">Section 13</div><div class="toc-item-title">Conclusion</div></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
     <article class="article-content">
         <div class="container">
             <div class="article-body">
-                <h2>Abstract</h2>
-                <p>In many data centers, safety and reliability are inferred from the absence of incidents. Periods without outages are treated as proof that systems, processes, and behaviors are sound. This article challenges that assumption.</p>
 
-                <blockquote>
-                    "For months, nothing happens. No outages. No customer impact. No headlines. Then one day, everything fails at once. The failure did not appear suddenly. It accumulated quietly while the dashboard stayed green."
-                </blockquote>
+                <!-- Section 1: Abstract -->
+                <h2 id="abstract"><span class="section-number">1</span> Abstract</h2>
 
-                <h2>1. The Dangerous Comfort of Zero Incidents</h2>
-                <p>In critical infrastructure, "no incident" is often celebrated as success. Dashboards glow green, KPIs are met, and confidence increases. Yet safety science has repeatedly shown that long accident-free periods often precede major failures.</p>
+                <p>In many data centers and critical infrastructure facilities, safety and reliability are inferred from the absence of incidents. Periods without outages, injuries, or near-misses are treated as proof that systems, processes, and human behaviors are sound. This assumption is deeply embedded in management dashboards, regulatory compliance reports, and organizational culture. Yet safety science has consistently demonstrated that this inference is fundamentally flawed.</p>
 
-                <div class="highlight-box">
-                    <p><strong>The Paradox:</strong> Stability breeds normalization. Success can mask accumulating risk.</p>
+                <p>This paper examines the paradox of incident-free operations through the lens of established safety theory. We explore Jens Rasmussen's drift-to-failure model<a href="#ref1" class="src-ref">[1]</a>, Diane Vaughan's normalization of deviance<a href="#ref2" class="src-ref">[2]</a>, and Erik Hollnagel's Safety-I versus Safety-II paradigm<a href="#ref3" class="src-ref">[3]</a> to demonstrate why "no incident" periods often precede catastrophic failures rather than prevent them. The paper proposes a comprehensive weak signal taxonomy, a set of eight effective leading indicators with quantitative targets, and an interactive Safety Health Index calculator that reveals the hidden relationship between extended incident-free periods and accumulating systemic risk.</p>
+
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Central Thesis
+                    </div>
+                    <p>The absence of incidents is not evidence of safety. It is evidence that boundaries have not yet been crossed. In complex socio-technical systems, extended incident-free periods without corresponding leading indicator health create a false sense of security that actively increases systemic risk through normalized drift, suppressed reporting, and eroded safety margins.</p>
                 </div>
 
-                <h2>2. Lagging Indicators: What They Measure—and Miss</h2>
-                <p>Lagging indicators measure outcomes after failure: outages, SLA breaches, safety events. They are useful for accountability, but they are blind to system condition.</p>
+                <p>For operators of critical facilities&mdash;from data centers managing <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> and <span class="tip" data-tip="Power Distribution Unit: Device that distributes electric power to rack-mounted equipment in data centers">PDU</span> systems to those overseeing <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> and <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span> infrastructure&mdash;the implications are profound. A green dashboard does not mean the system is safe. It means the system has not yet failed. These are fundamentally different propositions, and confusing them is the first step toward catastrophe.</p>
 
-                <div class="warning-box">
-                    <p><strong>Critical Insight:</strong> By the time a lagging indicator moves, control is already lost.</p>
-                </div>
+                <p>This analysis draws from 16 foundational references spanning safety science, reliability engineering, high-reliability organization (<span class="tip" data-tip="High Reliability Organization: Organizations that operate in hazardous conditions with fewer than expected accidents through mindful practices">HRO</span>) theory, and international standards from <span class="tip" data-tip="International Atomic Energy Agency: The world's central intergovernmental forum for scientific and technical cooperation in the nuclear field">IAEA</span> and <span class="tip" data-tip="International Civil Aviation Organization: UN specialized agency managing the administration and governance of international civil aviation">ICAO</span>. The paper concludes with actionable frameworks for transitioning from lagging-indicator complacency to leading-indicator vigilance.</p>
 
-                <h2>3. The Myth of Predictive Absence</h2>
-                <p>The absence of incidents does not predict future safety. It only confirms that boundaries have not yet been crossed. Complex systems can operate for long periods while gradually eroding their safety margins.</p>
+                <!-- Section 2: The Dangerous Comfort of Zero -->
+                <h2 id="dangerous-comfort"><span class="section-number">2</span> The Dangerous Comfort of Zero</h2>
 
-                <h2>4. Weak Signals and Early Warnings</h2>
-                <p>Weak signals are subtle deviations that do not cause immediate failure:</p>
+                <p>In critical infrastructure, "zero incidents" is often celebrated as the ultimate achievement. Dashboards glow green. <span class="tip" data-tip="Key Performance Indicator: Measurable value demonstrating how effectively an organization is achieving key business objectives">KPI</span> targets are met. Confidence cascades upward through management layers. Teams receive commendations. Budgets are maintained&mdash;or reduced, because after all, if nothing is breaking, perhaps less investment is needed. This is the dangerous comfort of zero.</p>
+
+                <p>The logic appears sound on the surface: if the goal of safety management is to prevent incidents, then the absence of incidents must indicate successful safety management. But this reasoning commits what philosophers call the fallacy of <em>absence of evidence as evidence of absence</em>. The fact that we have not observed a failure does not mean the conditions for failure are not present. It means only that the conditions have not yet been sufficient to produce an observable outcome.</p>
+
+                <h3>2.1 The Statistics of Silence</h3>
+
+                <p>Consider a data center operating for 365 days without a power-related incident. Management interprets this as confirmation that the electrical infrastructure&mdash;<span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> systems, <span class="tip" data-tip="Automatic Transfer Switch: Electrical device that switches a load between two sources, typically utility and generator power">ATS</span> units, generator sets, distribution panels&mdash;is performing well. But during those 365 days, several conditions may have developed silently:</p>
+
                 <ul>
-                    <li>Recurring nuisance alarms</li>
-                    <li>Informal workarounds</li>
-                    <li>Small procedural skips</li>
-                    <li>Increasing reliance on specific individuals</li>
+                    <li><strong>Battery degradation:</strong> <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> battery strings may have lost capacity below manufacturer specifications, but because no utility outage occurred, the degradation went untested by real-world demand</li>
+                    <li><strong>Thermal drift:</strong> <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span> performance may have degraded gradually, with hot spots developing that remained within alarm thresholds but represented a shrinking safety margin</li>
+                    <li><strong>Procedure erosion:</strong> Maintenance procedures may have been shortened or skipped under operational pressure, with each successful shortcut reinforcing the belief that the full procedure was unnecessary</li>
+                    <li><strong>Alarm normalization:</strong> Recurring nuisance alarms may have been acknowledged without investigation, training operators to ignore signals that could indicate early-stage failures</li>
+                    <li><strong>Knowledge concentration:</strong> Critical institutional knowledge may have become concentrated in a small number of experienced operators, creating single points of failure in the human system</li>
                 </ul>
-                <p>Individually, they are easy to ignore. Collectively, they are early warnings.</p>
 
-                <h2>5. Interactive: Weak Signals vs Perceived Safety</h2>
-                <p>This simulation shows how weak signals can accumulate while perceived safety remains high, creating a dangerous gap:</p>
+                <p>None of these conditions produce incidents on their own. They accumulate quietly, each one narrowing the gap between normal operations and catastrophic failure. James Reason described this as the "Swiss cheese model"<a href="#ref4" class="src-ref">[4]</a>&mdash;each degraded condition represents a hole in a defensive layer, and it is only when the holes align that an accident passes through all defenses simultaneously.</p>
 
-                <!-- Interactive Chart -->
+                <div class="info-box critical">
+                    <div class="info-box-title">The Paradox Quantified</div>
+                    <p style="margin:0; font-size: 0.88rem;">Uptime Institute's 2023 Annual Outage Analysis<a href="#ref5" class="src-ref">[5]</a> found that 70% of data center outages were caused by factors that had been present&mdash;and potentially detectable&mdash;for weeks or months before the incident. The 2024 report<a href="#ref6" class="src-ref">[6]</a> further confirmed that human error, often manifesting as procedural drift during "stable" periods, remained the leading root cause category. The incidents did not appear suddenly. They accumulated quietly while the dashboard stayed green.</p>
+                </div>
+
+                <h3>2.2 The Organizational Reward Loop</h3>
+
+                <p>The danger is compounded by organizational incentive structures. When zero incidents are achieved, the behavior that produced the zero is rewarded&mdash;regardless of whether that behavior was genuinely safe or merely lucky. This creates a reinforcement loop that Hollnagel<a href="#ref3" class="src-ref">[3]</a> identifies as the core problem with Safety-I thinking: the organization learns to optimize for the absence of negative outcomes rather than the presence of positive safety behaviors.</p>
+
+                <p>In practice, this means that the team which cuts a maintenance window short to meet operational targets and suffers no incident is rewarded equally&mdash;or more&mdash;than the team which takes the full maintenance window and identifies a latent defect. The first team delivered efficiency. The second team delivered safety. But the <span class="tip" data-tip="Key Performance Indicator: Measurable value demonstrating how effectively an organization is achieving key business objectives">KPI</span> dashboard cannot distinguish between the two.</p>
+
+                <h3>2.3 The Normative Trap</h3>
+
+                <p>Perhaps most insidiously, the comfort of zero creates normative pressure against reporting. When an organization celebrates its incident-free record, individual operators face social and professional pressure not to be the person who "breaks the streak." Near-misses go unreported. Anomalies are rationalized. Workarounds become standard practice. The very metric intended to measure safety begins to suppress the information needed to maintain it.</p>
+
+                <p>This is not a theoretical concern. The <span class="tip" data-tip="Health and Safety Executive: UK government body responsible for the regulation of health and safety in the workplace">HSE</span> (2005)<a href="#ref7" class="src-ref">[7]</a> documented this phenomenon across multiple industries, finding that organizations with the strongest incident-free cultures often had the weakest near-miss reporting rates. The correlation was not incidental&mdash;it was causal. The pursuit of zero had created silence where there should have been signal.</p>
+
+                <!-- Section 3: Lagging vs Leading Indicators -->
+                <h2 id="lagging-vs-leading"><span class="section-number">3</span> Lagging vs Leading Indicators</h2>
+
+                <p>To understand why incident-free periods provide false assurance, we must first distinguish between two fundamentally different types of safety measurement. Lagging indicators measure outcomes after failure has occurred. Leading indicators measure conditions before failure becomes possible. The distinction is not merely academic&mdash;it determines whether an organization can detect and respond to risk, or only count the consequences of undetected risk.</p>
+
+                <h3>3.1 Comprehensive Comparison</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>Lagging Indicators</th>
+                                <th>Leading Indicators</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Temporal orientation</strong></td>
+                                <td>Retrospective (what happened)</td>
+                                <td>Prospective (what could happen)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Measurement focus</strong></td>
+                                <td>Outcomes and consequences</td>
+                                <td>Conditions and behaviors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Control window</strong></td>
+                                <td>After boundary is crossed</td>
+                                <td>Before boundary is approached</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Actionability</strong></td>
+                                <td>Reactive (investigate, remediate)</td>
+                                <td>Proactive (prevent, intervene)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Signal clarity</strong></td>
+                                <td>Clear (incident occurred or not)</td>
+                                <td>Ambiguous (requires interpretation)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data source</strong></td>
+                                <td>Incident reports, <span class="tip" data-tip="Service Level Agreement: Contract defining expected service performance metrics and penalties for non-compliance">SLA</span> breaches</td>
+                                <td>Audits, observations, trend analysis</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Organizational ease</strong></td>
+                                <td>Easy to collect, easy to report</td>
+                                <td>Difficult to collect, requires judgment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Risk of manipulation</strong></td>
+                                <td>Reporting suppression, reclassification</td>
+                                <td>Gaming metrics, false compliance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Failure mode</strong></td>
+                                <td>False confidence from absence</td>
+                                <td>Alert fatigue from abundance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DC examples</strong></td>
+                                <td>Outage count, <span class="tip" data-tip="Mean Time Between Failures: Average time between system breakdowns, measuring reliability">MTBF</span>, injury rate</td>
+                                <td>Near-miss rate, audit close rate, training hours</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Critical Insight
+                    </div>
+                    <p>By the time a lagging indicator moves, control is already lost. The incident has occurred, the <span class="tip" data-tip="Service Level Agreement: Contract defining expected service performance metrics and penalties for non-compliance">SLA</span> has been breached, the injury has happened. Lagging indicators are useful for accountability and learning from failure, but they are structurally incapable of preventing the next failure. An organization that relies exclusively on lagging indicators is, by definition, operating blind to emerging risk.</p>
+                </div>
+
+                <h3>3.2 The Measurement Asymmetry Problem</h3>
+
+                <p>The fundamental challenge is measurement asymmetry. Lagging indicators are binary and unambiguous: an incident either occurred or it did not. Leading indicators are continuous and interpretive: a near-miss report requires judgment about what constitutes "near," an audit finding requires assessment of severity, and a training completion rate requires evaluation of whether the training actually improved competence.</p>
+
+                <p>This asymmetry creates organizational preference for lagging indicators. They are easier to collect, easier to report, and easier to benchmark. A facility manager can state with confidence that the site had "zero safety incidents in Q4." Stating that "the leading indicator profile suggests elevated systemic risk despite zero incidents" requires far more nuance, carries career risk, and may be met with skepticism by management that conflates absence of incidents with presence of safety.</p>
+
+                <p>Hudson's safety culture maturity model<a href="#ref8" class="src-ref">[8]</a> places organizations that rely primarily on lagging indicators at the "reactive" or "calculative" stages of safety maturity. Only at the "proactive" and "generative" stages do organizations systematically measure and act on leading indicators. The transition between these stages is not merely a matter of adding more metrics&mdash;it requires a fundamental shift in how the organization defines and measures safety.</p>
+
+                <!-- Section 4: Drift-to-Failure Theory -->
+                <h2 id="drift-to-failure"><span class="section-number">4</span> Drift-to-Failure Theory (Rasmussen 1997)</h2>
+
+                <p>Jens Rasmussen's seminal 1997 paper "Risk Management in a Dynamic Society"<a href="#ref1" class="src-ref">[1]</a> introduced the concept of drift-to-failure as a systemic property of complex socio-technical systems. Rather than viewing accidents as the result of individual errors or component failures, Rasmussen demonstrated that accidents emerge from the gradual migration of organizational behavior toward and eventually across safety boundaries.</p>
+
+                <h3>4.1 The Boundary Model</h3>
+
+                <p>Rasmussen's model describes system behavior as existing within a space bounded by three fundamental constraints:</p>
+
+                <ul>
+                    <li><strong>Economic failure boundary:</strong> The limit beyond which the organization becomes financially nonviable (too much cost, too little revenue)</li>
+                    <li><strong>Unacceptable workload boundary:</strong> The limit beyond which workers can no longer sustain their effort (burnout, turnover, errors)</li>
+                    <li><strong>Safety boundary:</strong> The limit beyond which operations become unsafe (equipment failure, environmental hazard, human harm)</li>
+                </ul>
+
+                <p>Under normal conditions, organizational behavior migrates within this space. Two forces drive systematic drift:</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Rasmussen's Dual Pressure Model</div>
+                    <code>
+                        Gradient toward least effort &rarr; Pushes behavior toward safety boundary<br>
+                        Gradient toward efficiency &rarr; Pushes behavior toward safety boundary<br><br>
+                        Combined effect: Systematic migration toward the safety boundary<br>
+                        over time, even without any individual decision to be "unsafe"
+                    </code>
+                </div>
+
+                <p>The critical insight is that each individual step in the drift is locally rational. A maintenance team that reduces a 4-hour procedure to 3 hours saves time, reduces workload, and faces no immediate consequence because the safety boundary is still some distance away. The 3-hour procedure becomes the new standard. Six months later, pressure reduces it to 2.5 hours. Then to 2 hours. At no point does anyone make a conscious decision to be unsafe. Each step is a marginal adaptation to competing pressures. But the cumulative effect is progressive erosion of the safety margin until the system operates at the very edge of its boundary&mdash;where even a small perturbation can cause it to cross over into failure.</p>
+
+                <h3>4.2 Why Drift Is Invisible</h3>
+
+                <p>Drift is invisible for three reasons that are particularly relevant to data center operations:</p>
+
+                <p><strong>First, the boundary is invisible.</strong> Unlike physical boundaries (a cliff edge, a wall), safety boundaries in complex systems are not marked with bright lines. The point at which a <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> system transitions from "operating with adequate margin" to "operating with insufficient margin to survive a dual utility failure" is not accompanied by a dashboard change. The boundary exists, but it can only be known through rigorous analysis&mdash;analysis that may not be performed during long incident-free periods when the system appears to be functioning well.</p>
+
+                <p><strong>Second, drift is rewarded.</strong> Each step closer to the boundary typically comes with efficiency gains&mdash;shorter maintenance windows, reduced staffing, lower costs. In Rasmussen's framework, these are not failures of management; they are predictable responses to economic pressure. The organization is optimizing for the gradient it can see (cost, efficiency, speed) while drifting toward the gradient it cannot see (safety boundary proximity).</p>
+
+                <p><strong>Third, drift is normalized.</strong> As we will explore in the next section, once a deviation from original design or procedure becomes established practice, it ceases to be perceived as a deviation. It becomes "the way we do things." Diane Vaughan<a href="#ref2" class="src-ref">[2]</a> documented this phenomenon in devastating detail in her analysis of the Challenger disaster, but the same dynamics operate in every complex organization, including data center operations.</p>
+
+                <p>Sidney Dekker<a href="#ref9" class="src-ref">[9]</a> further developed this concept, noting that drift into failure is a property of systems, not of individuals. "The drift occurs because the system is doing exactly what it was designed to do: adapt to local pressures while maintaining production." The problem is that adaptation, in the absence of equally strong safety feedback, always tends in one direction: toward the boundary.</p>
+
+                <!-- Section 5: Normalization of Deviance -->
+                <h2 id="normalization"><span class="section-number">5</span> Normalization of Deviance (Vaughan 1996)</h2>
+
+                <p>Diane Vaughan's concept of the "normalization of deviance," developed in her landmark study of the 1986 Challenger disaster<a href="#ref2" class="src-ref">[2]</a>, describes the process by which organizations gradually accept previously unacceptable conditions as normal. The concept has since been recognized as one of the most important contributions to organizational safety theory, with applications far beyond aerospace.</p>
+
+                <h3>5.1 The Mechanism</h3>
+
+                <p>Normalization of deviance follows a predictable sequence that maps directly to data center operations:</p>
+
+                <ol>
+                    <li><strong>Initial deviation occurs:</strong> A design specification, procedure, or standard is not fully met. In a data center context, this might be a <span class="tip" data-tip="Preventive Maintenance: Regularly scheduled maintenance activities designed to prevent equipment failures">PM</span> task that is performed with a simplified checklist rather than the full manufacturer protocol, or a <span class="tip" data-tip="Management of Change: Formal process for evaluating and approving changes to facilities, equipment, procedures, or personnel that could affect safety">MoC</span> process that is bypassed for "minor" changes.</li>
+                    <li><strong>No immediate consequence:</strong> The deviation does not produce an incident. The <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> still functions. The cooling system still maintains temperature. The generator still starts on test.</li>
+                    <li><strong>Deviation is rationalized:</strong> Because no consequence occurred, the deviation is retrospectively justified. "The full procedure takes too long." "The <span class="tip" data-tip="Management of Change: Formal process for evaluating and approving changes to facilities, equipment, procedures, or personnel that could affect safety">MoC</span> process is too bureaucratic for something this simple." "We've always done it this way and nothing has gone wrong."</li>
+                    <li><strong>Deviation becomes precedent:</strong> The rationalized deviation becomes the new standard practice. New team members are trained on the deviated procedure, not the original. The deviation is now invisible&mdash;it is "how we do things."</li>
+                    <li><strong>Cycle repeats:</strong> A new deviation occurs from the already-deviated standard, and the process begins again. Each cycle moves the operational norm further from the original design intent, accumulating risk that remains invisible until a triggering event exposes the accumulated gap.</li>
+                </ol>
+
+                <h3>5.2 Data Center Manifestations</h3>
+
+                <p>In critical facilities, normalization of deviance manifests in patterns that are remarkably consistent across organizations:</p>
+
+                <ul>
+                    <li><strong><span class="tip" data-tip="Lockout/Tagout: Safety procedure ensuring that dangerous machines are properly shut off and not able to be started up again before maintenance work is completed">LOTO</span> procedure shortcuts:</strong> Lock-out/tag-out procedures gradually simplified from multi-step verification to single-check processes, eroding the defense-in-depth that the original procedure was designed to provide</li>
+                    <li><strong><span class="tip" data-tip="Computerized Maintenance Management System: Software system that maintains a computer database of information about maintenance operations">CMMS</span> work order closure:</strong> Maintenance work orders closed as "complete" with incomplete testing, driven by pressure to clear the backlog and maintain closure rate <span class="tip" data-tip="Key Performance Indicator: Measurable value demonstrating how effectively an organization is achieving key business objectives">KPI</span>s</li>
+                    <li><strong>Alarm threshold creep:</strong> <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> alarm thresholds gradually widened to reduce nuisance alarms, inadvertently narrowing the warning window between normal operation and failure</li>
+                    <li><strong><span class="tip" data-tip="Management of Change: Formal process for evaluating and approving changes to facilities, equipment, procedures, or personnel that could affect safety">MoC</span> bypass:</strong> Changes classified as "like-for-like" to avoid the change management process, even when the replacement introduces subtle differences in performance characteristics</li>
+                    <li><strong>Staffing adaptation:</strong> Critical operations performed by one person instead of the designed two-person protocol, justified by experience and "familiarity with the system"</li>
+                </ul>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">The Insidiousness of Normalization</div>
+                    <p style="margin:0; font-size: 0.88rem;">Vaughan's most important finding was that normalization is not a failure of vigilance. The engineers and managers at NASA who normalized the O-ring erosion problem were not negligent. They were following the organizational logic available to them: the erosion had been observed, analyzed, and determined to be within acceptable limits based on prior successful flights. Each successful flight reinforced the conclusion. The deviance was not hidden&mdash;it was visible but reclassified as acceptable. This is precisely what happens in data centers when a known deviation produces no incident: the deviation is not suppressed; it is accepted.</p>
+                </div>
+
+                <h3>5.3 The Accumulation Problem</h3>
+
+                <p>The most dangerous aspect of normalization is not any single deviance, but the accumulation of multiple normalized deviances operating simultaneously. A data center may simultaneously have:</p>
+
+                <ul>
+                    <li>Simplified <span class="tip" data-tip="Lockout/Tagout: Safety procedure ensuring that dangerous machines are properly shut off and not able to be started up again before maintenance work is completed">LOTO</span> procedures (reducing human defense)</li>
+                    <li>Widened <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> alarm thresholds (reducing technical detection)</li>
+                    <li>Deferred maintenance items (reducing equipment reliability)</li>
+                    <li>Single-person operations for two-person tasks (reducing verification)</li>
+                    <li>Bypassed <span class="tip" data-tip="Management of Change: Formal process for evaluating and approving changes to facilities, equipment, procedures, or personnel that could affect safety">MoC</span> processes (reducing change control)</li>
+                </ul>
+
+                <p>Each individual normalization may represent an acceptable risk. But collectively, they create a system state that the original designers never intended and the original risk assessment never evaluated. This is Perrow's "normal accident"<a href="#ref10" class="src-ref">[10]</a>&mdash;a failure that emerges not from any single cause but from the unexpected interaction of multiple degraded conditions that were each individually "acceptable."</p>
+
+                <!-- Section 6: Weak Signals Taxonomy -->
+                <h2 id="weak-signals"><span class="section-number">6</span> Weak Signals Taxonomy</h2>
+
+                <p>If incident-free periods mask accumulating risk, then the critical question becomes: what signals exist that could reveal the hidden drift? Weick and Sutcliffe<a href="#ref11" class="src-ref">[11]</a>, in their study of High Reliability Organizations (<span class="tip" data-tip="High Reliability Organization: Organizations that operate in hazardous conditions with fewer than expected accidents through mindful practices">HRO</span>s), identified "preoccupation with failure" as a defining characteristic of organizations that successfully detect and respond to emerging risk. This preoccupation manifests as systematic attention to weak signals&mdash;subtle deviations from expected conditions that, individually, appear insignificant but collectively indicate systemic drift.</p>
+
+                <p>Based on the safety science literature and operational experience in critical facilities, we propose a taxonomy of five weak signal categories relevant to data center operations:</p>
+
+                <h3>6.1 Category 1: Operational Anomalies</h3>
+                <p>These are deviations from expected system behavior that do not trigger alarms or incidents but indicate that something has changed:</p>
+                <ul>
+                    <li>Recurring nuisance alarms that are acknowledged but not investigated</li>
+                    <li><span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span> temperature variations that remain within thresholds but show increasing amplitude</li>
+                    <li><span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> battery test results that meet minimum requirements but show declining trend</li>
+                    <li>Generator start times that are increasing, even if still within specification</li>
+                    <li><span class="tip" data-tip="Data Center Infrastructure Management: Software solutions that provide comprehensive management of data center assets, resources, and operational information">DCIM</span> data showing drift in power utilization patterns</li>
+                </ul>
+
+                <h3>6.2 Category 2: Procedural Drift Signals</h3>
+                <p>These indicate that actual practice has diverged from documented procedure:</p>
+                <ul>
+                    <li>Maintenance tasks consistently completed faster than the estimated duration</li>
+                    <li><span class="tip" data-tip="Computerized Maintenance Management System: Software system that maintains a computer database of information about maintenance operations">CMMS</span> work orders with identical completion notes across different tasks</li>
+                    <li>Increasing use of "N/A" or "not applicable" in checklist items</li>
+                    <li>Informal workarounds that have become standard practice</li>
+                    <li><span class="tip" data-tip="Standard Operating Procedure: Established step-by-step instruction compiled by an organization to help workers carry out routine operations">SOP</span> versions that do not match actual practice</li>
+                </ul>
+
+                <h3>6.3 Category 3: Organizational Stress Signals</h3>
+                <p>These reflect pressures on the human system that may degrade decision-making and vigilance:</p>
+                <ul>
+                    <li>Increasing overtime hours, particularly for key technical personnel</li>
+                    <li>Rising turnover in critical roles, especially experienced operators</li>
+                    <li>Declining participation in safety meetings or toolbox talks</li>
+                    <li>Increasing time between incident and <span class="tip" data-tip="Root Cause Analysis: Method of problem solving used for identifying the root causes of faults or problems">RCA</span> completion</li>
+                    <li>Knowledge concentration in a small number of individuals</li>
+                </ul>
+
+                <h3>6.4 Category 4: Reporting Suppression Signals</h3>
+                <p>These indicate that the organization's information flow about safety is being constrained:</p>
+                <ul>
+                    <li>Declining near-miss report rates during periods of high operational tempo</li>
+                    <li>Near-miss reports with decreasing detail or specificity</li>
+                    <li>Gap between safety-walk observations and formal reports</li>
+                    <li>Informal resolution of safety concerns without documentation</li>
+                    <li>Reluctance to escalate findings to management</li>
+                </ul>
+
+                <h3>6.5 Category 5: System Coupling Signals</h3>
+                <p>These indicate increasing interdependency that may amplify the impact of individual failures. Perrow<a href="#ref10" class="src-ref">[10]</a> and Leveson<a href="#ref12" class="src-ref">[12]</a> both emphasize that tight coupling is a precondition for cascade failures:</p>
+                <ul>
+                    <li>Increasing number of systems sharing single points of failure</li>
+                    <li>Reduced isolation capability between independent systems</li>
+                    <li>Growing dependency on specific network paths or control systems</li>
+                    <li>Configuration changes that inadvertently create new interdependencies</li>
+                    <li>Maintenance windows that require multiple systems to be at elevated risk simultaneously</li>
+                </ul>
+
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Why Weak Signals Matter
+                    </div>
+                    <p>Turner (1978)<a href="#ref13" class="src-ref">[13]</a> demonstrated that every major disaster he studied was preceded by an "incubation period" during which weak signals were present but unrecognized. The signals were not absent. They were unstructured, unowned, and unacted upon. A systematic taxonomy provides the structure; the following sections address ownership and action.</p>
+                </div>
+
+                <!-- Section 7: Case Context: Silent Drift -->
+                <h2 id="case-context"><span class="section-number">7</span> Case Context: Silent Drift in Data Center Operations</h2>
+
+                <p>To illustrate how drift, normalization, and weak signal suppression operate in practice, consider a composite case drawn from patterns observed across multiple critical facilities. This is not a single incident report; it is a synthesis of recurring dynamics that safety science literature and operational experience consistently identify.</p>
+
+                <h3>7.1 The Scenario: 18 Months of Green</h3>
+
+                <p>A Tier III data center serving financial services clients operates for 18 consecutive months without a reportable incident. During this period, several observable changes occur:</p>
+
+                <ul>
+                    <li><strong>Month 1-6:</strong> Full compliance with all maintenance protocols. Near-miss reports average 4-5 per month. <span class="tip" data-tip="Failure Mode and Effects Analysis: Systematic method for evaluating processes to identify where and how they might fail">FMEA</span> reviews conducted quarterly. Safety meetings well-attended with active participation.</li>
+                    <li><strong>Month 7-12:</strong> Maintenance window pressures increase as client load grows. Two experienced operators leave; replacements are less experienced. Near-miss reports decline to 1-2 per month. <span class="tip" data-tip="Root Cause Analysis: Method of problem solving used for identifying the root causes of faults or problems">RCA</span> completion times extend from 5 days to 15 days. Management celebrates the "zero incident" milestone.</li>
+                    <li><strong>Month 13-18:</strong> Informal workarounds become standard for three maintenance procedures. <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> alarm thresholds widened twice to reduce "noise." Near-miss reports drop to zero&mdash;interpreted as evidence of improving safety. Budget request for additional training is deferred because "the numbers look great."</li>
+                </ul>
+
+                <h3>7.2 The Invisible Gap</h3>
+
+                <p>At month 18, the dashboard shows perfect performance. Every lagging indicator is green. But the leading indicator profile tells a different story entirely:</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Indicator</th>
+                                <th>Month 1</th>
+                                <th>Month 18</th>
+                                <th>Direction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Near-miss reports/month</td>
+                                <td style="color: #10b981;">4.5</td>
+                                <td style="color: #ef4444;">0</td>
+                                <td style="color: #ef4444;">Deteriorating</td>
+                            </tr>
+                            <tr>
+                                <td>RCA completion (days)</td>
+                                <td style="color: #10b981;">5</td>
+                                <td style="color: #ef4444;">15+</td>
+                                <td style="color: #ef4444;">Deteriorating</td>
+                            </tr>
+                            <tr>
+                                <td>Training hours/quarter</td>
+                                <td style="color: #10b981;">16</td>
+                                <td style="color: #f59e0b;">6</td>
+                                <td style="color: #ef4444;">Deteriorating</td>
+                            </tr>
+                            <tr>
+                                <td>Open audit findings</td>
+                                <td style="color: #10b981;">3</td>
+                                <td style="color: #ef4444;">14</td>
+                                <td style="color: #ef4444;">Deteriorating</td>
+                            </tr>
+                            <tr>
+                                <td>Mgmt safety walks/month</td>
+                                <td style="color: #10b981;">4</td>
+                                <td style="color: #f59e0b;">1</td>
+                                <td style="color: #ef4444;">Deteriorating</td>
+                            </tr>
+                            <tr>
+                                <td>Procedure deviations known</td>
+                                <td style="color: #10b981;">0</td>
+                                <td style="color: #ef4444;">3 normalized</td>
+                                <td style="color: #ef4444;">Deteriorating</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>The system has drifted substantially toward its safety boundary. The conditions for a significant failure are present. Only the triggering event&mdash;a utility outage, an equipment demand beyond degraded capacity, a human error in a simplified procedure&mdash;is missing. And the organization, looking at its lagging indicator dashboard, has no awareness of the accumulated risk.</p>
+
+                <div class="info-box critical">
+                    <div class="info-box-title">The Silent Drift Pattern</div>
+                    <p style="margin:0; font-size: 0.88rem;">This pattern&mdash;green dashboards masking deteriorating safety margins&mdash;has been documented by Uptime Institute<a href="#ref5" class="src-ref">[5]</a><a href="#ref6" class="src-ref">[6]</a>, the <span class="tip" data-tip="International Atomic Energy Agency: The world's central intergovernmental forum for scientific and technical cooperation in the nuclear field">IAEA</span><a href="#ref14" class="src-ref">[14]</a>, and <span class="tip" data-tip="International Civil Aviation Organization: UN specialized agency managing the administration and governance of international civil aviation">ICAO</span><a href="#ref15" class="src-ref">[15]</a> across their respective industries. The pattern is not industry-specific. It is a property of complex socio-technical systems under production pressure. The question is not whether drift will occur, but whether the organization has the instrumentation to detect it.</p>
+                </div>
+
+                <!-- Section 8: Interactive Canvas -->
+                <h2 id="interactive"><span class="section-number">8</span> Interactive: Safety Health Over Time</h2>
+
+                <p>The following interactive visualization demonstrates the relationship between perceived safety (based on lagging indicators) and actual safety health (based on leading indicators) over a 24-month period. Adjust the sliders to model different organizational conditions and observe how the gap between perception and reality develops.</p>
+
                 <div class="chart-container">
-                    <div class="chart-title">Weak Signal Accumulation vs Perceived Safety</div>
-                    <div class="chart-subtitle">The gap between perception and reality grows over time</div>
+                    <div class="chart-title">Perceived Safety vs Actual Safety Health</div>
+                    <div class="chart-subtitle">The growing gap between lagging indicator comfort and leading indicator reality</div>
 
                     <div class="chart-wrapper">
-                        <canvas id="signalChart" class="chart-canvas" width="800" height="380"></canvas>
+                        <canvas id="safetyHealthChart" class="chart-canvas" width="800" height="380"></canvas>
                     </div>
 
                     <div class="control-row">
-                        <span class="control-label">Signal Accumulation Rate:</span>
-                        <input type="range" id="signalSlider" class="control-slider" min="0" max="100" value="40">
-                        <span class="control-value" id="signalValue">40%</span>
+                        <span class="control-label">Drift Rate:</span>
+                        <input type="range" id="driftSlider" class="control-slider" min="0" max="100" value="45">
+                        <span class="control-value" id="driftValue">45%</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Reporting Suppression:</span>
+                        <input type="range" id="suppressionSlider" class="control-slider" min="0" max="100" value="30">
+                        <span class="control-value" id="suppressionValue">30%</span>
                     </div>
 
                     <div class="legend-row">
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: #22c55e;"></span>
-                            Perceived Safety
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: #f59e0b;"></span>
-                            Accumulated Weak Signals
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: #ef4444;"></span>
-                            Danger Zone
-                        </div>
+                        <div class="legend-item"><span class="legend-dot" style="background: #22c55e;"></span> Perceived Safety (Lagging)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background: #8b5cf6;"></span> Actual Safety Health (Leading)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background: #ef4444;"></span> Critical Threshold</div>
                     </div>
 
                     <div class="callout-row">
                         <div class="callout-card">
                             <div class="callout-label">Perception Gap</div>
-                            <div class="callout-value" id="percGap">47%</div>
+                            <div class="callout-value" id="chartGap">38%</div>
                         </div>
                         <div class="callout-card">
-                            <div class="callout-label">Signal Level</div>
-                            <div class="callout-value" id="sigLevel" style="color: #f59e0b;">Moderate</div>
+                            <div class="callout-label">Drift Level</div>
+                            <div class="callout-value" id="chartDrift" style="color: #f59e0b;">Moderate</div>
                         </div>
                         <div class="callout-card">
                             <div class="callout-label">Risk Status</div>
-                            <div class="callout-value" id="riskStatus">Hidden</div>
+                            <div class="callout-value" id="chartRisk" style="color: #8b5cf6;">Latent</div>
+                        </div>
+                        <div class="callout-card">
+                            <div class="callout-label">Time to Boundary</div>
+                            <div class="callout-value" id="chartTime" style="color: #06b6d4;">~8 mo</div>
                         </div>
                     </div>
                 </div>
 
-                <h2>6. Drift Toward Failure</h2>
-                <p>James Reason and Erik Hollnagel describe drift as a gradual movement toward unsafe states driven by efficiency, success, and adaptation. Because drift is slow and often rewarded, it remains invisible until a triggering event occurs.</p>
+                <!-- Section 9: Detection System Design -->
+                <h2 id="detection-system"><span class="section-number">9</span> Detection System Design</h2>
 
-                <h2>7. Human Factors: Success Masking Fragility</h2>
-                <p>When systems succeed despite degraded conditions, operators adapt to compensate. Success reinforces the adaptation, masking underlying fragility. Ironically, high-performing teams may drift faster, because their skill absorbs design weakness.</p>
+                <p>Given that drift is systematic, normalization is predictable, and weak signals are identifiable, the question becomes: how should an organization design a detection system that surfaces emerging risk before it manifests as incident? Drawing from <span class="tip" data-tip="High Reliability Organization: Organizations that operate in hazardous conditions with fewer than expected accidents through mindful practices">HRO</span> principles<a href="#ref11" class="src-ref">[11]</a> and the <span class="tip" data-tip="Safety Management System: Systematic approach to managing safety, including organizational structures, accountabilities, policies, and procedures">SMS</span> frameworks of <span class="tip" data-tip="International Atomic Energy Agency: The world's central intergovernmental forum for scientific and technical cooperation in the nuclear field">IAEA</span><a href="#ref14" class="src-ref">[14]</a> and <span class="tip" data-tip="International Civil Aviation Organization: UN specialized agency managing the administration and governance of international civil aviation">ICAO</span><a href="#ref15" class="src-ref">[15]</a>, we propose a five-component detection architecture.</p>
 
-                <h2>8. Leading Indicators That Actually Matter</h2>
-                <div class="result-box">
-                    <h4>Effective leading indicators focus on system health, not outcomes:</h4>
-                    <ul>
-                        <li><strong>MTTR variance</strong> — not just averages</li>
-                        <li><strong>Escalation latency</strong> — time to first decision</li>
-                        <li><strong>Deviation backlog size</strong> — accumulated technical debt</li>
-                        <li><strong>Alarm rationalization debt</strong> — unaddressed alarm issues</li>
-                        <li><strong>Technical debt aging</strong> — how long deviations persist</li>
-                        <li><strong>RCA recurrence suppression</strong> — learning effectiveness</li>
-                    </ul>
-                    <p>These indicators reveal trajectory, not just history.</p>
+                <h3>9.1 Component 1: Safe Reporting Channels</h3>
+                <p>The foundation of any detection system is the willingness and ability of front-line personnel to report anomalies, near-misses, and concerns without fear of reprisal. This requires:</p>
+                <ul>
+                    <li>Anonymous or confidential reporting mechanisms</li>
+                    <li>Explicit organizational commitment to non-punitive reporting</li>
+                    <li>Visible response to reported concerns (closing the feedback loop)</li>
+                    <li>Regular communication about the value of reporting</li>
+                </ul>
+
+                <h3>9.2 Component 2: Structured Near-Miss Capture</h3>
+                <p>Near-miss events are the most valuable leading indicator available, because they represent actual system failures that were intercepted before consequence. Structured capture requires:</p>
+                <ul>
+                    <li>Standardized near-miss classification taxonomy</li>
+                    <li>Low-friction reporting tools (mobile, simple, rapid)</li>
+                    <li>Dedicated analysis resource (not ad hoc review)</li>
+                    <li>Trend analysis across reports (pattern recognition)</li>
+                </ul>
+
+                <h3>9.3 Component 3: Trend Analysis Over Time</h3>
+                <p>Individual data points are less informative than trends. A detection system must track key indicators over time and alert on trajectory changes, not just threshold breaches:</p>
+                <ul>
+                    <li><span class="tip" data-tip="Mean Time To Repair: Average time to restore a failed system to full operational capability">MTTR</span> variance (not just average)</li>
+                    <li>Alarm frequency trends (increasing nuisance alarms)</li>
+                    <li>Work order completion time distributions</li>
+                    <li>Training completion and competency assessment trends</li>
+                </ul>
+
+                <h3>9.4 Component 4: Explicit Anomaly Ownership</h3>
+                <p>Every identified weak signal must have an owner&mdash;a specific individual or team responsible for investigation, disposition, and closure. Without ownership, signals enter what Turner<a href="#ref13" class="src-ref">[13]</a> called the "organizational void"&mdash;observed but unacted upon.</p>
+
+                <h3>9.5 Component 5: Independent Safety Assessment</h3>
+                <p>Periodic assessment by individuals or teams not embedded in day-to-day operations. This addresses the normalization problem: people embedded in the system cannot see the drift because they are part of it. Independent assessors&mdash;whether internal safety teams, peer reviewers from other sites, or external auditors&mdash;provide the outside perspective necessary to identify normalized deviance.</p>
+
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Design Principle
+                    </div>
+                    <p>The goal of a detection system is not to eliminate risk&mdash;that is impossible in complex systems. The goal is to make risk visible. An organization that can see its risk can manage it. An organization that cannot see its risk is managing an illusion.</p>
                 </div>
 
-                <h2>9. Case Pattern: Green Dashboards Before Failure</h2>
-                <p>Across multiple major incidents, post-event analysis reveals the same story:</p>
-                <ul>
-                    <li>Dashboards were green</li>
-                    <li>Audits were passed</li>
-                    <li>Confidence was high</li>
-                </ul>
-                <p>Weak signals were present, but unmeasured, unowned, or normalized.</p>
+                <!-- Section 10: Effective Leading Indicators -->
+                <h2 id="effective-leading"><span class="section-number">10</span> Effective Leading Indicators</h2>
 
-                <h2>10. Designing a Weak-Signal Detection System</h2>
-                <p>Resilient organizations deliberately surface weak signals:</p>
-                <ul>
-                    <li><strong>Safe reporting channels</strong> — encourage disclosure</li>
-                    <li><strong>Structured near-miss capture</strong> — formal documentation</li>
-                    <li><strong>Trend analysis over time</strong> — pattern recognition</li>
-                    <li><strong>Explicit ownership of anomalies</strong> — accountability</li>
-                </ul>
-                <p>The goal is not alarmism, but sensitivity to change.</p>
+                <p>Based on the theoretical foundations established in the preceding sections, we propose eight leading indicators specifically designed for critical facility operations. Each indicator includes a measurement method, a target range, and a rationale grounded in safety science.</p>
 
-                <h2>11. Conclusion</h2>
-                <blockquote>
-                    "'No incident' is a lagging comfort. Safety lives in signals that precede failure, not in the absence of visible harm. Organizations that learn to see weak signals trade false confidence for true resilience."
-                </blockquote>
-
-                <div class="references">
-                    <h3>References</h3>
-                    <ul>
-                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents.</li>
-                        <li>Hollnagel, E. (2014). Safety-I and Safety-II.</li>
-                        <li>Dekker, S. (2011). Drift into Failure.</li>
-                        <li>Weick, K. E., & Sutcliffe, K. M. (2015). Managing the Unexpected.</li>
-                        <li>Leveson, N. (2011). Engineering a Safer World.</li>
-                    </ul>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Indicator</th>
+                                <th>Measurement</th>
+                                <th>Target</th>
+                                <th>Rationale</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">1</td>
+                                <td><strong>Near-miss report rate</strong></td>
+                                <td>Reports per month per 100 staff</td>
+                                <td style="color: #10b981;">&ge; 10</td>
+                                <td>Indicates reporting culture health; declining rates signal suppression</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">2</td>
+                                <td><strong>Weak signal identification rate</strong></td>
+                                <td>Documented weak signals per month</td>
+                                <td style="color: #10b981;">&ge; 15</td>
+                                <td>Measures organizational sensitivity to emerging risk per the taxonomy</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">3</td>
+                                <td><strong>Open audit finding count</strong></td>
+                                <td>Unresolved findings at month-end</td>
+                                <td style="color: #10b981;">&le; 5</td>
+                                <td>Proxy for organizational capacity to close gaps; rising count indicates overload</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">4</td>
+                                <td><strong>Safety training hours</strong></td>
+                                <td>Hours per person per quarter</td>
+                                <td style="color: #10b981;">&ge; 20</td>
+                                <td>Competency maintenance; declining hours correlate with procedural drift</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">5</td>
+                                <td><strong>Management safety walks</strong></td>
+                                <td>Walks per month per facility</td>
+                                <td style="color: #10b981;">&ge; 8</td>
+                                <td>Demonstrates leadership commitment; provides independent observation data</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">6</td>
+                                <td><strong>Hazard action close rate</strong></td>
+                                <td>% of identified hazards resolved within SLA</td>
+                                <td style="color: #10b981;">&ge; 85%</td>
+                                <td>Measures responsiveness to identified risk; declining rate indicates normalization</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">7</td>
+                                <td><strong>Safety meeting frequency</strong></td>
+                                <td>Scheduled meetings per month</td>
+                                <td style="color: #10b981;">Weekly</td>
+                                <td>Maintains organizational attention to safety; less frequent meetings correlate with drift</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--accent-purple); font-weight: 700;">8</td>
+                                <td><strong><span class="tip" data-tip="Mean Time To Repair: Average time to restore a failed system to full operational capability">MTTR</span> variance coefficient</strong></td>
+                                <td>Standard deviation / mean of repair times</td>
+                                <td style="color: #10b981;">&le; 0.3</td>
+                                <td>High variance indicates inconsistent competency or process; trending up indicates degradation</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <!-- Newsletter Signup -->
-                <div class="newsletter-signup">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
-                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
+                <div class="formula-box">
+                    <div class="formula-box-title">Leading Indicator Health Score Composite Formula</div>
+                    <code>
+                        Safety Health Index = Sum of weighted dimension scores (0-100)<br><br>
+                        Near-miss score     = min(100, reports/10 * 100) * 0.15<br>
+                        Weak signal score   = min(100, signals/15 * 100) * 0.15<br>
+                        Audit score         = max(0, (1 - findings/30) * 100) * 0.10<br>
+                        Training score      = min(100, hours/20 * 100) * 0.15<br>
+                        Walk score          = min(100, walks/8 * 100) * 0.10<br>
+                        Hazard score        = hazardRate * 0.20<br>
+                        Meeting score       = meetingMap[frequency] * 0.15<br><br>
+                        Total = sum of all weighted scores (range: 0-100)
+                    </code>
+                </div>
+
+                <p>The critical observation is that these indicators are designed to move <em>before</em> an incident occurs. A declining Safety Health Index during an incident-free period is precisely the paradox this paper addresses: the leading indicators are deteriorating while the lagging indicators remain green. This is the drift-to-failure pattern in quantitative form.</p>
+
+                <!-- Section 11: Calculator -->
+                <h2 id="calculator"><span class="section-number">11</span> Safety Health Index Calculator</h2>
+
+                <p>Use this interactive calculator to assess your facility's Safety Health Index. Enter your current operational metrics to receive a composite score, drift probability assessment, culture classification, and trajectory projection. Pay particular attention to the paradox warning&mdash;it activates when extended incident-free periods coincide with low safety health scores, revealing the exact condition this paper identifies as most dangerous.</p>
+
+                <div class="calculator-section">
+                    <div class="calculator-title">Safety Health Index Calculator</div>
+                    <div class="calculator-subtitle">Quantifying the gap between perceived safety and actual system health</div>
+
+                    <div class="calc-grid">
+                        <div class="calc-input-group">
+                            <label class="calc-label">Near-miss Reports / Month</label>
+                            <input type="number" id="calcNearMiss" class="calc-input" value="3" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Weak Signals / Month</label>
+                            <input type="number" id="calcWeakSignals" class="calc-input" value="5" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Open Audit Findings</label>
+                            <input type="number" id="calcAudit" class="calc-input" value="12" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Training Hrs / Quarter</label>
+                            <input type="number" id="calcTraining" class="calc-input" value="8" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Incident-Free Days</label>
+                            <input type="number" id="calcDays" class="calc-input" value="365" min="0" max="3650">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Mgmt Walkarounds / Month</label>
+                            <input type="number" id="calcWalks" class="calc-input" value="2" min="0" max="30">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Hazard Action Rate %</label>
+                            <input type="number" id="calcHazard" class="calc-input" value="60" min="0" max="100">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Safety Meeting Frequency</label>
+                            <select id="calcMeeting" class="calc-select">
+                                <option value="None">None</option>
+                                <option value="Monthly" selected>Monthly</option>
+                                <option value="Bi-weekly">Bi-weekly</option>
+                                <option value="Weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Gauge -->
+                    <div class="gauge-container">
+                        <canvas id="gaugeCanvas" width="280" height="160"></canvas>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="calc-results">
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultScore">--</div>
+                            <div class="calc-result-label">Health Score</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultDrift" style="color: #ef4444;">--</div>
+                            <div class="calc-result-label">Drift Probability</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultCulture">--</div>
+                            <div class="calc-result-label">Culture Type</div>
+                            <div id="cultureBadge"></div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultTrajectory">--</div>
+                            <div class="calc-result-label">Trajectory</div>
+                            <div id="trajectoryIndicator" class="trajectory-indicator"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dimension Bars -->
+                    <div class="dimension-bars" id="dimensionBars"></div>
+
+                    <!-- Paradox Warning -->
+                    <div class="paradox-warning" id="paradoxWarning">
+                        <div class="paradox-warning-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            SAFETY PARADOX DETECTED
+                        </div>
+                        <p id="paradoxText">Your facility has been incident-free for an extended period, but your Safety Health Index indicates significant systemic drift. This is the exact condition described by Rasmussen's drift-to-failure model: the absence of incidents is masking accumulating risk. Immediate leading indicator review is recommended.</p>
+                    </div>
+
+                    <!-- Recommended Indicators -->
+                    <div id="recommendations" style="margin-top: 1.5rem; padding: 1.25rem; background: rgba(139, 92, 246, 0.1); border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2); display: none;">
+                        <div style="color: #a78bfa; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem;">Priority Improvement Areas</div>
+                        <ul id="recList" style="color: #94a3b8; font-size: 0.85rem; margin: 0; padding-left: 1.25rem;"></ul>
+                    </div>
+                </div>
+
+                <!-- Section 12: Proactive Safety Culture -->
+                <h2 id="proactive-culture"><span class="section-number">12</span> Proactive Safety Culture (Westrum Typology)</h2>
+
+                <p>The theoretical and practical frameworks presented in this paper converge on a single conclusion: the transition from lagging-indicator dependence to leading-indicator competence requires a fundamental cultural transformation. Ron Westrum's organizational culture typology<a href="#ref16" class="src-ref">[16]</a> provides the most widely-used framework for understanding where an organization sits on this spectrum and what is required to advance.</p>
+
+                <h3>12.1 Westrum's Three Culture Types</h3>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card" style="border-left: 4px solid #ef4444;">
+                        <h4 style="color: #ef4444; margin-top: 0;">Pathological</h4>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Power-oriented:</strong> Information is a personal resource to be hoarded for advantage.</p>
+                        <ul style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; padding-left: 1rem;">
+                            <li>Messengers are "shot" (penalized for bad news)</li>
+                            <li>Responsibilities are shirked</li>
+                            <li>Bridging between teams is discouraged</li>
+                            <li>Failure leads to scapegoating</li>
+                            <li>Novelty is crushed</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #f59e0b;">
+                        <h4 style="color: #f59e0b; margin-top: 0;">Bureaucratic</h4>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Rule-oriented:</strong> Information flows through channels. Standard processes are followed.</p>
+                        <ul style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; padding-left: 1rem;">
+                            <li>Messengers are tolerated</li>
+                            <li>Responsibilities are compartmentalized</li>
+                            <li>Bridging is allowed but not encouraged</li>
+                            <li>Failure leads to justice</li>
+                            <li>Novelty creates problems</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card" style="border-left: 4px solid #10b981;">
+                        <h4 style="color: #10b981; margin-top: 0;">Generative</h4>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Performance-oriented:</strong> Information is actively sought and shared to improve outcomes.</p>
+                        <ul style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; padding-left: 1rem;">
+                            <li>Messengers are trained and rewarded</li>
+                            <li>Responsibilities are shared across teams</li>
+                            <li>Bridging between teams is actively rewarded</li>
+                            <li>Failure leads to inquiry (not blame)</li>
+                            <li>Novelty is implemented and shared</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>12.2 Implications for Safety Indicator Programs</h3>
+
+                <p>Westrum's typology has direct implications for the feasibility and effectiveness of leading indicator programs:</p>
+
+                <p>In <strong>pathological</strong> organizations, leading indicator programs will fail because the information they generate threatens power structures. Near-miss reports will be suppressed. Audit findings will be buried. The organization's immune system will reject the feedback mechanism. Safety Health Index scores in the 0-55 range typically correlate with this culture type.</p>
+
+                <p>In <strong>bureaucratic</strong> organizations, leading indicator programs can function mechanistically&mdash;data is collected, reports are generated, meetings are held&mdash;but the information rarely drives genuine change. The metrics become compliance artifacts rather than decision-making tools. Scores in the 55-80 range often reflect this culture.</p>
+
+                <p>In <strong>generative</strong> organizations, leading indicators are valued precisely because they provide early warning. Bad news is welcomed. Declining indicators trigger investigation, not blame. The Safety Health Index becomes a genuine operational tool rather than a compliance checklist. Scores above 80 typically reflect this culture type.</p>
+
+                <h3>12.3 The Culture-Indicator Feedback Loop</h3>
+
+                <p>The relationship between culture and indicators is not one-directional. Implementing a leading indicator program can itself shift organizational culture, provided leadership demonstrates genuine commitment to acting on the information. When operators see that their near-miss reports lead to visible improvements, reporting increases. When audit findings are closed promptly, the value of the audit process is reinforced. Each cycle builds trust in the system, moving the organization from bureaucratic compliance toward generative engagement.</p>
+
+                <p>Conversely, implementing leading indicators in a pathological culture without addressing the underlying power dynamics will produce gaming, suppression, and cynicism&mdash;actively worsening the safety culture rather than improving it. As Westrum<a href="#ref16" class="src-ref">[16]</a> emphasizes, the culture determines how information flows, and information flow determines whether safety indicators function as intended.</p>
+
+                <!-- Section 13: Conclusion -->
+                <h2 id="conclusion"><span class="section-number">13</span> Conclusion</h2>
+
+                <div class="conclusion-box">
+                    <h3>The Central Argument Summarized</h3>
+
+                    <p>"No incident" is a lagging indicator masquerading as a safety statement. It tells us that boundaries have not been crossed. It tells us nothing about how close to those boundaries the organization is operating, how fast it is drifting toward them, or how many normalized deviances have accumulated along the way.</p>
+
+                    <p>This paper has demonstrated, through the theoretical frameworks of Rasmussen<a href="#ref1" class="src-ref">[1]</a>, Vaughan<a href="#ref2" class="src-ref">[2]</a>, Hollnagel<a href="#ref3" class="src-ref">[3]</a>, Reason<a href="#ref4" class="src-ref">[4]</a>, Dekker<a href="#ref9" class="src-ref">[9]</a>, and Weick &amp; Sutcliffe<a href="#ref11" class="src-ref">[11]</a>, that:</p>
+
+                    <ol>
+                        <li><strong>Drift is systematic:</strong> Organizations under production pressure inevitably migrate toward safety boundaries. The drift is not random&mdash;it is driven by predictable forces (economic gradient, least-effort gradient) and follows a predictable trajectory.</li>
+                        <li><strong>Normalization masks drift:</strong> As deviations accumulate without consequence, they are reclassified from "deviance" to "normal." The organization loses the ability to perceive its own degradation.</li>
+                        <li><strong>Weak signals precede failure:</strong> Every major failure is preceded by an incubation period during which detectable signals are present. The question is whether the organization has the structures, culture, and will to detect and act on them.</li>
+                        <li><strong>Leading indicators can reveal the invisible:</strong> A well-designed set of leading indicators&mdash;measuring near-miss reporting, weak signal detection, audit health, training investment, management engagement, hazard closure, and meeting cadence&mdash;can make the invisible drift visible.</li>
+                        <li><strong>Culture determines effectiveness:</strong> The Westrum typology demonstrates that leading indicators function as intended only in organizational cultures that value information flow and respond to bad news with inquiry rather than blame.</li>
+                    </ol>
+
+                    <p>For data center operators managing <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span>, <span class="tip" data-tip="Power Distribution Unit: Device that distributes electric power to rack-mounted equipment in data centers">PDU</span>, <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span>, <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span>, and associated infrastructure, the practical implication is clear: <strong>celebrate incident-free periods cautiously, and complement them with rigorous leading indicator programs that measure the conditions under which the next incident becomes possible.</strong></p>
+
+                    <p>Safety lives in signals that precede failure, not in the absence of visible harm. Organizations that learn to see weak signals trade false confidence for true resilience. Those that do not will continue to be surprised by failures that, in retrospect, were always visible&mdash;just not measured.</p>
+                </div>
+
+                <!-- References -->
+                <div class="references-section" id="references">
+                    <h3 class="references-title">References</h3>
+                    <ol class="ref-list">
+                        <li id="ref1">Rasmussen, J. (1997). "Risk Management in a Dynamic Society: A Modelling Problem." <em>Safety Science</em>, 27(2-3), 183-213.</li>
+                        <li id="ref2">Vaughan, D. (1996). <em>The Challenger Launch Decision: Risky Technology, Culture, and Deviance at NASA.</em> University of Chicago Press.</li>
+                        <li id="ref3">Hollnagel, E. (2014). <em>Safety-I and Safety-II: The Past and Future of Safety Management.</em> Ashgate Publishing.</li>
+                        <li id="ref4">Reason, J. (1997). <em>Managing the Risks of Organizational Accidents.</em> Ashgate Publishing.</li>
+                        <li id="ref5">Uptime Institute. (2023). <em>Annual Outage Analysis 2023.</em> Uptime Institute Research.</li>
+                        <li id="ref6">Uptime Institute. (2024). <em>Annual Outage Analysis 2024.</em> Uptime Institute Research.</li>
+                        <li id="ref7">Health and Safety Executive. (2005). <em>A Review of Safety Culture and Safety Climate Literature for the Development of the Safety Culture Inspection Toolkit.</em> Research Report 367.</li>
+                        <li id="ref8">Hudson, P. (2007). "Implementing a Safety Culture in a Major Multi-National." <em>Safety Science</em>, 45(6), 697-722.</li>
+                        <li id="ref9">Dekker, S. (2011). <em>Drift into Failure: From Hunting Broken Components to Understanding Complex Systems.</em> Ashgate Publishing.</li>
+                        <li id="ref10">Perrow, C. (1999). <em>Normal Accidents: Living with High-Risk Technologies.</em> Princeton University Press (Updated Edition).</li>
+                        <li id="ref11">Weick, K. E., &amp; Sutcliffe, K. M. (2007). <em>Managing the Unexpected: Resilient Performance in an Age of Uncertainty.</em> 2nd Edition. Jossey-Bass.</li>
+                        <li id="ref12">Leveson, N. (2011). <em>Engineering a Safer World: Systems Thinking Applied to Safety.</em> MIT Press.</li>
+                        <li id="ref13">Turner, B. A. (1978). <em>Man-Made Disasters.</em> Wykeham Publications.</li>
+                        <li id="ref14">IAEA. (2016). <em>Leadership and Management for Safety.</em> IAEA Safety Standards Series No. GSR Part 2.</li>
+                        <li id="ref15">ICAO. (2018). <em>Safety Management Manual (SMM).</em> Doc 9859, 4th Edition.</li>
+                        <li id="ref16">Westrum, R. (2004). "A Typology of Organisational Cultures." <em>Quality &amp; Safety in Health Care</em>, 13(suppl 2), ii22-ii27.</li>
+                    </ol>
                 </div>
 
                 <!-- Author Bio -->
-                <div class="author-bio">
-                    <div class="author-bio-image">
-                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
-                    </div>
-                    <div class="author-bio-content">
+                <div class="author-bio-section">
+                    <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
+                    <div>
                         <h4>Bagus Dwi Permana</h4>
-                        <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
-                        <div class="author-bio-links">
-                            <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                                LinkedIn
-                            </a>
-                            <a href="https://github.com/baguspermana7-cpu" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                                GitHub
-                            </a>
-                            <a href="mailto:baguspermana7@gmail.com">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                Email
-                            </a>
-                        </div>
+                        <p>Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik (Indonesian Electrical Safety Expert) and CDFOM. This paper synthesizes foundational safety science theory with practical operational experience to provide actionable frameworks for proactive safety management in data center environments.</p>
                     </div>
                 </div>
 
-                <!-- Related Articles -->
-                <div class="related-articles">
-                    <h3>Continue Reading</h3>
-                    <div class="related-grid">
-                        <a href="article-7.html" class="related-card">
-                            <div class="related-card-number">07</div>
-                            <div class="related-card-content">
-                                <h4>From Reliability to Resilience: Why Tier Ratings Stop at Design</h4>
-                                <p>Resilience as operational achievement</p>
-                            </div>
-                        </a>
-                        <a href="article-9.html" class="related-card">
-                            <div class="related-card-number">09</div>
-                            <div class="related-card-content">
-                                <h4>The HVAC Shock: "No Chillers" Doesn't Mean "No Cooling"</h4>
-                                <p>Understanding data center cooling evolution</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="article-nav">
-                    <a href="article-7.html">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                        Previous Article
-                    </a>
-                    <a href="article-9.html">
-                        Next Article
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
             </div>
         </div>
     </article>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
-                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Bagus Dwi Permana</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience spanning industrial engineering and critical facilities operations.</p>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Insights</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="articles.html" style="color: #06b6d4; text-decoration: none;">Engineering Journal</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="geopolitics.html" style="color: #ef4444; text-decoration: none;">Global Analysis</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Connect</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/" target="_blank" style="color: #94a3b8; text-decoration: none;">LinkedIn</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="mailto:baguspermana7@gmail.com" style="color: #94a3b8; text-decoration: none;">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="margin: 0;">&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -754,206 +1925,319 @@
     function shareWhatsApp(){const d=getShareData();window.open(`https://wa.me/?text=${encodeURIComponent(d.title+'\n\n'+d.url)}`,'_blank')}
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
+
+    <!-- Interactive Chart Script -->
     <script>
     (function() {
-        const canvas = document.getElementById('signalChart');
+        const canvas = document.getElementById('safetyHealthChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const signalSlider = document.getElementById('signalSlider');
-        const signalValue = document.getElementById('signalValue');
-        const percGap = document.getElementById('percGap');
-        const sigLevel = document.getElementById('sigLevel');
-        const riskStatus = document.getElementById('riskStatus');
+        const driftSlider = document.getElementById('driftSlider');
+        const suppressionSlider = document.getElementById('suppressionSlider');
+        const driftValue = document.getElementById('driftValue');
+        const suppressionValue = document.getElementById('suppressionValue');
+        const chartGap = document.getElementById('chartGap');
+        const chartDrift = document.getElementById('chartDrift');
+        const chartRisk = document.getElementById('chartRisk');
+        const chartTime = document.getElementById('chartTime');
 
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
-
-        const W = rect.width;
-        const H = rect.height;
+        function setupCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            return rect;
+        }
+        let rect = setupCanvas();
         const padding = { top: 50, right: 60, bottom: 60, left: 80 };
-        const chartW = W - padding.left - padding.right;
-        const chartH = H - padding.top - padding.bottom;
 
-        function simulate(rate) {
-            let perceived = [], weak = [];
-            let perceivedVal = 90;
-            let weakVal = 10;
-
-            for (let i = 0; i < 12; i++) {
-                perceived.push(perceivedVal);
-                weakVal += rate / 15;
-                weak.push(weakVal);
+        function simulate(drift, suppression) {
+            let perceived = [], actual = [];
+            let p = 92, a = 88;
+            for (let i = 0; i < 24; i++) {
+                p = Math.max(60, p - (drift * 0.005) + (suppression * 0.01));
+                a = Math.max(10, a - (drift * 0.12) - (suppression * 0.05));
+                perceived.push(p);
+                actual.push(a);
             }
-            return { perceived, weak };
+            return { perceived, actual };
         }
 
-        function drawChart(rate) {
-            ctx.clearRect(0, 0, W, H);
+        function drawChart() {
+            const drift = parseInt(driftSlider.value);
+            const suppression = parseInt(suppressionSlider.value);
+            driftValue.textContent = drift + '%';
+            suppressionValue.textContent = suppression + '%';
 
-            // Background
-            ctx.fillStyle = 'rgba(2, 6, 23, 0.5)';
-            ctx.fillRect(0, 0, W, H);
+            const W = rect.width, H = rect.height;
+            const chartW = W - padding.left - padding.right;
+            const chartH = H - padding.top - padding.bottom;
+            ctx.clearRect(0, 0, W, H);
 
             // Grid
             ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 5; i++) {
                 const y = padding.top + (chartH / 5) * i;
-                ctx.beginPath();
-                ctx.moveTo(padding.left, y);
-                ctx.lineTo(W - padding.right, y);
-                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(W - padding.right, y); ctx.stroke();
             }
 
-            // Danger zone
-            const dangerY = padding.top + chartH - (70 / 100) * chartH;
-            ctx.fillStyle = 'rgba(239, 68, 68, 0.1)';
-            ctx.fillRect(padding.left, padding.top, chartW, dangerY - padding.top);
+            // Critical threshold
+            const threshY = padding.top + chartH - (40 / 100) * chartH;
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
+            ctx.fillRect(padding.left, threshY, chartW, padding.top + chartH - threshY);
             ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
             ctx.setLineDash([6, 6]);
-            ctx.beginPath();
-            ctx.moveTo(padding.left, dangerY);
-            ctx.lineTo(W - padding.right, dangerY);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(padding.left, threshY); ctx.lineTo(W - padding.right, threshY); ctx.stroke();
             ctx.setLineDash([]);
-            ctx.fillStyle = '#ef4444';
-            ctx.font = '11px Inter, system-ui, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Danger Zone', padding.left + 10, dangerY + 15);
+            ctx.fillStyle = '#ef4444'; ctx.font = '11px Inter, sans-serif'; ctx.textAlign = 'left';
+            ctx.fillText('Critical Threshold (40%)', padding.left + 10, threshY - 6);
 
             // Y-axis labels
-            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
-            ctx.font = '12px Inter, system-ui, sans-serif';
-            ctx.textAlign = 'right';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)'; ctx.font = '12px Inter, sans-serif'; ctx.textAlign = 'right';
             for (let i = 0; i <= 5; i++) {
                 const y = padding.top + (chartH / 5) * i;
-                const val = 100 - i * 20;
-                ctx.fillText(val, padding.left - 10, y + 4);
+                ctx.fillText(100 - i * 20, padding.left - 10, y + 4);
             }
-
-            // Y-axis title
-            ctx.save();
-            ctx.translate(25, H / 2);
-            ctx.rotate(-Math.PI / 2);
-            ctx.textAlign = 'center';
-            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
-            ctx.fillText('Level', 0, 0);
-            ctx.restore();
 
             // X-axis labels
-            ctx.textAlign = 'center';
-            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
-            for (let i = 0; i < 12; i++) {
-                const x = padding.left + (chartW / 11) * i;
+            ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            for (let i = 0; i < 24; i += 3) {
+                const x = padding.left + (chartW / 23) * i;
                 ctx.fillText('M' + (i + 1), x, H - padding.bottom + 25);
             }
-
-            // X-axis title
             ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
             ctx.fillText('Time (Months)', W / 2, H - 15);
 
-            // Get data
-            const { perceived, weak } = simulate(rate);
+            const { perceived, actual } = simulate(drift, suppression);
 
-            // Draw perceived safety line (green)
-            ctx.strokeStyle = '#22c55e';
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            // Draw perceived (green)
+            ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
             ctx.beginPath();
-            for (let i = 0; i < perceived.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
-                const y = padding.top + chartH - (perceived[i] / 100) * chartH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
+            perceived.forEach((v, i) => {
+                const x = padding.left + (chartW / 23) * i;
+                const y = padding.top + chartH - (v / 100) * chartH;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
             ctx.stroke();
 
-            // Draw weak signals line (amber)
-            ctx.strokeStyle = '#f59e0b';
+            // Draw actual (purple)
+            ctx.strokeStyle = '#8b5cf6';
             ctx.beginPath();
-            for (let i = 0; i < weak.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
-                const y = padding.top + chartH - (weak[i] / 100) * chartH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
+            actual.forEach((v, i) => {
+                const x = padding.left + (chartW / 23) * i;
+                const y = padding.top + chartH - (v / 100) * chartH;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
             ctx.stroke();
 
-            // Draw points
-            ctx.fillStyle = '#22c55e';
-            for (let i = 0; i < perceived.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
-                const y = padding.top + chartH - (perceived[i] / 100) * chartH;
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            ctx.fillStyle = '#f59e0b';
-            for (let i = 0; i < weak.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
-                const y = padding.top + chartH - (weak[i] / 100) * chartH;
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            // Points
+            [{ data: perceived, color: '#22c55e' }, { data: actual, color: '#8b5cf6' }].forEach(({ data, color }) => {
+                ctx.fillStyle = color;
+                data.forEach((v, i) => {
+                    if (i % 3 === 0) {
+                        const x = padding.left + (chartW / 23) * i;
+                        const y = padding.top + chartH - (v / 100) * chartH;
+                        ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
+                    }
+                });
+            });
 
             // End labels
-            const lastPerc = perceived[perceived.length - 1];
-            const lastWeak = weak[weak.length - 1];
-            const lastX = padding.left + chartW;
+            const lp = perceived[23], la = actual[23];
+            ctx.font = 'bold 11px Inter, sans-serif'; ctx.textAlign = 'left';
+            ctx.fillStyle = '#22c55e'; ctx.fillText(Math.round(lp) + '%', W - padding.right + 8, padding.top + chartH - (lp / 100) * chartH + 4);
+            ctx.fillStyle = '#8b5cf6'; ctx.fillText(Math.round(la) + '%', W - padding.right + 8, padding.top + chartH - (la / 100) * chartH + 4);
 
-            ctx.font = 'bold 11px Inter, system-ui, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillStyle = '#22c55e';
-            ctx.fillText(Math.round(lastPerc) + '%', lastX + 8, padding.top + chartH - (lastPerc / 100) * chartH + 4);
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillText(Math.round(lastWeak) + '%', lastX + 8, padding.top + chartH - (lastWeak / 100) * chartH + 4);
+            // Callouts
+            const gap = Math.round(lp - la);
+            chartGap.textContent = gap + '%';
+            if (la < 30) { chartDrift.textContent = 'Critical'; chartDrift.style.color = '#ef4444'; chartRisk.textContent = 'Imminent'; chartRisk.style.color = '#ef4444'; }
+            else if (la < 50) { chartDrift.textContent = 'High'; chartDrift.style.color = '#f59e0b'; chartRisk.textContent = 'Elevated'; chartRisk.style.color = '#f59e0b'; }
+            else { chartDrift.textContent = 'Moderate'; chartDrift.style.color = '#8b5cf6'; chartRisk.textContent = 'Latent'; chartRisk.style.color = '#8b5cf6'; }
+            // Time to boundary estimate
+            if (la <= 40) chartTime.textContent = 'NOW';
+            else { const moLeft = Math.round((la - 40) / ((88 - la) / 24 || 1)); chartTime.textContent = '~' + Math.max(1, Math.min(moLeft, 36)) + ' mo'; }
+        }
 
-            // Update callouts
-            const gap = lastPerc - lastWeak;
-            percGap.textContent = Math.round(gap) + '%';
+        driftSlider.addEventListener('input', drawChart);
+        suppressionSlider.addEventListener('input', drawChart);
+        drawChart();
+        window.addEventListener('resize', () => { rect = setupCanvas(); drawChart(); });
+    })();
+    </script>
 
-            if (lastWeak >= 70) {
-                sigLevel.textContent = 'Critical';
-                sigLevel.style.color = '#ef4444';
-                riskStatus.textContent = 'Imminent';
-                riskStatus.style.color = '#ef4444';
-            } else if (lastWeak >= 50) {
-                sigLevel.textContent = 'High';
-                sigLevel.style.color = '#f59e0b';
-                riskStatus.textContent = 'Growing';
-                riskStatus.style.color = '#f59e0b';
+    <!-- Safety Health Index Calculator Script -->
+    <script>
+    (function() {
+        const ids = ['calcNearMiss','calcWeakSignals','calcAudit','calcTraining','calcDays','calcWalks','calcHazard','calcMeeting'];
+        const meetingMap = { 'None': 0, 'Monthly': 40, 'Bi-weekly': 70, 'Weekly': 100 };
+        const dimLabels = ['Near-Miss','Weak Signals','Audit Health','Training','Walkarounds','Hazard Rate','Meetings'];
+
+        function calculate() {
+            const reports = parseFloat(document.getElementById('calcNearMiss').value) || 0;
+            const signals = parseFloat(document.getElementById('calcWeakSignals').value) || 0;
+            const findings = parseFloat(document.getElementById('calcAudit').value) || 0;
+            const hours = parseFloat(document.getElementById('calcTraining').value) || 0;
+            const days = parseFloat(document.getElementById('calcDays').value) || 0;
+            const walks = parseFloat(document.getElementById('calcWalks').value) || 0;
+            const hazardRate = parseFloat(document.getElementById('calcHazard').value) || 0;
+            const freq = document.getElementById('calcMeeting').value;
+
+            // Calculate dimension scores (raw 0-100)
+            const nearMissRaw = Math.min(100, (reports / 10) * 100);
+            const weakSignalRaw = Math.min(100, (signals / 15) * 100);
+            const auditRaw = Math.max(0, (1 - findings / 30) * 100);
+            const trainingRaw = Math.min(100, (hours / 20) * 100);
+            const walkRaw = Math.min(100, (walks / 8) * 100);
+            const hazardRaw = hazardRate;
+            const meetingRaw = meetingMap[freq] || 0;
+
+            // Weighted scores
+            const nearMissScore = nearMissRaw * 0.15;
+            const weakSignalScore = weakSignalRaw * 0.15;
+            const auditScore = auditRaw * 0.10;
+            const trainingScore = trainingRaw * 0.15;
+            const walkScore = walkRaw * 0.10;
+            const hazardScore = hazardRaw * 0.20;
+            const meetingScore = meetingRaw * 0.15;
+
+            const totalScore = nearMissScore + weakSignalScore + auditScore + trainingScore + walkScore + hazardScore + meetingScore;
+            const dimScores = [nearMissRaw, weakSignalRaw, auditRaw, trainingRaw, walkRaw, hazardRaw, meetingRaw];
+
+            // Drift probability (PARADOX logic)
+            let drift;
+            if (days > 180 && totalScore < 50) {
+                drift = 0.6 + (days / 1000) * 0.3;
+            } else if (days > 365 && totalScore < 70) {
+                drift = 0.3 + (days / 2000) * 0.3;
             } else {
-                sigLevel.textContent = 'Moderate';
-                sigLevel.style.color = '#a855f7';
-                riskStatus.textContent = 'Hidden';
-                riskStatus.style.color = '#a855f7';
+                drift = Math.max(0.05, 0.4 - totalScore / 250);
             }
+            drift = Math.min(drift, 0.99);
+
+            // Culture type
+            let culture, cultureClass;
+            if (totalScore >= 80) { culture = 'Generative'; cultureClass = 'generative'; }
+            else if (totalScore >= 55) { culture = 'Bureaucratic'; cultureClass = 'bureaucratic'; }
+            else { culture = 'Pathological'; cultureClass = 'pathological'; }
+
+            // Trajectory
+            let trajectory, trajClass, trajArrow;
+            if (drift > 0.5) { trajectory = 'Deteriorating'; trajClass = 'deteriorating'; trajArrow = '&#9660;'; }
+            else if (drift > 0.25) { trajectory = 'Stagnant'; trajClass = 'stagnant'; trajArrow = '&#9654;'; }
+            else { trajectory = 'Improving'; trajClass = 'improving'; trajArrow = '&#9650;'; }
+
+            // Update display
+            document.getElementById('resultScore').textContent = Math.round(totalScore);
+            document.getElementById('resultScore').style.color = totalScore >= 80 ? '#34d399' : totalScore >= 55 ? '#fbbf24' : '#f87171';
+            document.getElementById('resultDrift').textContent = (drift * 100).toFixed(1) + '%';
+            document.getElementById('resultCulture').textContent = culture;
+            document.getElementById('cultureBadge').innerHTML = '<span class="culture-badge ' + cultureClass + '">' + culture + '</span>';
+            document.getElementById('resultTrajectory').textContent = trajectory;
+            document.getElementById('trajectoryIndicator').innerHTML = '<span class="trajectory-arrow ' + trajClass + '">' + trajArrow + '</span><span style="color:#94a3b8;font-size:0.8rem;">' + trajectory + '</span>';
+
+            // Dimension bars
+            const barsContainer = document.getElementById('dimensionBars');
+            let barsHtml = '';
+            dimLabels.forEach((label, i) => {
+                const val = Math.round(dimScores[i]);
+                const barColor = val >= 70 ? '#10b981' : val >= 40 ? '#f59e0b' : '#ef4444';
+                barsHtml += '<div class="dimension-bar-group"><div class="dimension-bar-label">' + label + '</div><div class="dimension-bar-track"><div class="dimension-bar-fill" style="width:' + val + '%;background:' + barColor + ';"></div></div><div class="dimension-bar-value">' + val + '%</div></div>';
+            });
+            barsContainer.innerHTML = barsHtml;
+
+            // Paradox warning
+            const paradoxEl = document.getElementById('paradoxWarning');
+            if (days > 365 && totalScore < 60) {
+                paradoxEl.classList.add('visible');
+                document.getElementById('paradoxText').textContent = 'Your facility has been incident-free for ' + days + ' days, but your Safety Health Index is only ' + Math.round(totalScore) + '/100. This is the exact paradox described by Rasmussen (1997): extended incident-free periods masking systemic drift toward safety boundaries. The drift probability is ' + (drift * 100).toFixed(1) + '%. Immediate review of all leading indicators is strongly recommended.';
+            } else {
+                paradoxEl.classList.remove('visible');
+            }
+
+            // Recommendations
+            const recEl = document.getElementById('recommendations');
+            const recList = document.getElementById('recList');
+            let recs = [];
+            if (nearMissRaw < 50) recs.push('Increase near-miss reporting: current rate of ' + reports + '/month suggests reporting suppression. Target: 10+/month.');
+            if (weakSignalRaw < 50) recs.push('Implement structured weak signal capture: only ' + signals + ' signals/month documented. Target: 15+/month.');
+            if (auditRaw < 50) recs.push('Reduce open audit findings: ' + findings + ' open items indicates overloaded closure capacity. Target: <5.');
+            if (trainingRaw < 50) recs.push('Increase safety training: ' + hours + ' hrs/quarter is below minimum. Target: 20 hrs/quarter.');
+            if (walkRaw < 50) recs.push('Increase management walkarounds: only ' + walks + '/month. Target: 8/month for leadership visibility.');
+            if (hazardRaw < 70) recs.push('Improve hazard action close rate: ' + hazardRate + '% is below target. Aim for 85%+ within SLA.');
+            if (meetingRaw < 70) recs.push('Increase safety meeting frequency to at least bi-weekly (currently: ' + freq + ').');
+            if (recs.length > 0) {
+                recEl.style.display = 'block';
+                recList.innerHTML = recs.map(r => '<li>' + r + '</li>').join('');
+            } else {
+                recEl.style.display = 'none';
+            }
+
+            // Draw gauge
+            drawGauge(totalScore);
         }
 
-        function refresh() {
-            const rate = parseInt(signalSlider.value);
-            signalValue.textContent = rate + '%';
-            drawChart(rate);
+        function drawGauge(score) {
+            const gc = document.getElementById('gaugeCanvas');
+            if (!gc) return;
+            const gctx = gc.getContext('2d');
+            const w = 280, h = 160;
+            gc.width = w * (window.devicePixelRatio || 1);
+            gc.height = h * (window.devicePixelRatio || 1);
+            gctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+            gc.style.width = w + 'px';
+            gc.style.height = h + 'px';
+            gctx.clearRect(0, 0, w, h);
+
+            const cx = w / 2, cy = h - 20, r = 100;
+            const startAngle = Math.PI, endAngle = 2 * Math.PI;
+
+            // Background arc
+            gctx.lineWidth = 16; gctx.lineCap = 'round';
+            gctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            gctx.beginPath(); gctx.arc(cx, cy, r, startAngle, endAngle); gctx.stroke();
+
+            // Score arc
+            const scoreAngle = startAngle + (score / 100) * Math.PI;
+            const gradient = gctx.createLinearGradient(cx - r, cy, cx + r, cy);
+            gradient.addColorStop(0, '#ef4444');
+            gradient.addColorStop(0.5, '#f59e0b');
+            gradient.addColorStop(1, '#10b981');
+            gctx.strokeStyle = gradient;
+            gctx.beginPath(); gctx.arc(cx, cy, r, startAngle, scoreAngle); gctx.stroke();
+
+            // Needle
+            const needleAngle = startAngle + (score / 100) * Math.PI;
+            const nx = cx + Math.cos(needleAngle) * (r - 25);
+            const ny = cy + Math.sin(needleAngle) * (r - 25);
+            gctx.strokeStyle = '#fff'; gctx.lineWidth = 2;
+            gctx.beginPath(); gctx.moveTo(cx, cy); gctx.lineTo(nx, ny); gctx.stroke();
+            gctx.fillStyle = '#fff'; gctx.beginPath(); gctx.arc(cx, cy, 6, 0, Math.PI * 2); gctx.fill();
+
+            // Score text
+            gctx.fillStyle = '#fff'; gctx.font = 'bold 28px Inter, sans-serif'; gctx.textAlign = 'center';
+            gctx.fillText(Math.round(score), cx, cy - 15);
+            gctx.fillStyle = '#94a3b8'; gctx.font = '12px Inter, sans-serif';
+            gctx.fillText('Safety Health Index', cx, cy + 2);
+
+            // Labels
+            gctx.fillStyle = '#ef4444'; gctx.font = '10px Inter, sans-serif'; gctx.textAlign = 'left';
+            gctx.fillText('0', cx - r - 5, cy + 16);
+            gctx.fillStyle = '#10b981'; gctx.textAlign = 'right';
+            gctx.fillText('100', cx + r + 5, cy + 16);
         }
 
-        signalSlider.addEventListener('input', refresh);
-        refresh();
-
-        window.addEventListener('resize', function() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            refresh();
+        // Event listeners
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', calculate);
+            if (el) el.addEventListener('change', calculate);
         });
+        calculate();
     })();
     </script>
 </body>

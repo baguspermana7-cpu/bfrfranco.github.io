@@ -14,44 +14,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>From Reliability to Resilience: Why Tier Ratings Stop at Design | Data Center</title>
-    <meta name="description" content="How operational resilience emerges beyond redundancy and uptime metrics. Why Tier ratings measure design, not operational excellence in data centers.">
-    <meta name="keywords" content="Data Center Resilience, Tier Ratings, Operational Excellence, Uptime Institute, Redundancy, Infrastructure Reliability, Recovery Time">
+    <title>From Reliability to Resilience: Why Tier Ratings Stop at Design | Operations Engineering Journal #7</title>
+    <meta name="description" content="Comprehensive analysis of why Uptime Institute Tier ratings measure design reliability but not operational resilience. Introduces a 7-dimension resilience assessment framework with Hollnagel's four cornerstones applied to data center operations.">
+    <meta name="keywords" content="Data Center Resilience, Tier Ratings, Operational Excellence, Uptime Institute, Redundancy, Infrastructure Reliability, Recovery Time, Hollnagel, Resilience Engineering, MTBF, MTTR, Graceful Degradation">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0066cc">
+    <meta name="theme-color" content="#10b981">
     <link rel="canonical" href="https://resistancezero.com/article-7.html">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-7.html">
     <meta property="og:title" content="From Reliability to Resilience: Why Tier Ratings Stop at Design">
-    <meta property="og:description" content="How operational resilience emerges beyond redundancy, uptime metrics, and static architectures.">
+    <meta property="og:description" content="Comprehensive analysis of why Uptime Institute Tier ratings measure design reliability but not operational resilience. A 7-dimension resilience assessment framework for critical facilities.">
     <meta property="og:image" content="https://resistancezero.com/assets/article-7-cover.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="From Reliability to Resilience: Why Tier Ratings Stop at Design - Data Center Article">
+    <meta property="og:image:alt" content="From Reliability to Resilience: Why Tier Ratings Stop at Design - Operations Engineering Journal">
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="article:author" content="Bagus Dwi Permana">
     <meta property="article:published_time" content="2025-11-09T00:00:00Z">
     <meta property="article:modified_time" content="2025-12-22T00:00:00Z">
-    <meta property="article:section" content="Data Center Resilience">
+    <meta property="article:section" content="Resilience Engineering">
     <meta property="article:tag" content="Reliability">
     <meta property="article:tag" content="Tier Ratings">
     <meta property="article:tag" content="Operational Resilience">
+    <meta property="article:tag" content="Hollnagel">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
     <meta name="twitter:title" content="From Reliability to Resilience: Why Tier Ratings Stop at Design">
-    <meta name="twitter:description" content="Operational resilience goes beyond redundancy and uptime metrics in data centers.">
+    <meta name="twitter:description" content="Why Tier ratings measure design but not operational resilience. A 7-dimension assessment framework for critical facilities.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/article-7-cover.jpg">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
@@ -62,15 +63,17 @@
         "@context": "https://schema.org",
         "@type": "TechnicalArticle",
         "headline": "From Reliability to Resilience: Why Tier Ratings Stop at Design",
-        "description": "How operational resilience emerges beyond redundancy and uptime metrics. Why Tier ratings measure design, not operational excellence in data centers.",
+        "description": "Comprehensive analysis of why Uptime Institute Tier ratings measure design reliability but not operational resilience. Introduces a 7-dimension resilience assessment framework.",
+        "image": "https://resistancezero.com/assets/article-7-cover.jpg",
         "author": {
             "@type": "Person",
             "name": "Bagus Dwi Permana",
-            "jobTitle": "Data Center Operations Lead",
+            "jobTitle": "Engineering Operations Manager",
             "url": "https://resistancezero.com/"
         },
         "datePublished": "2025-11-09",
-        "dateModified": "2025-11-09",
+        "dateModified": "2025-12-22",
+        "wordCount": "9000",
         "publisher": {
             "@type": "Person",
             "name": "Bagus Dwi Permana"
@@ -79,8 +82,8 @@
             "@type": "WebPage",
             "@id": "https://resistancezero.com/article-7.html"
         },
-        "articleSection": "Data Center Resilience",
-        "keywords": ["Reliability", "Resilience", "Tier Ratings", "Operational Excellence"]
+        "articleSection": "Resilience Engineering",
+        "keywords": ["Reliability", "Resilience", "Tier Ratings", "Operational Excellence", "Hollnagel", "MTBF", "MTTR"]
     }
     </script>
 
@@ -112,188 +115,422 @@
     </script>
 
     <style>
+        :root {
+            --primary-blue: #1e3a5f;
+            --accent-emerald: #10b981;
+            --accent-emerald-light: #34d399;
+            --accent-emerald-dark: #059669;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        [data-theme="dark"] {
+            --bg-light: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+        }
+
+        [data-theme="dark"] .article-content { background: #0f172a; }
+        [data-theme="dark"] .toc-section { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        [data-theme="dark"] .toc-item { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+        [data-theme="dark"] .data-table thead { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        [data-theme="dark"] .data-table td { border-bottom-color: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .data-table tbody tr:hover { background: rgba(255,255,255,0.05); }
+        [data-theme="dark"] .info-box { background: rgba(16, 185, 129, 0.1); }
+        [data-theme="dark"] .info-box.warning { background: rgba(245, 158, 11, 0.1); }
+        [data-theme="dark"] .info-box.critical { background: rgba(239, 68, 68, 0.1); }
+        [data-theme="dark"] .key-insight { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); }
+        [data-theme="dark"] .formula-box { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); }
+        [data-theme="dark"] .references-section { background: rgba(255,255,255,0.03); }
+        [data-theme="dark"] .conclusion-box { background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.05) 100%); }
+        [data-theme="dark"] .comparison-card { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .article-body blockquote { background: rgba(16, 185, 129, 0.08); color: #34d399; }
+        [data-theme="dark"] .author-section { background: rgba(255,255,255,0.03); }
+
+        /* Hero Section */
         .article-hero {
-            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            background: linear-gradient(135deg, #0b1220 0%, #064e3b 50%, #0f172a 100%);
             padding: 8rem 2rem 4rem;
             color: #fff;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
+
         .article-hero::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: url('assets/article-7-cover.jpg') center/cover no-repeat;
-            opacity: 0.2;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.1) 0%, transparent 50%);
             z-index: 0;
         }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 15 L42 17 L32 19 L30 29 L28 19 L18 17 L28 15 Z' fill='%2310b981' fill-opacity='0.03'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
         .article-hero > * { position: relative; z-index: 1; }
-        .article-hero .container { max-width: 900px; }
-        .article-category {
-            display: inline-block;
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
+        .article-hero .container { max-width: 1000px; margin: 0 auto; }
+
+        .article-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
+
         .article-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
             font-weight: 800;
             margin-bottom: 1.5rem;
             line-height: 1.2;
-            color: #fff;
         }
+
         .article-subtitle {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            font-size: 1.1rem;
             color: #94a3b8;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto 2rem;
             line-height: 1.7;
         }
+
         .article-meta {
             display: flex;
             justify-content: center;
             gap: 2rem;
             flex-wrap: wrap;
             color: #94a3b8;
-            font-size: 0.9375rem;
+            font-size: 0.9rem;
         }
+
         .article-meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .toc-container { max-width: 900px; margin: 0 auto; }
+
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            background: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-emerald);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .toc-item-number {
+            font-size: 0.75rem;
+            color: var(--accent-emerald);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-item-title { font-weight: 600; font-size: 0.95rem; }
+
+        /* Article Content */
         .article-content {
             padding: 4rem 2rem;
             background: #fff;
         }
-        .article-content .container { max-width: 800px; }
+
+        .article-content .container { max-width: 900px; margin: 0 auto; }
+
         .article-body {
-            font-size: 1.125rem;
-            line-height: 1.6;
-            color: #374151;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-primary);
         }
-        .article-body p { margin-bottom: 1.25rem; }
+
+        .article-body p { margin-bottom: 1rem; }
+
         .article-body h2 {
-            font-size: 1.75rem;
-            color: #1e3a5f;
-            margin: 3rem 0 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 3px solid #e5e7eb;
-        }
-        .article-body h3 {
-            font-size: 1.375rem;
-            color: #2d5a87;
+            font-size: 1.35rem;
+            color: var(--primary-blue);
             margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-emerald);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
+
+        .article-body h2 .section-number {
+            background: var(--accent-emerald);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .article-body h3 {
+            font-size: 1.05rem;
+            color: #334155;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .article-body h4 {
+            font-size: 0.9rem;
+            color: #475569;
+            margin: 1rem 0 0.5rem;
+        }
+
         .article-body blockquote {
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border-left: 4px solid #22c55e;
+            border-left: 4px solid var(--accent-emerald);
             padding: 1.5rem 2rem;
             margin: 2rem 0;
             border-radius: 0 12px 12px 0;
             font-style: italic;
             color: #166534;
         }
+
         .article-body ul, .article-body ol {
-            margin: 1.5rem 0;
+            margin: 1.25rem 0;
             padding-left: 1.5rem;
         }
-        .article-body li { margin-bottom: 0.75rem; }
-        .highlight-box {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #3b82f6;
+
+        .article-body li { margin-bottom: 0.5rem; }
+
+        /* Inline Citations */
+        .cite {
+            color: var(--accent-emerald);
+            font-size: 0.75em;
+            vertical-align: super;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0 2px;
+            cursor: pointer;
         }
-        .highlight-box p {
-            margin: 0;
-            color: #1e40af;
+        .cite:hover { color: var(--accent-emerald-dark); text-decoration: underline; }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            border-bottom: 1px dashed var(--accent-emerald);
+            cursor: help;
             font-weight: 500;
         }
-        .comparison-box {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 100;
+            max-width: 300px;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        .tooltip:hover::after { opacity: 1; }
+
+        /* Key Insight Box */
+        .key-insight {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-left: 4px solid var(--accent-emerald);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .key-insight-title {
+            font-weight: 700;
+            color: var(--accent-emerald-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left: 4px solid var(--accent-emerald);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: var(--accent-amber);
+        }
+
+        .info-box.critical {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-left-color: var(--accent-red);
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            padding: 1.5rem;
             border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border: 1px solid #e2e8f0;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .comparison-box h4 {
-            color: #1e3a5f;
-            margin-bottom: 1rem;
+
+        .formula-box-title {
+            font-weight: 700;
+            color: var(--accent-emerald-dark);
+            margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
         }
+
+        /* Data Tables */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            color: #fff;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tbody tr:hover { background: #f8fafc; }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        /* Comparison Cards */
         .comparison-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
+            margin: 2rem 0;
         }
-        .comparison-col h5 {
-            color: #2d5a87;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-        .comparison-col ul {
-            margin: 0;
-            padding-left: 1.25rem;
-            font-size: 0.95rem;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .back-link:hover { color: #fff; }
-        .article-nav {
-            display: flex;
-            justify-content: space-between;
-            padding: 2rem 0;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 3rem;
-        }
-        .article-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #2d5a87;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        .article-nav a:hover { color: #1e3a5f; }
-        /* Inline Citations */
-        .cite { color: #22c55e; font-size: 0.75em; vertical-align: super; font-weight: 600; text-decoration: none; padding: 0 2px; }
-        .cite:hover { color: #16a34a; text-decoration: underline; }
 
-        /* References Section */
-        .references {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 1.5rem 2rem;
+        .comparison-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .comparison-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card-icon {
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            margin-top: 2.5rem;
-            border-left: 4px solid #22c55e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
-        .references h3 { font-size: 1rem; margin-bottom: 1rem; color: #1e3a5f; }
-        .references ol, .references ul { font-size: 0.85rem; color: #475569; padding-left: 1.25rem; line-height: 1.7; }
-        .references li { margin-bottom: 0.5rem; }
-        .references a { color: #22c55e; }
 
-        /* Interactive Chart */
+        .comparison-card-title { font-weight: 700; font-size: 1.1rem; }
+        .comparison-card-subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+
+        /* Interactive Chart Container */
         .chart-container {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 16px;
             padding: 2rem;
             margin: 2rem 0;
         }
+
         .chart-title {
             text-align: center;
             color: #fff;
@@ -301,23 +538,23 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
+
         .chart-subtitle {
             text-align: center;
             color: #94a3b8;
             font-size: 0.875rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-wrapper {
             background: rgba(2, 6, 23, 0.5);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        .chart-canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+
+        .chart-canvas { width: 100%; height: auto; display: block; }
+
         .control-row {
             display: flex;
             align-items: center;
@@ -326,10 +563,9 @@
             justify-content: center;
             margin-top: 1rem;
         }
-        .control-label {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
+
+        .control-label { color: #94a3b8; font-size: 0.9rem; }
+
         .control-slider {
             width: 200px;
             height: 8px;
@@ -338,17 +574,19 @@
             outline: none;
             -webkit-appearance: none;
         }
+
         .control-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #22c55e;
+            background: var(--accent-emerald);
             cursor: pointer;
         }
+
         .control-value {
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
             padding: 0.25rem 0.75rem;
             border-radius: 999px;
             font-weight: 700;
@@ -356,6 +594,7 @@
             min-width: 50px;
             text-align: center;
         }
+
         .legend-row {
             display: flex;
             justify-content: center;
@@ -363,76 +602,360 @@
             margin-top: 1rem;
             flex-wrap: wrap;
         }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.8rem;
-        }
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
+
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; color: #94a3b8; font-size: 0.8rem; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
         .callout-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
         }
+
         .callout-card {
             background: rgba(30, 58, 95, 0.3);
             border-radius: 10px;
             padding: 1rem;
             text-align: center;
-            border: 1px solid rgba(34, 197, 94, 0.15);
-        }
-        .callout-label {
-            color: #94a3b8;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .callout-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #22c55e;
+            border: 1px solid rgba(16, 185, 129, 0.15);
         }
 
-        @media (max-width: 768px) {
-            .article-hero { padding: 6rem 1rem 3rem; }
-            .article-meta { flex-direction: column; gap: 1rem; }
-            .article-content { padding: 3rem 1rem; }
-            .article-body { font-size: 1rem; }
-            .chart-container { padding: 1rem; }
+        .callout-label { color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .callout-value { font-size: 1.5rem; font-weight: 800; color: var(--accent-emerald-light); }
+
+        /* Calculator Section */
+        .calculator-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+            color: #fff;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .calculator-subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calc-input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .calc-label { font-size: 0.85rem; color: #94a3b8; font-weight: 500; }
+
+        .calc-select, .calc-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+        }
+
+        .calc-select option { background: #1e293b; color: #fff; }
+
+        .calc-select:focus, .calc-input:focus {
+            outline: none;
+            border-color: var(--accent-emerald);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .calc-slider-container { display: flex; align-items: center; gap: 0.75rem; }
+
+        .calc-slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .calc-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            cursor: pointer;
+        }
+
+        .calc-slider-value {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .calc-results {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .calc-results-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #fff;
+        }
+
+        .dual-bars { margin-bottom: 2rem; }
+
+        .bar-group { margin-bottom: 1.5rem; }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .bar-label-name { color: #94a3b8; }
+        .bar-label-value { font-weight: 700; }
+
+        .bar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            height: 28px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.6s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .gap-indicator {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-weight: 600;
+        }
+
+        .gap-indicator.critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .gap-indicator.warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .gap-indicator.balanced { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .tier-equivalents {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .tier-equiv-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .tier-equiv-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem; }
+        .tier-equiv-value { font-size: 1.25rem; font-weight: 800; }
+
+        .dimension-breakdown { margin: 1.5rem 0; }
+        .dimension-breakdown h4 { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem; }
+
+        .dimension-bar { margin-bottom: 0.75rem; }
+
+        .dimension-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .dimension-bar-name { color: #94a3b8; }
+        .dimension-bar-score { color: #34d399; font-weight: 600; }
+
+        .dimension-bar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .dimension-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--accent-emerald);
+            transition: width 0.6s ease;
+        }
+
+        .recommendations {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .recommendations h4 { color: #34d399; font-size: 0.9rem; margin-bottom: 0.75rem; }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .recommendation-item:last-child { border-bottom: none; }
+
+        .rec-priority {
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .rec-priority.high { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .rec-priority.medium { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+
+        /* Conclusion Box */
+        .conclusion-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .conclusion-box h3 { color: var(--accent-emerald-dark); margin-bottom: 1rem; }
+
+        /* References Section */
+        .references-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+            counter-reset: ref-counter;
+        }
+
+        .references-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .references-list { display: grid; gap: 0.75rem; list-style: none; padding: 0; }
+
+        .reference-item {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            counter-increment: ref-counter;
+        }
+
+        .reference-item::before {
+            content: "[" counter(ref-counter) "]";
+            color: var(--accent-emerald);
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        /* Author Bio Section */
+        .author-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-emerald);
+            flex-shrink: 0;
+        }
+
+        .author-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .author-role { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .author-bio-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Print CSS */
+        @media print {
+            .navbar, .share-buttons, .toc-section, .calculator-section, .chart-container { display: none !important; }
+            .article-hero { padding: 2rem; background: #064e3b !important; }
+            .article-content { padding: 1rem; }
+            .article-body { font-size: 11pt; }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
             .comparison-grid { grid-template-columns: 1fr; }
+            .tier-equivalents { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .article-hero { padding: 6rem 1rem 3rem; }
+            .article-content { padding: 2rem 1rem; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .article-meta { flex-direction: column; gap: 0.75rem; align-items: center; }
+            .chart-container { padding: 1rem; }
+            .calculator-section { padding: 1.5rem 1rem; }
+            .author-section { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
-            </a>
+            <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar"></a>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">
-                        DC Solutions
-                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </a>
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
                     <ul class="dropdown-menu">
-                        <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
-                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                        <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li><a href="datahallAI.html" style="color:#8b5cf6;">DC AI/HPC</a></li>
                         <li><a href="dc-conventional.html">DC Conventional</a></li>
-                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
-                        <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -442,141 +965,755 @@
                 <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             </button>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
+            <div class="hamburger"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="article-hero">
         <div class="container">
-            <a href="articles.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back to Articles
+            <a href="articles.html" style="display:inline-flex;align-items:center;gap:0.5rem;color:#94a3b8;margin-bottom:1.5rem;font-size:0.9rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Back to Engineering Journal
             </a>
-            <span class="article-category">Resilience Engineering</span>
-            <h1 class="article-title">From Reliability to Resilience: Why Tier Ratings Stop at Design</h1>
-            <p class="article-subtitle">How operational resilience emerges beyond redundancy, uptime metrics, and static architectures.</p>
+
+            <span class="article-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Operations Engineering Journal #7
+            </span>
+
+            <h1 class="article-title">From Reliability to Resilience:<br>Why Tier Ratings Stop at Design</h1>
+
+            <p class="article-subtitle">
+                A comprehensive analysis of why Uptime Institute Tier classifications measure design topology but not operational resilience. This paper introduces a 7-dimension resilience assessment framework grounded in Hollnagel's resilience engineering principles, demonstrating why certification alone cannot predict facility performance under stress.
+            </p>
+
             <div class="article-meta">
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    10 min read
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    20 min read
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     November 9, 2025
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     Bagus Dwi Permana
+                </span>
+                <span class="article-meta-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    ~9,000 words
                 </span>
             </div>
         </div>
     </section>
 
+    <!-- Table of Contents -->
+    <section class="toc-section">
+        <div class="toc-container">
+            <div class="toc-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Table of Contents
+            </div>
+            <div class="toc-grid">
+                <a href="#abstract" class="toc-item"><div class="toc-item-number">SECTION 01</div><div class="toc-item-title">Abstract</div></a>
+                <a href="#tier-insufficient" class="toc-item"><div class="toc-item-number">SECTION 02</div><div class="toc-item-title">Tier Ratings Are Insufficient</div></a>
+                <a href="#distinction" class="toc-item"><div class="toc-item-number">SECTION 03</div><div class="toc-item-title">Defining the Distinction</div></a>
+                <a href="#limitations" class="toc-item"><div class="toc-item-number">SECTION 04</div><div class="toc-item-title">Limitations of Tier Classification</div></a>
+                <a href="#resilience-engineering" class="toc-item"><div class="toc-item-number">SECTION 05</div><div class="toc-item-title">Resilience Engineering Principles</div></a>
+                <a href="#hollnagel" class="toc-item"><div class="toc-item-number">SECTION 06</div><div class="toc-item-title">Hollnagel's Four Cornerstones</div></a>
+                <a href="#case-context" class="toc-item"><div class="toc-item-number">SECTION 07</div><div class="toc-item-title">Case Context: Reliability Without Resilience</div></a>
+                <a href="#measuring" class="toc-item"><div class="toc-item-number">SECTION 08</div><div class="toc-item-title">Measuring Resilience</div></a>
+                <a href="#framework" class="toc-item"><div class="toc-item-number">SECTION 09</div><div class="toc-item-title">Operational Resilience Framework</div></a>
+                <a href="#canvas" class="toc-item"><div class="toc-item-number">SECTION 10</div><div class="toc-item-title">Interactive: Reliability vs Resilience Canvas</div></a>
+                <a href="#calculator" class="toc-item"><div class="toc-item-number">SECTION 11</div><div class="toc-item-title">Calculator: Resilience Assessment</div></a>
+                <a href="#implementation" class="toc-item"><div class="toc-item-number">SECTION 12</div><div class="toc-item-title">Practical Implementation</div></a>
+                <a href="#conclusion" class="toc-item"><div class="toc-item-number">SECTION 13</div><div class="toc-item-title">Conclusion</div></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
     <article class="article-content">
         <div class="container">
             <div class="article-body">
-                <h2>Abstract</h2>
-                <p>Data center reliability has traditionally been framed through design constructs: redundancy, fault tolerance, and tier certification. While these constructs are necessary, they are insufficient to explain why similarly designed facilities perform very differently under stress.</p>
+
+                <!-- Section 1: Abstract -->
+                <h2 id="abstract"><span class="section-number">01</span> Abstract</h2>
+
+                <p>Data center reliability has traditionally been defined through design constructs: redundancy levels, fault-tolerant topologies, and tier certification. The Uptime Institute's Tier Standard, first published in the mid-1990s and revised through subsequent editions, provides a globally recognized framework for classifying data center infrastructure based on its design capacity to withstand component failures and permit concurrent maintenance. These classifications have become the lingua franca of the industry, shaping investment decisions, contractual <span class="tooltip" data-tooltip="Service Level Agreement: A commitment between a service provider and a client defining the expected level of service, including uptime guarantees.">SLA</span> structures, and organizational identity.</p>
+
+                <p>Yet a persistent paradox undermines the sufficiency of this framework: facilities with identical Tier certifications routinely exhibit dramatically different performance under stress. Two Tier III data centers, both validated against the same topology standard, can respond to the same category of disturbance with entirely divergent outcomes. One isolates the fault, adapts its operational posture, and recovers within minutes. The other cascades into a broader outage that extends for hours, damages equipment, and erodes client trust. The design was equivalent. The outcome was not.</p>
 
                 <blockquote>
-                    "Two Tier III data centers can pass the same certification, share the same topology, and meet identical SLAs. Yet when reality intrudes—weather, human error, partial failures—one bends and recovers, while the other breaks. The difference is not reliability. It is resilience."
+                    "Reliability is a property of the system as designed. Resilience is a property of the organization as it operates. Tier ratings capture the first but remain silent on the second. This silence is not a minor gap; it is the central vulnerability of modern data center assurance."
                 </blockquote>
 
-                <h2>1. Reliability: A Design-Time Promise</h2>
-                <p>Reliability is fundamentally a probabilistic promise made at design time. Redundancy, fault tolerance, and component availability define how often systems are expected to fail under assumed conditions. Tier ratings formalize this promise.</p>
+                <p>This paper argues that the distinction between reliability and resilience is not merely semantic but fundamentally structural. Reliability, grounded in probabilistic failure analysis and expressed through metrics such as <span class="tooltip" data-tooltip="Mean Time Between Failures: The average time elapsed between one failure and the next, measuring the reliability of a repairable system.">MTBF</span> and component availability, describes the system's capacity to function without failure under anticipated conditions. Resilience, by contrast, encompasses the organization's ability to absorb unexpected disruptions, adapt its responses in real time, and recover functionality while learning from the experience <a href="#ref1" class="cite">[1]</a>.</p>
 
-                <p>They describe what the system <em>can</em> survive, not how the organization <em>will</em> respond.</p>
+                <p>Drawing on resilience engineering theory, particularly the work of Erik Hollnagel <a href="#ref2" class="cite">[2]</a>, David Woods <a href="#ref7" class="cite">[7]</a>, and organizational safety researchers including James Reason <a href="#ref8" class="cite">[8]</a> and Nancy Leveson <a href="#ref9" class="cite">[9]</a>, this paper develops a comprehensive framework for understanding, measuring, and building operational resilience in critical facilities. It introduces a seven-dimension resilience assessment model that complements existing Tier classifications rather than replacing them, and provides practical implementation guidance for operations teams seeking to move beyond design-centric assurance.</p>
 
-                <h2>2. The Blind Spot in Tier-Based Thinking</h2>
-                <p>Tier certification evaluates topology, maintainability, and separation. It does not evaluate:</p>
-                <ul>
-                    <li>Decision latency</li>
-                    <li>Operational cognition</li>
-                    <li>Recovery adaptability</li>
-                    <li>Learning capability</li>
-                </ul>
-
-                <div class="highlight-box">
-                    <p><strong>Critical Gap:</strong> Tier ratings end precisely where real operations begin.</p>
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Key Thesis
+                    </div>
+                    <p style="margin:0;">Tier ratings are necessary but not sufficient for ensuring data center performance. A facility can be highly reliable by design and simultaneously fragile in operation. True resilience is an operational achievement, not a design feature, and it requires deliberate cultivation through organizational practices that Tier standards neither specify nor measure.</p>
                 </div>
 
-                <h2>3. Resilience Engineering Perspective</h2>
-                <p>Resilience engineering defines success not as absence of failure, but as the ability to sustain function under varying conditions. Hollnagel identifies four core abilities:</p>
+                <!-- Section 2: Tier Ratings Are Insufficient -->
+                <h2 id="tier-insufficient"><span class="section-number">02</span> Tier Ratings Are Insufficient</h2>
+
+                <h3>What Tier Ratings Actually Measure</h3>
+
+                <p>The Uptime Institute's Tier Classification System defines four progressive levels of data center infrastructure capability <a href="#ref3" class="cite">[3]</a>. Each tier specifies requirements related to redundancy, distribution path architecture, and concurrent maintainability. At its core, the system evaluates the design topology of the facility, answering a specific question: can the infrastructure sustain IT load through a defined set of failure scenarios without requiring load interruption?</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tier Level</th>
+                                <th>Redundancy</th>
+                                <th>Distribution</th>
+                                <th>Concurrently Maintainable</th>
+                                <th>Fault Tolerant</th>
+                                <th>Expected Uptime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Tier I</strong></td>
+                                <td>N (no redundancy)</td>
+                                <td>Single path</td>
+                                <td>No</td>
+                                <td>No</td>
+                                <td>99.671%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tier II</strong></td>
+                                <td><span class="tooltip" data-tooltip="N+1: A redundancy configuration where one additional component is added beyond the minimum required (N) to serve the load.">N+1</span></td>
+                                <td>Single path</td>
+                                <td>Partial</td>
+                                <td>No</td>
+                                <td>99.741%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tier III</strong></td>
+                                <td>N+1 minimum</td>
+                                <td>Dual path (one active)</td>
+                                <td>Yes</td>
+                                <td>No</td>
+                                <td>99.982%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tier IV</strong></td>
+                                <td><span class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated, with each system capable of supporting the full load independently.">2N</span> or <span class="tooltip" data-tooltip="2N+1: Beyond full duplication, this adds an extra component to the already fully redundant 2N configuration for additional safety margin.">2N+1</span></td>
+                                <td>Dual path (both active)</td>
+                                <td>Yes</td>
+                                <td>Yes</td>
+                                <td>99.995%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>This framework is elegant and powerful for its intended purpose. It creates a common vocabulary, enables benchmarking, and provides investors and clients with a shorthand for infrastructure quality. However, the framework evaluates the facility at a specific moment in time, under assumed conditions, with the implicit assumption that the design will be operated as intended.</p>
+
+                <h3>What Tier Ratings Do Not Measure</h3>
+
+                <p>The critical blind spots in Tier classification become apparent when we catalog what falls outside the topology assessment. The following capabilities, each of which directly determines facility performance under real-world stress, are absent from the Tier design standard <a href="#ref5" class="cite">[5]</a>:</p>
+
                 <ul>
-                    <li><strong>Respond</strong> — to the actual</li>
-                    <li><strong>Monitor</strong> — the critical</li>
-                    <li><strong>Anticipate</strong> — the potential</li>
-                    <li><strong>Learn</strong> — from the past</li>
+                    <li><strong>Operational decision-making speed</strong> &mdash; The time between alarm activation and first human decision is often the single largest variable in incident outcomes, yet no Tier standard addresses it.</li>
+                    <li><strong>Human factors and team cognition</strong> &mdash; The ability of operators to correctly interpret complex, multi-system failures under time pressure depends on training, experience, and team dynamics that cannot be specified in engineering drawings.</li>
+                    <li><strong>Organizational learning capability</strong> &mdash; Whether incidents produce meaningful process improvements or merely generate reports determines long-term facility trajectory.</li>
+                    <li><strong>Communication and escalation effectiveness</strong> &mdash; The quality and speed of information flow during emergencies often determines whether an incident remains contained or propagates across domains.</li>
+                    <li><strong>Procedural currency and documentation accuracy</strong> &mdash; As-built documentation that accurately reflects current configuration is essential for effective troubleshooting, but Tier certification does not audit document management practices.</li>
+                    <li><strong>Cross-training depth and coverage</strong> &mdash; Whether the team can sustain operations when key individuals are unavailable directly affects resilience but is invisible to design-based assessment.</li>
                 </ul>
-                <p>None of these can be fully specified in drawings. They must be enacted in real time.</p>
 
-                <h2>4. Reliability vs Resilience Comparison</h2>
+                <div class="info-box warning">
+                    <div class="info-box-title">Uptime Institute Outage Data</div>
+                    <p style="margin:0;">According to Uptime Institute's Annual Outage Analysis <a href="#ref5" class="cite">[5]</a>, approximately <strong>60-80% of all data center outages are attributable to human error, process failures, or organizational factors</strong> rather than equipment failures. Their 2024 Global Data Center Survey <a href="#ref6" class="cite">[6]</a> further reveals that even among Tier III and Tier IV certified facilities, significant outages continue to occur at rates that topology alone cannot explain. The implication is clear: design certification addresses the minority of failure causes while leaving the majority unexamined.</p>
+                </div>
 
-                <div class="comparison-box">
-                    <h4>Two Paradigms</h4>
-                    <div class="comparison-grid">
-                        <div class="comparison-col">
-                            <h5>Reliability (Design)</h5>
-                            <ul>
-                                <li>Minimize failure probability</li>
-                                <li>Static architecture focus</li>
-                                <li>Component-level thinking</li>
-                                <li>Predictable scenarios</li>
-                                <li>Certification-driven</li>
-                            </ul>
+                <p>This is not a criticism of the Tier Standard per se. The standard was designed to evaluate topology, and it does so effectively. The problem arises when organizations treat Tier certification as comprehensive assurance rather than as one component of a broader assurance framework. When "we are Tier III certified" becomes the answer to all questions about reliability, the organization has confused a necessary condition with a sufficient one.</p>
+
+                <!-- Section 3: Defining the Distinction -->
+                <h2 id="distinction"><span class="section-number">03</span> Defining the Distinction: Reliability vs Resilience</h2>
+
+                <h3>Reliability as a Probabilistic Property</h3>
+
+                <p>In engineering terms, reliability is defined as the probability that a system will perform its intended function without failure for a specified period under stated conditions. It is fundamentally a design-time property, expressed through metrics that characterize component and system behavior under anticipated operating parameters.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Reliability Metrics</div>
+                    <p style="margin:0.5rem 0;"><strong>Availability</strong> = <span class="tooltip" data-tooltip="Mean Time Between Failures: Average operational time between system failures.">MTBF</span> / (MTBF + <span class="tooltip" data-tooltip="Mean Time To Repair: The average time required to repair a failed component or system and restore it to operational status.">MTTR</span>)</p>
+                    <p style="margin:0.5rem 0;"><strong>System Availability (series)</strong> = A<sub>1</sub> &times; A<sub>2</sub> &times; ... &times; A<sub>n</sub></p>
+                    <p style="margin:0.5rem 0;"><strong>System Availability (parallel)</strong> = 1 - (1 - A<sub>1</sub>) &times; (1 - A<sub>2</sub>) &times; ... &times; (1 - A<sub>n</sub>)</p>
+                    <p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">Where A = individual component availability, MTBF = mean time between failures, MTTR = mean time to repair</p>
+                </div>
+
+                <p>Reliability engineering focuses on reducing failure probability through redundancy (adding parallel components), derating (operating components below maximum capacity), and selection (choosing components with proven failure rates). These are powerful techniques, and they form the foundation of all Tier classifications. A <span class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated.">2N</span> power distribution, for example, mathematically reduces the probability of total power loss to negligible levels, assuming that both paths are properly maintained and operated.</p>
+
+                <p>However, the word "assuming" in that sentence carries the entire weight of the reliability-resilience distinction.</p>
+
+                <h3>Resilience as an Organizational Capability</h3>
+
+                <p>Resilience, as defined in the resilience engineering literature, is the intrinsic ability of a system to adjust its functioning prior to, during, or following changes and disturbances, so that it can sustain required operations under both expected and unexpected conditions <a href="#ref1" class="cite">[1]</a>. Several characteristics distinguish resilience from reliability:</p>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8;">R</div>
+                            <div>
+                                <div class="comparison-card-title">Reliability</div>
+                                <div class="comparison-card-subtitle">Design-time property</div>
+                            </div>
                         </div>
-                        <div class="comparison-col">
-                            <h5>Resilience (Operations)</h5>
-                            <ul>
-                                <li>Minimize failure impact</li>
-                                <li>Adaptive response focus</li>
-                                <li>System-level thinking</li>
-                                <li>Unanticipated scenarios</li>
-                                <li>Capability-driven</li>
-                            </ul>
+                        <ul style="font-size:0.9rem;padding-left:1.25rem;margin:0;">
+                            <li>Minimizes failure <em>probability</em></li>
+                            <li>Static architecture focus</li>
+                            <li>Component-level analysis</li>
+                            <li>Predictable failure scenarios</li>
+                            <li>Certification-driven validation</li>
+                            <li>Binary: working or failed</li>
+                            <li>Measured by MTBF, availability %</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background:rgba(16,185,129,0.15);color:#10b981;">R</div>
+                            <div>
+                                <div class="comparison-card-title">Resilience</div>
+                                <div class="comparison-card-subtitle">Operational capability</div>
+                            </div>
                         </div>
+                        <ul style="font-size:0.9rem;padding-left:1.25rem;margin:0;">
+                            <li>Minimizes failure <em>impact</em></li>
+                            <li>Adaptive response focus</li>
+                            <li>System-of-systems analysis</li>
+                            <li>Unanticipated failure scenarios</li>
+                            <li>Capability-driven validation</li>
+                            <li>Spectrum: graceful degradation</li>
+                            <li>Measured by MTTR distribution, learning velocity</li>
+                        </ul>
                     </div>
                 </div>
 
-                <h2>5. Interactive: Disturbance vs Recovery Performance</h2>
-                <p>This simulation compares how reliable-only systems vs resilient systems perform under varying disturbance intensities:</p>
+                <p>The critical insight is that a reliable system can still be fragile. A 2N power distribution provides extraordinary redundancy, but if the operations team has never practiced a failover, if the <span class="tooltip" data-tooltip="Automatic Transfer Switch: A device that automatically transfers electrical load from one power source to another when the primary source fails.">ATS</span> maintenance is overdue, if the <span class="tooltip" data-tooltip="Building Management System: An integrated system for monitoring and controlling building services including HVAC, power, fire, and security.">BMS</span> alarm configuration has drifted from the original design, then the system's theoretical reliability may never be realized in practice.</p>
 
-                <!-- Interactive Chart -->
+                <p>Conversely, a resilient system can gracefully degrade. An organization with strong operational practices may operate an N+1 facility with better real-world outcomes than a poorly operated 2N facility, because the team knows how to manage reduced capacity, has practiced emergency procedures, maintains current documentation, and communicates effectively under pressure.</p>
+
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Key Insight
+                    </div>
+                    <p style="margin:0;">A reliable system fails suddenly and completely when it encounters something beyond its design envelope. A resilient system bends, adapts, and recovers. The difference is not in the equipment but in the organization that operates it.</p>
+                </div>
+                <!-- Section 4: Limitations of Tier Classification -->
+                <h2 id="limitations"><span class="section-number">04</span> Limitations of Tier Classification</h2>
+
+                <h3>TCCF vs TCOS: The Two Halves of the Tier System</h3>
+
+                <p>The Uptime Institute actually offers two distinct certification tracks, though the industry overwhelmingly focuses on only one. The Tier Certification of Constructed Facility (<span class="tooltip" data-tooltip="Tier Certification of Constructed Facility: Uptime Institute's validation that the as-built data center meets the design requirements of the claimed Tier level.">TCCF</span>) validates that the physical infrastructure has been built according to the claimed Tier topology. The Tier Certification of Operational Sustainability (<span class="tooltip" data-tooltip="Tier Certification of Operational Sustainability: Uptime Institute's assessment of operational practices including staffing, maintenance, training, and management processes.">TCOS</span>) evaluates the operational practices, management behaviors, staffing levels, training programs, maintenance processes, and organizational governance that determine how effectively the infrastructure is operated <a href="#ref4" class="cite">[4]</a>.</p>
+
+                <p>The disparity in adoption between these two programs is revealing. While hundreds of facilities worldwide hold TCCF certification, the number holding TCOS certification is a fraction of that total. This adoption gap reflects several organizational realities:</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>TCCF (Design Certification)</th>
+                                <th>TCOS (Operational Certification)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Focus</strong></td>
+                                <td>Physical infrastructure topology</td>
+                                <td>Operational behaviors and processes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Assessment Type</strong></td>
+                                <td>Point-in-time construction audit</td>
+                                <td>Ongoing operational evaluation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>What It Validates</strong></td>
+                                <td>Infrastructure meets design standard</td>
+                                <td>Operations sustain design intent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Industry Adoption</strong></td>
+                                <td>Widespread (hundreds of facilities)</td>
+                                <td>Limited (fraction of TCCF holders)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Client Demand</strong></td>
+                                <td>High (RFP requirement)</td>
+                                <td>Low (rarely specified in contracts)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Renewal Requirement</strong></td>
+                                <td>One-time (with re-certification)</td>
+                                <td>Periodic ongoing assessment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost</strong></td>
+                                <td>Significant but bounded</td>
+                                <td>Ongoing operational investment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Perceived Value</strong></td>
+                                <td>Marketing asset, sales tool</td>
+                                <td>Internal improvement tool</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>The Gap Between Certified Topology and Operational Reality</h3>
+
+                <p>The gap between design certification and operational reality manifests in several predictable patterns. Over time, even a well-designed facility can drift from its certified configuration through a process that safety science researchers call "normalization of deviance" <a href="#ref13" class="cite">[13]</a>. Maintenance windows get deferred. Temporary configurations become permanent. Alarm setpoints are adjusted to reduce nuisance notifications. Staffing models are optimized for cost rather than capability. Documentation falls behind as-built reality.</p>
+
+                <p>Each individual deviation may be minor and rational in isolation. But the cumulative effect is a progressive widening of the gap between the facility's theoretical capability (as certified) and its actual capability (as operated). This drift is invisible to design-based assessment because the physical infrastructure has not changed. The <span class="tooltip" data-tooltip="Uninterruptible Power Supply: A device that provides emergency power when the input power source fails, bridging the gap until generators start.">UPS</span> units are still in place. The <span class="tooltip" data-tooltip="Power Distribution Unit: A device used to distribute electric power within a data center, from the main feed to individual racks.">PDU</span> topology remains 2N. The generators still have sufficient capacity. What has changed is the organizational capacity to realize the design's potential when it matters most.</p>
+
+                <div class="info-box critical">
+                    <div class="info-box-title">The Certification Paradox</div>
+                    <p style="margin:0;">Facilities often invest heavily in achieving Tier certification, then underinvest in the operational practices needed to sustain the certified capability. The certificate becomes a substitute for ongoing operational excellence rather than a foundation for it. This creates a dangerous gap between perceived and actual resilience that remains hidden until an incident reveals it.</p>
+                </div>
+
+                <h3>What Design Cannot Specify</h3>
+
+                <p>Even the most sophisticated Tier IV fault-tolerant design cannot specify or guarantee the following operational requirements, each of which directly affects facility performance during disturbances:</p>
+
+                <ul>
+                    <li><strong>Situational awareness under pressure</strong> &mdash; The cognitive ability to rapidly assess multi-system failure states and identify the correct intervention sequence.</li>
+                    <li><strong>Decision-making under uncertainty</strong> &mdash; The organizational willingness to make consequential decisions with incomplete information during rapidly evolving incidents.</li>
+                    <li><strong>Adaptive improvisation</strong> &mdash; The capacity to deviate from standard procedures when the actual failure mode does not match any documented scenario.</li>
+                    <li><strong>Team coordination during emergencies</strong> &mdash; The ability of multiple teams (electrical, mechanical, IT, management) to share information, align priorities, and coordinate actions without a formal incident command structure.</li>
+                    <li><strong>Post-incident organizational learning</strong> &mdash; The willingness to conduct honest, non-punitive analysis of failures and translate findings into meaningful process improvements.</li>
+                </ul>
+
+                <p>These capabilities exist in the organizational domain, not the engineering domain. They cannot be drawn on a one-line diagram, specified in a Bill of Materials, or validated through a construction audit. Yet they determine whether the 2N design actually delivers 2N performance when the facility is under stress.</p>
+
+                <!-- Section 5: Resilience Engineering Principles -->
+                <h2 id="resilience-engineering"><span class="section-number">05</span> Resilience Engineering Principles</h2>
+
+                <h3>Origins and Core Philosophy</h3>
+
+                <p>Resilience engineering emerged as a discipline in the early 2000s, driven by the recognition that traditional safety management approaches, focused on preventing specific identified failure modes, were insufficient to explain performance variability in complex sociotechnical systems <a href="#ref1" class="cite">[1]</a>. The field draws on insights from high-reliability organizations (<span class="tooltip" data-tooltip="High Availability: System design approach ensuring a high level of operational performance, typically with 99.99%+ uptime through redundancy and failover mechanisms.">HA</span> research by Weick and Sutcliffe <a href="#ref10" class="cite">[10]</a>), systems theory (Leveson's systems-theoretic accident model <a href="#ref9" class="cite">[9]</a>), and organizational culture research (Westrum's typology of organizational cultures <a href="#ref14" class="cite">[14]</a>).</p>
+
+                <p>The fundamental philosophical shift introduced by resilience engineering is the distinction between what Hollnagel terms Safety-I and Safety-II <a href="#ref2" class="cite">[2]</a>:</p>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">I</div>
+                            <div>
+                                <div class="comparison-card-title">Safety-I</div>
+                                <div class="comparison-card-subtitle">Absence of failure</div>
+                            </div>
+                        </div>
+                        <ul style="font-size:0.9rem;padding-left:1.25rem;margin:0;">
+                            <li>Success = nothing goes wrong</li>
+                            <li>Focus on failures and errors</li>
+                            <li>Reactive: investigate after incidents</li>
+                            <li>Humans as liability</li>
+                            <li>Compliance-driven</li>
+                            <li>Root cause: find what broke</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-icon" style="background:rgba(16,185,129,0.15);color:#10b981;">II</div>
+                            <div>
+                                <div class="comparison-card-title">Safety-II</div>
+                                <div class="comparison-card-subtitle">Presence of success</div>
+                            </div>
+                        </div>
+                        <ul style="font-size:0.9rem;padding-left:1.25rem;margin:0;">
+                            <li>Success = things go right</li>
+                            <li>Focus on performance variability</li>
+                            <li>Proactive: understand daily work</li>
+                            <li>Humans as adaptive resource</li>
+                            <li>Capability-driven</li>
+                            <li>Understand how work happens</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Key Concepts of Resilience</h3>
+
+                <p>Resilience engineering introduces several concepts that are directly applicable to data center operations, each challenging assumptions that underlie conventional tier-based thinking:</p>
+
+                <h4>Graceful Degradation</h4>
+                <p>A resilient system does not fail catastrophically when a boundary condition is exceeded. Instead, it degrades gradually, maintaining partial functionality while the organization mobilizes its response. In data center terms, this means the difference between a complete site outage and a controlled load reduction. Graceful degradation requires both design features (the ability to shed non-critical load) and operational capabilities (knowing which loads to shed, in what sequence, and having practiced the procedure).</p>
+
+                <h4>Adaptive Capacity</h4>
+                <p>Adaptive capacity refers to the organization's ability to adjust its behavior in response to novel situations that fall outside the envelope of anticipated scenarios <a href="#ref7" class="cite">[7]</a>. In high-stakes environments, the ability to improvise intelligently when procedures do not match reality is often the decisive factor in incident outcomes. This capacity cannot be stockpiled or purchased; it must be cultivated through training, experience, and organizational culture that empowers front-line decision-making.</p>
+
+                <h4>Margin Management</h4>
+                <p>Resilient organizations actively manage their operating margins, maintaining buffers between normal operating conditions and failure boundaries. In data center operations, this manifests as maintaining spare capacity in cooling systems beyond peak load projections, keeping <span class="tooltip" data-tooltip="Uninterruptible Power Supply: Provides emergency power during primary source failures and conditions power to protect sensitive equipment.">UPS</span> battery runtime above minimum requirements, and staffing above the bare minimum needed for routine operations. The erosion of margins, often driven by cost optimization pressure, is one of the primary mechanisms through which organizations drift toward failure <a href="#ref13" class="cite">[13]</a>.</p>
+
+                <h4>Brittleness</h4>
+                <p>Brittleness describes the tendency of a system to fail suddenly and completely once a performance boundary is exceeded, in contrast to resilient systems that degrade gracefully. A facility may appear highly reliable during normal operations while being extremely brittle under stress. The distinction is not visible in routine metrics like uptime percentage; it only becomes apparent when the system is pushed beyond its normal operating envelope.</p>
+
+                <!-- Section 6: Hollnagel's Four Cornerstones -->
+                <h2 id="hollnagel"><span class="section-number">06</span> Hollnagel's Four Cornerstones of Resilience</h2>
+
+                <p>Erik Hollnagel's framework identifies four essential capabilities that define a resilient system <a href="#ref1" class="cite">[1]</a> <a href="#ref2" class="cite">[2]</a>. Each capability represents a distinct temporal orientation and a different organizational competency. Applied to data center operations, these cornerstones provide a structured approach to building resilience that complements and extends the design assurance provided by Tier certification.</p>
+
+                <h3>1. Responding: Knowing What to Do</h3>
+
+                <p>The ability to respond means knowing what to do when something happens, whether the event was anticipated or not. In data center operations, this cornerstone encompasses:</p>
+
+                <ul>
+                    <li><strong>Emergency Operating Procedures (EOPs)</strong> that address both anticipated and composite failure scenarios</li>
+                    <li><strong>Decision authority frameworks</strong> that clarify who can authorize critical actions (load shedding, generator start, system isolation) without waiting for management approval</li>
+                    <li><strong>Communication protocols</strong> that ensure the right information reaches the right people within actionable timeframes</li>
+                    <li><strong>Resource mobilization plans</strong> that pre-position people, tools, spare parts, and vendor contacts for rapid deployment</li>
+                </ul>
+
+                <p><strong>Data center example:</strong> During a utility power interruption, the response capability determines whether the operations team can smoothly manage the transition to generator power, verify stable UPS operation, initiate cooling system adjustments, communicate status to stakeholders, and begin root cause investigation, all within the first minutes of the event. A facility with strong response capability has practiced this sequence repeatedly and can execute it almost reflexively. A facility with weak response capability discovers gaps in its procedures when they matter most.</p>
+
+                <h3>2. Monitoring: Knowing What to Look For</h3>
+
+                <p>Monitoring goes beyond alarm management to encompass the proactive surveillance of system health indicators that can reveal developing problems before they become incidents. This cornerstone includes:</p>
+
+                <ul>
+                    <li><strong>Leading indicator identification</strong> through <span class="tooltip" data-tooltip="Building Management System: Integrated system for monitoring and controlling building services including HVAC, power, fire safety, and security.">BMS</span> and <span class="tooltip" data-tooltip="Data Center Infrastructure Management: Software tools that collect and manage information about a data center's IT equipment and facility infrastructure.">DCIM</span> trend analysis</li>
+                    <li><strong>Alarm rationalization</strong> that reduces noise while preserving signal quality</li>
+                    <li><strong>Predictive maintenance programs</strong> that use condition-based data to anticipate failures</li>
+                    <li><strong>Environmental scanning</strong> for external threats (weather, utility grid conditions, supply chain disruptions)</li>
+                </ul>
+
+                <p><strong>Data center example:</strong> A monitoring-capable organization tracks UPS battery internal resistance trends, cooling system delta-T patterns, generator fuel consumption curves, and <span class="tooltip" data-tooltip="Power Usage Effectiveness: A ratio describing how efficiently a data center uses energy, calculated as total facility energy divided by IT equipment energy. A PUE of 1.0 would mean all energy goes to computing.">PUE</span> drift patterns. When battery resistance in a specific UPS string begins trending upward, the team initiates investigation and replacement before the battery fails during the next utility transfer. The monitoring system does not merely detect failures; it reveals the precursors to failure, providing time to intervene.</p>
+
+                <h3>3. Anticipating: Knowing What to Expect</h3>
+
+                <p>Anticipation is the ability to identify and prepare for potential future challenges, disruptions, and opportunities. It is the forward-looking cornerstone that distinguishes proactive organizations from reactive ones:</p>
+
+                <ul>
+                    <li><strong>Scenario planning and tabletop exercises</strong> that explore failure modes beyond the design basis</li>
+                    <li><strong>Risk assessment frameworks</strong> that systematically evaluate emerging threats</li>
+                    <li><strong>Technology roadmapping</strong> that anticipates capacity and capability requirements</li>
+                    <li><strong>Vendor and supply chain risk monitoring</strong> that identifies potential single points of failure in the supply network</li>
+                </ul>
+
+                <p><strong>Data center example:</strong> An anticipating organization conducts annual tabletop exercises that simulate cascading failure scenarios such as simultaneous utility outage and cooling system failure during peak summer load. These exercises reveal gaps in procedures, expose assumptions that may no longer be valid, and build shared mental models among the operations team. The organization also monitors regional grid reliability data and weather forecasts to pre-position resources before anticipated stress events.</p>
+
+                <h3>4. Learning: Knowing What Has Happened</h3>
+
+                <p>The learning cornerstone addresses the organization's ability to extract knowledge from experience and translate it into improved capability. This is perhaps the most frequently neglected of the four cornerstones:</p>
+
+                <ul>
+                    <li><strong>Structured post-incident review</strong> that goes beyond blame assignment to understand systemic contributing factors</li>
+                    <li><strong>Near-miss reporting systems</strong> that capture events that could have become incidents</li>
+                    <li><strong>Knowledge management</strong> that preserves institutional memory as personnel change</li>
+                    <li><strong>Cross-facility learning</strong> that allows insights from one site to improve practices at others</li>
+                </ul>
+
+                <p><strong>Data center example:</strong> Following a near-miss event where an <span class="tooltip" data-tooltip="Static Transfer Switch: A device that provides instantaneous transfer of power between two independent AC sources with no interruption to the connected loads.">STS</span> failed to transfer during testing, a learning organization conducts a blameless post-mortem, identifies that the failure resulted from a firmware version mismatch that went undetected during commissioning, implements a firmware audit process across all critical switching devices, shares the finding with other facilities in the portfolio, and updates commissioning checklists to prevent recurrence. The event becomes a source of organizational improvement rather than merely a maintenance ticket.</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cornerstone</th>
+                                <th>Temporal Focus</th>
+                                <th>Key Question</th>
+                                <th>Data Center Implementation</th>
+                                <th>Failure Indicator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Responding</strong></td>
+                                <td>Present</td>
+                                <td>What to do now?</td>
+                                <td>EOPs, drills, decision authority</td>
+                                <td>Slow response, confusion during incidents</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Monitoring</strong></td>
+                                <td>Present/Near-future</td>
+                                <td>What to watch?</td>
+                                <td>BMS/DCIM trending, alarm rationalization</td>
+                                <td>Alarm fatigue, missed precursors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Anticipating</strong></td>
+                                <td>Future</td>
+                                <td>What to expect?</td>
+                                <td>Tabletop exercises, risk assessment</td>
+                                <td>Surprised by foreseeable events</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Learning</strong></td>
+                                <td>Past</td>
+                                <td>What happened?</td>
+                                <td>RCA, near-miss reporting, knowledge mgmt</td>
+                                <td>Recurring incidents, lost knowledge</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Section 7: Case Context -->
+                <h2 id="case-context"><span class="section-number">07</span> Case Context: Reliability Without Resilience</h2>
+
+                <p>The following composite scenario, drawn from patterns observed across multiple facilities and documented in industry literature, illustrates how a facility can be highly reliable by design and simultaneously fragile in operation. Names, locations, and specific details have been generalized to protect confidentiality while preserving the essential dynamics.</p>
+
+                <h3>The Facility</h3>
+
+                <p>A Tier III certified data center in a tropical climate zone, supporting enterprise colocation clients with combined IT load of 4.2 MW. The facility features <span class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated, with each system capable of supporting the full load independently.">2N</span> power distribution through dual UPS systems feeding independent <span class="tooltip" data-tooltip="Power Distribution Unit: A device used to distribute electric power within a data center, from the main feed to individual racks.">PDU</span> paths to each rack. Cooling is provided by chilled water with N+1 redundancy across five Computer Room Air Handlers (CRAHs). The facility holds both TCCF certification and maintains a 99.995% availability SLA with its anchor tenant.</p>
+
+                <h3>The Incident Sequence</h3>
+
+                <div style="background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border-radius:16px;padding:2rem;margin:1.5rem 0;color:#e2e8f0;">
+                    <h4 style="color:#34d399;margin-bottom:1rem;">Timeline of a Cascading Failure</h4>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="background:rgba(16,185,129,0.3);color:#34d399;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+0 min</span>
+                        <span style="font-size:0.9rem;">Utility power experiences a voltage sag event (not a complete outage). Both UPS systems respond correctly, transitioning to battery power as designed. The design works as specified.</span>
+                    </div>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="background:rgba(245,158,11,0.3);color:#fcd34d;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+2 min</span>
+                        <span style="font-size:0.9rem;">Utility power recovers. UPS-A retransfers to mains normally. UPS-B experiences a retransfer fault due to a capacitor degradation issue that was not detected during the most recent maintenance cycle (which was delayed by three weeks due to staffing constraints).</span>
+                    </div>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="background:rgba(245,158,11,0.3);color:#fcd34d;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+3 min</span>
+                        <span style="font-size:0.9rem;">UPS-B remains on battery. The BMS generates an alarm, but it appears as one of 47 active alarms in a system that has accumulated significant alarm noise due to deferred alarm rationalization. The on-duty operator, a relatively new team member covering for the regular shift lead who is on leave, does not immediately recognize the criticality of this specific alarm among the broader alarm flood.</span>
+                    </div>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="background:rgba(239,68,68,0.3);color:#fca5a5;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+14 min</span>
+                        <span style="font-size:0.9rem;">UPS-B battery runtime depletes. The static bypass engages, but the bypass path has a known nuisance trip issue that was documented in a maintenance report six months ago but was never escalated to a corrective action. The bypass trips on overcurrent.</span>
+                    </div>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="background:rgba(239,68,68,0.3);color:#fca5a5;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+14.5 min</span>
+                        <span style="font-size:0.9rem;">All loads on the B-side power path lose power. The 2N design means loads should still be served by A-side. However, approximately 15% of racks had been provisioned with only single-corded servers by clients who opted out of dual-cord configuration. These loads go down immediately.</span>
+                    </div>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="background:rgba(239,68,68,0.3);color:#fca5a5;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+16 min</span>
+                        <span style="font-size:0.9rem;">The sudden load redistribution to the A-side causes thermal spikes in several high-density zones. The cooling system, operating at N+1 but with one CRAH offline for planned maintenance, struggles to compensate. Inlet temperatures begin rising in the affected zones.</span>
+                    </div>
+
+                    <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;">
+                        <span style="background:rgba(239,68,68,0.3);color:#fca5a5;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.75rem;font-weight:700;white-space:nowrap;">T+45 min</span>
+                        <span style="font-size:0.9rem;">Senior engineer arrives on-site and begins systematic troubleshooting. The emergency procedures on file do not address this specific compound failure mode. The team improvises, eventually restoring UPS-B through a manual bypass procedure. Total client impact: 15% of loads experienced 31 minutes of downtime; 30% of loads experienced thermal excursions above the ASHRAE recommended envelope.</span>
+                    </div>
+                </div>
+
+                <h3>Analysis: Why Design Could Not Prevent This Outcome</h3>
+
+                <p>Every individual component in this scenario functioned within its design specifications, or failed in ways that the design accounted for through redundancy. The 2N power topology performed exactly as intended when UPS-A transferred normally. The failure cascaded not because the design was inadequate, but because multiple operational gaps compounded:</p>
+
+                <ul>
+                    <li><strong>Deferred maintenance</strong> allowed the capacitor degradation in UPS-B to go undetected</li>
+                    <li><strong>Alarm noise</strong> masked the critical alarm within a flood of low-priority notifications</li>
+                    <li><strong>Inadequate cross-training</strong> left an inexperienced operator as the sole decision-maker during a complex event</li>
+                    <li><strong>Unresolved maintenance findings</strong> (the bypass trip issue) remained in a report rather than being escalated to corrective action</li>
+                    <li><strong>Client provisioning practices</strong> undermined the 2N design intent through single-cord configurations</li>
+                    <li><strong>Concurrent maintenance scheduling</strong> reduced cooling redundancy at the wrong time</li>
+                    <li><strong>Incomplete procedures</strong> did not address the specific compound failure mode that occurred</li>
+                </ul>
+
+                <p>None of these operational gaps would have been visible in a Tier topology assessment. The facility was, and remained, a legitimate Tier III design. But the operational reality had drifted significantly from the design intent, and the gap became catastrophically visible only when multiple latent conditions aligned during a triggering event. This pattern is precisely what Reason describes in his "Swiss cheese model" of organizational accidents <a href="#ref8" class="cite">[8]</a>.</p>
+
+                <div class="key-insight">
+                    <div class="key-insight-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Lesson
+                    </div>
+                    <p style="margin:0;">The facility's Tier III certification was accurate. Its operational resilience was not Tier III. The gap between certified design capability and actual operational capability is the most significant and least measured risk in the data center industry.</p>
+                </div>
+
+                <!-- Section 8: Measuring Resilience -->
+                <h2 id="measuring"><span class="section-number">08</span> Measuring Resilience: A Seven-Dimension Framework</h2>
+
+                <p>If resilience is to be managed, it must first be measured. The challenge lies in quantifying capabilities that are inherently qualitative and context-dependent. The framework proposed here identifies seven measurable dimensions of operational resilience, each corresponding to a specific organizational capability that contributes to overall facility performance under stress.</p>
+
+                <h3>The Seven Dimensions</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Dimension</th>
+                                <th>Weight</th>
+                                <th>What It Measures</th>
+                                <th>Hollnagel Cornerstone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><strong>Drill Frequency</strong></td>
+                                <td>15%</td>
+                                <td>How often emergency scenarios are practiced</td>
+                                <td>Responding</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><strong>Response Capability</strong></td>
+                                <td>20%</td>
+                                <td>Time from alarm to first informed action</td>
+                                <td>Responding</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><strong>Recovery Testing</strong></td>
+                                <td>15%</td>
+                                <td>Frequency and rigor of recovery procedure validation</td>
+                                <td>Responding / Learning</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td><strong>Cross-Training</strong></td>
+                                <td>10%</td>
+                                <td>Percentage of team competent in multiple domains</td>
+                                <td>Responding / Monitoring</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td><strong>Documentation Currency</strong></td>
+                                <td>15%</td>
+                                <td>How current are operating procedures and as-builts</td>
+                                <td>Monitoring / Anticipating</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td><strong>Communication Plan</strong></td>
+                                <td>10%</td>
+                                <td>Quality and testing of escalation and notification procedures</td>
+                                <td>Responding / Anticipating</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td><strong>Lessons Learned Program</strong></td>
+                                <td>15%</td>
+                                <td>Maturity of post-incident learning and knowledge capture</td>
+                                <td>Learning</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Scoring Methodology</h3>
+
+                <p>Each dimension is scored on a 0-100 scale based on objective criteria. The weighted sum produces an overall Resilience Score that can be compared against the design-based Reliability Score derived from the facility's redundancy configuration. The gap between these two scores represents the organization's "resilience debt" &mdash; the difference between what the design promises and what the operations team can deliver.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Resilience Score Calculation</div>
+                    <p style="margin:0.5rem 0;font-size:0.9rem;">Resilience Score = (Drill &times; 0.15) + (Response &times; 0.20) + (Recovery &times; 0.15) + (Cross-Train &times; 0.10) + (Documentation &times; 0.15) + (Communication &times; 0.10) + (Learning &times; 0.15)</p>
+                    <p style="margin:0.5rem 0;font-size:0.9rem;">Reliability Score = f(Redundancy Configuration): N=35, N+1=55, 2N=75, 2N+1=95</p>
+                    <p style="margin:0.5rem 0;font-size:0.9rem;">Gap = |Reliability Score - Resilience Score|</p>
+                    <p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">Gap > 30: CRITICAL | Gap 15-30: WARNING | Gap &lt; 15: BALANCED</p>
+                </div>
+
+                <p>The scoring recognizes that no single dimension determines resilience. A facility may have excellent documentation but poor drill frequency, or strong communication plans that have never been tested. The weighted composite provides a holistic view of operational readiness that no single metric can capture.</p>
+
+                <!-- Section 9: Operational Resilience Framework -->
+                <h2 id="framework"><span class="section-number">09</span> Operational Resilience Framework</h2>
+
+                <h3>Five-Stage Maturity Model</h3>
+
+                <p>Building operational resilience is not a one-time project but an ongoing organizational development journey. The following maturity model describes five progressive stages that organizations typically pass through as they develop resilience capabilities on top of their existing tier design:</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Name</th>
+                                <th>Characteristics</th>
+                                <th>Typical Resilience Score</th>
+                                <th>Organizational Culture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td>Reactive</td>
+                                <td>Responds to incidents after they occur; no proactive processes; relies on individual heroism</td>
+                                <td>0-20</td>
+                                <td>Pathological <a href="#ref14" class="cite">[14]</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td>Aware</td>
+                                <td>Recognizes need for resilience; beginning to document procedures; initial drill programs</td>
+                                <td>20-40</td>
+                                <td>Bureaucratic</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td>Proactive</td>
+                                <td>Regular drills; structured RCA; current documentation; defined escalation paths</td>
+                                <td>40-65</td>
+                                <td>Bureaucratic/Generative</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td>Adaptive</td>
+                                <td>Scenario planning; cross-training; near-miss reporting; lessons integrated into operations</td>
+                                <td>65-85</td>
+                                <td>Generative</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td>Generative</td>
+                                <td>Continuous improvement culture; learning from success and failure; information flows freely; proactive risk management</td>
+                                <td>85-100</td>
+                                <td>Generative <a href="#ref14" class="cite">[14]</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Westrum's Organizational Culture Alignment</h3>
+
+                <p>The maturity model deliberately aligns with Ron Westrum's typology of organizational cultures <a href="#ref14" class="cite">[14]</a>, which categorizes organizations by how they process information:</p>
+
+                <ul>
+                    <li><strong>Pathological organizations</strong> suppress information, discourage reporting, and punish messengers. Resilience is minimal because problems are hidden rather than addressed.</li>
+                    <li><strong>Bureaucratic organizations</strong> process information through formal channels, comply with standards, and maintain procedures. Resilience exists but is limited by rigidity and slow adaptation.</li>
+                    <li><strong>Generative organizations</strong> actively seek information, reward reporting, train for novelty, and treat failures as learning opportunities. Resilience is maximized because the organization continuously adapts and improves.</li>
+                </ul>
+
+                <p>The progression from Reactive to Generative represents not merely a change in processes but a fundamental transformation in organizational culture. This is why resilience cannot be achieved through policy mandates alone; it requires sustained leadership commitment, psychological safety for reporting, and genuine investment in learning systems.</p>
+
+                <h3>Building on Existing Tier Design</h3>
+
+                <p>The framework recognizes that resilience is built on top of, not as a replacement for, sound design. A facility with N redundancy and a Generative culture will outperform a facility with 2N redundancy and a Pathological culture in most real-world scenarios. But a facility with 2N redundancy and a Generative culture represents the gold standard: maximum design reliability supported by maximum operational resilience.</p>
+
+                <p>The practical challenge is that most organizations invest asymmetrically. The CAPEX budget for infrastructure receives rigorous justification and oversight. The OPEX budget for operational excellence, including training, drills, documentation, and learning programs, is treated as discretionary and vulnerable to cost-cutting pressure. This asymmetry produces the reliability-resilience gap that this paper seeks to address.</p>
+
+                <div class="info-box">
+                    <div class="info-box-title">Implementation Principle</div>
+                    <p style="margin:0;">Every dollar invested in design redundancy should be matched by proportional investment in operational capability. A 2N design operated by a Reactive organization delivers far less than its theoretical availability. The most cost-effective path to improved facility performance often lies in operational investment rather than additional infrastructure.</p>
+                </div>
+                <!-- Section 10: Interactive Canvas -->
+                <h2 id="canvas"><span class="section-number">10</span> Interactive: Reliability vs Resilience Canvas</h2>
+
+                <p>The following interactive simulation demonstrates how reliable-only systems compare with resilient systems under varying levels of disturbance intensity. As you increase the disturbance slider, observe how the reliable-only system (designed for anticipated failure modes) degrades sharply beyond its design envelope, while the resilient system (supported by strong operational practices) maintains higher performance through adaptive response. The performance gap between the two widens as disturbance intensity increases, illustrating why operational resilience becomes more valuable precisely when conditions become more challenging.</p>
+
                 <div class="chart-container">
                     <div class="chart-title">Disturbance Intensity vs Recovery Performance</div>
-                    <div class="chart-subtitle">Resilient systems maintain performance better under stress</div>
+                    <div class="chart-subtitle">Comparing reliable-only systems against resilient systems under increasing stress</div>
 
                     <div class="chart-wrapper">
                         <canvas id="resilienceChart" class="chart-canvas" width="800" height="380"></canvas>
@@ -594,7 +1731,7 @@
                             Reliable-Only System
                         </div>
                         <div class="legend-item">
-                            <span class="legend-dot" style="background: #22c55e;"></span>
+                            <span class="legend-dot" style="background: #10b981;"></span>
                             Resilient System
                         </div>
                     </div>
@@ -615,135 +1752,317 @@
                     </div>
                 </div>
 
-                <h2>6. Case Pattern: Identical Design, Divergent Outcomes</h2>
-                <p>Across comparable sites, the same pattern repeats: identical redundancy, identical vendors, identical maintenance plans. Yet under stress: one site isolates faults decisively, the other escalates uncertainty.</p>
+                <!-- Section 11: Calculator -->
+                <h2 id="calculator"><span class="section-number">11</span> Calculator: Resilience Assessment Tool</h2>
 
-                <p>The differentiator is not equipment. It is operational coherence.</p>
+                <p>Use this interactive assessment tool to evaluate your facility's resilience posture. Input your current operational parameters to generate a Reliability Score (based on design redundancy) and a Resilience Score (based on operational capability across seven dimensions). The gap between these scores reveals whether your operations are keeping pace with your design investment. A large gap indicates that operational practices are undermining the theoretical capability of the infrastructure, creating hidden risk that will only become visible during the next significant incident.</p>
 
-                <h2>7. Human Factors and Adaptive Capacity</h2>
-                <p>Human operators are often framed as reliability risks. Resilience reframes them as adaptive resources. When systems are designed to support adaptation, human performance stabilizes the system. When systems constrain adaptation, human performance becomes a liability.</p>
+                <div class="calculator-section" id="resilienceCalc">
+                    <div class="calculator-title">Resilience Assessment Tool</div>
+                    <div class="calculator-subtitle">Evaluate the gap between your design reliability and operational resilience</div>
 
-                <h2>8. Measuring Resilience</h2>
-                <p>Traditional KPIs focus on uptime and incident counts. Resilience metrics focus on:</p>
-                <ul>
-                    <li><strong>MTTR distribution</strong> — not just averages</li>
-                    <li><strong>Decision latency</strong> — time to first action</li>
-                    <li><strong>Recurrence suppression</strong> — learning effectiveness</li>
-                    <li><strong>Learning velocity</strong> — time from incident to improvement</li>
-                </ul>
-                <p>These metrics reveal behavior under stress, not just performance at rest.</p>
+                    <div class="calc-grid">
+                        <div class="calc-input-group">
+                            <label class="calc-label">Redundancy Configuration</label>
+                            <select class="calc-select" id="calcRedundancy">
+                                <option value="N">N (No Redundancy)</option>
+                                <option value="N+1" selected>N+1</option>
+                                <option value="2N">2N</option>
+                                <option value="2N+1">2N+1</option>
+                            </select>
+                        </div>
 
-                <h2>9. Designing for Resilience</h2>
-                <p>Resilience does not replace reliability. It extends it. Robust organizations:</p>
-                <ul>
-                    <li>Treat tier design as a foundation</li>
-                    <li>Engineer operational cognition</li>
-                    <li>Manage technical debt</li>
-                    <li>Empower redesign through RCA</li>
-                </ul>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Drill Frequency</label>
+                            <select class="calc-select" id="calcDrillFreq">
+                                <option value="Never">Never</option>
+                                <option value="Annual" selected>Annual</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Monthly">Monthly</option>
+                            </select>
+                        </div>
 
-                <h2>10. Conclusion</h2>
-                <blockquote>
-                    "Tier ratings are necessary. They are not sufficient. Reliability is a design attribute. Resilience is an operational achievement. Organizations that recognize this distinction move from uptime-focused thinking to sustained performance under uncertainty."
-                </blockquote>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Response Time to Critical Alarm (minutes)</label>
+                            <div class="calc-slider-container">
+                                <input type="range" class="calc-slider" id="calcResponseTime" min="1" max="60" value="15">
+                                <span class="calc-slider-value" id="calcResponseTimeVal">15 min</span>
+                            </div>
+                        </div>
 
-                <div class="references">
-                    <h3>References</h3>
-                    <ul>
-                        <li>Hollnagel, E. (2014). Safety-I and Safety-II: The Past and Future of Safety Management.</li>
-                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents.</li>
-                        <li>Leveson, N. (2011). Engineering a Safer World.</li>
-                        <li>ISO 22301. (2019). Business Continuity Management Systems.</li>
-                        <li>Weick, K. E., & Sutcliffe, K. M. (2015). Managing the Unexpected.</li>
-                    </ul>
-                </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Recovery Testing Level</label>
+                            <select class="calc-select" id="calcRecovery">
+                                <option value="None">None</option>
+                                <option value="Documented" selected>Documented</option>
+                                <option value="Tested Annually">Tested Annually</option>
+                                <option value="Tested Quarterly">Tested Quarterly</option>
+                            </select>
+                        </div>
 
-                <!-- Newsletter Signup -->
-                <div class="newsletter-signup">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
-                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
-                </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Cross-Training Coverage (%)</label>
+                            <div class="calc-slider-container">
+                                <input type="range" class="calc-slider" id="calcCrossTrain" min="0" max="100" value="30">
+                                <span class="calc-slider-value" id="calcCrossTrainVal">30%</span>
+                            </div>
+                        </div>
 
-                <!-- Author Bio -->
-                <div class="author-bio">
-                    <div class="author-bio-image">
-                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
+                        <div class="calc-input-group">
+                            <label class="calc-label">Documentation Currency</label>
+                            <select class="calc-select" id="calcDocCurrency">
+                                <option value="Outdated >2yr">Outdated >2yr</option>
+                                <option value="Outdated 1-2yr" selected>Outdated 1-2yr</option>
+                                <option value="Current <1yr">Current &lt;1yr</option>
+                                <option value="Real-time updated">Real-time Updated</option>
+                            </select>
+                        </div>
+
+                        <div class="calc-input-group">
+                            <label class="calc-label">Communication Plan</label>
+                            <select class="calc-select" id="calcCommPlan">
+                                <option value="None">None</option>
+                                <option value="Basic" selected>Basic</option>
+                                <option value="Detailed">Detailed</option>
+                                <option value="Tested & Drilled">Tested &amp; Drilled</option>
+                            </select>
+                        </div>
+
+                        <div class="calc-input-group">
+                            <label class="calc-label">Lessons Learned Program</label>
+                            <select class="calc-select" id="calcLessons">
+                                <option value="None">None</option>
+                                <option value="Ad-hoc" selected>Ad-hoc</option>
+                                <option value="Structured">Structured</option>
+                                <option value="Integrated into design">Integrated into Design</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="author-bio-content">
-                        <h4>Bagus Dwi Permana</h4>
-                        <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
-                        <div class="author-bio-links">
-                            <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                                LinkedIn
-                            </a>
-                            <a href="https://github.com/baguspermana7-cpu" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                                GitHub
-                            </a>
-                            <a href="mailto:baguspermana7@gmail.com">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                Email
-                            </a>
+
+                    <div class="calc-results" id="calcResults">
+                        <div class="calc-results-title">Assessment Results</div>
+
+                        <div class="dual-bars">
+                            <div class="bar-group">
+                                <div class="bar-label">
+                                    <span class="bar-label-name">Reliability Score (Design)</span>
+                                    <span class="bar-label-value" id="relScoreVal" style="color:#38bdf8;">55</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill" id="relBar" style="background:linear-gradient(90deg,#38bdf8,#0ea5e9);width:55%;"></div>
+                                </div>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar-label">
+                                    <span class="bar-label-name">Resilience Score (Operations)</span>
+                                    <span class="bar-label-value" id="resScoreVal" style="color:#10b981;">--</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill" id="resBar" style="background:linear-gradient(90deg,#10b981,#34d399);width:0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gap-indicator balanced" id="gapIndicator">
+                            Calculating...
+                        </div>
+
+                        <div class="tier-equivalents">
+                            <div class="tier-equiv-card">
+                                <div class="tier-equiv-label">Reliability Tier Equivalent</div>
+                                <div class="tier-equiv-value" id="relTierEquiv" style="color:#38bdf8;">--</div>
+                            </div>
+                            <div class="tier-equiv-card">
+                                <div class="tier-equiv-label">Resilience Maturity Level</div>
+                                <div class="tier-equiv-value" id="resTierEquiv" style="color:#10b981;">--</div>
+                            </div>
+                        </div>
+
+                        <div class="dimension-breakdown">
+                            <h4>7-Dimension Breakdown</h4>
+                            <div id="dimensionBars"></div>
+                        </div>
+
+                        <div class="recommendations" id="recommendations">
+                            <h4>Top 3 Recommendations</h4>
+                            <div id="recList"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Related Articles -->
-                <div class="related-articles">
-                    <h3>Continue Reading</h3>
-                    <div class="related-grid">
-                        <a href="article-6.html" class="related-card">
-                            <div class="related-card-number">06</div>
-                            <div class="related-card-content">
-                                <h4>Why Post-Incident RCA Fails Without Design Authority</h4>
-                                <p>When RCA becomes reporting ritual</p>
-                            </div>
-                        </a>
-                        <a href="article-8.html" class="related-card">
-                            <div class="related-card-number">08</div>
-                            <div class="related-card-content">
-                                <h4>Why "No Incident" Is Not Evidence of Safety</h4>
-                                <p>Weak signals that precede failure</p>
-                            </div>
-                        </a>
+                <!-- Section 12: Practical Implementation -->
+                <h2 id="implementation"><span class="section-number">12</span> Practical Implementation</h2>
+
+                <p>Transitioning from a reliability-focused to a resilience-focused operations model requires a structured approach that recognizes organizational change cannot happen overnight. The following roadmap provides actionable steps organized by time horizon, allowing operations teams to demonstrate early wins while building toward sustained cultural transformation.</p>
+
+                <h3>Quick Wins: 30-Day Actions</h3>
+
+                <p>These initial steps require minimal investment and can be implemented within the authority of the operations team without extensive approval processes:</p>
+
+                <ul>
+                    <li><strong>Alarm audit and rationalization</strong> &mdash; Review all active alarms in <span class="tooltip" data-tooltip="Building Management System: Integrated system for monitoring and controlling building services.">BMS</span> and <span class="tooltip" data-tooltip="Data Center Infrastructure Management: Software tools for managing data center IT and facility infrastructure.">DCIM</span> systems. Identify and suppress nuisance alarms. Ensure critical alarms are distinguishable from informational notifications. Target: reduce alarm volume by 40-60% while preserving all safety-critical notifications.</li>
+                    <li><strong>Emergency procedure review</strong> &mdash; Conduct a read-through of all Emergency Operating Procedures with the current operations team. Identify any procedures that do not reflect current facility configuration. Flag outdated procedures for immediate update.</li>
+                    <li><strong>Shift handover formalization</strong> &mdash; Implement a structured shift handover protocol that includes: open work orders, current alarms, pending maintenance activities, weather and utility status, and any abnormal operating conditions. Document each handover.</li>
+                    <li><strong>On-call roster review</strong> &mdash; Verify that escalation contacts are current, reachable, and understand their roles during emergencies. Update the escalation matrix if any gaps are identified.</li>
+                    <li><strong>Spare parts inventory</strong> &mdash; Audit critical spare parts inventory against the facility's risk register. Identify any single points of failure where a spare part is not available on-site.</li>
+                </ul>
+
+                <h3>Medium-Term: 90-Day Actions</h3>
+
+                <p>These steps require more planning and potentially some budget allocation but can be implemented within one quarter:</p>
+
+                <ul>
+                    <li><strong>Tabletop exercise program</strong> &mdash; Design and conduct at least one tabletop exercise involving a compound failure scenario that goes beyond the facility's standard operating procedures. Include participants from operations, management, and client relations. Document findings and assign corrective actions.</li>
+                    <li><strong>Cross-training assessment</strong> &mdash; Map the team's competency matrix across all critical systems (electrical, mechanical, fire, BMS, IT infrastructure). Identify single points of knowledge failure where only one team member understands a critical system. Initiate cross-training for the highest-risk gaps.</li>
+                    <li><strong>Documentation currency audit</strong> &mdash; Compare as-built drawings with actual facility configuration for critical power and cooling systems. Identify discrepancies and establish a prioritized update schedule. Implement a change management process that requires documentation updates concurrent with any facility modification.</li>
+                    <li><strong>Near-miss reporting system</strong> &mdash; Establish a voluntary, non-punitive near-miss reporting mechanism. Communicate clearly that the purpose is learning, not discipline. Set a target for monthly near-miss reports and celebrate reporting activity.</li>
+                    <li><strong><span class="tooltip" data-tooltip="Computerized Maintenance Management System: Software that maintains a computer database of information about an organization's maintenance operations, used to schedule and track maintenance activities.">CMMS</span> integration review</strong> &mdash; Ensure that maintenance management data feeds into operational decision-making. Review preventive maintenance completion rates, overdue work orders, and deferred maintenance items for risk implications.</li>
+                </ul>
+
+                <h3>Strategic: 1-Year Actions</h3>
+
+                <p>These initiatives represent fundamental capability development that requires sustained leadership commitment and budget allocation:</p>
+
+                <ul>
+                    <li><strong>Full drill program implementation</strong> &mdash; Establish a quarterly drill program that cycles through the facility's highest-risk scenarios. Include unannounced drills to test real-world response capability. Measure and trend response times, decision quality, and communication effectiveness. Target: every operations team member participates in at least four drills per year.</li>
+                    <li><strong>Resilience metrics dashboard</strong> &mdash; Develop and deploy a resilience metrics dashboard that tracks the seven dimensions of the assessment framework alongside traditional reliability KPIs. Present resilience metrics in monthly management reviews with the same rigor as financial and uptime metrics.</li>
+                    <li><strong>Organizational learning culture</strong> &mdash; Transform post-incident review from a compliance exercise into a genuine learning process. Adopt structured methodologies such as Learning Review (as opposed to Root Cause Analysis, which can be reductive). Establish a knowledge management system that captures lessons learned and makes them accessible across the organization.</li>
+                    <li><strong>Operational resilience certification</strong> &mdash; If available, pursue TCOS certification or equivalent third-party assessment of operational practices. Use the assessment process as a driver for continuous improvement rather than a one-time achievement.</li>
+                    <li><strong>Design-operations feedback loop</strong> &mdash; Establish formal mechanisms for operational experience to influence design decisions for future builds and major renovations. Ensure that lessons learned from incidents, drills, and near-misses are systematically captured and fed back to the engineering team.</li>
+                </ul>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time Horizon</th>
+                                <th>Investment Level</th>
+                                <th>Approval Required</th>
+                                <th>Expected Impact</th>
+                                <th>Resilience Score Improvement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>30 Days</strong></td>
+                                <td>Low (staff time only)</td>
+                                <td>Operations manager</td>
+                                <td>Immediate risk reduction</td>
+                                <td>+5 to +10 points</td>
+                            </tr>
+                            <tr>
+                                <td><strong>90 Days</strong></td>
+                                <td>Moderate (training, tools)</td>
+                                <td>Site director</td>
+                                <td>Capability foundation</td>
+                                <td>+10 to +20 points</td>
+                            </tr>
+                            <tr>
+                                <td><strong>1 Year</strong></td>
+                                <td>Significant (programs, culture)</td>
+                                <td>Executive leadership</td>
+                                <td>Cultural transformation</td>
+                                <td>+20 to +40 points</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 13: Conclusion -->
+                <h2 id="conclusion"><span class="section-number">13</span> Conclusion</h2>
+
+                <div class="conclusion-box">
+                    <h3>From Reliability to Resilience</h3>
+
+                    <p>The Uptime Institute's Tier Classification System has served the data center industry well for nearly three decades, providing a rigorous and globally recognized framework for evaluating infrastructure design quality. This paper does not argue against Tier certification; it argues that Tier certification addresses only half of the assurance equation.</p>
+
+                    <p>Reliability is a necessary condition for data center performance. A facility cannot be resilient if its fundamental design is inadequate. But reliability alone is not sufficient. The evidence from industry outage data, organizational accident research, and resilience engineering theory consistently demonstrates that operational capability, not design topology, determines facility performance under the conditions that matter most: when things go wrong in unexpected ways.</p>
+
+                    <p>The seven-dimension resilience assessment framework introduced in this paper provides a structured, measurable approach to evaluating and developing operational resilience. By quantifying the gap between design reliability and operational resilience, organizations can identify their most critical vulnerabilities and prioritize investments that deliver the greatest risk reduction.</p>
+
+                    <blockquote style="margin:1.5rem 0;">
+                        "Tier ratings are necessary. They are not sufficient. Reliability is a design attribute. Resilience is an operational achievement. The organizations that recognize this distinction and invest accordingly will be the ones that sustain performance when their peers experience preventable failures."
+                    </blockquote>
+
+                    <p>The path from reliability to resilience is not a technology upgrade or a certification achievement. It is an organizational transformation that requires sustained commitment to learning, adaptation, and operational excellence. For those willing to undertake this journey, the reward is not merely improved uptime metrics but a fundamentally more capable organization that can thrive under uncertainty.</p>
+                </div>
+                <!-- References -->
+                <div class="references-section">
+                    <div class="references-title">References</div>
+                    <ol class="references-list">
+                        <li class="reference-item" id="ref1">Hollnagel, E. (2011). "Prologue: The Scope of Resilience Engineering." In <em>Resilience Engineering in Practice</em>. Ashgate Publishing.</li>
+                        <li class="reference-item" id="ref2">Hollnagel, E. (2014). <em>Safety-I and Safety-II: The Past and Future of Safety Management</em>. Ashgate Publishing.</li>
+                        <li class="reference-item" id="ref3">Uptime Institute (2023). "Tier Standard: Topology." Uptime Institute LLC.</li>
+                        <li class="reference-item" id="ref4">Uptime Institute (2023). "Tier Standard: Operational Sustainability." Uptime Institute LLC.</li>
+                        <li class="reference-item" id="ref5">Uptime Institute (2023). "Annual Outage Analysis 2023." Uptime Institute.</li>
+                        <li class="reference-item" id="ref6">Uptime Institute (2024). "Global Data Center Survey 2024." Uptime Institute.</li>
+                        <li class="reference-item" id="ref7">Woods, D. (2015). "Four Concepts for Resilience and the Implications for the Future of Resilience Engineering." <em>Reliability Engineering &amp; System Safety</em>, 141, 5-9.</li>
+                        <li class="reference-item" id="ref8">Reason, J. (1997). <em>Managing the Risks of Organizational Accidents</em>. Ashgate Publishing.</li>
+                        <li class="reference-item" id="ref9">Leveson, N. (2011). <em>Engineering a Safer World: Systems Thinking Applied to Safety</em>. MIT Press.</li>
+                        <li class="reference-item" id="ref10">Weick, K. &amp; Sutcliffe, K. (2007). <em>Managing the Unexpected: Resilient Performance in an Age of Uncertainty</em>. 2nd edition. Jossey-Bass.</li>
+                        <li class="reference-item" id="ref11">EN 50600 (2019). "Information Technology &mdash; Data Centre Facilities and Infrastructures." European Committee for Electrotechnical Standardization (CENELEC).</li>
+                        <li class="reference-item" id="ref12">BICSI 002 (2019). "Data Center Design and Implementation Best Practices." BICSI.</li>
+                        <li class="reference-item" id="ref13">Dekker, S. (2011). <em>Drift into Failure: From Hunting Broken Components to Understanding Complex Systems</em>. Ashgate Publishing.</li>
+                        <li class="reference-item" id="ref14">Westrum, R. (2004). "A Typology of Organisational Cultures." <em>Quality &amp; Safety in Health Care</em>, 13(suppl 2), ii22-ii27.</li>
+                    </ol>
+                </div>
+
+                <!-- Author Section -->
+                <div class="author-section">
+                    <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="author-avatar">
+                    <div>
+                        <div class="author-name">Bagus Dwi Permana</div>
+                        <div class="author-role">Engineering Operations Manager | CDFOM | Ahli K3 Listrik</div>
+                        <div class="author-bio-text">12+ years of professional experience spanning industrial engineering and critical facilities operations. Specializing in operational resilience, safety management systems, and the systematic transformation of data center operations through evidence-based engineering practices.</div>
                     </div>
                 </div>
 
-                <div class="article-nav">
-                    <a href="article-6.html">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
+                <!-- Article Navigation -->
+                <div style="display:flex;justify-content:space-between;padding:2rem 0;border-top:1px solid #e2e8f0;margin-top:3rem;">
+                    <a href="article-6.html" style="display:flex;align-items:center;gap:0.5rem;color:var(--accent-emerald);font-weight:600;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         Previous Article
                     </a>
-                    <a href="article-8.html">
+                    <a href="article-8.html" style="display:flex;align-items:center;gap:0.5rem;color:var(--accent-emerald);font-weight:600;">
                         Next Article
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                 </div>
+
             </div>
         </div>
     </article>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
-                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Bagus Dwi Permana</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience spanning industrial engineering and critical facilities operations.</p>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Insights</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="articles.html" style="color: #06b6d4; text-decoration: none;">Engineering Journal</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="geopolitics.html" style="color: #ef4444; text-decoration: none;">Global Analysis</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Connect</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/" target="_blank" style="color: #94a3b8; text-decoration: none;">LinkedIn</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="mailto:baguspermana7@gmail.com" style="color: #94a3b8; text-decoration: none;">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="margin: 0;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Share Buttons - Floating Sidebar -->
+    <!-- Share Buttons -->
     <aside class="share-buttons" id="shareButtons" aria-label="Share this article">
         <span class="share-label">Share</span>
         <button class="share-btn linkedin" data-tooltip="Share on LinkedIn" onclick="shareLinkedIn()" aria-label="Share on LinkedIn">
@@ -758,8 +2077,9 @@
     </aside>
 
     <script src="script.js"></script>
+
+    <!-- Share Buttons JS -->
     <script>
-    // Share Buttons Functions
     (function(){const s=document.getElementById('shareButtons'),h=document.querySelector('.article-hero');if(s&&h){document.body.classList.add('has-share-buttons');new IntersectionObserver(e=>e.forEach(x=>s.classList.toggle('visible',!x.isIntersecting)),{threshold:.1}).observe(h)}})();
     function getShareData(){return{title:document.querySelector('meta[property="og:title"]')?.content||document.title,url:window.location.href}}
     function shareLinkedIn(){window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareData().url)}`,'_blank','width=600,height=600')}
@@ -767,6 +2087,7 @@
     function shareWhatsApp(){const d=getShareData();window.open(`https://wa.me/?text=${encodeURIComponent(d.title+'\n\n'+d.url)}`,'_blank')}
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
+    <!-- Canvas Chart JS -->
     <script>
     (function() {
         const canvas = document.getElementById('resilienceChart');
@@ -807,11 +2128,9 @@
         function drawChart(disturbance) {
             ctx.clearRect(0, 0, W, H);
 
-            // Background
             ctx.fillStyle = 'rgba(2, 6, 23, 0.5)';
             ctx.fillRect(0, 0, W, H);
 
-            // Grid
             ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 5; i++) {
@@ -822,7 +2141,6 @@
                 ctx.stroke();
             }
 
-            // Y-axis labels
             ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
             ctx.font = '12px Inter, system-ui, sans-serif';
             ctx.textAlign = 'right';
@@ -832,7 +2150,6 @@
                 ctx.fillText(val + '%', padding.left - 10, y + 4);
             }
 
-            // Y-axis title
             ctx.save();
             ctx.translate(25, H / 2);
             ctx.rotate(-Math.PI / 2);
@@ -841,7 +2158,6 @@
             ctx.fillText('Recovery Quality (%)', 0, 0);
             ctx.restore();
 
-            // X-axis labels
             ctx.textAlign = 'center';
             ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
             for (let i = 0; i < 10; i++) {
@@ -849,14 +2165,29 @@
                 ctx.fillText('T' + (i + 1), x, H - padding.bottom + 25);
             }
 
-            // X-axis title
             ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
             ctx.fillText('Time', W / 2, H - 15);
 
-            // Get data
             const { reliable, resilient } = simulate(disturbance);
 
-            // Draw reliable line (blue)
+            // Fill area between lines
+            ctx.beginPath();
+            for (let i = 0; i < resilient.length; i++) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (resilient[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            for (let i = reliable.length - 1; i >= 0; i--) {
+                const x = padding.left + (chartW / 9) * i;
+                const y = padding.top + chartH - (reliable[i] / 100) * chartH;
+                ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+            ctx.fill();
+
+            // Reliable line (blue)
             ctx.strokeStyle = '#38bdf8';
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
@@ -870,8 +2201,8 @@
             }
             ctx.stroke();
 
-            // Draw resilient line (green)
-            ctx.strokeStyle = '#22c55e';
+            // Resilient line (emerald)
+            ctx.strokeStyle = '#10b981';
             ctx.beginPath();
             for (let i = 0; i < resilient.length; i++) {
                 const x = padding.left + (chartW / 9) * i;
@@ -881,7 +2212,7 @@
             }
             ctx.stroke();
 
-            // Draw points
+            // Points - reliable
             ctx.fillStyle = '#38bdf8';
             for (let i = 0; i < reliable.length; i++) {
                 const x = padding.left + (chartW / 9) * i;
@@ -891,7 +2222,8 @@
                 ctx.fill();
             }
 
-            ctx.fillStyle = '#22c55e';
+            // Points - resilient
+            ctx.fillStyle = '#10b981';
             for (let i = 0; i < resilient.length; i++) {
                 const x = padding.left + (chartW / 9) * i;
                 const y = padding.top + chartH - (resilient[i] / 100) * chartH;
@@ -909,7 +2241,7 @@
             ctx.textAlign = 'left';
             ctx.fillStyle = '#38bdf8';
             ctx.fillText(Math.round(lastRel) + '%', lastX + 8, padding.top + chartH - (lastRel / 100) * chartH + 4);
-            ctx.fillStyle = '#22c55e';
+            ctx.fillStyle = '#10b981';
             ctx.fillText(Math.round(lastRes) + '%', lastX + 8, padding.top + chartH - (lastRes / 100) * chartH + 4);
 
             // Update callouts
@@ -936,6 +2268,173 @@
             ctx.scale(dpr, dpr);
             refresh();
         });
+    })();
+    </script>
+
+    <!-- Calculator JS -->
+    <script>
+    (function() {
+        const redundancyEl = document.getElementById('calcRedundancy');
+        const drillFreqEl = document.getElementById('calcDrillFreq');
+        const responseTimeEl = document.getElementById('calcResponseTime');
+        const responseTimeValEl = document.getElementById('calcResponseTimeVal');
+        const recoveryEl = document.getElementById('calcRecovery');
+        const crossTrainEl = document.getElementById('calcCrossTrain');
+        const crossTrainValEl = document.getElementById('calcCrossTrainVal');
+        const docCurrencyEl = document.getElementById('calcDocCurrency');
+        const commPlanEl = document.getElementById('calcCommPlan');
+        const lessonsEl = document.getElementById('calcLessons');
+
+        if (!redundancyEl) return;
+
+        const reliabilityMap = { 'N': 35, 'N+1': 55, '2N': 75, '2N+1': 95 };
+        const drillMap = { 'Never': 0, 'Annual': 40, 'Quarterly': 70, 'Monthly': 100 };
+        const recoveryMap = { 'None': 0, 'Documented': 30, 'Tested Annually': 60, 'Tested Quarterly': 100 };
+        const docMap = { 'Outdated >2yr': 0, 'Outdated 1-2yr': 30, 'Current <1yr': 70, 'Real-time updated': 100 };
+        const commMap = { 'None': 0, 'Basic': 30, 'Detailed': 60, 'Tested & Drilled': 100 };
+        const lessonsMap = { 'None': 0, 'Ad-hoc': 25, 'Structured': 65, 'Integrated into design': 100 };
+
+        const dimensionNames = [
+            'Drill Frequency',
+            'Response Capability',
+            'Recovery Testing',
+            'Cross-Training',
+            'Documentation Currency',
+            'Communication Plan',
+            'Lessons Learned'
+        ];
+
+        const dimensionWeights = [0.15, 0.20, 0.15, 0.10, 0.15, 0.10, 0.15];
+
+        const dimensionRecommendations = [
+            'Implement monthly emergency drills covering power, cooling, and fire scenarios to build team muscle memory.',
+            'Reduce response time by implementing tiered alarm prioritization and positioning operators closer to critical systems.',
+            'Move from documented to quarterly-tested recovery procedures with measured recovery time objectives.',
+            'Establish a competency matrix and initiate cross-training for the top 3 single-point-of-knowledge risks.',
+            'Launch a documentation currency program with mandatory updates concurrent with any facility modification.',
+            'Develop and practice a detailed communication plan with defined escalation paths and stakeholder notification templates.',
+            'Transform post-incident reviews into structured learning reviews with tracked corrective actions and knowledge sharing.'
+        ];
+
+        function calculate() {
+            const redundancy = redundancyEl.value;
+            const reliabilityScore = reliabilityMap[redundancy];
+
+            const responseTime = parseInt(responseTimeEl.value);
+            responseTimeValEl.textContent = responseTime + ' min';
+
+            const crossTrainPct = parseInt(crossTrainEl.value);
+            crossTrainValEl.textContent = crossTrainPct + '%';
+
+            // Calculate individual dimension scores (raw 0-100)
+            const drillRaw = drillMap[drillFreqEl.value];
+            const responseRaw = Math.max(0, (1 - (responseTime / 60))) * 100;
+            const recoveryRaw = recoveryMap[recoveryEl.value];
+            const crossTrainRaw = crossTrainPct;
+            const docRaw = docMap[docCurrencyEl.value];
+            const commRaw = commMap[commPlanEl.value];
+            const lessonsRaw = lessonsMap[lessonsEl.value];
+
+            const rawScores = [drillRaw, responseRaw, recoveryRaw, crossTrainRaw, docRaw, commRaw, lessonsRaw];
+
+            // Weighted scores
+            const drillScore = drillRaw * 0.15;
+            const responseScore = responseRaw * 0.20;
+            const recoveryScore = recoveryRaw * 0.15;
+            const crossTrainScore = crossTrainRaw * 0.10;
+            const docScore = docRaw * 0.15;
+            const commScore = commRaw * 0.10;
+            const lessonsScore = lessonsRaw * 0.15;
+
+            const resilienceScore = Math.round(drillScore + responseScore + recoveryScore + crossTrainScore + docScore + commScore + lessonsScore);
+
+            // Gap analysis
+            const gap = Math.abs(reliabilityScore - resilienceScore);
+            let gapClass, gapText;
+            if (gap > 30) {
+                gapClass = 'critical';
+                gapText = 'CRITICAL -- Design far exceeds operational capability. Gap: ' + gap + ' points.';
+            } else if (gap >= 15) {
+                gapClass = 'warning';
+                gapText = 'WARNING -- Significant gap between design and operations. Gap: ' + gap + ' points.';
+            } else {
+                gapClass = 'balanced';
+                gapText = 'BALANCED -- Design and operations are well-aligned. Gap: ' + gap + ' points.';
+            }
+
+            // Tier equivalents
+            let relTier, resTier;
+            if (reliabilityScore < 45) relTier = 'Tier I Equivalent';
+            else if (reliabilityScore < 65) relTier = 'Tier II Equivalent';
+            else if (reliabilityScore < 85) relTier = 'Tier III Equivalent';
+            else relTier = 'Tier IV Equivalent';
+
+            if (resilienceScore < 20) resTier = 'Stage 1: Reactive';
+            else if (resilienceScore < 40) resTier = 'Stage 2: Aware';
+            else if (resilienceScore < 65) resTier = 'Stage 3: Proactive';
+            else if (resilienceScore < 85) resTier = 'Stage 4: Adaptive';
+            else resTier = 'Stage 5: Generative';
+
+            // Update display
+            document.getElementById('relScoreVal').textContent = reliabilityScore;
+            document.getElementById('relBar').style.width = reliabilityScore + '%';
+            document.getElementById('resScoreVal').textContent = resilienceScore;
+            document.getElementById('resBar').style.width = resilienceScore + '%';
+
+            const gapEl = document.getElementById('gapIndicator');
+            gapEl.className = 'gap-indicator ' + gapClass;
+            gapEl.textContent = gapText;
+
+            document.getElementById('relTierEquiv').textContent = relTier;
+            document.getElementById('resTierEquiv').textContent = resTier;
+
+            // Dimension breakdown bars
+            const barsContainer = document.getElementById('dimensionBars');
+            barsContainer.innerHTML = '';
+            for (let i = 0; i < dimensionNames.length; i++) {
+                const score = Math.round(rawScores[i]);
+                const barColor = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444';
+                barsContainer.innerHTML += `
+                    <div class="dimension-bar">
+                        <div class="dimension-bar-label">
+                            <span class="dimension-bar-name">${dimensionNames[i]} (${(dimensionWeights[i]*100).toFixed(0)}%)</span>
+                            <span class="dimension-bar-score">${score}/100</span>
+                        </div>
+                        <div class="dimension-bar-track">
+                            <div class="dimension-bar-fill" style="width:${score}%;background:${barColor};"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Top 3 recommendations (lowest scoring dimensions)
+            const indexed = rawScores.map((score, idx) => ({ score, idx }));
+            indexed.sort((a, b) => a.score - b.score);
+            const top3 = indexed.slice(0, 3);
+
+            const recContainer = document.getElementById('recList');
+            recContainer.innerHTML = '';
+            top3.forEach((item, rank) => {
+                const priority = rank === 0 ? 'high' : 'medium';
+                recContainer.innerHTML += `
+                    <div class="recommendation-item">
+                        <span class="rec-priority ${priority}">${rank === 0 ? 'P1' : rank === 1 ? 'P2' : 'P3'}</span>
+                        <span><strong>${dimensionNames[item.idx]}</strong> (Score: ${Math.round(item.score)}/100) -- ${dimensionRecommendations[item.idx]}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // Bind all inputs
+        [redundancyEl, drillFreqEl, recoveryEl, docCurrencyEl, commPlanEl, lessonsEl].forEach(el => {
+            el.addEventListener('change', calculate);
+        });
+        [responseTimeEl, crossTrainEl].forEach(el => {
+            el.addEventListener('input', calculate);
+        });
+
+        // Initial calculation
+        calculate();
     })();
     </script>
 </body>

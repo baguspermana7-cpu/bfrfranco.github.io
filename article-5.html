@@ -14,44 +14,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>Technical Debt in Data Centers Is Operational Risk | Infrastructure Management</title>
-    <meta name="description" content="Why temporary fixes and deferred decisions silently erode resilience in live data centers. Learn to identify and manage technical debt before it causes failures.">
-    <meta name="keywords" content="Technical Debt, Data Center Risk, Operational Risk, Infrastructure Resilience, Deferred Maintenance, Workaround Culture, Risk Management">
+    <title>Technical Debt in Live Data Centers Is Operational Risk | Infrastructure Risk Management</title>
+    <meta name="description" content="Comprehensive analysis of how deferred maintenance, design shortcuts, and documentation gaps create compounding operational risk in live data center facilities. Includes Weibull analysis, risk scoring framework, and interactive calculator.">
+    <meta name="keywords" content="Technical Debt, Data Center Risk, Operational Risk, Deferred Maintenance, Weibull Analysis, Infrastructure Resilience, Risk Management, MTBF, MTTR, Bathtub Curve, Reliability Engineering, Asset Management, ISO 55001">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0066cc">
+    <meta name="theme-color" content="#1e3a5f">
     <link rel="canonical" href="https://resistancezero.com/article-5.html">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-5.html">
     <meta property="og:title" content="Technical Debt in Live Data Centers Is Operational Risk">
-    <meta property="og:description" content="Why temporary fixes, deferred decisions, and workaround culture silently erode resilience.">
+    <meta property="og:description" content="How deferred maintenance, design shortcuts, and knowledge loss create compounding operational risk. Includes Weibull failure analysis and interactive risk calculator.">
     <meta property="og:image" content="https://resistancezero.com/assets/article-5-cover.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Technical Debt in Data Centers Is Operational Risk - Infrastructure Management Article">
+    <meta property="og:image:alt" content="Technical Debt in Data Centers Is Operational Risk - Infrastructure Risk Management Article">
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="article:author" content="Bagus Dwi Permana">
-    <meta property="article:published_time" content="2025-11-16T00:00:00Z">
-    <meta property="article:modified_time" content="2025-12-12T00:00:00Z">
-    <meta property="article:section" content="Infrastructure Management">
+    <meta property="article:published_time" content="2025-11-18T00:00:00Z">
+    <meta property="article:modified_time" content="2025-12-15T00:00:00Z">
+    <meta property="article:section" content="Infrastructure Risk Management">
     <meta property="article:tag" content="Technical Debt">
     <meta property="article:tag" content="Operational Risk">
-    <meta property="article:tag" content="Infrastructure Resilience">
+    <meta property="article:tag" content="Weibull Analysis">
+    <meta property="article:tag" content="Deferred Maintenance">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
     <meta name="twitter:title" content="Technical Debt in Data Centers Is Operational Risk">
-    <meta name="twitter:description" content="Identify and manage technical debt before it causes failures in live data centers.">
+    <meta name="twitter:description" content="Weibull failure analysis, risk scoring frameworks, and interactive calculator for quantifying deferred maintenance risk.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/article-5-cover.jpg">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
@@ -61,16 +62,18 @@
     {
         "@context": "https://schema.org",
         "@type": "TechnicalArticle",
-        "headline": "Technical Debt in Data Centers Is Operational Risk",
-        "description": "Why temporary fixes and deferred decisions silently erode resilience in live data centers. Learn to identify and manage technical debt before it causes failures.",
+        "headline": "Technical Debt in Live Data Centers Is Operational Risk",
+        "description": "Comprehensive analysis of how deferred maintenance, design shortcuts, and documentation gaps create compounding operational risk in live data center facilities.",
+        "image": "https://resistancezero.com/assets/article-5-cover.jpg",
         "author": {
             "@type": "Person",
             "name": "Bagus Dwi Permana",
-            "jobTitle": "Data Center Operations Lead",
+            "jobTitle": "Engineering Operations Manager",
             "url": "https://resistancezero.com/"
         },
-        "datePublished": "2025-11-16",
-        "dateModified": "2025-11-16",
+        "datePublished": "2025-11-18",
+        "dateModified": "2025-12-15",
+        "wordCount": "9000",
         "publisher": {
             "@type": "Person",
             "name": "Bagus Dwi Permana"
@@ -79,8 +82,8 @@
             "@type": "WebPage",
             "@id": "https://resistancezero.com/article-5.html"
         },
-        "articleSection": "Infrastructure Management",
-        "keywords": ["Technical Debt", "Operational Risk", "Infrastructure Resilience", "Deferred Maintenance"]
+        "articleSection": "Infrastructure Risk Management",
+        "keywords": ["Technical Debt", "Operational Risk", "Weibull Analysis", "Deferred Maintenance", "Data Center Reliability"]
     }
     </script>
 
@@ -112,169 +115,636 @@
     </script>
 
     <style>
+        :root {
+            --primary-blue: #1e3a5f;
+            --accent-cyan: #06b6d4;
+            --accent-gold: #f59e0b;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --card-bg: #fff;
+            --card-border: #e2e8f0;
+            --section-bg: #f8fafc;
+        }
+
+        /* Hero Section */
         .article-hero {
-            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);
+            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 50%, #4a3728 100%);
             padding: 8rem 2rem 4rem;
             color: #fff;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
+
         .article-hero::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: url('assets/article-5-cover.jpg') center/cover no-repeat;
-            opacity: 0.2;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
             z-index: 0;
         }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 15 L42 17 L32 19 L30 29 L28 19 L18 17 L28 15 Z' fill='%23f59e0b' fill-opacity='0.03'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
         .article-hero > * { position: relative; z-index: 1; }
-        .article-hero .container { max-width: 900px; }
-        .article-category {
-            display: inline-block;
+        .article-hero .container { max-width: 1000px; margin: 0 auto; }
+
+        .article-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             background: rgba(245, 158, 11, 0.2);
-            color: #fcd34d;
+            color: #fbbf24;
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
+
         .article-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
             font-weight: 800;
             margin-bottom: 1.5rem;
             line-height: 1.2;
-            color: #fff;
         }
+
         .article-subtitle {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            font-size: 1.1rem;
             color: #94a3b8;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto 2rem;
             line-height: 1.7;
         }
+
         .article-meta {
             display: flex;
             justify-content: center;
             gap: 2rem;
             flex-wrap: wrap;
             color: #94a3b8;
-            font-size: 0.9375rem;
+            font-size: 0.9rem;
         }
+
         .article-meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .toc-item {
+            background: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-gold);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .toc-item-number {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Article Content */
         .article-content {
             padding: 4rem 2rem;
             background: #fff;
         }
-        .article-content .container { max-width: 800px; }
+
+        .article-content .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
         .article-body {
-            font-size: 1.125rem;
-            line-height: 1.6;
-            color: #374151;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-primary);
         }
-        .article-body p { margin-bottom: 1.25rem; }
+
+        .article-body p {
+            margin-bottom: 1rem;
+        }
+
         .article-body h2 {
-            font-size: 1.75rem;
-            color: #1e3a5f;
-            margin: 3rem 0 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 3px solid #e5e7eb;
-        }
-        .article-body h3 {
-            font-size: 1.375rem;
-            color: #2d5a87;
+            font-size: 1.35rem;
+            color: var(--primary-blue);
             margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        .article-body blockquote {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
-            font-style: italic;
-            color: #92400e;
+
+        .article-body h2 .section-number {
+            background: var(--accent-gold);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
+
+        .article-body h3 {
+            font-size: 1.05rem;
+            color: #334155;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .article-body h4 {
+            font-size: 0.9rem;
+            color: #475569;
+            margin: 1rem 0 0.5rem;
+        }
+
         .article-body ul, .article-body ol {
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             padding-left: 1.5rem;
         }
-        .article-body li { margin-bottom: 0.75rem; }
-        .highlight-box {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+
+        .article-body li {
+            margin-bottom: 0.35rem;
+            font-size: 0.9rem;
+        }
+
+        /* Data Tables */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
             border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
-        .highlight-box p {
-            margin: 0;
-            color: #991b1b;
-            font-weight: 500;
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
         }
-        .result-box {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin: 2rem 0;
-            border-left: 4px solid #10b981;
+
+        .data-table thead {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2d5a87 100%);
+            color: #fff;
         }
-        .result-box h4 {
-            color: #065f46;
-            margin-bottom: 0.75rem;
-        }
-        .result-box p {
-            margin: 0.5rem 0;
-            color: #047857;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .back-link:hover { color: #fff; }
-        .article-nav {
-            display: flex;
-            justify-content: space-between;
-            padding: 2rem 0;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 3rem;
-        }
-        .article-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #2d5a87;
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
             font-weight: 600;
-            transition: color 0.3s ease;
+            white-space: nowrap;
         }
-        .article-nav a:hover { color: #1e3a5f; }
-        /* Inline Citations */
-        .cite { color: #f59e0b; font-size: 0.75em; vertical-align: super; font-weight: 600; text-decoration: none; padding: 0 2px; }
-        .cite:hover { color: #d97706; text-decoration: underline; }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: var(--accent-gold);
+        }
+
+        .info-box.critical {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-left-color: var(--accent-red);
+        }
+
+        .info-box.success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left-color: var(--accent-emerald);
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Key Insight Box */
+        .key-insight {
+            background: rgba(245,158,11,0.08);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin: 1.5rem 0;
+        }
+
+        .key-insight strong {
+            color: var(--accent-gold);
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border: 2px solid #c4b5fd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .formula-box-title {
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Conclusion Box */
+        .conclusion-box {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+
+        .conclusion-box h3 {
+            color: var(--accent-gold);
+            margin-top: 0;
+        }
+
+        .conclusion-box p {
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .conclusion-box ul {
+            color: #cbd5e1;
+            margin: 1rem 0;
+            padding-left: 1.25rem;
+        }
+
+        .conclusion-box li { margin-bottom: 0.5rem; }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+
+        .code-block .comment { color: #64748b; }
+        .code-block .keyword { color: #f472b6; }
+        .code-block .variable { color: #67e8f9; }
+        .code-block .value { color: #a5f3fc; }
+
+        /* Tooltip System */
+        .tip {
+            position: relative;
+            border-bottom: 1px dashed var(--accent-gold);
+            cursor: help;
+            font-weight: 600;
+        }
+        .tip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.5rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 60;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 320px;
+            white-space: normal;
+            line-height: 1.5;
+        }
+        .tip:hover::after { opacity: 1; }
+
+        /* Source Reference Link */
+        .src-ref {
+            font-size: 0.7rem;
+            vertical-align: super;
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .src-ref:hover { text-decoration: underline; }
 
         /* References Section */
-        .references {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            margin-top: 2.5rem;
-            border-left: 4px solid #f59e0b;
+        .ref-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: ref-counter;
         }
-        .references h3 { font-size: 1rem; margin-bottom: 1rem; color: #1e3a5f; }
-        .references ol, .references ul { font-size: 0.85rem; color: #475569; padding-left: 1.25rem; line-height: 1.7; }
-        .references li { margin-bottom: 0.5rem; }
-        .references a { color: #f59e0b; }
+        .ref-list li {
+            counter-increment: ref-counter;
+            padding: 0.75rem 0 0.75rem 2.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            position: relative;
+        }
+        .ref-list li::before {
+            content: "[" counter(ref-counter) "]";
+            color: var(--accent-gold);
+            font-weight: 700;
+            font-size: 0.8rem;
+            position: absolute;
+            left: 0;
+            top: 0.75rem;
+        }
+        .ref-list a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .ref-list a:hover { text-decoration: underline; }
+
+        /* Interactive Calculator */
+        .calculator-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+            color: #fff;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .calculator-subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calc-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .calc-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .calc-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
+        .calc-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(148,163,184,0.2);
+            outline: none;
+        }
+
+        .calc-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+        }
+
+        .calc-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .slider-value {
+            background: rgba(245,158,11,0.2);
+            color: #fbbf24;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .calc-result-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .calc-result-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .calc-result-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .calc-result-sub {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.15rem;
+        }
+
+        /* Risk Gauge */
+        .risk-gauge-container {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .risk-gauge-bar {
+            width: 100%;
+            height: 18px;
+            background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%);
+            border-radius: 9px;
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .risk-gauge-needle {
+            position: absolute;
+            top: -6px;
+            width: 4px;
+            height: 30px;
+            background: #fff;
+            border-radius: 2px;
+            transition: left 0.5s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .risk-gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Priority Breakdown */
+        .priority-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .priority-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .priority-card-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .priority-card-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
 
         /* Interactive Chart */
         .chart-container {
@@ -283,6 +753,7 @@
             padding: 2rem;
             margin: 2rem 0;
         }
+
         .chart-title {
             text-align: center;
             color: #fff;
@@ -290,23 +761,27 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
+
         .chart-subtitle {
             text-align: center;
             color: #94a3b8;
             font-size: 0.875rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-wrapper {
             background: rgba(2, 6, 23, 0.5);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
+
         .chart-canvas {
             width: 100%;
             height: auto;
             display: block;
         }
+
         .control-row {
             display: flex;
             align-items: center;
@@ -315,10 +790,12 @@
             justify-content: center;
             margin-top: 1rem;
         }
+
         .control-label {
             color: #94a3b8;
             font-size: 0.9rem;
         }
+
         .control-slider {
             width: 200px;
             height: 8px;
@@ -327,6 +804,7 @@
             outline: none;
             -webkit-appearance: none;
         }
+
         .control-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 20px;
@@ -335,6 +813,7 @@
             background: #f59e0b;
             cursor: pointer;
         }
+
         .control-value {
             background: rgba(245, 158, 11, 0.2);
             color: #fcd34d;
@@ -345,6 +824,7 @@
             min-width: 50px;
             text-align: center;
         }
+
         .legend-row {
             display: flex;
             justify-content: center;
@@ -352,6 +832,7 @@
             margin-top: 1rem;
             flex-wrap: wrap;
         }
+
         .legend-item {
             display: flex;
             align-items: center;
@@ -359,17 +840,20 @@
             color: #94a3b8;
             font-size: 0.8rem;
         }
+
         .legend-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
         }
+
         .callout-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
         }
+
         .callout-card {
             background: rgba(30, 58, 95, 0.3);
             border-radius: 10px;
@@ -377,28 +861,85 @@
             text-align: center;
             border: 1px solid rgba(245, 158, 11, 0.15);
         }
+
         .callout-label {
             color: #94a3b8;
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
         .callout-value {
             font-size: 1.5rem;
             font-weight: 800;
             color: #f59e0b;
         }
 
-        @media (max-width: 768px) {
+        /* Author Bio */
+        .author-bio {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            padding: 2rem;
+            background: var(--section-bg);
+            border-radius: 12px;
+            margin: 3rem 0 2rem;
+            border: 1px solid var(--card-border);
+        }
+        .author-bio img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .author-bio h4 {
+            margin: 0 0 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .author-bio p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .calc-grid { grid-template-columns: repeat(2, 1fr); }
+            .priority-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 600px) {
             .article-hero { padding: 6rem 1rem 3rem; }
-            .article-meta { flex-direction: column; gap: 1rem; }
-            .article-content { padding: 3rem 1rem; }
-            .article-body { font-size: 1rem; }
+            .article-content { padding: 2rem 1rem; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .priority-grid { grid-template-columns: 1fr; }
             .chart-container { padding: 1rem; }
+            .calculator-section { padding: 2rem 1rem; }
+            .author-bio { flex-direction: column; text-align: center; align-items: center; }
+        }
+
+        /* Print CSS */
+        @media print {
+            .navbar, .calculator-section, .toc-section, .chart-container { display: none !important; }
+            .article-hero { padding: 1.5rem 1rem; background: #1e3a5f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .article-hero .article-badge, .article-hero .article-meta { display: none; }
+            .article-content { padding: 1rem; }
+            body { font-size: 10pt; color: #000; }
+            .key-insight, .formula-box, .conclusion-box { break-inside: avoid; }
+            .article-body h2 { break-after: avoid; }
+            a { color: inherit; text-decoration: none; }
+            footer { display: none !important; }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -423,17 +964,27 @@
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
                     </ul>
                 </li>
-                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
-                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
-                <li><a href="articles.html" class="nav-link">Articles</a></li>
-                <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
                 <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -453,94 +1004,759 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="article-hero">
         <div class="container">
-            <a href="articles.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <a href="articles.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
-                Back to Articles
+                Back to Engineering Journal
             </a>
-            <span class="article-category">Risk Management</span>
-            <h1 class="article-title">Technical Debt in Live Data Centers Is Operational Risk</h1>
-            <p class="article-subtitle">Why temporary fixes, deferred decisions, and workaround culture silently erode resilience.</p>
+
+            <span class="article-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Risk Management &mdash; Article #5
+            </span>
+
+            <h1 class="article-title">Technical Debt in Live Data Centers<br>Is Operational Risk</h1>
+
+            <p class="article-subtitle">
+                How deferred maintenance, design shortcuts, documentation gaps, and vendor lock-in create compounding operational risk that degrades resilience in live facilities. Includes Weibull failure analysis, quantitative risk scoring framework, and an interactive Technical Debt Risk Analyzer.
+            </p>
+
             <div class="article-meta">
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
-                    10 min read
+                    November 18, 2025
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    November 16, 2025
+                    20 min read
                 </span>
                 <span class="article-meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                     </svg>
-                    Bagus Dwi Permana
+                    ~9,000 words
                 </span>
             </div>
         </div>
     </section>
 
+    <!-- Table of Contents -->
+    <section class="toc-section">
+        <div class="toc-container">
+            <h2 class="toc-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                Table of Contents
+            </h2>
+            <div class="toc-grid">
+                <a href="#section-1" class="toc-item">
+                    <div class="toc-item-number">SECTION 1</div>
+                    <div class="toc-item-title">Abstract</div>
+                </a>
+                <a href="#section-2" class="toc-item">
+                    <div class="toc-item-number">SECTION 2</div>
+                    <div class="toc-item-title">Physical Infrastructure Debt</div>
+                </a>
+                <a href="#section-3" class="toc-item">
+                    <div class="toc-item-number">SECTION 3</div>
+                    <div class="toc-item-title">Sources of Technical Debt</div>
+                </a>
+                <a href="#section-4" class="toc-item">
+                    <div class="toc-item-number">SECTION 4</div>
+                    <div class="toc-item-title">Compound Risk Analogy</div>
+                </a>
+                <a href="#section-5" class="toc-item">
+                    <div class="toc-item-number">SECTION 5</div>
+                    <div class="toc-item-title">Bathtub Curve &amp; Weibull Analysis</div>
+                </a>
+                <a href="#section-6" class="toc-item">
+                    <div class="toc-item-number">SECTION 6</div>
+                    <div class="toc-item-title">Case Context: 15MW Facility</div>
+                </a>
+                <a href="#section-7" class="toc-item">
+                    <div class="toc-item-number">SECTION 7</div>
+                    <div class="toc-item-title">Quantifying Framework</div>
+                </a>
+                <a href="#section-8" class="toc-item">
+                    <div class="toc-item-number">SECTION 8</div>
+                    <div class="toc-item-title">Remediation Strategy</div>
+                </a>
+                <a href="#section-9" class="toc-item">
+                    <div class="toc-item-number">SECTION 9</div>
+                    <div class="toc-item-title">Interactive: Debt Accumulation Chart</div>
+                </a>
+                <a href="#section-10" class="toc-item">
+                    <div class="toc-item-number">SECTION 10</div>
+                    <div class="toc-item-title">Technical Debt Risk Analyzer</div>
+                </a>
+                <a href="#section-11" class="toc-item">
+                    <div class="toc-item-number">SECTION 11</div>
+                    <div class="toc-item-title">Organizational Barriers</div>
+                </a>
+                <a href="#section-12" class="toc-item">
+                    <div class="toc-item-number">SECTION 12</div>
+                    <div class="toc-item-title">Conclusion</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
     <article class="article-content">
         <div class="container">
             <div class="article-body">
-                <h2>Abstract</h2>
-                <p>In live data centers, technical debt does not appear as broken equipment or failed SLAs. It appears as temporary fixes that never get reversed, undocumented deviations, and growing reliance on tribal knowledge to keep systems running.</p>
 
-                <blockquote>
-                    "Every data center accumulates technical debt. The difference between resilient sites and fragile ones is not whether debt exists, but whether it is visible, bounded, and actively serviced. The most dangerous words in critical operations are: 'Temporary solution—will fix later.'"
-                </blockquote>
+                <!-- Section 1: Abstract -->
+                <h2 id="section-1"><span class="section-number">1</span> Abstract</h2>
 
-                <h2>1. From Software Metaphor to Physical Reality</h2>
-                <p>The term "technical debt" originated in software engineering, describing the future cost of quick fixes made today. In data centers, the metaphor becomes literal. A temporary bypass, a non-standard configuration, or an undocumented parameter change behaves exactly like debt: it accrues interest over time.</p>
+                <p>In software engineering, Ward Cunningham introduced the metaphor of "technical debt" in 1992 to describe the future cost of choosing an expedient solution today instead of a better approach that would take longer.<a href="#ref1" class="src-ref" title="Cunningham, 1992">[1]</a> Three decades later, this metaphor has become literal in critical infrastructure. In live data centers, technical debt is not merely a software concept &mdash; it manifests as deferred maintenance tasks, aging components operating beyond design life, undocumented system modifications, and the slow erosion of institutional knowledge that keeps complex facilities running.</p>
 
-                <p>Unlike software, however, physical technical debt interacts with thermal limits, electrical tolerances, and human memory. The consequences are therefore nonlinear and harder to reverse.</p>
+                <p>This paper argues that technical debt in physical infrastructure is fundamentally an operational risk problem, not a maintenance backlog problem. Unlike software debt, which can be refactored during quiet periods, physical technical debt in a live 24/7 facility compounds under the constraints of continuous operation, where every remediation carries its own risk of disruption. The consequences are nonlinear: a single deferred item may carry negligible risk, but the accumulation of dozens of deferred items across interdependent systems creates latent failure conditions that dramatically reduce the facility's ability to withstand stress events.</p>
 
-                <h2>2. What Technical Debt Looks Like in Live Facilities</h2>
-                <p>Operational technical debt rarely appears as a single major deviation. It accumulates as small, reasonable decisions:</p>
-                <ul>
-                    <li>Temporary bypasses left in place after incidents</li>
-                    <li>PM scopes adjusted without updating acceptance criteria</li>
-                    <li>Alarm thresholds modified but not rationalized</li>
-                    <li>Vendor workarounds undocumented in SOPs</li>
-                    <li>Redundancy assumptions drifting from as-built reality</li>
-                </ul>
+                <p>We present a quantitative framework based on <span class="tip" data-tip="Weibull Distribution &mdash; A continuous probability distribution used in reliability engineering to model time-to-failure data. The shape parameter beta determines whether failure rate is decreasing, constant, or increasing.">Weibull</span> failure analysis for scoring and prioritizing technical debt, a remediation strategy incorporating phased approaches, and an interactive calculator for estimating risk exposure. The analysis draws on a composite case study of a 15MW data center facility with 127 identified deferred items, representing typical conditions observed across colocation and enterprise environments.</p>
 
-                <div class="highlight-box">
-                    <p><strong>The Hidden Risk:</strong> Individually, each change feels low risk. Collectively, they redefine system behavior in ways that are no longer documented or understood.</p>
+                <div class="key-insight">
+                    <strong>Core Thesis</strong>
+                    Technical debt in physical infrastructure is not a maintenance scheduling problem. It is a risk management problem that requires the same rigor as financial risk analysis &mdash; because deferred items accrue interest, compound over time, and can trigger cascading failures during stress events.
                 </div>
 
-                <h2>3. Latent Conditions and Drift Toward Failure</h2>
-                <p>James Reason describes accidents as the alignment of latent conditions. Technical debt is a systematic way of creating latent conditions. As debt accumulates:</p>
+                <!-- Section 2: Physical Infrastructure Debt -->
+                <h2 id="section-2"><span class="section-number">2</span> Physical Infrastructure Debt</h2>
+
+                <p>The concept of technical debt translates directly from software to physical infrastructure, but with critical differences. In software, debt typically affects development velocity and code quality. In live data center operations, debt affects system reliability, safety margins, and the probability of cascading failure under stress. Physical debt cannot be "patched" remotely during off-hours &mdash; it requires physical access, <span class="tip" data-tip="Management of Change &mdash; A systematic approach to dealing with changes in an organization, ensuring risks are properly assessed and controlled before implementation">MoC</span> procedures, and often partial system shutdowns that themselves carry risk.</p>
+
+                <h3>2.1 Deferred Maintenance</h3>
+
+                <p>Deferred maintenance is the most visible form of infrastructure debt. It encompasses preventive maintenance tasks that have been postponed, corrective actions identified during inspections but not yet executed, and equipment operating beyond manufacturer-recommended service intervals. The Uptime Institute's 2023 annual survey found that 44% of data center outages were attributable to issues that could have been prevented through proper maintenance practices.<a href="#ref6" class="src-ref" title="Uptime Institute, 2023">[6]</a></p>
+
+                <p>Common examples include:</p>
                 <ul>
-                    <li>System margins shrink</li>
-                    <li>Operator mental models diverge from reality</li>
-                    <li>Recovery paths become less certain</li>
+                    <li><strong><span class="tip" data-tip="Uninterruptible Power Supply &mdash; A device that provides emergency power to a load when the input power source fails, typically using batteries or flywheels to bridge the gap until generator power is available">UPS</span> battery strings</strong> operating beyond recommended replacement cycles (typically 4-5 years for VRLA), where capacity degradation is non-linear and accelerates dramatically in the final 20% of useful life</li>
+                    <li><strong><span class="tip" data-tip="Heating, Ventilation, and Air Conditioning &mdash; The technology of indoor environmental comfort, critical in data centers for maintaining optimal operating temperatures for IT equipment">HVAC</span> filter replacements</strong> deferred due to scheduling conflicts, increasing static pressure and reducing cooling efficiency by 5-15% before visible degradation occurs</li>
+                    <li><strong>Electrical connection re-torquing</strong> postponed across <span class="tip" data-tip="Power Distribution Unit &mdash; A device that distributes electric power to computing equipment in a data center, available in basic, metered, monitored, and switched configurations">PDU</span> and <span class="tip" data-tip="Automatic Transfer Switch &mdash; An electrical switch that automatically transfers a power supply from its primary source to a backup source when it senses a failure or outage in the primary source">ATS</span> connections, where thermal cycling creates progressive loosening that increases resistance and heat generation per <span class="tip" data-tip="National Fire Protection Association Standard 70B &mdash; Recommended Practice for Electrical Equipment Maintenance, providing guidance for preventive maintenance of electrical systems">NFPA 70B</span> guidelines<a href="#ref8" class="src-ref" title="NFPA 70B, 2023">[8]</a></li>
+                    <li><strong>Generator load bank testing</strong> skipped or reduced in scope, leaving uncertainty about actual performance under full-load conditions</li>
+                    <li><strong>Fire suppression system inspections</strong> overdue, including agent weight checks, detection system sensitivity testing, and damper integrity verification</li>
                 </ul>
 
-                <p>Drift toward failure does not require incompetence. It requires time, success, and lack of visibility.</p>
+                <h3>2.2 Aging Systems</h3>
 
-                <h2>4. Interactive: Technical Debt Accumulation vs Risk</h2>
-                <p>This simulation demonstrates how technical debt accumulation correlates with operational risk over time:</p>
+                <p>Equipment aging introduces a distinct category of technical debt that cannot be addressed through maintenance alone. As systems age beyond their design life, the probability of failure increases according to predictable patterns described by reliability engineering models. The <span class="tip" data-tip="End of Life &mdash; The point at which a product is no longer supported by the manufacturer, meaning spare parts become scarce, firmware updates cease, and vendor support contracts become expensive or unavailable">EOL</span> status of critical components introduces supply chain risk (unavailable spare parts), knowledge risk (fewer technicians familiar with legacy systems), and compatibility risk (integration challenges with newer monitoring and control platforms).</p>
 
-                <!-- Interactive Chart -->
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>System Category</th>
+                                <th>Typical Design Life</th>
+                                <th>Common Aging Indicators</th>
+                                <th>Risk When Deferred</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>UPS Systems</td>
+                                <td>10&ndash;15 years</td>
+                                <td>Capacitor degradation, control board obsolescence</td>
+                                <td>Unplanned transfer to bypass</td>
+                            </tr>
+                            <tr>
+                                <td>Switchgear</td>
+                                <td>20&ndash;30 years</td>
+                                <td>Insulation breakdown, mechanical wear on breakers</td>
+                                <td>Arc flash, protection coordination failure</td>
+                            </tr>
+                            <tr>
+                                <td>Cooling Plant</td>
+                                <td>15&ndash;20 years</td>
+                                <td>Compressor efficiency loss, refrigerant leakage</td>
+                                <td>Thermal excursion, cascading HVAC failure</td>
+                            </tr>
+                            <tr>
+                                <td>Generators</td>
+                                <td>20&ndash;25 years</td>
+                                <td>Fuel injection wear, governor drift, alternator insulation</td>
+                                <td>Failure to start or sustain load</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tip" data-tip="Building Management System &mdash; A computer-based control system installed in buildings to manage and monitor mechanical and electrical equipment such as HVAC, lighting, fire systems, and power systems">BMS</span> / <span class="tip" data-tip="Data Center Infrastructure Management &mdash; Software that collects and manages information about a data center's assets, resource use, and operational status to optimize performance and planning">DCIM</span></td>
+                                <td>5&ndash;8 years</td>
+                                <td>Unsupported OS, sensor drift, integration gaps</td>
+                                <td>Blind spots in monitoring, delayed response</td>
+                            </tr>
+                            <tr>
+                                <td>Fire Detection</td>
+                                <td>10&ndash;15 years</td>
+                                <td>Detector sensitivity drift, panel firmware EOL</td>
+                                <td>False alarms or missed detection</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>2.3 Documentation Gaps</h3>
+
+                <p>Documentation debt is arguably the most insidious form of infrastructure technical debt because it is invisible until a crisis demands accurate information. Documentation gaps include as-built drawings that no longer reflect actual configurations, standard operating procedures (<span class="tip" data-tip="Standard Operating Procedure &mdash; A documented process that describes how to perform a task consistently, ensuring repeatability and reducing human error during routine and emergency operations">SOP</span>) that reference equipment or configurations that have changed, alarm response matrices that were never updated after system modifications, and emergency procedures based on assumptions about system behavior that are no longer valid.</p>
+
+                <p>The operational impact of documentation debt is multiplicative: during normal operations, experienced personnel compensate with tribal knowledge. During incidents, when stress is high and unfamiliar personnel may be responding, documentation gaps directly extend <span class="tip" data-tip="Mean Time to Repair &mdash; The average time required to repair a failed component or system and restore it to operational status. A critical metric for data center availability calculations.">MTTR</span>. James Reason's research on organizational accidents demonstrated that documentation failures are consistently present as latent conditions in major incidents.<a href="#ref2" class="src-ref" title="Reason, 1997">[2]</a></p>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">Documentation Debt Multiplier</div>
+                    <p style="margin:0;">For every year of operations without systematic document review, <span class="tip" data-tip="Mean Time to Repair &mdash; The average time required to repair a failed component or system and restore it to operational status">MTTR</span> for complex incidents increases by an estimated 15-25%. In a facility that has operated for 8 years without comprehensive documentation updates, the effective MTTR for multi-system incidents may be 2-3x the design assumption. This directly impacts <span class="tip" data-tip="Service Level Agreement &mdash; A commitment between a service provider and a client that defines the level of service expected, including uptime guarantees, response times, and performance metrics">SLA</span> compliance calculations.</p>
+                </div>
+
+                <!-- Section 3: Sources of Technical Debt -->
+                <h2 id="section-3"><span class="section-number">3</span> Sources of Technical Debt</h2>
+
+                <p>Understanding where technical debt originates is essential for developing effective prevention and remediation strategies. While the manifestations of debt are physical, the root causes are primarily organizational and systemic. Turner's research on man-made disasters identified that organizational factors consistently create the preconditions for technical failures.<a href="#ref13" class="src-ref" title="Turner, 1978">[13]</a></p>
+
+                <h3>3.1 Design Shortcuts</h3>
+
+                <p>Design shortcuts occur when initial construction or subsequent modifications prioritize speed and cost over long-term maintainability and resilience. These shortcuts create permanent structural debt that is expensive and disruptive to remediate. Common design shortcuts in data center construction include:</p>
+
+                <ul>
+                    <li><strong>Insufficient maintenance access space</strong> around critical equipment, making routine maintenance more time-consuming and increasing the risk of accidental contact with adjacent systems during servicing</li>
+                    <li><strong>Value-engineered redundancy reductions</strong> where N+1 configurations are specified but N+0 is installed with "future provision" that is never completed, leaving the facility with lower resilience than the design intent documented in Tier certification submissions</li>
+                    <li><strong>Monitoring blind spots</strong> where cost savings eliminated sensors or integration points from the <span class="tip" data-tip="Building Management System &mdash; A computer-based control system installed in buildings to manage and monitor mechanical and electrical equipment">BMS</span>/<span class="tip" data-tip="Data Center Infrastructure Management &mdash; Software that collects and manages information about a data center's assets, resource use, and operational status">DCIM</span> scope, creating areas where degradation progresses undetected until failure</li>
+                    <li><strong>Single-vendor dependency</strong> in control systems, where proprietary protocols and closed architectures create lock-in that prevents competitive maintenance sourcing and limits future upgrade paths</li>
+                </ul>
+
+                <h3>3.2 Operational Compromises</h3>
+
+                <p>Operational compromises are the most common and most dangerous source of technical debt because they accumulate gradually through individually reasonable decisions. Each compromise is typically well-intentioned &mdash; maintaining uptime, meeting a customer deadline, or avoiding a risky maintenance window. Vaughan's concept of the "normalization of deviance" describes exactly this process: small deviations from standard practice become accepted as normal because they do not immediately produce negative outcomes.<a href="#ref14" class="src-ref" title="Vaughan, 1996">[14]</a></p>
+
+                <ul>
+                    <li><strong>Temporary bypasses</strong> installed during incidents that are never reversed because the system "works fine" in the modified configuration</li>
+                    <li><strong>Alarm threshold adjustments</strong> made to reduce nuisance alerts, which simultaneously reduce the system's ability to detect genuine pre-failure conditions</li>
+                    <li><strong>PM scope reductions</strong> where maintenance procedures are shortened "just this time" due to scheduling pressure, and the shortened version becomes the de facto standard</li>
+                    <li><strong>Workaround procedures</strong> that compensate for known defects but are never documented in formal SOPs, creating dependency on specific individuals who know the workaround</li>
+                    <li><strong>Deferred <span class="tip" data-tip="Management of Change &mdash; A systematic approach to dealing with changes in an organization, ensuring risks are assessed and controlled before implementation">MoC</span> reviews</strong> where changes are implemented under time pressure with promises of post-implementation review that never occurs</li>
+                </ul>
+
+                <h3>3.3 Knowledge Loss</h3>
+
+                <p>Knowledge loss is a frequently underestimated source of technical debt. When experienced personnel leave a facility &mdash; through retirement, promotion, or organizational restructuring &mdash; they take with them understanding of system quirks, historical failure modes, undocumented modifications, and the reasoning behind non-obvious configurations. This knowledge often represents years of accumulated operational intelligence that cannot be recreated from documentation alone because much of it was never documented.</p>
+
+                <p>The impact of knowledge loss is particularly severe in data centers because:</p>
+
+                <ul>
+                    <li>Critical infrastructure systems have long lives (15-30 years), often exceeding the tenure of any individual operator</li>
+                    <li>Many operational decisions are based on understanding of specific equipment behavior that differs from generic manufacturer documentation</li>
+                    <li>Emergency response effectiveness depends heavily on operator familiarity with facility-specific failure modes and recovery paths</li>
+                    <li>Handover processes rarely capture the "why" behind configurations, only the "what"</li>
+                </ul>
+
+                <h3>3.4 Vendor Lock-in</h3>
+
+                <p>Vendor lock-in creates a structural form of technical debt that constrains future decision-making and inflates costs. When proprietary systems, closed protocols, or exclusive maintenance agreements limit the facility's ability to source competitive alternatives, the result is reduced negotiating power, limited innovation adoption, and dependency on a single vendor's product roadmap, support quality, and business continuity. Schneider Electric's White Paper 37 on the <span class="tip" data-tip="Total Cost of Ownership &mdash; A financial estimate intended to help determine the direct and indirect costs of a system or product, including acquisition, operation, maintenance, and disposal costs over its entire lifecycle">TCO</span> of data center infrastructure identifies vendor dependency as a significant long-term cost driver.<a href="#ref9" class="src-ref" title="Schneider WP37">[9]</a></p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Lock-in Type</th>
+                                <th>Example</th>
+                                <th>Cost Impact</th>
+                                <th>Debt Mechanism</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Proprietary Controls</td>
+                                <td>BMS on vendor-specific protocol</td>
+                                <td>30-50% premium on integration</td>
+                                <td>Cannot integrate new equipment without vendor involvement</td>
+                            </tr>
+                            <tr>
+                                <td>Exclusive Spares</td>
+                                <td>UPS modules with no aftermarket</td>
+                                <td>50-200% markup on parts</td>
+                                <td>Extends MTTR when vendor supply chain fails</td>
+                            </tr>
+                            <tr>
+                                <td>Certification Lock</td>
+                                <td>Warranty voided by third-party service</td>
+                                <td>20-40% premium on service</td>
+                                <td>Prevents competitive bidding for maintenance</td>
+                            </tr>
+                            <tr>
+                                <td>Software Dependency</td>
+                                <td>DCIM requiring specific OS version</td>
+                                <td>Forced upgrade cycles</td>
+                                <td>Security vulnerabilities when OS goes EOL</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 4: Compound Risk Analogy -->
+                <h2 id="section-4"><span class="section-number">4</span> Compound Risk Analogy</h2>
+
+                <p>The financial debt metaphor is more than illustrative &mdash; it is structurally accurate. Technical debt in physical infrastructure behaves according to the same compounding principles as financial debt, and understanding this analogy provides a framework for quantitative risk assessment that decision-makers find intuitive.</p>
+
+                <h3>4.1 The Interest Mechanism</h3>
+
+                <p>When a maintenance task is deferred, the immediate savings (avoided cost, avoided downtime risk from the maintenance window) represents the "principal." However, the longer the task remains deferred, the more "interest" accrues in the form of:</p>
+
+                <ul>
+                    <li><strong>Increasing failure probability</strong> &mdash; components degrade non-linearly, with failure rates accelerating as equipment ages beyond design parameters</li>
+                    <li><strong>Rising remediation cost</strong> &mdash; a maintenance task that costs X today may cost 1.5X next year due to further degradation, and potentially 3-5X if it results in an emergency repair after failure</li>
+                    <li><strong>Expanding blast radius</strong> &mdash; deferred items in interconnected systems create compound failure modes where a single component failure cascades through adjacent systems</li>
+                    <li><strong>Knowledge decay</strong> &mdash; the longer an item is deferred, the fewer people remember the original assessment, the design intent, or the specific risk it represents</li>
+                </ul>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Compound Risk Equation</div>
+                    <p style="margin:0; font-size:0.85rem;">
+                        <span style="color:#7c3aed;">Risk<sub>t</sub></span> = Risk<sub>0</sub> &times; (1 + r)<sup>t</sup><br><br>
+                        Where:<br>
+                        &bull; Risk<sub>0</sub> = initial risk score at time of deferral<br>
+                        &bull; r = annual compounding rate (typically 0.12&ndash;0.20 for infrastructure)<br>
+                        &bull; t = years since deferral<br><br>
+                        A deferred item with initial risk score of 25 compounds to:<br>
+                        &bull; Year 1: 25 &times; 1.15 = <strong>28.8</strong><br>
+                        &bull; Year 3: 25 &times; 1.15<sup>3</sup> = <strong>38.0</strong><br>
+                        &bull; Year 5: 25 &times; 1.15<sup>5</sup> = <strong>50.3</strong> (doubled risk)
+                    </p>
+                </div>
+
+                <h3>4.2 The Bankruptcy Threshold</h3>
+
+                <p>Just as financial debt becomes unserviceable when interest payments exceed available cash flow, technical debt reaches a "bankruptcy" threshold when the accumulated remediation backlog exceeds the facility's ability to execute maintenance without unacceptable operational risk. At this point, every remediation attempt carries significant risk of causing the very outage it is trying to prevent, because the number of unknowns and undocumented states makes it impossible to fully predict the impact of any change.</p>
+
+                <p>Dekker's work on drift in complex systems describes this phenomenon: systems that have accumulated sufficient latent conditions reach a point where the next perturbation &mdash; regardless of how small &mdash; triggers a disproportionate response.<a href="#ref10" class="src-ref" title="Dekker, 2011">[10]</a> In practical terms, this manifests as facilities where:</p>
+
+                <ul>
+                    <li>Every maintenance window generates anxiety because "we don't know what else might be affected"</li>
+                    <li>Incident response takes longer because responders cannot trust documentation or assumptions about system state</li>
+                    <li>Management becomes increasingly risk-averse about authorized maintenance, paradoxically increasing the debt further</li>
+                    <li>Staff turnover accelerates because experienced operators recognize the growing gap between the facility's apparent stability and its actual fragility</li>
+                </ul>
+
+                <div class="key-insight">
+                    <strong>Warning Sign</strong>
+                    When operations teams begin describing the facility as "running on hope" or "held together with workarounds," the organization has likely passed the compound interest inflection point. At this stage, incremental remediation is insufficient &mdash; a structured, risk-prioritized debt reduction program is required, analogous to financial debt restructuring.
+                </div>
+
+                <!-- Section 5: Bathtub Curve & Weibull Analysis -->
+                <h2 id="section-5"><span class="section-number">5</span> Bathtub Curve &amp; Weibull Analysis</h2>
+
+                <p>Reliability engineering provides the mathematical framework for understanding why technical debt creates increasing risk over time. The bathtub curve and <span class="tip" data-tip="Weibull Distribution &mdash; A continuous probability distribution used in reliability engineering to model time-to-failure data. Named after Swedish mathematician Waloddi Weibull who described it in 1951.">Weibull</span> distribution are the foundational tools for quantifying this relationship.<a href="#ref4" class="src-ref" title="Moubray, 1997">[4]</a></p>
+
+                <h3>5.1 The Bathtub Curve</h3>
+
+                <p>The bathtub curve describes the failure rate pattern observed across the lifecycle of physical equipment. It comprises three distinct phases:</p>
+
+                <ul>
+                    <li><strong>Infant Mortality (Early Failure)</strong> &mdash; elevated failure rates immediately after installation due to manufacturing defects, installation errors, or design flaws that only manifest under operational conditions. In data centers, this phase typically lasts 6-18 months and is mitigated by commissioning, testing, and burn-in procedures</li>
+                    <li><strong>Useful Life (Random Failure)</strong> &mdash; a period of relatively constant, low failure rate where failures are primarily random (not age-related). This is the "design life" period where the system operates as intended. For most data center infrastructure, this phase extends from year 1-2 through year 8-15 depending on the system</li>
+                    <li><strong>Wear-Out (End of Life)</strong> &mdash; increasing failure rates as components degrade beyond their design parameters. The transition from useful life to wear-out is not abrupt &mdash; it follows a probability distribution that can be characterized mathematically using the Weibull function</li>
+                </ul>
+
+                <h3>5.2 Weibull Distribution Parameters</h3>
+
+                <p>The Weibull distribution is defined by two parameters that have direct physical meaning in reliability analysis:</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Weibull Hazard Function</div>
+                    <p style="margin:0; font-size:0.85rem;">
+                        <span style="color:#7c3aed;">h(t)</span> = (&beta;/&eta;) &times; (t/&eta;)<sup>&beta;-1</sup><br><br>
+                        Where:<br>
+                        &bull; h(t) = hazard rate (instantaneous failure rate) at time t<br>
+                        &bull; &beta; (beta) = shape parameter<br>
+                        &nbsp;&nbsp;&mdash; &beta; &lt; 1: decreasing failure rate (infant mortality)<br>
+                        &nbsp;&nbsp;&mdash; &beta; = 1: constant failure rate (useful life, exponential)<br>
+                        &nbsp;&nbsp;&mdash; &beta; &gt; 1: increasing failure rate (wear-out)<br>
+                        &bull; &eta; (eta) = scale parameter (characteristic life in months)<br><br>
+                        <strong>Typical data center equipment parameters:</strong><br>
+                        &bull; UPS batteries: &beta; = 2.5&ndash;3.5, &eta; = 48&ndash;60 months<br>
+                        &bull; Mechanical systems: &beta; = 1.5&ndash;2.5, &eta; = 120&ndash;180 months<br>
+                        &bull; Electrical connections: &beta; = 2.0&ndash;3.0, &eta; = 60&ndash;96 months<br>
+                        &bull; Electronic controls: &beta; = 1.2&ndash;2.0, &eta; = 96&ndash;144 months
+                    </p>
+                </div>
+
+                <h3>5.3 Implications for Technical Debt</h3>
+
+                <p>The Weibull framework reveals why technical debt creates accelerating risk. When maintenance is deferred, equipment operates further into the wear-out phase (high beta region) where the hazard rate increases rapidly. A UPS battery string at month 48 (of a 60-month characteristic life with beta = 2.5) has a hazard rate of 0.064 per month. By month 72, the same string has a hazard rate of 0.108 &mdash; a 69% increase. By month 84, the rate reaches 0.144 &mdash; a 125% increase from the month-48 baseline. This is the mathematical basis for why "just one more year" of deferred replacement dramatically changes the risk profile.</p>
+
+                <p>IEEE 493 (<span class="tip" data-tip="IEEE 493 &mdash; IEEE Recommended Practice for the Design of Reliable Industrial and Commercial Power Systems, commonly known as the 'Gold Book', providing reliability data and analytical methods">Gold Book</span>) provides failure rate data and <span class="tip" data-tip="Mean Time Between Failures &mdash; The average time between system breakdowns. A key reliability metric calculated as total operational time divided by the number of failures. Higher MTBF indicates greater reliability.">MTBF</span> benchmarks for common data center components that, when combined with Weibull analysis, enables quantitative risk scoring of deferred maintenance items.<a href="#ref5" class="src-ref" title="IEEE 493, 2007">[5]</a></p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>&beta; (Shape)</th>
+                                <th>&eta; (Scale, months)</th>
+                                <th>Hazard at 80% Life</th>
+                                <th>Hazard at 120% Life</th>
+                                <th>Increase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>UPS Battery (VRLA)</td>
+                                <td>2.5</td>
+                                <td>60</td>
+                                <td>0.056</td>
+                                <td>0.130</td>
+                                <td style="color:#ef4444; font-weight:700;">+132%</td>
+                            </tr>
+                            <tr>
+                                <td>Chiller Compressor</td>
+                                <td>2.0</td>
+                                <td>144</td>
+                                <td>0.009</td>
+                                <td>0.017</td>
+                                <td style="color:#f59e0b; font-weight:700;">+89%</td>
+                            </tr>
+                            <tr>
+                                <td>ATS Mechanism</td>
+                                <td>2.2</td>
+                                <td>96</td>
+                                <td>0.015</td>
+                                <td>0.030</td>
+                                <td style="color:#ef4444; font-weight:700;">+100%</td>
+                            </tr>
+                            <tr>
+                                <td>Generator Fuel System</td>
+                                <td>1.8</td>
+                                <td>120</td>
+                                <td>0.010</td>
+                                <td>0.016</td>
+                                <td style="color:#f59e0b; font-weight:700;">+60%</td>
+                            </tr>
+                            <tr>
+                                <td>BMS Controller</td>
+                                <td>1.5</td>
+                                <td>108</td>
+                                <td>0.010</td>
+                                <td>0.014</td>
+                                <td style="color:#f59e0b; font-weight:700;">+40%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 6: Case Context -->
+                <h2 id="section-6"><span class="section-number">6</span> Case Context: 15MW Facility</h2>
+
+                <p>To ground the theoretical framework in operational reality, we examine a composite case study based on conditions observed across multiple data center facilities. This case represents a 15MW critical power capacity colocation facility that has been operational for 8 years. During a comprehensive technical debt audit, 127 deferred items were identified across all infrastructure systems.</p>
+
+                <h3>6.1 Facility Profile</h3>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Critical IT Power</td>
+                                <td>15 MW</td>
+                                <td>Operating at ~78% of capacity</td>
+                            </tr>
+                            <tr>
+                                <td>Facility Age</td>
+                                <td>8 years</td>
+                                <td>Original equipment, Phase 1 commissioning 2017</td>
+                            </tr>
+                            <tr>
+                                <td>Design Tier</td>
+                                <td>Tier III (Concurrently Maintainable)</td>
+                                <td>2N power, N+1 cooling</td>
+                            </tr>
+                            <tr>
+                                <td>PUE</td>
+                                <td>1.52 (design: 1.35)</td>
+                                <td>Drift attributable to deferred optimization</td>
+                            </tr>
+                            <tr>
+                                <td>Deferred Items</td>
+                                <td>127</td>
+                                <td>Across all MEP and control systems</td>
+                            </tr>
+                            <tr>
+                                <td>Annual Revenue</td>
+                                <td>$50M</td>
+                                <td>Colocation services and managed hosting</td>
+                            </tr>
+                            <tr>
+                                <td>Annual Maintenance Budget</td>
+                                <td>$2.1M</td>
+                                <td>2.8% of <span class="tip" data-tip="Capital Expenditure &mdash; Funds used by a company to acquire, upgrade, and maintain physical assets such as property, plants, buildings, technology, or equipment">CAPEX</span>, below 3-5% industry guidance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>6.2 Debt Distribution</h3>
+
+                <p>The 127 deferred items were classified by criticality using a three-tier framework aligned with <span class="tip" data-tip="ISO 55001 &mdash; International standard for Asset Management Systems, specifying requirements for establishing, implementing, maintaining, and improving an asset management system">ISO 55001</span> asset criticality assessment principles:<a href="#ref3" class="src-ref" title="ISO 55001, 2014">[3]</a></p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Criticality Level</th>
+                                <th>Count</th>
+                                <th>%</th>
+                                <th>Description</th>
+                                <th>Example Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color:#ef4444; font-weight:700;">Critical</td>
+                                <td>25</td>
+                                <td>20%</td>
+                                <td>Direct impact on redundancy or capacity</td>
+                                <td>UPS capacitor replacement, ATS testing, generator fuel polishing</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#f59e0b; font-weight:700;">Major</td>
+                                <td>45</td>
+                                <td>35%</td>
+                                <td>Degraded performance or reduced margin</td>
+                                <td>Chiller coil cleaning, PDU thermal imaging, BMS sensor calibration</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#10b981; font-weight:700;">Minor</td>
+                                <td>57</td>
+                                <td>45%</td>
+                                <td>Cosmetic or low-impact operational items</td>
+                                <td>Labeling updates, cable management, painting, documentation updates</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>6.3 Average Age of Deferred Items</h3>
+
+                <p>The average age of the 127 deferred items was 18 months, with significant variation by criticality. Critical items had an average deferral age of 14 months (indicating they were identified relatively recently but remain unaddressed), while minor items averaged 24 months (reflecting long-standing low-priority items that gradually accumulated). The oldest deferred item &mdash; replacement of an original-equipment BMS controller running an unsupported operating system &mdash; had been in the backlog for 5 years.</p>
+
+                <div class="info-box critical">
+                    <div class="info-box-title">Audit Finding</div>
+                    <p style="margin:0;">Of the 25 critical items, 8 were directly related to the facility's ability to maintain concurrent maintainability (Tier III design intent). If any two of these 8 items were to fail simultaneously during a maintenance window, the facility would experience a partial or complete loss of redundancy &mdash; effectively operating as a Tier I facility for the duration of the repair. The probability of such co-occurrence increases non-linearly with the age of the deferred items, as demonstrated by the Weibull analysis in Section 5.</p>
+                </div>
+
+                <h3>6.4 Financial Context</h3>
+
+                <p>The total estimated remediation cost for all 127 items was $1.9M, against an annual maintenance budget of $2.1M that was already fully committed to routine operations. This created a classic debt trap: the facility could not address the backlog without either additional funding or reducing routine maintenance, which would generate new debt items. Moubray's principles of <span class="tip" data-tip="Reliability-Centered Maintenance &mdash; A process for determining the maintenance requirements of any physical asset in its operating context, focused on preserving system function rather than equipment condition">RCM</span> emphasize that maintenance decisions must be based on consequences of failure, not simply on equipment condition.<a href="#ref4" class="src-ref" title="Moubray, 1997">[4]</a></p>
+
+                <p>The annual revenue at risk from a significant outage (defined as >4 hours affecting >50% of load) was estimated at $5M based on contractual <span class="tip" data-tip="Service Level Agreement &mdash; A commitment between a service provider and a client defining the level of service expected, including uptime guarantees and financial penalties for non-compliance">SLA</span> penalties, customer churn projections, and reputation damage modeling. This framing &mdash; $1.9M remediation investment protecting $5M+ annual revenue at risk &mdash; fundamentally changed the budget discussion from "maintenance cost" to "risk management investment."</p>
+
+                <!-- Section 7: Quantifying Framework -->
+                <h2 id="section-7"><span class="section-number">7</span> Quantifying Framework</h2>
+
+                <p>Effective management of technical debt requires moving from subjective assessment ("we think this is risky") to quantitative scoring ("this item scores 72 on a 0-100 risk scale"). A quantitative framework enables comparison across disparate debt items, supports rational prioritization, and provides a common language for communicating risk to non-technical stakeholders. The EN 13306 standard on maintenance terminology provides the foundational vocabulary for this framework.<a href="#ref12" class="src-ref" title="EN 13306, 2017">[12]</a></p>
+
+                <h3>7.1 Risk Scoring Model</h3>
+
+                <p>The risk score for each deferred item is calculated as the product of three factors: criticality weight, age factor, and failure probability. This multiplicative approach ensures that high-criticality items are always prioritized, while also capturing the compounding effect of age on failure probability.</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Risk Scoring Formula</div>
+                    <p style="margin:0; font-size:0.85rem;">
+                        <span style="color:#7c3aed;">Risk Score</span> = C<sub>w</sub> &times; A<sub>f</sub> &times; P<sub>f</sub> &times; F<sub>m</sub><br><br>
+                        Where:<br>
+                        &bull; C<sub>w</sub> = Criticality weight (Critical=10, Major=5, Minor=1)<br>
+                        &bull; A<sub>f</sub> = Age factor = 1 + (months_deferred / 24)<br>
+                        &bull; P<sub>f</sub> = Failure probability from Weibull hazard function<br>
+                        &bull; F<sub>m</sub> = Facility age multiplier = 1 + (facility_age_years / 20)<br><br>
+                        <strong>Example calculation:</strong><br>
+                        Critical UPS capacitor, deferred 18 months, facility age 8 years:<br>
+                        &bull; C<sub>w</sub> = 10<br>
+                        &bull; A<sub>f</sub> = 1 + (18/24) = 1.75<br>
+                        &bull; P<sub>f</sub> = h(18) with &beta;=2.5, &eta;=60 = 0.032<br>
+                        &bull; F<sub>m</sub> = 1 + (8/20) = 1.4<br>
+                        &bull; <strong>Score = 10 &times; 1.75 &times; 0.032 &times; 1.4 = 0.784</strong> (normalized to 0-100 scale)
+                    </p>
+                </div>
+
+                <h3>7.2 Criticality Assessment</h3>
+
+                <p>The criticality classification follows <span class="tip" data-tip="ISO 55001 &mdash; International standard for Asset Management Systems, specifying requirements for establishing, implementing, maintaining, and improving an asset management system">ISO 55001</span> principles and is based on the consequence of failure, not the probability of failure or the cost of remediation. This is a fundamental distinction: a $500 item on a critical system path may warrant higher priority than a $50,000 item on a redundant path.</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Weight</th>
+                                <th>Consequence of Failure</th>
+                                <th>Impact on Availability</th>
+                                <th>Decision Timeframe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color:#ef4444; font-weight:700;">Critical</td>
+                                <td>10</td>
+                                <td>Loss of redundancy or capacity</td>
+                                <td>Direct impact on Tier rating</td>
+                                <td>Address within 90 days</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#f59e0b; font-weight:700;">Major</td>
+                                <td>5</td>
+                                <td>Degraded performance or reduced margin</td>
+                                <td>Reduced ability to withstand N-1 event</td>
+                                <td>Address within 180 days</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#10b981; font-weight:700;">Minor</td>
+                                <td>1</td>
+                                <td>Operational inconvenience</td>
+                                <td>No direct availability impact</td>
+                                <td>Address within 12 months</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>7.3 Aggregate Portfolio Risk</h3>
+
+                <p>Individual item risk scores are aggregated to produce a facility-level technical debt risk index. This aggregate score is not simply the sum of individual scores &mdash; it must account for interactions between deferred items. Two deferred items on the same system path create more risk than two deferred items on independent paths. The aggregate score therefore includes an interaction factor that increases when multiple deferred items affect the same functional system.</p>
+
+                <p>The Uptime Institute's 2024 survey data indicates that facilities with aggregate technical debt scores above 60 (on a 0-100 scale) experience 3.2x the frequency of severity-3+ incidents compared to facilities scoring below 30.<a href="#ref7" class="src-ref" title="Uptime Institute, 2024">[7]</a> This empirical correlation validates the scoring framework and provides management with a defensible threshold for triggering remediation investment.</p>
+
+                <div class="key-insight">
+                    <strong>Portfolio View</strong>
+                    Technical debt must be managed as a portfolio, not as individual items. Just as financial risk management considers correlation between assets, infrastructure debt management must consider how deferred items interact across systems. A facility with 50 uncorrelated minor items may be safer than one with 10 correlated critical items.
+                </div>
+
+                <!-- Section 8: Remediation Strategy -->
+                <h2 id="section-8"><span class="section-number">8</span> Remediation Strategy</h2>
+
+                <p>Remediating accumulated technical debt in a live data center requires a structured approach that balances urgency against the operational risk of the remediation work itself. The paradox of debt remediation is that the most critical items are often the most dangerous to address, because they involve systems that are currently providing (degraded) service and any maintenance window creates a period of reduced resilience.</p>
+
+                <h3>8.1 Prioritization Matrix</h3>
+
+                <p>Items are prioritized using a two-dimensional matrix that plots risk score against remediation complexity. This creates four quadrants that guide execution strategy:</p>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quadrant</th>
+                                <th>Risk Score</th>
+                                <th>Complexity</th>
+                                <th>Strategy</th>
+                                <th>Timeline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color:#ef4444; font-weight:700;">Q1: Critical Quick Wins</td>
+                                <td>High (&gt;70)</td>
+                                <td>Low</td>
+                                <td>Immediate execution, minimal planning needed</td>
+                                <td>0&ndash;30 days</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#f59e0b; font-weight:700;">Q2: Critical Complex</td>
+                                <td>High (&gt;70)</td>
+                                <td>High</td>
+                                <td>Detailed MoC, phased execution, risk-assessed MW</td>
+                                <td>30&ndash;90 days</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#06b6d4; font-weight:700;">Q3: Low-Risk Quick Wins</td>
+                                <td>Low (&lt;40)</td>
+                                <td>Low</td>
+                                <td>Bundle into routine maintenance windows</td>
+                                <td>90&ndash;180 days</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#10b981; font-weight:700;">Q4: Low-Risk Complex</td>
+                                <td>Low (&lt;40)</td>
+                                <td>High</td>
+                                <td>Schedule for next major outage window or capital project</td>
+                                <td>180&ndash;365 days</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>8.2 Phased Approach</h3>
+
+                <p>A phased remediation approach is essential for facilities with significant accumulated debt. Attempting to address all items simultaneously overwhelms operational capacity, introduces excessive change risk, and typically leads to poor execution quality. The recommended three-phase approach is:</p>
+
+                <ul>
+                    <li><strong>Phase 1: Stabilization (Months 1-3)</strong> &mdash; Address Q1 items (high risk, low complexity). These are the "quick wins" that materially reduce aggregate risk with minimal operational disruption. Typically includes sensor replacements, documentation updates for critical systems, overdue PM completion, and software patches</li>
+                    <li><strong>Phase 2: Risk Reduction (Months 3-12)</strong> &mdash; Address Q2 items (high risk, high complexity) through carefully planned <span class="tip" data-tip="Management of Change &mdash; A systematic approach to dealing with changes in an organization, ensuring risks are assessed and controlled before implementation">MoC</span> processes. Each item requires detailed method statements, risk assessments, rollback procedures, and contingency plans. Includes UPS component replacements, ATS refurbishment, generator overhauls, and <span class="tip" data-tip="Building Management System &mdash; A computer-based control system installed in buildings to manage and monitor mechanical and electrical equipment">BMS</span> upgrades</li>
+                    <li><strong>Phase 3: Optimization (Months 12-36)</strong> &mdash; Address Q3 and Q4 items, implement permanent solutions for recurring issues, and establish ongoing debt prevention processes. Includes equipment lifecycle replacement programs, documentation management systems, and <span class="tip" data-tip="Condition-Based Maintenance &mdash; A maintenance strategy that monitors the actual condition of equipment to decide what maintenance needs to be done, using sensors and analytics to predict failures before they occur">CBM</span> implementation</li>
+                </ul>
+
+                <h3>8.3 Cost Escalation Model</h3>
+
+                <p>The cost of remediation increases with the age of the deferred item. This escalation follows a predictable pattern based on field observations across multiple facilities:</p>
+
+                <div class="formula-box">
+                    <div class="formula-box-title">Cost Escalation Formula</div>
+                    <p style="margin:0; font-size:0.85rem;">
+                        <span style="color:#7c3aed;">Escalated Cost</span> = Original Cost &times; (1 + (months_deferred / 24) &times; 0.5)<br><br>
+                        This implies:<br>
+                        &bull; 6 months deferred: 12.5% cost increase<br>
+                        &bull; 12 months deferred: 25% cost increase<br>
+                        &bull; 24 months deferred: 50% cost increase<br>
+                        &bull; 48 months deferred: 100% cost increase (doubled)<br><br>
+                        The escalation reflects: parts price increases, expanded scope of work<br>
+                        (secondary damage), emergency vs. planned rates, and additional<br>
+                        engineering/assessment costs for aged items.
+                    </p>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-box-title">Budget Recommendation</div>
+                    <p style="margin:0;">Industry guidance suggests allocating <strong>3-5% of original <span class="tip" data-tip="Capital Expenditure &mdash; Funds used by a company to acquire, upgrade, and maintain physical assets">CAPEX</span></strong> annually for maintenance and lifecycle replacement. Facilities that consistently allocate below this threshold accumulate technical debt at a rate that eventually requires capital project-level remediation investment &mdash; typically 2-3x what would have been spent on timely maintenance.</p>
+                </div>
+
+                <!-- Section 9: Interactive Canvas -->
+                <h2 id="section-9"><span class="section-number">9</span> Interactive: Technical Debt Accumulation</h2>
+
+                <p>The following interactive visualization demonstrates how technical debt accumulation correlates with operational risk over the life of a data center facility. Use the slider to adjust the debt accumulation rate and observe how different management approaches affect the risk trajectory. Hollnagel's <span class="tip" data-tip="Functional Resonance Analysis Method &mdash; A method for analyzing how outcomes emerge from the variability of everyday performance in complex socio-technical systems">FRAM</span> framework suggests that system performance variability &mdash; including technical debt accumulation &mdash; follows non-linear patterns that require continuous monitoring.<a href="#ref11" class="src-ref" title="Hollnagel, 2012">[11]</a></p>
+
                 <div class="chart-container">
                     <div class="chart-title">Technical Debt Accumulation vs Operational Risk</div>
-                    <div class="chart-subtitle">Higher debt accumulation rate increases risk exposure over time</div>
+                    <div class="chart-subtitle">Drag the slider to model different debt accumulation scenarios over a 20-year facility lifecycle</div>
 
                     <div class="chart-wrapper">
                         <canvas id="debtChart" class="chart-canvas" width="800" height="380"></canvas>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="control-label">Facility Age (Years):</span>
+                        <input type="range" id="ageSlider" class="control-slider" min="1" max="25" value="8">
+                        <span class="control-value" id="ageValue">8 yr</span>
                     </div>
 
                     <div class="control-row">
@@ -555,6 +1771,10 @@
                             Operational Risk Level
                         </div>
                         <div class="legend-item">
+                            <span class="legend-dot" style="background: #10b981;"></span>
+                            Managed Debt Baseline
+                        </div>
+                        <div class="legend-item">
                             <span class="legend-dot" style="background: #ef4444;"></span>
                             Critical Threshold
                         </div>
@@ -562,7 +1782,7 @@
 
                     <div class="callout-row">
                         <div class="callout-card">
-                            <div class="callout-label">Final Risk Level</div>
+                            <div class="callout-label">Current Risk Level</div>
                             <div class="callout-value" id="finalRisk">45</div>
                         </div>
                         <div class="callout-card">
@@ -573,156 +1793,255 @@
                             <div class="callout-label">Debt Status</div>
                             <div class="callout-value" id="debtStatus">Moderate</div>
                         </div>
-                    </div>
-                </div>
-
-                <h2>5. Case Pattern: How Debt Amplifies Incidents</h2>
-                <p>Across multiple incidents, the same amplification pattern appears:</p>
-                <ol>
-                    <li>Incident occurs in a non-standard configuration</li>
-                    <li>Documentation does not reflect actual state</li>
-                    <li>Engineers lose time reconstructing history</li>
-                    <li>Recovery actions are conservative or delayed</li>
-                    <li>MTTR extends beyond design expectations</li>
-                </ol>
-
-                <p>In post-incident reviews, the root cause is often labeled as "complexity" or "unexpected interaction". Technical debt is the missing name.</p>
-
-                <h2>6. Why Redundancy Does Not Cancel Technical Debt</h2>
-                <p>Redundancy protects against component failure, not against misunderstanding of system state. A redundant system operating under undocumented constraints can fail faster than a simpler, well-understood one. Technical debt undermines the assumptions redundancy relies on.</p>
-
-                <h2>7. Asset Management Perspective (ISO 55000)</h2>
-                <p>ISO 55000 emphasizes assurance, governance, and lifecycle thinking. Unmanaged technical debt violates all three:</p>
-                <ul>
-                    <li><strong>Assurance:</strong> cannot be provided without truthful system state</li>
-                    <li><strong>Governance:</strong> decisions made without traceability</li>
-                    <li><strong>Lifecycle:</strong> temporary changes become permanent without review</li>
-                </ul>
-
-                <p>From an asset management view, technical debt is unmanaged lifecycle risk.</p>
-
-                <h2>8. Designing a Technical Debt Control System</h2>
-                <p>Resilient sites treat technical debt as a controlled backlog, not as an embarrassment to hide. Key elements:</p>
-                <ul>
-                    <li><strong>Explicit classification:</strong> temporary, tolerated, prohibited</li>
-                    <li><strong>Time-bound approvals:</strong> with expiry dates</li>
-                    <li><strong>Centralized deviation register:</strong> linked to assets</li>
-                    <li><strong>Mandatory reversal:</strong> or formal redesign paths</li>
-                    <li><strong>Review cadence:</strong> aligned with risk, not convenience</li>
-                </ul>
-
-                <div class="result-box">
-                    <h4>Key Principle</h4>
-                    <p>Debt must be visible to be payable. Hidden debt compounds silently until it manifests as an incident.</p>
-                </div>
-
-                <h2>9. Leading Indicators of Debt Saturation</h2>
-                <p>While debt itself is abstract, its effects are measurable:</p>
-                <ul>
-                    <li>Increasing MTTR variance</li>
-                    <li>Rising number of "known unknowns" during incidents</li>
-                    <li>Growing dependency on specific individuals</li>
-                    <li>Repeated PM findings on the same assets</li>
-                    <li>Escalation delays due to uncertainty</li>
-                </ul>
-
-                <h2>10. Conclusion</h2>
-                <blockquote>
-                    "Technical debt is inevitable in live operations. Ignoring it converts short-term stability into long-term fragility. Resilient data centers do not eliminate debt. They make it visible, bounded, and continuously repaid."
-                </blockquote>
-
-                <div class="references">
-                    <h3>References</h3>
-                    <ul>
-                        <li>Reason, J. (1997). Managing the Risks of Organizational Accidents. Ashgate.</li>
-                        <li>Hollnagel, E. (2014). Safety-I and Safety-II: The Past and Future of Safety Management. Ashgate.</li>
-                        <li>ISO 55000. (2014). Asset Management — Overview, Principles and Terminology.</li>
-                        <li>Weick, K. E., & Sutcliffe, K. M. (2015). Managing the Unexpected.</li>
-                        <li>Leveson, N. (2011). Engineering a Safer World: Systems Thinking Applied to Safety.</li>
-                    </ul>
-                </div>
-
-                <!-- Newsletter Signup -->
-                <div class="newsletter-signup">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
-                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
-                </div>
-
-                <!-- Author Bio -->
-                <div class="author-bio">
-                    <div class="author-bio-image">
-                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
-                    </div>
-                    <div class="author-bio-content">
-                        <h4>Bagus Dwi Permana</h4>
-                        <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
-                        <div class="author-bio-links">
-                            <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                                LinkedIn
-                            </a>
-                            <a href="https://github.com/baguspermana7-cpu" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                                GitHub
-                            </a>
-                            <a href="mailto:baguspermana7@gmail.com">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                Email
-                            </a>
+                        <div class="callout-card">
+                            <div class="callout-label">Years to Critical</div>
+                            <div class="callout-value" id="yearsToCritical">4</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Related Articles -->
-                <div class="related-articles">
-                    <h3>Continue Reading</h3>
-                    <div class="related-grid">
-                        <a href="article-4.html" class="related-card">
-                            <div class="related-card-number">04</div>
-                            <div class="related-card-content">
-                                <h4>In-House Capability Is a Reliability Strategy</h4>
-                                <p>Reducing vendor dependency for faster MTTR</p>
+                <!-- Section 10: Calculator -->
+                <h2 id="section-10"><span class="section-number">10</span> Technical Debt Risk Analyzer</h2>
+
+                <p>This interactive calculator applies the quantitative framework described in Section 7 to estimate the current risk exposure, projected risk trajectory, and cost implications of a facility's technical debt portfolio. Adjust the inputs to model your facility's specific conditions.</p>
+
+                <div class="calculator-section">
+                    <h3 class="calculator-title">Technical Debt Risk Analyzer</h3>
+                    <p class="calculator-subtitle">Quantify your facility's technical debt exposure using Weibull-based risk scoring</p>
+
+                    <div class="calc-grid">
+                        <div class="calc-input-group">
+                            <label class="calc-label">Deferred Items Count</label>
+                            <input type="number" class="calc-input" id="calcItems" value="45" min="1" max="500">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Avg Age (Months)</label>
+                            <input type="number" class="calc-input" id="calcAge" value="18" min="1" max="120">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Facility Age (Years)</label>
+                            <input type="number" class="calc-input" id="calcFacilityAge" value="8" min="1" max="30">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Avg Remediation Cost ($)</label>
+                            <input type="number" class="calc-input" id="calcCost" value="15000" min="100" max="500000">
+                        </div>
+                        <div class="calc-input-group">
+                            <label class="calc-label">Annual Revenue ($)</label>
+                            <input type="number" class="calc-input" id="calcRevenue" value="50000000" min="1000000" max="1000000000">
+                        </div>
+                    </div>
+
+                    <!-- Criticality Sliders -->
+                    <div style="margin-bottom: 2rem;">
+                        <label class="calc-label" style="margin-bottom: 0.75rem; display: block;">Criticality Distribution</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.8rem; color: #ef4444; font-weight: 600;">% Critical</span>
+                                    <span class="slider-value" id="criticalVal">20%</span>
+                                </div>
+                                <input type="range" class="calc-slider" id="calcCritical" min="0" max="100" value="20">
                             </div>
-                        </a>
-                        <a href="article-6.html" class="related-card">
-                            <div class="related-card-number">06</div>
-                            <div class="related-card-content">
-                                <h4>Why Post-Incident RCA Fails Without Design Authority</h4>
-                                <p>When RCA becomes reporting ritual</p>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.8rem; color: #f59e0b; font-weight: 600;">% Major</span>
+                                    <span class="slider-value" id="majorVal">35%</span>
+                                </div>
+                                <input type="range" class="calc-slider" id="calcMajor" min="0" max="100" value="35">
                             </div>
-                        </a>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.8rem; color: #10b981; font-weight: 600;">% Minor</span>
+                                    <span class="slider-value" id="minorVal">45%</span>
+                                </div>
+                                <input type="range" class="calc-slider" id="calcMinor" min="0" max="100" value="45" disabled style="opacity:0.6;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Gauge -->
+                    <div class="risk-gauge-container">
+                        <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">Current Risk Score</div>
+                        <div style="font-size: 3rem; font-weight: 800; color: #f59e0b;" id="riskScoreDisplay">0</div>
+                        <div class="risk-gauge-bar">
+                            <div class="risk-gauge-needle" id="riskNeedle" style="left: 0%;"></div>
+                        </div>
+                        <div class="risk-gauge-labels">
+                            <span>0 - Low</span>
+                            <span>25 - Moderate</span>
+                            <span>50 - Elevated</span>
+                            <span>75 - High</span>
+                            <span>100 - Critical</span>
+                        </div>
+                    </div>
+
+                    <!-- Results Grid -->
+                    <div class="calc-results" style="margin-top: 2rem;">
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultRisk1yr">--</div>
+                            <div class="calc-result-label">Projected Risk (1yr)</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultRisk3yr">--</div>
+                            <div class="calc-result-label">Projected Risk (3yr)</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultRisk5yr">--</div>
+                            <div class="calc-result-label">Projected Risk (5yr)</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultOriginalCost">--</div>
+                            <div class="calc-result-label">Original Remediation Cost</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultEscalatedCost">--</div>
+                            <div class="calc-result-label">Escalated Cost (Current)</div>
+                            <div class="calc-result-sub" id="resultEscalationPct">--</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultRevenueAtRisk">--</div>
+                            <div class="calc-result-label">Annual Revenue at Risk</div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="resultBudget">--</div>
+                            <div class="calc-result-label">Recommended Annual Budget</div>
+                            <div class="calc-result-sub">3-year remediation target</div>
+                        </div>
+                    </div>
+
+                    <!-- Priority Breakdown -->
+                    <div class="priority-grid">
+                        <div class="priority-card">
+                            <div class="priority-card-value" style="color: #ef4444;" id="criticalCount">--</div>
+                            <div class="priority-card-label">Critical Items</div>
+                        </div>
+                        <div class="priority-card">
+                            <div class="priority-card-value" style="color: #f59e0b;" id="majorCount">--</div>
+                            <div class="priority-card-label">Major Items</div>
+                        </div>
+                        <div class="priority-card">
+                            <div class="priority-card-value" style="color: #10b981;" id="minorCount">--</div>
+                            <div class="priority-card-label">Minor Items</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="article-nav">
-                    <a href="article-4.html">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                        Previous Article
-                    </a>
-                    <a href="article-6.html">
-                        Next Article
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
+                <!-- Section 11: Organizational Barriers -->
+                <h2 id="section-11"><span class="section-number">11</span> Organizational Barriers</h2>
+
+                <p>Technical debt accumulation is rarely caused by individual negligence. It is the predictable outcome of organizational structures and incentive systems that make debt accumulation rational from the perspective of individual decision-makers, even when it is irrational from the perspective of the organization as a whole. Understanding these barriers is essential for designing remediation programs that address root causes rather than symptoms.</p>
+
+                <h3>11.1 Budget Cycle Misalignment</h3>
+
+                <p>Annual budget cycles create a structural incentive for debt accumulation. Maintenance spending is categorized as <span class="tip" data-tip="Operational Expenditure &mdash; Ongoing costs for running a product, business, or system, including maintenance, utilities, consumables, and staff costs">OPEX</span>, which is scrutinized quarterly and subject to reduction when revenue targets are missed. The benefits of preventive maintenance, however, are realized over multi-year timescales. This creates a persistent temptation to defer maintenance to "protect" the current quarter's OPEX performance, transferring the cost (with compounding interest) to future periods.</p>
+
+                <p>The <span class="tip" data-tip="Capital Expenditure &mdash; Funds used by a company to acquire, upgrade, and maintain physical assets">CAPEX</span>/<span class="tip" data-tip="Operational Expenditure &mdash; Ongoing costs for running a product, business, or system">OPEX</span> classification itself creates perverse incentives: replacing a worn component (OPEX) is harder to justify than waiting for it to fail catastrophically and then funding a major replacement project (CAPEX). The result is that organizations inadvertently incentivize the accumulation of technical debt up to the point of failure, then fund expensive remediation as capital projects.</p>
+
+                <h3>11.2 Invisible Risk</h3>
+
+                <p>Technical debt is invisible to standard operational metrics. <span class="tip" data-tip="Service Level Agreement &mdash; A commitment between a service provider and a client defining the level of service expected, including uptime guarantees">SLA</span> compliance, PUE, and availability statistics all look acceptable until the moment debt triggers a failure. This creates a dangerous illusion: leadership sees green dashboards and concludes that the facility is healthy, while the operations team sees the growing gap between documented and actual system states.</p>
+
+                <p>Unlike financial debt, which appears on balance sheets and is subject to audit, technical debt has no standard reporting mechanism. It exists in <span class="tip" data-tip="Computerized Maintenance Management System &mdash; Software that maintains a computer database of information about an organization's maintenance operations, used to schedule and track maintenance work">CMMS</span> backlogs, in the heads of experienced operators, in the gap between as-built drawings and actual configurations, and in the assumptions embedded in emergency procedures that no longer reflect reality. Making this debt visible is the first and most critical step in managing it.</p>
+
+                <h3>11.3 Normalization of Deviance</h3>
+
+                <p>Diane Vaughan's research on the Challenger disaster identified a pattern she termed "normalization of deviance" &mdash; the gradual process through which unacceptable practices become acceptable as the basis for decisions.<a href="#ref14" class="src-ref" title="Vaughan, 1996">[14]</a> This pattern is pervasive in data center operations:</p>
+
+                <ul>
+                    <li>A temporary bypass is installed during an incident. The system works. The bypass stays.</li>
+                    <li>A PM task is deferred "just this once" because of scheduling pressure. Nothing breaks. It gets deferred again.</li>
+                    <li>An alarm threshold is raised to eliminate nuisance alarms. The real alarm condition does not occur. The threshold remains elevated.</li>
+                    <li>A vendor workaround replaces the formal procedure. It works well enough. It becomes the standard.</li>
+                    <li>Each deviation creates a new baseline from which the next deviation is measured. The cumulative drift from design intent becomes invisible because each step was individually small and apparently harmless.</li>
+                </ul>
+
+                <div class="info-box critical">
+                    <div class="info-box-title">The Drift Paradox</div>
+                    <p style="margin:0;">The most dangerous facilities are often those with the longest run of incident-free operation. Extended periods without major incidents reinforce the belief that current practices are adequate, making it harder to justify investment in addressing accumulated technical debt. The absence of incidents becomes evidence of safety, when in reality it may simply indicate that the specific combination of failures required to trigger a cascade has not yet occurred. Reason's "Swiss cheese model" describes this latent condition precisely.<a href="#ref2" class="src-ref" title="Reason, 1997">[2]</a></p>
                 </div>
+
+                <h3>11.4 Organizational Amnesia</h3>
+
+                <p>Staff turnover, organizational restructuring, and outsourcing transitions create "organizational amnesia" &mdash; the loss of institutional memory about why specific configurations exist, what compromises were made during construction, and which workarounds are in place. This amnesia converts documented debt (items that someone knows about) into undiscovered debt (items that no one knows about until they cause a failure).</p>
+
+                <p>The typical data center team has 15-25% annual turnover. In a facility with a 15-year lifecycle, this means that after 5-7 years, the majority of the current team was not present when the facility was commissioned. Without systematic knowledge transfer processes, the understanding of system behavior that informed original operational decisions is progressively lost, and the debt that this knowledge was compensating for becomes invisible.</p>
+
+                <!-- Section 12: Conclusion -->
+                <h2 id="section-12"><span class="section-number">12</span> Conclusion</h2>
+
+                <div class="conclusion-box">
+                    <h3>Technical Debt Is Operational Risk</h3>
+                    <p>Technical debt in live data centers is not a maintenance backlog to be managed with spreadsheets and scheduling tools. It is an operational risk that compounds over time, degrades system resilience, and creates the preconditions for cascading failures. Managing it effectively requires three fundamental shifts:</p>
+                    <ul>
+                        <li><strong>From maintenance to risk management.</strong> Technical debt items must be assessed using risk frameworks (criticality x probability x consequence), not maintenance scheduling frameworks (cost x convenience). The quantitative scoring model presented in this paper provides a structured approach for this assessment.</li>
+                        <li><strong>From invisible to visible.</strong> Debt must be tracked, reported, and reviewed with the same rigor as financial debt. A "technical debt register" should be a standing agenda item in operational governance meetings, with clear ownership, trending analysis, and escalation thresholds.</li>
+                        <li><strong>From reactive to proactive.</strong> Organizations must move from a model where debt accumulates until failure triggers remediation, to a model where debt is continuously measured, bounded, and reduced. The Weibull-based framework demonstrates mathematically why the cost of proactive management is consistently lower than the cost of reactive recovery.</li>
+                    </ul>
+                    <p>Every data center accumulates technical debt. The difference between resilient facilities and fragile ones is not whether debt exists, but whether it is quantified, bounded, governed, and actively serviced. The tools and frameworks presented in this paper &mdash; risk scoring, Weibull analysis, phased remediation, and interactive risk modeling &mdash; provide the analytical foundation for treating technical debt as what it truly is: operational risk that requires structured management.</p>
+                    <p style="color:#f59e0b; font-weight:600; margin-bottom:0;">The most dangerous words in critical infrastructure operations remain: "Temporary solution &mdash; will fix later."</p>
+                </div>
+
+                <!-- References -->
+                <div style="margin-top: 3rem; padding: 2rem; background: #f8fafc; border-radius: 16px;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary-blue); margin-bottom: 1.5rem; margin-top:0;">References</h3>
+                    <ol class="ref-list">
+                        <li id="ref1">Cunningham, W. (1992). "The WyCash Portfolio Management System." <em>OOPSLA '92 Experience Report.</em> The original articulation of the technical debt metaphor in software engineering.</li>
+                        <li id="ref2">Reason, J. (1997). <em>Managing the Risks of Organizational Accidents.</em> Ashgate Publishing. Foundational framework for understanding latent conditions and organizational factors in system failures.</li>
+                        <li id="ref3">ISO 55001:2014. <em>Asset Management &mdash; Management Systems &mdash; Requirements.</em> International Organization for Standardization. Provides the framework for systematic asset management including criticality assessment and lifecycle planning.</li>
+                        <li id="ref4">Moubray, J. (1997). <em>Reliability-Centered Maintenance.</em> Industrial Press. Definitive text on RCM methodology and consequence-based maintenance decision-making.</li>
+                        <li id="ref5">IEEE 493-2007. <em>IEEE Recommended Practice for the Design of Reliable Industrial and Commercial Power Systems</em> (Gold Book). Provides failure rate data for power system components used in reliability calculations.</li>
+                        <li id="ref6">Uptime Institute (2023). <em>Annual Outage Analysis 2023.</em> Analysis of data center outage causes, frequency, and severity across the global portfolio of certified facilities.</li>
+                        <li id="ref7">Uptime Institute (2024). <em>Global Data Center Survey 2024.</em> Industry-wide survey of operational practices, staffing, and infrastructure management trends.</li>
+                        <li id="ref8">NFPA 70B (2023). <em>Recommended Practice for Electrical Equipment Maintenance.</em> National Fire Protection Association. Guidelines for preventive maintenance of electrical systems including connection integrity testing.</li>
+                        <li id="ref9">Schneider Electric. White Paper 37: <em>"Determining Total Cost of Ownership for Data Center and Network Room Infrastructure."</em> Analysis of lifecycle costs including vendor dependency impacts on TCO.</li>
+                        <li id="ref10">Dekker, S. (2011). <em>Drift into Failure: From Hunting Broken Components to Understanding Complex Systems.</em> Ashgate Publishing. Analysis of how complex systems gradually drift toward failure through normal operations.</li>
+                        <li id="ref11">Hollnagel, E. (2012). <em>FRAM: The Functional Resonance Analysis Method.</em> Ashgate Publishing. Framework for understanding emergent behavior in complex socio-technical systems.</li>
+                        <li id="ref12">EN 13306:2017. <em>Maintenance &mdash; Maintenance Terminology.</em> European Standard defining key maintenance concepts and vocabulary used in asset management frameworks.</li>
+                        <li id="ref13">Turner, B. A. (1978). <em>Man-Made Disasters.</em> Wykeham Publications. Seminal work on how organizational factors create preconditions for technical failures and disasters.</li>
+                        <li id="ref14">Vaughan, D. (1996). <em>The Challenger Launch Decision: Risky Technology, Culture, and Deviance at NASA.</em> University of Chicago Press. Definitive study of normalization of deviance in high-reliability organizations.</li>
+                    </ol>
+                </div>
+
+                <!-- Author Bio -->
+                <div class="author-bio">
+                    <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
+                    <div>
+                        <h4>Bagus Dwi Permana</h4>
+                        <p style="color: var(--accent-gold); font-weight: 600; margin-bottom: 0.5rem !important;">Engineering Operations Manager | Ahli K3 Listrik | CDFOM</p>
+                        <p>12+ years professional experience in critical infrastructure and operations. This paper synthesizes reliability engineering principles, risk management frameworks, and operational field experience to provide a quantitative approach to managing technical debt in live data center facilities.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </article>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p>&copy; 2025 Bagus Dwi Permana. All rights reserved.</p>
-                <p class="footer-tagline">Transforming Critical Infrastructure Through Systematic Excellence</p>
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Bagus Dwi Permana</h3>
+                    <p style="font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience spanning industrial engineering and critical facilities operations.</p>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Insights</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="articles.html" style="color: #06b6d4; text-decoration: none;">Engineering Journal</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="geopolitics.html" style="color: #ef4444; text-decoration: none;">Global Analysis</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Connect</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/" target="_blank" style="color: #94a3b8; text-decoration: none;">LinkedIn</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="mailto:baguspermana7@gmail.com" style="color: #94a3b8; text-decoration: none;">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="margin: 0;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -742,8 +2061,9 @@
     </aside>
 
     <script src="script.js"></script>
+
+    <!-- Share Buttons JS -->
     <script>
-    // Share Buttons Functions
     (function(){const s=document.getElementById('shareButtons'),h=document.querySelector('.article-hero');if(s&&h){document.body.classList.add('has-share-buttons');new IntersectionObserver(e=>e.forEach(x=>s.classList.toggle('visible',!x.isIntersecting)),{threshold:.1}).observe(h)}})();
     function getShareData(){return{title:document.querySelector('meta[property="og:title"]')?.content||document.title,url:window.location.href}}
     function shareLinkedIn(){window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareData().url)}`,'_blank','width=600,height=600')}
@@ -751,43 +2071,71 @@
     function shareWhatsApp(){const d=getShareData();window.open(`https://wa.me/?text=${encodeURIComponent(d.title+'\n\n'+d.url)}`,'_blank')}
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
+
+    <!-- Interactive Chart JS -->
     <script>
     (function() {
         const canvas = document.getElementById('debtChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        const ageSlider = document.getElementById('ageSlider');
         const debtSlider = document.getElementById('debtSlider');
+        const ageValue = document.getElementById('ageValue');
         const debtValue = document.getElementById('debtValue');
         const finalRisk = document.getElementById('finalRisk');
         const trajectory = document.getElementById('trajectory');
         const debtStatus = document.getElementById('debtStatus');
+        const yearsToCritical = document.getElementById('yearsToCritical');
 
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
+        let rect = canvas.getBoundingClientRect();
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
 
-        const W = rect.width;
-        const H = rect.height;
+        let W = rect.width;
+        let H = rect.height;
         const padding = { top: 50, right: 60, bottom: 60, left: 80 };
-        const chartW = W - padding.left - padding.right;
-        const chartH = H - padding.top - padding.bottom;
 
-        function simulate(rate) {
+        function weibullHazard(age, beta, eta) {
+            return (beta / eta) * Math.pow(age / eta, beta - 1);
+        }
+
+        function simulate(rate, maxYears) {
             let risk = [];
-            let base = 10;
-            for (let i = 0; i < 12; i++) {
-                base += rate / 20;
-                let spike = Math.max(0, Math.sin(i) * 5);
-                risk.push(base + spike);
+            for (let y = 0; y <= maxYears; y++) {
+                let ageMonths = y * 12;
+                let debtFactor = 1 + (rate / 100) * y * 0.3;
+                let hazard = weibullHazard(Math.max(1, ageMonths), 2.0, 180);
+                let baseRisk = 5 + hazard * debtFactor * 800;
+                risk.push(Math.min(100, baseRisk));
             }
             return risk;
         }
 
-        function drawChart(rate) {
+        function simulateManaged(maxYears) {
+            let risk = [];
+            for (let y = 0; y <= maxYears; y++) {
+                let ageMonths = y * 12;
+                let hazard = weibullHazard(Math.max(1, ageMonths), 1.5, 240);
+                let baseRisk = 5 + hazard * 200;
+                risk.push(Math.min(100, baseRisk));
+            }
+            return risk;
+        }
+
+        function drawChart() {
+            const rate = parseInt(debtSlider.value);
+            const maxYears = parseInt(ageSlider.value);
+
+            ageValue.textContent = maxYears + ' yr';
+            debtValue.textContent = rate + '%';
+
+            const chartW = W - padding.left - padding.right;
+            const chartH = H - padding.top - padding.bottom;
+
             ctx.clearRect(0, 0, W, H);
 
             // Background
@@ -805,11 +2153,12 @@
                 ctx.stroke();
             }
 
-            // Critical threshold line
+            // Critical threshold
             const threshold = 60;
             const thresholdY = padding.top + chartH - (threshold / 100) * chartH;
             ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
             ctx.setLineDash([6, 6]);
+            ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(padding.left, thresholdY);
             ctx.lineTo(W - padding.right, thresholdY);
@@ -818,7 +2167,7 @@
             ctx.fillStyle = '#ef4444';
             ctx.font = '11px Inter, system-ui, sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText('Critical Threshold', W - padding.right - 100, thresholdY - 8);
+            ctx.fillText('Critical Threshold (60)', W - padding.right - 120, thresholdY - 8);
 
             // Y-axis labels
             ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
@@ -842,23 +2191,53 @@
             // X-axis labels
             ctx.textAlign = 'center';
             ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
-            for (let i = 0; i < 12; i++) {
-                const x = padding.left + (chartW / 11) * i;
-                ctx.fillText('M' + (i + 1), x, H - padding.bottom + 25);
+            const steps = maxYears;
+            for (let i = 0; i <= steps; i++) {
+                if (steps > 15 && i % 2 !== 0 && i !== steps) continue;
+                const x = padding.left + (chartW / steps) * i;
+                ctx.fillText('Y' + i, x, H - padding.bottom + 25);
             }
 
-            // X-axis title
             ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
-            ctx.fillText('Time (Months)', W / 2, H - 15);
+            ctx.fillText('Facility Age (Years)', W / 2, H - 15);
 
             // Get data
-            const risk = simulate(rate);
+            const risk = simulate(rate, maxYears);
+            const managed = simulateManaged(maxYears);
 
-            // Draw area
+            // Draw managed baseline area
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+            for (let i = 0; i < managed.length; i++) {
+                const x = padding.left + (chartW / steps) * i;
+                const y = padding.top + chartH - (managed[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.lineTo(padding.left + chartW, H - padding.bottom);
+            ctx.lineTo(padding.left, H - padding.bottom);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw managed baseline line
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            for (let i = 0; i < managed.length; i++) {
+                const x = padding.left + (chartW / steps) * i;
+                const y = padding.top + chartH - (managed[i] / 100) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw risk area
             ctx.beginPath();
             ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
             for (let i = 0; i < risk.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
+                const x = padding.left + (chartW / steps) * i;
                 const y = padding.top + chartH - (risk[i] / 100) * chartH;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -868,14 +2247,14 @@
             ctx.closePath();
             ctx.fill();
 
-            // Draw line
+            // Draw risk line
             ctx.strokeStyle = '#f59e0b';
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
             for (let i = 0; i < risk.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
+                const x = padding.left + (chartW / steps) * i;
                 const y = padding.top + chartH - (risk[i] / 100) * chartH;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -885,10 +2264,11 @@
             // Draw points
             ctx.fillStyle = '#f59e0b';
             for (let i = 0; i < risk.length; i++) {
-                const x = padding.left + (chartW / 11) * i;
+                if (steps > 15 && i % 2 !== 0 && i !== steps && i !== 0) continue;
+                const x = padding.left + (chartW / steps) * i;
                 const y = padding.top + chartH - (risk[i] / 100) * chartH;
                 ctx.beginPath();
-                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -905,12 +2285,15 @@
             finalRisk.textContent = Math.round(lastRisk);
 
             const growth = risk[risk.length - 1] - risk[0];
-            if (growth > 20) {
-                trajectory.textContent = 'Rising';
+            if (lastRisk >= 60) {
+                trajectory.textContent = 'Critical';
                 trajectory.style.color = '#ef4444';
+            } else if (growth > 20) {
+                trajectory.textContent = 'Rising';
+                trajectory.style.color = '#f59e0b';
             } else if (growth > 10) {
                 trajectory.textContent = 'Climbing';
-                trajectory.style.color = '#f59e0b';
+                trajectory.style.color = '#fbbf24';
             } else {
                 trajectory.textContent = 'Stable';
                 trajectory.style.color = '#10b981';
@@ -926,24 +2309,180 @@
                 debtStatus.textContent = 'Managed';
                 debtStatus.style.color = '#10b981';
             }
+
+            // Years to critical
+            let ytc = '--';
+            for (let i = 0; i < risk.length; i++) {
+                if (risk[i] >= 60) { ytc = i; break; }
+            }
+            if (ytc === '--') ytc = '>' + maxYears;
+            yearsToCritical.textContent = ytc;
+            yearsToCritical.style.color = (typeof ytc === 'number' && ytc <= 5) ? '#ef4444' : '#10b981';
         }
 
-        function refresh() {
-            const rate = parseInt(debtSlider.value);
-            debtValue.textContent = rate + '%';
-            drawChart(rate);
-        }
-
-        debtSlider.addEventListener('input', refresh);
-        refresh();
+        ageSlider.addEventListener('input', drawChart);
+        debtSlider.addEventListener('input', drawChart);
+        drawChart();
 
         window.addEventListener('resize', function() {
-            const rect = canvas.getBoundingClientRect();
+            rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
-            refresh();
+            W = rect.width;
+            H = rect.height;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            drawChart();
         });
+    })();
+    </script>
+
+    <!-- Technical Debt Risk Analyzer Calculator JS -->
+    <script>
+    (function() {
+        const calcItems = document.getElementById('calcItems');
+        const calcAge = document.getElementById('calcAge');
+        const calcFacilityAge = document.getElementById('calcFacilityAge');
+        const calcCost = document.getElementById('calcCost');
+        const calcRevenue = document.getElementById('calcRevenue');
+        const calcCritical = document.getElementById('calcCritical');
+        const calcMajor = document.getElementById('calcMajor');
+        const calcMinor = document.getElementById('calcMinor');
+
+        function weibullHazard(age, beta, eta) {
+            if (age <= 0) return 0;
+            return (beta / eta) * Math.pow(age / eta, beta - 1);
+        }
+
+        function formatCurrency(num) {
+            if (num >= 1000000) return '$' + (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return '$' + (num / 1000).toFixed(0) + 'K';
+            return '$' + Math.round(num);
+        }
+
+        function updateMinor() {
+            const crit = parseInt(calcCritical.value) || 0;
+            const maj = parseInt(calcMajor.value) || 0;
+            const minor = Math.max(0, 100 - crit - maj);
+            calcMinor.value = minor;
+            document.getElementById('criticalVal').textContent = crit + '%';
+            document.getElementById('majorVal').textContent = maj + '%';
+            document.getElementById('minorVal').textContent = minor + '%';
+        }
+
+        function calculate() {
+            updateMinor();
+
+            const items = parseInt(calcItems.value) || 45;
+            const avgAge = parseInt(calcAge.value) || 18;
+            const facilityAge = parseInt(calcFacilityAge.value) || 8;
+            const avgCost = parseInt(calcCost.value) || 15000;
+            const annualRevenue = parseInt(calcRevenue.value) || 50000000;
+            const criticalPct = parseInt(calcCritical.value) || 20;
+            const majorPct = parseInt(calcMajor.value) || 35;
+            const minorPct = Math.max(0, 100 - criticalPct - majorPct);
+
+            // Per-item counts
+            const criticalItems = items * criticalPct / 100;
+            const majorItems = items * majorPct / 100;
+            const minorItems = items - criticalItems - majorItems;
+
+            // Criticality weights
+            const critWeight = 10, majWeight = 5, minWeight = 1;
+
+            // Weibull hazard rate
+            const hazardRate = weibullHazard(avgAge, 2.5, 60);
+
+            // Base risk
+            const baseRisk = (criticalItems * critWeight + majorItems * majWeight + minorItems * minWeight) * hazardRate;
+
+            // Facility multiplier
+            const facilityMultiplier = 1 + (facilityAge / 20);
+
+            // Current risk score
+            const currentRisk = Math.min(100, baseRisk * facilityMultiplier);
+
+            // Projected risks
+            const projectedRisk1 = Math.min(100, currentRisk * Math.pow(1.15, 1));
+            const projectedRisk3 = Math.min(100, currentRisk * Math.pow(1.15, 3));
+            const projectedRisk5 = Math.min(100, currentRisk * Math.pow(1.15, 5));
+
+            // Cost escalation
+            const escalationFactor = 1 + (avgAge / 24) * 0.5;
+            const escalatedCost = items * avgCost * escalationFactor;
+            const originalCost = items * avgCost;
+            const escalationPct = ((escalationFactor - 1) * 100).toFixed(0);
+
+            // Revenue at risk
+            const revenueAtRisk = annualRevenue * (currentRisk / 100) * 0.1;
+
+            // Recommended budget
+            const recommendedBudget = escalatedCost / 3;
+
+            // Update UI
+            const riskDisplay = document.getElementById('riskScoreDisplay');
+            riskDisplay.textContent = Math.round(currentRisk);
+            if (currentRisk >= 75) riskDisplay.style.color = '#ef4444';
+            else if (currentRisk >= 50) riskDisplay.style.color = '#f59e0b';
+            else if (currentRisk >= 25) riskDisplay.style.color = '#fbbf24';
+            else riskDisplay.style.color = '#10b981';
+
+            // Needle position
+            const needle = document.getElementById('riskNeedle');
+            needle.style.left = Math.min(98, currentRisk) + '%';
+
+            // Results
+            document.getElementById('resultRisk1yr').textContent = Math.round(projectedRisk1);
+            document.getElementById('resultRisk1yr').style.color = projectedRisk1 >= 60 ? '#ef4444' : '#f59e0b';
+
+            document.getElementById('resultRisk3yr').textContent = Math.round(projectedRisk3);
+            document.getElementById('resultRisk3yr').style.color = projectedRisk3 >= 60 ? '#ef4444' : '#f59e0b';
+
+            document.getElementById('resultRisk5yr').textContent = Math.round(projectedRisk5);
+            document.getElementById('resultRisk5yr').style.color = projectedRisk5 >= 60 ? '#ef4444' : '#f59e0b';
+
+            document.getElementById('resultOriginalCost').textContent = formatCurrency(originalCost);
+            document.getElementById('resultEscalatedCost').textContent = formatCurrency(escalatedCost);
+            document.getElementById('resultEscalatedCost').style.color = escalationFactor > 1.3 ? '#ef4444' : '#f59e0b';
+            document.getElementById('resultEscalationPct').textContent = '+' + escalationPct + '% escalation';
+
+            document.getElementById('resultRevenueAtRisk').textContent = formatCurrency(revenueAtRisk);
+            document.getElementById('resultRevenueAtRisk').style.color = revenueAtRisk > 1000000 ? '#ef4444' : '#f59e0b';
+
+            document.getElementById('resultBudget').textContent = formatCurrency(recommendedBudget);
+
+            // Priority breakdown
+            document.getElementById('criticalCount').textContent = Math.round(criticalItems);
+            document.getElementById('majorCount').textContent = Math.round(majorItems);
+            document.getElementById('minorCount').textContent = Math.round(minorItems);
+        }
+
+        // Event listeners
+        [calcItems, calcAge, calcFacilityAge, calcCost, calcRevenue].forEach(el => {
+            el.addEventListener('input', calculate);
+        });
+
+        calcCritical.addEventListener('input', function() {
+            const crit = parseInt(this.value) || 0;
+            const maj = parseInt(calcMajor.value) || 0;
+            if (crit + maj > 100) {
+                calcMajor.value = 100 - crit;
+            }
+            calculate();
+        });
+
+        calcMajor.addEventListener('input', function() {
+            const crit = parseInt(calcCritical.value) || 0;
+            const maj = parseInt(this.value) || 0;
+            if (crit + maj > 100) {
+                this.value = 100 - crit;
+            }
+            calculate();
+        });
+
+        // Initial calculation
+        calculate();
     })();
     </script>
 </body>
