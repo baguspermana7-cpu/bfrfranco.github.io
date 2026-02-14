@@ -1505,6 +1505,99 @@ a {
     font-style: italic;
 }
 
+/* Nav Vibrate Animation */
+.nav-vibrate {
+    animation: navVibrate 3s ease-in-out infinite;
+    animation-delay: 2s;
+}
+
+@keyframes navVibrate {
+    0%, 90%, 100% { transform: translateX(0); }
+    92% { transform: translateX(-1.5px); }
+    94% { transform: translateX(1.5px); }
+    96% { transform: translateX(-1px); }
+    98% { transform: translateX(1px); }
+}
+
+/* Floating Side Cards */
+.floating-side-cards {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.floating-side-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    text-decoration: none;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--body-color);
+    letter-spacing: 0.02em;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    transform: translateX(calc(100% - 10px));
+}
+
+.floating-side-card:hover {
+    transform: translateX(0);
+    box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .floating-side-card {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .floating-side-card:hover {
+    background: #243347;
+    box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.floating-card-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.floating-dot-blue {
+    background: #8b5cf6;
+    box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+}
+
+.floating-dot-emerald {
+    background: var(--accent-emerald);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.floating-card-label {
+    white-space: nowrap;
+}
+
+.floating-side-card svg {
+    flex-shrink: 0;
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .floating-side-cards {
+        display: none;
+    }
+}
+
 /* Bento Grid Responsive */
 @media (max-width: 1024px) {
     .bento-row-career {
