@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Page Not Found | ResistanceZero</title>
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #e8e0f0 0%, #d5cce3 40%, #ffffff 70%);
+            color: #1e293b;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scene {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .big-404 {
+            font-size: clamp(10rem, 25vw, 18rem);
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1;
+            letter-spacing: -0.05em;
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+            user-select: none;
+            pointer-events: none;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .character {
+            position: relative;
+            z-index: 2;
+            width: clamp(220px, 40vw, 340px);
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .content {
+            position: relative;
+            z-index: 3;
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.25rem);
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: #64748b;
+            max-width: 480px;
+            line-height: 1.7;
+            margin: 0 auto 2rem;
+        }
+
+        .btn-return {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #1e293b;
+            color: #fff;
+            padding: 0.75rem 1.75rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(30, 41, 59, 0.25);
+        }
+
+        .btn-return:hover {
+            background: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-return svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .footer-note {
+            position: fixed;
+            bottom: 1.5rem;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 480px) {
+            .big-404 { top: 0; }
+            .character { width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="big-404">404</div>
+        <img src="assets/character404.png" alt="Confused maintenance crew member" class="character">
+        <div class="content">
+            <h1>Whoa! This Circuit Went Open.</h1>
+            <p class="subtitle">
+                Looks like our safety crew checked every breaker panel, but this page doesn't exist in our infrastructure.
+                Even the best DCEO can't find a route to this address.
+            </p>
+            <a href="index.html" class="btn-return">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 8 8 12 12 16"></polyline>
+                    <line x1="16" y1="12" x2="8" y2="12"></line>
+                </svg>
+                Return to Base Camp
+            </a>
+        </div>
+    </div>
+    <p class="footer-note">ResistanceZero // Mission Critical // 2026</p>
+</body>
+</html>
