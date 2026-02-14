@@ -2090,30 +2090,30 @@
 
             let rowsHTML = sortedCosts.map(([key, cost]) => {
                 const f = costFactors[key];
-                return `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${f.label}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(cost)}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((cost/result.total)*100).toFixed(1)}%</td></tr>`;
+                return `<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">${f.label}</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(cost)}</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((cost/result.total)*100).toFixed(1)}%</td></tr>`;
             }).join('');
 
             // Add soft costs
             if (result.softCosts.design) {
-                rowsHTML += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Design & Engineering</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.softCosts.design)}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.softCosts.design/result.total)*100).toFixed(1)}%</td></tr>`;
+                rowsHTML += `<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">Design & Engineering</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.softCosts.design)}</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.softCosts.design/result.total)*100).toFixed(1)}%</td></tr>`;
             }
             if (result.softCosts.pm) {
-                rowsHTML += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Project Management</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.softCosts.pm)}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.softCosts.pm/result.total)*100).toFixed(1)}%</td></tr>`;
+                rowsHTML += `<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">Project Management</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.softCosts.pm)}</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.softCosts.pm/result.total)*100).toFixed(1)}%</td></tr>`;
             }
             if (result.fomIncluded) {
-                rowsHTML += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Front-of-Meter / Utility</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.fomTotal)}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.fomTotal/result.total)*100).toFixed(1)}%</td></tr>`;
+                rowsHTML += `<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">Front-of-Meter / Utility</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.fomTotal)}</td>
+                    <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.fomTotal/result.total)*100).toFixed(1)}%</td></tr>`;
             }
-            rowsHTML += `<tr style="background:#f9fafb;"><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Contingency (${result.contingencyPct}%)</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.contingency)}</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${result.contingencyPct}.0%</td></tr>`;
+            rowsHTML += `<tr style="background:#f9fafb;"><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">Contingency (${result.contingencyPct}%)</td>
+                <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.contingency)}</td>
+                <td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${result.contingencyPct}.0%</td></tr>`;
 
             // Config summary
             const itLoad = document.getElementById('itLoad').value;
@@ -2129,8 +2129,9 @@
             if (result.yearLabel !== '2025') configHTML += `<tr><td style="padding:6px 0;color:#6b7280;">Projection Year</td><td style="padding:6px 0;font-weight:600;">${result.yearLabel}</td></tr>`;
             if (result.cityLabel) configHTML += `<tr><td style="padding:6px 0;color:#6b7280;">City/Market</td><td style="padding:6px 0;font-weight:600;">${result.cityLabel}</td></tr>`;
 
-            // Compare section
-            let compareHTML = '';
+            // Compare sections
+            let compareSummaryHTML = '';
+            let compareBreakdownHTML = '';
             if (savedScenario) {
                 const a = savedScenario;
                 const b = result;
@@ -2148,14 +2149,34 @@
                 const monoR = cellSt + 'text-align:right;font-family:monospace;';
                 const deltaR = cellSt + 'text-align:right;';
 
-                // Summary rows
-                let cmpRows = `
-                    <tr style="background:#f0f7ff;"><td style="${cellSt}font-weight:700;" colspan="4">Summary</td></tr>
-                    <tr><td style="${cellSt}">Total CAPEX</td><td style="${monoR}">${formatCurrency(a.total)}</td><td style="${monoR}">${formatCurrency(b.total)}</td><td style="${deltaR}">${dFmt(a.total, b.total)}</td></tr>
-                    <tr><td style="${cellSt}">Cost per kW</td><td style="${monoR}">${formatCurrency(a.total/a.itLoad)}/kW</td><td style="${monoR}">${formatCurrency(b.total/b.itLoad)}/kW</td><td style="${deltaR}">${dFmt(a.total/a.itLoad, b.total/b.itLoad)}</td></tr>
-                    <tr><td style="${cellSt}">IT Load</td><td style="${monoR}">${a.itLoad.toLocaleString()} kW</td><td style="${monoR}">${b.itLoad.toLocaleString()} kW</td><td style="${deltaR}">${a.itLoad !== b.itLoad ? dFmt(a.itLoad, b.itLoad) : '—'}</td></tr>
-                    <tr><td style="${cellSt}">Tier / PUE</td><td style="${monoR}">${a.tierInfo.tier} / ${a.pue}</td><td style="${monoR}">${b.tierInfo.tier} / ${b.pue}</td><td style="${deltaR}">—</td></tr>`;
+                // ── Visual summary cards (like the web) ──
+                const cardSt = 'flex:1;background:#1e3a5f;color:white;border-radius:10px;padding:16px 20px;text-align:center;';
+                compareSummaryHTML = `
+                <div style="margin-bottom:24px;">
+                    <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Scenario Comparison</h2>
+                    <div style="display:flex;gap:12px;align-items:stretch;">
+                        <div style="${cardSt}">
+                            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-bottom:2px;">Scenario A</div>
+                            <div style="font-size:22px;font-weight:700;color:#fbbf24;font-family:monospace;">${formatCurrency(a.total)}</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">${formatCurrency(a.total/a.itLoad)}/kW · ${a.itLoad.toLocaleString()} kW</div>
+                            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;">${a.tierInfo.tier} · PUE ${a.pue}${a.yearLabel!=='2025'?' · '+a.yearLabel:''}${a.cityLabel?' · '+a.cityLabel:''}</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:80px;">
+                            <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Delta</div>
+                            <div style="font-size:20px;font-weight:700;color:${dClr(totalDelta)};font-family:monospace;">${totalSign}${totalDelta.toFixed(1)}%</div>
+                            <div style="font-size:11px;color:#6b7280;">${totalSign}${formatCurrency(b.total - a.total)}</div>
+                        </div>
+                        <div style="${cardSt}">
+                            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-bottom:2px;">Scenario B</div>
+                            <div style="font-size:22px;font-weight:700;color:#34d399;font-family:monospace;">${formatCurrency(b.total)}</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">${formatCurrency(b.total/b.itLoad)}/kW · ${b.itLoad.toLocaleString()} kW</div>
+                            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;">${b.tierInfo.tier} · PUE ${b.pue}${b.yearLabel!=='2025'?' · '+b.yearLabel:''}${b.cityLabel?' · '+b.cityLabel:''}</div>
+                        </div>
+                    </div>
+                </div>`;
 
+                // ── Detailed breakdown table ──
+                let cmpRows = '';
                 // Component breakdown rows
                 cmpRows += `<tr style="background:#f0f7ff;"><td style="${cellSt}font-weight:700;" colspan="4">Component Breakdown</td></tr>`;
                 costKeyOrder.forEach(key => {
@@ -2182,51 +2203,54 @@
                 // Total row
                 cmpRows += `<tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px;">TOTAL</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(b.total)}</td><td style="padding:10px;text-align:right;">${totalSign}${totalDelta.toFixed(1)}%<br><span style="font-size:11px;font-weight:400;">${totalSign}${formatCurrency(b.total - a.total)}</span></td></tr>`;
 
-                compareHTML = `
-                <div style="page-break-before:auto;margin-top:30px;">
-                    <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:8px;margin-bottom:16px;">Scenario Comparison — Full Breakdown</h2>
-                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                        <tr style="background:#1e3a5f;color:white;"><th style="padding:10px;text-align:left;">Component</th><th style="padding:10px;text-align:right;min-width:100px;">Scenario A</th><th style="padding:10px;text-align:right;min-width:100px;">Scenario B</th><th style="padding:10px;text-align:right;min-width:70px;">Delta</th></tr>
+                compareBreakdownHTML = `
+                <div style="margin-top:24px;">
+                    <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Detailed Comparison</h2>
+                    <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="padding:8px 10px;text-align:left;">Component</th><th style="padding:8px 10px;text-align:right;min-width:90px;">Scenario A</th><th style="padding:8px 10px;text-align:right;min-width:90px;">Scenario B</th><th style="padding:8px 10px;text-align:right;min-width:60px;">Delta</th></tr>
                         ${cmpRows}
                     </table>
                 </div>`;
             }
 
             const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CAPEX Report — ${dateStr}</title>
-            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head>
-            <body style="font-family:Arial,Helvetica,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#1f2937;">
-                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:16px;margin-bottom:24px;">
+            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:15mm;}}</style></head>
+            <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
                     <div>
-                        <h1 style="font-size:22px;color:#1e3a5f;margin:0;">Data Center CAPEX Report</h1>
-                        <p style="font-size:12px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
+                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center CAPEX Report</h1>
+                        <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-size:28px;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</div>
-                        <div style="font-size:13px;color:#6b7280;">${formatCurrency(result.total/result.itLoad)}/kW · ${result.itLoad.toLocaleString()} kW IT Load</div>
+                        <div style="font-size:26px;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</div>
+                        <div style="font-size:12px;color:#6b7280;">${formatCurrency(result.total/result.itLoad)}/kW · ${result.itLoad.toLocaleString()} kW IT Load</div>
                     </div>
                 </div>
-                <div style="display:flex;gap:24px;margin-bottom:24px;">
-                    <div style="flex:1;">
-                        <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:12px;">Configuration</h2>
-                        <table style="width:100%;font-size:13px;">${configHTML}</table>
+                ${compareSummaryHTML}
+                <div style="display:flex;gap:16px;margin-bottom:20px;">
+                    <div style="flex:1;min-width:0;">
+                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Configuration</h2>
+                        <table style="width:100%;font-size:11.5px;">${configHTML}</table>
                     </div>
-                    <div style="flex:1;">
-                        <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:12px;">Key Metrics</h2>
-                        <table style="width:100%;font-size:13px;">
-                            <tr><td style="padding:6px 0;color:#6b7280;">Total CAPEX</td><td style="padding:6px 0;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">Annual Energy (est.)</td><td style="padding:6px 0;font-weight:600;font-family:monospace;">${formatCurrency(result.annualEnergy)}/yr</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">Uptime SLA</td><td style="padding:6px 0;font-weight:600;">${result.tierInfo.uptime}</td></tr>
+                    <div style="flex:1;min-width:0;">
+                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Key Metrics</h2>
+                        <table style="width:100%;font-size:11.5px;">
+                            <tr><td style="padding:5px 0;color:#6b7280;">Total CAPEX</td><td style="padding:5px 0;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">Annual Energy</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">${formatCurrency(result.annualEnergy)}/yr</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">Uptime SLA</td><td style="padding:5px 0;font-weight:600;">${result.tierInfo.uptime}</td></tr>
+                        </table>
+                    </div>
+                    <div style="flex:1.2;min-width:0;">
+                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Cost Breakdown</h2>
+                        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                            <tr style="background:#1e3a5f;color:white;"><th style="padding:6px 8px;text-align:left;">Component</th><th style="padding:6px 8px;text-align:right;">Cost</th><th style="padding:6px 8px;text-align:right;">%</th></tr>
+                            ${rowsHTML}
+                            <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:6px 8px;">TOTAL</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:6px 8px;text-align:right;">100%</td></tr>
                         </table>
                     </div>
                 </div>
-                <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:8px;margin-bottom:16px;">Cost Breakdown</h2>
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                    <tr style="background:#1e3a5f;color:white;"><th style="padding:10px 12px;text-align:left;">Component</th><th style="padding:10px 12px;text-align:right;">Cost (USD)</th><th style="padding:10px 12px;text-align:right;">Share</th></tr>
-                    ${rowsHTML}
-                    <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px 12px;">TOTAL</td><td style="padding:10px 12px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:10px 12px;text-align:right;">100%</td></tr>
-                </table>
-                ${compareHTML}
-                <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center;">
+                ${compareBreakdownHTML}
+                <div style="margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center;">
                     <p>This report is a general-purpose estimate. Actual costs depend on site-specific engineering, local regulations, and procurement strategy.</p>
                     <p style="margin-top:4px;">Generated by Data Center CAPEX Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana</p>
                 </div>

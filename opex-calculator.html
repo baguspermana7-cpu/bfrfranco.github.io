@@ -3179,13 +3179,14 @@
 
             let rowsHTML = cats.filter(c => result.breakdown[c.key]?.value > 0).map(c => {
                 const v = result.breakdown[c.key].value;
-                return `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${c.label}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(v)}</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((v/result.total)*100).toFixed(1)}%</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">$${Math.round(v/result.itLoadKW).toLocaleString()}</td></tr>`;
+                return `<tr><td style="padding:5px 6px;border-bottom:1px solid #e5e7eb;">${c.label}</td>
+                    <td style="padding:5px 6px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(v)}</td>
+                    <td style="padding:5px 6px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((v/result.total)*100).toFixed(1)}%</td>
+                    <td style="padding:5px 6px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">$${Math.round(v/result.itLoadKW).toLocaleString()}</td></tr>`;
             }).join('');
 
-            let compareHTML = '';
+            let compareSummaryHTML = '';
+            let compareBreakdownHTML = '';
             if (savedOpexScenario) {
                 const a = savedOpexScenario;
                 const b = result;
@@ -3203,15 +3204,32 @@
                 const monoR = cellSt + 'text-align:right;font-family:monospace;';
                 const deltaR = cellSt + 'text-align:right;';
 
-                // Summary rows
-                let cmpRows = `
-                    <tr style="background:#f0fdf4;"><td style="${cellSt}font-weight:700;" colspan="4">Summary</td></tr>
-                    <tr><td style="${cellSt}">Annual OPEX</td><td style="${monoR}">${formatCurrency(a.total)}</td><td style="${monoR}">${formatCurrency(b.total)}</td><td style="${deltaR}">${dFmt(a.total, b.total)}</td></tr>
-                    <tr><td style="${cellSt}">$/kW/Year</td><td style="${monoR}">$${Math.round(a.perKW).toLocaleString()}</td><td style="${monoR}">$${Math.round(b.perKW).toLocaleString()}</td><td style="${deltaR}">${dFmt(a.perKW, b.perKW)}</td></tr>
-                    <tr><td style="${cellSt}">Monthly OPEX</td><td style="${monoR}">${formatCurrency(a.monthly, true)}</td><td style="${monoR}">${formatCurrency(b.monthly, true)}</td><td style="${deltaR}">${dFmt(a.monthly, b.monthly)}</td></tr>
-                    <tr><td style="${cellSt}">IT Load</td><td style="${monoR}">${a.itLoadKW.toLocaleString()} kW</td><td style="${monoR}">${b.itLoadKW.toLocaleString()} kW</td><td style="${deltaR}">${a.itLoadKW !== b.itLoadKW ? dFmt(a.itLoadKW, b.itLoadKW) : '—'}</td></tr>`;
+                // ── Visual summary cards (like the web) ──
+                const cardSt = 'flex:1;background:#1e3a5f;color:white;border-radius:10px;padding:16px 20px;text-align:center;';
+                compareSummaryHTML = `
+                <div style="margin-bottom:24px;">
+                    <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:6px;margin-bottom:14px;">Scenario Comparison</h2>
+                    <div style="display:flex;gap:12px;align-items:stretch;">
+                        <div style="${cardSt}">
+                            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-bottom:2px;">Scenario A</div>
+                            <div style="font-size:22px;font-weight:700;color:#fbbf24;font-family:monospace;">${formatCurrency(a.total)}</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">$${Math.round(a.perKW).toLocaleString()}/kW/yr · ${a.itLoadKW.toLocaleString()} kW</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:80px;">
+                            <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Delta</div>
+                            <div style="font-size:20px;font-weight:700;color:${dClr(totalDelta)};font-family:monospace;">${totalSign}${totalDelta.toFixed(1)}%</div>
+                            <div style="font-size:11px;color:#6b7280;">${totalSign}${formatCurrency(b.total - a.total)}</div>
+                        </div>
+                        <div style="${cardSt}">
+                            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-bottom:2px;">Scenario B</div>
+                            <div style="font-size:22px;font-weight:700;color:#34d399;font-family:monospace;">${formatCurrency(b.total)}</div>
+                            <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">$${Math.round(b.perKW).toLocaleString()}/kW/yr · ${b.itLoadKW.toLocaleString()} kW</div>
+                        </div>
+                    </div>
+                </div>`;
 
-                // Category breakdown rows
+                // ── Detailed breakdown table ──
+                let cmpRows = '';
                 cmpRows += `<tr style="background:#f0fdf4;"><td style="${cellSt}font-weight:700;" colspan="4">Category Breakdown</td></tr>`;
                 cats.forEach(c => {
                     const aVal = a.breakdown[c.key]?.value || 0;
@@ -3223,56 +3241,59 @@
                 // Total row
                 cmpRows += `<tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px;">TOTAL</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(b.total)}</td><td style="padding:10px;text-align:right;">${totalSign}${totalDelta.toFixed(1)}%<br><span style="font-size:11px;font-weight:400;">${totalSign}${formatCurrency(b.total - a.total)}</span></td></tr>`;
 
-                compareHTML = `
-                <div style="margin-top:30px;">
-                    <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:8px;margin-bottom:16px;">Scenario Comparison — Full Breakdown</h2>
-                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                        <tr style="background:#1e3a5f;color:white;"><th style="padding:10px;text-align:left;">Category</th><th style="padding:10px;text-align:right;min-width:100px;">Scenario A</th><th style="padding:10px;text-align:right;min-width:100px;">Scenario B</th><th style="padding:10px;text-align:right;min-width:70px;">Delta</th></tr>
+                compareBreakdownHTML = `
+                <div style="margin-top:24px;">
+                    <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:6px;margin-bottom:14px;">Detailed Comparison</h2>
+                    <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="padding:8px 10px;text-align:left;">Category</th><th style="padding:8px 10px;text-align:right;min-width:90px;">Scenario A</th><th style="padding:8px 10px;text-align:right;min-width:90px;">Scenario B</th><th style="padding:8px 10px;text-align:right;min-width:60px;">Delta</th></tr>
                         ${cmpRows}
                     </table>
                 </div>`;
             }
 
             const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>OPEX Report — ${dateStr}</title>
-            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head>
-            <body style="font-family:Arial,Helvetica,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#1f2937;">
-                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:16px;margin-bottom:24px;">
+            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:15mm;}}</style></head>
+            <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
                     <div>
-                        <h1 style="font-size:22px;color:#1e3a5f;margin:0;">Data Center OPEX Report</h1>
-                        <p style="font-size:12px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
+                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center OPEX Report</h1>
+                        <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-size:28px;font-weight:700;color:#10b981;font-family:monospace;">${formatCurrency(result.total)}</div>
-                        <div style="font-size:13px;color:#6b7280;">$${Math.round(result.perKW).toLocaleString()}/kW/yr · ${cf.flag} ${cf.name}</div>
+                        <div style="font-size:26px;font-weight:700;color:#10b981;font-family:monospace;">${formatCurrency(result.total)}</div>
+                        <div style="font-size:12px;color:#6b7280;">$${Math.round(result.perKW).toLocaleString()}/kW/yr · ${cf.flag} ${cf.name}</div>
                     </div>
                 </div>
-                <div style="display:flex;gap:24px;margin-bottom:24px;">
-                    <div style="flex:1;">
-                        <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:6px;margin-bottom:12px;">Configuration</h2>
-                        <table style="width:100%;font-size:13px;">
-                            <tr><td style="padding:6px 0;color:#6b7280;">Country</td><td style="padding:6px 0;font-weight:600;">${cf.flag} ${cf.name}</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">IT Load</td><td style="padding:6px 0;font-weight:600;">${result.itLoadKW.toLocaleString()} kW</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">PUE</td><td style="padding:6px 0;font-weight:600;">${result.effectivePue.toFixed(2)}</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">Total FTE</td><td style="padding:6px 0;font-weight:600;">${result.staffingDetail.totalFTE}</td></tr>
+                ${compareSummaryHTML}
+                <div style="display:flex;gap:16px;margin-bottom:20px;">
+                    <div style="flex:1;min-width:0;">
+                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:5px;margin-bottom:10px;">Configuration</h2>
+                        <table style="width:100%;font-size:11.5px;">
+                            <tr><td style="padding:5px 0;color:#6b7280;">Country</td><td style="padding:5px 0;font-weight:600;">${cf.flag} ${cf.name}</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">IT Load</td><td style="padding:5px 0;font-weight:600;">${result.itLoadKW.toLocaleString()} kW</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">PUE</td><td style="padding:5px 0;font-weight:600;">${result.effectivePue.toFixed(2)}</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">Total FTE</td><td style="padding:5px 0;font-weight:600;">${result.staffingDetail.totalFTE}</td></tr>
                         </table>
                     </div>
-                    <div style="flex:1;">
-                        <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:6px;margin-bottom:12px;">Key Metrics</h2>
-                        <table style="width:100%;font-size:13px;">
-                            <tr><td style="padding:6px 0;color:#6b7280;">Annual OPEX</td><td style="padding:6px 0;font-weight:700;color:#10b981;font-family:monospace;">${formatCurrency(result.total)}</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">Monthly</td><td style="padding:6px 0;font-family:monospace;">${formatCurrency(result.monthly, true)}</td></tr>
-                            <tr><td style="padding:6px 0;color:#6b7280;">$/kWh (effective)</td><td style="padding:6px 0;font-family:monospace;">$${result.perKWh.toFixed(3)}</td></tr>
+                    <div style="flex:1;min-width:0;">
+                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:5px;margin-bottom:10px;">Key Metrics</h2>
+                        <table style="width:100%;font-size:11.5px;">
+                            <tr><td style="padding:5px 0;color:#6b7280;">Annual OPEX</td><td style="padding:5px 0;font-weight:700;color:#10b981;font-family:monospace;">${formatCurrency(result.total)}</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">Monthly</td><td style="padding:5px 0;font-family:monospace;">${formatCurrency(result.monthly, true)}</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">$/kWh</td><td style="padding:5px 0;font-family:monospace;">$${result.perKWh.toFixed(3)}</td></tr>
+                        </table>
+                    </div>
+                    <div style="flex:1.2;min-width:0;">
+                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:5px;margin-bottom:10px;">Cost Breakdown</h2>
+                        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                            <tr style="background:#1e3a5f;color:white;"><th style="padding:5px 6px;text-align:left;">Category</th><th style="padding:5px 6px;text-align:right;">Cost</th><th style="padding:5px 6px;text-align:right;">%</th><th style="padding:5px 6px;text-align:right;">$/kW</th></tr>
+                            ${rowsHTML}
+                            <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:5px 6px;">TOTAL</td><td style="padding:5px 6px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:5px 6px;text-align:right;">100%</td><td style="padding:5px 6px;text-align:right;font-family:monospace;">$${Math.round(result.perKW).toLocaleString()}</td></tr>
                         </table>
                     </div>
                 </div>
-                <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:8px;margin-bottom:16px;">Cost Breakdown</h2>
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                    <tr style="background:#1e3a5f;color:white;"><th style="padding:10px 12px;text-align:left;">Category</th><th style="padding:10px 12px;text-align:right;">Annual Cost</th><th style="padding:10px 12px;text-align:right;">Share</th><th style="padding:10px 12px;text-align:right;">$/kW/yr</th></tr>
-                    ${rowsHTML}
-                    <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px 12px;">TOTAL</td><td style="padding:10px 12px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:10px 12px;text-align:right;">100%</td><td style="padding:10px 12px;text-align:right;font-family:monospace;">$${Math.round(result.perKW).toLocaleString()}</td></tr>
-                </table>
-                ${compareHTML}
-                <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center;">
+                ${compareBreakdownHTML}
+                <div style="margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center;">
                     <p>This report is a general-purpose estimate. Actual OPEX varies with contract terms, utility tariffs, and operational maturity.</p>
                     <p style="margin-top:4px;">Generated by Data Center OPEX Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana</p>
                 </div>
