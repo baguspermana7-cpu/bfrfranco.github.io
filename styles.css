@@ -1552,6 +1552,24 @@ a {
     writing-mode: vertical-rl;
     text-orientation: mixed;
     min-height: 90px;
+    transform: translateX(110%);
+    animation: floatingSlideIn 0.5s ease-out forwards, floatingBounce 0.4s ease-in-out 2.8s 1;
+    animation-delay: 2s, 2.8s;
+}
+
+.floating-side-card:last-child {
+    animation-delay: 2.15s, 2.95s;
+}
+
+@keyframes floatingSlideIn {
+    from { transform: translateX(110%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes floatingBounce {
+    0%, 100% { transform: translateX(0); }
+    40% { transform: translateX(-6px); }
+    70% { transform: translateX(2px); }
 }
 
 .floating-side-card:first-child {
