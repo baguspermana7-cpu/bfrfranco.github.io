@@ -911,6 +911,133 @@ a {
     margin-top: 1rem;
 }
 
+/* Hero Experience Logos */
+.hero-experience {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: var(--bg-secondary, rgba(0,0,0,0.03));
+    border: 1px solid var(--border-color, rgba(0,0,0,0.06));
+}
+
+.hero-exp-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+.hero-exp-logos {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.exp-logo-link {
+    display: flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    filter: grayscale(0.3);
+}
+
+.exp-logo-link:hover {
+    opacity: 1;
+    transform: scale(1.08);
+    filter: grayscale(0);
+}
+
+.exp-logo {
+    height: 24px;
+    width: auto;
+    object-fit: contain;
+}
+
+.exp-logo-puredc {
+    height: 22px;
+    border-radius: 4px;
+}
+
+/* Theme-aware logos: day mode by default */
+.exp-logo-cargill-dark,
+.exp-logo-aws-dark {
+    display: none;
+}
+
+[data-theme="dark"] .exp-logo-cargill-day,
+[data-theme="dark"] .exp-logo-aws-day {
+    display: none;
+}
+
+[data-theme="dark"] .exp-logo-cargill-dark,
+[data-theme="dark"] .exp-logo-aws-dark {
+    display: block;
+}
+
+[data-theme="dark"] .hero-experience {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.06);
+}
+
+/* Hero Profile Card with Active Status */
+.hero-profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.hero-profile-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-size: 0.8rem;
+    color: #10b981;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: statusPulse 2s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* Theme-aware profile photos */
+.hero-photo-dark {
+    display: none;
+}
+
+[data-theme="dark"] .hero-photo-day {
+    display: none;
+}
+
+[data-theme="dark"] .hero-photo-dark {
+    display: block;
+}
+
+[data-theme="dark"] .hero-profile-status {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
 /* ==========================================
    Section Styles
    ========================================== */
@@ -921,6 +1048,55 @@ section {
 .section-header {
     text-align: center;
     margin-bottom: 4rem;
+}
+
+/* Section header with row layout (title left, button right) */
+.section-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    text-align: left;
+}
+
+.section-header-row .section-title {
+    display: block;
+}
+
+.section-header-row .section-title::after {
+    left: 0;
+    transform: none;
+}
+
+.btn-explore-articles {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--white);
+    background: var(--primary-gradient);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.2);
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+}
+
+.btn-explore-articles:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.35);
+}
+
+.btn-explore-articles svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-explore-articles:hover svg:last-child {
+    transform: translateX(3px);
 }
 
 .section-title {
@@ -1759,6 +1935,79 @@ section {
 .footer-tagline {
     font-style: italic;
     opacity: 0.7;
+}
+
+/* Enhanced Footer */
+.footer-enhanced {
+    padding: 3.5rem 0 2.5rem;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-tagline-main {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.footer-tagline-sub {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+.footer-copyright {
+    font-size: 0.75rem;
+    opacity: 0.4;
+    margin-top: 1rem;
+}
+
+.footer-heading {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: var(--white);
+    transform: translateX(3px);
+    opacity: 1;
 }
 
 /* ==========================================
@@ -2603,6 +2852,53 @@ section {
 
     .hero-downloads {
         justify-content: center;
+    }
+
+    /* Hero Experience Logos - Mobile */
+    .hero-experience {
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .hero-exp-logos {
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .exp-logo {
+        height: 18px;
+    }
+
+    /* Section header row - Mobile */
+    .section-header-row {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .section-header-row .section-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .btn-explore-articles {
+        align-self: center;
+    }
+
+    /* Footer Grid - Mobile */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .footer-heading {
+        margin-bottom: 0.75rem;
+    }
+
+    .footer-links a:hover {
+        transform: none;
     }
 
     section {
