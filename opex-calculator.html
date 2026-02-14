@@ -2664,6 +2664,7 @@
 
             // 3b. CRITICAL SPARE PARTS INVENTORY
             // Cost depends on: IT load, tier (more redundancy = more spare types), facility age, and contract model
+            const tier = parseInt(tierLevel);
             const tierSpareMult = tier === 4 ? 1.35 : tier === 3 ? 1.15 : tier === 2 ? 1.0 : 0.80;
             const ageSpareMult = facilityAge === 'new' ? 0.65 : facilityAge === 'mid' ? 1.0 : 1.45;
             const contractSpareMult = sparePartsContractMultiplier[currentStaffingModel] || 0.55;
