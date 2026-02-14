@@ -2792,6 +2792,22 @@
                 cooling: cooling,
                 generator: generator,
                 effectivePue: effectivePue,
+                // Configuration metadata for PDF comparison
+                _config: {
+                    countryCode: country,
+                    countryName: cf.name,
+                    countryFlag: cf.flag,
+                    tierLevel: tierLevel,
+                    facilityAge: facilityAge,
+                    climateZone: climate.name,
+                    coolingType: cooling.name,
+                    genConfig: generator.name,
+                    staffingModel: currentStaffingModel === 'inhouse' ? 'Full In-House' :
+                                   currentStaffingModel === 'contractor' ? 'Full Contractor' :
+                                   `Partial (${currentPartialPercent}% In-House)`,
+                    pue: effectivePue.toFixed(2),
+                    utilization: (utilization * 100).toFixed(0) + '%',
+                },
             };
         }
 
@@ -3621,20 +3637,72 @@
                 </div>`;
             }
 
-            const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>OPEX Report — ${dateStr}</title>
-            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:15mm;}}</style></head>
-            <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
-                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
-                    <div>
-                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center OPEX Report</h1>
-                        <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:26px;font-weight:700;color:#10b981;font-family:monospace;">${formatCurrency(result.total)}</div>
-                        <div style="font-size:12px;color:#6b7280;">$${Math.round(result.perKW).toLocaleString()}/kW/yr · ${cf.flag} ${cf.name}</div>
-                    </div>
+            // Build the main content sections
+            let configMetricsHTML = '';
+            let breakdownSectionHTML = '';
+
+            if (savedOpexScenario) {
+                const a = savedOpexScenario;
+                const b = result;
+                const ac = a._config || {};
+                const bc = b._config || {};
+
+                // Helper: highlight value difference
+                const hl = (aVal, bVal) => {
+                    if (String(aVal) !== String(bVal)) return 'color:#ef4444;font-weight:700;';
+                    return 'font-weight:600;';
+                };
+                const cellP = 'padding:4px 0;font-size:11px;';
+                const labelSt = cellP + 'color:#6b7280;';
+
+                // ── Side-by-side Configuration ──
+                configMetricsHTML = `
+                <div style="margin-bottom:18px;">
+                    <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:5px;margin-bottom:12px;">Configuration Comparison</h2>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;">
+                        <tr style="background:#1e3a5f;color:white;">
+                            <th style="padding:6px 8px;text-align:left;">Parameter</th>
+                            <th style="padding:6px 8px;text-align:center;min-width:140px;color:#fbbf24;">Scenario A</th>
+                            <th style="padding:6px 8px;text-align:center;min-width:140px;color:#34d399;">Scenario B</th>
+                        </tr>
+                        <tr><td style="${labelSt}padding-left:8px;">Country</td><td style="${cellP}text-align:center;${hl(ac.countryName,bc.countryName)}">${ac.countryFlag||''} ${ac.countryName||cf.name}</td><td style="${cellP}text-align:center;${hl(ac.countryName,bc.countryName)}">${bc.countryFlag||cf.flag} ${bc.countryName||cf.name}</td></tr>
+                        <tr style="background:#f9fafb;"><td style="${labelSt}padding-left:8px;">IT Load</td><td style="${cellP}text-align:center;${hl(a.itLoadKW,b.itLoadKW)}">${a.itLoadKW.toLocaleString()} kW</td><td style="${cellP}text-align:center;${hl(a.itLoadKW,b.itLoadKW)}">${b.itLoadKW.toLocaleString()} kW</td></tr>
+                        <tr><td style="${labelSt}padding-left:8px;">Tier Level</td><td style="${cellP}text-align:center;${hl(ac.tierLevel,bc.tierLevel)}">Tier ${ac.tierLevel||'-'}</td><td style="${cellP}text-align:center;${hl(ac.tierLevel,bc.tierLevel)}">Tier ${bc.tierLevel||'-'}</td></tr>
+                        <tr style="background:#f9fafb;"><td style="${labelSt}padding-left:8px;">Facility Age</td><td style="${cellP}text-align:center;${hl(ac.facilityAge,bc.facilityAge)}">${ac.facilityAge||'-'}</td><td style="${cellP}text-align:center;${hl(ac.facilityAge,bc.facilityAge)}">${bc.facilityAge||'-'}</td></tr>
+                        <tr><td style="${labelSt}padding-left:8px;">PUE</td><td style="${cellP}text-align:center;${hl(ac.pue,bc.pue)}">${ac.pue||a.effectivePue?.toFixed(2)||'-'}</td><td style="${cellP}text-align:center;${hl(ac.pue,bc.pue)}">${bc.pue||b.effectivePue.toFixed(2)}</td></tr>
+                        <tr style="background:#f9fafb;"><td style="${labelSt}padding-left:8px;">Cooling Type</td><td style="${cellP}text-align:center;${hl(ac.coolingType,bc.coolingType)}">${ac.coolingType||a.cooling?.name||'-'}</td><td style="${cellP}text-align:center;${hl(ac.coolingType,bc.coolingType)}">${bc.coolingType||b.cooling.name}</td></tr>
+                        <tr><td style="${labelSt}padding-left:8px;">Generator Config</td><td style="${cellP}text-align:center;${hl(ac.genConfig,bc.genConfig)}">${ac.genConfig||a.generator?.name||'-'}</td><td style="${cellP}text-align:center;${hl(ac.genConfig,bc.genConfig)}">${bc.genConfig||b.generator.name}</td></tr>
+                        <tr style="background:#f0fdf4;"><td style="${labelSt}padding-left:8px;font-weight:600;">Staffing Model</td><td style="${cellP}text-align:center;${hl(ac.staffingModel,bc.staffingModel)}">${ac.staffingModel||'-'}</td><td style="${cellP}text-align:center;${hl(ac.staffingModel,bc.staffingModel)}">${bc.staffingModel||'-'}</td></tr>
+                        <tr style="background:#f0fdf4;"><td style="${labelSt}padding-left:8px;font-weight:600;">Utilization</td><td style="${cellP}text-align:center;${hl(ac.utilization,bc.utilization)}">${ac.utilization||'-'}</td><td style="${cellP}text-align:center;${hl(ac.utilization,bc.utilization)}">${bc.utilization||'-'}</td></tr>
+                    </table>
                 </div>
-                ${compareSummaryHTML}
+
+                <div style="display:flex;gap:16px;margin-bottom:18px;">
+                    <div style="flex:1;min-width:0;">
+                        <h2 style="font-size:13px;color:#fbbf24;border-bottom:2px solid #fbbf24;padding-bottom:5px;margin-bottom:8px;">Key Metrics — Scenario A</h2>
+                        <table style="width:100%;font-size:11px;">
+                            <tr><td style="${labelSt}">Annual OPEX</td><td style="${cellP}font-weight:700;color:#1e3a5f;font-family:monospace;">${formatCurrency(a.total)}</td></tr>
+                            <tr><td style="${labelSt}">Monthly</td><td style="${cellP}font-family:monospace;">${formatCurrency(a.monthly, true)}</td></tr>
+                            <tr><td style="${labelSt}">$/kW/Year</td><td style="${cellP}font-family:monospace;">$${Math.round(a.perKW).toLocaleString()}</td></tr>
+                            <tr><td style="${labelSt}">$/kWh</td><td style="${cellP}font-family:monospace;">$${a.perKWh?.toFixed(3)||'-'}</td></tr>
+                            <tr><td style="${labelSt}">Total FTE</td><td style="${cellP}font-weight:600;">${a.staffingDetail.totalFTE} (${a.staffingDetail.totalInhouse} in-house, ${a.staffingDetail.totalContractor} contractor)</td></tr>
+                        </table>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <h2 style="font-size:13px;color:#34d399;border-bottom:2px solid #34d399;padding-bottom:5px;margin-bottom:8px;">Key Metrics — Scenario B</h2>
+                        <table style="width:100%;font-size:11px;">
+                            <tr><td style="${labelSt}">Annual OPEX</td><td style="${cellP}font-weight:700;color:#1e3a5f;font-family:monospace;">${formatCurrency(b.total)}</td></tr>
+                            <tr><td style="${labelSt}">Monthly</td><td style="${cellP}font-family:monospace;">${formatCurrency(b.monthly, true)}</td></tr>
+                            <tr><td style="${labelSt}">$/kW/Year</td><td style="${cellP}font-family:monospace;">$${Math.round(b.perKW).toLocaleString()}</td></tr>
+                            <tr><td style="${labelSt}">$/kWh</td><td style="${cellP}font-family:monospace;">$${b.perKWh.toFixed(3)}</td></tr>
+                            <tr><td style="${labelSt}">Total FTE</td><td style="${cellP}font-weight:600;">${b.staffingDetail.totalFTE} (${b.staffingDetail.totalInhouse} in-house, ${b.staffingDetail.totalContractor} contractor)</td></tr>
+                        </table>
+                    </div>
+                </div>`;
+
+            } else {
+                // Single scenario — original 3-column layout
+                configMetricsHTML = `
                 <div style="display:flex;gap:16px;margin-bottom:20px;">
                     <div style="flex:1;min-width:0;">
                         <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:5px;margin-bottom:10px;">Configuration</h2>
@@ -3642,6 +3710,7 @@
                             <tr><td style="padding:5px 0;color:#6b7280;">Country</td><td style="padding:5px 0;font-weight:600;">${cf.flag} ${cf.name}</td></tr>
                             <tr><td style="padding:5px 0;color:#6b7280;">IT Load</td><td style="padding:5px 0;font-weight:600;">${result.itLoadKW.toLocaleString()} kW</td></tr>
                             <tr><td style="padding:5px 0;color:#6b7280;">PUE</td><td style="padding:5px 0;font-weight:600;">${result.effectivePue.toFixed(2)}</td></tr>
+                            <tr><td style="padding:5px 0;color:#6b7280;">Staffing</td><td style="padding:5px 0;font-weight:600;">${result._config?.staffingModel || '-'}</td></tr>
                             <tr><td style="padding:5px 0;color:#6b7280;">Total FTE</td><td style="padding:5px 0;font-weight:600;">${result.staffingDetail.totalFTE}</td></tr>
                         </table>
                     </div>
@@ -3661,7 +3730,24 @@
                             <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:5px 6px;">TOTAL</td><td style="padding:5px 6px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:5px 6px;text-align:right;">100%</td><td style="padding:5px 6px;text-align:right;font-family:monospace;">$${Math.round(result.perKW).toLocaleString()}</td></tr>
                         </table>
                     </div>
+                </div>`;
+            }
+
+            const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>OPEX Report — ${dateStr}</title>
+            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:15mm;}}</style></head>
+            <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
+                    <div>
+                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center OPEX Report${savedOpexScenario ? ' — Scenario Comparison' : ''}</h1>
+                        <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:26px;font-weight:700;color:#10b981;font-family:monospace;">${formatCurrency(result.total)}</div>
+                        <div style="font-size:12px;color:#6b7280;">$${Math.round(result.perKW).toLocaleString()}/kW/yr · ${cf.flag} ${cf.name}</div>
+                    </div>
                 </div>
+                ${compareSummaryHTML}
+                ${configMetricsHTML}
                 ${compareBreakdownHTML}
                 <div style="margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center;">
                     <p>This report is a general-purpose estimate. Actual OPEX varies with contract terms, utility tariffs, and operational maturity.</p>
