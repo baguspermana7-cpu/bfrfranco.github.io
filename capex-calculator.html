@@ -884,6 +884,14 @@
             <div class="simulator-container">
                 <!-- Input Side -->
                 <div class="simulator-inputs">
+                    <!-- Scenario B indicator (shown after Save Scenario A) -->
+                    <div id="scenarioBBanner" style="display:none;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(16,185,129,0.08));border:1.5px solid rgba(16,185,129,0.4);margin-bottom:0.75rem;display:none;align-items:center;gap:10px;">
+                        <span style="width:28px;height:28px;border-radius:8px;background:rgba(52,211,153,0.2);color:#34d399;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">B</span>
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:600;color:#059669;">Scenario B Input</div>
+                            <div style="font-size:0.72rem;color:#6b7280;">Modify the inputs below to configure Scenario B for comparison</div>
+                        </div>
+                    </div>
                     <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
@@ -1988,20 +1996,22 @@
             savedScenario = JSON.parse(JSON.stringify(lastResult));
             document.getElementById('comparePanel').style.display = 'block';
             document.getElementById('savedIndicator').style.display = 'block';
+            document.getElementById('scenarioBBanner').style.display = 'flex';
             const btn = document.getElementById('btnSaveA');
             btn.innerHTML = '<i class="fas fa-check-circle"></i> Scenario A Saved';
             btn.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1))';
             btn.style.borderColor = 'rgba(16,185,129,0.5)';
             btn.style.color = '#34d399';
             renderComparison();
-            // Scroll to compare
-            setTimeout(() => document.getElementById('comparePanel').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+            // Scroll to input top so user sees Scenario B banner
+            setTimeout(() => document.getElementById('scenarioBBanner').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
         }
 
         function clearComparison() {
             savedScenario = null;
             document.getElementById('comparePanel').style.display = 'none';
             document.getElementById('savedIndicator').style.display = 'none';
+            document.getElementById('scenarioBBanner').style.display = 'none';
             const btn = document.getElementById('btnSaveA');
             btn.innerHTML = '<i class="fas fa-bookmark"></i> Save Scenario A';
             btn.style.background = 'linear-gradient(135deg,rgba(251,191,36,0.2),rgba(245,158,11,0.1))';
@@ -2033,9 +2043,15 @@
                 </div>`;
         }
 
+        // Fixed order for consistent comparison display
+        const costKeyOrder = ['electrical','cooling','building','ups','generator','fireSuppression','fireAlarm','bms','network','security','seismic','commissioning'];
+
         function renderScenarioCard(label, data, accent) {
-            const topCosts = Object.entries(data.costs).sort((a, b) => b[1] - a[1]).slice(0, 5);
-            const maxC = topCosts[0][1];
+            // Use fixed key order, show top items by value but in consistent order
+            const allEntries = costKeyOrder.map(k => [k, data.costs[k] || 0]).filter(([,v]) => v > 0);
+            const topKeys = Object.entries(data.costs).sort((a,b) => b[1] - a[1]).slice(0, 5).map(e => e[0]);
+            const topCosts = costKeyOrder.filter(k => topKeys.includes(k)).map(k => [k, data.costs[k]]);
+            const maxC = Math.max(...topCosts.map(e => e[1]));
             let barsHTML = topCosts.map(([key, cost]) => {
                 const f = costFactors[key];
                 return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -2117,17 +2133,61 @@
             let compareHTML = '';
             if (savedScenario) {
                 const a = savedScenario;
-                const delta = ((result.total - a.total) / a.total * 100);
-                const sign = delta >= 0 ? '+' : '';
+                const b = result;
+                const totalDelta = ((b.total - a.total) / a.total * 100);
+                const totalSign = totalDelta >= 0 ? '+' : '';
+                const dClr = (v) => v > 0 ? '#ef4444' : v < 0 ? '#10b981' : '#6b7280';
+                const dFmt = (aVal, bVal) => {
+                    if (!aVal && !bVal) return '—';
+                    if (!aVal) return '<span style="color:#ef4444;">NEW</span>';
+                    const d = ((bVal - aVal) / aVal * 100);
+                    const s = d >= 0 ? '+' : '';
+                    return `<span style="color:${dClr(d)};font-weight:600;">${s}${d.toFixed(1)}%</span>`;
+                };
+                const cellSt = 'padding:8px 10px;border-bottom:1px solid #e5e7eb;';
+                const monoR = cellSt + 'text-align:right;font-family:monospace;';
+                const deltaR = cellSt + 'text-align:right;';
+
+                // Summary rows
+                let cmpRows = `
+                    <tr style="background:#f0f7ff;"><td style="${cellSt}font-weight:700;" colspan="4">Summary</td></tr>
+                    <tr><td style="${cellSt}">Total CAPEX</td><td style="${monoR}">${formatCurrency(a.total)}</td><td style="${monoR}">${formatCurrency(b.total)}</td><td style="${deltaR}">${dFmt(a.total, b.total)}</td></tr>
+                    <tr><td style="${cellSt}">Cost per kW</td><td style="${monoR}">${formatCurrency(a.total/a.itLoad)}/kW</td><td style="${monoR}">${formatCurrency(b.total/b.itLoad)}/kW</td><td style="${deltaR}">${dFmt(a.total/a.itLoad, b.total/b.itLoad)}</td></tr>
+                    <tr><td style="${cellSt}">IT Load</td><td style="${monoR}">${a.itLoad.toLocaleString()} kW</td><td style="${monoR}">${b.itLoad.toLocaleString()} kW</td><td style="${deltaR}">${a.itLoad !== b.itLoad ? dFmt(a.itLoad, b.itLoad) : '—'}</td></tr>
+                    <tr><td style="${cellSt}">Tier / PUE</td><td style="${monoR}">${a.tierInfo.tier} / ${a.pue}</td><td style="${monoR}">${b.tierInfo.tier} / ${b.pue}</td><td style="${deltaR}">—</td></tr>`;
+
+                // Component breakdown rows
+                cmpRows += `<tr style="background:#f0f7ff;"><td style="${cellSt}font-weight:700;" colspan="4">Component Breakdown</td></tr>`;
+                costKeyOrder.forEach(key => {
+                    const aVal = a.costs[key] || 0;
+                    const bVal = b.costs[key] || 0;
+                    if (aVal === 0 && bVal === 0) return;
+                    const f = costFactors[key];
+                    cmpRows += `<tr><td style="${cellSt}">${f.label}</td><td style="${monoR}">${formatCurrency(aVal)}</td><td style="${monoR}">${formatCurrency(bVal)}</td><td style="${deltaR}">${dFmt(aVal, bVal)}</td></tr>`;
+                });
+
+                // Soft costs & contingency
+                cmpRows += `<tr style="background:#f0f7ff;"><td style="${cellSt}font-weight:700;" colspan="4">Additional Costs</td></tr>`;
+                if (a.softCosts.design || b.softCosts.design) {
+                    cmpRows += `<tr><td style="${cellSt}">Design & Engineering</td><td style="${monoR}">${formatCurrency(a.softCosts.design||0)}</td><td style="${monoR}">${formatCurrency(b.softCosts.design||0)}</td><td style="${deltaR}">${dFmt(a.softCosts.design, b.softCosts.design)}</td></tr>`;
+                }
+                if (a.softCosts.pm || b.softCosts.pm) {
+                    cmpRows += `<tr><td style="${cellSt}">Project Management</td><td style="${monoR}">${formatCurrency(a.softCosts.pm||0)}</td><td style="${monoR}">${formatCurrency(b.softCosts.pm||0)}</td><td style="${deltaR}">${dFmt(a.softCosts.pm, b.softCosts.pm)}</td></tr>`;
+                }
+                if (a.fomIncluded || b.fomIncluded) {
+                    cmpRows += `<tr><td style="${cellSt}">Front-of-Meter / Utility</td><td style="${monoR}">${a.fomIncluded ? formatCurrency(a.fomTotal) : '—'}</td><td style="${monoR}">${b.fomIncluded ? formatCurrency(b.fomTotal) : '—'}</td><td style="${deltaR}">${(a.fomIncluded && b.fomIncluded) ? dFmt(a.fomTotal, b.fomTotal) : '—'}</td></tr>`;
+                }
+                cmpRows += `<tr><td style="${cellSt}">Contingency</td><td style="${monoR}">${formatCurrency(a.contingency)} (${a.contingencyPct}%)</td><td style="${monoR}">${formatCurrency(b.contingency)} (${b.contingencyPct}%)</td><td style="${deltaR}">${dFmt(a.contingency, b.contingency)}</td></tr>`;
+
+                // Total row
+                cmpRows += `<tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px;">TOTAL</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(b.total)}</td><td style="padding:10px;text-align:right;">${totalSign}${totalDelta.toFixed(1)}%<br><span style="font-size:11px;font-weight:400;">${totalSign}${formatCurrency(b.total - a.total)}</span></td></tr>`;
+
                 compareHTML = `
                 <div style="page-break-before:auto;margin-top:30px;">
-                    <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:8px;margin-bottom:16px;">Scenario Comparison</h2>
-                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                        <tr style="background:#1e3a5f;color:white;"><th style="padding:10px;text-align:left;">Metric</th><th style="padding:10px;text-align:right;">Scenario A</th><th style="padding:10px;text-align:right;">Scenario B</th><th style="padding:10px;text-align:right;">Delta</th></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">Total CAPEX</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:8px;text-align:right;color:${delta>0?'#ef4444':'#10b981'};font-weight:600;">${sign}${delta.toFixed(1)}%</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">Cost per kW</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(a.total/a.itLoad)}/kW</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(result.total/result.itLoad)}/kW</td><td style="padding:8px;text-align:right;color:${delta>0?'#ef4444':'#10b981'};font-weight:600;">${sign}${formatCurrency((result.total/result.itLoad)-(a.total/a.itLoad))}</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">IT Load</td><td style="padding:8px;text-align:right;">${a.itLoad.toLocaleString()} kW</td><td style="padding:8px;text-align:right;">${result.itLoad.toLocaleString()} kW</td><td style="padding:8px;text-align:right;">—</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">Tier</td><td style="padding:8px;text-align:right;">${a.tierInfo.tier}</td><td style="padding:8px;text-align:right;">${result.tierInfo.tier}</td><td style="padding:8px;text-align:right;">—</td></tr>
+                    <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:8px;margin-bottom:16px;">Scenario Comparison — Full Breakdown</h2>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="padding:10px;text-align:left;">Component</th><th style="padding:10px;text-align:right;min-width:100px;">Scenario A</th><th style="padding:10px;text-align:right;min-width:100px;">Scenario B</th><th style="padding:10px;text-align:right;min-width:70px;">Delta</th></tr>
+                        ${cmpRows}
                     </table>
                 </div>`;
             }
