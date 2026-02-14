@@ -1497,12 +1497,12 @@
                                 <div class="tooltip-title"><i class="fas fa-users-cog"></i> Staffing Model</div>
                                 <div class="tooltip-desc">Choose how to staff your data center operations.</div>
                                 <table class="tooltip-table">
-                                    <tr><th>Model</th><th>Cost Factor</th></tr>
-                                    <tr><td>In-House</td><td>1.0x (lowest)</td></tr>
-                                    <tr><td>Partial (Hybrid)</td><td>1.2-1.5x</td></tr>
-                                    <tr><td>Full Contractor</td><td>2.0-2.5x (OEM rates)</td></tr>
+                                    <tr><th>Model</th><th>Effect</th></tr>
+                                    <tr><td>In-House</td><td>Full headcount, lower per-person cost</td></tr>
+                                    <tr><td>Partial (Hybrid)</td><td>Blended efficiency</td></tr>
+                                    <tr><td>Full Contractor</td><td>~30% fewer FTE, higher per-person rate, net 10-15% savings</td></tr>
                                 </table>
-                                <div class="tooltip-note">Contractor model always needs 1 internal admin for supervision & permits</div>
+                                <div class="tooltip-note">Contractor: fewer staff (multi-skilled), no training/cert cost, but higher OEM maintenance rates. Management stays in-house.</div>
                             </span>
                         </span>
                     </div>
@@ -2427,7 +2427,9 @@
             const totalInsuranceComplianceCost = totalInsuranceCost + totalComplianceCertCost;
 
             // 6. OTHER COSTS
-            const trainingCost = staffingCost * 0.025;
+            // Training: only for in-house staff (contractor handles own training, K3 certs, manufacturer training)
+            const inhouseStaffingCost = staffingDetail.details.reduce((sum, r) => sum + r.inhouseCost, 0);
+            const trainingCost = inhouseStaffingCost * 0.035;
             const miscCost = (energyCost + staffingCost) * 0.02;
             const otherCosts = trainingCost + miscCost;
 
@@ -2465,7 +2467,7 @@
 
         function calculateStaffingDetail(staffingFTE, cf) {
             const inhouseMultiplier = 1.42; // Benefits + overhead (BPJS, THR, leave, training)
-            const contractorMultiplier = 1.85; // Contractor margin (OEM margin + overhead + profit)
+            const contractorMultiplier = 1.75; // Contractor rate (margin + overhead + profit, adjusted for FTE efficiency)
 
             const details = [];
             let totalFTE = 0;
@@ -2504,12 +2506,16 @@
                     contractorFTE = 0;
                 } else if (currentStaffingModel === 'contractor') {
                     // Full contractor: management stays in-house, technicians outsourced
+                    // Contractor is more efficient: multi-skilled workers, shared resources, optimized scheduling
                     if (role.category === 'management') {
                         inhouseFTE = fte;
                         contractorFTE = 0;
                     } else {
+                        const efficiencyMap = { operations: 0.70, technician: 0.65, support: 0.85, outsource: 1.0 };
+                        const efficiency = efficiencyMap[role.category] || 0.75;
+                        const adjustedFTE = Math.max(1, Math.round(fte * efficiency));
                         inhouseFTE = 0;
-                        contractorFTE = fte;
+                        contractorFTE = adjustedFTE;
                     }
                 } else {
                     // Partial - different splits by category
@@ -2517,17 +2523,21 @@
                     if (role.category === 'management') categoryPct = Math.min(100, currentPartialPercent + 20);
                     if (role.category === 'support') categoryPct = Math.max(0, currentPartialPercent - 20);
 
+                    // Contractor portion gets efficiency benefit
+                    const efficiencyMap = { operations: 0.70, technician: 0.65, support: 0.85, outsource: 1.0, management: 1.0 };
+                    const efficiency = efficiencyMap[role.category] || 0.75;
                     inhouseFTE = Math.round(fte * categoryPct / 100);
-                    contractorFTE = fte - inhouseFTE;
+                    contractorFTE = Math.max(0, Math.round((fte - inhouseFTE) * efficiency));
                 }
 
                 inhouseCost = inhouseFTE * countryAdjustedSalary * inhouseMultiplier;
                 contractorCost = contractorFTE * countryAdjustedSalary * contractorMultiplier;
 
+                const actualFTE = inhouseFTE + contractorFTE;
                 details.push({
                     roleId,
                     name: role.name,
-                    fte,
+                    fte: actualFTE,
                     inhouseFTE,
                     contractorFTE,
                     inhouseCost,
@@ -2535,7 +2545,7 @@
                     totalCost: inhouseCost + contractorCost,
                 });
 
-                totalFTE += fte;
+                totalFTE += actualFTE;
                 totalInhouse += inhouseFTE;
                 totalContractor += contractorFTE;
                 totalCost += inhouseCost + contractorCost;
