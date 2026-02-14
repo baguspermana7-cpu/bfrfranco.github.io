@@ -1800,7 +1800,7 @@
                 <div class="breakdown-card fade-in">
                     <div class="chart-title">
                         <i class="fas fa-tools"></i>
-                        Detailed Maintenance Breakdown
+                        Maintenance & Spare Parts Breakdown
                         <span style="margin-left: auto; font-size: 0.8rem; font-weight: 500; color: var(--text-muted);" id="maintConfigLabel">N+1 | Water-Cooled</span>
                     </div>
                     <table class="breakdown-table">
@@ -2248,6 +2248,45 @@
         };
 
         // =====================================================
+        // CRITICAL SPARE PARTS INVENTORY ($/kW/Year)
+        // Major cost often overlooked in OPEX planning
+        // Transformers: 12-18 month lead time, must stock
+        // UPS modules: critical for redundancy replacement
+        // =====================================================
+        const sparePartsRates = {
+            electrical: { name: 'UPS Modules & PDU/STS Spares', baseCostPerKw: 12.00, icon: 'fa-battery-full', color: '#8b5cf6' },
+            cooling:    { name: 'Chiller/CRAC Spares (Compressor, VFD, Refrigerant)', baseCostPerKw: 8.50, icon: 'fa-snowflake', color: '#06b6d4' },
+            generator:  { name: 'Generator Spares (Injector, Filter, Alternator)', baseCostPerKw: 5.50, icon: 'fa-car-battery', color: '#ef4444' },
+            switchgear: { name: 'Switchgear & Transformer Spares', baseCostPerKw: 4.50, icon: 'fa-plug', color: '#f59e0b' },
+            controls:   { name: 'BMS Sensors, Controllers, I/O Modules', baseCostPerKw: 2.50, icon: 'fa-microchip', color: '#10b981' },
+            general:    { name: 'General (Cables, Connectors, Fuses, Breakers)', baseCostPerKw: 3.00, icon: 'fa-toolbox', color: '#6b7280' },
+        };
+        // Total baseline: ~$36/kW/yr for full owner-managed inventory
+
+        // Spare parts risk transfer multiplier based on staffing model + contract scope
+        // Basic contract: labor only, owner holds all spares
+        // Comprehensive: labor + common spares included
+        // All-Risk: full warranty, contractor holds everything
+        const sparePartsContractMultiplier = {
+            'inhouse':    1.00,  // Owner manages all spares (full inventory)
+            'contractor': 0.15,  // All-Risk: contractor holds 85%, owner keeps emergency buffer only
+            'partial':    0.55,  // Comprehensive: shared responsibility
+        };
+
+        // =====================================================
+        // SOFTWARE & LICENSING ($/kW/Year)
+        // Recurring annual costs for DC operations software
+        // =====================================================
+        const softwareLicensingRates = {
+            dcim:       { name: 'DCIM Platform (Nlyte/Sunbird/openDCIM)', baseCostPerKw: 6.00, icon: 'fa-server', color: '#3b82f6' },
+            bmsLicense: { name: 'BMS Software Maintenance & Updates', baseCostPerKw: 3.50, icon: 'fa-desktop', color: '#8b5cf6' },
+            cmms:       { name: 'CMMS (Maintenance Management System)', baseCostPerKw: 2.50, icon: 'fa-clipboard-list', color: '#10b981' },
+            monitoring: { name: 'Environmental Monitoring & SNMP', baseCostPerKw: 1.50, icon: 'fa-chart-line', color: '#06b6d4' },
+            cybersec:   { name: 'Cybersecurity (OT Network, SIEM)', baseCostPerKw: 3.00, icon: 'fa-shield-alt', color: '#ef4444' },
+        };
+        // Total baseline: ~$16.50/kW/yr
+
+        // =====================================================
         // STAFFING CALCULATOR
         // Note: Even full contractor model needs internal supervision for:
         // - Contract administration
@@ -2374,6 +2413,42 @@
 
             const totalMaintenanceCost = Object.values(maintenanceDetail).reduce((sum, m) => sum + m.cost, 0);
 
+            // 3b. CRITICAL SPARE PARTS INVENTORY
+            // Cost depends on: IT load, tier (more redundancy = more spare types), facility age, and contract model
+            const tierSpareMult = tier === 4 ? 1.35 : tier === 3 ? 1.15 : tier === 2 ? 1.0 : 0.80;
+            const ageSpareMult = facilityAge === 'new' ? 0.65 : facilityAge === 'mid' ? 1.0 : 1.45;
+            const contractSpareMult = sparePartsContractMultiplier[currentStaffingModel] || 0.55;
+
+            const sparePartsDetail = {};
+            Object.keys(sparePartsRates).forEach(key => {
+                const rate = sparePartsRates[key];
+                const cost = itLoadKW * rate.baseCostPerKw * tierSpareMult * ageSpareMult * contractSpareMult * cf.maintMult;
+                sparePartsDetail[key] = {
+                    name: rate.name,
+                    cost: cost,
+                    perKw: cost / itLoadKW,
+                    icon: rate.icon,
+                    color: rate.color,
+                };
+            });
+            const totalSparePartsCost = Object.values(sparePartsDetail).reduce((sum, s) => sum + s.cost, 0);
+
+            // 3c. SOFTWARE & LICENSING
+            // Relatively fixed per kW, scales slightly with country labor mult (support contracts)
+            const softwareDetail = {};
+            Object.keys(softwareLicensingRates).forEach(key => {
+                const rate = softwareLicensingRates[key];
+                const cost = itLoadKW * rate.baseCostPerKw * (0.7 + 0.3 * cf.laborMult); // 70% fixed + 30% labor-adjusted
+                softwareDetail[key] = {
+                    name: rate.name,
+                    cost: cost,
+                    perKw: cost / itLoadKW,
+                    icon: rate.icon,
+                    color: rate.color,
+                };
+            });
+            const totalSoftwareCost = Object.values(softwareDetail).reduce((sum, s) => sum + s.cost, 0);
+
             // 4. DETAILED UTILITIES BREAKDOWN
             const mw = itLoadKW / 1000;
             const waterBaseCost = 2.50; // $/m³
@@ -2435,6 +2510,7 @@
 
             // TOTAL
             const totalOPEX = energyCost + staffingCost + totalMaintenanceCost +
+                             totalSparePartsCost + totalSoftwareCost +
                              totalInsuranceComplianceCost + totalUtilitiesCost + otherCosts;
 
             return {
@@ -2445,13 +2521,17 @@
                 breakdown: {
                     energy: { value: energyCost, color: '#f59e0b' },
                     staffing: { value: staffingCost, color: '#10b981' },
-                    maintenance: { value: totalMaintenanceCost, color: '#3b82f6' },
+                    maintenance: { value: totalMaintenanceCost + totalSparePartsCost, color: '#3b82f6' },
+                    software: { value: totalSoftwareCost, color: '#a855f7' },
                     insurance: { value: totalInsuranceComplianceCost, color: '#8b5cf6' },
                     utilities: { value: totalUtilitiesCost, color: '#06b6d4' },
-                    compliance: { value: 0, color: '#ec4899' }, // Merged into insurance
                     other: { value: otherCosts, color: '#6b7280' },
                 },
                 maintenanceDetail: maintenanceDetail,
+                sparePartsDetail: sparePartsDetail,
+                totalSparePartsCost: totalSparePartsCost,
+                softwareDetail: softwareDetail,
+                totalSoftwareCost: totalSoftwareCost,
                 utilitiesDetail: utilitiesDetail,
                 insuranceDetail: insuranceDetail,
                 complianceDetail: complianceDetail,
@@ -2625,7 +2705,8 @@
             const categories = [
                 { key: 'energy', name: 'Energy (Electricity)', icon: 'fa-bolt' },
                 { key: 'staffing', name: 'Staffing & Labor', icon: 'fa-users' },
-                { key: 'maintenance', name: 'Maintenance', icon: 'fa-wrench' },
+                { key: 'maintenance', name: 'Maintenance & Spares', icon: 'fa-wrench' },
+                { key: 'software', name: 'Software & Licensing', icon: 'fa-laptop-code' },
                 { key: 'insurance', name: 'Insurance & Compliance', icon: 'fa-shield-alt' },
                 { key: 'utilities', name: 'Utilities & Consumables', icon: 'fa-water' },
                 { key: 'other', name: 'Other Costs', icon: 'fa-ellipsis-h' },
@@ -2702,32 +2783,44 @@
                 { key: 'building', icon: 'fa-building', color: '#6b7280' },
             ];
 
-            tbody.innerHTML = systems.map(sys => {
+            // All values for progress bar max calculation
+            const allMaintCosts = [...Object.values(maintData).map(d => d.cost), ...Object.values(result.sparePartsDetail).map(d => d.cost)];
+            const maxCost = Math.max(...allMaintCosts);
+
+            // Preventive & Corrective Maintenance rows
+            let rows = systems.map(sys => {
                 const data = maintData[sys.key];
                 const rate = maintenanceRates[sys.key];
                 totalCost += data.cost;
-                const maxCost = Math.max(...Object.values(maintData).map(d => d.cost));
                 const percent = (data.cost / maxCost * 100).toFixed(0);
-
-                return `
-                    <tr>
-                        <td>
-                            <span class="category-icon" style="background: ${sys.color}20; color: ${sys.color}">
-                                <i class="fas ${sys.icon}"></i>
-                            </span>
-                            ${rate.name}
-                        </td>
-                        <td class="amount">${formatCurrency(data.cost)}</td>
-                        <td>$${data.perKw.toFixed(2)}</td>
-                        <td>${data.frequency}</td>
-                        <td>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${percent}%; background: ${sys.color}"></div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                return `<tr>
+                    <td><span class="category-icon" style="background: ${sys.color}20; color: ${sys.color}"><i class="fas ${sys.icon}"></i></span>${rate.name}</td>
+                    <td class="amount">${formatCurrency(data.cost)}</td>
+                    <td>$${data.perKw.toFixed(2)}</td>
+                    <td>${data.frequency}</td>
+                    <td><div class="progress-bar"><div class="progress-fill" style="width: ${percent}%; background: ${sys.color}"></div></div></td>
+                </tr>`;
             }).join('');
+
+            // Spare Parts Inventory sub-header + rows
+            const spareData = result.sparePartsDetail;
+            const contractLabel = currentStaffingModel === 'inhouse' ? 'Owner-Managed' : currentStaffingModel === 'contractor' ? 'Contractor-Managed (All-Risk)' : 'Shared Risk';
+            rows += `<tr style="background:rgba(168,85,247,0.06);"><td colspan="5" style="padding:8px 12px;font-weight:600;font-size:0.8rem;color:#a855f7;"><i class="fas fa-boxes" style="margin-right:6px;"></i>Spare Parts Inventory — ${contractLabel}</td></tr>`;
+
+            Object.keys(spareData).forEach(key => {
+                const sp = spareData[key];
+                totalCost += sp.cost;
+                const percent = (sp.cost / maxCost * 100).toFixed(0);
+                rows += `<tr>
+                    <td><span class="category-icon" style="background: ${sp.color}20; color: ${sp.color}"><i class="fas ${sp.icon}"></i></span>${sp.name}</td>
+                    <td class="amount">${formatCurrency(sp.cost)}</td>
+                    <td>$${sp.perKw.toFixed(2)}</td>
+                    <td>Inventory</td>
+                    <td><div class="progress-bar"><div class="progress-fill" style="width: ${percent}%; background: ${sp.color}"></div></div></td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = rows;
 
             document.getElementById('totalMaintCost').textContent = formatCurrency(totalCost);
             document.getElementById('totalMaintPerKw').textContent = '$' + (totalCost / result.itLoadKW).toFixed(2);
@@ -2743,7 +2836,7 @@
                 { key: 'fuel', name: 'Diesel Fuel (Generator)', icon: 'fa-gas-pump', color: '#ef4444' },
                 { key: 'telecom', name: 'Telecom / Internet', icon: 'fa-wifi', color: '#3b82f6' },
                 { key: 'security', name: 'Security Systems', icon: 'fa-shield-alt', color: '#8b5cf6' },
-                { key: 'consumables', name: 'Consumables & Spares', icon: 'fa-box', color: '#f59e0b' },
+                { key: 'consumables', name: 'Consumables (Filters, etc.)', icon: 'fa-box', color: '#f59e0b' },
             ];
 
             tbody.innerHTML = utilities.map(util => {
@@ -2854,17 +2947,18 @@
         }
 
         function updateCharts(result) {
-            const labels = ['Energy', 'Staffing', 'Maintenance', 'Insurance & Compliance', 'Utilities', 'Other'];
+            const labels = ['Energy', 'Staffing', 'Maintenance & Spares', 'Software & Licensing', 'Insurance & Compliance', 'Utilities', 'Other'];
             const data = [
                 result.breakdown.energy.value,
                 result.breakdown.staffing.value,
                 result.breakdown.maintenance.value,
+                result.breakdown.software.value,
                 result.breakdown.insurance.value,
                 result.breakdown.utilities.value,
                 result.breakdown.other.value,
             ];
             const colors = [
-                '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#06b6d4', '#6b7280'
+                '#f59e0b', '#10b981', '#3b82f6', '#a855f7', '#8b5cf6', '#06b6d4', '#6b7280'
             ];
 
             // Pie Chart
@@ -3069,11 +3163,12 @@
             result.breakdown.energy.value *= esc.energy * energyContractMult[energyContract];
             result.breakdown.staffing.value *= esc.labor * (1 + overtime) * contractTypeMult[contractTp];
             result.breakdown.maintenance.value *= esc.labor * maintLevelMult[maintLevel];
+            result.breakdown.software.value *= esc.labor; // Software licensing scales with labor inflation
             result.breakdown.insurance.value *= insuranceLevelMult[insurLvl];
 
-            // DCIM/Software cost
+            // DCIM level upgrade cost (additional on top of base software)
             const dcimCost = dcimCostPerKw[dcimLvl] * result.itLoadKW;
-            result.breakdown.other.value += dcimCost;
+            result.breakdown.software.value += dcimCost;
 
             // Recalculate total
             result.total = Object.values(result.breakdown).reduce((sum, b) => sum + b.value, 0);
@@ -3128,8 +3223,8 @@
             const dColor = delta > 0 ? '#ef4444' : '#10b981';
 
             const renderCard = (label, data, accent) => {
-                const cats = ['energy','staffing','maintenance','insurance','utilities','other'];
-                const catLabels = { energy:'Energy', staffing:'Staffing', maintenance:'Maintenance', insurance:'Insurance', utilities:'Utilities', other:'Other' };
+                const cats = ['energy','staffing','maintenance','software','insurance','utilities','other'];
+                const catLabels = { energy:'Energy', staffing:'Staffing', maintenance:'Maint & Spares', software:'Software', insurance:'Insurance', utilities:'Utilities', other:'Other' };
                 const maxVal = Math.max(...cats.map(c => data.breakdown[c]?.value || 0));
                 let bars = cats.filter(c => data.breakdown[c]?.value > 0).map(c => {
                     const v = data.breakdown[c].value;
@@ -3181,7 +3276,8 @@
             const cats = [
                 { key: 'energy', label: 'Energy' },
                 { key: 'staffing', label: 'Staffing' },
-                { key: 'maintenance', label: 'Maintenance' },
+                { key: 'maintenance', label: 'Maintenance & Spares' },
+                { key: 'software', label: 'Software & Licensing' },
                 { key: 'insurance', label: 'Insurance & Compliance' },
                 { key: 'utilities', label: 'Utilities & Consumables' },
                 { key: 'other', label: 'Other (Training, Misc)' }
