@@ -27,14 +27,15 @@
     <meta property="og:url" content="https://resistancezero.com/opex-calculator.html">
     <meta property="og:title" content="Data Center OPEX Calculator">
     <meta property="og:description" content="Comprehensive operational cost analysis with country-specific rates and flexible staffing models.">
-    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image" content="https://resistancezero.com/assets/opex-og.jpg">
     <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:height" content="669">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Data Center OPEX Calculator">
     <meta name="twitter:description" content="OPEX calculator with 30+ countries, climate zones, and flexible staffing models.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/opex-og.jpg">
 
     <!-- WebApplication Schema -->
     <script type="application/ld+json">
@@ -251,6 +252,91 @@
             color: var(--text-secondary);
             max-width: 700px;
             margin: 0 auto;
+        }
+
+        /* Brief Section */
+        .brief-section {
+            max-width: 860px;
+            margin: -0.5rem auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .brief-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.04), rgba(30, 58, 95, 0.06));
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brief-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #10b981, #059669);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .brief-hero-img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(16, 185, 129, 0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .brief-lead {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .brief-body {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+
+        .brief-stats {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .brief-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .brief-stat i {
+            color: var(--accent-emerald);
+            font-size: 0.75rem;
+        }
+
+        .brief-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .brief-section { padding: 0 1rem; }
+            .brief-card { padding: 1.25rem 1.25rem 1.25rem 1.5rem; }
+            .brief-stats { gap: 1rem; }
         }
 
         /* Calculator Layout */
@@ -1047,7 +1133,37 @@
             <p>Comprehensive operational expenditure analysis with 30+ countries, climate-adjusted calculations, and flexible staffing models</p>
         </section>
 
+        <!-- Brief -->
+        <section class="brief-section">
+            <div class="brief-card">
+                <img src="assets/opex-og.jpg" alt="Data Center OPEX Calculator — operational cost analysis with energy, staffing, maintenance, and climate-adjusted breakdown" class="brief-hero-img" loading="eager">
+                <p class="brief-lead">CAPEX gets the boardroom attention. OPEX is what actually kills the margin &mdash; year after year, silently.</p>
+                <p class="brief-body">Energy alone can eat 40&ndash;60% of your annual operating budget, and that's before you factor in staffing models, maintenance contracts, climate-driven cooling penalties, and the 30+ country-specific variables that turn a "simple" cost projection into a guessing game. This calculator maps all of it: pick your country, set your IT load, choose between in-house, hybrid, or outsourced staffing, and see how geography and climate reshape the numbers. It won't replace a full financial model &mdash; but it will show you where the real cost drivers hide, before they show up in your P&L.</p>
+                <div class="brief-stats">
+                    <span class="brief-stat"><i class="fas fa-globe"></i> 30+ countries with local rates</span>
+                    <span class="brief-stat"><i class="fas fa-users-cog"></i> 3 staffing models</span>
+                    <span class="brief-stat"><i class="fas fa-temperature-high"></i> Climate-adjusted PUE</span>
+                    <span class="brief-stat"><i class="fas fa-chart-pie"></i> Full cost breakdown</span>
+                </div>
+                <p class="brief-note">General-purpose estimate &mdash; actual OPEX varies with contract terms, utility tariffs, and operational maturity. Need a tailored projection? Let's talk.</p>
+            </div>
+        </section>
+
+        <!-- Tab Navigation -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 2rem;">
+            <button type="button" class="opex-tab" data-tab="simple" onclick="switchOpexTab('simple')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(16,185,129,0.4); background: rgba(16,185,129,0.15); color: #10b981; cursor: pointer; font-weight: 600; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
+                <i class="fas fa-sliders-h" style="margin-right: 6px;"></i>Simple Mode
+            </button>
+            <button type="button" class="opex-tab" data-tab="advanced" onclick="switchOpexTab('advanced')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
+                <i class="fas fa-cogs" style="margin-right: 6px;"></i>Advanced Mode
+            </button>
+            <button type="button" class="opex-tab" data-tab="compare" onclick="switchOpexTab('compare')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
+                <i class="fas fa-balance-scale" style="margin-right: 6px;"></i>Compare Scenarios
+            </button>
+        </div>
+
         <!-- Calculator -->
+        <div id="opex-tab-calculator">
         <div class="calculator-container">
             <!-- Input Panel -->
             <div class="input-panel">
@@ -1185,7 +1301,7 @@
                         </div>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group" data-opex-mode="advanced">
                         <label class="input-label">
                             Tier Classification
                             <span class="info-tooltip">
@@ -1212,7 +1328,7 @@
                         </select>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group" data-opex-mode="advanced">
                         <label class="input-label">
                             Facility Age
                             <span class="info-tooltip">
@@ -1237,7 +1353,7 @@
                         </select>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group" data-opex-mode="advanced">
                         <div class="slider-container">
                             <div class="slider-header">
                                 <label class="input-label">
@@ -1265,7 +1381,7 @@
                 </div>
 
                 <!-- Climate & System Configuration -->
-                <div class="input-section">
+                <div class="input-section" data-opex-mode="advanced">
                     <div class="section-title">
                         <i class="fas fa-temperature-high"></i>
                         Climate & System Config
@@ -1680,6 +1796,22 @@
                             <div class="scenario-diff savings" id="contractorDiff">-8.7% vs In-House</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        </div><!-- /opex-tab-calculator -->
+
+        <!-- Compare Tab Content -->
+        <div id="opex-tab-compare" style="display: none; max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
+            <div style="background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.95)); backdrop-filter: blur(20px); border: 1px solid rgba(16,185,129,0.15); border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
+                <h3 style="font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.5rem; text-align: center;">
+                    <i class="fas fa-balance-scale" style="color: #10b981; margin-right: 8px;"></i>
+                    OPEX Scenario Comparison
+                </h3>
+                <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem;">
+                    Your configuration vs. industry benchmarks &mdash; annual operational costs at your current IT Load
+                </p>
+                <div id="opexComparisonGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
                 </div>
             </div>
         </div>
@@ -2723,10 +2855,134 @@
             updateCalculation();
         }
 
+        // Tab Switching
+        function switchOpexTab(tabName) {
+            document.querySelectorAll('.opex-tab').forEach(function(btn) {
+                btn.style.background = 'transparent';
+                btn.style.color = '#94a3b8';
+                btn.style.borderColor = 'rgba(255,255,255,0.15)';
+                btn.style.fontWeight = '500';
+            });
+            var activeBtn = document.querySelector('.opex-tab[data-tab="' + tabName + '"]');
+            if (activeBtn) {
+                activeBtn.style.background = 'rgba(16,185,129,0.15)';
+                activeBtn.style.color = '#10b981';
+                activeBtn.style.borderColor = 'rgba(16,185,129,0.4)';
+                activeBtn.style.fontWeight = '600';
+            }
+            if (tabName === 'compare') {
+                document.getElementById('opex-tab-calculator').style.display = 'none';
+                document.getElementById('opex-tab-compare').style.display = 'block';
+                generateOpexComparison();
+            } else {
+                document.getElementById('opex-tab-calculator').style.display = 'block';
+                document.getElementById('opex-tab-compare').style.display = 'none';
+                document.querySelectorAll('[data-opex-mode="advanced"]').forEach(function(el) {
+                    el.style.display = tabName === 'advanced' ? '' : 'none';
+                });
+                updateCalculation();
+            }
+        }
+
+        // Compare Scenarios
+        function generateOpexComparison() {
+            // Save current form state
+            var savedState = {
+                pue: document.getElementById('pueSlider').value,
+                tier: document.getElementById('tierLevel').value,
+                age: document.getElementById('facilityAge').value,
+                util: document.getElementById('utilizationSlider').value,
+                climate: document.getElementById('climateZone').value,
+                cooling: document.getElementById('coolingType').value,
+                gen: document.getElementById('genConfig').value,
+                model: currentStaffingModel,
+                partial: currentPartialPercent
+            };
+
+            var scenarios = [
+                { name: 'Your Configuration', highlight: true },
+                { name: 'Hyperscale Efficiency', highlight: false,
+                  pue: '1.15', tier: '3', age: 'new', util: '85',
+                  climate: 'temperate', cooling: 'dlc', gen: 'N1',
+                  model: 'partial', partial: 60 },
+                { name: 'Industry Average', highlight: false,
+                  pue: '1.55', tier: '3', age: 'mid', util: '65',
+                  climate: 'tropical_humid', cooling: 'water_chiller', gen: 'N1',
+                  model: 'inhouse', partial: 70 },
+                { name: 'Legacy Enterprise', highlight: false,
+                  pue: '1.85', tier: '2', age: 'mature', util: '50',
+                  climate: 'tropical_humid', cooling: 'air_chiller', gen: 'N',
+                  model: 'inhouse', partial: 70 }
+            ];
+
+            var results = scenarios.map(function(s) {
+                if (!s.highlight) {
+                    document.getElementById('pueSlider').value = s.pue;
+                    document.getElementById('tierLevel').value = s.tier;
+                    document.getElementById('facilityAge').value = s.age;
+                    document.getElementById('utilizationSlider').value = s.util;
+                    document.getElementById('climateZone').value = s.climate;
+                    document.getElementById('coolingType').value = s.cooling;
+                    document.getElementById('genConfig').value = s.gen;
+                    currentStaffingModel = s.model;
+                    currentPartialPercent = s.partial;
+                }
+                var r = calculateOPEX();
+                return {
+                    name: s.name, highlight: s.highlight,
+                    total: r.total, monthly: r.monthly, perKW: r.perKW,
+                    pue: r.effectivePue, fte: r.staffingDetail.totalFTE,
+                    energyPct: (r.breakdown.energy.value / r.total * 100).toFixed(0),
+                    staffPct: (r.breakdown.staffing.value / r.total * 100).toFixed(0)
+                };
+            });
+
+            // Restore form state
+            document.getElementById('pueSlider').value = savedState.pue;
+            document.getElementById('tierLevel').value = savedState.tier;
+            document.getElementById('facilityAge').value = savedState.age;
+            document.getElementById('utilizationSlider').value = savedState.util;
+            document.getElementById('climateZone').value = savedState.climate;
+            document.getElementById('coolingType').value = savedState.cooling;
+            document.getElementById('genConfig').value = savedState.gen;
+            currentStaffingModel = savedState.model;
+            currentPartialPercent = savedState.partial;
+
+            var grid = document.getElementById('opexComparisonGrid');
+            grid.innerHTML = results.map(function(r) {
+                var border = r.highlight ? '#10b981' : 'rgba(255,255,255,0.1)';
+                var bg = r.highlight ? 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04))' : 'rgba(255,255,255,0.03)';
+                var badge = r.highlight ? '<span style="background:rgba(16,185,129,0.2);color:#10b981;padding:3px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">YOUR CONFIG</span>' : '';
+                return '<div style="background:' + bg + ';border:2px solid ' + border + ';border-radius:16px;padding:1.5rem;text-align:center;">' +
+                    '<div style="margin-bottom:0.75rem;min-height:24px;">' + badge + '</div>' +
+                    '<h4 style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:1rem;">' + r.name + '</h4>' +
+                    '<div style="font-size:1.8rem;font-weight:800;color:#f1f5f9;font-family:JetBrains Mono,monospace;margin-bottom:0.25rem;">' + formatCurrency(r.total) + '</div>' +
+                    '<div style="font-size:0.85rem;color:#94a3b8;margin-bottom:1.5rem;">' + formatCurrency(r.monthly, true) + '/month</div>' +
+                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">' +
+                        '<div style="padding:0.75rem;background:rgba(6,182,212,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">PUE</div>' +
+                            '<div style="font-size:1.1rem;font-weight:700;color:#22d3ee;">' + r.pue.toFixed(2) + '</div></div>' +
+                        '<div style="padding:0.75rem;background:rgba(16,185,129,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">Staff FTE</div>' +
+                            '<div style="font-size:1.1rem;font-weight:700;color:#34d399;">' + r.fte + '</div></div>' +
+                        '<div style="padding:0.75rem;background:rgba(245,158,11,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">$/kW/Year</div>' +
+                            '<div style="font-size:0.9rem;font-weight:700;color:#fbbf24;">$' + Math.round(r.perKW).toLocaleString() + '</div></div>' +
+                        '<div style="padding:0.75rem;background:rgba(139,92,246,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">Energy</div>' +
+                            '<div style="font-size:0.9rem;font-weight:700;color:#a78bfa;">' + r.energyPct + '%</div></div>' +
+                    '</div></div>';
+            }).join('');
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateCalculation();
             initTooltipSystem();
+            // Initialize simple mode - hide advanced inputs
+            document.querySelectorAll('[data-opex-mode="advanced"]').forEach(function(el) {
+                el.style.display = 'none';
+            });
         });
 
         // Global Tooltip System - escapes overflow containers

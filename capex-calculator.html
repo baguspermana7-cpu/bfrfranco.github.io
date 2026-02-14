@@ -27,14 +27,15 @@
     <meta property="og:url" content="https://resistancezero.com/capex-calculator.html">
     <meta property="og:title" content="Data Center CAPEX Calculator">
     <meta property="og:description" content="Construction cost estimation with detailed breakdown of all infrastructure components.">
-    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image" content="https://resistancezero.com/assets/capex-og.jpg">
     <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:height" content="509">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Data Center CAPEX Calculator">
     <meta name="twitter:description" content="Construction cost estimation with infrastructure breakdown.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/capex-og.jpg">
 
     <!-- WebApplication Schema -->
     <script type="application/ld+json">
@@ -250,6 +251,91 @@
             color: var(--text-secondary);
             max-width: 700px;
             margin: 0 auto;
+        }
+
+        /* Brief Section */
+        .brief-section {
+            max-width: 860px;
+            margin: -0.5rem auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .brief-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.04), rgba(30, 58, 95, 0.06));
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brief-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #f59e0b, #d97706);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .brief-hero-img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(245, 158, 11, 0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .brief-lead {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .brief-body {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+
+        .brief-stats {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .brief-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .brief-stat i {
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+        }
+
+        .brief-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .brief-section { padding: 0 1rem; }
+            .brief-card { padding: 1.25rem 1.25rem 1.25rem 1.5rem; }
+            .brief-stats { gap: 1rem; }
         }
 
         /* Calculator Container */
@@ -765,34 +851,63 @@
             <p>Calculate comprehensive construction costs with detailed breakdown of electrical, cooling, civil, and infrastructure components</p>
         </section>
 
+        <!-- Brief -->
+        <section class="brief-section">
+            <div class="brief-card">
+                <img src="assets/capex-og.jpg" alt="Data Center CAPEX Calculator — capital expenditure breakdown for construction, electrical, cooling, and infrastructure" class="brief-hero-img" loading="eager">
+                <p class="brief-lead">Building a data center is not a spreadsheet exercise &mdash; it's a bet worth millions where every wrong assumption compounds.</p>
+                <p class="brief-body">A 10 MW facility can swing between $80M and $200M+ depending on cooling architecture, redundancy tier, seismic zone, and dozens of other variables most cost models quietly ignore. This calculator won't replace a detailed engineering estimate &mdash; but it will give you a defensible starting point in under 60 seconds. Adjust IT load, pick your cooling strategy, set your redundancy level, and watch how each decision moves the total. Use it to sanity-check vendor quotes, benchmark across regions, or build a rough business case before the first shovel hits the ground.</p>
+                <div class="brief-stats">
+                    <span class="brief-stat"><i class="fas fa-sliders-h"></i> 12+ configurable variables</span>
+                    <span class="brief-stat"><i class="fas fa-globe-americas"></i> Location factor adjustments</span>
+                    <span class="brief-stat"><i class="fas fa-layer-group"></i> Tier I &ndash; IV redundancy</span>
+                    <span class="brief-stat"><i class="fas fa-snowflake"></i> 4 cooling architectures</span>
+                </div>
+                <p class="brief-note">General-purpose estimate &mdash; actual costs depend on site-specific engineering, local regulations, and procurement strategy. Need a deeper analysis? Let's talk.</p>
+            </div>
+        </section>
+
         <!-- Calculator -->
         <section class="calculator-section">
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; max-width: 1400px; margin-left: auto; margin-right: auto;">
+                <button type="button" class="capex-tab" data-tab="simple" onclick="switchCapexTab('simple')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(245,158,11,0.4); background: rgba(245,158,11,0.15); color: #f59e0b; cursor: pointer; font-weight: 600; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
+                    <i class="fas fa-sliders-h" style="margin-right: 6px;"></i>Simple Mode
+                </button>
+                <button type="button" class="capex-tab" data-tab="advanced" onclick="switchCapexTab('advanced')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
+                    <i class="fas fa-cogs" style="margin-right: 6px;"></i>Advanced Mode
+                </button>
+                <button type="button" class="capex-tab" data-tab="compare" onclick="switchCapexTab('compare')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
+                    <i class="fas fa-balance-scale" style="margin-right: 6px;"></i>Compare Scenarios
+                </button>
+            </div>
+
+            <div id="capex-tab-calculator">
             <div class="simulator-container">
                 <!-- Input Side -->
                 <div class="simulator-inputs">
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label class="input-label">
-                                <i class="fas fa-bolt"></i> IT Load (kW)
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
-                                        <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th>Category</th><th>Range</th></tr>
-                                            <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
-                                            <tr><td>Medium</td><td>500-2,000 kW</td></tr>
-                                            <tr><td>Large</td><td>2-10 MW</td></tr>
-                                            <tr><td>Hyperscale</td><td>10+ MW</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
-                            </label>
-                            <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-bolt"></i> IT Load (kW)
+                            <span class="tooltip-trigger">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
+                                    <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices.</div>
+                                    <table class="tooltip-table">
+                                        <tr><th>Category</th><th>Range</th></tr>
+                                        <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
+                                        <tr><td>Medium</td><td>500-2,000 kW</td></tr>
+                                        <tr><td>Large</td><td>2-10 MW</td></tr>
+                                        <tr><td>Hyperscale</td><td>10+ MW</td></tr>
+                                    </table>
+                                </div>
+                            </span>
+                        </label>
+                        <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000">
+                    </div>
+                    <div class="input-group" data-capex-mode="advanced">
+                        <label class="input-label">
+                            <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
                                 <span class="tooltip-trigger">?
                                     <div class="tooltip-content">
                                         <div class="tooltip-title"><i class="fas fa-gas-pump"></i> Fuel Autonomy</div>
@@ -808,10 +923,9 @@
                                 </span>
                             </label>
                             <input type="number" class="input-field" id="fuelHours" value="48" min="8" max="168">
-                        </div>
                     </div>
 
-                    <div class="input-row">
+                    <div class="input-row" data-capex-mode="advanced">
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-building"></i> Building Type
@@ -864,7 +978,7 @@
                         </div>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group" data-capex-mode="advanced">
                         <label class="input-label">
                             <i class="fas fa-server"></i> Rack Density
                             <span class="tooltip-trigger">?
@@ -975,7 +1089,7 @@
                         </div>
                     </div>
 
-                    <div class="input-row">
+                    <div class="input-row" data-capex-mode="advanced">
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-fire-extinguisher"></i> Fire Suppression
@@ -1028,7 +1142,7 @@
                         </div>
                     </div>
 
-                    <div class="input-row">
+                    <div class="input-row" data-capex-mode="advanced">
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-battery-full"></i> UPS Type
@@ -1178,6 +1292,22 @@
                             </span></div>
                             <div class="metric-value energy" id="energyCost">$1.2M</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            </div><!-- /capex-tab-calculator -->
+
+            <!-- Compare Tab Content -->
+            <div id="capex-tab-compare" style="display: none;">
+                <div style="background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.95)); backdrop-filter: blur(20px); border: 1px solid rgba(245,158,11,0.15); border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
+                    <h3 style="font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.5rem; text-align: center;">
+                        <i class="fas fa-balance-scale" style="color: #f59e0b; margin-right: 8px;"></i>
+                        CAPEX Scenario Comparison
+                    </h3>
+                    <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem;">
+                        Your configuration vs. industry benchmarks &mdash; all calculated at your current IT Load
+                    </p>
+                    <div id="capexComparisonGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
                     </div>
                 </div>
             </div>
@@ -1383,9 +1513,125 @@
             radio.addEventListener('change', calculateCosts);
         });
 
+        // Tab Switching
+        function switchCapexTab(tabName) {
+            document.querySelectorAll('.capex-tab').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = '#94a3b8';
+                btn.style.borderColor = 'rgba(255,255,255,0.15)';
+                btn.style.fontWeight = '500';
+            });
+            const activeBtn = document.querySelector('.capex-tab[data-tab="' + tabName + '"]');
+            if (activeBtn) {
+                activeBtn.style.background = 'rgba(245,158,11,0.15)';
+                activeBtn.style.color = '#f59e0b';
+                activeBtn.style.borderColor = 'rgba(245,158,11,0.4)';
+                activeBtn.style.fontWeight = '600';
+            }
+            if (tabName === 'compare') {
+                document.getElementById('capex-tab-calculator').style.display = 'none';
+                document.getElementById('capex-tab-compare').style.display = 'block';
+                generateCapexComparison();
+            } else {
+                document.getElementById('capex-tab-calculator').style.display = 'block';
+                document.getElementById('capex-tab-compare').style.display = 'none';
+                document.querySelectorAll('[data-capex-mode="advanced"]').forEach(function(el) {
+                    el.style.display = tabName === 'advanced' ? '' : 'none';
+                });
+                calculateCosts();
+            }
+        }
+
+        // Compare Scenarios
+        function generateCapexComparison() {
+            var itLoad = parseInt(document.getElementById('itLoad').value) || 1000;
+            var scenarios = [
+                { name: 'Your Configuration', highlight: true,
+                  redundancy: getSelectedValue('redundancy'), cooling: getSelectedValue('coolingType'),
+                  rack: getSelectedValue('rackType'), building: document.getElementById('buildingType').value,
+                  seismic: document.getElementById('seismicZone').value, fire: document.getElementById('fireType').value,
+                  alarm: document.getElementById('alarmType').value, ups: document.getElementById('upsType').value,
+                  gen: document.getElementById('genType').value, location: document.getElementById('locationFactor').value,
+                  fuel: parseInt(document.getElementById('fuelHours').value) || 48 },
+                { name: 'Best-in-Class Hyperscale', highlight: false,
+                  redundancy: '2n', cooling: 'liquid', rack: 'ai', building: 'purpose', seismic: 'zone1',
+                  fire: 'novec', alarm: 'vesda', ups: 'modular', gen: 'hvo', location: 'usa', fuel: 72 },
+                { name: 'Industry Average', highlight: false,
+                  redundancy: 'n1', cooling: 'inrow', rack: 'medium', building: 'purpose', seismic: 'zone2',
+                  fire: 'fm200', alarm: 'addressable', ups: 'modular', gen: 'diesel', location: 'usa', fuel: 48 },
+                { name: 'Legacy Enterprise', highlight: false,
+                  redundancy: 'n', cooling: 'air', rack: 'standard', building: 'warehouse', seismic: 'zone1',
+                  fire: 'fm200', alarm: 'conventional', ups: 'standalone', gen: 'diesel', location: 'usa', fuel: 24 }
+            ];
+
+            var results = scenarios.map(function(s) {
+                var redMult = redundancyMultipliers[s.redundancy];
+                var coolMult = coolingMultipliers[s.cooling];
+                var rackMult = rackMultipliers[s.rack];
+                var buildMult = buildingMultipliers[s.building];
+                var seismicMt = seismicMultipliers[s.seismic];
+                var fireSupMt = fireSuppressionMultipliers[s.fire];
+                var alarmMt = fireAlarmMultipliers[s.alarm];
+                var upsMt = upsMultipliers[s.ups];
+                var genMt = genMultipliers[s.gen];
+                var locMult = locationMultipliers[s.location];
+                var fuelMt = 1 + (s.fuel - 24) * 0.008;
+                var total = 0;
+                for (var key in costFactors) {
+                    var factor = costFactors[key];
+                    var mult = locMult;
+                    if (key === 'building') mult *= buildMult * rackMult;
+                    else if (key === 'seismic') mult *= seismicMt * buildMult;
+                    else if (key === 'electrical') mult *= redMult * rackMult;
+                    else if (key === 'ups') mult *= redMult * rackMult * upsMt;
+                    else if (key === 'generator') mult *= redMult * fuelMt * genMt;
+                    else if (key === 'cooling') mult *= coolMult * rackMult;
+                    else if (key === 'fireSuppression') mult *= fireSupMt;
+                    else if (key === 'fireAlarm') mult *= alarmMt;
+                    total += factor.base * itLoad * mult;
+                }
+                total *= 1.05;
+                var tierInfo = tierMapping[s.redundancy];
+                var pue = pueMapping[s.cooling][s.rack];
+                return { name: s.name, highlight: s.highlight, total: total, perKw: total / itLoad,
+                         pue: pue, tier: tierInfo.tier, uptime: tierInfo.uptime };
+            });
+
+            var grid = document.getElementById('capexComparisonGrid');
+            grid.innerHTML = results.map(function(r) {
+                var border = r.highlight ? '#f59e0b' : 'rgba(255,255,255,0.1)';
+                var bg = r.highlight ? 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04))' : 'rgba(255,255,255,0.03)';
+                var badge = r.highlight ? '<span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:3px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">YOUR CONFIG</span>' : '';
+                return '<div style="background:' + bg + ';border:2px solid ' + border + ';border-radius:16px;padding:1.5rem;text-align:center;">' +
+                    '<div style="margin-bottom:0.75rem;min-height:24px;">' + badge + '</div>' +
+                    '<h4 style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:1rem;">' + r.name + '</h4>' +
+                    '<div style="font-size:1.8rem;font-weight:800;color:#f1f5f9;font-family:JetBrains Mono,monospace;margin-bottom:0.25rem;">' + formatCurrency(r.total) + '</div>' +
+                    '<div style="font-size:0.85rem;color:#94a3b8;margin-bottom:1.5rem;">' + formatCurrency(r.perKw) + '/kW</div>' +
+                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">' +
+                        '<div style="padding:0.75rem;background:rgba(139,92,246,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">Tier</div>' +
+                            '<div style="font-size:1.1rem;font-weight:700;color:#a78bfa;">' + r.tier + '</div></div>' +
+                        '<div style="padding:0.75rem;background:rgba(6,182,212,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">PUE</div>' +
+                            '<div style="font-size:1.1rem;font-weight:700;color:#22d3ee;">' + r.pue.toFixed(2) + '</div></div>' +
+                        '<div style="padding:0.75rem;background:rgba(16,185,129,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">Uptime</div>' +
+                            '<div style="font-size:0.9rem;font-weight:700;color:#34d399;">' + r.uptime + '</div></div>' +
+                        '<div style="padding:0.75rem;background:rgba(245,158,11,0.1);border-radius:10px;">' +
+                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">$/kW</div>' +
+                            '<div style="font-size:0.9rem;font-weight:700;color:#fbbf24;">' + formatCurrency(r.perKw) + '</div></div>' +
+                    '</div></div>';
+            }).join('');
+        }
+
         // Initial calculation
         calculateCosts();
         initTooltipSystem();
+
+        // Initialize simple mode - hide advanced inputs
+        document.querySelectorAll('[data-capex-mode="advanced"]').forEach(function(el) {
+            el.style.display = 'none';
+        });
 
         // Global Tooltip System
         function initTooltipSystem() {
