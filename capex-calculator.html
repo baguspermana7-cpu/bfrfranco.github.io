@@ -810,6 +810,8 @@
             .nav-links { display: none; }
             .calculator-section { padding: 1rem; }
             .simulator-container { padding: 1.5rem; }
+            #compareGrid { grid-template-columns: 1fr !important; }
+            #deltaColumn { flex-direction: row !important; width: 100%; justify-content: center !important; }
         }
     </style>
 </head>
@@ -869,45 +871,42 @@
 
         <!-- Calculator -->
         <section class="calculator-section">
-            <!-- Tab Navigation -->
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; max-width: 1400px; margin-left: auto; margin-right: auto;">
-                <button type="button" class="capex-tab" data-tab="simple" onclick="switchCapexTab('simple')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(245,158,11,0.4); background: rgba(245,158,11,0.15); color: #f59e0b; cursor: pointer; font-weight: 600; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
-                    <i class="fas fa-sliders-h" style="margin-right: 6px;"></i>Simple Mode
+            <!-- Mode Tabs -->
+            <div id="capexModeTabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;max-width:1400px;margin-left:auto;margin-right:auto;">
+                <button type="button" class="capex-mode-btn active" data-mode="simple" onclick="switchCapexMode('simple')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.15);color:#f59e0b;cursor:pointer;font-weight:600;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
+                    <i class="fas fa-sliders-h" style="margin-right:6px;"></i>Simple
                 </button>
-                <button type="button" class="capex-tab" data-tab="advanced" onclick="switchCapexTab('advanced')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
-                    <i class="fas fa-cogs" style="margin-right: 6px;"></i>Advanced Mode
-                </button>
-                <button type="button" class="capex-tab" data-tab="compare" onclick="switchCapexTab('compare')" style="padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;">
-                    <i class="fas fa-balance-scale" style="margin-right: 6px;"></i>Compare Scenarios
+                <button type="button" class="capex-mode-btn" data-mode="advanced" onclick="switchCapexMode('advanced')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94a3b8;cursor:pointer;font-weight:500;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
+                    <i class="fas fa-cogs" style="margin-right:6px;"></i>Advanced
                 </button>
             </div>
 
-            <div id="capex-tab-calculator">
             <div class="simulator-container">
                 <!-- Input Side -->
                 <div class="simulator-inputs">
-                    <div class="input-group">
-                        <label class="input-label">
-                            <i class="fas fa-bolt"></i> IT Load (kW)
-                            <span class="tooltip-trigger">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
-                                    <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices.</div>
-                                    <table class="tooltip-table">
-                                        <tr><th>Category</th><th>Range</th></tr>
-                                        <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
-                                        <tr><td>Medium</td><td>500-2,000 kW</td></tr>
-                                        <tr><td>Large</td><td>2-10 MW</td></tr>
-                                        <tr><td>Hyperscale</td><td>10+ MW</td></tr>
-                                    </table>
-                                </div>
-                            </span>
-                        </label>
-                        <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000">
-                    </div>
-                    <div class="input-group" data-capex-mode="advanced">
-                        <label class="input-label">
-                            <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-bolt"></i> IT Load (kW)
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
+                                        <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Category</th><th>Range</th></tr>
+                                            <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
+                                            <tr><td>Medium</td><td>500-2,000 kW</td></tr>
+                                            <tr><td>Large</td><td>2-10 MW</td></tr>
+                                            <tr><td>Hyperscale</td><td>10+ MW</td></tr>
+                                        </table>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
                                 <span class="tooltip-trigger">?
                                     <div class="tooltip-content">
                                         <div class="tooltip-title"><i class="fas fa-gas-pump"></i> Fuel Autonomy</div>
@@ -923,9 +922,10 @@
                                 </span>
                             </label>
                             <input type="number" class="input-field" id="fuelHours" value="48" min="8" max="168">
+                        </div>
                     </div>
 
-                    <div class="input-row" data-capex-mode="advanced">
+                    <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-building"></i> Building Type
@@ -978,7 +978,7 @@
                         </div>
                     </div>
 
-                    <div class="input-group" data-capex-mode="advanced">
+                    <div class="input-group">
                         <label class="input-label">
                             <i class="fas fa-server"></i> Rack Density
                             <span class="tooltip-trigger">?
@@ -1089,7 +1089,7 @@
                         </div>
                     </div>
 
-                    <div class="input-row" data-capex-mode="advanced">
+                    <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-fire-extinguisher"></i> Fire Suppression
@@ -1142,7 +1142,7 @@
                         </div>
                     </div>
 
-                    <div class="input-row" data-capex-mode="advanced">
+                    <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-battery-full"></i> UPS Type
@@ -1221,12 +1221,247 @@
                             <option value="usa" selected>USA (1.00x)</option>
                         </select>
                     </div>
+
+                    <!-- ═══ ADVANCED MODE SECTIONS (hidden by default) ═══ -->
+                    <div id="advancedInputs" style="display:none;flex-direction:column;gap:1.5rem;">
+
+                        <!-- A. Year & City/Market -->
+                        <div style="border-top:1px solid rgba(245,158,11,0.2);padding-top:1.5rem;margin-top:0.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-calendar-alt"></i> Year & Market Location
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-calendar"></i> Projection Year
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-calendar"></i> Year Escalation</div>
+                                                <div class="tooltip-desc">Cost escalation based on industry trends. 7% CAGR 2020-2025 (T&T), decelerating as supply chains normalize.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Year</th><th>Multiplier</th></tr>
+                                                    <tr><td>2025 (baseline)</td><td>1.000x</td></tr>
+                                                    <tr><td>2026</td><td>1.060x (+6.0%)</td></tr>
+                                                    <tr><td>2027</td><td>1.115x (+5.5%)</td></tr>
+                                                    <tr><td>2028</td><td>1.165x (+4.5%)</td></tr>
+                                                    <tr><td>2029</td><td>1.210x (+3.8%)</td></tr>
+                                                    <tr><td>2030</td><td>1.250x (+3.3%)</td></tr>
+                                                </table>
+                                                <div class="tooltip-impact">Sources: JLL 2026 Outlook, Turner & Townsend DCCI 2025, Avid Solutions 2026-2030 projections</div>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="projYear">
+                                        <option value="2025" selected>2025 (Baseline)</option>
+                                        <option value="2026">2026 (+6.0%)</option>
+                                        <option value="2027">2027 (+5.2%)</option>
+                                        <option value="2028">2028 (+4.5%)</option>
+                                        <option value="2029">2029 (+3.9%)</option>
+                                        <option value="2030">2030 (+3.3%)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-city"></i> City / Market
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-city"></i> City-Specific $/W Cost</div>
+                                                <div class="tooltip-desc">Construction cost per watt based on specific metro area. Replaces generic Location Factor when selected.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>City</th><th>$/W (2025)</th></tr>
+                                                    <tr><td>Tokyo</td><td>$15.20</td></tr>
+                                                    <tr><td>Singapore</td><td>$14.53</td></tr>
+                                                    <tr><td>Silicon Valley</td><td>$13.30</td></tr>
+                                                    <tr><td>Dallas, TX</td><td>$14.30</td></tr>
+                                                    <tr><td>Mumbai</td><td>$6.64</td></tr>
+                                                </table>
+                                                <div class="tooltip-impact">Sources: Turner & Townsend DCCI 2025, Cushman & Wakefield Cost Guide 2025</div>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="cityMarket">
+                                        <option value="none">-- Use Location Factor above --</option>
+                                        <optgroup label="Americas">
+                                            <option value="silicon_valley">Silicon Valley — $13.30/W</option>
+                                            <option value="new_jersey">New Jersey / NYC — $12.90/W</option>
+                                            <option value="virginia">Virginia / NOVA — $13.40/W</option>
+                                            <option value="dallas">Dallas, TX — $14.30/W</option>
+                                            <option value="phoenix">Phoenix, AZ — $13.40/W</option>
+                                            <option value="chicago">Chicago, IL — $13.20/W</option>
+                                            <option value="san_antonio">San Antonio, TX — $9.30/W</option>
+                                        </optgroup>
+                                        <optgroup label="Europe">
+                                            <option value="london">London — $12.00/W</option>
+                                            <option value="frankfurt">Frankfurt — $11.60/W</option>
+                                            <option value="amsterdam">Amsterdam — $11.80/W</option>
+                                            <option value="stockholm">Stockholm — $10.50/W</option>
+                                        </optgroup>
+                                        <optgroup label="Asia Pacific">
+                                            <option value="tokyo">Tokyo — $15.20/W</option>
+                                            <option value="singapore">Singapore — $14.53/W</option>
+                                            <option value="hong_kong">Hong Kong — $13.80/W</option>
+                                            <option value="seoul">Seoul — $9.50/W</option>
+                                            <option value="sydney">Sydney — $12.30/W</option>
+                                            <option value="malaysia">Malaysia / Johor — $11.37/W</option>
+                                            <option value="jakarta">Jakarta — $11.21/W</option>
+                                            <option value="mumbai">Mumbai — $6.64/W</option>
+                                            <option value="bangkok">Bangkok — $8.50/W</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B. Front-of-Meter / Utility Interconnection -->
+                        <div style="border-top:1px solid rgba(59,130,246,0.2);padding-top:1.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-plug"></i> Front-of-Meter / Utility
+                            </div>
+                            <div class="input-group" style="margin-bottom:1rem;">
+                                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.9rem;font-weight:500;color:var(--text-secondary);">
+                                    <input type="checkbox" id="includeFOM" style="width:18px;height:18px;accent-color:#3b82f6;cursor:pointer;">
+                                    Include Front-of-Meter Costs
+                                    <span class="tooltip-trigger">?
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title"><i class="fas fa-plug"></i> Front-of-Meter</div>
+                                            <div class="tooltip-desc">Costs for grid interconnection, substation, transformer, switchgear — typically borne by data center operator per utility agreement.</div>
+                                            <div class="tooltip-impact">Per Mark Lewis (VP Engineering): "Don't forget front-of-meter — transformer, substation, switchgear, and utility's 9% return on investment."</div>
+                                        </div>
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="fomInputs" style="display:none;flex-direction:column;gap:1rem;">
+                                <div class="input-row">
+                                    <div class="input-group">
+                                        <label class="input-label"><i class="fas fa-industry"></i> Substation Type</label>
+                                        <select class="input-field" id="substationType">
+                                            <option value="shared">Shared Utility ($0.5-1.5M)</option>
+                                            <option value="dedicated_33kv" selected>Dedicated 33kV ($3-5M)</option>
+                                            <option value="dedicated_132kv">Dedicated 132kV+ ($5-10M+)</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label"><i class="fas fa-bolt"></i> Transformer Lead Time</label>
+                                        <select class="input-field" id="transformerLead">
+                                            <option value="standard" selected>Standard (18-24 mo)</option>
+                                            <option value="extended">Extended (24-36 mo, +15%)</option>
+                                            <option value="emergency">Emergency (expedited, +30%)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-percentage"></i> Utility Rate of Return: <span id="utilRateVal" style="color:#3b82f6;font-family:'JetBrains Mono',monospace;">9%</span></label>
+                                    <input type="range" id="utilityRate" min="7" max="12" value="9" step="0.5" style="width:100%;accent-color:#3b82f6;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- C. Vendor & Market Factors -->
+                        <div style="border-top:1px solid rgba(139,92,246,0.2);padding-top:1.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-handshake"></i> Vendor & Market Factors
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-chart-line"></i> Market Conditions
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-chart-line"></i> Market Conditions</div>
+                                                <div class="tooltip-desc">Current supply-demand dynamics affect pricing. Seller's market = contractors charge premiums due to high demand.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Condition</th><th>Impact</th></tr>
+                                                    <tr><td>Buyer's Market</td><td>-5% (overcapacity)</td></tr>
+                                                    <tr><td>Balanced</td><td>0% (baseline)</td></tr>
+                                                    <tr><td>Seller's Market</td><td>+10% (high demand)</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="marketCondition">
+                                        <option value="buyer">Buyer's Market (-5%)</option>
+                                        <option value="balanced" selected>Balanced (0%)</option>
+                                        <option value="seller">Seller's Market (+10%)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-truck"></i> Delivery Method
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-truck"></i> Delivery Method</div>
+                                                <div class="tooltip-desc">Project delivery approach affects cost structure and timeline.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Method</th><th>Impact</th></tr>
+                                                    <tr><td>Design-Bid-Build</td><td>Baseline</td></tr>
+                                                    <tr><td>Design-Build</td><td>-3% (integrated)</td></tr>
+                                                    <tr><td>Modular-Prefab</td><td>-8% (factory-built)</td></tr>
+                                                    <tr><td>EPC Turnkey</td><td>+5% (single source)</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="deliveryMethod">
+                                        <option value="dbb" selected>Design-Bid-Build (baseline)</option>
+                                        <option value="db">Design-Build (-3%)</option>
+                                        <option value="modular">Modular-Prefab (-8%)</option>
+                                        <option value="epc">EPC Turnkey (+5%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group" style="margin-top:1rem;">
+                                <label class="input-label">
+                                    <i class="fas fa-hard-hat"></i> Contractor Availability
+                                    <span class="tooltip-trigger">?
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title"><i class="fas fa-hard-hat"></i> Contractor Availability</div>
+                                            <div class="tooltip-desc">Labor market tightness. Per Matt Pacione: location-specific labor costs drive significant variance.</div>
+                                            <table class="tooltip-table">
+                                                <tr><th>Availability</th><th>Premium</th></tr>
+                                                <tr><td>High Availability</td><td>+0%</td></tr>
+                                                <tr><td>Normal</td><td>+3%</td></tr>
+                                                <tr><td>Tight Market</td><td>+8%</td></tr>
+                                            </table>
+                                        </div>
+                                    </span>
+                                </label>
+                                <select class="input-field" id="contractorAvail">
+                                    <option value="high">High Availability (+0%)</option>
+                                    <option value="normal" selected>Normal (+3%)</option>
+                                    <option value="tight">Tight Market (+8%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- D. Professional Fees & Soft Costs -->
+                        <div style="border-top:1px solid rgba(16,185,129,0.2);padding-top:1.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-file-invoice-dollar"></i> Professional Fees & Soft Costs
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-drafting-compass"></i> Design & Engineering: <span id="designFeeVal" style="color:#10b981;font-family:'JetBrains Mono',monospace;">8%</span></label>
+                                    <input type="range" id="designFee" min="5" max="12" value="8" step="0.5" style="width:100%;accent-color:#10b981;">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-tasks"></i> Project Management: <span id="pmFeeVal" style="color:#10b981;font-family:'JetBrains Mono',monospace;">5%</span></label>
+                                    <input type="range" id="pmFee" min="3" max="8" value="5" step="0.5" style="width:100%;accent-color:#10b981;">
+                                </div>
+                            </div>
+                            <div class="input-group" style="margin-top:1rem;">
+                                <label class="input-label"><i class="fas fa-exclamation-triangle"></i> Contingency: <span id="contingencyVal" style="color:#10b981;font-family:'JetBrains Mono',monospace;">10%</span></label>
+                                <input type="range" id="contingencyAdv" min="5" max="20" value="10" step="1" style="width:100%;accent-color:#10b981;">
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- ═══ END ADVANCED MODE ═══ -->
                 </div>
 
                 <!-- Results Side -->
                 <div class="simulator-results">
                     <div class="results-header">
-                        <span class="results-title"><i class="fas fa-chart-pie"></i> Cost Breakdown</span>
+                        <span class="results-title"><i class="fas fa-chart-pie"></i> Cost Breakdown <span id="advInfoBadge" style="display:none;font-size:0.65rem;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 8px;border-radius:6px;font-weight:500;margin-left:6px;"></span></span>
                         <div class="results-total">
                             <div class="total-label">Total CAPEX <span class="tooltip-trigger" style="font-size: 0.7rem;">?
                                 <div class="tooltip-content">
@@ -1293,22 +1528,36 @@
                             <div class="metric-value energy" id="energyCost">$1.2M</div>
                         </div>
                     </div>
+
+                    <!-- Action buttons -->
+                    <div style="display:flex;gap:0.5rem;margin-top:1.25rem;flex-wrap:wrap;">
+                        <button onclick="saveScenarioA()" id="btnSaveA" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(251,191,36,0.4);background:rgba(251,191,36,0.15);color:#fbbf24;cursor:pointer;font-weight:600;font-size:0.8rem;font-family:inherit;transition:all 0.3s;">
+                            <i class="fas fa-save" style="margin-right:4px;"></i> Save as Scenario A
+                        </button>
+                        <button onclick="exportPDF()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);cursor:pointer;font-weight:500;font-size:0.8rem;font-family:inherit;transition:all 0.3s;">
+                            <i class="fas fa-file-pdf" style="margin-right:4px;"></i> Export PDF
+                        </button>
+                    </div>
                 </div>
             </div>
-            </div><!-- /capex-tab-calculator -->
 
-            <!-- Compare Tab Content -->
-            <div id="capex-tab-compare" style="display: none;">
-                <div style="background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.95)); backdrop-filter: blur(20px); border: 1px solid rgba(245,158,11,0.15); border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
-                    <h3 style="font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.5rem; text-align: center;">
-                        <i class="fas fa-balance-scale" style="color: #f59e0b; margin-right: 8px;"></i>
-                        CAPEX Scenario Comparison
+            <!-- ═══ COMPARE MODE: Side-by-side cards ═══ -->
+            <div id="comparePanel" style="display:none;margin-top:2rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                    <h3 style="font-size:1.1rem;font-weight:700;color:var(--dark-blue);display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-columns" style="color:#f59e0b;"></i> Scenario Comparison
                     </h3>
-                    <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem;">
-                        Your configuration vs. industry benchmarks &mdash; all calculated at your current IT Load
-                    </p>
-                    <div id="capexComparisonGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
-                    </div>
+                    <button onclick="clearComparison()" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;cursor:pointer;font-size:0.8rem;font-family:inherit;font-weight:500;">
+                        <i class="fas fa-times" style="margin-right:4px;"></i> Clear
+                    </button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:start;" id="compareGrid">
+                    <!-- Scenario A card -->
+                    <div id="scenarioACard" style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);border-radius:16px;padding:1.5rem;color:white;"></div>
+                    <!-- Delta column -->
+                    <div id="deltaColumn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem 0;gap:0.75rem;min-width:80px;"></div>
+                    <!-- Scenario B card -->
+                    <div id="scenarioBCard" style="background:linear-gradient(135deg,#1a4731,#2d6a4f);border-radius:16px;padding:1.5rem;color:white;"></div>
                 </div>
             </div>
         </section>
@@ -1347,6 +1596,104 @@
         const upsMultipliers = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
         const genMultipliers = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
         const locationMultipliers = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0 };
+
+        // ═══ ADVANCED MODE DATA ═══
+        // City-specific cost per Watt ($/W, 2025 baseline)
+        // Sources: Turner & Townsend DCCI 2025, Cushman & Wakefield Cost Guide 2025
+        const cityData = {
+            silicon_valley: { perW: 13.30, region: 'usa', label: 'Silicon Valley', source: 'T&T 2025' },
+            new_jersey:     { perW: 12.90, region: 'usa', label: 'New Jersey/NYC', source: 'C&W 2025' },
+            virginia:       { perW: 13.40, region: 'usa', label: 'Virginia/NOVA', source: 'C&W 2025' },
+            dallas:         { perW: 14.30, region: 'usa', label: 'Dallas, TX', source: 'C&W 2025' },
+            phoenix:        { perW: 13.40, region: 'usa', label: 'Phoenix, AZ', source: 'C&W 2025' },
+            chicago:        { perW: 13.20, region: 'usa', label: 'Chicago, IL', source: 'C&W 2025' },
+            san_antonio:    { perW:  9.30, region: 'usa', label: 'San Antonio, TX', source: 'C&W 2025' },
+            london:         { perW: 12.00, region: 'europe', label: 'London', source: 'T&T 2025' },
+            frankfurt:      { perW: 11.60, region: 'europe', label: 'Frankfurt', source: 'T&T 2025' },
+            amsterdam:      { perW: 11.80, region: 'europe', label: 'Amsterdam', source: 'Est. T&T' },
+            stockholm:      { perW: 10.50, region: 'europe', label: 'Stockholm', source: 'Est. T&T' },
+            tokyo:          { perW: 15.20, region: 'japan', label: 'Tokyo', source: 'T&T 2025' },
+            singapore:      { perW: 14.53, region: 'sea', label: 'Singapore', source: 'T&T 2025' },
+            hong_kong:      { perW: 13.80, region: 'china', label: 'Hong Kong', source: 'Est. T&T' },
+            seoul:          { perW:  9.50, region: 'japan', label: 'Seoul', source: 'C&W APAC' },
+            sydney:         { perW: 12.30, region: 'australia', label: 'Sydney', source: 'Est. T&T' },
+            malaysia:       { perW: 11.37, region: 'sea', label: 'Malaysia/Johor', source: 'T&T 2025' },
+            jakarta:        { perW: 11.21, region: 'sea', label: 'Jakarta', source: 'T&T 2025' },
+            mumbai:         { perW:  6.64, region: 'india', label: 'Mumbai', source: 'T&T 2025' },
+            bangkok:        { perW:  8.50, region: 'sea', label: 'Bangkok', source: 'Est. APAC' }
+        };
+
+        // Year escalation multipliers (CAPEX)
+        // Sources: JLL 2026 Outlook (6%), T&T DCCI survey, Avid Solutions 2026-2030
+        const yearEscalation = {
+            '2025': { mult: 1.000, note: 'Baseline (current data)' },
+            '2026': { mult: 1.060, note: '+6.0% — JLL forecast' },
+            '2027': { mult: 1.115, note: '+5.2% — T&T trend' },
+            '2028': { mult: 1.165, note: '+4.5% — supply normalization' },
+            '2029': { mult: 1.210, note: '+3.9% — market stabilization' },
+            '2030': { mult: 1.250, note: '+3.3% — historical average' }
+        };
+
+        // Front-of-meter costs (USD)
+        const substationCosts = {
+            shared: { base: 1000000, label: 'Shared Utility' },
+            dedicated_33kv: { base: 4000000, label: 'Dedicated 33kV' },
+            dedicated_132kv: { base: 7500000, label: 'Dedicated 132kV+' }
+        };
+        const transformerLeadMult = { standard: 1.0, extended: 1.15, emergency: 1.30 };
+        const marketConditionMult = { buyer: 0.95, balanced: 1.0, seller: 1.10 };
+        const deliveryMethodMult = { dbb: 1.0, db: 0.97, modular: 0.92, epc: 1.05 };
+        const contractorAvailMult = { high: 1.0, normal: 1.03, tight: 1.08 };
+
+        // Current mode
+        let capexMode = 'simple';
+        let savedScenario = null;
+
+        function switchCapexMode(mode) {
+            capexMode = mode;
+            document.querySelectorAll('.capex-mode-btn').forEach(btn => {
+                const isActive = btn.dataset.mode === mode;
+                btn.style.background = isActive ? 'rgba(245,158,11,0.15)' : 'transparent';
+                btn.style.borderColor = isActive ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.15)';
+                btn.style.color = isActive ? '#f59e0b' : '#94a3b8';
+                btn.style.fontWeight = isActive ? '600' : '500';
+                btn.classList.toggle('active', isActive);
+            });
+            const advPanel = document.getElementById('advancedInputs');
+            advPanel.style.display = mode === 'advanced' ? 'flex' : 'none';
+            calculateCosts();
+            // Re-init tooltips for newly visible elements
+            setTimeout(() => initTooltipSystem(), 50);
+        }
+
+        // FOM toggle
+        document.getElementById('includeFOM').addEventListener('change', function() {
+            document.getElementById('fomInputs').style.display = this.checked ? 'flex' : 'none';
+            calculateCosts();
+        });
+
+        // Slider label updaters
+        document.getElementById('utilityRate').addEventListener('input', function() {
+            document.getElementById('utilRateVal').textContent = this.value + '%';
+            calculateCosts();
+        });
+        document.getElementById('designFee').addEventListener('input', function() {
+            document.getElementById('designFeeVal').textContent = this.value + '%';
+            calculateCosts();
+        });
+        document.getElementById('pmFee').addEventListener('input', function() {
+            document.getElementById('pmFeeVal').textContent = this.value + '%';
+            calculateCosts();
+        });
+        document.getElementById('contingencyAdv').addEventListener('input', function() {
+            document.getElementById('contingencyVal').textContent = this.value + '%';
+            calculateCosts();
+        });
+
+        // Advanced mode event listeners
+        ['projYear','cityMarket','substationType','transformerLead','marketCondition','deliveryMethod','contractorAvail'].forEach(id => {
+            document.getElementById(id).addEventListener('change', calculateCosts);
+        });
 
         const tierMapping = {
             n: { tier: 'Tier I', uptime: '99.671%' },
@@ -1401,11 +1748,57 @@
             const alarmMult = fireAlarmMultipliers[alarmType];
             const upsMult = upsMultipliers[upsType];
             const genMult = genMultipliers[genType];
-            const locMult = locationMultipliers[location];
+            let locMult = locationMultipliers[location];
             const fuelMult = 1 + (fuelHours - 24) * 0.008;
+
+            // Advanced mode adjustments
+            const isAdv = capexMode === 'advanced';
+            let yearMult = 1.0, cityLabel = '', yearLabel = '2025';
+            let marketMult = 1.0, deliveryMult = 1.0, contractorMult = 1.0;
+            let designPct = 0, pmPct = 0, contingencyPct = 5;
+            let fomTotal = 0, fomIncluded = false;
+
+            if (isAdv) {
+                // Year escalation
+                yearLabel = document.getElementById('projYear').value;
+                yearMult = yearEscalation[yearLabel].mult;
+
+                // City-specific override
+                const cityVal = document.getElementById('cityMarket').value;
+                if (cityVal !== 'none' && cityData[cityVal]) {
+                    const city = cityData[cityVal];
+                    cityLabel = city.label;
+                    // City $/W -> derive location multiplier relative to US baseline ~$13/W
+                    locMult = city.perW / 13.0;
+                }
+
+                // Market factors
+                marketMult = marketConditionMult[document.getElementById('marketCondition').value];
+                deliveryMult = deliveryMethodMult[document.getElementById('deliveryMethod').value];
+                contractorMult = contractorAvailMult[document.getElementById('contractorAvail').value];
+
+                // Professional fees
+                designPct = parseFloat(document.getElementById('designFee').value);
+                pmPct = parseFloat(document.getElementById('pmFee').value);
+                contingencyPct = parseInt(document.getElementById('contingencyAdv').value);
+
+                // Front-of-meter
+                fomIncluded = document.getElementById('includeFOM').checked;
+                if (fomIncluded) {
+                    const subType = document.getElementById('substationType').value;
+                    const transLead = document.getElementById('transformerLead').value;
+                    const utilRate = parseFloat(document.getElementById('utilityRate').value) / 100;
+                    const subCost = substationCosts[subType].base * transformerLeadMult[transLead];
+                    const gridConnection = itLoad * 0.001 * 500000; // ~$500K per MW
+                    const switchgear = itLoad * 0.001 * 300000; // ~$300K per MW
+                    fomTotal = (subCost + gridConnection + switchgear) * (1 + utilRate);
+                    fomTotal *= yearMult;
+                }
+            }
 
             const costs = {};
             let total = 0;
+            const advGlobalMult = isAdv ? yearMult * marketMult * deliveryMult * contractorMult : 1.0;
 
             for (const [key, factor] of Object.entries(costFactors)) {
                 let multiplier = locMult;
@@ -1428,15 +1821,31 @@
                     multiplier *= alarmMult;
                 }
 
-                costs[key] = factor.base * itLoad * multiplier;
+                costs[key] = factor.base * itLoad * multiplier * advGlobalMult;
                 total += costs[key];
             }
 
-            // Add contingency (5%)
-            const contingency = total * 0.05;
+            // Soft costs (advanced)
+            let softCosts = {};
+            if (isAdv) {
+                if (designPct > 0) {
+                    softCosts.design = total * (designPct / 100);
+                }
+                if (pmPct > 0) {
+                    softCosts.pm = total * (pmPct / 100);
+                }
+            }
+            const softTotal = Object.values(softCosts).reduce((a, b) => a + b, 0);
+            total += softTotal;
+
+            // Contingency
+            const contingency = total * (contingencyPct / 100);
             total += contingency;
 
-            // Update UI
+            // Add FOM
+            if (fomIncluded) total += fomTotal;
+
+            // ═══ UPDATE UI ═══
             document.getElementById('totalCost').textContent = formatCurrency(total);
             document.getElementById('perKwCost').textContent = formatCurrency(total / itLoad) + '/kW';
 
@@ -1447,29 +1856,31 @@
             const pue = pueMapping[coolingType][rackType];
             document.getElementById('pueValue').textContent = pue.toFixed(2);
 
-            // Annual energy cost
             const energyRate = location === 'sea' ? 0.08 : location === 'india' ? 0.07 : location === 'usa' ? 0.10 : 0.12;
             const annualEnergy = itLoad * pue * 8760 * energyRate;
             document.getElementById('energyCost').textContent = formatCurrency(annualEnergy);
 
-            // Render breakdown
+            // ═══ RENDER BREAKDOWN ═══
             const breakdownEl = document.getElementById('costBreakdown');
             breakdownEl.innerHTML = '';
 
-            const sortedCosts = Object.entries(costs).sort((a, b) => b[1] - a[1]);
-            const maxCost = Math.max(...Object.values(costs));
+            // Collect all line items for bar sizing
+            const allItems = { ...costs };
+            if (softCosts.design) allItems._design = softCosts.design;
+            if (softCosts.pm) allItems._pm = softCosts.pm;
+            allItems._contingency = contingency;
+            if (fomIncluded) allItems._fom = fomTotal;
+            const maxCost = Math.max(...Object.values(allItems));
 
+            const sortedCosts = Object.entries(costs).sort((a, b) => b[1] - a[1]);
             for (const [key, cost] of sortedCosts) {
                 const factor = costFactors[key];
                 const percent = ((cost / total) * 100).toFixed(1);
                 const barWidth = (cost / maxCost) * 100;
-
                 breakdownEl.innerHTML += `
                     <div class="cost-item">
                         <div class="cost-name">
-                            <div class="cost-icon" style="background: ${factor.color}30; color: ${factor.color};">
-                                <i class="fas ${factor.icon}"></i>
-                            </div>
+                            <div class="cost-icon" style="background: ${factor.color}30; color: ${factor.color};"><i class="fas ${factor.icon}"></i></div>
                             ${factor.label}
                         </div>
                         <div class="cost-bar-container">
@@ -1477,26 +1888,65 @@
                         </div>
                         <span class="cost-value">${formatCurrency(cost)}</span>
                         <span class="cost-percent">${percent}%</span>
-                    </div>
-                `;
+                    </div>`;
             }
 
-            // Add contingency row
+            // Soft cost rows (advanced)
+            if (softCosts.design) {
+                breakdownEl.innerHTML += renderExtraRow('fa-drafting-compass', 'Design & Engineering', softCosts.design, '#10b981', maxCost, total);
+            }
+            if (softCosts.pm) {
+                breakdownEl.innerHTML += renderExtraRow('fa-tasks', 'Project Management', softCosts.pm, '#059669', maxCost, total);
+            }
+
+            // FOM row
+            if (fomIncluded) {
+                breakdownEl.innerHTML += renderExtraRow('fa-plug', 'Front-of-Meter / Utility', fomTotal, '#3b82f6', maxCost, total);
+            }
+
+            // Contingency row
             breakdownEl.innerHTML += `
                 <div class="cost-item" style="opacity: 0.7;">
                     <div class="cost-name">
-                        <div class="cost-icon" style="background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                        Contingency (5%)
+                        <div class="cost-icon" style="background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);"><i class="fas fa-plus-circle"></i></div>
+                        Contingency (${contingencyPct}%)
                     </div>
                     <div class="cost-bar-container">
                         <div class="cost-bar" style="width: ${(contingency / maxCost) * 100}%; background: rgba(255,255,255,0.5);"></div>
                     </div>
                     <span class="cost-value">${formatCurrency(contingency)}</span>
-                    <span class="cost-percent">5.0%</span>
+                    <span class="cost-percent">${contingencyPct}.0%</span>
+                </div>`;
+
+            // Advanced info badge
+            const advBadge = document.getElementById('advInfoBadge');
+            if (advBadge) {
+                if (isAdv) {
+                    let info = yearLabel;
+                    if (cityLabel) info += ' · ' + cityLabel;
+                    if (yearMult > 1) info += ' · +' + ((yearMult - 1) * 100).toFixed(1) + '% escalation';
+                    advBadge.textContent = info;
+                    advBadge.style.display = 'inline-block';
+                } else {
+                    advBadge.style.display = 'none';
+                }
+            }
+
+            return { total, costs, contingency, softCosts, fomTotal, fomIncluded, itLoad, pue, tierInfo, annualEnergy, yearLabel, cityLabel, contingencyPct, designPct, pmPct };
+        }
+
+        function renderExtraRow(icon, label, cost, color, maxCost, total) {
+            return `<div class="cost-item">
+                <div class="cost-name">
+                    <div class="cost-icon" style="background: ${color}30; color: ${color};"><i class="fas ${icon}"></i></div>
+                    ${label}
                 </div>
-            `;
+                <div class="cost-bar-container">
+                    <div class="cost-bar" style="width: ${(cost / maxCost) * 100}%; background: ${color};"></div>
+                </div>
+                <span class="cost-value">${formatCurrency(cost)}</span>
+                <span class="cost-percent">${((cost / total) * 100).toFixed(1)}%</span>
+            </div>`;
         }
 
         // Event Listeners
@@ -1513,125 +1963,210 @@
             radio.addEventListener('change', calculateCosts);
         });
 
-        // Tab Switching
-        function switchCapexTab(tabName) {
-            document.querySelectorAll('.capex-tab').forEach(btn => {
-                btn.style.background = 'transparent';
-                btn.style.color = '#94a3b8';
-                btn.style.borderColor = 'rgba(255,255,255,0.15)';
-                btn.style.fontWeight = '500';
-            });
-            const activeBtn = document.querySelector('.capex-tab[data-tab="' + tabName + '"]');
-            if (activeBtn) {
-                activeBtn.style.background = 'rgba(245,158,11,0.15)';
-                activeBtn.style.color = '#f59e0b';
-                activeBtn.style.borderColor = 'rgba(245,158,11,0.4)';
-                activeBtn.style.fontWeight = '600';
-            }
-            if (tabName === 'compare') {
-                document.getElementById('capex-tab-calculator').style.display = 'none';
-                document.getElementById('capex-tab-compare').style.display = 'block';
-                generateCapexComparison();
-            } else {
-                document.getElementById('capex-tab-calculator').style.display = 'block';
-                document.getElementById('capex-tab-compare').style.display = 'none';
-                document.querySelectorAll('[data-capex-mode="advanced"]').forEach(function(el) {
-                    el.style.display = tabName === 'advanced' ? '' : 'none';
-                });
-                calculateCosts();
-            }
-        }
-
-        // Compare Scenarios
-        function generateCapexComparison() {
-            var itLoad = parseInt(document.getElementById('itLoad').value) || 1000;
-            var scenarios = [
-                { name: 'Your Configuration', highlight: true,
-                  redundancy: getSelectedValue('redundancy'), cooling: getSelectedValue('coolingType'),
-                  rack: getSelectedValue('rackType'), building: document.getElementById('buildingType').value,
-                  seismic: document.getElementById('seismicZone').value, fire: document.getElementById('fireType').value,
-                  alarm: document.getElementById('alarmType').value, ups: document.getElementById('upsType').value,
-                  gen: document.getElementById('genType').value, location: document.getElementById('locationFactor').value,
-                  fuel: parseInt(document.getElementById('fuelHours').value) || 48 },
-                { name: 'Best-in-Class Hyperscale', highlight: false,
-                  redundancy: '2n', cooling: 'liquid', rack: 'ai', building: 'purpose', seismic: 'zone1',
-                  fire: 'novec', alarm: 'vesda', ups: 'modular', gen: 'hvo', location: 'usa', fuel: 72 },
-                { name: 'Industry Average', highlight: false,
-                  redundancy: 'n1', cooling: 'inrow', rack: 'medium', building: 'purpose', seismic: 'zone2',
-                  fire: 'fm200', alarm: 'addressable', ups: 'modular', gen: 'diesel', location: 'usa', fuel: 48 },
-                { name: 'Legacy Enterprise', highlight: false,
-                  redundancy: 'n', cooling: 'air', rack: 'standard', building: 'warehouse', seismic: 'zone1',
-                  fire: 'fm200', alarm: 'conventional', ups: 'standalone', gen: 'diesel', location: 'usa', fuel: 24 }
-            ];
-
-            var results = scenarios.map(function(s) {
-                var redMult = redundancyMultipliers[s.redundancy];
-                var coolMult = coolingMultipliers[s.cooling];
-                var rackMult = rackMultipliers[s.rack];
-                var buildMult = buildingMultipliers[s.building];
-                var seismicMt = seismicMultipliers[s.seismic];
-                var fireSupMt = fireSuppressionMultipliers[s.fire];
-                var alarmMt = fireAlarmMultipliers[s.alarm];
-                var upsMt = upsMultipliers[s.ups];
-                var genMt = genMultipliers[s.gen];
-                var locMult = locationMultipliers[s.location];
-                var fuelMt = 1 + (s.fuel - 24) * 0.008;
-                var total = 0;
-                for (var key in costFactors) {
-                    var factor = costFactors[key];
-                    var mult = locMult;
-                    if (key === 'building') mult *= buildMult * rackMult;
-                    else if (key === 'seismic') mult *= seismicMt * buildMult;
-                    else if (key === 'electrical') mult *= redMult * rackMult;
-                    else if (key === 'ups') mult *= redMult * rackMult * upsMt;
-                    else if (key === 'generator') mult *= redMult * fuelMt * genMt;
-                    else if (key === 'cooling') mult *= coolMult * rackMult;
-                    else if (key === 'fireSuppression') mult *= fireSupMt;
-                    else if (key === 'fireAlarm') mult *= alarmMt;
-                    total += factor.base * itLoad * mult;
-                }
-                total *= 1.05;
-                var tierInfo = tierMapping[s.redundancy];
-                var pue = pueMapping[s.cooling][s.rack];
-                return { name: s.name, highlight: s.highlight, total: total, perKw: total / itLoad,
-                         pue: pue, tier: tierInfo.tier, uptime: tierInfo.uptime };
-            });
-
-            var grid = document.getElementById('capexComparisonGrid');
-            grid.innerHTML = results.map(function(r) {
-                var border = r.highlight ? '#f59e0b' : 'rgba(255,255,255,0.1)';
-                var bg = r.highlight ? 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04))' : 'rgba(255,255,255,0.03)';
-                var badge = r.highlight ? '<span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:3px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">YOUR CONFIG</span>' : '';
-                return '<div style="background:' + bg + ';border:2px solid ' + border + ';border-radius:16px;padding:1.5rem;text-align:center;">' +
-                    '<div style="margin-bottom:0.75rem;min-height:24px;">' + badge + '</div>' +
-                    '<h4 style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:1rem;">' + r.name + '</h4>' +
-                    '<div style="font-size:1.8rem;font-weight:800;color:#f1f5f9;font-family:JetBrains Mono,monospace;margin-bottom:0.25rem;">' + formatCurrency(r.total) + '</div>' +
-                    '<div style="font-size:0.85rem;color:#94a3b8;margin-bottom:1.5rem;">' + formatCurrency(r.perKw) + '/kW</div>' +
-                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">' +
-                        '<div style="padding:0.75rem;background:rgba(139,92,246,0.1);border-radius:10px;">' +
-                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">Tier</div>' +
-                            '<div style="font-size:1.1rem;font-weight:700;color:#a78bfa;">' + r.tier + '</div></div>' +
-                        '<div style="padding:0.75rem;background:rgba(6,182,212,0.1);border-radius:10px;">' +
-                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">PUE</div>' +
-                            '<div style="font-size:1.1rem;font-weight:700;color:#22d3ee;">' + r.pue.toFixed(2) + '</div></div>' +
-                        '<div style="padding:0.75rem;background:rgba(16,185,129,0.1);border-radius:10px;">' +
-                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">Uptime</div>' +
-                            '<div style="font-size:0.9rem;font-weight:700;color:#34d399;">' + r.uptime + '</div></div>' +
-                        '<div style="padding:0.75rem;background:rgba(245,158,11,0.1);border-radius:10px;">' +
-                            '<div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">$/kW</div>' +
-                            '<div style="font-size:0.9rem;font-weight:700;color:#fbbf24;">' + formatCurrency(r.perKw) + '</div></div>' +
-                    '</div></div>';
-            }).join('');
-        }
-
         // Initial calculation
         calculateCosts();
         initTooltipSystem();
 
-        // Initialize simple mode - hide advanced inputs
-        document.querySelectorAll('[data-capex-mode="advanced"]').forEach(function(el) {
-            el.style.display = 'none';
-        });
+        // Auto-update comparison when inputs change
+        const totalEl = document.getElementById('totalCost');
+        new MutationObserver(() => { if (savedScenario) renderComparison(); })
+            .observe(totalEl, { childList: true, characterData: true, subtree: true });
+
+        // ═══ COMPARE MODE ═══
+        function saveScenarioA() {
+            const result = calculateCosts();
+            savedScenario = { ...result, timestamp: new Date().toLocaleString() };
+            document.getElementById('comparePanel').style.display = 'block';
+            document.getElementById('btnSaveA').innerHTML = '<i class="fas fa-check" style="margin-right:4px;"></i> Scenario A Saved';
+            document.getElementById('btnSaveA').style.background = 'rgba(16,185,129,0.2)';
+            document.getElementById('btnSaveA').style.borderColor = 'rgba(16,185,129,0.4)';
+            document.getElementById('btnSaveA').style.color = '#10b981';
+            renderComparison();
+        }
+
+        function clearComparison() {
+            savedScenario = null;
+            document.getElementById('comparePanel').style.display = 'none';
+            document.getElementById('btnSaveA').innerHTML = '<i class="fas fa-save" style="margin-right:4px;"></i> Save as Scenario A';
+            document.getElementById('btnSaveA').style.background = 'rgba(251,191,36,0.15)';
+            document.getElementById('btnSaveA').style.borderColor = 'rgba(251,191,36,0.4)';
+            document.getElementById('btnSaveA').style.color = '#fbbf24';
+        }
+
+        function renderComparison() {
+            if (!savedScenario) return;
+            const b = calculateCosts();
+            const a = savedScenario;
+            const delta = ((b.total - a.total) / a.total * 100);
+            const deltaSign = delta >= 0 ? '+' : '';
+            const deltaColor = delta > 0 ? '#ef4444' : '#10b981';
+
+            document.getElementById('scenarioACard').innerHTML = renderScenarioCard('A', a, '#fbbf24');
+            document.getElementById('scenarioBCard').innerHTML = renderScenarioCard('B', b, '#34d399');
+
+            document.getElementById('deltaColumn').innerHTML = `
+                <div style="text-align:center;padding:0.5rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Delta</div>
+                    <div style="font-size:1.6rem;font-weight:700;color:${deltaColor};font-family:'JetBrains Mono',monospace;">${deltaSign}${delta.toFixed(1)}%</div>
+                    <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:4px;">${deltaSign}${formatCurrency(b.total - a.total)}</div>
+                </div>
+                <div style="width:2px;height:60px;background:linear-gradient(180deg,${deltaColor},transparent);border-radius:1px;"></div>
+                <div style="text-align:center;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">$/kW Delta</div>
+                    <div style="font-size:0.95rem;font-weight:600;color:${deltaColor};font-family:'JetBrains Mono',monospace;">${deltaSign}${formatCurrency((b.total/b.itLoad) - (a.total/a.itLoad))}</div>
+                </div>`;
+        }
+
+        function renderScenarioCard(label, data, accent) {
+            const topCosts = Object.entries(data.costs).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const maxC = topCosts[0][1];
+            let barsHTML = topCosts.map(([key, cost]) => {
+                const f = costFactors[key];
+                return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <span style="font-size:0.7rem;min-width:90px;color:rgba(255,255,255,0.7);">${f.label}</span>
+                    <div style="flex:1;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+                        <div style="width:${(cost/maxC)*100}%;height:100%;background:${f.color};border-radius:3px;"></div>
+                    </div>
+                    <span style="font-size:0.75rem;font-family:'JetBrains Mono',monospace;min-width:60px;text-align:right;">${formatCurrency(cost)}</span>
+                </div>`;
+            }).join('');
+            let metaInfo = data.tierInfo.tier + ' · PUE ' + data.pue;
+            if (data.yearLabel !== '2025') metaInfo += ' · ' + data.yearLabel;
+            if (data.cityLabel) metaInfo += ' · ' + data.cityLabel;
+            return `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(255,255,255,0.15);">
+                    <span style="font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                        <span style="width:24px;height:24px;border-radius:6px;background:${accent}30;color:${accent};display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;">${label}</span>
+                        Scenario ${label}
+                    </span>
+                    <span style="font-size:0.7rem;color:rgba(255,255,255,0.5);">${metaInfo}</span>
+                </div>
+                <div style="text-align:center;margin-bottom:1rem;">
+                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.5px;">Total CAPEX</div>
+                    <div style="font-size:1.8rem;font-weight:700;color:${accent};font-family:'JetBrains Mono',monospace;">${formatCurrency(data.total)}</div>
+                    <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace;">${formatCurrency(data.total/data.itLoad)}/kW · ${data.itLoad.toLocaleString()} kW</div>
+                </div>
+                <div style="margin-top:0.75rem;">${barsHTML}</div>`;
+        }
+
+        // Update comparison when inputs change (if scenario A is saved)
+        const origCalc = calculateCosts;
+        // We'll call renderComparison after each calc via MutationObserver on totalCost
+        const observer = new MutationObserver(() => { if (savedScenario) renderComparison(); });
+
+        // ═══ EXPORT PDF ═══
+        function exportPDF() {
+            const result = calculateCosts();
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+            const sortedCosts = Object.entries(result.costs).sort((a, b) => b[1] - a[1]);
+
+            let rowsHTML = sortedCosts.map(([key, cost]) => {
+                const f = costFactors[key];
+                return `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${f.label}</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(cost)}</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((cost/result.total)*100).toFixed(1)}%</td></tr>`;
+            }).join('');
+
+            // Add soft costs
+            if (result.softCosts.design) {
+                rowsHTML += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Design & Engineering</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.softCosts.design)}</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.softCosts.design/result.total)*100).toFixed(1)}%</td></tr>`;
+            }
+            if (result.softCosts.pm) {
+                rowsHTML += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Project Management</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.softCosts.pm)}</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.softCosts.pm/result.total)*100).toFixed(1)}%</td></tr>`;
+            }
+            if (result.fomIncluded) {
+                rowsHTML += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Front-of-Meter / Utility</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.fomTotal)}</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${((result.fomTotal/result.total)*100).toFixed(1)}%</td></tr>`;
+            }
+            rowsHTML += `<tr style="background:#f9fafb;"><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">Contingency (${result.contingencyPct}%)</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-family:monospace;">${formatCurrency(result.contingency)}</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#6b7280;">${result.contingencyPct}.0%</td></tr>`;
+
+            // Config summary
+            const itLoad = document.getElementById('itLoad').value;
+            const redundancy = getSelectedValue('redundancy');
+            const coolingType = getSelectedValue('coolingType');
+            const rackType = getSelectedValue('rackType');
+            let configHTML = `<tr><td style="padding:6px 0;color:#6b7280;">IT Load</td><td style="padding:6px 0;font-weight:600;">${parseInt(itLoad).toLocaleString()} kW</td></tr>
+                <tr><td style="padding:6px 0;color:#6b7280;">Redundancy</td><td style="padding:6px 0;font-weight:600;">${redundancy.toUpperCase()}</td></tr>
+                <tr><td style="padding:6px 0;color:#6b7280;">Cooling</td><td style="padding:6px 0;font-weight:600;">${coolingType.toUpperCase()}</td></tr>
+                <tr><td style="padding:6px 0;color:#6b7280;">Rack Density</td><td style="padding:6px 0;font-weight:600;">${rackType}</td></tr>
+                <tr><td style="padding:6px 0;color:#6b7280;">Tier</td><td style="padding:6px 0;font-weight:600;">${result.tierInfo.tier}</td></tr>
+                <tr><td style="padding:6px 0;color:#6b7280;">PUE</td><td style="padding:6px 0;font-weight:600;">${result.pue}</td></tr>`;
+            if (result.yearLabel !== '2025') configHTML += `<tr><td style="padding:6px 0;color:#6b7280;">Projection Year</td><td style="padding:6px 0;font-weight:600;">${result.yearLabel}</td></tr>`;
+            if (result.cityLabel) configHTML += `<tr><td style="padding:6px 0;color:#6b7280;">City/Market</td><td style="padding:6px 0;font-weight:600;">${result.cityLabel}</td></tr>`;
+
+            // Compare section
+            let compareHTML = '';
+            if (savedScenario) {
+                const a = savedScenario;
+                const delta = ((result.total - a.total) / a.total * 100);
+                const sign = delta >= 0 ? '+' : '';
+                compareHTML = `
+                <div style="page-break-before:auto;margin-top:30px;">
+                    <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:8px;margin-bottom:16px;">Scenario Comparison</h2>
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="padding:10px;text-align:left;">Metric</th><th style="padding:10px;text-align:right;">Scenario A</th><th style="padding:10px;text-align:right;">Scenario B</th><th style="padding:10px;text-align:right;">Delta</th></tr>
+                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">Total CAPEX</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:8px;text-align:right;color:${delta>0?'#ef4444':'#10b981'};font-weight:600;">${sign}${delta.toFixed(1)}%</td></tr>
+                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">Cost per kW</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(a.total/a.itLoad)}/kW</td><td style="padding:8px;text-align:right;font-family:monospace;">${formatCurrency(result.total/result.itLoad)}/kW</td><td style="padding:8px;text-align:right;color:${delta>0?'#ef4444':'#10b981'};font-weight:600;">${sign}${formatCurrency((result.total/result.itLoad)-(a.total/a.itLoad))}</td></tr>
+                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">IT Load</td><td style="padding:8px;text-align:right;">${a.itLoad.toLocaleString()} kW</td><td style="padding:8px;text-align:right;">${result.itLoad.toLocaleString()} kW</td><td style="padding:8px;text-align:right;">—</td></tr>
+                        <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">Tier</td><td style="padding:8px;text-align:right;">${a.tierInfo.tier}</td><td style="padding:8px;text-align:right;">${result.tierInfo.tier}</td><td style="padding:8px;text-align:right;">—</td></tr>
+                    </table>
+                </div>`;
+            }
+
+            const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CAPEX Report — ${dateStr}</title>
+            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head>
+            <body style="font-family:Arial,Helvetica,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#1f2937;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:16px;margin-bottom:24px;">
+                    <div>
+                        <h1 style="font-size:22px;color:#1e3a5f;margin:0;">Data Center CAPEX Report</h1>
+                        <p style="font-size:12px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:28px;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</div>
+                        <div style="font-size:13px;color:#6b7280;">${formatCurrency(result.total/result.itLoad)}/kW · ${result.itLoad.toLocaleString()} kW IT Load</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:24px;margin-bottom:24px;">
+                    <div style="flex:1;">
+                        <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:12px;">Configuration</h2>
+                        <table style="width:100%;font-size:13px;">${configHTML}</table>
+                    </div>
+                    <div style="flex:1;">
+                        <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:12px;">Key Metrics</h2>
+                        <table style="width:100%;font-size:13px;">
+                            <tr><td style="padding:6px 0;color:#6b7280;">Total CAPEX</td><td style="padding:6px 0;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</td></tr>
+                            <tr><td style="padding:6px 0;color:#6b7280;">Annual Energy (est.)</td><td style="padding:6px 0;font-weight:600;font-family:monospace;">${formatCurrency(result.annualEnergy)}/yr</td></tr>
+                            <tr><td style="padding:6px 0;color:#6b7280;">Uptime SLA</td><td style="padding:6px 0;font-weight:600;">${result.tierInfo.uptime}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <h2 style="font-size:16px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:8px;margin-bottom:16px;">Cost Breakdown</h2>
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <tr style="background:#1e3a5f;color:white;"><th style="padding:10px 12px;text-align:left;">Component</th><th style="padding:10px 12px;text-align:right;">Cost (USD)</th><th style="padding:10px 12px;text-align:right;">Share</th></tr>
+                    ${rowsHTML}
+                    <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px 12px;">TOTAL</td><td style="padding:10px 12px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:10px 12px;text-align:right;">100%</td></tr>
+                </table>
+                ${compareHTML}
+                <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center;">
+                    <p>This report is a general-purpose estimate. Actual costs depend on site-specific engineering, local regulations, and procurement strategy.</p>
+                    <p style="margin-top:4px;">Generated by Data Center CAPEX Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana</p>
+                </div>
+            </body></html>`;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        }
 
         // Global Tooltip System
         function initTooltipSystem() {
