@@ -3155,6 +3155,42 @@
                 </h2>
 
                 <!-- KPI Cards -->
+                ${savedScenario ? (function(){
+                    const aR = savedScenario;
+                    const aRw = aR._raw || {};
+                    const aRacks = Math.ceil(aR.itLoad / rackKw[aRw.rackType || 'standard']);
+                    const aFloor = Math.ceil(aRacks * rackFootprint);
+                    const aTl = aR._timeline || { totalMonths: 0 };
+                    const aMWh = aR.itLoad * aR.pue * 8760 / 1000;
+                    const cardS = 'flex:1;border-radius:8px;padding:10px;text-align:center;';
+                    const lblS = 'font-size:9px;text-transform:uppercase;margin-bottom:2px;';
+                    const valS = 'font-size:18px;font-weight:700;';
+                    const subS = 'font-size:9px;color:#6b7280;';
+                    return '<div style="display:flex;gap:12px;margin-bottom:16px;">' +
+                        '<div style="flex:1;">' +
+                            '<div style="font-size:10px;font-weight:700;color:#d97706;margin-bottom:6px;">SCENARIO A</div>' +
+                            '<div style="display:flex;gap:8px;">' +
+                                '<div style="' + cardS + 'background:#fffbeb;border:1px solid #fde68a;"><div style="' + lblS + 'color:#92400e;">Racks</div><div style="' + valS + 'color:#d97706;">' + aRacks + '</div><div style="' + subS + '">' + aR.itLoad.toLocaleString() + ' kW</div></div>' +
+                                '<div style="' + cardS + 'background:#fffbeb;border:1px solid #fde68a;"><div style="' + lblS + 'color:#92400e;">White Space</div><div style="' + valS + 'color:#d97706;">' + aFloor.toLocaleString() + ' m²</div><div style="' + subS + '">~' + Math.ceil(aFloor*1.8).toLocaleString() + ' m² gross</div></div>' +
+                                '<div style="' + cardS + 'background:#fffbeb;border:1px solid #fde68a;"><div style="' + lblS + 'color:#92400e;">Build Time</div><div style="' + valS + 'color:#d97706;">' + aTl.totalMonths + ' mo</div><div style="' + subS + '">Design to COD</div></div>' +
+                                '<div style="' + cardS + 'background:#fffbeb;border:1px solid #fde68a;"><div style="' + lblS + 'color:#92400e;">$/kW</div><div style="' + valS + 'color:#d97706;">$' + Math.round(aR.total/aR.itLoad).toLocaleString() + '</div><div style="' + subS + '">' + (aR.total/1e6).toFixed(1) + 'M total</div></div>' +
+                                '<div style="' + cardS + 'background:#fffbeb;border:1px solid #fde68a;"><div style="' + lblS + 'color:#92400e;">Energy</div><div style="' + valS + 'color:#d97706;">' + (aMWh/1000).toFixed(1) + ' GWh</div><div style="' + subS + '">PUE ' + aR.pue.toFixed(2) + '</div></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="display:flex;gap:12px;margin-bottom:16px;">' +
+                        '<div style="flex:1;">' +
+                            '<div style="font-size:10px;font-weight:700;color:#059669;margin-bottom:6px;">SCENARIO B</div>' +
+                            '<div style="display:flex;gap:8px;">' +
+                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Racks</div><div style="' + valS + 'color:#059669;">' + racks + '</div><div style="' + subS + '">' + result.itLoad.toLocaleString() + ' kW</div></div>' +
+                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">White Space</div><div style="' + valS + 'color:#059669;">' + floorM2.toLocaleString() + ' m²</div><div style="' + subS + '">~' + Math.ceil(floorM2*1.8).toLocaleString() + ' m² gross</div></div>' +
+                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Build Time</div><div style="' + valS + 'color:#059669;">' + totalMonths + ' mo</div><div style="' + subS + '">Design to COD</div></div>' +
+                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">$/kW</div><div style="' + valS + 'color:#059669;">$' + Math.round(result.total/result.itLoad).toLocaleString() + '</div><div style="' + subS + '">' + (result.total/1e6).toFixed(1) + 'M total</div></div>' +
+                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Energy</div><div style="' + valS + 'color:#059669;">' + (annualMWh/1000).toFixed(1) + ' GWh</div><div style="' + subS + '">PUE ' + result.pue.toFixed(2) + '</div></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                })() : `
                 <div style="display:flex;gap:10px;margin-bottom:16px;">
                     <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
                         <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Est. Racks</div>
@@ -3182,6 +3218,7 @@
                         <div style="font-size:9px;color:#6b7280;">PUE ${result.pue.toFixed(2)}</div>
                     </div>
                 </div>
+                `}
 
                 ${savedScenario ? buildPremiumComparisonHTML(savedScenario, result, cellS, hdrS) : `
                 <!-- Design & Delivery Concept -->
