@@ -2900,10 +2900,33 @@
         document.getElementById('alarmType').addEventListener('change', calculateCosts);
         document.getElementById('upsType').addEventListener('change', calculateCosts);
         document.getElementById('genType').addEventListener('change', calculateCosts);
-        document.getElementById('locationFactor').addEventListener('change', calculateCosts);
+        document.getElementById('locationFactor').addEventListener('change', function() {
+            filterCityByLocation();
+            calculateCosts();
+        });
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', calculateCosts);
         });
+
+        // Filter city dropdown to only show cities matching the selected location/region
+        function filterCityByLocation() {
+            const loc = document.getElementById('locationFactor').value;
+            const citySelect = document.getElementById('cityMarket');
+            if (!citySelect) return;
+            const prev = citySelect.value;
+            citySelect.querySelectorAll('option').forEach(opt => {
+                if (opt.value === 'none') { opt.style.display = ''; return; }
+                const cd = cityData[opt.value];
+                opt.style.display = (cd && cd.region === loc) ? '' : 'none';
+            });
+            citySelect.querySelectorAll('optgroup').forEach(og => {
+                const visible = Array.from(og.querySelectorAll('option')).some(o => o.style.display !== 'none');
+                og.style.display = visible ? '' : 'none';
+            });
+            // Reset to "none" if current selection is now hidden
+            const selOpt = citySelect.querySelector('option[value="' + prev + '"]');
+            if (selOpt && selOpt.style.display === 'none') citySelect.value = 'none';
+        }
 
         // Last computed result (avoids recalculation in comparison)
         let lastResult = null;
@@ -2913,6 +2936,7 @@
         var userTier = 'free'; // 'free' | 'pro'
 
         // Initial calculation
+        filterCityByLocation();
         calculateCosts();
         initTooltipSystem();
 
@@ -3159,6 +3183,7 @@
                     </div>
                 </div>
 
+                ${savedScenario ? buildPremiumComparisonHTML(savedScenario, result, cellS, hdrS) : `
                 <!-- Design & Delivery Concept -->
                 <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Design & Delivery Concept</h3>
                 <div style="display:flex;gap:16px;margin-bottom:12px;">
@@ -3244,8 +3269,7 @@
                 <!-- Sustainability & Efficiency -->
                 <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Sustainability & Efficiency</h3>
                 ${buildSustainabilityHTML(result, coolingType, effReg, racks, floorM2, annualMWh, cellS, hdrS)}
-
-                ${savedScenario ? buildPremiumComparisonHTML(savedScenario, result, cellS, hdrS) : ''}
+                `}
             </div>`;
         }
 
