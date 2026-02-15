@@ -659,24 +659,7 @@
         .cost-breakdown {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 320px;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .cost-breakdown::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .cost-breakdown::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-        }
-
-        .cost-breakdown::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 2px;
+            gap: 8px;
         }
 
         .cost-item {
@@ -805,6 +788,79 @@
             font-size: 0.9rem;
         }
 
+        /* Navbar Auth */
+        .nav-auth-wrap {
+            position: relative;
+            margin-left: 0.5rem;
+        }
+        .nav-login-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border: none; border-radius: 8px;
+            color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(139,92,246,0.3);
+            white-space: nowrap;
+        }
+        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,92,246,0.4); filter: brightness(1.08); }
+
+        .nav-user-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 12px 6px 6px;
+            background: rgba(139,92,246,0.08);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 50px;
+            cursor: pointer; transition: all 0.3s;
+            font-family: inherit;
+            color: var(--text-primary);
+        }
+        .nav-user-btn:hover { background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.4); }
+
+        .nav-user-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.7rem; font-weight: 700;
+        }
+        .nav-user-email {
+            font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
+            max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
+        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
+
+        .nav-user-dropdown {
+            display: none; position: absolute; top: calc(100% + 8px); right: 0;
+            background: white; border-radius: 12px; border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px;
+            z-index: 1001; overflow: hidden;
+            animation: dropdownSlideIn 0.2s ease;
+        }
+        .nav-user-dropdown.show { display: block; }
+        @keyframes dropdownSlideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+        .nav-dd-header {
+            padding: 14px 16px; border-bottom: 1px solid #f1f5f9;
+        }
+        .nav-dd-tier-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 50px;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: white; }
+        .nav-dd-email {
+            font-size: 0.78rem; color: #64748b; word-break: break-all;
+        }
+        .nav-dd-logout {
+            display: flex; align-items: center; gap: 8px;
+            width: 100%; padding: 12px 16px; border: none; background: none;
+            font-size: 0.82rem; font-weight: 500; color: #ef4444;
+            cursor: pointer; font-family: inherit; transition: background 0.2s;
+        }
+        .nav-dd-logout:hover { background: #fef2f2; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -812,6 +868,9 @@
             .simulator-container { padding: 1.5rem; }
             #compareGrid { grid-template-columns: 1fr !important; }
             #deltaColumn { flex-direction: row !important; width: 100%; justify-content: center !important; }
+            .nav-user-email { display: none; }
+            .nav-login-btn .nav-login-text { display: none; }
+            .nav-login-btn { padding: 8px 12px; }
         }
     </style>
 </head>
@@ -833,6 +892,27 @@
                 <a href="datahallAI.html" class="nav-link" style="color: #8b5cf6;">DC AI/HPC</a>
                 <a href="dc-conventional.html" class="nav-link">DC Conventional</a>
                 <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
+                <!-- Auth Button -->
+                <div class="nav-auth-wrap" id="navAuthWrap">
+                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="nav-login-text">Login</span>
+                    </button>
+                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
+                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
+                        <span class="nav-user-email" id="navUserEmail"></span>
+                        <i class="fas fa-chevron-down nav-user-chevron"></i>
+                    </button>
+                    <div class="nav-user-dropdown" id="navUserDropdown">
+                        <div class="nav-dd-header">
+                            <div class="nav-dd-tier-badge" id="navDdTierBadge">PRO</div>
+                            <div class="nav-dd-email" id="navDdEmail"></div>
+                        </div>
+                        <button class="nav-dd-logout" onclick="logoutPremium()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
                 <a href="index.html" class="nav-back">
                     <i class="fas fa-arrow-left"></i>
                     Portfolio
@@ -872,14 +952,162 @@
         <!-- Calculator -->
         <section class="calculator-section">
             <!-- Mode Tabs -->
-            <div id="capexModeTabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;max-width:1400px;margin-left:auto;margin-right:auto;">
+            <div id="capexModeTabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;max-width:1400px;margin-left:auto;margin-right:auto;">
                 <button type="button" class="capex-mode-btn active" data-mode="simple" onclick="switchCapexMode('simple')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.15);color:#f59e0b;cursor:pointer;font-weight:600;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
                     <i class="fas fa-sliders-h" style="margin-right:6px;"></i>Simple
                 </button>
                 <button type="button" class="capex-mode-btn" data-mode="advanced" onclick="switchCapexMode('advanced')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94a3b8;cursor:pointer;font-weight:500;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
                     <i class="fas fa-cogs" style="margin-right:6px;"></i>Advanced
                 </button>
+                <!-- Separator + Premium button (right-aligned) -->
+                <div style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;">
+                    <span id="premiumBadge" style="display:none;padding:4px 12px;border-radius:50px;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">PRO ACTIVE</span>
+                    <button type="button" id="premiumTabBtn" onclick="handlePremiumTab()" style="padding:0.6rem 1.4rem;border-radius:10px;border:1px solid rgba(168,85,247,0.6);background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;cursor:pointer;font-weight:700;font-size:0.9rem;font-family:inherit;transition:all 0.3s;box-shadow:0 2px 12px rgba(139,92,246,0.35);position:relative;overflow:hidden;">
+                        <i class="fas fa-crown" style="margin-right:6px;"></i>Premium
+                    </button>
+                </div>
             </div>
+
+            <!-- Login Modal -->
+            <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
+                <div style="background:white;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:modalSlideIn 0.3s ease;">
+                    <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;padding:4px;">&times;</button>
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#8b5cf6,#a855f7);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                            <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
+                        </div>
+                        <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;margin-bottom:0.25rem;">Premium Access</h3>
+                        <p style="font-size:0.85rem;color:#64748b;">Login to unlock all premium features</p>
+                    </div>
+                    <div id="loginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#dc2626;font-size:0.8rem;margin-bottom:1rem;text-align:center;">
+                        Invalid credentials
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:1rem;">
+                        <div>
+                            <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Email</label>
+                            <input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Password</label>
+                            <input type="password" id="loginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')attemptLogin()">
+                        </div>
+                        <button onclick="attemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(139,92,246,0.3);" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <i class="fas fa-unlock" style="margin-right:8px;"></i>Unlock Premium
+                        </button>
+                    </div>
+                    <div style="text-align:center;margin-top:1.25rem;padding-top:1rem;border-top:1px solid #f1f5f9;">
+                        <p style="font-size:0.75rem;color:#94a3b8;">PRO features: Full breakdown, $/kW benchmark, PDF export, Scenario compare, Premium articles &amp; analysis</p>
+                        <a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" style="display:inline-block;margin-top:8px;font-size:0.78rem;color:#8b5cf6;text-decoration:none;font-weight:600;">Don't have an account? Subscribe to PRO &rarr;</a>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @keyframes modalSlideIn { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes premiumGlow { 0%,100% { box-shadow:0 2px 12px rgba(139,92,246,0.35); } 50% { box-shadow:0 2px 20px rgba(139,92,246,0.55); } }
+                #premiumTabBtn { animation: premiumGlow 2.5s ease-in-out infinite; }
+                #premiumTabBtn:hover { transform:translateY(-2px); box-shadow:0 4px 24px rgba(139,92,246,0.5) !important; filter:brightness(1.1); }
+                #premiumTabBtn.premium-active { animation:none !important; background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(168,85,247,0.15)) !important; color:#c4b5fd !important; border-color:rgba(139,92,246,0.5) !important; box-shadow:0 2px 8px rgba(139,92,246,0.2) !important; }
+                #premiumTabBtn.premium-active:hover { transform:translateY(-1px); }
+
+                /* Feature Gating Styles */
+                .gated-overlay {
+                    position: relative;
+                    cursor: pointer;
+                }
+                .gated-overlay::after {
+                    content: '';
+                    position: absolute;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(15, 23, 42, 0.6);
+                    backdrop-filter: blur(6px);
+                    -webkit-backdrop-filter: blur(6px);
+                    border-radius: inherit;
+                    z-index: 10;
+                }
+                .gated-overlay::before {
+                    content: '\f521';
+                    font-family: 'Font Awesome 5 Free';
+                    font-weight: 900;
+                    position: absolute;
+                    top: 50%; left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: #a78bfa;
+                    font-size: 1.2rem;
+                    z-index: 11;
+                    text-shadow: 0 2px 8px rgba(139,92,246,0.5);
+                }
+                .gated-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                    background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(168,85,247,0.1));
+                    border: 1px solid rgba(139,92,246,0.3);
+                    color: #a78bfa;
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    letter-spacing: 0.5px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .gated-badge:hover {
+                    background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(168,85,247,0.2));
+                    transform: translateY(-1px);
+                }
+                .gated-btn {
+                    opacity: 0.5;
+                    pointer-events: none;
+                    position: relative;
+                }
+                .gated-btn.clickable {
+                    opacity: 0.7;
+                    pointer-events: auto;
+                    cursor: pointer;
+                }
+                .free-watermark {
+                    text-align: center;
+                    padding: 8px 16px;
+                    margin-top: 0.75rem;
+                    border-radius: 8px;
+                    background: rgba(139, 92, 246, 0.08);
+                    border: 1px dashed rgba(139, 92, 246, 0.25);
+                    font-size: 0.7rem;
+                    color: #a78bfa;
+                    letter-spacing: 0.3px;
+                }
+                .cost-value-hidden {
+                    filter: blur(5px);
+                    user-select: none;
+                    pointer-events: none;
+                }
+
+                /* Action button hover effects */
+                .action-btn-save:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(245,158,11,0.35) !important; border-color: rgba(251,191,36,0.8) !important; }
+                .action-btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(239,68,68,0.3) !important; border-color: rgba(239,68,68,0.7) !important; }
+
+                /* Print / PDF Styles */
+                @media print {
+                    body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .navbar, .hero, .brief-section, #capexModeTabs, #loginModal, .nav-back, footer,
+                    #freeWatermark, #btnSaveA, #btnExportPDF, #btnClearCompare, #scenarioBBanner,
+                    .tooltip-trigger, .gated-badge { display: none !important; }
+                    .main-content { padding-top: 0 !important; }
+                    .calculator-section { padding: 0 !important; }
+                    .simulator-container { display: block !important; max-width: 100% !important; }
+                    .simulator-inputs { margin-bottom: 2rem; }
+                    .simulator-results { background: #f8fafc !important; color: #1e293b !important; border: 1px solid #e2e8f0; }
+                    .results-header { background: linear-gradient(135deg, #1e3a5f, #2d5a87) !important; }
+                    .cost-item { border-color: #e2e8f0 !important; }
+                    .cost-value, .cost-percent { color: #334155 !important; filter: none !important; }
+                    .cost-name { color: #475569 !important; }
+                    #premiumOutput { display: flex !important; }
+                    #premiumOutput > div { border-color: #e2e8f0 !important; background: #f8fafc !important; }
+                    .gated-overlay::after, .gated-overlay::before { display: none !important; }
+                    .cost-value-hidden { filter: none !important; user-select: auto !important; }
+                    @page { margin: 1cm; size: A4; }
+                }
+            </style>
 
             <div class="simulator-container">
                 <!-- Input Side -->
@@ -1462,6 +1690,263 @@
                             </div>
                         </div>
 
+                        <!-- E. Electrical Distribution -->
+                        <div style="border-top:1px solid rgba(234,179,8,0.2);padding-top:1.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#eab308;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-bolt"></i> Electrical Distribution
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-ethernet"></i> Power Distribution
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-ethernet"></i> Power Distribution Method</div>
+                                                <div class="tooltip-desc">How power is distributed from switchgear to PDUs. Busway is standard for large facilities; underground conduit adds civil costs but better for campus layouts.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Method</th><th>Cost Impact</th></tr>
+                                                    <tr><td>Overhead Cable Tray</td><td>-8% (cheapest, less flexible)</td></tr>
+                                                    <tr><td>Busway</td><td>Baseline (industry standard)</td></tr>
+                                                    <tr><td>Underground Conduit</td><td>+15% (cable pits, trenching)</td></tr>
+                                                    <tr><td>Mixed (Bus + Underground)</td><td>+8% (campus/multi-building)</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="powerDistribution">
+                                        <option value="overhead">Overhead Cable Tray (-8%)</option>
+                                        <option value="busway" selected>Busway (standard)</option>
+                                        <option value="underground">Underground Conduit (+15%)</option>
+                                        <option value="mixed">Mixed Bus + Underground (+8%)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-random"></i> Transformer Type
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-random"></i> MV/LV Transformer</div>
+                                                <div class="tooltip-desc">Dry-type is common indoors; oil-filled is cheaper but requires containment and fire separation. Cast-resin is premium indoor option.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Type</th><th>Cost Impact</th></tr>
+                                                    <tr><td>Oil-Filled (outdoor)</td><td>-10% (cheapest, needs bund)</td></tr>
+                                                    <tr><td>Dry-Type</td><td>Baseline (indoor standard)</td></tr>
+                                                    <tr><td>Cast Resin</td><td>+12% (premium, low fire risk)</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="transformerType">
+                                        <option value="oil">Oil-Filled Outdoor (-10%)</option>
+                                        <option value="dry" selected>Dry-Type Indoor (standard)</option>
+                                        <option value="cast_resin">Cast Resin (+12%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-row" style="margin-top:1rem;">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-plug"></i> PDU Type
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-plug"></i> Power Distribution Unit</div>
+                                                <div class="tooltip-desc">Basic PDUs distribute power only. Intelligent PDUs add per-outlet monitoring, switching, and DCIM integration — critical for high-density racks.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Type</th><th>Cost per Rack</th></tr>
+                                                    <tr><td>Basic Metered</td><td>~$800/rack</td></tr>
+                                                    <tr><td>Intelligent (monitored)</td><td>~$1,500/rack</td></tr>
+                                                    <tr><td>Intelligent + Switched</td><td>~$2,500/rack</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="pduType">
+                                        <option value="basic">Basic Metered ($800/rack)</option>
+                                        <option value="intelligent" selected>Intelligent Monitored ($1,500/rack)</option>
+                                        <option value="switched">Intelligent + Switched ($2,500/rack)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-network-wired"></i> Structured Cabling
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-network-wired"></i> Structured Cabling System</div>
+                                                <div class="tooltip-desc">Backbone and horizontal cabling type. Fiber backbone with copper drops is standard; all-fiber is premium for high-density/AI facilities.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Type</th><th>Cost per Rack</th></tr>
+                                                    <tr><td>Cat6A Copper</td><td>~$600/rack</td></tr>
+                                                    <tr><td>Hybrid (Fiber + Cat6A)</td><td>~$1,200/rack</td></tr>
+                                                    <tr><td>All-Fiber (OM4/OS2)</td><td>~$2,000/rack</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="cablingType">
+                                        <option value="copper">Cat6A Copper ($600/rack)</option>
+                                        <option value="hybrid" selected>Hybrid Fiber+Copper ($1,200/rack)</option>
+                                        <option value="fiber">All-Fiber OM4/OS2 ($2,000/rack)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- F. Site & Civil -->
+                        <div style="border-top:1px solid rgba(244,63,94,0.2);padding-top:1.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#f43f5e;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-building"></i> Site & Civil
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-layer-group"></i> Floor Construction
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-layer-group"></i> Raised Floor vs Slab</div>
+                                                <div class="tooltip-desc">Raised floor allows under-floor air distribution and cable routing but adds $25-50/sqft. Slab with overhead is increasingly popular for high-density deployments.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Type</th><th>Cost Impact</th></tr>
+                                                    <tr><td>Slab (overhead services)</td><td>-5% on building</td></tr>
+                                                    <tr><td>Raised Floor 600mm</td><td>Baseline</td></tr>
+                                                    <tr><td>Raised Floor 900mm</td><td>+6% on building</td></tr>
+                                                    <tr><td>Raised Floor 1200mm</td><td>+12% (high airflow)</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="floorType">
+                                        <option value="slab">Slab / Overhead (-5%)</option>
+                                        <option value="raised_600" selected>Raised Floor 600mm (standard)</option>
+                                        <option value="raised_900">Raised Floor 900mm (+6%)</option>
+                                        <option value="raised_1200">Raised Floor 1200mm (+12%)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-hard-hat"></i> Site Condition
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-hard-hat"></i> Site Preparation</div>
+                                                <div class="tooltip-desc">Greenfield = raw land needing full civil work. Brownfield = existing industrial site needing some demo. Retrofit = converting existing building.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Condition</th><th>Site Cost</th></tr>
+                                                    <tr><td>Greenfield (raw land)</td><td>+5-8% for grading/utilities</td></tr>
+                                                    <tr><td>Brownfield</td><td>Baseline</td></tr>
+                                                    <tr><td>Retrofit / Conversion</td><td>+10-20% for demo/adaptation</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="siteCondition">
+                                        <option value="greenfield">Greenfield (+6%)</option>
+                                        <option value="brownfield" selected>Brownfield (standard)</option>
+                                        <option value="retrofit">Retrofit / Conversion (+15%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-row" style="margin-top:1rem;">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-shield-alt"></i> Security Level
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-shield-alt"></i> Physical Security</div>
+                                                <div class="tooltip-desc">Security infrastructure including fencing, CCTV, access control, bollards, mantrap, vehicle barriers, and SOC. Enterprise+ adds biometrics, 24/7 SOC, and anti-vehicle barriers.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Level</th><th>$/kW Impact</th></tr>
+                                                    <tr><td>Standard</td><td>Baseline (CCTV+access)</td></tr>
+                                                    <tr><td>Enterprise</td><td>+2% (biometric+mantrap)</td></tr>
+                                                    <tr><td>High Security</td><td>+5% (SOC+barriers+K12)</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="securityLevel">
+                                        <option value="standard" selected>Standard (CCTV + Access Control)</option>
+                                        <option value="enterprise">Enterprise (+2% biometric/mantrap)</option>
+                                        <option value="high">High Security (+5% SOC/barriers)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-satellite-dish"></i> Fiber Entry
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-satellite-dish"></i> Fiber / Connectivity</div>
+                                                <div class="tooltip-desc">Number of diverse fiber entry paths. Dual-diverse is standard for Tier III+. Multi-carrier meet-me room adds connectivity value but costs more.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Entry</th><th>Cost</th></tr>
+                                                    <tr><td>Single Path</td><td>~$150K</td></tr>
+                                                    <tr><td>Dual Diverse</td><td>~$350K</td></tr>
+                                                    <tr><td>Multi-Path + MMR</td><td>~$600K</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="fiberEntry">
+                                        <option value="single">Single Path ($150K)</option>
+                                        <option value="dual" selected>Dual Diverse ($350K)</option>
+                                        <option value="multi">Multi-Path + Meet-Me Room ($600K)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- G. Sustainability & Certification -->
+                        <div style="border-top:1px solid rgba(34,197,94,0.2);padding-top:1.5rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-leaf"></i> Sustainability & Certification
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-certificate"></i> Green Certification
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-certificate"></i> LEED / BREEAM</div>
+                                                <div class="tooltip-desc">Green building certification adds 2-8% to construction costs for materials, energy modeling, commissioning, and documentation, but reduces long-term OPEX.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Level</th><th>Cost Premium</th></tr>
+                                                    <tr><td>None</td><td>0%</td></tr>
+                                                    <tr><td>LEED Silver</td><td>+2%</td></tr>
+                                                    <tr><td>LEED Gold</td><td>+4%</td></tr>
+                                                    <tr><td>LEED Platinum</td><td>+8%</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="greenCert">
+                                        <option value="none" selected>None</option>
+                                        <option value="silver">LEED Silver (+2%)</option>
+                                        <option value="gold">LEED Gold / BREEAM Very Good (+4%)</option>
+                                        <option value="platinum">LEED Platinum / BREEAM Outstanding (+8%)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-solar-panel"></i> On-Site Renewable
+                                        <span class="tooltip-trigger">?
+                                            <div class="tooltip-content">
+                                                <div class="tooltip-title"><i class="fas fa-solar-panel"></i> On-Site Generation</div>
+                                                <div class="tooltip-desc">On-site solar PV or battery energy storage (BESS). Reduces grid dependency but adds CAPEX. BESS can also serve as UPS reserve.</div>
+                                                <table class="tooltip-table">
+                                                    <tr><th>Option</th><th>Cost Addition</th></tr>
+                                                    <tr><td>None</td><td>$0</td></tr>
+                                                    <tr><td>Rooftop Solar</td><td>~$1.2M/MW</td></tr>
+                                                    <tr><td>Solar + BESS</td><td>~$2.5M/MW</td></tr>
+                                                </table>
+                                            </div>
+                                        </span>
+                                    </label>
+                                    <select class="input-field" id="renewableOption">
+                                        <option value="none" selected>None</option>
+                                        <option value="solar">Rooftop Solar (~$1.2M/MW)</option>
+                                        <option value="solar_bess">Solar + Battery Storage (~$2.5M/MW)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <!-- ═══ END ADVANCED MODE ═══ -->
                 </div>
@@ -1481,17 +1966,38 @@
                         </div>
                     </div>
 
+                    <!-- Action Toolbar — right under total for visibility -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.75rem;">
+                        <button onclick="gatedAction('save')" id="btnSaveA" class="action-btn-save" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(251,191,36,0.5);background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(245,158,11,0.1));color:#fbbf24;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(245,158,11,0.15);">
+                            <i class="fas fa-bookmark"></i> <span id="btnSaveLabel">Save A</span>
+                        </button>
+                        <button onclick="gatedAction('pdf')" id="btnExportPDF" class="action-btn-pdf" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));color:#f87171;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(239,68,68,0.12);">
+                            <i class="fas fa-file-pdf"></i> <span id="btnPdfLabel">Export PDF</span>
+                        </button>
+                        <div style="display:none;" id="btnClearRow">
+                            <button onclick="clearComparison()" id="btnClearCompare" style="width:100%;padding:10px 8px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04));color:#f87171;cursor:pointer;font-weight:600;font-size:0.75rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:5px;">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Saved indicator -->
+                    <div id="savedIndicator" style="display:none;margin-top:0.5rem;padding:6px 10px;border-radius:8px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;color:#34d399;text-align:center;">
+                        <i class="fas fa-check-circle" style="margin-right:4px;"></i> Scenario A saved — change inputs for Scenario B
+                    </div>
+
                     <div class="cost-breakdown" id="costBreakdown">
                         <!-- Cost items populated by JS -->
                     </div>
 
-                    <div class="per-kw-display">
+                    <div class="per-kw-display" id="perKwSection" onclick="if(!isPremiumUser)handlePremiumTab()">
                         <span class="per-kw-label">Cost per kW IT Load <span class="tooltip-trigger" style="font-size: 0.7rem;">?
                             <div class="tooltip-content">
                                 <div class="tooltip-title"><i class="fas fa-calculator"></i> Cost per kW</div>
                                 <div class="tooltip-desc">Industry benchmark metric: Total CAPEX divided by IT Load capacity. Typical ranges: $8,000-15,000/kW for Tier III, $15,000-25,000/kW for Tier IV.</div>
                             </div>
-                        </span></span>
+                        </span>
+                        <span id="perKwGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span>
+                        </span>
                         <span class="per-kw-value" id="perKwCost">$12,500/kW</span>
                     </div>
 
@@ -1526,32 +2032,20 @@
                             </span></div>
                             <div class="metric-value uptime" id="uptimeValue">99.982%</div>
                         </div>
-                        <div class="metric-box">
+                        <div class="metric-box" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()">
                             <div class="metric-label">Annual Energy <span class="tooltip-trigger" style="font-size: 0.6rem;">?
                                 <div class="tooltip-content">
                                     <div class="tooltip-title"><i class="fas fa-plug"></i> Annual Energy Cost</div>
                                     <div class="tooltip-desc">Estimated yearly electricity cost based on IT Load × PUE × 8,760 hours × electricity rate. This is an OPEX cost, not included in CAPEX.</div>
                                 </div>
-                            </span></div>
+                            </span> <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span></div>
                             <div class="metric-value energy" id="energyCost">$1.2M</div>
                         </div>
                     </div>
 
-                    <!-- Action Toolbar -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:1.25rem;">
-                        <button onclick="saveScenarioA()" id="btnSaveA" style="padding:11px 8px;border-radius:10px;border:1px solid rgba(251,191,36,0.5);background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(245,158,11,0.1));color:#fbbf24;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;">
-                            <i class="fas fa-bookmark"></i> Save Scenario A
-                        </button>
-                        <button onclick="exportPDF()" style="padding:11px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.75);cursor:pointer;font-weight:500;font-size:0.82rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;">
-                            <i class="fas fa-file-pdf"></i> Export PDF
-                        </button>
-                        <button onclick="clearComparison()" id="btnClearCompare" style="display:none;padding:11px 8px;border-radius:10px;border:1px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.05));color:#f87171;cursor:pointer;font-weight:500;font-size:0.82rem;font-family:inherit;transition:all 0.3s;align-items:center;justify-content:center;gap:6px;">
-                            <i class="fas fa-times"></i> Clear Compare
-                        </button>
-                    </div>
-                    <!-- Saved indicator -->
-                    <div id="savedIndicator" style="display:none;margin-top:0.5rem;padding:8px 12px;border-radius:8px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);font-size:0.75rem;color:#34d399;text-align:center;">
-                        <i class="fas fa-check-circle" style="margin-right:4px;"></i> Scenario A saved — change inputs above to create Scenario B
+                    <!-- Free Tier Watermark -->
+                    <div id="freeWatermark" class="free-watermark" onclick="handlePremiumTab()">
+                        <i class="fas fa-crown" style="margin-right:4px;"></i> Free Estimate &mdash; resistancezero.com &mdash; <strong style="cursor:pointer;text-decoration:underline;">Upgrade to PRO — Rp 199K/bulan</strong>
                     </div>
 
                     <!-- ═══ COMPARE MODE: Side-by-side cards ═══ -->
@@ -1569,6 +2063,65 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ═══ PREMIUM OUTPUT SECTION ═══ -->
+                    <div id="premiumOutput" style="display:none;margin-top:1.5rem;flex-direction:column;gap:1rem;">
+
+                        <!-- Premium KPI Cards -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;" id="premiumKpiGrid">
+                            <div style="background:linear-gradient(135deg,#5b21b6,#7c3aed);border-radius:12px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(139,92,246,0.25);">
+                                <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Est. Racks</div>
+                                <div style="font-size:1.5rem;font-weight:800;color:#ffffff;margin-top:4px;" id="premRackCount">167</div>
+                            </div>
+                            <div style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:12px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(59,130,246,0.25);">
+                                <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Floor Space</div>
+                                <div style="font-size:1.5rem;font-weight:800;color:#ffffff;margin-top:4px;" id="premFloorSpace">418 m²</div>
+                            </div>
+                            <div style="background:linear-gradient(135deg,#047857,#10b981);border-radius:12px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(16,185,129,0.25);">
+                                <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Build Time</div>
+                                <div style="font-size:1.5rem;font-weight:800;color:#ffffff;margin-top:4px;" id="premTimeline">29 mo</div>
+                            </div>
+                        </div>
+
+                        <!-- $/kW Benchmark Bar -->
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:1rem 1.25rem;">
+                            <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:1rem;display:flex;align-items:center;gap:6px;">
+                                <i class="fas fa-chart-bar"></i> $/kW Industry Benchmark
+                            </div>
+                            <div id="benchmarkBar" style="position:relative;height:28px;background:linear-gradient(90deg,#10b981 0%,#f59e0b 50%,#ef4444 100%);border-radius:8px;overflow:visible;margin-bottom:1.75rem;">
+                                <div id="benchmarkMarker" style="position:absolute;top:-4px;width:3px;height:36px;background:white;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.5);transition:left 0.5s ease;"></div>
+                                <div id="benchmarkLabel" style="position:absolute;bottom:-24px;transform:translateX(-50%);font-size:0.72rem;font-weight:800;color:#fbbf24;white-space:nowrap;transition:left 0.5s ease;background:rgba(251,191,36,0.12);padding:2px 8px;border-radius:6px;border:1px solid rgba(251,191,36,0.3);"></div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#64748b;">
+                                <span>$5K/kW (Low)</span>
+                                <span>$15K/kW (Avg)</span>
+                                <span>$30K/kW (Premium)</span>
+                            </div>
+                        </div>
+
+
+                        <!-- Construction Timeline -->
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:1rem 1.25rem;">
+                            <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;">
+                                <i class="fas fa-project-diagram"></i> Estimated Construction Timeline
+                            </div>
+                            <div id="timelineChart" style="display:flex;flex-direction:column;gap:4px;"></div>
+                        </div>
+
+                        <!-- Sustainability Metrics -->
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:1rem 1.25rem;">
+                            <div style="font-size:0.72rem;font-weight:700;color:#6ee7b7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;">
+                                <i class="fas fa-leaf"></i> Sustainability & Efficiency Metrics
+                            </div>
+                            <div id="sustainMetrics" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"></div>
+                        </div>
+
+                        <!-- Pro watermark -->
+                        <div style="text-align:center;padding:6px;font-size:0.6rem;color:rgba(139,92,246,0.5);letter-spacing:0.3px;">
+                            <i class="fas fa-crown" style="margin-right:3px;"></i> PRO Report — resistancezero.com — Generated <span id="premReportDate"></span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -1619,7 +2172,9 @@
             bms: { base: 120, label: 'BMS / DCIM', icon: 'fa-desktop', color: '#10b981' },
             network: { base: 250, label: 'Network Infra', icon: 'fa-network-wired', color: '#a855f7' },
             security: { base: 80, label: 'Security Systems', icon: 'fa-shield-alt', color: '#6366f1' },
-            commissioning: { base: 200, label: 'Commissioning', icon: 'fa-clipboard-check', color: '#14b8a6' }
+            commissioning: { base: 120, label: 'Cx Agent & Startup', icon: 'fa-clipboard-check', color: '#14b8a6' },
+            testing: { base: 90, label: 'Testing & Compliance', icon: 'fa-certificate', color: '#0ea5e9' },
+            permits: { base: 60, label: 'Permits & Approvals', icon: 'fa-file-contract', color: '#84cc16' }
         };
 
         const redundancyMultipliers = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
@@ -1681,13 +2236,228 @@
         const deliveryMethodMult = { dbb: 1.0, db: 0.97, modular: 0.92, epc: 1.05 };
         const contractorAvailMult = { high: 1.0, normal: 1.03, tight: 1.08 };
 
+        // Electrical distribution multipliers (applied to electrical cost category)
+        const powerDistMult = { overhead: 0.92, busway: 1.0, underground: 1.15, mixed: 1.08 };
+        const transformerTypeMult = { oil: 0.90, dry: 1.0, cast_resin: 1.12 };
+        // PDU cost per rack (added as flat cost to electrical)
+        const pduCostPerRack = { basic: 800, intelligent: 1500, switched: 2500 };
+        // Structured cabling cost per rack (added as flat cost to network)
+        const cablingCostPerRack = { copper: 600, hybrid: 1200, fiber: 2000 };
+        // Floor construction multipliers (applied to building cost)
+        const floorTypeMult = { slab: 0.95, raised_600: 1.0, raised_900: 1.06, raised_1200: 1.12 };
+        // Site condition multipliers (applied to building cost)
+        const siteConditionMult = { greenfield: 1.06, brownfield: 1.0, retrofit: 1.15 };
+        // Security multipliers (applied to security cost)
+        const securityLevelMult = { standard: 1.0, enterprise: 1.5, high: 2.2 };
+        // Fiber entry fixed costs
+        const fiberEntryCost = { single: 150000, dual: 350000, multi: 600000 };
+        // Green cert multipliers (applied to total)
+        const greenCertMult = { none: 1.0, silver: 1.02, gold: 1.04, platinum: 1.08 };
+        // On-site renewable fixed costs (per MW of IT load)
+        const renewableCostPerMW = { none: 0, solar: 1200000, solar_bess: 2500000 };
+
+        // Permit & compliance cost multipliers by region
+        // Higher = stricter regulations, more permits, longer processes
+        const permitRegionMult = {
+            sea: { permits: 1.3, testing: 0.8, label: 'PUPR/BKPM permits, AMDAL, SLF, PLN approval' },
+            india: { permits: 1.4, testing: 0.7, label: 'MoEF clearance, CEA, state DISCOM, fire NOC' },
+            china: { permits: 1.5, testing: 0.9, label: 'NDRC approval, environmental impact, fire bureau' },
+            japan: { permits: 1.8, testing: 1.5, label: 'Building Standards Act, fire prevention, seismic cert' },
+            australia: { permits: 1.6, testing: 1.3, label: 'DA/CC approval, NCC compliance, fire safety' },
+            europe: { permits: 1.7, testing: 1.4, label: 'EIA, energy efficiency directive, CE marking' },
+            usa: { permits: 1.0, testing: 1.0, label: 'AHJ permits, NFPA 75/76, UL/ETL listing' }
+        };
+        // Testing standards by redundancy (more redundancy = more IST/ISST testing)
+        const testingRedundancyMult = { n: 0.7, n1: 1.0, '2n': 1.5, '2n1': 1.8 };
+
+        // ═══ PREMIUM: EQUIPMENT BRAND DATABASE ═══
+        const equipmentBrands = {
+            ups: {
+                standalone: [
+                    { brand: 'Eaton', model: '93PM', range: '30-500 kVA', efficiency: '97.4%', note: 'Hot-swappable modules' },
+                    { brand: 'Vertiv', model: 'Liebert EXL S1', range: '100-1200 kVA', efficiency: '97%', note: 'Scalable architecture' },
+                    { brand: 'Schneider', model: 'Galaxy VX', range: '500-1500 kVA', efficiency: '97%', note: 'Lithium-ion compatible' }
+                ],
+                modular: [
+                    { brand: 'Vertiv', model: 'Trinergy Cube', range: '200-3600 kVA', efficiency: '98.5%', note: '3-mode operation' },
+                    { brand: 'ABB', model: 'MegaFlex DPA', range: '200-4800 kVA', efficiency: '97.6%', note: 'Decentralized parallel' },
+                    { brand: 'Huawei', model: 'UPS5000-H', range: '50-800 kVA/module', efficiency: '97.5%', note: 'AI-powered management' }
+                ],
+                distributed: [
+                    { brand: 'Schneider', model: 'Symmetra PX', range: '16-500 kVA', efficiency: '97%', note: 'Rack-mount modular' },
+                    { brand: 'Vertiv', model: 'Liebert APM', range: '30-600 kVA', efficiency: '96%', note: 'Mixed-capacity modules' },
+                    { brand: 'Eaton', model: '9PXM', range: '4-20 kVA', efficiency: '97%', note: 'Hot-swap batteries' }
+                ],
+                rotary: [
+                    { brand: 'Hitec', model: 'PowerProtection UNIBLOCK', range: '300-3000 kVA', efficiency: '97%', note: 'Diesel rotary, no batteries' },
+                    { brand: 'Piller', model: 'UNIBLOCK', range: '400-3300 kVA', efficiency: '96%', note: 'Kinetic energy storage' },
+                    { brand: 'Rolls-Royce', model: 'DRUPS', range: '500-3000 kW', efficiency: '95%', note: 'Integrated diesel flywheel' }
+                ]
+            },
+            cooling: {
+                air: [
+                    { brand: 'Vertiv', model: 'Liebert PFH', range: '24-252 kW', note: 'Perimeter CRAH with EC fans' },
+                    { brand: 'Schneider', model: 'InRow RD', range: '21-50 kW', note: 'Close-coupled, variable speed' },
+                    { brand: 'Stulz', model: 'CyberAir 3PRO', range: '6-200 kW', note: 'Free cooling capable' }
+                ],
+                inrow: [
+                    { brand: 'Vertiv', model: 'Liebert XDC', range: '35-80 kW', note: 'Rear-intake, variable capacity' },
+                    { brand: 'Schneider', model: 'InRow RD', range: '21-50 kW/row', note: 'Hot/cold aisle containment' },
+                    { brand: 'Stulz', model: 'CoolRow', range: '10-50 kW', note: 'Direct expansion or chilled water' }
+                ],
+                rdhx: [
+                    { brand: 'CoolIT', model: 'Rack DCHX', range: '30-80 kW/rack', note: 'Passive rear-door, no fans' },
+                    { brand: 'Vertiv', model: 'Liebert RDHx', range: '10-40 kW/rack', note: 'Zero rack footprint' },
+                    { brand: 'Motivair', model: 'ChilledDoor', range: '50-100 kW/rack', note: 'Active cooling, high density' }
+                ],
+                liquid: [
+                    { brand: 'CoolIT', model: 'DLC Manifold', range: '100+ kW/rack', note: 'CPU/GPU direct-to-chip' },
+                    { brand: 'GRC', model: 'ICEtank', range: 'Full immersion', note: 'Single-phase immersion' },
+                    { brand: 'LiquidCool', model: 'LCS2', range: '200+ kW/rack', note: 'Two-phase immersion cooling' }
+                ]
+            },
+            generator: {
+                diesel: [
+                    { brand: 'Caterpillar', model: 'C175-16', range: '2-3.5 MW', note: 'Tier 4F / EPA compliant' },
+                    { brand: 'Cummins', model: 'QSK95', range: '2.2-3.5 MW', note: 'Modular power nodes' },
+                    { brand: 'MTU', model: 'Series 4000', range: '0.5-3.25 MW', note: 'Compact footprint, low emissions' }
+                ],
+                gas: [
+                    { brand: 'Caterpillar', model: 'CG260-16', range: '2-4.5 MW', note: 'Natural gas, CHP capable' },
+                    { brand: 'Jenbacher', model: 'Type 6', range: '2-4.4 MW', note: 'High efficiency gas engine' },
+                    { brand: 'Wärtsilä', model: '34SG', range: '4-18 MW', note: 'Multi-fuel smart power' }
+                ],
+                dualfuel: [
+                    { brand: 'Wärtsilä', model: '34DF', range: '4-18 MW', note: 'Gas primary, diesel backup' },
+                    { brand: 'MAN', model: '51/60DF', range: '8-18 MW', note: 'Dual-fuel marine-grade' },
+                    { brand: 'Caterpillar', model: 'CG260DF', range: '2-4 MW', note: 'Seamless fuel switching' }
+                ],
+                hvo: [
+                    { brand: 'Cummins', model: 'QSK78 HVO', range: '2-3 MW', note: 'Drop-in HVO/renewable diesel' },
+                    { brand: 'Caterpillar', model: 'C175 HVO', range: '2-3.5 MW', note: '90% CO₂ reduction' },
+                    { brand: 'MTU', model: '4000 HVO', range: '1-3 MW', note: 'Certified for 100% HVO' }
+                ]
+            },
+            fire: {
+                fm200: { agent: 'HFC-227ea', density: '0.57 kg/m³', discharge: '10 sec', note: 'Being phased out (high GWP 3220)' },
+                novec: { agent: 'FK-5-1-12', density: '0.51 kg/m³', discharge: '10 sec', note: 'GWP=1, zero ODP, safest choice' },
+                inergen: { agent: 'IG-541 (N₂/Ar/CO₂)', density: '43.7%', discharge: '60 sec', note: 'Infinite atmospheric life, no residue' },
+                n2: { agent: 'N₂', density: '12-15% O₂', discharge: 'Continuous', note: 'Prevents ignition, sealed rooms only' },
+                water: { agent: 'High-pressure mist', density: '50-120 bar', discharge: 'Zoned', note: 'Green, no chemicals, NFPA 750' }
+            }
+        };
+
+        // Premium: Floor space & timeline estimators
+        const rackKw = { standard: 6, medium: 12.5, high: 25, ai: 75 };
+        const rackFootprint = 2.5; // m² per rack (including aisle)
+
+        // Base timeline by redundancy (months)
+        const timelineBase = {
+            n: { design: 4, permit: 3, civil: 8, mep: 6, commission: 2 },
+            n1: { design: 5, permit: 3, civil: 10, mep: 8, commission: 3 },
+            '2n': { design: 6, permit: 4, civil: 12, mep: 10, commission: 4 },
+            '2n1': { design: 7, permit: 4, civil: 14, mep: 12, commission: 5 }
+        };
+
+        // Timeline adjustment multipliers
+        const buildingTimeMult = { warehouse: 0.7, modular: 0.6, purpose: 1.0, highrise: 1.4 };
+        const coolingTimeMult = { air: 1.0, inrow: 1.05, rdhx: 1.15, liquid: 1.3 }; // DLC needs more MEP time
+        const permitTimeMult = { sea: 1.2, india: 1.4, china: 1.3, japan: 1.5, australia: 1.3, europe: 1.4, usa: 1.0 };
+        // IT load scale: >10MW = +20%, >50MW = +40%
+        function loadScaleMult(itLoad) {
+            if (itLoad <= 1000) return 0.55;   // micro/edge DC
+            if (itLoad <= 2000) return 0.65;   // small DC
+            if (itLoad <= 5000) return 0.8;    // medium-small
+            if (itLoad <= 10000) return 1.0;   // medium (reference)
+            if (itLoad <= 25000) return 1.15;  // large
+            if (itLoad <= 50000) return 1.3;   // campus
+            return 1.5;                        // hyperscale
+        }
+
+        // ═══ ESG / SUSTAINABILITY DATA ═══
+        // Grid emission factors (tCO₂/MWh) — IEA 2024 estimates
+        const gridEmissionFactor = {
+            sea: 0.72, india: 0.71, china: 0.56, japan: 0.47,
+            australia: 0.65, europe: 0.23, usa: 0.39
+        };
+        // WUE by cooling type (L/kWh IT load)
+        const wueByCooling = {
+            air: 0.0, inrow: 1.8, rdhx: 0.3, liquid: 0.1
+        };
+        // Refrigerant data by cooling type
+        const refrigerantData = {
+            air:    { type: 'R-410A', gwp: 2088, rec: 'R-32', recGwp: 675, note: 'EU F-Gas phase-down by 2030; US AIM Act restricts GWP >700 for new equipment from 2025' },
+            inrow:  { type: 'R-410A', gwp: 2088, rec: 'R-454B', recGwp: 466, note: 'Kigali Amendment mandates 80% HFC phase-down by 2036 (A2 countries)' },
+            rdhx:   { type: 'R-134a', gwp: 1430, rec: 'R-1234ze(E)', recGwp: 7, note: 'Ultra-low GWP HFO; EU F-Gas bans GWP >150 for new chillers from 2025' },
+            liquid: { type: 'None (closed-loop)', gwp: 0, rec: 'N/A', recGwp: 0, note: 'No refrigerant — lowest environmental impact cooling method' }
+        };
+
+        // Compute timeline from all inputs
+        function computeTimeline(redundancy, buildingType, coolingType, effectiveRegion, itLoad) {
+            const base = timelineBase[redundancy] || timelineBase['n1'];
+            const bMult = buildingTimeMult[buildingType] || 1.0;
+            const cMult = coolingTimeMult[coolingType] || 1.0;
+            const pMult = permitTimeMult[effectiveRegion] || 1.0;
+            const lMult = loadScaleMult(itLoad);
+
+            // Phase durations (months)
+            const design = Math.max(2, Math.ceil(base.design * lMult));
+            const permit = Math.max(2, Math.ceil(base.permit * pMult));
+            const procurement = Math.max(2, Math.ceil(base.mep * 0.4 * cMult * lMult));
+            const civil = Math.max(2, Math.ceil(base.civil * bMult * lMult));
+            const mep = Math.max(2, Math.ceil(base.mep * cMult * lMult));
+            const commission = Math.max(1, Math.ceil(base.commission * cMult * Math.max(0.7, lMult)));
+
+            // PARALLEL MODEL — realistic phase overlaps
+            // Permit starts 1 month into design (parallel)
+            const permitStart = 1;
+            const designEnd = design;
+            const permitEnd = permitStart + permit;
+            const designPermitEnd = Math.max(designEnd, permitEnd);
+
+            // Procurement starts late in design phase
+            const procStart = Math.max(1, design - Math.ceil(procurement * 0.3));
+            const procEnd = procStart + procurement;
+
+            // Civil starts after design+permit complete
+            const civilStart = designPermitEnd;
+            const civilEnd = civilStart + civil;
+
+            // MEP starts after procurement done AND 50% of civil done (whichever is later)
+            const mepStart = Math.max(procEnd, civilStart + Math.ceil(civil * 0.5));
+            const mepEnd = mepStart + mep;
+
+            // Commissioning after MEP and civil both complete
+            const commStart = Math.max(mepEnd, civilEnd);
+            const totalMonths = commStart + commission;
+
+            return {
+                design, permit, procurement, civil, mep, commission,
+                totalMonths,
+                phases: [
+                    { name: 'Design & Engineering', start: 0, end: designEnd, color: '#8b5cf6' },
+                    { name: 'Permitting & Approvals', start: permitStart, end: permitEnd, color: '#f59e0b' },
+                    { name: 'Procurement (Long-Lead)', start: procStart, end: procEnd, color: '#ec4899' },
+                    { name: 'Civil & Structural', start: civilStart, end: civilEnd, color: '#3b82f6' },
+                    { name: 'MEP Installation', start: mepStart, end: mepEnd, color: '#10b981' },
+                    { name: 'Testing & Commissioning', start: commStart, end: commStart + commission, color: '#06b6d4' }
+                ]
+            };
+        }
+
         // Current mode
         let capexMode = 'simple';
         let savedScenario = null;
 
         function switchCapexMode(mode) {
+            // Gate: only free users cannot access Advanced mode (demo + pro can)
+            if (mode === 'advanced' && !isPremiumUser) {
+                handlePremiumTab();
+                return;
+            }
             capexMode = mode;
             document.querySelectorAll('.capex-mode-btn').forEach(btn => {
+                if (btn.id === 'premiumTabBtn') return; // Skip — Premium has its own styling
                 const isActive = btn.dataset.mode === mode;
                 btn.style.background = isActive ? 'rgba(245,158,11,0.15)' : 'transparent';
                 btn.style.borderColor = isActive ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.15)';
@@ -1727,7 +2497,8 @@
         });
 
         // Advanced mode event listeners
-        ['projYear','cityMarket','substationType','transformerLead','marketCondition','deliveryMethod','contractorAvail'].forEach(id => {
+        ['projYear','cityMarket','substationType','transformerLead','marketCondition','deliveryMethod','contractorAvail',
+         'powerDistribution','transformerType','pduType','cablingType','floorType','siteCondition','securityLevel','fiberEntry','greenCert','renewableOption'].forEach(id => {
             document.getElementById(id).addEventListener('change', calculateCosts);
         });
 
@@ -1785,6 +2556,7 @@
             const upsMult = upsMultipliers[upsType];
             const genMult = genMultipliers[genType];
             let locMult = locationMultipliers[location];
+            let effectiveRegion = location; // for permit/compliance lookup
             const fuelMult = 1 + (fuelHours - 24) * 0.008;
 
             // Advanced mode adjustments
@@ -1793,6 +2565,9 @@
             let marketMult = 1.0, deliveryMult = 1.0, contractorMult = 1.0;
             let designPct = 0, pmPct = 0, contingencyPct = 5;
             let fomTotal = 0, fomIncluded = false;
+            let powerDistM = 1.0, transformerM = 1.0, pduPerRack = 0, cablingPerRack = 0;
+            let floorM = 1.0, siteM = 1.0, securityM = 1.0, fiberCost = 0;
+            let greenM = 1.0, renewableCost = 0;
 
             if (isAdv) {
                 // Year escalation
@@ -1804,6 +2579,7 @@
                 if (cityVal !== 'none' && cityData[cityVal]) {
                     const city = cityData[cityVal];
                     cityLabel = city.label;
+                    effectiveRegion = city.region;
                     // City $/W -> derive location multiplier relative to US baseline ~$13/W
                     locMult = city.perW / 13.0;
                 }
@@ -1830,6 +2606,22 @@
                     fomTotal = (subCost + gridConnection + switchgear) * (1 + utilRate);
                     fomTotal *= yearMult;
                 }
+
+                // Electrical distribution
+                powerDistM = powerDistMult[document.getElementById('powerDistribution').value] || 1.0;
+                transformerM = transformerTypeMult[document.getElementById('transformerType').value] || 1.0;
+                pduPerRack = pduCostPerRack[document.getElementById('pduType').value] || 1500;
+                cablingPerRack = cablingCostPerRack[document.getElementById('cablingType').value] || 1200;
+
+                // Site & civil
+                floorM = floorTypeMult[document.getElementById('floorType').value] || 1.0;
+                siteM = siteConditionMult[document.getElementById('siteCondition').value] || 1.0;
+                securityM = securityLevelMult[document.getElementById('securityLevel').value] || 1.0;
+                fiberCost = fiberEntryCost[document.getElementById('fiberEntry').value] || 350000;
+
+                // Sustainability
+                greenM = greenCertMult[document.getElementById('greenCert').value] || 1.0;
+                renewableCost = renewableCostPerMW[document.getElementById('renewableOption').value] * (itLoad / 1000) || 0;
             }
 
             const costs = {};
@@ -1840,11 +2632,11 @@
                 let multiplier = locMult;
 
                 if (key === 'building') {
-                    multiplier *= buildMult * rackMult;
+                    multiplier *= buildMult * rackMult * floorM * siteM;
                 } else if (key === 'seismic') {
                     multiplier *= seismicMult * buildMult;
                 } else if (key === 'electrical') {
-                    multiplier *= redMult * rackMult;
+                    multiplier *= redMult * rackMult * powerDistM * transformerM;
                 } else if (key === 'ups') {
                     multiplier *= redMult * rackMult * upsMult;
                 } else if (key === 'generator') {
@@ -1855,10 +2647,39 @@
                     multiplier *= fireSupMult;
                 } else if (key === 'fireAlarm') {
                     multiplier *= alarmMult;
+                } else if (key === 'security') {
+                    multiplier *= securityM;
+                } else if (key === 'commissioning') {
+                    multiplier *= redMult; // more redundancy = more Cx scope
+                } else if (key === 'testing') {
+                    const regionTest = permitRegionMult[effectiveRegion] || permitRegionMult.usa;
+                    const redTest = testingRedundancyMult[redundancy] || 1.0;
+                    multiplier *= regionTest.testing * redTest;
+                } else if (key === 'permits') {
+                    const regionPermit = permitRegionMult[effectiveRegion] || permitRegionMult.usa;
+                    multiplier *= regionPermit.permits;
                 }
 
                 costs[key] = factor.base * itLoad * multiplier * advGlobalMult;
                 total += costs[key];
+            }
+
+            // Add per-rack fixed costs (PDU + structured cabling) in advanced mode
+            const racks = Math.ceil(itLoad / rackKw[rackType]);
+            if (isAdv) {
+                const pduTotal = racks * pduPerRack * advGlobalMult * locMult;
+                costs['electrical'] += pduTotal;
+                total += pduTotal;
+
+                const cablingTotal = racks * cablingPerRack * advGlobalMult * locMult;
+                costs['network'] += cablingTotal;
+                total += cablingTotal;
+
+                // Add fiber entry cost
+                if (fiberCost > 0) {
+                    costs['network'] += fiberCost * advGlobalMult;
+                    total += fiberCost * advGlobalMult;
+                }
             }
 
             // Soft costs (advanced)
@@ -1874,12 +2695,23 @@
             const softTotal = Object.values(softCosts).reduce((a, b) => a + b, 0);
             total += softTotal;
 
+            // Green certification premium (applied to subtotal)
+            if (isAdv && greenM > 1.0) {
+                const greenPremium = total * (greenM - 1.0);
+                total += greenPremium;
+            }
+
             // Contingency
             const contingency = total * (contingencyPct / 100);
             total += contingency;
 
             // Add FOM
             if (fomIncluded) total += fomTotal;
+
+            // Add on-site renewable costs
+            if (isAdv && renewableCost > 0) {
+                total += renewableCost * advGlobalMult;
+            }
 
             // ═══ UPDATE UI ═══
             document.getElementById('totalCost').textContent = formatCurrency(total);
@@ -1954,6 +2786,15 @@
                     <span class="cost-percent">${contingencyPct}.0%</span>
                 </div>`;
 
+            // Green cert and renewable rows
+            if (isAdv && greenM > 1.0) {
+                const greenPremium = (total - contingency) * (greenM - 1.0); // approx
+                breakdownEl.innerHTML += renderExtraRow('fa-certificate', 'Green Certification (' + document.getElementById('greenCert').selectedOptions[0].text.split('(')[0].trim() + ')', greenPremium, '#22c55e', maxCost, total);
+            }
+            if (isAdv && renewableCost > 0) {
+                breakdownEl.innerHTML += renderExtraRow('fa-solar-panel', 'On-Site Renewable', renewableCost * advGlobalMult, '#f97316', maxCost, total);
+            }
+
             // Advanced info badge
             const advBadge = document.getElementById('advInfoBadge');
             if (advBadge) {
@@ -1977,6 +2818,12 @@
             const upsLabels = { standalone: 'Standalone', modular: 'Modular', distributed: 'Distributed', rotary: 'Rotary' };
             const genLabels = { diesel: 'Diesel', gas: 'Natural Gas', dualfuel: 'Dual Fuel', hvo: 'HVO Biodiesel' };
             const fireLabels = { fm200: 'FM-200 / HFC', novec: 'Novec 1230', inergen: 'Inergen / IG-541', n2: 'Nitrogen (N₂)', water: 'Water Mist' };
+            const deliveryLabels = { dbb: 'Design-Bid-Build', db: 'Design-Build', modular: 'Modular-Prefab', epc: 'EPC Turnkey' };
+            const marketLabels = { buyer: "Buyer's Market (-5%)", balanced: 'Balanced', seller: "Seller's Market (+10%)" };
+            const contractorLabels = { high: 'High Availability', normal: 'Normal (+3%)', tight: 'Tight Market (+8%)' };
+            const substationLabels = { shared: 'Shared Utility', dedicated_33kv: 'Dedicated 33kV', dedicated_132kv: 'Dedicated 132kV+' };
+            const transformerLeadLabels = { standard: 'Standard (18-24 mo)', extended: 'Extended (+15%)', emergency: 'Emergency (+30%)' };
+
             const _config = {
                 itLoad: itLoad.toLocaleString() + ' kW',
                 location: locationLabels[location] || location,
@@ -1993,12 +2840,40 @@
                 yearLabel: yearLabel,
                 cityLabel: cityLabel || '—',
                 fuelHours: fuelHours + 'h',
+                deliveryMethod: isAdv ? deliveryLabels[document.getElementById('deliveryMethod').value] : 'Design-Bid-Build (default)',
+                marketCondition: isAdv ? marketLabels[document.getElementById('marketCondition').value] : 'Balanced (default)',
+                contractorAvail: isAdv ? contractorLabels[document.getElementById('contractorAvail').value] : 'Normal (default)',
+                designFee: designPct + '%',
+                pmFee: pmPct + '%',
+                contingency: contingencyPct + '%',
+                fomIncluded: fomIncluded ? 'Yes' : 'No',
+                substationType: fomIncluded ? substationLabels[document.getElementById('substationType').value] : '—',
+                transformerLead: fomIncluded ? transformerLeadLabels[document.getElementById('transformerLead').value] : '—',
+                utilityRate: fomIncluded ? document.getElementById('utilityRate').value + '%' : '—',
+                effectiveRegion: (permitRegionMult[effectiveRegion] || permitRegionMult.usa).label.split(',')[0],
+                powerDistribution: isAdv ? { overhead:'Overhead Cable Tray', busway:'Busway', underground:'Underground Conduit', mixed:'Mixed Bus+Underground' }[document.getElementById('powerDistribution').value] : 'Busway (default)',
+                transformerType: isAdv ? { oil:'Oil-Filled Outdoor', dry:'Dry-Type Indoor', cast_resin:'Cast Resin' }[document.getElementById('transformerType').value] : 'Dry-Type (default)',
+                pduType: isAdv ? { basic:'Basic Metered', intelligent:'Intelligent Monitored', switched:'Intelligent + Switched' }[document.getElementById('pduType').value] : 'Intelligent (default)',
+                cablingType: isAdv ? { copper:'Cat6A Copper', hybrid:'Hybrid Fiber+Copper', fiber:'All-Fiber OM4/OS2' }[document.getElementById('cablingType').value] : 'Hybrid (default)',
+                floorType: isAdv ? { slab:'Slab/Overhead', raised_600:'Raised Floor 600mm', raised_900:'Raised Floor 900mm', raised_1200:'Raised Floor 1200mm' }[document.getElementById('floorType').value] : 'Raised Floor 600mm (default)',
+                siteCondition: isAdv ? { greenfield:'Greenfield', brownfield:'Brownfield', retrofit:'Retrofit' }[document.getElementById('siteCondition').value] : 'Brownfield (default)',
+                securityLevel: isAdv ? { standard:'Standard', enterprise:'Enterprise', high:'High Security' }[document.getElementById('securityLevel').value] : 'Standard (default)',
+                fiberEntry: isAdv ? { single:'Single Path', dual:'Dual Diverse', multi:'Multi-Path + MMR' }[document.getElementById('fiberEntry').value] : 'Dual Diverse (default)',
+                greenCert: isAdv ? { none:'None', silver:'LEED Silver', gold:'LEED Gold', platinum:'LEED Platinum' }[document.getElementById('greenCert').value] : 'None',
+                renewable: isAdv ? { none:'None', solar:'Rooftop Solar', solar_bess:'Solar + BESS' }[document.getElementById('renewableOption').value] : 'None',
             };
 
-            const result = { total, costs, contingency, softCosts, fomTotal, fomIncluded, itLoad, pue, tierInfo, annualEnergy, yearLabel, cityLabel, contingencyPct, designPct, pmPct, _config };
+            // Pre-compute timeline & ESG for A/B comparison persistence
+            const _timeline = computeTimeline(redundancy, buildingType, coolingType, effectiveRegion, itLoad);
+            const _raw = { redundancy, buildingType, coolingType, rackType, upsType, genType, fireType, location, effectiveRegion };
+
+            const result = { total, costs, contingency, softCosts, fomTotal, fomIncluded, itLoad, pue, tierInfo, annualEnergy, yearLabel, cityLabel, contingencyPct, designPct, pmPct, _config, _timeline, _raw };
             lastResult = result;
             // Auto-update comparison if saved
             if (savedScenario) renderComparison();
+            // Apply feature gating after render
+            if (typeof applyFeatureGating === 'function') applyFeatureGating();
+            if (typeof renderPremiumOutput === 'function') renderPremiumOutput();
             return result;
         }
 
@@ -2033,6 +2908,10 @@
         // Last computed result (avoids recalculation in comparison)
         let lastResult = null;
 
+        // Premium state (must be declared before first calculateCosts call)
+        var isPremiumUser = false;
+        var userTier = 'free'; // 'free' | 'pro'
+
         // Initial calculation
         calculateCosts();
         initTooltipSystem();
@@ -2044,12 +2923,16 @@
             document.getElementById('comparePanel').style.display = 'block';
             document.getElementById('savedIndicator').style.display = 'block';
             document.getElementById('scenarioBBanner').style.display = 'flex';
-            document.getElementById('btnClearCompare').style.display = 'flex';
+            document.getElementById('btnClearRow').style.display = 'block';
             const btn = document.getElementById('btnSaveA');
             btn.innerHTML = '<i class="fas fa-check-circle"></i> Scenario A Saved';
             btn.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1))';
             btn.style.borderColor = 'rgba(16,185,129,0.5)';
             btn.style.color = '#34d399';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            btn.style.cursor = 'default';
             renderComparison();
             // Scroll to input top so user sees Scenario B banner
             setTimeout(() => document.getElementById('scenarioBBanner').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
@@ -2060,12 +2943,16 @@
             document.getElementById('comparePanel').style.display = 'none';
             document.getElementById('savedIndicator').style.display = 'none';
             document.getElementById('scenarioBBanner').style.display = 'none';
-            document.getElementById('btnClearCompare').style.display = 'none';
+            document.getElementById('btnClearRow').style.display = 'none';
             const btn = document.getElementById('btnSaveA');
             btn.innerHTML = '<i class="fas fa-bookmark"></i> Save Scenario A';
-            btn.style.background = 'linear-gradient(135deg,rgba(251,191,36,0.2),rgba(245,158,11,0.1))';
-            btn.style.borderColor = 'rgba(251,191,36,0.5)';
+            btn.style.background = 'linear-gradient(135deg,rgba(251,191,36,0.25),rgba(245,158,11,0.15))';
+            btn.style.borderColor = 'rgba(251,191,36,0.6)';
             btn.style.color = '#fbbf24';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+            btn.style.cursor = 'pointer';
         }
 
         function renderComparison() {
@@ -2093,7 +2980,7 @@
         }
 
         // Fixed order for consistent comparison display
-        const costKeyOrder = ['electrical','cooling','building','ups','generator','fireSuppression','fireAlarm','bms','network','security','seismic','commissioning'];
+        const costKeyOrder = ['electrical','cooling','building','ups','generator','fireSuppression','fireAlarm','bms','network','security','seismic','commissioning','testing','permits'];
 
         function renderScenarioCard(label, data, accent) {
             // Use fixed key order, show top items by value but in consistent order
@@ -2128,6 +3015,484 @@
                     <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace;">${formatCurrency(data.total/data.itLoad)}/kW · ${data.itLoad.toLocaleString()} kW</div>
                 </div>
                 <div style="margin-top:0.75rem;">${barsHTML}</div>`;
+        }
+
+        // ═══ TIMELINE GANTT HTML BUILDER (for PDF) ═══
+        function buildTimelineGanttHTML(phases, totalMonths, cellS, hdrS) {
+            const barH = 18;
+            const labelW = 120;
+            let barsHTML = '';
+            phases.phases.forEach(p => {
+                const leftPct = (p.start / totalMonths * 100).toFixed(1);
+                const widthPct = ((p.end - p.start) / totalMonths * 100).toFixed(1);
+                const dur = p.end - p.start;
+                const barNarrow = parseFloat(widthPct) < 12;
+                const rightPct = (parseFloat(leftPct) + parseFloat(widthPct)).toFixed(1);
+                barsHTML += '<div style="display:flex;align-items:center;margin-bottom:4px;">' +
+                    '<div style="width:' + labelW + 'px;font-size:8.5px;color:#374151;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px;">' + p.name + '</div>' +
+                    '<div style="flex:1;position:relative;height:' + barH + 'px;background:#f1f5f9;border-radius:3px;">' +
+                        '<div style="position:absolute;left:' + leftPct + '%;width:' + widthPct + '%;height:100%;background:' + p.color + ';border-radius:3px;opacity:0.85;"></div>' +
+                        (barNarrow
+                            ? '<span style="position:absolute;left:' + rightPct + '%;top:0;font-size:7.5px;color:#374151;font-weight:600;padding-left:4px;line-height:' + barH + 'px;white-space:nowrap;">' + dur + 'mo</span>'
+                            : '<span style="position:absolute;left:' + leftPct + '%;top:0;font-size:7.5px;color:white;font-weight:600;padding-left:4px;line-height:' + barH + 'px;white-space:nowrap;">' + dur + 'mo</span>') +
+                    '</div>' +
+                '</div>';
+            });
+            // Month scale
+            let scaleHTML = '<div style="display:flex;align-items:center;margin-top:4px;"><div style="width:' + labelW + 'px;"></div><div style="flex:1;display:flex;justify-content:space-between;font-size:7px;color:#9ca3af;">';
+            const step = totalMonths <= 18 ? 3 : totalMonths <= 30 ? 6 : 12;
+            for (let m = 0; m <= totalMonths; m += step) {
+                scaleHTML += '<span>Mo ' + m + '</span>';
+            }
+            scaleHTML += '</div></div>';
+            return '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;margin-bottom:8px;">' + barsHTML + scaleHTML + '</div>';
+        }
+
+        // ═══ SUSTAINABILITY HTML BUILDER (for PDF) ═══
+        function buildSustainabilityHTML(result, coolingType, effReg, racks, floorM2, annualMWh, cellS, hdrS) {
+            const emFactor = gridEmissionFactor[effReg] || 0.4;
+            const co2Tons = annualMWh * emFactor;
+            const wue = wueByCooling[coolingType] || 0;
+            const waterM3 = wue * result.itLoad * result.pue * 8760 / 1000;
+            const dcie = (1 / result.pue * 100).toFixed(1);
+            const cue = (co2Tons * 1000 / (result.itLoad * 8760)).toFixed(3);
+            const refrig = refrigerantData[coolingType] || refrigerantData.air;
+
+            return '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '" colspan="2">Energy & Carbon</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">PUE / DCiE</td><td style="' + cellS + '">' + result.pue.toFixed(2) + ' (' + (result.pue <= 1.2 ? 'Best-in-Class' : result.pue <= 1.3 ? 'Excellent' : result.pue <= 1.5 ? 'Good' : result.pue <= 1.7 ? 'Average' : 'Below Average') + ') / ' + dcie + '%</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Annual Energy</td><td style="' + cellS + '">' + annualMWh.toLocaleString(undefined,{maximumFractionDigits:0}) + ' MWh/yr (' + (annualMWh/1000).toFixed(1) + ' GWh)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Grid Emission Factor</td><td style="' + cellS + '">' + emFactor.toFixed(2) + ' tCO\u2082/MWh (' + (effReg||'avg').toUpperCase() + ' region — IEA 2024)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Scope 2 CO\u2082 Emissions</td><td style="' + cellS + '">' + co2Tons.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tCO\u2082/yr (' + (co2Tons/result.itLoad).toFixed(1) + ' tCO\u2082/kW IT)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">CUE (Carbon Use Effectiveness)</td><td style="' + cellS + '">' + cue + ' kgCO\u2082/kWh IT</td></tr>' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '" colspan="2">Water & Cooling</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">WUE (Water Use Effectiveness)</td><td style="' + cellS + '">' + wue.toFixed(1) + ' L/kWh' + (wue === 0 ? ' — Air-cooled: no evaporative water used' : wue <= 0.5 ? ' (Excellent)' : wue <= 1.0 ? ' (Good)' : wue <= 2.0 ? ' (Average)' : ' (High)') + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Est. Annual Water Consumption</td><td style="' + cellS + '">' + (waterM3 > 0 ? waterM3.toLocaleString(undefined,{maximumFractionDigits:0}) + ' m\u00B3/yr (' + (waterM3 * 264.172).toLocaleString(undefined,{maximumFractionDigits:0}) + ' gal)' : 'No water consumption (air-cooled DX — zero evaporative load)') + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Power Density</td><td style="' + cellS + '">' + rackKw[document.querySelector('input[name="rackType"]:checked').value] + ' kW/rack \u00B7 ' + (result.itLoad * result.pue / (floorM2 * 1.8)).toFixed(1) + ' kW/m\u00B2 gross</td></tr>' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '" colspan="2">Refrigerant & Compliance</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Current Refrigerant</td><td style="' + cellS + '">' + refrig.type + (refrig.gwp > 0 ? ' (GWP ' + refrig.gwp.toLocaleString() + ')' : '') + '</td></tr>' +
+                (refrig.gwp > 0 ? '<tr><td style="' + cellS + 'font-weight:600;color:#047857;">Recommended Alternative</td><td style="' + cellS + 'color:#047857;font-weight:600;">' + refrig.rec + ' (GWP ' + refrig.recGwp + ') — ' + ((1 - refrig.recGwp / refrig.gwp) * 100).toFixed(0) + '% lower GWP</td></tr>' : '') +
+                '<tr><td style="' + cellS + 'font-weight:600;">Regulatory Context</td><td style="' + cellS + 'color:#6b7280;font-size:10px;">' + refrig.note + '</td></tr>' +
+            '</table>';
+        }
+
+        // ═══ PREMIUM PDF SECTION BUILDER ═══
+        function buildPremiumPdfSection(result) {
+            const rackType = document.querySelector('input[name="rackType"]:checked').value;
+            const coolingType = document.querySelector('input[name="coolingType"]:checked').value;
+            const upsType = document.getElementById('upsType').value;
+            const genType = document.getElementById('genType').value;
+            const fireType = document.getElementById('fireType').value;
+            const redundancy = document.querySelector('input[name="redundancy"]:checked').value;
+
+            const buildingType = document.getElementById('buildingType').value;
+            const locVal = document.getElementById('locationFactor').value;
+            const cityVal2 = document.getElementById('cityMarket') ? document.getElementById('cityMarket').value : 'none';
+            const effReg = (cityVal2 !== 'none' && cityData[cityVal2]) ? cityData[cityVal2].region : locVal;
+
+            const racks = Math.ceil(result.itLoad / rackKw[rackType]);
+            const floorM2 = Math.ceil(racks * rackFootprint);
+            const phases = result._timeline || computeTimeline(redundancy, buildingType, coolingType, effReg, result.itLoad);
+            const totalMonths = phases.totalMonths;
+
+            // Equipment specs
+            const upsOpts = equipmentBrands.ups[upsType] || equipmentBrands.ups.modular;
+            const coolOpts = equipmentBrands.cooling[coolingType] || equipmentBrands.cooling.air;
+            const genOpts = equipmentBrands.generator[genType] || equipmentBrands.generator.diesel;
+            const fireInfo = equipmentBrands.fire[fireType] || equipmentBrands.fire.novec;
+
+            const cellS = 'padding:5px 8px;border-bottom:1px solid #e5e7eb;font-size:11px;';
+            const hdrS = 'padding:6px 8px;text-align:left;font-size:11px;';
+            const cfg = result._config || {};
+
+            // Equipment table
+            let eqRows = '';
+            upsOpts.forEach(u => { eqRows += `<tr><td style="${cellS}">UPS</td><td style="${cellS}font-weight:600;">${u.brand} ${u.model}</td><td style="${cellS}">${u.range}</td><td style="${cellS}color:#6b7280;">${u.note}</td></tr>`; });
+            coolOpts.forEach(c => { eqRows += `<tr><td style="${cellS}">Cooling</td><td style="${cellS}font-weight:600;">${c.brand} ${c.model}</td><td style="${cellS}">${c.range || '—'}</td><td style="${cellS}color:#6b7280;">${c.note}</td></tr>`; });
+            genOpts.forEach(g => { eqRows += `<tr><td style="${cellS}">Generator</td><td style="${cellS}font-weight:600;">${g.brand} ${g.model}</td><td style="${cellS}">${g.range}</td><td style="${cellS}color:#6b7280;">${g.note}</td></tr>`; });
+            eqRows += `<tr><td style="${cellS}">Fire Suppression</td><td style="${cellS}font-weight:600;">${fireInfo.agent}</td><td style="${cellS}">${fireInfo.density} / ${fireInfo.discharge}</td><td style="${cellS}color:#6b7280;">${fireInfo.note}</td></tr>`;
+            const pdfRegionInfo = permitRegionMult[effReg] || permitRegionMult.usa;
+            eqRows += `<tr><td style="${cellS}">Permits & Compliance</td><td style="${cellS}font-weight:600;">${effReg.toUpperCase()} region</td><td style="${cellS}">—</td><td style="${cellS}color:#6b7280;">${pdfRegionInfo.label}</td></tr>`;
+
+            // Total capacity metrics
+            const totalUpsKva = Math.ceil(result.itLoad * 1.15);
+            const totalGenMw = (result.itLoad * result.pue / 1000 * (redundancy === '2n' || redundancy === '2n1' ? 2 : 1.25)).toFixed(1);
+            const coolingKw = Math.ceil(result.itLoad * result.pue * 0.35);
+
+            // Sustainability
+            const annualMWh = result.itLoad * result.pue * 8760 / 1000;
+            const co2Tons = annualMWh * 0.4;
+            const waterM3 = coolingType === 'liquid' ? result.itLoad * 0.5 : result.itLoad * 2.5;
+
+            return `
+            <div style="page-break-before:auto;margin-top:28px;">
+                <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #8b5cf6;padding-bottom:6px;margin-bottom:14px;">
+                    <span style="color:#8b5cf6;">&#9733;</span> Premium: Infrastructure Summary
+                </h2>
+
+                <!-- KPI Cards -->
+                <div style="display:flex;gap:10px;margin-bottom:16px;">
+                    <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+                        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Est. Racks</div>
+                        <div style="font-size:20px;font-weight:700;color:#1e3a5f;">${racks}</div>
+                        <div style="font-size:9px;color:#6b7280;">${rackKw[rackType]} kW/rack</div>
+                    </div>
+                    <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+                        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">White Space</div>
+                        <div style="font-size:20px;font-weight:700;color:#1e3a5f;">${floorM2.toLocaleString()} m²</div>
+                        <div style="font-size:9px;color:#6b7280;">~${Math.ceil(floorM2*1.8).toLocaleString()} m² gross</div>
+                    </div>
+                    <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+                        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Build Time</div>
+                        <div style="font-size:20px;font-weight:700;color:#1e3a5f;">${totalMonths} mo</div>
+                        <div style="font-size:9px;color:#6b7280;">Design to COD</div>
+                    </div>
+                    <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+                        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">$/kW</div>
+                        <div style="font-size:20px;font-weight:700;color:#f59e0b;">$${Math.round(result.total/result.itLoad).toLocaleString()}</div>
+                        <div style="font-size:9px;color:#6b7280;">per kW IT Load</div>
+                    </div>
+                    <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+                        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Annual Energy</div>
+                        <div style="font-size:20px;font-weight:700;color:#1e3a5f;">${(annualMWh/1000).toFixed(1)} GWh</div>
+                        <div style="font-size:9px;color:#6b7280;">PUE ${result.pue.toFixed(2)}</div>
+                    </div>
+                </div>
+
+                <!-- Design & Delivery Concept -->
+                <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Design & Delivery Concept</h3>
+                <div style="display:flex;gap:16px;margin-bottom:12px;">
+                    <table style="flex:1;border-collapse:collapse;font-size:11px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}" colspan="2">Facility Design</th></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Building Type</td><td style="${cellS}font-weight:600;">${cfg.buildingType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Redundancy</td><td style="${cellS}font-weight:600;">${cfg.redundancy} (${cfg.tier})</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Cooling Strategy</td><td style="${cellS}font-weight:600;">${cfg.coolingType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Rack Density</td><td style="${cellS}font-weight:600;">${cfg.rackDensity}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">UPS Architecture</td><td style="${cellS}font-weight:600;">${cfg.upsType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Generator</td><td style="${cellS}font-weight:600;">${cfg.genType} (${cfg.fuelHours} fuel)</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Fire Suppression</td><td style="${cellS}font-weight:600;">${cfg.fireSuppression}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Floor Construction</td><td style="${cellS}font-weight:600;">${cfg.floorType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Site Condition</td><td style="${cellS}font-weight:600;">${cfg.siteCondition}</td></tr>
+                    </table>
+                    <table style="flex:1;border-collapse:collapse;font-size:11px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}" colspan="2">Electrical & Connectivity</th></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Power Distribution</td><td style="${cellS}font-weight:600;">${cfg.powerDistribution}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Transformer Type</td><td style="${cellS}font-weight:600;">${cfg.transformerType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">PDU Type</td><td style="${cellS}font-weight:600;">${cfg.pduType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Structured Cabling</td><td style="${cellS}font-weight:600;">${cfg.cablingType}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Fiber Entry</td><td style="${cellS}font-weight:600;">${cfg.fiberEntry}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Security Level</td><td style="${cellS}font-weight:600;">${cfg.securityLevel}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Green Certification</td><td style="${cellS}font-weight:600;">${cfg.greenCert}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">On-Site Renewable</td><td style="${cellS}font-weight:600;">${cfg.renewable}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Front-of-Meter</td><td style="${cellS}font-weight:600;">${cfg.fomIncluded === 'Yes' ? cfg.substationType + ' — ' + cfg.transformerLead : 'Not included'}</td></tr>
+                    </table>
+                </div>
+                <div style="display:flex;gap:16px;margin-bottom:12px;">
+                    <table style="flex:1;border-collapse:collapse;font-size:11px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}" colspan="2">Project Delivery</th></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Delivery Method</td><td style="${cellS}font-weight:600;">${cfg.deliveryMethod}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Market Condition</td><td style="${cellS}font-weight:600;">${cfg.marketCondition}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Contractor Availability</td><td style="${cellS}font-weight:600;">${cfg.contractorAvail}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Projection Year</td><td style="${cellS}font-weight:600;">${cfg.yearLabel}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Location / Region</td><td style="${cellS}font-weight:600;">${cfg.location}${cfg.cityLabel !== '—' ? ' — ' + cfg.cityLabel : ''}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Permits / Compliance</td><td style="${cellS}font-weight:600;">${cfg.effectiveRegion || '—'}</td></tr>
+                    </table>
+                    <table style="flex:1;border-collapse:collapse;font-size:11px;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}" colspan="2">Project Cost Assumptions</th></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Design & Engineering</td><td style="${cellS}font-weight:600;">${cfg.designFee} of hard costs</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Project Management</td><td style="${cellS}font-weight:600;">${cfg.pmFee} of hard costs</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Contingency Reserve</td><td style="${cellS}font-weight:600;">${cfg.contingency} of subtotal</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Utility Rate of Return</td><td style="${cellS}font-weight:600;">${cfg.fomIncluded === 'Yes' ? cfg.utilityRate : 'N/A'}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Green Cert Premium</td><td style="${cellS}font-weight:600;">${cfg.greenCert !== 'None' ? cfg.greenCert : 'N/A'}</td></tr>
+                        <tr><td style="${cellS}color:#6b7280;">Renewable CAPEX</td><td style="${cellS}font-weight:600;">${cfg.renewable !== 'None' ? cfg.renewable : 'N/A'}</td></tr>
+                    </table>
+                </div>
+
+                <!-- Capacity Summary -->
+                <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Capacity Summary</h3>
+                <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                    <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}">System</th><th style="${hdrS}">Total Capacity</th><th style="${hdrS}">Per Rack</th><th style="${hdrS}">Notes</th></tr>
+                    <tr><td style="${cellS}font-weight:600;">IT Load</td><td style="${cellS}">${result.itLoad.toLocaleString()} kW (${(result.itLoad/1000).toFixed(1)} MW)</td><td style="${cellS}">${rackKw[rackType]} kW/rack</td><td style="${cellS}color:#6b7280;">${racks} racks total</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">UPS</td><td style="${cellS}">${totalUpsKva.toLocaleString()} kVA</td><td style="${cellS}">${(totalUpsKva/racks).toFixed(1)} kVA/rack</td><td style="${cellS}color:#6b7280;">15% safety margin included</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Generator</td><td style="${cellS}">${totalGenMw} MW</td><td style="${cellS}">—</td><td style="${cellS}color:#6b7280;">${redundancy === '2n' || redundancy === '2n1' ? '2x redundancy' : 'N+1 redundancy'}</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Cooling</td><td style="${cellS}">${coolingKw.toLocaleString()} kW</td><td style="${cellS}">${(coolingKw/racks).toFixed(1)} kW/rack</td><td style="${cellS}color:#6b7280;">~35% of total facility load</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Floor Space</td><td style="${cellS}">${floorM2.toLocaleString()} m² (white) / ~${Math.ceil(floorM2*1.8).toLocaleString()} m² (gross)</td><td style="${cellS}">${rackFootprint.toFixed(1)} m²/rack</td><td style="${cellS}color:#6b7280;">${Math.ceil(racks * 0.3)} kW/m² density</td></tr>
+                </table>
+
+                <!-- Recommended Equipment Specification -->
+                <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Recommended Equipment Specification</h3>
+                <table style="width:100%;border-collapse:collapse;">
+                    <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}">System</th><th style="${hdrS}">Brand / Model</th><th style="${hdrS}">Capacity</th><th style="${hdrS}">Notes</th></tr>
+                    ${eqRows}
+                </table>
+
+                <!-- Construction Timeline with Parallel Gantt -->
+                <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Estimated Construction Timeline (Parallel Model)</h3>
+                <p style="font-size:9px;color:#6b7280;margin:0 0 8px;">Phases shown with realistic overlaps — permitting parallels design, MEP overlaps civil, procurement runs during design/civil.</p>
+                ${buildTimelineGanttHTML(phases, totalMonths, cellS, hdrS)}
+                <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;">
+                    <tr style="background:#1e3a5f;color:white;"><th style="${hdrS}">Phase</th><th style="${hdrS}">Duration</th><th style="${hdrS}">Start → End</th><th style="${hdrS}">Key Factors</th></tr>
+                    <tr><td style="${cellS}font-weight:600;">Design & Engineering</td><td style="${cellS}">${phases.design} mo</td><td style="${cellS}">Mo 0 → ${phases.phases[0].end}</td><td style="${cellS}color:#6b7280;">${result.itLoad > 10000 ? 'Scaled for ' + (result.itLoad/1000).toFixed(0) + ' MW facility' : 'Standard design scope'}</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Permitting & Approvals</td><td style="${cellS}">${phases.permit} mo</td><td style="${cellS}">Mo ${phases.phases[1].start} → ${phases.phases[1].end}</td><td style="${cellS}color:#6b7280;">${pdfRegionInfo.label.split(',')[0]} (overlaps design)</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Procurement (Long-Lead)</td><td style="${cellS}">${phases.procurement} mo</td><td style="${cellS}">Mo ${phases.phases[2].start} → ${phases.phases[2].end}</td><td style="${cellS}color:#6b7280;">Major equipment lead time</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Civil & Structural</td><td style="${cellS}">${phases.civil} mo</td><td style="${cellS}">Mo ${phases.phases[3].start} → ${phases.phases[3].end}</td><td style="${cellS}color:#6b7280;">${cfg.buildingType} construction</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">MEP Installation</td><td style="${cellS}">${phases.mep} mo</td><td style="${cellS}">Mo ${phases.phases[4].start} → ${phases.phases[4].end}</td><td style="${cellS}color:#6b7280;">${coolingType === 'liquid' ? 'DLC pipework +30%' : coolingType === 'rdhx' ? 'RDHX plumbing +15%' : 'Standard MEP scope'} (overlaps 50% civil)</td></tr>
+                    <tr><td style="${cellS}font-weight:600;">Testing & Commissioning</td><td style="${cellS}">${phases.commission} mo</td><td style="${cellS}">Mo ${phases.phases[5].start} → ${phases.phases[5].end}</td><td style="${cellS}color:#6b7280;">${redundancy === '2n1' ? 'Full IST/ISST for 2N+1' : redundancy === '2n' ? 'IST required for 2N' : 'Standard Cx scope'}</td></tr>
+                    <tr style="background:#f0f7ff;"><td style="${cellS}font-weight:700;">Total (Design → COD)</td><td style="${cellS}font-weight:700;">${totalMonths} months</td><td style="${cellS}font-weight:700;">~${(totalMonths/12).toFixed(1)} years</td><td style="${cellS}font-weight:600;color:#1e3a5f;">Parallel model saves ~${Math.round((phases.design + phases.permit + phases.procurement + phases.civil + phases.mep + phases.commission - totalMonths) / totalMonths * 100)}% vs serial</td></tr>
+                </table>
+
+                <!-- Sustainability & Efficiency -->
+                <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Sustainability & Efficiency</h3>
+                ${buildSustainabilityHTML(result, coolingType, effReg, racks, floorM2, annualMWh, cellS, hdrS)}
+
+                ${savedScenario ? buildPremiumComparisonHTML(savedScenario, result, cellS, hdrS) : ''}
+            </div>`;
+        }
+
+        // ═══ PREMIUM A vs B COMPARISON (Timeline + Sustainability + Capacity) ═══
+        function buildPremiumComparisonHTML(a, b, cellS, hdrS) {
+            const aTimeline = a._timeline;
+            const bTimeline = b._timeline;
+            const aRaw = a._raw || {};
+            const bRaw = b._raw || {};
+            if (!aTimeline || !bTimeline) return '';
+
+            const aRacks = Math.ceil(a.itLoad / rackKw[aRaw.rackType || 'standard']);
+            const bRacks = Math.ceil(b.itLoad / rackKw[bRaw.rackType || 'standard']);
+            const aFloor = Math.ceil(aRacks * rackFootprint);
+            const bFloor = Math.ceil(bRacks * rackFootprint);
+            const aUpsKva = Math.ceil(a.itLoad * 1.15);
+            const bUpsKva = Math.ceil(b.itLoad * 1.15);
+            const aRed = aRaw.redundancy || 'n1';
+            const bRed = bRaw.redundancy || 'n1';
+            const aGenMw = (a.itLoad * a.pue / 1000 * (aRed === '2n' || aRed === '2n1' ? 2 : 1.25)).toFixed(1);
+            const bGenMw = (b.itLoad * b.pue / 1000 * (bRed === '2n' || bRed === '2n1' ? 2 : 1.25)).toFixed(1);
+            const aCoolKw = Math.ceil(a.itLoad * a.pue * 0.35);
+            const bCoolKw = Math.ceil(b.itLoad * b.pue * 0.35);
+
+            // ESG comparison
+            const aEf = gridEmissionFactor[aRaw.effectiveRegion] || 0.4;
+            const bEf = gridEmissionFactor[bRaw.effectiveRegion] || 0.4;
+            const aMWh = a.itLoad * a.pue * 8760 / 1000;
+            const bMWh = b.itLoad * b.pue * 8760 / 1000;
+            const aCo2 = aMWh * aEf;
+            const bCo2 = bMWh * bEf;
+            const aWue = wueByCooling[aRaw.coolingType] || 0;
+            const bWue = wueByCooling[bRaw.coolingType] || 0;
+            const aWater = aWue * a.itLoad * a.pue * 8760 / 1000;
+            const bWater = bWue * b.itLoad * b.pue * 8760 / 1000;
+            const aRefrig = refrigerantData[aRaw.coolingType] || refrigerantData.air;
+            const bRefrig = refrigerantData[bRaw.coolingType] || refrigerantData.air;
+
+            const dFmt = (aV, bV, unit) => {
+                if (!aV && !bV) return '';
+                const d = ((bV - aV) / (aV || 1) * 100);
+                const clr = d > 0 ? '#ef4444' : d < 0 ? '#10b981' : '#6b7280';
+                return '<span style="color:' + clr + ';font-weight:600;">' + (d >= 0 ? '+' : '') + d.toFixed(1) + '% ' + (unit || '') + '</span>';
+            };
+
+            let html = '<div style="page-break-before:auto;margin-top:24px;">' +
+                '<h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Scenario A vs B: Infrastructure Comparison</h2>';
+
+            // Timeline comparison
+            html += '<h3 style="font-size:13px;color:#1e3a5f;margin:12px 0 8px;">Construction Timeline</h3>' +
+                '<div style="display:flex;gap:16px;">' +
+                    '<div style="flex:1;"><div style="font-size:10px;font-weight:700;color:#fbbf24;margin-bottom:6px;">SCENARIO A — ' + aTimeline.totalMonths + ' months</div>' + buildTimelineGanttHTML(aTimeline, Math.max(aTimeline.totalMonths, bTimeline.totalMonths), cellS, hdrS) + '</div>' +
+                    '<div style="flex:1;"><div style="font-size:10px;font-weight:700;color:#34d399;margin-bottom:6px;">SCENARIO B — ' + bTimeline.totalMonths + ' months</div>' + buildTimelineGanttHTML(bTimeline, Math.max(aTimeline.totalMonths, bTimeline.totalMonths), cellS, hdrS) + '</div>' +
+                '</div>';
+
+            // Capacity comparison table
+            html += '<h3 style="font-size:13px;color:#1e3a5f;margin:16px 0 8px;">Capacity Summary</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '">Metric</th><th style="' + hdrS + '">Scenario A</th><th style="' + hdrS + '">Scenario B</th><th style="' + hdrS + '">Delta</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">IT Load</td><td style="' + cellS + '">' + a.itLoad.toLocaleString() + ' kW</td><td style="' + cellS + '">' + b.itLoad.toLocaleString() + ' kW</td><td style="' + cellS + '">' + dFmt(a.itLoad, b.itLoad) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Racks</td><td style="' + cellS + '">' + aRacks + '</td><td style="' + cellS + '">' + bRacks + '</td><td style="' + cellS + '">' + dFmt(aRacks, bRacks) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">White Space</td><td style="' + cellS + '">' + aFloor.toLocaleString() + ' m\u00B2</td><td style="' + cellS + '">' + bFloor.toLocaleString() + ' m\u00B2</td><td style="' + cellS + '">' + dFmt(aFloor, bFloor) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">UPS Capacity</td><td style="' + cellS + '">' + aUpsKva.toLocaleString() + ' kVA</td><td style="' + cellS + '">' + bUpsKva.toLocaleString() + ' kVA</td><td style="' + cellS + '">' + dFmt(aUpsKva, bUpsKva) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Generator</td><td style="' + cellS + '">' + aGenMw + ' MW</td><td style="' + cellS + '">' + bGenMw + ' MW</td><td style="' + cellS + '">' + dFmt(parseFloat(aGenMw), parseFloat(bGenMw)) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Cooling Capacity</td><td style="' + cellS + '">' + aCoolKw.toLocaleString() + ' kW</td><td style="' + cellS + '">' + bCoolKw.toLocaleString() + ' kW</td><td style="' + cellS + '">' + dFmt(aCoolKw, bCoolKw) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Build Time</td><td style="' + cellS + '">' + aTimeline.totalMonths + ' months</td><td style="' + cellS + '">' + bTimeline.totalMonths + ' months</td><td style="' + cellS + '">' + dFmt(aTimeline.totalMonths, bTimeline.totalMonths) + '</td></tr>' +
+                '</table>';
+
+            // Sustainability comparison
+            html += '<h3 style="font-size:13px;color:#1e3a5f;margin:16px 0 8px;">Sustainability Comparison</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '">Metric</th><th style="' + hdrS + '">Scenario A</th><th style="' + hdrS + '">Scenario B</th><th style="' + hdrS + '">Delta</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">PUE</td><td style="' + cellS + '">' + a.pue.toFixed(2) + '</td><td style="' + cellS + '">' + b.pue.toFixed(2) + '</td><td style="' + cellS + '">' + dFmt(a.pue, b.pue) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Annual Energy</td><td style="' + cellS + '">' + (aMWh/1000).toFixed(1) + ' GWh</td><td style="' + cellS + '">' + (bMWh/1000).toFixed(1) + ' GWh</td><td style="' + cellS + '">' + dFmt(aMWh, bMWh) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Grid Emission Factor</td><td style="' + cellS + '">' + aEf.toFixed(2) + ' tCO\u2082/MWh</td><td style="' + cellS + '">' + bEf.toFixed(2) + ' tCO\u2082/MWh</td><td style="' + cellS + '">' + (aEf !== bEf ? 'Different regions' : 'Same') + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Scope 2 CO\u2082</td><td style="' + cellS + '">' + aCo2.toLocaleString(undefined,{maximumFractionDigits:0}) + ' t/yr</td><td style="' + cellS + '">' + bCo2.toLocaleString(undefined,{maximumFractionDigits:0}) + ' t/yr</td><td style="' + cellS + '">' + dFmt(aCo2, bCo2) + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">WUE</td><td style="' + cellS + '">' + aWue.toFixed(1) + ' L/kWh</td><td style="' + cellS + '">' + bWue.toFixed(1) + ' L/kWh</td><td style="' + cellS + '">' + (aWue !== bWue ? dFmt(aWue || 0.001, bWue || 0.001) : 'Same') + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Water Usage</td><td style="' + cellS + '">' + (aWater > 0 ? aWater.toLocaleString(undefined,{maximumFractionDigits:0}) + ' m\u00B3/yr' : 'None') + '</td><td style="' + cellS + '">' + (bWater > 0 ? bWater.toLocaleString(undefined,{maximumFractionDigits:0}) + ' m\u00B3/yr' : 'None') + '</td><td style="' + cellS + '">' + (aWater && bWater ? dFmt(aWater, bWater) : '\u2014') + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Refrigerant</td><td style="' + cellS + '">' + aRefrig.type + (aRefrig.gwp ? ' (GWP ' + aRefrig.gwp.toLocaleString() + ')' : '') + '</td><td style="' + cellS + '">' + bRefrig.type + (bRefrig.gwp ? ' (GWP ' + bRefrig.gwp.toLocaleString() + ')' : '') + '</td><td style="' + cellS + '">' + (aRefrig.type !== bRefrig.type ? 'Different type' : 'Same') + '</td></tr>' +
+                '</table>';
+
+            html += '</div>';
+            return html;
+        }
+
+        // ═══ CAPEX NARRATIVE CONCLUSION ═══
+        function generateCapexNarrative(result, hasCompare, savedA) {
+            const total = result.total;
+            const perKW = total / result.itLoad;
+            const itKW = result.itLoad;
+            const mw = itKW / 1000;
+            const pue = result.pue;
+            const tier = result.tierInfo.tier;
+            const costs = result.costs;
+            const cfg = result._config || {};
+            const timeline = result._timeline;
+            const raw = result._raw || {};
+
+            // Sort costs to find top contributors
+            const sorted = Object.entries(costs).sort((a, b) => b[1] - a[1]);
+            const topCost = sorted[0] || ['unknown', 0];
+            const topPct = ((topCost[1] / total) * 100).toFixed(1);
+            const top3 = sorted.slice(0, 3);
+
+            // $/kW benchmarking
+            let costProfile;
+            if (perKW < 8000) costProfile = { label: 'Ultra-Lean', color: '#059669', desc: 'well below industry average. This may indicate a lean facility design (warehouse conversion, air-cooled, lower redundancy) or favorable market conditions. Verify that reliability and quality standards are not compromised.' };
+            else if (perKW < 12000) costProfile = { label: 'Cost-Efficient', color: '#0284c7', desc: 'below the industry midpoint for ' + tier + ' facilities. The design achieves good value through efficient component selection and/or favorable location factors.' };
+            else if (perKW < 18000) costProfile = { label: 'Market Rate', color: '#d97706', desc: 'within the typical range for ' + tier + ' data center construction. Cost is consistent with current market conditions for ' + (cfg.buildingType || 'standard') + ' facilities with ' + (cfg.coolingType || 'standard') + ' cooling.' };
+            else if (perKW < 25000) costProfile = { label: 'Premium Build', color: '#dc2626', desc: 'above average, typical for purpose-built facilities with high redundancy, premium cooling (RDHX/DLC), and comprehensive infrastructure. The premium reflects higher reliability and operational efficiency.' };
+            else costProfile = { label: 'Hyperscale/Complex', color: '#7c3aed', desc: 'in the upper range, consistent with large-scale, mission-critical deployments requiring maximum redundancy, liquid cooling, extensive utility infrastructure, and stringent compliance.' };
+
+            // Cost structure analysis
+            const mechPct = ((costs.cooling || 0) / total * 100);
+            const elecPct = (((costs.ups || 0) + (costs.generator || 0) + (costs.switchgear || 0)) / total * 100);
+            const civilPct = (((costs.building || 0) + (costs.raisedFloor || 0)) / total * 100);
+            const itInfra = (((costs.racks || 0) + (costs.cabling || 0) + (costs.pdu || 0)) / total * 100);
+
+            let structureNarrative;
+            if (elecPct > 35) structureNarrative = 'Electrical infrastructure dominates at ' + elecPct.toFixed(0) + '% of CAPEX, driven by ' + (cfg.upsType || 'UPS') + ' and generator requirements. This is typical for high-redundancy designs where 2N electrical paths are specified.';
+            else if (mechPct > 25) structureNarrative = 'Mechanical/cooling systems represent ' + mechPct.toFixed(0) + '% of CAPEX, reflecting the ' + (cfg.coolingType || 'selected') + ' cooling strategy. Advanced cooling solutions (RDHX, DLC) command higher upfront cost but deliver significantly better PUE and lower long-term OPEX.';
+            else if (civilPct > 30) structureNarrative = 'Civil/structural costs are the primary driver at ' + civilPct.toFixed(0) + '% of CAPEX. This may indicate purpose-built construction, high-rise design, or challenging site conditions requiring significant foundation and structural work.';
+            else structureNarrative = 'Cost distribution is well-balanced across electrical (' + elecPct.toFixed(0) + '%), mechanical (' + mechPct.toFixed(0) + '%), and civil (' + civilPct.toFixed(0) + '%) systems. This suggests a well-optimized design without any single system dominating the budget.';
+
+            // PUE analysis
+            let pueNarrative;
+            if (pue <= 1.2) pueNarrative = 'Design PUE of ' + pue.toFixed(2) + ' is best-in-class, achievable with ' + (cfg.coolingType || 'advanced') + ' cooling. Annual energy cost of <strong>' + formatCurrency(result.annualEnergy) + '</strong> reflects excellent efficiency. The CAPEX premium for advanced cooling is offset by estimated annual energy savings of $' + Math.round((1.5 - pue) * itKW * 8760 * 0.08 / 1000).toLocaleString() + 'K versus a PUE 1.5 baseline.';
+            else if (pue <= 1.4) pueNarrative = 'Design PUE of ' + pue.toFixed(2) + ' is above average. Annual energy consumption will be approximately ' + ((itKW * pue * 8760) / 1000000).toFixed(1) + ' GWh, costing <strong>' + formatCurrency(result.annualEnergy) + '/year</strong>. For every 0.1 PUE improvement, annual energy savings would be approximately $' + Math.round(0.1 * itKW * 8760 * 0.08 / 1000).toLocaleString() + 'K.';
+            else pueNarrative = 'Design PUE of ' + pue.toFixed(2) + ' is average to below average. The facility will consume approximately ' + ((itKW * pue * 8760) / 1000000).toFixed(1) + ' GWh annually (' + formatCurrency(result.annualEnergy) + '/year). Consider investing in cooling upgrades — a 0.2 PUE improvement would save approximately $' + Math.round(0.2 * itKW * 8760 * 0.08 / 1000).toLocaleString() + 'K/year, potentially paying back within ' + Math.ceil(total * 0.05 / (0.2 * itKW * 8760 * 0.08 / 1000) * 10) / 10 + ' years.';
+
+            // Timeline assessment
+            let timelineNarrative = '';
+            if (timeline) {
+                const months = timeline.totalMonths;
+                if (months <= 12) timelineNarrative = 'Estimated build time of <strong>' + months + ' months</strong> is aggressive and achievable with modular/prefab construction and parallel execution. Critical path risks include long-lead equipment procurement and permitting delays.';
+                else if (months <= 24) timelineNarrative = 'Estimated build time of <strong>' + months + ' months</strong> is standard for a ' + (cfg.buildingType || 'data center') + ' facility of this scale. The parallel execution model saves approximately ' + Math.round((timeline.design + timeline.permit + timeline.procurement + timeline.civil + timeline.mep + timeline.commission - months) / (timeline.design + timeline.permit + timeline.procurement + timeline.civil + timeline.mep + timeline.commission) * 100) + '% versus serial execution.';
+                else timelineNarrative = 'Estimated build time of <strong>' + months + ' months</strong> reflects the complexity of this project (scale, location, or regulatory requirements). Consider phased deployment to achieve partial revenue earlier, or modular construction to accelerate the critical path.';
+            }
+
+            // Risk factors
+            let risks = [];
+            if (perKW > 20000) risks.push({ level: 'HIGH', text: '<strong>Budget Risk:</strong> At $' + Math.round(perKW).toLocaleString() + '/kW, total investment of ' + formatCurrency(total) + ' is significant. Ensure contingency (' + (result.contingencyPct || 10) + '%) is adequate for scope changes and market volatility.' });
+            if (pue > 1.6) risks.push({ level: 'HIGH', text: '<strong>Efficiency Risk:</strong> PUE ' + pue.toFixed(2) + ' will result in high ongoing energy costs. Consider cooling system upgrade during design phase — the marginal CAPEX increase may deliver substantial OPEX savings.' });
+            if (sorted.some(([k, v]) => v / total > 0.25)) risks.push({ level: 'MEDIUM', text: '<strong>Concentration Risk:</strong> ' + (costFactors[topCost[0]]?.label || topCost[0]) + ' represents ' + topPct + '% of total CAPEX. Diversify vendor strategy and negotiate competitive bids for this component.' });
+            if (timeline && timeline.totalMonths > 24) risks.push({ level: 'MEDIUM', text: '<strong>Schedule Risk:</strong> ' + timeline.totalMonths + '-month timeline increases exposure to material price escalation, labor market changes, and regulatory shifts. Lock in pricing for long-lead items early.' });
+            if (raw.redundancy === '2n' || raw.redundancy === '2n1') risks.push({ level: 'LOW', text: '<strong>Over-Engineering Risk:</strong> Full ' + (raw.redundancy === '2n1' ? '2(N+1)' : '2N') + ' redundancy adds significant cost. Validate that SLA requirements justify this level of redundancy versus a ' + (raw.redundancy === '2n1' ? '2N' : 'N+1') + ' design.' });
+            risks.push({ level: 'LOW', text: '<strong>Annual Review:</strong> Re-run this analysis with updated market conditions, commodity prices, and regulatory requirements before final procurement decisions.' });
+
+            const riskHTML = risks.map(r => {
+                const c = r.level === 'HIGH' ? '#dc2626' : r.level === 'MEDIUM' ? '#d97706' : '#059669';
+                return '<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;"><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:' + c + ';color:white;font-size:9px;font-weight:700;">' + r.level + '</span></td><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;font-size:11px;">' + r.text + '</td></tr>';
+            }).join('');
+
+            // Optimization opportunities
+            let optHTML = '';
+            const opts = [];
+            if (mechPct > 20 && raw.coolingType !== 'liquid') opts.push('Evaluate direct liquid cooling (DLC) for high-density racks — potential 20-40% cooling CAPEX reduction with PUE improvement');
+            if (raw.buildingType === 'purpose' && itKW < 5000) opts.push('Consider warehouse conversion instead of purpose-built — potential 15-25% civil cost savings for smaller facilities');
+            if (raw.redundancy === '2n1' && itKW < 3000) opts.push('Evaluate 2N instead of 2(N+1) redundancy for this scale — significant CAPEX savings with minimal SLA impact');
+            if (elecPct > 30) opts.push('Investigate modular UPS architecture to right-size initial deployment and scale with demand — reduces day-1 CAPEX');
+            if (result.softCosts.design / total > 0.06) opts.push('Design & engineering at ' + ((result.softCosts.design / total) * 100).toFixed(1) + '% of CAPEX — consider value engineering workshop to identify cost reduction opportunities');
+            if (timeline && timeline.totalMonths > 18) opts.push('Prefabricated/modular power and cooling skids could reduce MEP installation time by 30-50%');
+            opts.push('Phase IT deployment to match customer demand — reduces initial rack/cabling/PDU investment by 30-50%');
+
+            if (opts.length > 0) {
+                optHTML = '<div style="margin-bottom:14px;"><div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:8px;">Optimization Opportunities</div><ul style="margin:0;padding-left:18px;font-size:11px;line-height:1.7;color:#374151;">' + opts.map(o => '<li>' + o + '</li>').join('') + '</ul></div>';
+            }
+
+            // Comparison narrative
+            let compNarrative = '';
+            if (hasCompare && savedA) {
+                const delta = ((total - savedA.total) / savedA.total * 100);
+                const sign = delta >= 0 ? '+' : '';
+                const perKwA = savedA.total / savedA.itLoad;
+                compNarrative = '<div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:14px;margin-bottom:14px;">' +
+                    '<div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:6px;">Scenario Comparison Insight</div>' +
+                    '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0 0 6px;">' +
+                    'Scenario B (' + formatCurrency(total) + ', $' + Math.round(perKW).toLocaleString() + '/kW) is <strong>' + sign + delta.toFixed(1) + '%</strong> (' + sign + formatCurrency(total - savedA.total) + ') ' + (delta >= 0 ? 'higher' : 'lower') + ' than Scenario A (' + formatCurrency(savedA.total) + ', $' + Math.round(perKwA).toLocaleString() + '/kW).</p>' +
+                    '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">' +
+                    (Math.abs(delta) > 20 ? 'The substantial cost difference reflects fundamentally different design philosophies. Carefully evaluate whether the additional investment translates to proportional improvements in reliability, efficiency, and operational performance.' :
+                    Math.abs(delta) > 8 ? 'The moderate cost difference is likely driven by changes in scale, redundancy level, or cooling strategy. Review the component-level comparison to identify the primary cost drivers.' :
+                    'The scenarios are closely aligned in total CAPEX, suggesting that the configuration changes have minimal cost impact. Selection should be based on operational preferences, efficiency targets, and long-term OPEX implications rather than CAPEX alone.') +
+                    '</p></div>';
+            }
+
+            // Assemble narrative
+            return '<div style="page-break-before:auto;margin-top:24px;">' +
+                '<h2 style="font-size:16px;color:#1e3a5f;border-bottom:3px solid #1e3a5f;padding-bottom:6px;margin-bottom:14px;">Executive Assessment & Recommendations</h2>' +
+
+                // Cost Profile Badge
+                '<div style="display:flex;gap:12px;margin-bottom:14px;">' +
+                    '<div style="flex:0 0 140px;background:' + costProfile.color + ';color:white;border-radius:10px;padding:16px;text-align:center;">' +
+                        '<div style="font-size:10px;opacity:0.8;text-transform:uppercase;letter-spacing:1px;">CAPEX Profile</div>' +
+                        '<div style="font-size:16px;font-weight:800;margin:4px 0;">' + costProfile.label + '</div>' +
+                        '<div style="font-size:11px;opacity:0.9;">$' + Math.round(perKW).toLocaleString() + '/kW</div>' +
+                    '</div>' +
+                    '<div style="flex:1;font-size:11.5px;line-height:1.65;color:#374151;">' +
+                        '<p style="margin:0 0 6px;"><strong>Investment Assessment:</strong> At <strong style="font-family:monospace;">' + formatCurrency(total) + '</strong> ($' + Math.round(perKW).toLocaleString() + '/kW) for a ' + (mw >= 1 ? mw.toFixed(1) + ' MW' : itKW.toLocaleString() + ' kW') + ' ' + tier + ' facility, this project is ' + costProfile.desc + '</p>' +
+                        '<p style="margin:0;font-size:10.5px;color:#6b7280;">Top cost drivers: ' + top3.map(([k, v]) => (costFactors[k]?.label || k) + ' (' + ((v / total) * 100).toFixed(0) + '%)').join(', ') + '</p>' +
+                    '</div>' +
+                '</div>' +
+
+                // Cost Structure
+                '<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:14px;">' +
+                    '<div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:6px;">Cost Structure Analysis</div>' +
+                    '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">' + structureNarrative + '</p>' +
+                '</div>' +
+
+                // PUE & Efficiency
+                '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:14px;">' +
+                    '<div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:6px;">Energy Efficiency & PUE Assessment</div>' +
+                    '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">' + pueNarrative + '</p>' +
+                '</div>' +
+
+                // Timeline
+                (timelineNarrative ? '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:14px;">' +
+                    '<div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:6px;">Construction Timeline Assessment</div>' +
+                    '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">' + timelineNarrative + '</p>' +
+                '</div>' : '') +
+
+                // Comparison insight
+                compNarrative +
+
+                // Optimization opportunities
+                optHTML +
+
+                // Risk & Action Items
+                '<div style="margin-bottom:14px;">' +
+                    '<div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:8px;">Risk Assessment & Action Items</div>' +
+                    '<table style="width:100%;border-collapse:collapse;">' +
+                        '<tr style="background:#1e3a5f;color:white;"><th style="padding:5px 8px;text-align:left;font-size:10px;width:80px;">Level</th><th style="padding:5px 8px;text-align:left;font-size:10px;">Item</th></tr>' +
+                        riskHTML +
+                    '</table>' +
+                '</div>' +
+
+                // Summary KPI bar
+                '<div style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);border-radius:10px;padding:14px;color:white;display:flex;gap:2px;text-align:center;">' +
+                    [
+                        { label: 'Total CAPEX', value: formatCurrency(total) },
+                        { label: '$/kW', value: '$' + Math.round(perKW).toLocaleString() },
+                        { label: 'PUE', value: pue.toFixed(2) },
+                        { label: 'Annual Energy', value: formatCurrency(result.annualEnergy) },
+                        { label: 'Timeline', value: (timeline ? timeline.totalMonths + ' mo' : '—') },
+                        { label: 'Tier', value: tier }
+                    ].map(function(k) { return '<div style="flex:1;padding:6px;background:rgba(255,255,255,0.06);border-radius:6px;margin:0 2px;"><div style="font-size:13px;font-weight:700;font-family:monospace;">' + k.value + '</div><div style="font-size:8px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">' + k.label + '</div></div>'; }).join('') +
+                '</div>' +
+            '</div>';
         }
 
         // ═══ EXPORT PDF ═══
@@ -2226,6 +3591,11 @@
                     { label: 'Fire Suppression', a: ac.fireSuppression || '—', b: bc.fireSuppression || '—' },
                     { label: 'PUE', a: ac.pue || a.pue, b: bc.pue || b.pue },
                     { label: 'Fuel Storage', a: ac.fuelHours || '—', b: bc.fuelHours || '—' },
+                    { label: 'Delivery Method', a: ac.deliveryMethod || '—', b: bc.deliveryMethod || '—' },
+                    { label: 'Power Distribution', a: ac.powerDistribution || '—', b: bc.powerDistribution || '—' },
+                    { label: 'Floor Type', a: ac.floorType || '—', b: bc.floorType || '—' },
+                    { label: 'Site Condition', a: ac.siteCondition || '—', b: bc.siteCondition || '—' },
+                    { label: 'Security', a: ac.securityLevel || '—', b: bc.securityLevel || '—' },
                     { label: 'Mode', a: ac.mode || 'Simple', b: bc.mode || 'Simple' },
                     { label: 'Year', a: ac.yearLabel || a.yearLabel, b: bc.yearLabel || b.yearLabel },
                     { label: 'City/Market', a: ac.cityLabel || a.cityLabel || '—', b: bc.cityLabel || b.cityLabel || '—' },
@@ -2293,15 +3663,24 @@
             } else {
                 // Single scenario — original 3-column layout
                 const cfg = result._config || {};
-                let singleConfigHTML = `<tr><td style="padding:6px 0;color:#6b7280;">IT Load</td><td style="padding:6px 0;font-weight:600;">${cfg.itLoad || result.itLoad.toLocaleString()+' kW'}</td></tr>
-                    <tr><td style="padding:6px 0;color:#6b7280;">Location</td><td style="padding:6px 0;font-weight:600;">${cfg.location || '—'}</td></tr>
-                    <tr><td style="padding:6px 0;color:#6b7280;">Redundancy</td><td style="padding:6px 0;font-weight:600;">${cfg.redundancy || '—'}</td></tr>
-                    <tr><td style="padding:6px 0;color:#6b7280;">Cooling</td><td style="padding:6px 0;font-weight:600;">${cfg.coolingType || '—'}</td></tr>
-                    <tr><td style="padding:6px 0;color:#6b7280;">Rack Density</td><td style="padding:6px 0;font-weight:600;">${cfg.rackDensity || '—'}</td></tr>
-                    <tr><td style="padding:6px 0;color:#6b7280;">Tier</td><td style="padding:6px 0;font-weight:600;">${result.tierInfo.tier}</td></tr>
-                    <tr><td style="padding:6px 0;color:#6b7280;">PUE</td><td style="padding:6px 0;font-weight:600;">${result.pue}</td></tr>`;
-                if (result.yearLabel !== '2025') singleConfigHTML += `<tr><td style="padding:6px 0;color:#6b7280;">Projection Year</td><td style="padding:6px 0;font-weight:600;">${result.yearLabel}</td></tr>`;
-                if (result.cityLabel) singleConfigHTML += `<tr><td style="padding:6px 0;color:#6b7280;">City/Market</td><td style="padding:6px 0;font-weight:600;">${result.cityLabel}</td></tr>`;
+                const cR = 'padding:5px 0;color:#6b7280;font-size:11px;';
+                const cV = 'padding:5px 0;font-weight:600;font-size:11px;';
+                let singleConfigHTML = `<tr><td style="${cR}">IT Load</td><td style="${cV}">${cfg.itLoad || result.itLoad.toLocaleString()+' kW'}</td></tr>
+                    <tr><td style="${cR}">Location</td><td style="${cV}">${cfg.location || '—'}${cfg.cityLabel !== '—' ? ' — ' + cfg.cityLabel : ''}</td></tr>
+                    <tr><td style="${cR}">Building Type</td><td style="${cV}">${cfg.buildingType || '—'}</td></tr>
+                    <tr><td style="${cR}">Redundancy / Tier</td><td style="${cV}">${cfg.redundancy || '—'} (${result.tierInfo.tier})</td></tr>
+                    <tr><td style="${cR}">Cooling</td><td style="${cV}">${cfg.coolingType || '—'}</td></tr>
+                    <tr><td style="${cR}">Rack Density</td><td style="${cV}">${cfg.rackDensity || '—'}</td></tr>
+                    <tr><td style="${cR}">UPS / Generator</td><td style="${cV}">${cfg.upsType || '—'} / ${cfg.genType || '—'}</td></tr>
+                    <tr><td style="${cR}">Fire Suppression</td><td style="${cV}">${cfg.fireSuppression || '—'}</td></tr>
+                    <tr><td style="${cR}">Floor / Site</td><td style="${cV}">${cfg.floorType || '—'} / ${cfg.siteCondition || '—'}</td></tr>
+                    <tr><td style="${cR}">Power Distribution</td><td style="${cV}">${cfg.powerDistribution || '—'}</td></tr>
+                    <tr><td style="${cR}">Cabling / PDU</td><td style="${cV}">${cfg.cablingType || '—'} / ${cfg.pduType || '—'}</td></tr>
+                    <tr><td style="${cR}">Delivery Method</td><td style="${cV}">${cfg.deliveryMethod || '—'}</td></tr>
+                    <tr><td style="${cR}">Market Condition</td><td style="${cV}">${cfg.marketCondition || '—'}</td></tr>
+                    <tr><td style="${cR}">Security / Fiber</td><td style="${cV}">${cfg.securityLevel || '—'} / ${cfg.fiberEntry || '—'}</td></tr>
+                    <tr><td style="${cR}">Projection Year</td><td style="${cV}">${result.yearLabel}</td></tr>
+                    <tr><td style="${cR}">PUE</td><td style="${cV}">${result.pue}</td></tr>`;
 
                 configMetricsHTML = `
                 <div style="display:flex;gap:16px;margin-bottom:20px;">
@@ -2333,20 +3712,27 @@
             <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
                 <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
                     <div>
-                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center CAPEX Report</h1>
+                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center CAPEX Report${savedScenario ? ' — Scenario Comparison' : ''}</h1>
                         <p style="font-size:11px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
                     </div>
+                    ${savedScenario ? `
+                    <div style="display:flex;gap:12px;text-align:right;">
+                        <div style="padding:6px 12px;background:#fef3c7;border-radius:8px;"><div style="font-size:9px;color:#92400e;text-transform:uppercase;font-weight:700;">Scenario A</div><div style="font-size:18px;font-weight:700;color:#d97706;font-family:monospace;">${formatCurrency(savedScenario.total)}</div><div style="font-size:10px;color:#6b7280;">${formatCurrency(savedScenario.total/savedScenario.itLoad)}/kW</div></div>
+                        <div style="padding:6px 12px;background:#d1fae5;border-radius:8px;"><div style="font-size:9px;color:#065f46;text-transform:uppercase;font-weight:700;">Scenario B</div><div style="font-size:18px;font-weight:700;color:#059669;font-family:monospace;">${formatCurrency(result.total)}</div><div style="font-size:10px;color:#6b7280;">${formatCurrency(result.total/result.itLoad)}/kW</div></div>
+                    </div>` : `
                     <div style="text-align:right;">
                         <div style="font-size:26px;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</div>
                         <div style="font-size:12px;color:#6b7280;">${formatCurrency(result.total/result.itLoad)}/kW · ${result.itLoad.toLocaleString()} kW IT Load</div>
-                    </div>
+                    </div>`}
                 </div>
                 ${compareSummaryHTML}
                 ${configMetricsHTML}
                 ${compareBreakdownHTML}
+                ${isPremiumUser ? buildPremiumPdfSection(result) : ''}
+                ${generateCapexNarrative(result, !!savedScenario, savedScenario)}
                 <div style="margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center;">
                     <p>This report is a general-purpose estimate. Actual costs depend on site-specific engineering, local regulations, and procurement strategy.</p>
-                    <p style="margin-top:4px;">Generated by Data Center CAPEX Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana</p>
+                    <p style="margin-top:4px;">Generated by Data Center CAPEX Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana${isPremiumUser ? ' · PRO Report' : ''}</p>
                 </div>
             </body></html>`;
 
@@ -2399,6 +3785,428 @@
                 });
             });
         }
+
+        // ═══════════════════════════════════════════
+        // PREMIUM OUTPUT RENDERING
+        // ═══════════════════════════════════════════
+        function renderPremiumOutput() {
+            if (!isPremiumUser || !lastResult || userTier !== 'pro') {
+                document.getElementById('premiumOutput').style.display = 'none';
+                return;
+            }
+            document.getElementById('premiumOutput').style.display = 'flex';
+
+            const r = lastResult;
+            const itLoad = r.itLoad;
+            const redundancy = document.querySelector('input[name="redundancy"]:checked').value;
+            const rackType = document.querySelector('input[name="rackType"]:checked').value;
+            const coolingType = document.querySelector('input[name="coolingType"]:checked').value;
+            const upsType = document.getElementById('upsType').value;
+            const genType = document.getElementById('genType').value;
+            const fireType = document.getElementById('fireType').value;
+
+            // 1. KPI Cards
+            const racks = Math.ceil(itLoad / rackKw[rackType]);
+            const floorM2 = Math.ceil(racks * rackFootprint);
+            const buildingType = document.getElementById('buildingType').value;
+            const location = document.getElementById('locationFactor').value;
+            const cityVal = document.getElementById('cityMarket') ? document.getElementById('cityMarket').value : 'none';
+            const effRegion = (cityVal !== 'none' && cityData[cityVal]) ? cityData[cityVal].region : location;
+            const phases = r._timeline || computeTimeline(redundancy, buildingType, coolingType, effRegion, itLoad);
+            const totalMonths = phases.totalMonths;
+
+            document.getElementById('premRackCount').textContent = racks.toLocaleString();
+            document.getElementById('premFloorSpace').textContent = floorM2.toLocaleString() + ' m²';
+            document.getElementById('premTimeline').textContent = totalMonths + ' mo';
+
+            // 2. $/kW Benchmark
+            const perKw = r.total / itLoad;
+            const pct = Math.min(Math.max((perKw - 5000) / 25000, 0), 1) * 100;
+            document.getElementById('benchmarkMarker').style.left = pct + '%';
+            document.getElementById('benchmarkLabel').style.left = pct + '%';
+            document.getElementById('benchmarkLabel').textContent = '$' + Math.round(perKw).toLocaleString() + '/kW';
+
+            // 3. Construction Timeline (Gantt-style bars with parallel model)
+            const tlEl = document.getElementById('timelineChart');
+            const regionLabel = (permitRegionMult[effRegion] || permitRegionMult.usa).label.split(',')[0];
+            const buildLabel = { warehouse: 'Warehouse', modular: 'Modular/Prefab', purpose: 'Purpose-Built', highrise: 'High-Rise' }[buildingType] || '';
+            const icons = ['fa-drafting-compass', 'fa-file-alt', 'fa-truck', 'fa-hard-hat', 'fa-wrench', 'fa-clipboard-check'];
+            const notes = [
+                itLoad > 10000 ? 'Scaled for ' + (itLoad/1000).toFixed(0) + ' MW' : '',
+                regionLabel,
+                'Long-lead equipment',
+                buildLabel,
+                coolingType === 'liquid' ? 'DLC pipework +30%' : coolingType === 'rdhx' ? 'RDHX plumbing +15%' : '',
+                redundancy === '2n1' ? 'Full IST/ISST' : redundancy === '2n' ? 'IST required' : ''
+            ];
+            let tlHTML = '';
+            phases.phases.forEach((p, i) => {
+                const leftPct = (p.start / totalMonths * 100).toFixed(1);
+                const widthPct = ((p.end - p.start) / totalMonths * 100).toFixed(1);
+                const dur = p.end - p.start;
+                tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;align-items:center;font-size:0.7rem;">
+                    <div style="color:#e2e8f0;display:flex;align-items:center;gap:6px;font-weight:500;"><i class="fas ${icons[i]}" style="color:${p.color};width:14px;text-align:center;"></i>${p.name.length > 18 ? p.name.substring(0,16) + '..' : p.name}</div>
+                    <div style="position:relative;height:20px;background:rgba(255,255,255,0.06);border-radius:4px;">
+                        <div style="position:absolute;left:${leftPct}%;width:${widthPct}%;height:100%;background:linear-gradient(90deg,${p.color},${p.color}cc);border-radius:4px;display:flex;align-items:center;padding-left:6px;overflow:hidden;">
+                            ${notes[i] ? `<span style="font-size:0.5rem;color:rgba(255,255,255,0.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">${notes[i]}</span>` : ''}
+                        </div>
+                    </div>
+                    <div style="color:${p.color};font-weight:700;text-align:right;">${dur} mo</div>
+                </div>`;
+            });
+            // Total row
+            const serialTotal = phases.design + phases.permit + phases.procurement + phases.civil + phases.mep + phases.commission;
+            const savedPct = Math.round((serialTotal - totalMonths) / serialTotal * 100);
+            tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;align-items:center;font-size:0.7rem;margin-top:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);">
+                <div style="color:#fbbf24;font-weight:700;">Total (Design→COD)</div>
+                <div style="height:3px;background:linear-gradient(90deg,#8b5cf6,#f59e0b,#ec4899,#3b82f6,#10b981,#06b6d4);border-radius:2px;"></div>
+                <div style="color:#fbbf24;font-weight:800;text-align:right;">${totalMonths} mo</div>
+            </div>`;
+            if (savedPct > 0) {
+                tlHTML += `<div style="font-size:0.55rem;color:#94a3b8;text-align:right;margin-top:2px;">Parallel model saves ~${savedPct}% vs serial execution</div>`;
+            }
+            tlEl.innerHTML = tlHTML;
+
+            // 5. Sustainability Metrics (region-specific)
+            const smEl = document.getElementById('sustainMetrics');
+            const annualMWh = itLoad * r.pue * 8760 / 1000;
+            const emFactor = gridEmissionFactor[effRegion] || 0.4;
+            const co2Tons = annualMWh * emFactor;
+            const wue = wueByCooling[coolingType] || 0;
+            const waterM3 = wue * itLoad * r.pue * 8760 / 1000;
+            const dcie = (1 / r.pue * 100).toFixed(1);
+            const refrig = refrigerantData[coolingType] || refrigerantData.air;
+            smEl.innerHTML = `
+                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#047857,#10b981);box-shadow:0 2px 6px rgba(16,185,129,0.2);">
+                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">PUE / DCiE</div>
+                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">${r.pue.toFixed(2)}</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">DCiE ${dcie}% · ${r.pue <= 1.3 ? 'Excellent' : r.pue <= 1.5 ? 'Good' : r.pue <= 1.7 ? 'Average' : 'Below Average'}</div>
+                </div>
+                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);box-shadow:0 2px 6px rgba(59,130,246,0.2);">
+                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">Annual Energy</div>
+                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">${(annualMWh / 1000).toFixed(1)} GWh</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">${annualMWh.toLocaleString(undefined,{maximumFractionDigits:0})} MWh/yr</div>
+                </div>
+                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 2px 6px rgba(245,158,11,0.2);">
+                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">Scope 2 CO₂</div>
+                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">${co2Tons >= 1000 ? (co2Tons / 1000).toFixed(1) + 'K' : Math.round(co2Tons)} t</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">${emFactor.toFixed(2)} tCO₂/MWh (${(effRegion||'avg').toUpperCase()})</div>
+                </div>
+                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#0e7490,#06b6d4);box-shadow:0 2px 6px rgba(6,182,212,0.2);">
+                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">Water / Refrigerant</div>
+                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">WUE ${wue.toFixed(1)}</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">${refrig.type}${refrig.gwp > 0 ? ' GWP ' + refrig.gwp : ''}</div>
+                </div>`;
+
+            // Report date
+            document.getElementById('premReportDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // ═══════════════════════════════════════════
+        // FEATURE GATING SYSTEM
+        // ═══════════════════════════════════════════
+        function applyFeatureGating() {
+            const isFree = !isPremiumUser;               // true for free tier
+            const isFullPremium = (userTier === 'pro');   // pro tier
+
+            // 1. $/kW section — blur for free only (demo + pro see values)
+            const perKwSection = document.getElementById('perKwSection');
+            const perKwValue = document.getElementById('perKwCost');
+            const perKwBadge = document.getElementById('perKwGateBadge');
+            if (perKwSection) {
+                if (isFree) {
+                    perKwSection.classList.add('gated-overlay');
+                    perKwValue.classList.add('cost-value-hidden');
+                } else {
+                    perKwSection.classList.remove('gated-overlay');
+                    perKwValue.classList.remove('cost-value-hidden');
+                }
+            }
+            if (perKwBadge) perKwBadge.style.display = isFree ? 'inline-flex' : 'none';
+
+            // 2. Annual Energy — blur for free only
+            const energySection = document.getElementById('energySection');
+            const energyValue = document.getElementById('energyCost');
+            const energyBadge = document.getElementById('energyGateBadge');
+            if (energySection) {
+                if (isFree) {
+                    energySection.classList.add('gated-overlay');
+                    energyValue.classList.add('cost-value-hidden');
+                } else {
+                    energySection.classList.remove('gated-overlay');
+                    energyValue.classList.remove('cost-value-hidden');
+                }
+            }
+            if (energyBadge) energyBadge.style.display = isFree ? 'inline-flex' : 'none';
+
+            // 3. Cost breakdown — hide dollar values for free only
+            const costItems = document.querySelectorAll('#costBreakdown .cost-item');
+            costItems.forEach((item, index) => {
+                const valueEl = item.querySelector('.cost-value');
+                const barEl = item.querySelector('.cost-bar');
+                if (isFree) {
+                    if (valueEl) valueEl.classList.add('cost-value-hidden');
+                    if (barEl && index > 2) barEl.style.opacity = '0.15';
+                } else {
+                    if (valueEl) valueEl.classList.remove('cost-value-hidden');
+                    if (barEl) barEl.style.opacity = '1';
+                }
+            });
+
+            // 4. Action buttons — lock for free (pro only)
+            const btnSave = document.getElementById('btnSaveA');
+            const btnPdf = document.getElementById('btnExportPDF');
+            const btnSaveLabel = document.getElementById('btnSaveLabel');
+            const btnPdfLabel = document.getElementById('btnPdfLabel');
+            const lockActions = !isFullPremium; // free locked
+            if (lockActions) {
+                if (btnSave) { btnSave.classList.add('gated-btn','clickable'); btnSave.style.opacity = '0.6'; }
+                if (btnPdf) { btnPdf.classList.add('gated-btn','clickable'); btnPdf.style.opacity = '0.6'; }
+                if (btnSaveLabel) btnSaveLabel.innerHTML = '<i class="fas fa-lock" style="font-size:0.65rem;margin-right:3px;color:#a78bfa;"></i>Save Scenario A';
+                if (btnPdfLabel) btnPdfLabel.innerHTML = '<i class="fas fa-lock" style="font-size:0.65rem;margin-right:3px;color:#a78bfa;"></i>Export PDF';
+            } else {
+                if (btnSave) { btnSave.classList.remove('gated-btn','clickable'); btnSave.style.opacity = '1'; }
+                if (btnPdf) { btnPdf.classList.remove('gated-btn','clickable'); btnPdf.style.opacity = '1'; }
+                if (btnSaveLabel) btnSaveLabel.textContent = 'Save Scenario A';
+                if (btnPdfLabel) btnPdfLabel.textContent = 'Export PDF';
+            }
+
+            // 5. Watermark — show for free only
+            const watermark = document.getElementById('freeWatermark');
+            if (watermark) watermark.style.display = isFree ? 'block' : 'none';
+
+            // 6. Advanced tab — add lock icon for free only
+            const advBtn = document.querySelector('.capex-mode-btn[data-mode="advanced"]');
+            if (advBtn) {
+                if (isFree) {
+                    if (!advBtn.querySelector('.gate-lock-icon')) {
+                        advBtn.insertAdjacentHTML('beforeend', '<i class="fas fa-lock gate-lock-icon" style="margin-left:6px;font-size:0.65rem;color:#a78bfa;"></i>');
+                    }
+                } else {
+                    const lockIcon = advBtn.querySelector('.gate-lock-icon');
+                    if (lockIcon) lockIcon.remove();
+                }
+            }
+
+            // 7. Comparison section — blur for free (pro only)
+            const compareGrid = document.getElementById('compareGrid');
+            if (compareGrid) {
+                if (!isFullPremium) {
+                    compareGrid.style.filter = 'blur(4px)';
+                    compareGrid.style.pointerEvents = 'none';
+                    compareGrid.style.opacity = '0.5';
+                } else {
+                    compareGrid.style.filter = 'none';
+                    compareGrid.style.pointerEvents = 'auto';
+                    compareGrid.style.opacity = '1';
+                }
+            }
+        }
+
+        // Gated action handler — intercepts non-pro users
+        function gatedAction(action) {
+            if (userTier !== 'pro') {
+                handlePremiumTab(); // show login modal for free users
+                return;
+            }
+            if (action === 'save') saveScenarioA();
+            if (action === 'pdf') exportPDF();
+        }
+
+        // PREMIUM ACCESS SYSTEM (Temporary)
+        // ═══════════════════════════════════════════
+
+        // Check if already logged in (session persistence)
+        (function checkPremiumSession() {
+            const session = localStorage.getItem('rz_premium_session');
+            if (session) {
+                try {
+                    const data = JSON.parse(session);
+                    // Handle both ISO string and timestamp formats
+                    const expiresMs = typeof data.expires === 'string' ? new Date(data.expires).getTime() : data.expires;
+                    if (expiresMs > Date.now()) {
+                        isPremiumUser = true;
+                        userTier = data.tier || 'pro';
+                        activatePremiumUI();
+                    } else {
+                        localStorage.removeItem('rz_premium_session');
+                    }
+                } catch(e) {
+                    localStorage.removeItem('rz_premium_session');
+                }
+            }
+        })();
+
+        function handlePremiumTab() {
+            if (isPremiumUser) {
+                // Already premium — toggle to show advanced mode
+                switchCapexMode('advanced');
+                return;
+            }
+            // Show login modal
+            const modal = document.getElementById('loginModal');
+            modal.style.display = 'flex';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            setTimeout(() => document.getElementById('loginEmail').focus(), 100);
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target === this) closeLoginModal();
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLoginModal();
+        });
+
+        function attemptLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (!email || !password) {
+                errorEl.textContent = 'Please enter email and password';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Temporary hardcoded auth (will be replaced with Supabase)
+            const validUsers = [
+                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
+                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
+                { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' }
+            ];
+
+            const match = validUsers.find(u => u.email === email && u.password === password);
+
+            if (match) {
+                // Login success — store session (30 days)
+                var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
+                localStorage.setItem('rz_premium_session', JSON.stringify({
+                    email: match.email,
+                    tier: match.tier,
+                    expires: expDate.toISOString()
+                }));
+                isPremiumUser = true;
+                userTier = match.tier;
+                closeLoginModal();
+                activatePremiumUI();
+                switchCapexMode('advanced');
+            } else {
+                errorEl.textContent = 'Invalid email or password';
+                errorEl.style.display = 'block';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginPassword').focus();
+            }
+        }
+
+        function activatePremiumUI() {
+            const premBtn = document.getElementById('premiumTabBtn');
+            premBtn.classList.add('premium-active');
+            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium Active';
+            premBtn.onclick = function() { logoutPremium(); };
+
+            // Show tier badge
+            const premBadge = document.getElementById('premiumBadge');
+            premBadge.textContent = 'PRO ACTIVE';
+            premBadge.style.display = 'inline-flex';
+            premBadge.style.background = 'linear-gradient(135deg,#8b5cf6,#a855f7)';
+            premBadge.style.color = 'white';
+
+            // Enable advanced mode and apply gating
+            switchCapexMode('advanced');
+            applyFeatureGating();
+            renderPremiumOutput();
+
+            // Update navbar auth UI
+            updateNavbarAuthUI();
+        }
+
+        function logoutPremium() {
+            if (!confirm('Logout from your account?')) return;
+            isPremiumUser = false;
+            userTier = 'free';
+            localStorage.removeItem('rz_premium_session');
+
+            const premBtn = document.getElementById('premiumTabBtn');
+            premBtn.classList.remove('premium-active');
+            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+            premBtn.onclick = function() { handlePremiumTab(); };
+
+            // Hide badge
+            document.getElementById('premiumBadge').style.display = 'none';
+
+            switchCapexMode('simple');
+            applyFeatureGating();
+            renderPremiumOutput(); // hides premium output
+
+            // Update navbar auth UI
+            updateNavbarAuthUI();
+
+            // Close dropdown if open
+            const dd = document.getElementById('navUserDropdown');
+            if (dd) dd.classList.remove('show');
+        }
+
+        // Toggle user dropdown in navbar
+        function toggleUserDropdown() {
+            const btn = document.getElementById('navUserBtn');
+            const dd = document.getElementById('navUserDropdown');
+            btn.classList.toggle('open');
+            dd.classList.toggle('show');
+        }
+
+        // Close dropdown on outside click
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('navAuthWrap');
+            if (wrap && !wrap.contains(e.target)) {
+                const dd = document.getElementById('navUserDropdown');
+                const btn = document.getElementById('navUserBtn');
+                if (dd) dd.classList.remove('show');
+                if (btn) btn.classList.remove('open');
+            }
+        });
+
+        // Update navbar auth state (login btn vs user avatar)
+        function updateNavbarAuthUI() {
+            const loginBtn = document.getElementById('navLoginBtn');
+            const userBtn = document.getElementById('navUserBtn');
+            const ddEmail = document.getElementById('navDdEmail');
+            const ddBadge = document.getElementById('navDdTierBadge');
+            const avatar = document.getElementById('navUserAvatar');
+            const emailSpan = document.getElementById('navUserEmail');
+
+            if (isPremiumUser) {
+                const session = JSON.parse(localStorage.getItem('rz_premium_session') || '{}');
+                const email = session.email || '';
+                const initial = email.charAt(0).toUpperCase();
+                loginBtn.style.display = 'none';
+                userBtn.style.display = 'flex';
+                avatar.textContent = initial;
+                emailSpan.textContent = email;
+                ddEmail.textContent = email;
+                ddBadge.textContent = 'PRO';
+                ddBadge.className = 'nav-dd-tier-badge pro';
+            } else {
+                loginBtn.style.display = 'flex';
+                userBtn.style.display = 'none';
+            }
+        }
+
+        // Apply gating on initial page load (after DOM + calculateCosts)
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                applyFeatureGating();
+                updateNavbarAuthUI();
+            }, 100);
+        });
     </script>
 </body>
 </html>

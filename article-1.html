@@ -56,6 +56,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -856,7 +857,198 @@
             text-decoration: underline;
         }
 
-        /* Responsive */
+        /* ═══ TOOLTIP SYSTEM ═══ */
+        .tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 50%;
+            font-size: 10px;
+            color: #fbbf24;
+            cursor: help;
+            margin-left: 6px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .tooltip-trigger:hover { background: rgba(245, 158, 11, 0.3); transform: scale(1.15); }
+        .tooltip-trigger .tooltip-content { display: none; }
+
+        #maturity-tooltip-container {
+            position: fixed;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            z-index: 999999;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease;
+            color: white;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        #maturity-tooltip-container.visible { opacity: 1; visibility: visible; }
+        #maturity-tooltip-container .tooltip-title { font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 8px; }
+        #maturity-tooltip-container .tooltip-desc { color: rgba(255,255,255,0.9); margin-bottom: 6px; }
+        #maturity-tooltip-container .tooltip-formula { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px; margin-top: 6px; color: #22d3ee; }
+
+        /* ═══ MODE TOGGLE ═══ */
+        .maturity-mode-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 1.5rem; }
+        .maturity-mode-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.06);
+            color: #94a3b8;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .maturity-mode-btn:hover { background: rgba(255,255,255,0.12); color: #e2e8f0; }
+        .maturity-mode-btn.active { background: rgba(59,130,246,0.25); border-color: rgba(59,130,246,0.5); color: #60a5fa; }
+        .maturity-mode-btn .fa-lock { font-size: 0.7rem; color: #fbbf24; }
+
+        /* ═══ GATING ═══ */
+        .pro-panel { position: relative; margin-top: 1.5rem; }
+        .gated-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .gated-overlay .gated-icon { font-size: 2rem; color: #fbbf24; margin-bottom: 8px; }
+        .gated-overlay .gated-text { color: #e2e8f0; font-size: 0.85rem; font-weight: 600; }
+        .gated-overlay .gated-sub { color: #94a3b8; font-size: 0.75rem; margin-top: 4px; }
+        .gated-badge { display: inline-block; background: linear-gradient(135deg,#7c3aed,#a855f7); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ═══ PRO PANELS ═══ */
+        .pro-panel-inner {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+        .pro-panel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pro-panel-title i { color: #a855f7; font-size: 0.85rem; }
+
+        /* Facility Context Grid */
+        .facility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
+        .facility-grid .calc-input-group .calc-label { font-size: 0.75rem; }
+
+        /* Weight Editor */
+        .weight-editor-grid { display: grid; gap: 0.6rem; }
+        .weight-row { display: flex; align-items: center; gap: 0.75rem; }
+        .weight-row-label { min-width: 120px; font-size: 0.8rem; color: #94a3b8; }
+        .weight-row input[type="range"] { flex: 1; accent-color: #a855f7; height: 6px; }
+        .weight-row-value { min-width: 40px; text-align: right; font-size: 0.8rem; font-weight: 700; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; }
+        .weight-total { text-align: right; font-size: 0.85rem; font-weight: 700; color: #fbbf24; margin-top: 0.5rem; }
+        .weight-total.invalid { color: #ef4444; }
+        .weight-preset-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+        .weight-preset-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .weight-preset-btn:hover, .weight-preset-btn.active { background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.5); color: #c084fc; }
+
+        /* Sub-Dimension Accordions */
+        .subdim-accordion { margin-bottom: 0.5rem; }
+        .subdim-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .subdim-header:hover { background: rgba(255,255,255,0.08); }
+        .subdim-header-label { font-size: 0.8rem; color: #e2e8f0; font-weight: 600; }
+        .subdim-header-avg { font-size: 0.8rem; font-weight: 700; color: #60a5fa; font-family: 'JetBrains Mono', monospace; }
+        .subdim-header .fa-chevron-down { font-size: 0.65rem; color: #64748b; transition: transform 0.2s; }
+        .subdim-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .subdim-body.open { max-height: 500px; }
+        .subdim-body-inner { padding: 0.75rem; display: grid; gap: 0.5rem; }
+        .subdim-row { display: flex; align-items: center; gap: 0.5rem; }
+        .subdim-row-label { flex: 1; font-size: 0.75rem; color: #94a3b8; }
+        .subdim-row select { width: 110px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 6px; color: #e2e8f0; font-size: 0.75rem; }
+        .subdim-row select option { background: #1e293b; color: #fff; }
+
+        /* ═══ TORNADO / SENSITIVITY ═══ */
+        .tornado-bar-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+        .tornado-label { min-width: 110px; text-align: right; font-size: 0.75rem; color: #94a3b8; }
+        .tornado-track { flex: 1; height: 18px; background: rgba(255,255,255,0.05); border-radius: 4px; position: relative; overflow: hidden; }
+        .tornado-neg { position: absolute; top: 0; height: 100%; background: rgba(239,68,68,0.6); border-radius: 4px 0 0 4px; }
+        .tornado-pos { position: absolute; top: 0; height: 100%; background: rgba(34,197,94,0.6); border-radius: 0 4px 4px 0; }
+        .tornado-range { min-width: 45px; font-size: 0.7rem; font-weight: 600; color: #e2e8f0; text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+        /* ═══ CONFIDENCE ═══ */
+        .confidence-display { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .confidence-stat { text-align: center; padding: 0.5rem 1rem; background: rgba(255,255,255,0.04); border-radius: 8px; }
+        .confidence-stat-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #60a5fa; }
+        .confidence-stat-label { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+
+        /* ═══ SCENARIO WHAT-IF ═══ */
+        .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; }
+        .scenario-item { display: flex; align-items: center; gap: 0.5rem; }
+        .scenario-item-label { min-width: 100px; font-size: 0.75rem; color: #94a3b8; }
+        .scenario-item select { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 6px; color: #e2e8f0; font-size: 0.75rem; }
+        .scenario-item select option { background: #1e293b; }
+        .scenario-result-bar { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; padding: 1rem; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2); border-radius: 10px; }
+        .scenario-result-bar .sr-current, .scenario-result-bar .sr-target { text-align: center; flex: 1; }
+        .scenario-result-bar .sr-value { font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+        .scenario-result-bar .sr-label { font-size: 0.7rem; color: #94a3b8; }
+        .scenario-result-bar .sr-delta { font-size: 1.2rem; font-weight: 700; color: #22c55e; }
+
+        /* ═══ WATERFALL ═══ */
+        .waterfall-container { display: flex; justify-content: center; margin: 1rem 0; }
+
+        /* ═══ EXPORT BTN ═══ */
+        .maturity-export-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(168,85,247,0.3);
+            background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(124,58,237,0.15));
+            color: #c084fc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .maturity-export-btn:hover { background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(124,58,237,0.25)); transform: translateY(-1px); }
+
+        /* ═══ RESPONSIVE ═══ */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
             .article-content { padding: 2rem 1rem; }
@@ -867,6 +1059,12 @@
             .calc-results { grid-template-columns: repeat(2, 1fr); }
             .benchmark-grid { grid-template-columns: repeat(2, 1fr); }
             .dimension-bar-label { min-width: 90px; font-size: 0.7rem; }
+            .tornado-label { min-width: 80px; }
+            .weight-row-label { min-width: 90px; }
+            .facility-grid { grid-template-columns: 1fr 1fr; }
+            .scenario-grid { grid-template-columns: 1fr; }
+            .confidence-display { gap: 0.5rem; }
+            .maturity-mode-btn { padding: 6px 12px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -1106,6 +1304,17 @@
                 <p>
                     We begin with theory. Not because theory is academic luxury, but because the language we use to describe operations determines what we measure, what we value, and ultimately what we fund. The distinction between <span class="tooltip" data-tip="Safety-I: Traditional approach focused on what goes wrong">Safety-I</span> and <span class="tooltip" data-tip="Safety-II: Modern approach focused on understanding why things go right">Safety-II</span> thinking is not a philosophical curiosity. It is the difference between an organization that only reacts to failure and one that actively engineers success.
                 </p>
+
+                <!-- Quick Assessment CTA -->
+                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; padding: 1.5rem 2rem; margin: 2rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+                    <div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;">Assess Your Facility's Operational Maturity</div>
+                        <div style="font-size: 0.82rem; color: #94a3b8;">Rate 8 dimensions on a 1-5 scale. Get your composite score, radar chart, and improvement priorities instantly.</div>
+                    </div>
+                    <a href="#maturityCalculator" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: none; white-space: nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <i class="fas fa-calculator"></i> Try the Calculator
+                    </a>
+                </div>
 
                 <!-- Section 2: Safety-I vs Safety-II -->
                 <h2 id="section-2">
@@ -1900,106 +2109,182 @@
                     <h3 class="calculator-title">Operational Maturity Assessment</h3>
                     <p class="calculator-subtitle">Rate each dimension from 1 (Ad-hoc) to 5 (Optimized) to calculate your composite maturity score</p>
 
+                    <!-- Mode Toggle -->
+                    <div class="maturity-mode-bar">
+                        <button class="maturity-mode-btn active" id="maturityModeFree" onclick="switchMaturityMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
+                        <button class="maturity-mode-btn" id="maturityModePro" onclick="switchMaturityMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maturityProBadge">PRO</span></button>
+                    </div>
+
+                    <!-- ─── 8 DIMENSION INPUTS ─── -->
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Documentation</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Documentation
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Documentation (Weight: 10%)</div><div class="tooltip-desc">SOPs, MOPs, EOPs, as-built drawings, version control, CMMS integration.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No formal docs; tribal knowledge only<br><strong>2 Repeatable:</strong> Some docs exist but outdated or incomplete<br><strong>3 Defined:</strong> All critical SOPs documented, version-controlled<br><strong>4 Managed:</strong> Docs linked to CMMS, audit trail, regular reviews<br><strong>5 Optimized:</strong> Automated doc workflows, real-time as-builts, integrated knowledge base</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-doc" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Training</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Training
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Training (Weight: 15%)</div><div class="tooltip-desc">Competency programs, cross-training, certifications, drill frequency, skill gap analysis.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> OJT only, no structured program<br><strong>2 Repeatable:</strong> Annual training schedule, basic orientation<br><strong>3 Defined:</strong> Role-based competency matrix, regular drills<br><strong>4 Managed:</strong> Cross-training across systems, skill gap tracking, certifications required<br><strong>5 Optimized:</strong> Continuous learning culture, external benchmarking, advanced simulation drills</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-train" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Change Management</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Change Management
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Change Management (Weight: 15%)</div><div class="tooltip-desc">MOC process, risk assessment, CAB governance, rollback procedures. Prevents ~70% of human-caused outages.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> Changes made without formal process or approval<br><strong>2 Repeatable:</strong> Change requests logged, basic approvals<br><strong>3 Defined:</strong> Formal MOC with risk assessment, CAB reviews<br><strong>4 Managed:</strong> Automated workflows, rollback plans mandatory, post-change verification<br><strong>5 Optimized:</strong> Predictive impact analysis, zero-downtime change windows, automated validation</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-change" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Monitoring</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Monitoring
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monitoring (Weight: 15%)</div><div class="tooltip-desc">BMS/DCIM coverage, alarm hierarchy, dashboards, trend analysis, predictive analytics.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> Manual readings, no centralized monitoring<br><strong>2 Repeatable:</strong> BMS installed but limited coverage, alarm fatigue<br><strong>3 Defined:</strong> Full BMS coverage, tiered alarm hierarchy, basic dashboards<br><strong>4 Managed:</strong> DCIM integrated, trend analysis, KPI dashboards, automated reporting<br><strong>5 Optimized:</strong> Predictive analytics (ML/AI), anomaly detection, digital twin integration</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-monitor" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Maintenance</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Maintenance
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maintenance (Weight: 15%)</div><div class="tooltip-desc">PM program, CMMS utilization, PdM integration, spare parts strategy, vendor management.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> Reactive only (fix when broken), no PM schedule<br><strong>2 Repeatable:</strong> Basic PM schedule, manual tracking<br><strong>3 Defined:</strong> CMMS-driven PM program, work order tracking, spare parts inventory<br><strong>4 Managed:</strong> PdM integration (vibration, thermal), vendor SLA tracking, KPIs<br><strong>5 Optimized:</strong> Condition-based maintenance, AI-driven scheduling, RCM methodology</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-maint" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Emergency Readiness</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Emergency Readiness
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Emergency Readiness (Weight: 10%)</div><div class="tooltip-desc">EOP completeness, drill realism, escalation matrix, communication protocols, RTO/RPO.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No written EOPs, ad-hoc response<br><strong>2 Repeatable:</strong> Basic EOPs exist, annual drills<br><strong>3 Defined:</strong> Comprehensive EOPs, quarterly drills, clear escalation matrix<br><strong>4 Managed:</strong> Realistic drills with measured MTTR, automated communication, tabletop exercises<br><strong>5 Optimized:</strong> Continuous readiness assessment, cross-site drills, post-incident improvement loop</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-emergency" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Continuous Improvement</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Continuous Improvement
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Continuous Improvement (Weight: 10%)</div><div class="tooltip-desc">RCA depth, CAPA tracking, lessons learned, benchmarking practices.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No formal RCA process, repeat incidents<br><strong>2 Repeatable:</strong> Basic incident reports, some follow-up<br><strong>3 Defined:</strong> Structured RCA (5-Why, Ishikawa), CAPA tracking<br><strong>4 Managed:</strong> Lessons learned database, proactive CAPA, industry benchmarking<br><strong>5 Optimized:</strong> Self-improving system (Safety-II), data-driven optimization, cross-industry learning</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-improve" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Leadership</label>
+                            <label class="calc-label" style="display:flex;align-items:center;">Leadership
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Leadership (Weight: 10%)</div><div class="tooltip-desc">Management commitment, resource allocation, safety culture, strategic planning. Impact multiplier: 1.5x.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No executive sponsorship, ops seen as cost center<br><strong>2 Repeatable:</strong> Basic management oversight, reactive budget allocation<br><strong>3 Defined:</strong> Dedicated ops leadership, annual budget planning, safety awareness<br><strong>4 Managed:</strong> Just culture established, cross-functional alignment, strategic roadmap<br><strong>5 Optimized:</strong> Ops excellence as competitive advantage, full executive buy-in, generative culture</div></span></span>
+                            </label>
                             <select class="calc-select" id="calc-leadership" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option>
-                                <option value="2">2 - Repeatable</option>
-                                <option value="3" selected>3 - Defined</option>
-                                <option value="4">4 - Managed</option>
-                                <option value="5">5 - Optimized</option>
+                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Results -->
+                    <!-- ─── PRO INPUT PANELS (appear right after dimension inputs, BEFORE results) ─── -->
+                    <div id="maturityProInputs" style="display:none;">
+
+                        <!-- 1. Facility Context -->
+                        <div class="pro-panel" id="proFacilityContext">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-building"></i> Facility Context
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Facility Context</div><div class="tooltip-desc">Contextualizes your maturity score against your facility's profile. Larger facilities and higher tiers typically require higher maturity to operate safely. This data appears in your PDF report.</div></span></span>
+                                </div>
+                                <div class="facility-grid">
+                                    <div class="calc-input-group">
+                                        <label class="calc-label" style="display:flex;align-items:center;">Capacity (MW)
+                                            <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">IT Capacity</div><div class="tooltip-desc">Total IT power capacity. Larger facilities (10+ MW) need higher operational maturity due to complexity, blast radius, and regulatory scrutiny.</div></span></span>
+                                        </label>
+                                        <select class="calc-select" id="pro-capacity" onchange="calculateMaturity()">
+                                            <option value="1">1 MW</option><option value="2">2 MW</option><option value="5" selected>5 MW</option><option value="10">10 MW</option><option value="20">20 MW</option><option value="50">50 MW</option><option value="100">100+ MW</option>
+                                        </select>
+                                    </div>
+                                    <div class="calc-input-group">
+                                        <label class="calc-label" style="display:flex;align-items:center;">Facility Type
+                                            <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Facility Type</div><div class="tooltip-desc"><strong>Enterprise:</strong> Single-tenant, internal IT<br><strong>Colocation:</strong> Multi-tenant, shared infrastructure<br><strong>Hyperscale:</strong> 50+ MW, cloud provider-grade<br><strong>Edge:</strong> Distributed, remote, unmanned</div></span></span>
+                                        </label>
+                                        <select class="calc-select" id="pro-type" onchange="calculateMaturity()">
+                                            <option value="enterprise">Enterprise</option><option value="colocation" selected>Colocation</option><option value="hyperscale">Hyperscale</option><option value="edge">Edge</option>
+                                        </select>
+                                    </div>
+                                    <div class="calc-input-group">
+                                        <label class="calc-label" style="display:flex;align-items:center;">Redundancy Tier
+                                            <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Uptime Tier Level</div><div class="tooltip-desc"><strong>Tier I:</strong> Basic, no redundancy (99.671%)<br><strong>Tier II:</strong> Redundant components (99.741%)<br><strong>Tier III:</strong> Concurrently maintainable (99.982%)<br><strong>Tier IV:</strong> Fault tolerant (99.995%)</div></span></span>
+                                        </label>
+                                        <select class="calc-select" id="pro-tier" onchange="calculateMaturity()">
+                                            <option value="1">Tier I</option><option value="2">Tier II</option><option value="3" selected>Tier III</option><option value="4">Tier IV</option>
+                                        </select>
+                                    </div>
+                                    <div class="calc-input-group">
+                                        <label class="calc-label" style="display:flex;align-items:center;">Operating Model
+                                            <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Operating Model</div><div class="tooltip-desc"><strong>In-House:</strong> All staff employed directly<br><strong>Managed Services:</strong> Outsourced to FM provider<br><strong>Hybrid:</strong> Core team in-house, specialists outsourced</div></span></span>
+                                        </label>
+                                        <select class="calc-select" id="pro-model" onchange="calculateMaturity()">
+                                            <option value="inhouse" selected>In-House</option><option value="managed">Managed Services</option><option value="hybrid">Hybrid</option>
+                                        </select>
+                                    </div>
+                                    <div class="calc-input-group">
+                                        <label class="calc-label" style="display:flex;align-items:center;">Region
+                                            <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Geographic Region</div><div class="tooltip-desc">Affects benchmark comparison. APAC, Americas, and EMEA have different regulatory environments and maturity baselines.</div></span></span>
+                                        </label>
+                                        <select class="calc-select" id="pro-region" onchange="calculateMaturity()">
+                                            <option value="apac" selected>Asia Pacific</option><option value="americas">Americas</option><option value="emea">EMEA</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Custom Weights -->
+                        <div class="pro-panel" id="proCustomWeights">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-sliders"></i> Custom Weights
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Custom Dimension Weights</div><div class="tooltip-desc">Adjust how much each dimension contributes to the final score. Use presets for industry-specific weighting or manually tune each slider. Total must equal 100%. AI/HPC facilities typically weight Monitoring and Maintenance higher.</div></span></span>
+                                </div>
+                                <div class="weight-preset-bar" id="weightPresetBar"></div>
+                                <div class="weight-editor-grid" id="weightEditorGrid"></div>
+                                <div class="weight-total" id="weightTotal">Total: 100%</div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Sub-Dimension Scoring -->
+                        <div class="pro-panel" id="proSubDimensions">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-layer-group"></i> Sub-Dimension Scoring
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Sub-Dimension Detail</div><div class="tooltip-desc">Break each dimension into 4-6 specific practices for granular scoring. The average of sub-dimensions automatically updates the parent dimension score. Click each accordion to expand and rate individual practices.</div></span></span>
+                                </div>
+                                <div id="subDimContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ─── RESULTS ─── -->
                     <div class="calc-results">
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-score">50</div>
-                            <div class="calc-result-label">Composite Score (0-100)</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Composite Score (0-100)
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Composite Score</div><div class="tooltip-desc">Normalized score mapping 1-5 weighted average to 0-100 scale.</div><div class="tooltip-formula">((WeightedSum - 1) / 4) &times; 100</div><div class="tooltip-desc" style="margin-top:6px;">Score of 50 = all dimensions at Level 3 (Defined).</div></span></span>
+                            </div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-level">3</div>
-                            <div class="calc-result-label">Maturity Level</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Maturity Level
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maturity Level (1-5)</div><div class="tooltip-desc">1 = Reactive (0-20): Firefighting mode<br>2 = Preventive (21-40): Basic PM in place<br>3 = Predictive (41-60): Data-driven decisions<br>4 = Proactive (61-80): Risk anticipation<br>5 = Generative (81-100): Self-improving system</div></span></span>
+                            </div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-label" style="font-size: 1.1rem;">Predictive</div>
-                            <div class="calc-result-label">Maturity Category</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Maturity Category
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maturity Category</div><div class="tooltip-desc"><strong>Reactive</strong> — Firefighting, no process, high incident rate<br><strong>Preventive</strong> — Scheduled maintenance, some structure<br><strong>Predictive</strong> — Data-driven, trending, condition monitoring<br><strong>Proactive</strong> — Anticipatory risk management, leading indicators<br><strong>Generative</strong> — Self-improving, Safety-II, organizational learning</div></span></span>
+                            </div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-weighted">3.00</div>
-                            <div class="calc-result-label">Weighted Average (1-5)</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Weighted Average (1-5)
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weighted Average</div><div class="tooltip-desc">Raw weighted mean before normalization. Each dimension score (1-5) multiplied by its percentage weight. Range: 1.00 (all Level 1) to 5.00 (all Level 5).</div></span></span>
+                            </div>
                         </div>
                     </div>
 
@@ -2011,20 +2296,84 @@
 
                     <!-- Dimension Bars -->
                     <h4 style="color: #e2e8f0; margin: 2rem 0 1rem; font-size: 0.95rem;">Dimension Scores</h4>
-                    <div class="dimension-bars" id="dimensionBars">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div class="dimension-bars" id="dimensionBars"></div>
 
                     <!-- Top 3 Priorities -->
-                    <h4 style="color: #e2e8f0; margin: 2rem 0 1rem; font-size: 0.95rem;">Top 3 Improvement Priorities</h4>
-                    <div class="priority-list" id="priorityList">
-                        <!-- Populated by JS -->
-                    </div>
+                    <h4 style="color: #e2e8f0; margin: 2rem 0 1rem; font-size: 0.95rem; display:flex;align-items:center;gap:6px;">Top 3 Improvement Priorities
+                        <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Priority Score</div><div class="tooltip-desc">Calculated as (5 - Score) &times; Weight &times; Impact Multiplier. Higher score = more leverage from improving this dimension first.</div></span></span>
+                    </h4>
+                    <div class="priority-list" id="priorityList"></div>
 
                     <!-- Benchmark Comparison -->
-                    <h4 style="color: #e2e8f0; margin: 2rem 0 1rem; font-size: 0.95rem;">Benchmark Comparison</h4>
-                    <div class="benchmark-grid" id="benchmarkGrid">
-                        <!-- Populated by JS -->
+                    <h4 style="color: #e2e8f0; margin: 2rem 0 1rem; font-size: 0.95rem; display:flex;align-items:center;gap:6px;">Benchmark Comparison
+                        <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Industry Benchmarks</div><div class="tooltip-desc">Directional benchmarks from Uptime Institute &amp; industry assessments.<br><br>Tier I ≈ 25 · Tier II ≈ 45 · Tier III ≈ 65 · Tier IV ≈ 82<br><br>Your score is highlighted against these reference points.</div></span></span>
+                    </h4>
+                    <div class="benchmark-grid" id="benchmarkGrid"></div>
+
+                    <!-- PDF Export (available in both modes) -->
+                    <button class="maturity-export-btn" onclick="exportMaturityPDF()" style="margin-top:2rem;">
+                        <i class="fas fa-file-pdf"></i> Export Maturity Report (PDF)
+                    </button>
+
+                    <!-- ─── PRO ANALYSIS PANELS (appear after results/charts) ─── -->
+                    <div id="maturityProPanels" style="display:none;">
+
+                        <h4 style="color: #c084fc; margin: 2rem 0 1rem; font-size: 1rem; font-weight: 700; display:flex;align-items:center;gap:8px;"><i class="fas fa-microscope" style="font-size:0.85rem;"></i> Pro Analysis</h4>
+
+                        <!-- 4. Sensitivity Tornado -->
+                        <div class="pro-panel" id="proSensitivity">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-tornado"></i> Sensitivity Analysis
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Tornado Chart</div><div class="tooltip-desc">Shows the impact on your composite score if each dimension changes by &plusmn;1 point. Sorted by total range — dimensions at the top have the most leverage. Red = score decrease, Green = score increase.</div></span></span>
+                                </div>
+                                <div id="tornadoContainer"></div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Scenario What-If -->
+                        <div class="pro-panel" id="proScenario">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-flask"></i> Scenario What-If
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">What-If Scenario</div><div class="tooltip-desc">Set target scores for each dimension and see the projected composite score improvement. Useful for building business cases: "If we invest in training (3→4) and monitoring (3→4), our score improves by X points."</div></span></span>
+                                </div>
+                                <div class="scenario-grid" id="scenarioGrid"></div>
+                                <div class="scenario-result-bar" id="scenarioResult" style="display:none;"></div>
+                            </div>
+                        </div>
+
+                        <!-- 6. Confidence Interval -->
+                        <div class="pro-panel" id="proConfidence">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-chart-area"></i> Confidence Interval (Monte Carlo)
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo Simulation</div><div class="tooltip-desc">Runs 10,000 simulations with &plusmn;0.5 random noise on each dimension to estimate score uncertainty. P5/P95 = 90% confidence interval. Narrow CI = high confidence in your score; wide CI = more uncertainty in the assessment.</div></span></span>
+                                </div>
+                                <div class="confidence-display" id="confidenceDisplay"></div>
+                            </div>
+                        </div>
+
+                        <!-- 7. Waterfall Chart -->
+                        <div class="pro-panel" id="proWaterfall">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-chart-bar"></i> Waterfall — Dimension Contributions
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Waterfall Chart</div><div class="tooltip-desc">Shows each dimension's individual contribution to the composite score, stacked cumulatively. Taller bars = larger contributors. The rightmost bar shows the total. Useful for identifying which dimensions drive the most value.</div></span></span>
+                                </div>
+                                <div class="waterfall-container">
+                                    <canvas id="waterfallCanvas" width="500" height="280"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8. Current vs Target Radar -->
+                        <div class="pro-panel" id="proTargetRadar">
+                            <div class="pro-panel-inner">
+                                <div class="pro-panel-title"><i class="fas fa-bullseye"></i> Current vs Target Radar
+                                    <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Dual Radar Chart</div><div class="tooltip-desc">Blue polygon = your current scores. Purple dashed polygon = your target scores (from What-If above). The gap between them visualizes improvement opportunities across all 8 dimensions.</div></span></span>
+                                </div>
+                                <div class="radar-chart-container">
+                                    <canvas id="proRadarCanvas" width="400" height="400"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2330,7 +2679,8 @@
 
     <!-- Maturity Calculator Script -->
     <script>
-        // Configuration
+    (function() {
+        // ═══ CONFIGURATION ═══
         const dimensions = [
             { id: 'doc', label: 'Documentation', weight: 0.10, impact: 1.0, el: 'calc-doc' },
             { id: 'train', label: 'Training', weight: 0.15, impact: 1.2, el: 'calc-train' },
@@ -2349,6 +2699,76 @@
             { tier: 'Tier IV', avg: 82 }
         ];
 
+        const weightPresets = {
+            default: { label: 'Default', weights: [0.10, 0.15, 0.15, 0.15, 0.15, 0.10, 0.10, 0.10] },
+            'ai-hpc': { label: 'AI / HPC', weights: [0.08, 0.12, 0.12, 0.20, 0.20, 0.08, 0.10, 0.10] },
+            colocation: { label: 'Colocation', weights: [0.12, 0.10, 0.18, 0.15, 0.15, 0.12, 0.08, 0.10] },
+            enterprise: { label: 'Enterprise', weights: [0.10, 0.15, 0.12, 0.12, 0.12, 0.12, 0.12, 0.15] }
+        };
+
+        const subDimensions = {
+            doc: [
+                { id: 'sop', label: 'SOP/MOP Quality', desc: 'Standard & Method of Procedure completeness' },
+                { id: 'eop', label: 'EOP Coverage', desc: 'Emergency Operating Procedures for all scenarios' },
+                { id: 'asbuilt', label: 'As-Built Accuracy', desc: 'Drawings match physical infrastructure' },
+                { id: 'version', label: 'Version Control', desc: 'Document change tracking and audit trails' },
+                { id: 'cmms', label: 'CMMS Integration', desc: 'Docs linked to work orders and assets' }
+            ],
+            train: [
+                { id: 'competency', label: 'Competency Program', desc: 'Structured role-based training paths' },
+                { id: 'cross', label: 'Cross-Training', desc: 'Multi-skill coverage for redundancy' },
+                { id: 'cert', label: 'Certifications', desc: 'Industry certs (CDCP, ATD, K3 Listrik)' },
+                { id: 'drill', label: 'Drill Frequency', desc: 'Tabletop and live drill cadence' },
+                { id: 'gap', label: 'Skill Gap Analysis', desc: 'Regular assessment and remediation' }
+            ],
+            change: [
+                { id: 'moc', label: 'MOC Process', desc: 'Management of Change formalization' },
+                { id: 'risk', label: 'Risk Assessment', desc: 'Pre-change risk scoring methodology' },
+                { id: 'cab', label: 'CAB Governance', desc: 'Change Advisory Board effectiveness' },
+                { id: 'rollback', label: 'Rollback Plans', desc: 'Documented rollback for every change' },
+                { id: 'postchange', label: 'Post-Change Review', desc: 'Verification and lessons learned' }
+            ],
+            monitor: [
+                { id: 'bms', label: 'BMS/DCIM Coverage', desc: 'Sensor density and system coverage' },
+                { id: 'alarm', label: 'Alarm Hierarchy', desc: 'Prioritized alarm tiers (info/warn/critical)' },
+                { id: 'dashboard', label: 'Dashboards', desc: 'Real-time operational visibility' },
+                { id: 'trend', label: 'Trend Analysis', desc: 'Historical pattern recognition' },
+                { id: 'predictive', label: 'Predictive Analytics', desc: 'ML/AI-based anomaly detection' }
+            ],
+            maint: [
+                { id: 'pm', label: 'PM Program', desc: 'Preventive maintenance scheduling' },
+                { id: 'cmmsutil', label: 'CMMS Utilization', desc: 'Work order completion and tracking' },
+                { id: 'pdm', label: 'PdM Integration', desc: 'Predictive maintenance (vibration, thermal)' },
+                { id: 'spares', label: 'Spare Parts Strategy', desc: 'Critical spares inventory management' },
+                { id: 'vendor', label: 'Vendor Management', desc: 'SLA tracking and performance review' }
+            ],
+            emergency: [
+                { id: 'eopcomp', label: 'EOP Completeness', desc: 'All failure scenarios documented' },
+                { id: 'drillreal', label: 'Drill Realism', desc: 'Exercises simulate actual conditions' },
+                { id: 'escalation', label: 'Escalation Matrix', desc: 'Clear chain of command and contacts' },
+                { id: 'comms', label: 'Communication Protocol', desc: 'Internal and external notification plans' }
+            ],
+            improve: [
+                { id: 'rca', label: 'RCA Depth', desc: 'Root cause analysis methodology (5-Why, Ishikawa)' },
+                { id: 'capa', label: 'CAPA Tracking', desc: 'Corrective/preventive action closure rate' },
+                { id: 'lessons', label: 'Lessons Learned DB', desc: 'Searchable knowledge base of incidents' },
+                { id: 'benchmark', label: 'Benchmarking', desc: 'Regular comparison against industry peers' }
+            ],
+            leadership: [
+                { id: 'commitment', label: 'Mgmt Commitment', desc: 'Visible leadership support for operations' },
+                { id: 'resources', label: 'Resource Allocation', desc: 'Adequate staffing, budget, and tools' },
+                { id: 'culture', label: 'Safety Culture', desc: 'Just culture, blameless post-mortems' },
+                { id: 'alignment', label: 'Cross-Functional', desc: 'IT-Facilities-Business alignment' }
+            ]
+        };
+
+        // ═══ STATE ═══
+        let isPremiumMaturity = false;
+        let maturityMode = 'free';
+        let customWeights = dimensions.map(d => d.weight);
+        let proBuilt = false;
+
+        // ═══ CORE FUNCTIONS ═══
         function getMaturityLabel(score) {
             if (score <= 20) return { label: 'Reactive', level: 1, color: '#ef4444' };
             if (score <= 40) return { label: 'Preventive', level: 2, color: '#f97316' };
@@ -2357,30 +2777,34 @@
             return { label: 'Generative', level: 5, color: '#3b82f6' };
         }
 
-        function calculateMaturity() {
-            // Get values
-            const values = dimensions.map(d => ({
+        function getActiveWeights() {
+            if (maturityMode === 'pro') return customWeights;
+            return dimensions.map(d => d.weight);
+        }
+
+        function calculateScoreWithValues(vals, weights) {
+            const ws = vals.reduce((s, v, i) => s + v * (weights || getActiveWeights())[i], 0);
+            return ((ws - 1) / 4) * 100;
+        }
+
+        window.calculateMaturity = function() {
+            const weights = getActiveWeights();
+            const values = dimensions.map((d, i) => ({
                 ...d,
+                weight: weights[i],
                 value: parseInt(document.getElementById(d.el).value)
             }));
 
-            // Weighted sum (1-5 scale)
             const weightedSum = values.reduce((sum, d) => sum + d.value * d.weight, 0);
-
-            // Composite score (0-100)
             const compositeScore = ((weightedSum - 1) / 4) * 100;
-
-            // Maturity level
             const maturity = getMaturityLabel(compositeScore);
 
-            // Update results
             document.getElementById('result-score').textContent = Math.round(compositeScore);
             document.getElementById('result-level').textContent = maturity.level;
             document.getElementById('result-label').textContent = maturity.label;
             document.getElementById('result-label').style.color = maturity.color;
             document.getElementById('result-weighted').textContent = weightedSum.toFixed(2);
 
-            // Gap analysis and priorities
             const gaps = values.map(d => ({
                 label: d.label,
                 gap: 5 - d.value,
@@ -2388,161 +2812,704 @@
                 value: d.value
             })).sort((a, b) => b.priority - a.priority);
 
-            // Render dimension bars
-            const barsHtml = values.map(d => {
+            document.getElementById('dimensionBars').innerHTML = values.map(d => {
                 const pct = (d.value / 5) * 100;
-                return `<div class="dimension-bar">
-                    <div class="dimension-bar-label">${d.label}</div>
-                    <div class="dimension-bar-track">
-                        <div class="dimension-bar-fill" style="width: ${pct}%">${d.value}/5</div>
-                    </div>
-                </div>`;
+                return `<div class="dimension-bar"><div class="dimension-bar-label">${d.label}</div><div class="dimension-bar-track"><div class="dimension-bar-fill" style="width:${pct}%">${d.value}/5</div></div></div>`;
             }).join('');
-            document.getElementById('dimensionBars').innerHTML = barsHtml;
 
-            // Render top 3 priorities
             const top3 = gaps.filter(g => g.gap > 0).slice(0, 3);
-            const priorityHtml = top3.length > 0 ? top3.map((p, i) => `
-                <div class="priority-item">
-                    <div class="priority-rank">${i + 1}</div>
-                    <div>
-                        <div class="priority-text"><strong>${p.label}</strong> — Current: ${p.value}/5, Gap: ${p.gap}</div>
-                        <div class="priority-gap">Priority Score: ${p.priority.toFixed(3)}</div>
-                    </div>
-                </div>
-            `).join('') : '<div style="color: #94a3b8; font-size: 0.85rem; padding: 1rem;">All dimensions at maximum — no improvement gaps identified.</div>';
-            document.getElementById('priorityList').innerHTML = priorityHtml;
+            document.getElementById('priorityList').innerHTML = top3.length > 0 ? top3.map((p, i) => `
+                <div class="priority-item"><div class="priority-rank">${i + 1}</div><div><div class="priority-text"><strong>${p.label}</strong> — Current: ${p.value}/5, Gap: ${p.gap}</div><div class="priority-gap">Priority Score: ${p.priority.toFixed(3)}</div></div></div>
+            `).join('') : '<div style="color:#94a3b8;font-size:0.85rem;padding:1rem;">All dimensions at maximum.</div>';
 
-            // Render benchmarks
             const benchmarkHtml = benchmarks.map(b => {
                 const isClosest = Math.abs(compositeScore - b.avg) === Math.min(...benchmarks.map(x => Math.abs(compositeScore - x.avg)));
-                return `<div class="benchmark-item ${isClosest ? 'benchmark-marker' : ''}">
-                    <div class="benchmark-tier">${b.tier} Avg</div>
-                    <div class="benchmark-value">${b.avg}</div>
-                </div>`;
-            }).join('') + `<div class="benchmark-item" style="border: 2px solid #3b82f6;">
-                <div class="benchmark-tier">Your Score</div>
-                <div class="benchmark-value" style="color: ${maturity.color};">${Math.round(compositeScore)}</div>
-            </div>`;
+                return `<div class="benchmark-item ${isClosest ? 'benchmark-marker' : ''}"><div class="benchmark-tier">${b.tier} Avg</div><div class="benchmark-value">${b.avg}</div></div>`;
+            }).join('') + `<div class="benchmark-item" style="border:2px solid #3b82f6;"><div class="benchmark-tier">Your Score</div><div class="benchmark-value" style="color:${maturity.color};">${Math.round(compositeScore)}</div></div>`;
             document.getElementById('benchmarkGrid').innerHTML = benchmarkHtml;
 
-            // Draw radar chart
             drawRadarChart(values);
-        }
 
+            // Pro extensions
+            if (maturityMode === 'pro' && proBuilt) {
+                renderSensitivityTornado(values, weights);
+                renderConfidenceInterval(values, weights);
+                renderScenarioResults(values, weights);
+                renderWaterfallChart(values, weights);
+                drawProRadarChart(values);
+            }
+        };
+
+        // ═══ RADAR CHART ═══
         function drawRadarChart(values) {
             const canvas = document.getElementById('radarCanvas');
             if (!canvas) return;
+            drawRadarOnCanvas(canvas, values, null, 400);
+        }
+
+        function drawRadarOnCanvas(canvas, values, targetValues, size) {
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
-            const size = 400;
-
             canvas.width = size * dpr;
             canvas.height = size * dpr;
             canvas.style.width = size + 'px';
             canvas.style.height = size + 'px';
             ctx.scale(dpr, dpr);
-
-            const cx = size / 2;
-            const cy = size / 2;
-            const maxRadius = 150;
-            const n = values.length;
-            const angleStep = (2 * Math.PI) / n;
-            const startAngle = -Math.PI / 2;
-
-            // Clear
+            const cx = size / 2, cy = size / 2, maxR = size * 0.375;
+            const n = values.length, step = (2 * Math.PI) / n, start = -Math.PI / 2;
             ctx.clearRect(0, 0, size, size);
 
-            // Draw grid rings (1-5)
+            // Grid rings
             for (let ring = 1; ring <= 5; ring++) {
-                const r = (ring / 5) * maxRadius;
+                const r = (ring / 5) * maxR;
                 ctx.beginPath();
-                for (let i = 0; i <= n; i++) {
-                    const angle = startAngle + i * angleStep;
-                    const x = cx + r * Math.cos(angle);
-                    const y = cy + r * Math.sin(angle);
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.closePath();
-                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
+                for (let i = 0; i <= n; i++) { const a = start + i * step; const x = cx + r * Math.cos(a); const y = cy + r * Math.sin(a); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+                ctx.closePath(); ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1; ctx.stroke();
+                ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '10px Inter,sans-serif'; ctx.fillText(ring.toString(), cx + 4, cy - r + 12);
+            }
+            // Axis lines
+            for (let i = 0; i < n; i++) { const a = start + i * step; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + maxR * Math.cos(a), cy + maxR * Math.sin(a)); ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.stroke(); }
 
-                // Ring label
-                ctx.fillStyle = 'rgba(255,255,255,0.25)';
-                ctx.font = '10px Inter, sans-serif';
-                ctx.fillText(ring.toString(), cx + 4, cy - r + 12);
+            // Target polygon (if provided)
+            if (targetValues) {
+                ctx.beginPath();
+                targetValues.forEach((v, i) => { const a = start + i * step; const r = (v / 5) * maxR; const x = cx + r * Math.cos(a); const y = cy + r * Math.sin(a); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+                ctx.closePath(); ctx.fillStyle = 'rgba(168,85,247,0.15)'; ctx.fill(); ctx.strokeStyle = 'rgba(192,132,252,0.7)'; ctx.lineWidth = 2; ctx.setLineDash([6, 3]); ctx.stroke(); ctx.setLineDash([]);
             }
 
-            // Draw axis lines
-            for (let i = 0; i < n; i++) {
-                const angle = startAngle + i * angleStep;
-                const x = cx + maxRadius * Math.cos(angle);
-                const y = cy + maxRadius * Math.sin(angle);
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.lineTo(x, y);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-
-            // Draw data polygon (filled)
+            // Current polygon
             ctx.beginPath();
-            values.forEach((d, i) => {
-                const angle = startAngle + i * angleStep;
-                const r = (d.value / 5) * maxRadius;
-                const x = cx + r * Math.cos(angle);
-                const y = cy + r * Math.sin(angle);
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.closePath();
-            ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(96, 165, 250, 0.9)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            values.forEach((d, i) => { const a = start + i * step; const r = (d.value / 5) * maxR; const x = cx + r * Math.cos(a); const y = cy + r * Math.sin(a); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+            ctx.closePath(); ctx.fillStyle = 'rgba(59,130,246,0.25)'; ctx.fill(); ctx.strokeStyle = 'rgba(96,165,250,0.9)'; ctx.lineWidth = 2; ctx.stroke();
 
-            // Draw data points
-            values.forEach((d, i) => {
-                const angle = startAngle + i * angleStep;
-                const r = (d.value / 5) * maxRadius;
-                const x = cx + r * Math.cos(angle);
-                const y = cy + r * Math.sin(angle);
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                ctx.fillStyle = '#60a5fa';
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-            });
+            // Data points
+            values.forEach((d, i) => { const a = start + i * step; const r = (d.value / 5) * maxR; ctx.beginPath(); ctx.arc(cx + r * Math.cos(a), cy + r * Math.sin(a), 4, 0, 2 * Math.PI); ctx.fillStyle = '#60a5fa'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); });
 
-            // Draw labels
-            ctx.fillStyle = '#e2e8f0';
-            ctx.font = '11px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+            // Labels
+            ctx.fillStyle = '#e2e8f0'; ctx.font = '11px Inter,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             values.forEach((d, i) => {
-                const angle = startAngle + i * angleStep;
-                const labelR = maxRadius + 24;
-                const x = cx + labelR * Math.cos(angle);
-                const y = cy + labelR * Math.sin(angle);
-
-                // Adjust alignment for edges
-                if (Math.abs(Math.cos(angle)) > 0.8) {
-                    ctx.textAlign = Math.cos(angle) > 0 ? 'left' : 'right';
-                } else {
-                    ctx.textAlign = 'center';
-                }
+                const a = start + i * step; const lR = maxR + 24; const x = cx + lR * Math.cos(a); const y = cy + lR * Math.sin(a);
+                if (Math.abs(Math.cos(a)) > 0.8) ctx.textAlign = Math.cos(a) > 0 ? 'left' : 'right'; else ctx.textAlign = 'center';
                 ctx.fillText(d.label, x, y);
             });
         }
 
-        // Initial calculation
+        // ═══ SENSITIVITY TORNADO ═══
+        function renderSensitivityTornado(values, weights) {
+            const container = document.getElementById('tornadoContainer');
+            if (!container) return;
+            const baseScore = calculateScoreWithValues(values.map(v => v.value), weights);
+            const sensData = [];
+            values.forEach((d, i) => {
+                const valsLow = values.map(v => v.value); const valsHigh = values.map(v => v.value);
+                valsLow[i] = Math.max(1, d.value - 1); valsHigh[i] = Math.min(5, d.value + 1);
+                const scoreLow = calculateScoreWithValues(valsLow, weights);
+                const scoreHigh = calculateScoreWithValues(valsHigh, weights);
+                sensData.push({ label: d.label, low: scoreLow - baseScore, high: scoreHigh - baseScore, range: Math.abs(scoreHigh - scoreLow) });
+            });
+            sensData.sort((a, b) => b.range - a.range);
+            const maxRange = Math.max(...sensData.map(s => Math.max(Math.abs(s.low), Math.abs(s.high))), 1);
+            container.innerHTML = sensData.map(s => {
+                const negW = Math.abs(s.low) / maxRange * 45;
+                const posW = Math.abs(s.high) / maxRange * 45;
+                const negLeft = s.low < 0 ? (50 - negW) : 50;
+                const posLeft = s.high > 0 ? 50 : (50 - posW);
+                return `<div class="tornado-bar-row"><div class="tornado-label">${s.label}</div><div class="tornado-track"><div class="tornado-neg" style="left:${s.low < 0 ? 50 - negW : 50}%;width:${negW}%"></div><div class="tornado-pos" style="left:${s.high > 0 ? 50 : 50 - posW}%;width:${posW}%"></div><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.3);"></div></div><div class="tornado-range">${s.range.toFixed(1)}</div></div>`;
+            }).join('');
+        }
+
+        // ═══ WATERFALL CHART ═══
+        function renderWaterfallChart(values, weights) {
+            const canvas = document.getElementById('waterfallCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const w = 500, h = 280;
+            canvas.width = w * dpr; canvas.height = h * dpr;
+            canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, w, h);
+
+            const contributions = values.map((d, i) => ({ label: d.label, contrib: ((d.value * weights[i]) / 4) * 100 }));
+            const total = contributions.reduce((s, c) => s + c.contrib, 0);
+            const barW = 40, gap = 12, startX = 50, maxH = 200, topPad = 40;
+            const scale = maxH / Math.max(total, 100);
+            let cumY = topPad + maxH;
+
+            // Axis
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.beginPath(); ctx.moveTo(startX - 5, topPad + maxH); ctx.lineTo(startX + (barW + gap) * (contributions.length + 1), topPad + maxH); ctx.stroke();
+            const colors = ['#3b82f6','#10b981','#f59e0b','#06b6d4','#8b5cf6','#ef4444','#ec4899','#14b8a6'];
+
+            contributions.forEach((c, i) => {
+                const barH = c.contrib * scale;
+                const x = startX + i * (barW + gap);
+                const y = cumY - barH;
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillRect(x, y, barW, barH);
+                // Connector line
+                if (i > 0) { ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.setLineDash([3, 2]); ctx.beginPath(); ctx.moveTo(x - gap, y + barH); ctx.lineTo(x, y + barH); ctx.stroke(); ctx.setLineDash([]); }
+                cumY = y;
+                // Label
+                ctx.fillStyle = '#94a3b8'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(c.label.substring(0, 8), x + barW / 2, topPad + maxH + 14);
+                ctx.fillStyle = '#e2e8f0'; ctx.font = '10px JetBrains Mono,monospace';
+                ctx.fillText(c.contrib.toFixed(1), x + barW / 2, y - 4);
+            });
+
+            // Total bar
+            const tx = startX + contributions.length * (barW + gap);
+            const totalH = total * scale;
+            ctx.fillStyle = 'rgba(59,130,246,0.4)'; ctx.fillRect(tx, topPad + maxH - totalH, barW, totalH);
+            ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.strokeRect(tx, topPad + maxH - totalH, barW, totalH);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('TOTAL', tx + barW / 2, topPad + maxH + 14);
+            ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 11px JetBrains Mono,monospace';
+            ctx.fillText(total.toFixed(1), tx + barW / 2, topPad + maxH - totalH - 6);
+        }
+
+        // ═══ CONFIDENCE INTERVAL (MONTE CARLO) ═══
+        function renderConfidenceInterval(values, weights) {
+            const container = document.getElementById('confidenceDisplay');
+            if (!container) return;
+            const baseVals = values.map(v => v.value);
+            const results = [];
+            for (let i = 0; i < 10000; i++) {
+                const noisy = baseVals.map(v => Math.max(1, Math.min(5, v + (Math.random() - 0.5))));
+                results.push(calculateScoreWithValues(noisy, weights));
+            }
+            results.sort((a, b) => a - b);
+            const p5 = results[Math.floor(results.length * 0.05)];
+            const p95 = results[Math.floor(results.length * 0.95)];
+            const mean = results.reduce((s, v) => s + v, 0) / results.length;
+            const median = results[Math.floor(results.length * 0.5)];
+            const ciWidth = p95 - p5;
+
+            container.innerHTML = [
+                { label: 'P5', value: p5.toFixed(1) },
+                { label: 'Mean', value: mean.toFixed(1) },
+                { label: 'Median', value: median.toFixed(1) },
+                { label: 'P95', value: p95.toFixed(1) },
+                { label: '90% CI Width', value: ciWidth.toFixed(1) }
+            ].map(s => `<div class="confidence-stat"><div class="confidence-stat-value">${s.value}</div><div class="confidence-stat-label">${s.label}</div></div>`).join('');
+        }
+
+        // ═══ SCENARIO WHAT-IF ═══
+        function renderScenarioResults(values, weights) {
+            const container = document.getElementById('scenarioResult');
+            if (!container) return;
+            const targetVals = dimensions.map(d => {
+                const el = document.getElementById('scenario-' + d.id);
+                return el ? parseInt(el.value) : parseInt(document.getElementById(d.el).value);
+            });
+            const currentScore = calculateScoreWithValues(values.map(v => v.value), weights);
+            const targetScore = calculateScoreWithValues(targetVals, weights);
+            const delta = targetScore - currentScore;
+            const currentMat = getMaturityLabel(currentScore);
+            const targetMat = getMaturityLabel(targetScore);
+            container.style.display = 'flex';
+            container.innerHTML = `
+                <div class="sr-current"><div class="sr-value" style="color:${currentMat.color};">${Math.round(currentScore)}</div><div class="sr-label">Current (${currentMat.label})</div></div>
+                <div style="font-size:1.5rem;color:#64748b;">&rarr;</div>
+                <div class="sr-target"><div class="sr-value" style="color:${targetMat.color};">${Math.round(targetScore)}</div><div class="sr-label">Target (${targetMat.label})</div></div>
+                <div style="border-left:1px solid rgba(255,255,255,0.1);padding-left:1rem;"><div class="sr-delta" style="color:${delta >= 0 ? '#22c55e' : '#ef4444'};">${delta >= 0 ? '+' : ''}${delta.toFixed(1)}</div><div class="sr-label">Delta</div></div>
+            `;
+        }
+
+        // ═══ PRO RADAR (CURRENT vs TARGET) ═══
+        function drawProRadarChart(values) {
+            const canvas = document.getElementById('proRadarCanvas');
+            if (!canvas) return;
+            const targetVals = dimensions.map(d => {
+                const el = document.getElementById('scenario-' + d.id);
+                return el ? parseInt(el.value) : parseInt(document.getElementById(d.el).value);
+            });
+            drawRadarOnCanvas(canvas, values, targetVals, 400);
+        }
+
+        // ═══ WEIGHT EDITOR ═══
+        function buildWeightEditor() {
+            const presetBar = document.getElementById('weightPresetBar');
+            const grid = document.getElementById('weightEditorGrid');
+            if (!presetBar || !grid) return;
+            presetBar.innerHTML = Object.entries(weightPresets).map(([key, p]) =>
+                `<button class="weight-preset-btn${key === 'default' ? ' active' : ''}" data-preset="${key}" onclick="applyWeightPreset('${key}')">${p.label}</button>`
+            ).join('');
+            grid.innerHTML = dimensions.map((d, i) =>
+                `<div class="weight-row"><div class="weight-row-label">${d.label}</div><input type="range" min="0" max="30" step="1" value="${Math.round(customWeights[i] * 100)}" id="weight-${d.id}" oninput="updateWeight(${i}, this.value)"><div class="weight-row-value" id="weight-val-${d.id}">${Math.round(customWeights[i] * 100)}%</div></div>`
+            ).join('');
+        }
+
+        window.updateWeight = function(idx, val) {
+            customWeights[idx] = parseInt(val) / 100;
+            document.getElementById('weight-val-' + dimensions[idx].id).textContent = val + '%';
+            const total = Math.round(customWeights.reduce((s, w) => s + w, 0) * 100);
+            const totalEl = document.getElementById('weightTotal');
+            totalEl.textContent = 'Total: ' + total + '%';
+            totalEl.className = 'weight-total' + (total !== 100 ? ' invalid' : '');
+            calculateMaturity();
+        };
+
+        window.applyWeightPreset = function(key) {
+            const preset = weightPresets[key];
+            if (!preset) return;
+            customWeights = [...preset.weights];
+            dimensions.forEach((d, i) => {
+                const slider = document.getElementById('weight-' + d.id);
+                const label = document.getElementById('weight-val-' + d.id);
+                if (slider) { slider.value = Math.round(customWeights[i] * 100); }
+                if (label) { label.textContent = Math.round(customWeights[i] * 100) + '%'; }
+            });
+            document.querySelectorAll('.weight-preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.weight-preset-btn[data-preset="${key}"]`)?.classList.add('active');
+            const totalEl = document.getElementById('weightTotal');
+            totalEl.textContent = 'Total: 100%'; totalEl.className = 'weight-total';
+            calculateMaturity();
+        };
+
+        // ═══ SUB-DIMENSION ACCORDIONS ═══
+        function buildSubDimensionAccordions() {
+            const container = document.getElementById('subDimContainer');
+            if (!container) return;
+            container.innerHTML = dimensions.map(d => {
+                const subs = subDimensions[d.id] || [];
+                const parentVal = parseInt(document.getElementById(d.el).value);
+                const optionsHtml = [1,2,3,4,5].map(v => `<option value="${v}"${v === parentVal ? ' selected' : ''}>${v}</option>`).join('');
+                return `<div class="subdim-accordion">
+                    <div class="subdim-header" onclick="toggleSubDim('${d.id}')"><span class="subdim-header-label">${d.label}</span><span style="display:flex;align-items:center;gap:8px;"><span class="subdim-header-avg" id="subdim-avg-${d.id}">${parentVal.toFixed(1)}</span><i class="fas fa-chevron-down" id="subdim-chevron-${d.id}"></i></span></div>
+                    <div class="subdim-body" id="subdim-body-${d.id}"><div class="subdim-body-inner">${subs.map(s =>
+                        `<div class="subdim-row"><div class="subdim-row-label" title="${s.desc}">${s.label}</div><select id="subdim-${d.id}-${s.id}" onchange="updateSubDimAvg('${d.id}')">${optionsHtml}</select></div>`
+                    ).join('')}</div></div>
+                </div>`;
+            }).join('');
+        }
+
+        window.toggleSubDim = function(dimId) {
+            const body = document.getElementById('subdim-body-' + dimId);
+            const chevron = document.getElementById('subdim-chevron-' + dimId);
+            if (body) body.classList.toggle('open');
+            if (chevron) chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+        };
+
+        window.updateSubDimAvg = function(dimId) {
+            const subs = subDimensions[dimId] || [];
+            const vals = subs.map(s => { const el = document.getElementById('subdim-' + dimId + '-' + s.id); return el ? parseInt(el.value) : 3; });
+            const avg = vals.reduce((s, v) => s + v, 0) / vals.length;
+            const rounded = Math.round(avg);
+            document.getElementById(dimensions.find(d => d.id === dimId).el).value = rounded;
+            const avgEl = document.getElementById('subdim-avg-' + dimId);
+            if (avgEl) avgEl.textContent = avg.toFixed(1);
+            calculateMaturity();
+        };
+
+        // ═══ SCENARIO GRID ═══
+        function buildScenarioGrid() {
+            const grid = document.getElementById('scenarioGrid');
+            if (!grid) return;
+            grid.innerHTML = dimensions.map(d => {
+                const current = parseInt(document.getElementById(d.el).value);
+                const opts = [1,2,3,4,5].map(v => `<option value="${v}"${v === Math.min(5, current + 1) ? ' selected' : ''}>${v}</option>`).join('');
+                return `<div class="scenario-item"><div class="scenario-item-label">${d.label}</div><select id="scenario-${d.id}" onchange="calculateMaturity()">${opts}</select></div>`;
+            }).join('');
+        }
+
+        // ═══ MODE SWITCHING & GATING ═══
+        window.switchMaturityMode = function(mode) {
+            if (mode === 'pro' && !isPremiumMaturity) {
+                if (typeof window.opexShowLogin === 'function') window.opexShowLogin();
+                else if (document.querySelector('.login-overlay')) document.querySelector('.login-overlay').style.display = 'flex';
+                else alert('Pro Analysis requires a ResistanceZero PRO subscription.');
+                return;
+            }
+            maturityMode = mode;
+            document.getElementById('maturityModeFree').classList.toggle('active', mode === 'free');
+            document.getElementById('maturityModePro').classList.toggle('active', mode === 'pro');
+            var inputs = document.getElementById('maturityProInputs');
+            var panels = document.getElementById('maturityProPanels');
+            if (inputs) inputs.style.display = mode === 'pro' ? 'block' : 'none';
+            if (panels) panels.style.display = mode === 'pro' ? 'block' : 'none';
+            if (mode === 'pro' && !proBuilt) {
+                proBuilt = true;
+                buildWeightEditor();
+                buildSubDimensionAccordions();
+                buildScenarioGrid();
+            }
+            calculateMaturity();
+        };
+
+        function applyMaturityGating() {
+            const badge = document.getElementById('maturityProBadge');
+            if (isPremiumMaturity) {
+                if (badge) badge.style.display = 'none';
+                document.querySelectorAll('#maturityProPanels .pro-panel .gated-overlay').forEach(o => o.remove());
+            } else {
+                if (badge) badge.style.display = 'inline-block';
+            }
+        }
+
+        // ═══ NARRATIVE CONCLUSION GENERATOR ═══
+        function generateMaturityNarrative(score, maturity, weightedSum, values, gaps, weights) {
+            const sc = Math.round(score);
+            const lvl = maturity.level;
+            const lbl = maturity.label;
+            const sorted = [...values].sort((a, b) => b.value - a.value);
+            const strongest = sorted[0];
+            const secondStr = sorted[1];
+            const weakest = sorted[sorted.length - 1];
+            const secondWeak = sorted[sorted.length - 2];
+            const topGaps = gaps.filter(g => g.gap > 0).slice(0, 3);
+            const atMax = values.filter(v => v.value === 5).length;
+            const atMin = values.filter(v => v.value <= 2).length;
+            const avgScore = values.reduce((s, v) => s + v.value, 0) / values.length;
+            const spread = Math.max(...values.map(v => v.value)) - Math.min(...values.map(v => v.value));
+
+            // Benchmark positioning
+            let benchRef = '';
+            if (sc >= 82) benchRef = 'exceeds the Tier IV industry benchmark (82), placing this facility among the top-performing organizations globally';
+            else if (sc >= 65) benchRef = 'meets or exceeds the Tier III benchmark (65), indicating solid operational discipline with room for further optimization';
+            else if (sc >= 45) benchRef = 'aligns with the Tier II benchmark range (45), representing developing operational capabilities with significant improvement potential';
+            else if (sc >= 25) benchRef = 'falls within the Tier I benchmark range (25), indicating foundational capabilities that require substantial development';
+            else benchRef = 'falls below the Tier I baseline, indicating critical operational gaps that pose immediate risk to facility reliability';
+
+            // Risk assessment matrix
+            let riskLevel, riskColor, riskNarrative;
+            if (sc >= 80) { riskLevel = 'LOW'; riskColor = '#059669'; riskNarrative = 'The organization demonstrates mature, proactive risk management. Incident probability is minimized through robust preventive systems, predictive capabilities, and a culture of continuous improvement.'; }
+            else if (sc >= 60) { riskLevel = 'MODERATE'; riskColor = '#d97706'; riskNarrative = 'Core operational processes are in place, but gaps in specific dimensions create vulnerability windows. The organization responds well to known risks but may struggle with novel failure modes or cascading scenarios.'; }
+            else if (sc >= 40) { riskLevel = 'ELEVATED'; riskColor = '#ea580c'; riskNarrative = 'Multiple operational dimensions show developing maturity. The facility depends heavily on individual expertise rather than systematic processes. Human error risk is elevated due to incomplete procedures, training gaps, or monitoring blind spots.'; }
+            else { riskLevel = 'HIGH'; riskColor = '#dc2626'; riskNarrative = 'Significant operational risk exists across multiple dimensions. The facility operates in a predominantly reactive mode, with limited preventive measures and high dependency on ad-hoc responses. Immediate intervention is recommended.'; }
+
+            // Improvement impact projection
+            let improvementNarrative = '';
+            if (topGaps.length > 0) {
+                const projections = topGaps.map(g => {
+                    const newVals = values.map(v => v.value);
+                    const idx = values.findIndex(v => v.label === g.label);
+                    const target = Math.min(5, g.value + 1);
+                    newVals[idx] = target;
+                    const newWS = newVals.reduce((s, v, i) => s + v * weights[i], 0);
+                    const newScore = ((newWS - 1) / 4) * 100;
+                    const delta = newScore - score;
+                    return { label: g.label, from: g.value, to: target, delta: delta.toFixed(1), newScore: Math.round(newScore) };
+                });
+                improvementNarrative = projections.map(p =>
+                    `Improving <strong>${p.label}</strong> from Level ${p.from} to Level ${p.to} would increase the composite score by <strong>+${p.delta} points</strong> to <strong>${p.newScore}/100</strong>.`
+                ).join(' ');
+            }
+
+            // Dimension balance analysis
+            let balanceNarrative;
+            if (spread <= 1) balanceNarrative = 'Dimension scores are well-balanced (spread: ' + spread + '), indicating consistent maturity across all operational areas. This is a positive indicator — uneven organizations tend to fail at their weakest link.';
+            else if (spread <= 2) balanceNarrative = 'Moderate dimension spread (' + spread + ' points) suggests some unevenness in operational maturity. While strengths exist, the weaker dimensions represent potential failure vectors that should be addressed.';
+            else balanceNarrative = 'High dimension spread (' + spread + ' points) reveals significant imbalance. The gap between strongest (' + strongest.label + ' at ' + strongest.value + '/5) and weakest (' + weakest.label + ' at ' + weakest.value + '/5) dimensions creates operational vulnerability — incidents are most likely to originate from the weakest areas.';
+
+            // Maturity stage narrative
+            const stageDescriptions = {
+                1: 'At Level 1 (Reactive), the organization operates in firefighting mode. There are no standardized processes, and outcomes depend entirely on individual heroics. The immediate priority is establishing basic documentation, minimum viable monitoring, and foundational PM programs.',
+                2: 'At Level 2 (Preventive), basic operational structures exist but are inconsistently applied. Scheduled maintenance occurs but may lack rigor. The priority is formalizing processes, building accountability, and transitioning from calendar-based to condition-based decision-making.',
+                3: 'At Level 3 (Predictive), the organization has crossed the critical threshold from reactive to data-informed operations. Core processes are defined and followed. The challenge now is deepening analytical capability, expanding cross-training, and building organizational resilience beyond individual competence.',
+                4: 'At Level 4 (Proactive), the organization actively anticipates and mitigates risks before they materialize. Strong processes, skilled teams, and robust monitoring create a resilient operational environment. The opportunity is advancing toward generative culture — where the organization learns and adapts continuously.',
+                5: 'At Level 5 (Generative), the organization represents best-in-class operational maturity. Safety-II principles are embedded: success is actively engineered, not merely the absence of failure. Focus should shift to sustaining excellence, mentoring the industry, and preparing for next-generation challenges (AI workloads, liquid cooling, edge computing).'
+            };
+
+            // Strategic recommendations matrix
+            let recommendations = [];
+            if (atMin > 0) recommendations.push({ priority: 'CRITICAL', text: atMin + ' dimension(s) scored at Level 1-2 (Ad-hoc/Repeatable). These represent immediate operational risk. Focus on establishing minimum viable processes within 90 days.' });
+            if (topGaps.length > 0) recommendations.push({ priority: 'HIGH', text: 'Top priority improvement: <strong>' + topGaps[0].label + '</strong> (currently ' + topGaps[0].value + '/5). This dimension has the highest weighted impact score (' + topGaps[0].priority.toFixed(3) + ') — improving it yields the greatest return on investment.' });
+            if (spread >= 3) recommendations.push({ priority: 'HIGH', text: 'Address dimensional imbalance. The ' + spread + '-point spread between highest and lowest dimensions creates chain-of-failure risk. Equalize weaker areas before advancing stronger ones.' });
+            if (lvl <= 3 && values.find(v => v.id === 'monitor')?.value <= 3) recommendations.push({ priority: 'MEDIUM', text: 'Monitoring is at Level ' + (values.find(v => v.id === 'monitor')?.value || '?') + '. Invest in BMS/DCIM coverage and alarm hierarchy — you cannot manage what you cannot measure.' });
+            if (lvl <= 3 && values.find(v => v.id === 'change')?.value <= 2) recommendations.push({ priority: 'MEDIUM', text: 'Change Management is critically low. 70% of data center outages trace to human error during changes. Implement formal MOC process immediately.' });
+            if (values.find(v => v.id === 'leadership')?.value < values.find(v => v.id === 'maint')?.value) recommendations.push({ priority: 'MEDIUM', text: 'Leadership maturity (' + values.find(v => v.id === 'leadership')?.value + '/5) lags behind technical maturity. Operational improvements will stall without executive sponsorship and cultural alignment.' });
+            if (atMax >= 6) recommendations.push({ priority: 'LOW', text: 'Maintain excellence across ' + atMax + ' dimensions. Focus on sustaining performance through regular audits, benchmark refreshes, and knowledge transfer programs.' });
+            if (lvl >= 4) recommendations.push({ priority: 'LOW', text: 'Consider external validation: Uptime M&O certification, ISO 27001, or ISMS audit to formally recognize your operational maturity.' });
+
+            const recsHTML = recommendations.map(r => {
+                const pColor = r.priority === 'CRITICAL' ? '#dc2626' : r.priority === 'HIGH' ? '#ea580c' : r.priority === 'MEDIUM' ? '#d97706' : '#059669';
+                return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;"><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:${pColor};color:white;font-size:9px;font-weight:700;">${r.priority}</span></td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;font-size:11px;">${r.text}</td></tr>`;
+            }).join('');
+
+            return `
+            <div style="page-break-before:auto;margin-top:24px;">
+                <h2 style="font-size:16px;color:#1e3a5f;border-bottom:3px solid #1e3a5f;padding-bottom:6px;margin-bottom:14px;">Executive Assessment & Recommendations</h2>
+
+                <!-- Risk Badge -->
+                <div style="display:flex;gap:12px;margin-bottom:16px;">
+                    <div style="flex:0 0 140px;background:${riskColor};color:white;border-radius:10px;padding:16px;text-align:center;">
+                        <div style="font-size:10px;opacity:0.8;text-transform:uppercase;letter-spacing:1px;">Operational Risk</div>
+                        <div style="font-size:22px;font-weight:800;margin:4px 0;">${riskLevel}</div>
+                        <div style="font-size:10px;opacity:0.8;">Score: ${sc}/100</div>
+                    </div>
+                    <div style="flex:1;font-size:11.5px;line-height:1.65;color:#374151;">
+                        <p style="margin:0 0 8px;"><strong>Overall Assessment:</strong> This facility achieves a composite maturity score of <strong style="color:${maturity.color};">${sc}/100</strong> (Level ${lvl} — ${lbl}), which ${benchRef}.</p>
+                        <p style="margin:0;">${riskNarrative}</p>
+                    </div>
+                </div>
+
+                <!-- Maturity Stage Analysis -->
+                <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:16px;">
+                    <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:6px;">Maturity Stage Analysis</div>
+                    <p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">${stageDescriptions[lvl]}</p>
+                </div>
+
+                <!-- Strengths & Weaknesses -->
+                <div style="display:flex;gap:12px;margin-bottom:16px;">
+                    <div style="flex:1;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:12px;">
+                        <div style="font-size:11px;font-weight:700;color:#065f46;margin-bottom:6px;">Strengths</div>
+                        <p style="font-size:11px;color:#374151;margin:0;line-height:1.5;">
+                            <strong>${strongest.label}</strong> leads at <strong>${strongest.value}/5</strong> (contributing ${((strongest.value * strongest.weight) / 4 * 100).toFixed(1)} points to composite score)${secondStr.value >= 4 ? ', followed by <strong>' + secondStr.label + '</strong> at <strong>' + secondStr.value + '/5</strong>' : ''}.
+                            ${atMax > 0 ? atMax + ' dimension(s) at maximum level (5/5).' : ''}
+                        </p>
+                    </div>
+                    <div style="flex:1;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px;">
+                        <div style="font-size:11px;font-weight:700;color:#991b1b;margin-bottom:6px;">Vulnerabilities</div>
+                        <p style="font-size:11px;color:#374151;margin:0;line-height:1.5;">
+                            <strong>${weakest.label}</strong> is the weakest dimension at <strong>${weakest.value}/5</strong>${secondWeak.value <= 3 ? ', with <strong>' + secondWeak.label + '</strong> also requiring attention at <strong>' + secondWeak.value + '/5</strong>' : ''}.
+                            ${atMin > 0 ? '<span style="color:#dc2626;font-weight:600;">' + atMin + ' dimension(s) at critical level (1-2).</span>' : ''}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Dimension Balance -->
+                <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:16px;">
+                    <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:6px;">Dimensional Balance</div>
+                    <p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">${balanceNarrative}</p>
+                </div>
+
+                <!-- Improvement Projections -->
+                ${improvementNarrative ? `
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:16px;">
+                    <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:6px;">Improvement Impact Projections</div>
+                    <p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">${improvementNarrative}</p>
+                </div>` : ''}
+
+                <!-- Strategic Recommendations -->
+                <div style="margin-bottom:16px;">
+                    <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:8px;">Strategic Recommendations</div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr style="background:#1e3a5f;color:white;"><th style="padding:6px 8px;text-align:left;font-size:10px;width:80px;">Priority</th><th style="padding:6px 8px;text-align:left;font-size:10px;">Recommendation</th></tr>
+                        ${recsHTML}
+                    </table>
+                </div>
+
+                <!-- Maturity Roadmap -->
+                <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);border-radius:10px;padding:16px;color:white;">
+                    <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Maturity Advancement Roadmap</div>
+                    <div style="display:flex;align-items:center;gap:4px;margin-bottom:10px;">
+                        ${[1,2,3,4,5].map(l => {
+                            const isActive = l === lvl;
+                            const isPast = l < lvl;
+                            const labels = ['Reactive','Preventive','Predictive','Proactive','Generative'];
+                            const bg = isActive ? maturity.color : isPast ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)';
+                            return `<div style="flex:1;text-align:center;padding:8px 4px;background:${bg};border-radius:6px;${isActive ? 'border:2px solid white;' : ''}"><div style="font-size:14px;font-weight:800;">${l}</div><div style="font-size:8px;opacity:0.8;">${labels[l-1]}</div></div>`;
+                        }).join('<div style="width:12px;height:2px;background:rgba(255,255,255,0.3);"></div>')}
+                    </div>
+                    <p style="font-size:11px;line-height:1.5;opacity:0.9;margin:0;">
+                        ${lvl < 5 ? `<strong>Next milestone:</strong> Level ${lvl + 1} (${['','Preventive','Predictive','Proactive','Generative'][lvl]}) requires a composite score of ${lvl * 20 + 1}+. ` +
+                        `Current gap: <strong>${(lvl * 20 + 1) - sc > 0 ? (lvl * 20 + 1) - sc : 0} points</strong>. ` +
+                        `Focus on the top ${Math.min(3, topGaps.length)} priority dimensions to close this gap most efficiently.`
+                        : 'This facility has achieved the highest maturity level. Focus on sustaining excellence, sharing best practices, and mentoring less mature operations in the portfolio.'}
+                    </p>
+                </div>
+            </div>`;
+        }
+
+        // ═══ PDF EXPORT ═══
+        window.exportMaturityPDF = function() {
+            const weights = getActiveWeights();
+            const values = dimensions.map((d, i) => ({
+                ...d, weight: weights[i],
+                value: parseInt(document.getElementById(d.el).value)
+            }));
+            const weightedSum = values.reduce((s, d) => s + d.value * d.weight, 0);
+            const compositeScore = ((weightedSum - 1) / 4) * 100;
+            const maturity = getMaturityLabel(compositeScore);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const gaps = values.map(d => ({
+                label: d.label, gap: 5 - d.value, priority: (5 - d.value) * d.weight * d.impact, value: d.value, weight: d.weight
+            })).sort((a, b) => b.priority - a.priority);
+
+            // Dimension table
+            const dimRows = values.map(d => {
+                const pct = (d.value / 5) * 100;
+                const contrib = ((d.value * d.weight) / 4) * 100;
+                return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${d.label}</td>
+                    <td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${d.value}/5</td>
+                    <td style="padding:6px 8px;text-align:right;border-bottom:1px solid #e5e7eb;">${(d.weight * 100).toFixed(0)}%</td>
+                    <td style="padding:6px 8px;text-align:right;border-bottom:1px solid #e5e7eb;font-family:monospace;">${contrib.toFixed(1)}</td>
+                    <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;"><div style="background:#e5e7eb;border-radius:4px;height:12px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:4px;"></div></div></td></tr>`;
+            }).join('');
+
+            // Priority rows
+            const priorityRows = gaps.filter(g => g.gap > 0).slice(0, 5).map((p, i) =>
+                `<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">${i + 1}</td><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;font-weight:600;">${p.label}</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${p.value}/5</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${p.gap}</td><td style="padding:5px 8px;text-align:right;border-bottom:1px solid #e5e7eb;font-family:monospace;">${p.priority.toFixed(3)}</td></tr>`
+            ).join('');
+
+            // Benchmark
+            const benchRows = benchmarks.map(b => {
+                const isClose = Math.abs(compositeScore - b.avg) === Math.min(...benchmarks.map(x => Math.abs(compositeScore - x.avg)));
+                return `<tr${isClose ? ' style="background:#eff6ff;"' : ''}><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">${b.tier}</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${b.avg}</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${compositeScore >= b.avg ? 'Above' : 'Below'}</td></tr>`;
+            }).join('');
+
+            // Radar SVG for PDF
+            function radarSVG(vals, size) {
+                const cx = size/2, cy = size/2, maxR = size*0.35, n = vals.length, step = (2*Math.PI)/n, start = -Math.PI/2;
+                let svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="background:#0f172a;border-radius:12px;">`;
+                // Rings
+                for (let ring = 1; ring <= 5; ring++) {
+                    const r = (ring/5)*maxR; let pts = '';
+                    for (let i = 0; i < n; i++) { const a = start+i*step; pts += `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `; }
+                    svg += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
+                }
+                // Data polygon
+                let dataPts = '';
+                vals.forEach((v, i) => { const a = start+i*step; const r = (v.value/5)*maxR; dataPts += `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `; });
+                svg += `<polygon points="${dataPts}" fill="rgba(59,130,246,0.3)" stroke="rgba(96,165,250,0.9)" stroke-width="2"/>`;
+                // Labels
+                vals.forEach((v, i) => { const a = start+i*step; const lR = maxR+22; const x = cx+lR*Math.cos(a); const y = cy+lR*Math.sin(a); let anchor = 'middle'; if (Math.cos(a) > 0.5) anchor='start'; else if (Math.cos(a) < -0.5) anchor='end'; svg += `<text x="${x}" y="${y}" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="${anchor}" dominant-baseline="middle">${v.label} (${v.value})</text>`; });
+                svg += '</svg>';
+                return svg;
+            }
+
+            // Facility context (if pro mode)
+            let facilityHTML = '';
+            if (maturityMode === 'pro') {
+                const cap = document.getElementById('pro-capacity')?.value || '-';
+                const type = document.getElementById('pro-type')?.value || '-';
+                const tier = document.getElementById('pro-tier')?.value || '-';
+                const model = document.getElementById('pro-model')?.value || '-';
+                const region = document.getElementById('pro-region')?.value || '-';
+                facilityHTML = `<div style="margin-bottom:18px;"><h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #3b82f6;padding-bottom:5px;margin-bottom:10px;">Facility Context</h2>
+                <table style="width:100%;font-size:11px;"><tr><td style="padding:4px 0;color:#6b7280;">Capacity</td><td style="padding:4px 0;font-weight:600;">${cap} MW</td><td style="padding:4px 0;color:#6b7280;">Type</td><td style="padding:4px 0;font-weight:600;">${type}</td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280;">Tier</td><td style="padding:4px 0;font-weight:600;">Tier ${tier}</td><td style="padding:4px 0;color:#6b7280;">Model</td><td style="padding:4px 0;font-weight:600;">${model}</td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280;">Region</td><td style="padding:4px 0;font-weight:600;">${region.toUpperCase()}</td><td></td><td></td></tr></table></div>`;
+            }
+
+            const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maturity Report — ${dateStr}</title>
+            <style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:15mm;}}</style></head>
+            <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
+                    <div><h1 style="font-size:20px;color:#1e3a5f;margin:0;">Operational Maturity Assessment Report</h1><p style="font-size:11px;color:#6b7280;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p></div>
+                    <div style="text-align:right;">
+                        <div style="font-size:32px;font-weight:800;color:${maturity.color};font-family:monospace;">${Math.round(compositeScore)}</div>
+                        <div style="font-size:12px;color:#6b7280;">${maturity.label} (Level ${maturity.level})</div>
+                    </div>
+                </div>
+
+                <!-- Executive Summary -->
+                <div style="display:flex;gap:12px;margin-bottom:20px;">
+                    <div style="flex:1;background:${maturity.color};color:white;border-radius:10px;padding:16px;text-align:center;">
+                        <div style="font-size:11px;opacity:0.8;">Composite Score</div>
+                        <div style="font-size:28px;font-weight:800;">${Math.round(compositeScore)}/100</div>
+                    </div>
+                    <div style="flex:1;background:#1e3a5f;color:white;border-radius:10px;padding:16px;text-align:center;">
+                        <div style="font-size:11px;opacity:0.8;">Maturity Level</div>
+                        <div style="font-size:22px;font-weight:700;">Level ${maturity.level}</div>
+                        <div style="font-size:12px;opacity:0.9;">${maturity.label}</div>
+                    </div>
+                    <div style="flex:1;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:16px;text-align:center;">
+                        <div style="font-size:11px;color:#6b7280;">Weighted Average</div>
+                        <div style="font-size:22px;font-weight:700;color:#1e3a5f;font-family:monospace;">${weightedSum.toFixed(2)}</div>
+                        <div style="font-size:11px;color:#6b7280;">out of 5.00</div>
+                    </div>
+                </div>
+
+                ${facilityHTML}
+
+                <!-- Radar Chart -->
+                <div style="text-align:center;margin-bottom:20px;">${radarSVG(values, 320)}</div>
+
+                <!-- Dimension Scores -->
+                <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #3b82f6;padding-bottom:5px;margin-bottom:10px;">Dimension Scores</h2>
+                <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                    <tr style="background:#1e3a5f;color:white;"><th style="padding:6px 8px;text-align:left;">Dimension</th><th style="padding:6px 8px;text-align:center;">Score</th><th style="padding:6px 8px;text-align:right;">Weight</th><th style="padding:6px 8px;text-align:right;">Contribution</th><th style="padding:6px 8px;min-width:100px;">Bar</th></tr>
+                    ${dimRows}
+                    <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:6px 8px;">TOTAL</td><td style="padding:6px 8px;text-align:center;">${weightedSum.toFixed(2)}</td><td style="padding:6px 8px;text-align:right;">100%</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${compositeScore.toFixed(1)}</td><td></td></tr>
+                </table>
+
+                <!-- Improvement Priorities -->
+                <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin:18px 0 10px;">Improvement Priorities</h2>
+                <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                    <tr style="background:#f59e0b;color:white;"><th style="padding:5px 8px;text-align:left;">#</th><th style="padding:5px 8px;text-align:left;">Dimension</th><th style="padding:5px 8px;text-align:center;">Current</th><th style="padding:5px 8px;text-align:center;">Gap</th><th style="padding:5px 8px;text-align:right;">Priority</th></tr>
+                    ${priorityRows}
+                </table>
+
+                <!-- Benchmark Comparison -->
+                <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #10b981;padding-bottom:5px;margin:18px 0 10px;">Benchmark Comparison</h2>
+                <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                    <tr style="background:#10b981;color:white;"><th style="padding:5px 8px;text-align:left;">Tier</th><th style="padding:5px 8px;text-align:center;">Typical Score</th><th style="padding:5px 8px;text-align:center;">Your Position</th></tr>
+                    ${benchRows}
+                    <tr style="background:#eff6ff;font-weight:700;"><td style="padding:5px 8px;">Your Score</td><td style="padding:5px 8px;text-align:center;font-family:monospace;color:${maturity.color};">${Math.round(compositeScore)}</td><td style="padding:5px 8px;text-align:center;">${maturity.label}</td></tr>
+                </table>
+
+                ${generateMaturityNarrative(compositeScore, maturity, weightedSum, values, gaps, weights)}
+
+                <div style="margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center;">
+                    <p>Assessment based on self-reported scores. Actual maturity may vary based on audit findings and operational evidence.</p>
+                    <p style="margin-top:4px;">Generated by Operational Maturity Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana</p>
+                </div>
+            </body></html>`;
+
+            const w = window.open('', '_blank');
+            w.document.write(printHTML);
+            w.document.close();
+            w.focus();
+            setTimeout(() => w.print(), 500);
+        };
+
+        // ═══ TOOLTIP SYSTEM ═══
+        function initMaturityTooltips() {
+            const tooltipEl = document.createElement('div');
+            tooltipEl.id = 'maturity-tooltip-container';
+            document.body.appendChild(tooltipEl);
+
+            document.querySelectorAll('#maturityCalculator .tooltip-trigger').forEach(trigger => {
+                const content = trigger.querySelector('.tooltip-content');
+                if (!content) return;
+                trigger.addEventListener('mouseenter', () => {
+                    tooltipEl.innerHTML = content.innerHTML;
+                    const rect = trigger.getBoundingClientRect();
+                    const tw = 320;
+                    let left = rect.right + 12;
+                    let top = rect.top + rect.height / 2;
+                    if (left + tw > window.innerWidth - 20) left = rect.left - tw - 12;
+                    if (left < 20) left = 20;
+                    const th = tooltipEl.offsetHeight || 150;
+                    top = top - th / 2;
+                    if (top < 20) top = 20;
+                    if (top + th > window.innerHeight - 20) top = window.innerHeight - th - 20;
+                    tooltipEl.style.left = left + 'px';
+                    tooltipEl.style.top = top + 'px';
+                    tooltipEl.classList.add('visible');
+                });
+                trigger.addEventListener('mouseleave', () => { tooltipEl.classList.remove('visible'); });
+            });
+        }
+
+        // ═══ SESSION CHECK ═══
+        (function checkMaturitySession() {
+            var session = localStorage.getItem('rz_premium_session');
+            if (session) {
+                try {
+                    var data = JSON.parse(session);
+                    var exp = typeof data.expires === 'string' ? new Date(data.expires).getTime() : data.expires;
+                    if (exp > Date.now()) { isPremiumMaturity = true; }
+                } catch(e) {}
+            }
+            applyMaturityGating();
+        })();
+
+        // Listen for auth changes
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.premium) { isPremiumMaturity = true; }
+            else { isPremiumMaturity = false; maturityMode = 'free'; switchMaturityMode('free'); }
+            applyMaturityGating();
+        });
+
+        // ═══ INIT ═══
         calculateMaturity();
+        initMaturityTooltips();
+    })();
     </script>
+<script src="auth.js"></script>
 </body>
 </html>

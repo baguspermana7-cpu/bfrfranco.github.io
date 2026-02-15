@@ -1,13 +1,102 @@
 # Claude Code Session Notes
-**Date:** 2026-02-11
+**Date:** 2026-02-15
 **Project:** Portfolio Website - baguspermana7-cpu.github.io
 **Domain:** resistancezero.com (GitHub Pages)
 
 ## Current State
 - Branch: `main`
-- Latest commit: `0b23f0b` - docs: update session notes with all work completed
-- All changes committed and pushed
 - Working directory: `C:\Users\User\Sandbox`
+
+---
+
+## Session: 2026-02-15 — Pro Enhancement Mode + Auth System + Calculator Upgrades
+
+### Summary
+Major enhancement session implementing Pro Enhancement Mode across article calculators, auth system injection to all pages, and CAPEX/OPEX calculator overhauls.
+
+### Completed Work
+
+#### 1. Auth System (`auth.js`) — Injected to 33+ Pages
+- Shared auth module with localStorage session (30-day expiry)
+- Hardcoded demo credentials: `demo@resistancezero.com / demo2026`
+- Auto-detects 4 navbar types and injects login button + user dropdown
+- Files injected: all article pages, calculator pages, dashboard pages, index, articles, insights, geopolitics, etc.
+
+#### 2. Article-1 Enhancement (Pro Enhancement Mode)
+- **Mode toggle**: Free Assessment / Pro Analysis with PRO badge
+- **28 weighted sub-dimensions** in Pro mode (8 main categories)
+- **Tooltips**: Custom positioning system on key inputs
+- **Gated overlays**: Blur + lock icon on Pro panels for free users
+- **PDF export**: Full narrative conclusion with:
+  - Executive Summary with risk level assessment
+  - Domain-specific analysis (8 maturity dimensions)
+  - Prioritized recommendations table (CRITICAL/HIGH/MEDIUM/LOW)
+  - Scenario modeling & custom weight profiles
+- **+1,345 lines** of enhancements
+
+#### 3. Article-2 Enhancement (Pro Enhancement Mode)
+- **Mode toggle**: Free Assessment / Pro Analysis
+- **Free inputs**: 8 parameters with tooltips (ISA-18.2 references)
+- **Pro inputs drawer**: 8 additional parameters (flood window, threshold, standing%, facility type, priority model, handling distribution, chattering%, authorized suppress%)
+- **Free output**: 7 KPI cards (same as original)
+- **Pro output**: 28 KPIs across 5 panels:
+  - Burden & Capacity (8 cards: Erlang-C queueing, utilization band, overload margin)
+  - Flood Risk Deep Dive (6 cards: Poisson model, 95th percentile burst, time-in-flood)
+  - Priority & Quality (6 cards: distribution, chattering impact, quality score)
+  - Compliance Drilldown (4 cards: ISA-18.2 criteria breakdown)
+  - Scenario Sensitivity (4 cards: +1 operator, 50% faster response, etc.)
+- **PDF export**: Narrative conclusion with risk assessment, domain analysis, prioritized actions
+- **+847 lines** of enhancements
+
+#### 4. CAPEX Calculator Major Overhaul
+- **Pro Enhancement Mode**: Full premium feature set
+- **Equipment specification database**: UPS, cooling, generator, fire suppression brands/models
+- **Construction timeline**: Gantt chart with parallel phases
+- **Sustainability section**: PUE, CO2, WUE, refrigerant analysis
+- **Scenario comparison**: Save Scenario A, calculate B, compare side-by-side
+- **Narrative conclusion**: Multi-section executive assessment
+- **+1,928 lines** of enhancements
+
+#### 5. OPEX Calculator Major Overhaul
+- **Pro Enhancement Mode**: Gated premium analytics
+- **8 operational domains**: Staffing, Energy, Maintenance, Compliance, Security, BMS, Inventory, Training
+- **Narrative conclusion**: 5 domain-specific narratives + 8 prioritized actions
+- **PDF export**: Executive report with benchmarks, risk assessment, recommendations
+- **+1,327 lines** of enhancements
+
+#### 6. CAPEX PDF Fix: Gantt Chart Text Overflow
+- Bar height 14px → 18px
+- Label width 150px → 120px with overflow:hidden
+- Duration text ("3mo") positioned OUTSIDE bar when bar is narrow (<12% width)
+
+#### 7. Datacenter Solutions Page
+- Replaced inline calculator with links to dedicated calculator pages
+- **-612 lines** (cleaned up)
+
+#### 8. LinkedIn Post Drafts Created
+- `Article/Article_1 02.02.26/linkedin-post-article1.txt` — Safety-II, operational maturity, Pro mode
+- `Article/Article_2 02.02.26/linkedin-post-article2.txt` — Alarm fatigue, ISA-18.2, Erlang-C, Pro mode
+- Both include demo account: `demo@resistancezero.com / demo2026`
+
+#### 9. New Files Created
+- `auth.js` — Shared authentication module
+- `supabase-auth.js` — Supabase auth integration (future)
+- `terms.html` — Terms of service page
+- `rz-ops-panel.html` — Operations panel page
+
+### Pending Work (Not Yet Completed)
+- **CAPEX PDF A/B Comparison**: Design & Delivery Concept and Equipment Specification sections still show only Scenario B. Need to add these to `buildPremiumComparisonHTML()` function (lines 3253-3332 in capex-calculator.html). Timeline, Capacity, and Sustainability comparisons already work.
+
+### File Statistics
+```
+article-1.html            | +1,345 lines
+article-2.html            |   +847 lines
+capex-calculator.html      | +1,928 lines
+opex-calculator.html       | +1,327 lines
+datacenter-solutions.html  |   -612 lines
+34 modified files, 13 new files
+Total: ~4,979 insertions, 1,116 deletions
+```
 
 ---
 

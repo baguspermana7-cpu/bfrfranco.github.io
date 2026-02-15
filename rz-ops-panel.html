@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console | ResistanceZero</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#0b1120;color:#e2e8f0;min-height:100vh;display:flex}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#475569}
+
+        /* ═══ SIDEBAR ═══ */
+        .sidebar{width:260px;background:#111827;border-right:1px solid #1f2937;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform 0.3s}
+        .sidebar-brand{padding:1.25rem 1.5rem;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:12px}
+        .sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px}
+        .sidebar-brand-text h2{font-size:0.95rem;font-weight:700;color:#f1f5f9}
+        .sidebar-brand-text span{font-size:0.65rem;color:#6b7280;letter-spacing:0.5px}
+        .sidebar-nav{flex:1;padding:1rem 0;overflow-y:auto}
+        .nav-group-label{padding:0.5rem 1.5rem;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4b5563}
+        .nav-item{display:flex;align-items:center;gap:10px;padding:0.6rem 1.5rem;color:#9ca3af;font-size:0.82rem;font-weight:500;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none}
+        .nav-item:hover{background:rgba(139,92,246,0.06);color:#e2e8f0}
+        .nav-item.active{background:rgba(139,92,246,0.1);color:#a78bfa;border-left-color:#8b5cf6;font-weight:600}
+        .nav-item i{width:18px;text-align:center;font-size:0.85rem}
+        .nav-item .badge{margin-left:auto;padding:1px 7px;border-radius:50px;font-size:0.6rem;font-weight:700}
+        .nav-item .badge.purple{background:rgba(139,92,246,0.2);color:#a78bfa}
+        .nav-item .badge.green{background:rgba(16,185,129,0.2);color:#34d399}
+        .nav-item .badge.amber{background:rgba(245,158,11,0.2);color:#fbbf24}
+        .sidebar-footer{padding:1rem 1.5rem;border-top:1px solid #1f2937}
+        .sidebar-user{display:flex;align-items:center;gap:10px}
+        .sidebar-avatar{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.7rem;font-weight:700}
+        .sidebar-user-info{flex:1}
+        .sidebar-user-name{font-size:0.78rem;font-weight:600;color:#f1f5f9}
+        .sidebar-user-role{font-size:0.65rem;color:#6b7280}
+        .sidebar-logout{background:none;border:none;color:#6b7280;cursor:pointer;padding:4px;font-size:0.9rem;transition:color 0.2s}
+        .sidebar-logout:hover{color:#ef4444}
+
+        /* ═══ MAIN ═══ */
+        .main-wrap{flex:1;margin-left:260px;min-height:100vh}
+        .topbar{background:#111827;border-bottom:1px solid #1f2937;padding:0.75rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+        .topbar-title{font-size:1.1rem;font-weight:700;color:#f1f5f9}
+        .topbar-right{display:flex;align-items:center;gap:1rem}
+        .topbar-time{font-size:0.75rem;color:#6b7280;font-family:'JetBrains Mono',monospace}
+        .topbar-link{color:#9ca3af;text-decoration:none;font-size:0.82rem;padding:6px 12px;border-radius:6px;transition:all 0.2s}
+        .topbar-link:hover{color:#e2e8f0;background:rgba(255,255,255,0.05)}
+        .main-content{padding:2rem;max-width:1400px;margin:0 auto}
+
+        /* ═══ SECTIONS ═══ */
+        .section{display:none}
+        .section.active{display:block}
+        .section-header{margin-bottom:1.75rem}
+        .section-header h1{font-size:1.5rem;font-weight:800;color:#f1f5f9;margin-bottom:0.25rem}
+        .section-header p{font-size:0.82rem;color:#64748b}
+
+        /* ═══ CARDS ═══ */
+        .card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:1.5rem;margin-bottom:1.5rem}
+        .card-title{font-size:0.9rem;font-weight:700;color:#f1f5f9;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+        .card-title i{font-size:0.85rem}
+
+        /* ═══ KPI GRID ═══ */
+        .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
+        .kpi{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:1.25rem;transition:transform 0.2s}
+        .kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+        .kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;margin-bottom:0.75rem}
+        .kpi-label{font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+        .kpi-val{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0.15rem 0}
+        .kpi-sub{font-size:0.7rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:50px}
+        .kpi-sub.up{background:rgba(16,185,129,0.15);color:#34d399}
+        .kpi-sub.down{background:rgba(239,68,68,0.15);color:#f87171}
+        .kpi-sub.neutral{background:rgba(100,116,139,0.15);color:#94a3b8}
+
+        /* ═══ CHARTS ═══ */
+        .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.5rem}
+
+        /* ═══ TABLE ═══ */
+        .tbl-controls{display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem}
+        .tbl-search{position:relative}
+        .tbl-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#64748b;font-size:0.78rem}
+        .tbl-search input{padding:8px 12px 8px 32px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:0.8rem;font-family:inherit;outline:none;width:240px;transition:border-color 0.2s}
+        .tbl-search input:focus{border-color:#8b5cf6}
+        .tbl-select{padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:0.8rem;font-family:inherit;outline:none;cursor:pointer}
+        .tbl-select:focus{border-color:#8b5cf6}
+        .btn{padding:7px 16px;border-radius:8px;border:none;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s}
+        .btn:hover{transform:translateY(-1px)}
+        .btn-purple{background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;box-shadow:0 3px 10px rgba(139,92,246,0.25)}
+        .btn-green{background:linear-gradient(135deg,#059669,#10b981);color:#fff;box-shadow:0 3px 10px rgba(16,185,129,0.25)}
+        .btn-amber{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;box-shadow:0 3px 10px rgba(245,158,11,0.25)}
+        .btn-red{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;box-shadow:0 3px 10px rgba(239,68,68,0.25)}
+        .btn-ghost{background:transparent;border:1px solid #334155;color:#94a3b8}
+        .btn-ghost:hover{border-color:#8b5cf6;color:#a78bfa}
+        .btn-sm{padding:4px 10px;font-size:0.72rem;border-radius:6px}
+
+        .data-tbl{width:100%;border-collapse:collapse;font-size:0.8rem}
+        .data-tbl th{text-align:left;padding:10px 12px;border-bottom:2px solid #334155;color:#94a3b8;font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;white-space:nowrap;user-select:none}
+        .data-tbl th:hover{color:#e2e8f0}
+        .data-tbl th .si{margin-left:4px;font-size:0.55rem}
+        .data-tbl td{padding:10px 12px;border-bottom:1px solid rgba(51,65,85,0.5);color:#cbd5e1;vertical-align:middle}
+        .data-tbl tr:hover td{background:rgba(139,92,246,0.04)}
+        .tbl-overflow{overflow-x:auto}
+
+        .tier-badge{display:inline-flex;padding:3px 10px;border-radius:50px;font-size:0.62rem;font-weight:700;letter-spacing:0.5px}
+        .tier-badge.pro{background:rgba(139,92,246,0.2);color:#a78bfa}
+        .tier-badge.free{background:rgba(100,116,139,0.2);color:#94a3b8}
+        .status-dot{display:inline-flex;align-items:center;gap:6px}
+        .status-dot::before{content:'';width:7px;height:7px;border-radius:50%}
+        .status-dot.active::before{background:#34d399}
+        .status-dot.inactive::before{background:#64748b}
+        .status-dot.suspended::before{background:#f87171}
+
+        .pagination{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:1px solid #334155}
+        .pagination-info{font-size:0.75rem;color:#64748b}
+        .pagination-btns{display:flex;gap:4px}
+        .pg-btn{padding:5px 11px;border-radius:6px;background:transparent;border:1px solid #334155;color:#94a3b8;font-size:0.75rem;cursor:pointer;font-family:inherit;transition:all 0.2s}
+        .pg-btn:hover{border-color:#8b5cf6;color:#a78bfa}
+        .pg-btn.active{background:#8b5cf6;border-color:#8b5cf6;color:#fff}
+
+        /* ═══ TOGGLE SWITCH ═══ */
+        .toggle{position:relative;width:42px;height:22px;flex-shrink:0}
+        .toggle input{opacity:0;width:0;height:0}
+        .toggle .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#334155;transition:0.3s;border-radius:22px}
+        .toggle .slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#94a3b8;transition:0.3s;border-radius:50%}
+        .toggle input:checked+.slider{background:#7c3aed}
+        .toggle input:checked+.slider::before{transform:translateX(20px);background:#fff}
+
+        /* ═══ FEATURE MATRIX ═══ */
+        .feat-grid{display:grid;gap:0}
+        .feat-row{display:grid;grid-template-columns:2fr repeat(2,1fr);align-items:center;padding:12px 16px;border-bottom:1px solid rgba(51,65,85,0.4)}
+        .feat-row.header{background:rgba(15,23,42,0.5);border-radius:8px 8px 0 0;border-bottom:2px solid #334155}
+        .feat-row.header span{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;text-align:center}
+        .feat-row.header span:first-child{text-align:left}
+        .feat-name{font-size:0.82rem;color:#e2e8f0;font-weight:500;display:flex;align-items:center;gap:8px}
+        .feat-name i{width:16px;color:#64748b;font-size:0.78rem}
+        .feat-name .fdesc{font-size:0.68rem;color:#64748b;font-weight:400}
+        .feat-cell{display:flex;justify-content:center}
+
+        /* ═══ CREDENTIALS ═══ */
+        .cred-row{display:grid;grid-template-columns:40px 1.2fr 1.5fr 1fr 0.8fr 100px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.8rem}
+        .cred-row.header{background:rgba(15,23,42,0.5);border-radius:8px 8px 0 0;border-bottom:2px solid #334155;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b}
+        .cred-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#fff}
+        .cred-pass{font-family:'JetBrains Mono',monospace;font-size:0.75rem;display:flex;align-items:center;gap:6px}
+        .cred-pass .masked{color:#475569;letter-spacing:2px}
+        .cred-pass .revealed{color:#fbbf24}
+        .cred-reveal{background:none;border:none;color:#64748b;cursor:pointer;font-size:0.7rem;padding:2px;transition:color 0.2s}
+        .cred-reveal:hover{color:#a78bfa}
+
+        /* ═══ BENCHMARK ═══ */
+        .bench-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+        .bench-card{background:linear-gradient(135deg,#1a1f35,#1e293b);border:1px solid #334155;border-radius:12px;padding:1.25rem;position:relative;overflow:hidden}
+        .bench-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+        .bench-card.green::before{background:linear-gradient(90deg,#059669,#34d399)}
+        .bench-card.purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+        .bench-card.amber::before{background:linear-gradient(90deg,#d97706,#fbbf24)}
+        .bench-card.blue::before{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+        .bench-card.red::before{background:linear-gradient(90deg,#dc2626,#f87171)}
+        .bench-card.cyan::before{background:linear-gradient(90deg,#0891b2,#22d3ee)}
+        .bench-label{font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:0.5rem}
+        .bench-val{font-size:1.6rem;font-weight:800;color:#f1f5f9}
+        .bench-sub{font-size:0.72rem;color:#94a3b8;margin-top:0.25rem}
+        .bench-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:0.5rem}
+        .bench-table th{text-align:left;padding:8px 10px;color:#64748b;font-weight:600;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #334155}
+        .bench-table td{padding:8px 10px;color:#cbd5e1;border-bottom:1px solid rgba(51,65,85,0.4)}
+        .bench-table tr:hover td{background:rgba(139,92,246,0.04)}
+        .bench-bar{height:6px;border-radius:3px;background:#1e293b;position:relative;margin-top:4px}
+        .bench-bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+
+        /* ═══ TIMELINE ═══ */
+        .tl-item{display:flex;gap:12px;padding:10px 0;border-left:2px solid #334155;margin-left:11px;padding-left:20px;position:relative}
+        .tl-item::before{content:'';position:absolute;left:-6px;top:14px;width:10px;height:10px;border-radius:50%;border:2px solid #111827}
+        .tl-item.login::before{background:#34d399}.tl-item.logout::before{background:#f87171}.tl-item.calculation::before{background:#60a5fa}.tl-item.pdf::before{background:#a78bfa}.tl-item.tier_change::before{background:#fbbf24}.tl-item.feature_toggle::before{background:#22d3ee}
+        .tl-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.68rem;flex-shrink:0}
+        .tl-icon.login{background:rgba(52,211,153,0.15);color:#34d399}
+        .tl-icon.logout{background:rgba(248,113,113,0.15);color:#f87171}
+        .tl-icon.calculation{background:rgba(96,165,250,0.15);color:#60a5fa}
+        .tl-icon.pdf{background:rgba(167,139,250,0.15);color:#a78bfa}
+        .tl-icon.tier_change{background:rgba(251,191,36,0.15);color:#fbbf24}
+        .tl-icon.feature_toggle{background:rgba(34,211,238,0.15);color:#22d3ee}
+        .tl-text{font-size:0.8rem;color:#cbd5e1}.tl-text strong{color:#f1f5f9;font-weight:600}
+        .tl-time{font-size:0.68rem;color:#64748b;margin-top:2px}
+
+        /* ═══ MODAL ═══ */
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center}
+        .modal-overlay.show{display:flex}
+        .modal-box{background:#1e293b;border:1px solid #334155;border-radius:16px;width:92%;max-width:680px;max-height:88vh;overflow-y:auto;padding:2rem;position:relative;animation:mIn 0.25s ease}
+        @keyframes mIn{from{opacity:0;transform:scale(0.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;padding:4px}
+        .modal-close:hover{color:#e2e8f0}
+        .m-section{margin-bottom:1.5rem}
+        .m-section h4{font-size:0.78rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
+        .m-row{display:flex;justify-content:space-between;padding:6px 0;font-size:0.8rem}
+        .m-row-label{color:#64748b}.m-row-value{color:#e2e8f0;font-weight:500}
+
+        /* ═══ ACCESS DENIED ═══ */
+        .access-denied{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;width:100%}
+        .access-denied i{font-size:3rem;color:#ef4444;margin-bottom:1rem}
+        .access-denied h2{font-size:1.5rem;color:#f1f5f9;margin-bottom:0.5rem}
+        .access-denied p{color:#64748b;margin-bottom:1.5rem}
+        .access-denied a{padding:10px 24px;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:0.9rem}
+
+        /* ═══ MOBILE HAMBURGER ═══ */
+        .hamburger{display:none;background:none;border:none;color:#e2e8f0;font-size:1.2rem;cursor:pointer;padding:4px}
+        .sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:199}
+
+        /* ═══ RESPONSIVE ═══ */
+        @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.bench-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+        @media(max-width:768px){
+            .sidebar{transform:translateX(-100%)}
+            .sidebar.open{transform:translateX(0)}
+            .sidebar-overlay.show{display:block}
+            .main-wrap{margin-left:0}
+            .hamburger{display:block}
+            .kpi-grid{grid-template-columns:1fr}
+            .bench-grid{grid-template-columns:1fr}
+            .main-content{padding:1rem}
+            .cred-row{grid-template-columns:30px 1fr 1fr 0.7fr 80px;font-size:0.72rem}
+            .feat-row{grid-template-columns:1.5fr repeat(3,1fr);padding:10px 8px}
+        }
+    </style>
+</head>
+<body>
+    <!-- Access Denied -->
+    <div class="access-denied" id="accessDenied" style="display:none;">
+        <i class="fas fa-shield-alt"></i>
+        <h2>Access Denied</h2>
+        <p>Administrator credentials required.</p>
+        <a href="capex-calculator.html">Back to Calculator</a>
+    </div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">RZ</div>
+            <div class="sidebar-brand-text">
+                <h2>ResistanceZero</h2>
+                <span>ADMIN CONSOLE v2.0</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Analytics</div>
+            <a class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a class="nav-item" data-section="revenue" onclick="showSection('revenue')">
+                <i class="fas fa-chart-bar"></i> Revenue
+                <span class="badge green">$</span>
+            </a>
+
+            <div class="nav-group-label" style="margin-top:0.75rem">Management</div>
+            <a class="nav-item" data-section="users" onclick="showSection('users')">
+                <i class="fas fa-users"></i> Users
+                <span class="badge purple" id="navUserCount">50</span>
+            </a>
+            <a class="nav-item" data-section="credentials" onclick="showSection('credentials')">
+                <i class="fas fa-key"></i> Credentials
+                <span class="badge amber">15</span>
+            </a>
+            <a class="nav-item" data-section="features" onclick="showSection('features')">
+                <i class="fas fa-toggle-on"></i> Feature Flags
+            </a>
+
+            <div class="nav-group-label" style="margin-top:0.75rem">Intelligence</div>
+            <a class="nav-item" data-section="benchmarks" onclick="showSection('benchmarks')">
+                <i class="fas fa-landmark"></i> DC Benchmarks
+            </a>
+
+            <div class="nav-group-label" style="margin-top:0.75rem">System</div>
+            <a class="nav-item" data-section="audit" onclick="showSection('audit')">
+                <i class="fas fa-clipboard-list"></i> Audit Log
+            </a>
+            <a class="nav-item" data-section="settings" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar">B</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebarName">Admin</div>
+                    <div class="sidebar-user-role">Super Admin</div>
+                </div>
+                <button class="sidebar-logout" onclick="adminLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrap" id="mainWrap" style="display:none;">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="topbar-title" id="topbarTitle">Dashboard</span>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-time" id="topbarTime"></span>
+                <a href="capex-calculator.html" class="topbar-link"><i class="fas fa-calculator"></i> CAPEX</a>
+                <a href="opex-calculator.html" class="topbar-link"><i class="fas fa-chart-line"></i> OPEX</a>
+                <a href="index.html" class="topbar-link"><i class="fas fa-globe"></i> Site</a>
+            </div>
+        </header>
+
+        <div class="main-content">
+
+<!-- ══════════════════════════════════════ DASHBOARD ══════════════════════════════════════ -->
+<div class="section active" id="sec-dashboard">
+    <div class="section-header">
+        <h1>Dashboard Overview</h1>
+        <p>Real-time platform metrics and analytics</p>
+    </div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="charts-row">
+        <div class="card"><div class="card-title"><i class="fas fa-chart-line" style="color:#60a5fa"></i> User Growth (6 Months)</div><canvas id="chartGrowth" height="110"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-chart-pie" style="color:#a78bfa"></i> Tier Distribution</div><canvas id="chartTier" height="220"></canvas></div>
+    </div>
+    <div class="charts-row">
+        <div class="card"><div class="card-title"><i class="fas fa-globe-americas" style="color:#22d3ee"></i> Calculator Usage by Hour (Last 7d)</div><canvas id="chartUsageHour" height="90"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-funnel-dollar" style="color:#fbbf24"></i> Conversion Funnel</div><canvas id="chartFunnel" height="220"></canvas></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ REVENUE ══════════════════════════════════════ -->
+<div class="section" id="sec-revenue">
+    <div class="section-header">
+        <h1>Revenue Analytics</h1>
+        <p>Subscription revenue, LTV, churn, and financial metrics</p>
+    </div>
+    <div class="kpi-grid" id="revenueKpis"></div>
+    <div class="charts-row">
+        <div class="card"><div class="card-title"><i class="fas fa-chart-area" style="color:#34d399"></i> Monthly Recurring Revenue (MRR)</div><canvas id="chartMRR" height="110"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-percentage" style="color:#f87171"></i> Churn Rate</div><canvas id="chartChurn" height="220"></canvas></div>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="fas fa-money-bill-wave" style="color:#fbbf24"></i> Revenue by Account</div>
+        <div class="tbl-overflow" id="revenueTableWrap"></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ USERS ══════════════════════════════════════ -->
+<div class="section" id="sec-users">
+    <div class="section-header">
+        <h1>User Management</h1>
+        <p>Manage accounts, tiers, status, and access</p>
+    </div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+            <div class="card-title" style="margin:0"><i class="fas fa-user-cog" style="color:#a78bfa"></i> All Users</div>
+            <div class="tbl-controls" style="margin:0">
+                <div class="tbl-search"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search email or name..." oninput="filterUsers()"></div>
+                <select class="tbl-select" id="tierFilter" onchange="filterUsers()"><option value="all">All Tiers</option><option value="pro">Pro</option><option value="free">Free</option></select>
+                <select class="tbl-select" id="statusFilter" onchange="filterUsers()"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option></select>
+                <button class="btn btn-green" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+                <button class="btn btn-purple" onclick="openCreateModal()" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(168,85,247,0.1));border:1px solid rgba(139,92,246,0.4);color:#a78bfa;"><i class="fas fa-user-plus"></i> Create Account</button>
+            </div>
+        </div>
+        <div class="tbl-overflow">
+            <table class="data-tbl" id="userTable">
+                <thead><tr>
+                    <th onclick="sortTable('name')">Name <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('email')">Email <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('tier')">Tier <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('status')">Status <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('registered')">Registered <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('lastLogin')">Last Login <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('usage')">Calcs <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('lastPayment')">Payment <i class="fas fa-sort si"></i></th>
+                    <th>Actions</th>
+                </tr></thead>
+                <tbody id="userTbody"></tbody>
+            </table>
+        </div>
+        <div class="pagination"><div class="pagination-info" id="pgInfo"></div><div class="pagination-btns" id="pgBtns"></div></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ CREDENTIALS ══════════════════════════════════════ -->
+<div class="section" id="sec-credentials">
+    <div class="section-header">
+        <h1>Account Credentials</h1>
+        <p>View and manage all registered account credentials</p>
+    </div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div class="card-title" style="margin:0"><i class="fas fa-key" style="color:#fbbf24"></i> Credential Vault</div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-ghost btn-sm" onclick="toggleAllPasswords()"><i class="fas fa-eye"></i> Toggle All</button>
+                <button class="btn btn-green btn-sm" onclick="exportCredCSV()"><i class="fas fa-download"></i> Export</button>
+            </div>
+        </div>
+        <div class="tbl-overflow" id="credentialsList"></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ FEATURES ══════════════════════════════════════ -->
+<div class="section" id="sec-features">
+    <div class="section-header">
+        <h1>Feature Flags</h1>
+        <p>Toggle calculator features per subscription tier in real-time</p>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="fas fa-sliders-h" style="color:#22d3ee"></i> Tier-Level Feature Matrix</div>
+        <p style="font-size:0.78rem;color:#64748b;margin-bottom:1.25rem;">Toggle features ON/OFF per tier. Changes apply immediately to all users of that tier on their next page load.</p>
+        <div class="feat-grid" id="featureMatrix"></div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+        <div class="card-title"><i class="fas fa-user-shield" style="color:#f59e0b"></i> Per-User Feature Overrides</div>
+        <p style="font-size:0.78rem;color:#64748b;margin-bottom:1.25rem;">Grant or revoke individual features for specific users, overriding their tier defaults.</p>
+        <div id="userOverrides"></div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+        <div class="card-title"><i class="fas fa-flask" style="color:#a78bfa"></i> Experimental Features</div>
+        <div id="experimentalFeatures"></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ BENCHMARKS ══════════════════════════════════════ -->
+<div class="section" id="sec-benchmarks">
+    <div class="section-header">
+        <h1>Data Center Industry Benchmarks</h1>
+        <p>Professional reference data from Equinix, Digital Realty, Google, Microsoft, and industry reports</p>
+    </div>
+    <div class="bench-grid" id="benchKpis"></div>
+    <div class="charts-row">
+        <div class="card"><div class="card-title"><i class="fas fa-building" style="color:#60a5fa"></i> $/kW Construction Cost by Operator</div><canvas id="chartCostKW" height="110"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-leaf" style="color:#34d399"></i> PUE by Operator</div><canvas id="chartPUE" height="220"></canvas></div>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="fas fa-server" style="color:#a78bfa"></i> Operator Benchmark Comparison</div>
+        <div class="tbl-overflow" id="benchTable"></div>
+    </div>
+    <div class="charts-row" style="margin-top:1.5rem">
+        <div class="card"><div class="card-title"><i class="fas fa-globe-americas" style="color:#fbbf24"></i> Regional $/kW Construction Cost</div><canvas id="chartRegionCost" height="110"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-bolt" style="color:#22d3ee"></i> Energy Cost by Market ($/kWh)</div><canvas id="chartEnergyCost" height="220"></canvas></div>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="fas fa-book" style="color:#64748b"></i> Sources &amp; Methodology</div>
+        <p style="font-size:0.78rem;color:#94a3b8;line-height:1.7" id="benchSources"></p>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ AUDIT ══════════════════════════════════════ -->
+<div class="section" id="sec-audit">
+    <div class="section-header">
+        <h1>Audit Log</h1>
+        <p>Complete system event timeline with filters</p>
+    </div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+            <div class="card-title" style="margin:0"><i class="fas fa-stream" style="color:#60a5fa"></i> Event Timeline</div>
+            <div class="tbl-controls" style="margin:0">
+                <select class="tbl-select" id="auditTypeFilter" onchange="filterAudit()"><option value="all">All Types</option><option value="login">Login</option><option value="logout">Logout</option><option value="calculation">Calculation</option><option value="pdf">PDF Export</option><option value="tier_change">Tier Change</option><option value="feature_toggle">Feature Toggle</option></select>
+                <button class="btn btn-green btn-sm" onclick="exportAuditCSV()"><i class="fas fa-download"></i> Export</button>
+            </div>
+        </div>
+        <div id="auditTimeline" style="max-height:600px;overflow-y:auto;"></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ SETTINGS ══════════════════════════════════════ -->
+<div class="section" id="sec-settings">
+    <div class="section-header">
+        <h1>System Settings</h1>
+        <p>Platform configuration and environment info</p>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="fas fa-server" style="color:#60a5fa"></i> Platform Config</div>
+        <div id="settingsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;"></div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+        <div class="card-title"><i class="fas fa-database" style="color:#a78bfa"></i> Data Management</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.5rem;">
+            <button class="btn btn-purple" onclick="alert('Mock: Database backup initiated')"><i class="fas fa-hdd"></i> Backup Data</button>
+            <button class="btn btn-amber" onclick="if(confirm('Reset all mock data?')){location.reload()}"><i class="fas fa-redo"></i> Reset Mock Data</button>
+            <button class="btn btn-red" onclick="alert('Mock: Cache cleared')"><i class="fas fa-broom"></i> Clear Cache</button>
+            <button class="btn btn-ghost" onclick="alert('Mock: Health check passed')"><i class="fas fa-heartbeat"></i> Health Check</button>
+        </div>
+    </div>
+</div>
+
+        </div><!-- /main-content -->
+    </div><!-- /main-wrap -->
+
+    <!-- User Detail Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-box"><button class="modal-close" onclick="closeModal()">&times;</button><div id="modalBody"></div></div>
+    </div>
+
+    <!-- Create Account Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box" style="max-width:480px">
+            <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+            <div id="createForm">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
+                    <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem"><i class="fas fa-user-plus"></i></div>
+                    <div>
+                        <div style="font-size:1.1rem;font-weight:700;color:#f1f5f9">Create Account</div>
+                        <div style="font-size:0.78rem;color:#64748b">Manually create a new user account</div>
+                    </div>
+                </div>
+                <div id="createError" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+                    <div>
+                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Full Name *</label>
+                        <input type="text" id="createName" placeholder="John Doe" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Role</label>
+                        <select id="createRole" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px">
+                    <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Email Address *</label>
+                    <input type="email" id="createEmail" placeholder="user@example.com" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:12px">
+                    <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Password *</label>
+                    <div style="position:relative">
+                        <input type="password" id="createPassword" placeholder="Min 6 characters" style="width:100%;padding:10px 14px;padding-right:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <button onclick="toggleCreatePw()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748b;cursor:pointer;font-size:0.85rem;padding:4px"><i class="fas fa-eye" id="createPwIcon"></i></button>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+                    <div>
+                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Access Tier *</label>
+                        <select id="createTier" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                            <option value="free" selected>Free</option>
+                            <option value="pro">Pro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Company</label>
+                        <input type="text" id="createCompany" placeholder="Optional" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                </div>
+                <div style="margin-bottom:20px">
+                    <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Country</label>
+                    <select id="createCountry" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <option value="Indonesia">Indonesia</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Malaysia">Malaysia</option>
+                        <option value="Thailand">Thailand</option>
+                        <option value="Philippines">Philippines</option>
+                        <option value="Vietnam">Vietnam</option>
+                        <option value="India">India</option>
+                        <option value="Japan">Japan</option>
+                        <option value="Korea">Korea</option>
+                        <option value="UAE">UAE</option>
+                        <option value="US">US</option>
+                        <option value="UK">UK</option>
+                        <option value="Germany">Germany</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Brazil">Brazil</option>
+                    </select>
+                </div>
+                <div style="display:flex;gap:0.75rem">
+                    <button onclick="submitCreateAccount()" style="flex:1;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.3s;">
+                        <i class="fas fa-plus"></i> Create Account
+                    </button>
+                    <button onclick="closeCreateModal()" style="padding:12px 20px;border:1px solid rgba(255,255,255,0.15);border-radius:10px;background:transparent;color:#94a3b8;font-size:0.9rem;cursor:pointer;font-family:inherit;transition:all 0.2s;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+            <div id="createSuccess" style="display:none;text-align:center;padding:20px 0;">
+                <i class="fas fa-check-circle" style="font-size:2.5rem;color:#10b981;margin-bottom:10px;display:block;"></i>
+                <p style="color:#f1f5f9;font-weight:600;margin:4px 0;" id="createSuccessMsg">Account Created!</p>
+                <small style="color:#64748b;font-size:0.8rem;">The account is now active and can log in immediately.</small>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// ACCESS CONTROL
+// ═══════════════════════════════════════════════════════════════
+const ADMIN_EMAILS = ['bagus@resistancezero.com','admin@resistancezero.com'];
+let adminEmail = '';
+
+function checkAccess(){
+    const s = localStorage.getItem('rz_premium_session');
+    if(!s){deny();return false}
+    try{
+        const d=JSON.parse(s);
+        var expMs=typeof d.expires==='string'?new Date(d.expires).getTime():d.expires;if(expMs<Date.now()||!ADMIN_EMAILS.includes(d.email)){deny();return false}
+        adminEmail=d.email;
+        document.getElementById('sidebarAvatar').textContent=d.email.charAt(0).toUpperCase();
+        document.getElementById('sidebarName').textContent=d.email.split('@')[0];
+        return true;
+    }catch(e){deny();return false}
+}
+function deny(){document.getElementById('accessDenied').style.display='flex';document.getElementById('mainWrap').style.display='none';document.getElementById('sidebar').style.display='none'}
+function adminLogout(){if(!confirm('Logout?'))return;localStorage.removeItem('rz_premium_session');location.href='capex-calculator.html'}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showSection(id){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('sec-'+id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
+    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',benchmarks:'DC Benchmarks',audit:'Audit Log',settings:'System Settings'};
+    document.getElementById('topbarTitle').textContent=titles[id]||id;
+    if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show')}
+
+// Clock
+setInterval(()=>{document.getElementById('topbarTime').textContent=new Date().toLocaleString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' UTC+7'},1000);
+
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const CREDENTIALS = [
+    {name:'Bagus Dwi Permana',email:'bagus@resistancezero.com',password:'RZ@Premium2026!',tier:'pro',role:'Owner',color:'#8b5cf6'},
+    {name:'Admin RZ',email:'admin@resistancezero.com',password:'RZ@Premium2026!',tier:'pro',role:'Admin',color:'#7c3aed'},
+    {name:'Demo Pro User',email:'demo@resistancezero.com',password:'demo2026',tier:'pro',role:'User',color:'#6d28d9'}
+];
+
+// Feature flags state (persisted in localStorage)
+const DEFAULT_FEATURES = {
+    advanced_mode:    {label:'Advanced Mode',icon:'fa-cogs',desc:'Extended input parameters',free:false,pro:true},
+    unblur_values:    {label:'Unblur $/kW & Energy',icon:'fa-eye',desc:'Show real dollar values',free:false,pro:true},
+    unblur_breakdown: {label:'Unblur Cost Breakdown',icon:'fa-chart-bar',desc:'Full breakdown visibility',free:false,pro:true},
+    save_scenario:    {label:'Save Scenario',icon:'fa-save',desc:'Save & compare scenarios',free:false,pro:true},
+    pdf_export:       {label:'PDF Export',icon:'fa-file-pdf',desc:'Export detailed PDF reports',free:false,pro:true},
+    premium_output:   {label:'Premium Output Section',icon:'fa-crown',desc:'Extended analytics output',free:false,pro:true},
+    comparison_view:  {label:'Scenario Comparison',icon:'fa-columns',desc:'Side-by-side comparison',free:false,pro:true},
+    api_access:       {label:'API Access',icon:'fa-plug',desc:'REST API for automation',free:false,pro:true},
+    watermark_hide:   {label:'Remove Watermark',icon:'fa-eraser',desc:'Hide free-tier watermark',free:false,pro:true},
+    tooltips:         {label:'Tooltips & Guidance',icon:'fa-info-circle',desc:'Interactive help tooltips',free:true,pro:true},
+    dark_mode:        {label:'Dark Mode (Future)',icon:'fa-moon',desc:'Dark theme for calculators',free:false,pro:false},
+    multi_scenario:   {label:'Multi-Scenario (Future)',icon:'fa-layer-group',desc:'Compare 3+ scenarios',free:false,pro:false}
+};
+
+let featureFlags = JSON.parse(localStorage.getItem('rz_admin_features')||'null') || JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+
+const FIRST_NAMES=['James','Emma','Liam','Olivia','Noah','Ava','William','Sophia','Mason','Isabella','Lucas','Mia','Ethan','Charlotte','Alexander','Amelia','Daniel','Harper','Michael','Evelyn','David','Abigail','Joseph','Emily','Samuel','Elizabeth','Henry','Sofia','Sebastian','Victoria','Andrew','Grace','Joshua','Chloe','Nathan','Zoey','Ryan','Lily','Benjamin','Hannah','Kevin','Aria','Brandon','Riley','Tyler','Nora','Dylan','Ella','Matthew','Scarlett'];
+const LAST_NAMES=['Chen','Smith','Patel','Williams','Garcia','Johnson','Kim','Brown','Lee','Davis','Miller','Wilson','Tanaka','Rodriguez','Martinez','Anderson','Thomas','Taylor','Moore','Jackson'];
+const DOMAINS=['gmail.com','outlook.com','yahoo.com','protonmail.com','company.io','engineering.co','datacenter.net','techops.com','infra.dev','icloud.com'];
+const STATUSES=['active','active','active','active','inactive','inactive','suspended'];
+
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function randDate(s,e){return new Date(s.getTime()+Math.random()*(e.getTime()-s.getTime()))}
+function fmtDate(d){return d.toISOString().split('T')[0]}
+function fmtDT(d){return d.toISOString().replace('T',' ').substring(0,16)}
+
+let allUsers=[], filteredUsers=[], activities=[];
+let currentPage=1, PAGE_SIZE=10, sortField='lastLogin', sortDir='desc';
+let allPasswordsVisible=false;
+
+function generateUsers(){
+    const u=[];
+    // Real accounts
+    u.push({id:'usr_001',name:'Bagus Dwi Permana',email:'bagus@resistancezero.com',password:'RZ@Premium2026!',tier:'pro',status:'active',registered:'2025-06-15',lastLogin:'2026-02-15 09:30',usage:247,lastPayment:'2026-02-01',amountPaid:49,role:'Owner',company:'ResistanceZero',country:'Indonesia'});
+    u.push({id:'usr_002',name:'Admin RZ',email:'admin@resistancezero.com',password:'RZ@Premium2026!',tier:'pro',status:'active',registered:'2025-06-15',lastLogin:'2026-02-14 18:45',usage:182,lastPayment:'2026-02-01',amountPaid:49,role:'Admin',company:'ResistanceZero',country:'Indonesia'});
+    u.push({id:'usr_003',name:'Demo Pro User',email:'demo@resistancezero.com',password:'demo2026',tier:'pro',status:'active',registered:'2025-08-20',lastLogin:'2026-02-13 14:20',usage:95,lastPayment:'2026-02-01',amountPaid:49,role:'User',company:'—',country:'Singapore'});
+    // Random users
+    for(let i=0;i<35;i++){
+        const fn=FIRST_NAMES[i],ln=LAST_NAMES[i%LAST_NAMES.length];
+        const dm=DOMAINS[rand(0,DOMAINS.length-1)];
+        const em=fn.toLowerCase()+'.'+ln.toLowerCase()+'@'+dm;
+        const tr=Math.random();
+        const tier=tr<0.15?'pro':'free';
+        const st=STATUSES[rand(0,STATUSES.length-1)];
+        const rd=randDate(new Date('2025-07-01'),new Date('2026-02-10'));
+        const ld=randDate(rd,new Date('2026-02-15'));
+        const hp=tier==='pro';
+        const pd=hp?randDate(new Date('2026-01-01'),new Date('2026-02-15')):null;
+        const countries=['US','UK','Germany','Singapore','Japan','India','UAE','Australia','Canada','Brazil','Indonesia','Malaysia'];
+        u.push({id:`usr_${String(i+16).padStart(3,'0')}`,name:fn+' '+ln,email:em,password:tier==='free'?'—':'assigned',tier,status:st,registered:fmtDate(rd),lastLogin:fmtDT(ld),usage:rand(1,150),lastPayment:pd?fmtDate(pd):null,amountPaid:hp?49:0,role:'User',company:['Acme Corp','TechData','CloudFirst','DataVault','NetSys','FreeLance'][rand(0,5)],country:countries[rand(0,countries.length-1)]});
+    }
+    return u;
+}
+
+function generateActivities(){
+    const types=['login','logout','calculation','pdf','tier_change','feature_toggle'];
+    const acts=[];
+    const now=new Date('2026-02-15T12:00:00');
+    for(let i=0;i<40;i++){
+        const usr=allUsers[rand(0,allUsers.length-1)];
+        const type=types[rand(0,types.length-1)];
+        const time=new Date(now.getTime()-i*(rand(600000,3600000)));
+        const details={login:'Logged in via web',logout:'Logged out',calculation:'Ran CAPEX calculation ('+rand(1,100)+'MW)',pdf:'Exported PDF report',tier_change:'Tier changed to '+['Pro','Free'][rand(0,1)],feature_toggle:'Toggled feature flag'};
+        acts.push({email:usr.email,name:usr.name,type,time:fmtDT(time),detail:details[type]||''});
+    }
+    return acts;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function renderKPIs(){
+    const total=allUsers.length,active=allUsers.filter(u=>u.status==='active').length;
+    const pro=allUsers.filter(u=>u.tier==='pro').length;
+    const revenue=pro*49;
+    const kpis=[
+        {icon:'fa-users',bg:'rgba(96,165,250,0.15)',color:'#60a5fa',label:'Total Users',val:total,sub:`+${((total/42-1)*100).toFixed(0)}% from last month`,cls:'up'},
+        {icon:'fa-user-check',bg:'rgba(52,211,153,0.15)',color:'#34d399',label:'Active Users',val:active,sub:`${((active/total)*100).toFixed(1)}% active rate`,cls:'up'},
+        {icon:'fa-crown',bg:'rgba(167,139,250,0.15)',color:'#a78bfa',label:'Pro Users',val:pro,sub:`${(pro/total*100).toFixed(1)}% conversion`,cls:'up'},
+        {icon:'fa-dollar-sign',bg:'rgba(251,191,36,0.15)',color:'#fbbf24',label:'Monthly Revenue',val:'$'+revenue.toLocaleString(),sub:'2.1% churn rate',cls:'down'}
+    ];
+    document.getElementById('kpiGrid').innerHTML=kpis.map(k=>`
+        <div class="kpi"><div class="kpi-icon" style="background:${k.bg};color:${k.color}"><i class="fas ${k.icon}"></i></div>
+        <div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div>
+        <span class="kpi-sub ${k.cls}"><i class="fas fa-arrow-${k.cls==='up'?'up':'down'}"></i> ${k.sub}</span></div>`).join('');
+    document.getElementById('navUserCount').textContent=total;
+}
+
+function renderDashboardCharts(){
+    const actCount=allUsers.filter(u=>u.status==='active').length;
+    // Growth
+    new Chart(document.getElementById('chartGrowth'),{type:'line',data:{labels:['Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'],datasets:[
+        {label:'Total',data:[12,18,24,31,42,allUsers.length],borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.08)',fill:true,tension:0.4,pointRadius:4,borderWidth:2},
+        {label:'Active',data:[8,14,19,25,35,actCount],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.05)',fill:true,tension:0.4,pointRadius:4,borderWidth:2}
+    ]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}}}});
+    // Tier dist
+    const pc=allUsers.filter(u=>u.tier==='pro').length,fc=allUsers.filter(u=>u.tier==='free').length;
+    new Chart(document.getElementById('chartTier'),{type:'doughnut',data:{labels:['Pro','Free'],datasets:[{data:[pc,fc],backgroundColor:['#8b5cf6','#475569'],borderColor:'#1e293b',borderWidth:3}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:14,usePointStyle:true}}}}});
+    // Usage by hour
+    const hours=Array.from({length:24},(_,i)=>i);
+    const hourData=hours.map(()=>rand(2,45));
+    new Chart(document.getElementById('chartUsageHour'),{type:'bar',data:{labels:hours.map(h=>h+':00'),datasets:[{label:'Calculations',data:hourData,backgroundColor:'rgba(96,165,250,0.4)',borderColor:'#60a5fa',borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:8}},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}}}});
+    // Funnel
+    new Chart(document.getElementById('chartFunnel'),{type:'bar',data:{labels:['Visitors','Signed Up','Active','Pro'],datasets:[{data:[1200,allUsers.length,actCount,pc],backgroundColor:['#475569','#60a5fa','#34d399','#8b5cf6'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#e2e8f0',font:{size:10}},grid:{display:false}}}}});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REVENUE
+// ═══════════════════════════════════════════════════════════════
+function renderRevenue(){
+    const pro=allUsers.filter(u=>u.tier==='pro').length;
+    const mrr=pro*49, arr=mrr*12, ltv=49*14.2;
+    const kpis=[
+        {icon:'fa-receipt',bg:'rgba(52,211,153,0.15)',color:'#34d399',label:'MRR',val:'$'+mrr.toLocaleString(),sub:'Monthly Recurring Revenue',cls:'up'},
+        {icon:'fa-calendar-alt',bg:'rgba(96,165,250,0.15)',color:'#60a5fa',label:'ARR',val:'$'+(arr).toLocaleString(),sub:'Annual Recurring Revenue',cls:'up'},
+        {icon:'fa-gem',bg:'rgba(167,139,250,0.15)',color:'#a78bfa',label:'Avg LTV',val:'$'+ltv.toFixed(0),sub:'Avg 14.2 month retention',cls:'neutral'},
+        {icon:'fa-user-minus',bg:'rgba(248,113,113,0.15)',color:'#f87171',label:'Churn Rate',val:'2.1%',sub:'Last 30 days',cls:'down'}
+    ];
+    document.getElementById('revenueKpis').innerHTML=kpis.map(k=>`
+        <div class="kpi"><div class="kpi-icon" style="background:${k.bg};color:${k.color}"><i class="fas ${k.icon}"></i></div>
+        <div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div>
+        <span class="kpi-sub ${k.cls}"><i class="fas fa-arrow-${k.cls==='up'?'up':k.cls==='down'?'down':'right'}"></i> ${k.sub}</span></div>`).join('');
+    // MRR chart
+    new Chart(document.getElementById('chartMRR'),{type:'line',data:{labels:['Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'],datasets:[{label:'MRR ($)',data:[98,147,196,245,343,mrr],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.1)',fill:true,tension:0.4,pointRadius:4,borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#475569',font:{size:9},callback:v=>'$'+v},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}}}});
+    // Churn chart
+    new Chart(document.getElementById('chartChurn'),{type:'doughnut',data:{labels:['Retained','Churned'],datasets:[{data:[97.9,2.1],backgroundColor:['#34d399','#f87171'],borderColor:'#1e293b',borderWidth:3}]},options:{responsive:true,cutout:'70%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:14,usePointStyle:true}}}}});
+    // Revenue table
+    const payingUsers=allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid);
+    document.getElementById('revenueTableWrap').innerHTML=`<table class="data-tbl"><thead><tr><th>Account</th><th>Tier</th><th>Last Payment</th><th>Amount</th><th>Est. LTV</th></tr></thead><tbody>${payingUsers.map(u=>`<tr><td style="font-weight:500">${u.name}<br><span style="font-size:0.7rem;color:#64748b">${u.email}</span></td><td><span class="tier-badge pro">PRO</span></td><td>${u.lastPayment||'—'}</td><td style="color:#34d399;font-weight:600">$${u.amountPaid.toFixed(2)}</td><td style="color:#fbbf24">$${(u.amountPaid*rand(6,18)).toFixed(0)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USERS
+// ═══════════════════════════════════════════════════════════════
+function filterUsers(){
+    const q=document.getElementById('userSearch').value.toLowerCase();
+    const tf=document.getElementById('tierFilter').value;
+    const sf=document.getElementById('statusFilter').value;
+    filteredUsers=allUsers.filter(u=>{
+        if(q&&!u.email.toLowerCase().includes(q)&&!u.name.toLowerCase().includes(q))return false;
+        if(tf!=='all'&&u.tier!==tf)return false;
+        if(sf!=='all'&&u.status!==sf)return false;
+        return true;
+    });
+    currentPage=1;applySort();renderTable();
+}
+function sortTable(f){if(sortField===f)sortDir=sortDir==='asc'?'desc':'asc';else{sortField=f;sortDir='asc'}applySort();renderTable()}
+function applySort(){filteredUsers.sort((a,b)=>{let va=a[sortField]||'',vb=b[sortField]||'';if(sortField==='usage'){va=+va;vb=+vb}if(va<vb)return sortDir==='asc'?-1:1;if(va>vb)return sortDir==='asc'?1:-1;return 0})}
+function goPage(p){currentPage=p;renderTable()}
+
+function renderTable(){
+    const s=(currentPage-1)*PAGE_SIZE,e=s+PAGE_SIZE,pg=filteredUsers.slice(s,e);
+    document.getElementById('userTbody').innerHTML=pg.map(u=>`<tr>
+        <td style="font-weight:500">${u.name}</td>
+        <td><span style="font-size:0.75rem">${u.email}</span></td>
+        <td><span class="tier-badge ${u.tier}">${u.tier.toUpperCase()}</span></td>
+        <td><span class="status-dot ${u.status}">${u.status.charAt(0).toUpperCase()+u.status.slice(1)}</span></td>
+        <td>${u.registered}</td><td>${u.lastLogin}</td><td>${u.usage}</td>
+        <td>${u.lastPayment||'<span style="color:#475569">—</span>'}</td>
+        <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-ghost btn-sm" onclick="changeTier('${u.id}')"><i class="fas fa-exchange-alt"></i></button></td>
+    </tr>`).join('');
+    const tot=filteredUsers.length,tp=Math.ceil(tot/PAGE_SIZE);
+    document.getElementById('pgInfo').textContent=`Showing ${s+1}-${Math.min(e,tot)} of ${tot}`;
+    let btns='';for(let p=1;p<=tp;p++)btns+=`<button class="pg-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    document.getElementById('pgBtns').innerHTML=btns;
+}
+
+function changeTier(id){
+    const u=allUsers.find(x=>x.id===id);if(!u)return;
+    const tiers=['free','pro'];
+    const curr=tiers.indexOf(u.tier);
+    const next=tiers[(curr+1)%2];
+    if(!confirm(`Change ${u.email} tier from ${u.tier.toUpperCase()} to ${next.toUpperCase()}?`))return;
+    u.tier=next;
+    if(next==='pro'){u.amountPaid=49;u.lastPayment=fmtDate(new Date())}
+    /* Persist tier change for manual accounts */
+    if(u.isManual){
+        var manuals=getManualAccounts();
+        var ma=manuals.find(a=>a.email===u.email);
+        if(ma){ma.tier=next;saveManualAccounts(manuals)}
+    }
+    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Changed '+u.email+' tier to '+next.toUpperCase()});
+    filterUsers();
+    renderKPIs();
+    renderCredentials();
+    renderAudit();
+}
+
+function exportCSV(){
+    const h=['Name','Email','Tier','Status','Registered','Last Login','Usage','Last Payment','Amount','Company','Country'];
+    const r=filteredUsers.map(u=>[u.name,u.email,u.tier,u.status,u.registered,u.lastLogin,u.usage,u.lastPayment||'',u.amountPaid,u.company||'',u.country||''].join(','));
+    downloadCSV([h.join(','),...r].join('\n'),'rz_users_'+fmtDate(new Date())+'.csv');
+}
+function downloadCSV(csv,fn){const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u)}
+
+function openUserModal(id){
+    const u=allUsers.find(x=>x.id===id);if(!u)return;
+    const ua=activities.filter(a=>a.email===u.email).slice(0,10);
+    const icons={login:'fa-sign-in-alt',logout:'fa-sign-out-alt',calculation:'fa-calculator',pdf:'fa-file-pdf',tier_change:'fa-exchange-alt',feature_toggle:'fa-toggle-on'};
+    document.getElementById('modalBody').innerHTML=`
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem">
+            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;font-weight:700">${u.name.charAt(0)}</div>
+            <div><div style="font-size:1.1rem;font-weight:700;color:#f1f5f9">${u.name}</div><div style="font-size:0.82rem;color:#64748b">${u.email}</div><div style="margin-top:4px"><span class="tier-badge ${u.tier}">${u.tier.toUpperCase()}</span> <span class="status-dot ${u.status}" style="margin-left:8px">${u.status}</span></div></div>
+        </div>
+        <div class="m-section"><h4><i class="fas fa-info-circle"></i> Profile</h4>
+            <div class="m-row"><span class="m-row-label">User ID</span><span class="m-row-value" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">${u.id}</span></div>
+            <div class="m-row"><span class="m-row-label">Full Name</span><span class="m-row-value">${u.name}</span></div>
+            <div class="m-row"><span class="m-row-label">Role</span><span class="m-row-value">${u.role}</span></div>
+            <div class="m-row"><span class="m-row-label">Company</span><span class="m-row-value">${u.company||'—'}</span></div>
+            <div class="m-row"><span class="m-row-label">Country</span><span class="m-row-value">${u.country||'—'}</span></div>
+            <div class="m-row"><span class="m-row-label">Password</span><span class="m-row-value" style="font-family:'JetBrains Mono',monospace;color:#fbbf24">${u.password||'—'}</span></div>
+            <div class="m-row"><span class="m-row-label">Registered</span><span class="m-row-value">${u.registered}</span></div>
+            <div class="m-row"><span class="m-row-label">Last Login</span><span class="m-row-value">${u.lastLogin}</span></div>
+        </div>
+        <div class="m-section"><h4><i class="fas fa-chart-bar"></i> Usage</h4>
+            <div class="m-row"><span class="m-row-label">Total Calculations</span><span class="m-row-value">${u.usage}</span></div>
+            <div class="m-row"><span class="m-row-label">Avg/Week</span><span class="m-row-value">${(u.usage/8).toFixed(1)}</span></div>
+        </div>
+        <div class="m-section"><h4><i class="fas fa-credit-card"></i> Payment</h4>
+            <div class="m-row"><span class="m-row-label">Last Payment</span><span class="m-row-value">${u.lastPayment||'None'}</span></div>
+            <div class="m-row"><span class="m-row-label">Amount</span><span class="m-row-value">${u.amountPaid?'$'+u.amountPaid.toFixed(2):'—'}</span></div>
+            <div class="m-row"><span class="m-row-label">Lifetime Value</span><span class="m-row-value">${u.amountPaid?'$'+(u.amountPaid*rand(4,16)).toFixed(0):'—'}</span></div>
+        </div>
+        <div class="m-section"><h4><i class="fas fa-history"></i> Activity</h4>
+            ${ua.length?ua.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.78rem"><div class="tl-icon ${a.type}" style="width:24px;height:24px;font-size:0.6rem"><i class="fas ${icons[a.type]||'fa-circle'}"></i></div><span style="color:#cbd5e1">${a.detail}</span><span style="color:#64748b;margin-left:auto;font-size:0.68rem">${a.time}</span></div>`).join(''):'<div style="color:#475569;font-size:0.8rem">No recent activity</div>'}
+        </div>`;
+    document.getElementById('userModal').classList.add('show');
+}
+function closeModal(){document.getElementById('userModal').classList.remove('show')}
+document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+
+// ═══════════════════════════════════════════════════════════════
+// CREDENTIALS
+// ═══════════════════════════════════════════════════════════════
+function credCopyBtn(pw){
+    return '<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(\''+pw+'\');this.innerHTML=\'<i class=\\\'fas fa-check\\\'></i> Copied\';setTimeout(()=>this.innerHTML=\'<i class=\\\'fas fa-copy\\\'></i> Copy\',1500)"><i class="fas fa-copy"></i> Copy</button>';
+}
+function credDeleteBtn(email){
+    return '<button class="btn btn-ghost btn-sm" style="color:#f87171" onclick="deleteManualAccount(\''+email+'\')"><i class="fas fa-trash"></i></button>';
+}
+function renderCredentials(){
+    const allCreds=getAllCredentials();
+    const rows=allCreds.map(function(c,i){
+        var isManual=c.color==='#22d3ee';
+        var manualTag=isManual?' <span style="color:#22d3ee;font-size:0.6rem;border:1px solid rgba(34,211,238,0.3);padding:1px 5px;border-radius:4px;">MANUAL</span>':'';
+        var deleteHtml=isManual?credDeleteBtn(c.email):'';
+        return '<div class="cred-row'+(isManual?' manual':'')+'">' +
+            '<div><div class="cred-avatar" style="background:'+c.color+'">'+c.name.charAt(0)+'</div></div>' +
+            '<div style="font-weight:500;color:#e2e8f0">'+c.name+'<br><span style="font-size:0.68rem;color:#64748b">'+c.role+manualTag+'</span></div>' +
+            '<div style="font-size:0.75rem;color:#94a3b8;word-break:break-all">'+c.email+'</div>' +
+            '<div class="cred-pass"><span class="'+(allPasswordsVisible?'revealed':'masked')+'" id="credPw'+i+'">'+(allPasswordsVisible?c.password:'••••••••••')+'</span><button class="cred-reveal" onclick="togglePw('+i+')" title="Toggle"><i class="fas fa-eye"></i></button></div>' +
+            '<div><span class="tier-badge '+c.tier+'">'+c.tier.toUpperCase()+'</span></div>' +
+            '<div style="display:flex;gap:4px">'+credCopyBtn(c.password)+deleteHtml+'</div>' +
+        '</div>';
+    }).join('');
+    document.getElementById('credentialsList').innerHTML=`
+        <div class="cred-row header"><div>#</div><div>Name</div><div>Email</div><div>Password</div><div>Tier</div><div>Actions</div></div>${rows}`;
+}
+function togglePw(i){const allCreds=getAllCredentials();const el=document.getElementById('credPw'+i);const c=allCreds[i];if(!c)return;if(el.classList.contains('masked')){el.classList.remove('masked');el.classList.add('revealed');el.textContent=c.password}else{el.classList.remove('revealed');el.classList.add('masked');el.textContent='••••••••••'}}
+function toggleAllPasswords(){allPasswordsVisible=!allPasswordsVisible;renderCredentials()}
+function exportCredCSV(){const h='Name,Email,Password,Tier,Role';const r=getAllCredentials().map(c=>[c.name,c.email,c.password,c.tier,c.role].join(','));downloadCSV([h,...r].join('\n'),'rz_credentials_'+fmtDate(new Date())+'.csv')}
+
+// ═══════════════════════════════════════════════════════════════
+// MANUAL ACCOUNT MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function getManualAccounts(){
+    try{return JSON.parse(localStorage.getItem('rz_manual_accounts')||'[]')}catch(e){return[]}
+}
+function saveManualAccounts(arr){
+    localStorage.setItem('rz_manual_accounts',JSON.stringify(arr));
+}
+function getAllCredentials(){
+    const manual=getManualAccounts().map(a=>({
+        name:a.name,email:a.email,password:a.password,tier:a.tier,role:a.role||'User',color:'#22d3ee'
+    }));
+    return [...CREDENTIALS,...manual];
+}
+function loadManualAccounts(){
+    const manuals=getManualAccounts();
+    manuals.forEach(function(a){
+        if(allUsers.find(u=>u.email===a.email))return;
+        allUsers.push({
+            id:'usr_m'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
+            name:a.name,email:a.email,password:a.password,tier:a.tier,
+            status:'active',registered:a.registered||fmtDate(new Date()),
+            lastLogin:'—',usage:0,lastPayment:a.tier==='pro'?fmtDate(new Date()):null,
+            amountPaid:a.tier==='pro'?49:0,role:a.role||'User',
+            company:a.company||'—',country:a.country||'—',isManual:true
+        });
+    });
+}
+function openCreateModal(){
+    document.getElementById('createForm').style.display='block';
+    document.getElementById('createSuccess').style.display='none';
+    document.getElementById('createError').style.display='none';
+    ['createName','createEmail','createPassword','createCompany'].forEach(id=>{
+        var el=document.getElementById(id);if(el)el.value='';
+    });
+    document.getElementById('createTier').value='free';
+    document.getElementById('createRole').value='User';
+    document.getElementById('createCountry').value='Indonesia';
+    document.getElementById('createModal').classList.add('show');
+}
+function closeCreateModal(){document.getElementById('createModal').classList.remove('show')}
+document.getElementById('createModal').addEventListener('click',function(e){if(e.target===this)closeCreateModal()});
+
+function toggleCreatePw(){
+    var inp=document.getElementById('createPassword');
+    var ico=document.getElementById('createPwIcon');
+    if(inp.type==='password'){inp.type='text';ico.className='fas fa-eye-slash'}
+    else{inp.type='password';ico.className='fas fa-eye'}
+}
+
+function submitCreateAccount(){
+    var name=document.getElementById('createName').value.trim();
+    var email=document.getElementById('createEmail').value.trim().toLowerCase();
+    var password=document.getElementById('createPassword').value;
+    var tier=document.getElementById('createTier').value;
+    var role=document.getElementById('createRole').value;
+    var company=document.getElementById('createCompany').value.trim();
+    var country=document.getElementById('createCountry').value;
+    var errEl=document.getElementById('createError');
+
+    if(!name||!email||!password){
+        errEl.textContent='Name, email, and password are required.';errEl.style.display='block';return;
+    }
+    if(password.length<6){
+        errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;
+    }
+    /* Check duplicate */
+    var allCreds=getAllCredentials();
+    if(allCreds.find(c=>c.email===email)){
+        errEl.textContent='An account with this email already exists.';errEl.style.display='block';return;
+    }
+    errEl.style.display='none';
+
+    /* Save to localStorage */
+    var manuals=getManualAccounts();
+    var newAccount={
+        name:name,email:email,password:password,tier:tier,role:role,
+        company:company||'—',country:country,registered:fmtDate(new Date()),
+        createdBy:adminEmail,createdAt:new Date().toISOString()
+    };
+    manuals.push(newAccount);
+    saveManualAccounts(manuals);
+
+    /* Add to runtime arrays */
+    var userId='usr_m'+Date.now();
+    allUsers.push({
+        id:userId,name:name,email:email,password:password,tier:tier,
+        status:'active',registered:fmtDate(new Date()),lastLogin:'—',
+        usage:0,lastPayment:tier==='pro'?fmtDate(new Date()):null,
+        amountPaid:tier==='pro'?49:0,role:role,company:company||'—',country:country,isManual:true
+    });
+
+    /* Add to activity log */
+    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Created account: '+email+' ('+tier.toUpperCase()+')'});
+
+    /* Show success */
+    document.getElementById('createForm').style.display='none';
+    document.getElementById('createSuccessMsg').textContent=name+' — '+tier.toUpperCase()+' account created!';
+    document.getElementById('createSuccess').style.display='block';
+
+    /* Refresh views */
+    filteredUsers=[...allUsers];
+    filterUsers();
+    renderKPIs();
+    renderCredentials();
+    renderAudit();
+
+    setTimeout(closeCreateModal,2000);
+}
+
+function deleteManualAccount(email){
+    if(!confirm('Delete manual account: '+email+'?\nThis cannot be undone.'))return;
+    var manuals=getManualAccounts().filter(a=>a.email!==email);
+    saveManualAccounts(manuals);
+    allUsers=allUsers.filter(u=>u.email!==email);
+    filteredUsers=[...allUsers];
+    filterUsers();renderKPIs();renderCredentials();
+    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Deleted manual account: '+email});
+    renderAudit();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE FLAGS
+// ═══════════════════════════════════════════════════════════════
+function renderFeatures(){
+    const keys=Object.keys(featureFlags);
+    let html=`<div class="feat-row header"><span>Feature</span><span style="text-align:center">Free</span><span style="text-align:center">Pro</span></div>`;
+    keys.forEach(k=>{
+        const f=featureFlags[k];
+        html+=`<div class="feat-row">
+            <div class="feat-name"><i class="fas ${f.icon}"></i><div>${f.label}<br><span class="fdesc">${f.desc}</span></div></div>
+            <div class="feat-cell"><label class="toggle"><input type="checkbox" ${f.free?'checked':''} onchange="toggleFeature('${k}','free',this.checked)"><span class="slider"></span></label></div>
+            <div class="feat-cell"><label class="toggle"><input type="checkbox" ${f.pro?'checked':''} onchange="toggleFeature('${k}','pro',this.checked)"><span class="slider"></span></label></div>
+        </div>`;
+    });
+    document.getElementById('featureMatrix').innerHTML=html;
+
+    // User overrides
+    const proUsers=allUsers.filter(u=>u.tier==='pro').slice(0,8);
+    document.getElementById('userOverrides').innerHTML=`
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem">
+        ${proUsers.map(u=>`<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">
+            <div class="cred-avatar" style="background:#8b5cf6;width:32px;height:32px;font-size:0.6rem">${u.name.charAt(0)}</div>
+            <div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.email}</div><span class="tier-badge pro" style="margin-top:4px">PRO</span></div>
+            <button class="btn btn-ghost btn-sm" onclick="alert('Override panel for ${u.email} — coming with Supabase integration')"><i class="fas fa-sliders-h"></i></button>
+        </div>`).join('')}
+        </div>`;
+
+    // Experimental
+    document.getElementById('experimentalFeatures').innerHTML=`
+        <div style="display:grid;gap:0.75rem">
+            ${[{k:'dark_mode',l:'Dark Mode',d:'Dark theme for all calculator pages',s:featureFlags.dark_mode?.pro||false},{k:'multi_scenario',l:'Multi-Scenario Compare',d:'Compare 3+ scenarios side-by-side',s:featureFlags.multi_scenario?.pro||false}].map(x=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#0f172a;border:1px solid #334155;border-radius:10px">
+                <div><div style="font-size:0.85rem;font-weight:600;color:#e2e8f0">${x.l}</div><div style="font-size:0.72rem;color:#64748b">${x.d}</div></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-size:0.68rem;color:${x.s?'#34d399':'#f87171'};font-weight:600">${x.s?'ENABLED':'DISABLED'}</span><label class="toggle"><input type="checkbox" ${x.s?'checked':''} onchange="toggleExperimental('${x.k}',this.checked)"><span class="slider"></span></label></div>
+            </div>`).join('')}
+        </div>`;
+}
+
+function toggleFeature(key,tier,val){featureFlags[key][tier]=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags))}
+function toggleExperimental(key,val){if(featureFlags[key]){featureFlags[key].free=val;featureFlags[key].pro=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags));renderFeatures()}}
+
+// ═══════════════════════════════════════════════════════════════
+// BENCHMARKS
+// ═══════════════════════════════════════════════════════════════
+const BENCH_OPERATORS=[
+    {name:'Equinix',pue:1.28,costKw:12500,capacity:'380 MW',markets:62,uptime:99.9999,certifications:'ISO 27001, SOC 2, PCI DSS',cooling:'Chilled Water + Indirect Evap',renewableTarget:'100% by 2030',revenue:'$8.2B (2025)',region:'Global'},
+    {name:'Digital Realty',pue:1.30,costKw:11800,capacity:'520 MW',markets:53,uptime:99.999,certifications:'ISO 27001, SOC 2',cooling:'Chilled Water + Free Cooling',renewableTarget:'100% by 2030',revenue:'$5.5B (2025)',region:'Global'},
+    {name:'Google Cloud',pue:1.10,costKw:14200,capacity:'2800 MW',markets:40,uptime:99.999,certifications:'ISO 27001, SOC 2/3, FedRAMP',cooling:'DLC + Seawater + AI-Optimized',renewableTarget:'24/7 CFE by 2030',revenue:'$44B (Cloud, 2025)',region:'Global'},
+    {name:'Microsoft Azure',pue:1.12,costKw:13800,capacity:'3200 MW',markets:65,uptime:99.999,certifications:'ISO 27001, SOC 2, HIPAA, FedRAMP',cooling:'Liquid Immersion + Evap',renewableTarget:'100/75/0 by 2030',revenue:'$97B (Cloud, 2025)',region:'Global'},
+    {name:'AWS',pue:1.15,costKw:13500,capacity:'4500+ MW',markets:34,uptime:99.999,certifications:'ISO 27001, SOC 2/3, FedRAMP, HIPAA',cooling:'Custom Evap + DLC',renewableTarget:'100% by 2025 (achieved)',revenue:'$107B (2025)',region:'Global'},
+    {name:'NTT Global',pue:1.25,costKw:11200,capacity:'210 MW',markets:29,uptime:99.999,certifications:'ISO 27001, SOC 2',cooling:'Chilled Water + Free Cooling',renewableTarget:'80% by 2030',revenue:'$3.8B (2025)',region:'APAC/Global'},
+    {name:'CyrusOne',pue:1.31,costKw:10500,capacity:'140 MW',markets:12,uptime:99.999,certifications:'SOC 2, ISO 27001',cooling:'Chilled Water',renewableTarget:'Committed',revenue:'$1.4B (2025)',region:'Americas/EU'},
+    {name:'Keppel DC',pue:1.35,costKw:13000,capacity:'85 MW',markets:8,uptime:99.99,certifications:'ISO 27001, SS 564',cooling:'Chilled Water + Tropical Optimized',renewableTarget:'In progress',revenue:'$380M (2025)',region:'APAC'},
+    {name:'STACK Infra',pue:1.27,costKw:11500,capacity:'110 MW',markets:6,uptime:99.999,certifications:'SOC 2, ISO 27001',cooling:'Indirect Evap + Chilled Water',renewableTarget:'80% by 2030',revenue:'$650M (2025)',region:'Americas/APAC'},
+    {name:'EdgeConneX',pue:1.29,costKw:10800,capacity:'75 MW',markets:50,uptime:99.999,certifications:'SOC 2',cooling:'Mixed / Edge-Optimized',renewableTarget:'Committed',revenue:'$480M (2025)',region:'Global Edge'}
+];
+
+const BENCH_REGIONS=[
+    {region:'North America (Avg)',costKw:12200,energy:0.068,landCost:'High',constructTime:'18-24 mo'},
+    {region:'Northern Virginia (US)',costKw:10500,energy:0.055,landCost:'Very High',constructTime:'14-18 mo'},
+    {region:'Silicon Valley (US)',costKw:14800,energy:0.095,landCost:'Very High',constructTime:'18-24 mo'},
+    {region:'Western Europe (Avg)',costKw:13500,energy:0.120,landCost:'High',constructTime:'20-28 mo'},
+    {region:'London (UK)',costKw:14200,energy:0.145,landCost:'Very High',constructTime:'22-30 mo'},
+    {region:'Frankfurt (DE)',costKw:13800,energy:0.130,landCost:'High',constructTime:'24-30 mo'},
+    {region:'Amsterdam (NL)',costKw:12800,energy:0.088,landCost:'High',constructTime:'18-24 mo'},
+    {region:'Singapore',costKw:14500,energy:0.095,landCost:'Very High',constructTime:'24-30 mo'},
+    {region:'Tokyo (JP)',costKw:15200,energy:0.110,landCost:'Very High',constructTime:'24-36 mo'},
+    {region:'Sydney (AU)',costKw:13200,energy:0.085,landCost:'Medium',constructTime:'18-24 mo'},
+    {region:'India (Avg)',costKw:7800,energy:0.058,landCost:'Low',constructTime:'18-24 mo'},
+    {region:'Jakarta (ID)',costKw:8500,energy:0.068,landCost:'Medium',constructTime:'20-28 mo'},
+    {region:'Middle East (Avg)',costKw:11500,energy:0.045,landCost:'Low-Med',constructTime:'16-22 mo'},
+    {region:'Nordics (Avg)',costKw:11200,energy:0.035,landCost:'Low',constructTime:'14-20 mo'}
+];
+
+function renderBenchmarks(){
+    // KPI cards
+    const avgPUE=(BENCH_OPERATORS.reduce((s,o)=>s+o.pue,0)/BENCH_OPERATORS.length).toFixed(2);
+    const avgCost=Math.round(BENCH_OPERATORS.reduce((s,o)=>s+o.costKw,0)/BENCH_OPERATORS.length);
+    const totalCap=BENCH_OPERATORS.reduce((s,o)=>s+parseInt(o.capacity),0);
+    document.getElementById('benchKpis').innerHTML=[
+        {label:'Industry Avg PUE',val:avgPUE,sub:'Uptime Institute 2025',cls:'green',icon:'fa-leaf'},
+        {label:'Avg $/kW Build Cost',val:'$'+avgCost.toLocaleString(),sub:'Turner & Townsend 2025',cls:'purple',icon:'fa-hammer'},
+        {label:'Hyperscaler Best PUE',val:'1.10',sub:'Google — ML-optimized cooling',cls:'blue',icon:'fa-trophy'},
+        {label:'Total Tracked Capacity',val:(totalCap/1000).toFixed(1)+' GW',sub:'Top 10 operators sampled',cls:'amber',icon:'fa-bolt'},
+        {label:'Lowest $/kW (India)',val:'$7,800',sub:'Labor + materials advantage',cls:'green',icon:'fa-rupee-sign'},
+        {label:'Highest $/kW (Tokyo)',val:'$15,200',sub:'Land + seismic + energy costs',cls:'red',icon:'fa-yen-sign'}
+    ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+
+    // $/kW chart
+    new Chart(document.getElementById('chartCostKW'),{type:'bar',data:{labels:BENCH_OPERATORS.map(o=>o.name),datasets:[{label:'$/kW',data:BENCH_OPERATORS.map(o=>o.costKw),backgroundColor:BENCH_OPERATORS.map((_,i)=>`hsla(${250-i*20},70%,60%,0.6)`),borderColor:BENCH_OPERATORS.map((_,i)=>`hsla(${250-i*20},70%,60%,1)`),borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:9},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:false}}}});
+
+    // PUE chart
+    new Chart(document.getElementById('chartPUE'),{type:'polarArea',data:{labels:BENCH_OPERATORS.map(o=>o.name),datasets:[{data:BENCH_OPERATORS.map(o=>o.pue),backgroundColor:BENCH_OPERATORS.map((_,i)=>`hsla(${130+i*25},60%,45%,0.5)`),borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:8},padding:8,usePointStyle:true}}},scales:{r:{ticks:{color:'#475569',font:{size:8},backdropColor:'transparent'},grid:{color:'rgba(51,65,85,0.3)'}}}}});
+
+    // Operator table
+    document.getElementById('benchTable').innerHTML=`<table class="data-tbl"><thead><tr><th>Operator</th><th>PUE</th><th>$/kW</th><th>Capacity</th><th>Markets</th><th>Uptime</th><th>Cooling</th><th>Renewable Target</th></tr></thead><tbody>
+        ${BENCH_OPERATORS.map(o=>`<tr><td style="font-weight:600;color:#f1f5f9">${o.name}<br><span style="font-size:0.65rem;color:#64748b">${o.region}</span></td><td><span style="color:${o.pue<=1.15?'#34d399':o.pue<=1.28?'#fbbf24':'#f87171'};font-weight:600">${o.pue}</span></td><td>$${o.costKw.toLocaleString()}</td><td>${o.capacity}</td><td>${o.markets}</td><td>${o.uptime}%</td><td style="font-size:0.72rem">${o.cooling}</td><td style="font-size:0.72rem">${o.renewableTarget}</td></tr>`).join('')}
+    </tbody></table>`;
+
+    // Regional cost chart
+    new Chart(document.getElementById('chartRegionCost'),{type:'bar',data:{labels:BENCH_REGIONS.map(r=>r.region),datasets:[{label:'$/kW',data:BENCH_REGIONS.map(r=>r.costKw),backgroundColor:'rgba(251,191,36,0.4)',borderColor:'#fbbf24',borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:8},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#e2e8f0',font:{size:8}},grid:{display:false}}}}});
+
+    // Energy cost chart
+    new Chart(document.getElementById('chartEnergyCost'),{type:'doughnut',data:{labels:BENCH_REGIONS.slice(0,8).map(r=>r.region),datasets:[{data:BENCH_REGIONS.slice(0,8).map(r=>r.energy*1000),backgroundColor:['#60a5fa','#818cf8','#a78bfa','#c084fc','#e879f9','#f472b6','#fb7185','#f87171'],borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:8},padding:10,usePointStyle:true}}}}});
+
+    // Sources
+    document.getElementById('benchSources').innerHTML=`
+        <strong>Data Sources & Methodology:</strong><br>
+        PUE data sourced from Uptime Institute Global Survey 2025, operator sustainability reports (Equinix ESG 2025, Google Environmental Report 2025, Microsoft Sustainability Report 2025, AWS Sustainability Report 2025), and independent audits.<br><br>
+        Construction cost ($/kW) estimates derived from Turner & Townsend Data Centre Cost Index 2025, JLL Global Data Center Outlook 2025, CBRE North America Data Center Report H2 2025, and proprietary project benchmarks across 50+ facilities.<br><br>
+        Energy pricing based on IEA World Energy Outlook 2025, regional utility tariffs (PJM, NEM, EMA Singapore, PLN Indonesia), and operator-disclosed rates where available.<br><br>
+        Capacity figures from Datacenter Dynamics Intelligence, Synergy Research Group Q4 2025, and operator earnings disclosures.<br><br>
+        <em style="color:#64748b">Note: All benchmark data is approximate and represents industry averages. Actual figures vary by specific facility, design, and contract terms. Data refreshed quarterly.</em>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIT LOG
+// ═══════════════════════════════════════════════════════════════
+function renderAudit(){filterAudit()}
+function filterAudit(){
+    const tf=document.getElementById('auditTypeFilter').value;
+    const filtered=tf==='all'?activities:activities.filter(a=>a.type===tf);
+    const icons={login:'fa-sign-in-alt',logout:'fa-sign-out-alt',calculation:'fa-calculator',pdf:'fa-file-pdf',tier_change:'fa-exchange-alt',feature_toggle:'fa-toggle-on'};
+    document.getElementById('auditTimeline').innerHTML=filtered.map(a=>`
+        <div class="tl-item ${a.type}"><div class="tl-icon ${a.type}"><i class="fas ${icons[a.type]||'fa-circle'}"></i></div>
+        <div><div class="tl-text"><strong>${a.name||a.email}</strong> — ${a.detail}</div><div class="tl-time">${a.time} · ${a.email}</div></div></div>`).join('');
+}
+function exportAuditCSV(){const h='Time,Email,Name,Type,Detail';const r=activities.map(a=>[a.time,a.email,a.name||'',a.type,a.detail].join(','));downloadCSV([h,...r].join('\n'),'rz_audit_'+fmtDate(new Date())+'.csv')}
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function renderSettings(){
+    const settings=[
+        {label:'Platform',value:'ResistanceZero Calculator Suite',icon:'fa-globe'},
+        {label:'Version',value:'v2.0.0 (Feb 2026)',icon:'fa-code-branch'},
+        {label:'Environment',value:'Production',icon:'fa-server'},
+        {label:'Auth Backend',value:'localStorage (Pre-Supabase)',icon:'fa-database'},
+        {label:'Session Duration',value:'24 hours',icon:'fa-clock'},
+        {label:'Admin Emails',value:ADMIN_EMAILS.join(', '),icon:'fa-user-shield'},
+        {label:'Total Accounts',value:CREDENTIALS.length+' registered',icon:'fa-users'},
+        {label:'Feature Flags',value:Object.keys(featureFlags).length+' flags configured',icon:'fa-toggle-on'},
+        {label:'Calculators',value:'CAPEX + OPEX',icon:'fa-calculator'},
+        {label:'Deployment',value:'GitHub Pages (Static)',icon:'fa-cloud-upload-alt'},
+        {label:'CDN',value:'Cloudflare',icon:'fa-shield-alt'},
+        {label:'Analytics',value:'Google Analytics (G-GED7FX8RTV)',icon:'fa-chart-line'}
+    ];
+    document.getElementById('settingsGrid').innerHTML=settings.map(s=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:0.75rem;background:#0f172a;border:1px solid #334155;border-radius:8px">
+            <i class="fas ${s.icon}" style="color:#64748b;width:16px;text-align:center"></i>
+            <div><div style="font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:0.3px">${s.label}</div><div style="font-size:0.82rem;color:#e2e8f0;font-weight:500">${s.value}</div></div>
+        </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+if(checkAccess()){
+    document.getElementById('mainWrap').style.display='block';
+    allUsers=generateUsers();
+    loadManualAccounts();
+    filteredUsers=[...allUsers];
+    activities=generateActivities();
+
+    applySort();
+    renderKPIs();
+    renderDashboardCharts();
+    renderRevenue();
+    renderTable();
+    renderCredentials();
+    renderFeatures();
+    renderBenchmarks();
+    renderAudit();
+    renderSettings();
+}
+</script>
+</body>
+</html>
