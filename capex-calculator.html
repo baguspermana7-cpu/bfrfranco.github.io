@@ -3301,6 +3301,68 @@
                     '<div style="flex:1;"><div style="font-size:10px;font-weight:700;color:#34d399;margin-bottom:6px;">SCENARIO B — ' + bTimeline.totalMonths + ' months</div>' + buildTimelineGanttHTML(bTimeline, Math.max(aTimeline.totalMonths, bTimeline.totalMonths), cellS, hdrS) + '</div>' +
                 '</div>';
 
+            // Design & Delivery Concept comparison
+            const aCfg = a._config || {};
+            const bCfg = b._config || {};
+            const designRows = [
+                ['Building Type', 'buildingType'],
+                ['Redundancy', 'redundancy'],
+                ['Cooling Strategy', 'coolingType'],
+                ['Rack Density', 'rackDensity'],
+                ['UPS Architecture', 'upsType'],
+                ['Generator', 'genType'],
+                ['Fire Suppression', 'fireSuppression'],
+                ['Floor Construction', 'floorType'],
+                ['Site Condition', 'siteCondition'],
+                ['Power Distribution', 'powerDistribution'],
+                ['Transformer Type', 'transformerType'],
+                ['PDU Type', 'pduType'],
+                ['Structured Cabling', 'cablingType'],
+                ['Fiber Entry', 'fiberEntry'],
+                ['Security Level', 'securityLevel'],
+                ['Green Certification', 'greenCert'],
+                ['On-Site Renewable', 'renewable'],
+                ['Delivery Method', 'deliveryMethod'],
+                ['Market Condition', 'marketCondition'],
+                ['Location / Region', 'location'],
+            ];
+            html += '<h3 style="font-size:13px;color:#1e3a5f;margin:16px 0 8px;">Design & Delivery Concept</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '">Parameter</th><th style="' + hdrS + '">Scenario A</th><th style="' + hdrS + '">Scenario B</th><th style="' + hdrS + '">Change</th></tr>';
+            designRows.forEach(function(r) {
+                var aVal = aCfg[r[1]] || '\u2014';
+                var bVal = bCfg[r[1]] || '\u2014';
+                var changed = aVal !== bVal;
+                html += '<tr' + (changed ? ' style="background:#fffbeb;"' : '') + '><td style="' + cellS + 'font-weight:600;">' + r[0] + '</td><td style="' + cellS + '">' + aVal + '</td><td style="' + cellS + '">' + bVal + '</td><td style="' + cellS + (changed ? 'color:#f59e0b;font-weight:600;"' : '"') + '>' + (changed ? 'Changed' : '\u2014') + '</td></tr>';
+            });
+            html += '</table>';
+
+            // Equipment Specification comparison
+            var aUpsOpts = equipmentBrands.ups[aRaw.upsType] || equipmentBrands.ups.modular;
+            var bUpsOpts = equipmentBrands.ups[bRaw.upsType] || equipmentBrands.ups.modular;
+            var aCoolOpts = equipmentBrands.cooling[aRaw.coolingType] || equipmentBrands.cooling.air;
+            var bCoolOpts = equipmentBrands.cooling[bRaw.coolingType] || equipmentBrands.cooling.air;
+            var aGenOpts = equipmentBrands.generator[aRaw.genType] || equipmentBrands.generator.diesel;
+            var bGenOpts = equipmentBrands.generator[bRaw.genType] || equipmentBrands.generator.diesel;
+            var aFireInfo = equipmentBrands.fire[aRaw.fireType] || equipmentBrands.fire.novec;
+            var bFireInfo = equipmentBrands.fire[bRaw.fireType] || equipmentBrands.fire.novec;
+
+            function eqRow(sys, aItems, bItems) {
+                var aText = aItems.join(', ') || '\u2014';
+                var bText = bItems.join(', ') || '\u2014';
+                var changed = aText !== bText;
+                return '<tr' + (changed ? ' style="background:#fffbeb;"' : '') + '><td style="' + cellS + 'font-weight:600;">' + sys + '</td><td style="' + cellS + '">' + aText + '</td><td style="' + cellS + '">' + bText + '</td><td style="' + cellS + (changed ? 'color:#f59e0b;font-weight:600;"' : '"') + '>' + (changed ? 'Changed' : '\u2014') + '</td></tr>';
+            }
+
+            html += '<h3 style="font-size:13px;color:#1e3a5f;margin:16px 0 8px;">Recommended Equipment Specification</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#1e3a5f;color:white;"><th style="' + hdrS + '">System</th><th style="' + hdrS + '">Scenario A</th><th style="' + hdrS + '">Scenario B</th><th style="' + hdrS + '">Change</th></tr>' +
+                eqRow('UPS', aUpsOpts.map(function(u){return u.brand+' '+u.model;}), bUpsOpts.map(function(u){return u.brand+' '+u.model;})) +
+                eqRow('Cooling', aCoolOpts.map(function(c){return c.brand+' '+c.model;}), bCoolOpts.map(function(c){return c.brand+' '+c.model;})) +
+                eqRow('Generator', aGenOpts.map(function(g){return g.brand+' '+g.model;}), bGenOpts.map(function(g){return g.brand+' '+g.model;})) +
+                eqRow('Fire Suppression', [aFireInfo.agent || '\u2014'], [bFireInfo.agent || '\u2014']) +
+                '</table>';
+
             // Capacity comparison table
             html += '<h3 style="font-size:13px;color:#1e3a5f;margin:16px 0 8px;">Capacity Summary</h3>' +
                 '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
