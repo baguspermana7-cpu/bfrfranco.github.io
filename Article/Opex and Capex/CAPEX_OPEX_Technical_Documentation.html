@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAPEX & OPEX Calculator — Technical Documentation & Algorithm Reference</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1e293b;line-height:1.7;font-size:11.5px;background:#fff}
+.page{max-width:850px;margin:0 auto;padding:50px 60px}
+h1{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:6px;letter-spacing:-0.5px}
+h2{font-size:16px;font-weight:700;color:#0f172a;border-bottom:2.5px solid #3b82f6;padding-bottom:6px;margin:32px 0 14px;page-break-after:avoid}
+h3{font-size:13px;font-weight:700;color:#1e40af;margin:20px 0 8px}
+h4{font-size:12px;font-weight:600;color:#334155;margin:14px 0 6px}
+p{margin-bottom:10px}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:10.5px}
+th{background:#f1f5f9;padding:7px 10px;text-align:left;font-weight:600;color:#334155;border:1px solid #e2e8f0}
+td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top}
+tr:nth-child(even) td{background:#f8fafc}
+code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:10px;color:#7c3aed}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 18px;border-radius:8px;overflow-x:auto;margin:10px 0 16px;font-size:10px;line-height:1.6;font-family:'JetBrains Mono',monospace}
+pre .kw{color:#c084fc}pre .fn{color:#38bdf8}pre .cm{color:#64748b}pre .st{color:#4ade80}pre .num{color:#fbbf24}
+.formula{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#1e40af}
+.note{background:#fffbeb;border-left:3px solid #f59e0b;padding:10px 14px;margin:10px 0;font-size:10.5px;border-radius:0 6px 6px 0}
+.note strong{color:#92400e}
+.section-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;margin-right:6px}
+.capex-tag{background:#dbeafe;color:#1e40af}.opex-tag{background:#dcfce7;color:#166534}
+.toc{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px 24px;margin:20px 0}
+.toc a{color:#2563eb;text-decoration:none;font-size:11px;display:block;padding:3px 0}
+.toc a:hover{text-decoration:underline}
+.cover-header{text-align:center;padding:40px 0 30px;border-bottom:3px solid #1e40af}
+.cover-header .subtitle{color:#64748b;font-size:13px;margin-top:8px}
+.cover-header .version{color:#94a3b8;font-size:10px;margin-top:12px;letter-spacing:0.5px}
+.ref{font-size:9.5px;color:#64748b;font-style:italic;margin:4px 0}
+@media print{
+  .page{padding:30px 40px}
+  h2{page-break-before:always}
+  h2:first-of-type{page-break-before:avoid}
+  pre{font-size:9px;padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- COVER -->
+<div class="cover-header">
+<h1>Data Center CAPEX & OPEX Calculator</h1>
+<div style="font-size:17px;font-weight:700;color:#3b82f6;margin:8px 0;">Technical Documentation & Algorithm Reference</div>
+<div class="subtitle">Complete Manual: Calculation Methodology, Modeling Mechanisms, Reference Data & Validation</div>
+<div class="version">Version 2.0 | February 2026 | ResistanceZero Engineering Tools</div>
+<div style="margin-top:16px;font-size:10px;color:#94a3b8;">Author: Bagus Dwi Permana | Engineering Operations Manager | Ahli K3 Listrik</div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+<h3 style="margin-top:0;color:#0f172a;">Table of Contents</h3>
+<div style="columns:2;column-gap:30px;">
+<strong style="font-size:10px;color:#1e40af;">CAPEX CALCULATOR</strong>
+<a href="#s1">1. Architecture Overview</a>
+<a href="#s2">2. Input Parameters</a>
+<a href="#s3">3. Cost Factor Model (Base $/kW)</a>
+<a href="#s4">4. Multiplier System</a>
+<a href="#s5">5. Advanced Mode Parameters</a>
+<a href="#s6">6. City-Specific Cost Data</a>
+<a href="#s7">7. Core Calculation Algorithm</a>
+<a href="#s8">8. Timeline Model (Parallel Construction)</a>
+<a href="#s9">9. Sustainability & ESG Metrics</a>
+<a href="#s10">10. Equipment Brand Database</a>
+<a href="#s11">11. Scenario Comparison (A/B)</a>
+<a href="#s12">12. PDF Export Structure</a>
+<strong style="font-size:10px;color:#166534;margin-top:8px;display:block;">OPEX CALCULATOR</strong>
+<a href="#s13">13. OPEX Architecture Overview</a>
+<a href="#s14">14. OPEX Input Parameters</a>
+<a href="#s15">15. Country Data Model</a>
+<a href="#s16">16. Energy Cost Calculation</a>
+<a href="#s17">17. Staffing Model (FTE)</a>
+<a href="#s18">18. Maintenance Cost Model</a>
+<a href="#s19">19. Derived Metrics (Pro Mode)</a>
+<a href="#s20">20. TCO Projections</a>
+<a href="#s21">21. Industry Benchmarks</a>
+<a href="#s22">22. Validation & Sources</a>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CAPEX CALCULATOR -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="s1"><span class="section-tag capex-tag">CAPEX</span> 1. Architecture Overview</h2>
+<p>The CAPEX Calculator estimates total data center construction capital expenditure using a parametric cost model. It operates in three modes:</p>
+<table>
+<tr><th>Mode</th><th>Access</th><th>Inputs</th><th>Outputs</th></tr>
+<tr><td><strong>Simple</strong></td><td>Free</td><td>8 core parameters</td><td>Total cost, $/kW, PUE, tier, annual energy, breakdown chart</td></tr>
+<tr><td><strong>Advanced</strong></td><td>Pro</td><td>30+ parameters (city, year, FOM, electrical detail, civil, sustainability)</td><td>All Simple outputs + timeline Gantt, sustainability metrics, equipment recommendations</td></tr>
+<tr><td><strong>Premium</strong></td><td>Pro</td><td>Scenario A/B comparison</td><td>Side-by-side KPIs, design comparison, equipment comparison, timeline comparison, PDF export</td></tr>
+</table>
+
+<div class="formula">
+<strong>Core Formula:</strong><br>
+Cost[category] = baseFactor[$/kW] &times; IT_Load[kW] &times; multiplier_chain &times; advGlobalMult<br>
+Total = &Sigma;(all categories) + softCosts + contingency + FOM + renewables
+</div>
+
+<h2 id="s2"><span class="section-tag capex-tag">CAPEX</span> 2. Input Parameters</h2>
+
+<h3>2.1 Simple Mode (8 Core Inputs)</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options</th><th>Default</th></tr>
+<tr><td>IT Load Capacity</td><td>Number (kW)</td><td>100 - 100,000</td><td>1,000 kW</td></tr>
+<tr><td>Rack Density</td><td>Radio</td><td>Standard (6 kW), Medium (12.5 kW), High (25 kW), AI/GPU (75 kW)</td><td>Standard</td></tr>
+<tr><td>Cooling Technology</td><td>Radio</td><td>Air (CRAH), In-Row, RDHX (Rear Door), Direct Liquid Cooling</td><td>Air</td></tr>
+<tr><td>Redundancy</td><td>Radio</td><td>N (Tier I), N+1 (Tier II), 2N (Tier III), 2N+1 (Tier IV)</td><td>N+1</td></tr>
+<tr><td>Fuel Storage</td><td>Number (hrs)</td><td>12 - 168</td><td>48 hrs</td></tr>
+<tr><td>Building Type</td><td>Select</td><td>Warehouse Conversion, Modular/Prefab, Purpose-Built, High-Rise</td><td>Purpose-Built</td></tr>
+<tr><td>Seismic Zone</td><td>Select</td><td>None/Minimal, Zone 1, Zone 2, Zone 3, Zone 4</td><td>None</td></tr>
+<tr><td>Fire Suppression</td><td>Select</td><td>FM-200, Novec 1230, Inergen, Nitrogen, Water Mist</td><td>FM-200</td></tr>
+</table>
+
+<h3>2.2 Additional Simple Inputs</h3>
+<table>
+<tr><th>Parameter</th><th>Options</th></tr>
+<tr><td>Fire Alarm</td><td>Conventional (0.6x), Addressable (1.0x), VESDA (1.8x), Hybrid VESDA+Addr (2.2x)</td></tr>
+<tr><td>UPS Type</td><td>Standalone (0.9x), Modular (1.0x), Distributed (1.2x), Rotary DRUPS (1.5x)</td></tr>
+<tr><td>Generator Type</td><td>Diesel (1.0x), Natural Gas (1.15x), Dual-Fuel (1.3x), HVO/Renewable (1.2x)</td></tr>
+<tr><td>Location</td><td>Southeast Asia (0.65x), India (0.55x), China (0.7x), Japan (1.1x), Australia (1.05x), Europe (1.15x), USA (1.0x)</td></tr>
+</table>
+
+<h2 id="s3"><span class="section-tag capex-tag">CAPEX</span> 3. Cost Factor Model (Base $/kW)</h2>
+<p>Each infrastructure category has a base cost factor in $/kW of IT load. This represents the reference cost for a US-based, N+1, standard density, purpose-built facility.</p>
+
+<table>
+<tr><th>Category</th><th>Base ($/kW)</th><th>Description</th><th>Multiplied By</th></tr>
+<tr><td>Building & Civil</td><td>$800</td><td>Structure, foundation, slab, walls, roof</td><td>location, building, rack, floor, site</td></tr>
+<tr><td>Seismic Protection</td><td>$100</td><td>Base isolation, bracing, dampers</td><td>seismic, building</td></tr>
+<tr><td>Electrical (MV/LV)</td><td>$1,200</td><td>Switchgear, transformers, PDUs, busway</td><td>redundancy, rack, powerDist, transformer</td></tr>
+<tr><td>UPS Systems</td><td>$600</td><td>UPS modules, batteries, bypass</td><td>redundancy, rack, UPS type</td></tr>
+<tr><td>Generator & Fuel</td><td>$400</td><td>Generators, fuel storage, ATS</td><td>redundancy, fuel hours, gen type</td></tr>
+<tr><td>Cooling Systems</td><td>$700</td><td>CRAH/CDU/DLC, piping, pumps</td><td>cooling type, rack density</td></tr>
+<tr><td>Fire Suppression</td><td>$150</td><td>Suppression agent, piping, cylinders</td><td>fire suppression type</td></tr>
+<tr><td>Fire Alarm</td><td>$80</td><td>Detection, notification, integration</td><td>alarm type</td></tr>
+<tr><td>BMS / DCIM</td><td>$120</td><td>Monitoring, control, analytics</td><td>location only</td></tr>
+<tr><td>Network Infrastructure</td><td>$250</td><td>Cabling, fiber, patch panels, MDA</td><td>location only</td></tr>
+<tr><td>Security Systems</td><td>$80</td><td>Access control, CCTV, mantrap</td><td>security level</td></tr>
+<tr><td>Commissioning</td><td>$120</td><td>Cx agent, IST, ISST, startup</td><td>redundancy</td></tr>
+<tr><td>Testing & Compliance</td><td>$90</td><td>Regulatory testing, certification</td><td>region testing mult, redundancy testing mult</td></tr>
+<tr><td>Permits & Approvals</td><td>$60</td><td>Building permits, environmental</td><td>region permits mult</td></tr>
+</table>
+<p><strong>Total base cost:</strong> $4,750/kW (before any multipliers)</p>
+
+<h2 id="s4"><span class="section-tag capex-tag">CAPEX</span> 4. Multiplier System</h2>
+
+<h3>4.1 Redundancy Multipliers</h3>
+<table>
+<tr><th>Config</th><th>Multiplier</th><th>Tier Equiv</th><th>Uptime</th></tr>
+<tr><td>N</td><td>1.00</td><td>Tier I</td><td>99.671%</td></tr>
+<tr><td>N+1</td><td>1.25</td><td>Tier II</td><td>99.741%</td></tr>
+<tr><td>2N</td><td>1.85</td><td>Tier III</td><td>99.982%</td></tr>
+<tr><td>2N+1</td><td>2.10</td><td>Tier IV</td><td>99.995%</td></tr>
+</table>
+
+<h3>4.2 Cooling Technology Multipliers</h3>
+<table>
+<tr><th>Type</th><th>Cost Mult</th><th>PUE Impact (by rack density)</th></tr>
+<tr><td>Air (CRAH)</td><td>1.00</td><td>Standard: 1.80, Medium: 1.70, High: 1.60, AI: 1.50</td></tr>
+<tr><td>In-Row</td><td>1.20</td><td>Standard: 1.60, Medium: 1.50, High: 1.45, AI: 1.40</td></tr>
+<tr><td>RDHX</td><td>1.35</td><td>Standard: 1.45, Medium: 1.40, High: 1.35, AI: 1.30</td></tr>
+<tr><td>Direct Liquid</td><td>1.60</td><td>Standard: 1.30, Medium: 1.25, High: 1.20, AI: 1.15</td></tr>
+</table>
+
+<h3>4.3 Other Multipliers</h3>
+<table>
+<tr><th>Category</th><th>Values</th></tr>
+<tr><td>Rack Density</td><td>Standard: 1.0, Medium: 1.1, High: 1.3, AI: 1.6</td></tr>
+<tr><td>Building Type</td><td>Warehouse: 0.7, Modular: 0.85, Purpose-Built: 1.0, High-Rise: 1.4</td></tr>
+<tr><td>Seismic Zone</td><td>None: 0.2, Zone 1: 1.0, Zone 2: 2.5, Zone 3: 5.0, Zone 4: 8.0</td></tr>
+<tr><td>Fire Suppression</td><td>FM-200: 1.0, Novec: 1.3, Inergen: 1.2, Nitrogen: 1.8, Water Mist: 0.6</td></tr>
+<tr><td>Location</td><td>SEA: 0.65, India: 0.55, China: 0.7, Japan: 1.1, Australia: 1.05, Europe: 1.15, USA: 1.0</td></tr>
+<tr><td>Fuel Hours</td><td>fuelMult = 1 + (hours - 24) &times; 0.008</td></tr>
+</table>
+
+<h2 id="s5"><span class="section-tag capex-tag">CAPEX</span> 5. Advanced Mode Parameters</h2>
+
+<h3>5.1 Year Escalation (Source: JLL 2026, T&T DCCI)</h3>
+<table>
+<tr><th>Year</th><th>Multiplier</th><th>Basis</th></tr>
+<tr><td>2025</td><td>1.000</td><td>Baseline (current data)</td></tr>
+<tr><td>2026</td><td>1.060</td><td>+6.0% JLL forecast</td></tr>
+<tr><td>2027</td><td>1.115</td><td>+5.2% T&T trend</td></tr>
+<tr><td>2028</td><td>1.165</td><td>+4.5% supply normalization</td></tr>
+<tr><td>2029</td><td>1.210</td><td>+3.9% market stabilization</td></tr>
+<tr><td>2030</td><td>1.250</td><td>+3.3% historical average</td></tr>
+</table>
+
+<h3>5.2 Market & Delivery Factors</h3>
+<table>
+<tr><th>Parameter</th><th>Options (Multiplier)</th></tr>
+<tr><td>Market Condition</td><td>Buyer's Market: 0.95, Balanced: 1.0, Seller's Market: 1.10</td></tr>
+<tr><td>Delivery Method</td><td>Design-Bid-Build: 1.0, Design-Build: 0.97, Modular/Prefab: 0.92, EPC: 1.05</td></tr>
+<tr><td>Contractor Availability</td><td>High: 1.0, Normal: 1.03, Tight: 1.08</td></tr>
+</table>
+
+<h3>5.3 Front-of-Meter (FOM) Costs</h3>
+<div class="formula">
+FOM = (substationCost &times; transformerLeadMult + gridConnection + switchgear) &times; (1 + utilityRate) &times; yearMult<br>
+gridConnection = IT_Load_kW &times; 0.001 &times; $500,000/MW<br>
+switchgear = IT_Load_kW &times; 0.001 &times; $300,000/MW
+</div>
+<table>
+<tr><th>Substation</th><th>Base Cost</th></tr>
+<tr><td>Shared Utility</td><td>$1,000,000</td></tr>
+<tr><td>Dedicated 33kV</td><td>$4,000,000</td></tr>
+<tr><td>Dedicated 132kV+</td><td>$7,500,000</td></tr>
+</table>
+
+<h3>5.4 Electrical Distribution (Advanced)</h3>
+<table>
+<tr><th>Power Distribution</th><th>Mult</th><th>Transformer Type</th><th>Mult</th></tr>
+<tr><td>Overhead Busway</td><td>0.92</td><td>Oil-Filled</td><td>0.90</td></tr>
+<tr><td>Busway/Bus Duct</td><td>1.00</td><td>Dry-Type</td><td>1.00</td></tr>
+<tr><td>Underground</td><td>1.15</td><td>Cast Resin</td><td>1.12</td></tr>
+<tr><td>Mixed</td><td>1.08</td><td></td><td></td></tr>
+</table>
+
+<table>
+<tr><th>PDU Type</th><th>$/Rack</th><th>Cabling Type</th><th>$/Rack</th></tr>
+<tr><td>Basic</td><td>$800</td><td>Copper Cat6a</td><td>$600</td></tr>
+<tr><td>Intelligent</td><td>$1,500</td><td>Hybrid Cu+Fiber</td><td>$1,200</td></tr>
+<tr><td>Switched</td><td>$2,500</td><td>Full Fiber</td><td>$2,000</td></tr>
+</table>
+
+<h3>5.5 Civil & Sustainability (Advanced)</h3>
+<table>
+<tr><th>Floor Type</th><th>Mult</th><th>Site Condition</th><th>Mult</th><th>Security Level</th><th>Mult</th></tr>
+<tr><td>Slab-on-Grade</td><td>0.95</td><td>Greenfield</td><td>1.06</td><td>Standard</td><td>1.0</td></tr>
+<tr><td>Raised 600mm</td><td>1.00</td><td>Brownfield</td><td>1.00</td><td>Enterprise</td><td>1.5</td></tr>
+<tr><td>Raised 900mm</td><td>1.06</td><td>Retrofit</td><td>1.15</td><td>High Security</td><td>2.2</td></tr>
+<tr><td>Raised 1200mm</td><td>1.12</td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<table>
+<tr><th>Green Cert</th><th>Premium</th><th>Renewable Option</th><th>Cost/MW IT</th></tr>
+<tr><td>None</td><td>0%</td><td>None</td><td>$0</td></tr>
+<tr><td>LEED Silver</td><td>+2%</td><td>Solar PV</td><td>$1,200,000</td></tr>
+<tr><td>LEED Gold</td><td>+4%</td><td>Solar + BESS</td><td>$2,500,000</td></tr>
+<tr><td>LEED Platinum</td><td>+8%</td><td></td><td></td></tr>
+</table>
+
+<h2 id="s6"><span class="section-tag capex-tag">CAPEX</span> 6. City-Specific Cost Data</h2>
+<p class="ref">Sources: Turner & Townsend DCCI 2025, Cushman & Wakefield Global Cost Guide 2025</p>
+<table>
+<tr><th>City</th><th>$/W</th><th>Region</th><th>Source</th></tr>
+<tr><td>Silicon Valley</td><td>13.30</td><td>USA</td><td>T&T 2025</td></tr>
+<tr><td>Virginia/NOVA</td><td>13.40</td><td>USA</td><td>C&W 2025</td></tr>
+<tr><td>Dallas, TX</td><td>14.30</td><td>USA</td><td>C&W 2025</td></tr>
+<tr><td>Phoenix, AZ</td><td>13.40</td><td>USA</td><td>C&W 2025</td></tr>
+<tr><td>New Jersey/NYC</td><td>12.90</td><td>USA</td><td>C&W 2025</td></tr>
+<tr><td>Chicago, IL</td><td>13.20</td><td>USA</td><td>C&W 2025</td></tr>
+<tr><td>San Antonio, TX</td><td>9.30</td><td>USA</td><td>C&W 2025</td></tr>
+<tr><td>Tokyo</td><td>15.20</td><td>Japan</td><td>T&T 2025</td></tr>
+<tr><td>Singapore</td><td>14.53</td><td>SEA</td><td>T&T 2025</td></tr>
+<tr><td>Malaysia/Johor</td><td>11.37</td><td>SEA</td><td>T&T 2025</td></tr>
+<tr><td>Jakarta</td><td>11.21</td><td>SEA</td><td>T&T 2025</td></tr>
+<tr><td>Bangkok</td><td>8.50</td><td>SEA</td><td>Est. APAC</td></tr>
+<tr><td>Mumbai</td><td>6.64</td><td>India</td><td>T&T 2025</td></tr>
+<tr><td>London</td><td>12.00</td><td>Europe</td><td>T&T 2025</td></tr>
+<tr><td>Frankfurt</td><td>11.60</td><td>Europe</td><td>T&T 2025</td></tr>
+<tr><td>Amsterdam</td><td>11.80</td><td>Europe</td><td>Est. T&T</td></tr>
+<tr><td>Stockholm</td><td>10.50</td><td>Europe</td><td>Est. T&T</td></tr>
+<tr><td>Sydney</td><td>12.30</td><td>Australia</td><td>Est. T&T</td></tr>
+<tr><td>Hong Kong</td><td>13.80</td><td>China</td><td>Est. T&T</td></tr>
+<tr><td>Seoul</td><td>9.50</td><td>Japan</td><td>C&W APAC</td></tr>
+</table>
+
+<div class="note"><strong>City Override Mechanism:</strong> When a city is selected, locMult = city.perW / 13.0 (US baseline ~$13/W). The effectiveRegion is set to the city's region for permit/compliance calculations.</div>
+
+<h2 id="s7"><span class="section-tag capex-tag">CAPEX</span> 7. Core Calculation Algorithm</h2>
+
+<pre>
+<span class="cm">// Step 1: Resolve all multipliers</span>
+advGlobalMult = yearMult * marketMult * deliveryMult * contractorMult  <span class="cm">// (1.0 in Simple mode)</span>
+
+<span class="cm">// Step 2: Calculate each cost category</span>
+<span class="kw">for each</span> category <span class="kw">in</span> costFactors:
+    multiplier = locationMult
+    <span class="cm">// Apply category-specific multipliers:</span>
+    <span class="kw">if</span> building:  multiplier *= buildMult * rackMult * floorM * siteM
+    <span class="kw">if</span> electrical: multiplier *= redMult * rackMult * powerDistM * transformerM
+    <span class="kw">if</span> ups:       multiplier *= redMult * rackMult * upsMult
+    <span class="kw">if</span> generator: multiplier *= redMult * fuelMult * genMult
+    <span class="kw">if</span> cooling:   multiplier *= coolMult * rackMult
+    <span class="kw">if</span> testing:   multiplier *= regionTest * redundancyTest
+    <span class="kw">if</span> permits:   multiplier *= regionPermits
+
+    costs[category] = baseFactor * IT_Load * multiplier * advGlobalMult
+
+<span class="cm">// Step 3: Per-rack fixed costs (Advanced only)</span>
+racks = ceil(IT_Load / rackKw[rackType])
+costs.electrical += racks * pduPerRack * advGlobalMult * locMult
+costs.network += racks * cablingPerRack * advGlobalMult * locMult + fiberCost
+
+<span class="cm">// Step 4: Soft costs (Advanced only)</span>
+softCosts.design = subtotal * (designPct / 100)
+softCosts.pm = subtotal * (pmPct / 100)
+
+<span class="cm">// Step 5: Green certification premium</span>
+greenPremium = subtotal * (greenMult - 1.0)
+
+<span class="cm">// Step 6: Contingency</span>
+contingency = subtotal * (contingencyPct / 100)  <span class="cm">// Default 5%</span>
+
+<span class="cm">// Step 7: Add FOM + Renewables</span>
+TOTAL = subtotal + softCosts + greenPremium + contingency + fomTotal + renewableCost
+</pre>
+
+<h2 id="s8"><span class="section-tag capex-tag">CAPEX</span> 8. Timeline Model (Parallel Construction)</h2>
+
+<h3>8.1 Base Phase Durations (months)</h3>
+<table>
+<tr><th>Phase</th><th>N</th><th>N+1</th><th>2N</th><th>2N+1</th></tr>
+<tr><td>Design</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+<tr><td>Permit</td><td>3</td><td>3</td><td>4</td><td>4</td></tr>
+<tr><td>Civil</td><td>8</td><td>10</td><td>12</td><td>14</td></tr>
+<tr><td>MEP</td><td>6</td><td>8</td><td>10</td><td>12</td></tr>
+<tr><td>Commission</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+</table>
+
+<h3>8.2 Phase Overlap (Parallel Model)</h3>
+<div class="formula">
+permitStart = month 1 (parallel with design)<br>
+procurementStart = max(1, design - ceil(procurement &times; 0.3))<br>
+civilStart = max(designEnd, permitEnd)<br>
+mepStart = max(procurementEnd, civilStart + ceil(civil &times; 0.5))<br>
+commissionStart = max(mepEnd, civilEnd)<br>
+totalMonths = commissionStart + commission
+</div>
+
+<h3>8.3 Load Scale Multiplier</h3>
+<table>
+<tr><th>IT Load</th><th>Multiplier</th><th>Category</th></tr>
+<tr><td>&le;1 MW</td><td>0.55</td><td>Micro/Edge</td></tr>
+<tr><td>&le;2 MW</td><td>0.65</td><td>Small</td></tr>
+<tr><td>&le;5 MW</td><td>0.80</td><td>Medium-Small</td></tr>
+<tr><td>&le;10 MW</td><td>1.00</td><td>Medium (reference)</td></tr>
+<tr><td>&le;25 MW</td><td>1.15</td><td>Large</td></tr>
+<tr><td>&le;50 MW</td><td>1.30</td><td>Campus</td></tr>
+<tr><td>&gt;50 MW</td><td>1.50</td><td>Hyperscale</td></tr>
+</table>
+
+<h2 id="s9"><span class="section-tag capex-tag">CAPEX</span> 9. Sustainability & ESG Metrics</h2>
+
+<h3>9.1 Grid Emission Factors (tCO2/MWh, IEA 2024)</h3>
+<table>
+<tr><th>Region</th><th>SEA</th><th>India</th><th>China</th><th>Japan</th><th>Australia</th><th>Europe</th><th>USA</th></tr>
+<tr><td>tCO2/MWh</td><td>0.72</td><td>0.71</td><td>0.56</td><td>0.47</td><td>0.65</td><td>0.23</td><td>0.39</td></tr>
+</table>
+
+<h3>9.2 Water Usage Effectiveness (WUE) by Cooling Type</h3>
+<table>
+<tr><th>Cooling</th><th>Air</th><th>In-Row</th><th>RDHX</th><th>DLC</th></tr>
+<tr><td>WUE (L/kWh)</td><td>0.0</td><td>1.8</td><td>0.3</td><td>0.1</td></tr>
+</table>
+
+<h3>9.3 Refrigerant Data</h3>
+<table>
+<tr><th>Cooling</th><th>Current</th><th>GWP</th><th>Recommended</th><th>Rec GWP</th><th>Regulation</th></tr>
+<tr><td>Air/CRAH</td><td>R-410A</td><td>2,088</td><td>R-32</td><td>675</td><td>EU F-Gas phase-down by 2030</td></tr>
+<tr><td>In-Row</td><td>R-410A</td><td>2,088</td><td>R-454B</td><td>466</td><td>Kigali Amendment 80% by 2036</td></tr>
+<tr><td>RDHX</td><td>R-134a</td><td>1,430</td><td>R-1234ze(E)</td><td>7</td><td>EU bans GWP>150 new chillers 2025</td></tr>
+<tr><td>DLC</td><td>None</td><td>0</td><td>N/A</td><td>0</td><td>Lowest environmental impact</td></tr>
+</table>
+
+<h2 id="s10"><span class="section-tag capex-tag">CAPEX</span> 10. Equipment Brand Database</h2>
+<p>The Premium tier provides equipment recommendations based on configuration choices. Sample entries:</p>
+
+<h4>UPS Systems</h4>
+<table>
+<tr><th>Type</th><th>Brand</th><th>Model</th><th>Range</th><th>Efficiency</th></tr>
+<tr><td>Standalone</td><td>Eaton</td><td>93PM</td><td>30-500 kVA</td><td>97.4%</td></tr>
+<tr><td>Modular</td><td>Vertiv</td><td>Trinergy Cube</td><td>200-3600 kVA</td><td>98.5%</td></tr>
+<tr><td>Distributed</td><td>Schneider</td><td>Symmetra PX</td><td>16-500 kVA</td><td>97%</td></tr>
+<tr><td>Rotary</td><td>Hitec</td><td>UNIBLOCK</td><td>300-3000 kVA</td><td>97%</td></tr>
+</table>
+
+<h4>Cooling Systems</h4>
+<table>
+<tr><th>Type</th><th>Brand</th><th>Model</th><th>Range</th></tr>
+<tr><td>Air</td><td>Vertiv</td><td>Liebert PFH</td><td>24-252 kW</td></tr>
+<tr><td>In-Row</td><td>Schneider</td><td>InRow RD</td><td>21-50 kW/row</td></tr>
+<tr><td>RDHX</td><td>CoolIT</td><td>Rack DCHX</td><td>30-80 kW/rack</td></tr>
+<tr><td>DLC</td><td>GRC</td><td>ICEtank</td><td>Full immersion</td></tr>
+</table>
+
+<h2 id="s11"><span class="section-tag capex-tag">CAPEX</span> 11. Scenario Comparison (A/B)</h2>
+<p>The Premium mode allows saving Scenario A and computing Scenario B for side-by-side comparison across all output categories:</p>
+<ul style="padding-left:20px;margin:10px 0;">
+<li>KPI Summary (Total Cost, $/kW, Racks, White Space, Build Time, Energy)</li>
+<li>Design & Delivery Concept (20 parameters compared, changes highlighted)</li>
+<li>Equipment Specification (UPS, Cooling, Generator, Fire per scenario)</li>
+<li>Construction Timeline Gantt (parallel model per scenario)</li>
+<li>Capacity Summary (racks, floor area, power density per scenario)</li>
+<li>Sustainability Metrics (CO2, WUE, refrigerant per scenario)</li>
+</ul>
+
+<h2 id="s12"><span class="section-tag capex-tag">CAPEX</span> 12. PDF Export Structure</h2>
+<p>The PDF report is generated client-side using <code>window.open()</code> with inline HTML. Sections include:</p>
+<ol style="padding-left:20px;margin:10px 0;">
+<li>Header with total cost and $/kW headline</li>
+<li>Executive Summary with tier, uptime, PUE, and annual energy</li>
+<li>Infrastructure Summary KPI cards (A/B when two scenarios)</li>
+<li>Cost Breakdown table with percentages</li>
+<li>Design & Delivery Concept comparison (A vs B)</li>
+<li>Equipment Specification comparison</li>
+<li>Construction Timeline (parallel Gantt chart)</li>
+<li>Capacity Summary</li>
+<li>Sustainability & Efficiency metrics</li>
+<li>Footer with generation date and source</li>
+</ol>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- OPEX CALCULATOR -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="s13"><span class="section-tag opex-tag">OPEX</span> 13. OPEX Architecture Overview</h2>
+<p>The OPEX Calculator estimates annual operational expenditure for data center facilities. It supports 30+ countries with localized rates and three staffing models.</p>
+
+<div class="formula">
+<strong>Core Formula:</strong><br>
+Total OPEX = Energy + Staffing + Maintenance + Software/DCIM + Insurance + Utilities + Other<br>
+Per-kW = Total OPEX / IT_Load_kW
+</div>
+
+<h2 id="s14"><span class="section-tag opex-tag">OPEX</span> 14. OPEX Input Parameters</h2>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options/Range</th><th>Default</th></tr>
+<tr><td>Country</td><td>Select</td><td>30+ countries</td><td>Indonesia</td></tr>
+<tr><td>IT Load</td><td>Number (kW)</td><td>100 - 100,000</td><td>1,000 kW</td></tr>
+<tr><td>PUE</td><td>Slider</td><td>1.1 - 2.5</td><td>1.5</td></tr>
+<tr><td>Tier Level</td><td>Select</td><td>Tier I - IV</td><td>Tier III</td></tr>
+<tr><td>Facility Age</td><td>Select</td><td>New (0-3yr), Mid (3-10yr), Old (10+yr)</td><td>Mid</td></tr>
+<tr><td>Utilization</td><td>Slider</td><td>20% - 100%</td><td>70%</td></tr>
+<tr><td>Climate Zone</td><td>Select</td><td>Tropical, Subtropical, Temperate, Continental, Arid</td><td>Tropical</td></tr>
+<tr><td>Cooling Type</td><td>Select</td><td>Air, In-Row, RDHX, DLC</td><td>Air</td></tr>
+<tr><td>Generator Config</td><td>Select</td><td>N, N+1, 2N, 2N+1</td><td>N+1</td></tr>
+<tr><td>Staffing Model</td><td>Toggle</td><td>In-House, Partial, Full Contractor</td><td>In-House</td></tr>
+</table>
+
+<h2 id="s15"><span class="section-tag opex-tag">OPEX</span> 15. Country Data Model</h2>
+<p>Each country has a data object with localized rates:</p>
+<table>
+<tr><th>Field</th><th>Description</th><th>Example (Indonesia)</th></tr>
+<tr><td>energyRate</td><td>$/kWh for commercial/industrial</td><td>$0.075</td></tr>
+<tr><td>waterRate</td><td>$/m3 water cost</td><td>$0.50</td></tr>
+<tr><td>baseSalary</td><td>Annual base salary (facility manager)</td><td>$18,000</td></tr>
+<tr><td>laborMult</td><td>Labor cost multiplier vs baseline</td><td>0.35</td></tr>
+<tr><td>maintMult</td><td>Maintenance cost multiplier</td><td>0.70</td></tr>
+<tr><td>insuranceMult</td><td>Insurance rate multiplier</td><td>0.80</td></tr>
+<tr><td>softwareMult</td><td>Software licensing multiplier</td><td>0.85</td></tr>
+<tr><td>currency</td><td>Local currency code</td><td>IDR</td></tr>
+<tr><td>exchangeRate</td><td>Local currency per USD</td><td>15,800</td></tr>
+</table>
+
+<div class="note"><strong>Note:</strong> All calculations are performed in USD. Local currency display is optional (converted at the stored exchange rate). The Indonesia baseline uses UMK (Minimum Wage) rates as the floor for labor calculations.</div>
+
+<h2 id="s16"><span class="section-tag opex-tag">OPEX</span> 16. Energy Cost Calculation</h2>
+
+<div class="formula">
+coolingPowerKW = IT_Load &times; (PUE - 1) &times; coolingEfficiencyMult &times; climateEnergyMult<br>
+adjustedTotalPowerKW = IT_Load + coolingPowerKW<br>
+annualKWh = adjustedTotalPowerKW &times; 8,760 &times; utilization<br>
+energyCost = annualKWh &times; energyRate[country]
+</div>
+
+<h3>Climate Zone Factors</h3>
+<table>
+<tr><th>Zone</th><th>Cooling Energy Mult</th><th>Cooling Maint Mult</th><th>Description</th></tr>
+<tr><td>Tropical</td><td>1.15</td><td>1.10</td><td>Year-round cooling, high humidity</td></tr>
+<tr><td>Subtropical</td><td>1.08</td><td>1.05</td><td>Hot summers, mild winters</td></tr>
+<tr><td>Temperate</td><td>1.00</td><td>1.00</td><td>Reference baseline, free cooling possible</td></tr>
+<tr><td>Continental</td><td>0.90</td><td>0.95</td><td>Cold winters enable economizer</td></tr>
+<tr><td>Arid</td><td>1.20</td><td>1.15</td><td>Extreme heat, sand/dust challenges</td></tr>
+</table>
+
+<h3>Cooling Type Impacts</h3>
+<table>
+<tr><th>Type</th><th>PUE Impact</th><th>Efficiency Mult</th><th>Maint $/kW</th></tr>
+<tr><td>Air (CRAH)</td><td>+0.00</td><td>1.00</td><td>$15</td></tr>
+<tr><td>In-Row</td><td>-0.08</td><td>0.92</td><td>$18</td></tr>
+<tr><td>RDHX</td><td>-0.15</td><td>0.85</td><td>$22</td></tr>
+<tr><td>DLC</td><td>-0.25</td><td>0.75</td><td>$30</td></tr>
+</table>
+
+<h2 id="s17"><span class="section-tag opex-tag">OPEX</span> 17. Staffing Model (FTE Calculator)</h2>
+
+<h3>17.1 FTE Calculation by Role</h3>
+<div class="formula">
+MW = IT_Load / 1,000<br>
+tierMult = {Tier I: 0.85, Tier II: 1.0, Tier III: 1.15, Tier IV: 1.3}
+</div>
+
+<table>
+<tr><th>Role</th><th>Formula</th><th>Example (5 MW, Tier III)</th></tr>
+<tr><td>Facility Manager</td><td>Fixed: 1</td><td>1</td></tr>
+<tr><td>Maintenance Supervisor</td><td>1 if MW &ge; 2, else 0</td><td>1</td></tr>
+<tr><td>Shift Lead (MTL)</td><td>max(5, ceil(MW/2) &times; 5) for 24/7</td><td>15</td></tr>
+<tr><td>Electrical HV (ME)</td><td>ceil(MW &times; 1.0 &times; tierMult)</td><td>6</td></tr>
+<tr><td>Electrical LV (MT)</td><td>ceil(MW &times; 1.0 &times; tierMult)</td><td>6</td></tr>
+<tr><td>HVAC/Mech (ME)</td><td>ceil(MW &times; 0.8 &times; tierMult)</td><td>5</td></tr>
+<tr><td>Mechanical (MT)</td><td>ceil(MW &times; 0.5 &times; tierMult)</td><td>3</td></tr>
+<tr><td>Generator Tech</td><td>max(1, ceil(MW &times; 0.3))</td><td>2</td></tr>
+<tr><td>BMS Operator</td><td>Fixed: 2 (24/7 control room)</td><td>2</td></tr>
+<tr><td>Security</td><td>max(5, ceil(MW &times; 0.4) &times; 5) for 24/7</td><td>10</td></tr>
+<tr><td>Cleaning</td><td>Fixed: 3 (always outsourced)</td><td>3</td></tr>
+</table>
+
+<h3>17.2 Staffing Cost Models</h3>
+<table>
+<tr><th>Model</th><th>Description</th><th>Cost Impact</th></tr>
+<tr><td><strong>In-House</strong></td><td>All staff are direct employees</td><td>Baseline salary + benefits (30-40%)</td></tr>
+<tr><td><strong>Partial (Hybrid)</strong></td><td>Core in-house, routine outsourced</td><td>adjustable % split (default 70% in-house)</td></tr>
+<tr><td><strong>Full Contractor</strong></td><td>Managed services / FM contractor</td><td>+40-60% premium vs in-house, but includes contract admin</td></tr>
+</table>
+
+<h2 id="s18"><span class="section-tag opex-tag">OPEX</span> 18. Maintenance Cost Model</h2>
+
+<h3>18.1 Maintenance Cost per System</h3>
+<div class="formula">
+systemCost = IT_Load &times; baseCostPerKw &times; configMult &times; ageFactor &times; countryMaintMult &times; oemFactor
+</div>
+
+<table>
+<tr><th>System</th><th>Base $/kW</th><th>Frequency</th><th>OEM Mult (contractor)</th></tr>
+<tr><td>Generator</td><td>Variable (config-dependent)</td><td>Weekly/Bi-weekly test + 6M/12M OH</td><td>2.5x</td></tr>
+<tr><td>Cooling</td><td>$15-30/kW (type-dependent)</td><td>Monthly filter, quarterly, annual</td><td>2.0x</td></tr>
+<tr><td>Electrical</td><td>$12/kW base</td><td>Quarterly inspection, annual thermography</td><td>2.0x</td></tr>
+<tr><td>Fire Systems</td><td>$5/kW base</td><td>Semi-annual inspection, annual full test</td><td>1.8x</td></tr>
+<tr><td>BMS/DCIM</td><td>$8/kW base</td><td>Monthly calibration, annual license</td><td>1.5x</td></tr>
+</table>
+
+<h3>18.2 Age Factor</h3>
+<table>
+<tr><th>Facility Age</th><th>Factor</th><th>Rationale</th></tr>
+<tr><td>New (0-3 years)</td><td>0.60</td><td>Under warranty, minimal wear</td></tr>
+<tr><td>Mid-Life (3-10 years)</td><td>1.00</td><td>Baseline maintenance schedule</td></tr>
+<tr><td>Aging (10+ years)</td><td>1.50</td><td>Increased failures, parts replacement, legacy systems</td></tr>
+</table>
+
+<h3>18.3 OEM Factor by Staffing Model</h3>
+<div class="formula">
+In-House: oemFactor = 1.0 (self-maintained)<br>
+Full Contractor: oemFactor = system.oemMultiplier (2.0-2.5x)<br>
+Partial: oemFactor = 1.0 + (oemMult - 1.0) &times; contractorPct
+</div>
+
+<div class="note"><strong>Key Insight:</strong> OEM contractors charge 2-3x more due to: travel/mobilization, profit margin, specialized parts inventory, SLA guarantees, and overhead. This is the single largest variable in maintenance OPEX and the primary driver for the in-house vs. contractor cost differential.</div>
+
+<h2 id="s19"><span class="section-tag opex-tag">OPEX</span> 19. Derived Metrics (Pro Mode)</h2>
+<p>Pro mode computes 20+ additional KPIs from the base calculation:</p>
+
+<h3>19.1 Per-Unit Metrics</h3>
+<div class="formula">
+rackCount = round(IT_Load / rackKwDefault)<br>
+perRackYear = totalOPEX / rackCount<br>
+perRackMonth = perRackYear / 12<br>
+whiteSpaceM2 = rackCount &times; 3.5 m2/rack<br>
+perM2Year = totalOPEX / whiteSpaceM2
+</div>
+
+<h3>19.2 Energy & Efficiency</h3>
+<div class="formula">
+pueOverhead = (PUE - 1.0) &times; IT_Load &times; energyRate &times; 8760 &times; utilization<br>
+coolingPct = pueOverhead / totalOPEX &times; 100<br>
+pueSavings = 0.1 &times; IT_Load &times; energyRate &times; 8760 &times; utilization  <span style="color:#64748b">// savings from 0.1 PUE improvement</span><br>
+energyIntensity = annualKWh / IT_Load
+</div>
+
+<h3>19.3 Labor Metrics</h3>
+<div class="formula">
+staffPerMW = totalFTE / (IT_Load / 1000)<br>
+costPerMW = staffingCost / (IT_Load / 1000)
+</div>
+
+<h3>19.4 Carbon Metrics</h3>
+<div class="formula">
+co2Tonnes = (annualKWh &times; gridEmissionFactor[country]) / 1000<br>
+carbonCost = co2Tonnes &times; carbonPrice[region]<br>
+CUE = (co2Tonnes &times; 1000) / (IT_Load &times; 8760 &times; utilization)
+</div>
+
+<h3>19.5 Fixed vs Variable Analysis</h3>
+<div class="formula">
+fixedCost = staffing + insurance + software<br>
+variableCost = energy + utilities + other<br>
+operatingLeverage = variableCost / totalOPEX
+</div>
+
+<h2 id="s20"><span class="section-tag opex-tag">OPEX</span> 20. TCO Projections</h2>
+
+<div class="formula">
+<strong>Escalation Rates:</strong><br>
+Energy: +3.0% per year<br>
+Labor: +4.0% per year<br>
+General (maintenance, software, insurance): +2.5% per year<br><br>
+TCO(years) = &Sigma;[y=1..N] (energyCost &times; 1.03^y + staffCost &times; 1.04^y + generalCost &times; 1.025^y)
+</div>
+
+<table>
+<tr><th>Projection</th><th>Formula</th></tr>
+<tr><td>5-Year TCO</td><td>Sum of escalated annual costs for years 1-5</td></tr>
+<tr><td>10-Year TCO</td><td>Sum of escalated annual costs for years 1-10</td></tr>
+</table>
+
+<div class="note"><strong>Escalation Sources:</strong> Energy escalation based on IEA World Energy Outlook trend data. Labor escalation reflects typical emerging market wage growth (4-5% nominal). General inflation at 2.5% reflects global infrastructure maintenance cost trends.</div>
+
+<h2 id="s21"><span class="section-tag opex-tag">OPEX</span> 21. Industry Benchmarks</h2>
+
+<h3>21.1 OPEX Benchmarks by Tier ($/kW/year)</h3>
+<table>
+<tr><th>Tier</th><th>Low (Efficient)</th><th>Mid (Average)</th><th>High (Premium)</th></tr>
+<tr><td>Tier I</td><td>$800</td><td>$1,200</td><td>$1,600</td></tr>
+<tr><td>Tier II</td><td>$1,000</td><td>$1,500</td><td>$2,000</td></tr>
+<tr><td>Tier III</td><td>$1,200</td><td>$1,800</td><td>$2,500</td></tr>
+<tr><td>Tier IV</td><td>$1,500</td><td>$2,200</td><td>$3,000</td></tr>
+</table>
+
+<h3>21.2 Efficiency Score</h3>
+<div class="formula">
+efficiencyScore = max(0, min(100, round((1 - (perKW - benchLow) / (benchHigh - benchLow)) &times; 100)))<br>
+<br>
+Interpretation:<br>
+&ge;80: Below Average (Efficient) | 50-79: Average | 20-49: Above Average | &lt;20: High Cost
+</div>
+
+<h2 id="s22">22. Validation & Data Sources</h2>
+
+<h3>22.1 Primary Data Sources</h3>
+<table>
+<tr><th>Source</th><th>Used For</th><th>Year</th></tr>
+<tr><td>Turner & Townsend DCCI</td><td>City-specific $/W, cost benchmarks</td><td>2025</td></tr>
+<tr><td>Cushman & Wakefield</td><td>US market $/W, APAC benchmarks</td><td>2025</td></tr>
+<tr><td>JLL Data Center Outlook</td><td>Year escalation forecasts</td><td>2026</td></tr>
+<tr><td>Uptime Institute Annual Survey</td><td>PUE benchmarks, staffing ratios</td><td>2023-2024</td></tr>
+<tr><td>IEA World Energy Outlook</td><td>Grid emission factors, energy rates</td><td>2024</td></tr>
+<tr><td>ASHRAE TC 9.9</td><td>Thermal guidelines, cooling efficiency</td><td>2021</td></tr>
+<tr><td>TIA-942-B</td><td>Tier classification, redundancy definitions</td><td>2017</td></tr>
+<tr><td>Kigali Amendment / EU F-Gas</td><td>Refrigerant phase-down schedules</td><td>2024</td></tr>
+<tr><td>ISO 50001 / ISO 14064</td><td>Energy management, carbon accounting</td><td>Latest</td></tr>
+<tr><td>NFPA 75 / NFPA 76</td><td>Fire protection for IT facilities</td><td>Latest</td></tr>
+</table>
+
+<h3>22.2 Model Limitations</h3>
+<ul style="padding-left:20px;margin:10px 0;">
+<li>Parametric estimation — actual costs vary with site conditions, procurement strategy, and market timing</li>
+<li>City data is sourced from industry reports; actual quotes may differ by 15-25%</li>
+<li>Equipment brand database is indicative — vendor selection requires RFP process</li>
+<li>Staffing model uses generic FTE ratios — actual needs depend on scope, SLA, and organizational structure</li>
+<li>Carbon pricing uses regional averages; actual schemes (ETS, carbon tax) vary significantly</li>
+<li>TCO projections assume steady-state escalation; actual costs may be step-function (contract renewals, equipment replacement)</li>
+</ul>
+
+<h3>22.3 Recommended Validation Approach</h3>
+<ol style="padding-left:20px;margin:10px 0;">
+<li>Cross-reference total $/kW against T&T DCCI published ranges for the target city</li>
+<li>Validate cooling energy with PUE measurement data from similar facilities</li>
+<li>Compare staffing FTE against Uptime Institute benchmarks (staff/MW)</li>
+<li>Verify maintenance costs against actual OEM quotes for major systems</li>
+<li>Run scenario A/B to bound uncertainty (optimistic vs conservative)</li>
+</ol>
+
+<!-- FOOTER -->
+<div style="margin-top:40px;padding-top:20px;border-top:2px solid #e2e8f0;text-align:center;">
+<p style="font-size:10px;color:#94a3b8;margin:0;">ResistanceZero Engineering Tools | Version 2.0 | February 2026</p>
+<p style="font-size:10px;color:#94a3b8;margin:4px 0 0;">Author: Bagus Dwi Permana | Engineering Operations Manager & Ahli K3 Listrik</p>
+<p style="font-size:9px;color:#cbd5e1;margin:4px 0 0;">This document is auto-generated from the production calculator codebase. Print to PDF for distribution.</p>
+</div>
+
+</div>
+</body>
+</html>

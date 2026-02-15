@@ -57,6 +57,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -926,6 +927,44 @@
             .chart-wrapper { padding: 1rem; }
             .term-tooltip::after { left: 0; transform: none; max-width: 250px; }
         }
+
+        /* ═══ PRO ENHANCEMENT MODE ═══ */
+        #maint-tooltip-container{position:fixed;width:320px;background:linear-gradient(135deg,#1e293b,#0f172a);color:#e2e8f0;padding:16px 18px;border-radius:14px;border:1px solid rgba(16,185,129,.25);box-shadow:0 20px 50px rgba(0,0,0,.4);z-index:10000;pointer-events:none;opacity:0;transition:opacity .2s;font-size:.82rem;line-height:1.55}
+        #maint-tooltip-container.visible{opacity:1}
+        #maint-tooltip-container .tooltip-title{font-weight:700;color:#34d399;margin-bottom:6px;font-size:.85rem}
+        #maint-tooltip-container .tooltip-desc{color:#cbd5e1;margin-bottom:8px}
+        #maint-tooltip-container .tooltip-formula{background:rgba(16,185,129,.1);padding:8px 10px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#6ee7b7}
+        .maint-mode-bar{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem}
+        .maint-mode-btn{padding:8px 20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#94a3b8;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+        .maint-mode-btn:hover{background:rgba(255,255,255,.1);color:#e2e8f0}
+        .maint-mode-btn.active{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#10b981;box-shadow:0 4px 15px rgba(16,185,129,.3)}
+        .gated-badge{display:inline-block;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:.65rem;padding:2px 7px;border-radius:6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;vertical-align:middle;margin-left:4px}
+        .pro-panel{position:relative;margin-top:1.5rem}
+        .pro-panel-inner{padding:1.25rem;border:1px solid rgba(16,185,129,.15);border-radius:14px;background:rgba(16,185,129,.03)}
+        .pro-panel-title{font-size:.8rem;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+        .gated-overlay{position:absolute;inset:0;background:rgba(15,23,42,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:background .2s}
+        .gated-overlay:hover{background:rgba(15,23,42,.8)}
+        .gated-icon{font-size:2rem;color:#fbbf24;margin-bottom:8px}
+        .gated-text{font-size:.85rem;font-weight:600;color:#e2e8f0}
+        .gated-sub{font-size:.75rem;color:#94a3b8;margin-top:4px}
+        #maintProInputs{display:none;margin-top:1.5rem;padding-top:1.25rem;border-top:1px dashed rgba(16,185,129,.3)}
+        .pro-input-section-title{font-size:.72rem;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+        .maint-action-toolbar{display:flex;gap:8px;justify-content:center;margin-top:1.5rem}
+        .maint-action-btn{padding:8px 18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#94a3b8;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+        .maint-action-btn:hover{background:rgba(255,255,255,.12);color:#e2e8f0}
+        .maint-action-btn.primary{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#10b981}
+        #maintLoginModal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:10001;display:none;align-items:center;justify-content:center}
+        #maintLoginModal.show{display:flex}
+        .maint-login-box{background:#fff;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;position:relative;box-shadow:0 25px 60px rgba(0,0,0,.3)}
+        .nav-auth-wrap{display:flex;align-items:center;position:relative;margin-left:12px}
+        .nav-login-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(16,185,129,.3)}
+        .nav-user-btn{display:none;align-items:center;gap:8px;padding:4px 12px 4px 4px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:50px;cursor:pointer;color:#e2e8f0;font-size:.8rem}
+        .nav-user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem}
+        .nav-user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem}
+        .nav-user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#1e293b;border:1px solid #334155;border-radius:12px;min-width:220px;display:none;z-index:100;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+        .nav-user-dropdown.show{display:block}
+        .tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:rgba(16,185,129,.2);color:#10b981;border-radius:50%;font-size:.65rem;font-weight:700;cursor:help;margin-left:4px;vertical-align:middle;position:relative}
+        .tooltip-trigger .tooltip-content{display:none}
     </style>
 </head>
 <body>
@@ -986,6 +1025,17 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                 </svg>
             </button>
+            <div class="nav-auth-wrap" id="maintNavAuthWrap">
+                <button class="nav-login-btn" id="maintNavLoginBtn" onclick="maintShowLogin()"><i class="fas fa-user-circle"></i> <span>Login</span></button>
+                <button class="nav-user-btn" id="maintNavUserBtn" onclick="maintToggleDropdown()"><span class="nav-user-avatar" id="maintNavAvatar">U</span><span class="nav-user-email" id="maintNavEmail">user</span><i class="fas fa-chevron-down" style="font-size:0.6rem;color:#64748b;"></i></button>
+                <div class="nav-user-dropdown" id="maintNavDropdown">
+                    <div style="padding:14px 16px;border-bottom:1px solid #334155;">
+                        <div style="display:inline-block;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:6px;font-weight:700;text-transform:uppercase;">PRO</div>
+                        <div style="font-size:.8rem;color:#94a3b8;margin-top:6px;" id="maintDdEmail">user</div>
+                    </div>
+                    <button onclick="maintLogout()" style="width:100%;padding:12px 16px;background:none;border:none;color:#f87171;font-size:.82rem;cursor:pointer;text-align:left;"><i class="fas fa-sign-out-alt" style="margin-right:8px;"></i>Logout</button>
+                </div>
+            </div>
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -1130,6 +1180,19 @@
                 <p>This article presents a comprehensive systems-level analysis of why <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> compliance plateaus at 70-85% in the majority of data center operations despite repeated training interventions, monitoring dashboards, and supervisory pressure. Drawing on maintenance engineering theory<a href="#ref-1" class="cite">[1]</a>, reliability-centered maintenance<a href="#ref-3" class="cite">[3]</a>, and human factors research, it demonstrates that sustained compliance above 95% emerges only when five systemic conditions are simultaneously addressed: workflow friction, <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> usability, evidence burden, scheduling conflicts, and escalation gaps.</p>
 
                 <p>The article introduces a Maintenance Compliance Predictor model that quantifies the relationship between staffing capacity, workflow friction, CMMS maturity, and evidence clarity. Through an applied case study of a 15MW concurrently maintainable facility, it documents the journey from 74% to 97.2% compliance over 18 weeks using exclusively systems-level interventions -- without adding headcount or changing personnel.</p>
+
+                <!-- Quick Assessment CTA -->
+                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; padding: 1.5rem 2rem; margin: 2rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+                    <div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;">
+                            <i class="fas fa-wrench" style="color: #10b981; margin-right: 6px;"></i>Predict Your Facility's Compliance
+                        </div>
+                        <div style="font-size: 0.82rem; color: #94a3b8;">Input staffing, workload, and system parameters to get predicted compliance, capacity analysis, and improvement roadmap.</div>
+                    </div>
+                    <a href="#section-12" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: none; white-space: nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <i class="fas fa-calculator"></i> Try the Calculator
+                    </a>
+                </div>
 
                 <div class="info-box">
                     <div class="info-box-title">Core Thesis</div>
@@ -1786,9 +1849,16 @@
                     <h3 class="calculator-title">Maintenance Compliance Predictor</h3>
                     <p class="calculator-subtitle">Model your facility's compliance potential based on system design parameters</p>
 
+                    <!-- Mode Toggle -->
+                    <div class="maint-mode-bar">
+                        <button class="maint-mode-btn active" id="maintModeFree" onclick="switchMaintMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
+                        <button class="maint-mode-btn" id="maintModePro" onclick="switchMaintMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maintProBadge">PRO</span></button>
+                    </div>
+
+                    <!-- Free Inputs -->
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">PM Tasks / Month</label>
+                            <label class="calc-label">PM Tasks / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">PM Task Volume</div><div class="tooltip-desc">Total scheduled preventive maintenance tasks per month. Industry benchmark: 50-80 tasks per technician per month for data center facilities.</div><div class="tooltip-formula">Ref: Palmer (2006) Maintenance Planning Handbook</div></span></span></label>
                             <input type="number" id="calcTasks" class="calc-input" value="400" min="1">
                         </div>
                         <div class="calc-input-group">
@@ -1800,7 +1870,7 @@
                             <input type="number" id="calcBacklog" class="calc-input" value="85" min="0">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Avg Task Duration (hrs)</label>
+                            <label class="calc-label">Avg Task Duration (hrs) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Average Task Duration</div><div class="tooltip-desc">Mean time to complete one PM task including setup, execution, and documentation. Does NOT include travel or admin overhead (those are Pro inputs).</div><div class="tooltip-formula">Typical DC PM: 0.5-3.0 hrs depending on system complexity</div></span></span></label>
                             <input type="number" id="calcDuration" class="calc-input" value="1.5" min="0.1" step="0.1">
                         </div>
                         <div class="calc-input-group">
@@ -1808,7 +1878,7 @@
                             <input type="number" id="calcHours" class="calc-input" value="160" min="1">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">CMMS Maturity Level</label>
+                            <label class="calc-label">CMMS Maturity Level <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">CMMS Maturity Scale</div><div class="tooltip-desc">L1 Reactive: paper/spreadsheet. L2 Scheduled: basic CMMS. L3 Managed: full CMMS with KPIs. L4 Optimized: predictive integration. L5 Autonomous: AI-driven scheduling.</div><div class="tooltip-formula">Modifier: L1=0.70, L2=0.80, L3=0.90, L4=0.97, L5=1.00</div></span></span></label>
                             <select id="calcCMMS" class="calc-select">
                                 <option value="1">Level 1 - Reactive</option>
                                 <option value="2" selected>Level 2 - Scheduled</option>
@@ -1820,48 +1890,132 @@
                         <div class="calc-input-group">
                             <label class="calc-label">Workflow Friction</label>
                             <select id="calcFriction" class="calc-select">
-                                <option value="High">High</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Low">Low</option>
+                                <option value="High">High (55% efficiency)</option>
+                                <option value="Medium" selected>Medium (70% efficiency)</option>
+                                <option value="Low">Low (85% efficiency)</option>
                             </select>
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Evidence Clarity</label>
                             <select id="calcEvidence" class="calc-select">
-                                <option value="Unclear">Unclear</option>
-                                <option value="Adequate">Adequate</option>
-                                <option value="Excellent">Excellent</option>
+                                <option value="Unclear">Unclear (85% modifier)</option>
+                                <option value="Adequate" selected>Adequate (92% modifier)</option>
+                                <option value="Excellent">Excellent (98% modifier)</option>
                             </select>
                         </div>
                     </div>
 
-                    <button class="calc-btn" onclick="calculateCompliance()">Calculate Predicted Compliance</button>
+                    <!-- Pro Inputs (hidden) -->
+                    <div id="maintProInputs">
+                        <div class="pro-input-section-title"><i class="fas fa-sliders"></i> Advanced Parameters</div>
+                        <div class="calc-grid">
+                            <div class="calc-input-group">
+                                <label class="calc-label">Wrench Time %</label>
+                                <input type="number" id="calcWrench" class="calc-input" value="35" min="10" max="80">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Travel & Admin Overhead %</label>
+                                <input type="number" id="calcOverhead" class="calc-input" value="25" min="0" max="60">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Task Duration Variability</label>
+                                <select id="calcVariability" class="calc-select">
+                                    <option value="Low">Low (CV 0.15)</option>
+                                    <option value="Medium" selected>Medium (CV 0.30)</option>
+                                    <option value="High">High (CV 0.50)</option>
+                                </select>
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Critical Asset PM %</label>
+                                <input type="number" id="calcCritical" class="calc-input" value="30" min="0" max="100">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">SLA Target %</label>
+                                <input type="number" id="calcSLA" class="calc-input" value="95" min="80" max="100">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Backlog Age (avg weeks)</label>
+                                <input type="number" id="calcBacklogAge" class="calc-input" value="4" min="0" max="52">
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Free Output Cards -->
                     <div class="calc-results" id="calcResults">
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="resultCapacity">--</div>
-                            <div class="calc-result-label">Effective Capacity (hrs)</div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="resultCompliance">--</div>
-                            <div class="calc-result-label">Predicted Compliance</div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="resultBacklogBurn">--</div>
-                            <div class="calc-result-label">Backlog Burn Rate (tasks/mo)</div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="resultRisk">--</div>
-                            <div class="calc-result-label">Risk Score (0-100)</div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="resultStaffing">--</div>
-                            <div class="calc-result-label">Recommended Techs (95%)</div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="resultMonths">--</div>
-                            <div class="calc-result-label">Months to 95% Target</div>
-                        </div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultCapacity">--</div><div class="calc-result-label">Effective Capacity (hrs)</div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultCompliance">--</div><div class="calc-result-label">Predicted Compliance</div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultBacklogBurn">--</div><div class="calc-result-label">Backlog Burn Rate (tasks/mo)</div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultRisk">--</div><div class="calc-result-label">Risk Score (0-100)</div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultStaffing">--</div><div class="calc-result-label">Recommended Techs (SLA)</div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultMonths">--</div><div class="calc-result-label">Months to Target</div></div>
+                    </div>
+
+                    <!-- Pro Output Panels -->
+                    <div id="maintProPanels" style="display:none;">
+                        <!-- Panel 1: Capacity & Utilization -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-gauge-high"></i> Capacity & Utilization</div>
+                            <div class="calc-results" id="proCapGrid">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proRawCap">--</div><div class="calc-result-label">Raw Capacity (hrs/mo)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proWrenchCap">--</div><div class="calc-result-label">Wrench-Time Adjusted</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proTotalDemand">--</div><div class="calc-result-label">Total Demand (hrs/mo)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proUtilization">--</div><div class="calc-result-label">Utilization Rate</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMargin">--</div><div class="calc-result-label">Capacity Margin</div></div>
+                            </div>
+                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Unlock 24 advanced KPIs + PDF export</div></div></div>
+
+                        <!-- Panel 2: Compliance Deep Dive -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-clipboard-check"></i> Compliance Deep Dive</div>
+                            <div class="calc-results" id="proCompGrid">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proCompPct">--</div><div class="calc-result-label">Predicted Compliance</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proConfBand">--</div><div class="calc-result-label">90% Confidence Band</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proCritComp">--</div><div class="calc-result-label">Critical Asset Compliance</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proGap">--</div><div class="calc-result-label">Gap to SLA Target</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proPercentile">--</div><div class="calc-result-label">Industry Percentile</div></div>
+                            </div>
+                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo confidence intervals</div></div></div>
+
+                        <!-- Panel 3: Backlog & Risk -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-triangle-exclamation"></i> Backlog & Risk</div>
+                            <div class="calc-results" id="proRiskGrid">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBurnRate">--</div><div class="calc-result-label">Burn Rate (tasks/mo)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proClearTime">--</div><div class="calc-result-label">Time-to-Clear Backlog</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proGrowthRisk">--</div><div class="calc-result-label">Backlog Growth Risk</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proWeightedRisk">--</div><div class="calc-result-label">Weighted Risk Score</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proSlaMiss">--</div><div class="calc-result-label">SLA Miss Probability</div></div>
+                            </div>
+                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Backlog trajectory modeling</div></div></div>
+
+                        <!-- Panel 4: Workforce Optimization -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-users-gear"></i> Workforce Optimization</div>
+                            <div class="calc-results" id="proWorkGrid">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proReqTechs">--</div><div class="calc-result-label">Techs for SLA Target</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proOptUtil">--</div><div class="calc-result-label">Optimal Utilization</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proOvertime">--</div><div class="calc-result-label">Overtime Needed (hrs/mo)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMarginal">--</div><div class="calc-result-label">Marginal Tech Impact</div></div>
+                            </div>
+                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Staffing optimization model</div></div></div>
+
+                        <!-- Panel 5: Scenario Sensitivity -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-arrow-trend-up"></i> Scenario Sensitivity</div>
+                            <div class="calc-results" id="proScenGrid">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen1">--</div><div class="calc-result-label">+1 Technician</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen2">--</div><div class="calc-result-label">CMMS +1 Level</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen3">--</div><div class="calc-result-label">Friction → Low</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen4">--</div><div class="calc-result-label">Evidence → Excellent</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen5">--</div><div class="calc-result-label">-20% Task Duration</div></div>
+                            </div>
+                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div></div>
+                    </div>
+
+                    <!-- Action Toolbar -->
+                    <div class="maint-action-toolbar">
+                        <button class="maint-action-btn primary" id="maintBtnPdf" onclick="maintShowLogin()"><i class="fas fa-file-pdf"></i> Export PDF Report</button>
+                        <button class="maint-action-btn" onclick="maintResetDefaults()"><i class="fas fa-rotate-left"></i> Reset</button>
                     </div>
                 </div>
 
@@ -2006,6 +2160,33 @@
         </div>
     </footer>
 
+    <!-- Login Modal -->
+    <div id="maintLoginModal" style="display:none;">
+        <div style="background:#fff;border-radius:20px;padding:2.5rem;max-width:400px;width:90%;position:relative;box-shadow:0 25px 60px rgba(0,0,0,.3);">
+            <button onclick="maintCloseLogin()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;color:#94a3b8;cursor:pointer;">&times;</button>
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="width:56px;height:56px;background:linear-gradient(135deg,#10b981,#059669);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                    <i class="fas fa-wrench" style="color:#fff;font-size:1.4rem;"></i>
+                </div>
+                <h3 style="margin:0 0 .25rem;color:#1e293b;font-size:1.2rem;">Unlock Maintenance Pro</h3>
+                <p style="margin:0;color:#64748b;font-size:.85rem;">Access 24 advanced KPIs, Monte Carlo analysis & PDF export</p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:.8rem;font-weight:600;color:#475569;margin-bottom:4px;">Email</label>
+                <input type="email" id="maintLoginEmail" placeholder="you@company.com" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;outline:none;transition:border .2s;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:block;font-size:.8rem;font-weight:600;color:#475569;margin-bottom:4px;">Password</label>
+                <input type="password" id="maintLoginPass" placeholder="Enter password" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;outline:none;transition:border .2s;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')maintDoLogin()">
+            </div>
+            <button onclick="maintDoLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Sign In</button>
+            <div id="maintLoginError" style="display:none;margin-top:.75rem;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#dc2626;font-size:.8rem;text-align:center;"></div>
+            <div style="margin-top:1rem;padding:12px;background:#f0fdf4;border-radius:10px;text-align:center;">
+                <p style="margin:0;font-size:.78rem;color:#166534;"><i class="fas fa-flask" style="margin-right:4px;"></i> <strong>Demo access:</strong> demo@resistancezero.com / demo2026</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Share Buttons - Floating Sidebar -->
     <aside class="share-buttons" id="shareButtons" aria-label="Share this article">
         <span class="share-label">Share</span>
@@ -2032,69 +2213,470 @@
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
 
-    <!-- Maintenance Compliance Calculator -->
+    <!-- Maintenance Compliance Pro Engine -->
     <script>
-    function calculateCompliance() {
-        const tasks = parseFloat(document.getElementById('calcTasks').value) || 400;
-        const techs = parseFloat(document.getElementById('calcTechs').value) || 6;
-        const backlog = parseFloat(document.getElementById('calcBacklog').value) || 0;
-        const duration = parseFloat(document.getElementById('calcDuration').value) || 1.5;
-        const hoursPerMonth = parseFloat(document.getElementById('calcHours').value) || 160;
-        const cmms = parseInt(document.getElementById('calcCMMS').value) || 2;
-        const friction = document.getElementById('calcFriction').value;
-        const evidence = document.getElementById('calcEvidence').value;
+    (function(){
+    /* ===== STATE ===== */
+    var maintMode = 'free';
+    var maintIsPremium = false;
+    var MAINT_USERS = {
+        'demo@resistancezero.com': {pw:'demo2026',name:'Demo User',tier:'pro'},
+        'admin@resistancezero.com': {pw:'admin2026',name:'Admin',tier:'pro'},
+        'baguspermana7@gmail.com': {pw:'rzpro2026',name:'Bagus Permana',tier:'pro'}
+    };
 
-        // Calculate
-        const rawCapacity = techs * hoursPerMonth;
-        const frictionFactor = {High: 0.55, Medium: 0.70, Low: 0.85}[friction];
-        const effectiveCapacity = rawCapacity * frictionFactor;
-        const totalDemand = (tasks * duration) + (backlog * duration * 0.3);
-        const cmmsModifier = {1: 0.70, 2: 0.80, 3: 0.90, 4: 0.97, 5: 1.0}[cmms];
-        const evidenceModifier = {Unclear: 0.85, Adequate: 0.92, Excellent: 0.98}[evidence];
-        const rawCompliance = Math.min(100, (effectiveCapacity / totalDemand) * 100);
-        const predictedCompliance = rawCompliance * cmmsModifier * evidenceModifier;
-        const surplusHours = Math.max(0, effectiveCapacity - (tasks * duration));
-        const backlogBurnRate = Math.floor(surplusHours / duration);
-        const monthsToZeroBacklog = backlog > 0 ? Math.ceil(backlog / Math.max(1, backlogBurnRate)) : 0;
-        const riskScore = Math.min(100, backlog * 0.8 * Math.pow(1.02, backlog / 10));
-        const targetHours = (tasks * duration) / 0.95 / frictionFactor / cmmsModifier / evidenceModifier;
-        const recommendedTechs = Math.ceil(targetHours / hoursPerMonth);
-        const monthsToTarget = predictedCompliance >= 95 ? 0 : Math.ceil((95 - predictedCompliance) / 3.5);
+    /* ===== MATH HELPERS ===== */
+    var FF = {High:0.55, Medium:0.70, Low:0.85};
+    var CM = {1:0.70, 2:0.80, 3:0.90, 4:0.97, 5:1.0};
+    var EM = {Unclear:0.85, Adequate:0.92, Excellent:0.98};
+    var DV = {Low:0.10, Medium:0.20, High:0.35};
 
-        // Update results
-        const capEl = document.getElementById('resultCapacity');
-        capEl.textContent = Math.round(effectiveCapacity) + ' / ' + Math.round(totalDemand);
-        capEl.className = 'calc-result-value' + (effectiveCapacity < totalDemand ? ' danger' : '');
-
-        const compEl = document.getElementById('resultCompliance');
-        compEl.textContent = predictedCompliance.toFixed(1) + '%';
-        compEl.className = 'calc-result-value' + (predictedCompliance < 80 ? ' danger' : predictedCompliance < 95 ? ' warning' : '');
-
-        document.getElementById('resultBacklogBurn').textContent = backlogBurnRate > 0 ? backlogBurnRate + ' tasks' : 'Deficit';
-        document.getElementById('resultBacklogBurn').className = 'calc-result-value' + (backlogBurnRate <= 0 ? ' danger' : '');
-
-        const riskEl = document.getElementById('resultRisk');
-        riskEl.textContent = Math.round(riskScore);
-        riskEl.className = 'calc-result-value' + (riskScore > 60 ? ' danger' : riskScore > 30 ? ' warning' : '');
-
-        document.getElementById('resultStaffing').textContent = recommendedTechs + ' techs';
-        document.getElementById('resultStaffing').className = 'calc-result-value' + (recommendedTechs > techs ? ' warning' : '');
-
-        const moEl = document.getElementById('resultMonths');
-        moEl.textContent = monthsToTarget === 0 ? 'Already met' : monthsToTarget + ' months';
-        moEl.className = 'calc-result-value' + (monthsToTarget > 6 ? ' warning' : '');
+    function getInputs(){
+        var t=parseFloat(document.getElementById('calcTasks').value)||400;
+        var n=parseFloat(document.getElementById('calcTechs').value)||6;
+        var b=parseFloat(document.getElementById('calcBacklog').value)||0;
+        var d=parseFloat(document.getElementById('calcDuration').value)||1.5;
+        var h=parseFloat(document.getElementById('calcHours').value)||160;
+        var c=parseInt(document.getElementById('calcCMMS').value)||2;
+        var f=document.getElementById('calcFriction').value||'Medium';
+        var e=document.getElementById('calcEvidence').value||'Adequate';
+        // Pro inputs
+        var wt=parseFloat(document.getElementById('proWrenchTime')?.value)||35;
+        var oh=parseFloat(document.getElementById('proOverhead')?.value)||25;
+        var dv=document.getElementById('proDurVar')?.value||'Medium';
+        var cp=parseFloat(document.getElementById('proCriticalPct')?.value)||30;
+        var st=parseFloat(document.getElementById('proSlaTarget')?.value)||95;
+        var ba=parseFloat(document.getElementById('proBacklogAge')?.value)||4;
+        return {tasks:t,techs:n,backlog:b,duration:d,hrsPerMonth:h,cmms:c,friction:f,evidence:e,
+                wrenchPct:wt/100,overheadPct:oh/100,durVar:dv,criticalPct:cp/100,slaTarget:st/100,backlogAge:ba};
     }
 
-    // Auto-calculate on any input change
-    document.querySelectorAll('#calcTasks, #calcTechs, #calcBacklog, #calcDuration, #calcHours').forEach(function(el) {
-        el.addEventListener('input', calculateCompliance);
-    });
-    document.querySelectorAll('#calcCMMS, #calcFriction, #calcEvidence').forEach(function(el) {
-        el.addEventListener('change', calculateCompliance);
-    });
+    function calcEffCap(p){
+        var raw=p.techs*p.hrsPerMonth;
+        var ff=FF[p.friction]||0.70;
+        if(maintMode==='pro') return raw*ff*p.wrenchPct*(1-p.overheadPct);
+        return raw*ff;
+    }
+    function calcDemand(p){
+        var backlogWeight=Math.min(0.5, 0.3+p.backlogAge*0.02);
+        return (p.tasks*p.duration)+(p.backlog*p.duration*backlogWeight);
+    }
+    function calcCompliance(cap,dem,c,e){
+        var raw=Math.min(100,(cap/Math.max(1,dem))*100);
+        return Math.min(100, raw*(CM[c]||0.80)*(EM[e]||0.92));
+    }
+    function calcComplianceFromParams(p){
+        return calcCompliance(calcEffCap(p),calcDemand(p),p.cmms,p.evidence);
+    }
 
-    // Initial calculation
-    calculateCompliance();
+    function monteCarloCompliance(p, iters){
+        iters=iters||5000;
+        var results=[];
+        var cv=DV[p.durVar]||0.20;
+        for(var i=0;i<iters;i++){
+            var dJitter=p.duration*(1+cv*(Math.random()+Math.random()+Math.random()-1.5)*0.8165);
+            var fJitter=FF[p.friction]*(0.95+Math.random()*0.10);
+            var wJitter=p.wrenchPct*(0.92+Math.random()*0.16);
+            var rawCap=p.techs*p.hrsPerMonth*fJitter*wJitter*(1-p.overheadPct);
+            var dem=(p.tasks*dJitter)+(p.backlog*dJitter*0.3);
+            var comp=Math.min(100,(rawCap/Math.max(1,dem))*100*(CM[p.cmms]||0.80)*(EM[p.evidence]||0.92));
+            results.push(comp);
+        }
+        results.sort(function(a,b){return a-b});
+        return {p5:results[Math.floor(iters*0.05)],median:results[Math.floor(iters*0.5)],p95:results[Math.floor(iters*0.95)]};
+    }
+
+    function calcRisk(p,compliance,margin){
+        var backlogRisk=Math.min(40, p.backlog*0.4*Math.pow(1.015,p.backlog/10));
+        var compRisk=(100-compliance)*0.4;
+        var capRisk=margin<0?Math.min(30,Math.abs(margin)/10):0;
+        var critRisk=p.criticalPct>0.4?10:p.criticalPct>0.25?5:0;
+        return Math.min(100, backlogRisk+compRisk+capRisk+critRisk);
+    }
+
+    function findTechsForTarget(p,target){
+        for(var t=1;t<=100;t++){
+            var pp=Object.assign({},p,{techs:t});
+            if(calcComplianceFromParams(pp)>=target*100) return t;
+        }
+        return 100;
+    }
+
+    /* ===== MAIN CALCULATOR ===== */
+    function updateMaintCalculator(){
+        var p=getInputs();
+        var ff=FF[p.friction]||0.70;
+        var rawCap=p.techs*p.hrsPerMonth;
+        var effCap=calcEffCap(p);
+        var demand=calcDemand(p);
+        var compliance=calcComplianceFromParams(p);
+        var surplus=Math.max(0,effCap-(p.tasks*p.duration));
+        var burnRate=Math.floor(surplus/Math.max(0.1,p.duration));
+        var riskScore=calcRisk(p,compliance,effCap-demand);
+        var reqTechs=findTechsForTarget(p,p.slaTarget);
+        var monthsToTarget=compliance>=p.slaTarget*100?0:Math.ceil((p.slaTarget*100-compliance)/3.5);
+
+        /* Free outputs */
+        var el;
+        el=document.getElementById('resultCapacity');
+        if(el){el.textContent=Math.round(effCap)+' / '+Math.round(demand);el.className='calc-result-value'+(effCap<demand?' danger':'');}
+        el=document.getElementById('resultCompliance');
+        if(el){el.textContent=compliance.toFixed(1)+'%';el.className='calc-result-value'+(compliance<80?' danger':compliance<95?' warning':'');}
+        el=document.getElementById('resultBacklogBurn');
+        if(el){el.textContent=burnRate>0?burnRate+' tasks':'Deficit';el.className='calc-result-value'+(burnRate<=0?' danger':'');}
+        el=document.getElementById('resultRisk');
+        if(el){el.textContent=Math.round(riskScore);el.className='calc-result-value'+(riskScore>60?' danger':riskScore>30?' warning':'');}
+        el=document.getElementById('resultStaffing');
+        if(el){el.textContent=reqTechs+' techs';el.className='calc-result-value'+(reqTechs>p.techs?' warning':'');}
+        el=document.getElementById('resultMonths');
+        if(el){el.textContent=monthsToTarget===0?'Already met':monthsToTarget+' months';el.className='calc-result-value'+(monthsToTarget>6?' warning':'');}
+
+        /* Pro outputs */
+        if(maintMode==='pro'&&maintIsPremium){
+            var mc=monteCarloCompliance(p);
+            var utilRate=Math.min(100,(demand/Math.max(1,effCap))*100);
+            var margin=effCap-demand;
+            var clearTime=p.backlog>0&&burnRate>0?Math.ceil(p.backlog/burnRate):p.backlog>0?999:0;
+            var growthRisk=margin<0?'Growing':'Stable';
+            var slaMiss=Math.max(0,Math.min(100,100-mc.p5));
+            var critComp=compliance*(1-p.criticalPct*0.15);
+            var gap=p.slaTarget*100-compliance;
+            var percentile=compliance>=97?95:compliance>=95?85:compliance>=90?70:compliance>=85?50:compliance>=80?30:compliance>=70?15:5;
+            var optUtil=utilRate>=75&&utilRate<=85?'In Range':utilRate<75?'Under-utilized':'Over-utilized';
+            var overtime=margin<0?Math.abs(margin):0;
+            // Marginal tech impact
+            var ppPlus=Object.assign({},p,{techs:p.techs+1});
+            var compPlus1=calcComplianceFromParams(ppPlus);
+            var marginal=compPlus1-compliance;
+
+            setText('proRawCap',Math.round(rawCap)+' hrs');
+            setText('proWrenchCap',Math.round(effCap)+' hrs');
+            setText('proTotalDemand',Math.round(demand)+' hrs');
+            setText('proUtilization',utilRate.toFixed(1)+'%');
+            setTextColor('proUtilization',utilRate>90?'danger':utilRate>80?'warning':'');
+            setText('proMargin',(margin>=0?'+':'')+Math.round(margin)+' hrs');
+            setTextColor('proMargin',margin<0?'danger':'');
+            setText('proCompPct',compliance.toFixed(1)+'%');
+            setTextColor('proCompPct',compliance<80?'danger':compliance<95?'warning':'');
+            setText('proConfBand',mc.p5.toFixed(1)+'% - '+mc.p95.toFixed(1)+'%');
+            setText('proCritComp',critComp.toFixed(1)+'%');
+            setTextColor('proCritComp',critComp<90?'warning':'');
+            setText('proGap',gap>0?'-'+gap.toFixed(1)+'pp':'Met');
+            setTextColor('proGap',gap>0?'warning':'');
+            setText('proPercentile','P'+percentile);
+            setText('proBurnRate',burnRate>0?burnRate+' tasks/mo':'Deficit');
+            setTextColor('proBurnRate',burnRate<=0?'danger':'');
+            setText('proClearTime',clearTime===0?'No backlog':clearTime>24?'>24 mo':clearTime+' months');
+            setTextColor('proClearTime',clearTime>12?'danger':clearTime>6?'warning':'');
+            setText('proGrowthRisk',growthRisk);
+            setTextColor('proGrowthRisk',growthRisk==='Growing'?'danger':'');
+            setText('proWeightedRisk',Math.round(riskScore)+'/100');
+            setTextColor('proWeightedRisk',riskScore>60?'danger':riskScore>30?'warning':'');
+            setText('proSlaMiss',slaMiss.toFixed(1)+'%');
+            setTextColor('proSlaMiss',slaMiss>20?'danger':slaMiss>10?'warning':'');
+            setText('proReqTechs',reqTechs+' techs');
+            setTextColor('proReqTechs',reqTechs>p.techs?'warning':'');
+            setText('proOptUtil',optUtil);
+            setTextColor('proOptUtil',optUtil==='Over-utilized'?'danger':optUtil==='Under-utilized'?'warning':'');
+            setText('proOvertime',overtime>0?Math.round(overtime)+' hrs':'None');
+            setTextColor('proOvertime',overtime>0?'warning':'');
+            setText('proMarginal','+'+marginal.toFixed(1)+'pp');
+
+            // Scenario deltas
+            var scens=[
+                {mod:{techs:p.techs+1}},
+                {mod:{cmms:Math.min(5,p.cmms+1)}},
+                {mod:{friction:'Low'}},
+                {mod:{evidence:'Excellent'}},
+                {mod:{duration:p.duration*0.8}}
+            ];
+            for(var i=0;i<scens.length;i++){
+                var sp=Object.assign({},p,scens[i].mod);
+                var sc=calcComplianceFromParams(sp);
+                var delta=sc-compliance;
+                setText('proScen'+(i+1),(delta>=0?'+':'')+delta.toFixed(1)+'pp');
+                setTextColor('proScen'+(i+1),delta>5?'':'warning');
+            }
+        }
+
+        window._maintData={params:p,compliance:compliance,effCap:effCap,demand:demand,burnRate:burnRate,riskScore:riskScore,reqTechs:reqTechs,monthsToTarget:monthsToTarget};
+    }
+
+    function setText(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+    function setTextColor(id,cls){var e=document.getElementById(id);if(e)e.className='calc-result-value'+(cls?' '+cls:'');}
+
+    /* ===== MODE & GATING ===== */
+    window.switchMaintMode=function(mode){
+        maintMode=mode;
+        document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode===mode);});
+        var proPanels=document.getElementById('maintProPanels');
+        var proInputs=document.getElementById('maintProInputs');
+        if(mode==='pro'){
+            if(!maintIsPremium){maintShowLogin();return;}
+            if(proPanels)proPanels.style.display='block';
+            if(proInputs)proInputs.style.display='block';
+        }else{
+            if(proPanels)proPanels.style.display='none';
+            if(proInputs)proInputs.style.display='none';
+        }
+        applyMaintGating();
+        updateMaintCalculator();
+    };
+
+    function applyMaintGating(){
+        document.querySelectorAll('.gated-overlay').forEach(function(o){o.style.display=maintIsPremium?'none':'flex';});
+        var pdf=document.getElementById('maintBtnPdf');
+        if(pdf){
+            if(maintIsPremium){pdf.onclick=function(){exportMaintPDF();};pdf.style.opacity='1';}
+            else{pdf.onclick=function(){maintShowLogin();};pdf.style.opacity='0.7';}
+        }
+    }
+
+    /* ===== AUTH ===== */
+    window.maintShowLogin=function(){document.getElementById('maintLoginModal').style.display='flex';};
+    window.maintCloseLogin=function(){document.getElementById('maintLoginModal').style.display='none';document.getElementById('maintLoginError').style.display='none';};
+    window.maintDoLogin=function(){
+        var email=document.getElementById('maintLoginEmail').value.trim().toLowerCase();
+        var pass=document.getElementById('maintLoginPass').value;
+        var user=MAINT_USERS[email];
+        if(user&&user.pw===pass){
+            maintIsPremium=true;
+            localStorage.setItem('rz_premium_session',JSON.stringify({email:email,name:user.name,tier:user.tier,ts:Date.now()}));
+            maintCloseLogin();
+            maintMode='pro';
+            document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='pro');});
+            var pp=document.getElementById('maintProPanels');if(pp)pp.style.display='block';
+            var pi=document.getElementById('maintProInputs');if(pi)pi.style.display='block';
+            applyMaintGating();
+            maintUpdateNavAuth(user.name);
+            updateMaintCalculator();
+        }else{
+            var err=document.getElementById('maintLoginError');err.textContent='Invalid credentials. Try demo@resistancezero.com / demo2026';err.style.display='block';
+        }
+    };
+    window.maintLogout=function(){
+        maintIsPremium=false;maintMode='free';
+        localStorage.removeItem('rz_premium_session');
+        document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='free');});
+        var pp=document.getElementById('maintProPanels');if(pp)pp.style.display='none';
+        var pi=document.getElementById('maintProInputs');if(pi)pi.style.display='none';
+        applyMaintGating();
+        maintUpdateNavAuth(null);
+        updateMaintCalculator();
+    };
+    window.maintToggleDropdown=function(){
+        var d=document.getElementById('maintNavDropdown');if(d)d.style.display=d.style.display==='block'?'none':'block';
+    };
+    function maintUpdateNavAuth(name){
+        var lb=document.getElementById('maintNavLoginBtn'),ub=document.getElementById('maintNavUserBtn'),dd=document.getElementById('maintNavDropdown');
+        if(name){if(lb)lb.style.display='none';if(ub){ub.style.display='inline-flex';ub.querySelector('span').textContent=name;}}
+        else{if(lb)lb.style.display='inline-flex';if(ub)ub.style.display='none';if(dd)dd.style.display='none';}
+    }
+
+    /* ===== RESET ===== */
+    window.maintResetDefaults=function(){
+        var defs={calcTasks:400,calcTechs:6,calcBacklog:0,calcDuration:1.5,calcHours:160,calcCMMS:2,calcFriction:'Medium',calcEvidence:'Adequate',proWrenchTime:35,proOverhead:25,proDurVar:'Medium',proCriticalPct:30,proSlaTarget:95,proBacklogAge:4};
+        for(var k in defs){var e=document.getElementById(k);if(e)e.value=defs[k];}
+        updateMaintCalculator();
+    };
+
+    /* ===== PDF EXPORT ===== */
+    function exportMaintPDF(){
+        var d=window._maintData;if(!d)return;
+        var p=d.params;
+        var grade=d.compliance>=97?'A':d.compliance>=93?'A-':d.compliance>=90?'B+':d.compliance>=85?'B':d.compliance>=80?'B-':d.compliance>=75?'C+':d.compliance>=70?'C':d.compliance>=60?'D':'F';
+        var gradeColor=d.compliance>=90?'#10b981':d.compliance>=80?'#f59e0b':d.compliance>=70?'#f97316':'#ef4444';
+        var riskLevel=d.riskScore<=20?'LOW':d.riskScore<=40?'MODERATE':d.riskScore<=60?'ELEVATED':'HIGH';
+        var riskColor=d.riskScore<=20?'#10b981':d.riskScore<=40?'#f59e0b':d.riskScore<=60?'#f97316':'#ef4444';
+        var mc=monteCarloCompliance(p);
+        var utilRate=Math.min(100,(d.demand/Math.max(1,d.effCap))*100);
+        var margin=d.effCap-d.demand;
+        var clearTime=p.backlog>0&&d.burnRate>0?Math.ceil(p.backlog/d.burnRate):p.backlog>0?999:0;
+        var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+        var cellS='padding:8px 12px;border:1px solid #e2e8f0;font-size:11px;';
+        var hdrS=cellS+'background:#f8fafc;font-weight:600;color:#334155;';
+
+        var actions=[];
+        if(d.compliance<p.slaTarget*100) actions.push({pri:'CRITICAL',text:'Compliance ('+d.compliance.toFixed(1)+'%) is below SLA target ('+Math.round(p.slaTarget*100)+'%). Prioritize capacity and friction reduction.'});
+        if(margin<0) actions.push({pri:'CRITICAL',text:'Capacity deficit of '+Math.abs(Math.round(margin))+' hrs/mo. Add '+Math.max(1,d.reqTechs-p.techs)+' technician(s) or reduce task duration.'});
+        if(p.cmms<=2) actions.push({pri:'HIGH',text:'CMMS maturity is Level '+p.cmms+'. Upgrade to Level 3+ for 10-20% compliance improvement.'});
+        if(p.friction==='High') actions.push({pri:'HIGH',text:'High workflow friction reduces effective capacity by 45%. Implement SOPs, mobile CMMS, parts staging.'});
+        if(p.evidence==='Unclear') actions.push({pri:'MEDIUM',text:'Evidence standards are unclear, causing 15% compliance drag. Define clear, proportionate evidence requirements.'});
+        if(p.backlog>50) actions.push({pri:'MEDIUM',text:'Backlog of '+p.backlog+' tasks creating compounding risk. Schedule dedicated backlog sprints.'});
+        if(utilRate>90) actions.push({pri:'HIGH',text:'Utilization at '+utilRate.toFixed(0)+'% — no buffer for emergencies. Target 75-85% utilization.'});
+        if(actions.length===0) actions.push({pri:'LOW',text:'System is well-optimized. Continue monitoring and maintain current practices.'});
+
+        var priColor={CRITICAL:'#dc2626',HIGH:'#f97316',MEDIUM:'#f59e0b',LOW:'#10b981'};
+
+        var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maintenance Compliance Pro Report</title>';
+        html+='<style>body{font-family:Segoe UI,system-ui,sans-serif;margin:0;padding:0;color:#1e293b;font-size:12px;line-height:1.5;}';
+        html+='.page{max-width:800px;margin:0 auto;padding:40px 50px;}';
+        html+='table{width:100%;border-collapse:collapse;margin:12px 0;}';
+        html+='h2{font-size:14px;color:#0f172a;border-bottom:2px solid #10b981;padding-bottom:6px;margin:24px 0 12px;}';
+        html+='h3{font-size:12px;color:#334155;margin:16px 0 8px;}';
+        html+='@media print{.page{padding:20px 30px;}}</style></head><body><div class="page">';
+
+        // Header
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #10b981;padding-bottom:16px;margin-bottom:24px;">';
+        html+='<div><div style="font-size:20px;font-weight:800;color:#0f172a;">Maintenance Compliance</div><div style="font-size:14px;font-weight:600;color:#10b981;">Pro Assessment Report</div><div style="font-size:11px;color:#64748b;margin-top:4px;">'+today+'</div></div>';
+        html+='<div style="text-align:center;"><div style="width:64px;height:64px;border-radius:50%;background:'+gradeColor+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin:0 auto;">'+grade+'</div><div style="font-size:10px;color:#64748b;margin-top:4px;">Compliance Grade</div></div>';
+        html+='</div>';
+
+        // Executive Summary
+        html+='<h2>Executive Summary</h2>';
+        html+='<div style="background:#f8fafc;padding:16px;border-radius:8px;border-left:4px solid '+riskColor+';margin:12px 0;">';
+        html+='<p style="margin:0;">This facility operates at <strong>'+d.compliance.toFixed(1)+'%</strong> predicted maintenance compliance with <strong>'+p.techs+'</strong> technicians managing <strong>'+p.tasks+'</strong> PM tasks/month. ';
+        html+='Overall risk level is <strong style="color:'+riskColor+';">'+riskLevel+'</strong> (score: '+Math.round(d.riskScore)+'/100). ';
+        if(margin>=0) html+='The facility has a capacity surplus of '+Math.round(margin)+' hrs/mo, providing adequate buffer for corrective maintenance.';
+        else html+='The facility has a capacity <strong style="color:#dc2626;">deficit</strong> of '+Math.abs(Math.round(margin))+' hrs/mo, indicating structural understaffing.';
+        html+=' Monte Carlo simulation (5,000 iterations) yields a 90% confidence band of <strong>'+mc.p5.toFixed(1)+'% - '+mc.p95.toFixed(1)+'%</strong>.</p></div>';
+
+        // Configuration
+        html+='<h2>System Configuration</h2>';
+        html+='<table><tr><td style="'+hdrS+'width:50%;">Parameter</td><td style="'+hdrS+'">Value</td></tr>';
+        html+='<tr><td style="'+cellS+'">PM Tasks / Month</td><td style="'+cellS+'">'+p.tasks+'</td></tr>';
+        html+='<tr><td style="'+cellS+'">Available Technicians</td><td style="'+cellS+'">'+p.techs+'</td></tr>';
+        html+='<tr><td style="'+cellS+'">Current Backlog</td><td style="'+cellS+'">'+p.backlog+' tasks</td></tr>';
+        html+='<tr><td style="'+cellS+'">Avg Task Duration</td><td style="'+cellS+'">'+p.duration+' hrs</td></tr>';
+        html+='<tr><td style="'+cellS+'">Hours / Tech / Month</td><td style="'+cellS+'">'+p.hrsPerMonth+'</td></tr>';
+        html+='<tr><td style="'+cellS+'">CMMS Maturity Level</td><td style="'+cellS+'">Level '+p.cmms+' / 5</td></tr>';
+        html+='<tr><td style="'+cellS+'">Workflow Friction</td><td style="'+cellS+'">'+p.friction+'</td></tr>';
+        html+='<tr><td style="'+cellS+'">Evidence Clarity</td><td style="'+cellS+'">'+p.evidence+'</td></tr>';
+        html+='<tr><td style="'+cellS+'background:#f0fdf4;">Wrench Time</td><td style="'+cellS+'background:#f0fdf4;">'+Math.round(p.wrenchPct*100)+'%</td></tr>';
+        html+='<tr><td style="'+cellS+'background:#f0fdf4;">Travel & Admin Overhead</td><td style="'+cellS+'background:#f0fdf4;">'+Math.round(p.overheadPct*100)+'%</td></tr>';
+        html+='<tr><td style="'+cellS+'background:#f0fdf4;">Task Duration Variability</td><td style="'+cellS+'background:#f0fdf4;">'+p.durVar+'</td></tr>';
+        html+='<tr><td style="'+cellS+'background:#f0fdf4;">Critical Asset PM %</td><td style="'+cellS+'background:#f0fdf4;">'+Math.round(p.criticalPct*100)+'%</td></tr>';
+        html+='<tr><td style="'+cellS+'background:#f0fdf4;">SLA Target</td><td style="'+cellS+'background:#f0fdf4;">'+Math.round(p.slaTarget*100)+'%</td></tr>';
+        html+='</table>';
+
+        // KPI Performance
+        html+='<h2>KPI Performance Summary</h2>';
+        html+='<table><tr><td style="'+hdrS+'">KPI</td><td style="'+hdrS+'">Value</td><td style="'+hdrS+'">Benchmark</td><td style="'+hdrS+'">Status</td></tr>';
+        var kpis=[
+            ['Predicted Compliance',d.compliance.toFixed(1)+'%','>=95%',d.compliance>=95?'PASS':'GAP'],
+            ['Utilization Rate',utilRate.toFixed(1)+'%','75-85%',utilRate>=75&&utilRate<=85?'OPTIMAL':utilRate>85?'HIGH':'LOW'],
+            ['Capacity Margin',(margin>=0?'+':'')+Math.round(margin)+' hrs','> 0',''+((margin>=0)?'PASS':'DEFICIT')],
+            ['Backlog Burn Rate',d.burnRate>0?d.burnRate+' tasks/mo':'Deficit','> 0',d.burnRate>0?'PASS':'DEFICIT'],
+            ['Risk Score',Math.round(d.riskScore)+'/100','< 30',d.riskScore<30?'LOW':d.riskScore<60?'MODERATE':'HIGH'],
+            ['Confidence Band (90%)',mc.p5.toFixed(1)+'% - '+mc.p95.toFixed(1)+'%','Narrow range',mc.p95-mc.p5<15?'NARROW':'WIDE']
+        ];
+        for(var i=0;i<kpis.length;i++){
+            var sc=kpis[i][3]==='PASS'||kpis[i][3]==='OPTIMAL'||kpis[i][3]==='LOW'||kpis[i][3]==='NARROW'?'#10b981':'#ef4444';
+            html+='<tr><td style="'+cellS+'font-weight:600;">'+kpis[i][0]+'</td><td style="'+cellS+'">'+kpis[i][1]+'</td><td style="'+cellS+'color:#64748b;">'+kpis[i][2]+'</td><td style="'+cellS+'color:'+sc+';font-weight:700;">'+kpis[i][3]+'</td></tr>';
+        }
+        html+='</table>';
+
+        // Capacity Analysis
+        html+='<h2>Capacity Analysis</h2>';
+        html+='<p>Raw capacity is <strong>'+Math.round(p.techs*p.hrsPerMonth)+' hrs/mo</strong> ('+p.techs+' technicians x '+p.hrsPerMonth+' hrs/mo). ';
+        html+='After accounting for workflow friction ('+p.friction+': '+Math.round(FF[p.friction]*100)+'% efficiency), wrench time ('+Math.round(p.wrenchPct*100)+'%), and overhead ('+Math.round(p.overheadPct*100)+'%), ';
+        html+='effective capacity is <strong>'+Math.round(d.effCap)+' hrs/mo</strong>. ';
+        html+='Total demand including PM tasks and weighted backlog is <strong>'+Math.round(d.demand)+' hrs/mo</strong>. ';
+        if(margin>=0) html+='This leaves a <strong>surplus of '+Math.round(margin)+' hrs/mo</strong> available for corrective and project work.</p>';
+        else html+='This creates a <strong style="color:#dc2626;">deficit of '+Math.abs(Math.round(margin))+' hrs/mo</strong>, meaning scheduled PM tasks are being deferred.</p>';
+
+        // Backlog Risk
+        html+='<h2>Backlog Risk Assessment</h2>';
+        if(p.backlog===0) html+='<p>No current backlog. Continue proactive scheduling to maintain this status.</p>';
+        else{
+            html+='<p>Current backlog of <strong>'+p.backlog+' tasks</strong> (avg age: '+p.backlogAge+' weeks). ';
+            if(d.burnRate>0) html+='At current surplus capacity, backlog will clear in approximately <strong>'+clearTime+' months</strong>. ';
+            else html+='With current capacity deficit, backlog is <strong style="color:#dc2626;">growing</strong> and will not clear without intervention. ';
+            html+='Backlog compounds compliance risk: aged tasks increase failure probability and may cascade into corrective emergencies.</p>';
+        }
+
+        // Workforce
+        html+='<h2>Workforce Optimization</h2>';
+        html+='<p>To achieve '+Math.round(p.slaTarget*100)+'% compliance target, the model recommends <strong>'+d.reqTechs+' technicians</strong>. ';
+        if(d.reqTechs<=p.techs) html+='Current staffing of '+p.techs+' is sufficient. ';
+        else html+='This represents a gap of <strong>'+(d.reqTechs-p.techs)+' additional technician(s)</strong>. ';
+        html+='Each additional technician adds approximately <strong>+'+((calcComplianceFromParams(Object.assign({},p,{techs:p.techs+1}))-d.compliance)).toFixed(1)+' percentage points</strong> to compliance.</p>';
+
+        // Actions
+        html+='<h2>Prioritized Action Items</h2>';
+        for(var i=0;i<actions.length;i++){
+            html+='<div style="display:flex;gap:10px;align-items:flex-start;margin:8px 0;padding:10px;background:#f8fafc;border-radius:6px;border-left:3px solid '+priColor[actions[i].pri]+';">';
+            html+='<span style="background:'+priColor[actions[i].pri]+';color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;">'+actions[i].pri+'</span>';
+            html+='<span style="font-size:11px;">'+actions[i].text+'</span></div>';
+        }
+
+        // Scenario Deltas
+        html+='<h2>Scenario Sensitivity Analysis</h2>';
+        html+='<table><tr><td style="'+hdrS+'">Scenario</td><td style="'+hdrS+'">Compliance Delta</td></tr>';
+        var scenLabels=['+1 Technician','CMMS +1 Level','Friction to Low','Evidence to Excellent','-20% Task Duration'];
+        var scenMods=[{techs:p.techs+1},{cmms:Math.min(5,p.cmms+1)},{friction:'Low'},{evidence:'Excellent'},{duration:p.duration*0.8}];
+        for(var i=0;i<scenLabels.length;i++){
+            var sc=calcComplianceFromParams(Object.assign({},p,scenMods[i]));
+            var delta=sc-d.compliance;
+            html+='<tr><td style="'+cellS+'">'+scenLabels[i]+'</td><td style="'+cellS+'color:'+(delta>0?'#10b981':'#64748b')+';font-weight:600;">'+(delta>=0?'+':'')+delta.toFixed(1)+' pp</td></tr>';
+        }
+        html+='</table>';
+
+        // Footer
+        html+='<div style="margin-top:30px;padding-top:16px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">';
+        html+='<div style="font-size:10px;color:#94a3b8;">Generated by ResistanceZero Maintenance Pro | '+today+'</div>';
+        html+='<div style="display:flex;gap:4px;">';
+        var barKpis=[{l:'Compliance',v:d.compliance,c:gradeColor},{l:'Risk',v:100-d.riskScore,c:riskColor},{l:'Capacity',v:Math.min(100,margin>0?100:Math.max(0,(d.effCap/Math.max(1,d.demand))*100)),c:margin>=0?'#10b981':'#ef4444'}];
+        for(var i=0;i<barKpis.length;i++){
+            html+='<div style="text-align:center;"><div style="width:50px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;"><div style="width:'+Math.min(100,barKpis[i].v)+'%;height:100%;background:'+barKpis[i].c+';border-radius:3px;"></div></div><div style="font-size:8px;color:#94a3b8;margin-top:2px;">'+barKpis[i].l+'</div></div>';
+        }
+        html+='</div></div>';
+
+        html+='</div></body></html>';
+
+        var w=window.open('','_blank');
+        if(w){w.document.write(html);w.document.close();setTimeout(function(){w.print();},500);}
+    }
+    window.exportMaintPDF=exportMaintPDF;
+
+    /* ===== TOOLTIPS ===== */
+    function initMaintTooltips(){
+        var tc=document.getElementById('maint-tooltip-container');
+        if(!tc) return;
+        document.querySelectorAll('#section-12 .tooltip-trigger').forEach(function(t){
+            t.addEventListener('mouseenter',function(ev){
+                var content=t.querySelector('.tooltip-content');
+                if(!content) return;
+                tc.innerHTML=content.innerHTML;
+                tc.style.display='block';
+                var r=t.getBoundingClientRect();
+                tc.style.top=(r.bottom+window.scrollY+8)+'px';
+                tc.style.left=Math.max(10,Math.min(window.innerWidth-340,r.left))+'px';
+            });
+            t.addEventListener('mouseleave',function(){tc.style.display='none';});
+        });
+    }
+
+    /* ===== INIT ===== */
+    // Event listeners
+    ['calcTasks','calcTechs','calcBacklog','calcDuration','calcHours'].forEach(function(id){
+        var e=document.getElementById(id);if(e)e.addEventListener('input',updateMaintCalculator);
+    });
+    ['calcCMMS','calcFriction','calcEvidence'].forEach(function(id){
+        var e=document.getElementById(id);if(e)e.addEventListener('change',updateMaintCalculator);
+    });
+    ['proWrenchTime','proOverhead','proCriticalPct','proSlaTarget','proBacklogAge'].forEach(function(id){
+        var e=document.getElementById(id);if(e)e.addEventListener('input',updateMaintCalculator);
+    });
+    var dvEl=document.getElementById('proDurVar');if(dvEl)dvEl.addEventListener('change',updateMaintCalculator);
+
+    // Session restore
+    try{
+        var sess=JSON.parse(localStorage.getItem('rz_premium_session'));
+        if(sess&&sess.email&&(Date.now()-sess.ts<30*86400000)){
+            maintIsPremium=true;maintMode='pro';
+            document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='pro');});
+            var pp=document.getElementById('maintProPanels');if(pp)pp.style.display='block';
+            var pi=document.getElementById('maintProInputs');if(pi)pi.style.display='block';
+            applyMaintGating();
+            maintUpdateNavAuth(sess.name);
+        }
+    }catch(ex){}
+
+    initMaintTooltips();
+    updateMaintCalculator();
+    })();
     </script>
 
     <!-- Interactive Compliance Dashboard -->
