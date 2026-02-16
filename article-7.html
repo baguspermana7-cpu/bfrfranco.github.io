@@ -915,6 +915,24 @@
         .author-role { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; }
         .author-bio-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
 
+        /* Article Navigation */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-emerald);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .article-nav a:hover { color: var(--accent-emerald-dark); }
+
         /* Print CSS */
         /* TOC Calculator Highlight */
         .toc-item.toc-calculator {
@@ -2317,6 +2335,17 @@
                     </ol>
                 </div>
 
+                <!-- Newsletter Signup -->
+                <div class="newsletter-signup">
+                    <h3>Stay Updated</h3>
+                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
+                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
+                </div>
+
                 <!-- Author Section -->
                 <div class="author-section">
                     <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="author-avatar">
@@ -2327,15 +2356,36 @@
                     </div>
                 </div>
 
+                <!-- Related Articles -->
+                <div class="related-articles">
+                    <h3>Continue Reading</h3>
+                    <div class="related-grid">
+                        <a href="article-6.html" class="related-card">
+                            <div class="related-card-number">06</div>
+                            <div class="related-card-content">
+                                <h4>Why Post-Incident RCA Fails Without Design Authority</h4>
+                                <p>Root cause analysis in critical infrastructure</p>
+                            </div>
+                        </a>
+                        <a href="article-8.html" class="related-card">
+                            <div class="related-card-number">08</div>
+                            <div class="related-card-content">
+                                <h4>Why "No Incident" Is Not Evidence of Safety</h4>
+                                <p>Safety culture beyond incident metrics</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Article Navigation -->
-                <div style="display:flex;justify-content:space-between;padding:2rem 0;border-top:1px solid #e2e8f0;margin-top:3rem;">
-                    <a href="article-6.html" style="display:flex;align-items:center;gap:0.5rem;color:var(--accent-emerald);font-weight:600;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <div class="article-nav">
+                    <a href="article-6.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         Previous Article
                     </a>
-                    <a href="article-8.html" style="display:flex;align-items:center;gap:0.5rem;color:var(--accent-emerald);font-weight:600;">
+                    <a href="article-8.html">
                         Next Article
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                 </div>
 
@@ -3572,6 +3622,9 @@
     })();
     </script>
 
+<script>
+function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
+</script>
 <script src="auth.js"></script>
 </body>
 </html>

@@ -2187,12 +2187,44 @@
                     </ol>
                 </div>
 
+                <!-- Newsletter Signup -->
+                <div class="newsletter-signup">
+                    <h3>Stay Updated</h3>
+                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
+                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
+                </div>
+
                 <!-- Author Bio -->
                 <div class="author-bio">
                     <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
                     <div>
                         <h4>Bagus Dwi Permana</h4>
                         <p>Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik (Indonesian Electrical Safety Expert) and CDFOM. This paper presents a practical framework for building in-house capability derived from operational experience managing mission-critical data center facilities.</p>
+                    </div>
+                </div>
+
+                <!-- Related Articles -->
+                <div class="related-articles">
+                    <h3>Continue Reading</h3>
+                    <div class="related-grid">
+                        <a href="article-3.html" class="related-card">
+                            <div class="related-card-number">03</div>
+                            <div class="related-card-content">
+                                <h4>Maintenance Compliance Is Not a Technician Problem</h4>
+                                <p>Systemic approach to maintenance excellence</p>
+                            </div>
+                        </a>
+                        <a href="article-5.html" class="related-card">
+                            <div class="related-card-number">05</div>
+                            <div class="related-card-content">
+                                <h4>Technical Debt in Live Data Centers Is Operational Risk</h4>
+                                <p>Managing accumulated technical compromises</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
 
@@ -3003,6 +3035,9 @@
         calculate();
     })();
     </script>
+<script>
+function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
+</script>
 <script src="auth.js"></script>
 </body>
 </html>

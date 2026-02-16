@@ -1107,6 +1107,22 @@
             footer { display: none !important; }
         }
 
+        /* ═══ DARK MODE ENHANCEMENTS ═══ */
+        [data-theme="dark"] .article-content { background: #0f172a; }
+        [data-theme="dark"] .article-body { background: #0f172a; color: #e2e8f0; }
+        [data-theme="dark"] .article-body h2 { color: #f1f5f9; }
+        [data-theme="dark"] .article-body h3 { color: #e2e8f0; }
+        [data-theme="dark"] .article-body p { color: #cbd5e1; }
+        [data-theme="dark"] .article-body blockquote { background: rgba(30,58,95,0.3); border-color: rgba(96,165,250,0.4); color: #cbd5e1; }
+        [data-theme="dark"] .article-body .info-box,
+        [data-theme="dark"] .article-body .key-insight { background: rgba(15,23,42,0.8); border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
+        [data-theme="dark"] .article-body table th { background: #0f172a; color: #e2e8f0; }
+        [data-theme="dark"] .article-body table td { color: #cbd5e1; border-color: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .article-body ul li,
+        [data-theme="dark"] .article-body ol li { color: #cbd5e1; }
+        [data-theme="dark"] .article-body a { color: #60a5fa; }
+        [data-theme="dark"] .article-body strong { color: #f1f5f9; }
+
         /* Responsive */
         @media (max-width: 900px) {
             .calc-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2268,6 +2284,17 @@
                     </ol>
                 </div>
 
+                <!-- Newsletter Signup -->
+                <div class="newsletter-signup">
+                    <h3>Stay Updated</h3>
+                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
+                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
+                </div>
+
                 <!-- Author Bio -->
                 <div class="author-bio">
                     <div style="flex-shrink: 0;">
@@ -2277,6 +2304,27 @@
                         <h4>Bagus Dwi Permana</h4>
                         <p style="color: var(--accent-cyan); font-weight: 600; margin-bottom: 0.5rem;">Engineering Operations Manager | Ahli K3 Listrik | CDFOM</p>
                         <p>12+ years professional experience in critical infrastructure and operations. This paper synthesizes insights from safety science, resilience engineering, and operational experience to propose a structural solution to the persistent problem of RCA ineffectiveness in data center environments.</p>
+                    </div>
+                </div>
+
+                <!-- Related Articles -->
+                <div class="related-articles">
+                    <h3>Continue Reading</h3>
+                    <div class="related-grid">
+                        <a href="article-5.html" class="related-card">
+                            <div class="related-card-number">05</div>
+                            <div class="related-card-content">
+                                <h4>Technical Debt in Live Data Centers Is Operational Risk</h4>
+                                <p>Managing accumulated technical compromises</p>
+                            </div>
+                        </a>
+                        <a href="article-7.html" class="related-card">
+                            <div class="related-card-number">07</div>
+                            <div class="related-card-content">
+                                <h4>From Reliability to Resilience: Why Tier Ratings Stop at Design</h4>
+                                <p>Beyond design ratings to operational resilience</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
 
@@ -2651,6 +2699,9 @@
         });
     })();
     </script>
+<script>
+function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">✓ Subscribed successfully!</p>';return false}
+</script>
 <script src="auth.js"></script>
 
 <!-- RCA Pro Mode JS -->
