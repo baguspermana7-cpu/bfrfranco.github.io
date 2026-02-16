@@ -266,6 +266,11 @@
                 <i class="fas fa-toggle-on"></i> Feature Flags
             </a>
 
+            <a class="nav-item" data-section="subscribers" onclick="showSection('subscribers')">
+                <i class="fas fa-envelope-open-text"></i> Subscribers
+                <span class="badge green" id="navSubCount">0</span>
+            </a>
+
             <div class="nav-group-label" style="margin-top:0.75rem">Intelligence</div>
             <a class="nav-item" data-section="benchmarks" onclick="showSection('benchmarks')">
                 <i class="fas fa-landmark"></i> DC Benchmarks
@@ -462,6 +467,35 @@
     </div>
 </div>
 
+<!-- ══════════════════════════════════════ SUBSCRIBERS ══════════════════════════════════════ -->
+<div class="section" id="sec-subscribers">
+    <div class="section-header">
+        <h1>Newsletter Subscribers</h1>
+        <p>Manage email subscribers from article newsletter forms</p>
+    </div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+            <div class="card-title" style="margin:0"><i class="fas fa-envelope-open-text" style="color:#34d399"></i> Subscriber List</div>
+            <div class="tbl-controls" style="margin:0;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                <input type="text" id="subSearch" placeholder="Search email..." oninput="renderSubscribers()" style="padding:0.4rem 0.75rem;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e2e8f0;font-size:0.8rem;width:180px;">
+                <select class="tbl-select" id="subSourceFilter" onchange="renderSubscribers()"><option value="all">All Sources</option></select>
+                <select class="tbl-select" id="subStatusFilter" onchange="renderSubscribers()"><option value="all">All Status</option><option value="active">Active</option><option value="unsubscribed">Unsubscribed</option></select>
+                <button class="btn btn-green btn-sm" onclick="exportSubscribersCSV()"><i class="fas fa-download"></i> Export CSV</button>
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="tbl" id="subscribersTable">
+                <thead><tr><th>Email</th><th>Date Subscribed</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="subTableBody"></tbody>
+            </table>
+        </div>
+        <div id="subEmpty" style="display:none;text-align:center;padding:3rem;color:#64748b;">
+            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block;opacity:0.5"></i>
+            No subscribers yet. Newsletter signups from articles will appear here.
+        </div>
+    </div>
+</div>
+
 <!-- ══════════════════════════════════════ SETTINGS ══════════════════════════════════════ -->
 <div class="section" id="sec-settings">
     <div class="section-header">
@@ -608,7 +642,7 @@ function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     document.getElementById('sec-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
-    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',benchmarks:'DC Benchmarks',audit:'Audit Log',settings:'System Settings'};
+    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Benchmarks',audit:'Audit Log',settings:'System Settings'};
     document.getElementById('topbarTitle').textContent=titles[id]||id;
     if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
 }
@@ -1171,6 +1205,66 @@ function renderSettings(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// NEWSLETTER SUBSCRIBERS
+// ═══════════════════════════════════════════════════════════════
+function getSubscribers(){return JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]')}
+function renderSubscribers(){
+    var subs=getSubscribers();
+    var search=(document.getElementById('subSearch').value||'').toLowerCase();
+    var srcFilter=document.getElementById('subSourceFilter').value;
+    var statusFilter=document.getElementById('subStatusFilter').value;
+    // Populate source filter options
+    var sources=[...new Set(subs.map(s=>s.source))].sort();
+    var srcSel=document.getElementById('subSourceFilter');
+    var curVal=srcSel.value;
+    srcSel.innerHTML='<option value="all">All Sources</option>'+sources.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
+    srcSel.value=curVal;
+    // Filter
+    var filtered=subs.filter(function(s){
+        if(search&&s.email.toLowerCase().indexOf(search)<0)return false;
+        if(srcFilter!=='all'&&s.source!==srcFilter)return false;
+        if(statusFilter!=='all'&&s.status!==statusFilter)return false;
+        return true;
+    });
+    // Update nav badge
+    document.getElementById('navSubCount').textContent=subs.length;
+    // Render
+    var tbody=document.getElementById('subTableBody');
+    if(filtered.length===0){
+        tbody.innerHTML='';
+        document.getElementById('subEmpty').style.display='block';
+        return;
+    }
+    document.getElementById('subEmpty').style.display='none';
+    tbody.innerHTML=filtered.map(function(s,i){
+        var d=new Date(s.date);
+        var dateStr=d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        var statusClass=s.status==='active'?'green':'amber';
+        return '<tr><td style="font-weight:500">'+s.email+'</td><td style="font-size:0.78rem;color:#94a3b8">'+dateStr+'</td><td><span class="badge '+statusClass+'" style="font-size:0.7rem">'+s.source+'</span></td><td><span style="color:'+(s.status==='active'?'#34d399':'#fbbf24')+'">'+s.status+'</span></td><td><button class="btn btn-ghost btn-sm" onclick="toggleSubStatus('+i+')" title="Toggle status"><i class="fas fa-exchange-alt"></i></button> <button class="btn btn-red btn-sm" onclick="removeSub('+i+')" title="Remove"><i class="fas fa-trash"></i></button></td></tr>';
+    }).join('');
+}
+function toggleSubStatus(idx){
+    var subs=getSubscribers();
+    if(subs[idx])subs[idx].status=subs[idx].status==='active'?'unsubscribed':'active';
+    localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));
+    renderSubscribers();
+}
+function removeSub(idx){
+    if(!confirm('Remove this subscriber?'))return;
+    var subs=getSubscribers();
+    subs.splice(idx,1);
+    localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));
+    renderSubscribers();
+}
+function exportSubscribersCSV(){
+    var subs=getSubscribers();
+    if(!subs.length){alert('No subscribers to export');return}
+    var h='Email,Date Subscribed,Source,Status';
+    var rows=subs.map(function(s){return [s.email,s.date,s.source,s.status].join(',')});
+    downloadCSV([h].concat(rows).join('\n'),'rz_subscribers_'+fmtDate(new Date())+'.csv');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 if(checkAccess()){
@@ -1189,6 +1283,7 @@ if(checkAccess()){
     renderFeatures();
     renderBenchmarks();
     renderAudit();
+    renderSubscribers();
     renderSettings();
 }
 </script>
