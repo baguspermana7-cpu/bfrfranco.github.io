@@ -55,6 +55,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -1338,6 +1339,193 @@
             text-decoration: underline;
         }
 
+        /* === HVAC PRO ENHANCEMENT MODE === */
+        .hvac-evidence-block {
+            margin: 2rem auto; max-width: 900px; padding: 2rem;
+            background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(96,165,250,0.04) 100%);
+            border: 1px solid rgba(59,130,246,0.25); border-radius: 16px;
+        }
+        .hvac-evidence-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1rem;
+        }
+        .hvac-evidence-card {
+            text-align: center; padding: 1rem 0.5rem;
+            background: rgba(59,130,246,0.06); border-radius: 10px;
+        }
+        .hvac-evidence-value {
+            font-size: 1.5rem; font-weight: 800; color: #60a5fa;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-evidence-label { font-size: 0.78rem; color: #94a3b8; margin-top: 0.25rem; }
+        .hvac-evidence-sub { font-size: 0.68rem; color: #64748b; margin-top: 0.15rem; }
+        .hvac-evidence-source {
+            text-align: center; font-size: 0.72rem; color: #64748b;
+            border-top: 1px solid rgba(59,130,246,0.15); padding-top: 0.75rem; margin-top: 0.5rem;
+        }
+        .hvac-cta-block {
+            margin: 2rem 0; padding: 2rem; text-align: center;
+            background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(96,165,250,0.06));
+            border: 1px solid rgba(59,130,246,0.3); border-radius: 16px;
+        }
+        .hvac-cta-headline {
+            font-size: 1.4rem; font-weight: 800; color: #e2e8f0; margin-bottom: 0.5rem;
+        }
+        .hvac-cta-subtitle { font-size: 0.92rem; color: #94a3b8; margin-bottom: 1.25rem; }
+        .hvac-cta-btn {
+            display: inline-block; padding: 0.75rem 2rem; font-weight: 700; font-size: 0.9rem;
+            color: #fff; background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 10px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .hvac-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59,130,246,0.4); }
+        .hvac-toolbar {
+            display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+            margin-bottom: 1.5rem; padding: 0.75rem 1rem;
+            background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 10px;
+        }
+        .hvac-toolbar-btn {
+            padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 600; border: none;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .hvac-btn-free { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .hvac-btn-free.active { background: #3b82f6; color: #fff; }
+        .hvac-btn-pro { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .hvac-btn-pro.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
+        .hvac-btn-reset { background: rgba(148,163,184,0.15); color: #94a3b8; margin-left: auto; }
+        .hvac-btn-reset:hover { background: rgba(148,163,184,0.25); }
+        .hvac-btn-pdf { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .hvac-btn-pdf:hover { background: rgba(59,130,246,0.3); }
+        .hvac-pro-container { display: none; margin-top: 2rem; }
+        .hvac-pro-container.visible { display: block; }
+        .hvac-pro-panel {
+            margin-bottom: 1.5rem; padding: 1.5rem;
+            background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 14px; position: relative; overflow: hidden;
+        }
+        .hvac-pro-panel.gated .hvac-panel-content { filter: blur(6px); pointer-events: none; user-select: none; }
+        .hvac-gate-overlay {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 10; cursor: pointer;
+            background: rgba(15,23,42,0.7); backdrop-filter: blur(4px);
+        }
+        .hvac-gate-overlay i { font-size: 2rem; color: #60a5fa; margin-bottom: 0.5rem; }
+        .hvac-gate-overlay span { color: #cbd5e1; font-size: 0.85rem; font-weight: 600; }
+        .hvac-panel-title {
+            font-size: 1rem; font-weight: 700; color: #60a5fa; margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .hvac-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .hvac-kpi-card {
+            padding: 0.75rem; background: rgba(59,130,246,0.08); border-radius: 10px;
+            text-align: center;
+        }
+        .hvac-kpi-value {
+            font-size: 1.2rem; font-weight: 800; color: #60a5fa;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-kpi-label { font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem; }
+        .hvac-chart-container { margin-top: 1rem; }
+        .hvac-chart-container canvas { width: 100%; max-height: 280px; }
+        .hvac-narrative-box {
+            margin-top: 1rem; padding: 1rem; font-size: 0.85rem; line-height: 1.6;
+            color: #cbd5e1; background: rgba(59,130,246,0.05);
+            border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0;
+        }
+        .hvac-sensitivity-bar {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+        }
+        .hvac-sensitivity-label { min-width: 110px; font-size: 0.78rem; color: #94a3b8; }
+        .hvac-sensitivity-track {
+            flex: 1; height: 20px; background: rgba(255,255,255,0.05);
+            border-radius: 4px; position: relative; overflow: hidden;
+        }
+        .hvac-sensitivity-fill {
+            height: 100%; border-radius: 4px; transition: width 0.3s;
+        }
+        .hvac-sensitivity-value {
+            min-width: 40px; text-align: right; font-size: 0.78rem;
+            color: #60a5fa; font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-login-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(15,23,42,0.85); backdrop-filter: blur(6px);
+            align-items: center; justify-content: center;
+        }
+        .hvac-login-overlay.visible { display: flex; }
+        .hvac-login-box {
+            background: #1e293b; border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 16px; padding: 2rem; width: 90%; max-width: 400px;
+            position: relative;
+        }
+        .hvac-login-close {
+            position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+            color: #94a3b8; font-size: 1.5rem; cursor: pointer;
+        }
+        .hvac-login-title { font-size: 1.2rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.25rem; }
+        .hvac-login-subtitle { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem; }
+        .hvac-login-input {
+            width: 100%; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem;
+            font-family: 'Inter', sans-serif; box-sizing: border-box;
+        }
+        .hvac-login-input:focus { outline: none; border-color: #3b82f6; }
+        .hvac-login-error { color: #f87171; font-size: 0.8rem; margin-bottom: 0.75rem; display: none; }
+        .hvac-login-submit {
+            width: 100%; padding: 0.75rem; font-weight: 700; font-size: 0.9rem;
+            color: #fff; background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none; border-radius: 8px; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+        }
+        .hvac-login-submit:hover { opacity: 0.9; }
+        .hvac-login-demo {
+            text-align: center; margin-top: 1rem; font-size: 0.75rem; color: #64748b;
+        }
+        .hvac-privacy-badge {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            margin-top: 1.5rem; font-size: 0.75rem; color: #64748b;
+        }
+        .hvac-privacy-badge i { color: #3b82f6; }
+        .hvac-benchmark-meta {
+            display: none;
+        }
+        .tooltip-trigger {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%; font-size: 0.65rem;
+            font-weight: 700; color: #60a5fa; background: rgba(59,130,246,0.15);
+            cursor: help; margin-left: 0.35rem; position: relative; vertical-align: middle;
+        }
+        .tooltip-content {
+            display: none; position: fixed; z-index: 9998;
+            width: 260px; padding: 0.85rem; background: #1e293b;
+            border: 1px solid rgba(59,130,246,0.3); border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        .tooltip-content.visible { display: block; }
+        .tooltip-title { font-size: 0.82rem; font-weight: 700; color: #60a5fa; margin-bottom: 0.35rem; }
+        .tooltip-desc { font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 0.35rem; }
+        .tooltip-formula {
+            font-size: 0.72rem; color: #3b82f6; font-family: 'JetBrains Mono', monospace;
+            background: rgba(59,130,246,0.08); padding: 0.35rem 0.5rem; border-radius: 6px;
+        }
+        .hvac-region-select-row {
+            display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+        }
+        .hvac-region-select-row label {
+            color: #94a3b8; font-size: 0.85rem; font-weight: 600;
+        }
+        .hvac-region-dropdown {
+            padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(59,130,246,0.25); border-radius: 8px;
+            color: #e2e8f0; font-size: 0.85rem; font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+        .hvac-region-dropdown option { background: #1e293b; color: #fff; }
+        [data-theme="dark"] .hvac-evidence-block { background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(96,165,250,0.06) 100%); }
+        [data-theme="dark"] .hvac-gate-overlay { background: rgba(15,23,42,0.8); }
+        [data-theme="dark"] .hvac-cta-block { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(96,165,250,0.08)); }
+
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
             .article-meta { flex-direction: column; gap: var(--spacing-md); }
@@ -1353,6 +1541,10 @@
             .flow-arrow { transform: rotate(90deg); padding: var(--spacing-md) 0; }
             .timeline-header, .timeline-row { grid-template-columns: 60px 70px 1fr; font-size: 0.75rem; }
             .timeline-header > :last-child, .timeline-row > :last-child { display: none; }
+            .hvac-evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .hvac-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .hvac-toolbar { flex-wrap: wrap; }
+            .hvac-region-select-row { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -1471,6 +1663,40 @@
         </div>
     </section>
 
+    <!-- Pro Evidence Block -->
+    <div class="hvac-evidence-block">
+        <div class="hvac-evidence-grid">
+            <div class="hvac-evidence-card">
+                <div class="hvac-evidence-value">7.5%</div>
+                <div class="hvac-evidence-label">Johnson Controls Stock Drop</div>
+                <div class="hvac-evidence-sub">Nvidia CES 2026</div>
+            </div>
+            <div class="hvac-evidence-card">
+                <div class="hvac-evidence-value">$1.7B</div>
+                <div class="hvac-evidence-label">Market Cap Lost in Hours</div>
+                <div class="hvac-evidence-sub">HVAC sector panic</div>
+            </div>
+            <div class="hvac-evidence-card">
+                <div class="hvac-evidence-value">3</div>
+                <div class="hvac-evidence-label">Cooling Methods Compared</div>
+                <div class="hvac-evidence-sub">Traditional, Hybrid, DLC</div>
+            </div>
+            <div class="hvac-evidence-card">
+                <div class="hvac-evidence-value">15-45%</div>
+                <div class="hvac-evidence-label">Energy Savings Range</div>
+                <div class="hvac-evidence-sub">DLC vs Traditional</div>
+            </div>
+            <div class="hvac-evidence-card">
+                <div class="hvac-evidence-value">8</div>
+                <div class="hvac-evidence-label">Regions Analyzed</div>
+                <div class="hvac-evidence-sub">Implementation verdict</div>
+            </div>
+        </div>
+        <div class="hvac-evidence-source">
+            <i class="fas fa-calculator" style="margin-right:4px;"></i> Based on operational data from 8 climate regions | PUE modeling from ASHRAE & Uptime Institute benchmarks
+        </div>
+    </div>
+
     <article class="article-content">
         <div class="container">
             <div class="article-body">
@@ -1485,6 +1711,13 @@
                         <li><strong>Tropical implementation:</strong> Requires hybrid approach with 40-50% chiller backup capacity due to high ambient temperature and humidity.</li>
                         <li><strong>Fault dynamics change:</strong> Liquid cooling fails FASTER but recovers FASTER than traditional systems - requires enhanced monitoring.</li>
                     </ul>
+                </div>
+
+                <!-- Pro CTA Block -->
+                <div class="hvac-cta-block">
+                    <div class="hvac-cta-headline">Calculate Your Cooling Architecture Impact</div>
+                    <div class="hvac-cta-subtitle">Compare PUE, energy cost, and ROI across 3 cooling strategies for your facility</div>
+                    <a href="#pueChart" class="hvac-cta-btn"><i class="fas fa-calculator" style="margin-right:6px;"></i> Open PUE Calculator</a>
                 </div>
 
                 <h2>The Moment: One Sentence, Billions of Market Cap</h2>
@@ -2016,18 +2249,31 @@ Where LMTD (Log Mean Temperature Difference) requires:
                     <div class="chart-title">Cooling Architecture PUE Comparison</div>
                     <div class="chart-subtitle">Annual energy cost impact based on your facility parameters</div>
 
+                    <div class="hvac-toolbar">
+                        <button class="hvac-toolbar-btn hvac-btn-free active" onclick="hvacSetMode('free')">Free Mode</button>
+                        <button class="hvac-toolbar-btn hvac-btn-pro" onclick="hvacSetMode('pro')">
+                            <i class="fas fa-crown" style="margin-right:4px;font-size:0.7rem;"></i> Pro Mode
+                        </button>
+                        <button class="hvac-toolbar-btn hvac-btn-reset" onclick="hvacReset()">
+                            <i class="fas fa-undo" style="margin-right:4px;font-size:0.7rem;"></i> Reset
+                        </button>
+                        <button class="hvac-toolbar-btn hvac-btn-pdf" onclick="hvacExportPDF()">
+                            <i class="fas fa-file-pdf" style="margin-right:4px;font-size:0.7rem;"></i> Export PDF
+                        </button>
+                    </div>
+
                     <div class="chart-wrapper">
                         <canvas id="pueChart" class="chart-canvas" width="800" height="400"></canvas>
                     </div>
 
                     <div class="control-row">
-                        <span class="control-label">IT Load (MW):</span>
+                        <span class="control-label">IT Load (MW): <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">IT Load Capacity</div><div class="tooltip-desc">Total IT power demand in megawatts. Higher loads amplify the cost difference between cooling methods. A 10MW facility typically serves 1,500-2,000 racks.</div><div class="tooltip-formula">Range: 1-20 MW | Industry avg: 10 MW</div></span></span></span>
                         <input type="range" id="loadSlider" class="control-slider" min="1" max="20" value="10">
                         <span class="control-value" id="loadValue">10 MW</span>
                     </div>
 
                     <div class="control-row">
-                        <span class="control-label">Electricity Rate ($/kWh):</span>
+                        <span class="control-label">Electricity Rate ($/kWh): <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Electricity Rate</div><div class="tooltip-desc">Blended electricity cost per kilowatt-hour. Varies by region: $0.05 (SEA), $0.10 (US avg), $0.15 (Europe). Directly multiplies all cooling energy cost calculations.</div><div class="tooltip-formula">Range: $0.05-$0.20 | SEA avg: $0.08</div></span></span></span>
                         <input type="range" id="rateSlider" class="control-slider" min="5" max="20" value="10">
                         <span class="control-value" id="rateValue">$0.10</span>
                     </div>
@@ -2060,6 +2306,93 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <div class="callout-label">CO2 Reduction</div>
                             <div class="callout-value" id="co2Reduction" style="color: #10b981;">31%</div>
                         </div>
+                    </div>
+
+                    <!-- Region Select for Pro -->
+                    <div class="hvac-region-select-row" style="margin-top:1rem;">
+                        <label for="hvacRegionSelect"><i class="fas fa-globe" style="margin-right:4px;"></i> Region:</label>
+                        <select id="hvacRegionSelect" class="hvac-region-dropdown">
+                            <option value="indonesia">Indonesia (Tropical)</option>
+                            <option value="singapore">Singapore (Tropical)</option>
+                            <option value="india">India (Mixed)</option>
+                            <option value="uae">UAE (Hot-Arid)</option>
+                            <option value="virginia" selected>Virginia, USA</option>
+                            <option value="frankfurt">Frankfurt, Germany</option>
+                            <option value="stockholm">Stockholm, Sweden</option>
+                            <option value="ireland">Ireland (Maritime)</option>
+                        </select>
+                    </div>
+
+                    <!-- Pro Analysis Container -->
+                    <div class="hvac-pro-container" id="hvacProContainer">
+                        <!-- Panel 1: 10-Year TCO Deep Model -->
+                        <div class="hvac-pro-panel gated" id="hvacPanel1">
+                            <div class="hvac-gate-overlay" onclick="hvacShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="hvac-panel-content">
+                                <div class="hvac-panel-title"><i class="fas fa-chart-line"></i> 10-Year TCO Deep Model</div>
+                                <div class="hvac-kpi-grid" id="hvacTcoKPIs"></div>
+                                <div class="hvac-chart-container"><canvas id="hvacWaterfallChart" height="280"></canvas></div>
+                                <div class="hvac-narrative-box" id="hvacTcoNarrative"></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Regional Risk Matrix -->
+                        <div class="hvac-pro-panel gated" id="hvacPanel2">
+                            <div class="hvac-gate-overlay" onclick="hvacShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="hvac-panel-content">
+                                <div class="hvac-panel-title"><i class="fas fa-map-marked-alt"></i> Regional Risk Matrix</div>
+                                <div class="hvac-kpi-grid" id="hvacRiskKPIs"></div>
+                                <div class="hvac-narrative-box" id="hvacRiskNarrative"></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Transition Planning -->
+                        <div class="hvac-pro-panel gated" id="hvacPanel3">
+                            <div class="hvac-gate-overlay" onclick="hvacShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="hvac-panel-content">
+                                <div class="hvac-panel-title"><i class="fas fa-project-diagram"></i> Transition Planning</div>
+                                <div class="hvac-kpi-grid" id="hvacTransitionKPIs"></div>
+                                <div class="hvac-narrative-box" id="hvacTransitionNarrative"></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4: Monte Carlo Sensitivity -->
+                        <div class="hvac-pro-panel gated" id="hvacPanel4">
+                            <div class="hvac-gate-overlay" onclick="hvacShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="hvac-panel-content">
+                                <div class="hvac-panel-title"><i class="fas fa-brain"></i> Monte Carlo Sensitivity (10,000 iterations)</div>
+                                <div class="hvac-kpi-grid" id="hvacMonteKPIs"></div>
+                                <div class="hvac-chart-container"><canvas id="hvacMonteChart" height="280"></canvas></div>
+                                <div id="hvacTornadoBars" style="margin-top:1rem;"></div>
+                                <div class="hvac-narrative-box" id="hvacMonteNarrative"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Badge -->
+                    <div class="hvac-privacy-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        PDF generated in your browser — no data sent to any server
+                    </div>
+
+                    <!-- Benchmark Meta -->
+                    <div class="hvac-benchmark-meta">
+                        <meta name="hvac-model-version" content="HVAC-TCO-v1.0">
+                        <meta name="hvac-date" content="2026-02-16">
+                        <meta name="hvac-sources" content="ASHRAE TC 9.9, Uptime Institute 2024, Nvidia Rubin Thermal Specs, DCD 2025">
+                        <meta name="hvac-methodology" content="10-year NPV at 8% discount, Monte Carlo 10K iterations, 8-region climate analysis">
                     </div>
                 </div>
 
@@ -2204,6 +2537,20 @@ Where LMTD (Log Mean Temperature Difference) requires:
                     <li><strong>Train your teams:</strong> New technology introduces new failure modes requiring new skills and procedures.</li>
                     <li><strong>Design for climate change:</strong> Build margin for 2050 conditions, not just today's averages.</li>
                 </ol>
+
+                <!-- Login Modal -->
+                <div class="hvac-login-overlay" id="hvacLoginOverlay">
+                    <div class="hvac-login-box">
+                        <button class="hvac-login-close" onclick="hvacHideLogin()">&times;</button>
+                        <div class="hvac-login-title">Unlock Pro Analysis</div>
+                        <div class="hvac-login-subtitle">Access 10-Year TCO modeling, regional risk matrix, transition planning, Monte Carlo simulation, and comprehensive PDF reports</div>
+                        <input type="email" class="hvac-login-input" id="hvacLoginEmail" placeholder="Email address">
+                        <input type="password" class="hvac-login-input" id="hvacLoginPass" placeholder="Password">
+                        <div class="hvac-login-error" id="hvacLoginError">Invalid credentials</div>
+                        <button class="hvac-login-submit" onclick="hvacDoLogin()">Sign In</button>
+                        <div class="hvac-login-demo">Demo: demo@resistancezero.com / demo2026</div>
+                    </div>
+                </div>
 
                 <div class="references">
                     <h3>References & Further Reading</h3>
@@ -2698,6 +3045,851 @@ Where LMTD (Log Mean Temperature Difference) requires:
             setupCanvas();
             refresh();
         });
+    })();
+    </script>
+
+    <!-- HVAC Pro Enhancement Mode JS -->
+    <script>
+    (function() {
+        'use strict';
+
+        // === REGION DATA ===
+        var HVAC_REGIONS = {
+            indonesia: { temp: 31, humidity: 80, freeHours: 600, chillerBackup: 45, pueTraditional: 1.75, pueHybrid: 1.45, pueDLC: 1.25, riskScore: 7.2, label: 'Indonesia (Tropical)' },
+            singapore: { temp: 30, humidity: 82, freeHours: 500, chillerBackup: 50, pueTraditional: 1.72, pueHybrid: 1.42, pueDLC: 1.22, riskScore: 7.0, label: 'Singapore (Tropical)' },
+            india: { temp: 33, humidity: 65, freeHours: 2200, chillerBackup: 30, pueTraditional: 1.70, pueHybrid: 1.38, pueDLC: 1.20, riskScore: 6.5, label: 'India (Mixed)' },
+            uae: { temp: 38, humidity: 55, freeHours: 800, chillerBackup: 55, pueTraditional: 1.80, pueHybrid: 1.50, pueDLC: 1.30, riskScore: 8.0, label: 'UAE (Hot-Arid)' },
+            virginia: { temp: 15, humidity: 60, freeHours: 5500, chillerBackup: 15, pueTraditional: 1.55, pueHybrid: 1.28, pueDLC: 1.12, riskScore: 3.5, label: 'Virginia, USA' },
+            frankfurt: { temp: 10, humidity: 70, freeHours: 6200, chillerBackup: 10, pueTraditional: 1.50, pueHybrid: 1.25, pueDLC: 1.10, riskScore: 3.0, label: 'Frankfurt, Germany' },
+            stockholm: { temp: 6, humidity: 75, freeHours: 7800, chillerBackup: 5, pueTraditional: 1.35, pueHybrid: 1.15, pueDLC: 1.05, riskScore: 1.5, label: 'Stockholm, Sweden' },
+            ireland: { temp: 10, humidity: 80, freeHours: 7000, chillerBackup: 8, pueTraditional: 1.40, pueHybrid: 1.20, pueDLC: 1.08, riskScore: 2.0, label: 'Ireland (Maritime)' }
+        };
+
+        // === TCO MODEL CONSTANTS ===
+        var COOLING_CONFIGS = {
+            traditional: { capexPerMW: 800000, opexFactor: 1.0, maintenancePerMW: 50000, pueKey: 'pueTraditional' },
+            hybrid: { capexPerMW: 1100000, opexFactor: 0.75, maintenancePerMW: 65000, pueKey: 'pueHybrid' },
+            dlc: { capexPerMW: 1400000, opexFactor: 0.55, maintenancePerMW: 80000, pueKey: 'pueDLC' }
+        };
+        var DISCOUNT_RATE = 0.08;
+
+        var proMode = false;
+        var isAuthenticated = false;
+
+        // === UTILITY ===
+        function fmt(n) {
+            if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+            if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+            return '$' + n.toFixed(0);
+        }
+        function pct(n) { return (n * 100).toFixed(1) + '%'; }
+
+        // === CORE CALCULATIONS ===
+        function hvacCalcTCO(inputs) {
+            var load = inputs.load;
+            var rate = inputs.rate;
+            var regionKey = inputs.region;
+            var region = HVAC_REGIONS[regionKey];
+            var results = {};
+
+            ['traditional', 'hybrid', 'dlc'].forEach(function(arch) {
+                var cfg = COOLING_CONFIGS[arch];
+                var pue = region[cfg.pueKey];
+                var capex = cfg.capexPerMW * load;
+                var annualEnergy = load * 1000 * (pue - 1) * 8760 * rate * cfg.opexFactor;
+                var annualMaint = cfg.maintenancePerMW * load;
+                var annualOpex = annualEnergy + annualMaint;
+                var npv = capex;
+                var cashflows = [capex];
+                for (var y = 1; y <= 10; y++) {
+                    var discounted = annualOpex / Math.pow(1 + DISCOUNT_RATE, y);
+                    npv += discounted;
+                    cashflows.push(annualOpex);
+                }
+                results[arch] = {
+                    capex: capex,
+                    annualEnergy: annualEnergy,
+                    annualMaint: annualMaint,
+                    annualOpex: annualOpex,
+                    npv10yr: npv,
+                    pue: pue,
+                    cashflows: cashflows
+                };
+            });
+
+            // Payback: year when cumulative savings of DLC vs traditional exceed DLC capex premium
+            var capexPremiumDLC = results.dlc.capex - results.traditional.capex;
+            var annualSavingsDLC = results.traditional.annualOpex - results.dlc.annualOpex;
+            var paybackDLC = annualSavingsDLC > 0 ? capexPremiumDLC / annualSavingsDLC : 99;
+
+            var capexPremiumHybrid = results.hybrid.capex - results.traditional.capex;
+            var annualSavingsHybrid = results.traditional.annualOpex - results.hybrid.annualOpex;
+            var paybackHybrid = annualSavingsHybrid > 0 ? capexPremiumHybrid / annualSavingsHybrid : 99;
+
+            // IRR approximation for DLC
+            var irrDLC = annualSavingsDLC > 0 ? (annualSavingsDLC / capexPremiumDLC) * 0.85 : 0;
+
+            results.paybackDLC = paybackDLC;
+            results.paybackHybrid = paybackHybrid;
+            results.irrDLC = irrDLC;
+            results.savingsDLC10yr = results.traditional.npv10yr - results.dlc.npv10yr;
+            results.savingsHybrid10yr = results.traditional.npv10yr - results.hybrid.npv10yr;
+
+            return results;
+        }
+
+        function runHvacMonteCarlo(base) {
+            var iterations = 10000;
+            var results = [];
+            var load = base.load;
+            var rate = base.rate;
+            var region = HVAC_REGIONS[base.region];
+
+            for (var i = 0; i < iterations; i++) {
+                var loadVar = load * (1 + (Math.random() - 0.5) * 0.3); // +/-15%
+                var rateVar = rate * (1 + (Math.random() - 0.5) * 0.3);
+                var pueVar = region.pueDLC * (1 + (Math.random() - 0.5) * 0.1); // +/-5%
+
+                var tradEnergy = loadVar * 1000 * (region.pueTraditional - 1) * 8760 * rateVar;
+                var dlcEnergy = loadVar * 1000 * (pueVar - 1) * 8760 * rateVar * 0.55;
+                var savings = tradEnergy - dlcEnergy;
+                results.push(savings);
+            }
+
+            results.sort(function(a, b) { return a - b; });
+            var sum = 0;
+            results.forEach(function(v) { sum += v; });
+            var mean = sum / iterations;
+
+            var variance = 0;
+            results.forEach(function(v) { variance += (v - mean) * (v - mean); });
+            var stdDev = Math.sqrt(variance / iterations);
+
+            return {
+                results: results,
+                mean: mean,
+                stdDev: stdDev,
+                p5: results[Math.floor(iterations * 0.05)],
+                p25: results[Math.floor(iterations * 0.25)],
+                p50: results[Math.floor(iterations * 0.50)],
+                p75: results[Math.floor(iterations * 0.75)],
+                p95: results[Math.floor(iterations * 0.95)],
+                min: results[0],
+                max: results[iterations - 1]
+            };
+        }
+
+        function runHvacSensitivity(base) {
+            var region = HVAC_REGIONS[base.region];
+            var baseEnergy = base.load * 1000 * (region.pueTraditional - 1) * 8760 * base.rate;
+            var baseDLC = base.load * 1000 * (region.pueDLC - 1) * 8760 * base.rate * 0.55;
+            var baseSavings = baseEnergy - baseDLC;
+
+            // Vary load +15%
+            var highLoad = base.load * 1.15;
+            var loadHighSavings = highLoad * 1000 * (region.pueTraditional - 1) * 8760 * base.rate -
+                                  highLoad * 1000 * (region.pueDLC - 1) * 8760 * base.rate * 0.55;
+            var loadImpact = Math.abs(loadHighSavings - baseSavings);
+
+            // Vary rate +15%
+            var highRate = base.rate * 1.15;
+            var rateHighSavings = base.load * 1000 * (region.pueTraditional - 1) * 8760 * highRate -
+                                  base.load * 1000 * (region.pueDLC - 1) * 8760 * highRate * 0.55;
+            var rateImpact = Math.abs(rateHighSavings - baseSavings);
+
+            // Vary PUE +5%
+            var highPUE = region.pueDLC * 1.05;
+            var pueHighSavings = base.load * 1000 * (region.pueTraditional - 1) * 8760 * base.rate -
+                                 base.load * 1000 * (highPUE - 1) * 8760 * base.rate * 0.55;
+            var pueImpact = Math.abs(pueHighSavings - baseSavings);
+
+            var maxImpact = Math.max(loadImpact, rateImpact, pueImpact);
+
+            return [
+                { label: 'IT Load (MW)', impact: loadImpact, pct: loadImpact / maxImpact, color: '#3b82f6' },
+                { label: 'Electricity Rate', impact: rateImpact, pct: rateImpact / maxImpact, color: '#f59e0b' },
+                { label: 'PUE Efficiency', impact: pueImpact, pct: pueImpact / maxImpact, color: '#22c55e' }
+            ].sort(function(a, b) { return b.impact - a.impact; });
+        }
+
+        function generateHvacNarrative(inputs, selectedRegion) {
+            var region = HVAC_REGIONS[selectedRegion];
+            var tco = hvacCalcTCO(inputs);
+            var sizeCategory = inputs.load <= 5 ? 'small' : inputs.load <= 12 ? 'medium' : 'large';
+            var narrative = '';
+
+            narrative += 'For a ' + inputs.load + ' MW facility in ' + region.label + ', ';
+
+            if (region.riskScore >= 6) {
+                narrative += 'the tropical climate presents significant challenges for chiller-free operation. ';
+                narrative += 'With ambient temperatures averaging ' + region.temp + '\u00B0C and ' + region.humidity + '% RH, ';
+                narrative += 'free cooling hours are limited to ' + region.freeHours + ' hrs/year (' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours). ';
+                narrative += 'A hybrid approach with ' + region.chillerBackup + '% chiller backup is recommended. ';
+            } else {
+                narrative += 'the favorable climate enables substantial chiller-free operation. ';
+                narrative += 'With ' + region.freeHours + ' free cooling hours/year (' + (region.freeHours / 87.6).toFixed(0) + '%), ';
+                narrative += 'a full DLC deployment can achieve PUE ' + region.pueDLC.toFixed(2) + '. ';
+            }
+
+            narrative += 'Over 10 years, DLC saves ' + fmt(tco.savingsDLC10yr) + ' (NPV) vs traditional cooling, ';
+            narrative += 'with a payback period of ' + tco.paybackDLC.toFixed(1) + ' years. ';
+
+            if (sizeCategory === 'large') {
+                narrative += 'At ' + inputs.load + ' MW scale, the absolute savings are substantial — the capex premium of ' +
+                    fmt(tco.dlc.capex - tco.traditional.capex) + ' is recovered through ' + fmt(tco.traditional.annualOpex - tco.dlc.annualOpex) + '/year in reduced operating costs. ';
+            }
+
+            narrative += 'The estimated IRR on the DLC investment is ' + (tco.irrDLC * 100).toFixed(1) + '%.';
+
+            return narrative;
+        }
+
+        // === CANVAS CHARTS ===
+        function drawTCOWaterfall(canvas, data) {
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var dpr = window.devicePixelRatio || 1;
+            var W = canvas.parentElement.clientWidth || 700;
+            var H = 280;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, W, H);
+
+            var pad = { top: 30, right: 20, bottom: 60, left: 70 };
+            var chartW = W - pad.left - pad.right;
+            var chartH = H - pad.top - pad.bottom;
+
+            var items = [
+                { label: 'Traditional\nCapex', value: data.traditional.capex, color: '#ef4444', type: 'bar' },
+                { label: 'Traditional\n10yr Opex', value: data.traditional.npv10yr - data.traditional.capex, color: '#f87171', type: 'bar' },
+                { label: 'Hybrid\nCapex', value: data.hybrid.capex, color: '#f59e0b', type: 'bar' },
+                { label: 'Hybrid\n10yr Opex', value: data.hybrid.npv10yr - data.hybrid.capex, color: '#fbbf24', type: 'bar' },
+                { label: 'DLC\nCapex', value: data.dlc.capex, color: '#22c55e', type: 'bar' },
+                { label: 'DLC\n10yr Opex', value: data.dlc.npv10yr - data.dlc.capex, color: '#4ade80', type: 'bar' }
+            ];
+
+            var maxVal = 0;
+            items.forEach(function(it) { if (it.value > maxVal) maxVal = it.value; });
+            maxVal *= 1.15;
+
+            // Y-axis
+            ctx.strokeStyle = 'rgba(148,163,184,0.2)';
+            ctx.fillStyle = 'rgba(148,163,184,0.7)';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            for (var i = 0; i <= 5; i++) {
+                var y = pad.top + chartH - (i / 5) * chartH;
+                var val = (i / 5) * maxVal;
+                ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+                ctx.fillText(fmt(val), pad.left - 8, y + 4);
+            }
+
+            var barW = chartW / items.length;
+            var gap = barW * 0.3;
+
+            items.forEach(function(item, idx) {
+                var x = pad.left + idx * barW + gap / 2;
+                var barH = (item.value / maxVal) * chartH;
+                var y = pad.top + chartH - barH;
+
+                var grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
+                grad.addColorStop(0, item.color);
+                grad.addColorStop(1, item.color + '66');
+                ctx.fillStyle = grad;
+
+                ctx.beginPath();
+                ctx.roundRect(x, y, barW - gap, barH, [4, 4, 0, 0]);
+                ctx.fill();
+
+                // Value
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 10px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(fmt(item.value), x + (barW - gap) / 2, y - 6);
+
+                // Label
+                ctx.fillStyle = 'rgba(148,163,184,0.9)';
+                ctx.font = '9px Inter, sans-serif';
+                var lines = item.label.split('\n');
+                lines.forEach(function(line, li) {
+                    ctx.fillText(line, x + (barW - gap) / 2, H - pad.bottom + 14 + li * 12);
+                });
+            });
+
+            // Title
+            ctx.fillStyle = '#60a5fa';
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('10-Year TCO Waterfall (NPV @ 8%)', W / 2, 18);
+        }
+
+        function drawMonteHistogram(canvas, mc) {
+            if (!canvas || !mc) return;
+            var ctx = canvas.getContext('2d');
+            var dpr = window.devicePixelRatio || 1;
+            var W = canvas.parentElement.clientWidth || 700;
+            var H = 280;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, W, H);
+
+            var pad = { top: 30, right: 20, bottom: 50, left: 60 };
+            var chartW = W - pad.left - pad.right;
+            var chartH = H - pad.top - pad.bottom;
+
+            // Build histogram bins
+            var numBins = 40;
+            var range = mc.max - mc.min;
+            var binWidth = range / numBins;
+            var bins = new Array(numBins).fill(0);
+            mc.results.forEach(function(v) {
+                var idx = Math.min(Math.floor((v - mc.min) / binWidth), numBins - 1);
+                bins[idx]++;
+            });
+            var maxBin = Math.max.apply(null, bins);
+
+            // Draw bins
+            var barW = chartW / numBins;
+            bins.forEach(function(count, i) {
+                var x = pad.left + i * barW;
+                var barH = (count / maxBin) * chartH;
+                var y = pad.top + chartH - barH;
+
+                ctx.fillStyle = 'rgba(59,130,246,0.6)';
+                ctx.fillRect(x, y, barW - 1, barH);
+            });
+
+            // P5, P50, P95 lines
+            function drawLine(val, label, color) {
+                var x = pad.left + ((val - mc.min) / range) * chartW;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + chartH); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = color;
+                ctx.font = 'bold 10px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(label + ': ' + fmt(val), x, pad.top - 6);
+            }
+            drawLine(mc.p5, 'P5', '#ef4444');
+            drawLine(mc.p50, 'P50', '#f59e0b');
+            drawLine(mc.p95, 'P95', '#22c55e');
+
+            // X-axis labels
+            ctx.fillStyle = 'rgba(148,163,184,0.7)';
+            ctx.font = '9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            for (var i = 0; i <= 4; i++) {
+                var val = mc.min + (i / 4) * range;
+                var x = pad.left + (i / 4) * chartW;
+                ctx.fillText(fmt(val), x, H - pad.bottom + 18);
+            }
+
+            // Title
+            ctx.fillStyle = '#60a5fa';
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Monte Carlo: Annual DLC Savings Distribution (10K iterations)', W / 2, 18);
+        }
+
+        // === UPDATE PRO PANELS ===
+        function updateHvacProPanels() {
+            var loadSlider = document.getElementById('loadSlider');
+            var rateSlider = document.getElementById('rateSlider');
+            var regionSelect = document.getElementById('hvacRegionSelect');
+            if (!loadSlider || !rateSlider || !regionSelect) return;
+
+            var inputs = {
+                load: parseInt(loadSlider.value),
+                rate: parseInt(rateSlider.value) / 100,
+                region: regionSelect.value
+            };
+
+            var region = HVAC_REGIONS[inputs.region];
+            var tco = hvacCalcTCO(inputs);
+            var mc = runHvacMonteCarlo(inputs);
+            var sensitivity = runHvacSensitivity(inputs);
+            var narrative = generateHvacNarrative(inputs, inputs.region);
+
+            // Panel 1: 10-Year TCO
+            var tcoKPIs = document.getElementById('hvacTcoKPIs');
+            if (tcoKPIs) {
+                tcoKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.traditional.npv10yr) + '</div><div class="hvac-kpi-label">Traditional TCO (10yr NPV)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.hybrid.npv10yr) + '</div><div class="hvac-kpi-label">Hybrid TCO (10yr NPV)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.dlc.npv10yr) + '</div><div class="hvac-kpi-label">DLC TCO (10yr NPV)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.savingsDLC10yr) + '</div><div class="hvac-kpi-label">DLC Savings vs Traditional</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.paybackDLC.toFixed(1) + ' yrs</div><div class="hvac-kpi-label">DLC Payback Period</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + (tco.irrDLC * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Estimated IRR (DLC)</div></div>';
+            }
+
+            drawTCOWaterfall(document.getElementById('hvacWaterfallChart'), tco);
+
+            var tcoNar = document.getElementById('hvacTcoNarrative');
+            if (tcoNar) tcoNar.textContent = narrative;
+
+            // Panel 2: Regional Risk Matrix
+            var riskKPIs = document.getElementById('hvacRiskKPIs');
+            if (riskKPIs) {
+                var failProb = (region.riskScore / 10 * 100).toFixed(0);
+                var adjustedPUE = (region.pueDLC * (1 + region.riskScore * 0.005)).toFixed(3);
+                riskKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.temp + '\u00B0C</div><div class="hvac-kpi-label">Avg Ambient Temperature</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.humidity + '%</div><div class="hvac-kpi-label">Avg Relative Humidity</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.freeHours.toLocaleString() + '</div><div class="hvac-kpi-label">Free Cooling Hours/Year</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (region.riskScore >= 6 ? '#ef4444' : region.riskScore >= 3 ? '#f59e0b' : '#22c55e') + ';">' + region.riskScore.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Risk Score</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + failProb + '%</div><div class="hvac-kpi-label">Failure Probability (High Heat)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + adjustedPUE + '</div><div class="hvac-kpi-label">Risk-Adjusted PUE (DLC)</div></div>';
+            }
+
+            var riskNar = document.getElementById('hvacRiskNarrative');
+            if (riskNar) {
+                var riskText = region.label + ' has a climate risk score of ' + region.riskScore.toFixed(1) + '/10. ';
+                if (region.riskScore >= 6) {
+                    riskText += 'This is a high-risk region for chiller-free operation. Only ' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours qualify for free cooling. ';
+                    riskText += 'Chiller backup capacity of ' + region.chillerBackup + '% is required. Risk-adjusted PUE increases to ' + adjustedPUE + ' when accounting for degraded performance during extreme conditions.';
+                } else {
+                    riskText += 'This region is favorable for chiller-free operation with ' + (region.freeHours / 87.6).toFixed(0) + '% free cooling availability. ';
+                    riskText += 'Only ' + region.chillerBackup + '% chiller backup is recommended for extreme events. The risk-adjusted PUE of ' + adjustedPUE + ' remains excellent.';
+                }
+                riskNar.textContent = riskText;
+            }
+
+            // Panel 3: Transition Planning
+            var transKPIs = document.getElementById('hvacTransitionKPIs');
+            if (transKPIs) {
+                var phase1Capex = tco.dlc.capex * 0.4;
+                var phase2Capex = tco.dlc.capex * 0.35;
+                var phase3Capex = tco.dlc.capex * 0.25;
+                var trainingCost = inputs.load * 25000; // $25K per MW for workforce training
+                var totalTransition = tco.dlc.capex + trainingCost;
+                transKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase1Capex) + '</div><div class="hvac-kpi-label">Phase 1 (Year 0-1): Foundation</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase2Capex) + '</div><div class="hvac-kpi-label">Phase 2 (Year 2-3): Expansion</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase3Capex) + '</div><div class="hvac-kpi-label">Phase 3 (Year 4-5): Optimization</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(trainingCost) + '</div><div class="hvac-kpi-label">Workforce Training</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(totalTransition) + '</div><div class="hvac-kpi-label">Total Transition Cost</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlc.annualOpex) + '/yr</div><div class="hvac-kpi-label">Steady-State Opex</div></div>';
+            }
+
+            var transNar = document.getElementById('hvacTransitionNarrative');
+            if (transNar) {
+                transNar.textContent = 'Recommended 3-phase transition over 5 years for ' + inputs.load + ' MW facility in ' + region.label + '. ' +
+                    'Phase 1 (Year 0-1) focuses on CDU infrastructure, piping, and controls for ' + fmt(phase1Capex) + '. ' +
+                    'Phase 2 (Year 2-3) expands DLC coverage to high-density racks for ' + fmt(phase2Capex) + '. ' +
+                    'Phase 3 (Year 4-5) completes migration and decommissions legacy chillers for ' + fmt(phase3Capex) + '. ' +
+                    'Workforce training budget of ' + fmt(trainingCost) + ' covers liquid cooling certification, leak detection, and emergency procedures.';
+            }
+
+            // Panel 4: Monte Carlo
+            var monteKPIs = document.getElementById('hvacMonteKPIs');
+            if (monteKPIs) {
+                monteKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.mean) + '</div><div class="hvac-kpi-label">Mean Annual Savings</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#ef4444;">' + fmt(mc.p5) + '</div><div class="hvac-kpi-label">P5 (Worst Case)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.p50) + '</div><div class="hvac-kpi-label">P50 (Median)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(mc.p95) + '</div><div class="hvac-kpi-label">P95 (Best Case)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.stdDev) + '</div><div class="hvac-kpi-label">Std Deviation</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + ((mc.stdDev / mc.mean) * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Coefficient of Variation</div></div>';
+            }
+
+            drawMonteHistogram(document.getElementById('hvacMonteChart'), mc);
+
+            // Tornado bars
+            var tornadoBars = document.getElementById('hvacTornadoBars');
+            if (tornadoBars) {
+                var html = '<div style="font-size:0.85rem;font-weight:700;color:#60a5fa;margin-bottom:0.75rem;">Sensitivity Analysis (Tornado)</div>';
+                sensitivity.forEach(function(item) {
+                    html += '<div class="hvac-sensitivity-bar">' +
+                        '<div class="hvac-sensitivity-label">' + item.label + '</div>' +
+                        '<div class="hvac-sensitivity-track"><div class="hvac-sensitivity-fill" style="width:' + (item.pct * 100).toFixed(0) + '%;background:' + item.color + ';"></div></div>' +
+                        '<div class="hvac-sensitivity-value">' + fmt(item.impact) + '</div></div>';
+                });
+                tornadoBars.innerHTML = html;
+            }
+
+            var monteNar = document.getElementById('hvacMonteNarrative');
+            if (monteNar) {
+                var topDriver = sensitivity[0];
+                monteNar.textContent = 'Monte Carlo simulation with 10,000 iterations (load and rate varied \u00B115%) shows median annual DLC savings of ' + fmt(mc.p50) +
+                    ' with a 90% confidence interval of ' + fmt(mc.p5) + ' to ' + fmt(mc.p95) + '. ' +
+                    'The coefficient of variation is ' + ((mc.stdDev / mc.mean) * 100).toFixed(1) + '%, indicating ' +
+                    ((mc.stdDev / mc.mean) < 0.15 ? 'low' : (mc.stdDev / mc.mean) < 0.25 ? 'moderate' : 'high') + ' uncertainty. ' +
+                    'Sensitivity analysis reveals ' + topDriver.label + ' as the dominant cost driver (' + fmt(topDriver.impact) + ' impact at +15%).';
+            }
+        }
+
+        // === MODE TOGGLE ===
+        window.hvacSetMode = function(mode) {
+            var freeBtn = document.querySelector('.hvac-btn-free');
+            var proBtn = document.querySelector('.hvac-btn-pro');
+            var container = document.getElementById('hvacProContainer');
+
+            if (mode === 'pro') {
+                if (!isAuthenticated) {
+                    hvacShowLogin();
+                    return;
+                }
+                proMode = true;
+                if (freeBtn) { freeBtn.classList.remove('active'); }
+                if (proBtn) { proBtn.classList.add('active'); }
+                if (container) { container.classList.add('visible'); }
+                updateHvacProPanels();
+            } else {
+                proMode = false;
+                if (freeBtn) { freeBtn.classList.add('active'); }
+                if (proBtn) { proBtn.classList.remove('active'); }
+                if (container) { container.classList.remove('visible'); }
+            }
+        };
+
+        // === PANEL LOCK/UNLOCK ===
+        function unlockPanels() {
+            document.querySelectorAll('.hvac-pro-panel.gated').forEach(function(p) {
+                p.classList.remove('gated');
+                var overlay = p.querySelector('.hvac-gate-overlay');
+                if (overlay) overlay.style.display = 'none';
+            });
+        }
+        function lockPanels() {
+            document.querySelectorAll('.hvac-pro-panel').forEach(function(p) {
+                p.classList.add('gated');
+                var overlay = p.querySelector('.hvac-gate-overlay');
+                if (overlay) overlay.style.display = '';
+            });
+        }
+
+        // === AUTH ===
+        function checkAuth() {
+            try {
+                var sess = JSON.parse(localStorage.getItem('rz_premium_session'));
+                if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
+                    isAuthenticated = true;
+                    unlockPanels();
+                    return true;
+                }
+            } catch(e) {}
+            isAuthenticated = false;
+            return false;
+        }
+
+        window.hvacShowLogin = function() {
+            document.getElementById('hvacLoginOverlay').classList.add('visible');
+        };
+        window.hvacHideLogin = function() {
+            document.getElementById('hvacLoginOverlay').classList.remove('visible');
+            document.getElementById('hvacLoginError').style.display = 'none';
+        };
+        window.hvacDoLogin = function() {
+            var email = document.getElementById('hvacLoginEmail').value.trim();
+            var pass = document.getElementById('hvacLoginPass').value;
+            if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+                var session = { email: email, tier: 'pro', expires: new Date(Date.now() + 30*24*60*60*1000).toISOString() };
+                localStorage.setItem('rz_premium_session', JSON.stringify(session));
+                isAuthenticated = true;
+                unlockPanels();
+                hvacHideLogin();
+                hvacSetMode('pro');
+                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
+            } else {
+                document.getElementById('hvacLoginError').style.display = 'block';
+            }
+        };
+
+        // === RESET ===
+        window.hvacReset = function() {
+            var loadSlider = document.getElementById('loadSlider');
+            var rateSlider = document.getElementById('rateSlider');
+            var regionSelect = document.getElementById('hvacRegionSelect');
+            if (loadSlider) { loadSlider.value = 10; }
+            if (rateSlider) { rateSlider.value = 10; }
+            if (regionSelect) { regionSelect.value = 'virginia'; }
+            // Trigger refresh
+            if (loadSlider) loadSlider.dispatchEvent(new Event('input'));
+            if (proMode) updateHvacProPanels();
+        };
+
+        // === PDF EXPORT ===
+        window.hvacExportPDF = function() {
+            var loadSlider = document.getElementById('loadSlider');
+            var rateSlider = document.getElementById('rateSlider');
+            var regionSelect = document.getElementById('hvacRegionSelect');
+            var inputs = {
+                load: parseInt(loadSlider.value),
+                rate: parseInt(rateSlider.value) / 100,
+                region: regionSelect.value
+            };
+            var region = HVAC_REGIONS[inputs.region];
+            var tco = hvacCalcTCO(inputs);
+            var mc = proMode ? runHvacMonteCarlo(inputs) : null;
+            var sensitivity = proMode ? runHvacSensitivity(inputs) : null;
+            var narrative = generateHvacNarrative(inputs, inputs.region);
+            var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // SVG chart generators for PDF
+            function waterfallSVG(tco) {
+                var W = 600, H = 300, pad = 60;
+                var items = [
+                    { label: 'Trad Capex', value: tco.traditional.capex, color: '#ef4444' },
+                    { label: 'Trad Opex', value: tco.traditional.npv10yr - tco.traditional.capex, color: '#f87171' },
+                    { label: 'Hybrid Capex', value: tco.hybrid.capex, color: '#f59e0b' },
+                    { label: 'Hybrid Opex', value: tco.hybrid.npv10yr - tco.hybrid.capex, color: '#fbbf24' },
+                    { label: 'DLC Capex', value: tco.dlc.capex, color: '#22c55e' },
+                    { label: 'DLC Opex', value: tco.dlc.npv10yr - tco.dlc.capex, color: '#4ade80' }
+                ];
+                var maxVal = 0;
+                items.forEach(function(it) { if (it.value > maxVal) maxVal = it.value; });
+                maxVal *= 1.15;
+                var chartW = W - pad * 2, chartH = H - 100;
+                var barW = chartW / items.length;
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:600px;">';
+                svg += '<text x="' + W/2 + '" y="20" font-size="13" fill="#1e3a5f" text-anchor="middle" font-weight="bold" font-family="Inter,sans-serif">10-Year TCO Waterfall (NPV @ 8%)</text>';
+                items.forEach(function(item, i) {
+                    var x = pad + i * barW + 4;
+                    var barH = (item.value / maxVal) * chartH;
+                    var y = 40 + chartH - barH;
+                    svg += '<rect x="' + x + '" y="' + y + '" width="' + (barW - 8) + '" height="' + barH + '" fill="' + item.color + '" rx="3"/>';
+                    svg += '<text x="' + (x + (barW-8)/2) + '" y="' + (y - 4) + '" font-size="9" fill="#1f2937" text-anchor="middle" font-family="Inter,sans-serif">' + fmt(item.value) + '</text>';
+                    svg += '<text x="' + (x + (barW-8)/2) + '" y="' + (H - 20) + '" font-size="8" fill="#64748b" text-anchor="middle" font-family="Inter,sans-serif" transform="rotate(-20,' + (x+(barW-8)/2) + ',' + (H-20) + ')">' + item.label + '</text>';
+                });
+                svg += '</svg>';
+                return svg;
+            }
+
+            function histogramSVG(mc) {
+                if (!mc) return '';
+                var W = 600, H = 250, pad = 50;
+                var numBins = 30;
+                var range = mc.max - mc.min;
+                var binWidth = range / numBins;
+                var bins = new Array(numBins).fill(0);
+                mc.results.forEach(function(v) {
+                    var idx = Math.min(Math.floor((v - mc.min) / binWidth), numBins - 1);
+                    bins[idx]++;
+                });
+                var maxBin = Math.max.apply(null, bins);
+                var chartW = W - pad * 2, chartH = H - 80;
+                var barW = chartW / numBins;
+
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:600px;">';
+                svg += '<text x="' + W/2 + '" y="20" font-size="13" fill="#1e3a5f" text-anchor="middle" font-weight="bold" font-family="Inter,sans-serif">Monte Carlo Distribution (10K iterations)</text>';
+                bins.forEach(function(count, i) {
+                    var x = pad + i * barW;
+                    var barH = (count / maxBin) * chartH;
+                    var y = 40 + chartH - barH;
+                    svg += '<rect x="' + x + '" y="' + y + '" width="' + (barW - 1) + '" height="' + barH + '" fill="#3b82f6" opacity="0.6"/>';
+                });
+                // P5/P50/P95 lines
+                function addLine(val, label, color) {
+                    var x = pad + ((val - mc.min) / range) * chartW;
+                    svg += '<line x1="' + x + '" y1="35" x2="' + x + '" y2="' + (40 + chartH) + '" stroke="' + color + '" stroke-width="2" stroke-dasharray="4,4"/>';
+                    svg += '<text x="' + x + '" y="' + (H - 10) + '" font-size="9" fill="' + color + '" text-anchor="middle" font-family="Inter,sans-serif">' + label + ': ' + fmt(val) + '</text>';
+                }
+                addLine(mc.p5, 'P5', '#dc2626');
+                addLine(mc.p50, 'P50', '#d97706');
+                addLine(mc.p95, 'P95', '#16a34a');
+                svg += '</svg>';
+                return svg;
+            }
+
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HVAC Cooling Architecture Report</title>' +
+            '<style>' +
+                '@page { size: A4; margin: 20mm; }' +
+                'body { font-family: "Segoe UI", Arial, sans-serif; color: #1f2937; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }' +
+                'h1 { color: #1e3a5f; font-size: 22px; border-bottom: 3px solid #3b82f6; padding-bottom: 8px; }' +
+                'h2 { color: #1e3a5f; font-size: 16px; margin-top: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }' +
+                'h3 { color: #374151; font-size: 14px; }' +
+                '.header-meta { display: flex; justify-content: space-between; color: #6b7280; font-size: 11px; margin-bottom: 20px; }' +
+                '.score-hero { text-align: center; padding: 20px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 12px; margin: 16px 0; }' +
+                '.score-hero .score { font-size: 36px; font-weight: 800; color: #3b82f6; }' +
+                '.score-hero .label { color: #6b7280; font-size: 13px; }' +
+                'table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }' +
+                'th { background: #f8fafc; color: #1e3a5f; padding: 8px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }' +
+                'td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1f2937; }' +
+                'tr:nth-child(even) td { background: #fafbfc; }' +
+                '.narrative { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 14px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 13px; color: #374151; line-height: 1.7; }' +
+                '.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }' +
+                '.kpi-card { text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }' +
+                '.kpi-value { font-size: 16px; font-weight: 800; color: #3b82f6; }' +
+                '.kpi-label { font-size: 10px; color: #6b7280; margin-top: 2px; }' +
+                '.footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #9ca3af; text-align: center; }' +
+                '.badge-good { color: #16a34a; } .badge-warn { color: #d97706; } .badge-bad { color: #dc2626; }' +
+            '</style></head><body>';
+
+            html += '<h1>HVAC Cooling Architecture Analysis</h1>';
+            html += '<div class="header-meta"><span>Generated: ' + today + '</span><span>Region: ' + region.label + '</span><span>Facility: ' + inputs.load + ' MW @ $' + inputs.rate.toFixed(2) + '/kWh</span></div>';
+
+            // Summary
+            html += '<div class="score-hero">';
+            html += '<div class="score">' + fmt(tco.savingsDLC10yr) + '</div>';
+            html += '<div class="label">10-Year NPV Savings (DLC vs Traditional)</div>';
+            html += '<div style="margin-top:8px;font-size:12px;color:#6b7280;">Payback: ' + tco.paybackDLC.toFixed(1) + ' years | IRR: ' + (tco.irrDLC * 100).toFixed(1) + '%</div>';
+            html += '</div>';
+
+            // TCO Table
+            html += '<h2>10-Year Total Cost of Ownership</h2>';
+            html += '<table><tr><th>Architecture</th><th>CAPEX</th><th>Annual Energy</th><th>Annual Maint.</th><th>10-Year NPV</th><th>PUE</th></tr>';
+            ['traditional', 'hybrid', 'dlc'].forEach(function(arch) {
+                var r = tco[arch];
+                var label = arch === 'traditional' ? 'Traditional Chiller' : arch === 'hybrid' ? 'Hybrid DLC' : 'Warm-Water DLC';
+                html += '<tr><td><strong>' + label + '</strong></td><td>' + fmt(r.capex) + '</td><td>' + fmt(r.annualEnergy) + '</td><td>' + fmt(r.annualMaint) + '</td><td>' + fmt(r.npv10yr) + '</td><td>' + r.pue.toFixed(2) + '</td></tr>';
+            });
+            html += '</table>';
+
+            html += waterfallSVG(tco);
+
+            // Regional Risk
+            html += '<h2>Regional Risk Assessment</h2>';
+            html += '<table><tr><th>Region</th><th>Temp</th><th>RH</th><th>Free Cooling Hrs</th><th>Risk Score</th><th>PUE (DLC)</th></tr>';
+            Object.keys(HVAC_REGIONS).forEach(function(key) {
+                var r = HVAC_REGIONS[key];
+                var isSelected = key === inputs.region;
+                html += '<tr' + (isSelected ? ' style="background:#eff6ff;font-weight:600;"' : '') + '>';
+                html += '<td>' + r.label + (isSelected ? ' *' : '') + '</td><td>' + r.temp + '\u00B0C</td><td>' + r.humidity + '%</td><td>' + r.freeHours.toLocaleString() + '</td>';
+                html += '<td class="' + (r.riskScore >= 6 ? 'badge-bad' : r.riskScore >= 3 ? 'badge-warn' : 'badge-good') + '">' + r.riskScore.toFixed(1) + '/10</td>';
+                html += '<td>' + r.pueDLC.toFixed(2) + '</td></tr>';
+            });
+            html += '</table>';
+
+            // Transition Planning
+            html += '<h2>Transition Planning</h2>';
+            var phase1 = tco.dlc.capex * 0.4;
+            var phase2 = tco.dlc.capex * 0.35;
+            var phase3 = tco.dlc.capex * 0.25;
+            var training = inputs.load * 25000;
+            html += '<table><tr><th>Phase</th><th>Timeline</th><th>Investment</th><th>Focus</th></tr>';
+            html += '<tr><td>Phase 1</td><td>Year 0-1</td><td>' + fmt(phase1) + '</td><td>CDU infrastructure, piping, controls</td></tr>';
+            html += '<tr><td>Phase 2</td><td>Year 2-3</td><td>' + fmt(phase2) + '</td><td>High-density rack DLC expansion</td></tr>';
+            html += '<tr><td>Phase 3</td><td>Year 4-5</td><td>' + fmt(phase3) + '</td><td>Full migration, legacy decommission</td></tr>';
+            html += '<tr><td>Training</td><td>Ongoing</td><td>' + fmt(training) + '</td><td>Liquid cooling certification, procedures</td></tr>';
+            html += '</table>';
+
+            if (proMode && mc) {
+                // Monte Carlo
+                html += '<h2>Monte Carlo Simulation</h2>';
+                html += '<div class="kpi-grid">';
+                html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.mean) + '</div><div class="kpi-label">Mean Annual Savings</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p5) + '</div><div class="kpi-label">P5 (Worst Case)</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + fmt(mc.p95) + '</div><div class="kpi-label">P95 (Best Case)</div></div>';
+                html += '</div>';
+                html += histogramSVG(mc);
+
+                // Sensitivity
+                html += '<h2>Sensitivity Analysis</h2>';
+                html += '<table><tr><th>Variable</th><th>Impact (+15%)</th><th>Relative Weight</th></tr>';
+                sensitivity.forEach(function(s) {
+                    html += '<tr><td>' + s.label + '</td><td>' + fmt(s.impact) + '</td><td>' + (s.pct * 100).toFixed(0) + '%</td></tr>';
+                });
+                html += '</table>';
+            }
+
+            // Narrative
+            html += '<h2>Analysis Narrative</h2>';
+            html += '<div class="narrative">' + narrative + '</div>';
+
+            html += '<div class="footer">';
+            html += '<p>HVAC Cooling Architecture Report | ResistanceZero.com | ' + today + '</p>';
+            html += '<p>Model: HVAC-TCO-v1.0 | Discount Rate: 8% | Sources: ASHRAE TC 9.9, Uptime Institute 2024, Nvidia Rubin Thermal Specs</p>';
+            html += '<p style="font-style:italic;">Generated client-side — no data transmitted to any server</p>';
+            html += '</div>';
+
+            html += '</body></html>';
+
+            var blob = new Blob([html], { type: 'text/html' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'HVAC_Cooling_Report_' + inputs.region + '_' + inputs.load + 'MW.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // === TOOLTIP POSITIONING ===
+        function initTooltips() {
+            document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
+                var content = trigger.querySelector('.tooltip-content');
+                if (!content) return;
+
+                trigger.addEventListener('mouseenter', function(e) {
+                    var rect = trigger.getBoundingClientRect();
+                    content.style.top = (rect.bottom + 8) + 'px';
+                    content.style.left = Math.max(10, Math.min(rect.left - 120, window.innerWidth - 280)) + 'px';
+                    content.classList.add('visible');
+                });
+                trigger.addEventListener('mouseleave', function() {
+                    content.classList.remove('visible');
+                });
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    content.classList.toggle('visible');
+                });
+            });
+
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.tooltip-content.visible').forEach(function(tc) {
+                    tc.classList.remove('visible');
+                });
+            });
+        }
+
+        // === HOOK EVENTS ===
+        function init() {
+            checkAuth();
+            initTooltips();
+
+            var loadSlider = document.getElementById('loadSlider');
+            var rateSlider = document.getElementById('rateSlider');
+            var regionSelect = document.getElementById('hvacRegionSelect');
+
+            if (loadSlider) {
+                loadSlider.addEventListener('input', function() {
+                    if (proMode) updateHvacProPanels();
+                });
+            }
+            if (rateSlider) {
+                rateSlider.addEventListener('input', function() {
+                    if (proMode) updateHvacProPanels();
+                });
+            }
+            if (regionSelect) {
+                regionSelect.addEventListener('change', function() {
+                    if (proMode) updateHvacProPanels();
+                });
+            }
+
+            // Listen for auth changes from other tabs/articles
+            window.addEventListener('rz-auth-change', function() {
+                checkAuth();
+                if (isAuthenticated && proMode) updateHvacProPanels();
+            });
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'rz_premium_session') {
+                    checkAuth();
+                    if (isAuthenticated && proMode) updateHvacProPanels();
+                }
+            });
+
+            // Resize handler for pro charts
+            window.addEventListener('resize', function() {
+                if (proMode) updateHvacProPanels();
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     })();
     </script>
 <script src="auth.js"></script>

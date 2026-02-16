@@ -55,6 +55,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -690,6 +691,202 @@
         }
         .article-nav a:hover { color: #164e63; }
 
+        /* ===== Pro Enhancement Mode — Water Stress (.ws-) ===== */
+
+        /* Evidence Block */
+        .ws-evidence-block {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px; padding: 2rem; margin: 2rem 0;
+            border: 1px solid rgba(8,145,178,0.25);
+        }
+        .ws-evidence-title {
+            color: #67e8f9; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.5px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px;
+        }
+        .ws-evidence-title i { font-size: 0.85rem; }
+        .ws-evidence-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;
+        }
+        .ws-evidence-card {
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1.25rem 1rem; text-align: center;
+            border: 1px solid rgba(255,255,255,0.08); transition: transform 0.2s, border-color 0.2s;
+        }
+        .ws-evidence-card:hover { transform: translateY(-2px); border-color: rgba(8,145,178,0.3); }
+        .ws-evidence-value { font-size: 1.6rem; font-weight: 800; color: #06b6d4; line-height: 1.2; }
+        .ws-evidence-label { font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem; line-height: 1.3; }
+        .ws-evidence-sub { font-size: 0.65rem; color: #64748b; margin-top: 0.2rem; }
+        .ws-evidence-source { font-size: 0.65rem; color: #475569; margin-top: 1rem; text-align: right; }
+
+        /* CTA Block */
+        .ws-cta-block {
+            background: linear-gradient(135deg, rgba(8,145,178,0.12), rgba(6,182,212,0.04));
+            border: 1.5px solid rgba(8,145,178,0.3); border-radius: 14px;
+            padding: 1.5rem 2rem; margin: 1.5rem 0; text-align: center;
+        }
+        .ws-cta-headline {
+            font-size: 1.05rem; font-weight: 700; color: #0891b2; margin: 0 0 0.5rem;
+        }
+        .ws-cta-sub {
+            font-size: 0.85rem; color: #64748b; margin: 0 0 1rem;
+        }
+        .ws-cta-btn {
+            display: inline-block; background: linear-gradient(135deg, #06b6d4, #0891b2); color: #fff;
+            padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+            text-decoration: none; transition: opacity 0.3s, transform 0.2s; border: none; cursor: pointer;
+        }
+        .ws-cta-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Toolbar */
+        .ws-toolbar-row {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            gap: 0.75rem; margin-bottom: 1.5rem;
+        }
+        .ws-mode-bar {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .ws-mode-bar .mode-toggle {
+            display: flex; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .ws-mode-bar .mode-btn {
+            padding: 8px 18px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none;
+            background: transparent; color: #94a3b8; transition: all 0.3s; font-family: inherit;
+        }
+        .ws-mode-bar .mode-btn.active { background: #0891b2; color: #fff; }
+        .ws-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .ws-toolbar-actions button {
+            padding: 8px 16px; border-radius: 8px; border: none; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px;
+        }
+        .ws-btn-reset { background: rgba(255,255,255,0.1); color: #94a3b8; }
+        .ws-btn-reset:hover { background: rgba(255,255,255,0.15); }
+        .ws-btn-pdf { background: linear-gradient(135deg, rgba(8,145,178,0.2), rgba(6,182,212,0.1)); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3) !important; }
+        .ws-btn-pdf:hover { background: linear-gradient(135deg, rgba(8,145,178,0.3), rgba(6,182,212,0.15)); }
+
+        /* Tooltips */
+        .tooltip-trigger {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border-radius: 50%; background: rgba(8,145,178,0.25);
+            color: #67e8f9; font-size: 0.65rem; font-weight: 700; cursor: help;
+            position: relative; margin-left: 4px; flex-shrink: 0;
+        }
+        .tooltip-content {
+            display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+            background: #1e293b; border: 1px solid rgba(6,182,212,0.3); border-radius: 10px;
+            padding: 1rem; width: 260px; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+        .tooltip-content::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: rgba(6,182,212,0.3);
+        }
+        .tooltip-trigger:hover .tooltip-content,
+        .tooltip-trigger:focus .tooltip-content { display: block; }
+        .tooltip-title { font-size: 0.8rem; font-weight: 700; color: #06b6d4; margin-bottom: 0.4rem; }
+        .tooltip-desc { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; margin-bottom: 0.4rem; }
+        .tooltip-formula { font-size: 0.68rem; color: #67e8f9; font-family: 'JetBrains Mono', monospace; background: rgba(6,182,212,0.1); padding: 4px 8px; border-radius: 4px; }
+
+        /* Pro Panels */
+        .ws-pro-panel {
+            position: relative; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem;
+        }
+        .ws-pro-panel.gated { filter: blur(3px); pointer-events: none; user-select: none; }
+        .ws-pro-panel .panel-title {
+            font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .ws-pro-panel .panel-title i { color: #06b6d4; }
+        .ws-gate-overlay {
+            position: absolute; inset: 0; background: rgba(15,23,42,0.85); border-radius: 14px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.5rem; z-index: 5; cursor: pointer;
+        }
+        .ws-gate-overlay i { font-size: 1.5rem; color: #06b6d4; }
+        .ws-gate-overlay span { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+        .ws-kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;
+        }
+        .ws-kpi-card {
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .ws-kpi-value { font-size: 1.3rem; font-weight: 800; color: #06b6d4; }
+        .ws-kpi-label { font-size: 0.7rem; color: #94a3b8; margin-top: 0.2rem; }
+        .ws-kpi-sublabel { font-size: 0.6rem; color: #475569; margin-top: 0.15rem; }
+
+        /* Panel Chart Container */
+        .ws-chart-container { margin-top: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 1rem; }
+        .ws-chart-container canvas { width: 100% !important; max-height: 220px; }
+
+        /* Region Selector */
+        .ws-region-select {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px; padding: 0.5rem 1rem; color: #e2e8f0; font-size: 0.85rem;
+            font-family: inherit; cursor: pointer; width: 100%; max-width: 300px; margin-bottom: 1rem;
+        }
+        .ws-region-select:focus { outline: none; border-color: #0891b2; }
+        .ws-region-select option { background: #1e293b; color: #e2e8f0; }
+
+        /* Narrative */
+        .ws-narrative {
+            background: rgba(8,145,178,0.08); border: 1px solid rgba(8,145,178,0.2);
+            border-radius: 12px; padding: 1.25rem; margin-top: 1rem;
+        }
+        .ws-narrative h4 { color: #06b6d4; font-size: 0.85rem; margin: 0 0 0.75rem; display: flex; align-items: center; gap: 6px; }
+        .ws-narrative p { color: #94a3b8; font-size: 0.78rem; line-height: 1.6; margin: 0 0 0.5rem; }
+        .ws-narrative p:last-child { margin-bottom: 0; }
+
+        /* Login Modal */
+        .ws-login-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 9999; align-items: center; justify-content: center;
+        }
+        .ws-login-overlay.active { display: flex; }
+        .ws-login-box {
+            background: #1e293b; border-radius: 16px; padding: 2.5rem; max-width: 380px; width: 90%;
+            border: 1px solid rgba(8,145,178,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .ws-login-box h3 { color: #e2e8f0; margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .ws-login-box p { color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem; }
+        .ws-login-box input {
+            width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem; box-sizing: border-box;
+        }
+        .ws-login-box input:focus { outline: none; border-color: #0891b2; }
+        .ws-login-box button.login-submit {
+            width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #0891b2, #06b6d4); color: #fff;
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; margin-top: 0.5rem;
+        }
+        .ws-login-box .demo-hint { font-size: 0.7rem; color: #64748b; margin-top: 0.75rem; text-align: center; }
+        .ws-login-box .demo-hint code { background: rgba(8,145,178,0.15); padding: 1px 5px; border-radius: 3px; color: #67e8f9; }
+        .ws-login-close {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: #64748b; font-size: 1.2rem; cursor: pointer;
+        }
+        .ws-login-error { color: #f87171; font-size: 0.75rem; margin-top: 0.5rem; text-align: center; display: none; }
+
+        /* Privacy Badge + Benchmark Meta */
+        .ws-privacy-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; padding: 6px 0; }
+        .ws-privacy-badge i { color: #10b981; font-size: 0.8rem; }
+        .ws-benchmark-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .ws-benchmark-tag { font-size: 0.65rem; color: #64748b; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+        .ws-benchmark-tag i { font-size: 0.6rem; }
+
+        /* Score bars for risk matrix */
+        .ws-score-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 0.4rem; overflow: hidden; }
+        .ws-score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+        .ws-score-bar-fill.risk-high { background: linear-gradient(90deg, #dc2626, #ef4444); }
+        .ws-score-bar-fill.risk-med { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .ws-score-bar-fill.risk-low { background: linear-gradient(90deg, #10b981, #34d399); }
+
+        /* Dark mode overrides */
+        [data-theme="dark"] .ws-evidence-block,
+        [data-theme="dark"] .ws-pro-panel { background: linear-gradient(135deg, #0c1220 0%, #162032 100%); }
+        [data-theme="dark"] .ws-cta-block { background: linear-gradient(135deg, rgba(8,145,178,0.15), rgba(6,182,212,0.06)); }
+        [data-theme="dark"] .ws-login-box { background: #0f172a; }
+
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
             .article-meta { flex-direction: column; gap: 1rem; }
@@ -699,6 +896,13 @@
             .calc-controls { grid-template-columns: 1fr; }
             .paper-actions { flex-direction: column; }
             .paper-btn { width: 100%; justify-content: center; }
+            .ws-evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .ws-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .ws-toolbar-row { flex-direction: column; align-items: stretch; }
+            .ws-toolbar-actions { justify-content: center; }
+            .ws-cta-block { padding: 1.25rem 1rem; }
+            .tooltip-content { width: 220px; left: auto; right: -10px; transform: none; }
+            .tooltip-content::after { left: auto; right: 20px; transform: none; }
         }
 
         @media print {
@@ -820,6 +1024,39 @@
         </div>
     </section>
 
+    <!-- Evidence Block -->
+    <div class="ws-evidence-block" style="max-width: 900px; margin: -2rem auto 0; position: relative; z-index: 2;">
+        <div class="ws-evidence-title"><i class="fas fa-chart-line"></i> Key Evidence at a Glance</div>
+        <div class="ws-evidence-grid">
+            <div class="ws-evidence-card">
+                <div class="ws-evidence-value">58%</div>
+                <div class="ws-evidence-label">Global DCs in Water-Stressed Regions</div>
+                <div class="ws-evidence-sub">WRI Aqueduct 2024</div>
+            </div>
+            <div class="ws-evidence-card">
+                <div class="ws-evidence-value">131M</div>
+                <div class="ws-evidence-label">Liters/Year for 10MW Facility</div>
+                <div class="ws-evidence-sub">WUE 1.5 baseline</div>
+            </div>
+            <div class="ws-evidence-card">
+                <div class="ws-evidence-value">500MW+</div>
+                <div class="ws-evidence-label">Jakarta/Bekasi Planned Capacity</div>
+                <div class="ws-evidence-sub">Digital Edge + others</div>
+            </div>
+            <div class="ws-evidence-card">
+                <div class="ws-evidence-value">43%</div>
+                <div class="ws-evidence-label">Bekasi Built-Up Area Increase</div>
+                <div class="ws-evidence-sub">1990-2018</div>
+            </div>
+            <div class="ws-evidence-card">
+                <div class="ws-evidence-value">$4.5B</div>
+                <div class="ws-evidence-label">Digital Edge Campus Investment</div>
+                <div class="ws-evidence-sub">Indonesia's largest</div>
+            </div>
+        </div>
+        <div class="ws-evidence-source">Sources: S&P Global 2024, WRI Aqueduct 4.0, Data Center Knowledge 2024, IJG 2020</div>
+    </div>
+
     <article class="article-content">
         <div class="container">
             <div class="article-body">
@@ -836,6 +1073,13 @@
                 <div class="warning-box" style="background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border-left-color: #ca8a04;">
                     <p style="color: #854d0e; margin-bottom: 0.5rem;"><strong>Data Validity Notice</strong></p>
                     <p style="color: #a16207; font-size: 0.9rem; margin: 0;">The water stress indices, market data, and infrastructure statistics presented in this article are based on publicly available data as of <strong>February 2026</strong>. Water stress conditions are dynamic and influenced by seasonal variations, climate change, urban development, and policy changes. Readers are advised to consult the latest WRI Aqueduct data and local environmental agencies for current assessments before making infrastructure investment decisions.</p>
+                </div>
+
+                <!-- CTA Block -->
+                <div class="ws-cta-block">
+                    <p class="ws-cta-headline">Calculate Your Facility's Water Footprint</p>
+                    <p class="ws-cta-sub">Estimate annual water consumption and compare mitigation strategies across 8 Southeast Asian regions</p>
+                    <a href="#calculator-section" class="ws-cta-btn">Open Water Calculator</a>
                 </div>
 
                 <!-- Key Statistics Infographic -->
@@ -1095,7 +1339,7 @@
                     <p style="margin-top: 0.5rem;">A typical 10MW facility with WUE of 1.5 consumes approximately <strong>131 million liters annually</strong>—equivalent to 52 Olympic swimming pools.</p>
                 </div>
 
-                <h2>3. Interactive: Data Center Water Consumption Calculator</h2>
+                <h2 id="calculator-section">3. Interactive: Data Center Water Consumption Calculator</h2>
                 <p>Use this calculator to estimate water consumption based on facility parameters. Adjust the sliders to see real-time impact analysis:</p>
 
                 <!-- Water Calculator -->
@@ -1103,11 +1347,25 @@
                     <div class="calc-title">Data Center Water Consumption Calculator</div>
                     <div class="calc-subtitle">Estimate annual water usage based on facility specifications</div>
 
+                    <!-- Toolbar -->
+                    <div class="ws-toolbar-row">
+                        <div class="ws-mode-bar">
+                            <div class="mode-toggle">
+                                <button class="mode-btn active" id="wsFreeBtn" onclick="wsSetMode('free')">Free</button>
+                                <button class="mode-btn" id="wsProBtn" onclick="wsSetMode('pro')">Pro</button>
+                            </div>
+                        </div>
+                        <div class="ws-toolbar-actions">
+                            <button class="ws-btn-reset" onclick="wsResetDefaults()"><i class="fas fa-undo"></i> Reset</button>
+                            <button class="ws-btn-pdf" onclick="wsExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                        </div>
+                    </div>
+
                     <div class="calc-controls">
                         <div class="control-card">
                             <div class="control-label">
                                 <span class="control-icon power">⚡</span>
-                                IT Load Capacity
+                                IT Load Capacity <span class="tooltip-trigger" tabindex="0">?<span class="tooltip-content"><div class="tooltip-title">IT Load Capacity (MW)</div><div class="tooltip-desc">Total IT power demand. Directly determines cooling load and water consumption. A 10MW facility is mid-size; hyperscalers build 100MW+.</div><div class="tooltip-formula">Water &#8733; Load &#215; PUE &#215; WUE &#215; 8,760 hrs</div></span></span>
                             </div>
                             <input type="range" id="powerSlider" class="control-slider" min="1" max="100" value="10">
                             <div class="control-value">
@@ -1120,7 +1378,7 @@
                         <div class="control-card">
                             <div class="control-label">
                                 <span class="control-icon pue">🌡️</span>
-                                PUE (Power Usage Effectiveness)
+                                PUE (Power Usage Effectiveness) <span class="tooltip-trigger" tabindex="0">?<span class="tooltip-content"><div class="tooltip-title">Power Usage Effectiveness</div><div class="tooltip-desc">Ratio of total facility power to IT power. Lower PUE = less cooling overhead. Industry avg 1.58 (Uptime 2023). Hyperscalers achieve 1.10-1.20.</div><div class="tooltip-formula">PUE = Total Power / IT Power | Best: 1.10</div></span></span>
                             </div>
                             <input type="range" id="pueSlider" class="control-slider" min="110" max="200" value="140">
                             <div class="control-value">
@@ -1133,7 +1391,7 @@
                         <div class="control-card">
                             <div class="control-label">
                                 <span class="control-icon wue">💧</span>
-                                WUE (L/kWh)
+                                WUE (L/kWh) <span class="tooltip-trigger" tabindex="0">?<span class="tooltip-content"><div class="tooltip-title">Water Usage Effectiveness</div><div class="tooltip-desc">Liters of water consumed per kWh of IT energy. Air-cooled = 0, evaporative = 0.5-1.5, traditional cooling tower = 1.5-2.0. Key metric for water sustainability.</div><div class="tooltip-formula">Annual Water = Load &#215; 1000 &#215; 8760 &#215; WUE</div></span></span>
                             </div>
                             <input type="range" id="wueSlider" class="control-slider" min="0" max="200" value="150">
                             <div class="control-value">
@@ -1171,6 +1429,184 @@
                             <div class="impact-text" id="impactText">High water consumption - consider water recycling systems</div>
                         </div>
                     </div>
+
+                    <!-- Pro Panel 1: Water Cost & Financial Impact -->
+                    <div class="ws-pro-panel gated" id="wsPanel1">
+                        <div class="ws-gate-overlay" onclick="wsShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-dollar-sign"></i> Water Cost &amp; Financial Impact</div>
+                        <div class="ws-kpi-grid">
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsAnnualCost">$157K</div>
+                                <div class="ws-kpi-label">Annual Water Cost</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsCostPerMW">$15.7K</div>
+                                <div class="ws-kpi-label">Cost per MW</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="ws10yrTCO">$1.8M</div>
+                                <div class="ws-kpi-label">10-Year TCO Water</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsEscalation">3.0%</div>
+                                <div class="ws-kpi-label">Annual Escalation</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsEvapCost">$157K</div>
+                                <div class="ws-kpi-label">Evaporative Cost</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsDLCSaving">-87%</div>
+                                <div class="ws-kpi-label">DLC Savings vs Evap</div>
+                            </div>
+                        </div>
+                        <div class="ws-chart-container">
+                            <canvas id="wsWaterfallChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 2: Regional Water Risk Matrix -->
+                    <div class="ws-pro-panel gated" id="wsPanel2">
+                        <div class="ws-gate-overlay" onclick="wsShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-globe-asia"></i> Regional Water Risk Matrix</div>
+                        <select class="ws-region-select" id="wsRegionSelect" onchange="updateWsProPanels()">
+                            <option value="jakarta">Jakarta/Bekasi - Extremely High Stress</option>
+                            <option value="singapore">Singapore - High Stress</option>
+                            <option value="johor">Johor Bahru - Low-Medium Stress</option>
+                            <option value="hanoi">Hanoi - Medium Stress</option>
+                            <option value="danang">Da Nang - Low Stress</option>
+                            <option value="bangkok">Bangkok - Medium-High Stress</option>
+                            <option value="manila">Manila - High Stress</option>
+                            <option value="kualalumpur">Kuala Lumpur - Medium Stress</option>
+                        </select>
+                        <div class="ws-kpi-grid">
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegionStress">4.8/5</div>
+                                <div class="ws-kpi-label">Water Stress Score</div>
+                                <div class="ws-score-bar-bg"><div class="ws-score-bar-fill risk-high" id="wsStressBar" style="width:96%"></div></div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegionRisk">92</div>
+                                <div class="ws-kpi-label">Risk Score (0-100)</div>
+                                <div class="ws-score-bar-bg"><div class="ws-score-bar-fill risk-high" id="wsRiskBar" style="width:92%"></div></div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegionPrice">$1.20</div>
+                                <div class="ws-kpi-label">Water Price ($/m&#179;)</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegionLevel">Extreme</div>
+                                <div class="ws-kpi-label">Stress Level</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegionAnnualCost">$157K</div>
+                                <div class="ws-kpi-label">Annual Water Cost</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegionRank">#1</div>
+                                <div class="ws-kpi-label">Risk Rank (of 8)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 3: Sustainability Compliance Scorecard -->
+                    <div class="ws-pro-panel gated" id="wsPanel3">
+                        <div class="ws-gate-overlay" onclick="wsShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-leaf"></i> Sustainability Compliance Scorecard</div>
+                        <div class="ws-kpi-grid">
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsESGScore">C+</div>
+                                <div class="ws-kpi-label">ESG Water Alignment</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsCDPGrade">B-</div>
+                                <div class="ws-kpi-label">CDP Water Disclosure</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsSBTiGap">32%</div>
+                                <div class="ws-kpi-label">SBTi Water Target Gap</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRegExposure">High</div>
+                                <div class="ws-kpi-label">Regulatory Exposure</div>
+                                <div class="ws-kpi-sublabel">Indonesia PP 22/2021</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsRecycleRate">15%</div>
+                                <div class="ws-kpi-label">Water Recycle Rate</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsComplianceRisk">68/100</div>
+                                <div class="ws-kpi-label">Compliance Risk Index</div>
+                            </div>
+                        </div>
+                        <div class="ws-narrative" id="wsNarrative">
+                            <h4><i class="fas fa-robot"></i> AI-Generated Assessment</h4>
+                            <p id="wsNarrativeText">Loading assessment...</p>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 4: Monte Carlo Water Projection -->
+                    <div class="ws-pro-panel gated" id="wsPanel4">
+                        <div class="ws-gate-overlay" onclick="wsShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-chart-area"></i> Monte Carlo Water Projection (10K Iterations)</div>
+                        <div class="ws-kpi-grid">
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsMCP5">$98K</div>
+                                <div class="ws-kpi-label">P5 (Best Case)</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsMCP50">$157K</div>
+                                <div class="ws-kpi-label">P50 (Median)</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsMCP95">$238K</div>
+                                <div class="ws-kpi-label">P95 (Worst Case)</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsMCMean">$161K</div>
+                                <div class="ws-kpi-label">Mean Cost</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsMCStd">$42K</div>
+                                <div class="ws-kpi-label">Std Deviation</div>
+                            </div>
+                            <div class="ws-kpi-card">
+                                <div class="ws-kpi-value" id="wsMCTopDriver">WUE</div>
+                                <div class="ws-kpi-label">Highest Impact Factor</div>
+                            </div>
+                        </div>
+                        <div class="ws-chart-container">
+                            <canvas id="wsMonteCarloChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Badge -->
+                    <div class="ws-privacy-badge">
+                        <i class="fas fa-shield-alt"></i> All calculations run locally in your browser. No data is sent to any server.
+                    </div>
+
+                    <!-- Benchmark Meta Tags -->
+                    <div class="ws-benchmark-meta">
+                        <span class="ws-benchmark-tag"><i class="fas fa-database"></i> WRI Aqueduct 4.0</span>
+                        <span class="ws-benchmark-tag"><i class="fas fa-water"></i> WUE ISO 30134-9</span>
+                        <span class="ws-benchmark-tag"><i class="fas fa-chart-bar"></i> 10K MC Iterations</span>
+                        <span class="ws-benchmark-tag"><i class="fas fa-globe"></i> 8 SEA Regions</span>
+                        <span class="ws-benchmark-tag"><i class="fas fa-calendar"></i> Feb 2026 Data</span>
+                    </div>
+
                 </div>
 
                 <h2>4. Southeast Asia Focus: Jakarta and Bekasi</h2>
@@ -1437,6 +1873,20 @@
                     <p><strong>Final Thought:</strong> The $30 billion investment flowing into SEA data centers over the next five years represents an unprecedented opportunity to build digital infrastructure that respects planetary boundaries. Water stress is a constraint, but it's also a catalyst for innovation. The operators who master water efficiency in tropical, water-stressed environments will have a competitive advantage as these challenges become global.</p>
                 </div>
 
+                <!-- Login Modal -->
+                <div class="ws-login-overlay" id="wsLoginOverlay">
+                    <div class="ws-login-box">
+                        <button class="ws-login-close" onclick="wsHideLogin()">&times;</button>
+                        <h3><i class="fas fa-lock" style="color:#06b6d4;margin-right:6px;"></i> Unlock Pro Analysis</h3>
+                        <p>Access Water Cost Analysis, Regional Risk Matrix, Sustainability Scorecard, and Monte Carlo Projections.</p>
+                        <input type="email" id="wsLoginEmail" placeholder="Email address" autocomplete="email">
+                        <input type="password" id="wsLoginPass" placeholder="Password" autocomplete="current-password">
+                        <div class="ws-login-error" id="wsLoginError">Invalid credentials. Please try again.</div>
+                        <button class="login-submit" onclick="wsDoLogin()">Sign In</button>
+                        <div class="demo-hint">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+                    </div>
+                </div>
+
                 <div class="references" id="references">
                     <h3>References & Data Sources</h3>
                     <ol>
@@ -1560,8 +2010,8 @@
                         </svg>
                         Previous Article
                     </a>
-                    <a href="articles.html">
-                        All Articles
+                    <a href="article-11.html">
+                        Next Article
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"/>
                         </svg>
@@ -1690,12 +2140,656 @@
             }
         }
 
-        powerSlider.addEventListener('input', calculate);
-        pueSlider.addEventListener('input', calculate);
-        wueSlider.addEventListener('input', calculate);
+        powerSlider.addEventListener('input', function() { calculate(); if (typeof updateWsProPanels === 'function') updateWsProPanels(); });
+        pueSlider.addEventListener('input', function() { calculate(); if (typeof updateWsProPanels === 'function') updateWsProPanels(); });
+        wueSlider.addEventListener('input', function() { calculate(); if (typeof updateWsProPanels === 'function') updateWsProPanels(); });
 
         // Initial calculation
         calculate();
+    })();
+    </script>
+
+    <!-- Pro Enhancement Mode JS -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ===== Regional Water Pricing Data =====
+        const WS_REGIONS = {
+            jakarta:     { name: 'Jakarta/Bekasi',  stressLevel: 'Extremely High', stressScore: 4.8, waterPrice: 1.20, riskScore: 92 },
+            singapore:   { name: 'Singapore',       stressLevel: 'High',           stressScore: 3.8, waterPrice: 2.80, riskScore: 65 },
+            johor:       { name: 'Johor Bahru',     stressLevel: 'Low-Medium',     stressScore: 1.5, waterPrice: 0.80, riskScore: 25 },
+            hanoi:       { name: 'Hanoi',           stressLevel: 'Medium',         stressScore: 2.2, waterPrice: 0.55, riskScore: 40 },
+            danang:      { name: 'Da Nang',         stressLevel: 'Low',            stressScore: 1.0, waterPrice: 0.45, riskScore: 18 },
+            bangkok:     { name: 'Bangkok',         stressLevel: 'Medium-High',    stressScore: 2.8, waterPrice: 0.90, riskScore: 55 },
+            manila:      { name: 'Manila',          stressLevel: 'High',           stressScore: 3.5, waterPrice: 1.10, riskScore: 72 },
+            kualalumpur: { name: 'Kuala Lumpur',    stressLevel: 'Medium',         stressScore: 2.0, waterPrice: 0.70, riskScore: 35 }
+        };
+
+        const WS_ESCALATION = 0.03; // 3% annual water price escalation
+
+        var wsProMode = false;
+
+        // ===== Helpers =====
+        function getInputs() {
+            var power = parseInt(document.getElementById('powerSlider').value);
+            var pue = parseInt(document.getElementById('pueSlider').value) / 100;
+            var wue = parseInt(document.getElementById('wueSlider').value) / 100;
+            var regionKey = document.getElementById('wsRegionSelect').value;
+            var region = WS_REGIONS[regionKey];
+            var annualKwh = power * 1000 * 8760;
+            var annualLiters = annualKwh * wue;
+            var annualM3 = annualLiters / 1000;
+            return { power: power, pue: pue, wue: wue, regionKey: regionKey, region: region, annualKwh: annualKwh, annualLiters: annualLiters, annualM3: annualM3 };
+        }
+
+        function fmt(n) {
+            if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
+            return '$' + Math.round(n);
+        }
+
+        // ===== Core Calculation Functions =====
+        function wsCalcWaterCost(inputs) {
+            var annualCost = inputs.annualM3 * inputs.region.waterPrice;
+            var costPerMW = annualCost / Math.max(inputs.power, 1);
+            // 10-year TCO with escalation
+            var tco10 = 0;
+            for (var y = 0; y < 10; y++) {
+                tco10 += annualCost * Math.pow(1 + WS_ESCALATION, y);
+            }
+            // Evaporative vs DLC vs Air-cooled comparison
+            var evapCost = annualCost; // current WUE-based
+            var dlcWue = Math.max(inputs.wue * 0.13, 0); // DLC ~87% reduction
+            var dlcCost = (inputs.power * 1000 * 8760 * dlcWue / 1000) * inputs.region.waterPrice;
+            var airCost = 0; // air-cooled = 0 water
+            var dlcSaving = evapCost > 0 ? ((evapCost - dlcCost) / evapCost * 100) : 0;
+            return { annualCost: annualCost, costPerMW: costPerMW, tco10: tco10, evapCost: evapCost, dlcCost: dlcCost, airCost: airCost, dlcSaving: dlcSaving };
+        }
+
+        function runWsMonteCarlo(inputs) {
+            var results = [];
+            var N = 10000;
+            for (var i = 0; i < N; i++) {
+                var loadVar = inputs.power * (1 + (Math.random() - 0.5) * 0.30);  // +/-15%
+                var pueVar = inputs.pue * (1 + (Math.random() - 0.5) * 0.20);     // +/-10%
+                var wueVar = inputs.wue * (1 + (Math.random() - 0.5) * 0.40);     // +/-20%
+                var priceVar = inputs.region.waterPrice * (1 + (Math.random() - 0.5) * 0.30); // +/-15%
+                var m3 = loadVar * 1000 * 8760 * Math.max(wueVar, 0) / 1000;
+                var cost = m3 * priceVar;
+                results.push(cost);
+            }
+            results.sort(function(a, b) { return a - b; });
+            var sum = results.reduce(function(a, b) { return a + b; }, 0);
+            var mean = sum / N;
+            var sqDiff = results.reduce(function(a, b) { return a + Math.pow(b - mean, 2); }, 0);
+            var std = Math.sqrt(sqDiff / N);
+            return {
+                p5: results[Math.floor(N * 0.05)],
+                p50: results[Math.floor(N * 0.50)],
+                p95: results[Math.floor(N * 0.95)],
+                mean: mean,
+                std: std,
+                results: results
+            };
+        }
+
+        function runWsSensitivity(inputs) {
+            var base = inputs.annualM3 * inputs.region.waterPrice;
+            // Vary each input by +10% and see impact
+            var loadImpact = ((inputs.power * 1.1) * 1000 * 8760 * inputs.wue / 1000 * inputs.region.waterPrice - base) / base * 100;
+            var pueImpact = 0; // PUE doesn't directly affect water in this model but affects total energy
+            var wueImpact = ((inputs.power * 1000 * 8760 * (inputs.wue * 1.1) / 1000) * inputs.region.waterPrice - base) / base * 100;
+            var priceImpact = (inputs.annualM3 * inputs.region.waterPrice * 1.1 - base) / base * 100;
+            var drivers = [
+                { name: 'IT Load', impact: loadImpact },
+                { name: 'WUE', impact: wueImpact },
+                { name: 'Water Price', impact: priceImpact }
+            ];
+            drivers.sort(function(a, b) { return b.impact - a.impact; });
+            return drivers;
+        }
+
+        function generateWsNarrative(inputs) {
+            var cost = wsCalcWaterCost(inputs);
+            var region = inputs.region;
+            var parts = [];
+
+            // Water stress assessment
+            if (region.stressScore >= 4) {
+                parts.push('CRITICAL: ' + region.name + ' operates in an extremely high water stress zone (score ' + region.stressScore + '/5). Facilities here face acute supply disruption risk, potential regulatory restrictions on new extraction permits, and reputational ESG exposure.');
+            } else if (region.stressScore >= 3) {
+                parts.push('WARNING: ' + region.name + ' has high water stress (score ' + region.stressScore + '/5). While current supply is manageable, growing demand from data centers and urbanization will increase competition for water resources within 3-5 years.');
+            } else if (region.stressScore >= 2) {
+                parts.push(region.name + ' has moderate water stress (score ' + region.stressScore + '/5). Current conditions are favorable for data center operations, but climate variability and rapid infrastructure growth warrant proactive water management.');
+            } else {
+                parts.push(region.name + ' enjoys low water stress (score ' + region.stressScore + '/5), making it well-suited for water-intensive cooling operations. This represents a strategic site selection advantage.');
+            }
+
+            // Sustainability gap
+            if (inputs.wue > 1.2) {
+                parts.push('Your WUE of ' + inputs.wue.toFixed(2) + ' L/kWh exceeds the industry best practice target of 0.5 L/kWh. Transitioning to direct liquid cooling (DLC) could reduce water consumption by approximately 87%, saving ' + fmt(cost.evapCost - cost.dlcCost) + ' annually.');
+            } else if (inputs.wue > 0.5) {
+                parts.push('Your WUE of ' + inputs.wue.toFixed(2) + ' L/kWh is within the moderate range. Further optimization through free cooling and partial liquid cooling could bring this below 0.5 L/kWh.');
+            } else if (inputs.wue > 0) {
+                parts.push('Your WUE of ' + inputs.wue.toFixed(2) + ' L/kWh demonstrates strong water efficiency. Maintaining this level while scaling capacity should be a key operational priority.');
+            }
+
+            // Risk outlook
+            parts.push('10-year water TCO projection: ' + fmt(cost.tco10) + ' (assuming 3% annual price escalation). In ' + region.name + ', water price volatility and regulatory tightening (including Indonesia PP 22/2021 for applicable regions) could increase actual costs by 15-40% above baseline projections.');
+
+            // Recommendation
+            var drivers = runWsSensitivity(inputs);
+            parts.push('Sensitivity analysis identifies ' + drivers[0].name + ' as the highest-impact variable on water cost (+' + drivers[0].impact.toFixed(1) + '% per 10% increase). Prioritize ' + drivers[0].name.toLowerCase() + ' optimization for maximum financial impact.');
+
+            return parts.join(' ');
+        }
+
+        // ===== Chart Drawing =====
+        function drawWaterfallChart(costData) {
+            var canvas = document.getElementById('wsWaterfallChart');
+            if (!canvas || !canvas.getContext) return;
+            var ctx = canvas.getContext('2d');
+            var W = canvas.parentElement.clientWidth - 32;
+            canvas.width = W;
+            canvas.height = 200;
+            ctx.clearRect(0, 0, W, 200);
+
+            var items = [
+                { label: 'Evaporative', value: costData.evapCost, color: '#ef4444' },
+                { label: 'DLC', value: costData.dlcCost, color: '#06b6d4' },
+                { label: 'Air-Cooled', value: costData.airCost, color: '#10b981' }
+            ];
+            var maxVal = Math.max.apply(null, items.map(function(i) { return i.value; })) || 1;
+            var barWidth = Math.min(80, (W - 60) / items.length - 20);
+            var chartH = 150;
+            var baseY = 180;
+
+            // Title
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Annual Water Cost by Cooling Technology', W / 2, 15);
+
+            items.forEach(function(item, i) {
+                var x = 40 + i * ((W - 60) / items.length) + ((W - 60) / items.length - barWidth) / 2;
+                var barH = maxVal > 0 ? (item.value / maxVal) * chartH : 0;
+                var y = baseY - barH;
+
+                // Bar
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                // Rounded top corners
+                var r = 4;
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + barWidth - r, y);
+                ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + r);
+                ctx.lineTo(x + barWidth, y + barH);
+                ctx.lineTo(x, y + barH);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+                ctx.closePath();
+                ctx.fill();
+
+                // Value label
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = 'bold 11px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(fmt(item.value), x + barWidth / 2, y - 6);
+
+                // Category label
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px Inter, sans-serif';
+                ctx.fillText(item.label, x + barWidth / 2, baseY + 14);
+            });
+        }
+
+        function drawMonteCarloChart(mcData) {
+            var canvas = document.getElementById('wsMonteCarloChart');
+            if (!canvas || !canvas.getContext) return;
+            var ctx = canvas.getContext('2d');
+            var W = canvas.parentElement.clientWidth - 32;
+            canvas.width = W;
+            canvas.height = 200;
+            ctx.clearRect(0, 0, W, 200);
+
+            // Create histogram bins
+            var results = mcData.results;
+            var minVal = results[0];
+            var maxVal = results[results.length - 1];
+            var range = maxVal - minVal || 1;
+            var numBins = 40;
+            var bins = new Array(numBins).fill(0);
+            results.forEach(function(v) {
+                var bin = Math.min(Math.floor((v - minVal) / range * numBins), numBins - 1);
+                bins[bin]++;
+            });
+            var maxBin = Math.max.apply(null, bins);
+            var chartH = 150;
+            var baseY = 175;
+            var barW = (W - 60) / numBins;
+
+            // Title
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Annual Water Cost Distribution (10,000 Simulations)', W / 2, 15);
+
+            bins.forEach(function(count, i) {
+                var x = 30 + i * barW;
+                var barH = maxBin > 0 ? (count / maxBin) * chartH : 0;
+                var y = baseY - barH;
+                var binCenter = minVal + (i + 0.5) * range / numBins;
+
+                // Color based on percentile
+                if (binCenter <= mcData.p5) ctx.fillStyle = '#10b981';
+                else if (binCenter <= mcData.p50) ctx.fillStyle = '#06b6d4';
+                else if (binCenter <= mcData.p95) ctx.fillStyle = '#f59e0b';
+                else ctx.fillStyle = '#ef4444';
+
+                ctx.fillRect(x, y, Math.max(barW - 1, 1), barH);
+            });
+
+            // P5, P50, P95 lines
+            var markers = [
+                { val: mcData.p5, label: 'P5', color: '#10b981' },
+                { val: mcData.p50, label: 'P50', color: '#06b6d4' },
+                { val: mcData.p95, label: 'P95', color: '#ef4444' }
+            ];
+            markers.forEach(function(m) {
+                var xPos = 30 + ((m.val - minVal) / range) * (W - 60);
+                ctx.strokeStyle = m.color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 3]);
+                ctx.beginPath();
+                ctx.moveTo(xPos, 25);
+                ctx.lineTo(xPos, baseY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = m.color;
+                ctx.font = 'bold 9px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(m.label, xPos, baseY + 13);
+            });
+        }
+
+        // ===== Panel Update =====
+        window.updateWsProPanels = function() {
+            var inputs = getInputs();
+            var costData = wsCalcWaterCost(inputs);
+            var mcData = runWsMonteCarlo(inputs);
+            var sensitivity = runWsSensitivity(inputs);
+            var region = inputs.region;
+
+            // Panel 1: Water Cost
+            document.getElementById('wsAnnualCost').textContent = fmt(costData.annualCost);
+            document.getElementById('wsCostPerMW').textContent = fmt(costData.costPerMW);
+            document.getElementById('ws10yrTCO').textContent = fmt(costData.tco10);
+            document.getElementById('wsEscalation').textContent = (WS_ESCALATION * 100).toFixed(1) + '%';
+            document.getElementById('wsEvapCost').textContent = fmt(costData.evapCost);
+            document.getElementById('wsDLCSaving').textContent = '-' + Math.round(costData.dlcSaving) + '%';
+
+            // Panel 2: Regional Risk
+            document.getElementById('wsRegionStress').textContent = region.stressScore.toFixed(1) + '/5';
+            document.getElementById('wsRegionRisk').textContent = region.riskScore;
+            document.getElementById('wsRegionPrice').textContent = '$' + region.waterPrice.toFixed(2);
+            document.getElementById('wsRegionLevel').textContent = region.stressLevel;
+            document.getElementById('wsRegionAnnualCost').textContent = fmt(costData.annualCost);
+
+            // Region rank
+            var sorted = Object.keys(WS_REGIONS).sort(function(a, b) { return WS_REGIONS[b].riskScore - WS_REGIONS[a].riskScore; });
+            var rank = sorted.indexOf(inputs.regionKey) + 1;
+            document.getElementById('wsRegionRank').textContent = '#' + rank;
+
+            // Score bars
+            var stressBar = document.getElementById('wsStressBar');
+            var riskBar = document.getElementById('wsRiskBar');
+            stressBar.style.width = (region.stressScore / 5 * 100) + '%';
+            riskBar.style.width = region.riskScore + '%';
+            stressBar.className = 'ws-score-bar-fill ' + (region.stressScore >= 3.5 ? 'risk-high' : region.stressScore >= 2 ? 'risk-med' : 'risk-low');
+            riskBar.className = 'ws-score-bar-fill ' + (region.riskScore >= 60 ? 'risk-high' : region.riskScore >= 30 ? 'risk-med' : 'risk-low');
+
+            // Panel 3: Sustainability
+            var wue = inputs.wue;
+            var esgScore = wue > 1.5 ? 'D' : wue > 1.0 ? 'C+' : wue > 0.5 ? 'B' : 'A-';
+            var cdpGrade = wue > 1.5 ? 'C' : wue > 1.0 ? 'B-' : wue > 0.5 ? 'B+' : 'A';
+            var sbtiGap = Math.max(0, Math.round((wue - 0.5) / 2.0 * 100));
+            var regExposure = region.riskScore >= 70 ? 'High' : region.riskScore >= 40 ? 'Medium' : 'Low';
+            var recycleRate = wue > 1.5 ? '5%' : wue > 1.0 ? '15%' : wue > 0.5 ? '35%' : '60%';
+            var complianceIdx = Math.min(100, Math.round(region.riskScore * 0.5 + sbtiGap * 0.3 + (wue > 1.0 ? 20 : 5)));
+
+            document.getElementById('wsESGScore').textContent = esgScore;
+            document.getElementById('wsCDPGrade').textContent = cdpGrade;
+            document.getElementById('wsSBTiGap').textContent = sbtiGap + '%';
+            document.getElementById('wsRegExposure').textContent = regExposure;
+            document.getElementById('wsRecycleRate').textContent = recycleRate;
+            document.getElementById('wsComplianceRisk').textContent = complianceIdx + '/100';
+
+            // Narrative
+            document.getElementById('wsNarrativeText').textContent = generateWsNarrative(inputs);
+
+            // Panel 4: Monte Carlo
+            document.getElementById('wsMCP5').textContent = fmt(mcData.p5);
+            document.getElementById('wsMCP50').textContent = fmt(mcData.p50);
+            document.getElementById('wsMCP95').textContent = fmt(mcData.p95);
+            document.getElementById('wsMCMean').textContent = fmt(mcData.mean);
+            document.getElementById('wsMCStd').textContent = fmt(mcData.std);
+            document.getElementById('wsMCTopDriver').textContent = sensitivity[0].name;
+
+            // Draw charts if unlocked
+            if (wsProMode) {
+                drawWaterfallChart(costData);
+                drawMonteCarloChart(mcData);
+            }
+        };
+
+        // ===== Auth =====
+        function wsCheckAuth() {
+            try {
+                var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+                if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) return true;
+            } catch (e) {}
+            return false;
+        }
+
+        function wsUnlockPanels() {
+            wsProMode = true;
+            document.querySelectorAll('.ws-pro-panel').forEach(function(p) {
+                p.classList.remove('gated');
+                var overlay = p.querySelector('.ws-gate-overlay');
+                if (overlay) overlay.style.display = 'none';
+            });
+            document.getElementById('wsProBtn').classList.add('active');
+            document.getElementById('wsFreeBtn').classList.remove('active');
+            updateWsProPanels();
+        }
+
+        function wsLockPanels() {
+            wsProMode = false;
+            document.querySelectorAll('.ws-pro-panel').forEach(function(p) {
+                p.classList.add('gated');
+                var overlay = p.querySelector('.ws-gate-overlay');
+                if (overlay) overlay.style.display = '';
+            });
+            document.getElementById('wsFreeBtn').classList.add('active');
+            document.getElementById('wsProBtn').classList.remove('active');
+        }
+
+        window.wsSetMode = function(mode) {
+            if (mode === 'pro') {
+                if (wsCheckAuth()) { wsUnlockPanels(); }
+                else { wsShowLogin(); }
+            } else {
+                wsLockPanels();
+            }
+        };
+
+        window.wsShowLogin = function() {
+            document.getElementById('wsLoginOverlay').classList.add('active');
+            document.getElementById('wsLoginError').style.display = 'none';
+            document.getElementById('wsLoginEmail').value = '';
+            document.getElementById('wsLoginPass').value = '';
+            setTimeout(function() { document.getElementById('wsLoginEmail').focus(); }, 100);
+        };
+
+        window.wsHideLogin = function() {
+            document.getElementById('wsLoginOverlay').classList.remove('active');
+        };
+
+        window.wsDoLogin = function() {
+            var email = document.getElementById('wsLoginEmail').value.trim().toLowerCase();
+            var pass = document.getElementById('wsLoginPass').value;
+            if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+                var session = { email: email, tier: 'pro', expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+                localStorage.setItem('rz_premium_session', JSON.stringify(session));
+                window.dispatchEvent(new Event('rz-auth-change'));
+                wsHideLogin();
+                wsUnlockPanels();
+            } else {
+                document.getElementById('wsLoginError').style.display = 'block';
+            }
+        };
+
+        // Enter key in login
+        document.getElementById('wsLoginPass').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') wsDoLogin();
+        });
+        document.getElementById('wsLoginEmail').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('wsLoginPass').focus();
+        });
+
+        // Close on overlay click
+        document.getElementById('wsLoginOverlay').addEventListener('click', function(e) {
+            if (e.target === this) wsHideLogin();
+        });
+
+        // Listen for auth changes
+        window.addEventListener('rz-auth-change', function() {
+            if (wsCheckAuth()) wsUnlockPanels();
+            else wsLockPanels();
+        });
+
+        // ===== Reset =====
+        window.wsResetDefaults = function() {
+            document.getElementById('powerSlider').value = 10;
+            document.getElementById('pueSlider').value = 140;
+            document.getElementById('wueSlider').value = 150;
+            document.getElementById('wsRegionSelect').value = 'jakarta';
+            // Trigger recalculation
+            document.getElementById('powerSlider').dispatchEvent(new Event('input'));
+        };
+
+        // ===== PDF Export =====
+        window.wsExportPDF = function() {
+            if (!wsCheckAuth()) { wsShowLogin(); return; }
+            var inputs = getInputs();
+            var costData = wsCalcWaterCost(inputs);
+            var mcData = runWsMonteCarlo(inputs);
+            var sensitivity = runWsSensitivity(inputs);
+            var narrative = generateWsNarrative(inputs);
+
+            // Build SVG chart for waterfall
+            function buildWaterfallSVG() {
+                var items = [
+                    { label: 'Evaporative', value: costData.evapCost, color: '#ef4444' },
+                    { label: 'DLC', value: costData.dlcCost, color: '#0891b2' },
+                    { label: 'Air-Cooled', value: costData.airCost, color: '#10b981' }
+                ];
+                var maxVal = Math.max.apply(null, items.map(function(i) { return i.value; })) || 1;
+                var svgW = 500, svgH = 200, barW = 80, gap = 50;
+                var startX = (svgW - (items.length * (barW + gap) - gap)) / 2;
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+                svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc"/>';
+                svg += '<text x="' + (svgW/2) + '" y="20" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="12" font-weight="bold">Annual Water Cost by Cooling Technology</text>';
+                items.forEach(function(item, i) {
+                    var x = startX + i * (barW + gap);
+                    var barH = maxVal > 0 ? (item.value / maxVal) * 140 : 0;
+                    var y = 170 - barH;
+                    svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + item.color + '" rx="4"/>';
+                    svg += '<text x="' + (x + barW/2) + '" y="' + (y - 6) + '" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="11" font-weight="bold">' + fmt(item.value) + '</text>';
+                    svg += '<text x="' + (x + barW/2) + '" y="188" text-anchor="middle" fill="#64748b" font-family="Inter,sans-serif" font-size="10">' + item.label + '</text>';
+                });
+                svg += '</svg>';
+                return svg;
+            }
+
+            // Build SVG histogram
+            function buildHistogramSVG() {
+                var results = mcData.results;
+                var minV = results[0], maxV = results[results.length - 1], range = maxV - minV || 1;
+                var numBins = 40, bins = new Array(numBins).fill(0);
+                results.forEach(function(v) { var b = Math.min(Math.floor((v - minV) / range * numBins), numBins - 1); bins[b]++; });
+                var maxBin = Math.max.apply(null, bins);
+                var svgW = 500, svgH = 200, barW = (svgW - 60) / numBins;
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+                svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc"/>';
+                svg += '<text x="' + (svgW/2) + '" y="18" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="12" font-weight="bold">Monte Carlo Distribution (10K Simulations)</text>';
+                bins.forEach(function(c, i) {
+                    var x = 30 + i * barW;
+                    var barH = maxBin > 0 ? (c / maxBin) * 140 : 0;
+                    var y = 170 - barH;
+                    var binCenter = minV + (i + 0.5) * range / numBins;
+                    var color = binCenter <= mcData.p5 ? '#10b981' : binCenter <= mcData.p50 ? '#0891b2' : binCenter <= mcData.p95 ? '#f59e0b' : '#ef4444';
+                    svg += '<rect x="' + x + '" y="' + y + '" width="' + Math.max(barW - 0.5, 0.5) + '" height="' + barH + '" fill="' + color + '"/>';
+                });
+                // P-lines
+                [{ v: mcData.p5, l: 'P5', c: '#10b981' }, { v: mcData.p50, l: 'P50', c: '#0891b2' }, { v: mcData.p95, l: 'P95', c: '#ef4444' }].forEach(function(m) {
+                    var xp = 30 + ((m.v - minV) / range) * (svgW - 60);
+                    svg += '<line x1="' + xp + '" y1="28" x2="' + xp + '" y2="170" stroke="' + m.c + '" stroke-width="1.5" stroke-dasharray="4,3"/>';
+                    svg += '<text x="' + xp + '" y="185" text-anchor="middle" fill="' + m.c + '" font-family="Inter,sans-serif" font-size="9" font-weight="bold">' + m.l + '</text>';
+                });
+                svg += '</svg>';
+                return svg;
+            }
+
+            var region = inputs.region;
+            var wue = inputs.wue;
+            var esgScore = wue > 1.5 ? 'D' : wue > 1.0 ? 'C+' : wue > 0.5 ? 'B' : 'A-';
+            var cdpGrade = wue > 1.5 ? 'C' : wue > 1.0 ? 'B-' : wue > 0.5 ? 'B+' : 'A';
+            var sbtiGap = Math.max(0, Math.round((wue - 0.5) / 2.0 * 100));
+
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+            html += '<title>Water Stress Pro Report - ' + region.name + '</title>';
+            html += '<style>';
+            html += 'body { font-family: Inter, Helvetica, Arial, sans-serif; color: #1f2937; max-width: 800px; margin: 0 auto; padding: 40px 30px; font-size: 11pt; line-height: 1.6; }';
+            html += 'h1 { color: #1e3a5f; font-size: 22pt; margin-bottom: 4px; border-bottom: 3px solid #0891b2; padding-bottom: 8px; }';
+            html += 'h2 { color: #1e3a5f; font-size: 14pt; margin-top: 28px; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }';
+            html += 'h3 { color: #1e3a5f; font-size: 12pt; margin-top: 20px; }';
+            html += '.subtitle { color: #64748b; font-size: 10pt; margin-bottom: 20px; }';
+            html += '.meta { display: flex; gap: 20px; font-size: 9pt; color: #64748b; margin-bottom: 24px; flex-wrap: wrap; }';
+            html += '.meta span { background: #f1f5f9; padding: 3px 10px; border-radius: 4px; }';
+            html += 'table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }';
+            html += 'th { background: #f1f5f9; color: #1e3a5f; padding: 8px 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e7eb; }';
+            html += 'td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; color: #1f2937; }';
+            html += '.kpi-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }';
+            html += '.kpi-item { flex: 1; min-width: 110px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; text-align: center; }';
+            html += '.kpi-val { font-size: 16pt; font-weight: 800; color: #0891b2; }';
+            html += '.kpi-lbl { font-size: 8pt; color: #64748b; margin-top: 2px; }';
+            html += '.narrative { background: #f0f9ff; border-left: 3px solid #0891b2; padding: 12px 16px; margin: 14px 0; border-radius: 0 8px 8px 0; }';
+            html += '.narrative p { color: #1f2937; font-size: 10pt; margin: 0; }';
+            html += '.chart-wrap { text-align: center; margin: 16px 0; }';
+            html += '.methodology { background: #f8fafc; padding: 12px 16px; border-radius: 8px; margin-top: 24px; font-size: 9pt; color: #64748b; }';
+            html += '.methodology h3 { color: #1e3a5f; margin-top: 0; }';
+            html += '.footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 8pt; color: #94a3b8; text-align: center; }';
+            html += '@media print { body { padding: 20px; } }';
+            html += '</style></head><body>';
+
+            html += '<h1>Water Stress Analysis Report</h1>';
+            html += '<p class="subtitle">Data Center Water Consumption & Risk Assessment - ' + region.name + '</p>';
+            html += '<div class="meta">';
+            html += '<span>Region: ' + region.name + '</span>';
+            html += '<span>IT Load: ' + inputs.power + ' MW</span>';
+            html += '<span>PUE: ' + inputs.pue.toFixed(2) + '</span>';
+            html += '<span>WUE: ' + inputs.wue.toFixed(2) + ' L/kWh</span>';
+            html += '<span>Generated: ' + new Date().toLocaleDateString() + '</span>';
+            html += '</div>';
+
+            // Section 1: Water Cost
+            html += '<h2>1. Water Cost & Financial Impact</h2>';
+            html += '<div class="kpi-row">';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(costData.annualCost) + '</div><div class="kpi-lbl">Annual Water Cost</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(costData.costPerMW) + '</div><div class="kpi-lbl">Cost per MW</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(costData.tco10) + '</div><div class="kpi-lbl">10-Year TCO</div></div>';
+            html += '</div>';
+            html += '<table><tr><th>Cooling Type</th><th>Annual Cost</th><th>vs Evaporative</th></tr>';
+            html += '<tr><td>Evaporative Cooling</td><td>' + fmt(costData.evapCost) + '</td><td>Baseline</td></tr>';
+            html += '<tr><td>Direct Liquid Cooling</td><td>' + fmt(costData.dlcCost) + '</td><td>-' + Math.round(costData.dlcSaving) + '%</td></tr>';
+            html += '<tr><td>Air-Cooled</td><td>' + fmt(costData.airCost) + '</td><td>-100%</td></tr></table>';
+            html += '<div class="chart-wrap">' + buildWaterfallSVG() + '</div>';
+
+            // Section 2: Regional Risk
+            html += '<h2>2. Regional Water Risk Matrix</h2>';
+            html += '<table><tr><th>Region</th><th>Stress Score</th><th>Risk Score</th><th>Water Price</th><th>Stress Level</th></tr>';
+            Object.keys(WS_REGIONS).forEach(function(k) {
+                var r = WS_REGIONS[k];
+                var highlight = k === inputs.regionKey ? ' style="background:#f0f9ff;font-weight:600;"' : '';
+                html += '<tr' + highlight + '><td>' + r.name + '</td><td>' + r.stressScore + '/5</td><td>' + r.riskScore + '/100</td><td>$' + r.waterPrice.toFixed(2) + '/m\u00B3</td><td>' + r.stressLevel + '</td></tr>';
+            });
+            html += '</table>';
+
+            // Section 3: Sustainability
+            html += '<h2>3. Sustainability Compliance Scorecard</h2>';
+            html += '<div class="kpi-row">';
+            html += '<div class="kpi-item"><div class="kpi-val">' + esgScore + '</div><div class="kpi-lbl">ESG Water Alignment</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + cdpGrade + '</div><div class="kpi-lbl">CDP Water Grade</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + sbtiGap + '%</div><div class="kpi-lbl">SBTi Target Gap</div></div>';
+            html += '</div>';
+
+            // Section 4: Monte Carlo
+            html += '<h2>4. Monte Carlo Projection (10,000 Iterations)</h2>';
+            html += '<div class="kpi-row">';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mcData.p5) + '</div><div class="kpi-lbl">P5 (Best)</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mcData.p50) + '</div><div class="kpi-lbl">P50 (Median)</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mcData.p95) + '</div><div class="kpi-lbl">P95 (Worst)</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mcData.mean) + '</div><div class="kpi-lbl">Mean</div></div>';
+            html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mcData.std) + '</div><div class="kpi-lbl">Std Dev</div></div>';
+            html += '</div>';
+            html += '<div class="chart-wrap">' + buildHistogramSVG() + '</div>';
+
+            // Sensitivity
+            html += '<h3>Sensitivity Analysis</h3>';
+            html += '<table><tr><th>Variable</th><th>Impact (+10% change)</th></tr>';
+            sensitivity.forEach(function(d) { html += '<tr><td>' + d.name + '</td><td>+' + d.impact.toFixed(1) + '%</td></tr>'; });
+            html += '</table>';
+
+            // Narrative
+            html += '<h2>5. AI-Generated Assessment</h2>';
+            html += '<div class="narrative"><p>' + narrative + '</p></div>';
+
+            // Methodology
+            html += '<div class="methodology">';
+            html += '<h3>Methodology Note</h3>';
+            html += '<p>Water consumption calculated as: Annual Water (L) = IT Load (kW) x 8,760 hrs x WUE (L/kWh). Water cost derived from regional pricing data ($/m\u00B3). Monte Carlo simulation runs 10,000 iterations with parameter variations: IT Load \u00B115%, PUE \u00B110%, WUE \u00B120%, Water Price \u00B115%. Regional water stress scores from WRI Aqueduct 4.0. Sustainability metrics aligned with CDP Water Security framework and SBTi guidance. All calculations performed client-side.</p>';
+            html += '</div>';
+
+            html += '<div class="footer">Generated by ResistanceZero Water Stress Calculator | resistancezero.com | ' + new Date().toISOString().split('T')[0] + '</div>';
+            html += '</body></html>';
+
+            var blob = new Blob([html], { type: 'text/html' });
+            var url = URL.createObjectURL(blob);
+            var w = window.open(url, '_blank');
+            if (w) {
+                w.onload = function() {
+                    setTimeout(function() { w.print(); }, 500);
+                };
+            }
+            setTimeout(function() { URL.revokeObjectURL(url); }, 30000);
+        };
+
+        // ===== Tooltip Positioning =====
+        document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
+            trigger.addEventListener('mouseenter', function() {
+                var tip = this.querySelector('.tooltip-content');
+                if (!tip) return;
+                var rect = this.getBoundingClientRect();
+                var tipRect = tip.getBoundingClientRect();
+                // If tooltip would go off right edge, shift left
+                if (rect.left + tipRect.width / 2 > window.innerWidth - 10) {
+                    tip.style.left = 'auto';
+                    tip.style.right = '-10px';
+                    tip.style.transform = 'none';
+                }
+                // If tooltip would go off left edge, shift right
+                if (rect.left - tipRect.width / 2 < 10) {
+                    tip.style.left = '-10px';
+                    tip.style.right = 'auto';
+                    tip.style.transform = 'none';
+                }
+                // If tooltip would go off top, show below
+                if (rect.top < tipRect.height + 20) {
+                    tip.style.bottom = 'auto';
+                    tip.style.top = 'calc(100% + 10px)';
+                }
+            });
+        });
+
+        // ===== Init =====
+        if (wsCheckAuth()) {
+            wsUnlockPanels();
+        } else {
+            updateWsProPanels(); // populate values even when locked (blurred)
+        }
+
     })();
     </script>
 <script src="auth.js"></script>

@@ -220,12 +220,12 @@
         .toc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 0.75rem;
+            gap: 0.625rem;
         }
 
         .toc-item {
             background: var(--card-bg);
-            padding: 0.875rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-radius: 10px;
             border-left: 4px solid var(--accent-gold);
             transition: all 0.2s ease;
@@ -248,7 +248,21 @@
 
         .toc-item-title {
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+        }
+
+        /* TOC Calculator Highlight */
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: #f59e0b;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #f59e0b; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.08) 100%);
         }
 
         /* Article Content */
@@ -1173,9 +1187,29 @@
         .calc-results::-webkit-scrollbar-track { background: var(--section-bg); border-radius: 3px; }
         .calc-results::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
 
+        /* Article Nav */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid var(--card-border);
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+        [data-theme="dark"] .article-nav a { color: #93c5fd; }
+        .article-nav a:hover { color: #60a5fa; }
+
         /* Print / PDF Export */
         @media print {
-            .navbar, .quote-builder, .calculator-section, .quote-modal, .toc-section { display: none !important; }
+            .navbar, .quote-builder, .calculator-section, .quote-modal, .toc-section, .article-nav { display: none !important; }
             .article-hero { padding: 1.5rem 1rem; background: #1e3a5f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .article-hero .article-badge, .article-hero .article-meta { display: none; }
             .article-content { padding: 1rem; }
@@ -1342,7 +1376,7 @@
                 <a href="#sec10" class="toc-item"><div class="toc-item-number">Section 10</div><div class="toc-item-title">Cat I: Emergency & Recovery (#101-107)</div></a>
                 <a href="#sec11" class="toc-item"><div class="toc-item-number">Section 11</div><div class="toc-item-title">Cat J: Training & Certification (#108-114)</div></a>
                 <a href="#sec12" class="toc-item"><div class="toc-item-number">Section 12</div><div class="toc-item-title">Cat K: Sustainability & Energy (#115-120)</div></a>
-                <a href="#sec13" class="toc-item"><div class="toc-item-number">Section 13</div><div class="toc-item-title">Interactive Service Catalog Calculator</div></a>
+                <a href="#sec13" class="toc-item toc-calculator"><div class="toc-item-number">Section 13 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div><div class="toc-item-title">Interactive Service Catalog Calculator</div></a>
                 <a href="#sec14" class="toc-item"><div class="toc-item-number">Section 14</div><div class="toc-item-title">Regional Pricing Analysis</div></a>
                 <a href="#sec15" class="toc-item"><div class="toc-item-number">Section 15</div><div class="toc-item-title">Conclusion & Revenue Strategy</div></a>
                 <a href="#sec16" class="toc-item"><div class="toc-item-number">Section 16</div><div class="toc-item-title">References & Sources</div></a>
@@ -1752,6 +1786,18 @@
                     &mdash; End of Article 15 &mdash;<br>
                     <span style="font-size: 0.8rem;">All pricing data represents Americas baseline ranges as of Q1 2026. Actual pricing varies by scope, complexity, and vendor.</span>
                 </p>
+
+                <!-- Article Navigation -->
+                <div class="article-nav">
+                    <a href="article-14.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Previous Article
+                    </a>
+                    <a href="article-16.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
 
             </div>
         </div>

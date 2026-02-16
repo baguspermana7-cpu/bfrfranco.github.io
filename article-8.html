@@ -56,6 +56,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -229,12 +230,12 @@
         .toc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
+            gap: 0.625rem;
         }
 
         .toc-item {
             background: #fff;
-            padding: 1rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-radius: 10px;
             border-left: 4px solid var(--accent-purple);
             transition: all 0.2s ease;
@@ -256,7 +257,21 @@
 
         .toc-item-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
+        }
+
+        /* TOC Calculator Highlight */
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-left-color: #8b5cf6;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #8b5cf6; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0.08) 100%);
         }
 
         /* Article Content */
@@ -935,13 +950,206 @@
             line-height: 1.6;
         }
 
+        /* Article Nav */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+        [data-theme="dark"] .article-nav a { color: #93c5fd; }
+        .article-nav a:hover { color: #60a5fa; }
+
         /* Print CSS */
         @media print {
-            .navbar, .share-buttons, .toc-section, .calculator-section, .chart-container { display: none !important; }
+            .navbar, .share-buttons, .toc-section, .calculator-section, .chart-container, .article-nav { display: none !important; }
             .article-hero { padding: 2rem; background: #4c1d95 !important; }
             .article-content { padding: 1rem; }
             .article-body { font-size: 10pt; }
         }
+
+        /* === PRO ENHANCEMENT MODE === */
+        .shi-evidence-block {
+            margin: 2rem auto; max-width: 900px; padding: 2rem;
+            background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(167,139,250,0.04) 100%);
+            border: 1px solid rgba(139,92,246,0.25); border-radius: 16px;
+        }
+        .shi-evidence-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1rem;
+        }
+        .shi-evidence-card {
+            text-align: center; padding: 1rem 0.5rem;
+            background: rgba(139,92,246,0.06); border-radius: 10px;
+        }
+        .shi-evidence-value {
+            font-size: 1.5rem; font-weight: 800; color: #a78bfa;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .shi-evidence-label { font-size: 0.78rem; color: #94a3b8; margin-top: 0.25rem; }
+        .shi-evidence-sub { font-size: 0.68rem; color: #64748b; margin-top: 0.15rem; }
+        .shi-evidence-source {
+            text-align: center; font-size: 0.72rem; color: #64748b;
+            border-top: 1px solid rgba(139,92,246,0.15); padding-top: 0.75rem; margin-top: 0.5rem;
+        }
+        .shi-cta-block {
+            margin: 2rem 0; padding: 2rem; text-align: center;
+            background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(167,139,250,0.06));
+            border: 1px solid rgba(139,92,246,0.3); border-radius: 16px;
+        }
+        .shi-cta-headline {
+            font-size: 1.4rem; font-weight: 800; color: #e2e8f0; margin-bottom: 0.5rem;
+        }
+        .shi-cta-subtitle { font-size: 0.92rem; color: #94a3b8; margin-bottom: 1.25rem; }
+        .shi-cta-btn {
+            display: inline-block; padding: 0.75rem 2rem; font-weight: 700; font-size: 0.9rem;
+            color: #fff; background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            border-radius: 10px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .shi-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139,92,246,0.4); }
+        .shi-toolbar {
+            display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+            margin-bottom: 1.5rem; padding: 0.75rem 1rem;
+            background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 10px;
+        }
+        .shi-toolbar-btn {
+            padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 600; border: none;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .shi-btn-free { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .shi-btn-free.active { background: #8b5cf6; color: #fff; }
+        .shi-btn-pro { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .shi-btn-pro.active { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
+        .shi-btn-reset { background: rgba(148,163,184,0.15); color: #94a3b8; margin-left: auto; }
+        .shi-btn-reset:hover { background: rgba(148,163,184,0.25); }
+        .shi-btn-pdf { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .shi-btn-pdf:hover { background: rgba(139,92,246,0.3); }
+        .shi-pro-container { display: none; margin-top: 2rem; }
+        .shi-pro-container.visible { display: block; }
+        .shi-pro-panel {
+            margin-bottom: 1.5rem; padding: 1.5rem;
+            background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 14px; position: relative; overflow: hidden;
+        }
+        .shi-pro-panel.gated .shi-panel-content { filter: blur(6px); pointer-events: none; user-select: none; }
+        .shi-gate-overlay {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 10; cursor: pointer;
+            background: rgba(15,23,42,0.7); backdrop-filter: blur(4px);
+        }
+        .shi-gate-overlay i { font-size: 2rem; color: #a78bfa; margin-bottom: 0.5rem; }
+        .shi-gate-overlay span { color: #cbd5e1; font-size: 0.85rem; font-weight: 600; }
+        .shi-panel-title {
+            font-size: 1rem; font-weight: 700; color: #a78bfa; margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .shi-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .shi-kpi-card {
+            padding: 0.75rem; background: rgba(139,92,246,0.08); border-radius: 10px;
+            text-align: center;
+        }
+        .shi-kpi-value {
+            font-size: 1.2rem; font-weight: 800; color: #a78bfa;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .shi-kpi-label { font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem; }
+        .shi-chart-container { margin-top: 1rem; }
+        .shi-chart-container canvas { width: 100%; max-height: 280px; }
+        .shi-narrative-box {
+            margin-top: 1rem; padding: 1rem; font-size: 0.85rem; line-height: 1.6;
+            color: #cbd5e1; background: rgba(139,92,246,0.05);
+            border-left: 3px solid #8b5cf6; border-radius: 0 8px 8px 0;
+        }
+        .shi-sensitivity-bar {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+        }
+        .shi-sensitivity-label { min-width: 110px; font-size: 0.78rem; color: #94a3b8; }
+        .shi-sensitivity-track {
+            flex: 1; height: 20px; background: rgba(255,255,255,0.05);
+            border-radius: 4px; position: relative; overflow: hidden;
+        }
+        .shi-sensitivity-fill {
+            height: 100%; border-radius: 4px; transition: width 0.3s;
+        }
+        .shi-sensitivity-value {
+            min-width: 40px; text-align: right; font-size: 0.78rem;
+            color: #a78bfa; font-family: 'JetBrains Mono', monospace;
+        }
+        .shi-login-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(15,23,42,0.85); backdrop-filter: blur(6px);
+            align-items: center; justify-content: center;
+        }
+        .shi-login-overlay.visible { display: flex; }
+        .shi-login-box {
+            background: #1e293b; border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 16px; padding: 2rem; width: 90%; max-width: 400px;
+            position: relative;
+        }
+        .shi-login-close {
+            position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+            color: #94a3b8; font-size: 1.5rem; cursor: pointer;
+        }
+        .shi-login-title { font-size: 1.2rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.25rem; }
+        .shi-login-subtitle { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem; }
+        .shi-login-input {
+            width: 100%; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem;
+            font-family: 'Inter', sans-serif; box-sizing: border-box;
+        }
+        .shi-login-input:focus { outline: none; border-color: #8b5cf6; }
+        .shi-login-error { color: #f87171; font-size: 0.8rem; margin-bottom: 0.75rem; display: none; }
+        .shi-login-submit {
+            width: 100%; padding: 0.75rem; font-weight: 700; font-size: 0.9rem;
+            color: #fff; background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border: none; border-radius: 8px; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+        }
+        .shi-login-submit:hover { opacity: 0.9; }
+        .shi-login-demo {
+            text-align: center; margin-top: 1rem; font-size: 0.75rem; color: #64748b;
+        }
+        .shi-privacy-badge {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            margin-top: 1.5rem; font-size: 0.75rem; color: #64748b;
+        }
+        .shi-privacy-badge i { color: #8b5cf6; }
+        .shi-benchmark-meta {
+            display: none;
+        }
+        .tooltip-trigger {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%; font-size: 0.65rem;
+            font-weight: 700; color: #a78bfa; background: rgba(139,92,246,0.15);
+            cursor: help; margin-left: 0.35rem; position: relative; vertical-align: middle;
+        }
+        .tooltip-content {
+            display: none; position: fixed; z-index: 9998;
+            width: 260px; padding: 0.85rem; background: #1e293b;
+            border: 1px solid rgba(139,92,246,0.3); border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        .tooltip-content.visible { display: block; }
+        .tooltip-title { font-size: 0.82rem; font-weight: 700; color: #a78bfa; margin-bottom: 0.35rem; }
+        .tooltip-desc { font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 0.35rem; }
+        .tooltip-formula {
+            font-size: 0.72rem; color: #8b5cf6; font-family: 'JetBrains Mono', monospace;
+            background: rgba(139,92,246,0.08); padding: 0.35rem 0.5rem; border-radius: 6px;
+        }
+        [data-theme="dark"] .shi-evidence-block { background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(167,139,250,0.06) 100%); }
+        [data-theme="dark"] .shi-gate-overlay { background: rgba(15,23,42,0.8); }
 
         /* Responsive */
         @media (max-width: 900px) {
@@ -959,6 +1167,9 @@
             .dimension-bar-group { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
             .dimension-bar-label { text-align: left; min-width: auto; }
             .author-bio-section { flex-direction: column; text-align: center; }
+            .shi-evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .shi-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .shi-toolbar { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -1064,6 +1275,38 @@
         </div>
     </section>
 
+    <!-- Evidence Block -->
+    <section class="shi-evidence-block">
+        <div class="shi-evidence-grid">
+            <div class="shi-evidence-card">
+                <div class="shi-evidence-value">70%</div>
+                <div class="shi-evidence-label">Outages Had Detectable Precursors</div>
+                <div class="shi-evidence-sub">Uptime Institute 2023</div>
+            </div>
+            <div class="shi-evidence-card">
+                <div class="shi-evidence-value">3-6 mo</div>
+                <div class="shi-evidence-label">Avg Signal Incubation Window</div>
+                <div class="shi-evidence-sub">Before catastrophic failure</div>
+            </div>
+            <div class="shi-evidence-card">
+                <div class="shi-evidence-value">8x</div>
+                <div class="shi-evidence-label">Near-Miss Reporting Multiplier</div>
+                <div class="shi-evidence-sub">Generative vs Pathological orgs</div>
+            </div>
+            <div class="shi-evidence-card">
+                <div class="shi-evidence-value">45%</div>
+                <div class="shi-evidence-label">Safety Events Underreported</div>
+                <div class="shi-evidence-sub">HSE Research Report 367</div>
+            </div>
+            <div class="shi-evidence-card">
+                <div class="shi-evidence-value">$2.5M</div>
+                <div class="shi-evidence-label">Avg Cost per Major DC Outage</div>
+                <div class="shi-evidence-sub">Uptime Institute 2024</div>
+            </div>
+        </div>
+        <div class="shi-evidence-source">Sources: Uptime Institute Annual Outage Analysis 2023-2024, HSE Research Report 367, Westrum (2004), IAEA GSR Part 2</div>
+    </section>
+
     <!-- Table of Contents -->
     <section class="toc-section">
         <div class="toc-container">
@@ -1079,10 +1322,10 @@
                 <a href="#normalization" class="toc-item"><div class="toc-item-number">Section 05</div><div class="toc-item-title">Normalization of Deviance</div></a>
                 <a href="#weak-signals" class="toc-item"><div class="toc-item-number">Section 06</div><div class="toc-item-title">Weak Signals Taxonomy</div></a>
                 <a href="#case-context" class="toc-item"><div class="toc-item-number">Section 07</div><div class="toc-item-title">Case Context: Silent Drift</div></a>
-                <a href="#interactive" class="toc-item"><div class="toc-item-number">Section 08</div><div class="toc-item-title">Interactive Safety Health Chart</div></a>
+                <a href="#interactive" class="toc-item toc-calculator"><div class="toc-item-number">Section 08 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div><div class="toc-item-title">Interactive Safety Health Chart</div></a>
                 <a href="#detection-system" class="toc-item"><div class="toc-item-number">Section 09</div><div class="toc-item-title">Detection System Design</div></a>
                 <a href="#effective-leading" class="toc-item"><div class="toc-item-number">Section 10</div><div class="toc-item-title">Effective Leading Indicators</div></a>
-                <a href="#calculator" class="toc-item"><div class="toc-item-number">Section 11</div><div class="toc-item-title">Safety Health Index Calculator</div></a>
+                <a href="#calculator" class="toc-item toc-calculator"><div class="toc-item-number">Section 11 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div><div class="toc-item-title">Safety Health Index Calculator</div></a>
                 <a href="#proactive-culture" class="toc-item"><div class="toc-item-number">Section 12</div><div class="toc-item-title">Proactive Safety Culture</div></a>
                 <a href="#conclusion" class="toc-item"><div class="toc-item-number">Section 13</div><div class="toc-item-title">Conclusion</div></a>
             </div>
@@ -1112,6 +1355,13 @@
                 <p>For operators of critical facilities&mdash;from data centers managing <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> and <span class="tip" data-tip="Power Distribution Unit: Device that distributes electric power to rack-mounted equipment in data centers">PDU</span> systems to those overseeing <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> and <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span> infrastructure&mdash;the implications are profound. A green dashboard does not mean the system is safe. It means the system has not yet failed. These are fundamentally different propositions, and confusing them is the first step toward catastrophe.</p>
 
                 <p>This analysis draws from 16 foundational references spanning safety science, reliability engineering, high-reliability organization (<span class="tip" data-tip="High Reliability Organization: Organizations that operate in hazardous conditions with fewer than expected accidents through mindful practices">HRO</span>) theory, and international standards from <span class="tip" data-tip="International Atomic Energy Agency: The world's central intergovernmental forum for scientific and technical cooperation in the nuclear field">IAEA</span> and <span class="tip" data-tip="International Civil Aviation Organization: UN specialized agency managing the administration and governance of international civil aviation">ICAO</span>. The paper concludes with actionable frameworks for transitioning from lagging-indicator complacency to leading-indicator vigilance.</p>
+
+                <!-- CTA Block -->
+                <div class="shi-cta-block">
+                    <div class="shi-cta-headline">Calculate Your Facility's Safety Health Index</div>
+                    <div class="shi-cta-subtitle">Quantify the gap between perceived safety and systemic drift risk with 8 leading indicators</div>
+                    <a href="#calculator" class="shi-cta-btn">Open Safety Calculator</a>
+                </div>
 
                 <!-- Section 2: The Dangerous Comfort of Zero -->
                 <h2 id="dangerous-comfort"><span class="section-number">2</span> The Dangerous Comfort of Zero</h2>
@@ -1668,37 +1918,50 @@
                     <div class="calculator-title">Safety Health Index Calculator</div>
                     <div class="calculator-subtitle">Quantifying the gap between perceived safety and actual system health</div>
 
+                    <div class="shi-toolbar">
+                        <button class="shi-toolbar-btn shi-btn-free active" onclick="shiSetMode('free')">Free Mode</button>
+                        <button class="shi-toolbar-btn shi-btn-pro" onclick="shiSetMode('pro')">
+                            <i class="fas fa-crown" style="margin-right:4px;font-size:0.7rem;"></i> Pro Mode
+                        </button>
+                        <button class="shi-toolbar-btn shi-btn-reset" onclick="shiReset()">
+                            <i class="fas fa-undo" style="margin-right:4px;font-size:0.7rem;"></i> Reset
+                        </button>
+                        <button class="shi-toolbar-btn shi-btn-pdf" onclick="shiExportPDF()">
+                            <i class="fas fa-file-pdf" style="margin-right:4px;font-size:0.7rem;"></i> Export PDF
+                        </button>
+                    </div>
+
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Near-miss Reports / Month</label>
+                            <label class="calc-label">Near-miss Reports / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Near-Miss Reporting Rate</div><div class="tooltip-desc">Monthly count of reported near-miss events. High reporting = healthy safety culture. Suppressed reporting is the #1 precursor to catastrophic drift.</div><div class="tooltip-formula">Benchmark: 10+ reports/month = Generative culture</div></span></span></label>
                             <input type="number" id="calcNearMiss" class="calc-input" value="3" min="0" max="100">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Weak Signals / Month</label>
+                            <label class="calc-label">Weak Signals / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weak Signal Detection</div><div class="tooltip-desc">Number of anomalies, deviations, or early-warning signals captured per month. These are pre-incident indicators from Turner's incubation theory.</div><div class="tooltip-formula">Benchmark: 15+ signals/month = active detection</div></span></span></label>
                             <input type="number" id="calcWeakSignals" class="calc-input" value="5" min="0" max="100">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Open Audit Findings</label>
+                            <label class="calc-label">Open Audit Findings <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Open Audit Findings</div><div class="tooltip-desc">Total unresolved audit findings. High count indicates backlog accumulation and eroding compliance. Inversely scored — fewer open items = better health.</div><div class="tooltip-formula">Benchmark: &lt;5 open findings = healthy closure rate</div></span></span></label>
                             <input type="number" id="calcAudit" class="calc-input" value="12" min="0" max="100">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Training Hrs / Quarter</label>
+                            <label class="calc-label">Training Hrs / Quarter <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Safety Training Investment</div><div class="tooltip-desc">Hours of safety-specific training per quarter. Includes drills, tabletops, classroom sessions, and hands-on exercises per Weick & Sutcliffe HRO principles.</div><div class="tooltip-formula">Benchmark: 20 hrs/quarter = minimum for HRO</div></span></span></label>
                             <input type="number" id="calcTraining" class="calc-input" value="8" min="0" max="100">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Incident-Free Days</label>
+                            <label class="calc-label">Incident-Free Days <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Incident-Free Period</div><div class="tooltip-desc">Consecutive days without a recordable safety incident. Paradoxically, long incident-free periods with low safety scores indicate Rasmussen's drift-to-failure.</div><div class="tooltip-formula">Warning: &gt;365 days + low score = paradox zone</div></span></span></label>
                             <input type="number" id="calcDays" class="calc-input" value="365" min="0" max="3650">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Mgmt Walkarounds / Month</label>
+                            <label class="calc-label">Mgmt Walkarounds / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Management Safety Walkarounds</div><div class="tooltip-desc">Monthly frequency of leadership safety walkarounds. Direct observation by management signals commitment and detects issues missed in reports.</div><div class="tooltip-formula">Benchmark: 8/month = strong leadership engagement</div></span></span></label>
                             <input type="number" id="calcWalks" class="calc-input" value="2" min="0" max="30">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Hazard Action Rate %</label>
+                            <label class="calc-label">Hazard Action Rate % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Hazard Action Close-Out Rate</div><div class="tooltip-desc">Percentage of identified hazards with completed corrective actions within SLA. Low rates indicate systemic inability to close the feedback loop.</div><div class="tooltip-formula">Benchmark: 85%+ = responsive safety system</div></span></span></label>
                             <input type="number" id="calcHazard" class="calc-input" value="60" min="0" max="100">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Safety Meeting Frequency</label>
+                            <label class="calc-label">Safety Meeting Frequency <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Safety Meeting Cadence</div><div class="tooltip-desc">Regularity of dedicated safety meetings. Weekly cadence enables rapid feedback loops and early signal escalation per ICAO Safety Management Manual (Doc 9859).</div><div class="tooltip-formula">Benchmark: Weekly = generative culture standard</div></span></span></label>
                             <select id="calcMeeting" class="calc-select">
                                 <option value="None">None</option>
                                 <option value="Monthly" selected>Monthly</option>
@@ -1751,6 +2014,91 @@
                     <div id="recommendations" style="margin-top: 1.5rem; padding: 1.25rem; background: rgba(139, 92, 246, 0.1); border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2); display: none;">
                         <div style="color: #a78bfa; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem;">Priority Improvement Areas</div>
                         <ul id="recList" style="color: #94a3b8; font-size: 0.85rem; margin: 0; padding-left: 1.25rem;"></ul>
+                    </div>
+
+                    <!-- Pro Analysis Container -->
+                    <div class="shi-pro-container" id="shiProContainer">
+                        <!-- Panel 1: Safety Maturity Classification -->
+                        <div class="shi-pro-panel gated" id="shiPanel1">
+                            <div class="shi-gate-overlay" onclick="shiShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="shi-panel-content">
+                                <div class="shi-panel-title"><i class="fas fa-layer-group"></i> Safety Maturity Classification (Westrum Typology)</div>
+                                <div class="shi-kpi-grid" id="shiMaturityKPIs"></div>
+                                <div class="shi-chart-container"><canvas id="shiRadarChart" height="280"></canvas></div>
+                                <div class="shi-narrative-box" id="shiMaturityNarrative"></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Cost of Complacency -->
+                        <div class="shi-pro-panel gated" id="shiPanel2">
+                            <div class="shi-gate-overlay" onclick="shiShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="shi-panel-content">
+                                <div class="shi-panel-title"><i class="fas fa-dollar-sign"></i> Cost of Complacency Model</div>
+                                <div class="shi-kpi-grid" id="shiCostKPIs"></div>
+                                <div class="shi-chart-container"><canvas id="shiWaterfallChart" height="280"></canvas></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Sensitivity Analysis -->
+                        <div class="shi-pro-panel gated" id="shiPanel3">
+                            <div class="shi-gate-overlay" onclick="shiShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="shi-panel-content">
+                                <div class="shi-panel-title"><i class="fas fa-chart-bar"></i> Sensitivity Analysis (Tornado)</div>
+                                <div id="shiTornadoBars"></div>
+                                <div class="shi-narrative-box" id="shiSensitivityNarrative"></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4: Monte Carlo & Predictive Risk -->
+                        <div class="shi-pro-panel gated" id="shiPanel4">
+                            <div class="shi-gate-overlay" onclick="shiShowLogin()">
+                                <i class="fas fa-lock"></i>
+                                <span>Unlock Pro Analysis</span>
+                            </div>
+                            <div class="shi-panel-content">
+                                <div class="shi-panel-title"><i class="fas fa-brain"></i> Monte Carlo Risk Simulation (10,000 iterations)</div>
+                                <div class="shi-kpi-grid" id="shiMonteKPIs"></div>
+                                <div class="shi-chart-container"><canvas id="shiMonteChart" height="280"></canvas></div>
+                                <div class="shi-narrative-box" id="shiMonteNarrative"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Badge -->
+                    <div class="shi-privacy-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        PDF generated in your browser — no data sent to any server
+                    </div>
+
+                    <!-- Benchmark Meta -->
+                    <div class="shi-benchmark-meta">
+                        <meta name="shi-model-version" content="SHI-v2.0">
+                        <meta name="shi-date" content="2026-02-16">
+                        <meta name="shi-sources" content="Rasmussen 1997, Vaughan 1996, Hollnagel 2014, Reason 1997, Uptime Institute 2023-2024, HSE 2005, Westrum 2004">
+                        <meta name="shi-methodology" content="Weighted composite index with 7 dimensions, Monte Carlo confidence bands (10K iterations), Westrum culture classification">
+                    </div>
+                </div>
+
+                <!-- Login Modal -->
+                <div class="shi-login-overlay" id="shiLoginOverlay">
+                    <div class="shi-login-box">
+                        <button class="shi-login-close" onclick="shiHideLogin()">&times;</button>
+                        <div class="shi-login-title">Unlock Pro Analysis</div>
+                        <div class="shi-login-subtitle">Access Monte Carlo simulation, sensitivity analysis, cost modeling, and comprehensive PDF reports</div>
+                        <input type="email" class="shi-login-input" id="shiLoginEmail" placeholder="Email address">
+                        <input type="password" class="shi-login-input" id="shiLoginPass" placeholder="Password">
+                        <div class="shi-login-error" id="shiLoginError">Invalid credentials</div>
+                        <button class="shi-login-submit" onclick="shiDoLogin()">Sign In</button>
+                        <div class="shi-login-demo">Demo: demo@resistancezero.com / demo2026</div>
                     </div>
                 </div>
 
@@ -1866,6 +2214,18 @@
                         <h4>Bagus Dwi Permana</h4>
                         <p>Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik (Indonesian Electrical Safety Expert) and CDFOM. This paper synthesizes foundational safety science theory with practical operational experience to provide actionable frameworks for proactive safety management in data center environments.</p>
                     </div>
+                </div>
+
+                <!-- Article Navigation -->
+                <div class="article-nav">
+                    <a href="article-7.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Previous Article
+                    </a>
+                    <a href="article-9.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
 
             </div>
@@ -2242,6 +2602,744 @@
         calculate();
     })();
     </script>
+<script>
+// === PRO ENHANCEMENT MODE — Safety Health Index ===
+(function() {
+    'use strict';
+
+    // --- Config ---
+    const DEFAULTS = { nearMiss:3, weakSignals:5, audit:12, training:8, days:365, walks:2, hazard:60, meeting:'Monthly' };
+    const WEIGHTS = [0.15, 0.15, 0.10, 0.15, 0.10, 0.20, 0.15];
+    const DIM_LABELS = ['Near-Miss','Weak Signals','Audit Health','Training','Walkarounds','Hazard Rate','Meetings'];
+    const MEETING_MAP = { 'None':0, 'Monthly':40, 'Bi-weekly':70, 'Weekly':100 };
+    let proMode = false, isAuthenticated = false;
+
+    // --- Core Calculation Helper ---
+    function shiCalcScore(v) {
+        const dims = [
+            Math.min(100, (v.nearMiss/10)*100),
+            Math.min(100, (v.weakSignals/15)*100),
+            Math.max(0, (1 - v.audit/30)*100),
+            Math.min(100, (v.training/20)*100),
+            Math.min(100, (v.walks/8)*100),
+            v.hazard,
+            MEETING_MAP[v.meeting]||0
+        ];
+        const total = dims.reduce((s,d,i) => s + d*WEIGHTS[i], 0);
+        return { dims, total };
+    }
+
+    function getInputs() {
+        return {
+            nearMiss: parseFloat(document.getElementById('calcNearMiss').value)||0,
+            weakSignals: parseFloat(document.getElementById('calcWeakSignals').value)||0,
+            audit: parseFloat(document.getElementById('calcAudit').value)||0,
+            training: parseFloat(document.getElementById('calcTraining').value)||0,
+            days: parseFloat(document.getElementById('calcDays').value)||0,
+            walks: parseFloat(document.getElementById('calcWalks').value)||0,
+            hazard: parseFloat(document.getElementById('calcHazard').value)||0,
+            meeting: document.getElementById('calcMeeting').value
+        };
+    }
+
+    // --- Monte Carlo (10K iterations) ---
+    function runMonteCarlo(base) {
+        const results = [];
+        for (let i = 0; i < 10000; i++) {
+            const noisy = {
+                nearMiss: Math.max(0, base.nearMiss * (0.85 + Math.random()*0.3)),
+                weakSignals: Math.max(0, base.weakSignals * (0.85 + Math.random()*0.3)),
+                audit: Math.max(0, base.audit * (0.85 + Math.random()*0.3)),
+                training: Math.max(0, base.training * (0.85 + Math.random()*0.3)),
+                days: base.days,
+                walks: Math.max(0, base.walks * (0.85 + Math.random()*0.3)),
+                hazard: Math.min(100, Math.max(0, base.hazard * (0.85 + Math.random()*0.3))),
+                meeting: base.meeting
+            };
+            results.push(shiCalcScore(noisy).total);
+        }
+        results.sort((a,b) => a-b);
+        return {
+            p5: results[499], p25: results[2499], p50: results[4999],
+            p75: results[7499], p95: results[9499], mean: results.reduce((a,b)=>a+b,0)/10000,
+            all: results
+        };
+    }
+
+    // --- Sensitivity Tornado ---
+    function runSensitivity(base) {
+        const baseScore = shiCalcScore(base).total;
+        const keys = ['nearMiss','weakSignals','audit','training','walks','hazard'];
+        const labels = ['Near-Miss Rate','Weak Signals','Audit Findings','Training Hours','Walkarounds','Hazard Action %'];
+        const deltas = [];
+        keys.forEach((k, i) => {
+            const lo = {...base}; lo[k] = base[k] * 0.8;
+            const hi = {...base}; hi[k] = base[k] * 1.2;
+            if (k === 'hazard') { lo[k] = Math.max(0, lo[k]); hi[k] = Math.min(100, hi[k]); }
+            const scoreLo = shiCalcScore(lo).total;
+            const scoreHi = shiCalcScore(hi).total;
+            deltas.push({ label: labels[i], low: scoreLo - baseScore, high: scoreHi - baseScore, range: Math.abs(scoreHi - scoreLo) });
+        });
+        deltas.sort((a,b) => b.range - a.range);
+        return deltas;
+    }
+
+    // --- Narrative Generator ---
+    function generateNarrative(inputs, score, dims) {
+        let stage, risk, narrative = '';
+        if (score >= 85) { stage = 'Generative (HRO)'; risk = 'Low'; }
+        else if (score >= 70) { stage = 'Proactive'; risk = 'Moderate'; }
+        else if (score >= 55) { stage = 'Bureaucratic-Calculative'; risk = 'Elevated'; }
+        else if (score >= 35) { stage = 'Reactive'; risk = 'High'; }
+        else { stage = 'Pathological'; risk = 'Critical'; }
+
+        narrative += 'Your facility operates at the "' + stage + '" maturity level with an overall Safety Health Index of ' + score.toFixed(1) + '/100. ';
+
+        if (inputs.days > 365 && score < 60) {
+            narrative += 'CRITICAL PARADOX: ' + inputs.days + ' incident-free days combined with a score of ' + score.toFixed(0) + ' indicates classic Rasmussen drift-to-failure. The absence of incidents is masking systemic degradation. ';
+        }
+
+        // Identify weakest dimensions
+        const indexed = dims.map((d,i) => ({score:d, label:DIM_LABELS[i]})).sort((a,b) => a.score - b.score);
+        narrative += 'Your weakest dimensions are ' + indexed[0].label + ' (' + indexed[0].score.toFixed(0) + '%) and ' + indexed[1].label + ' (' + indexed[1].score.toFixed(0) + '%). ';
+
+        if (risk === 'Critical' || risk === 'High') {
+            narrative += 'Immediate intervention is recommended: establish mandatory near-miss reporting, increase management walkarounds to weekly, and implement rapid audit finding closure protocols. ';
+        } else if (risk === 'Elevated') {
+            narrative += 'Focus on transitioning from compliance-based safety to proactive detection. Increase weak signal capture mechanisms and ensure all safety meetings produce actionable outcomes. ';
+        } else if (risk === 'Moderate') {
+            narrative += 'Continue strengthening leading indicators. Consider implementing cross-functional safety reviews and expanding the weak signal taxonomy to capture more subtle precursors. ';
+        } else {
+            narrative += 'Your organization demonstrates generative safety culture characteristics. Maintain vigilance and continue investing in leading indicators to sustain this level. ';
+        }
+
+        return narrative;
+    }
+
+    // --- Draw Radar Chart ---
+    function drawRadarChart(dims) {
+        const canvas = document.getElementById('shiRadarChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const W = canvas.parentElement.offsetWidth || 400;
+        const H = 280;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.clearRect(0, 0, W, H);
+
+        const cx = W/2, cy = H/2 + 10, R = Math.min(W, H)/2 - 40;
+        const n = 7, angleStep = (2*Math.PI)/n, startAngle = -Math.PI/2;
+        const benchmarks = [100, 100, 100, 100, 100, 85, 100];
+
+        // Grid circles
+        [0.2, 0.4, 0.6, 0.8, 1.0].forEach(function(f) {
+            ctx.beginPath();
+            for (var i = 0; i <= n; i++) {
+                var a = startAngle + i * angleStep;
+                var x = cx + Math.cos(a) * R * f;
+                var y = cy + Math.sin(a) * R * f;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(148,163,184,0.15)'; ctx.lineWidth = 1; ctx.stroke();
+        });
+
+        // Axis lines + labels
+        ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'center';
+        for (var i = 0; i < n; i++) {
+            var a = startAngle + i * angleStep;
+            var x = cx + Math.cos(a) * R;
+            var y = cy + Math.sin(a) * R;
+            ctx.strokeStyle = 'rgba(148,163,184,0.2)'; ctx.beginPath();
+            ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+            var lx = cx + Math.cos(a) * (R + 25);
+            var ly = cy + Math.sin(a) * (R + 25);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText(DIM_LABELS[i], lx, ly + 3);
+        }
+
+        // Benchmark polygon
+        ctx.beginPath();
+        for (var i = 0; i <= n; i++) {
+            var idx = i % n;
+            var a = startAngle + idx * angleStep;
+            var x = cx + Math.cos(a) * R * (benchmarks[idx]/100);
+            var y = cy + Math.sin(a) * R * (benchmarks[idx]/100);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = 'rgba(148,163,184,0.4)'; ctx.setLineDash([4,4]);
+        ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+
+        // Score polygon
+        ctx.beginPath();
+        for (var i = 0; i <= n; i++) {
+            var idx = i % n;
+            var a = startAngle + idx * angleStep;
+            var x = cx + Math.cos(a) * R * (dims[idx]/100);
+            var y = cy + Math.sin(a) * R * (dims[idx]/100);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.fillStyle = 'rgba(139,92,246,0.2)'; ctx.fill();
+        ctx.strokeStyle = '#8b5cf6'; ctx.lineWidth = 2; ctx.stroke();
+
+        // Dots
+        for (var i = 0; i < n; i++) {
+            var a = startAngle + i * angleStep;
+            var x = cx + Math.cos(a) * R * (dims[i]/100);
+            var y = cy + Math.sin(a) * R * (dims[i]/100);
+            ctx.fillStyle = '#8b5cf6'; ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    // --- Draw Waterfall Chart (Cost of Complacency) ---
+    function drawWaterfallChart(dims, score) {
+        const canvas = document.getElementById('shiWaterfallChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const W = canvas.parentElement.offsetWidth || 400;
+        const H = 280;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.clearRect(0, 0, W, H);
+
+        // Cost model: base $2.5M * risk multiplier per dimension gap
+        const baseCost = 2500000;
+        const gaps = dims.map(function(d) { return Math.max(0, (100 - d) / 100); });
+        const costs = gaps.map(function(g, i) { return Math.round(baseCost * g * WEIGHTS[i] * 1.5); });
+        const totalCost = costs.reduce(function(a,b) { return a+b; }, 0);
+
+        const pad = { top: 30, right: 20, bottom: 60, left: 70 };
+        const chartW = W - pad.left - pad.right;
+        const chartH = H - pad.top - pad.bottom;
+        const barW = chartW / (costs.length + 1) - 8;
+        const maxCost = Math.max(totalCost, Math.max.apply(null, costs)) * 1.2;
+
+        // Y-axis
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'right';
+        for (var i = 0; i <= 5; i++) {
+            var val = (maxCost / 5) * i;
+            var y = pad.top + chartH - (val / maxCost) * chartH;
+            ctx.fillText('$' + (val/1000).toFixed(0) + 'K', pad.left - 8, y + 3);
+            ctx.strokeStyle = 'rgba(148,163,184,0.1)'; ctx.beginPath();
+            ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        }
+
+        // Bars (waterfall)
+        var cumulative = 0;
+        costs.forEach(function(cost, i) {
+            var x = pad.left + i * (barW + 8) + 4;
+            var barH = (cost / maxCost) * chartH;
+            var y = pad.top + chartH - (cumulative + cost) / maxCost * chartH;
+
+            var gradient = ctx.createLinearGradient(x, y, x, y + barH);
+            gradient.addColorStop(0, 'rgba(139,92,246,0.8)');
+            gradient.addColorStop(1, 'rgba(139,92,246,0.4)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, barW, barH);
+
+            // Label
+            ctx.fillStyle = '#a78bfa'; ctx.font = '9px Inter, sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('$' + (cost/1000).toFixed(0) + 'K', x + barW/2, y - 5);
+
+            // X label
+            ctx.save(); ctx.translate(x + barW/2, pad.top + chartH + 12);
+            ctx.rotate(-0.4); ctx.fillStyle = '#94a3b8'; ctx.font = '9px Inter, sans-serif';
+            ctx.textAlign = 'left'; ctx.fillText(DIM_LABELS[i], 0, 0); ctx.restore();
+
+            cumulative += cost;
+        });
+
+        // Total bar
+        var totalX = pad.left + costs.length * (barW + 8) + 4;
+        var totalBarH = (totalCost / maxCost) * chartH;
+        var totalY = pad.top + chartH - totalBarH;
+        ctx.fillStyle = 'rgba(239,68,68,0.6)';
+        ctx.fillRect(totalX, totalY, barW, totalBarH);
+        ctx.fillStyle = '#f87171'; ctx.font = 'bold 10px Inter, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('$' + (totalCost/1000).toFixed(0) + 'K', totalX + barW/2, totalY - 5);
+        ctx.save(); ctx.translate(totalX + barW/2, pad.top + chartH + 12);
+        ctx.rotate(-0.4); ctx.fillStyle = '#f87171'; ctx.font = 'bold 9px Inter, sans-serif';
+        ctx.textAlign = 'left'; ctx.fillText('TOTAL RISK', 0, 0); ctx.restore();
+    }
+
+    // --- Draw Monte Carlo Histogram ---
+    function drawMonteChart(mc) {
+        const canvas = document.getElementById('shiMonteChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const W = canvas.parentElement.offsetWidth || 400;
+        const H = 280;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.clearRect(0, 0, W, H);
+
+        const pad = { top: 30, right: 20, bottom: 40, left: 50 };
+        const chartW = W - pad.left - pad.right;
+        const chartH = H - pad.top - pad.bottom;
+
+        // Build histogram bins
+        const bins = 30;
+        const min = Math.floor(mc.p5 - 5);
+        const max = Math.ceil(mc.p95 + 5);
+        const binWidth = (max - min) / bins;
+        const counts = new Array(bins).fill(0);
+        mc.all.forEach(function(v) {
+            var idx = Math.min(bins - 1, Math.max(0, Math.floor((v - min) / binWidth)));
+            counts[idx]++;
+        });
+        const maxCount = Math.max.apply(null, counts);
+
+        // Draw bars
+        const barW = chartW / bins - 1;
+        counts.forEach(function(c, i) {
+            var x = pad.left + i * (chartW / bins);
+            var barH = (c / maxCount) * chartH;
+            var y = pad.top + chartH - barH;
+            var binCenter = min + (i + 0.5) * binWidth;
+
+            var color;
+            if (binCenter < 40) color = 'rgba(239,68,68,0.6)';
+            else if (binCenter < 60) color = 'rgba(245,158,11,0.6)';
+            else if (binCenter < 80) color = 'rgba(139,92,246,0.6)';
+            else color = 'rgba(16,185,129,0.6)';
+
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, barW, barH);
+        });
+
+        // P5, P50, P95 lines
+        var drawLine = function(val, label, color) {
+            var x = pad.left + ((val - min) / (max - min)) * chartW;
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.setLineDash([4,3]);
+            ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + chartH); ctx.stroke();
+            ctx.setLineDash([]); ctx.fillStyle = color; ctx.font = 'bold 10px Inter, sans-serif';
+            ctx.textAlign = 'center'; ctx.fillText(label + ': ' + val.toFixed(1), x, pad.top - 8);
+        };
+        drawLine(mc.p5, 'P5', '#ef4444');
+        drawLine(mc.p50, 'P50', '#8b5cf6');
+        drawLine(mc.p95, 'P95', '#10b981');
+
+        // X-axis labels
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'center';
+        for (var i = 0; i <= 5; i++) {
+            var val = min + (max - min) * (i / 5);
+            var x = pad.left + (i / 5) * chartW;
+            ctx.fillText(val.toFixed(0), x, pad.top + chartH + 20);
+        }
+        ctx.fillText('Safety Health Index Score Distribution', pad.left + chartW/2, pad.top + chartH + 35);
+    }
+
+    // --- Update All Pro Panels ---
+    function updateProPanels() {
+        if (!proMode) return;
+        const inputs = getInputs();
+        const { dims, total } = shiCalcScore(inputs);
+
+        // Panel 1: Maturity KPIs + Radar
+        const matKPIs = document.getElementById('shiMaturityKPIs');
+        let stage, stageColor;
+        if (total >= 85) { stage = 'Generative (HRO)'; stageColor = '#10b981'; }
+        else if (total >= 70) { stage = 'Proactive'; stageColor = '#8b5cf6'; }
+        else if (total >= 55) { stage = 'Bureaucratic'; stageColor = '#f59e0b'; }
+        else if (total >= 35) { stage = 'Reactive'; stageColor = '#f97316'; }
+        else { stage = 'Pathological'; stageColor = '#ef4444'; }
+
+        const gapFromHRO = Math.max(0, 85 - total).toFixed(1);
+        const strongDims = dims.filter(function(d) { return d >= 70; }).length;
+        const weakDims = dims.filter(function(d) { return d < 40; }).length;
+        const avgDim = (dims.reduce(function(a,b) { return a+b; }, 0) / 7).toFixed(1);
+        const dimBalance = (100 - (Math.max.apply(null, dims) - Math.min.apply(null, dims))).toFixed(0);
+
+        matKPIs.innerHTML =
+            '<div class="shi-kpi-card"><div class="shi-kpi-value" style="color:' + stageColor + '">' + stage + '</div><div class="shi-kpi-label">Westrum Classification</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + gapFromHRO + '</div><div class="shi-kpi-label">Points to HRO Level</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + strongDims + '/7</div><div class="shi-kpi-label">Strong Dimensions (\u226570%)</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value" style="color:#f87171">' + weakDims + '</div><div class="shi-kpi-label">Critical Gaps (&lt;40%)</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + avgDim + '%</div><div class="shi-kpi-label">Average Dimension Score</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + dimBalance + '%</div><div class="shi-kpi-label">Dimension Balance Index</div></div>';
+        drawRadarChart(dims);
+        document.getElementById('shiMaturityNarrative').textContent = generateNarrative(inputs, total, dims);
+
+        // Panel 2: Cost of Complacency
+        const costKPIs = document.getElementById('shiCostKPIs');
+        const gaps = dims.map(function(d) { return Math.max(0, (100 - d) / 100); });
+        const costs = gaps.map(function(g, i) { return Math.round(2500000 * g * WEIGHTS[i] * 1.5); });
+        const totalCost = costs.reduce(function(a,b) { return a+b; }, 0);
+        const driftProb = inputs.days > 180 && total < 50 ? Math.min(0.99, 0.6 + (inputs.days/1000)*0.3) : Math.max(0.05, 0.4 - total/250);
+        const annualExpected = Math.round(totalCost * driftProb);
+        const paybackTraining = Math.round(annualExpected / (inputs.training > 0 ? inputs.training * 200 : 1));
+
+        costKPIs.innerHTML =
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">$' + (totalCost/1000).toFixed(0) + 'K</div><div class="shi-kpi-label">Total Risk Exposure</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + (driftProb*100).toFixed(1) + '%</div><div class="shi-kpi-label">Annual Drift Probability</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">$' + (annualExpected/1000).toFixed(0) + 'K</div><div class="shi-kpi-label">Expected Annual Loss</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + paybackTraining + 'x</div><div class="shi-kpi-label">Training ROI Multiplier</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">$' + ((totalCost - annualExpected)/1000).toFixed(0) + 'K</div><div class="shi-kpi-label">Preventable Losses</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + Math.round(inputs.days * driftProb) + '</div><div class="shi-kpi-label">Est. Days to Incident</div></div>';
+        drawWaterfallChart(dims, total);
+
+        // Panel 3: Sensitivity Tornado
+        const sensitivity = runSensitivity(inputs);
+        const tornadoDiv = document.getElementById('shiTornadoBars');
+        const maxRange = Math.max.apply(null, sensitivity.map(function(s) { return s.range; }));
+        tornadoDiv.innerHTML = sensitivity.map(function(s) {
+            var pct = maxRange > 0 ? (s.range / maxRange * 100) : 0;
+            return '<div class="shi-sensitivity-bar">' +
+                '<div class="shi-sensitivity-label">' + s.label + '</div>' +
+                '<div class="shi-sensitivity-track"><div class="shi-sensitivity-fill" style="width:' + pct + '%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>' +
+                '<div class="shi-sensitivity-value">\u00b1' + s.range.toFixed(1) + '</div>' +
+            '</div>';
+        }).join('');
+
+        var topDriver = sensitivity[0];
+        document.getElementById('shiSensitivityNarrative').textContent =
+            'The most influential input is "' + topDriver.label + '" with a \u00b1' + topDriver.range.toFixed(1) + ' point impact on the Safety Health Index when varied by \u00b120%. ' +
+            'This means improving ' + topDriver.label + ' will yield the highest return on safety investment. ' +
+            (sensitivity[1] ? 'The second most impactful factor is "' + sensitivity[1].label + '" (\u00b1' + sensitivity[1].range.toFixed(1) + ' points). ' : '') +
+            'Focus improvement efforts on these high-leverage dimensions for maximum safety culture advancement.';
+
+        // Panel 4: Monte Carlo
+        const mc = runMonteCarlo(inputs);
+        const monteKPIs = document.getElementById('shiMonteKPIs');
+        const confInterval = mc.p95 - mc.p5;
+        const belowCritical = (mc.all.filter(function(v) { return v < 40; }).length / 100).toFixed(1);
+        const aboveHRO = (mc.all.filter(function(v) { return v >= 85; }).length / 100).toFixed(1);
+
+        monteKPIs.innerHTML =
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + mc.p5.toFixed(1) + '</div><div class="shi-kpi-label">P5 (Worst Case)</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value" style="color:#a78bfa">' + mc.p50.toFixed(1) + '</div><div class="shi-kpi-label">P50 (Median)</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value" style="color:#10b981">' + mc.p95.toFixed(1) + '</div><div class="shi-kpi-label">P95 (Best Case)</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value">' + confInterval.toFixed(1) + '</div><div class="shi-kpi-label">90% Confidence Width</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value" style="color:#ef4444">' + belowCritical + '%</div><div class="shi-kpi-label">P(Below Critical 40)</div></div>' +
+            '<div class="shi-kpi-card"><div class="shi-kpi-value" style="color:#10b981">' + aboveHRO + '%</div><div class="shi-kpi-label">P(HRO Level \u226585)</div></div>';
+        drawMonteChart(mc);
+
+        document.getElementById('shiMonteNarrative').textContent =
+            'Based on 10,000 Monte Carlo iterations with \u00b115% parameter uncertainty, your Safety Health Index has a 90% confidence interval of [' + mc.p5.toFixed(1) + ', ' + mc.p95.toFixed(1) + ']. ' +
+            'The median outcome is ' + mc.p50.toFixed(1) + ', with ' + belowCritical + '% probability of falling below the critical threshold of 40. ' +
+            (parseFloat(belowCritical) > 10 ? 'This indicates significant downside risk \u2014 even small variations in your safety practices could push you into the danger zone. ' : '') +
+            'There is a ' + aboveHRO + '% chance of achieving HRO-level performance (\u226585) under current conditions.';
+    }
+
+    // --- Mode Switching ---
+    window.shiSetMode = function(mode) {
+        var freeBtn = document.querySelector('.shi-btn-free');
+        var proBtn = document.querySelector('.shi-btn-pro');
+        var container = document.getElementById('shiProContainer');
+
+        if (mode === 'pro') {
+            if (!isAuthenticated) { shiShowLogin(); return; }
+            proMode = true;
+            freeBtn.classList.remove('active');
+            proBtn.classList.add('active');
+            container.classList.add('visible');
+            updateProPanels();
+        } else {
+            proMode = false;
+            proBtn.classList.remove('active');
+            freeBtn.classList.add('active');
+            container.classList.remove('visible');
+        }
+    };
+
+    // --- Panel Unlock ---
+    function unlockPanels() {
+        document.querySelectorAll('.shi-pro-panel.gated').forEach(function(p) {
+            p.classList.remove('gated');
+            var overlay = p.querySelector('.shi-gate-overlay');
+            if (overlay) overlay.style.display = 'none';
+        });
+    }
+    function lockPanels() {
+        document.querySelectorAll('.shi-pro-panel').forEach(function(p) {
+            p.classList.add('gated');
+            var overlay = p.querySelector('.shi-gate-overlay');
+            if (overlay) overlay.style.display = '';
+        });
+    }
+
+    // --- Auth ---
+    function checkAuth() {
+        try {
+            var sess = JSON.parse(localStorage.getItem('rz_premium_session'));
+            if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
+                isAuthenticated = true;
+                unlockPanels();
+                return true;
+            }
+        } catch(e) {}
+        isAuthenticated = false;
+        return false;
+    }
+
+    window.shiShowLogin = function() {
+        document.getElementById('shiLoginOverlay').classList.add('visible');
+    };
+    window.shiHideLogin = function() {
+        document.getElementById('shiLoginOverlay').classList.remove('visible');
+        document.getElementById('shiLoginError').style.display = 'none';
+    };
+    window.shiDoLogin = function() {
+        var email = document.getElementById('shiLoginEmail').value.trim();
+        var pass = document.getElementById('shiLoginPass').value;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            var session = { email: email, tier: 'pro', expires: new Date(Date.now() + 30*24*60*60*1000).toISOString() };
+            localStorage.setItem('rz_premium_session', JSON.stringify(session));
+            isAuthenticated = true;
+            unlockPanels();
+            shiHideLogin();
+            shiSetMode('pro');
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
+        } else {
+            document.getElementById('shiLoginError').style.display = 'block';
+        }
+    };
+
+    // --- Reset ---
+    window.shiReset = function() {
+        document.getElementById('calcNearMiss').value = DEFAULTS.nearMiss;
+        document.getElementById('calcWeakSignals').value = DEFAULTS.weakSignals;
+        document.getElementById('calcAudit').value = DEFAULTS.audit;
+        document.getElementById('calcTraining').value = DEFAULTS.training;
+        document.getElementById('calcDays').value = DEFAULTS.days;
+        document.getElementById('calcWalks').value = DEFAULTS.walks;
+        document.getElementById('calcHazard').value = DEFAULTS.hazard;
+        document.getElementById('calcMeeting').value = DEFAULTS.meeting;
+        document.getElementById('calcNearMiss').dispatchEvent(new Event('input'));
+    };
+
+    // --- PDF Export ---
+    window.shiExportPDF = function() {
+        var inputs = getInputs();
+        var result = shiCalcScore(inputs);
+        var dims = result.dims, total = result.total;
+        var mc = proMode ? runMonteCarlo(inputs) : null;
+        var sensitivity = proMode ? runSensitivity(inputs) : null;
+
+        // Generate SVG charts for PDF
+        function radarSVG(dims) {
+            var W = 400, H = 400, cx = 200, cy = 210, R = 150;
+            var n = 7, step = (2*Math.PI)/n, start = -Math.PI/2;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:400px;">';
+            // Grid
+            [0.2,0.4,0.6,0.8,1].forEach(function(f) {
+                var pts = [];
+                for (var i = 0; i < n; i++) { var a = start+i*step; pts.push((cx+Math.cos(a)*R*f) + ',' + (cy+Math.sin(a)*R*f)); }
+                svg += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="#cbd5e1" stroke-width="0.5" opacity="0.3"/>';
+            });
+            // Labels
+            for (var i = 0; i < n; i++) {
+                var a = start + i * step;
+                var lx = cx + Math.cos(a) * (R + 30);
+                var ly = cy + Math.sin(a) * (R + 30);
+                svg += '<text x="' + lx + '" y="' + ly + '" font-size="10" fill="#1f2937" text-anchor="middle" font-family="Inter,sans-serif">' + DIM_LABELS[i] + '</text>';
+            }
+            // Score polygon
+            var pts = [];
+            for (var i = 0; i < n; i++) { var a = start+i*step; pts.push((cx+Math.cos(a)*R*(dims[i]/100)) + ',' + (cy+Math.sin(a)*R*(dims[i]/100))); }
+            svg += '<polygon points="' + pts.join(' ') + '" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" stroke-width="2"/>';
+            for (var i = 0; i < n; i++) { var a = start+i*step; var x = cx+Math.cos(a)*R*(dims[i]/100); var y = cy+Math.sin(a)*R*(dims[i]/100); svg += '<circle cx="' + x + '" cy="' + y + '" r="4" fill="#8b5cf6"/>';
+                svg += '<text x="' + x + '" y="' + (y-10) + '" font-size="9" fill="#8b5cf6" text-anchor="middle" font-family="JetBrains Mono,monospace">' + dims[i].toFixed(0) + '%</text>';
+            }
+            svg += '</svg>';
+            return svg;
+        }
+
+        function gapBarSVG(dims) {
+            var W = 500, H = 220, pad = 50;
+            var barW = (W - pad*2) / 7 - 6;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:500px;">';
+            dims.forEach(function(d, i) {
+                var x = pad + i * ((W-pad*2)/7) + 3;
+                var barH = (d/100) * (H - 80);
+                var y = H - 40 - barH;
+                var color = d >= 70 ? '#10b981' : d >= 40 ? '#f59e0b' : '#ef4444';
+                svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + color + '" rx="3"/>';
+                svg += '<text x="' + (x+barW/2) + '" y="' + (y-5) + '" font-size="10" fill="#1f2937" text-anchor="middle" font-family="JetBrains Mono,monospace">' + d.toFixed(0) + '%</text>';
+                svg += '<text x="' + (x+barW/2) + '" y="' + (H-20) + '" font-size="8" fill="#64748b" text-anchor="middle" font-family="Inter,sans-serif" transform="rotate(-25,' + (x+barW/2) + ',' + (H-20) + ')">' + DIM_LABELS[i] + '</text>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        var culture;
+        if (total >= 85) culture = 'Generative (HRO)';
+        else if (total >= 70) culture = 'Proactive';
+        else if (total >= 55) culture = 'Bureaucratic';
+        else if (total >= 35) culture = 'Reactive';
+        else culture = 'Pathological';
+
+        var narrative = generateNarrative(inputs, total, dims);
+        var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Safety Health Index Report</title>' +
+        '<style>' +
+            '@page { size: A4; margin: 20mm; }' +
+            'body { font-family: "Segoe UI", Arial, sans-serif; color: #1f2937; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }' +
+            'h1 { color: #1e3a5f; font-size: 22px; border-bottom: 3px solid #8b5cf6; padding-bottom: 8px; }' +
+            'h2 { color: #1e3a5f; font-size: 16px; margin-top: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }' +
+            'h3 { color: #374151; font-size: 14px; }' +
+            '.header-meta { display: flex; justify-content: space-between; color: #6b7280; font-size: 11px; margin-bottom: 20px; }' +
+            '.score-hero { text-align: center; padding: 20px; background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-radius: 12px; margin: 16px 0; }' +
+            '.score-hero .score { font-size: 48px; font-weight: 800; color: #8b5cf6; }' +
+            '.score-hero .label { color: #6b7280; font-size: 13px; }' +
+            'table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }' +
+            'th { background: #f8fafc; color: #1e3a5f; padding: 8px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }' +
+            'td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1f2937; }' +
+            'tr:nth-child(even) td { background: #fafbfc; }' +
+            '.narrative { background: #f5f3ff; border-left: 4px solid #8b5cf6; padding: 14px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 13px; color: #374151; line-height: 1.7; }' +
+            '.rec-item { padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }' +
+            '.rec-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; margin-right: 6px; }' +
+            '.badge-critical { background: #fef2f2; color: #dc2626; }' +
+            '.badge-warning { background: #fffbeb; color: #d97706; }' +
+            '.badge-info { background: #f5f3ff; color: #7c3aed; }' +
+            '.chart-container { text-align: center; margin: 16px 0; }' +
+            '.footer { margin-top: 30px; padding-top: 12px; border-top: 2px solid #e2e8f0; font-size: 10px; color: #9ca3af; text-align: center; }' +
+            '.methodology { background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 11px; color: #6b7280; margin-top: 16px; }' +
+            '@media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }' +
+        '</style></head><body>' +
+        '<h1>Safety Health Index \u2014 Professional Analysis Report</h1>' +
+        '<div class="header-meta">' +
+            '<span>Generated: ' + today + '</span>' +
+            '<span>Model: SHI-v2.0 | resistancezero.com</span>' +
+        '</div>' +
+        '<div class="score-hero">' +
+            '<div class="score">' + total.toFixed(1) + '</div>' +
+            '<div class="label">Safety Health Index Score</div>' +
+            '<div style="margin-top:8px;font-size:14px;color:#374151;">Culture Classification: <strong>' + culture + '</strong></div>' +
+        '</div>' +
+        '<h2>Input Parameters</h2>' +
+        '<table>' +
+            '<tr><th>Parameter</th><th>Value</th><th>Benchmark</th><th>Status</th></tr>' +
+            '<tr><td>Near-Miss Reports/Month</td><td>' + inputs.nearMiss + '</td><td>10+</td><td>' + (inputs.nearMiss >= 10 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
+            '<tr><td>Weak Signals/Month</td><td>' + inputs.weakSignals + '</td><td>15+</td><td>' + (inputs.weakSignals >= 15 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
+            '<tr><td>Open Audit Findings</td><td>' + inputs.audit + '</td><td>&lt;5</td><td>' + (inputs.audit <= 5 ? '\u2713 Good' : '\u26a0 High') + '</td></tr>' +
+            '<tr><td>Training Hrs/Quarter</td><td>' + inputs.training + '</td><td>20</td><td>' + (inputs.training >= 20 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
+            '<tr><td>Incident-Free Days</td><td>' + inputs.days + '</td><td>\u2014</td><td>' + (inputs.days > 365 && total < 60 ? '\u26a0 Paradox' : 'Noted') + '</td></tr>' +
+            '<tr><td>Mgmt Walkarounds/Month</td><td>' + inputs.walks + '</td><td>8</td><td>' + (inputs.walks >= 8 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
+            '<tr><td>Hazard Action Rate</td><td>' + inputs.hazard + '%</td><td>85%+</td><td>' + (inputs.hazard >= 85 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
+            '<tr><td>Safety Meetings</td><td>' + inputs.meeting + '</td><td>Weekly</td><td>' + (inputs.meeting === 'Weekly' ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
+        '</table>' +
+        '<h2>Dimension Analysis</h2>' +
+        '<div class="chart-container">' + radarSVG(dims) + '</div>' +
+        '<table>' +
+            '<tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Weighted</th></tr>' +
+            DIM_LABELS.map(function(l,i) { return '<tr><td>' + l + '</td><td>' + dims[i].toFixed(1) + '%</td><td>' + (WEIGHTS[i]*100).toFixed(0) + '%</td><td>' + (dims[i]*WEIGHTS[i]).toFixed(1) + '</td></tr>'; }).join('') +
+        '</table>' +
+        '<div class="chart-container">' + gapBarSVG(dims) + '</div>' +
+        '<h2>Narrative Assessment</h2>' +
+        '<div class="narrative">' + narrative + '</div>';
+
+        // Pro sections
+        if (proMode && mc && sensitivity) {
+            var gaps = dims.map(function(d) { return Math.max(0, (100-d)/100); });
+            var costs = gaps.map(function(g,i) { return Math.round(2500000*g*WEIGHTS[i]*1.5); });
+            var totalCost = costs.reduce(function(a,b) { return a+b; },0);
+
+            html += '<h2>Monte Carlo Simulation (10,000 Iterations)</h2>' +
+            '<table>' +
+                '<tr><th>Metric</th><th>Value</th></tr>' +
+                '<tr><td>P5 (Worst Case)</td><td>' + mc.p5.toFixed(1) + '</td></tr>' +
+                '<tr><td>P50 (Median)</td><td>' + mc.p50.toFixed(1) + '</td></tr>' +
+                '<tr><td>P95 (Best Case)</td><td>' + mc.p95.toFixed(1) + '</td></tr>' +
+                '<tr><td>90% Confidence Interval</td><td>[' + mc.p5.toFixed(1) + ', ' + mc.p95.toFixed(1) + ']</td></tr>' +
+                '<tr><td>P(Below Critical 40)</td><td>' + (mc.all.filter(function(v){return v<40;}).length/100).toFixed(1) + '%</td></tr>' +
+                '<tr><td>P(HRO Level \u226585)</td><td>' + (mc.all.filter(function(v){return v>=85;}).length/100).toFixed(1) + '%</td></tr>' +
+            '</table>' +
+            '<h2>Sensitivity Analysis</h2>' +
+            '<table>' +
+                '<tr><th>Rank</th><th>Input Parameter</th><th>Impact (\u00b120%)</th></tr>' +
+                sensitivity.map(function(s,i) { return '<tr><td>#' + (i+1) + '</td><td>' + s.label + '</td><td>\u00b1' + s.range.toFixed(1) + ' points</td></tr>'; }).join('') +
+            '</table>' +
+            '<h2>Cost of Complacency</h2>' +
+            '<table>' +
+                '<tr><th>Dimension</th><th>Gap</th><th>Risk Exposure</th></tr>' +
+                DIM_LABELS.map(function(l,i) { return '<tr><td>' + l + '</td><td>' + (gaps[i]*100).toFixed(0) + '%</td><td>$' + (costs[i]/1000).toFixed(0) + 'K</td></tr>'; }).join('') +
+                '<tr style="font-weight:700;"><td>TOTAL</td><td>\u2014</td><td>$' + (totalCost/1000).toFixed(0) + 'K</td></tr>' +
+            '</table>';
+        }
+
+        // Recommendations
+        var recs = [];
+        if (dims[0] < 50) recs.push({ level: 'critical', text: 'Increase near-miss reporting from ' + inputs.nearMiss + ' to 10+/month' });
+        if (dims[1] < 50) recs.push({ level: 'critical', text: 'Establish weak signal capture: only ' + inputs.weakSignals + '/month vs 15+ target' });
+        if (dims[2] < 50) recs.push({ level: 'warning', text: 'Reduce open audit findings from ' + inputs.audit + ' to <5' });
+        if (dims[3] < 50) recs.push({ level: 'warning', text: 'Increase safety training to 20 hrs/quarter (current: ' + inputs.training + ')' });
+        if (dims[4] < 50) recs.push({ level: 'info', text: 'Increase management walkarounds to 8/month (current: ' + inputs.walks + ')' });
+        if (dims[5] < 70) recs.push({ level: 'warning', text: 'Improve hazard close-out rate to 85%+ (current: ' + inputs.hazard + '%)' });
+        if (dims[6] < 70) recs.push({ level: 'info', text: 'Increase safety meeting cadence to weekly (current: ' + inputs.meeting + ')' });
+
+        if (recs.length > 0) {
+            html += '<h2>Prioritized Recommendations</h2>';
+            recs.forEach(function(r) {
+                html += '<div class="rec-item"><span class="rec-badge badge-' + r.level + '">' + r.level.toUpperCase() + '</span>' + r.text + '</div>';
+            });
+        }
+
+        html += '<div class="methodology">' +
+            '<strong>Methodology Note:</strong> The Safety Health Index is a weighted composite of 7 leading indicator dimensions based on Rasmussen (1997), Vaughan (1996), Hollnagel (2014), Reason (1997), and Westrum (2004). ' +
+            'Monte Carlo simulation uses 10,000 iterations with \u00b115% uniform noise on each input parameter. Cost modeling uses $2.5M base incident cost from Uptime Institute (2024) scaled by dimension gap and weight.' +
+            (proMode ? ' This report includes Pro-level analysis with Monte Carlo confidence bands and sensitivity analysis.' : '') +
+        '</div>' +
+        '<div class="footer">resistancezero.com | Generated ' + today + ' | All calculations performed client-side | SHI Model v2.0</div>' +
+        '</body></html>';
+
+        var w = window.open('', '_blank');
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 500);
+    };
+
+    // --- Tooltip Positioning ---
+    document.addEventListener('mouseover', function(e) {
+        var trigger = e.target.closest('.tooltip-trigger');
+        if (!trigger) return;
+        var content = trigger.querySelector('.tooltip-content');
+        if (!content) return;
+        content.classList.add('visible');
+        var rect = trigger.getBoundingClientRect();
+        content.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+        content.style.top = (rect.bottom + 8) + 'px';
+    });
+    document.addEventListener('mouseout', function(e) {
+        var trigger = e.target.closest('.tooltip-trigger');
+        if (!trigger) return;
+        var content = trigger.querySelector('.tooltip-content');
+        if (content) content.classList.remove('visible');
+    });
+
+    // --- Hook to Calculator Inputs ---
+    ['calcNearMiss','calcWeakSignals','calcAudit','calcTraining','calcDays','calcWalks','calcHazard','calcMeeting'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', updateProPanels);
+            el.addEventListener('change', updateProPanels);
+        }
+    });
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAuth();
+        if (isAuthenticated) {
+            var proBtn = document.querySelector('.shi-btn-pro');
+            if (proBtn) proBtn.classList.add('active');
+        }
+    });
+    window.addEventListener('rz-auth-change', function() {
+        checkAuth();
+        if (isAuthenticated && proMode) { unlockPanels(); updateProPanels(); }
+    });
+
+    // Run initial auth check
+    checkAuth();
+})();
+</script>
 <script src="auth.js"></script>
 </body>
 </html>

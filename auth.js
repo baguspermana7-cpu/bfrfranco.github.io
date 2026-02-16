@@ -176,6 +176,11 @@
                     '<label>Password</label>' +
                     '<input type="password" id="rzModalPassword" placeholder="Enter password" autocomplete="current-password">' +
                     '<button class="rz-submit-btn" id="rzModalSubmit" onclick="window._rzAuth.doLogin()">Sign In</button>' +
+                    '<div style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
+                        '<span style="color:#a78bfa;font-weight:600;">Demo:</span> ' +
+                        '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo2026</code>' +
+                    '</div>' +
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +
                     '<i class="fas fa-check-circle"></i>' +
@@ -396,6 +401,11 @@
         if (dropdown && userBtn && !userBtn.contains(e.target) && !dropdown.contains(e.target)) {
             dropdown.classList.remove('show');
         }
+    });
+
+    /* ───────── Listen for auth changes from page-specific login handlers ───────── */
+    window.addEventListener('rz-auth-change', function () {
+        updateAuthUI();
     });
 
     /* ───────── Init ───────── */

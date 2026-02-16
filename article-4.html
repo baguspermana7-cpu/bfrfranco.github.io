@@ -51,6 +51,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -208,12 +209,12 @@
         .toc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 0.75rem;
+            gap: 0.625rem;
         }
 
         .toc-item {
             background: var(--card-bg);
-            padding: 0.875rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-radius: 10px;
             border-left: 4px solid var(--accent-blue);
             transition: all 0.2s ease;
@@ -236,7 +237,21 @@
 
         .toc-item-title {
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+        }
+
+        /* TOC Calculator Highlight */
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left-color: #3b82f6;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #3b82f6; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.08) 100%);
         }
 
         /* Article Content */
@@ -520,6 +535,7 @@
             margin: 2rem 0;
             border-radius: 16px;
             color: #e2e8f0;
+            position: relative;
         }
 
         .calculator-section h2 {
@@ -844,9 +860,29 @@
         .author-bio h4 { margin: 0 0 0.5rem; color: var(--text-primary); font-size: 1rem; }
         .author-bio p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; margin: 0; }
 
+        /* Article Navigation */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid var(--card-border);
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+        [data-theme="dark"] .article-nav a { color: #93c5fd; }
+        .article-nav a:hover { color: #60a5fa; }
+
         /* Print CSS */
         @media print {
-            .navbar, .calculator-section, .toc-section, .share-buttons, .chart-container { display: none !important; }
+            .navbar, .calculator-section, .toc-section, .share-buttons, .chart-container, .article-nav { display: none !important; }
             .article-hero { padding: 1.5rem 1rem; background: #1e3a5f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .article-hero .article-badge, .article-hero .article-meta { display: none; }
             .article-content { padding: 1rem; }
@@ -866,6 +902,9 @@
             .icb-steps { justify-content: center; }
         }
 
+        .privacy-badge { display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.72rem;color:#64748b;margin-top:0.5rem;padding:6px 0; }
+        .privacy-badge i { color:#10b981;font-size:0.8rem; }
+
         @media (max-width: 600px) {
             .article-hero { padding: 5rem 1rem 2.5rem; }
             .article-meta { flex-direction: column; gap: 0.75rem; }
@@ -875,6 +914,196 @@
             .calc-grid { grid-template-columns: 1fr; }
             .icb-steps { flex-direction: column; align-items: center; }
             .callout-row { grid-template-columns: repeat(2, 1fr); }
+            .cta-card { flex-direction: column; text-align: center; }
+            .mode-toggle { flex-direction: column; }
+            .mode-toolbar-row { flex-direction: column; align-items: stretch; }
+            .pro-panel .calc-results { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ============================================
+           PRO ENHANCEMENT MODE
+           ============================================ */
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex; gap: 4px; padding: 4px;
+            background: rgba(255,255,255,0.05); border-radius: 12px;
+            margin-bottom: 0; width: fit-content;
+        }
+        .mode-toolbar-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem; }
+        .mode-toolbar-actions { display: flex; gap: 8px; align-items: center; }
+        .mode-btn {
+            padding: 0.65rem 1.25rem; border: none; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            transition: all 0.25s ease; color: #94a3b8; background: transparent;
+        }
+        .mode-btn.active { background: var(--accent-blue); color: #fff; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .mode-btn:hover:not(.active) { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+        .gated-badge {
+            font-size: 0.6rem; font-weight: 800; padding: 2px 6px;
+            border-radius: 4px; background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff; letter-spacing: 0.5px;
+        }
+
+        /* CTA Card */
+        .cta-card {
+            display: flex; align-items: center; gap: 1.5rem;
+            background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(59,130,246,0.04) 100%);
+            border: 1px solid rgba(59,130,246,0.2); border-radius: 14px;
+            padding: 1.5rem 2rem; margin: 2rem 0 1.5rem;
+        }
+        .cta-icon { font-size: 2rem; color: var(--accent-blue); flex-shrink: 0; }
+        .cta-card h4 { color: #e2e8f0; margin: 0 0 0.25rem; font-size: 1rem; }
+        .cta-card p { color: #94a3b8; margin: 0; font-size: 0.85rem; line-height: 1.5; }
+
+        /* Pro Input Drawer */
+        .pro-drawer {
+            display: none; margin-top: 1.5rem; padding: 1.5rem;
+            background: rgba(59,130,246,0.05);
+            border: 1px solid rgba(59,130,246,0.15); border-radius: 14px;
+        }
+        .pro-drawer.visible { display: block; }
+        .pro-drawer-title {
+            font-size: 0.8rem; font-weight: 700; color: var(--accent-blue);
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+        }
+
+        /* Pro Output Panels */
+        .pro-panels { display: none; margin-top: 1.5rem; }
+        .pro-panels.visible { display: block; }
+        .pro-panel {
+            position: relative; margin-top: 1.25rem;
+        }
+        .pro-panel-inner {
+            padding: 1.25rem; border: 1px solid rgba(59,130,246,0.15);
+            border-radius: 14px; background: rgba(59,130,246,0.03);
+        }
+        .pro-panel-title {
+            font-size: 0.8rem; font-weight: 700; color: var(--accent-blue);
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+        }
+        .pro-panel .calc-results {
+            background: transparent; padding: 0; margin: 0;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+        .pro-panel .calc-result-value { font-size: 1.35rem; }
+
+        /* Gated Overlay */
+        .gated-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15,23,42,0.75); backdrop-filter: blur(6px);
+            border-radius: 14px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.3s ease; z-index: 5;
+        }
+        .gated-overlay:hover { background: rgba(15,23,42,0.65); }
+        .gated-icon { font-size: 1.5rem; color: var(--accent-blue); margin-bottom: 0.5rem; }
+        .gated-text { color: #e2e8f0; font-weight: 700; font-size: 0.9rem; }
+        .gated-sub { color: #64748b; font-size: 0.75rem; margin-top: 0.25rem; }
+
+        /* Login Modal */
+        .login-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 9999; align-items: center; justify-content: center;
+        }
+        .login-overlay.visible { display: flex; }
+        .login-box {
+            background: #1e293b; border-radius: 20px; padding: 2.5rem;
+            width: 90%; max-width: 420px; position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 1px solid rgba(59,130,246,0.2);
+        }
+        .login-box h3 { color: #f1f5f9; text-align: center; margin: 0 0 0.5rem; }
+        .login-box .login-sub { color: #94a3b8; text-align: center; font-size: 0.85rem; margin-bottom: 1.5rem; }
+        .login-close {
+            position: absolute; top: 1rem; right: 1rem; background: none;
+            border: none; color: #64748b; font-size: 1.25rem; cursor: pointer;
+        }
+        .login-input {
+            width: 100%; padding: 0.875rem 1rem; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+            color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.75rem;
+            box-sizing: border-box;
+        }
+        .login-input:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        .login-submit {
+            width: 100%; padding: 0.875rem; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            margin-top: 0.5rem; transition: all 0.2s ease;
+        }
+        .login-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
+        .login-error { color: #ef4444; font-size: 0.8rem; text-align: center; margin-top: 0.5rem; display: none; }
+        .login-hint {
+            margin-top: 1rem; padding: 0.75rem; background: rgba(59,130,246,0.1);
+            border-radius: 8px; text-align: center;
+        }
+        .login-hint span { color: #94a3b8; font-size: 0.78rem; }
+        .login-hint code { color: var(--accent-blue); font-size: 0.78rem; }
+
+        /* Tooltip System (Calculator) */
+        .tooltip-trigger {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; background: rgba(59,130,246,0.2);
+            color: var(--accent-blue); border-radius: 50%; font-size: 0.65rem;
+            font-weight: 700; cursor: help; margin-left: 4px; vertical-align: middle;
+            position: relative;
+        }
+        .tooltip-trigger .tooltip-content { display: none; }
+        #calc-tooltip-container {
+            display: none; position: absolute; z-index: 1000; width: 320px;
+            background: #1e293b; border: 1px solid rgba(59,130,246,0.25);
+            border-radius: 12px; padding: 1rem; box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+        #calc-tooltip-container .tooltip-title {
+            color: var(--accent-blue); font-weight: 700; font-size: 0.8rem;
+            margin-bottom: 0.35rem;
+        }
+        #calc-tooltip-container .tooltip-desc {
+            color: #cbd5e1; font-size: 0.78rem; line-height: 1.55; margin-bottom: 0.35rem;
+        }
+        #calc-tooltip-container .tooltip-formula {
+            color: #64748b; font-size: 0.72rem; font-style: italic;
+            border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.35rem;
+        }
+
+        /* PDF Export Button */
+        .pdf-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff; border: none; border-radius: 10px; font-weight: 700;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+        .pdf-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
+        .pdf-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Narrative Conclusion Box */
+        .narrative-box {
+            background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.15);
+            border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; display: none;
+        }
+        .narrative-box.visible { display: block; }
+        .narrative-box h4 { color: var(--accent-blue); margin: 0 0 1rem; font-size: 0.95rem; }
+        .narrative-grade {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 48px; height: 48px; border-radius: 12px; font-size: 1.5rem;
+            font-weight: 800; margin-right: 1rem; vertical-align: middle;
+        }
+        .narrative-summary { color: #cbd5e1; font-size: 0.85rem; line-height: 1.65; }
+        .narrative-actions { margin-top: 1rem; }
+        .narrative-action {
+            display: flex; align-items: center; gap: 8px;
+            padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.82rem; color: #cbd5e1;
+        }
+        .narrative-action .action-pri {
+            font-size: 0.6rem; font-weight: 800; padding: 2px 8px;
+            border-radius: 4px; color: #fff; white-space: nowrap;
         }
     </style>
 </head>
@@ -1042,12 +1271,12 @@
                     <div class="toc-item-number">Section 8</div>
                     <div class="toc-item-title">ICB Framework</div>
                 </a>
-                <a href="#section-9" class="toc-item">
-                    <div class="toc-item-number">Section 9</div>
+                <a href="#section-9" class="toc-item toc-calculator">
+                    <div class="toc-item-number">Section 9 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div>
                     <div class="toc-item-title">Interactive MTTR Canvas</div>
                 </a>
-                <a href="#section-10" class="toc-item">
-                    <div class="toc-item-number">Section 10</div>
+                <a href="#section-10" class="toc-item toc-calculator">
+                    <div class="toc-item-number">Section 10 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div>
                     <div class="toc-item-title">Capability vs MTTR Calculator</div>
                 </a>
                 <a href="#section-11" class="toc-item">
@@ -1573,11 +1802,33 @@
                         Capability vs MTTR Analyzer
                     </h2>
 
-                    <p style="color: #94a3b8; margin-bottom: 2rem;">Configure your facility parameters to compare vendor-dependent vs in-house MTTR, annual costs, and ROI from capability building investment.</p>
+                    <p style="color: #94a3b8; margin-bottom: 1.5rem;">Configure your facility parameters to compare vendor-dependent vs in-house MTTR, annual costs, and ROI from capability building investment.</p>
+
+                    <!-- Mode Toggle + Action Buttons -->
+                    <div class="mode-toolbar-row">
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" id="modeFree" onclick="switchCalcMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
+                            <button class="mode-btn" id="modePro" onclick="switchCalcMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="proBadge">PRO</span></button>
+                        </div>
+                        <div class="mode-toolbar-actions">
+                            <button class="pdf-btn" id="pdfBtn" disabled onclick="exportMTTRPDF()" style="padding:8px 14px;font-size:0.78rem;margin:0;"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                        </div>
+                    </div>
+
+                    <!-- CTA Card -->
+                    <div class="cta-card" id="ctaCard">
+                        <div class="cta-icon"><i class="fas fa-flask"></i></div>
+                        <div>
+                            <h4>Unlock Decision-Grade MTTR Analytics</h4>
+                            <p>Pro Analysis adds Monte Carlo uncertainty bounds, Erlang-C staffing model, availability calculations, scenario sensitivity, and narrative PDF export with 26 advanced KPIs.</p>
+                        </div>
+                    </div>
+
+                    <div id="calc-tooltip-container"></div>
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Incident Category</label>
+                            <label class="calc-label">Incident Category <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Infrastructure Domain</div><div class="tooltip-desc">Select the primary incident category. Each domain has distinct MTTR phase baselines derived from industry data: Electrical (UPS, PDU, switchgear), Mechanical (HVAC, chillers, CRAH), Controls (BMS, PLC, sensors), Fire Protection (suppression, VESDA, detection).</div><div class="tooltip-formula">Ref: IEEE 493 Gold Book — category-specific failure/repair distributions</div></span></span></label>
                             <select id="calcCategory" class="calc-select">
                                 <option value="Electrical" selected>Electrical</option>
                                 <option value="Mechanical">Mechanical</option>
@@ -1586,11 +1837,11 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Vendor SLA Hours</label>
+                            <label class="calc-label">Vendor SLA Hours <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Contracted Response Time</div><div class="tooltip-desc">Maximum guaranteed time for vendor technician to arrive on-site after dispatch. This drives the Mobilization phase of vendor MTTR. Note: SLA guarantees arrival, not resolution. Actual response may vary ±40% based on time-of-day and resource availability.</div><div class="tooltip-formula">Typical P1: 4h | P2: 8h | P3: 24h | P4: 48h</div></span></span></label>
                             <input type="number" id="calcVendorSLA" class="calc-input" value="4" min="1" max="24" step="0.5">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">In-House Skill Level</label>
+                            <label class="calc-label">In-House Skill Level <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Team Competence Tier</div><div class="tooltip-desc">Average diagnostic and repair competence of in-house technicians. Affects Diagnosis and Repair phase durations via a skill factor multiplier. L1 Novice: follow SOPs only. L3 Competent: independent troubleshooting. L5 Expert: root cause analysis, cross-domain.</div><div class="tooltip-formula">Skill Factor: L1=1.50x | L2=1.20x | L3=1.00x | L4=0.75x | L5=0.55x</div></span></span></label>
                             <select id="calcSkillLevel" class="calc-select">
                                 <option value="1">1 — Novice</option>
                                 <option value="2" selected>2 — Basic</option>
@@ -1600,20 +1851,67 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Annual Incidents</label>
+                            <label class="calc-label">Annual Incidents <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Incident Frequency</div><div class="tooltip-desc">Total critical incidents per year requiring immediate response. Drives annual downtime and cost calculations. A 10MW colocation facility typically experiences 30-50 critical incidents/year across all infrastructure domains.</div><div class="tooltip-formula">Ref: Uptime Institute 2023 — median critical incident frequency for Tier III facilities</div></span></span></label>
                             <input type="number" id="calcIncidents" class="calc-input" value="36" min="1" max="200">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Downtime Cost / Hour ($)</label>
+                            <label class="calc-label">Downtime Cost / Hour ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Hourly Outage Cost</div><div class="tooltip-desc">Weighted average cost per hour of downtime including SLA penalties, revenue loss, reputational impact, and operational overhead. Varies significantly by client mix and facility tier. Range: $1,000 (enterprise) to $100,000+ (financial services).</div><div class="tooltip-formula">Ref: Uptime Institute 2023 — average significant outage cost >$100K</div></span></span></label>
                             <input type="number" id="calcCostHour" class="calc-input" value="9000" min="100" step="500">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Vendor Callout Cost ($)</label>
+                            <label class="calc-label">Vendor Callout Cost ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Per-Incident Vendor Fee</div><div class="tooltip-desc">Direct cost per emergency vendor dispatch including emergency response premium, labor, travel, and standard parts. Does NOT include downtime cost (calculated separately). Excludes retainer/contract fees.</div><div class="tooltip-formula">Typical range: $1,500-$5,000 per P1 callout depending on OEM and region</div></span></span></label>
                             <input type="number" id="calcCallout" class="calc-input" value="2500" min="100" step="100">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Annual Training Investment ($)</label>
+                            <label class="calc-label">Training Investment ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Annual ICB Investment</div><div class="tooltip-desc">Total annual investment in capability building: OEM training courses, certifications (NFPA 70E, refrigerant handling), diagnostic equipment, spare parts inventory, and competence assessment programs. Year 1 typically 60-70% higher than ongoing.</div><div class="tooltip-formula">ICB Framework: Year 1 ~$85K | Year 2+ ~$50K (10MW facility baseline)</div></span></span></label>
                             <input type="number" id="calcTraining" class="calc-input" value="50000" min="0" step="5000">
+                        </div>
+                    </div>
+
+                    <!-- Pro Input Drawer -->
+                    <div class="pro-drawer" id="proDrawer">
+                        <div class="pro-drawer-title"><i class="fas fa-sliders"></i> Advanced Parameters</div>
+                        <div class="calc-grid">
+                            <div class="calc-input-group">
+                                <label class="calc-label">MTBF (hours) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Mean Time Between Failures</div><div class="tooltip-desc">Average operating hours between critical failures for the selected infrastructure category. Used to calculate system availability: A = MTBF/(MTBF+MTTR). MTBF is primarily driven by equipment design, age, and PM quality.</div><div class="tooltip-formula">Typical DC: 4,000-15,000 hrs | NASA/IEEE 493 availability framework</div></span></span></label>
+                                <input type="number" id="proMTBF" class="calc-input" value="8760" min="500" max="100000" step="100">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Off-Hours SLA Multiplier <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weekend/Holiday Response Degradation</div><div class="tooltip-desc">Multiplier applied to vendor SLA during off-hours, weekends, and holidays. Analysis shows vendor P1 response averages 6.8h off-hours vs 3.4h business hours — a 2.0x degradation factor. Affects Monte Carlo tail risk calculations.</div><div class="tooltip-formula">Typical: 1.5x (best case) to 2.5x (remote site) | Source: Section 5.2</div></span></span></label>
+                                <input type="number" id="proOffHours" class="calc-input" value="2.0" min="1.0" max="4.0" step="0.1">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">In-House Coverage <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Shift Coverage Model</div><div class="tooltip-desc">In-house team coverage pattern. Affects mobilization time distribution — 24/7 coverage eliminates off-hours gaps. Limited coverage models introduce mobilization variance during uncovered periods.</div><div class="tooltip-formula">24/7: 0.25h mob | 16/7: avg 0.8h | 12/5: avg 2.1h (off-hours)</div></span></span></label>
+                                <select id="proCoverage" class="calc-select">
+                                    <option value="24_7" selected>24/7 — Full Coverage</option>
+                                    <option value="16_7">16/7 — Two Shifts</option>
+                                    <option value="12_5">12/5 — Business Hours</option>
+                                </select>
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Spare Parts Readiness (%) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Spares Availability</div><div class="tooltip-desc">Percentage of common failure components available in on-site inventory. Directly affects Repair phase duration — missing parts add procurement delay (typically 4-48 hours). Strategic spares program is an ICB Phase 3 deliverable.</div><div class="tooltip-formula">Impact: Each 10% gap adds ~0.3h to avg repair phase | ICB Phase 3</div></span></span></label>
+                                <input type="number" id="proSpares" class="calc-input" value="80" min="0" max="100" step="5">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Team Size (responders) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Qualified In-House Responders</div><div class="tooltip-desc">Number of Tier 2+ qualified technicians available for incident response. Used in Erlang-C queueing model to calculate wait probability when multiple incidents occur simultaneously. Understaffing creates hidden queuing delays.</div><div class="tooltip-formula">Erlang-C: P(wait) increases exponentially as utilization → 1.0</div></span></span></label>
+                                <input type="number" id="proTeamSize" class="calc-input" value="4" min="1" max="20" step="1">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Vendor Retainer ($/yr) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Annual Vendor Contract</div><div class="tooltip-desc">Base annual vendor maintenance contract cost (covering PM visits, priority access, parts discounts). Partially retained under in-house model for OEM warranty work and Tier 4 escalations — typically reduced by 40-60%.</div><div class="tooltip-formula">Under ICB: retain ~40% of retainer for Tier 4 OEM access</div></span></span></label>
+                                <input type="number" id="proRetainer" class="calc-input" value="180000" min="0" step="10000">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Critical Severity (%) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">P1 Critical Mix</div><div class="tooltip-desc">Percentage of incidents classified as P1 Critical (client-impacting). Critical incidents carry full downtime cost; non-critical incidents carry reduced cost (typically 30% of full rate). Affects financial calculation realism.</div><div class="tooltip-formula">Cost weighting: P1 = 100% rate | Non-P1 = 30% of hourly rate</div></span></span></label>
+                                <input type="number" id="proCriticalPct" class="calc-input" value="40" min="0" max="100" step="5">
+                            </div>
+                            <div class="calc-input-group">
+                                <label class="calc-label">Duration Variability <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Phase Duration Spread</div><div class="tooltip-desc">Coefficient of variation for MTTR phase durations. Low = consistent, predictable repairs. High = wide variance (aging equipment, mixed failure modes). Drives Monte Carlo confidence band width.</div><div class="tooltip-formula">Low: CV=0.2 (tight band) | Medium: CV=0.35 | High: CV=0.5 (wide band)</div></span></span></label>
+                                <select id="proDurVar" class="calc-select">
+                                    <option value="low">Low — Predictable</option>
+                                    <option value="medium" selected>Medium — Typical</option>
+                                    <option value="high">High — Variable</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -1661,6 +1959,98 @@
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resBreakeven">0</div>
                             <div class="calc-result-label">Breakeven (months)</div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Output Panels -->
+                    <div class="pro-panels" id="proPanels">
+
+                        <!-- Panel 1: MTTR Distribution -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-chart-bar"></i> MTTR Distribution & Phase Analysis</div>
+                            <div class="calc-results">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMeanMTTR">—</div><div class="calc-result-label">Mean In-House MTTR</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMedianMTTR">—</div><div class="calc-result-label">Median MTTR (p50)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proP90MTTR">—</div><div class="calc-result-label">p90 MTTR (tail)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMobPct">—</div><div class="calc-result-label">Mobilization % (Vendor)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBottleneck">—</div><div class="calc-result-label">Phase Bottleneck</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proMTTRReduction">—</div><div class="calc-result-label">MTTR Reduction</div></div>
+                            </div>
+                        </div><div class="gated-overlay" id="gate1" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo MTTR distributions</div></div></div>
+
+                        <!-- Panel 2: Availability & Downtime -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-shield-halved"></i> Availability & Downtime Impact</div>
+                            <div class="calc-results">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proAvailVendor">—</div><div class="calc-result-label">Vendor Availability</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proAvailInhouse">—</div><div class="calc-result-label">In-House Availability</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proAvailDelta">—</div><div class="calc-result-label">Availability Improvement</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proDownVendorP50">—</div><div class="calc-result-label">Vendor Downtime (p50)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proDownInhouseP50">—</div><div class="calc-result-label">In-House Downtime (p50)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proHoursSaved">—</div><div class="calc-result-label">Downtime Hours Saved</div></div>
+                            </div>
+                        </div><div class="gated-overlay" id="gate2" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">NASA/IEEE availability framework</div></div></div>
+
+                        <!-- Panel 3: Financial Deep Dive -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-coins"></i> Financial Deep Dive</div>
+                            <div class="calc-results">
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proNPV3">—</div><div class="calc-result-label">3-Year NPV</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proCostVendor">—</div><div class="calc-result-label">Cost / Incident (Vendor)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proCostInhouse">—</div><div class="calc-result-label">Cost / Incident (In-House)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBEp50">—</div><div class="calc-result-label">Breakeven (p50)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBEp90">—</div><div class="calc-result-label">Breakeven (p90)</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="pro3YrSavings">—</div><div class="calc-result-label">3-Year Cumulative</div></div>
+                            </div>
+                        </div><div class="gated-overlay" id="gate3" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">NPV & confidence-banded ROI</div></div></div>
+
+                        <!-- Panel 4: Staffing & Queueing -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-users-gear"></i> Staffing & Queueing (Erlang-C)</div>
+                            <div class="calc-results">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proWaitProb">—</div><div class="calc-result-label">Wait Probability</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proQueueDelay">—</div><div class="calc-result-label">Avg Queue Delay</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proOptTeam">—</div><div class="calc-result-label">Optimal Team Size</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proUtilRate">—</div><div class="calc-result-label">Utilization Rate</div></div>
+                            </div>
+                        </div><div class="gated-overlay" id="gate4" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Erlang-C staffing optimization</div></div></div>
+
+                        <!-- Panel 5: Scenario Sensitivity -->
+                        <div class="pro-panel"><div class="pro-panel-inner">
+                            <div class="pro-panel-title"><i class="fas fa-arrow-trend-up"></i> Scenario Sensitivity</div>
+                            <div class="calc-results">
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen1">—</div><div class="calc-result-label">+1 Technician</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen2">—</div><div class="calc-result-label">+1 Skill Level</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen3">—</div><div class="calc-result-label">2x Incidents</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen4">—</div><div class="calc-result-label">−50% Vendor SLA</div></div>
+                            </div>
+                        </div><div class="gated-overlay" id="gate5" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div></div>
+                    </div>
+
+                    <!-- Narrative Conclusion -->
+                    <div class="narrative-box" id="narrativeBox">
+                        <h4><i class="fas fa-file-lines"></i> Executive Assessment</h4>
+                        <div id="narrativeContent"></div>
+                    </div>
+
+                    <div class="privacy-badge" style="margin-top:0.5rem;">
+                        <i class="fas fa-shield-halved"></i> PDF generated in your browser — no data is sent to any server
+                    </div>
+
+                </div>
+
+                <!-- Login Modal -->
+                <div class="login-overlay" id="loginOverlay">
+                    <div class="login-box">
+                        <button class="login-close" onclick="hideLoginModal()">&times;</button>
+                        <h3><i class="fas fa-microscope" style="color: var(--accent-blue); margin-right: 8px;"></i> Pro Analysis</h3>
+                        <p class="login-sub">Unlock 26 advanced KPIs, Monte Carlo simulation & executive PDF export</p>
+                        <input type="email" class="login-input" id="loginEmail" placeholder="Email address">
+                        <input type="password" class="login-input" id="loginPass" placeholder="Password">
+                        <button class="login-submit" id="loginSubmit" onclick="handleLogin()">Unlock Pro Analysis</button>
+                        <div class="login-error" id="loginError">Invalid credentials. Please try again.</div>
+                        <div class="login-hint">
+                            <span>Demo access:</span> <code>demo@resistancezero.com</code> / <code>demo2026</code>
                         </div>
                     </div>
                 </div>
@@ -1804,6 +2194,18 @@
                         <h4>Bagus Dwi Permana</h4>
                         <p>Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik (Indonesian Electrical Safety Expert) and CDFOM. This paper presents a practical framework for building in-house capability derived from operational experience managing mission-critical data center facilities.</p>
                     </div>
+                </div>
+
+                <!-- Article Navigation -->
+                <div class="article-nav">
+                    <a href="article-3.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Previous Article
+                    </a>
+                    <a href="article-5.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
 
             </div>
@@ -2066,114 +2468,538 @@
     })();
     </script>
 
-    <!-- Calculator Logic -->
+    <!-- Calculator Logic — Pro Enhancement Engine -->
     <script>
     (function() {
+        /* ===== CONSTANTS ===== */
         var CATEGORY_BASE = {
-            Electrical: {detect: 0.25, diagnose: 0.5, mobilize: 0, repair: 1.5, verify: 0.5},
-            Mechanical: {detect: 0.5, diagnose: 0.75, mobilize: 0, repair: 2.0, verify: 0.5},
-            Controls: {detect: 0.15, diagnose: 1.0, mobilize: 0, repair: 1.0, verify: 0.75},
-            "Fire Protection": {detect: 0.1, diagnose: 0.5, mobilize: 0, repair: 1.5, verify: 1.0}
+            Electrical: {detect:0.25, diagnose:0.5, repair:1.5, verify:0.5},
+            Mechanical: {detect:0.5, diagnose:0.75, repair:2.0, verify:0.5},
+            Controls: {detect:0.15, diagnose:1.0, repair:1.0, verify:0.75},
+            "Fire Protection": {detect:0.1, diagnose:0.5, repair:1.5, verify:1.0}
         };
+        var SKILL_FACTORS = {1:1.5, 2:1.2, 3:1.0, 4:0.75, 5:0.55};
+        var COVERAGE_MOB = {'24_7':0.25, '16_7':0.80, '12_5':2.10};
+        var DUR_CV = {low:0.20, medium:0.35, high:0.50};
 
-        var SKILL_FACTORS = {1: 1.5, 2: 1.2, 3: 1.0, 4: 0.75, 5: 0.55};
+        var isPremium = false;
+        var calcMode = 'free';
+        var lastProData = null;
 
-        function calculate() {
-            var category = document.getElementById('calcCategory').value;
-            var vendorSLA = parseFloat(document.getElementById('calcVendorSLA').value) || 4;
-            var skillLevel = parseInt(document.getElementById('calcSkillLevel').value) || 2;
-            var annualIncidents = parseInt(document.getElementById('calcIncidents').value) || 36;
-            var costPerHour = parseFloat(document.getElementById('calcCostHour').value) || 9000;
-            var vendorCallout = parseFloat(document.getElementById('calcCallout').value) || 2500;
-            var trainingInvestment = parseFloat(document.getElementById('calcTraining').value) || 50000;
+        /* ===== HELPERS ===== */
+        function $(id){ return document.getElementById(id); }
+        function val(id, def){ var e=$(id); if(!e) return def; var v=parseFloat(e.value); return isNaN(v)?def:v; }
+        function fmt(n,d){ return n.toFixed(d===undefined?2:d); }
+        function fmtK(n){ return n>=1e6?'$'+fmt(n/1e6,1)+'M':n>=1e3?'$'+fmt(n/1e3,1)+'K':'$'+Math.round(n); }
+        function pct(n){ return fmt(n,1)+'%'; }
+        function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
 
-            var base = CATEGORY_BASE[category];
-            var skillFactor = SKILL_FACTORS[skillLevel];
+        /* ===== GAUSSIAN RANDOM (Box-Muller) ===== */
+        function gaussRand(){ var u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+        function sampleLognormal(mean,cv){ var sigma2=Math.log(1+cv*cv); var mu=Math.log(mean)-sigma2/2; return Math.exp(mu+Math.sqrt(sigma2)*gaussRand()); }
 
-            // Vendor MTTR phases
-            var vDetect = base.detect;
-            var vDiagnose = base.diagnose;
-            var vMobilize = vendorSLA;
-            var vRepair = base.repair;
-            var vVerify = base.verify;
-            var vendorMTTR = vDetect + vDiagnose + vMobilize + vRepair + vVerify;
+        /* ===== ERLANG-C ===== */
+        function factorial(n){ var f=1; for(var i=2;i<=n;i++) f*=i; return f; }
+        function erlangC(lambda,mu,c){
+            var rho=lambda/(c*mu);
+            if(rho>=1) return {pw:0.99,wq:999,util:rho};
+            var a=lambda/mu;
+            var sum=0; for(var k=0;k<c;k++) sum+=Math.pow(a,k)/factorial(k);
+            var last=Math.pow(a,c)/factorial(c) * 1/(1-rho);
+            var pw=last/(sum+last);
+            var wq=pw/(c*mu-lambda);
+            return {pw:Math.min(pw,0.99),wq:Math.max(0,wq),util:rho};
+        }
 
-            // In-house MTTR phases
-            var iDetect = base.detect;
-            var iDiagnose = base.diagnose * skillFactor;
-            var iMobilize = 0.25;
-            var iRepair = base.repair * skillFactor;
-            var iVerify = base.verify;
-            var inhouseMTTR = iDetect + iDiagnose + iMobilize + iRepair + iVerify;
+        /* ===== PERCENTILE ===== */
+        function percentile(arr,p){ arr.sort(function(a,b){return a-b;}); var i=(p/100)*(arr.length-1); var lo=Math.floor(i),hi=Math.ceil(i); return arr[lo]+(arr[hi]-arr[lo])*(i-lo); }
+
+        /* ===== CORE CALCULATION ===== */
+        function getParams(){
+            return {
+                category: $('calcCategory').value,
+                vendorSLA: val('calcVendorSLA',4),
+                skillLevel: parseInt($('calcSkillLevel').value)||2,
+                incidents: val('calcIncidents',36),
+                costHour: val('calcCostHour',9000),
+                callout: val('calcCallout',2500),
+                training: val('calcTraining',50000),
+                mtbf: val('proMTBF',8760),
+                offHours: val('proOffHours',2.0),
+                coverage: $('proCoverage')?$('proCoverage').value:'24_7',
+                spares: val('proSpares',80),
+                teamSize: val('proTeamSize',4),
+                retainer: val('proRetainer',180000),
+                criticalPct: val('proCriticalPct',40),
+                durVar: $('proDurVar')?$('proDurVar').value:'medium'
+            };
+        }
+
+        function calcPhases(p){
+            var base = CATEGORY_BASE[p.category];
+            var sf = SKILL_FACTORS[p.skillLevel];
+            var mob = COVERAGE_MOB[p.coverage]||0.25;
+            var spareFactor = 1 + (100-p.spares)/100 * 0.5;
+            return {
+                vendor: {detect:base.detect, diagnose:base.diagnose, mobilize:p.vendorSLA, repair:base.repair, verify:base.verify},
+                inhouse: {detect:base.detect, diagnose:base.diagnose*sf, mobilize:mob, repair:base.repair*sf*spareFactor, verify:base.verify}
+            };
+        }
+
+        function sumPhases(ph){ return ph.detect+ph.diagnose+ph.mobilize+ph.repair+ph.verify; }
+
+        function calculate(){
+            var p = getParams();
+            var phases = calcPhases(p);
+            var vendorMTTR = sumPhases(phases.vendor);
+            var inhouseMTTR = sumPhases(phases.inhouse);
 
             // Phase table
-            var phases = [
-                {name: 'Detection', v: vDetect, i: iDetect},
-                {name: 'Diagnosis', v: vDiagnose, i: iDiagnose},
-                {name: 'Mobilization', v: vMobilize, i: iMobilize},
-                {name: 'Repair', v: vRepair, i: iRepair},
-                {name: 'Verification', v: vVerify, i: iVerify}
+            var phList = [
+                {name:'Detection', v:phases.vendor.detect, i:phases.inhouse.detect},
+                {name:'Diagnosis', v:phases.vendor.diagnose, i:phases.inhouse.diagnose},
+                {name:'Mobilization', v:phases.vendor.mobilize, i:phases.inhouse.mobilize},
+                {name:'Repair', v:phases.vendor.repair, i:phases.inhouse.repair},
+                {name:'Verification', v:phases.vendor.verify, i:phases.inhouse.verify}
             ];
-
-            var tbody = document.getElementById('phaseTableBody');
+            var tbody = $('phaseTableBody');
             tbody.innerHTML = '';
-            phases.forEach(function(p) {
+            phList.forEach(function(ph){
                 var tr = document.createElement('tr');
-                tr.innerHTML = '<td class="phase-label">' + p.name + '</td>' +
-                    '<td class="vendor-val">' + p.v.toFixed(2) + '</td>' +
-                    '<td class="inhouse-val">' + p.i.toFixed(2) + '</td>' +
-                    '<td>' + (p.v - p.i).toFixed(2) + '</td>';
+                tr.innerHTML = '<td class="phase-label">'+ph.name+'</td><td class="vendor-val">'+fmt(ph.v)+'</td><td class="inhouse-val">'+fmt(ph.i)+'</td><td>'+fmt(ph.v-ph.i)+'</td>';
                 tbody.appendChild(tr);
             });
-
-            // Total row
             var totalTr = document.createElement('tr');
-            totalTr.style.fontWeight = '700';
-            totalTr.style.borderTop = '2px solid rgba(59,130,246,0.3)';
-            totalTr.innerHTML = '<td class="phase-label">TOTAL</td>' +
-                '<td class="vendor-val">' + vendorMTTR.toFixed(2) + '</td>' +
-                '<td class="inhouse-val">' + inhouseMTTR.toFixed(2) + '</td>' +
-                '<td>' + (vendorMTTR - inhouseMTTR).toFixed(2) + '</td>';
+            totalTr.style.fontWeight='700'; totalTr.style.borderTop='2px solid rgba(59,130,246,0.3)';
+            totalTr.innerHTML = '<td class="phase-label">TOTAL</td><td class="vendor-val">'+fmt(vendorMTTR)+'</td><td class="inhouse-val">'+fmt(inhouseMTTR)+'</td><td>'+fmt(vendorMTTR-inhouseMTTR)+'</td>';
             tbody.appendChild(totalTr);
 
             // Annual analysis
-            var vendorAnnualDowntime = vendorMTTR * annualIncidents;
-            var inhouseAnnualDowntime = inhouseMTTR * annualIncidents;
-            var downtimeSavings = (vendorAnnualDowntime - inhouseAnnualDowntime) * costPerHour;
-            var vendorCosts = annualIncidents * vendorCallout;
-            var netSavings = downtimeSavings + vendorCosts - trainingInvestment;
-            var roi = trainingInvestment > 0 ? (netSavings / trainingInvestment) * 100 : 0;
-            var monthlyBenefit = (downtimeSavings + vendorCosts) / 12;
-            var breakeven = monthlyBenefit > 0 ? trainingInvestment / monthlyBenefit : 99;
+            var vDown = vendorMTTR * p.incidents;
+            var iDown = inhouseMTTR * p.incidents;
+            var critW = p.criticalPct/100;
+            var effCostHour = p.costHour * critW + p.costHour * 0.3 * (1-critW);
+            var downtimeSavings = (vDown - iDown) * effCostHour;
+            var vendorCosts = p.incidents * p.callout;
+            var retainerSavings = p.retainer * 0.55;
+            var netSavings = downtimeSavings + vendorCosts + retainerSavings - p.training;
+            var roi = p.training > 0 ? (netSavings/p.training)*100 : 0;
+            var monthlyBenefit = (downtimeSavings + vendorCosts + retainerSavings)/12;
+            var breakeven = monthlyBenefit > 0 ? p.training/monthlyBenefit : 99;
 
-            // Update results
-            document.getElementById('resVendorMTTR').textContent = vendorMTTR.toFixed(2);
-            document.getElementById('resInhouseMTTR').textContent = inhouseMTTR.toFixed(2);
-            document.getElementById('resVendorDowntime').textContent = vendorAnnualDowntime.toFixed(1);
-            document.getElementById('resInhouseDowntime').textContent = inhouseAnnualDowntime.toFixed(1);
+            // Update Free results
+            $('resVendorMTTR').textContent = fmt(vendorMTTR);
+            $('resInhouseMTTR').textContent = fmt(inhouseMTTR);
+            $('resVendorDowntime').textContent = fmt(vDown,1);
+            $('resInhouseDowntime').textContent = fmt(iDown,1);
+            var sEl=$('resNetSavings'); sEl.textContent=fmtK(netSavings); sEl.className='calc-result-value '+(netSavings>=0?'positive':'negative');
+            var rEl=$('resROI'); rEl.textContent=Math.round(roi)+'%'; rEl.className='calc-result-value '+(roi>=0?'positive':'negative');
+            $('resBreakeven').textContent = breakeven<12?fmt(breakeven,1)+' mo':Math.round(breakeven)+' mo';
 
-            var savingsEl = document.getElementById('resNetSavings');
-            savingsEl.textContent = '$' + Math.round(netSavings).toLocaleString();
-            savingsEl.className = 'calc-result-value ' + (netSavings >= 0 ? 'positive' : 'negative');
-
-            var roiEl = document.getElementById('resROI');
-            roiEl.textContent = Math.round(roi) + '%';
-            roiEl.className = 'calc-result-value ' + (roi >= 0 ? 'positive' : 'negative');
-
-            document.getElementById('resBreakeven').textContent = breakeven < 12 ? breakeven.toFixed(1) + ' mo' : breakeven.toFixed(0) + ' mo';
+            // Pro calculations
+            if(isPremium && calcMode==='pro') calculatePro(p, phases, vendorMTTR, inhouseMTTR, effCostHour);
         }
 
-        // Event listeners
-        var inputs = ['calcCategory', 'calcVendorSLA', 'calcSkillLevel', 'calcIncidents', 'calcCostHour', 'calcCallout', 'calcTraining'];
-        inputs.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('input', calculate);
-                el.addEventListener('change', calculate);
+        /* ===== PRO ENGINE ===== */
+        function calculatePro(p, phases, vendorMTTR, inhouseMTTR, effCostHour){
+            var cv = DUR_CV[p.durVar]||0.35;
+            var N = 5000;
+
+            // Monte Carlo — sample in-house MTTR distribution
+            var mcInhouse=[], mcVendor=[], mcDown=[], mcSavings=[], mcBreakeven=[];
+            for(var i=0;i<N;i++){
+                var iD = sampleLognormal(phases.inhouse.detect, cv*0.5);
+                var iDg = sampleLognormal(phases.inhouse.diagnose, cv);
+                var iM = sampleLognormal(phases.inhouse.mobilize, cv*0.7);
+                var iR = sampleLognormal(phases.inhouse.repair, cv);
+                var iV = sampleLognormal(phases.inhouse.verify, cv*0.5);
+                var iTotal = iD+iDg+iM+iR+iV;
+                mcInhouse.push(iTotal);
+
+                var vSLA = sampleLognormal(p.vendorSLA, cv*0.6);
+                var offHoursChance = 0.42;
+                if(Math.random()<offHoursChance) vSLA *= (1 + (p.offHours-1)*Math.random());
+                var vTotal = sampleLognormal(phases.vendor.detect,cv*0.5) + sampleLognormal(phases.vendor.diagnose,cv) + vSLA + sampleLognormal(phases.vendor.repair,cv) + sampleLognormal(phases.vendor.verify,cv*0.5);
+                mcVendor.push(vTotal);
+
+                var annualInc = Math.max(1, Math.round(p.incidents + gaussRand()*Math.sqrt(p.incidents)));
+                var vDn = vTotal * annualInc;
+                var iDn = iTotal * annualInc;
+                mcDown.push(iDn);
+                var sav = (vDn-iDn)*effCostHour + annualInc*p.callout + p.retainer*0.55 - p.training;
+                mcSavings.push(sav);
+                var mb = ((vDn-iDn)*effCostHour + annualInc*p.callout + p.retainer*0.55)/12;
+                mcBreakeven.push(mb>0?p.training/mb:99);
             }
+
+            // Panel 1: MTTR Distribution
+            var meanIH = mcInhouse.reduce(function(a,b){return a+b;},0)/N;
+            var medianIH = percentile(mcInhouse,50);
+            var p90IH = percentile(mcInhouse,90);
+            var mobPct = (phases.vendor.mobilize/vendorMTTR*100);
+            var phNames=['Detect','Diagnose','Mobilize','Repair','Verify'];
+            var phVals=[phases.vendor.detect,phases.vendor.diagnose,phases.vendor.mobilize,phases.vendor.repair,phases.vendor.verify];
+            var maxPh=0,maxIdx=0; for(var j=0;j<5;j++){if(phVals[j]>maxPh){maxPh=phVals[j];maxIdx=j;}}
+            var reduction = (vendorMTTR-inhouseMTTR)/vendorMTTR*100;
+
+            $('proMeanMTTR').textContent = fmt(meanIH)+'h';
+            $('proMedianMTTR').textContent = fmt(medianIH)+'h';
+            $('proP90MTTR').textContent = fmt(p90IH)+'h';
+            $('proMobPct').textContent = pct(mobPct);
+            $('proBottleneck').textContent = phNames[maxIdx];
+            $('proBottleneck').style.fontSize='1rem';
+            $('proMTTRReduction').textContent = pct(reduction);
+
+            // Panel 2: Availability
+            var availV = p.mtbf/(p.mtbf+vendorMTTR)*100;
+            var availI = p.mtbf/(p.mtbf+inhouseMTTR)*100;
+            var downVp50 = percentile(mcDown.map(function(d){return d;}),50);
+            var meanVDown = mcVendor.reduce(function(a,b){return a+b;},0)/N * p.incidents;
+            $('proAvailVendor').textContent = fmt(availV,3)+'%';
+            $('proAvailInhouse').textContent = fmt(availI,3)+'%';
+            $('proAvailDelta').textContent = '+'+fmt(availI-availV,3)+' pp';
+            $('proDownVendorP50').textContent = fmt(percentile(mcVendor,50)*p.incidents,0)+'h';
+            $('proDownInhouseP50').textContent = fmt(downVp50,0)+'h';
+            $('proHoursSaved').textContent = fmt(meanVDown-meanIH*p.incidents,0)+'h';
+
+            // Panel 3: Financial
+            var discRate=0.08;
+            var npv3=0; for(var y=1;y<=3;y++){
+                var annSav = (vendorMTTR-inhouseMTTR)*p.incidents*effCostHour + p.incidents*p.callout + p.retainer*0.55;
+                var annCost = y===1?p.training*1.7:p.training;
+                npv3 += (annSav-annCost)/Math.pow(1+discRate,y);
+            }
+            var costPerIncV = (vendorMTTR*effCostHour + p.callout);
+            var costPerIncI = (inhouseMTTR*effCostHour + p.training/p.incidents);
+            var bep50 = percentile(mcBreakeven,50);
+            var bep90 = percentile(mcBreakeven,90);
+            var cum3 = 0; for(var y=1;y<=3;y++){
+                var s = (vendorMTTR-inhouseMTTR)*p.incidents*effCostHour + p.incidents*p.callout + p.retainer*0.55 - (y===1?p.training*1.7:p.training);
+                cum3 += s;
+            }
+            $('proNPV3').textContent = fmtK(npv3);
+            $('proCostVendor').textContent = fmtK(costPerIncV);
+            $('proCostInhouse').textContent = fmtK(costPerIncI);
+            $('proBEp50').textContent = fmt(Math.max(0.5,bep50),1)+' mo';
+            $('proBEp90').textContent = fmt(Math.max(0.5,bep90),1)+' mo';
+            $('pro3YrSavings').textContent = fmtK(cum3);
+
+            // Panel 4: Erlang-C
+            var lambda = p.incidents/(365*24);
+            var mu = 1/inhouseMTTR;
+            var c = Math.max(1,p.teamSize);
+            var ec = erlangC(lambda,mu,c);
+            var optTeam = c;
+            for(var t=1;t<=20;t++){var test=erlangC(lambda,mu,t);if(test.pw<0.05){optTeam=t;break;}}
+            $('proWaitProb').textContent = pct(ec.pw*100);
+            $('proQueueDelay').textContent = fmt(ec.wq*60,0)+' min';
+            $('proOptTeam').textContent = optTeam+' FTE';
+            $('proUtilRate').textContent = pct(ec.util*100);
+            $('proUtilRate').className = 'calc-result-value '+(ec.util>0.8?'negative':ec.util>0.6?'':'positive');
+
+            // Panel 5: Scenarios
+            var baseNet = (vendorMTTR-inhouseMTTR)*p.incidents*effCostHour;
+            // +1 Technician
+            var ec2 = erlangC(lambda,mu,c+1);
+            var waitDelta = (ec.wq-ec2.wq)*60;
+            $('proScen1').textContent = (waitDelta>0?'-':'')+fmt(Math.abs(waitDelta),0)+' min wait';
+            $('proScen1').style.color = waitDelta>0?'#10b981':'#64748b';
+            // +1 Skill
+            var nextSkill = Math.min(5,p.skillLevel+1);
+            var sfNext = SKILL_FACTORS[nextSkill];
+            var base2 = CATEGORY_BASE[p.category];
+            var ihNext = base2.detect + base2.diagnose*sfNext + (COVERAGE_MOB[p.coverage]||0.25) + base2.repair*sfNext*(1+(100-p.spares)/100*0.5) + base2.verify;
+            var mttrDelta = inhouseMTTR - ihNext;
+            $('proScen2').textContent = (mttrDelta>0?'-':'')+fmt(Math.abs(mttrDelta))+'h MTTR';
+            $('proScen2').style.color = mttrDelta>0?'#10b981':'#64748b';
+            // 2x Incidents
+            var roi2x = p.training>0?((vendorMTTR-inhouseMTTR)*p.incidents*2*effCostHour+p.incidents*2*p.callout+p.retainer*0.55-p.training)/p.training*100:0;
+            $('proScen3').textContent = Math.round(roi2x)+'% ROI';
+            $('proScen3').style.color = '#f59e0b';
+            // -50% Vendor SLA
+            var halfSLA = p.vendorSLA*0.5;
+            var vHalf = phases.vendor.detect+phases.vendor.diagnose+halfSLA+phases.vendor.repair+phases.vendor.verify;
+            var savDelta = (vendorMTTR-vHalf)*p.incidents*effCostHour;
+            $('proScen4').textContent = fmtK(savDelta)+' less saved';
+            $('proScen4').style.color = '#ef4444';
+
+            // Store for narrative & PDF
+            lastProData = {
+                p:p, vendorMTTR:vendorMTTR, inhouseMTTR:inhouseMTTR, meanIH:meanIH,
+                medianIH:medianIH, p90IH:p90IH, mobPct:mobPct, reduction:reduction,
+                availV:availV, availI:availI, npv3:npv3, cum3:cum3, bep50:bep50, bep90:bep90,
+                ec:ec, optTeam:optTeam, bottleneck:phNames[maxIdx],
+                costPerIncV:costPerIncV, costPerIncI:costPerIncI,
+                mcInhouse:mcInhouse, mcSavings:mcSavings, effCostHour:effCostHour
+            };
+
+            buildNarrative(lastProData);
+        }
+
+        /* ===== NARRATIVE CONCLUSION ===== */
+        function buildNarrative(d){
+            var box=$('narrativeBox'); var content=$('narrativeContent');
+            if(!box||!content) return;
+
+            // Capability Maturity Grade
+            var score=0;
+            if(d.p.skillLevel>=4) score+=25; else if(d.p.skillLevel>=3) score+=15; else score+=5;
+            if(d.reduction>=60) score+=25; else if(d.reduction>=40) score+=15; else score+=5;
+            if(d.ec.pw<0.1) score+=20; else if(d.ec.pw<0.3) score+=10; else score+=3;
+            if(d.npv3>0) score+=15; else score+=3;
+            if(d.p.spares>=80) score+=15; else if(d.p.spares>=60) score+=8; else score+=2;
+            var grade,gradeColor;
+            if(score>=85){grade='A';gradeColor='#10b981';}
+            else if(score>=70){grade='B';gradeColor='#3b82f6';}
+            else if(score>=55){grade='C';gradeColor='#f59e0b';}
+            else if(score>=40){grade='D';gradeColor='#f97316';}
+            else{grade='F';gradeColor='#ef4444';}
+
+            var html='<div style="display:flex;align-items:center;margin-bottom:1rem;">';
+            html+='<div class="narrative-grade" style="background:'+gradeColor+'22;color:'+gradeColor+';border:2px solid '+gradeColor+';">'+grade+'</div>';
+            html+='<div><div style="color:#e2e8f0;font-weight:700;font-size:0.95rem;">Capability Maturity: Grade '+grade+'</div>';
+            html+='<div style="color:#94a3b8;font-size:0.8rem;">Score: '+score+'/100 — ';
+            if(score>=85) html+='Mature, self-reliant capability profile';
+            else if(score>=70) html+='Strong foundation with targeted improvement opportunities';
+            else if(score>=55) html+='Moderate capability — significant vendor dependency remains';
+            else if(score>=40) html+='Developing — high vendor dependency risk';
+            else html+='Critical gap — heavy vendor dependency with structural risk';
+            html+='</div></div></div>';
+
+            // Summary paragraph
+            html+='<div class="narrative-summary">';
+            html+='<p>This facility operates with a <strong>'+d.p.category+'</strong>-domain focus, experiencing <strong>'+d.p.incidents+'</strong> critical incidents annually. ';
+            html+='Monte Carlo simulation (5,000 iterations) projects an in-house mean MTTR of <strong>'+fmt(d.meanIH)+'h</strong> ';
+            html+='(90th percentile: '+fmt(d.p90IH)+'h) compared to vendor mean of <strong>'+fmt(d.vendorMTTR)+'h</strong>, ';
+            html+='representing a <strong>'+pct(d.reduction)+'</strong> reduction in incident response time.</p>';
+
+            html+='<p>Vendor mobilization accounts for <strong>'+pct(d.mobPct)+'</strong> of total vendor MTTR — confirming ';
+            html+='<strong>'+d.bottleneck+'</strong> as the dominant bottleneck. ';
+            html+='System availability improves from <strong>'+fmt(d.availV,3)+'%</strong> to <strong>'+fmt(d.availI,3)+'%</strong> ';
+            html+='(+'+fmt(d.availI-d.availV,3)+' percentage points), equivalent to approximately <strong>'+fmt((d.availI-d.availV)/100*8760,0)+'</strong> fewer downtime hours annually.</p>';
+
+            html+='<p>The 3-year NPV of the ICB investment is <strong>'+fmtK(d.npv3)+'</strong> with breakeven at <strong>'+fmt(d.bep50,1)+' months</strong> (p50). ';
+            html+='Erlang-C staffing analysis indicates a wait probability of <strong>'+pct(d.ec.pw*100)+'</strong> with the current team of '+d.p.teamSize+' responders';
+            if(d.optTeam!==d.p.teamSize) html+='; optimal staffing is <strong>'+d.optTeam+' FTE</strong>';
+            html+='.</p></div>';
+
+            // Prioritized Actions
+            var actions=[];
+            if(d.p.skillLevel<4) actions.push({pri:'CRITICAL',text:'Invest in skill development: current Level '+d.p.skillLevel+' limits diagnosis and repair speed by '+(SKILL_FACTORS[d.p.skillLevel]>1?'+':'')+Math.round((SKILL_FACTORS[d.p.skillLevel]-1)*100)+'%',color:'#ef4444'});
+            if(d.mobPct>50) actions.push({pri:'CRITICAL',text:'Mobilization represents '+pct(d.mobPct)+' of vendor MTTR — transition to in-house Tier 2 response for immediate 3.75h+ savings per incident',color:'#ef4444'});
+            if(d.ec.pw>0.2) actions.push({pri:'HIGH',text:'Queue wait probability is '+pct(d.ec.pw*100)+' — consider adding '+(d.optTeam-d.p.teamSize)+' FTE to reduce concurrent incident delays',color:'#f59e0b'});
+            if(d.p.spares<70) actions.push({pri:'HIGH',text:'Spare parts readiness at '+d.p.spares+'% — invest in critical spares inventory (ICB Phase 3) to reduce repair phase delays',color:'#f59e0b'});
+            if(d.p.coverage!=='24_7') actions.push({pri:'MEDIUM',text:'Current '+d.p.coverage.replace('_','/')+' coverage creates mobilization gaps during '+Math.round((1-0.42)*100)+'% of off-hours — evaluate 24/7 rotation feasibility',color:'#3b82f6'});
+            if(d.npv3>100000) actions.push({pri:'MEDIUM',text:'Strong NPV of '+fmtK(d.npv3)+' supports accelerated ICB investment — consider front-loading training spend for faster capability ramp',color:'#3b82f6'});
+            if(d.ec.util>0.7) actions.push({pri:'LOW',text:'Team utilization at '+pct(d.ec.util*100)+' — approaching saturation threshold; monitor for burnout and cross-training gaps',color:'#64748b'});
+            if(actions.length<4) actions.push({pri:'LOW',text:'Establish monthly drill cadence (ICB Phase 5) to maintain diagnostic competence across all infrastructure domains',color:'#64748b'});
+
+            html+='<div class="narrative-actions"><div style="font-weight:700;color:#e2e8f0;font-size:0.85rem;margin-bottom:0.5rem;"><i class="fas fa-list-check" style="color:var(--accent-blue);margin-right:6px;"></i> Prioritized Actions</div>';
+            for(var i=0;i<Math.min(6,actions.length);i++){
+                html+='<div class="narrative-action"><span class="action-pri" style="background:'+actions[i].color+';">'+actions[i].pri+'</span><span>'+actions[i].text+'</span></div>';
+            }
+            html+='</div>';
+
+            content.innerHTML=html;
+            box.classList.add('visible');
+        }
+
+        /* ===== PDF EXPORT ===== */
+        function exportMTTRPDF(){
+            if(!lastProData) return;
+            var d=lastProData, p=d.p;
+            var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+            var hdrS='background:#1e3a5f;color:#fff;padding:8px 12px;font-weight:600;font-size:11px;text-align:left;';
+            var cellS='padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:11px;';
+
+            var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MTTR & Capability Analytics — Executive Report</title>';
+            html+='<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Segoe UI,system-ui,sans-serif;color:#1e293b;line-height:1.6;padding:40px;}';
+            html+='h1{font-size:20px;color:#1e3a5f;margin-bottom:4px;}h2{font-size:14px;color:#1e3a5f;margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid #3b82f6;}';
+            html+='table{width:100%;border-collapse:collapse;margin:12px 0;}p{font-size:11px;margin-bottom:8px;line-height:1.65;}';
+            html+='.grade-box{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;font-size:24px;font-weight:800;margin-right:12px;}';
+            html+='.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}';
+            html+='.kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;}';
+            html+='.kpi-val{font-size:16px;font-weight:800;color:#1e3a5f;}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:0.3px;}';
+            html+='@media print{body{padding:20px;font-size:10px;}h1{font-size:16px;}h2{font-size:12px;}.kpi-grid{grid-template-columns:repeat(3,1fr);}}</style></head><body>';
+
+            // Header
+            html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #1e3a5f;">';
+            html+='<div><h1>MTTR & Capability Analytics</h1><div style="color:#64748b;font-size:11px;">Executive Report — '+p.category+' Domain | '+today+'</div></div>';
+            html+='<div style="text-align:right;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">RESISTANCEZERO</div><div style="font-size:9px;color:#94a3b8;">Pro Analysis Report</div></div></div>';
+
+            // Grade
+            var score=0;
+            if(p.skillLevel>=4)score+=25;else if(p.skillLevel>=3)score+=15;else score+=5;
+            if(d.reduction>=60)score+=25;else if(d.reduction>=40)score+=15;else score+=5;
+            if(d.ec.pw<0.1)score+=20;else if(d.ec.pw<0.3)score+=10;else score+=3;
+            if(d.npv3>0)score+=15;else score+=3;
+            if(p.spares>=80)score+=15;else if(p.spares>=60)score+=8;else score+=2;
+            var grade,gColor;
+            if(score>=85){grade='A';gColor='#10b981';}else if(score>=70){grade='B';gColor='#3b82f6';}
+            else if(score>=55){grade='C';gColor='#f59e0b';}else if(score>=40){grade='D';gColor='#f97316';}
+            else{grade='F';gColor='#ef4444';}
+
+            html+='<div style="display:flex;align-items:center;margin:16px 0;padding:12px;background:'+gColor+'11;border:1px solid '+gColor+'33;border-radius:10px;">';
+            html+='<div class="grade-box" style="background:'+gColor+'22;color:'+gColor+';border:2px solid '+gColor+';">'+grade+'</div>';
+            html+='<div><div style="font-weight:700;font-size:13px;">Capability Maturity Grade: '+grade+' ('+score+'/100)</div>';
+            html+='<div style="font-size:10px;color:#64748b;">'+p.category+' domain | '+p.incidents+' incidents/yr | Skill Level '+p.skillLevel+' | Team Size '+p.teamSize+'</div></div></div>';
+
+            // Executive Summary
+            html+='<h2>Executive Summary</h2>';
+            html+='<p>Monte Carlo analysis (5,000 iterations) projects in-house MTTR of <strong>'+fmt(d.meanIH)+'h</strong> (mean) vs vendor <strong>'+fmt(d.vendorMTTR)+'h</strong>, a <strong>'+pct(d.reduction)+'</strong> reduction. Vendor mobilization at <strong>'+pct(d.mobPct)+'</strong> of total MTTR confirms the structural bottleneck thesis. System availability improves from '+fmt(d.availV,3)+'% to '+fmt(d.availI,3)+'%. The 3-year NPV is <strong>'+fmtK(d.npv3)+'</strong> with breakeven at '+fmt(d.bep50,1)+' months (p50).</p>';
+
+            // KPI Grid
+            html+='<h2>Key Performance Indicators</h2><div class="kpi-grid">';
+            var kpis=[
+                {l:'Vendor MTTR',v:fmt(d.vendorMTTR)+'h'},{l:'In-House MTTR (mean)',v:fmt(d.meanIH)+'h'},{l:'MTTR Reduction',v:pct(d.reduction)},
+                {l:'Vendor Availability',v:fmt(d.availV,3)+'%'},{l:'In-House Availability',v:fmt(d.availI,3)+'%'},{l:'Availability Delta',v:'+'+fmt(d.availI-d.availV,3)+' pp'},
+                {l:'3-Year NPV',v:fmtK(d.npv3)},{l:'Breakeven (p50)',v:fmt(d.bep50,1)+' mo'},{l:'3-Yr Cumulative',v:fmtK(d.cum3)},
+                {l:'Wait Probability',v:pct(d.ec.pw*100)},{l:'Optimal Team',v:d.optTeam+' FTE'},{l:'Utilization',v:pct(d.ec.util*100)}
+            ];
+            for(var i=0;i<kpis.length;i++) html+='<div class="kpi"><div class="kpi-val">'+kpis[i].v+'</div><div class="kpi-label">'+kpis[i].l+'</div></div>';
+            html+='</div>';
+
+            // MTTR Phase Table
+            html+='<h2>MTTR Phase Decomposition</h2>';
+            html+='<table><tr><td style="'+hdrS+'">Phase</td><td style="'+hdrS+'">Vendor (hrs)</td><td style="'+hdrS+'">In-House (hrs)</td><td style="'+hdrS+'">Savings</td><td style="'+hdrS+'">% of Total Savings</td></tr>';
+            var base=CATEGORY_BASE[p.category];var sf=SKILL_FACTORS[p.skillLevel];var spF=1+(100-p.spares)/100*0.5;
+            var mob=COVERAGE_MOB[p.coverage]||0.25;
+            var phs=[{n:'Detection',v:base.detect,i:base.detect},{n:'Diagnosis',v:base.diagnose,i:base.diagnose*sf},{n:'Mobilization',v:p.vendorSLA,i:mob},{n:'Repair',v:base.repair,i:base.repair*sf*spF},{n:'Verification',v:base.verify,i:base.verify}];
+            var totalSav=d.vendorMTTR-d.inhouseMTTR;
+            for(var i=0;i<phs.length;i++){var s=phs[i].v-phs[i].i;html+='<tr><td style="'+cellS+'font-weight:600;">'+phs[i].n+'</td><td style="'+cellS+'">'+fmt(phs[i].v)+'</td><td style="'+cellS+'color:#10b981;font-weight:600;">'+fmt(phs[i].i)+'</td><td style="'+cellS+'">'+fmt(s)+'h</td><td style="'+cellS+'">'+(totalSav>0?pct(s/totalSav*100):'—')+'</td></tr>';}
+            html+='<tr style="font-weight:700;background:#f1f5f9;"><td style="'+cellS+'">TOTAL</td><td style="'+cellS+'">'+fmt(d.vendorMTTR)+'h</td><td style="'+cellS+'color:#10b981;">'+fmt(d.inhouseMTTR)+'h</td><td style="'+cellS+'">'+fmt(totalSav)+'h</td><td style="'+cellS+'">100%</td></tr>';
+            html+='</table>';
+
+            // Monte Carlo
+            html+='<h2>Monte Carlo Distribution (5,000 iterations)</h2>';
+            html+='<p>In-House MTTR: p10='+fmt(percentile(d.mcInhouse,10))+'h | p50='+fmt(d.medianIH)+'h | p90='+fmt(d.p90IH)+'h</p>';
+            html+='<p>Annual Savings: p10='+fmtK(percentile(d.mcSavings,10))+' | p50='+fmtK(percentile(d.mcSavings,50))+' | p90='+fmtK(percentile(d.mcSavings,90))+'</p>';
+
+            // Recommendations
+            html+='<h2>Prioritized Recommendations</h2><table><tr><td style="'+hdrS+'width:80px;">Priority</td><td style="'+hdrS+'">Action</td></tr>';
+            var actions=[];
+            if(p.skillLevel<4) actions.push({pri:'CRITICAL',text:'Accelerate skill development from Level '+p.skillLevel+' — each level reduces diagnosis and repair time by 20-25%'});
+            if(d.mobPct>50) actions.push({pri:'CRITICAL',text:'Transition '+Math.round(d.mobPct)+'% mobilization-dominated incidents to in-house Tier 2 response'});
+            if(d.ec.pw>0.2) actions.push({pri:'HIGH',text:'Expand team from '+p.teamSize+' to '+d.optTeam+' FTE to reduce queue probability below 5%'});
+            if(p.spares<70) actions.push({pri:'HIGH',text:'Build critical spares inventory — current '+p.spares+'% readiness adds repair phase delays'});
+            if(p.coverage!=='24_7') actions.push({pri:'MEDIUM',text:'Evaluate 24/7 coverage to eliminate off-hours mobilization gap'});
+            actions.push({pri:'LOW',text:'Establish monthly ICB drill cadence for sustained competence maintenance'});
+            var priColors={CRITICAL:'#ef4444',HIGH:'#f59e0b',MEDIUM:'#3b82f6',LOW:'#64748b'};
+            for(var i=0;i<actions.length;i++) html+='<tr><td style="'+cellS+'"><span style="background:'+priColors[actions[i].pri]+';color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;">'+actions[i].pri+'</span></td><td style="'+cellS+'font-size:11px;">'+actions[i].text+'</td></tr>';
+            html+='</table>';
+
+            // Footer
+            html+='<div style="margin-top:30px;padding-top:16px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">';
+            html+='<div style="font-size:10px;color:#94a3b8;">Generated by ResistanceZero MTTR Pro | '+today+'</div>';
+            html+='<div style="font-size:10px;color:#94a3b8;">Based on Article 4: In-House Capability Is a Reliability Strategy</div></div>';
+            html+='</body></html>';
+
+            var w=window.open('','_blank');
+            if(w){w.document.write(html);w.document.close();setTimeout(function(){w.print();},500);}
+        }
+        window.exportMTTRPDF = exportMTTRPDF;
+
+        /* ===== MODE SWITCHING ===== */
+        function switchCalcMode(mode){
+            calcMode=mode;
+            $('modeFree').classList.toggle('active',mode==='free');
+            $('modePro').classList.toggle('active',mode==='pro');
+
+            var drawer=$('proDrawer'), panels=$('proPanels'), cta=$('ctaCard'), narr=$('narrativeBox'), pdf=$('pdfBtn');
+            if(mode==='pro'){
+                if(!isPremium){ showLoginModal(); return; }
+                if(drawer) drawer.classList.add('visible');
+                if(panels) panels.classList.add('visible');
+                if(cta) cta.style.display='none';
+                if(pdf){pdf.disabled=false;}
+                applyGating();
+                calculate();
+            } else {
+                if(drawer) drawer.classList.remove('visible');
+                if(panels) panels.classList.remove('visible');
+                if(narr) narr.classList.remove('visible');
+                if(cta) cta.style.display='flex';
+                if(pdf){pdf.disabled=true;}
+            }
+        }
+        window.switchCalcMode = switchCalcMode;
+
+        function applyGating(){
+            for(var i=1;i<=5;i++){
+                var g=$('gate'+i);
+                if(g) g.style.display = isPremium?'none':'flex';
+            }
+        }
+
+        /* ===== LOGIN ===== */
+        function showLoginModal(){ $('loginOverlay').classList.add('visible'); }
+        function hideLoginModal(){ $('loginOverlay').classList.remove('visible'); $('loginError').style.display='none'; }
+        window.showLoginModal = showLoginModal;
+        window.hideLoginModal = hideLoginModal;
+
+        function handleLogin(){
+            var email=$('loginEmail').value.trim().toLowerCase();
+            var pass=$('loginPass').value;
+            if(email==='demo@resistancezero.com' && pass==='demo2026'){
+                isPremium=true;
+                var exp=new Date(); exp.setDate(exp.getDate()+30);
+                localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',expires:exp.toISOString()}));
+                hideLoginModal();
+                // Notify auth.js to update navbar
+                window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',action:'login'}}));
+                var badge=$('proBadge'); if(badge){badge.textContent='ACTIVE';badge.style.background='linear-gradient(135deg,#10b981,#059669)';}
+                switchCalcMode('pro');
+            } else {
+                $('loginError').style.display='block';
+            }
+        }
+        window.handleLogin = handleLogin;
+
+        /* ===== TOOLTIPS ===== */
+        function initTooltips(){
+            var tc=$('calc-tooltip-container');
+            if(!tc) return;
+            document.querySelectorAll('.calculator-section .tooltip-trigger, .pro-drawer .tooltip-trigger').forEach(function(t){
+                t.addEventListener('mouseenter',function(){
+                    var content=t.querySelector('.tooltip-content');
+                    if(!content) return;
+                    tc.innerHTML=content.innerHTML;
+                    tc.style.display='block';
+                    var r=t.getBoundingClientRect();
+                    var calcSection=document.querySelector('.calculator-section');
+                    var cr=calcSection.getBoundingClientRect();
+                    tc.style.top=(r.bottom-cr.top+8)+'px';
+                    tc.style.left=Math.max(10,Math.min(cr.width-340,r.left-cr.left))+'px';
+                });
+                t.addEventListener('mouseleave',function(){ tc.style.display='none'; });
+            });
+        }
+
+        /* ===== EVENT LISTENERS ===== */
+        var freeInputs = ['calcCategory','calcVendorSLA','calcSkillLevel','calcIncidents','calcCostHour','calcCallout','calcTraining'];
+        var proInputs = ['proMTBF','proOffHours','proCoverage','proSpares','proTeamSize','proRetainer','proCriticalPct','proDurVar'];
+        freeInputs.concat(proInputs).forEach(function(id){
+            var el=$(id);
+            if(el){ el.addEventListener('input',calculate); el.addEventListener('change',calculate); }
         });
 
-        // Initial calculation
+        /* ===== SESSION RESTORE ===== */
+        try{
+            var sess=JSON.parse(localStorage.getItem('rz_premium_session'));
+            if(sess&&sess.email){
+                var valid=false;
+                if(sess.expires){ valid=new Date(sess.expires)>new Date(); }
+                else if(sess.ts){ valid=(Date.now()-sess.ts)<30*86400000; }
+                if(valid){
+                    isPremium=true;
+                    var badge=$('proBadge'); if(badge){badge.textContent='ACTIVE';badge.style.background='linear-gradient(135deg,#10b981,#059669)';}
+                }
+            }
+        }catch(ex){}
+
+        /* ===== INIT ===== */
+        initTooltips();
         calculate();
     })();
     </script>

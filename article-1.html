@@ -231,12 +231,12 @@
         .toc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
+            gap: 0.625rem;
         }
 
         .toc-item {
             background: #fff;
-            padding: 1rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-radius: 10px;
             border-left: 4px solid var(--accent-blue);
             transition: all 0.2s ease;
@@ -258,7 +258,21 @@
 
         .toc-item-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
+        }
+
+        /* TOC Calculator Highlight */
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left-color: #3b82f6;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #3b82f6; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.08) 100%);
         }
 
         /* Article Content */
@@ -901,7 +915,9 @@
         #maturity-tooltip-container .tooltip-formula { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px; margin-top: 6px; color: #22d3ee; }
 
         /* ═══ MODE TOGGLE ═══ */
-        .maturity-mode-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 1.5rem; }
+        .maturity-mode-bar { display: flex; gap: 8px; margin-bottom: 0; }
+        .maturity-toolbar-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .maturity-toolbar-actions { display: flex; gap: 8px; align-items: center; }
         .maturity-mode-btn {
             padding: 8px 20px;
             border-radius: 8px;
@@ -1048,6 +1064,168 @@
         }
         .maturity-export-btn:hover { background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(124,58,237,0.25)); transform: translateY(-1px); }
 
+        /* ═══ ARTICLE NAV ═══ */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e3a5f;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+        [data-theme="dark"] .article-nav a { color: #93c5fd; }
+        .article-nav a:hover { color: #60a5fa; }
+
+        /* ═══ EXECUTIVE EVIDENCE BLOCK ═══ */
+        .evidence-block {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2.5rem 0;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .evidence-block-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #60a5fa;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        .evidence-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .evidence-card:hover {
+            background: rgba(59,130,246,0.08);
+            border-color: rgba(59,130,246,0.3);
+            transform: translateY(-2px);
+        }
+        .evidence-card-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 4px;
+        }
+        .evidence-card-label {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        .evidence-card-sub {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .evidence-source {
+            margin-top: 1rem;
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* ═══ RISK & COST TRANSLATION PANEL ═══ */
+        .risk-cost-panel {
+            background: linear-gradient(135deg, rgba(239,68,68,0.05) 0%, rgba(234,88,12,0.05) 100%);
+            border: 1px solid rgba(239,68,68,0.15);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .risk-cost-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .risk-cost-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .risk-cost-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .risk-cost-card-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 2px;
+        }
+        .risk-cost-card-label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        .risk-drivers-list {
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            line-height: 1.7;
+            padding-left: 1.25rem;
+        }
+        .risk-drivers-list li { margin-bottom: 4px; }
+
+        /* ═══ PRIVACY BADGE ═══ */
+        .privacy-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+            padding: 6px 0;
+        }
+        .privacy-badge i { color: #10b981; font-size: 0.8rem; }
+
+        /* ═══ BENCHMARK VERSION TAG ═══ */
+        .benchmark-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .benchmark-meta-tag {
+            font-size: 0.65rem;
+            color: #64748b;
+            background: rgba(255,255,255,0.04);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .benchmark-meta-tag i { font-size: 0.6rem; }
+
         /* ═══ RESPONSIVE ═══ */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -1065,6 +1243,10 @@
             .scenario-grid { grid-template-columns: 1fr; }
             .confidence-display { gap: 0.5rem; }
             .maturity-mode-btn { padding: 6px 12px; font-size: 0.75rem; }
+            .evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .evidence-card-value { font-size: 1.2rem; }
+            .risk-cost-grid { grid-template-columns: repeat(2, 1fr); }
+            .benchmark-meta { gap: 0.4rem; }
         }
     </style>
 </head>
@@ -1240,8 +1422,8 @@
                     <div class="toc-item-number">SECTION 8</div>
                     <div class="toc-item-title">Maturity Metrics: The Five-Level Model</div>
                 </a>
-                <a href="#section-9" class="toc-item">
-                    <div class="toc-item-number">SECTION 9</div>
+                <a href="#section-9" class="toc-item toc-calculator">
+                    <div class="toc-item-number">SECTION 9 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div>
                     <div class="toc-item-title">Calculator: Operational Maturity Assessment</div>
                 </a>
                 <a href="#section-10" class="toc-item">
@@ -1305,14 +1487,49 @@
                     We begin with theory. Not because theory is academic luxury, but because the language we use to describe operations determines what we measure, what we value, and ultimately what we fund. The distinction between <span class="tooltip" data-tip="Safety-I: Traditional approach focused on what goes wrong">Safety-I</span> and <span class="tooltip" data-tip="Safety-II: Modern approach focused on understanding why things go right">Safety-II</span> thinking is not a philosophical curiosity. It is the difference between an organization that only reacts to failure and one that actively engineers success.
                 </p>
 
+                <!-- Executive Evidence Block -->
+                <div class="evidence-block">
+                    <div class="evidence-block-title">
+                        <i class="fas fa-shield-halved"></i> Operational Evidence — Single 10MW Facility, 6-Month Period
+                    </div>
+                    <div class="evidence-grid">
+                        <div class="evidence-card">
+                            <div class="evidence-card-value" style="color:#10b981;">12</div>
+                            <div class="evidence-card-label">Prevented Incidents</div>
+                            <div class="evidence-card-sub">Proactive intervention before failure</div>
+                        </div>
+                        <div class="evidence-card">
+                            <div class="evidence-card-value" style="color:#3b82f6;">$1.2M+</div>
+                            <div class="evidence-card-label">Avoided Costs</div>
+                            <div class="evidence-card-sub">vs ~$180K proactive investment</div>
+                        </div>
+                        <div class="evidence-card">
+                            <div class="evidence-card-value" style="color:#8b5cf6;">99.999%</div>
+                            <div class="evidence-card-label">Uptime Achieved</div>
+                            <div class="evidence-card-sub">Zero unplanned outages</div>
+                        </div>
+                        <div class="evidence-card">
+                            <div class="evidence-card-value" style="color:#f59e0b;">1.65→1.48</div>
+                            <div class="evidence-card-label">PUE Improvement</div>
+                            <div class="evidence-card-sub">10.3% energy efficiency gain</div>
+                        </div>
+                        <div class="evidence-card">
+                            <div class="evidence-card-value" style="color:#06b6d4;">4:1–10:1</div>
+                            <div class="evidence-card-label">Prevention ROI</div>
+                            <div class="evidence-card-sub">Return on proactive investment</div>
+                        </div>
+                    </div>
+                    <div class="evidence-source">Case context from documented operational journal entries — details in Sections 5-7 below</div>
+                </div>
+
                 <!-- Quick Assessment CTA -->
                 <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; padding: 1.5rem 2rem; margin: 2rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
                     <div>
-                        <div style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;">Assess Your Facility's Operational Maturity</div>
-                        <div style="font-size: 0.82rem; color: #94a3b8;">Rate 8 dimensions on a 1-5 scale. Get your composite score, radar chart, and improvement priorities instantly.</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;">Get Your 3 Operational Investment Priorities in 10 Minutes</div>
+                        <div style="font-size: 0.82rem; color: #94a3b8;">Rate 8 dimensions (1-5 scale) → composite score + radar chart + improvement roadmap + PDF report. Data stays in your browser.</div>
                     </div>
                     <a href="#maturityCalculator" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: none; white-space: nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                        <i class="fas fa-calculator"></i> Try the Calculator
+                        <i class="fas fa-chart-line"></i> Start Assessment
                     </a>
                 </div>
 
@@ -2109,10 +2326,17 @@
                     <h3 class="calculator-title">Operational Maturity Assessment</h3>
                     <p class="calculator-subtitle">Rate each dimension from 1 (Ad-hoc) to 5 (Optimized) to calculate your composite maturity score</p>
 
-                    <!-- Mode Toggle -->
-                    <div class="maturity-mode-bar">
-                        <button class="maturity-mode-btn active" id="maturityModeFree" onclick="switchMaturityMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
-                        <button class="maturity-mode-btn" id="maturityModePro" onclick="switchMaturityMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maturityProBadge">PRO</span></button>
+                    <!-- Mode Toggle + Action Buttons -->
+                    <div class="maturity-toolbar-row">
+                        <div class="maturity-mode-bar">
+                            <button class="maturity-mode-btn active" id="maturityModeFree" onclick="switchMaturityMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
+                            <button class="maturity-mode-btn" id="maturityModePro" onclick="switchMaturityMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maturityProBadge">PRO</span></button>
+                        </div>
+                        <div class="maturity-toolbar-actions">
+                            <button class="maturity-export-btn" onclick="exportMaturityPDF()" style="padding:8px 14px;font-size:0.78rem;margin:0;">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                        </div>
                     </div>
 
                     <!-- ─── 8 DIMENSION INPUTS ─── -->
@@ -2309,11 +2533,29 @@
                         <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Industry Benchmarks</div><div class="tooltip-desc">Directional benchmarks from Uptime Institute &amp; industry assessments.<br><br>Tier I ≈ 25 · Tier II ≈ 45 · Tier III ≈ 65 · Tier IV ≈ 82<br><br>Your score is highlighted against these reference points.</div></span></span>
                     </h4>
                     <div class="benchmark-grid" id="benchmarkGrid"></div>
+                    <div class="benchmark-meta">
+                        <span class="benchmark-meta-tag"><i class="fas fa-code-branch"></i> Model v1.1</span>
+                        <span class="benchmark-meta-tag"><i class="fas fa-calendar"></i> Updated Feb 2026</span>
+                        <span class="benchmark-meta-tag"><i class="fas fa-book"></i> Sources: Uptime Institute 2023-2024, EN 50600</span>
+                        <span class="benchmark-meta-tag"><i class="fas fa-info-circle"></i> Directional benchmarks (median, enterprise + colo)</span>
+                    </div>
 
-                    <!-- PDF Export (available in both modes) -->
-                    <button class="maturity-export-btn" onclick="exportMaturityPDF()" style="margin-top:2rem;">
-                        <i class="fas fa-file-pdf"></i> Export Maturity Report (PDF)
-                    </button>
+                    <div class="privacy-badge" style="margin-top:1.5rem;">
+                        <i class="fas fa-shield-halved"></i> PDF generated in your browser — no data is sent to any server
+                    </div>
+
+                    <!-- Risk & Cost Translation (CEO View) -->
+                    <div class="risk-cost-panel" id="riskCostPanel">
+                        <div class="risk-cost-title">
+                            <i class="fas fa-coins"></i> Risk &amp; Cost Translation
+                            <span class="tooltip-trigger" style="margin-left:auto;">?<span class="tooltip-content"><div class="tooltip-title">Risk & Cost Translation</div><div class="tooltip-desc">Maps your maturity score to estimated annual risk exposure using industry data. >55% of significant outages cost >$100K (Uptime Institute 2024). Lower maturity = higher probability of experiencing costly incidents. Figures are directional estimates with explicit assumptions.</div></span></span>
+                        </div>
+                        <div class="risk-cost-grid" id="riskCostGrid"></div>
+                        <div id="riskCostDrivers"></div>
+                        <div style="font-size:0.65rem;color:#64748b;margin-top:8px;font-style:italic;">
+                            Assumptions: 10MW facility, $200K avg outage cost (Uptime 2024 median band). Estimates are directional; actual exposure varies by facility type, redundancy, and contract terms.
+                        </div>
+                    </div>
 
                     <!-- ─── PRO ANALYSIS PANELS (appear after results/charts) ─── -->
                     <div id="maturityProPanels" style="display:none;">
@@ -2535,14 +2777,10 @@
                 </div>
 
                 <!-- Article Navigation -->
-                <div style="display: flex; justify-content: space-between; padding: 2rem 0; border-top: 1px solid #e5e7eb; margin-top: 3rem;">
-                    <a href="articles.html" style="display: flex; align-items: center; gap: 0.5rem; color: #1e3a5f; font-weight: 600; text-decoration: none;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                        All Articles
-                    </a>
-                    <a href="article-2.html" style="display: flex; align-items: center; gap: 0.5rem; color: #1e3a5f; font-weight: 600; text-decoration: none;">
-                        Next: Alarm Fatigue
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <div class="article-nav" style="justify-content: flex-end;">
+                    <a href="article-2.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                 </div>
 
@@ -2787,6 +3025,56 @@
             return ((ws - 1) / 4) * 100;
         }
 
+        // ═══ RISK & COST TRANSLATION ═══
+        function renderRiskCostPanel(compositeScore, values, maturity) {
+            var grid = document.getElementById('riskCostGrid');
+            var drivers = document.getElementById('riskCostDrivers');
+            if (!grid) return;
+
+            // Risk model: lower maturity = higher outage probability
+            // Based on Uptime 2024: >55% outages from ops/human factors
+            // Tier III benchmark avg=65; below that = elevated risk
+            var baseOutageRate = 2.5; // avg outages/year for lowest maturity
+            var maturityFactor = Math.max(0.05, 1 - (compositeScore / 120)); // 0-100 maps to ~1.0-0.17
+            var estOutagesPerYear = baseOutageRate * maturityFactor;
+            var avgOutageCost = 200000; // $200K median (Uptime 2024)
+            var annualExposure = estOutagesPerYear * avgOutageCost;
+
+            // Risk level
+            var riskLevel, riskColor;
+            if (compositeScore >= 80) { riskLevel = 'LOW'; riskColor = '#10b981'; }
+            else if (compositeScore >= 60) { riskLevel = 'MODERATE'; riskColor = '#f59e0b'; }
+            else if (compositeScore >= 40) { riskLevel = 'ELEVATED'; riskColor = '#ea580c'; }
+            else { riskLevel = 'HIGH'; riskColor = '#ef4444'; }
+
+            // Prevention value: what improving +10 pts would save
+            var improvedFactor = Math.max(0.05, 1 - ((compositeScore + 10) / 120));
+            var improvedExposure = baseOutageRate * improvedFactor * avgOutageCost;
+            var preventionValue = annualExposure - improvedExposure;
+
+            // Top risk drivers (weakest weighted dimensions)
+            var sorted = values.slice().sort(function(a, b) { return (a.value * a.weight) - (b.value * b.weight); });
+            var topRisks = sorted.filter(function(d) { return d.value <= 3; }).slice(0, 3);
+
+            grid.innerHTML =
+                '<div class="risk-cost-card"><div class="risk-cost-card-value" style="color:' + riskColor + ';">' + riskLevel + '</div><div class="risk-cost-card-label">Operational Risk Level</div></div>' +
+                '<div class="risk-cost-card"><div class="risk-cost-card-value" style="color:#ef4444;">$' + (annualExposure >= 1000000 ? (annualExposure/1000000).toFixed(1) + 'M' : Math.round(annualExposure/1000) + 'K') + '</div><div class="risk-cost-card-label">Est. Annual Exposure</div></div>' +
+                '<div class="risk-cost-card"><div class="risk-cost-card-value" style="color:#f59e0b;">' + estOutagesPerYear.toFixed(1) + '</div><div class="risk-cost-card-label">Est. Incidents/Year</div></div>' +
+                '<div class="risk-cost-card"><div class="risk-cost-card-value" style="color:#10b981;">$' + (preventionValue >= 1000000 ? (preventionValue/1000000).toFixed(1) + 'M' : Math.round(preventionValue/1000) + 'K') + '</div><div class="risk-cost-card-label">Value of +10pt Improvement</div></div>';
+
+            if (topRisks.length > 0 && drivers) {
+                drivers.innerHTML = '<div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;margin-bottom:6px;"><i class="fas fa-triangle-exclamation" style="color:#f59e0b;margin-right:4px;"></i> Top Risk Drivers</div>' +
+                    '<ul class="risk-drivers-list">' + topRisks.map(function(d) {
+                        return '<li><strong>' + d.label + '</strong> (Level ' + d.value + '/5) — ' +
+                            (d.value <= 1 ? 'Critical gap: no formal process in place' :
+                             d.value <= 2 ? 'Developing: process exists but inconsistently applied' :
+                             'Baseline: structured but not yet data-driven') + '</li>';
+                    }).join('') + '</ul>';
+            } else if (drivers) {
+                drivers.innerHTML = '<div style="font-size:0.78rem;color:#10b981;"><i class="fas fa-check-circle" style="margin-right:4px;"></i> All dimensions above baseline (Level 3+). Operational risk well-managed.</div>';
+            }
+        }
+
         window.calculateMaturity = function() {
             const weights = getActiveWeights();
             const values = dimensions.map((d, i) => ({
@@ -2829,6 +3117,7 @@
             document.getElementById('benchmarkGrid').innerHTML = benchmarkHtml;
 
             drawRadarChart(values);
+            renderRiskCostPanel(compositeScore, values, maturity);
 
             // Pro extensions
             if (maturityMode === 'pro' && proBuilt) {
@@ -3115,9 +3404,9 @@
         // ═══ MODE SWITCHING & GATING ═══
         window.switchMaturityMode = function(mode) {
             if (mode === 'pro' && !isPremiumMaturity) {
-                if (typeof window.opexShowLogin === 'function') window.opexShowLogin();
+                if (window._rzAuth && typeof window._rzAuth.showModal === 'function') window._rzAuth.showModal();
                 else if (document.querySelector('.login-overlay')) document.querySelector('.login-overlay').style.display = 'flex';
-                else alert('Pro Analysis requires a ResistanceZero PRO subscription.');
+                else alert('Pro Analysis requires a ResistanceZero PRO subscription. Please log in first.');
                 return;
             }
             maturityMode = mode;
@@ -3350,22 +3639,92 @@
                 return `<tr${isClose ? ' style="background:#eff6ff;"' : ''}><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;">${b.tier}</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${b.avg}</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">${compositeScore >= b.avg ? 'Above' : 'Below'}</td></tr>`;
             }).join('');
 
-            // Radar SVG for PDF
+            // Radar SVG for PDF — wider with label padding
             function radarSVG(vals, size) {
-                const cx = size/2, cy = size/2, maxR = size*0.35, n = vals.length, step = (2*Math.PI)/n, start = -Math.PI/2;
-                let svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="background:#0f172a;border-radius:12px;">`;
-                // Rings
+                const pad = 70; // extra padding for labels
+                const totalW = size + pad*2, totalH = size + pad*2;
+                const cx = totalW/2, cy = totalH/2, maxR = size*0.32;
+                const n = vals.length, step = (2*Math.PI)/n, start = -Math.PI/2;
+                let svg = `<svg width="${totalW}" height="${totalH}" xmlns="http://www.w3.org/2000/svg" style="background:#0f172a;border-radius:12px;">`;
+                // Title
+                svg += `<text x="${cx}" y="18" fill="#64748b" font-size="9" font-family="Arial,sans-serif" text-anchor="middle">MATURITY PROFILE</text>`;
+                // Grid rings + ring labels
                 for (let ring = 1; ring <= 5; ring++) {
                     const r = (ring/5)*maxR; let pts = '';
                     for (let i = 0; i < n; i++) { const a = start+i*step; pts += `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `; }
-                    svg += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
+                    svg += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>`;
+                    svg += `<text x="${cx+4}" y="${cy-r+10}" fill="rgba(255,255,255,0.25)" font-size="8" font-family="Arial,sans-serif">${ring}</text>`;
                 }
-                // Data polygon
+                // Axis lines
+                vals.forEach((v,i) => { const a = start+i*step; const r = maxR; svg += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`; });
+                // Data polygon fill + stroke
                 let dataPts = '';
                 vals.forEach((v, i) => { const a = start+i*step; const r = (v.value/5)*maxR; dataPts += `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `; });
-                svg += `<polygon points="${dataPts}" fill="rgba(59,130,246,0.3)" stroke="rgba(96,165,250,0.9)" stroke-width="2"/>`;
-                // Labels
-                vals.forEach((v, i) => { const a = start+i*step; const lR = maxR+22; const x = cx+lR*Math.cos(a); const y = cy+lR*Math.sin(a); let anchor = 'middle'; if (Math.cos(a) > 0.5) anchor='start'; else if (Math.cos(a) < -0.5) anchor='end'; svg += `<text x="${x}" y="${y}" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif" text-anchor="${anchor}" dominant-baseline="middle">${v.label} (${v.value})</text>`; });
+                svg += `<polygon points="${dataPts}" fill="rgba(59,130,246,0.25)" stroke="rgba(96,165,250,0.9)" stroke-width="2"/>`;
+                // Data dots
+                vals.forEach((v, i) => { const a = start+i*step; const r = (v.value/5)*maxR; svg += `<circle cx="${cx+r*Math.cos(a)}" cy="${cy+r*Math.sin(a)}" r="3" fill="#60a5fa" stroke="white" stroke-width="1"/>`; });
+                // Labels with score badge
+                vals.forEach((v, i) => {
+                    const a = start+i*step; const lR = maxR+20;
+                    const x = cx+lR*Math.cos(a); const y = cy+lR*Math.sin(a);
+                    let anchor = 'middle'; if (Math.cos(a) > 0.3) anchor='start'; else if (Math.cos(a) < -0.3) anchor='end';
+                    // Score circle
+                    const bx = anchor==='start' ? x-12 : anchor==='end' ? x+12 : x;
+                    const by = Math.abs(Math.sin(a)) > 0.8 ? (Math.sin(a) > 0 ? y+14 : y-10) : y;
+                    svg += `<circle cx="${bx}" cy="${by-1}" r="8" fill="rgba(59,130,246,0.3)" stroke="rgba(96,165,250,0.5)" stroke-width="1"/>`;
+                    svg += `<text x="${bx}" y="${by+2}" fill="#60a5fa" font-size="9" font-weight="700" font-family="Arial,sans-serif" text-anchor="middle">${v.value}</text>`;
+                    // Label text
+                    const lx = anchor==='start' ? bx+14 : anchor==='end' ? bx-14 : x;
+                    const ly = Math.abs(Math.sin(a)) > 0.8 ? by : y;
+                    svg += `<text x="${lx}" y="${ly+3}" fill="#cbd5e1" font-size="9" font-family="Arial,sans-serif" text-anchor="${anchor}">${v.label}</text>`;
+                });
+                svg += '</svg>';
+                return svg;
+            }
+
+            // Gap Analysis horizontal bar chart SVG for PDF
+            function gapBarSVG(vals, gaps, compositeScore, maturityLabel) {
+                const w = 340, barH = 22, gap = 6, topPad = 36, bottomPad = 30;
+                const sortedGaps = [...gaps].sort((a, b) => b.priority - a.priority);
+                const h = topPad + sortedGaps.length * (barH + gap) + bottomPad;
+                const labelW = 90, barStart = labelW + 8, barMaxW = w - barStart - 40;
+                let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" style="background:#0f172a;border-radius:12px;">`;
+                svg += `<text x="${w/2}" y="18" fill="#64748b" font-size="9" font-family="Arial,sans-serif" text-anchor="middle">GAP &amp; PRIORITY ANALYSIS</text>`;
+                // Scale markers
+                for (let s = 1; s <= 5; s++) {
+                    const x = barStart + (s/5)*barMaxW;
+                    svg += `<line x1="${x}" y1="${topPad-4}" x2="${x}" y2="${topPad + sortedGaps.length*(barH+gap)-gap}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+                    svg += `<text x="${x}" y="${topPad-8}" fill="rgba(255,255,255,0.3)" font-size="7" font-family="Arial,sans-serif" text-anchor="middle">${s}</text>`;
+                }
+                // Bars
+                const colors = {5:'#22c55e',4:'#3b82f6',3:'#f59e0b',2:'#ea580c',1:'#ef4444'};
+                sortedGaps.forEach((g, i) => {
+                    const y = topPad + i * (barH + gap);
+                    const scoreW = (g.value/5) * barMaxW;
+                    const gapW = (g.gap/5) * barMaxW;
+                    // Label
+                    svg += `<text x="${labelW}" y="${y+barH/2+3}" fill="#cbd5e1" font-size="9" font-family="Arial,sans-serif" text-anchor="end">${g.label}</text>`;
+                    // Background (max)
+                    svg += `<rect x="${barStart}" y="${y}" width="${barMaxW}" height="${barH}" rx="4" fill="rgba(255,255,255,0.04)"/>`;
+                    // Score fill
+                    svg += `<rect x="${barStart}" y="${y}" width="${scoreW}" height="${barH}" rx="4" fill="${colors[g.value] || '#3b82f6'}" opacity="0.7"/>`;
+                    // Gap zone (striped)
+                    if (g.gap > 0) {
+                        svg += `<rect x="${barStart+scoreW}" y="${y}" width="${gapW}" height="${barH}" rx="0" fill="rgba(239,68,68,0.12)"/>`;
+                        svg += `<text x="${barStart+scoreW+gapW/2}" y="${y+barH/2+3}" fill="#f87171" font-size="7" font-family="Arial,sans-serif" text-anchor="middle" opacity="0.8">-${g.gap}</text>`;
+                    }
+                    // Score value
+                    svg += `<text x="${barStart+scoreW-4}" y="${y+barH/2+3}" fill="white" font-size="9" font-weight="700" font-family="Arial,sans-serif" text-anchor="end">${g.value}</text>`;
+                    // Priority score
+                    svg += `<text x="${barStart+barMaxW+4}" y="${y+barH/2+3}" fill="#94a3b8" font-size="8" font-family="monospace" text-anchor="start">${g.priority.toFixed(2)}</text>`;
+                });
+                // Legend
+                const ly = topPad + sortedGaps.length * (barH + gap) + 8;
+                svg += `<rect x="${barStart}" y="${ly}" width="8" height="8" rx="2" fill="#3b82f6" opacity="0.7"/>`;
+                svg += `<text x="${barStart+12}" y="${ly+7}" fill="#94a3b8" font-size="7" font-family="Arial,sans-serif">Current Score</text>`;
+                svg += `<rect x="${barStart+80}" y="${ly}" width="8" height="8" rx="2" fill="rgba(239,68,68,0.3)"/>`;
+                svg += `<text x="${barStart+92}" y="${ly+7}" fill="#94a3b8" font-size="7" font-family="Arial,sans-serif">Gap to Level 5</text>`;
+                svg += `<text x="${w-6}" y="${ly+7}" fill="#64748b" font-size="7" font-family="Arial,sans-serif" text-anchor="end">Priority →</text>`;
                 svg += '</svg>';
                 return svg;
             }
@@ -3415,8 +3774,11 @@
 
                 ${facilityHTML}
 
-                <!-- Radar Chart -->
-                <div style="text-align:center;margin-bottom:20px;">${radarSVG(values, 320)}</div>
+                <!-- Charts: Radar + Gap Analysis side by side -->
+                <div style="display:flex;gap:12px;margin-bottom:20px;align-items:flex-start;">
+                    <div style="flex:1;text-align:center;">${radarSVG(values, 280)}</div>
+                    <div style="flex:1;text-align:center;">${gapBarSVG(values, gaps, compositeScore, maturity.label)}</div>
+                </div>
 
                 <!-- Dimension Scores -->
                 <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #3b82f6;padding-bottom:5px;margin-bottom:10px;">Dimension Scores</h2>
@@ -3491,8 +3853,12 @@
             if (session) {
                 try {
                     var data = JSON.parse(session);
-                    var exp = typeof data.expires === 'string' ? new Date(data.expires).getTime() : data.expires;
-                    if (exp > Date.now()) { isPremiumMaturity = true; }
+                    if (data && data.email) {
+                        var valid = false;
+                        if (data.expires) { valid = new Date(data.expires) > new Date(); }
+                        else if (data.ts) { valid = (Date.now() - data.ts) < 30 * 86400000; }
+                        if (valid) { isPremiumMaturity = true; }
+                    }
                 } catch(e) {}
             }
             applyMaturityGating();
@@ -3500,9 +3866,17 @@
 
         // Listen for auth changes
         window.addEventListener('rz-auth-change', function(e) {
-            if (e.detail && e.detail.premium) { isPremiumMaturity = true; }
-            else { isPremiumMaturity = false; maturityMode = 'free'; switchMaturityMode('free'); }
-            applyMaturityGating();
+            if (e.detail && e.detail.action === 'login') {
+                isPremiumMaturity = true;
+                applyMaturityGating();
+                // Auto-switch to Pro if user just logged in
+                switchMaturityMode('pro');
+            } else if (e.detail && e.detail.action === 'logout') {
+                isPremiumMaturity = false;
+                maturityMode = 'free';
+                switchMaturityMode('free');
+                applyMaturityGating();
+            }
         });
 
         // ═══ INIT ═══

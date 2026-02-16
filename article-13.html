@@ -185,12 +185,12 @@
         .toc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
+            gap: 0.625rem;
         }
 
         .toc-item {
             background: #fff;
-            padding: 1rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-radius: 10px;
             border-left: 4px solid var(--accent-cyan);
             transition: all 0.2s ease;
@@ -212,7 +212,21 @@
 
         .toc-item-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
+        }
+
+        /* TOC Calculator Highlight */
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+            border-left-color: #06b6d4;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #06b6d4; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(6,182,212,0.08) 100%);
         }
 
         /* Article Content */
@@ -698,6 +712,26 @@
             font-size: 0.85rem;
         }
 
+        /* Article Nav */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+        [data-theme="dark"] .article-nav a { color: #93c5fd; }
+        .article-nav a:hover { color: #60a5fa; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -870,8 +904,8 @@
                     <div class="toc-item-number">SECTION 7</div>
                     <div class="toc-item-title">Protection & Coordination</div>
                 </a>
-                <a href="#section-8" class="toc-item">
-                    <div class="toc-item-number">SECTION 8</div>
+                <a href="#section-8" class="toc-item toc-calculator">
+                    <div class="toc-item-number">SECTION 8 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div>
                     <div class="toc-item-title">Reliability Calculations</div>
                 </a>
                 <a href="#section-9" class="toc-item">
@@ -3408,6 +3442,18 @@ E = Cf × En × (t/0.2) × (610/D)^x
                         <h4 style="margin: 0 0 0.5rem 0; color: #1e293b;">Bagus Dwi Permana</h4>
                         <p style="margin: 0; color: #64748b; font-size: 0.9rem; line-height: 1.6;">Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik (Indonesian Electrical Safety Expert) and CDFOM. This technical paper synthesizes research from leading hyperscalers to provide actionable design guidance for modern power distribution systems.</p>
                     </div>
+                </div>
+
+                <!-- Article Navigation -->
+                <div class="article-nav">
+                    <a href="article-12.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Previous Article
+                    </a>
+                    <a href="article-14.html">
+                        Next Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
 
             </div>
