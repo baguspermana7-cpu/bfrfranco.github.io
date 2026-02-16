@@ -58,6 +58,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preload" as="image" href="assets/article-16-cover.jpg">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -861,6 +862,70 @@
         }
         .article-nav a:hover { color: #f59e0b; }
 
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--bubble-amber);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.625rem;
+        }
+        .toc-item {
+            background: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            border-left: 3px solid var(--bubble-amber);
+            transition: all 0.2s ease;
+            display: block;
+        }
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .toc-item-number {
+            font-size: 0.7rem;
+            color: var(--bubble-amber);
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left-color: #d97706;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #d97706; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(217,119,6,0.15) 0%, rgba(217,119,6,0.08) 100%);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -870,6 +935,7 @@
             .comparison-grid { grid-template-columns: 1fr; }
             .results-grid { grid-template-columns: repeat(2, 1fr); }
             .author-section { flex-direction: column; text-align: center; }
+            .toc-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .article-title { font-size: 1.5rem; }
@@ -878,6 +944,7 @@
     </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Navigation (shared) -->
 <nav class="navbar">
@@ -920,6 +987,7 @@
     </div>
 </nav>
 
+<main id="main-content">
 <!-- Hero Section -->
 <section class="article-hero">
     <div class="container">
@@ -958,7 +1026,7 @@
             </span>
         </div>
 
-        <a href="#calculator" class="jump-to-calc">
+        <a href="#section-9" class="jump-to-calc">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg>
             Try the Bubble Risk Calculator
         </a>
@@ -985,8 +1053,63 @@
                 <p>Southeast Asia's data center market is undergoing an unprecedented expansion: <span class="stat-highlight">$37B+</span> committed across <span class="stat-highlight">6,068 MW</span> of new capacity. Johor alone has a <span class="stat-highlight">5.8 GW</span> pipeline &mdash; enough to power 4.6 million homes &mdash; in a state of 3.8 million people. Indonesia's installed capacity reached <span class="stat-highlight">1,717 MW</span> with operators racing to build ahead of demand. The critical question: does committed hyperscaler demand actually materialize at the pace needed, or does the region face a Southeast Asian version of the mid-2000s fiber-optic overbuild?</p>
             </div>
 
+            <!-- Table of Contents -->
+            <section class="toc-section">
+                <div class="toc-container">
+                    <h2 class="toc-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        Table of Contents
+                    </h2>
+                    <div class="toc-grid">
+                        <a href="#section-1" class="toc-item">
+                            <div class="toc-item-number">SECTION 1</div>
+                            <div class="toc-item-title">The Supply Explosion: $37 Billion and Counting</div>
+                        </a>
+                        <a href="#section-2" class="toc-item">
+                            <div class="toc-item-number">SECTION 2</div>
+                            <div class="toc-item-title">Indonesia: The 1,717 MW Frontier</div>
+                        </a>
+                        <a href="#section-3" class="toc-item">
+                            <div class="toc-item-number">SECTION 3</div>
+                            <div class="toc-item-title">Johor: Boom or Bubble?</div>
+                        </a>
+                        <a href="#section-4" class="toc-item">
+                            <div class="toc-item-number">SECTION 4</div>
+                            <div class="toc-item-title">Building on Borrowed Promises: The Hyperscaler Dependency Trap</div>
+                        </a>
+                        <a href="#section-5" class="toc-item">
+                            <div class="toc-item-number">SECTION 5</div>
+                            <div class="toc-item-title">The Stranded Assets Nobody Talks About</div>
+                        </a>
+                        <a href="#section-6" class="toc-item">
+                            <div class="toc-item-number">SECTION 6</div>
+                            <div class="toc-item-title">Is This a Bubble? The Historical Parallels</div>
+                        </a>
+                        <a href="#section-7" class="toc-item">
+                            <div class="toc-item-number">SECTION 7</div>
+                            <div class="toc-item-title">Investment Analysis: The Numbers Behind the Bets</div>
+                        </a>
+                        <a href="#section-8" class="toc-item">
+                            <div class="toc-item-number">SECTION 8</div>
+                            <div class="toc-item-title">What Happens When the Music Stops</div>
+                        </a>
+                        <a href="#section-9" class="toc-item toc-calculator">
+                            <div class="toc-item-number">SECTION 9 <span class="toc-calc-badge">INTERACTIVE</span></div>
+                            <div class="toc-item-title">SEA DC Bubble Risk Calculator</div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
             <!-- 1. The Numbers -->
-            <h2>1. The Supply Explosion: $37 Billion and Counting</h2>
+            <h2 id="section-1">1. The Supply Explosion: $37 Billion and Counting</h2>
 
             <p>Between 2024 and 2026, Southeast Asia witnessed the largest wave of data center investment in its history. The numbers are staggering: 135 upcoming facilities joining 290 existing ones, involving 149 major operators and investors, with a combined pipeline exceeding 6 GW of IT power capacity.</p>
 
@@ -1061,7 +1184,7 @@
             </div>
 
             <!-- 2. Indonesia Deep Dive -->
-            <h2>2. Indonesia: The 1,717 MW Frontier</h2>
+            <h2 id="section-2">2. Indonesia: The 1,717 MW Frontier</h2>
 
             <p>Indonesia's data center market is the largest in Southeast Asia by installed capacity, reaching an estimated 1,717 MW in 2026. Jakarta retains 56.7% of national capacity, but the geography of investment is shifting rapidly toward Greater Jakarta's industrial corridors: Bekasi, Cibitung, Cikarang, and Karawang.</p>
 
@@ -1167,7 +1290,7 @@
             <p>Greater Jakarta (covering 70% of Indonesia's DC capacity) is particularly vulnerable. Operators in Bekasi and Cikarang are already competing for limited transformer capacity, and new substations take 2-3 years to commission.</p>
 
             <!-- 3. The Johor Question -->
-            <h2>3. Johor: Boom or Bubble?</h2>
+            <h2 id="section-3">3. Johor: Boom or Bubble?</h2>
 
             <p>No market in Southeast Asia demands more scrutiny than Johor. The numbers are extraordinary: from a standing start of near-zero five years ago, Johor now has 487 MW of live capacity, 422 MW under construction, and a total pipeline of <strong>5.8 GW</strong>.</p>
 
@@ -1184,7 +1307,7 @@
             <p>Here's the math that matters: AWS's $6B investment in Malaysia spans <strong>15 years</strong>. That's ~$400M per year. Microsoft's $2.2B is over 4 years. These are not lump-sum capacity injections &mdash; they're gradual deployments that the 5.8 GW pipeline dramatically outpaces.</p>
 
             <!-- 4. Hyperscaler Dependency -->
-            <h2>4. Building on Borrowed Promises: The Hyperscaler Dependency Trap</h2>
+            <h2 id="section-4">4. Building on Borrowed Promises: The Hyperscaler Dependency Trap</h2>
 
             <p>An estimated 60-70% of new large-scale builds (50 MW+) in SEA are build-to-suit or pre-leased to hyperscalers. The remaining 30-40% are speculative, carrier-neutral builds hoping to attract tenants post-construction. This creates a dangerous concentration of risk.</p>
 
@@ -1212,7 +1335,7 @@
             </div>
 
             <!-- 5. Legacy DCs -->
-            <h2>5. The Stranded Assets Nobody Talks About</h2>
+            <h2 id="section-5">5. The Stranded Assets Nobody Talks About</h2>
 
             <p>While billions pour into new AI-ready facilities, a quieter crisis unfolds in the region's older data centers. Pre-2015 facilities designed for 5-10 kW per rack are fundamentally incompatible with modern AI workloads demanding 50-100 kW per rack.</p>
 
@@ -1270,7 +1393,7 @@
             </div>
 
             <!-- 6. Is This a Bubble? -->
-            <h2>6. Is This a Bubble? The Historical Parallels</h2>
+            <h2 id="section-6">6. Is This a Bubble? The Historical Parallels</h2>
 
             <p>To answer this question honestly, we need to examine what happened before in similar infrastructure build-outs.</p>
 
@@ -1385,7 +1508,7 @@
             </div>
 
             <!-- 7. Investment Analysis -->
-            <h2>7. Investment Analysis: The Numbers Behind the Bets</h2>
+            <h2 id="section-7">7. Investment Analysis: The Numbers Behind the Bets</h2>
 
             <h3>7.1 Build Economics</h3>
 
@@ -1463,7 +1586,7 @@
             <p>If vacancy rates across SEA rise by just 10-15 percentage points (from ~14% regional average to 25-30%), the revenue impact cascades: operators cut pricing to fill space, which compresses margins for everyone, which delays capex payback, which triggers covenant breaches on debt, which forces distressed sales. This is how infrastructure bubbles unwind.</p>
 
             <!-- 8. What Happens Next -->
-            <h2>8. What Happens When the Music Stops</h2>
+            <h2 id="section-8">8. What Happens When the Music Stops</h2>
 
             <h3>8.1 The Correction Scenario (2027-2029)</h3>
 
@@ -1515,7 +1638,7 @@
             </div>
 
             <!-- Calculator -->
-            <h2 id="calculator">9. Interactive: SEA DC Bubble Risk Calculator</h2>
+            <h2 id="section-9">9. Interactive: SEA DC Bubble Risk Calculator</h2>
 
             <p>Model the supply-demand dynamics for any SEA market. Adjust the variables below to see how different scenarios affect bubble risk, vacancy projections, and investment outcomes.</p>
 
@@ -1791,6 +1914,7 @@
         </div>
     </div>
 </article>
+</main>
 
 <!-- Footer -->
     <footer class="footer footer-enhanced">

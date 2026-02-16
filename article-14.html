@@ -58,6 +58,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preload" as="image" href="assets/article-14-cover.jpg">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -932,6 +933,54 @@
         .references a:hover { text-decoration: underline; }
         .ref-source { color: #94a3b8; font-size: 0.75rem; }
 
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            padding: 3rem 2rem;
+            border-bottom: 1px solid #fecaca;
+        }
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--rebellion-red);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.625rem;
+        }
+        .toc-item {
+            background: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--rebellion-red);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #1e293b;
+        }
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .toc-item-number {
+            font-size: 0.75rem;
+            color: var(--rebellion-red);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1.25rem 3rem; }
             .article-content { padding: 2rem 1.25rem; }
@@ -946,6 +995,7 @@
             .viral-quote { padding: 1.5rem; font-size: 0.95rem; }
             .viral-quote .vq-text { font-size: clamp(1rem, 3vw, 1.25rem); }
             #tooltip-container { width: 280px; max-width: 90vw; }
+            .toc-grid { grid-template-columns: 1fr; }
         }
 
         /* 480px breakpoint — small phones */
@@ -1033,6 +1083,7 @@
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -1066,6 +1117,7 @@
         </div>
     </nav>
 
+    <main id="main-content">
     <!-- Scroll Progress Bar -->
     <div class="progress-bar" id="progressBar" style="width:0%"></div>
 
@@ -1148,19 +1200,55 @@
                     </div>
                 </div>
 
-                <div class="table-of-contents">
-                    <h4>Table of Contents</h4>
-                    <ul class="toc-list">
-                        <li><a href="#section-1">1. The Opening Salvo: From Virginia to Johor</a></li>
-                        <li><a href="#section-2">2. Follow the Money: The Electricity Bill Crisis</a></li>
-                        <li><a href="#section-3">3. Water Wars: From Oregon to Johor</a></li>
-                        <li><a href="#section-4">4. The Air We Breathe: Diesel and Health</a></li>
-                        <li><a href="#section-5">5. The Industry's Defense</a></li>
-                        <li><a href="#section-6">6. The Government Response: A Global Moratorium Wave</a></li>
-                        <li><a href="#section-7">7. Southeast Asia: The Next Frontier</a></li>
-                        <li><a href="#section-8">8. The Path Forward: Coexistence Models</a></li>
-                    </ul>
-                </div>
+                <section class="toc-section">
+                    <div class="toc-container">
+                        <h2 class="toc-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                            Table of Contents
+                        </h2>
+                        <div class="toc-grid">
+                            <a href="#section-1" class="toc-item">
+                                <div class="toc-item-number">SECTION 1</div>
+                                <div class="toc-item-title">The Opening Salvo: From Virginia to Johor</div>
+                            </a>
+                            <a href="#section-2" class="toc-item">
+                                <div class="toc-item-number">SECTION 2</div>
+                                <div class="toc-item-title">Follow the Money: The Electricity Bill Crisis</div>
+                            </a>
+                            <a href="#section-3" class="toc-item">
+                                <div class="toc-item-number">SECTION 3</div>
+                                <div class="toc-item-title">Water Wars: From Oregon to Johor</div>
+                            </a>
+                            <a href="#section-4" class="toc-item">
+                                <div class="toc-item-number">SECTION 4</div>
+                                <div class="toc-item-title">The Air We Breathe: Diesel and Health</div>
+                            </a>
+                            <a href="#section-5" class="toc-item">
+                                <div class="toc-item-number">SECTION 5</div>
+                                <div class="toc-item-title">The Industry's Defense</div>
+                            </a>
+                            <a href="#section-6" class="toc-item">
+                                <div class="toc-item-number">SECTION 6</div>
+                                <div class="toc-item-title">The Government Response: A Global Moratorium Wave</div>
+                            </a>
+                            <a href="#section-7" class="toc-item">
+                                <div class="toc-item-number">SECTION 7</div>
+                                <div class="toc-item-title">Southeast Asia: The Next Frontier</div>
+                            </a>
+                            <a href="#section-8" class="toc-item">
+                                <div class="toc-item-number">SECTION 8</div>
+                                <div class="toc-item-title">The Path Forward: Coexistence Models</div>
+                            </a>
+                        </div>
+                    </div>
+                </section>
 
                 <h2 id="section-1">1.0 The Opening Salvo: From Virginia to Johor</h2>
 
@@ -2010,6 +2098,7 @@
             </div>
         </div>
     </article>
+    </main>
 
     <footer class="footer footer-enhanced">
         <div class="container">

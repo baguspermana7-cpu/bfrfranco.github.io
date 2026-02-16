@@ -58,6 +58,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preload" as="image" href="assets/article-17-cover.jpg">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -893,6 +894,70 @@
         }
         .article-nav a:hover { color: #10b981; }
 
+        /* Table of Contents */
+        .toc-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .toc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--opp-emerald);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.625rem;
+        }
+        .toc-item {
+            background: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            border-left: 3px solid var(--opp-emerald);
+            transition: all 0.2s ease;
+            display: block;
+        }
+        .toc-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .toc-item-number {
+            font-size: 0.7rem;
+            color: var(--opp-emerald);
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .toc-item-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+        .toc-item.toc-calculator {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left-color: #059669;
+            border-left-width: 5px;
+        }
+        .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
+        .toc-item.toc-calculator .toc-calc-badge {
+            font-size: 0.6rem; background: #059669; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .toc-item.toc-calculator {
+            background: linear-gradient(135deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.08) 100%);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -902,6 +967,7 @@
             .comparison-grid { grid-template-columns: 1fr; }
             .results-grid { grid-template-columns: repeat(2, 1fr); }
             .author-section { flex-direction: column; text-align: center; }
+            .toc-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .article-title { font-size: 1.5rem; }
@@ -910,6 +976,7 @@
     </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Navigation (shared) -->
 <nav class="navbar">
@@ -952,6 +1019,7 @@
     </div>
 </nav>
 
+<main id="main-content">
 <!-- Hero Section -->
 <section class="article-hero">
     <div class="container">
@@ -990,7 +1058,7 @@
             </span>
         </div>
 
-        <a href="#calculator" class="jump-to-calc">
+        <a href="#section-11" class="jump-to-calc">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z"/></svg>
             Try the Opportunity Value Calculator
         </a>
@@ -1021,8 +1089,75 @@
                 <p><span class="counterpoint-badge">Bear Case Recap</span><br><strong>Article 16 argued:</strong> 6,068 MW pipeline, Johor's 5.8 GW for 3.8M people, speculative builds, bullwhip effect, potential 2027-2029 correction. All valid data points. But data without context is just noise. This article provides the context.</p>
             </div>
 
+            <!-- Table of Contents -->
+            <section class="toc-section">
+                <div class="toc-container">
+                    <h2 class="toc-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        Table of Contents
+                    </h2>
+                    <div class="toc-grid">
+                        <a href="#section-1" class="toc-item">
+                            <div class="toc-item-number">SECTION 1</div>
+                            <div class="toc-item-title">Why the "Bubble" Narrative Is Fundamentally Wrong</div>
+                        </a>
+                        <a href="#section-2" class="toc-item">
+                            <div class="toc-item-number">SECTION 2</div>
+                            <div class="toc-item-title">Jevons Paradox: Why AI Efficiency Means MORE Demand, Not Less</div>
+                        </a>
+                        <a href="#section-3" class="toc-item">
+                            <div class="toc-item-number">SECTION 3</div>
+                            <div class="toc-item-title">The $1 Trillion Engine: SEA's Digital Economy Is Just Getting Started</div>
+                        </a>
+                        <a href="#section-4" class="toc-item">
+                            <div class="toc-item-number">SECTION 4</div>
+                            <div class="toc-item-title">Sovereign AI: The Demand Nobody's Counting</div>
+                        </a>
+                        <a href="#section-5" class="toc-item">
+                            <div class="toc-item-number">SECTION 5</div>
+                            <div class="toc-item-title">Every Great Infrastructure "Bubble" Wasn't: The Historical Evidence</div>
+                        </a>
+                        <a href="#section-6" class="toc-item">
+                            <div class="toc-item-number">SECTION 6</div>
+                            <div class="toc-item-title">$602 Billion in Rational Strategy, Not Irrational Exuberance</div>
+                        </a>
+                        <a href="#section-7" class="toc-item">
+                            <div class="toc-item-number">SECTION 7</div>
+                            <div class="toc-item-title">Johor: Not the Next Bubble — The Next Northern Virginia</div>
+                        </a>
+                        <a href="#section-8" class="toc-item">
+                            <div class="toc-item-number">SECTION 8</div>
+                            <div class="toc-item-title">Indonesia: 280 Million People Don't Fit in a Bubble</div>
+                        </a>
+                        <a href="#section-9" class="toc-item">
+                            <div class="toc-item-number">SECTION 9</div>
+                            <div class="toc-item-title">Legacy Data Centers: The Contrarian Value Play</div>
+                        </a>
+                        <a href="#section-10" class="toc-item">
+                            <div class="toc-item-number">SECTION 10</div>
+                            <div class="toc-item-title">The Inference Economy: The Demand Wave Nobody Modeled</div>
+                        </a>
+                        <a href="#section-11" class="toc-item toc-calculator">
+                            <div class="toc-item-number">SECTION 11 <span class="toc-calc-badge">INTERACTIVE</span></div>
+                            <div class="toc-item-title">SEA DC Opportunity Value Calculator</div>
+                        </a>
+                        <a href="#section-12" class="toc-item">
+                            <div class="toc-item-number">SECTION 12</div>
+                            <div class="toc-item-title">The Bottom Line: Fortune Favors the Builders</div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
             <!-- 1. The Contrarian Thesis -->
-            <h2>1. Why the "Bubble" Narrative Is Fundamentally Wrong</h2>
+            <h2 id="section-1">1. Why the "Bubble" Narrative Is Fundamentally Wrong</h2>
 
             <p>The bear case for Southeast Asia's data center market rests on a simple premise: supply is growing faster than demand. The math looks obvious &mdash; 6,068 MW of pipeline against current absorption rates projects years of oversupply.</p>
 
@@ -1056,7 +1191,7 @@
             <p>The bears are counting known demand against known supply. But the demand they're counting represents perhaps <strong>30-40% of actual demand by 2030</strong>. They're measuring the visible tip of an iceberg and declaring the ocean shallow.</p>
 
             <!-- 2. Jevons Paradox -->
-            <h2>2. Jevons Paradox: Why AI Efficiency Means MORE Demand, Not Less</h2>
+            <h2 id="section-2">2. Jevons Paradox: Why AI Efficiency Means MORE Demand, Not Less</h2>
 
             <p>The single most powerful argument against the bubble narrative is Jevons Paradox &mdash; and almost nobody in the data center industry is talking about it correctly.</p>
 
@@ -1127,7 +1262,7 @@
             </div>
 
             <!-- 3. $1 Trillion Digital Economy -->
-            <h2>3. The $1 Trillion Engine: SEA's Digital Economy Is Just Getting Started</h2>
+            <h2 id="section-3">3. The $1 Trillion Engine: SEA's Digital Economy Is Just Getting Started</h2>
 
             <p>Bear-case analyses fixate on hyperscaler demand. But hyperscalers are only half the story. The domestic digital economy of Southeast Asia is the demand driver that almost every pipeline analysis ignores.</p>
 
@@ -1176,7 +1311,7 @@
             </div>
 
             <!-- 4. Sovereign AI -->
-            <h2>4. Sovereign AI: The Demand Nobody's Counting</h2>
+            <h2 id="section-4">4. Sovereign AI: The Demand Nobody's Counting</h2>
 
             <p>Perhaps the most consequential demand driver for SEA data centers isn't commercial at all &mdash; it's political. Across the region, governments are racing to establish sovereign AI capabilities, and every sovereign AI initiative requires local data center infrastructure.</p>
 
@@ -1248,7 +1383,7 @@
             </div>
 
             <!-- 5. Historical Precedent -->
-            <h2>5. Every Great Infrastructure "Bubble" Wasn't: The Historical Evidence</h2>
+            <h2 id="section-5">5. Every Great Infrastructure "Bubble" Wasn't: The Historical Evidence</h2>
 
             <p>The bears love to invoke the 2001 telecom crash as a warning. Let's use it &mdash; but let's tell the <em>complete</em> story.</p>
 
@@ -1350,7 +1485,7 @@
             </blockquote>
 
             <!-- 6. Hyperscaler Rationality -->
-            <h2>6. $602 Billion in Rational Strategy, Not Irrational Exuberance</h2>
+            <h2 id="section-6">6. $602 Billion in Rational Strategy, Not Irrational Exuberance</h2>
 
             <p>The bear case treats hyperscaler capex as evidence of a bubble: <em>"They're spending 45-57% of revenue on capex! That's historically associated with overinvestment!"</em></p>
 
@@ -1408,7 +1543,7 @@
             <p>AWS's $6B was a <em>floor</em>, not a ceiling. Their total 2026 capex is $200B. If SEA captures even 3% of that, it's $6B <em>per year</em>, not over 15 years. Microsoft similarly announced $2.2B but their total capex is $80B. The announcements are anchoring, not capping.</p>
 
             <!-- 7. Johor -->
-            <h2>7. Johor: Not the Next Bubble &mdash; The Next Northern Virginia</h2>
+            <h2 id="section-7">7. Johor: Not the Next Bubble &mdash; The Next Northern Virginia</h2>
 
             <p>Article 16 identified Johor as the highest-risk market: 5.8 GW pipeline for a state of 3.8 million people. Let's reframe this entirely.</p>
 
@@ -1445,7 +1580,7 @@
             </div>
 
             <!-- 8. Indonesia -->
-            <h2>8. Indonesia: 280 Million People Don't Fit in a Bubble</h2>
+            <h2 id="section-8">8. Indonesia: 280 Million People Don't Fit in a Bubble</h2>
 
             <p>Indonesia is the least "bubbly" market in SEA and the strongest contrarian case. Here's why: Indonesia's data center demand is overwhelmingly <strong>domestic</strong>.</p>
 
@@ -1498,7 +1633,7 @@
             </div>
 
             <!-- 9. Legacy DCs -->
-            <h2>9. Legacy Data Centers: The Contrarian Value Play</h2>
+            <h2 id="section-9">9. Legacy Data Centers: The Contrarian Value Play</h2>
 
             <p>Article 16 painted legacy DCs as "stranded assets." Let's look at this differently.</p>
 
@@ -1567,7 +1702,7 @@
             </div>
 
             <!-- 10. The Inference Economy -->
-            <h2>10. The Inference Economy: The Demand Wave Nobody Modeled</h2>
+            <h2 id="section-10">10. The Inference Economy: The Demand Wave Nobody Modeled</h2>
 
             <p>Most supply-demand models for SEA data centers were built in 2023-2024, when AI training dominated the narrative. But the fastest-growing demand driver in 2026 is <strong>AI inference</strong> &mdash; and it changes the entire calculation.</p>
 
@@ -1609,7 +1744,7 @@
             </div>
 
             <!-- Calculator -->
-            <h2 id="calculator">11. Interactive: SEA DC Opportunity Value Calculator</h2>
+            <h2 id="section-11">11. Interactive: SEA DC Opportunity Value Calculator</h2>
 
             <p>The bear case has a Bubble Risk Calculator. Here's the bull case equivalent. Model the opportunity value for any SEA market by incorporating the demand factors that pipeline analyses miss: sovereign AI, digital economy growth, inference expansion, and enterprise cloud migration.</p>
 
@@ -1863,7 +1998,7 @@
             </div>
 
             <!-- 12. The Bottom Line -->
-            <h2>12. The Bottom Line: Fortune Favors the Builders</h2>
+            <h2 id="section-12">12. The Bottom Line: Fortune Favors the Builders</h2>
 
             <h3>12.1 The Bull Case Summary</h3>
 
@@ -2006,6 +2141,7 @@
         </div>
     </div>
 </article>
+</main>
 
 <!-- Footer -->
     <footer class="footer footer-enhanced">
