@@ -46,8 +46,8 @@
 
 | Email | Password | Tier | Source |
 |-------|----------|------|--------|
-| `bagus@resistancezero.com` | `RZ@Premium2026!` | pro | Hardcoded in auth.js |
-| `admin@resistancezero.com` | `RZ@Premium2026!` | pro | Hardcoded in auth.js |
+| `bagus@resistancezero.com` | *(server-side only)* | pro | Supabase (planned) |
+| `admin@resistancezero.com` | *(server-side only)* | pro | Supabase (planned) |
 | `demo@resistancezero.com` | `demo2026` | pro | Hardcoded in auth.js |
 | *(manual accounts)* | *(varies)* | *(varies)* | `rz_manual_accounts` localStorage |
 

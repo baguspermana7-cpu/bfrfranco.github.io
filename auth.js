@@ -17,8 +17,6 @@
 
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
-        { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
-        { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
         { email: 'demo@resistancezero.com',  password: 'demo2026',        tier: 'pro' }
     ];
 
