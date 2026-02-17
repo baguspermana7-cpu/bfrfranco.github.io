@@ -1,6 +1,6 @@
 # PDF Export Quality Standard — ResistanceZero
 
-> **Version**: 1.0 | **Updated**: 2026-02-16
+> **Version**: 1.1 | **Updated**: 2026-02-16
 
 ---
 
@@ -38,21 +38,24 @@
 │                                          │
 │─────────── ACCENT COLOR LINE ───────────│
 │                                          │
-│ INPUT PARAMETERS                         │
+│ INPUT PARAMETERS (2-col grid)            │
 │ ┌────────────┬─────────┬────────┬─────┐│
 │ │ Parameter  │ Value   │ Param  │ Val ││
 │ ├────────────┼─────────┼────────┼─────┤│
 │ │ ...        │ ...     │ ...    │ ... ││
 │ └────────────┴─────────┴────────┴─────┘│
 │                                          │
-│ RESULTS                                  │
+│ RESULTS (4-col KPI grid, 2-col min)      │
 │ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐       │
 │ │ KPI │ │ KPI │ │ KPI │ │ KPI │       │
 │ └─────┘ └─────┘ └─────┘ └─────┘       │
 │                                          │
-│ SVG CHARTS                               │
+│ SVG CHARTS (SIDE-BY-SIDE, 2-col)         │
 │ ┌──────────────────┐ ┌────────────────┐ │
 │ │  Radar/Bar Chart │ │ Histogram      │ │
+│ └──────────────────┘ └────────────────┘ │
+│ ┌──────────────────┐ ┌────────────────┐ │
+│ │  Tornado Chart   │ │ Risk Heatmap   │ │
 │ └──────────────────┘ └────────────────┘ │
 │                                          │
 │ NARRATIVE ASSESSMENT                     │
@@ -100,6 +103,108 @@
 - P5/P50/P95 dashed vertical lines with labels
 - X-axis: score range, Y-axis: frequency
 
+### Tornado / Sensitivity Chart
+- Bidirectional horizontal bars from baseline center
+- Left side: negative impact (red tones)
+- Right side: positive impact (green tones)
+- Bars sorted by absolute impact (largest at top)
+- Baseline vertical dashed line with label
+- $ values or % shown at bar ends
+- Bar height: 24-28px, gap: 4px
+
+---
+
+## White Space Minimization Rules
+
+**CRITICAL**: Never leave a single chart centered alone with empty space on both sides. This wastes 50%+ of printable area.
+
+### Rule 1: Side-by-Side Charts (2-Column Layout)
+When there are 2+ charts, place them side-by-side using `display: flex`:
+
+```css
+/* PDF chart row */
+.pdf-chart-row {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+.pdf-chart-row > div {
+  flex: 1;
+  min-width: 0;  /* prevent flex overflow */
+}
+```
+
+```html
+<div class="pdf-chart-row">
+  <div><!-- Chart 1: Radar --><svg>...</svg></div>
+  <div><!-- Chart 2: Histogram --><svg>...</svg></div>
+</div>
+<div class="pdf-chart-row">
+  <div><!-- Chart 3: Tornado --><svg>...</svg></div>
+  <div><!-- Chart 4: Heatmap --><svg>...</svg></div>
+</div>
+```
+
+### Rule 2: If Only 1 Chart, Add a Companion
+If a section only has 1 chart, create a complementary analysis to fill the adjacent space:
+- Radar chart alone → add summary KPI table beside it
+- Histogram alone → add percentile breakdown table beside it
+- Tornado alone → add top-3 drivers table beside it
+
+### Rule 3: KPI Grid Layout
+KPIs should use 3-4 column grids, never a single centered column:
+
+```css
+.pdf-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 12px 0;
+}
+.pdf-kpi-card {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+.pdf-kpi-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e3a5f;
+}
+.pdf-kpi-label {
+  font-size: 9px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+```
+
+### Rule 4: Input Parameters Table
+Always use 2-column key-value layout (4 columns total: param|value|param|value):
+
+```html
+<table style="width:100%;">
+  <tr>
+    <td style="width:30%;font-weight:600;">Param 1</td>
+    <td style="width:20%;">Value 1</td>
+    <td style="width:30%;font-weight:600;">Param 2</td>
+    <td style="width:20%;">Value 2</td>
+  </tr>
+</table>
+```
+
+### Rule 5: Compact Spacing
+```css
+/* PDF body spacing */
+body { padding: 20px 30px; }     /* Not 36px+ */
+h2 { margin: 16px 0 8px; }       /* Not 24px+ */
+h3 { margin: 12px 0 6px; }       /* Not 16px+ */
+p { margin: 6px 0; }             /* Not 12px+ */
+table { margin: 8px 0; }         /* Not 16px+ */
+.pdf-chart-row { margin: 12px 0; } /* Not 24px+ */
+```
+
 ---
 
 ## Implementation Pattern
@@ -145,6 +250,27 @@ function exportPDF() {
 | 8 | `#8b5cf6` | `#8b5cf6` |
 | 9 | `#3b82f6` | `#3b82f6` |
 | 10 | `#0891b2` | `#0891b2` |
+| 11 | `#f59e0b` | `#f59e0b` |
+| 12 | `#10b981` | `#10b981` |
+| 13 | `#6366f1` | `#6366f1` |
+| 14 | `#f97316` | `#f97316` |
+| 15 | `#ec4899` | `#ec4899` |
+
+---
+
+## PDF Export Checklist (Pre-Deployment)
+
+- [ ] All charts use side-by-side layout (no single centered chart with empty margins)
+- [ ] KPIs in 3-4 column grid (never single column)
+- [ ] Input parameters in 2-column key-value table
+- [ ] Body text color is `#1f2937` (never `#94a3b8` for primary text)
+- [ ] `print-color-adjust: exact` in `@media print`
+- [ ] `@page { margin: 15mm; }` set
+- [ ] Header has title, date, and RESISTANCEZERO branding
+- [ ] Footer has resistancezero.com, generation date, client-side disclaimer
+- [ ] SVG charts render correctly in print preview
+- [ ] Narrative text is data-aligned (references actual calculated values)
+- [ ] Compact spacing: no margins > 16px between sections
 
 ---
 

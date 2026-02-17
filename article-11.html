@@ -14,7 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>AI Data Centers vs Citizen Electricity Bills: Who Really Pays? | Southeast Asia Analysis</title>
+    <title>AI Data Centers vs Citizen Bills | Southeast Asia | ResistanceZero</title>
     <meta name="description" content="Comprehensive analysis of AI data center electricity consumption impact on citizen bills in Southeast Asia. Interactive calculator, country comparison, subsidy analysis. Why are citizens asked to save electricity while AI consumes megawatts?">
     <meta name="keywords" content="AI Data Center, Electricity Consumption, Southeast Asia, Indonesia PLN, Malaysia TNB, Singapore, Electricity Subsidy, Power Grid, NVIDIA GPU, Citizen Bills, Energy Crisis">
     <meta name="author" content="Bagus Dwi Permana">
@@ -35,7 +35,7 @@
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="article:author" content="Bagus Dwi Permana">
     <meta property="article:published_time" content="2026-02-09T00:00:00Z">
-    <meta property="article:modified_time" content="2026-02-09T00:00:00Z">
+    <meta property="article:modified_time" content="2026-02-17T00:00:00Z">
     <meta property="article:section" content="Energy & Policy">
     <meta property="article:tag" content="AI Data Centers">
     <meta property="article:tag" content="Electricity">
@@ -96,7 +96,7 @@
 
         .article-hero {
             background: linear-gradient(135deg, #0f0f0f 0%, #1a0a0a 50%, #2d1010 100%);
-            padding: 8rem 2rem 4rem;
+            padding: 7rem 2rem 3.5rem;
             color: #fff;
             text-align: center;
             position: relative;
@@ -135,11 +135,12 @@
             border: 1px solid rgba(220, 38, 38, 0.3);
         }
         .article-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.6rem, 3.2vw, 2.35rem);
             font-weight: 800;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
+            margin-bottom: 1.25rem;
+            line-height: 1.25;
             color: #fff;
+            letter-spacing: -0.01em;
         }
         .article-title .highlight {
             background: linear-gradient(90deg, #dc2626, #f59e0b);
@@ -148,7 +149,7 @@
             background-clip: text;
         }
         .article-subtitle {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            font-size: clamp(0.95rem, 1.6vw, 1.15rem);
             color: #94a3b8;
             max-width: 800px;
             margin: 0 auto 2rem;
@@ -185,20 +186,20 @@
         }
         .article-content .container { max-width: 900px; }
         .article-body {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             line-height: 1.7;
             color: #374151;
         }
         .article-body p { margin-bottom: 1rem; }
         .article-body h2 {
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             color: #dc2626;
             margin: var(--spacing-xl) 0 var(--spacing-md);
             padding-bottom: var(--spacing-sm);
             border-bottom: 3px solid #fecaca;
         }
         .article-body h3 {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: #991b1b;
             margin: var(--spacing-lg) 0 var(--spacing-sm);
         }
@@ -633,12 +634,22 @@
         /* Dark Mode */
         [data-theme="dark"] .article-content { background: #0f172a; }
         [data-theme="dark"] .article-body { background: #0f172a; color: #e2e8f0; }
-        [data-theme="dark"] .article-body h2 { color: #f1f5f9; }
-        [data-theme="dark"] .article-body h3 { color: #e2e8f0; }
+        [data-theme="dark"] .article-body h2 { color: #93c5fd; }
+        [data-theme="dark"] .article-body h3 { color: #cbd5e1; }
         [data-theme="dark"] .article-body p { color: #cbd5e1; }
         [data-theme="dark"] .article-body blockquote { background: rgba(30,58,95,0.3); border-color: rgba(96,165,250,0.4); color: #cbd5e1; }
         [data-theme="dark"] .article-body .info-box,
         [data-theme="dark"] .article-body .key-insight { background: rgba(15,23,42,0.8); border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
+        [data-theme="dark"] .highlight-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.4); }
+        [data-theme="dark"] .highlight-box p { color: #fbbf24; }
+        [data-theme="dark"] .warning-box { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.4); }
+        [data-theme="dark"] .warning-box p { color: #fca5a5; }
+        [data-theme="dark"] .result-box { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.4); }
+        [data-theme="dark"] .result-box h4 { color: #34d399; }
+        [data-theme="dark"] .result-box p { color: #6ee7b7; }
+        [data-theme="dark"] .references { background: rgba(15,23,42,0.8); border-color: rgba(6,182,212,0.4); }
+        [data-theme="dark"] .references h3 { color: #93c5fd; }
+        [data-theme="dark"] .references ol { color: #94a3b8; }
         [data-theme="dark"] .article-body table th { background: #0f172a; color: #e2e8f0; }
         [data-theme="dark"] .article-body table td { color: #cbd5e1; border-color: rgba(255,255,255,0.1); }
         [data-theme="dark"] .article-body ul li,
@@ -658,6 +669,263 @@
 
         @media print {
             .navbar, .impact-calculator, .article-nav { display: none !important; }
+        }
+
+        /* ============================================================
+           Energy Equity PRO ENHANCEMENT MODE (.eeq-)
+           Amber/Orange Theme: #f59e0b primary, #d97706 dark
+           ============================================================ */
+
+        /* Toolbar */
+        .eeq-toolbar-row {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            gap: 0.75rem; margin: 1.5rem 0;
+        }
+        .eeq-mode-bar {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .eeq-mode-bar .eeq-mode-toggle {
+            display: flex; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .eeq-mode-bar .eeq-mode-btn {
+            padding: 8px 18px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none;
+            background: transparent; color: #94a3b8; transition: all 0.3s; font-family: inherit;
+        }
+        .eeq-mode-bar .eeq-mode-btn.active { background: #d97706; color: #fff; }
+        .eeq-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .eeq-toolbar-actions button {
+            padding: 8px 16px; border-radius: 8px; border: none; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px;
+        }
+        .eeq-btn-reset { background: rgba(255,255,255,0.1); color: #94a3b8; }
+        .eeq-btn-reset:hover { background: rgba(255,255,255,0.15); }
+        .eeq-btn-pdf { background: linear-gradient(135deg, rgba(217,119,6,0.2), rgba(245,158,11,0.1)); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3) !important; }
+        .eeq-btn-pdf:hover { background: linear-gradient(135deg, rgba(217,119,6,0.3), rgba(245,158,11,0.15)); }
+
+        /* Pro Inputs */
+        .eeq-pro-inputs { display: none; margin-top: 1.5rem; }
+        .eeq-pro-inputs.visible { display: block; }
+        .eeq-pro-inputs-title {
+            font-size: 0.85rem; font-weight: 700; color: #fbbf24;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+            border-bottom: 1px solid rgba(245,158,11,0.2); padding-bottom: 0.5rem;
+        }
+        .eeq-slider-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;
+        }
+        .eeq-slider-card {
+            background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15);
+            border-radius: 10px; padding: 1rem;
+        }
+        .eeq-slider-label {
+            font-size: 0.78rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .eeq-slider-label .eeq-si-tag {
+            font-size: 0.6rem; color: #fbbf24; background: rgba(245,158,11,0.15);
+            padding: 1px 6px; border-radius: 3px; font-weight: 700;
+        }
+        .eeq-slider-card input[type="range"] {
+            width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.15); border-radius: 3px; outline: none;
+            margin: 0.5rem 0;
+        }
+        .eeq-slider-card input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+            background: #f59e0b; cursor: pointer; border: 2px solid #fff;
+        }
+        .eeq-slider-card input[type="range"]::-moz-range-thumb {
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #f59e0b; cursor: pointer; border: 2px solid #fff;
+        }
+        .eeq-slider-minmax {
+            display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b;
+        }
+        .eeq-slider-val {
+            text-align: center; font-size: 1.1rem; font-weight: 800; color: #f59e0b; margin-top: 0.25rem;
+        }
+
+        /* Tooltips */
+        .eeq-tooltip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%; background: rgba(245,158,11,0.25);
+            color: #fbbf24; font-size: 0.6rem; font-weight: 700; cursor: help;
+            position: relative; margin-left: 4px; flex-shrink: 0;
+        }
+        .eeq-tooltip-body {
+            display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+            background: #1e293b; border: 1px solid rgba(245,158,11,0.3); border-radius: 10px;
+            padding: 0.85rem; width: 240px; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+        .eeq-tooltip-body::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: rgba(245,158,11,0.3);
+        }
+        .eeq-tooltip:hover .eeq-tooltip-body,
+        .eeq-tooltip:focus .eeq-tooltip-body { display: block; }
+        .eeq-tooltip-title { font-size: 0.78rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.3rem; }
+        .eeq-tooltip-desc { font-size: 0.7rem; color: #94a3b8; line-height: 1.5; margin-bottom: 0.3rem; }
+        .eeq-tooltip-formula { font-size: 0.65rem; color: #fbbf24; font-family: 'JetBrains Mono', monospace; background: rgba(245,158,11,0.1); padding: 3px 7px; border-radius: 4px; }
+
+        /* Pro Panels */
+        .eeq-pro-panel {
+            position: relative; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem;
+        }
+        .eeq-pro-panel.gated { filter: blur(3px); pointer-events: none; user-select: none; }
+        .eeq-pro-panel .eeq-panel-title {
+            font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .eeq-pro-panel .eeq-panel-title .eeq-panel-icon { color: #f59e0b; font-size: 1.1rem; }
+        .eeq-gate-overlay {
+            position: absolute; inset: 0; background: rgba(15,23,42,0.85); border-radius: 14px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.5rem; z-index: 5; cursor: pointer;
+        }
+        .eeq-gate-overlay .eeq-lock-icon { font-size: 1.5rem; color: #f59e0b; }
+        .eeq-gate-overlay span { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+
+        /* KPI Grid */
+        .eeq-kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;
+        }
+        .eeq-kpi-card {
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .eeq-kpi-value { font-size: 1.4rem; font-weight: 800; color: #f59e0b; }
+        .eeq-kpi-label { font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem; }
+        .eeq-kpi-sublabel { font-size: 0.6rem; color: #475569; margin-top: 0.15rem; }
+
+        /* Risk Matrix Table */
+        .eeq-risk-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.78rem; }
+        .eeq-risk-table th {
+            padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; color: #94a3b8;
+            border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .eeq-risk-table td {
+            padding: 0.5rem 0.75rem; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .eeq-risk-table tr.eeq-highlight { background: rgba(245,158,11,0.08); }
+        .eeq-risk-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 700;
+        }
+        .eeq-risk-badge.high { background: rgba(239,68,68,0.15); color: #f87171; }
+        .eeq-risk-badge.med { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .eeq-risk-badge.low { background: rgba(16,185,129,0.15); color: #34d399; }
+
+        /* Score bars */
+        .eeq-score-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 0.4rem; overflow: hidden; }
+        .eeq-score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+        .eeq-score-bar-fill.high { background: linear-gradient(90deg, #dc2626, #ef4444); }
+        .eeq-score-bar-fill.med { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .eeq-score-bar-fill.low { background: linear-gradient(90deg, #10b981, #34d399); }
+
+        /* Score Ring */
+        .eeq-score-ring-wrap { text-align: center; margin: 1rem 0; }
+        .eeq-score-ring-label { font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; }
+
+        /* Chart Container */
+        .eeq-chart-container { margin-top: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 1rem; }
+        .eeq-chart-container canvas { width: 100% !important; max-height: 220px; }
+
+        /* Tornado Chart */
+        .eeq-tornado-wrap { margin-top: 1rem; }
+        .eeq-tornado-bar-row {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+        }
+        .eeq-tornado-label { width: 120px; font-size: 0.72rem; color: #94a3b8; text-align: right; flex-shrink: 0; }
+        .eeq-tornado-bar-container { flex: 1; height: 20px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; position: relative; }
+        .eeq-tornado-bar {
+            height: 100%; border-radius: 4px; transition: width 0.5s ease;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+        .eeq-tornado-val { width: 60px; font-size: 0.72rem; color: #fbbf24; font-weight: 700; }
+
+        /* Narrative */
+        .eeq-narrative {
+            background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 12px; padding: 1.25rem; margin-top: 1rem;
+        }
+        .eeq-narrative h4 { color: #f59e0b; font-size: 0.85rem; margin: 0 0 0.75rem; display: flex; align-items: center; gap: 6px; }
+        .eeq-narrative p { color: #94a3b8; font-size: 0.78rem; line-height: 1.6; margin: 0 0 0.5rem; }
+        .eeq-narrative p:last-child { margin-bottom: 0; }
+
+        /* CTA Block */
+        .eeq-cta-block {
+            background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(217,119,6,0.06));
+            border: 1px solid rgba(245,158,11,0.25); border-radius: 14px;
+            padding: 1.5rem 2rem; margin-top: 1.5rem; text-align: center;
+        }
+        .eeq-cta-block h4 { color: #fbbf24; font-size: 1rem; margin: 0 0 0.5rem; }
+        .eeq-cta-block p { color: #94a3b8; font-size: 0.82rem; margin: 0 0 1rem; }
+        .eeq-cta-btn {
+            display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff;
+            padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+            text-decoration: none; transition: opacity 0.3s, transform 0.2s; border: none; cursor: pointer;
+        }
+        .eeq-cta-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Login Modal */
+        .eeq-login-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+            z-index: 9999; align-items: center; justify-content: center;
+        }
+        .eeq-login-overlay.active { display: flex; }
+        .eeq-login-box {
+            background: #0f172a; border-radius: 16px; padding: 2.5rem; max-width: 380px; width: 90%;
+            border: 1px solid rgba(245,158,11,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .eeq-login-box h3 { color: #e2e8f0; margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .eeq-login-box p { color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem; }
+        .eeq-login-box input {
+            width: 100%; padding: 0.75rem 1rem; background: #1e293b; border: 1px solid #334155;
+            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem; box-sizing: border-box;
+        }
+        .eeq-login-box input:focus { outline: none; border-color: #f59e0b; }
+        .eeq-login-box button.eeq-login-submit {
+            width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff;
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; margin-top: 0.5rem;
+        }
+        .eeq-login-box .eeq-demo-hint { font-size: 0.7rem; color: #64748b; margin-top: 0.75rem; text-align: center; }
+        .eeq-login-box .eeq-demo-hint code { background: rgba(245,158,11,0.15); padding: 1px 5px; border-radius: 3px; color: #fbbf24; }
+        .eeq-login-close {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: #64748b; font-size: 1.2rem; cursor: pointer;
+        }
+        .eeq-login-error { color: #f87171; font-size: 0.75rem; margin-top: 0.5rem; text-align: center; display: none; }
+        [data-theme="light"] .eeq-login-box { background: #ffffff; border-color: #e2e8f0; }
+        [data-theme="light"] .eeq-login-box h3 { color: #1e293b; }
+        [data-theme="light"] .eeq-login-box p { color: #64748b; }
+        [data-theme="light"] .eeq-login-box input { background: #f1f5f9; border-color: #e2e8f0; color: #1e293b; }
+
+        /* Privacy Badge & Benchmark Meta */
+        .eeq-privacy-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; padding: 6px 0; }
+        .eeq-benchmark-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .eeq-benchmark-tag { font-size: 0.65rem; color: #64748b; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 4px; }
+
+        /* Dark Mode Overrides */
+        [data-theme="dark"] .eeq-pro-panel { background: linear-gradient(135deg, #0c1220 0%, #162032 100%); }
+        [data-theme="dark"] .eeq-cta-block { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.04)); }
+        [data-theme="dark"] .eeq-login-box { background: #0f172a; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .eeq-toolbar-row { flex-direction: column; align-items: stretch; }
+            .eeq-toolbar-actions { justify-content: center; }
+            .eeq-slider-grid { grid-template-columns: 1fr; }
+            .eeq-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .eeq-cta-block { padding: 1.25rem 1rem; }
+            .eeq-risk-table { font-size: 0.7rem; }
+            .eeq-risk-table th, .eeq-risk-table td { padding: 0.35rem 0.5rem; }
+            .eeq-tooltip-body { width: 200px; left: auto; right: -10px; transform: none; }
+            .eeq-tooltip-body::after { left: auto; right: 20px; transform: none; }
+            .eeq-tornado-label { width: 80px; }
         }
     </style>
 </head>
@@ -790,8 +1058,8 @@
                                 <div class="toc-item-number">SECTION 4</div>
                                 <div class="toc-item-title">The Uncomfortable Truth: Who Really Pays?</div>
                             </a>
-                            <a href="#section-5" class="toc-item">
-                                <div class="toc-item-number">SECTION 5</div>
+                            <a href="#section-5" class="toc-item toc-calculator">
+                                <div class="toc-item-number">SECTION 5 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div>
                                 <div class="toc-item-title">Interactive Calculator: Impact on Your Electricity Bill</div>
                             </a>
                             <a href="#section-6" class="toc-item">
@@ -1077,6 +1345,13 @@
 
                 <p>When data centers — which consume industrial-scale electricity — benefit from grid infrastructure built and subsidized for citizens, the question of fairness becomes unavoidable.</p>
 
+                <!-- Pro CTA Teaser -->
+                <div class="eeq-cta-block" style="margin: 2rem 0;">
+                    <h4><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle;"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg> Strategic Intelligence Engine</h4>
+                    <p>Unlock 6 strategic inputs, 10-Year NPV analysis, regional risk matrix, resilience scorecard, and Monte Carlo simulation with 10,000 iterations.</p>
+                    <a href="#section-5" class="eeq-cta-btn" style="text-decoration:none;display:inline-block;"><i class="fas fa-calculator" style="margin-right:6px;"></i> Open Impact Calculator</a>
+                </div>
+
                 <h2 id="section-5">5. Interactive Calculator: Impact on Your Electricity Bill</h2>
 
                 <p>Use this calculator to estimate how data center growth might impact electricity costs in your country. The model incorporates IEA growth projections, country-specific tariff structures, and infrastructure cost allocation methodologies.</p>
@@ -1171,6 +1446,354 @@
                         (adjusted for regional grid characteristics). Tariff increase estimates assume 40% of DC infrastructure costs are passed to
                         residential consumers through rate base adjustments.
                     </p>
+
+                    <!-- ========== PRO ENHANCEMENT MODE ========== -->
+
+                    <!-- Mode Toggle Toolbar -->
+                    <div class="eeq-toolbar-row">
+                        <div class="eeq-mode-bar">
+                            <div class="eeq-mode-toggle">
+                                <button class="eeq-mode-btn active" id="eeqFreeBtn" onclick="eeqSetMode('free')">Free</button>
+                                <button class="eeq-mode-btn" id="eeqProBtn" onclick="eeqSetMode('pro')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
+                                    Pro
+                                </button>
+                            </div>
+                        </div>
+                        <div class="eeq-toolbar-actions">
+                            <button class="eeq-btn-reset" onclick="eeqResetDefaults()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                Reset
+                            </button>
+                            <button class="eeq-btn-pdf" onclick="eeqExportPDF()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>
+                                Export PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pro Strategic Inputs (SI-02 to SI-06) -->
+                    <div class="eeq-pro-inputs" id="eeqProInputs">
+                        <div class="eeq-pro-inputs-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                            Strategic Intelligence Inputs
+                        </div>
+                        <div class="eeq-slider-grid">
+                            <div class="eeq-slider-card">
+                                <div class="eeq-slider-label">
+                                    <span class="eeq-si-tag">SI-02</span>
+                                    GPU Thermal Density
+                                    <span class="eeq-tooltip" tabindex="0">?
+                                        <span class="eeq-tooltip-body">
+                                            <div class="eeq-tooltip-title">GPU Thermal Density (kW/rack)</div>
+                                            <div class="eeq-tooltip-desc">Power density per rack. AI racks range from 20 kW (mixed) to 100 kW (full GPU). Higher density = more cooling cost + grid stress.</div>
+                                            <div class="eeq-tooltip-formula">Cooling Load = MW x (Density/40)</div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <input type="range" id="eeqGpuDensity" min="20" max="100" value="40" oninput="eeqUpdateSliderDisplay()">
+                                <div class="eeq-slider-minmax"><span>20 kW</span><span>100 kW</span></div>
+                                <div class="eeq-slider-val" id="eeqGpuDensityVal">40 kW/rack</div>
+                            </div>
+                            <div class="eeq-slider-card">
+                                <div class="eeq-slider-label">
+                                    <span class="eeq-si-tag">SI-03</span>
+                                    Subsidy Delta
+                                    <span class="eeq-tooltip" tabindex="0">?
+                                        <span class="eeq-tooltip-body">
+                                            <div class="eeq-tooltip-title">Subsidy Delta (%)</div>
+                                            <div class="eeq-tooltip-desc">Gap between real production cost and industry tariff. Higher delta means citizens subsidize more of the energy cost. Indonesia: ~33%, Singapore: ~5%.</div>
+                                            <div class="eeq-tooltip-formula">Citizen Burden = Tariff x (SubsidyDelta/100)</div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <input type="range" id="eeqSubsidyDelta" min="5" max="40" value="15" oninput="eeqUpdateSliderDisplay()">
+                                <div class="eeq-slider-minmax"><span>5%</span><span>40%</span></div>
+                                <div class="eeq-slider-val" id="eeqSubsidyDeltaVal">15%</div>
+                            </div>
+                            <div class="eeq-slider-card">
+                                <div class="eeq-slider-label">
+                                    <span class="eeq-si-tag">SI-04</span>
+                                    Grid Resilience Index
+                                    <span class="eeq-tooltip" tabindex="0">?
+                                        <span class="eeq-tooltip-body">
+                                            <div class="eeq-tooltip-title">Grid Resilience Index (3-9)</div>
+                                            <div class="eeq-tooltip-desc">Quality and stability of power supply. 3 = fragile (frequent outages), 9 = robust (Singapore-level). Affects infrastructure investment needs and tariff pressure.</div>
+                                            <div class="eeq-tooltip-formula">Infra Cost Multiplier = 10 / GridIndex</div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <input type="range" id="eeqGridResilience" min="3" max="9" value="6" oninput="eeqUpdateSliderDisplay()">
+                                <div class="eeq-slider-minmax"><span>3 (Fragile)</span><span>9 (Robust)</span></div>
+                                <div class="eeq-slider-val" id="eeqGridResilienceVal">6</div>
+                            </div>
+                            <div class="eeq-slider-card">
+                                <div class="eeq-slider-label">
+                                    <span class="eeq-si-tag">SI-05</span>
+                                    Community Impact Factor
+                                    <span class="eeq-tooltip" tabindex="0">?
+                                        <span class="eeq-tooltip-body">
+                                            <div class="eeq-tooltip-title">Community Impact Factor (1-10)</div>
+                                            <div class="eeq-tooltip-desc">Social license risk level. 1 = minimal opposition, 10 = active protest/political pressure. Affects regulatory and operational risk premiums.</div>
+                                            <div class="eeq-tooltip-formula">Social Risk = CIF / 10 x 100</div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <input type="range" id="eeqCommunityImpact" min="1" max="10" value="5" oninput="eeqUpdateSliderDisplay()">
+                                <div class="eeq-slider-minmax"><span>1 (Low)</span><span>10 (High)</span></div>
+                                <div class="eeq-slider-val" id="eeqCommunityImpactVal">5</div>
+                            </div>
+                            <div class="eeq-slider-card">
+                                <div class="eeq-slider-label">
+                                    <span class="eeq-si-tag">SI-06</span>
+                                    Organizational Maturity
+                                    <span class="eeq-tooltip" tabindex="0">?
+                                        <span class="eeq-tooltip-body">
+                                            <div class="eeq-tooltip-title">Organizational Maturity Level (1-5)</div>
+                                            <div class="eeq-tooltip-desc">CMMI-style maturity. 1 = ad-hoc/reactive, 5 = optimized/proactive. Lower maturity increases Cost of Immaturity (higher incident costs, slower response).</div>
+                                            <div class="eeq-tooltip-formula">CoI = ((C_resp - C_prev) / C_prev) x Gap</div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <input type="range" id="eeqMaturity" min="1" max="5" value="3" oninput="eeqUpdateSliderDisplay()">
+                                <div class="eeq-slider-minmax"><span>1 (Ad-hoc)</span><span>5 (Optimized)</span></div>
+                                <div class="eeq-slider-val" id="eeqMaturityVal">Level 3</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 1: Financial Impact & NPV Analysis -->
+                    <div class="eeq-pro-panel gated" id="eeqPanel1">
+                        <div class="eeq-gate-overlay" onclick="eeqShowLogin()">
+                            <span class="eeq-lock-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="eeq-panel-title">
+                            <span class="eeq-panel-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </span>
+                            Financial Impact &amp; NPV Analysis
+                        </div>
+                        <div class="eeq-kpi-grid">
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqNpv">$0</div>
+                                <div class="eeq-kpi-label">10-Year NPV Impact</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqVaR">$0</div>
+                                <div class="eeq-kpi-label">VaR (95% Confidence)</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqCoI">$0</div>
+                                <div class="eeq-kpi-label">Cost of Immaturity</div>
+                                <div class="eeq-kpi-sublabel">Annual ($M)</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqSavings">$0</div>
+                                <div class="eeq-kpi-label">Maturity Improvement Savings</div>
+                                <div class="eeq-kpi-sublabel">Annual potential</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqInfraMultiplier">1.0x</div>
+                                <div class="eeq-kpi-label">Infrastructure Cost Multiplier</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqSubsidyBurden">$0</div>
+                                <div class="eeq-kpi-label">Citizen Subsidy Burden</div>
+                                <div class="eeq-kpi-sublabel">Annual per household</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 2: Regional Comparative Risk Matrix -->
+                    <div class="eeq-pro-panel gated" id="eeqPanel2">
+                        <div class="eeq-gate-overlay" onclick="eeqShowLogin()">
+                            <span class="eeq-lock-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="eeq-panel-title">
+                            <span class="eeq-panel-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            </span>
+                            Regional Comparative Risk Matrix
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table class="eeq-risk-table" id="eeqRiskTable">
+                                <thead>
+                                    <tr>
+                                        <th>Country</th>
+                                        <th>Grid Stability</th>
+                                        <th>Subsidy Dependence</th>
+                                        <th>Regulatory</th>
+                                        <th>Social License</th>
+                                        <th>Composite</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eeqRiskTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 3: Strategic Resilience Scorecard -->
+                    <div class="eeq-pro-panel gated" id="eeqPanel3">
+                        <div class="eeq-gate-overlay" onclick="eeqShowLogin()">
+                            <span class="eeq-lock-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="eeq-panel-title">
+                            <span class="eeq-panel-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </span>
+                            Strategic Resilience Scorecard
+                        </div>
+                        <div class="eeq-score-ring-wrap">
+                            <canvas id="eeqScoreRing" width="160" height="160"></canvas>
+                            <div class="eeq-score-ring-label">Aggregate Resilience Score</div>
+                        </div>
+                        <div class="eeq-kpi-grid">
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqEnergyScore">0</div>
+                                <div class="eeq-kpi-label">Energy Security</div>
+                                <div class="eeq-score-bar-bg"><div class="eeq-score-bar-fill med" id="eeqEnergyBar" style="width:0%"></div></div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqFinanceScore">0</div>
+                                <div class="eeq-kpi-label">Financial Sustainability</div>
+                                <div class="eeq-score-bar-bg"><div class="eeq-score-bar-fill med" id="eeqFinanceBar" style="width:0%"></div></div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqSocialScore">0</div>
+                                <div class="eeq-kpi-label">Social License</div>
+                                <div class="eeq-score-bar-bg"><div class="eeq-score-bar-fill med" id="eeqSocialBar" style="width:0%"></div></div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqOpsScore">0</div>
+                                <div class="eeq-kpi-label">Operational Maturity</div>
+                                <div class="eeq-score-bar-bg"><div class="eeq-score-bar-fill med" id="eeqOpsBar" style="width:0%"></div></div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqLeadershipCoeff">0.00</div>
+                                <div class="eeq-kpi-label">Leadership Amplification</div>
+                                <div class="eeq-kpi-sublabel">L(s) coefficient</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqWeakestDim">-</div>
+                                <div class="eeq-kpi-label">Weakest Dimension</div>
+                            </div>
+                        </div>
+                        <div class="eeq-narrative" id="eeqScorecardNarrative">
+                            <h4>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                Strategic Assessment
+                            </h4>
+                            <p id="eeqScorecardText">Loading assessment...</p>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 4: Monte Carlo Simulation -->
+                    <div class="eeq-pro-panel gated" id="eeqPanel4">
+                        <div class="eeq-gate-overlay" onclick="eeqShowLogin()">
+                            <span class="eeq-lock-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="eeq-panel-title">
+                            <span class="eeq-panel-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            </span>
+                            Monte Carlo Simulation (10,000 Iterations)
+                        </div>
+                        <div class="eeq-kpi-grid">
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqMcP5">$0</div>
+                                <div class="eeq-kpi-label">P5 (Best Case)</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqMcP25">$0</div>
+                                <div class="eeq-kpi-label">P25</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqMcP50">$0</div>
+                                <div class="eeq-kpi-label">P50 (Median)</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqMcP75">$0</div>
+                                <div class="eeq-kpi-label">P75</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqMcP95">$0</div>
+                                <div class="eeq-kpi-label">P95 (Worst Case)</div>
+                            </div>
+                            <div class="eeq-kpi-card">
+                                <div class="eeq-kpi-value" id="eeqMcTopDriver">-</div>
+                                <div class="eeq-kpi-label">Top Sensitivity Driver</div>
+                            </div>
+                        </div>
+                        <div class="eeq-chart-container">
+                            <canvas id="eeqMonteCarloChart" height="200"></canvas>
+                        </div>
+                        <div class="eeq-tornado-wrap" id="eeqTornadoWrap">
+                            <div style="font-size:0.8rem;font-weight:700;color:#e2e8f0;margin-bottom:0.75rem;">Sensitivity Analysis (Tornado)</div>
+                            <div id="eeqTornadoBars"></div>
+                        </div>
+                        <div class="eeq-narrative" id="eeqMcNarrative">
+                            <h4>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                Monte Carlo Conclusion
+                            </h4>
+                            <p id="eeqMcNarrativeText">Loading simulation results...</p>
+                        </div>
+                    </div>
+
+                    <!-- Pro CTA Block -->
+                    <div class="eeq-cta-block" id="eeqCtaBlock">
+                        <h4>Unlock Strategic Intelligence Engine</h4>
+                        <p>Access NPV Analysis, Regional Risk Matrix, Resilience Scorecard, and Monte Carlo Simulation with 10,000 iterations. All calculations run locally in your browser.</p>
+                        <button class="eeq-cta-btn" onclick="eeqShowLogin()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
+                            Activate Pro Mode
+                        </button>
+                    </div>
+
+                    <!-- Privacy & Benchmark -->
+                    <div class="eeq-privacy-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        All calculations run locally in your browser. No data is sent to any server.
+                    </div>
+                    <div class="eeq-benchmark-meta">
+                        <span class="eeq-benchmark-tag">IEA Energy & AI 2025</span>
+                        <span class="eeq-benchmark-tag">6 SEA Countries</span>
+                        <span class="eeq-benchmark-tag">10K MC Iterations</span>
+                        <span class="eeq-benchmark-tag">NPV 10-Year @ 8%</span>
+                        <span class="eeq-benchmark-tag">Feb 2026 Data</span>
+                    </div>
+
+                </div>
+
+                <!-- Login Modal -->
+                <div class="eeq-login-overlay" id="eeqLoginOverlay">
+                    <div class="eeq-login-box">
+                        <button class="eeq-login-close" onclick="eeqHideLogin()">&times;</button>
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="margin-right:6px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Unlock Pro Analysis
+                        </h3>
+                        <p>Access Financial NPV, Regional Risk Matrix, Resilience Scorecard, and Monte Carlo projections for energy equity analysis.</p>
+                        <input type="email" id="eeqLoginEmail" placeholder="Email address" autocomplete="email">
+                        <input type="password" id="eeqLoginPass" placeholder="Password" autocomplete="current-password">
+                        <div class="eeq-login-error" id="eeqLoginError">Invalid credentials. Please try again.</div>
+                        <button class="eeq-login-submit" onclick="eeqDoLogin()">Sign In</button>
+                        <div class="eeq-demo-hint">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+                        <div style="text-align:center;margin-top:6px;"><a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" rel="noopener" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Unlock Pro Mode &rarr;</a></div>
+                    </div>
                 </div>
 
                 <h2 id="section-6">6. The 15-Why Analysis: Root Causes</h2>
@@ -1399,13 +2022,28 @@
                 </div>
 
                 <!-- Author Bio -->
-                <div class="author-bio" style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; display: flex; gap: 1.5rem; align-items: center;">
-                    <div style="flex-shrink: 0;">
-                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                <div class="author-bio">
+                    <div class="author-bio-image">
+                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
                     </div>
-                    <div>
-                        <h4 style="margin: 0 0 0.5rem 0; color: #1e293b;">Bagus Dwi Permana</h4>
-                        <p style="margin: 0; color: #64748b; font-size: 0.9rem;">Engineering Operations Manager with 12+ years professional experience in critical infrastructure and operations. Certified Ahli K3 Listrik and CDFOM. Passionate about sustainable digital infrastructure and transparent energy policy.</p>
+                    <div class="author-bio-content">
+                        <h4>Bagus Dwi Permana</h4>
+                        <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
+                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
+                        <div class="author-bio-links">
+                            <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                                LinkedIn
+                            </a>
+                            <a href="https://github.com/baguspermana7-cpu" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                GitHub
+                            </a>
+                            <a href="mailto:baguspermana7@gmail.com">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                Email
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -1482,7 +2120,7 @@
     <script src="script.js"></script>
     <script>
         // Country-specific data for calculator
-        const countryData = {
+        var countryData = {
             indonesia: {
                 name: 'Indonesia',
                 currency: 'IDR',
@@ -1648,6 +2286,885 @@
     </script>
 <script>
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
+</script>
+<!-- ========== PRO ENHANCEMENT MODE JS ========== -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== State =====
+    var eeqProMode = false;
+
+    // ===== Extended Country Risk Data =====
+    var eeqCountryRisk = {
+        indonesia: {
+            gridStability: 5.5, subsidyDependence: 8.5, regulatory: 6.0, socialLicense: 7.0,
+            gridLabel: 'Medium', subsidyLabel: 'Very High', regLabel: 'Medium-High', socialLabel: 'High',
+            flag: '\u{1F1EE}\u{1F1E9}', subsidyDefault: 33, gridDefault: 5
+        },
+        malaysia: {
+            gridStability: 4.0, subsidyDependence: 7.0, regulatory: 5.0, socialLicense: 5.5,
+            gridLabel: 'Good', subsidyLabel: 'High', regLabel: 'Medium', socialLabel: 'Medium',
+            flag: '\u{1F1F2}\u{1F1FE}', subsidyDefault: 20, gridDefault: 6
+        },
+        singapore: {
+            gridStability: 2.0, subsidyDependence: 1.5, regulatory: 7.5, socialLicense: 3.0,
+            gridLabel: 'Excellent', subsidyLabel: 'None', regLabel: 'High', socialLabel: 'Low',
+            flag: '\u{1F1F8}\u{1F1EC}', subsidyDefault: 5, gridDefault: 9
+        },
+        thailand: {
+            gridStability: 4.5, subsidyDependence: 5.0, regulatory: 4.5, socialLicense: 4.0,
+            gridLabel: 'Good', subsidyLabel: 'Medium', regLabel: 'Medium', socialLabel: 'Low-Med',
+            flag: '\u{1F1F9}\u{1F1ED}', subsidyDefault: 12, gridDefault: 7
+        },
+        vietnam: {
+            gridStability: 6.5, subsidyDependence: 6.0, regulatory: 5.5, socialLicense: 4.5,
+            gridLabel: 'Medium-Low', subsidyLabel: 'Medium-High', regLabel: 'Medium', socialLabel: 'Low-Med',
+            flag: '\u{1F1FB}\u{1F1F3}', subsidyDefault: 18, gridDefault: 5
+        },
+        philippines: {
+            gridStability: 7.0, subsidyDependence: 4.0, regulatory: 5.0, socialLicense: 6.5,
+            gridLabel: 'Low', subsidyLabel: 'Medium', regLabel: 'Medium', socialLabel: 'Medium-High',
+            flag: '\u{1F1F5}\u{1F1ED}', subsidyDefault: 10, gridDefault: 4
+        }
+    };
+
+    // ===== Auth =====
+    function eeqCheckAuth() {
+        try {
+            var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) return true;
+        } catch (e) {}
+        return false;
+    }
+
+    // ===== Get All Inputs =====
+    function eeqGetInputs() {
+        var country = document.getElementById('calcCountry').value;
+        var year = parseInt(document.getElementById('calcYear').value);
+        var householdUsage = parseFloat(document.getElementById('calcHouseholdUsage').value) || 200;
+        var dcCapacityMW = parseFloat(document.getElementById('calcDCCapacity').value) || 500;
+        var gpuDensity = parseInt(document.getElementById('eeqGpuDensity').value);
+        var subsidyDelta = parseInt(document.getElementById('eeqSubsidyDelta').value);
+        var gridResilience = parseInt(document.getElementById('eeqGridResilience').value);
+        var communityImpact = parseInt(document.getElementById('eeqCommunityImpact').value);
+        var maturity = parseInt(document.getElementById('eeqMaturity').value);
+
+        var data = countryData[country];
+        var risk = eeqCountryRisk[country];
+        var yearsFromNow = year - 2026;
+        var growthFactor = Math.pow(1.15, yearsFromNow) * data.growthMultiplier;
+
+        // DC annual consumption
+        var dcAnnualGWh = (dcCapacityMW * 0.90 * 8760) / 1000;
+
+        // Base tariff increase (from free calculator logic)
+        var baseIncrease = (dcCapacityMW / (data.nationalGridGW * 1000)) * 100 * 0.4;
+        var projectedIncrease = baseIncrease * growthFactor;
+
+        // Monthly/annual impact in USD
+        var currentMonthlyBill = householdUsage * data.residentialTariff;
+        var monthlyImpactLocal = currentMonthlyBill * (projectedIncrease / 100);
+        var monthlyImpactUSD = monthlyImpactLocal / data.usdRate;
+        var annualImpactUSD = monthlyImpactUSD * 12;
+
+        return {
+            country: country,
+            countryName: data.name,
+            year: year,
+            yearsFromNow: yearsFromNow,
+            householdUsage: householdUsage,
+            dcCapacityMW: dcCapacityMW,
+            gpuDensity: gpuDensity,
+            subsidyDelta: subsidyDelta,
+            gridResilience: gridResilience,
+            communityImpact: communityImpact,
+            maturity: maturity,
+            data: data,
+            risk: risk,
+            dcAnnualGWh: dcAnnualGWh,
+            growthFactor: growthFactor,
+            projectedIncrease: projectedIncrease,
+            annualImpactUSD: annualImpactUSD,
+            monthlyImpactUSD: monthlyImpactUSD,
+            infraMultiplier: 10 / gridResilience,
+            densityMultiplier: gpuDensity / 40
+        };
+    }
+
+    // ===== Format Helpers =====
+    function fmtUSD(val) {
+        if (Math.abs(val) >= 1e9) return '$' + (val / 1e9).toFixed(2) + 'B';
+        if (Math.abs(val) >= 1e6) return '$' + (val / 1e6).toFixed(2) + 'M';
+        if (Math.abs(val) >= 1e3) return '$' + (val / 1e3).toFixed(1) + 'K';
+        return '$' + val.toFixed(2);
+    }
+
+    // ===== Financial Calculations =====
+    function eeqCalcFinancials(inputs) {
+        var r = 0.08; // discount rate
+        var annualBase = inputs.annualImpactUSD;
+        // Scale by density and infra multiplier
+        var annualAdj = annualBase * inputs.densityMultiplier * inputs.infraMultiplier;
+
+        // NPV: 10-year sum of discounted annual citizen impact aggregated across affected households
+        var householdsAffected = (inputs.dcCapacityMW * 1000 * 0.90 * 730) / inputs.data.avgHouseholdKwh;
+        var annualAggregateImpact = annualAdj * Math.min(householdsAffected, inputs.data.nationalGridGW * 1000000 / inputs.data.avgHouseholdKwh * 0.1);
+        // Cap to reasonable per-country scale
+        annualAggregateImpact = Math.min(annualAggregateImpact, inputs.dcCapacityMW * 50000);
+
+        var npv = 0;
+        for (var t = 1; t <= 10; t++) {
+            npv += annualAggregateImpact * Math.pow(1.03, t) / Math.pow(1 + r, t);
+        }
+
+        // Cost of Immaturity
+        var baseIncidentCost = inputs.dcCapacityMW * 200; // $200 per MW per incident (thousands)
+        var cResp = baseIncidentCost * (6 - inputs.maturity);
+        var investmentCost = inputs.dcCapacityMW * 50; // $50 per MW investment
+        var cPrev = investmentCost * inputs.maturity;
+        var mTarget = 5;
+        var mCurrent = inputs.maturity;
+        var coiRaw = cPrev > 0 ? ((cResp - cPrev) / cPrev) * ((mTarget - mCurrent) / mTarget) : 0;
+        var coiAnnual = Math.abs(coiRaw) * inputs.dcCapacityMW * 100; // scale to dollars
+
+        // Savings from maturity improvement (+1 level)
+        var cRespImproved = baseIncidentCost * (6 - Math.min(inputs.maturity + 1, 5));
+        var cPrevImproved = investmentCost * Math.min(inputs.maturity + 1, 5);
+        var coiImproved = cPrevImproved > 0 ? ((cRespImproved - cPrevImproved) / cPrevImproved) * ((mTarget - Math.min(inputs.maturity + 1, 5)) / mTarget) : 0;
+        var coiImprovedAnnual = Math.abs(coiImproved) * inputs.dcCapacityMW * 100;
+        var savingsFromMaturity = coiAnnual - coiImprovedAnnual;
+
+        // Subsidy burden per household
+        var subsidyBurdenPerHH = annualAdj * (inputs.subsidyDelta / 100) * 2;
+
+        return {
+            npv: npv,
+            coiAnnual: coiAnnual,
+            savingsFromMaturity: Math.max(0, savingsFromMaturity),
+            infraMultiplier: inputs.infraMultiplier,
+            subsidyBurden: subsidyBurdenPerHH,
+            annualAggregateImpact: annualAggregateImpact
+        };
+    }
+
+    // ===== Monte Carlo Simulation (10K iterations) =====
+    function eeqRunMonteCarlo(inputs) {
+        var N = 10000;
+        var results = [];
+        var base = inputs.annualImpactUSD * inputs.densityMultiplier * inputs.infraMultiplier;
+        // Multiply by community factor for social risk premium
+        base *= (1 + inputs.communityImpact / 20);
+
+        for (var i = 0; i < N; i++) {
+            // Box-Muller for normal distribution
+            var u1 = Math.random(), u2 = Math.random();
+            var z1 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+            var z2 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+            var u3 = Math.random(), u4 = Math.random();
+            var z3 = Math.sqrt(-2 * Math.log(u3)) * Math.cos(2 * Math.PI * u4);
+
+            // Vary: subsidy delta +/-20%, grid resilience +/-2, DC capacity +/-30%
+            var subsidyFactor = 1 + (z1 * 0.20);
+            var gridFactor = 1 + (z2 * (2 / inputs.gridResilience));
+            var capacityFactor = 1 + (z3 * 0.30);
+
+            var simValue = base * subsidyFactor * gridFactor * capacityFactor;
+            results.push(Math.max(0, simValue));
+        }
+
+        results.sort(function(a, b) { return a - b; });
+
+        var sum = 0, sumSq = 0;
+        for (var j = 0; j < N; j++) {
+            sum += results[j];
+            sumSq += results[j] * results[j];
+        }
+        var mean = sum / N;
+        var std = Math.sqrt(sumSq / N - mean * mean);
+
+        return {
+            results: results,
+            p5: results[Math.floor(N * 0.05)],
+            p25: results[Math.floor(N * 0.25)],
+            p50: results[Math.floor(N * 0.50)],
+            p75: results[Math.floor(N * 0.75)],
+            p95: results[Math.floor(N * 0.95)],
+            mean: mean,
+            std: std
+        };
+    }
+
+    // ===== Sensitivity Analysis =====
+    function eeqRunSensitivity(inputs) {
+        var base = inputs.annualImpactUSD * inputs.densityMultiplier * inputs.infraMultiplier * (1 + inputs.communityImpact / 20);
+        var delta = 0.10; // 10% variation
+
+        // 6 variables, one per input
+        var drivers = [
+            {
+                name: 'DC Capacity (MW)',
+                impact: ((inputs.dcCapacityMW * (1 + delta)) / inputs.dcCapacityMW - 1) * 100
+            },
+            {
+                name: 'GPU Density (kW)',
+                impact: (((inputs.gpuDensity * (1 + delta)) / 40) / (inputs.gpuDensity / 40) - 1) * 100
+            },
+            {
+                name: 'Subsidy Delta (%)',
+                impact: delta * 100 * (inputs.subsidyDelta / 100) * 1.5 // amplified
+            },
+            {
+                name: 'Grid Resilience',
+                impact: ((10 / (inputs.gridResilience * (1 - delta))) / (10 / inputs.gridResilience) - 1) * 100
+            },
+            {
+                name: 'Community Impact',
+                impact: ((1 + (inputs.communityImpact * (1 + delta)) / 20) / (1 + inputs.communityImpact / 20) - 1) * 100
+            },
+            {
+                name: 'Maturity Level',
+                impact: Math.max(0, ((6 - Math.max(1, inputs.maturity - 0.5)) / (6 - inputs.maturity) - 1) * 100) || 5
+            }
+        ];
+
+        drivers.sort(function(a, b) { return b.impact - a.impact; });
+        return drivers;
+    }
+
+    // ===== Resilience Scorecard =====
+    function eeqCalcResilience(inputs) {
+        // Sub-scores (0-100)
+        var energySecurity = Math.min(100, (inputs.gridResilience / 9) * 60 + (1 - inputs.dcCapacityMW / (inputs.data.nationalGridGW * 1000)) * 40);
+        var financialSustainability = Math.max(0, 100 - inputs.subsidyDelta * 2 - (inputs.infraMultiplier - 1) * 20);
+        var socialLicense = Math.max(0, 100 - inputs.communityImpact * 10);
+        var opMaturity = (inputs.maturity / 5) * 100;
+
+        // Weighted aggregate
+        var aggregate = energySecurity * 0.30 + financialSustainability * 0.25 + socialLicense * 0.20 + opMaturity * 0.25;
+
+        // Leadership Amplification: L(s) = L_max / (1 + exp(-k(s - s0)))
+        var leadershipCoeff = 2.0 / (1 + Math.exp(-1.5 * (inputs.maturity - 3)));
+
+        // Weakest dimension
+        var dims = [
+            { name: 'Energy Security', score: energySecurity },
+            { name: 'Financial Sustainability', score: financialSustainability },
+            { name: 'Social License', score: socialLicense },
+            { name: 'Operational Maturity', score: opMaturity }
+        ];
+        dims.sort(function(a, b) { return a.score - b.score; });
+        var weakest = dims[0];
+
+        return {
+            aggregate: Math.round(aggregate),
+            energySecurity: Math.round(energySecurity),
+            financialSustainability: Math.round(financialSustainability),
+            socialLicense: Math.round(socialLicense),
+            opMaturity: Math.round(opMaturity),
+            leadershipCoeff: leadershipCoeff,
+            weakest: weakest,
+            dims: dims
+        };
+    }
+
+    // ===== Narrative Generators =====
+    function eeqGenerateScorecardNarrative(inputs, resilience, financials) {
+        var parts = [];
+        // Opening
+        parts.push('For a ' + inputs.dcCapacityMW + ' MW facility in ' + inputs.countryName + ', the aggregate resilience score is ' + resilience.aggregate + '/100.');
+
+        // Weakest dimension
+        if (resilience.weakest.score < 40) {
+            parts.push('CRITICAL: ' + resilience.weakest.name + ' scores only ' + resilience.weakest.score + '/100, indicating severe vulnerability that requires immediate strategic intervention.');
+        } else if (resilience.weakest.score < 60) {
+            parts.push('The weakest dimension is ' + resilience.weakest.name + ' at ' + resilience.weakest.score + '/100, presenting a moderate risk that should be addressed within the current planning cycle.');
+        } else {
+            parts.push('All dimensions score above 60/100. The relative weakness in ' + resilience.weakest.name + ' (' + resilience.weakest.score + '/100) represents an optimization opportunity rather than a critical gap.');
+        }
+
+        // Leadership coefficient
+        if (inputs.maturity <= 2) {
+            parts.push('At maturity Level ' + inputs.maturity + ', the Leadership Amplification coefficient is ' + resilience.leadershipCoeff.toFixed(2) + 'x (well below the 2.0x maximum), meaning organizational capability significantly limits strategic execution.');
+        } else if (inputs.maturity >= 4) {
+            parts.push('Maturity Level ' + inputs.maturity + ' yields a Leadership Amplification of ' + resilience.leadershipCoeff.toFixed(2) + 'x, approaching the theoretical maximum of 2.0x. This indicates strong organizational capability to execute complex energy equity strategies.');
+        }
+
+        // CoI
+        parts.push('The Cost of Immaturity is ' + fmtUSD(financials.coiAnnual) + ' annually; improving maturity by one level could save ' + fmtUSD(financials.savingsFromMaturity) + '/year.');
+
+        return parts.join(' ');
+    }
+
+    function eeqGenerateMcNarrative(inputs, mcData, sensitivity) {
+        var parts = [];
+
+        parts.push('For a ' + inputs.dcCapacityMW + ' MW facility in ' + inputs.countryName + ', with a subsidy delta of ' + inputs.subsidyDelta + '%, Monte Carlo simulation (10,000 iterations) projects a median annual citizen bill impact of ' + fmtUSD(mcData.p50) + ' with 90% confidence interval of [' + fmtUSD(mcData.p5) + ' - ' + fmtUSD(mcData.p95) + '].');
+
+        parts.push('The primary sensitivity driver is ' + sensitivity[0].name + ' (+' + sensitivity[0].impact.toFixed(1) + '% per 10% change), followed by ' + sensitivity[1].name + ' (+' + sensitivity[1].impact.toFixed(1) + '%).');
+
+        if (mcData.p95 > mcData.p50 * 2) {
+            parts.push('The distribution shows significant right-tail risk: worst-case scenarios (P95) are more than 2x the median, suggesting high uncertainty that warrants conservative planning and scenario buffers.');
+        } else {
+            parts.push('The distribution is relatively symmetric, indicating predictable outcomes under normal conditions. Variance is primarily driven by ' + sensitivity[0].name.toLowerCase() + ' assumptions.');
+        }
+
+        // Recommendation
+        if (inputs.gridResilience <= 5) {
+            parts.push('Recommendation: Prioritize grid resilience improvement (currently ' + inputs.gridResilience + '/9). Investing in dedicated power infrastructure and redundancy will reduce both the median impact and tail risk exposure.');
+        } else if (inputs.subsidyDelta >= 20) {
+            parts.push('Recommendation: Advocate for subsidy reform (current delta ' + inputs.subsidyDelta + '%). Transparent cost-causation pricing will reduce citizen burden and improve long-term regulatory predictability.');
+        } else if (inputs.maturity <= 2) {
+            parts.push('Recommendation: Invest in organizational maturity improvement from Level ' + inputs.maturity + ' to Level ' + Math.min(inputs.maturity + 2, 5) + '. The Cost of Immaturity currently represents a significant hidden tax on operations.');
+        } else {
+            parts.push('Recommendation: Focus on community engagement (CIF = ' + inputs.communityImpact + '/10) to maintain social license as facility operations scale.');
+        }
+
+        return parts.join(' ');
+    }
+
+    // ===== Draw Score Ring =====
+    function eeqDrawScoreRing(score) {
+        var canvas = document.getElementById('eeqScoreRing');
+        if (!canvas || !canvas.getContext) return;
+        var ctx = canvas.getContext('2d');
+        var size = 160;
+        canvas.width = size;
+        canvas.height = size;
+        ctx.clearRect(0, 0, size, size);
+
+        var cx = size / 2, cy = size / 2, radius = 60, lineW = 10;
+        var startAngle = -Math.PI / 2;
+        var endAngle = startAngle + (score / 100) * 2 * Math.PI;
+
+        // Background ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = lineW;
+        ctx.stroke();
+
+        // Score ring
+        var gradient = ctx.createLinearGradient(0, 0, size, size);
+        if (score >= 70) { gradient.addColorStop(0, '#10b981'); gradient.addColorStop(1, '#34d399'); }
+        else if (score >= 40) { gradient.addColorStop(0, '#f59e0b'); gradient.addColorStop(1, '#fbbf24'); }
+        else { gradient.addColorStop(0, '#ef4444'); gradient.addColorStop(1, '#f87171'); }
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, startAngle, endAngle);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = lineW;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Score text
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 32px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(score, cx, cy - 6);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText('/100', cx, cy + 18);
+    }
+
+    // ===== Draw Monte Carlo Histogram =====
+    function eeqDrawMonteCarloChart(mcData) {
+        var canvas = document.getElementById('eeqMonteCarloChart');
+        if (!canvas || !canvas.getContext) return;
+        var ctx = canvas.getContext('2d');
+        var W = canvas.parentElement.clientWidth - 32;
+        canvas.width = W;
+        canvas.height = 200;
+        ctx.clearRect(0, 0, W, 200);
+
+        var results = mcData.results;
+        var minVal = results[0], maxVal = results[results.length - 1], range = maxVal - minVal || 1;
+        var numBins = 40, bins = new Array(numBins).fill(0);
+        results.forEach(function(v) {
+            var bin = Math.min(Math.floor((v - minVal) / range * numBins), numBins - 1);
+            bins[bin]++;
+        });
+        var maxBin = Math.max.apply(null, bins);
+        var chartH = 150, baseY = 175, barW = (W - 60) / numBins;
+
+        // Title
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Annual Citizen Bill Impact Distribution (10,000 Simulations)', W / 2, 15);
+
+        bins.forEach(function(count, i) {
+            var x = 30 + i * barW;
+            var barH = maxBin > 0 ? (count / maxBin) * chartH : 0;
+            var y = baseY - barH;
+            var binCenter = minVal + (i + 0.5) * range / numBins;
+
+            if (binCenter <= mcData.p5) ctx.fillStyle = '#10b981';
+            else if (binCenter <= mcData.p50) ctx.fillStyle = '#f59e0b';
+            else if (binCenter <= mcData.p95) ctx.fillStyle = '#d97706';
+            else ctx.fillStyle = '#ef4444';
+
+            ctx.fillRect(x, y, Math.max(barW - 1, 1), barH);
+        });
+
+        // P-lines
+        var markers = [
+            { val: mcData.p5, label: 'P5', color: '#10b981' },
+            { val: mcData.p50, label: 'P50', color: '#fbbf24' },
+            { val: mcData.p95, label: 'P95', color: '#ef4444' }
+        ];
+        markers.forEach(function(m) {
+            var xPos = 30 + ((m.val - minVal) / range) * (W - 60);
+            ctx.strokeStyle = m.color;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(xPos, 25);
+            ctx.lineTo(xPos, baseY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = m.color;
+            ctx.font = 'bold 9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(m.label, xPos, baseY + 13);
+        });
+    }
+
+    // ===== Draw Tornado Bars =====
+    function eeqDrawTornado(sensitivity) {
+        var container = document.getElementById('eeqTornadoBars');
+        if (!container) return;
+        var maxImpact = Math.max.apply(null, sensitivity.map(function(d) { return d.impact; })) || 1;
+        var html = '';
+        sensitivity.forEach(function(d) {
+            var pct = Math.min(100, (d.impact / maxImpact) * 100);
+            html += '<div class="eeq-tornado-bar-row">';
+            html += '<div class="eeq-tornado-label">' + d.name + '</div>';
+            html += '<div class="eeq-tornado-bar-container"><div class="eeq-tornado-bar" style="width:' + pct + '%"></div></div>';
+            html += '<div class="eeq-tornado-val">+' + d.impact.toFixed(1) + '%</div>';
+            html += '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+    // ===== Build Risk Matrix Table =====
+    function eeqBuildRiskTable(currentCountry) {
+        var tbody = document.getElementById('eeqRiskTableBody');
+        if (!tbody) return;
+        var html = '';
+        var countries = ['indonesia', 'malaysia', 'singapore', 'thailand', 'vietnam', 'philippines'];
+
+        countries.forEach(function(key) {
+            var r = eeqCountryRisk[key];
+            var d = countryData[key];
+            var composite = (r.gridStability + r.subsidyDependence + r.regulatory + r.socialLicense) / 4;
+            var isHighlight = key === currentCountry;
+
+            function badge(val) {
+                if (val >= 6) return '<span class="eeq-risk-badge high">' + val.toFixed(1) + '</span>';
+                if (val >= 4) return '<span class="eeq-risk-badge med">' + val.toFixed(1) + '</span>';
+                return '<span class="eeq-risk-badge low">' + val.toFixed(1) + '</span>';
+            }
+
+            html += '<tr' + (isHighlight ? ' class="eeq-highlight"' : '') + '>';
+            html += '<td>' + r.flag + ' ' + d.name + '</td>';
+            html += '<td>' + badge(r.gridStability) + '</td>';
+            html += '<td>' + badge(r.subsidyDependence) + '</td>';
+            html += '<td>' + badge(r.regulatory) + '</td>';
+            html += '<td>' + badge(r.socialLicense) + '</td>';
+            html += '<td>' + badge(composite) + '</td>';
+            html += '</tr>';
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // ===== Update Slider Display =====
+    window.eeqUpdateSliderDisplay = function() {
+        document.getElementById('eeqGpuDensityVal').textContent = document.getElementById('eeqGpuDensity').value + ' kW/rack';
+        document.getElementById('eeqSubsidyDeltaVal').textContent = document.getElementById('eeqSubsidyDelta').value + '%';
+        document.getElementById('eeqGridResilienceVal').textContent = document.getElementById('eeqGridResilience').value;
+        document.getElementById('eeqCommunityImpactVal').textContent = document.getElementById('eeqCommunityImpact').value;
+        document.getElementById('eeqMaturityVal').textContent = 'Level ' + document.getElementById('eeqMaturity').value;
+
+        if (eeqProMode) {
+            eeqUpdateProPanels();
+        }
+    };
+
+    // ===== Update All Pro Panels =====
+    function eeqUpdateProPanels() {
+        var inputs = eeqGetInputs();
+        var financials = eeqCalcFinancials(inputs);
+        var mcData = eeqRunMonteCarlo(inputs);
+        var sensitivity = eeqRunSensitivity(inputs);
+        var resilience = eeqCalcResilience(inputs);
+
+        // Panel 1: Financial Impact
+        document.getElementById('eeqNpv').textContent = fmtUSD(financials.npv);
+        document.getElementById('eeqVaR').textContent = fmtUSD(mcData.p95);
+        document.getElementById('eeqCoI').textContent = fmtUSD(financials.coiAnnual);
+        document.getElementById('eeqSavings').textContent = fmtUSD(financials.savingsFromMaturity);
+        document.getElementById('eeqInfraMultiplier').textContent = financials.infraMultiplier.toFixed(1) + 'x';
+        document.getElementById('eeqSubsidyBurden').textContent = fmtUSD(financials.subsidyBurden);
+
+        // Panel 2: Risk Matrix
+        eeqBuildRiskTable(inputs.country);
+
+        // Panel 3: Resilience Scorecard
+        document.getElementById('eeqEnergyScore').textContent = resilience.energySecurity;
+        document.getElementById('eeqFinanceScore').textContent = resilience.financialSustainability;
+        document.getElementById('eeqSocialScore').textContent = resilience.socialLicense;
+        document.getElementById('eeqOpsScore').textContent = resilience.opMaturity;
+        document.getElementById('eeqLeadershipCoeff').textContent = resilience.leadershipCoeff.toFixed(2) + 'x';
+        document.getElementById('eeqWeakestDim').textContent = resilience.weakest.name;
+
+        // Score bars
+        function setBar(id, val) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.style.width = val + '%';
+            el.className = 'eeq-score-bar-fill ' + (val >= 60 ? 'low' : val >= 35 ? 'med' : 'high');
+        }
+        setBar('eeqEnergyBar', resilience.energySecurity);
+        setBar('eeqFinanceBar', resilience.financialSustainability);
+        setBar('eeqSocialBar', resilience.socialLicense);
+        setBar('eeqOpsBar', resilience.opMaturity);
+
+        // Score ring
+        eeqDrawScoreRing(resilience.aggregate);
+
+        // Scorecard narrative
+        document.getElementById('eeqScorecardText').textContent = eeqGenerateScorecardNarrative(inputs, resilience, financials);
+
+        // Panel 4: Monte Carlo
+        document.getElementById('eeqMcP5').textContent = fmtUSD(mcData.p5);
+        document.getElementById('eeqMcP25').textContent = fmtUSD(mcData.p25);
+        document.getElementById('eeqMcP50').textContent = fmtUSD(mcData.p50);
+        document.getElementById('eeqMcP75').textContent = fmtUSD(mcData.p75);
+        document.getElementById('eeqMcP95').textContent = fmtUSD(mcData.p95);
+        document.getElementById('eeqMcTopDriver').textContent = sensitivity[0].name;
+
+        // Draw charts
+        if (eeqProMode) {
+            eeqDrawMonteCarloChart(mcData);
+            eeqDrawTornado(sensitivity);
+        }
+
+        // MC narrative
+        document.getElementById('eeqMcNarrativeText').textContent = eeqGenerateMcNarrative(inputs, mcData, sensitivity);
+    }
+
+    // ===== Unlock / Lock Panels =====
+    function eeqUnlockPanels() {
+        eeqProMode = true;
+        document.querySelectorAll('.eeq-pro-panel').forEach(function(p) {
+            p.classList.remove('gated');
+            var overlay = p.querySelector('.eeq-gate-overlay');
+            if (overlay) overlay.style.display = 'none';
+        });
+        document.getElementById('eeqProBtn').classList.add('active');
+        document.getElementById('eeqFreeBtn').classList.remove('active');
+        document.getElementById('eeqProInputs').classList.add('visible');
+        var cta = document.getElementById('eeqCtaBlock');
+        if (cta) cta.style.display = 'none';
+        eeqUpdateProPanels();
+    }
+
+    function eeqLockPanels() {
+        eeqProMode = false;
+        document.querySelectorAll('.eeq-pro-panel').forEach(function(p) {
+            p.classList.add('gated');
+            var overlay = p.querySelector('.eeq-gate-overlay');
+            if (overlay) overlay.style.display = '';
+        });
+        document.getElementById('eeqFreeBtn').classList.add('active');
+        document.getElementById('eeqProBtn').classList.remove('active');
+        document.getElementById('eeqProInputs').classList.remove('visible');
+        var cta = document.getElementById('eeqCtaBlock');
+        if (cta) cta.style.display = '';
+    }
+
+    // ===== Mode Switching =====
+    window.eeqSetMode = function(mode) {
+        if (mode === 'pro') {
+            if (eeqCheckAuth()) { eeqUnlockPanels(); }
+            else { eeqShowLogin(); }
+        } else {
+            eeqLockPanels();
+        }
+    };
+
+    // ===== Login Handlers =====
+    window.eeqShowLogin = function() {
+        document.getElementById('eeqLoginOverlay').classList.add('active');
+        document.getElementById('eeqLoginError').style.display = 'none';
+        document.getElementById('eeqLoginEmail').value = '';
+        document.getElementById('eeqLoginPass').value = '';
+        setTimeout(function() { document.getElementById('eeqLoginEmail').focus(); }, 100);
+    };
+
+    window.eeqHideLogin = function() {
+        document.getElementById('eeqLoginOverlay').classList.remove('active');
+    };
+
+    window.eeqDoLogin = function() {
+        var email = document.getElementById('eeqLoginEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('eeqLoginPass').value;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            var session = { email: email, tier: 'pro', expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+            localStorage.setItem('rz_premium_session', JSON.stringify(session));
+            window.dispatchEvent(new Event('rz-auth-change'));
+            eeqHideLogin();
+            eeqUnlockPanels();
+        } else {
+            document.getElementById('eeqLoginError').style.display = 'block';
+        }
+    };
+
+    // Enter key in login
+    document.getElementById('eeqLoginPass').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') eeqDoLogin();
+    });
+    document.getElementById('eeqLoginEmail').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') document.getElementById('eeqLoginPass').focus();
+    });
+
+    // Close on overlay click
+    document.getElementById('eeqLoginOverlay').addEventListener('click', function(e) {
+        if (e.target === this) eeqHideLogin();
+    });
+
+    // ===== Reset =====
+    window.eeqResetDefaults = function() {
+        document.getElementById('calcCountry').value = 'indonesia';
+        document.getElementById('calcYear').value = '2026';
+        document.getElementById('calcHouseholdUsage').value = '200';
+        document.getElementById('calcDCCapacity').value = '500';
+        document.getElementById('eeqGpuDensity').value = '40';
+        document.getElementById('eeqSubsidyDelta').value = '15';
+        document.getElementById('eeqGridResilience').value = '6';
+        document.getElementById('eeqCommunityImpact').value = '5';
+        document.getElementById('eeqMaturity').value = '3';
+        eeqUpdateSliderDisplay();
+        calculateImpact();
+    };
+
+    // ===== PDF Export =====
+    window.eeqExportPDF = function() {
+        if (!eeqCheckAuth()) { eeqShowLogin(); return; }
+
+        var inputs = eeqGetInputs();
+        var financials = eeqCalcFinancials(inputs);
+        var mcData = eeqRunMonteCarlo(inputs);
+        var sensitivity = eeqRunSensitivity(inputs);
+        var resilience = eeqCalcResilience(inputs);
+
+        // Build SVG histogram
+        function buildHistogramSVG() {
+            var results = mcData.results;
+            var minV = results[0], maxV = results[results.length - 1], range = maxV - minV || 1;
+            var numBins = 40, bins = new Array(numBins).fill(0);
+            results.forEach(function(v) { var b = Math.min(Math.floor((v - minV) / range * numBins), numBins - 1); bins[b]++; });
+            var maxBin = Math.max.apply(null, bins);
+            var svgW = 500, svgH = 200, barW = (svgW - 60) / numBins;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+            svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc"/>';
+            svg += '<text x="' + (svgW/2) + '" y="18" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="12" font-weight="bold">Monte Carlo Distribution (10K Simulations)</text>';
+            bins.forEach(function(c, i) {
+                var x = 30 + i * barW;
+                var barH = maxBin > 0 ? (c / maxBin) * 140 : 0;
+                var y = 170 - barH;
+                var binCenter = minV + (i + 0.5) * range / numBins;
+                var color = binCenter <= mcData.p5 ? '#10b981' : binCenter <= mcData.p50 ? '#f59e0b' : binCenter <= mcData.p95 ? '#d97706' : '#ef4444';
+                svg += '<rect x="' + x + '" y="' + y + '" width="' + Math.max(barW - 0.5, 0.5) + '" height="' + barH + '" fill="' + color + '"/>';
+            });
+            [{ v: mcData.p5, l: 'P5', c: '#10b981' }, { v: mcData.p50, l: 'P50', c: '#d97706' }, { v: mcData.p95, l: 'P95', c: '#ef4444' }].forEach(function(m) {
+                var xp = 30 + ((m.v - minV) / range) * (svgW - 60);
+                svg += '<line x1="' + xp + '" y1="28" x2="' + xp + '" y2="170" stroke="' + m.c + '" stroke-width="1.5" stroke-dasharray="4,3"/>';
+                svg += '<text x="' + xp + '" y="185" text-anchor="middle" fill="' + m.c + '" font-family="Inter,sans-serif" font-size="9" font-weight="bold">' + m.l + '</text>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Build SVG tornado
+        function buildTornadoSVG() {
+            var maxImpact = Math.max.apply(null, sensitivity.map(function(d) { return d.impact; })) || 1;
+            var svgW = 500, barH = 22, gap = 6, margin = 140;
+            var svgH = sensitivity.length * (barH + gap) + 40;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+            svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc"/>';
+            svg += '<text x="' + (svgW/2) + '" y="18" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="12" font-weight="bold">Sensitivity Analysis (Tornado)</text>';
+            sensitivity.forEach(function(d, i) {
+                var y = 30 + i * (barH + gap);
+                var barWidth = maxImpact > 0 ? (d.impact / maxImpact) * (svgW - margin - 80) : 0;
+                svg += '<text x="' + (margin - 5) + '" y="' + (y + barH/2 + 4) + '" text-anchor="end" fill="#64748b" font-family="Inter,sans-serif" font-size="10">' + d.name + '</text>';
+                svg += '<rect x="' + margin + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" fill="#f59e0b" rx="3"/>';
+                svg += '<text x="' + (margin + barWidth + 5) + '" y="' + (y + barH/2 + 4) + '" fill="#1f2937" font-family="Inter,sans-serif" font-size="10" font-weight="bold">+' + d.impact.toFixed(1) + '%</text>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Build resilience ring SVG
+        function buildScoreRingSVG() {
+            var score = resilience.aggregate;
+            var svgW = 160, svgH = 160, cx = 80, cy = 80, radius = 60;
+            var circumference = 2 * Math.PI * radius;
+            var dashOffset = circumference - (score / 100) * circumference;
+            var color = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444';
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+            svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="none" stroke="#e5e7eb" stroke-width="10"/>';
+            svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="none" stroke="' + color + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + dashOffset + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"/>';
+            svg += '<text x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="28" font-weight="bold">' + score + '</text>';
+            svg += '<text x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle" fill="#64748b" font-family="Inter,sans-serif" font-size="11">/100</text>';
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Build HTML
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        html += '<title>Energy Equity Pro Report - ' + inputs.countryName + '</title>';
+        html += '<style>';
+        html += 'body{font-family:Inter,Helvetica,Arial,sans-serif;color:#1f2937;max-width:800px;margin:0 auto;padding:40px 30px;font-size:11pt;line-height:1.6}';
+        html += 'h1{color:#92400e;font-size:22pt;margin-bottom:4px;border-bottom:3px solid #f59e0b;padding-bottom:8px}';
+        html += 'h2{color:#92400e;font-size:14pt;margin-top:28px;margin-bottom:10px;border-bottom:1px solid #e5e7eb;padding-bottom:4px}';
+        html += '.subtitle{color:#64748b;font-size:10pt;margin-bottom:20px}';
+        html += '.meta{display:flex;gap:16px;font-size:9pt;color:#64748b;margin-bottom:24px;flex-wrap:wrap}';
+        html += '.meta span{background:#fef3c7;padding:3px 10px;border-radius:4px;color:#92400e}';
+        html += 'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10pt}';
+        html += 'th{background:#fef3c7;color:#92400e;padding:8px 10px;text-align:left;font-weight:600;border-bottom:2px solid #fde68a}';
+        html += 'td{padding:7px 10px;border-bottom:1px solid #e5e7eb;color:#1f2937}';
+        html += 'tr.hl{background:#fffbeb}';
+        html += '.kpi-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}';
+        html += '.kpi-item{flex:1;min-width:110px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;text-align:center}';
+        html += '.kpi-val{font-size:16pt;font-weight:800;color:#d97706}';
+        html += '.kpi-lbl{font-size:8pt;color:#64748b;margin-top:2px}';
+        html += '.narrative{background:#fffbeb;border-left:3px solid #f59e0b;padding:12px 16px;margin:14px 0;border-radius:0 8px 8px 0}';
+        html += '.narrative p{color:#1f2937;font-size:10pt;margin:0}';
+        html += '.chart-wrap{text-align:center;margin:16px 0}';
+        html += '.footer{margin-top:30px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:8pt;color:#94a3b8;text-align:center}';
+        html += '@media print{body{padding:20px}}';
+        html += '</style></head><body>';
+
+        html += '<h1>Energy Equity Analysis Report</h1>';
+        html += '<p class="subtitle">AI Data Center Citizen Impact &amp; Strategic Intelligence - ' + inputs.countryName + '</p>';
+        html += '<div class="meta">';
+        html += '<span>Country: ' + inputs.countryName + '</span>';
+        html += '<span>DC Capacity: ' + inputs.dcCapacityMW + ' MW</span>';
+        html += '<span>GPU Density: ' + inputs.gpuDensity + ' kW/rack</span>';
+        html += '<span>Subsidy Delta: ' + inputs.subsidyDelta + '%</span>';
+        html += '<span>Grid Index: ' + inputs.gridResilience + '/9</span>';
+        html += '<span>Maturity: L' + inputs.maturity + '</span>';
+        html += '<span>Generated: ' + new Date().toLocaleDateString() + '</span>';
+        html += '</div>';
+
+        // Section 1: Financial Impact
+        html += '<h2>1. Financial Impact &amp; NPV Analysis</h2>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(financials.npv) + '</div><div class="kpi-lbl">10-Year NPV Impact</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(mcData.p95) + '</div><div class="kpi-lbl">VaR (95%)</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(financials.coiAnnual) + '</div><div class="kpi-lbl">Cost of Immaturity</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(financials.savingsFromMaturity) + '</div><div class="kpi-lbl">Maturity Savings</div></div>';
+        html += '</div>';
+
+        // Section 2: Risk Matrix
+        html += '<h2>2. Regional Comparative Risk Matrix</h2>';
+        html += '<table><tr><th>Country</th><th>Grid Stability</th><th>Subsidy Dep.</th><th>Regulatory</th><th>Social</th><th>Composite</th></tr>';
+        ['indonesia','malaysia','singapore','thailand','vietnam','philippines'].forEach(function(key) {
+            var r = eeqCountryRisk[key]; var d = countryData[key];
+            var comp = ((r.gridStability + r.subsidyDependence + r.regulatory + r.socialLicense) / 4).toFixed(1);
+            var hl = key === inputs.country ? ' class="hl"' : '';
+            html += '<tr' + hl + '><td>' + d.name + '</td><td>' + r.gridStability.toFixed(1) + '</td><td>' + r.subsidyDependence.toFixed(1) + '</td><td>' + r.regulatory.toFixed(1) + '</td><td>' + r.socialLicense.toFixed(1) + '</td><td>' + comp + '</td></tr>';
+        });
+        html += '</table>';
+
+        // Section 3: Resilience Scorecard
+        html += '<h2>3. Strategic Resilience Scorecard</h2>';
+        html += '<div style="text-align:center;margin:16px 0">' + buildScoreRingSVG() + '</div>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + resilience.energySecurity + '</div><div class="kpi-lbl">Energy Security</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + resilience.financialSustainability + '</div><div class="kpi-lbl">Financial Sustainability</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + resilience.socialLicense + '</div><div class="kpi-lbl">Social License</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + resilience.opMaturity + '</div><div class="kpi-lbl">Operational Maturity</div></div>';
+        html += '</div>';
+        html += '<div class="narrative"><p>' + eeqGenerateScorecardNarrative(inputs, resilience, financials) + '</p></div>';
+
+        // Section 4: Monte Carlo
+        html += '<h2>4. Monte Carlo Simulation (10,000 Iterations)</h2>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(mcData.p5) + '</div><div class="kpi-lbl">P5</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(mcData.p25) + '</div><div class="kpi-lbl">P25</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(mcData.p50) + '</div><div class="kpi-lbl">P50 (Median)</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(mcData.p75) + '</div><div class="kpi-lbl">P75</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmtUSD(mcData.p95) + '</div><div class="kpi-lbl">P95</div></div>';
+        html += '</div>';
+        html += '<div class="chart-wrap">' + buildHistogramSVG() + '</div>';
+        html += '<div class="chart-wrap">' + buildTornadoSVG() + '</div>';
+        html += '<div class="narrative"><p>' + eeqGenerateMcNarrative(inputs, mcData, sensitivity) + '</p></div>';
+
+        // Methodology
+        html += '<h2>Methodology</h2>';
+        html += '<p style="font-size:9pt;color:#64748b;line-height:1.6">';
+        html += '<strong>NPV:</strong> 10-year discounted cash flow at 8% discount rate with 3% annual escalation. ';
+        html += '<strong>VaR:</strong> 95th percentile from 10,000 Monte Carlo iterations. ';
+        html += '<strong>Cost of Immaturity:</strong> CoI = ((C_response - C_preventive) / C_preventive) x (M_target - M_current) / M_target. ';
+        html += '<strong>Leadership Amplification:</strong> L(s) = 2.0 / (1 + exp(-1.5 x (s - 3))). ';
+        html += '<strong>Monte Carlo variables:</strong> Subsidy delta +/-20%, grid resilience +/-2, DC capacity +/-30%. ';
+        html += '<strong>Data sources:</strong> IEA Energy & AI 2025, PLN/TNB/SP Group/PEA/EVN/Meralco tariff schedules, PJM precedent analysis.';
+        html += '</p>';
+
+        // Footer
+        html += '<div class="footer">Generated by ResistanceZero Energy Equity Pro | ' + new Date().toISOString().split('T')[0] + ' | resistancezero.com</div>';
+        html += '</body></html>';
+
+        // Open and print
+        var w = window.open('', '_blank');
+        if (w) {
+            w.document.write(html);
+            w.document.close();
+            setTimeout(function() { w.print(); }, 500);
+        }
+    };
+
+    // ===== Listen for auth changes =====
+    window.addEventListener('rz-auth-change', function() {
+        if (eeqCheckAuth()) eeqUnlockPanels();
+        else eeqLockPanels();
+    });
+
+    // ===== Hook into free calculator changes =====
+    // Override the original calculateImpact to also update pro panels
+    var origCalcImpact = window.calculateImpact;
+    window.calculateImpact = function() {
+        if (typeof origCalcImpact === 'function') origCalcImpact();
+        if (eeqProMode) {
+            eeqUpdateProPanels();
+        }
+    };
+
+    // Add input listeners for pro sliders
+    ['eeqGpuDensity', 'eeqSubsidyDelta', 'eeqGridResilience', 'eeqCommunityImpact', 'eeqMaturity'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', function() {
+                eeqUpdateSliderDisplay();
+            });
+        }
+    });
+
+    // ===== Init =====
+    // Check auth on load
+    if (eeqCheckAuth()) {
+        eeqUnlockPanels();
+    }
+
+    // Initial slider display
+    eeqUpdateSliderDisplay();
+})();
 </script>
 <script src="auth.js"></script>
 </body>

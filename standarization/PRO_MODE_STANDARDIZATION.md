@@ -1,7 +1,7 @@
 # ResistanceZero Pro Enhancement Mode — Standardization Guide
 
 > **Version**: 2.0 | **Last Updated**: 2026-02-16 | **Status**: Active
-> **Applies to**: All article pages with interactive calculators (articles 1–10)
+> **Applies to**: All article pages with interactive calculators (articles 1–15)
 
 ---
 
@@ -49,6 +49,11 @@ Every article with an interactive calculator follows a **unified Pro Enhancement
 | 8 | Safety Health Index | `.shi-` | `#8b5cf6` purple | `#a78bfa` | Full |
 | 9 | HVAC/Cooling Strategy | `.hvac-` | `#3b82f6` blue | `#60a5fa` | Full |
 | 10 | Water Stress Assessment | `.ws-` | `#0891b2` teal | `#06b6d4` | Full |
+| 11 | Energy Equity | `.eeq-` | `#f59e0b` amber | `#fbbf24` | Full |
+| 12 | Operational Maturity | `.opm-` | `#10b981` emerald | `#34d399` | Full (Feb 2026) |
+| 13 | AI Governance | `.aig-` | `#6366f1` indigo | `#818cf8` | Full (Feb 2026) |
+| 14 | Maintenance Staffing | `.msf-` | `#f97316` orange | `#fb923c` | Full (Feb 2026) |
+| 15 | Mission Critical Leadership | `.mcl-` | `#ec4899` pink | `#f472b6` | Full (Feb 2026) |
 
 ---
 
@@ -533,8 +538,8 @@ Sandbox/
 8. **ALWAYS dispatch `rz-auth-change`** after login so auth.js updates the navbar
 9. **ALWAYS add demo credentials hint** to login modals
 10. **TOC calculator badges require Font Awesome** to render the calculator icon
-11. **BE trigger in EA must account for spread** (Gold spread 240pts = need 275+ pts profit) — wrong domain but important memory
-12. **Separate file versions** when MT5 caches .ex5 — also wrong domain but captured
+11. **PDF export MUST open window FIRST** — `var w = window.open('', '_blank')` must be called **immediately** in the click handler, BEFORE any computation (Monte Carlo 10K, sensitivity, etc.). Browsers block `window.open` if called after async or heavy synchronous work. Then use `w.document.write(html); w.document.close();` to render content. NEVER use the Blob URL pattern (`URL.createObjectURL` → `window.open(url)`) for PDF export.
+12. **PDF export pattern**: `var w = window.open('', '_blank'); if(!w){alert('Allow popups'); return;} /* compute */ w.document.write(html); w.document.close(); setTimeout(function(){w.print();},500);`
 
 ---
 
@@ -567,6 +572,77 @@ After implementing Pro Mode on any article, verify:
 - [ ] Dark mode: all new elements have appropriate overrides
 - [ ] Privacy badge visible below calculator
 - [ ] Benchmark meta tags present
+
+---
+
+## 12. CSS Consistency Standards (Global)
+
+### 12.1 Problem Statement
+Each article was developed independently, resulting in inconsistent sizing for the same semantic elements. For example, `.ws-kpi-value` (art-10) was `1.3rem` while `.shi-kpi-value` (art-8) was `1.2rem`. This section defines the unified standards.
+
+### 12.2 Standardized Values
+
+| Element | CSS Pattern | Standard Value | Previous Range |
+|---------|------------|----------------|----------------|
+| Body text `<p>` | — | `0.95rem` | 0.85–1.05rem |
+| H2 section headers | — | `1.5rem` | 1.3–1.8rem |
+| H3 subsections | — | `1.2rem` | 1.1–1.4rem |
+| KPI values | `[prefix]-kpi-value` | **`1.4rem`**, `font-weight: 800` | 1.2–1.8rem |
+| KPI labels | `[prefix]-kpi-label` | **`0.72rem`** | 0.65–0.78rem |
+| Calculator labels | `.calc-label` | `0.85rem` | 0.78–0.95rem |
+| Panel titles | `[prefix]-panel-title` | `0.95rem`, `font-weight: 700` | 0.85–1.1rem |
+| Toolbar row | `[prefix]-toolbar` | `padding: 0.75rem 1rem` | 0.75–1.5rem |
+| Pro panel | `[prefix]-pro-panel` | `margin: 1.5rem 0; padding: 1.25rem` | varies |
+| KPI grid | `[prefix]-kpi-grid` | `gap: 0.75rem` | 0.5–1.5rem |
+| KPI card | `[prefix]-kpi-card` | `padding: 0.875rem` | 0.75–2rem |
+| Evidence stat values | `[prefix]-evidence-value` | `1.8rem`, `font-weight: 800` | 1.5–2.5rem |
+| TOC items | `.toc-item` | `padding: 0.625rem 1rem` | 0.5–1.25rem |
+| Tooltip text | `.tooltip-desc` | `0.78rem` | 0.7–0.85rem |
+| Tooltip title | `.tooltip-title` | `0.82rem` | varies |
+
+### 12.3 Global CSS Implementation (styles.css)
+Global attribute selectors were added to `styles.css` at the bottom:
+
+```css
+/* Global Pro Mode Consistency */
+[class*="-pro-panel"] { margin: 1.5rem 0; padding: 1.25rem; border-radius: 12px; }
+[class*="-kpi-grid"] { gap: 0.75rem; }
+[class*="-kpi-card"] { padding: 0.875rem; border-radius: 10px; }
+[class*="-kpi-value"] { font-size: 1.4rem !important; font-weight: 800; }
+[class*="-kpi-label"] { font-size: 0.72rem; }
+[class*="-toolbar-row"], [class*="-toolbar"] { padding: 0.75rem 1rem; }
+[class*="-panel-title"] { font-size: 0.95rem; margin-bottom: 0.75rem; }
+```
+
+### 12.4 Specificity Lesson (CRITICAL)
+
+**CSS attribute selectors `[class*="-kpi-value"]` have LOWER specificity than class selectors `.ws-kpi-value`.**
+
+This means:
+- Global `[class*="-kpi-value"] { font-size: 1.4rem; }` is **overridden** by per-article `.ws-kpi-value { font-size: 1.3rem; }`
+- To enforce global values, you must EITHER:
+  1. **Use `!important`** on the global rule (used for kpi-value), OR
+  2. **Edit each article's `<style>` block** individually to match the standard
+- Best practice: **Do both** — add `!important` to global CSS as safety net, AND update per-article CSS to match for clarity
+
+### 12.5 Articles Updated (Per-Article CSS Fixes)
+| Article | Changes Made |
+|---------|-------------|
+| 1 | `.pro-panel-title` margin-bottom 1rem→0.75rem |
+| 2 | `.pro-panel-title` font-size 0.8→0.95rem, margin-bottom 1rem→0.75rem |
+| 3 | `.pro-panel-title` font-size .8→.95rem, margin-bottom 1rem→.75rem |
+| 4 | `.pro-panel-title` font-size 0.8→0.95rem, margin-bottom 1rem→0.75rem, `.calc-result-value` 1.35→1.4rem |
+| 5 | `.pro-panel-title` font-size 0.9→0.95rem, margin-bottom 1rem→0.75rem, `.pro-panel-inner` padding 1.5→1.25rem |
+| 6 | `.rca-kpi-value` 1.3→1.4rem, `.rca-kpi-label` 0.7→0.72rem, `.panel-title` margin-bottom 1rem→0.75rem |
+| 7 | `.res-kpi-value` 1.3→1.4rem, `.res-kpi-label` 0.7→0.72rem, `.panel-title` margin-bottom 1rem→0.75rem |
+| 8 | `.shi-kpi-value` 1.2→1.4rem, `.shi-panel-title` font-size 1rem→0.95rem, margin-bottom 1rem→0.75rem |
+| 9 | `.hvac-kpi-value` 1.2→1.4rem, `.hvac-panel-title` font-size 1rem→0.95rem, margin-bottom 1rem→0.75rem |
+| 10 | `.ws-kpi-value` 1.3→1.4rem, `.ws-kpi-label` 0.7→0.72rem, `.panel-title` margin-bottom 1rem→0.75rem |
+| 11 | `.eeq-kpi-value` 1.3→1.4rem, `.eeq-kpi-label` 0.7→0.72rem, `.panel-title` margin-bottom 1rem→0.75rem |
+| 12 | `.opm-panel-title` font-size 1rem→0.95rem, margin-bottom 1rem→0.75rem |
+| 13 | `.aig-kpi-value` 1.3→1.4rem, `.aig-kpi-label` 0.7→0.72rem, `.panel-title` margin-bottom 1rem→0.75rem |
+| 14 | `.msf-panel-title` margin-bottom 1rem→0.75rem |
+| 15 | `.mcl-panel-title` margin-bottom 1rem→0.75rem |
 
 ---
 

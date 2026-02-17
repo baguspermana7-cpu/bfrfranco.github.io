@@ -1,11 +1,11 @@
-# Gunakan Nginx versi ringan
+# Nginx Alpine for serving static site on Cloud Run
 FROM nginx:alpine
 
-# Copy semua file website Bapak ke dalam folder Nginx
+# Copy custom nginx config (handles 404, gzip, caching)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy all website files
 COPY . /usr/share/nginx/html
 
-# Trik Sakti: Ubah port default Nginx (80) ke 8080 agar disukai Cloud Run
-RUN sed -i 's/listen       80;/listen       8080;/g' /etc/nginx/conf.d/default.conf
-
-# Buka jalur 8080
+# Cloud Run requires port 8080
 EXPOSE 8080

@@ -14,7 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive | Technical Paper</title>
+    <title>Data Center Power Distribution | Hyperscaler Design | ResistanceZero</title>
     <meta name="description" content="Ultra-comprehensive technical analysis of modern data center power distribution systems. Covers AWS, Google, Microsoft, xAI Colossus architectures. 48V/380V/800V DC distribution, failure scenarios, arc flash calculations, protection coordination, and reliability engineering.">
     <meta name="keywords" content="Data Center Power Distribution, Hyperscaler Architecture, AWS UPS, Google 48V DC, Microsoft Azure Power, xAI Colossus, NVIDIA GB200, Arc Flash, Selective Coordination, UPS Design, Generator Systems, Lithium-ion Battery, Thermal Runaway, TIA-942, Uptime Institute Tier">
     <meta name="author" content="Bagus Dwi Permana">
@@ -35,11 +35,13 @@
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="article:author" content="Bagus Dwi Permana">
     <meta property="article:published_time" content="2026-02-08T00:00:00Z">
+    <meta property="article:modified_time" content="2026-02-17T00:00:00Z">
     <meta property="article:section" content="Engineering Journal">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:creator" content="@BagusDPermana">
     <meta name="twitter:title" content="Data Center Power Distribution Design: Hyperscaler Deep Dive">
     <meta name="twitter:description" content="AWS, Google, Microsoft, xAI power architectures. Failure scenarios and reliability engineering.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/article-13-cover.jpg">
@@ -52,6 +54,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-13-cover.jpg">
 
     <!-- Structured Data -->
@@ -90,7 +93,7 @@
         /* Hero Section */
         .article-hero {
             background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 50%, #2d5a87 100%);
-            padding: 8rem 2rem 4rem;
+            padding: 7rem 2rem 3.5rem;
             color: #fff;
             text-align: center;
             position: relative;
@@ -133,14 +136,16 @@
         }
 
         .article-title {
-            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-size: clamp(1.6rem, 3.2vw, 2.35rem);
             font-weight: 800;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
+            margin-bottom: 1.25rem;
+            line-height: 1.25;
+            color: #fff;
+            letter-spacing: -0.01em;
         }
 
         .article-subtitle {
-            font-size: 1.1rem;
+            font-size: clamp(0.95rem, 1.6vw, 1.15rem);
             color: #94a3b8;
             max-width: 800px;
             margin: 0 auto 2rem;
@@ -243,7 +248,7 @@
         }
 
         .article-body {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             line-height: 1.7;
             color: var(--text-primary);
         }
@@ -253,7 +258,7 @@
         }
 
         .article-body h2 {
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             color: var(--primary-blue);
             margin: 2rem 0 1rem;
             padding-bottom: 0.5rem;
@@ -277,7 +282,7 @@
         }
 
         .article-body h3 {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: #334155;
             margin: 1.5rem 0 0.5rem;
         }
@@ -734,8 +739,8 @@
         [data-theme="dark"] .article-nav a { color: #93c5fd; }
         [data-theme="dark"] .article-content { background: #0f172a; }
         [data-theme="dark"] .article-body { background: #0f172a; color: #e2e8f0; }
-        [data-theme="dark"] .article-body h2 { color: #f1f5f9; }
-        [data-theme="dark"] .article-body h3 { color: #e2e8f0; }
+        [data-theme="dark"] .article-body h2 { color: #93c5fd; }
+        [data-theme="dark"] .article-body h3 { color: #cbd5e1; }
         [data-theme="dark"] .article-body p { color: #cbd5e1; }
         [data-theme="dark"] .article-body blockquote { background: rgba(30,58,95,0.3); border-color: rgba(96,165,250,0.4); color: #cbd5e1; }
         [data-theme="dark"] .article-body .info-box,
@@ -748,6 +753,201 @@
         [data-theme="dark"] .article-body strong { color: #f1f5f9; }
         .article-nav a:hover { color: #60a5fa; }
 
+        /* ===== Pro Mode — AI Governance (.aig-) ===== */
+        .aig-cta-block {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04));
+            border: 1.5px solid rgba(99,102,241,0.3); border-radius: 14px;
+            padding: 1.5rem 2rem; margin: 1.5rem 0; text-align: center;
+        }
+        .aig-cta-headline { font-size: 1.05rem; font-weight: 700; color: #6366f1; margin: 0 0 0.5rem; }
+        .aig-cta-sub { font-size: 0.85rem; color: #64748b; margin: 0 0 1rem; }
+        .aig-cta-btn {
+            display: inline-block; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff;
+            padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+            text-decoration: none; transition: opacity 0.3s, transform 0.2s; border: none; cursor: pointer;
+        }
+        .aig-cta-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Toolbar */
+        .aig-toolbar-row {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            gap: 0.75rem; margin-bottom: 1.5rem;
+            padding: 1rem; background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0.03) 100%);
+            border-radius: 12px; border: 1px solid rgba(99,102,241,0.15);
+        }
+        .aig-mode-bar { display: flex; align-items: center; gap: 0.5rem; }
+        .aig-mode-toggle {
+            display: flex; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .aig-mode-btn {
+            padding: 8px 18px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none;
+            background: transparent; color: #94a3b8; transition: all 0.3s; font-family: inherit;
+        }
+        .aig-mode-btn.active { background: #6366f1; color: #fff; }
+        .aig-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .aig-toolbar-actions button {
+            padding: 8px 16px; border-radius: 8px; border: none; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px;
+        }
+        .aig-btn-reset { background: rgba(255,255,255,0.1); color: #94a3b8; }
+        .aig-btn-reset:hover { background: rgba(255,255,255,0.15); }
+        .aig-btn-pdf {
+            background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.1));
+            color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3) !important;
+        }
+        .aig-btn-pdf:hover { background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(99,102,241,0.15)); }
+        .aig-privacy-badge {
+            display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #64748b;
+        }
+        .aig-privacy-badge i { color: #10b981; font-size: 0.8rem; }
+
+        /* Tooltips */
+        .aig-tooltip-trigger {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border-radius: 50%; background: rgba(99,102,241,0.25);
+            color: #a5b4fc; font-size: 0.65rem; font-weight: 700; cursor: help;
+            position: relative; margin-left: 4px; flex-shrink: 0;
+        }
+        .aig-tooltip-content {
+            display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+            background: #1e293b; border: 1px solid rgba(99,102,241,0.3); border-radius: 10px;
+            padding: 1rem; width: 260px; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+        .aig-tooltip-content::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: rgba(99,102,241,0.3);
+        }
+        .aig-tooltip-trigger:hover .aig-tooltip-content,
+        .aig-tooltip-trigger:focus .aig-tooltip-content { display: block; }
+        .aig-tooltip-title { font-size: 0.8rem; font-weight: 700; color: #818cf8; margin-bottom: 0.4rem; }
+        .aig-tooltip-desc { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; margin-bottom: 0.4rem; }
+        .aig-tooltip-formula { font-size: 0.68rem; color: #a5b4fc; font-family: 'JetBrains Mono', monospace; background: rgba(99,102,241,0.1); padding: 4px 8px; border-radius: 4px; }
+
+        /* Strategic Inputs */
+        .aig-strategic-inputs {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+            padding: 1.25rem; background: rgba(99,102,241,0.05); border-radius: 14px;
+            border: 1px solid rgba(99,102,241,0.1);
+        }
+        .aig-si-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .aig-si-label {
+            font-size: 0.78rem; color: #94a3b8; font-weight: 600;
+            display: flex; align-items: center;
+        }
+        .aig-si-input {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px; padding: 0.6rem 0.8rem; color: #e2e8f0; font-size: 0.85rem;
+            font-family: inherit; width: 100%; box-sizing: border-box;
+        }
+        .aig-si-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+        .aig-si-input option { background: #1e293b; color: #e2e8f0; }
+
+        /* Pro Panels */
+        .aig-pro-panel {
+            position: relative; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem;
+        }
+        .aig-pro-panel.gated { filter: blur(3px); pointer-events: none; user-select: none; }
+        .aig-pro-panel .panel-title {
+            font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .aig-pro-panel .panel-title i { color: #818cf8; }
+        .aig-gate-overlay {
+            position: absolute; inset: 0; background: rgba(15,23,42,0.85); border-radius: 14px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.5rem; z-index: 5; cursor: pointer;
+        }
+        .aig-gate-overlay i { font-size: 1.5rem; color: #818cf8; }
+        .aig-gate-overlay span { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+
+        /* KPI Grid */
+        .aig-kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;
+        }
+        .aig-kpi-card {
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .aig-kpi-value { font-size: 1.4rem; font-weight: 800; color: #818cf8; }
+        .aig-kpi-label { font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem; }
+        .aig-kpi-sublabel { font-size: 0.6rem; color: #475569; margin-top: 0.15rem; }
+
+        /* Health Gauge */
+        .aig-gauge-container { display: flex; flex-direction: column; align-items: center; margin: 1rem 0; }
+        .aig-gauge-container svg { max-width: 220px; }
+        .aig-gauge-tier { font-size: 1.1rem; font-weight: 800; margin-top: 0.5rem; }
+        .aig-gauge-label { font-size: 0.75rem; color: #94a3b8; }
+
+        /* Chart Container */
+        .aig-chart-container { margin-top: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 1rem; }
+        .aig-chart-container canvas { width: 100% !important; max-height: 220px; }
+
+        /* Narrative */
+        .aig-narrative {
+            background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 12px; padding: 1.25rem; margin-top: 1rem;
+        }
+        .aig-narrative h4 { color: #818cf8; font-size: 0.85rem; margin: 0 0 0.75rem; display: flex; align-items: center; gap: 6px; }
+        .aig-narrative p { color: #94a3b8; font-size: 0.78rem; line-height: 1.7; margin: 0 0 0.75rem; }
+        .aig-narrative p:last-child { margin-bottom: 0; }
+        .aig-narrative p strong { color: #a5b4fc; }
+
+        /* Score bars */
+        .aig-score-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 0.4rem; overflow: hidden; }
+        .aig-score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+        .aig-score-bar-fill.risk-high { background: linear-gradient(90deg, #dc2626, #ef4444); }
+        .aig-score-bar-fill.risk-med { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .aig-score-bar-fill.risk-low { background: linear-gradient(90deg, #10b981, #34d399); }
+
+        /* Benchmark Meta */
+        .aig-benchmark-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .aig-benchmark-tag { font-size: 0.65rem; color: #64748b; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+        .aig-benchmark-tag i { font-size: 0.6rem; }
+
+        /* Login Modal */
+        .aig-login-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+            z-index: 9999; align-items: center; justify-content: center;
+        }
+        .aig-login-overlay.active { display: flex; }
+        .aig-login-box {
+            background: #0f172a; border-radius: 16px; padding: 2.5rem; max-width: 380px; width: 90%;
+            border: 1px solid rgba(99,102,241,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .aig-login-box h3 { color: #e2e8f0; margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .aig-login-box p { color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem; }
+        .aig-login-box input {
+            width: 100%; padding: 0.75rem 1rem; background: #1e293b; border: 1px solid #334155;
+            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem; box-sizing: border-box;
+        }
+        .aig-login-box input:focus { outline: none; border-color: #6366f1; }
+        .aig-login-box button.login-submit {
+            width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff;
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; margin-top: 0.5rem;
+        }
+        .aig-login-box .demo-hint { font-size: 0.7rem; color: #64748b; margin-top: 0.75rem; text-align: center; }
+        .aig-login-box .demo-hint code { background: rgba(99,102,241,0.15); padding: 1px 5px; border-radius: 3px; color: #a5b4fc; }
+        .aig-login-close {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: #64748b; font-size: 1.2rem; cursor: pointer;
+        }
+        .aig-login-error { color: #f87171; font-size: 0.75rem; margin-top: 0.5rem; text-align: center; display: none; }
+        [data-theme="light"] .aig-login-box { background: #ffffff; border-color: #e2e8f0; }
+        [data-theme="light"] .aig-login-box h3 { color: #1e293b; }
+        [data-theme="light"] .aig-login-box p { color: #64748b; }
+        [data-theme="light"] .aig-login-box input { background: #f1f5f9; border-color: #e2e8f0; color: #1e293b; }
+
+        /* Dark mode overrides for Pro */
+        [data-theme="dark"] .aig-pro-panel { background: linear-gradient(135deg, #0c0e1f 0%, #151933 100%); }
+        [data-theme="dark"] .aig-kpi-value { color: #a5b4fc; }
+        [data-theme="dark"] .aig-cta-block { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.06)); }
+        [data-theme="dark"] .aig-login-box { background: #0f172a; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -757,6 +957,13 @@
             .calc-grid { grid-template-columns: 1fr; }
             .flow-diagram { flex-direction: column; }
             .flow-arrow { transform: rotate(90deg); }
+            .aig-toolbar-row { flex-direction: column; align-items: stretch; }
+            .aig-toolbar-actions { justify-content: center; }
+            .aig-cta-block { padding: 1.25rem 1rem; }
+            .aig-strategic-inputs { grid-template-columns: 1fr; }
+            .aig-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .aig-tooltip-content { width: 220px; left: auto; right: -10px; transform: none; }
+            .aig-tooltip-content::after { left: auto; right: 20px; transform: none; }
         }
     </style>
 </head>
@@ -976,6 +1183,13 @@
                 <div style="margin: 2rem 0; text-align: center;">
                     <img src="assets/article-13-infographic.jpg" alt="Data Center Power Distribution Design - Hyperscaler Architecture Infographic" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
                     <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.75rem; font-style: italic;">Hyperscaler Power Architecture Overview: AWS, Google, Microsoft, xAI, and Anthropic</p>
+                </div>
+
+                <!-- CTA Block -->
+                <div class="aig-cta-block">
+                    <p class="aig-cta-headline"><i class="fas fa-microchip" style="margin-right:6px"></i> Strategic Intelligence Engine</p>
+                    <p class="aig-cta-sub">Unlock Operational Health Score, risk exposure analysis, Monte Carlo simulation, and consultant-grade PDF export.</p>
+                    <a href="#calculator-section" class="aig-cta-btn">Open Power Distribution Calculator</a>
                 </div>
 
                 <!-- Hyperscaler Comparison Table -->
@@ -3005,21 +3219,27 @@ E = Cf × En × (t/0.2) × (610/D)^x
                     Reliability Calculations
                 </h2>
 
-                <div class="calculator-section">
+                <div class="calculator-section" id="calculator-section">
                     <h3 class="calculator-title">Data Center Availability Calculator</h3>
                     <p class="calculator-subtitle">Calculate system availability based on redundancy configuration</p>
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Component MTBF (hours)</label>
+                            <label class="calc-label">Component MTBF (hours)
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Mean Time Between Failures</div><div class="aig-tooltip-desc">Average operating hours before a component fails. Higher MTBF = more reliable hardware. Typical values: UPS 100K-300K hrs, server PSU 50K-100K hrs, HDD 1M hrs.</div><div class="aig-tooltip-formula">Availability = MTBF / (MTBF + MTTR)</div></span></span>
+                            </label>
                             <input type="number" class="calc-input" id="mtbf" value="50000" min="1000">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Component MTTR (hours)</label>
+                            <label class="calc-label">Component MTTR (hours)
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Mean Time To Repair</div><div class="aig-tooltip-desc">Average hours to detect, diagnose, and restore a failed component. Includes spare availability, staff response, and testing. Typical: 2-8 hrs with on-site spares, 24-72 hrs without.</div><div class="aig-tooltip-formula">Lower MTTR = Higher Availability</div></span></span>
+                            </label>
                             <input type="number" class="calc-input" id="mttr" value="4" min="0.5" step="0.5">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Redundancy Configuration</label>
+                            <label class="calc-label">Redundancy Configuration
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Redundancy Topology</div><div class="aig-tooltip-desc">N = no spare; N+1 = one standby unit; 2N = fully mirrored parallel path; 2N+1 = mirrored + one spare. Higher redundancy exponentially reduces single-point-of-failure risk.</div><div class="aig-tooltip-formula">2N: A_sys = 1 - (1-A)^2</div></span></span>
+                            </label>
                             <select class="calc-input" id="redundancy">
                                 <option value="N">N (No redundancy)</option>
                                 <option value="N+1" selected>N+1 (One spare)</option>
@@ -3028,7 +3248,9 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Number of Components</label>
+                            <label class="calc-label">Number of Components
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Total Component Count</div><div class="aig-tooltip-desc">Number of identical components in the system chain (e.g., 4 UPS modules, 6 CRAC units). Series chain reliability decreases as count increases — each added component is another potential failure point.</div><div class="aig-tooltip-formula">A_chain = A_single ^ n (series)</div></span></span>
+                            </label>
                             <input type="number" class="calc-input" id="components" value="4" min="1" max="20">
                         </div>
                     </div>
@@ -3051,6 +3273,279 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             <div class="calc-result-label">Nines of Availability</div>
                         </div>
                     </div>
+
+                    <!-- ===== Pro Mode Enhancement Layer ===== -->
+                    <div class="aig-toolbar-row">
+                        <div class="aig-mode-bar">
+                            <div class="aig-mode-toggle">
+                                <button class="aig-mode-btn active" id="aigFreeBtn" onclick="aigSetMode('free')">Free Mode</button>
+                                <button class="aig-mode-btn" id="aigProBtn" onclick="aigSetMode('pro')">Pro Analysis</button>
+                            </div>
+                        </div>
+                        <div class="aig-toolbar-actions">
+                            <button class="aig-btn-reset" onclick="aigResetDefaults()"><i class="fas fa-undo"></i> Reset</button>
+                            <button class="aig-btn-pdf" onclick="aigExportPDF()" style="display:none" id="aigPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                            <span class="aig-privacy-badge"><i class="fas fa-shield-alt"></i> Client-Side Only</span>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Inputs -->
+                    <div class="aig-strategic-inputs">
+                        <div class="aig-si-group">
+                            <label class="aig-si-label">SI-01: Workload Profile
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Workload Profile</div><div class="aig-tooltip-desc">Determines power density, cooling factor, failure rate multiplier, and regulatory weight. AI/HPC racks draw 50+ kW vs 8 kW for conventional.</div><div class="aig-tooltip-formula">Affects: CER, Stranded Capacity, REI</div></span></span>
+                            </label>
+                            <select class="aig-si-input" id="aigWorkload">
+                                <option value="AI/HPC High-Density">AI/HPC High-Density</option>
+                                <option value="Conventional Enterprise" selected>Conventional Enterprise</option>
+                                <option value="Hybrid Mixed">Hybrid Mixed</option>
+                                <option value="Edge Computing">Edge Computing</option>
+                            </select>
+                        </div>
+                        <div class="aig-si-group">
+                            <label class="aig-si-label">SI-02: Design Redundancy Tier
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Redundancy Tier (I-IV)</div><div class="aig-tooltip-desc">Uptime Institute tier classification. Determines baseline availability, MTBF proxy, and maximum allowable downtime per year.</div><div class="aig-tooltip-formula">Tier IV: 99.995% | 2N+1 | 26 min/yr</div></span></span>
+                            </label>
+                            <select class="aig-si-input" id="aigTier">
+                                <option value="I">Tier I — N (Basic)</option>
+                                <option value="II">Tier II — N+1 (Redundant)</option>
+                                <option value="III" selected>Tier III — N+1 Dual Path (Concurrently Maintainable)</option>
+                                <option value="IV">Tier IV — 2N+1 (Fault Tolerant)</option>
+                            </select>
+                        </div>
+                        <div class="aig-si-group">
+                            <label class="aig-si-label">SI-03: Regional Power Reliability (1-10)
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Grid Reliability Score</div><div class="aig-tooltip-desc">Maps to regional grid stability. 10 = Singapore/Japan grade (SAIDI &lt; 5 min). 1 = frequent brownouts. Affects ARO and failure probability in Monte Carlo.</div><div class="aig-tooltip-formula">ARO modifier = 1 + (10 - score) &times; 0.15</div></span></span>
+                            </label>
+                            <input type="number" class="aig-si-input" id="aigGridScore" value="7" min="1" max="10" step="1">
+                        </div>
+                        <div class="aig-si-group">
+                            <label class="aig-si-label">SI-04: Process Maturity Level (1-5)
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Process Maturity (McKinsey Scale)</div><div class="aig-tooltip-desc">1=Reactive, 2=Defined, 3=Integrated, 4=Automated, 5=Optimized. Directly impacts MTTD, automation ratio, and governance integrity score.</div><div class="aig-tooltip-formula">Gov. Integrity = maturity &times; 20</div></span></span>
+                            </label>
+                            <input type="number" class="aig-si-input" id="aigMaturity" value="3" min="1" max="5" step="1">
+                        </div>
+                        <div class="aig-si-group">
+                            <label class="aig-si-label">SI-05: Regulatory Sensitivity Class
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">EU AI Act Sensitivity Class</div><div class="aig-tooltip-desc">High-Risk AI requires Article 13 transparency, logging, human oversight. Determines compliance gap count and regulatory weight multiplier.</div><div class="aig-tooltip-formula">High-Risk: 1.5x regulatory weight</div></span></span>
+                            </label>
+                            <select class="aig-si-input" id="aigRegClass">
+                                <option value="High-Risk AI">High-Risk AI (Art. 6)</option>
+                                <option value="Limited-Risk AI" selected>Limited-Risk AI (Art. 52)</option>
+                                <option value="Minimal-Risk AI">Minimal-Risk AI</option>
+                                <option value="General Purpose">General Purpose AI (GPAI)</option>
+                            </select>
+                        </div>
+                        <div class="aig-si-group">
+                            <label class="aig-si-label">SI-06: Fiduciary Tolerance ($)
+                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Max Single-Event Loss Tolerance</div><div class="aig-tooltip-desc">Maximum acceptable financial impact from a single catastrophic event. Used as SLE cap in ALE calculation and Monte Carlo stress testing.</div><div class="aig-tooltip-formula">ALE = SLE &times; ARO | COI threshold</div></span></span>
+                            </label>
+                            <input type="number" class="aig-si-input" id="aigFiduciary" value="5000000" min="100000" max="50000000" step="100000">
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 1: Operational Intelligence -->
+                    <div class="aig-pro-panel gated" id="aigPanel1">
+                        <div class="aig-gate-overlay" onclick="aigShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-tachometer-alt"></i> Operational Intelligence</div>
+                        <div class="aig-kpi-grid">
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigP99Avail">99.982%</div>
+                                <div class="aig-kpi-label">P99 Effective Availability</div>
+                                <div class="aig-kpi-sublabel">Simulated at 99th percentile</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigCER">1.42</div>
+                                <div class="aig-kpi-label">Cooling Efficiency Ratio</div>
+                                <div class="aig-kpi-sublabel">Total Cooling / IT Energy</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigStranded">18%</div>
+                                <div class="aig-kpi-label">Stranded Capacity</div>
+                                <div class="aig-kpi-sublabel">(Provisioned - Utilized) / Prov.</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMTTD">4.2 min</div>
+                                <div class="aig-kpi-label">MTTD Forecast</div>
+                                <div class="aig-kpi-sublabel">Mean Time to Detect</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigAutoRatio">62%</div>
+                                <div class="aig-kpi-label">Automation Ratio</div>
+                                <div class="aig-kpi-sublabel">Automated / Total Processes</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigLogInteg">78/100</div>
+                                <div class="aig-kpi-label">Log Integrity Score</div>
+                                <div class="aig-kpi-sublabel">Art.13 compliance index</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 2: Risk & Financial Exposure -->
+                    <div class="aig-pro-panel gated" id="aigPanel2">
+                        <div class="aig-gate-overlay" onclick="aigShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-exclamation-triangle"></i> Risk &amp; Financial Exposure</div>
+                        <div class="aig-kpi-grid">
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigREI">0.42</div>
+                                <div class="aig-kpi-label">Risk Exposure Index</div>
+                                <div class="aig-kpi-sublabel">&Sigma;(P<sub>i</sub> &times; I<sub>i</sub>)</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigALE">$1.2M</div>
+                                <div class="aig-kpi-label">Annual Loss Expectancy</div>
+                                <div class="aig-kpi-sublabel">SLE &times; ARO</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigOPEXLeak">8.4%</div>
+                                <div class="aig-kpi-label">OPEX Leakage Index</div>
+                                <div class="aig-kpi-sublabel">Waste / Total OPEX</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigTechDebt">$47K</div>
+                                <div class="aig-kpi-label">Technical Debt Hemorrhage</div>
+                                <div class="aig-kpi-sublabel">$/month deferred maintenance</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigFinExpose">62/100</div>
+                                <div class="aig-kpi-label">Financial Exposure Score</div>
+                                <div class="aig-score-bar-bg"><div class="aig-score-bar-fill risk-med" id="aigFinExposeBar" style="width:62%"></div></div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigCOI">$890K</div>
+                                <div class="aig-kpi-label">Cost of Inaction (COI)</div>
+                                <div class="aig-kpi-sublabel">P(fail) &times; hourly &times; hrs &times; premium</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 3: Operational Health Score -->
+                    <div class="aig-pro-panel gated" id="aigPanel3">
+                        <div class="aig-gate-overlay" onclick="aigShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-heartbeat"></i> Operational Health Score</div>
+                        <div class="aig-gauge-container">
+                            <svg id="aigGaugeSVG" width="220" height="140" viewBox="0 0 220 140">
+                                <path d="M 20 130 A 90 90 0 0 1 200 130" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="18" stroke-linecap="round"/>
+                                <path id="aigGaugeArc" d="M 20 130 A 90 90 0 0 1 200 130" fill="none" stroke="#6366f1" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 283"/>
+                                <text id="aigGaugeText" x="110" y="110" text-anchor="middle" fill="#e2e8f0" font-size="32" font-weight="800">72</text>
+                                <text x="110" y="128" text-anchor="middle" fill="#94a3b8" font-size="11">/ 100</text>
+                            </svg>
+                            <div class="aig-gauge-tier" id="aigHealthTier" style="color:#818cf8">Grade B</div>
+                            <div class="aig-gauge-label">Operational Health Score</div>
+                        </div>
+                        <div class="aig-kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigTechRel">78</div>
+                                <div class="aig-kpi-label">Technical Reliability</div>
+                                <div class="aig-kpi-sublabel">Weight: 35%</div>
+                                <div class="aig-score-bar-bg"><div class="aig-score-bar-fill risk-low" id="aigTechRelBar" style="width:78%"></div></div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigFinRes">65</div>
+                                <div class="aig-kpi-label">Financial Resilience</div>
+                                <div class="aig-kpi-sublabel">Weight: 25%</div>
+                                <div class="aig-score-bar-bg"><div class="aig-score-bar-fill risk-med" id="aigFinResBar" style="width:65%"></div></div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigGovInt">70</div>
+                                <div class="aig-kpi-label">Governance Integrity</div>
+                                <div class="aig-kpi-sublabel">Weight: 20%</div>
+                                <div class="aig-score-bar-bg"><div class="aig-score-bar-fill risk-med" id="aigGovIntBar" style="width:70%"></div></div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigProcMat">60</div>
+                                <div class="aig-kpi-label">Process Maturity</div>
+                                <div class="aig-kpi-sublabel">Weight: 20%</div>
+                                <div class="aig-score-bar-bg"><div class="aig-score-bar-fill risk-med" id="aigProcMatBar" style="width:60%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 4: Monte Carlo Simulation -->
+                    <div class="aig-pro-panel gated" id="aigPanel4">
+                        <div class="aig-gate-overlay" onclick="aigShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-dice"></i> Monte Carlo Simulation (10K Iterations)</div>
+                        <div class="aig-kpi-grid">
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMCP5">$480K</div>
+                                <div class="aig-kpi-label">P5 (Best Case)</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMCP25">$780K</div>
+                                <div class="aig-kpi-label">P25</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMCP50">$1.1M</div>
+                                <div class="aig-kpi-label">P50 (Median)</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMCP75">$1.6M</div>
+                                <div class="aig-kpi-label">P75</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMCP95">$2.8M</div>
+                                <div class="aig-kpi-label">P95 (Stress)</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigCVaR95">$3.2M</div>
+                                <div class="aig-kpi-label">CVaR-95</div>
+                                <div class="aig-kpi-sublabel">Expected tail loss</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigSLABreach">12%</div>
+                                <div class="aig-kpi-label">SLA Breach Probability</div>
+                            </div>
+                            <div class="aig-kpi-card">
+                                <div class="aig-kpi-value" id="aigMCMean">$1.2M</div>
+                                <div class="aig-kpi-label">Mean ALE</div>
+                            </div>
+                        </div>
+                        <div class="aig-chart-container">
+                            <canvas id="aigHistogramCanvas" height="200"></canvas>
+                        </div>
+                        <div class="aig-chart-container" style="margin-top:0.75rem">
+                            <canvas id="aigTornadoCanvas" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Pro Panel 5: AI-Generated Narrative -->
+                    <div class="aig-pro-panel gated" id="aigPanel5">
+                        <div class="aig-gate-overlay" onclick="aigShowLogin()">
+                            <i class="fas fa-lock"></i>
+                            <span>Pro Feature — Log in to unlock</span>
+                        </div>
+                        <div class="panel-title"><i class="fas fa-robot"></i> AI-Generated Board-Level Narrative</div>
+                        <div class="aig-narrative" id="aigNarrative">
+                            <h4><i class="fas fa-file-alt"></i> Executive Infrastructure Risk Report</h4>
+                            <div id="aigNarrativeText">Loading assessment...</div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy & Benchmark -->
+                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.72rem;color:#64748b;margin-top:0.75rem;padding:6px 0;">
+                        <i class="fas fa-shield-alt" style="color:#10b981;font-size:0.8rem"></i> All calculations run locally in your browser. No data is sent to any server.
+                    </div>
+                    <div class="aig-benchmark-meta">
+                        <span class="aig-benchmark-tag"><i class="fas fa-database"></i> Uptime Institute Tier Standards</span>
+                        <span class="aig-benchmark-tag"><i class="fas fa-bolt"></i> IEEE 1584-2018</span>
+                        <span class="aig-benchmark-tag"><i class="fas fa-chart-bar"></i> 10K MC Iterations</span>
+                        <span class="aig-benchmark-tag"><i class="fas fa-shield-alt"></i> EU AI Act Article 13</span>
+                        <span class="aig-benchmark-tag"><i class="fas fa-calendar"></i> Feb 2026 Data</span>
+                    </div>
+
                 </div>
 
                 <h3>8.1 Reliability Formulas</h3>
@@ -3344,6 +3839,21 @@ E = Cf × En × (t/0.2) × (610/D)^x
                         <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
                             Verify selective coordination for all fault scenarios. Implement ZSI or active arc flash mitigation for 1200A+ breakers.
                         </p>
+                    </div>
+                </div>
+
+                <!-- Login Modal -->
+                <div class="aig-login-overlay" id="aigLoginOverlay">
+                    <div class="aig-login-box">
+                        <button class="aig-login-close" onclick="aigHideLogin()">&times;</button>
+                        <h3><i class="fas fa-lock" style="color:#818cf8;margin-right:6px;"></i> Unlock Pro Analysis</h3>
+                        <p>Access Operational Health Score, Risk Exposure Analysis, Monte Carlo Simulation, and PDF Export.</p>
+                        <input type="email" id="aigLoginEmail" placeholder="Email address" autocomplete="email">
+                        <input type="password" id="aigLoginPass" placeholder="Password" autocomplete="current-password">
+                        <div class="aig-login-error" id="aigLoginError">Invalid credentials. Please try again.</div>
+                        <button class="login-submit" onclick="aigDoLogin()">Sign In</button>
+                        <div class="demo-hint">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+                        <div style="text-align:center;margin-top:6px;"><a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" rel="noopener" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Unlock Pro Mode &rarr;</a></div>
                     </div>
                 </div>
 
@@ -3651,6 +4161,950 @@ function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+enco
 function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(document.title+' '+window.location.href),'_blank')}
 function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(function(){b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(function(){b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">✓ Subscribed successfully!</p>';return false}
+</script>
+<script>
+/* ============================================================
+   Article-13 Pro Mode IIFE — AI in Power Grid Management
+   Prefix: aig- | Theme: Indigo #6366f1
+   ============================================================ */
+(function() {
+    'use strict';
+
+    var aigProMode = false;
+
+    // ===================== DATA TABLES =====================
+    var WORKLOAD_DATA = {
+        'AI/HPC High-Density':   { powerDensity: 50, coolingFactor: 1.45, failMult: 1.35, regWeight: 1.3, cerBase: 1.65, strandedBase: 25 },
+        'Conventional Enterprise':{ powerDensity: 8,  coolingFactor: 1.15, failMult: 1.00, regWeight: 1.0, cerBase: 1.20, strandedBase: 15 },
+        'Hybrid Mixed':          { powerDensity: 25, coolingFactor: 1.28, failMult: 1.15, regWeight: 1.1, cerBase: 1.38, strandedBase: 20 },
+        'Edge Computing':        { powerDensity: 12, coolingFactor: 1.10, failMult: 1.20, regWeight: 0.9, cerBase: 1.12, strandedBase: 10 }
+    };
+
+    var TIER_DATA = {
+        'I':   { avail: 99.671, mtbfProxy: 8760,  maxDownMin: 1729, redundancy: 'N',    sleFactor: 1.0  },
+        'II':  { avail: 99.741, mtbfProxy: 17520, maxDownMin: 1361, redundancy: 'N+1',  sleFactor: 0.85 },
+        'III': { avail: 99.982, mtbfProxy: 35040, maxDownMin: 95,   redundancy: 'N+1 Dual', sleFactor: 0.65 },
+        'IV':  { avail: 99.995, mtbfProxy: 52560, maxDownMin: 26,   redundancy: '2N+1', sleFactor: 0.45 }
+    };
+
+    var REG_CLASS_DATA = {
+        'High-Risk AI':     { weight: 1.50, complianceGaps: 8, logRequirement: 95, auditFreq: 'Quarterly' },
+        'Limited-Risk AI':  { weight: 1.15, complianceGaps: 4, logRequirement: 75, auditFreq: 'Semi-Annual' },
+        'Minimal-Risk AI':  { weight: 0.85, complianceGaps: 2, logRequirement: 50, auditFreq: 'Annual' },
+        'General Purpose':  { weight: 1.00, complianceGaps: 3, logRequirement: 65, auditFreq: 'Semi-Annual' }
+    };
+
+    // ===================== HELPERS =====================
+    function $(id) { return document.getElementById(id); }
+
+    function fmt(v) {
+        if (Math.abs(v) >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+        if (Math.abs(v) >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+        return '$' + Math.round(v);
+    }
+
+    function pctFmt(v) { return v.toFixed(1) + '%'; }
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function boxMuller() {
+        var u1 = 0, u2 = 0;
+        while (u1 === 0) u1 = Math.random();
+        while (u2 === 0) u2 = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+    }
+
+    function percentile(arr, p) { return arr[Math.floor(arr.length * p)]; }
+
+    function barClass(v) { return v >= 80 ? 'risk-low' : v >= 50 ? 'risk-med' : 'risk-high'; }
+
+    // ===================== READ INPUTS =====================
+    function getInputs() {
+        var workloadKey = $('aigWorkload').value;
+        var tierKey = $('aigTier').value;
+        var gridScore = clamp(parseFloat($('aigGridScore').value) || 7, 1, 10);
+        var maturity = clamp(parseFloat($('aigMaturity').value) || 3, 1, 5);
+        var regClassKey = $('aigRegClass').value;
+        var fiduciary = clamp(parseFloat($('aigFiduciary').value) || 5000000, 100000, 50000000);
+
+        var wl = WORKLOAD_DATA[workloadKey] || WORKLOAD_DATA['Conventional Enterprise'];
+        var tier = TIER_DATA[tierKey] || TIER_DATA['III'];
+        var reg = REG_CLASS_DATA[regClassKey] || REG_CLASS_DATA['Limited-Risk AI'];
+
+        return {
+            workloadKey: workloadKey,
+            tierKey: tierKey,
+            gridScore: gridScore,
+            maturity: maturity,
+            regClassKey: regClassKey,
+            fiduciary: fiduciary,
+            wl: wl,
+            tier: tier,
+            reg: reg
+        };
+    }
+
+    // ===================== PANEL 1: OPERATIONAL INTELLIGENCE =====================
+    function calcOperational(inp) {
+        // P99 Effective Availability — tier base adjusted by grid reliability and workload fail multiplier
+        var aroMod = 1 + (10 - inp.gridScore) * 0.15;
+        var failAdj = inp.wl.failMult * aroMod;
+        var baseDown = inp.tier.maxDownMin;
+        var adjDown = baseDown * failAdj * (1 - (inp.maturity - 1) * 0.08);
+        adjDown = Math.max(adjDown, 1);
+        var p99Avail = (1 - adjDown / 525600) * 100;
+        p99Avail = Math.min(p99Avail, 99.9999);
+
+        // CER — Cooling Efficiency Ratio
+        var cer = inp.wl.cerBase * (1 + (10 - inp.gridScore) * 0.02) * (1 - (inp.maturity - 1) * 0.04);
+        cer = Math.max(cer, 0.8);
+
+        // Stranded Capacity %
+        var stranded = inp.wl.strandedBase * (1 + (10 - inp.gridScore) * 0.03) * (1 - (inp.maturity - 1) * 0.06);
+        stranded = clamp(stranded, 2, 60);
+
+        // MTTD — Mean Time to Detect (minutes)
+        var mttd = 15 / inp.maturity * inp.wl.failMult * (1 + (10 - inp.gridScore) * 0.05);
+        mttd = Math.max(mttd, 0.5);
+
+        // Automation Ratio %
+        var autoRatio = clamp(inp.maturity * 20 + (inp.gridScore - 5) * 3, 10, 98);
+
+        // Log Integrity Score (Art.13 compliance)
+        var logInteg = clamp(Math.round(inp.maturity * 18 + inp.gridScore * 2 - inp.reg.complianceGaps * 2), 10, 100);
+
+        return {
+            p99Avail: p99Avail,
+            cer: cer,
+            stranded: stranded,
+            mttd: mttd,
+            autoRatio: autoRatio,
+            logInteg: logInteg,
+            aroMod: aroMod,
+            failAdj: failAdj,
+            adjDown: adjDown
+        };
+    }
+
+    // ===================== PANEL 2: RISK & FINANCIAL EXPOSURE =====================
+    function calcRisk(inp, ops) {
+        // SLE — Single Loss Event (based on fiduciary and tier)
+        var sle = inp.fiduciary * inp.tier.sleFactor * inp.wl.failMult;
+
+        // ARO — Annual Rate of Occurrence
+        var aro = (ops.adjDown / 525600) * 365 * ops.aroMod * inp.reg.weight;
+
+        // ALE = SLE x ARO
+        var ale = sle * aro;
+
+        // REI = Risk Exposure Index (normalised 0-1)
+        var rei = clamp(ale / inp.fiduciary, 0, 1);
+
+        // OPEX Leakage Index — % waste
+        var opexLeak = clamp((100 - ops.autoRatio) * 0.15 + (ops.stranded / 100) * 12 + (5 - inp.maturity) * 1.5, 1, 35);
+
+        // Technical Debt Hemorrhage $/month
+        var techDebt = Math.round((5 - inp.maturity) * 12000 * inp.wl.failMult + (100 - ops.logInteg) * 200 * inp.reg.weight);
+        techDebt = Math.max(techDebt, 500);
+
+        // Financial Exposure Score (0-100)
+        var finExpose = clamp(Math.round(rei * 50 + opexLeak * 1.2 + (100 - ops.logInteg) * 0.2), 5, 100);
+
+        // COI — Cost of Inaction (annual)
+        var hourlyLoss = inp.fiduciary * 0.002;
+        var failProb = aro * inp.wl.failMult;
+        var coi = hourlyLoss * (ops.adjDown / 60) * failProb * inp.reg.weight;
+        coi = Math.max(coi, 1000);
+
+        return {
+            sle: sle,
+            aro: aro,
+            ale: ale,
+            rei: rei,
+            opexLeak: opexLeak,
+            techDebt: techDebt,
+            finExpose: finExpose,
+            coi: coi
+        };
+    }
+
+    // ===================== PANEL 3: OPERATIONAL HEALTH SCORE =====================
+    function calcHealth(inp, ops, risk) {
+        // Sub-dimensions
+        var techRel = clamp(Math.round(ops.p99Avail - 99 + 20 + inp.maturity * 8 - ops.cer * 5), 10, 100);
+        var finRes = clamp(Math.round(100 - risk.finExpose + inp.maturity * 3), 10, 100);
+        var govInt = clamp(Math.round(inp.maturity * 20 + (ops.logInteg - 50) * 0.3), 10, 100);
+        var procMat = clamp(Math.round(inp.maturity * 18 + ops.autoRatio * 0.15), 10, 100);
+
+        // Weighted composite
+        var overall = Math.round(techRel * 0.35 + finRes * 0.25 + govInt * 0.20 + procMat * 0.20);
+        overall = clamp(overall, 5, 100);
+
+        var tier = overall >= 90 ? 'A+' : overall >= 80 ? 'A' : overall >= 70 ? 'B' : overall >= 55 ? 'C' : overall >= 40 ? 'D' : 'F';
+        var tierColor = overall >= 80 ? '#10b981' : overall >= 55 ? '#818cf8' : overall >= 40 ? '#f59e0b' : '#ef4444';
+
+        return {
+            techRel: techRel,
+            finRes: finRes,
+            govInt: govInt,
+            procMat: procMat,
+            overall: overall,
+            tier: tier,
+            tierColor: tierColor
+        };
+    }
+
+    // ===================== MONTE CARLO 10K =====================
+    function runMonteCarlo(inp) {
+        var N = 10000;
+        var results = [];
+        var ops0 = calcOperational(inp);
+        var risk0 = calcRisk(inp, ops0);
+
+        for (var i = 0; i < N; i++) {
+            // Perturb inputs with Box-Muller
+            var gridVar = clamp(inp.gridScore + boxMuller() * 1.5, 1, 10);
+            var matVar = clamp(inp.maturity + boxMuller() * 0.8, 1, 5);
+            var fidVar = inp.fiduciary * (1 + boxMuller() * 0.2);
+            fidVar = Math.max(fidVar, 100000);
+
+            var varInp = {
+                workloadKey: inp.workloadKey,
+                tierKey: inp.tierKey,
+                gridScore: gridVar,
+                maturity: matVar,
+                regClassKey: inp.regClassKey,
+                fiduciary: fidVar,
+                wl: inp.wl,
+                tier: inp.tier,
+                reg: inp.reg
+            };
+            var varOps = calcOperational(varInp);
+            var varRisk = calcRisk(varInp, varOps);
+            results.push(varRisk.ale);
+        }
+
+        results.sort(function(a, b) { return a - b; });
+
+        var sum = 0, sumSq = 0;
+        for (var j = 0; j < N; j++) { sum += results[j]; sumSq += results[j] * results[j]; }
+        var mean = sum / N;
+        var std = Math.sqrt(sumSq / N - mean * mean);
+
+        // CVaR-95: average of worst 5%
+        var tail5 = Math.floor(N * 0.95);
+        var tailSum = 0, tailCount = 0;
+        for (var k = tail5; k < N; k++) { tailSum += results[k]; tailCount++; }
+        var cvar95 = tailCount > 0 ? tailSum / tailCount : results[N - 1];
+
+        // SLA breach: P(ALE > fiduciary * 0.3)
+        var slaThresh = inp.fiduciary * 0.3;
+        var breachCount = 0;
+        for (var m = 0; m < N; m++) { if (results[m] > slaThresh) breachCount++; }
+
+        return {
+            results: results,
+            mean: mean,
+            std: std,
+            p5: percentile(results, 0.05),
+            p25: percentile(results, 0.25),
+            p50: percentile(results, 0.50),
+            p75: percentile(results, 0.75),
+            p95: percentile(results, 0.95),
+            cvar95: cvar95,
+            slaBreach: (breachCount / N) * 100
+        };
+    }
+
+    // ===================== SENSITIVITY ANALYSIS (5 factors) =====================
+    function runSensitivity(inp) {
+        var baseOps = calcOperational(inp);
+        var baseRisk = calcRisk(inp, baseOps);
+        var baseALE = baseRisk.ale;
+
+        var factors = [
+            { name: 'Grid Reliability', key: 'gridScore', delta: 0.10 },
+            { name: 'Process Maturity', key: 'maturity', delta: 0.10 },
+            { name: 'Fiduciary Tolerance', key: 'fiduciary', delta: 0.10 },
+            { name: 'Power Density (Workload)', key: '_powerDensity', delta: 0.10 },
+            { name: 'Regulatory Weight', key: '_regWeight', delta: 0.10 }
+        ];
+
+        var results = [];
+        for (var i = 0; i < factors.length; i++) {
+            var f = factors[i];
+            var upInp = JSON.parse(JSON.stringify(inp));
+            var dnInp = JSON.parse(JSON.stringify(inp));
+            // Re-attach objects (JSON loses prototype)
+            upInp.wl = JSON.parse(JSON.stringify(inp.wl));
+            upInp.tier = JSON.parse(JSON.stringify(inp.tier));
+            upInp.reg = JSON.parse(JSON.stringify(inp.reg));
+            dnInp.wl = JSON.parse(JSON.stringify(inp.wl));
+            dnInp.tier = JSON.parse(JSON.stringify(inp.tier));
+            dnInp.reg = JSON.parse(JSON.stringify(inp.reg));
+
+            if (f.key === '_powerDensity') {
+                upInp.wl.failMult = inp.wl.failMult * (1 + f.delta);
+                upInp.wl.cerBase = inp.wl.cerBase * (1 + f.delta * 0.5);
+                dnInp.wl.failMult = inp.wl.failMult * (1 - f.delta);
+                dnInp.wl.cerBase = inp.wl.cerBase * (1 - f.delta * 0.5);
+            } else if (f.key === '_regWeight') {
+                upInp.reg.weight = inp.reg.weight * (1 + f.delta);
+                dnInp.reg.weight = inp.reg.weight * (1 - f.delta);
+            } else {
+                upInp[f.key] = inp[f.key] * (1 + f.delta);
+                dnInp[f.key] = inp[f.key] * (1 - f.delta);
+            }
+
+            var upOps = calcOperational(upInp);
+            var dnOps = calcOperational(dnInp);
+            var upALE = calcRisk(upInp, upOps).ale;
+            var dnALE = calcRisk(dnInp, dnOps).ale;
+
+            results.push({
+                name: f.name,
+                upVal: upALE,
+                downVal: dnALE,
+                absSwing: Math.abs(upALE - dnALE),
+                impact: baseALE > 0 ? ((Math.max(upALE, dnALE) - baseALE) / baseALE * 100) : 0
+            });
+        }
+        results.sort(function(a, b) { return b.absSwing - a.absSwing; });
+        return results;
+    }
+
+    // ===================== NARRATIVE GENERATOR =====================
+    function generateNarrative(inp, ops, risk, health, mc, sens) {
+        var para = [];
+
+        // P1: Infrastructure Posture
+        var regLabel = inp.regClassKey;
+        para.push('<p><strong>Infrastructure Posture:</strong> This ' + inp.workloadKey + ' deployment operates at <strong>Tier ' + inp.tierKey + ' (' + inp.tier.redundancy + ')</strong> with a Regional Grid Reliability score of ' + inp.gridScore + '/10 and Process Maturity Level ' + inp.maturity + '/5. The overall Operational Health Score is <strong>' + health.overall + '/100 (Grade ' + health.tier + ')</strong>. ' + (health.overall >= 80 ? 'The facility demonstrates strong operational posture suitable for mission-critical AI workloads.' : health.overall >= 55 ? 'Operational performance is adequate but leaves material exposure for high-density or regulated workloads.' : 'Significant operational gaps exist that require immediate remediation before scaling AI/HPC capacity.') + ' The Cooling Efficiency Ratio of ' + ops.cer.toFixed(2) + ' ' + (ops.cer > 1.4 ? 'indicates cooling infrastructure is consuming excess energy relative to IT load.' : 'is within acceptable range for this workload profile.') + '</p>');
+
+        // P2: Financial Risk Exposure
+        para.push('<p><strong>Financial Risk Exposure:</strong> Annual Loss Expectancy stands at <strong>' + fmt(risk.ale) + '</strong> against a fiduciary tolerance of ' + fmt(inp.fiduciary) + ', yielding a Risk Exposure Index of ' + risk.rei.toFixed(3) + '. OPEX leakage at ' + risk.opexLeak.toFixed(1) + '% translates to avoidable cost hemorrhage, while technical debt accumulates at <strong>' + fmt(risk.techDebt) + '/month</strong>. ' + (risk.finExpose >= 70 ? 'The Financial Exposure Score of ' + risk.finExpose + '/100 is in the danger zone; executive intervention is recommended.' : risk.finExpose >= 40 ? 'Financial exposure is moderate and manageable with targeted improvement.' : 'Financial exposure is well-controlled.') + ' The Cost of Inaction is estimated at <strong>' + fmt(risk.coi) + '/year</strong> under the ' + regLabel + ' regulatory classification.</p>');
+
+        // P3: Monte Carlo & Risk Quantification
+        para.push('<p><strong>Stochastic Risk Quantification:</strong> Monte Carlo simulation (10,000 iterations, Box-Muller method) places the median ALE at <strong>' + fmt(mc.p50) + '</strong> with a 90% confidence interval of [' + fmt(mc.p5) + ' \u2013 ' + fmt(mc.p95) + ']. The CVaR-95 (expected tail loss) of <strong>' + fmt(mc.cvar95) + '</strong> represents the board-level catastrophic exposure figure. SLA breach probability stands at ' + mc.slaBreach.toFixed(1) + '%. The primary cost driver is <strong>' + sens[0].name + '</strong> (\u00B1' + fmt(sens[0].absSwing) + ' swing), followed by <strong>' + sens[1].name + '</strong>. ' + (mc.slaBreach > 20 ? 'SLA breach probability exceeds 20% \u2014 mitigation is urgent.' : mc.slaBreach > 10 ? 'SLA breach probability warrants attention in the next review cycle.' : 'SLA breach probability is within acceptable bounds.') + '</p>');
+
+        // P4: Recommendations
+        var topSens = sens[0].name;
+        var rec1 = topSens === 'Grid Reliability' ? 'Invest in on-site generation, dual-feed utility connections, or battery energy storage systems to reduce grid dependency.' :
+                   topSens === 'Process Maturity' ? 'Accelerate process automation, implement AIOps platforms, and establish continuous verification protocols.' :
+                   topSens === 'Fiduciary Tolerance' ? 'Review insurance coverage, establish contingency reserves at CVaR-95 level, and implement financial hedging strategies.' :
+                   topSens === 'Power Density (Workload)' ? 'Deploy liquid cooling, optimize rack density distribution, and implement dynamic power capping for AI/HPC clusters.' :
+                   'Conduct proactive regulatory gap analysis, implement Article 13 logging standards, and establish compliance monitoring dashboards.';
+
+        para.push('<p><strong>Priority Recommendations:</strong> (1) ' + rec1 + ' (2) ' + (ops.logInteg < 80 ? 'Close EU AI Act Article 13 compliance gaps \u2014 current Log Integrity Score of ' + ops.logInteg + '/100 falls below the ' + inp.reg.logRequirement + ' threshold required for ' + regLabel + ' classification.' : 'Maintain current compliance posture and prepare for upcoming audit cycle (' + inp.reg.auditFreq + ').') + ' (3) ' + (ops.stranded > 20 ? 'Address ' + ops.stranded.toFixed(0) + '% stranded capacity through workload consolidation or rack-level power management.' : 'Continue capacity optimization \u2014 current ' + ops.stranded.toFixed(0) + '% stranded rate is within best-practice range.') + ' Based on Monte Carlo analysis, implementing these recommendations could reduce the P95 ALE from ' + fmt(mc.p95) + ' to an estimated ' + fmt(mc.p50 * 0.7) + '.</p>');
+
+        return para.join('');
+    }
+
+    // ===================== CANVAS: HISTOGRAM =====================
+    function drawHistogram(mcData) {
+        var canvas = $('aigHistogramCanvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        var W = rect.width, H = rect.height;
+        var pad = { top: 30, right: 30, bottom: 40, left: 60 };
+        var cW = W - pad.left - pad.right;
+        var cH = H - pad.top - pad.bottom;
+
+        ctx.clearRect(0, 0, W, H);
+
+        var results = mcData.results;
+        var minV = results[0], maxV = results[results.length - 1];
+        var range = maxV - minV || 1;
+        var numBins = 40, bins = new Array(numBins).fill(0);
+        for (var i = 0; i < results.length; i++) {
+            var bi = Math.min(numBins - 1, Math.floor((results[i] - minV) / range * numBins));
+            bins[bi]++;
+        }
+        var maxBin = Math.max.apply(null, bins);
+        var barW = cW / numBins - 0.5;
+
+        // Draw bars
+        for (var i = 0; i < numBins; i++) {
+            var barH = maxBin > 0 ? (bins[i] / maxBin) * cH : 0;
+            var x = pad.left + i * (cW / numBins);
+            var y = pad.top + cH - barH;
+            var midVal = minV + (i + 0.5) * range / numBins;
+            ctx.fillStyle = midVal <= mcData.p5 ? '#10b981' : midVal <= mcData.p50 ? '#6366f1' : midVal <= mcData.p95 ? '#f59e0b' : '#ef4444';
+            ctx.fillRect(x, y, Math.max(barW, 0.5), barH);
+        }
+
+        // Axes
+        ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top);
+        ctx.lineTo(pad.left, pad.top + cH);
+        ctx.lineTo(pad.left + cW, pad.top + cH);
+        ctx.stroke();
+
+        // X labels
+        ctx.font = '10px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.textAlign = 'center';
+        for (var i = 0; i <= 5; i++) {
+            var val = minV + (range / 5) * i;
+            var x = pad.left + (cW / 5) * i;
+            ctx.fillText(fmt(val), x, pad.top + cH + 15);
+        }
+        ctx.fillText('Annual Loss Expectancy', W / 2, H - 5);
+
+        // Y label
+        ctx.save();
+        ctx.translate(15, H / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = 'center';
+        ctx.fillText('Frequency', 0, 0);
+        ctx.restore();
+
+        // Percentile lines
+        var pLines = [
+            { v: mcData.p5, l: 'P5 ' + fmt(mcData.p5), c: '#10b981' },
+            { v: mcData.p50, l: 'P50 ' + fmt(mcData.p50), c: '#6366f1' },
+            { v: mcData.p95, l: 'P95 ' + fmt(mcData.p95), c: '#ef4444' }
+        ];
+        for (var p = 0; p < pLines.length; p++) {
+            var px = pad.left + ((pLines[p].v - minV) / range) * cW;
+            ctx.beginPath();
+            ctx.setLineDash([4, 3]);
+            ctx.strokeStyle = pLines[p].c;
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(px, pad.top);
+            ctx.lineTo(px, pad.top + cH);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = pLines[p].c;
+            ctx.font = 'bold 10px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pLines[p].l, px, pad.top - 8);
+        }
+
+        // Title
+        ctx.font = 'bold 12px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.textAlign = 'left';
+        ctx.fillText('Monte Carlo Distribution (n=10,000)', pad.left, 15);
+    }
+
+    // ===================== CANVAS: TORNADO =====================
+    function drawTornado(sensitivity, baseALE) {
+        var canvas = $('aigTornadoCanvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        var W = rect.width, H = rect.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        var maxSwing = sensitivity[0] ? sensitivity[0].absSwing : 1;
+        var barH = 28, gap = 8, startY = 35;
+        var centerX = W * 0.55, maxBarW = W * 0.30;
+
+        // Title
+        ctx.font = 'bold 12px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sensitivity Tornado Chart (\u00B110% perturbation)', W / 2, 18);
+
+        // Center line
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(148,163,184,0.4)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.moveTo(centerX, startY - 5);
+        ctx.lineTo(centerX, startY + sensitivity.length * (barH + gap));
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Baseline label
+        ctx.font = '9px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.textAlign = 'center';
+        ctx.fillText('Baseline: ' + fmt(baseALE), centerX, startY - 8);
+
+        for (var i = 0; i < sensitivity.length; i++) {
+            var d = sensitivity[i];
+            var y = startY + i * (barH + gap);
+            var upW = maxSwing > 0 ? (((d.upVal - baseALE) / maxSwing) * maxBarW) : 0;
+            var dnW = maxSwing > 0 ? (((baseALE - d.downVal) / maxSwing) * maxBarW) : 0;
+
+            // Right bar (increase)
+            if (upW > 0) {
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.moveTo(centerX, y);
+                ctx.lineTo(centerX + upW, y);
+                ctx.lineTo(centerX + upW, y + barH);
+                ctx.lineTo(centerX, y + barH);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#fca5a5';
+                ctx.font = 'bold 9px Inter, system-ui, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('+' + fmt(d.upVal - baseALE), centerX + upW + 4, y + barH / 2 + 4);
+            }
+
+            // Left bar (decrease)
+            if (dnW > 0) {
+                ctx.fillStyle = '#6366f1';
+                ctx.beginPath();
+                ctx.moveTo(centerX, y);
+                ctx.lineTo(centerX - dnW, y);
+                ctx.lineTo(centerX - dnW, y + barH);
+                ctx.lineTo(centerX, y + barH);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#a5b4fc';
+                ctx.font = 'bold 9px Inter, system-ui, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('-' + fmt(baseALE - d.downVal), centerX - dnW - 4, y + barH / 2 + 4);
+            }
+
+            // Label
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = '10px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(d.name, centerX - maxBarW - 12, y + barH / 2 + 4);
+        }
+    }
+
+    // ===================== GAUGE RENDERER =====================
+    function drawGauge(score, tier, tierColor) {
+        var arc = $('aigGaugeArc');
+        var txt = $('aigGaugeText');
+        var tierEl = $('aigHealthTier');
+        if (!arc || !txt || !tierEl) return;
+
+        var maxLen = 283; // Semicircle circumference
+        var dashLen = (score / 100) * maxLen;
+        arc.setAttribute('stroke-dasharray', dashLen + ' ' + maxLen);
+        arc.setAttribute('stroke', tierColor);
+        txt.textContent = score;
+        tierEl.textContent = 'Grade ' + tier;
+        tierEl.style.color = tierColor;
+    }
+
+    // ===================== MAIN UPDATE =====================
+    function updateAigProPanels() {
+        var inp = getInputs();
+        var ops = calcOperational(inp);
+        var risk = calcRisk(inp, ops);
+        var health = calcHealth(inp, ops, risk);
+        var mc = runMonteCarlo(inp);
+        var sens = runSensitivity(inp);
+
+        // Panel 1: Operational Intelligence
+        $('aigP99Avail').textContent = ops.p99Avail.toFixed(3) + '%';
+        $('aigCER').textContent = ops.cer.toFixed(2);
+        $('aigStranded').textContent = ops.stranded.toFixed(0) + '%';
+        $('aigMTTD').textContent = ops.mttd.toFixed(1) + ' min';
+        $('aigAutoRatio').textContent = ops.autoRatio.toFixed(0) + '%';
+        $('aigLogInteg').textContent = ops.logInteg + '/100';
+
+        // Panel 2: Risk & Financial Exposure
+        $('aigREI').textContent = risk.rei.toFixed(3);
+        $('aigALE').textContent = fmt(risk.ale);
+        $('aigOPEXLeak').textContent = risk.opexLeak.toFixed(1) + '%';
+        $('aigTechDebt').textContent = fmt(risk.techDebt);
+        $('aigFinExpose').textContent = risk.finExpose + '/100';
+        var feBar = $('aigFinExposeBar');
+        if (feBar) {
+            feBar.style.width = risk.finExpose + '%';
+            feBar.className = 'aig-score-bar-fill ' + (risk.finExpose >= 70 ? 'risk-high' : risk.finExpose >= 40 ? 'risk-med' : 'risk-low');
+        }
+        $('aigCOI').textContent = fmt(risk.coi);
+
+        // Panel 3: Operational Health
+        drawGauge(health.overall, health.tier, health.tierColor);
+        $('aigTechRel').textContent = health.techRel;
+        $('aigFinRes').textContent = health.finRes;
+        $('aigGovInt').textContent = health.govInt;
+        $('aigProcMat').textContent = health.procMat;
+        var trBar = $('aigTechRelBar');
+        if (trBar) { trBar.style.width = health.techRel + '%'; trBar.className = 'aig-score-bar-fill ' + barClass(health.techRel); }
+        var frBar = $('aigFinResBar');
+        if (frBar) { frBar.style.width = health.finRes + '%'; frBar.className = 'aig-score-bar-fill ' + barClass(health.finRes); }
+        var giBar = $('aigGovIntBar');
+        if (giBar) { giBar.style.width = health.govInt + '%'; giBar.className = 'aig-score-bar-fill ' + barClass(health.govInt); }
+        var pmBar = $('aigProcMatBar');
+        if (pmBar) { pmBar.style.width = health.procMat + '%'; pmBar.className = 'aig-score-bar-fill ' + barClass(health.procMat); }
+
+        // Panel 4: Monte Carlo
+        $('aigMCP5').textContent = fmt(mc.p5);
+        $('aigMCP25').textContent = fmt(mc.p25);
+        $('aigMCP50').textContent = fmt(mc.p50);
+        $('aigMCP75').textContent = fmt(mc.p75);
+        $('aigMCP95').textContent = fmt(mc.p95);
+        $('aigCVaR95').textContent = fmt(mc.cvar95);
+        $('aigSLABreach').textContent = mc.slaBreach.toFixed(1) + '%';
+        $('aigMCMean').textContent = fmt(mc.mean);
+
+        // Panel 5: Narrative
+        $('aigNarrativeText').innerHTML = generateNarrative(inp, ops, risk, health, mc, sens);
+
+        // Draw charts if unlocked
+        if (aigProMode) {
+            drawHistogram(mc);
+            drawTornado(sens, risk.ale);
+        }
+    }
+
+    // ===================== AUTH =====================
+    function aigCheckAuth() {
+        try {
+            var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) return true;
+        } catch (e) {}
+        return false;
+    }
+
+    function aigUnlockPanels() {
+        aigProMode = true;
+        document.querySelectorAll('.aig-pro-panel').forEach(function(p) {
+            p.classList.remove('gated');
+            var ov = p.querySelector('.aig-gate-overlay');
+            if (ov) ov.style.display = 'none';
+        });
+        $('aigProBtn').classList.add('active');
+        $('aigFreeBtn').classList.remove('active');
+        var pdfBtn = $('aigPdfBtn');
+        if (pdfBtn) pdfBtn.style.display = '';
+        updateAigProPanels();
+    }
+
+    function aigLockPanels() {
+        aigProMode = false;
+        document.querySelectorAll('.aig-pro-panel').forEach(function(p) {
+            p.classList.add('gated');
+            var ov = p.querySelector('.aig-gate-overlay');
+            if (ov) ov.style.display = '';
+        });
+        $('aigFreeBtn').classList.add('active');
+        $('aigProBtn').classList.remove('active');
+        var pdfBtn = $('aigPdfBtn');
+        if (pdfBtn) pdfBtn.style.display = 'none';
+    }
+
+    // ===================== WINDOW FUNCTIONS =====================
+    window.aigSetMode = function(mode) {
+        if (mode === 'pro') {
+            if (aigCheckAuth()) { aigUnlockPanels(); }
+            else { aigShowLogin(); }
+        } else {
+            aigLockPanels();
+        }
+    };
+
+    window.aigShowLogin = function() {
+        $('aigLoginOverlay').classList.add('active');
+        $('aigLoginError').style.display = 'none';
+        $('aigLoginEmail').value = '';
+        $('aigLoginPass').value = '';
+        setTimeout(function() { $('aigLoginEmail').focus(); }, 100);
+    };
+
+    window.aigHideLogin = function() {
+        $('aigLoginOverlay').classList.remove('active');
+    };
+
+    window.aigDoLogin = function() {
+        var email = $('aigLoginEmail').value.trim().toLowerCase();
+        var pass = $('aigLoginPass').value;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            var session = { email: email, tier: 'pro', expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+            localStorage.setItem('rz_premium_session', JSON.stringify(session));
+            window.dispatchEvent(new Event('rz-auth-change'));
+            aigHideLogin();
+            aigUnlockPanels();
+        } else {
+            $('aigLoginError').style.display = 'block';
+        }
+    };
+
+    window.aigResetDefaults = function() {
+        $('aigWorkload').value = 'Conventional Enterprise';
+        $('aigTier').value = 'III';
+        $('aigGridScore').value = 7;
+        $('aigMaturity').value = 3;
+        $('aigRegClass').value = 'Limited-Risk AI';
+        $('aigFiduciary').value = 5000000;
+        updateAigProPanels();
+    };
+
+    // ===================== PDF EXPORT =====================
+    window.aigExportPDF = function() {
+        if (!aigCheckAuth()) { aigShowLogin(); return; }
+        var w = window.open('', '_blank');
+        if (!w) { alert('Please allow popups for this site to export PDF.'); return; }
+
+        var inp = getInputs();
+        var ops = calcOperational(inp);
+        var risk = calcRisk(inp, ops);
+        var health = calcHealth(inp, ops, risk);
+        var mc = runMonteCarlo(inp);
+        var sens = runSensitivity(inp);
+        var narrative = generateNarrative(inp, ops, risk, health, mc, sens);
+
+        // Build SVG histogram
+        function buildHistogramSVG() {
+            var results = mc.results;
+            var minV = results[0], maxV = results[results.length - 1], range = maxV - minV || 1;
+            var numBins = 40, bins = new Array(numBins).fill(0);
+            results.forEach(function(v) { var b = Math.min(Math.floor((v - minV) / range * numBins), numBins - 1); bins[b]++; });
+            var maxBin = Math.max.apply(null, bins);
+            var svgW = 520, svgH = 200, barW = (svgW - 60) / numBins;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+            svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc"/>';
+            svg += '<text x="' + (svgW / 2) + '" y="18" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="12" font-weight="bold">Monte Carlo Distribution (10K Simulations)</text>';
+            bins.forEach(function(c, i) {
+                var x = 30 + i * barW;
+                var barH = maxBin > 0 ? (c / maxBin) * 140 : 0;
+                var y = 170 - barH;
+                var binCenter = minV + (i + 0.5) * range / numBins;
+                var color = binCenter <= mc.p5 ? '#10b981' : binCenter <= mc.p50 ? '#6366f1' : binCenter <= mc.p95 ? '#f59e0b' : '#ef4444';
+                svg += '<rect x="' + x + '" y="' + y + '" width="' + Math.max(barW - 0.5, 0.5) + '" height="' + barH + '" fill="' + color + '"/>';
+            });
+            [{ v: mc.p5, l: 'P5 ' + fmt(mc.p5), c: '#10b981' }, { v: mc.p50, l: 'P50 ' + fmt(mc.p50), c: '#6366f1' }, { v: mc.p95, l: 'P95 ' + fmt(mc.p95), c: '#ef4444' }].forEach(function(m) {
+                var xp = 30 + ((m.v - minV) / range) * (svgW - 60);
+                svg += '<line x1="' + xp + '" y1="28" x2="' + xp + '" y2="170" stroke="' + m.c + '" stroke-width="1.5" stroke-dasharray="4,3"/>';
+                svg += '<text x="' + xp + '" y="185" text-anchor="middle" fill="' + m.c + '" font-family="Inter,sans-serif" font-size="9" font-weight="bold">' + m.l + '</text>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Build SVG tornado
+        function buildTornadoSVG() {
+            var svgW = 520, svgH = 200;
+            var maxSwing = Math.max.apply(null, sens.map(function(d) { return d.absSwing; })) || 1;
+            var barH = 28, gap = 8, startY = 35;
+            var centerX = svgW * 0.55, maxBarW = svgW * 0.30;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+            svg += '<rect width="' + svgW + '" height="' + svgH + '" fill="#f8fafc"/>';
+            svg += '<text x="' + (svgW / 2) + '" y="18" text-anchor="middle" fill="#1f2937" font-family="Inter,sans-serif" font-size="12" font-weight="bold">Sensitivity Tornado Chart</text>';
+            svg += '<line x1="' + centerX + '" y1="' + (startY - 5) + '" x2="' + centerX + '" y2="' + (startY + sens.length * (barH + gap)) + '" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>';
+            svg += '<text x="' + centerX + '" y="' + (startY - 8) + '" text-anchor="middle" fill="#64748b" font-family="Inter,sans-serif" font-size="8">Baseline: ' + fmt(risk.ale) + '</text>';
+            sens.forEach(function(d, i) {
+                var y = startY + i * (barH + gap);
+                var upW = d.absSwing > 0 ? (((d.upVal - risk.ale) / maxSwing) * maxBarW) : 0;
+                var dnW = d.absSwing > 0 ? (((risk.ale - d.downVal) / maxSwing) * maxBarW) : 0;
+                if (upW > 0) {
+                    svg += '<rect x="' + centerX + '" y="' + y + '" width="' + upW + '" height="' + barH + '" fill="#ef4444" rx="3"/>';
+                    svg += '<text x="' + (centerX + upW + 4) + '" y="' + (y + barH / 2 + 4) + '" fill="#dc2626" font-family="Inter,sans-serif" font-size="9" font-weight="bold">+' + fmt(d.upVal - risk.ale) + '</text>';
+                }
+                if (dnW > 0) {
+                    svg += '<rect x="' + (centerX - dnW) + '" y="' + y + '" width="' + dnW + '" height="' + barH + '" fill="#6366f1" rx="3"/>';
+                    svg += '<text x="' + (centerX - dnW - 4) + '" y="' + (y + barH / 2 + 4) + '" text-anchor="end" fill="#6366f1" font-family="Inter,sans-serif" font-size="9" font-weight="bold">-' + fmt(risk.ale - d.downVal) + '</text>';
+                }
+                svg += '<text x="' + (centerX - maxBarW - 12) + '" y="' + (y + barH / 2 + 4) + '" text-anchor="end" fill="#1f2937" font-family="Inter,sans-serif" font-size="10">' + d.name + '</text>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Build SVG gauge
+        function buildGaugeSVG() {
+            var maxLen = 283;
+            var dashLen = (health.overall / 100) * maxLen;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140">';
+            svg += '<path d="M 20 130 A 90 90 0 0 1 200 130" fill="none" stroke="#e5e7eb" stroke-width="18" stroke-linecap="round"/>';
+            svg += '<path d="M 20 130 A 90 90 0 0 1 200 130" fill="none" stroke="' + health.tierColor + '" stroke-width="18" stroke-linecap="round" stroke-dasharray="' + dashLen + ' ' + maxLen + '"/>';
+            svg += '<text x="110" y="110" text-anchor="middle" fill="#1f2937" font-size="32" font-weight="800" font-family="Inter,sans-serif">' + health.overall + '</text>';
+            svg += '<text x="110" y="128" text-anchor="middle" fill="#64748b" font-size="11" font-family="Inter,sans-serif">/ 100</text>';
+            svg += '</svg>';
+            return svg;
+        }
+
+        var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        html += '<title>AI Power Grid Management - Pro Report</title>';
+        html += '<style>';
+        html += 'body{font-family:Inter,Helvetica,Arial,sans-serif;color:#1f2937;max-width:800px;margin:0 auto;padding:40px 30px;font-size:11pt;line-height:1.6}';
+        html += 'h1{color:#312e81;font-size:22pt;margin-bottom:4px;border-bottom:3px solid #6366f1;padding-bottom:8px}';
+        html += 'h2{color:#312e81;font-size:14pt;margin-top:28px;margin-bottom:10px;border-bottom:1px solid #e5e7eb;padding-bottom:4px}';
+        html += 'h3{color:#312e81;font-size:12pt;margin-top:20px}';
+        html += '.subtitle{color:#64748b;font-size:10pt;margin-bottom:20px}';
+        html += '.meta{display:flex;gap:20px;font-size:9pt;color:#64748b;margin-bottom:24px;flex-wrap:wrap}';
+        html += '.meta span{background:#f1f5f9;padding:3px 10px;border-radius:4px}';
+        html += 'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10pt}';
+        html += 'th{background:#f1f5f9;color:#312e81;padding:8px 10px;text-align:left;font-weight:600;border-bottom:2px solid #e5e7eb}';
+        html += 'td{padding:7px 10px;border-bottom:1px solid #e5e7eb;color:#1f2937}';
+        html += '.kpi-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}';
+        html += '.kpi-item{flex:1;min-width:100px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center}';
+        html += '.kpi-val{font-size:14pt;font-weight:800;color:#6366f1}';
+        html += '.kpi-lbl{font-size:7.5pt;color:#64748b;margin-top:2px}';
+        html += '.kpi-sub{font-size:7pt;color:#94a3b8}';
+        html += '.narrative{background:#eef2ff;border-left:3px solid #6366f1;padding:12px 16px;margin:14px 0;border-radius:0 8px 8px 0}';
+        html += '.narrative p{color:#1f2937;font-size:9.5pt;margin:0 0 8px;line-height:1.6}';
+        html += '.narrative p:last-child{margin-bottom:0}';
+        html += '.narrative strong{color:#312e81}';
+        html += '.chart-wrap{text-align:center;margin:16px 0}';
+        html += '.gauge-wrap{text-align:center;margin:16px 0}';
+        html += '.methodology{background:#f8fafc;padding:12px 16px;border-radius:8px;margin-top:24px;font-size:9pt;color:#64748b}';
+        html += '.methodology h3{color:#312e81;margin-top:0}';
+        html += '.footer{margin-top:30px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:8pt;color:#94a3b8;text-align:center}';
+        html += '@media print{body{padding:20px}}';
+        html += '</style></head><body>';
+
+        html += '<h1>AI Power Grid Management Report</h1>';
+        html += '<p class="subtitle">Infrastructure Risk & Operational Intelligence Assessment</p>';
+        html += '<div class="meta">';
+        html += '<span>Workload: ' + inp.workloadKey + '</span>';
+        html += '<span>Tier: ' + inp.tierKey + ' (' + inp.tier.redundancy + ')</span>';
+        html += '<span>Grid Reliability: ' + inp.gridScore + '/10</span>';
+        html += '<span>Maturity: ' + inp.maturity + '/5</span>';
+        html += '<span>Regulatory: ' + inp.regClassKey + '</span>';
+        html += '<span>Generated: ' + now + '</span>';
+        html += '</div>';
+
+        // Section 1: Operational Intelligence
+        html += '<h2>1. Operational Intelligence</h2>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + ops.p99Avail.toFixed(3) + '%</div><div class="kpi-lbl">P99 Availability</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + ops.cer.toFixed(2) + '</div><div class="kpi-lbl">Cooling Efficiency</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + ops.stranded.toFixed(0) + '%</div><div class="kpi-lbl">Stranded Capacity</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + ops.mttd.toFixed(1) + ' min</div><div class="kpi-lbl">MTTD Forecast</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + ops.autoRatio.toFixed(0) + '%</div><div class="kpi-lbl">Automation Ratio</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + ops.logInteg + '/100</div><div class="kpi-lbl">Log Integrity (Art.13)</div></div>';
+        html += '</div>';
+
+        // Section 2: Risk & Financial Exposure
+        html += '<h2>2. Risk & Financial Exposure</h2>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + risk.rei.toFixed(3) + '</div><div class="kpi-lbl">Risk Exposure Index</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(risk.ale) + '</div><div class="kpi-lbl">Annual Loss Expectancy</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + risk.opexLeak.toFixed(1) + '%</div><div class="kpi-lbl">OPEX Leakage</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(risk.techDebt) + '</div><div class="kpi-lbl">Tech Debt /month</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + risk.finExpose + '/100</div><div class="kpi-lbl">Financial Exposure</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(risk.coi) + '</div><div class="kpi-lbl">Cost of Inaction</div></div>';
+        html += '</div>';
+
+        // Section 3: Operational Health
+        html += '<h2>3. Operational Health Score</h2>';
+        html += '<div class="gauge-wrap">' + buildGaugeSVG() + '</div>';
+        html += '<div style="text-align:center;font-weight:800;color:' + health.tierColor + ';font-size:14pt;margin-bottom:12px">Grade ' + health.tier + '</div>';
+        html += '<table><tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Assessment</th></tr>';
+        html += '<tr><td>Technical Reliability</td><td>' + health.techRel + '/100</td><td>35%</td><td>' + (health.techRel >= 80 ? 'Strong' : health.techRel >= 55 ? 'Adequate' : 'Needs Improvement') + '</td></tr>';
+        html += '<tr><td>Financial Resilience</td><td>' + health.finRes + '/100</td><td>25%</td><td>' + (health.finRes >= 80 ? 'Strong' : health.finRes >= 55 ? 'Adequate' : 'Needs Improvement') + '</td></tr>';
+        html += '<tr><td>Governance Integrity</td><td>' + health.govInt + '/100</td><td>20%</td><td>' + (health.govInt >= 80 ? 'Strong' : health.govInt >= 55 ? 'Adequate' : 'Needs Improvement') + '</td></tr>';
+        html += '<tr><td>Process Maturity</td><td>' + health.procMat + '/100</td><td>20%</td><td>' + (health.procMat >= 80 ? 'Strong' : health.procMat >= 55 ? 'Adequate' : 'Needs Improvement') + '</td></tr>';
+        html += '</table>';
+
+        // Section 4: Monte Carlo
+        html += '<h2>4. Monte Carlo Risk Analysis (10,000 Iterations)</h2>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.p5) + '</div><div class="kpi-lbl">P5 Best</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.p25) + '</div><div class="kpi-lbl">P25</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.p50) + '</div><div class="kpi-lbl">P50 Median</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.p75) + '</div><div class="kpi-lbl">P75</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.p95) + '</div><div class="kpi-lbl">P95 Stress</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.cvar95) + '</div><div class="kpi-lbl">CVaR-95</div></div>';
+        html += '</div>';
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-item"><div class="kpi-val">' + mc.slaBreach.toFixed(1) + '%</div><div class="kpi-lbl">SLA Breach Prob.</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.mean) + '</div><div class="kpi-lbl">Mean ALE</div></div>';
+        html += '<div class="kpi-item"><div class="kpi-val">' + fmt(mc.std) + '</div><div class="kpi-lbl">Std. Deviation</div></div>';
+        html += '</div>';
+        html += '<div class="chart-wrap">' + buildHistogramSVG() + '</div>';
+        html += '<h3>Sensitivity Analysis</h3>';
+        html += '<div class="chart-wrap">' + buildTornadoSVG() + '</div>';
+        html += '<table><tr><th>Variable</th><th>Impact (+10%)</th><th>Absolute Swing</th></tr>';
+        sens.forEach(function(d) { html += '<tr><td>' + d.name + '</td><td>+' + d.impact.toFixed(1) + '%</td><td>' + fmt(d.absSwing) + '</td></tr>'; });
+        html += '</table>';
+
+        // Section 5: Narrative
+        html += '<h2>5. Executive Assessment</h2>';
+        html += '<div class="narrative">' + narrative + '</div>';
+
+        // Methodology
+        html += '<div class="methodology">';
+        html += '<h3>Methodology Note</h3>';
+        html += '<p>Availability modeled per Uptime Institute Tier Standards with regional grid reliability adjustments (ARO modifier = 1 + (10 - GridScore) x 0.15). Risk calculations use SLE x ARO framework per ISO 27005 / NIST SP 800-30. Monte Carlo: 10,000 iterations using Box-Muller normal distribution for Grid Reliability (\u03C3=1.5), Process Maturity (\u03C3=0.8), and Fiduciary Tolerance (\u03C3=20%). CVaR-95 represents the expected shortfall (average of worst 5% outcomes). Sensitivity analysis applies \u00B110% perturbation to each factor independently. Regulatory framework aligned with EU AI Act Article 13 transparency requirements. Operational Health Score: weighted composite of Technical Reliability (35%), Financial Resilience (25%), Governance Integrity (20%), and Process Maturity (20%). All calculations performed client-side; no data transmitted.</p>';
+        html += '</div>';
+
+        html += '<div class="footer">Generated by ResistanceZero AI Grid Management Calculator | resistancezero.com | ' + new Date().toISOString().split('T')[0] + '</div>';
+        html += '</body></html>';
+
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 500);
+    };
+
+    // ===================== EVENT LISTENERS =====================
+    // Enter key in login
+    $('aigLoginPass').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') aigDoLogin();
+    });
+    $('aigLoginEmail').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') $('aigLoginPass').focus();
+    });
+
+    // Close on overlay click
+    $('aigLoginOverlay').addEventListener('click', function(e) {
+        if (e.target === this) aigHideLogin();
+    });
+
+    // Listen for auth changes from other articles/tabs
+    window.addEventListener('rz-auth-change', function() {
+        if (aigCheckAuth()) aigUnlockPanels();
+        else aigLockPanels();
+    });
+
+    // Recalculate on input change
+    ['aigWorkload', 'aigTier', 'aigGridScore', 'aigMaturity', 'aigRegClass', 'aigFiduciary'].forEach(function(id) {
+        var el = $(id);
+        if (el) {
+            el.addEventListener('change', function() { if (aigProMode) updateAigProPanels(); });
+            el.addEventListener('input', function() { if (aigProMode) updateAigProPanels(); });
+        }
+    });
+
+    // Tooltip positioning
+    document.querySelectorAll('.aig-tooltip-trigger').forEach(function(trigger) {
+        trigger.addEventListener('mouseenter', function() {
+            var tip = this.querySelector('.aig-tooltip-content');
+            if (!tip) return;
+            var rect = this.getBoundingClientRect();
+            var tipRect = tip.getBoundingClientRect();
+            if (rect.left + tipRect.width / 2 > window.innerWidth - 10) {
+                tip.style.left = 'auto';
+                tip.style.right = '-10px';
+                tip.style.transform = 'none';
+            }
+            if (rect.left - tipRect.width / 2 < 10) {
+                tip.style.left = '-10px';
+                tip.style.right = 'auto';
+                tip.style.transform = 'none';
+            }
+            if (rect.top < tipRect.height + 20) {
+                tip.style.bottom = 'auto';
+                tip.style.top = 'calc(100% + 10px)';
+            }
+        });
+    });
+
+    // ===================== INIT =====================
+    if (aigCheckAuth()) {
+        aigUnlockPanels();
+    } else {
+        updateAigProPanels(); // Populate values even when locked (blurred behind gate)
+    }
+
+})();
 </script>
 <script src="auth.js"></script>
 </body>

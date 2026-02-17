@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Dashboard | ResistanceZero</title>
+    <meta name="description" content="User dashboard for ResistanceZero SaaS platform. Manage your subscription, saved projects, and exports.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="canonical" href="https://resistancezero.com/dashboard.html">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ═══ DASHBOARD VARIABLES ═══ */
+        :root {
+            --db-primary: #1e3a5f;
+            --db-accent: #3b82f6;
+            --db-accent-light: #60a5fa;
+            --db-purple: #8b5cf6;
+            --db-purple-light: #a78bfa;
+            --db-emerald: #10b981;
+            --db-amber: #f59e0b;
+            --db-red: #ef4444;
+            --db-bg: #f8fafc;
+            --db-card: #ffffff;
+            --db-border: #e2e8f0;
+            --db-text: #1e293b;
+            --db-text-secondary: #64748b;
+            --db-text-muted: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            --db-bg: #0f172a;
+            --db-card: #1e293b;
+            --db-border: rgba(255,255,255,0.08);
+            --db-text: #f1f5f9;
+            --db-text-secondary: #94a3b8;
+            --db-text-muted: #64748b;
+        }
+
+        /* ═══ LAYOUT ═══ */
+        .db-page {
+            min-height: 100vh;
+            background: var(--db-bg);
+            padding-top: 80px;
+            transition: background 0.3s;
+        }
+
+        .db-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .db-header {
+            margin-bottom: 2rem;
+        }
+
+        .db-header h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--db-text);
+            margin: 0 0 0.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .db-header p {
+            font-size: 0.9rem;
+            color: var(--db-text-secondary);
+            margin: 0;
+        }
+
+        /* ═══ GRID LAYOUTS ═══ */
+        .db-grid-top {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .db-grid-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .db-grid-lists {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ═══ CARD BASE ═══ */
+        .db-card {
+            background: var(--db-card);
+            border: 1px solid var(--db-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .db-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        [data-theme="dark"] .db-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .db-card-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--db-text-muted);
+            margin: 0 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .db-card-title i {
+            font-size: 0.85rem;
+            color: var(--db-purple);
+        }
+
+        /* ═══ PROFILE CARD ═══ */
+        .db-profile {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .db-profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--db-purple), var(--db-accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .db-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .db-profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .db-profile-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--db-text);
+            margin: 0 0 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .db-profile-email {
+            font-size: 0.82rem;
+            color: var(--db-text-secondary);
+            margin: 0 0 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .db-profile-company {
+            font-size: 0.78rem;
+            color: var(--db-text-muted);
+            margin: 0 0 0.5rem;
+        }
+
+        .db-tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .db-tier-badge.pro {
+            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(168,85,247,0.08));
+            color: #8b5cf6;
+            border: 1px solid rgba(139,92,246,0.3);
+        }
+
+        [data-theme="dark"] .db-tier-badge.pro {
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(168,85,247,0.12));
+            color: #a78bfa;
+        }
+
+        .db-tier-badge.free {
+            background: rgba(100,116,139,0.1);
+            color: #64748b;
+            border: 1px solid rgba(100,116,139,0.2);
+        }
+
+        .db-tier-badge i {
+            font-size: 0.65rem;
+        }
+
+        /* ═══ SUBSCRIPTION CARD ═══ */
+        .db-sub-plan {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--db-text);
+            margin: 0 0 0.75rem;
+        }
+
+        .db-sub-plan span {
+            color: var(--db-purple);
+        }
+
+        .db-sub-dates {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .db-sub-date-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+        }
+
+        .db-sub-date-label {
+            color: var(--db-text-muted);
+        }
+
+        .db-sub-date-value {
+            color: var(--db-text);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+        }
+
+        .db-sub-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .db-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .db-btn-primary {
+            background: linear-gradient(135deg, var(--db-purple), #7c3aed);
+            color: #fff;
+        }
+
+        .db-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139,92,246,0.3);
+        }
+
+        .db-btn-outline {
+            background: transparent;
+            color: var(--db-text-secondary);
+            border: 1px solid var(--db-border);
+        }
+
+        .db-btn-outline:hover {
+            background: rgba(139,92,246,0.05);
+            border-color: rgba(139,92,246,0.3);
+            color: var(--db-purple);
+        }
+
+        .db-btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .db-btn-danger {
+            background: transparent;
+            color: var(--db-red);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        .db-btn-danger:hover {
+            background: rgba(239,68,68,0.08);
+        }
+
+        /* ═══ STATS CARDS ═══ */
+        .db-stat-card {
+            text-align: center;
+            padding: 1.25rem 1rem;
+        }
+
+        .db-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .db-stat-icon.blue {
+            background: rgba(59,130,246,0.1);
+            color: var(--db-accent);
+        }
+
+        [data-theme="dark"] .db-stat-icon.blue {
+            background: rgba(59,130,246,0.15);
+        }
+
+        .db-stat-icon.purple {
+            background: rgba(139,92,246,0.1);
+            color: var(--db-purple);
+        }
+
+        [data-theme="dark"] .db-stat-icon.purple {
+            background: rgba(139,92,246,0.15);
+        }
+
+        .db-stat-icon.emerald {
+            background: rgba(16,185,129,0.1);
+            color: var(--db-emerald);
+        }
+
+        [data-theme="dark"] .db-stat-icon.emerald {
+            background: rgba(16,185,129,0.15);
+        }
+
+        .db-stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--db-text);
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .db-stat-label {
+            font-size: 0.75rem;
+            color: var(--db-text-muted);
+            margin: 0.25rem 0 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* ═══ LIST CARDS ═══ */
+        .db-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .db-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--db-border);
+        }
+
+        .db-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .db-list-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .db-list-item-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--db-text);
+            margin: 0 0 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .db-list-item-meta {
+            font-size: 0.75rem;
+            color: var(--db-text-muted);
+        }
+
+        .db-list-item-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+            margin-left: 0.75rem;
+        }
+
+        .db-list-empty {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--db-text-muted);
+        }
+
+        .db-list-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+
+        .db-list-empty p {
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* ═══ PLAN COMPARISON TABLE ═══ */
+        .db-plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .db-plan-table thead th {
+            padding: 0.6rem 0.75rem;
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--db-text-muted);
+            border-bottom: 2px solid var(--db-border);
+        }
+
+        .db-plan-table thead th:first-child {
+            text-align: left;
+        }
+
+        .db-plan-table thead th.pro-col {
+            color: var(--db-purple);
+            background: rgba(139,92,246,0.04);
+            border-radius: 8px 8px 0 0;
+        }
+
+        [data-theme="dark"] .db-plan-table thead th.pro-col {
+            background: rgba(139,92,246,0.08);
+        }
+
+        .db-plan-table tbody td {
+            padding: 0.6rem 0.75rem;
+            color: var(--db-text-secondary);
+            border-bottom: 1px solid var(--db-border);
+        }
+
+        .db-plan-table tbody td:first-child {
+            font-weight: 500;
+            color: var(--db-text);
+        }
+
+        .db-plan-table tbody td:not(:first-child) {
+            text-align: center;
+        }
+
+        .db-plan-table .check {
+            color: var(--db-emerald);
+            font-weight: 700;
+        }
+
+        .db-plan-table .cross {
+            color: var(--db-text-muted);
+            opacity: 0.4;
+        }
+
+        .db-plan-table .pro-col {
+            background: rgba(139,92,246,0.02);
+        }
+
+        [data-theme="dark"] .db-plan-table .pro-col {
+            background: rgba(139,92,246,0.05);
+        }
+
+        .db-plan-cta {
+            text-align: center;
+            margin-top: 1.25rem;
+        }
+
+        /* ═══ LOADING & STATES ═══ */
+        .db-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .db-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--db-border);
+            border-top-color: var(--db-purple);
+            border-radius: 50%;
+            animation: db-spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes db-spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .db-loading p {
+            font-size: 0.9rem;
+            color: var(--db-text-muted);
+            margin: 0;
+        }
+
+        .db-error-banner {
+            display: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: var(--db-red);
+            font-size: 0.82rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .db-error-banner.show {
+            display: flex;
+        }
+
+        .db-error-banner i {
+            flex-shrink: 0;
+        }
+
+        /* ═══ AUTH GATE (shown when not logged in) ═══ */
+        .db-auth-gate {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .db-auth-gate.show {
+            display: flex;
+        }
+
+        .db-auth-gate-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .db-auth-gate-icon i {
+            font-size: 2rem;
+            color: var(--db-purple);
+        }
+
+        .db-auth-gate h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--db-text);
+            margin: 0 0 0.5rem;
+        }
+
+        .db-auth-gate p {
+            font-size: 0.9rem;
+            color: var(--db-text-secondary);
+            margin: 0 0 1.5rem;
+            max-width: 400px;
+        }
+
+        /* ═══ CONTENT WRAPPER ═══ */
+        .db-content {
+            display: none;
+        }
+
+        .db-content.show {
+            display: block;
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 768px) {
+            .db-container {
+                padding: 1.25rem 1rem 3rem;
+            }
+
+            .db-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .db-grid-top {
+                grid-template-columns: 1fr;
+            }
+
+            .db-grid-stats {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 0.75rem;
+            }
+
+            .db-grid-lists {
+                grid-template-columns: 1fr;
+            }
+
+            .db-profile {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .db-profile-name,
+            .db-profile-email {
+                text-align: center;
+            }
+
+            .db-sub-actions {
+                flex-direction: column;
+            }
+
+            .db-btn {
+                justify-content: center;
+            }
+
+            .db-stat-value {
+                font-size: 1.3rem;
+            }
+
+            .db-plan-table {
+                font-size: 0.78rem;
+            }
+
+            .db-plan-table thead th,
+            .db-plan-table tbody td {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .db-grid-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .db-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .db-list-item-actions {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">
+                        DC Solutions
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                        <li><a href="dc-conventional.html">DC Conventional</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                    </ul>
+                </li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Page -->
+    <div class="db-page">
+        <div class="db-container">
+
+            <!-- Auth Gate (shown when not logged in) -->
+            <div class="db-auth-gate" id="dbAuthGate">
+                <div class="db-auth-gate-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2>Sign in to access your dashboard</h2>
+                <p>View your profile, manage your subscription, track saved projects and recent exports.</p>
+                <button class="db-btn db-btn-primary" onclick="window._rzAuth && window._rzAuth.showModal()">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div class="db-loading" id="dbLoading" style="display: none;">
+                <div class="db-spinner"></div>
+                <p>Loading your dashboard...</p>
+            </div>
+
+            <!-- Dashboard Content (shown after auth + data load) -->
+            <div class="db-content" id="dbContent">
+
+                <!-- Header -->
+                <div class="db-header">
+                    <h1>Dashboard</h1>
+                    <p>Manage your account, subscription, and saved work.</p>
+                </div>
+
+                <!-- Error Banner -->
+                <div class="db-error-banner" id="dbErrorBanner">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="dbErrorText">Unable to load dashboard data. Showing cached information.</span>
+                </div>
+
+                <!-- Profile + Subscription Row -->
+                <div class="db-grid-top">
+
+                    <!-- Profile Card -->
+                    <div class="db-card">
+                        <div class="db-card-title"><i class="fas fa-user"></i> Profile</div>
+                        <div class="db-profile">
+                            <div class="db-profile-avatar" id="dbAvatar">U</div>
+                            <div class="db-profile-info">
+                                <p class="db-profile-name" id="dbName">--</p>
+                                <p class="db-profile-email" id="dbEmail">--</p>
+                                <p class="db-profile-company" id="dbCompany"></p>
+                                <span class="db-tier-badge free" id="dbTierBadge">
+                                    <i class="fas fa-circle"></i> FREE
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Card -->
+                    <div class="db-card">
+                        <div class="db-card-title"><i class="fas fa-crown"></i> Subscription</div>
+                        <p class="db-sub-plan" id="dbSubPlan">Free Plan</p>
+                        <div class="db-sub-dates">
+                            <div class="db-sub-date-row">
+                                <span class="db-sub-date-label">Started</span>
+                                <span class="db-sub-date-value" id="dbSubStart">--</span>
+                            </div>
+                            <div class="db-sub-date-row">
+                                <span class="db-sub-date-label">Renews</span>
+                                <span class="db-sub-date-value" id="dbSubRenew">--</span>
+                            </div>
+                        </div>
+                        <div class="db-sub-actions" id="dbSubActions">
+                            <button class="db-btn db-btn-primary" id="dbUpgradeBtn" onclick="handleUpgrade()">
+                                <i class="fas fa-arrow-up"></i> Upgrade to Pro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Row -->
+                <div class="db-grid-stats">
+                    <div class="db-card db-stat-card">
+                        <div class="db-stat-icon blue">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <p class="db-stat-value" id="dbStatProjects">0</p>
+                        <p class="db-stat-label">Saved Projects</p>
+                    </div>
+                    <div class="db-card db-stat-card">
+                        <div class="db-stat-icon purple">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <p class="db-stat-value" id="dbStatExports">0</p>
+                        <p class="db-stat-label">Exports</p>
+                    </div>
+                    <div class="db-card db-stat-card">
+                        <div class="db-stat-icon emerald">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <p class="db-stat-value" id="dbStatCalcRuns">0</p>
+                        <p class="db-stat-label">Calculator Runs</p>
+                    </div>
+                </div>
+
+                <!-- Saved Projects + Recent Exports -->
+                <div class="db-grid-lists">
+
+                    <!-- Saved Projects -->
+                    <div class="db-card">
+                        <div class="db-card-title"><i class="fas fa-folder-open"></i> Saved Projects</div>
+                        <ul class="db-list" id="dbProjectsList">
+                            <li class="db-list-empty" id="dbProjectsEmpty">
+                                <i class="fas fa-folder-open"></i>
+                                <p>No saved projects yet. Use the CAPEX or OPEX calculators to create your first project.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Recent Exports -->
+                    <div class="db-card">
+                        <div class="db-card-title"><i class="fas fa-download"></i> Recent Exports</div>
+                        <ul class="db-list" id="dbExportsList">
+                            <li class="db-list-empty" id="dbExportsEmpty">
+                                <i class="fas fa-file-pdf"></i>
+                                <p>No exports yet. Export a PDF report from any calculator to see it here.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Plan Comparison / Upgrade -->
+                <div class="db-card">
+                    <div class="db-card-title"><i class="fas fa-th-list"></i> Plan Comparison</div>
+                    <table class="db-plan-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Free</th>
+                                <th class="pro-col">Pro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CAPEX Calculator (basic)</td>
+                                <td><span class="check"><i class="fas fa-check"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td>OPEX Calculator (basic)</td>
+                                <td><span class="check"><i class="fas fa-check"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td>Article Pro Mode (Monte Carlo, Sensitivity)</td>
+                                <td><span class="cross"><i class="fas fa-times"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td>Advanced PDF Export</td>
+                                <td><span class="cross"><i class="fas fa-times"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td>Save / Load Projects</td>
+                                <td>Up to 3</td>
+                                <td class="pro-col">Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>Sensitivity Tornado Charts</td>
+                                <td><span class="cross"><i class="fas fa-times"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td>Narrative Report Generator</td>
+                                <td><span class="cross"><i class="fas fa-times"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td>Priority Support</td>
+                                <td><span class="cross"><i class="fas fa-times"></i></span></td>
+                                <td class="pro-col"><span class="check"><i class="fas fa-check"></i></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="db-plan-cta" id="dbPlanCta">
+                        <button class="db-btn db-btn-primary" onclick="handleUpgrade()">
+                            <i class="fas fa-rocket"></i> Upgrade to Pro
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /db-content -->
+        </div><!-- /db-container -->
+    </div><!-- /db-page -->
+
+    <!-- Footer -->
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home Dashboard</a></li>
+                        <li><a href="articles.html">Technical Journal</a></li>
+                        <li><a href="index.html#case-studies">Case Studies</a></li>
+                        <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+                        <li><a href="articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shared Scripts -->
+    <script src="script.js"></script>
+    <script src="firebase-auth.js"></script>
+
+    <!-- Dashboard Logic -->
+    <script>
+    (function() {
+        'use strict';
+
+        /* ─── DOM References ─── */
+        var authGate   = document.getElementById('dbAuthGate');
+        var loading    = document.getElementById('dbLoading');
+        var content    = document.getElementById('dbContent');
+        var errorBanner = document.getElementById('dbErrorBanner');
+        var errorText  = document.getElementById('dbErrorText');
+
+        /* Profile */
+        var elAvatar   = document.getElementById('dbAvatar');
+        var elName     = document.getElementById('dbName');
+        var elEmail    = document.getElementById('dbEmail');
+        var elCompany  = document.getElementById('dbCompany');
+        var elTierBadge = document.getElementById('dbTierBadge');
+
+        /* Subscription */
+        var elSubPlan  = document.getElementById('dbSubPlan');
+        var elSubStart = document.getElementById('dbSubStart');
+        var elSubRenew = document.getElementById('dbSubRenew');
+        var elSubActions = document.getElementById('dbSubActions');
+        var elUpgradeBtn = document.getElementById('dbUpgradeBtn');
+        var elPlanCta  = document.getElementById('dbPlanCta');
+
+        /* Stats */
+        var elStatProjects = document.getElementById('dbStatProjects');
+        var elStatExports  = document.getElementById('dbStatExports');
+        var elStatCalcRuns = document.getElementById('dbStatCalcRuns');
+
+        /* Lists */
+        var elProjectsList = document.getElementById('dbProjectsList');
+        var elExportsList  = document.getElementById('dbExportsList');
+
+        /* ─── Utility ─── */
+        function formatDate(dateStr) {
+            if (!dateStr) return '--';
+            try {
+                var d = new Date(dateStr);
+                return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch(e) {
+                return dateStr;
+            }
+        }
+
+        function showError(msg) {
+            if (errorText) errorText.textContent = msg;
+            if (errorBanner) errorBanner.classList.add('show');
+        }
+
+        /* ─── Auth State Check ─── */
+        function getSession() {
+            if (window._rzAuth && typeof window._rzAuth.getSession === 'function') {
+                return window._rzAuth.getSession();
+            }
+            try {
+                var raw = localStorage.getItem('rz_premium_session');
+                if (!raw) return null;
+                var data = JSON.parse(raw);
+                if (data.expires && new Date(data.expires) < new Date()) {
+                    localStorage.removeItem('rz_premium_session');
+                    return null;
+                }
+                return data;
+            } catch(e) { return null; }
+        }
+
+        /* ─── Get Firebase ID Token (if available) ─── */
+        function getIdToken() {
+            return new Promise(function(resolve) {
+                /* If firebase-auth.js exposes a token getter */
+                if (window._rzAuth && typeof window._rzAuth.getIdToken === 'function') {
+                    window._rzAuth.getIdToken()
+                        .then(function(token) { resolve(token); })
+                        .catch(function() { resolve(null); });
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+
+        /* ─── Fetch Dashboard Data from API ─── */
+        function fetchDashboard(token) {
+            var apiBase = window.API_BASE || '';
+            if (!apiBase) {
+                return Promise.reject(new Error('API_BASE not configured'));
+            }
+
+            var headers = { 'Content-Type': 'application/json' };
+            if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+            }
+
+            return fetch(apiBase + '/api/dashboard', {
+                method: 'GET',
+                headers: headers
+            }).then(function(resp) {
+                if (!resp.ok) throw new Error('API returned ' + resp.status);
+                return resp.json();
+            });
+        }
+
+        /* ─── Render Profile ─── */
+        function renderProfile(profile) {
+            var name = profile.display_name || profile.name || '';
+            var email = profile.email || '';
+            var company = profile.company || '';
+            var tier = profile.tier || 'free';
+            var avatarUrl = profile.avatar_url || '';
+
+            if (elAvatar) {
+                if (avatarUrl) {
+                    elAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="Avatar">';
+                } else {
+                    elAvatar.textContent = (name || email).charAt(0).toUpperCase();
+                }
+            }
+
+            if (elName) elName.textContent = name || email.split('@')[0] || '--';
+            if (elEmail) elEmail.textContent = email;
+            if (elCompany) {
+                elCompany.textContent = company;
+                elCompany.style.display = company ? 'block' : 'none';
+            }
+
+            if (elTierBadge) {
+                var isPro = tier === 'pro';
+                elTierBadge.className = 'db-tier-badge ' + (isPro ? 'pro' : 'free');
+                elTierBadge.innerHTML = '<i class="fas fa-' + (isPro ? 'crown' : 'circle') + '"></i> ' + tier.toUpperCase();
+            }
+
+            return tier;
+        }
+
+        /* ─── Render Subscription ─── */
+        function renderSubscription(sub, tier) {
+            var isPro = tier === 'pro';
+
+            if (elSubPlan) {
+                if (isPro) {
+                    elSubPlan.innerHTML = '<span>Pro</span> Plan';
+                } else {
+                    elSubPlan.textContent = 'Free Plan';
+                }
+            }
+
+            if (sub) {
+                if (elSubStart) elSubStart.textContent = formatDate(sub.start_date || sub.created_at);
+                if (elSubRenew) elSubRenew.textContent = formatDate(sub.end_date || sub.renews_at);
+            } else {
+                if (elSubStart) elSubStart.textContent = '--';
+                if (elSubRenew) elSubRenew.textContent = '--';
+            }
+
+            /* Show/hide upgrade vs renew buttons */
+            if (elSubActions) {
+                if (isPro && sub) {
+                    elSubActions.innerHTML =
+                        '<button class="db-btn db-btn-outline" onclick="handleManageSub()">' +
+                            '<i class="fas fa-cog"></i> Manage Subscription' +
+                        '</button>';
+                } else {
+                    elSubActions.innerHTML =
+                        '<button class="db-btn db-btn-primary" onclick="handleUpgrade()">' +
+                            '<i class="fas fa-arrow-up"></i> Upgrade to Pro' +
+                        '</button>';
+                }
+            }
+
+            /* Hide bottom CTA if already pro */
+            if (elPlanCta) {
+                elPlanCta.style.display = isPro ? 'none' : 'block';
+            }
+        }
+
+        /* ─── Render Stats ─── */
+        function renderStats(stats) {
+            if (elStatProjects) elStatProjects.textContent = (stats.projects_count != null) ? stats.projects_count : 0;
+            if (elStatExports) elStatExports.textContent = (stats.exports_count != null) ? stats.exports_count : 0;
+            if (elStatCalcRuns) elStatCalcRuns.textContent = (stats.calc_runs != null) ? stats.calc_runs : 0;
+        }
+
+        /* ─── Render Saved Projects ─── */
+        function renderProjects(projects) {
+            if (!elProjectsList) return;
+
+            if (!projects || projects.length === 0) {
+                elProjectsList.innerHTML =
+                    '<li class="db-list-empty">' +
+                        '<i class="fas fa-folder-open"></i>' +
+                        '<p>No saved projects yet. Use the CAPEX or OPEX calculators to create your first project.</p>' +
+                    '</li>';
+                return;
+            }
+
+            var html = '';
+            projects.forEach(function(proj) {
+                var typeIcon = (proj.type === 'capex') ? 'fa-coins' : (proj.type === 'opex') ? 'fa-chart-line' : 'fa-file-alt';
+                var typeLabel = (proj.type || 'project').toUpperCase();
+                html +=
+                    '<li class="db-list-item">' +
+                        '<div class="db-list-item-info">' +
+                            '<p class="db-list-item-name"><i class="fas ' + typeIcon + '" style="margin-right:6px;opacity:0.5;font-size:0.8rem;"></i>' + escapeHtml(proj.name || 'Untitled') + '</p>' +
+                            '<span class="db-list-item-meta">' + typeLabel + ' &middot; ' + formatDate(proj.updated_at || proj.created_at) + '</span>' +
+                        '</div>' +
+                        '<div class="db-list-item-actions">' +
+                            '<button class="db-btn db-btn-sm db-btn-outline" onclick="handleLoadProject(\'' + (proj.id || '') + '\', \'' + (proj.type || '') + '\')" title="Open project">' +
+                                '<i class="fas fa-external-link-alt"></i> Open' +
+                            '</button>' +
+                            '<button class="db-btn db-btn-sm db-btn-danger" onclick="handleDeleteProject(\'' + (proj.id || '') + '\')" title="Delete project">' +
+                                '<i class="fas fa-trash-alt"></i>' +
+                            '</button>' +
+                        '</div>' +
+                    '</li>';
+            });
+
+            elProjectsList.innerHTML = html;
+        }
+
+        /* ─── Render Recent Exports ─── */
+        function renderExports(exports) {
+            if (!elExportsList) return;
+
+            if (!exports || exports.length === 0) {
+                elExportsList.innerHTML =
+                    '<li class="db-list-empty">' +
+                        '<i class="fas fa-file-pdf"></i>' +
+                        '<p>No exports yet. Export a PDF report from any calculator to see it here.</p>' +
+                    '</li>';
+                return;
+            }
+
+            var html = '';
+            exports.forEach(function(exp) {
+                var formatIcon = (exp.format === 'pdf') ? 'fa-file-pdf' : (exp.format === 'csv') ? 'fa-file-csv' : 'fa-file-alt';
+                html +=
+                    '<li class="db-list-item">' +
+                        '<div class="db-list-item-info">' +
+                            '<p class="db-list-item-name"><i class="fas ' + formatIcon + '" style="margin-right:6px;color:#ef4444;opacity:0.7;font-size:0.8rem;"></i>' + escapeHtml(exp.name || 'Export') + '</p>' +
+                            '<span class="db-list-item-meta">' + (exp.format || 'PDF').toUpperCase() + ' &middot; ' + formatDate(exp.created_at) + '</span>' +
+                        '</div>' +
+                        '<div class="db-list-item-actions">' +
+                            '<a class="db-btn db-btn-sm db-btn-outline" href="' + (exp.download_url || '#') + '" target="_blank" title="Download">' +
+                                '<i class="fas fa-download"></i>' +
+                            '</a>' +
+                        '</div>' +
+                    '</li>';
+            });
+
+            elExportsList.innerHTML = html;
+        }
+
+        /* ─── HTML Escape ─── */
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        /* ─── Render from Session (fallback when API unavailable) ─── */
+        function renderFromSession(session) {
+            renderProfile({
+                email: session.email,
+                display_name: session.display_name || '',
+                tier: session.tier || 'free'
+            });
+            renderSubscription(null, session.tier || 'free');
+            renderStats({ projects_count: 0, exports_count: 0, calc_runs: 0 });
+            renderProjects([]);
+            renderExports([]);
+        }
+
+        /* ─── View State Transitions ─── */
+        function showAuthGate() {
+            authGate.classList.add('show');
+            loading.style.display = 'none';
+            content.classList.remove('show');
+        }
+
+        function showLoading() {
+            authGate.classList.remove('show');
+            loading.style.display = 'flex';
+            content.classList.remove('show');
+        }
+
+        function showContent() {
+            authGate.classList.remove('show');
+            loading.style.display = 'none';
+            content.classList.add('show');
+        }
+
+        /* ─── Main Init ─── */
+        function initDashboard() {
+            var session = getSession();
+
+            if (!session) {
+                showAuthGate();
+                return;
+            }
+
+            showLoading();
+
+            getIdToken().then(function(token) {
+                if (!token && !window.API_BASE) {
+                    /* No API configured: render from session only */
+                    renderFromSession(session);
+                    showContent();
+                    return;
+                }
+
+                fetchDashboard(token)
+                    .then(function(data) {
+                        /* Expected shape:
+                           { profile: {...}, subscription: {...}, stats: {...},
+                             projects: [...], exports: [...] }
+                        */
+                        var tier = renderProfile(data.profile || { email: session.email, tier: session.tier });
+                        renderSubscription(data.subscription || null, tier);
+                        renderStats(data.stats || {});
+                        renderProjects(data.projects || []);
+                        renderExports(data.exports || []);
+                        showContent();
+                    })
+                    .catch(function(err) {
+                        console.warn('[Dashboard] API fetch failed:', err.message);
+                        /* Fallback: render from session data */
+                        renderFromSession(session);
+                        showError('Unable to reach the server. Showing locally cached information.');
+                        showContent();
+                    });
+            });
+        }
+
+        /* ─── Action Handlers (exposed globally) ─── */
+        window.handleUpgrade = function() {
+            /* Navigate to upgrade/payment page when available */
+            alert('Pro upgrade coming soon! Stay tuned for launch.');
+        };
+
+        window.handleManageSub = function() {
+            alert('Subscription management portal coming soon.');
+        };
+
+        window.handleLoadProject = function(projectId, type) {
+            if (!projectId) return;
+            var target = (type === 'capex') ? 'capex-calculator.html' : 'opex-calculator.html';
+            window.location.href = target + '?project=' + encodeURIComponent(projectId);
+        };
+
+        window.handleDeleteProject = function(projectId) {
+            if (!projectId) return;
+            if (!confirm('Delete this project? This action cannot be undone.')) return;
+
+            getIdToken().then(function(token) {
+                var apiBase = window.API_BASE || '';
+                if (!apiBase || !token) {
+                    alert('Unable to delete: API not configured.');
+                    return;
+                }
+
+                fetch(apiBase + '/api/projects/' + encodeURIComponent(projectId), {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function(resp) {
+                    if (resp.ok) {
+                        initDashboard(); /* Refresh */
+                    } else {
+                        alert('Failed to delete project. Please try again.');
+                    }
+                }).catch(function() {
+                    alert('Network error. Please try again.');
+                });
+            });
+        };
+
+        /* ─── Listen for Auth Changes ─── */
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.action === 'login') {
+                setTimeout(initDashboard, 300);
+            } else if (e.detail && e.detail.action === 'logout') {
+                showAuthGate();
+            }
+        });
+
+        /* ─── Boot ─── */
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initDashboard, 100);
+            });
+        } else {
+            setTimeout(initDashboard, 100);
+        }
+    })();
+    </script>
+</body>
+</html>

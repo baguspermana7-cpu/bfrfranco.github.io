@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Audit Report — ResistanceZero Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --navy-900: #0b1120;
+            --navy-800: #111827;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --white: #ffffff;
+            --purple-600: #7c3aed;
+            --purple-500: #8b5cf6;
+            --purple-400: #a78bfa;
+            --purple-100: rgba(139,92,246,0.1);
+            --green-500: #10b981;
+            --green-400: #34d399;
+            --green-100: rgba(16,185,129,0.1);
+            --amber-500: #f59e0b;
+            --amber-400: #fbbf24;
+            --amber-100: rgba(245,158,11,0.1);
+            --red-500: #ef4444;
+            --red-400: #f87171;
+            --red-100: rgba(239,68,68,0.1);
+            --blue-500: #3b82f6;
+            --blue-100: rgba(59,130,246,0.1);
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --orange-100: rgba(249,115,22,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--navy-900);
+            color: var(--slate-300);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        @media print {
+            body { background: #fff; color: #1e293b; font-size: 11pt; line-height: 1.5; }
+            .cover-page { page-break-after: always; background: #0b1120 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cover-page * { color: #fff !important; }
+            .section { page-break-inside: avoid; }
+            .finding-card { break-inside: avoid; border: 1px solid #e2e8f0 !important; background: #f8fafc !important; }
+            .finding-card * { color: #1e293b !important; }
+            .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .category-header { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .risk-cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            h1, h2, h3 { color: #0b1120 !important; }
+            .summary-table th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .summary-table td { border: 1px solid #e2e8f0; color: #1e293b !important; }
+        }
+
+        /* ═══ COVER PAGE ═══ */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--navy-900) 0%, #1a0f20 50%, var(--navy-900) 100%);
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(239,68,68,0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(139,92,246,0.05) 0%, transparent 50%);
+        }
+        .cover-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: rgba(239,68,68,0.1);
+            color: var(--red-400);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .cover-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .cover-title span { color: var(--red-400); }
+        .cover-subtitle {
+            font-size: 1.15rem;
+            color: var(--slate-400);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+        .cover-meta {
+            display: flex;
+            gap: 3rem;
+            position: relative;
+        }
+        .cover-meta-item { text-align: center; }
+        .cover-meta-label { font-size: 0.65rem; color: var(--slate-400); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .cover-meta-value { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 4px; }
+
+        /* ═══ CONTENT ═══ */
+        .content-wrap { max-width: 960px; margin: 0 auto; padding: 3rem 2rem; }
+        h1 { font-size: 1.8rem; font-weight: 800; color: var(--white); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--white); margin: 2.5rem 0 1rem; letter-spacing: -0.01em; }
+        h3 { font-size: 1.1rem; font-weight: 700; color: var(--slate-200); margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+
+        /* ═══ EXEC SUMMARY ═══ */
+        .exec-summary {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .exec-summary h2 { margin-top: 0; }
+
+        .overall-score-wrap {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(239,68,68,0.04);
+            border: 1px solid rgba(239,68,68,0.15);
+            border-radius: 12px;
+        }
+        .score-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .score-circle.excellent { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05)); border: 3px solid var(--green-500); }
+        .score-circle.good { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.05)); border: 3px solid var(--blue-500); }
+        .score-circle.fair { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05)); border: 3px solid var(--amber-500); }
+        .score-circle.poor { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05)); border: 3px solid var(--red-500); }
+        .score-number { font-size: 2rem; font-weight: 800; color: var(--white); line-height: 1; }
+        .score-label { font-size: 0.6rem; color: var(--slate-400); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px; }
+        .score-commentary { flex: 1; }
+        .score-commentary h3 { margin-top: 0; color: var(--white); }
+
+        /* ═══ RISK MATRIX ═══ */
+        .risk-matrix-wrap {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: auto repeat(4, 1fr);
+            gap: 2px;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+        .risk-cell {
+            padding: 10px 8px;
+            text-align: center;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .risk-header { background: var(--navy-700); color: var(--slate-200); font-weight: 700; }
+        .risk-label { background: var(--navy-700); color: var(--slate-200); text-align: right; padding-right: 12px; }
+        .risk-critical { background: rgba(239,68,68,0.2); color: var(--red-400); }
+        .risk-high { background: rgba(249,115,22,0.15); color: var(--orange-400); }
+        .risk-medium { background: rgba(245,158,11,0.12); color: var(--amber-400); }
+        .risk-low { background: rgba(59,130,246,0.1); color: #60a5fa; }
+        .risk-none { background: rgba(16,185,129,0.08); color: var(--green-400); }
+
+        /* ═══ CATEGORY ═══ */
+        .category-section { margin-bottom: 2.5rem; }
+        .category-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: var(--navy-800); border: 1px solid var(--navy-600); border-radius: 12px 12px 0 0;
+        }
+        .category-header h2 { margin: 0; font-size: 1.15rem; }
+        .category-scores { display: flex; gap: 1.5rem; align-items: center; }
+        .cat-score { text-align: center; }
+        .cat-score-val { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+        .cat-score-val.current { color: var(--amber-400); }
+        .cat-score-val.expected { color: var(--green-400); }
+        .cat-score-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--slate-400); font-weight: 600; }
+        .score-arrow { color: var(--slate-400); font-size: 1.2rem; }
+        .category-body {
+            background: rgba(17,24,39,0.5); border: 1px solid var(--navy-600);
+            border-top: none; border-radius: 0 0 12px 12px; padding: 1.5rem;
+        }
+
+        /* ═══ FINDING CARDS ═══ */
+        .finding-card {
+            background: var(--navy-800); border: 1px solid var(--navy-600);
+            border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;
+            border-left: 4px solid var(--navy-600);
+        }
+        .finding-card.critical { border-left-color: var(--red-500); }
+        .finding-card.high { border-left-color: var(--orange-500); }
+        .finding-card.medium { border-left-color: var(--amber-500); }
+        .finding-card.low { border-left-color: var(--blue-500); }
+        .finding-card.info { border-left-color: var(--slate-400); }
+
+        .finding-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+        .badge {
+            display: inline-flex; padding: 3px 10px; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge.critical { background: var(--red-100); color: var(--red-400); }
+        .badge.high { background: var(--orange-100); color: var(--orange-400); }
+        .badge.medium { background: var(--amber-100); color: var(--amber-400); }
+        .badge.low { background: var(--blue-100); color: #60a5fa; }
+        .badge.info { background: rgba(148,163,184,0.1); color: var(--slate-400); }
+        .badge.pass { background: var(--green-100); color: var(--green-400); }
+
+        .finding-title { font-weight: 700; color: var(--white); font-size: 0.95rem; }
+        .finding-body { font-size: 0.88rem; color: var(--slate-300); }
+        .finding-body code {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+            background: rgba(139,92,246,0.1); color: var(--purple-400); padding: 2px 6px; border-radius: 4px;
+        }
+        .finding-file { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--slate-400); margin-top: 0.5rem; }
+        .finding-recommendation {
+            margin-top: 0.75rem; padding: 0.75rem;
+            background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.15); border-radius: 8px; font-size: 0.85rem;
+        }
+        .finding-recommendation strong { color: var(--green-400); }
+
+        /* ═══ SUMMARY TABLE ═══ */
+        .summary-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+        .summary-table th {
+            text-align: left; padding: 10px 14px; background: var(--navy-700);
+            color: var(--white); font-weight: 700; border-bottom: 2px solid var(--red-500);
+        }
+        .summary-table td { padding: 10px 14px; border-bottom: 1px solid var(--navy-600); }
+        .summary-table .score-current { color: var(--amber-400); font-weight: 700; }
+        .summary-table .score-expected { color: var(--green-400); font-weight: 700; }
+        .summary-table .score-delta { color: var(--purple-400); font-weight: 600; }
+
+        .methodology {
+            background: var(--navy-800); border: 1px solid var(--navy-600);
+            border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;
+        }
+        .methodology h3 { margin-top: 0; }
+        .scale-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; }
+        .scale-table th { text-align: left; padding: 8px 12px; background: var(--navy-700); color: var(--slate-200); font-weight: 600; border-bottom: 1px solid var(--navy-600); }
+        .scale-table td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+        hr { border: none; border-top: 1px solid var(--navy-600); margin: 2rem 0; }
+
+        .footer-note {
+            text-align: center; font-size: 0.75rem; color: var(--slate-400);
+            padding: 2rem 0; border-top: 1px solid var(--navy-600); margin-top: 3rem;
+        }
+
+        /* Priority Matrix */
+        .priority-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .priority-quadrant { padding: 1.25rem; border-radius: 12px; border: 1px solid var(--navy-600); }
+        .priority-quadrant h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; font-weight: 700; }
+        .priority-quadrant.urgent { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+        .priority-quadrant.urgent h4 { color: var(--red-400); }
+        .priority-quadrant.important { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); }
+        .priority-quadrant.important h4 { color: var(--amber-400); }
+        .priority-quadrant.moderate { background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.2); }
+        .priority-quadrant.moderate h4 { color: #60a5fa; }
+        .priority-quadrant.minor { background: rgba(148,163,184,0.05); border-color: rgba(148,163,184,0.2); }
+        .priority-quadrant.minor h4 { color: var(--slate-400); }
+        .priority-item { font-size: 0.82rem; padding: 4px 0; color: var(--slate-300); display: flex; gap: 8px; }
+        .priority-item::before { content: '\2022'; color: var(--slate-400); }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COVER PAGE                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="cover-page">
+    <div class="cover-badge">ResistanceZero &mdash; Security Audit</div>
+    <h1 class="cover-title">Security <span>Audit Report</span></h1>
+    <p class="cover-subtitle">
+        Comprehensive security assessment covering authentication, transport security, content protection, access control, and client-side vulnerability analysis of the ResistanceZero web application.
+    </p>
+    <div class="cover-meta">
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Report Date</div>
+            <div class="cover-meta-value">2026-02-17</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Version</div>
+            <div class="cover-meta-value">1.0</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Classification</div>
+            <div class="cover-meta-value">Confidential</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Risk Level</div>
+            <div class="cover-meta-value">Medium-High</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- REPORT CONTENT                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="content-wrap">
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="exec-summary">
+        <h2>Executive Summary</h2>
+        <p>
+            The ResistanceZero website is a hybrid static site served via Nginx on Cloud Run with Firebase Authentication and a Supabase backend. The security posture is <strong>moderate</strong>: basic transport security and standard Nginx hardening are present, but the client-side authentication system has significant architectural weaknesses. The most critical finding is that <strong>user credentials are hardcoded in client-side JavaScript</strong>, the session is stored in easily-manipulable localStorage with no server-side validation, and the Content Security Policy is absent.
+        </p>
+        <p>
+            The site is transitioning from a demo authentication system (auth.js with plaintext passwords) to Firebase Authentication (firebase-auth.js), which addresses many of the critical findings. However, the legacy auth.js is still deployed and active on all pages.
+        </p>
+        <div class="overall-score-wrap">
+            <div class="score-circle fair">
+                <div class="score-number">56</div>
+                <div class="score-label">Overall</div>
+            </div>
+            <div class="score-commentary">
+                <h3>Fair &mdash; Critical Issues Require Immediate Action</h3>
+                <p style="margin-bottom:0">
+                    The weighted security score of 56/100 reflects serious authentication weaknesses balanced against reasonable transport and infrastructure security. Completing the migration to Firebase Auth and implementing CSP headers would raise the expected score to <strong style="color:#34d399;">79/100</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RISK MATRIX VISUALIZATION -->
+    <div class="risk-matrix-wrap">
+        <h3>Risk Matrix &mdash; Findings by Severity and Likelihood</h3>
+        <div class="risk-matrix">
+            <!-- Header Row -->
+            <div class="risk-cell risk-header"></div>
+            <div class="risk-cell risk-header">Unlikely</div>
+            <div class="risk-cell risk-header">Possible</div>
+            <div class="risk-cell risk-header">Likely</div>
+            <div class="risk-cell risk-header">Almost Certain</div>
+            <!-- Critical Impact -->
+            <div class="risk-cell risk-label">Critical Impact</div>
+            <div class="risk-cell risk-medium">--</div>
+            <div class="risk-cell risk-high">--</div>
+            <div class="risk-cell risk-critical">Hardcoded Creds</div>
+            <div class="risk-cell risk-critical">No CSP</div>
+            <!-- High Impact -->
+            <div class="risk-cell risk-label">High Impact</div>
+            <div class="risk-cell risk-low">--</div>
+            <div class="risk-cell risk-medium">Session Forge</div>
+            <div class="risk-cell risk-high">No HSTS</div>
+            <div class="risk-cell risk-high">--</div>
+            <!-- Medium Impact -->
+            <div class="risk-cell risk-label">Medium Impact</div>
+            <div class="risk-cell risk-none">--</div>
+            <div class="risk-cell risk-low">Admin URL</div>
+            <div class="risk-cell risk-medium">No Rate Limit</div>
+            <div class="risk-cell risk-medium">--</div>
+            <!-- Low Impact -->
+            <div class="risk-cell risk-label">Low Impact</div>
+            <div class="risk-cell risk-none">--</div>
+            <div class="risk-cell risk-none">--</div>
+            <div class="risk-cell risk-low">CDN Integrity</div>
+            <div class="risk-cell risk-low">--</div>
+        </div>
+    </div>
+
+    <!-- SCORING METHODOLOGY -->
+    <div class="methodology">
+        <h3>Scoring Methodology</h3>
+        <p>Each category is scored 0&ndash;100 based on OWASP Top 10, CWE/SANS Top 25, and industry security benchmarks. Findings are classified by CVSS-aligned risk levels. The overall score uses impact-weighted averages.</p>
+        <table class="scale-table">
+            <thead>
+                <tr><th>Risk Level</th><th>CVSS Range</th><th>Impact</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><span class="badge critical">Critical</span></td><td>9.0&ndash;10.0</td><td>Immediate exploitation risk; data breach or full compromise</td></tr>
+                <tr><td><span class="badge high">High</span></td><td>7.0&ndash;8.9</td><td>Significant risk; exploitation plausible with moderate effort</td></tr>
+                <tr><td><span class="badge medium">Medium</span></td><td>4.0&ndash;6.9</td><td>Moderate risk; exploitation requires specific conditions</td></tr>
+                <tr><td><span class="badge low">Low</span></td><td>0.1&ndash;3.9</td><td>Minimal risk; defense-in-depth improvement</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 1: Authentication & Session     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>1. Authentication &amp; Session Management</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">30</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">72</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card critical">
+                <div class="finding-header">
+                    <span class="badge critical">Critical</span>
+                    <span class="finding-title">Hardcoded Credentials in Client-Side JavaScript</span>
+                </div>
+                <div class="finding-body">
+                    The <code>auth.js</code> file contains a hardcoded <code>VALID_USERS</code> array with plaintext email and password: <code>{ email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' }</code>. This is visible to anyone who opens browser DevTools. The <code>findUser()</code> function performs client-side password comparison with no server interaction. Additionally, <code>firebase-auth.js</code> contains the same demo credentials in its <code>DEMO_USERS</code> fallback array.
+                </div>
+                <div class="finding-file">auth.js:19&ndash;21 (VALID_USERS), auth.js:31&ndash;44 (findUser), firebase-auth.js:52&ndash;54 (DEMO_USERS)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Complete the migration to Firebase Authentication. Remove the <code>VALID_USERS</code> array and <code>DEMO_USERS</code> fallback entirely. All authentication must happen server-side. If a demo account is needed, create it in Firebase Auth with a documented demo flow.
+                </div>
+            </div>
+
+            <div class="finding-card critical">
+                <div class="finding-header">
+                    <span class="badge critical">Critical</span>
+                    <span class="finding-title">Session Token Forgeable via localStorage Manipulation</span>
+                </div>
+                <div class="finding-body">
+                    The session is a simple JSON object in <code>localStorage['rz_premium_session']</code> with fields <code>{email, tier, expires}</code>. There is no cryptographic signature, no server-side validation, and no token rotation. Any user can open DevTools and execute: <code>localStorage.setItem('rz_premium_session', JSON.stringify({email:'attacker@x.com', tier:'pro', expires:'2099-01-01'}))</code> to gain Pro access to all gated content without paying.
+                </div>
+                <div class="finding-file">auth.js:47&ndash;68 (getSession/setSession), firebase-auth.js:66&ndash;89</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> After Firebase migration, use Firebase ID tokens with server-side verification. The client should store only the Firebase token, and the backend should validate entitlements via the Supabase <code>profiles</code> table on each request. For cached Pro content, use a signed JWT from the backend with short expiry (15 min) and refresh logic.
+                </div>
+            </div>
+
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">Manual Accounts Stored in localStorage with Plaintext Passwords</span>
+                </div>
+                <div class="finding-body">
+                    The admin panel can create accounts stored in <code>localStorage['rz_manual_accounts']</code> as a JSON array with plaintext passwords. This data persists on the admin's browser and is not encrypted. If the admin's browser is compromised, all user passwords are exposed.
+                </div>
+                <div class="finding-file">auth.js:24&ndash;29 (getManualAccounts)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Eliminate the manual accounts system entirely. Migrate to Firebase Auth where passwords are hashed server-side with scrypt. The admin should manage users via Firebase Console or the backend admin API.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">No Rate Limiting on Client-Side Login</span>
+                </div>
+                <div class="finding-body">
+                    The <code>doLogin()</code> function in auth.js has no rate limiting, lockout, or delay after failed attempts. While the client-side check is instantaneous (no network call), this pattern trains users to accept a login form without backend protection. When migrated to Firebase, this needs explicit rate limit handling.
+                </div>
+                <div class="finding-file">auth.js:344&ndash;384</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Implement an exponential backoff after 3 failed attempts (1s, 2s, 4s delays). Firebase Auth already provides rate limiting, but add client-side UX feedback for lockout states.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">30-Day Session Expiry with No Rotation</span>
+                </div>
+                <div class="finding-body">
+                    Sessions are set to expire 30 days from login with no renewal/rotation mechanism. If a session token is compromised, it remains valid for up to 30 days with no way to revoke it.
+                </div>
+                <div class="finding-file">auth.js:61&ndash;62 (expires.setDate(expires.getDate() + 30))</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Reduce session lifetime to 7 days. Implement token refresh on each page load (sliding window). Add a server-side token revocation list after Firebase migration.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 2: Input Validation & XSS       -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>2. Input Validation &amp; XSS Prevention</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">60</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">80</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">insertAdjacentHTML Used for Auth UI Injection</span>
+                </div>
+                <div class="finding-body">
+                    The auth.js module uses <code>insertAdjacentHTML()</code> 8 times to inject login button, user profile dropdown, and modal HTML into the DOM. While the injected strings are template literals (not user input), this pattern bypasses DOM sanitization. If any of these templates were to include user-derived data (e.g., email display), XSS would be trivially possible.
+                </div>
+                <div class="finding-file">auth.js:218, 221, 232, 237, 240, 251, 260, 268</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Use <code>textContent</code> for user-derived values (email, tier display). For the templates themselves, consider using <code>document.createElement()</code> + <code>setAttribute()</code> pattern, or at minimum ensure no user input is interpolated into HTML strings.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">innerHTML Used in script.js Notification System</span>
+                </div>
+                <div class="finding-body">
+                    The file <code>script.js:379</code> uses <code>notification.innerHTML</code> with template literals. If notification content were to include user-generated data, this would be an XSS vector.
+                </div>
+                <div class="finding-file">script.js:379</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Replace <code>innerHTML</code> with DOM creation methods or use a sanitization library (DOMPurify) when setting HTML content that could include dynamic values.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">User Email Display Uses textContent</span>
+                </div>
+                <div class="finding-body">
+                    The auth UI update function correctly uses <code>avatar.textContent</code>, <code>emailEl.textContent</code>, and <code>ddEmail.textContent</code> to display user email, preventing XSS through the email field.
+                </div>
+                <div class="finding-file">auth.js:307&ndash;309 (updateAuthUI)</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Form Inputs Use Proper Type Attributes</span>
+                </div>
+                <div class="finding-body">
+                    Login form uses <code>type="email"</code> and <code>type="password"</code> with <code>autocomplete</code> attributes, enabling browser-native validation and password manager support.
+                </div>
+                <div class="finding-file">auth.js:183&ndash;185</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 3: Content Security Policy      -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>3. Content Security Policy (CSP)</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">15</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">70</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card critical">
+                <div class="finding-header">
+                    <span class="badge critical">Critical</span>
+                    <span class="finding-title">No Content Security Policy Header</span>
+                </div>
+                <div class="finding-body">
+                    The nginx.conf defines only three security headers: <code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, and <code>Referrer-Policy</code>. No <code>Content-Security-Policy</code> header is configured. This means any injected script (XSS) can load external resources, execute inline code, or exfiltrate data without restriction. Given the site loads scripts from Google Analytics, Font Awesome CDN, Google Fonts, Chart.js CDN, and Firebase SDK, a CSP is essential to restrict script sources.
+                </div>
+                <div class="finding-file">nginx.conf:25&ndash;27 (security headers section)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a Content-Security-Policy header to nginx.conf:
+                    <code>add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://*.firebaseio.com https://*.supabase.co https://api.mayar.id;"</code>
+                </div>
+            </div>
+
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">Extensive Inline Styles Require unsafe-inline for style-src</span>
+                </div>
+                <div class="finding-body">
+                    Every article page contains thousands of lines of inline <code>&lt;style&gt;</code> blocks. The auth.js module also injects CSS via <code>style.textContent</code>. Any CSP implementation will require <code>'unsafe-inline'</code> for <code>style-src</code>, which weakens the policy. Additionally, several HTML elements use inline <code>style=""</code> attributes (e.g., navbar dropdown items).
+                </div>
+                <div class="finding-file">auth.js:79&ndash;146 (CSS injection), index.html:168&ndash;174 (inline styles)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> While <code>'unsafe-inline'</code> for styles is commonly accepted, work toward extracting inline styles into external CSS files. For the auth.js CSS injection, use a nonce-based approach: <code>style-src 'nonce-{random}'</code> with server-generated nonces.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">No Permissions-Policy Header</span>
+                </div>
+                <div class="finding-body">
+                    The Nginx configuration does not set a <code>Permissions-Policy</code> (formerly Feature-Policy) header. This means the page can access camera, microphone, geolocation, and other sensitive APIs without restriction.
+                </div>
+                <div class="finding-file">nginx.conf (absent)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self)";</code> to nginx.conf.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 4: Transport Security           -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>4. HTTPS &amp; Transport Security</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">65</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">85</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">HTTPS Enforced via Cloud Run</span>
+                </div>
+                <div class="finding-body">
+                    Cloud Run automatically terminates TLS at the load balancer level. All traffic to <code>resistancezero.com</code> is served over HTTPS. The canonical URLs in all HTML files correctly use <code>https://</code>.
+                </div>
+                <div class="finding-file">index.html:23, Dockerfile (Cloud Run deployment)</div>
+            </div>
+
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">No HSTS Header Configured</span>
+                </div>
+                <div class="finding-body">
+                    The nginx.conf does not include a <code>Strict-Transport-Security</code> header. While Cloud Run handles TLS termination, without HSTS, a first-time visitor could potentially be intercepted via HTTP before redirect. The site should declare HSTS to prevent protocol downgrade attacks.
+                </div>
+                <div class="finding-file">nginx.conf:25&ndash;27 (HSTS absent)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";</code> to nginx.conf. Consider HSTS preload submission after confirming all subdomains support HTTPS.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">X-Content-Type-Options Prevents MIME Sniffing</span>
+                </div>
+                <div class="finding-body">
+                    The <code>X-Content-Type-Options: nosniff</code> header is configured in nginx.conf, preventing browsers from MIME-type guessing on responses.
+                </div>
+                <div class="finding-file">nginx.conf:25</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">X-Frame-Options Prevents Clickjacking</span>
+                </div>
+                <div class="finding-body">
+                    <code>X-Frame-Options: SAMEORIGIN</code> is configured, preventing the site from being embedded in iframes on other domains.
+                </div>
+                <div class="finding-file">nginx.conf:26</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Referrer Policy Restricts Origin Leakage</span>
+                </div>
+                <div class="finding-body">
+                    <code>Referrer-Policy: strict-origin-when-cross-origin</code> ensures that the full URL path is not sent to external domains, only the origin.
+                </div>
+                <div class="finding-file">nginx.conf:27</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 5: Sensitive Data Exposure      -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>5. Sensitive Data Exposure</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">50</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">78</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">Firebase Config Placeholder Exposes Architecture</span>
+                </div>
+                <div class="finding-body">
+                    The <code>firebase-config.js</code> file exposes the Firebase project structure with placeholder values. While Firebase public keys are designed to be client-visible, the file also exposes the Cloud Run backend URL: <code>https://bfrfranco-github-io-586770625232.us-central1.run.app</code>. This URL reveals the GCP project ID and region, aiding targeted reconnaissance.
+                </div>
+                <div class="finding-file">firebase-config.js:7&ndash;15 (config), firebase-config.js:21 (API_BASE)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> The Firebase config is expected to be public, but the Cloud Run URL should be proxied through the custom domain. Set up <code>resistancezero.com/api/*</code> to proxy to Cloud Run, hiding the direct service URL.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Personal Contact Information in Structured Data</span>
+                </div>
+                <div class="finding-body">
+                    The Organization schema in index.html includes a personal phone number (<code>+6281216874606</code>) and email (<code>baguspermana7@gmail.com</code>) in machine-readable structured data. While this is intentional for professional contact, it makes the data easily harvestable by bots.
+                </div>
+                <div class="finding-file">index.html:130&ndash;139 (Organization schema contactPoint)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Consider using a contact form URL instead of direct phone/email in structured data. Alternatively, accept the risk as intentional for professional networking purposes.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Dockerfile COPY Includes All Files Including Backend Configs</span>
+                </div>
+                <div class="finding-body">
+                    The Dockerfile uses <code>COPY . /usr/share/nginx/html</code> which copies the entire directory including potential sensitive files (backend configs, environment files, SQL schemas) into the container image. While most of these are in subdirectories that Nginx serves, files like <code>standarization/</code>, <code>Data/</code>, and session notes could be accessed.
+                </div>
+                <div class="finding-file">Dockerfile:8</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Create a <code>.dockerignore</code> file to exclude: <code>Data/</code>, <code>standarization/</code>, <code>SESSION_NOTES.md</code>, <code>.claude/</code>, <code>.git/</code>, <code>*.md</code>, and any backend configuration files. Alternatively, use a multi-stage build that copies only the website files.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Demo Credentials Displayed in Login Modal UI</span>
+                </div>
+                <div class="finding-body">
+                    The login modal renders demo credentials directly in the UI: "Demo: demo@resistancezero.com / demo2026". While intentional for the demo period, this should be removed before production launch.
+                </div>
+                <div class="finding-file">auth.js:187&ndash;190 (demo hint HTML)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Remove the demo hint block from the login modal before production launch. Use a separate demo landing page with time-limited credentials instead.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 6: Access Control               -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>6. Access Control</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">55</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">78</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">Pro Content Gating Is Purely Client-Side</span>
+                </div>
+                <div class="finding-body">
+                    All Pro Mode content (Monte Carlo simulations, sensitivity analysis, narrative generators, PDF exports) is shipped in the HTML to all users. The gating is done via JavaScript that checks <code>localStorage['rz_premium_session']</code>. Any user can view the full page source, or simply set the localStorage key to bypass the gate. The HTML contains all Pro content in the DOM &mdash; it is only hidden via CSS/JS.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> For truly gated content, serve Pro content from the backend API. Use server-side rendering or API-fetched content that requires a valid Firebase token. For the current static site architecture, accept that Pro Mode is a "soft gate" (honor system) until the SaaS migration is complete.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Admin Panel Protected Only by URL Obscurity</span>
+                </div>
+                <div class="finding-body">
+                    The admin console at <code>rz-ops-p7x3k9m.html</code> uses security through obscurity &mdash; a randomized URL path. While the file has <code>noindex, nofollow</code> meta tags, there is no authentication check at the page level. Anyone who discovers or guesses the URL has full access to the admin panel.
+                </div>
+                <div class="finding-file">rz-ops-p7x3k9m.html:7 (meta robots), no auth check visible</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add authentication to the admin panel. On page load, check for a valid admin-tier session. Redirect to login if not authenticated. After Firebase migration, verify Firebase token and check admin role in Supabase profiles table.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Dashboard Correctly Marked noindex</span>
+                </div>
+                <div class="finding-body">
+                    The dashboard page correctly uses <code>&lt;meta name="robots" content="noindex, nofollow"&gt;</code> to prevent search engine indexing of the authenticated area.
+                </div>
+                <div class="finding-file">dashboard.html:19</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Robots.txt Disallows Sensitive Directories</span>
+                </div>
+                <div class="finding-body">
+                    The robots.txt file disallows <code>/node_modules/</code> and <code>/Article/</code> directories from crawler access.
+                </div>
+                <div class="finding-file">robots.txt:11&ndash;12</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 7: Client-Side Security         -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>7. Client-Side Security</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">58</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">78</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">CDN Resources Loaded Without Subresource Integrity (SRI)</span>
+                </div>
+                <div class="finding-body">
+                    External libraries are loaded from CDNs without SRI hashes: Font Awesome from <code>cdnjs.cloudflare.com</code>, Chart.js from <code>cdn.jsdelivr.net</code>, Google Fonts. If any CDN is compromised, malicious code could be injected into the site.
+                </div>
+                <div class="finding-file">article-1.html:60 (FontAwesome), rz-ops-p7x3k9m.html:15 (Chart.js)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>integrity</code> and <code>crossorigin="anonymous"</code> attributes to all CDN script and stylesheet tags. Example: <code>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0" integrity="sha384-..." crossorigin="anonymous"&gt;</code>
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Google Analytics Script Loaded Before Consent</span>
+                </div>
+                <div class="finding-body">
+                    The Google Analytics tag (<code>G-GED7FX8RTV</code>) is loaded as the first element in <code>&lt;head&gt;</code> on every page, before any consent mechanism. For GDPR/PDPA compliance (relevant for EU and SEA visitors), analytics should only fire after user consent.
+                </div>
+                <div class="finding-file">index.html:5&ndash;12 (gtag.js), all article pages</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Implement a cookie consent banner. Load gtag.js conditionally after consent is given. Use Google Consent Mode v2 to handle consent-aware analytics.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">External Links Use rel="noopener"</span>
+                </div>
+                <div class="finding-body">
+                    The Mayar membership link in the login modal correctly uses <code>target="_blank" rel="noopener"</code>, preventing the target page from accessing <code>window.opener</code>.
+                </div>
+                <div class="finding-file">auth.js:193</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Click-Outside-to-Close Prevents UI Manipulation</span>
+                </div>
+                <div class="finding-body">
+                    The auth module properly handles click-outside events to close the dropdown and modal overlay, preventing UI state confusion.
+                </div>
+                <div class="finding-file">auth.js:271&ndash;274 (overlay click), auth.js:409&ndash;415 (dropdown outside click)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 8: Dependency Security          -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>8. Dependency &amp; Infrastructure Security</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">72</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">85</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Minimal Attack Surface &mdash; Static Site on Nginx Alpine</span>
+                </div>
+                <div class="finding-body">
+                    The Dockerfile uses <code>nginx:alpine</code> as the base image, which has a minimal attack surface. The container serves only static files with no server-side scripting runtime (no Node.js, PHP, or Python in the frontend container).
+                </div>
+                <div class="finding-file">Dockerfile:2</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Gzip Compression Configured Correctly</span>
+                </div>
+                <div class="finding-body">
+                    Nginx enables gzip for text-based content types with a minimum length of 256 bytes. This reduces bandwidth without introducing security issues.
+                </div>
+                <div class="finding-file">nginx.conf:30&ndash;32</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Static Asset Caching Marked "immutable" Without Versioning</span>
+                </div>
+                <div class="finding-body">
+                    Nginx sets <code>Cache-Control: public, immutable</code> with 7-day expiry for CSS, JS, and image files. However, the files do not use content hash versioning (e.g., <code>styles.abc123.css</code>). If a security fix is deployed to styles.css or auth.js, cached versions in users' browsers will persist for up to 7 days, delaying the security fix rollout.
+                </div>
+                <div class="finding-file">nginx.conf:20&ndash;21</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Either implement filename hashing in the build process, or change <code>immutable</code> to <code>must-revalidate</code> for JS/CSS files so browsers check for updates with ETags.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">No .dockerignore File</span>
+                </div>
+                <div class="finding-body">
+                    Without a <code>.dockerignore</code> file, the Docker build context includes all files in the Sandbox directory, potentially including <code>.git/</code>, <code>.claude/</code>, session notes, backend configs, and documentation. This increases build time and image size, and may expose sensitive files.
+                </div>
+                <div class="finding-file">Sandbox/ (no .dockerignore found)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Create a <code>.dockerignore</code> with: <code>.git, .claude, Data/, standarization/, SESSION_NOTES.md, *.md, claudecode.md, node_modules/</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SUMMARY TABLE                            -->
+    <!-- ═══════════════════════════════════════ -->
+    <h2>Summary: Score Comparison Table</h2>
+    <p>Weighted overall score uses the following weights: Authentication (25%), Input Validation (10%), CSP (15%), Transport Security (10%), Sensitive Data (10%), Access Control (15%), Client-Side (10%), Dependencies (5%).</p>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Weight</th>
+                <th>Current Score</th>
+                <th>Expected Score</th>
+                <th>Delta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Authentication &amp; Session Management</td>
+                <td>25%</td>
+                <td class="score-current">30</td>
+                <td class="score-expected">72</td>
+                <td class="score-delta">+42</td>
+            </tr>
+            <tr>
+                <td>2. Input Validation &amp; XSS Prevention</td>
+                <td>10%</td>
+                <td class="score-current">60</td>
+                <td class="score-expected">80</td>
+                <td class="score-delta">+20</td>
+            </tr>
+            <tr>
+                <td>3. Content Security Policy</td>
+                <td>15%</td>
+                <td class="score-current">15</td>
+                <td class="score-expected">70</td>
+                <td class="score-delta">+55</td>
+            </tr>
+            <tr>
+                <td>4. HTTPS &amp; Transport Security</td>
+                <td>10%</td>
+                <td class="score-current">65</td>
+                <td class="score-expected">85</td>
+                <td class="score-delta">+20</td>
+            </tr>
+            <tr>
+                <td>5. Sensitive Data Exposure</td>
+                <td>10%</td>
+                <td class="score-current">50</td>
+                <td class="score-expected">78</td>
+                <td class="score-delta">+28</td>
+            </tr>
+            <tr>
+                <td>6. Access Control</td>
+                <td>15%</td>
+                <td class="score-current">55</td>
+                <td class="score-expected">78</td>
+                <td class="score-delta">+23</td>
+            </tr>
+            <tr>
+                <td>7. Client-Side Security</td>
+                <td>10%</td>
+                <td class="score-current">58</td>
+                <td class="score-expected">78</td>
+                <td class="score-delta">+20</td>
+            </tr>
+            <tr>
+                <td>8. Dependency &amp; Infrastructure Security</td>
+                <td>5%</td>
+                <td class="score-current">72</td>
+                <td class="score-expected">85</td>
+                <td class="score-delta">+13</td>
+            </tr>
+            <tr style="border-top: 2px solid var(--red-500);">
+                <td><strong>WEIGHTED OVERALL</strong></td>
+                <td><strong>100%</strong></td>
+                <td class="score-current"><strong>44.6</strong></td>
+                <td class="score-expected"><strong>76.4</strong></td>
+                <td class="score-delta"><strong>+31.8</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- PRIORITY MATRIX -->
+    <h2>Priority Action Items</h2>
+
+    <div class="priority-matrix">
+        <div class="priority-quadrant urgent">
+            <h4>P0 &mdash; Critical (Fix Immediately)</h4>
+            <div class="priority-item">Complete Firebase Auth migration; remove hardcoded VALID_USERS and DEMO_USERS</div>
+            <div class="priority-item">Add Content-Security-Policy header to nginx.conf</div>
+            <div class="priority-item">Add HSTS header (Strict-Transport-Security)</div>
+        </div>
+        <div class="priority-quadrant important">
+            <h4>P1 &mdash; High (This Week)</h4>
+            <div class="priority-item">Replace localStorage session with signed JWT from backend</div>
+            <div class="priority-item">Add authentication gate to admin panel</div>
+            <div class="priority-item">Create .dockerignore to exclude sensitive files</div>
+            <div class="priority-item">Proxy Cloud Run URL through custom domain</div>
+        </div>
+        <div class="priority-quadrant moderate">
+            <h4>P2 &mdash; Medium (This Sprint)</h4>
+            <div class="priority-item">Add SRI hashes to all CDN resources</div>
+            <div class="priority-item">Implement cookie consent for Google Analytics</div>
+            <div class="priority-item">Add Permissions-Policy header</div>
+            <div class="priority-item">Fix cache-control to use must-revalidate for JS/CSS</div>
+        </div>
+        <div class="priority-quadrant minor">
+            <h4>P3 &mdash; Low (Backlog)</h4>
+            <div class="priority-item">Remove demo credentials display from login modal</div>
+            <div class="priority-item">Reduce session expiry from 30 days to 7 days</div>
+            <div class="priority-item">Consider obfuscating personal contact data in schemas</div>
+            <div class="priority-item">Replace innerHTML/insertAdjacentHTML with DOM APIs where possible</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        ResistanceZero Security Audit Report v1.0 &mdash; Generated 2026-02-17 &mdash; CONFIDENTIAL<br>
+        This report was produced through manual code inspection, static analysis, and configuration review.
+    </div>
+</div>
+
+</body>
+</html>

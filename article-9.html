@@ -14,7 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>The HVAC Shock: No Chillers Doesn't Mean No Cooling | Data Center Cooling Revolution</title>
+    <title>The HVAC Shock | Chiller-Free Cooling | ResistanceZero</title>
     <meta name="description" content="Deep technical analysis of chiller-free cooling for data centers. Nvidia's warm-water DLC announcement, tropical climate implementation, fault scenarios, and comprehensive pros/cons analysis.">
     <meta name="keywords" content="Data Center Cooling, Chiller-Free, Direct Liquid Cooling, DLC, Warm Water Cooling, Tropical Data Center, Nvidia Rubin, CDU, Dry Cooler, PUE Optimization, HVAC">
     <meta name="author" content="Bagus Dwi Permana">
@@ -35,7 +35,7 @@
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="article:author" content="Bagus Dwi Permana">
     <meta property="article:published_time" content="2026-02-07T00:00:00Z">
-    <meta property="article:modified_time" content="2026-02-07T00:00:00Z">
+    <meta property="article:modified_time" content="2026-02-17T00:00:00Z">
     <meta property="article:section" content="Data Center Cooling">
     <meta property="article:tag" content="Chiller-Free Cooling">
     <meta property="article:tag" content="Direct Liquid Cooling">
@@ -44,6 +44,7 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:creator" content="@BagusDPermana">
     <meta name="twitter:title" content="The HVAC Shock: No Chillers Doesn't Mean No Cooling">
     <meta name="twitter:description" content="Chiller-free cooling analysis for data centers with tropical implementation guide.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/article-9-cover_.jpg">
@@ -126,7 +127,7 @@
 
         .article-hero {
             background: linear-gradient(135deg, #0b1220 0%, #1a365d 50%, #2d5a87 100%);
-            padding: 8rem 2rem 4rem;
+            padding: 7rem 2rem 3.5rem;
             color: #fff;
             text-align: center;
             position: relative;
@@ -164,14 +165,15 @@
             letter-spacing: 1px;
         }
         .article-title {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.6rem, 3.2vw, 2.35rem);
             font-weight: 800;
-            margin-bottom: var(--spacing-lg);
-            line-height: 1.2;
+            margin-bottom: 1.25rem;
+            line-height: 1.25;
             color: #fff;
+            letter-spacing: -0.01em;
         }
         .article-subtitle {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            font-size: clamp(0.95rem, 1.6vw, 1.15rem);
             color: #94a3b8;
             max-width: 700px;
             margin: 0 auto var(--spacing-xl);
@@ -228,7 +230,7 @@
         }
         .article-content .container { max-width: 1150px; }
         .article-body {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             line-height: 1.7;
             color: #374151;
         }
@@ -236,14 +238,14 @@
             margin-bottom: var(--spacing-md);
         }
         .article-body h2 {
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             color: #1e3a5f;
             margin: var(--spacing-xl) 0 var(--spacing-md);
             padding-bottom: var(--spacing-sm);
             border-bottom: 3px solid #e5e7eb;
         }
         .article-body h3 {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: #2d5a87;
             margin: var(--spacing-lg) 0 var(--spacing-sm);
         }
@@ -1414,7 +1416,7 @@
         .hvac-gate-overlay i { font-size: 2rem; color: #60a5fa; margin-bottom: 0.5rem; }
         .hvac-gate-overlay span { color: #cbd5e1; font-size: 0.85rem; font-weight: 600; }
         .hvac-panel-title {
-            font-size: 1rem; font-weight: 700; color: #60a5fa; margin-bottom: 1rem;
+            font-size: 0.95rem; font-weight: 700; color: #60a5fa; margin-bottom: 0.75rem;
             display: flex; align-items: center; gap: 0.5rem;
         }
         .hvac-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
@@ -1423,7 +1425,7 @@
             text-align: center;
         }
         .hvac-kpi-value {
-            font-size: 1.2rem; font-weight: 800; color: #60a5fa;
+            font-size: 1.4rem; font-weight: 800; color: #60a5fa;
             font-family: 'JetBrains Mono', monospace;
         }
         .hvac-kpi-label { font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem; }
@@ -1446,17 +1448,84 @@
             height: 100%; border-radius: 4px; transition: width 0.3s;
         }
         .hvac-sensitivity-value {
-            min-width: 40px; text-align: right; font-size: 0.78rem;
+            min-width: 60px; text-align: right; font-size: 0.78rem;
             color: #60a5fa; font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-top: 0.75rem; }
+        .hvac-kpi-sublabel { font-size: 0.65rem; color: #64748b; margin-top: 0.1rem; }
+        .hvac-section-divider {
+            margin: 1rem 0 0.75rem; padding-top: 0.75rem;
+            border-top: 1px solid rgba(59,130,246,0.15);
+            font-size: 0.82rem; font-weight: 700; color: #94a3b8;
+        }
+        .hvac-tornado-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .hvac-tornado-header span { font-size: 0.85rem; font-weight: 700; color: #60a5fa; }
+        .hvac-tornado-baseline {
+            position: absolute; top: 0; bottom: 0; width: 2px;
+            background: rgba(255,255,255,0.3); left: 50%; z-index: 1;
+        }
+        .hvac-tornado-track {
+            flex: 1; height: 24px; background: rgba(255,255,255,0.05);
+            border-radius: 4px; position: relative; overflow: hidden;
+        }
+        .hvac-tornado-fill-neg {
+            position: absolute; height: 100%; right: 50%; border-radius: 4px 0 0 4px;
+            transition: width 0.3s;
+        }
+        .hvac-tornado-fill-pos {
+            position: absolute; height: 100%; left: 50%; border-radius: 0 4px 4px 0;
+            transition: width 0.3s;
+        }
+        .hvac-tornado-val-left {
+            min-width: 55px; text-align: right; font-size: 0.72rem;
+            color: #f87171; font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-tornado-val-right {
+            min-width: 55px; text-align: left; font-size: 0.72rem;
+            color: #4ade80; font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-narrative-paragraph { margin-bottom: 0.75rem; }
+        .hvac-narrative-paragraph:last-child { margin-bottom: 0; }
+        .hvac-narrative-paragraph strong { color: #60a5fa; }
+        .hvac-narrative-heading {
+            font-size: 0.82rem; font-weight: 700; color: #60a5fa;
+            margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .hvac-confidence-badge {
+            display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px;
+            font-size: 0.72rem; font-weight: 700; margin-left: 0.5rem;
+        }
+        .hvac-confidence-high { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .hvac-confidence-med { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .hvac-confidence-low { background: rgba(239,68,68,0.15); color: #f87171; }
+        .hvac-milestone-bar {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;
+        }
+        .hvac-milestone-year {
+            min-width: 50px; font-size: 0.75rem; font-weight: 600; color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .hvac-milestone-track {
+            flex: 1; height: 18px; background: rgba(255,255,255,0.05);
+            border-radius: 4px; position: relative; overflow: hidden;
+        }
+        .hvac-milestone-fill {
+            height: 100%; border-radius: 4px; transition: width 0.3s;
+        }
+        .hvac-milestone-label {
+            font-size: 0.72rem; color: #cbd5e1; min-width: 90px;
         }
         .hvac-login-overlay {
             display: none; position: fixed; inset: 0; z-index: 9999;
-            background: rgba(15,23,42,0.85); backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
             align-items: center; justify-content: center;
         }
         .hvac-login-overlay.visible { display: flex; }
         .hvac-login-box {
-            background: #1e293b; border: 1px solid rgba(59,130,246,0.3);
+            background: #0f172a; border: 1px solid rgba(59,130,246,0.3);
             border-radius: 16px; padding: 2rem; width: 90%; max-width: 400px;
             position: relative;
         }
@@ -1468,7 +1537,7 @@
         .hvac-login-subtitle { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem; }
         .hvac-login-input {
             width: 100%; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.2);
+            background: #1e293b; border: 1px solid #334155;
             border-radius: 8px; color: #e2e8f0; font-size: 0.9rem;
             font-family: 'Inter', sans-serif; box-sizing: border-box;
         }
@@ -1484,6 +1553,10 @@
         .hvac-login-demo {
             text-align: center; margin-top: 1rem; font-size: 0.75rem; color: #64748b;
         }
+        [data-theme="light"] .hvac-login-box { background: #ffffff; border-color: #e2e8f0; }
+        [data-theme="light"] .hvac-login-title { color: #1e293b; }
+        [data-theme="light"] .hvac-login-subtitle { color: #64748b; }
+        [data-theme="light"] .hvac-login-input { background: #f1f5f9; border-color: #e2e8f0; color: #1e293b; }
         .hvac-privacy-badge {
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             margin-top: 1.5rem; font-size: 0.75rem; color: #64748b;
@@ -1529,12 +1602,22 @@
         [data-theme="dark"] .hvac-cta-block { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(96,165,250,0.08)); }
         [data-theme="dark"] .article-content { background: #0f172a; }
         [data-theme="dark"] .article-body { background: #0f172a; color: #e2e8f0; }
-        [data-theme="dark"] .article-body h2 { color: #f1f5f9; }
-        [data-theme="dark"] .article-body h3 { color: #e2e8f0; }
+        [data-theme="dark"] .article-body h2 { color: #93c5fd; }
+        [data-theme="dark"] .article-body h3 { color: #cbd5e1; }
         [data-theme="dark"] .article-body p { color: #cbd5e1; }
         [data-theme="dark"] .article-body blockquote { background: rgba(30,58,95,0.3); border-color: rgba(96,165,250,0.4); color: #cbd5e1; }
         [data-theme="dark"] .article-body .info-box,
         [data-theme="dark"] .article-body .key-insight { background: rgba(15,23,42,0.8); border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
+        [data-theme="dark"] .highlight-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.4); }
+        [data-theme="dark"] .highlight-box p { color: #fbbf24; }
+        [data-theme="dark"] .warning-box { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.4); }
+        [data-theme="dark"] .warning-box p { color: #fca5a5; }
+        [data-theme="dark"] .result-box { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.4); }
+        [data-theme="dark"] .result-box h4 { color: #34d399; }
+        [data-theme="dark"] .result-box p { color: #6ee7b7; }
+        [data-theme="dark"] .references { background: rgba(15,23,42,0.8); border-color: rgba(6,182,212,0.4); }
+        [data-theme="dark"] .references h3 { color: #93c5fd; }
+        [data-theme="dark"] .references ol { color: #94a3b8; }
         [data-theme="dark"] .article-body table th { background: #0f172a; color: #e2e8f0; }
         [data-theme="dark"] .article-body table td { color: #cbd5e1; border-color: rgba(255,255,255,0.1); }
         [data-theme="dark"] .article-body ul li,
@@ -1559,6 +1642,7 @@
             .timeline-header > :last-child, .timeline-row > :last-child { display: none; }
             .hvac-evidence-grid { grid-template-columns: repeat(2, 1fr); }
             .hvac-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .hvac-kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
             .hvac-toolbar { flex-wrap: wrap; }
             .hvac-region-select-row { flex-direction: column; align-items: flex-start; }
         }
@@ -1772,8 +1856,8 @@
                                 <div class="toc-item-number">SECTION 5</div>
                                 <div class="toc-item-title">Fault Scenario Analysis: In-Depth</div>
                             </a>
-                            <a href="#section-6" class="toc-item">
-                                <div class="toc-item-number">SECTION 6</div>
+                            <a href="#section-6" class="toc-item toc-calculator">
+                                <div class="toc-item-number">SECTION 6 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div>
                                 <div class="toc-item-title">Interactive: PUE Impact Calculator</div>
                             </a>
                             <a href="#section-7" class="toc-item">
@@ -2406,6 +2490,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <div class="hvac-panel-content">
                                 <div class="hvac-panel-title"><i class="fas fa-chart-line"></i> 10-Year TCO Deep Model</div>
                                 <div class="hvac-kpi-grid" id="hvacTcoKPIs"></div>
+                                <div class="hvac-section-divider"><i class="fas fa-bolt" style="margin-right:4px;"></i> Energy & Environmental Breakdown</div>
+                                <div class="hvac-kpi-grid-4" id="hvacTcoEnergyKPIs"></div>
+                                <div class="hvac-section-divider"><i class="fas fa-wrench" style="margin-right:4px;"></i> Lifecycle Cost per kW &amp; Maintenance</div>
+                                <div class="hvac-kpi-grid-4" id="hvacTcoLifecycleKPIs"></div>
                                 <div class="hvac-chart-container"><canvas id="hvacWaterfallChart" height="280"></canvas></div>
                                 <div class="hvac-narrative-box" id="hvacTcoNarrative"></div>
                             </div>
@@ -2420,6 +2508,8 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <div class="hvac-panel-content">
                                 <div class="hvac-panel-title"><i class="fas fa-map-marked-alt"></i> Regional Risk Matrix</div>
                                 <div class="hvac-kpi-grid" id="hvacRiskKPIs"></div>
+                                <div class="hvac-section-divider"><i class="fas fa-shield-alt" style="margin-right:4px;"></i> Extended Risk Dimensions</div>
+                                <div class="hvac-kpi-grid-4" id="hvacRiskExtKPIs"></div>
                                 <div class="hvac-narrative-box" id="hvacRiskNarrative"></div>
                             </div>
                         </div>
@@ -2433,6 +2523,9 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <div class="hvac-panel-content">
                                 <div class="hvac-panel-title"><i class="fas fa-project-diagram"></i> Transition Planning</div>
                                 <div class="hvac-kpi-grid" id="hvacTransitionKPIs"></div>
+                                <div class="hvac-section-divider"><i class="fas fa-tasks" style="margin-right:4px;"></i> Operational Impact & ROI Milestones</div>
+                                <div class="hvac-kpi-grid-4" id="hvacTransitionExtKPIs"></div>
+                                <div id="hvacMilestoneTimeline" style="margin-top:1rem;"></div>
                                 <div class="hvac-narrative-box" id="hvacTransitionNarrative"></div>
                             </div>
                         </div>
@@ -2446,6 +2539,8 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <div class="hvac-panel-content">
                                 <div class="hvac-panel-title"><i class="fas fa-brain"></i> Monte Carlo Sensitivity (10,000 iterations)</div>
                                 <div class="hvac-kpi-grid" id="hvacMonteKPIs"></div>
+                                <div class="hvac-section-divider"><i class="fas fa-exclamation-triangle" style="margin-right:4px;"></i> Tail Risk & Break-Even Analysis</div>
+                                <div class="hvac-kpi-grid-4" id="hvacMonteTailKPIs"></div>
                                 <div class="hvac-chart-container"><canvas id="hvacMonteChart" height="280"></canvas></div>
                                 <div id="hvacTornadoBars" style="margin-top:1rem;"></div>
                                 <div class="hvac-narrative-box" id="hvacMonteNarrative"></div>
@@ -2461,10 +2556,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
                     <!-- Benchmark Meta -->
                     <div class="hvac-benchmark-meta">
-                        <meta name="hvac-model-version" content="HVAC-TCO-v1.0">
+                        <meta name="hvac-model-version" content="HVAC-TCO-v2.0">
                         <meta name="hvac-date" content="2026-02-16">
                         <meta name="hvac-sources" content="ASHRAE TC 9.9, Uptime Institute 2024, Nvidia Rubin Thermal Specs, DCD 2025">
-                        <meta name="hvac-methodology" content="10-year NPV at 8% discount, Monte Carlo 10K iterations, 8-region climate analysis">
+                        <meta name="hvac-methodology" content="10-year NPV at 8% discount, Monte Carlo 10K iterations, 8-region climate analysis, bidirectional sensitivity tornado, tail risk CVaR">
                     </div>
                 </div>
 
@@ -2621,6 +2716,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
                         <div class="hvac-login-error" id="hvacLoginError">Invalid credentials</div>
                         <button class="hvac-login-submit" onclick="hvacDoLogin()">Sign In</button>
                         <div class="hvac-login-demo">Demo: demo@resistancezero.com / demo2026</div>
+                        <div style="text-align:center;margin-top:6px;"><a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" rel="noopener" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Unlock Pro Mode &rarr;</a></div>
                     </div>
                 </div>
 
@@ -3128,14 +3224,30 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
         // === REGION DATA ===
         var HVAC_REGIONS = {
-            indonesia: { temp: 31, humidity: 80, freeHours: 600, chillerBackup: 45, pueTraditional: 1.75, pueHybrid: 1.45, pueDLC: 1.25, riskScore: 7.2, label: 'Indonesia (Tropical)' },
-            singapore: { temp: 30, humidity: 82, freeHours: 500, chillerBackup: 50, pueTraditional: 1.72, pueHybrid: 1.42, pueDLC: 1.22, riskScore: 7.0, label: 'Singapore (Tropical)' },
-            india: { temp: 33, humidity: 65, freeHours: 2200, chillerBackup: 30, pueTraditional: 1.70, pueHybrid: 1.38, pueDLC: 1.20, riskScore: 6.5, label: 'India (Mixed)' },
-            uae: { temp: 38, humidity: 55, freeHours: 800, chillerBackup: 55, pueTraditional: 1.80, pueHybrid: 1.50, pueDLC: 1.30, riskScore: 8.0, label: 'UAE (Hot-Arid)' },
-            virginia: { temp: 15, humidity: 60, freeHours: 5500, chillerBackup: 15, pueTraditional: 1.55, pueHybrid: 1.28, pueDLC: 1.12, riskScore: 3.5, label: 'Virginia, USA' },
-            frankfurt: { temp: 10, humidity: 70, freeHours: 6200, chillerBackup: 10, pueTraditional: 1.50, pueHybrid: 1.25, pueDLC: 1.10, riskScore: 3.0, label: 'Frankfurt, Germany' },
-            stockholm: { temp: 6, humidity: 75, freeHours: 7800, chillerBackup: 5, pueTraditional: 1.35, pueHybrid: 1.15, pueDLC: 1.05, riskScore: 1.5, label: 'Stockholm, Sweden' },
-            ireland: { temp: 10, humidity: 80, freeHours: 7000, chillerBackup: 8, pueTraditional: 1.40, pueHybrid: 1.20, pueDLC: 1.08, riskScore: 2.0, label: 'Ireland (Maritime)' }
+            indonesia: { temp: 31, humidity: 80, freeHours: 600, chillerBackup: 45, pueTraditional: 1.75, pueHybrid: 1.45, pueDLC: 1.25, riskScore: 7.2, label: 'Indonesia (Tropical)',
+                regulatoryRisk: 4.5, trl: 5, supplyChain: 3.8, climateVolatility: 6.2,
+                co2Factor: 0.78, waterFactor: 1.15, peakTemp: 38, climateType: 'tropical' },
+            singapore: { temp: 30, humidity: 82, freeHours: 500, chillerBackup: 50, pueTraditional: 1.72, pueHybrid: 1.42, pueDLC: 1.22, riskScore: 7.0, label: 'Singapore (Tropical)',
+                regulatoryRisk: 7.5, trl: 7, supplyChain: 8.2, climateVolatility: 4.8,
+                co2Factor: 0.41, waterFactor: 1.10, peakTemp: 36, climateType: 'tropical' },
+            india: { temp: 33, humidity: 65, freeHours: 2200, chillerBackup: 30, pueTraditional: 1.70, pueHybrid: 1.38, pueDLC: 1.20, riskScore: 6.5, label: 'India (Mixed)',
+                regulatoryRisk: 5.0, trl: 5, supplyChain: 5.5, climateVolatility: 7.5,
+                co2Factor: 0.82, waterFactor: 1.30, peakTemp: 45, climateType: 'mixed' },
+            uae: { temp: 38, humidity: 55, freeHours: 800, chillerBackup: 55, pueTraditional: 1.80, pueHybrid: 1.50, pueDLC: 1.30, riskScore: 8.0, label: 'UAE (Hot-Arid)',
+                regulatoryRisk: 6.0, trl: 6, supplyChain: 7.0, climateVolatility: 5.5,
+                co2Factor: 0.58, waterFactor: 1.60, peakTemp: 50, climateType: 'hot-arid' },
+            virginia: { temp: 15, humidity: 60, freeHours: 5500, chillerBackup: 15, pueTraditional: 1.55, pueHybrid: 1.28, pueDLC: 1.12, riskScore: 3.5, label: 'Virginia, USA',
+                regulatoryRisk: 7.0, trl: 8, supplyChain: 9.0, climateVolatility: 3.5,
+                co2Factor: 0.39, waterFactor: 0.85, peakTemp: 35, climateType: 'temperate' },
+            frankfurt: { temp: 10, humidity: 70, freeHours: 6200, chillerBackup: 10, pueTraditional: 1.50, pueHybrid: 1.25, pueDLC: 1.10, riskScore: 3.0, label: 'Frankfurt, Germany',
+                regulatoryRisk: 8.5, trl: 8, supplyChain: 8.5, climateVolatility: 3.0,
+                co2Factor: 0.35, waterFactor: 0.75, peakTemp: 35, climateType: '4-season' },
+            stockholm: { temp: 6, humidity: 75, freeHours: 7800, chillerBackup: 5, pueTraditional: 1.35, pueHybrid: 1.15, pueDLC: 1.05, riskScore: 1.5, label: 'Stockholm, Sweden',
+                regulatoryRisk: 9.0, trl: 9, supplyChain: 7.5, climateVolatility: 2.0,
+                co2Factor: 0.01, waterFactor: 0.60, peakTemp: 30, climateType: 'nordic' },
+            ireland: { temp: 10, humidity: 80, freeHours: 7000, chillerBackup: 8, pueTraditional: 1.40, pueHybrid: 1.20, pueDLC: 1.08, riskScore: 2.0, label: 'Ireland (Maritime)',
+                regulatoryRisk: 8.0, trl: 8, supplyChain: 7.8, climateVolatility: 2.5,
+                co2Factor: 0.30, waterFactor: 0.70, peakTemp: 28, climateType: 'maritime' }
         };
 
         // === TCO MODEL CONSTANTS ===
@@ -3209,6 +3321,63 @@ Where LMTD (Log Mean Temperature Difference) requires:
             results.savingsDLC10yr = results.traditional.npv10yr - results.dlc.npv10yr;
             results.savingsHybrid10yr = results.traditional.npv10yr - results.hybrid.npv10yr;
 
+            // === EXTENDED METRICS ===
+            // Energy savings in kWh/year
+            var tradCoolingKWh = load * 1000 * (region.pueTraditional - 1) * 8760;
+            var dlcCoolingKWh = load * 1000 * (region.pueDLC - 1) * 8760 * 0.55;
+            var hybridCoolingKWh = load * 1000 * (region.pueHybrid - 1) * 8760 * 0.75;
+            results.energySavingsDLC_kWh = tradCoolingKWh - dlcCoolingKWh;
+            results.energySavingsHybrid_kWh = tradCoolingKWh - hybridCoolingKWh;
+            results.tradCoolingKWh = tradCoolingKWh;
+            results.dlcCoolingKWh = dlcCoolingKWh;
+
+            // Carbon offset: tons CO2/year (region-specific emission factor)
+            results.carbonOffsetDLC = (results.energySavingsDLC_kWh / 1000) * region.co2Factor; // tons CO2
+            results.carbonOffsetHybrid = (results.energySavingsHybrid_kWh / 1000) * region.co2Factor;
+
+            // Water savings (gallons/year): traditional uses ~1.8 gal/kWh for evaporative cooling
+            // DLC/dry cooler uses ~0.2 gal/kWh
+            var tradWaterGal = tradCoolingKWh * 1.8 * region.waterFactor;
+            var dlcWaterGal = dlcCoolingKWh * 0.2;
+            results.waterSavingsDLC = tradWaterGal - dlcWaterGal;
+            results.tradWaterGal = tradWaterGal;
+            results.dlcWaterGal = dlcWaterGal;
+
+            // Lifecycle cost per kW of cooling capacity
+            var coolingCapacityKW = load * 1000 * (region.pueTraditional - 1); // cooling kW needed
+            results.lifecycleCostPerKW_trad = results.traditional.npv10yr / coolingCapacityKW;
+            results.lifecycleCostPerKW_dlc = results.dlc.npv10yr / coolingCapacityKW;
+            results.lifecycleCostPerKW_hybrid = results.hybrid.npv10yr / coolingCapacityKW;
+            results.coolingCapacityKW = coolingCapacityKW;
+
+            // Maintenance cost comparison (10yr NPV)
+            var tradMaint10yr = 0, dlcMaint10yr = 0, hybridMaint10yr = 0;
+            for (var m = 1; m <= 10; m++) {
+                tradMaint10yr += COOLING_CONFIGS.traditional.maintenancePerMW * load / Math.pow(1 + DISCOUNT_RATE, m);
+                dlcMaint10yr += COOLING_CONFIGS.dlc.maintenancePerMW * load / Math.pow(1 + DISCOUNT_RATE, m);
+                hybridMaint10yr += COOLING_CONFIGS.hybrid.maintenancePerMW * load / Math.pow(1 + DISCOUNT_RATE, m);
+            }
+            results.tradMaint10yr = tradMaint10yr;
+            results.dlcMaint10yr = dlcMaint10yr;
+            results.hybridMaint10yr = hybridMaint10yr;
+
+            // Energy cost savings (annual $)
+            results.annualEnergySavingsDLC = results.traditional.annualEnergy - results.dlc.annualEnergy;
+            results.annualEnergySavingsHybrid = results.traditional.annualEnergy - results.hybrid.annualEnergy;
+
+            // Phased vs full deployment cost comparison
+            // Phased adds 12% overhead for integration complexity over 5 years
+            results.phasedDeploymentCost = results.dlc.capex * 1.12;
+            results.fullDeploymentCost = results.dlc.capex;
+            results.phasedOverhead = results.dlc.capex * 0.12;
+
+            // Staff retraining cost estimate
+            results.retrainingCost = load * 25000; // $25K per MW
+
+            // Estimated downtime during transition (hours)
+            results.downtimeHoursPhased = Math.round(load * 4.5); // 4.5 hrs/MW for phased
+            results.downtimeHoursFull = Math.round(load * 12); // 12 hrs/MW for full cutover
+
             return results;
         }
 
@@ -3239,17 +3408,55 @@ Where LMTD (Log Mean Temperature Difference) requires:
             results.forEach(function(v) { variance += (v - mean) * (v - mean); });
             var stdDev = Math.sqrt(variance / iterations);
 
+            // P1 (worst case tail)
+            var p1 = results[Math.floor(iterations * 0.01)];
+            var p5 = results[Math.floor(iterations * 0.05)];
+            var p10 = results[Math.floor(iterations * 0.10)];
+            var p25 = results[Math.floor(iterations * 0.25)];
+            var p50 = results[Math.floor(iterations * 0.50)];
+            var p75 = results[Math.floor(iterations * 0.75)];
+            var p90 = results[Math.floor(iterations * 0.90)];
+            var p95 = results[Math.floor(iterations * 0.95)];
+            var p99 = results[Math.floor(iterations * 0.99)];
+
+            // Expected Shortfall (CVaR) at 95% - average of worst 5%
+            var tailCount = Math.floor(iterations * 0.05);
+            var tailSum = 0;
+            for (var t = 0; t < tailCount; t++) { tailSum += results[t]; }
+            var cvar95 = tailSum / tailCount;
+
+            // Probability of negative ROI (savings < capex premium / 10)
+            var capexPremium = (1400000 - 800000) * base.load; // DLC vs trad capex premium
+            var annualCapexRecovery = capexPremium / 10; // need this much per year to break even in 10yr
+            var negativeROIcount = 0;
+            var breakEvenCount = 0;
+            for (var j = 0; j < iterations; j++) {
+                if (results[j] < 0) negativeROIcount++;
+                if (results[j] >= annualCapexRecovery) breakEvenCount++;
+            }
+            var probNegativeROI = negativeROIcount / iterations;
+            var probBreakEven = breakEvenCount / iterations;
+
             return {
                 results: results,
                 mean: mean,
                 stdDev: stdDev,
-                p5: results[Math.floor(iterations * 0.05)],
-                p25: results[Math.floor(iterations * 0.25)],
-                p50: results[Math.floor(iterations * 0.50)],
-                p75: results[Math.floor(iterations * 0.75)],
-                p95: results[Math.floor(iterations * 0.95)],
+                p1: p1,
+                p5: p5,
+                p10: p10,
+                p25: p25,
+                p50: p50,
+                p75: p75,
+                p90: p90,
+                p95: p95,
+                p99: p99,
                 min: results[0],
-                max: results[iterations - 1]
+                max: results[iterations - 1],
+                cvar95: cvar95,
+                probNegativeROI: probNegativeROI,
+                probBreakEven: probBreakEven,
+                annualCapexRecovery: annualCapexRecovery,
+                iqr: p75 - p25
             };
         }
 
@@ -3259,63 +3466,220 @@ Where LMTD (Log Mean Temperature Difference) requires:
             var baseDLC = base.load * 1000 * (region.pueDLC - 1) * 8760 * base.rate * 0.55;
             var baseSavings = baseEnergy - baseDLC;
 
-            // Vary load +15%
-            var highLoad = base.load * 1.15;
-            var loadHighSavings = highLoad * 1000 * (region.pueTraditional - 1) * 8760 * base.rate -
-                                  highLoad * 1000 * (region.pueDLC - 1) * 8760 * base.rate * 0.55;
-            var loadImpact = Math.abs(loadHighSavings - baseSavings);
+            function calcSavings(load, rate, pueDLC) {
+                var trad = load * 1000 * (region.pueTraditional - 1) * 8760 * rate;
+                var dlc = load * 1000 * (pueDLC - 1) * 8760 * rate * 0.55;
+                return trad - dlc;
+            }
 
-            // Vary rate +15%
-            var highRate = base.rate * 1.15;
-            var rateHighSavings = base.load * 1000 * (region.pueTraditional - 1) * 8760 * highRate -
-                                  base.load * 1000 * (region.pueDLC - 1) * 8760 * highRate * 0.55;
-            var rateImpact = Math.abs(rateHighSavings - baseSavings);
+            var swingPct = 0.15; // +/-15%
+            var puePct = 0.05;   // +/-5%
+            var maintPct = 0.20; // +/-20%
 
-            // Vary PUE +5%
-            var highPUE = region.pueDLC * 1.05;
-            var pueHighSavings = base.load * 1000 * (region.pueTraditional - 1) * 8760 * base.rate -
-                                 base.load * 1000 * (highPUE - 1) * 8760 * base.rate * 0.55;
-            var pueImpact = Math.abs(pueHighSavings - baseSavings);
+            // IT Load
+            var loadHigh = calcSavings(base.load * (1 + swingPct), base.rate, region.pueDLC);
+            var loadLow = calcSavings(base.load * (1 - swingPct), base.rate, region.pueDLC);
 
-            var maxImpact = Math.max(loadImpact, rateImpact, pueImpact);
+            // Electricity Rate
+            var rateHigh = calcSavings(base.load, base.rate * (1 + swingPct), region.pueDLC);
+            var rateLow = calcSavings(base.load, base.rate * (1 - swingPct), region.pueDLC);
 
-            return [
-                { label: 'IT Load (MW)', impact: loadImpact, pct: loadImpact / maxImpact, color: '#3b82f6' },
-                { label: 'Electricity Rate', impact: rateImpact, pct: rateImpact / maxImpact, color: '#f59e0b' },
-                { label: 'PUE Efficiency', impact: pueImpact, pct: pueImpact / maxImpact, color: '#22c55e' }
-            ].sort(function(a, b) { return b.impact - a.impact; });
+            // PUE DLC Efficiency
+            var pueHigh = calcSavings(base.load, base.rate, region.pueDLC * (1 + puePct));
+            var pueLow = calcSavings(base.load, base.rate, region.pueDLC * (1 - puePct));
+
+            // Maintenance cost impact (on total savings including maintenance delta)
+            var baseMaintDelta = (50000 - 80000) * base.load; // trad-dlc maint (negative = DLC more expensive)
+            var maintHigh = baseSavings + baseMaintDelta * (1 + maintPct) - baseMaintDelta;
+            var maintLow = baseSavings + baseMaintDelta * (1 - maintPct) - baseMaintDelta;
+
+            // Climate volatility (simulate peak temp impact on PUE)
+            var climVolHigh = calcSavings(base.load, base.rate, region.pueDLC * (1 + region.climateVolatility * 0.008));
+            var climVolLow = calcSavings(base.load, base.rate, region.pueDLC * (1 - region.climateVolatility * 0.003));
+
+            var items = [
+                { label: 'IT Load (MW)', highVal: loadHigh, lowVal: loadLow, base: baseSavings, color: '#3b82f6' },
+                { label: 'Electricity Rate', highVal: rateHigh, lowVal: rateLow, base: baseSavings, color: '#f59e0b' },
+                { label: 'PUE Efficiency', highVal: pueLow, lowVal: pueHigh, base: baseSavings, color: '#22c55e' },
+                { label: 'Maintenance Cost', highVal: maintLow, lowVal: maintHigh, base: baseSavings, color: '#a78bfa' },
+                { label: 'Climate Volatility', highVal: climVolLow, lowVal: climVolHigh, base: baseSavings, color: '#f472b6' }
+            ];
+
+            // Calculate bidirectional impact magnitude and sort
+            items.forEach(function(item) {
+                item.upside = item.highVal - item.base;
+                item.downside = item.lowVal - item.base;
+                item.totalSwing = Math.abs(item.upside) + Math.abs(item.downside);
+                item.impact = item.totalSwing; // compat
+            });
+
+            items.sort(function(a, b) { return b.totalSwing - a.totalSwing; });
+            var maxSwing = items[0].totalSwing;
+            items.forEach(function(item) { item.pct = item.totalSwing / maxSwing; });
+
+            return { items: items, baseSavings: baseSavings };
         }
 
-        function generateHvacNarrative(inputs, selectedRegion) {
+        function generateHvacNarrative(inputs, selectedRegion, mcData, sensitivityData) {
             var region = HVAC_REGIONS[selectedRegion];
             var tco = hvacCalcTCO(inputs);
             var sizeCategory = inputs.load <= 5 ? 'small' : inputs.load <= 12 ? 'medium' : 'large';
-            var narrative = '';
+            var paragraphs = [];
 
-            narrative += 'For a ' + inputs.load + ' MW facility in ' + region.label + ', ';
+            // === PARAGRAPH 1: Executive Summary ===
+            var execSummary = '';
+            var capexPremium = tco.dlc.capex - tco.traditional.capex;
+            var savingsPct = ((tco.savingsDLC10yr / tco.traditional.npv10yr) * 100).toFixed(1);
+
+            if (tco.savingsDLC10yr <= 0) {
+                execSummary += '<strong>Financial Headline:</strong> At current parameters, a DLC transition for this ' + inputs.load + ' MW facility in ' + region.label +
+                    ' does not yield positive 10-year NPV savings. The DLC architecture costs ' + fmt(Math.abs(tco.savingsDLC10yr)) +
+                    ' <em>more</em> than traditional cooling over the analysis period. ';
+                execSummary += 'This suggests the current electricity rate of $' + inputs.rate.toFixed(2) + '/kWh is too low to justify the ' +
+                    fmt(capexPremium) + ' capex premium. Consider the hybrid approach, which saves ' + fmt(tco.savingsHybrid10yr) + ' over 10 years.';
+            } else if (tco.paybackDLC > 10) {
+                execSummary += '<strong>Financial Headline:</strong> The ' + inputs.load + ' MW DLC deployment in ' + region.label +
+                    ' generates ' + fmt(tco.savingsDLC10yr) + ' in 10-year NPV savings (' + savingsPct + '% reduction vs traditional), ' +
+                    'but with a payback period of ' + tco.paybackDLC.toFixed(1) + ' years that extends beyond the analysis horizon. ';
+                execSummary += 'The annual operating savings of ' + fmt(tco.annualEnergySavingsDLC) + ' are real but insufficient to recover the ' +
+                    fmt(capexPremium) + ' capex premium within 10 years. ';
+                execSummary += 'A hybrid approach (payback: ' + tco.paybackHybrid.toFixed(1) + ' years) may be more prudent as a stepping stone.';
+            } else {
+                execSummary += '<strong>Financial Headline:</strong> A ' + inputs.load + ' MW warm-water DLC deployment in ' + region.label +
+                    ' delivers <strong>' + fmt(tco.savingsDLC10yr) + '</strong> in 10-year NPV savings, a ' + savingsPct + '% reduction vs traditional chiller-based cooling. ';
+                execSummary += 'The DLC capex premium of ' + fmt(capexPremium) + ' pays back in <strong>' + tco.paybackDLC.toFixed(1) + ' years</strong> ' +
+                    'through ' + fmt(tco.annualEnergySavingsDLC) + '/year in energy savings alone. ';
+                execSummary += 'Estimated IRR on the DLC investment is ' + (tco.irrDLC * 100).toFixed(1) + '%, which is ' +
+                    (tco.irrDLC > 0.25 ? 'significantly above' : tco.irrDLC > 0.15 ? 'above' : 'near') + ' typical infrastructure hurdle rates of 12-15%.';
+            }
+            paragraphs.push(execSummary);
+
+            // === PARAGRAPH 2: Regional Context & Climate ===
+            var regionCtx = '<strong>Regional Context:</strong> ';
+
+            // Rank this region among all 8
+            var regionKeys = Object.keys(HVAC_REGIONS);
+            var regionsSorted = regionKeys.slice().sort(function(a, b) { return HVAC_REGIONS[a].riskScore - HVAC_REGIONS[b].riskScore; });
+            var regionRank = regionsSorted.indexOf(selectedRegion) + 1;
+            var riskLabel = region.riskScore >= 7 ? 'high-risk' : region.riskScore >= 5 ? 'moderate-risk' : region.riskScore >= 3 ? 'low-risk' : 'minimal-risk';
+
+            regionCtx += region.label + ' ranks #' + regionRank + ' out of 8 regions in climate risk (score: ' + region.riskScore.toFixed(1) + '/10, ' + riskLabel + '). ';
 
             if (region.riskScore >= 6) {
-                narrative += 'the tropical climate presents significant challenges for chiller-free operation. ';
-                narrative += 'With ambient temperatures averaging ' + region.temp + '\u00B0C and ' + region.humidity + '% RH, ';
-                narrative += 'free cooling hours are limited to ' + region.freeHours + ' hrs/year (' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours). ';
-                narrative += 'A hybrid approach with ' + region.chillerBackup + '% chiller backup is recommended. ';
+                regionCtx += 'With ' + region.climateType + ' conditions averaging ' + region.temp + '\u00B0C / ' + region.humidity + '% RH ' +
+                    '(peak: ' + region.peakTemp + '\u00B0C), free cooling is limited to ' + region.freeHours.toLocaleString() + ' hours/year (' +
+                    (region.freeHours / 87.6).toFixed(0) + '% of annual hours) -- ' +
+                    (regionKeys.filter(function(k) { return HVAC_REGIONS[k].freeHours < region.freeHours; }).length) + ' regions have even fewer free cooling hours. ';
+                regionCtx += 'A hybrid approach with ' + region.chillerBackup + '% chiller backup capacity is strongly recommended. ';
+                regionCtx += 'High humidity (' + region.humidity + '% RH) further limits evaporative cooling effectiveness and increases condensation risk on cold surfaces.';
+            } else if (region.riskScore >= 3) {
+                regionCtx += 'The ' + region.climateType + ' climate provides ' + region.freeHours.toLocaleString() + ' free cooling hours/year (' +
+                    (region.freeHours / 87.6).toFixed(0) + '%), enabling significant chiller-free operation. ';
+                regionCtx += 'Peak ambient temperature of ' + region.peakTemp + '\u00B0C still requires ' + region.chillerBackup + '% chiller backup for extreme events. ';
+                regionCtx += 'DLC achieves PUE ' + region.pueDLC.toFixed(2) + ', which is ' +
+                    ((region.pueTraditional - region.pueDLC) / region.pueTraditional * 100).toFixed(0) + '% better than the traditional baseline PUE of ' + region.pueTraditional.toFixed(2) + '.';
             } else {
-                narrative += 'the favorable climate enables substantial chiller-free operation. ';
-                narrative += 'With ' + region.freeHours + ' free cooling hours/year (' + (region.freeHours / 87.6).toFixed(0) + '%), ';
-                narrative += 'a full DLC deployment can achieve PUE ' + region.pueDLC.toFixed(2) + '. ';
+                regionCtx += 'The ' + region.climateType + ' climate is highly favorable with ' + region.freeHours.toLocaleString() + ' free cooling hours/year (' +
+                    (region.freeHours / 87.6).toFixed(0) + '%), among the best globally for chiller-free operation. ';
+                regionCtx += 'DLC achieves an excellent PUE of ' + region.pueDLC.toFixed(2) + ', ' +
+                    ((region.pueTraditional - region.pueDLC) / region.pueTraditional * 100).toFixed(0) + '% better than traditional (' + region.pueTraditional.toFixed(2) + '). ';
+                regionCtx += 'Only ' + region.chillerBackup + '% emergency chiller backup is recommended.';
             }
 
-            narrative += 'Over 10 years, DLC saves ' + fmt(tco.savingsDLC10yr) + ' (NPV) vs traditional cooling, ';
-            narrative += 'with a payback period of ' + tco.paybackDLC.toFixed(1) + ' years. ';
+            // Environmental impact
+            regionCtx += ' On the environmental front, DLC saves approximately ' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/year in cooling energy, ';
+            regionCtx += 'offsetting an estimated ' + Math.round(tco.carbonOffsetDLC).toLocaleString() + ' tons of CO2 annually' +
+                (region.co2Factor < 0.1 ? ' (limited due to the region\'s already-low grid carbon intensity)' : '') + '. ';
+            regionCtx += 'Water consumption drops from ' + Math.round(tco.tradWaterGal / 1e6).toLocaleString() + 'M gallons/year to ' +
+                Math.round(tco.dlcWaterGal / 1e6).toLocaleString() + 'M gallons/year with dry cooler-based DLC.';
+            paragraphs.push(regionCtx);
 
-            if (sizeCategory === 'large') {
-                narrative += 'At ' + inputs.load + ' MW scale, the absolute savings are substantial — the capex premium of ' +
-                    fmt(tco.dlc.capex - tco.traditional.capex) + ' is recovered through ' + fmt(tco.traditional.annualOpex - tco.dlc.annualOpex) + '/year in reduced operating costs. ';
+            // === PARAGRAPH 3: Risk & Sensitivity (if MC data available) ===
+            if (mcData && sensitivityData) {
+                var riskPara = '<strong>Risk & Sensitivity Assessment:</strong> ';
+                var cv = mcData.stdDev / mcData.mean;
+                var confidenceLevel = cv < 0.12 ? 'high' : cv < 0.20 ? 'moderate' : 'low';
+                var p5p95range = mcData.p95 - mcData.p5;
+
+                riskPara += 'Monte Carlo analysis (10,000 iterations) yields median annual DLC savings of ' + fmt(mcData.p50) +
+                    ' with a 90% confidence interval of ' + fmt(mcData.p5) + ' to ' + fmt(mcData.p95) + '. ';
+
+                // Confidence badge
+                riskPara += 'The coefficient of variation is ' + (cv * 100).toFixed(1) + '%, indicating <strong>' + confidenceLevel + ' confidence</strong> in the savings projection. ';
+
+                // Tail risk
+                riskPara += 'In the worst 1% of scenarios (P1), annual savings drop to ' + fmt(mcData.p1) +
+                    ', while the expected shortfall (CVaR at 95%) is ' + fmt(mcData.cvar95) + '. ';
+
+                // Break-even probability
+                riskPara += 'The probability that annual DLC savings exceed the capex recovery threshold (' + fmt(mcData.annualCapexRecovery) + '/year) is <strong>' +
+                    (mcData.probBreakEven * 100).toFixed(1) + '%</strong>';
+
+                if (mcData.probNegativeROI > 0) {
+                    riskPara += ', while ' + (mcData.probNegativeROI * 100).toFixed(2) + '% of scenarios show negative savings';
+                }
+                riskPara += '. ';
+
+                // Top sensitivity driver
+                var topDriver = sensitivityData.items[0];
+                var secondDriver = sensitivityData.items.length > 1 ? sensitivityData.items[1] : null;
+                riskPara += 'Sensitivity analysis identifies <strong>' + topDriver.label + '</strong> as the dominant cost driver (total swing: ' +
+                    fmt(topDriver.totalSwing) + ')';
+                if (secondDriver) {
+                    riskPara += ', followed by ' + secondDriver.label + ' (' + fmt(secondDriver.totalSwing) + ')';
+                }
+                riskPara += '. Upside potential from favorable ' + topDriver.label.toLowerCase() + ' conditions is ' + fmt(Math.abs(topDriver.upside)) +
+                    ', while downside exposure is ' + fmt(Math.abs(topDriver.downside)) + '.';
+
+                paragraphs.push(riskPara);
             }
 
-            narrative += 'The estimated IRR on the DLC investment is ' + (tco.irrDLC * 100).toFixed(1) + '%.';
+            // === PARAGRAPH 4: Strategic Recommendation ===
+            var strategy = '<strong>Strategic Recommendation:</strong> ';
 
-            return narrative;
+            if (tco.savingsDLC10yr <= 0) {
+                strategy += 'Given the negative NPV at current parameters, a full DLC transition is <em>not recommended</em> at this time. ';
+                strategy += 'Consider: (1) a phased hybrid approach starting with highest-density racks only, ';
+                strategy += '(2) re-evaluating when electricity rates exceed $' + ((capexPremium / (tco.tradCoolingKWh * 0.45)) / 8760).toFixed(3) + '/kWh, or ';
+                strategy += '(3) targeting regions with lower PUE achievability. ';
+                strategy += 'The hybrid architecture saves ' + fmt(tco.savingsHybrid10yr) + ' over 10 years with a payback of ' + tco.paybackHybrid.toFixed(1) + ' years, ';
+                strategy += 'making it a viable intermediate step.';
+            } else if (tco.paybackDLC > 7) {
+                strategy += 'The long payback period of ' + tco.paybackDLC.toFixed(1) + ' years suggests a cautious phased deployment. ';
+                strategy += 'Phase 1 (Year 0-1): Deploy CDU infrastructure for ' + fmt(tco.dlc.capex * 0.4) + ', targeting top 30% density racks. ';
+                strategy += 'Phase 2 (Year 2-3): Expand to 70% DLC coverage for ' + fmt(tco.dlc.capex * 0.35) + ' as the team gains operational maturity. ';
+                strategy += 'Phase 3 (Year 4-5): Complete migration and begin legacy decommission (' + fmt(tco.dlc.capex * 0.25) + '). ';
+                strategy += 'Budget ' + fmt(tco.retrainingCost) + ' for workforce retraining. ';
+                strategy += 'Estimated downtime: ' + tco.downtimeHoursPhased + ' hours (phased) vs ' + tco.downtimeHoursFull + ' hours (full cutover). ';
+                strategy += 'The phased approach costs ' + fmt(tco.phasedOverhead) + ' more in integration overhead but reduces operational risk significantly.';
+            } else {
+                strategy += 'With a ' + tco.paybackDLC.toFixed(1) + '-year payback and ' + (tco.irrDLC * 100).toFixed(0) + '% IRR, ';
+                strategy += 'DLC deployment presents a strong financial case. ';
+                if (sizeCategory === 'large') {
+                    strategy += 'At ' + inputs.load + ' MW scale, the absolute savings are substantial -- a 3-phase rollout over 3-4 years is recommended ';
+                    strategy += 'to manage operational risk while capturing ' + fmt(tco.annualEnergySavingsDLC) + '/year in energy savings. ';
+                } else if (sizeCategory === 'medium') {
+                    strategy += 'For a ' + inputs.load + ' MW facility, a 2-phase deployment (Year 0-1 foundation, Year 2-3 completion) ';
+                    strategy += 'balances speed-to-savings with risk management. ';
+                } else {
+                    strategy += 'For a ' + inputs.load + ' MW facility, consider accelerated single-phase deployment ';
+                    strategy += 'given the smaller absolute risk and faster path to full savings. ';
+                }
+                strategy += 'Key milestones: break-even at Year ' + Math.ceil(tco.paybackDLC) + ', cumulative savings reach ' +
+                    fmt(tco.annualEnergySavingsDLC * 5) + ' by Year 5. ';
+                strategy += 'Lifecycle cost per kW drops from $' + tco.lifecycleCostPerKW_trad.toFixed(0) + '/kW (traditional) to $' +
+                    tco.lifecycleCostPerKW_dlc.toFixed(0) + '/kW (DLC), a ' +
+                    ((1 - tco.lifecycleCostPerKW_dlc / tco.lifecycleCostPerKW_trad) * 100).toFixed(0) + '% improvement.';
+            }
+
+            // Supply chain & readiness note
+            strategy += ' Technology readiness for this region is TRL ' + region.trl + '/9 with supply chain availability rated ' +
+                region.supplyChain.toFixed(1) + '/10' +
+                (region.supplyChain < 6 ? ' (limited -- plan for longer lead times and local inventory buffers)' : '') + '.';
+
+            paragraphs.push(strategy);
+
+            return paragraphs;
         }
 
         // === CANVAS CHARTS ===
@@ -3490,113 +3854,278 @@ Where LMTD (Log Mean Temperature Difference) requires:
             var tco = hvacCalcTCO(inputs);
             var mc = runHvacMonteCarlo(inputs);
             var sensitivity = runHvacSensitivity(inputs);
-            var narrative = generateHvacNarrative(inputs, inputs.region);
+            var narrativeParagraphs = generateHvacNarrative(inputs, inputs.region, mc, sensitivity);
 
-            // Panel 1: 10-Year TCO
+            // ========== Panel 1: 10-Year TCO ==========
             var tcoKPIs = document.getElementById('hvacTcoKPIs');
             if (tcoKPIs) {
+                var savingsColor = tco.savingsDLC10yr > 0 ? '#22c55e' : '#ef4444';
                 tcoKPIs.innerHTML =
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.traditional.npv10yr) + '</div><div class="hvac-kpi-label">Traditional TCO (10yr NPV)</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.hybrid.npv10yr) + '</div><div class="hvac-kpi-label">Hybrid TCO (10yr NPV)</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.dlc.npv10yr) + '</div><div class="hvac-kpi-label">DLC TCO (10yr NPV)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.savingsDLC10yr) + '</div><div class="hvac-kpi-label">DLC Savings vs Traditional</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + savingsColor + ';">' + fmt(tco.savingsDLC10yr) + '</div><div class="hvac-kpi-label">DLC Savings vs Traditional</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.paybackDLC.toFixed(1) + ' yrs</div><div class="hvac-kpi-label">DLC Payback Period</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + (tco.irrDLC * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Estimated IRR (DLC)</div></div>';
             }
 
+            // Energy & Environmental KPIs
+            var energyKPIs = document.getElementById('hvacTcoEnergyKPIs');
+            if (energyKPIs) {
+                energyKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.annualEnergySavingsDLC) + '</div><div class="hvac-kpi-label">Annual Energy Savings (DLC)</div><div class="hvac-kpi-sublabel">' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/yr</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#10b981;">' + Math.round(tco.carbonOffsetDLC).toLocaleString() + '</div><div class="hvac-kpi-label">CO2 Offset (tons/yr)</div><div class="hvac-kpi-sublabel">Factor: ' + region.co2Factor.toFixed(2) + ' tCO2/MWh</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#06b6d4;">' + (tco.waterSavingsDLC / 1e6).toFixed(1) + 'M</div><div class="hvac-kpi-label">Water Savings (gal/yr)</div><div class="hvac-kpi-sublabel">DLC: ' + (tco.dlcWaterGal / 1e6).toFixed(1) + 'M vs Trad: ' + (tco.tradWaterGal / 1e6).toFixed(1) + 'M</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.annualEnergySavingsHybrid) + '</div><div class="hvac-kpi-label">Annual Energy Savings (Hybrid)</div><div class="hvac-kpi-sublabel">' + Math.round(tco.energySavingsHybrid_kWh).toLocaleString() + ' kWh/yr</div></div>';
+            }
+
+            // Lifecycle & Maintenance KPIs
+            var lifecycleKPIs = document.getElementById('hvacTcoLifecycleKPIs');
+            if (lifecycleKPIs) {
+                var lcImprovement = ((1 - tco.lifecycleCostPerKW_dlc / tco.lifecycleCostPerKW_trad) * 100).toFixed(0);
+                lifecycleKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">$' + tco.lifecycleCostPerKW_trad.toFixed(0) + '</div><div class="hvac-kpi-label">Lifecycle $/kW (Traditional)</div><div class="hvac-kpi-sublabel">10yr NPV per cooling kW</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">$' + tco.lifecycleCostPerKW_dlc.toFixed(0) + '</div><div class="hvac-kpi-label">Lifecycle $/kW (DLC)</div><div class="hvac-kpi-sublabel">' + lcImprovement + '% improvement</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.tradMaint10yr) + '</div><div class="hvac-kpi-label">Trad Maintenance (10yr NPV)</div><div class="hvac-kpi-sublabel">$' + (COOLING_CONFIGS.traditional.maintenancePerMW / 1000).toFixed(0) + 'K/MW/yr</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlcMaint10yr) + '</div><div class="hvac-kpi-label">DLC Maintenance (10yr NPV)</div><div class="hvac-kpi-sublabel">$' + (COOLING_CONFIGS.dlc.maintenancePerMW / 1000).toFixed(0) + 'K/MW/yr (leak det., fluid)</div></div>';
+            }
+
             drawTCOWaterfall(document.getElementById('hvacWaterfallChart'), tco);
 
+            // Panel 1 Narrative
             var tcoNar = document.getElementById('hvacTcoNarrative');
-            if (tcoNar) tcoNar.textContent = narrative;
+            if (tcoNar) {
+                tcoNar.innerHTML = narrativeParagraphs.map(function(p) {
+                    return '<div class="hvac-narrative-paragraph">' + p + '</div>';
+                }).join('');
+            }
 
-            // Panel 2: Regional Risk Matrix
+            // ========== Panel 2: Regional Risk Matrix ==========
             var riskKPIs = document.getElementById('hvacRiskKPIs');
+            var failProb = (region.riskScore / 10 * 100).toFixed(0);
+            var adjustedPUE = (region.pueDLC * (1 + region.riskScore * 0.005)).toFixed(3);
             if (riskKPIs) {
-                var failProb = (region.riskScore / 10 * 100).toFixed(0);
-                var adjustedPUE = (region.pueDLC * (1 + region.riskScore * 0.005)).toFixed(3);
                 riskKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.temp + '\u00B0C</div><div class="hvac-kpi-label">Avg Ambient Temperature</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.temp + '\u00B0C</div><div class="hvac-kpi-label">Avg Ambient Temperature</div><div class="hvac-kpi-sublabel">Peak: ' + region.peakTemp + '\u00B0C</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.humidity + '%</div><div class="hvac-kpi-label">Avg Relative Humidity</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.freeHours.toLocaleString() + '</div><div class="hvac-kpi-label">Free Cooling Hours/Year</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.freeHours.toLocaleString() + '</div><div class="hvac-kpi-label">Free Cooling Hours/Year</div><div class="hvac-kpi-sublabel">' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (region.riskScore >= 6 ? '#ef4444' : region.riskScore >= 3 ? '#f59e0b' : '#22c55e') + ';">' + region.riskScore.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Risk Score</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + failProb + '%</div><div class="hvac-kpi-label">Failure Probability (High Heat)</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + adjustedPUE + '</div><div class="hvac-kpi-label">Risk-Adjusted PUE (DLC)</div></div>';
             }
 
-            var riskNar = document.getElementById('hvacRiskNarrative');
-            if (riskNar) {
-                var riskText = region.label + ' has a climate risk score of ' + region.riskScore.toFixed(1) + '/10. ';
-                if (region.riskScore >= 6) {
-                    riskText += 'This is a high-risk region for chiller-free operation. Only ' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours qualify for free cooling. ';
-                    riskText += 'Chiller backup capacity of ' + region.chillerBackup + '% is required. Risk-adjusted PUE increases to ' + adjustedPUE + ' when accounting for degraded performance during extreme conditions.';
-                } else {
-                    riskText += 'This region is favorable for chiller-free operation with ' + (region.freeHours / 87.6).toFixed(0) + '% free cooling availability. ';
-                    riskText += 'Only ' + region.chillerBackup + '% chiller backup is recommended for extreme events. The risk-adjusted PUE of ' + adjustedPUE + ' remains excellent.';
-                }
-                riskNar.textContent = riskText;
+            // Extended Risk Dimensions
+            var riskExtKPIs = document.getElementById('hvacRiskExtKPIs');
+            if (riskExtKPIs) {
+                var regCompColor = region.regulatoryRisk >= 7 ? '#22c55e' : region.regulatoryRisk >= 5 ? '#f59e0b' : '#ef4444';
+                var trlColor = region.trl >= 7 ? '#22c55e' : region.trl >= 5 ? '#f59e0b' : '#ef4444';
+                var scColor = region.supplyChain >= 7 ? '#22c55e' : region.supplyChain >= 5 ? '#f59e0b' : '#ef4444';
+                var cvColor = region.climateVolatility <= 3 ? '#22c55e' : region.climateVolatility <= 5 ? '#f59e0b' : '#ef4444';
+                riskExtKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + regCompColor + ';">' + region.regulatoryRisk.toFixed(1) + '/10</div><div class="hvac-kpi-label">Regulatory Compliance</div><div class="hvac-kpi-sublabel">' + (region.regulatoryRisk >= 7 ? 'Strong frameworks' : region.regulatoryRisk >= 5 ? 'Developing standards' : 'Limited regulation') + '</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + trlColor + ';">TRL ' + region.trl + '/9</div><div class="hvac-kpi-label">Technology Readiness</div><div class="hvac-kpi-sublabel">' + (region.trl >= 8 ? 'Proven at scale' : region.trl >= 6 ? 'Demo validated' : 'Early adoption') + '</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + scColor + ';">' + region.supplyChain.toFixed(1) + '/10</div><div class="hvac-kpi-label">Supply Chain Availability</div><div class="hvac-kpi-sublabel">' + (region.supplyChain >= 7 ? 'Multiple vendors' : region.supplyChain >= 5 ? 'Limited options' : 'Scarce supply') + '</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + cvColor + ';">' + region.climateVolatility.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Volatility Index</div><div class="hvac-kpi-sublabel">' + (region.climateVolatility <= 3 ? 'Stable climate' : region.climateVolatility <= 5 ? 'Moderate swings' : 'High variability') + '</div></div>';
             }
 
-            // Panel 3: Transition Planning
+            var riskNar = document.getElementById('hvacRiskNarrative');
+            if (riskNar) {
+                // Rank region among all 8
+                var regionKeys = Object.keys(HVAC_REGIONS);
+                var regionsSorted = regionKeys.slice().sort(function(a, b) { return HVAC_REGIONS[a].riskScore - HVAC_REGIONS[b].riskScore; });
+                var regionRank = regionsSorted.indexOf(inputs.region) + 1;
+                var bestRegion = HVAC_REGIONS[regionsSorted[0]];
+                var worstRegion = HVAC_REGIONS[regionsSorted[regionsSorted.length - 1]];
+
+                var riskText = '<div class="hvac-narrative-paragraph"><strong>' + region.label + '</strong> ranks <strong>#' + regionRank + ' of 8 regions</strong> in climate risk (score: ' +
+                    region.riskScore.toFixed(1) + '/10). ';
+                if (region.riskScore >= 6) {
+                    riskText += 'This is a <strong>high-risk region</strong> for chiller-free operation. Only ' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours qualify for free cooling, ' +
+                        'compared to ' + (bestRegion.freeHours / 87.6).toFixed(0) + '% in ' + bestRegion.label + ' (best-in-class). ';
+                    riskText += 'Chiller backup capacity of <strong>' + region.chillerBackup + '%</strong> is required. Risk-adjusted PUE increases to ' + adjustedPUE + '.</div>';
+                    riskText += '<div class="hvac-narrative-paragraph">Key concerns: ';
+                    if (region.humidity >= 75) riskText += 'high humidity (' + region.humidity + '% RH) limits evaporative cooling and increases condensation risk; ';
+                    if (region.peakTemp >= 40) riskText += 'peak temperatures of ' + region.peakTemp + '\u00B0C exceed dry cooler design limits; ';
+                    if (region.supplyChain < 6) riskText += 'limited local supply chain (rated ' + region.supplyChain.toFixed(1) + '/10) may cause long lead times; ';
+                    riskText += 'climate volatility index of ' + region.climateVolatility.toFixed(1) + '/10 indicates ' + (region.climateVolatility > 5 ? 'significant' : 'moderate') + ' weather unpredictability.</div>';
+                } else {
+                    riskText += 'This region is <strong>favorable</strong> for chiller-free operation with ' + (region.freeHours / 87.6).toFixed(0) + '% free cooling availability. ';
+                    riskText += 'Only ' + region.chillerBackup + '% chiller backup is recommended. ';
+                    riskText += 'Risk-adjusted PUE of ' + adjustedPUE + ' remains excellent.</div>';
+                    riskText += '<div class="hvac-narrative-paragraph">Technology readiness (TRL ' + region.trl + '/9) and supply chain availability (' + region.supplyChain.toFixed(1) + '/10) support confident deployment. ';
+                    riskText += 'Regulatory compliance rated ' + region.regulatoryRisk.toFixed(1) + '/10 ' +
+                        (region.regulatoryRisk >= 7 ? 'with strong environmental standards that favor DLC adoption.' : 'with developing frameworks.') + '</div>';
+                }
+                riskNar.innerHTML = riskText;
+            }
+
+            // ========== Panel 3: Transition Planning ==========
             var transKPIs = document.getElementById('hvacTransitionKPIs');
+            var phase1Capex = tco.dlc.capex * 0.4;
+            var phase2Capex = tco.dlc.capex * 0.35;
+            var phase3Capex = tco.dlc.capex * 0.25;
+            var trainingCost = tco.retrainingCost;
+            var totalTransition = tco.dlc.capex + trainingCost;
             if (transKPIs) {
-                var phase1Capex = tco.dlc.capex * 0.4;
-                var phase2Capex = tco.dlc.capex * 0.35;
-                var phase3Capex = tco.dlc.capex * 0.25;
-                var trainingCost = inputs.load * 25000; // $25K per MW for workforce training
-                var totalTransition = tco.dlc.capex + trainingCost;
                 transKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase1Capex) + '</div><div class="hvac-kpi-label">Phase 1 (Year 0-1): Foundation</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase2Capex) + '</div><div class="hvac-kpi-label">Phase 2 (Year 2-3): Expansion</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase3Capex) + '</div><div class="hvac-kpi-label">Phase 3 (Year 4-5): Optimization</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(trainingCost) + '</div><div class="hvac-kpi-label">Workforce Training</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase1Capex) + '</div><div class="hvac-kpi-label">Phase 1 (Year 0-1): Foundation</div><div class="hvac-kpi-sublabel">CDU, piping, controls</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase2Capex) + '</div><div class="hvac-kpi-label">Phase 2 (Year 2-3): Expansion</div><div class="hvac-kpi-sublabel">High-density rack DLC</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase3Capex) + '</div><div class="hvac-kpi-label">Phase 3 (Year 4-5): Optimization</div><div class="hvac-kpi-sublabel">Full migration</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(trainingCost) + '</div><div class="hvac-kpi-label">Workforce Training</div><div class="hvac-kpi-sublabel">Certification & procedures</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(totalTransition) + '</div><div class="hvac-kpi-label">Total Transition Cost</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlc.annualOpex) + '/yr</div><div class="hvac-kpi-label">Steady-State Opex</div></div>';
             }
 
-            var transNar = document.getElementById('hvacTransitionNarrative');
-            if (transNar) {
-                transNar.textContent = 'Recommended 3-phase transition over 5 years for ' + inputs.load + ' MW facility in ' + region.label + '. ' +
-                    'Phase 1 (Year 0-1) focuses on CDU infrastructure, piping, and controls for ' + fmt(phase1Capex) + '. ' +
-                    'Phase 2 (Year 2-3) expands DLC coverage to high-density racks for ' + fmt(phase2Capex) + '. ' +
-                    'Phase 3 (Year 4-5) completes migration and decommissions legacy chillers for ' + fmt(phase3Capex) + '. ' +
-                    'Workforce training budget of ' + fmt(trainingCost) + ' covers liquid cooling certification, leak detection, and emergency procedures.';
+            // Extended Transition KPIs
+            var transExtKPIs = document.getElementById('hvacTransitionExtKPIs');
+            if (transExtKPIs) {
+                transExtKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.downtimeHoursPhased + ' hrs</div><div class="hvac-kpi-label">Est. Downtime (Phased)</div><div class="hvac-kpi-sublabel">' + (tco.downtimeHoursPhased / 24).toFixed(1) + ' days over 5 years</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#f59e0b;">' + tco.downtimeHoursFull + ' hrs</div><div class="hvac-kpi-label">Est. Downtime (Full Cutover)</div><div class="hvac-kpi-sublabel">' + (tco.downtimeHoursFull / 24).toFixed(1) + ' days single event</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.phasedDeploymentCost) + '</div><div class="hvac-kpi-label">Phased Deployment Cost</div><div class="hvac-kpi-sublabel">+12% integration overhead</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.fullDeploymentCost) + '</div><div class="hvac-kpi-label">Full Deployment Cost</div><div class="hvac-kpi-sublabel">Higher risk, lower cost</div></div>';
             }
 
-            // Panel 4: Monte Carlo
+            // ROI Milestone Timeline
+            var milestoneDiv = document.getElementById('hvacMilestoneTimeline');
+            if (milestoneDiv) {
+                var annualSavings = tco.traditional.annualOpex - tco.dlc.annualOpex;
+                var capexPremium = tco.dlc.capex - tco.traditional.capex;
+                var milestoneHtml = '<div class="hvac-section-divider"><i class="fas fa-flag-checkered" style="margin-right:4px;"></i> ROI Timeline with Milestones</div>';
+                var cumSavings = 0;
+                var maxCum = annualSavings * 10;
+                if (maxCum <= 0) maxCum = capexPremium * 2; // fallback
+                for (var yr = 1; yr <= 10; yr++) {
+                    cumSavings += annualSavings;
+                    var fillPct = Math.min(100, Math.max(0, (cumSavings / maxCum) * 100));
+                    var isBreakEven = cumSavings >= capexPremium && (cumSavings - annualSavings) < capexPremium;
+                    var barColor = cumSavings < 0 ? '#ef4444' : cumSavings < capexPremium ? '#f59e0b' : '#22c55e';
+                    var milestone = '';
+                    if (yr === 1) milestone = 'Phase 1 complete';
+                    else if (yr === 3) milestone = 'Phase 2 complete';
+                    else if (yr === 5) milestone = 'Phase 3 complete';
+                    else if (isBreakEven) milestone = 'BREAK-EVEN';
+                    milestoneHtml += '<div class="hvac-milestone-bar">' +
+                        '<div class="hvac-milestone-year">Y' + yr + '</div>' +
+                        '<div class="hvac-milestone-track"><div class="hvac-milestone-fill" style="width:' + fillPct.toFixed(0) + '%;background:' + barColor + ';"></div></div>' +
+                        '<div class="hvac-milestone-label">' + fmt(cumSavings) + (milestone ? ' <strong>' + milestone + '</strong>' : '') + '</div></div>';
+                }
+                milestoneDiv.innerHTML = milestoneHtml;
+            }
+
+            var transNar = document.getElementById('hvacTransitionNarrative');
+            if (transNar) {
+                var annualSav = tco.traditional.annualOpex - tco.dlc.annualOpex;
+                var phasedSavingsNote = annualSav > 0 ?
+                    'Phased deployment begins generating partial savings from Year 1 (est. 30% of full savings = ' + fmt(annualSav * 0.3) + '/yr), ' +
+                    'ramping to 70% by Year 3 and 100% by Year 5. ' : '';
+                transNar.innerHTML =
+                    '<div class="hvac-narrative-paragraph"><strong>Transition Strategy:</strong> Recommended 3-phase deployment over 5 years for ' + inputs.load + ' MW facility in ' + region.label + '. ' +
+                    'Phase 1 (Year 0-1) focuses on CDU infrastructure, piping, and controls for ' + fmt(phase1Capex) + '. ' +
+                    'Phase 2 (Year 2-3) expands DLC coverage to high-density racks for ' + fmt(phase2Capex) + '. ' +
+                    'Phase 3 (Year 4-5) completes migration and decommissions legacy chillers for ' + fmt(phase3Capex) + '.</div>' +
+                    '<div class="hvac-narrative-paragraph">' + phasedSavingsNote +
+                    'Phased approach adds ' + fmt(tco.phasedOverhead) + ' in integration overhead but reduces maximum downtime to ' + tco.downtimeHoursPhased + ' hours ' +
+                    '(spread across phases) vs ' + tco.downtimeHoursFull + ' hours for full cutover. ' +
+                    'Workforce training budget of ' + fmt(trainingCost) + ' covers liquid cooling certification, leak detection protocols, and emergency procedures -- ' +
+                    'this is ' + ((trainingCost / totalTransition) * 100).toFixed(1) + '% of total transition cost.</div>';
+            }
+
+            // ========== Panel 4: Monte Carlo ==========
             var monteKPIs = document.getElementById('hvacMonteKPIs');
             if (monteKPIs) {
                 monteKPIs.innerHTML =
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.mean) + '</div><div class="hvac-kpi-label">Mean Annual Savings</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#ef4444;">' + fmt(mc.p5) + '</div><div class="hvac-kpi-label">P5 (Worst Case)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#ef4444;">' + fmt(mc.p5) + '</div><div class="hvac-kpi-label">P5 (Conservative)</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.p50) + '</div><div class="hvac-kpi-label">P50 (Median)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(mc.p95) + '</div><div class="hvac-kpi-label">P95 (Best Case)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(mc.p95) + '</div><div class="hvac-kpi-label">P95 (Optimistic)</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.stdDev) + '</div><div class="hvac-kpi-label">Std Deviation</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + ((mc.stdDev / mc.mean) * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Coefficient of Variation</div></div>';
             }
 
+            // Tail Risk KPIs
+            var monteTailKPIs = document.getElementById('hvacMonteTailKPIs');
+            if (monteTailKPIs) {
+                var cv = mc.stdDev / mc.mean;
+                var confClass = cv < 0.12 ? 'hvac-confidence-high' : cv < 0.20 ? 'hvac-confidence-med' : 'hvac-confidence-low';
+                var confLabel = cv < 0.12 ? 'HIGH' : cv < 0.20 ? 'MODERATE' : 'LOW';
+                monteTailKPIs.innerHTML =
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#f87171;">' + fmt(mc.p1) + '</div><div class="hvac-kpi-label">P1 (Worst-Case Tail)</div><div class="hvac-kpi-sublabel">1st percentile scenario</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#fb923c;">' + fmt(mc.cvar95) + '</div><div class="hvac-kpi-label">CVaR at 95%</div><div class="hvac-kpi-sublabel">Expected shortfall (avg of worst 5%)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (mc.probNegativeROI > 0.05 ? '#ef4444' : mc.probNegativeROI > 0 ? '#f59e0b' : '#22c55e') + ';">' + (mc.probNegativeROI * 100).toFixed(2) + '%</div><div class="hvac-kpi-label">Prob. of Negative Savings</div><div class="hvac-kpi-sublabel">' + Math.round(mc.probNegativeROI * 10000) + ' of 10,000 scenarios</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (mc.probBreakEven >= 0.9 ? '#22c55e' : mc.probBreakEven >= 0.7 ? '#f59e0b' : '#ef4444') + ';">' + (mc.probBreakEven * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Break-Even Probability</div><div class="hvac-kpi-sublabel">Savings exceed ' + fmt(mc.annualCapexRecovery) + '/yr<span class="' + confClass + ' hvac-confidence-badge">' + confLabel + '</span></div></div>';
+            }
+
             drawMonteHistogram(document.getElementById('hvacMonteChart'), mc);
 
-            // Tornado bars
+            // Enhanced Tornado bars (bidirectional with $ values)
             var tornadoBars = document.getElementById('hvacTornadoBars');
             if (tornadoBars) {
-                var html = '<div style="font-size:0.85rem;font-weight:700;color:#60a5fa;margin-bottom:0.75rem;">Sensitivity Analysis (Tornado)</div>';
-                sensitivity.forEach(function(item) {
-                    html += '<div class="hvac-sensitivity-bar">' +
-                        '<div class="hvac-sensitivity-label">' + item.label + '</div>' +
-                        '<div class="hvac-sensitivity-track"><div class="hvac-sensitivity-fill" style="width:' + (item.pct * 100).toFixed(0) + '%;background:' + item.color + ';"></div></div>' +
-                        '<div class="hvac-sensitivity-value">' + fmt(item.impact) + '</div></div>';
+                var sensItems = sensitivity.items;
+                var maxHalf = 0;
+                sensItems.forEach(function(item) {
+                    var absUp = Math.abs(item.upside);
+                    var absDn = Math.abs(item.downside);
+                    if (absUp > maxHalf) maxHalf = absUp;
+                    if (absDn > maxHalf) maxHalf = absDn;
                 });
+
+                var html = '<div class="hvac-tornado-header"><span><i class="fas fa-chart-bar" style="margin-right:6px;"></i>Sensitivity Tornado Chart</span>' +
+                    '<span style="font-size:0.72rem;color:#94a3b8;">Baseline: ' + fmt(sensitivity.baseSavings) + '/yr</span></div>';
+
+                sensItems.forEach(function(item) {
+                    var upPct = maxHalf > 0 ? (Math.abs(item.upside) / maxHalf) * 50 : 0;
+                    var dnPct = maxHalf > 0 ? (Math.abs(item.downside) / maxHalf) * 50 : 0;
+                    var posColor = item.upside >= 0 ? '#22c55e' : '#ef4444';
+                    var negColor = item.downside >= 0 ? '#22c55e' : '#ef4444';
+
+                    html += '<div class="hvac-sensitivity-bar" style="margin-bottom:0.6rem;">' +
+                        '<div class="hvac-sensitivity-label" style="min-width:120px;">' + item.label + '</div>' +
+                        '<div class="hvac-tornado-val-left">' + (item.downside >= 0 ? '+' : '') + fmt(item.downside) + '</div>' +
+                        '<div class="hvac-tornado-track">' +
+                            '<div class="hvac-tornado-baseline"></div>' +
+                            '<div class="hvac-tornado-fill-neg" style="width:' + dnPct.toFixed(1) + '%;background:' + negColor + ';opacity:0.7;"></div>' +
+                            '<div class="hvac-tornado-fill-pos" style="width:' + upPct.toFixed(1) + '%;background:' + posColor + ';opacity:0.7;"></div>' +
+                        '</div>' +
+                        '<div class="hvac-tornado-val-right">' + (item.upside >= 0 ? '+' : '') + fmt(item.upside) + '</div>' +
+                    '</div>';
+                });
+                html += '<div style="display:flex;justify-content:center;gap:1.5rem;margin-top:0.5rem;font-size:0.72rem;color:#64748b;">' +
+                    '<span style="color:#ef4444;">&#9632; Downside</span>' +
+                    '<span style="color:#94a3b8;">| Baseline |</span>' +
+                    '<span style="color:#22c55e;">&#9632; Upside</span></div>';
                 tornadoBars.innerHTML = html;
             }
 
             var monteNar = document.getElementById('hvacMonteNarrative');
             if (monteNar) {
-                var topDriver = sensitivity[0];
-                monteNar.textContent = 'Monte Carlo simulation with 10,000 iterations (load and rate varied \u00B115%) shows median annual DLC savings of ' + fmt(mc.p50) +
-                    ' with a 90% confidence interval of ' + fmt(mc.p5) + ' to ' + fmt(mc.p95) + '. ' +
-                    'The coefficient of variation is ' + ((mc.stdDev / mc.mean) * 100).toFixed(1) + '%, indicating ' +
-                    ((mc.stdDev / mc.mean) < 0.15 ? 'low' : (mc.stdDev / mc.mean) < 0.25 ? 'moderate' : 'high') + ' uncertainty. ' +
-                    'Sensitivity analysis reveals ' + topDriver.label + ' as the dominant cost driver (' + fmt(topDriver.impact) + ' impact at +15%).';
+                var topDriver = sensitivity.items[0];
+                var cv = mc.stdDev / mc.mean;
+                var uncertaintyLevel = cv < 0.12 ? 'low' : cv < 0.20 ? 'moderate' : 'high';
+                var narHtml = '<div class="hvac-narrative-paragraph"><strong>Statistical Summary:</strong> Monte Carlo simulation with 10,000 iterations ' +
+                    '(load \u00B115%, rate \u00B115%, PUE \u00B15%) shows median annual DLC savings of ' + fmt(mc.p50) +
+                    ' with a 90% confidence interval of [' + fmt(mc.p5) + ', ' + fmt(mc.p95) + ']. ' +
+                    'The interquartile range (IQR) is ' + fmt(mc.iqr) + ' and coefficient of variation is ' + (cv * 100).toFixed(1) +
+                    '%, indicating <strong>' + uncertaintyLevel + ' uncertainty</strong> in the savings projection.</div>';
+                narHtml += '<div class="hvac-narrative-paragraph"><strong>Tail Risk:</strong> The worst-case scenario (P1) yields ' + fmt(mc.p1) +
+                    ' in annual savings, while the expected shortfall (CVaR-95) -- the average of the worst 5% of outcomes -- is ' + fmt(mc.cvar95) + '. ';
+                if (mc.probNegativeROI > 0.01) {
+                    narHtml += 'There is a ' + (mc.probNegativeROI * 100).toFixed(1) + '% probability of negative annual savings, which warrants risk mitigation. ';
+                } else if (mc.probNegativeROI > 0) {
+                    narHtml += 'Only ' + (mc.probNegativeROI * 100).toFixed(2) + '% of scenarios show negative savings, indicating robust downside protection. ';
+                } else {
+                    narHtml += 'No scenarios produced negative savings, indicating very strong downside protection at current parameters. ';
+                }
+                narHtml += 'Break-even probability (savings > capex recovery of ' + fmt(mc.annualCapexRecovery) + '/yr) is ' +
+                    (mc.probBreakEven * 100).toFixed(1) + '%.</div>';
+                narHtml += '<div class="hvac-narrative-paragraph"><strong>Key Sensitivity Drivers:</strong> ' + topDriver.label + ' is the dominant variable with a total swing of ' +
+                    fmt(topDriver.totalSwing) + ' (upside: ' + (topDriver.upside >= 0 ? '+' : '') + fmt(topDriver.upside) +
+                    ', downside: ' + (topDriver.downside >= 0 ? '+' : '') + fmt(topDriver.downside) + '). ';
+                if (sensitivity.items.length > 1) {
+                    narHtml += sensitivity.items[1].label + ' follows with ' + fmt(sensitivity.items[1].totalSwing) + ' swing. ';
+                }
+                narHtml += 'To reduce projection uncertainty, focus on securing favorable ' + topDriver.label.toLowerCase() + ' terms and locking in long-term contracts.</div>';
+                monteNar.innerHTML = narHtml;
             }
         }
 
@@ -3692,6 +4221,9 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
         // === PDF EXPORT ===
         window.hvacExportPDF = function() {
+            var w = window.open('', '_blank');
+            if (!w) { alert('Please allow pop-ups for this site to export PDF.'); return; }
+            w.document.write('<p style="font-family:sans-serif;text-align:center;margin-top:40vh;">Generating report...</p>');
             var loadSlider = document.getElementById('loadSlider');
             var rateSlider = document.getElementById('rateSlider');
             var regionSelect = document.getElementById('hvacRegionSelect');
@@ -3704,7 +4236,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
             var tco = hvacCalcTCO(inputs);
             var mc = proMode ? runHvacMonteCarlo(inputs) : null;
             var sensitivity = proMode ? runHvacSensitivity(inputs) : null;
-            var narrative = generateHvacNarrative(inputs, inputs.region);
+            var narrativeParagraphs = generateHvacNarrative(inputs, inputs.region, mc, sensitivity);
             var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
             // SVG chart generators for PDF
@@ -3760,15 +4292,50 @@ Where LMTD (Log Mean Temperature Difference) requires:
                     var y = 40 + chartH - barH;
                     svg += '<rect x="' + x + '" y="' + y + '" width="' + (barW - 1) + '" height="' + barH + '" fill="#3b82f6" opacity="0.6"/>';
                 });
-                // P5/P50/P95 lines
                 function addLine(val, label, color) {
                     var x = pad + ((val - mc.min) / range) * chartW;
                     svg += '<line x1="' + x + '" y1="35" x2="' + x + '" y2="' + (40 + chartH) + '" stroke="' + color + '" stroke-width="2" stroke-dasharray="4,4"/>';
                     svg += '<text x="' + x + '" y="' + (H - 10) + '" font-size="9" fill="' + color + '" text-anchor="middle" font-family="Inter,sans-serif">' + label + ': ' + fmt(val) + '</text>';
                 }
+                addLine(mc.p1, 'P1', '#991b1b');
                 addLine(mc.p5, 'P5', '#dc2626');
                 addLine(mc.p50, 'P50', '#d97706');
                 addLine(mc.p95, 'P95', '#16a34a');
+                svg += '</svg>';
+                return svg;
+            }
+
+            function tornadoSVG(sensitivity) {
+                if (!sensitivity) return '';
+                var W = 600, H = 40 + sensitivity.items.length * 40;
+                var pad = { left: 130, right: 70, top: 30 };
+                var chartW = W - pad.left - pad.right;
+                var maxHalf = 0;
+                sensitivity.items.forEach(function(item) {
+                    var absUp = Math.abs(item.upside);
+                    var absDn = Math.abs(item.downside);
+                    if (absUp > maxHalf) maxHalf = absUp;
+                    if (absDn > maxHalf) maxHalf = absDn;
+                });
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:600px;">';
+                svg += '<text x="' + W/2 + '" y="18" font-size="13" fill="#1e3a5f" text-anchor="middle" font-weight="bold" font-family="Inter,sans-serif">Sensitivity Tornado (Baseline: ' + fmt(sensitivity.baseSavings) + '/yr)</text>';
+                var midX = pad.left + chartW / 2;
+                svg += '<line x1="' + midX + '" y1="' + pad.top + '" x2="' + midX + '" y2="' + (H - 5) + '" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>';
+                sensitivity.items.forEach(function(item, i) {
+                    var y = pad.top + i * 40 + 8;
+                    var barH = 22;
+                    svg += '<text x="' + (pad.left - 8) + '" y="' + (y + barH / 2 + 4) + '" font-size="10" fill="#374151" text-anchor="end" font-family="Inter,sans-serif">' + item.label + '</text>';
+                    // Downside bar (left of baseline)
+                    var dnW = maxHalf > 0 ? (Math.abs(item.downside) / maxHalf) * (chartW / 2) : 0;
+                    var dnColor = item.downside >= 0 ? '#16a34a' : '#dc2626';
+                    svg += '<rect x="' + (midX - dnW) + '" y="' + y + '" width="' + dnW + '" height="' + barH + '" fill="' + dnColor + '" opacity="0.7" rx="2"/>';
+                    svg += '<text x="' + (midX - dnW - 4) + '" y="' + (y + barH / 2 + 4) + '" font-size="9" fill="' + dnColor + '" text-anchor="end" font-family="Inter,sans-serif">' + fmt(item.downside) + '</text>';
+                    // Upside bar (right of baseline)
+                    var upW = maxHalf > 0 ? (Math.abs(item.upside) / maxHalf) * (chartW / 2) : 0;
+                    var upColor = item.upside >= 0 ? '#16a34a' : '#dc2626';
+                    svg += '<rect x="' + midX + '" y="' + y + '" width="' + upW + '" height="' + barH + '" fill="' + upColor + '" opacity="0.7" rx="2"/>';
+                    svg += '<text x="' + (midX + upW + 4) + '" y="' + (y + barH / 2 + 4) + '" font-size="9" fill="' + upColor + '" text-anchor="start" font-family="Inter,sans-serif">+' + fmt(item.upside) + '</text>';
+                });
                 svg += '</svg>';
                 return svg;
             }
@@ -3789,22 +4356,26 @@ Where LMTD (Log Mean Temperature Difference) requires:
                 'td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1f2937; }' +
                 'tr:nth-child(even) td { background: #fafbfc; }' +
                 '.narrative { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 14px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 13px; color: #374151; line-height: 1.7; }' +
+                '.narrative p { margin: 0 0 10px 0; } .narrative p:last-child { margin-bottom: 0; }' +
                 '.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }' +
+                '.kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }' +
                 '.kpi-card { text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }' +
                 '.kpi-value { font-size: 16px; font-weight: 800; color: #3b82f6; }' +
                 '.kpi-label { font-size: 10px; color: #6b7280; margin-top: 2px; }' +
+                '.kpi-sub { font-size: 9px; color: #9ca3af; margin-top: 1px; }' +
                 '.footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #9ca3af; text-align: center; }' +
                 '.badge-good { color: #16a34a; } .badge-warn { color: #d97706; } .badge-bad { color: #dc2626; }' +
+                '.section-note { font-size: 11px; color: #6b7280; font-style: italic; margin: 4px 0 8px; }' +
             '</style></head><body>';
 
             html += '<h1>HVAC Cooling Architecture Analysis</h1>';
             html += '<div class="header-meta"><span>Generated: ' + today + '</span><span>Region: ' + region.label + '</span><span>Facility: ' + inputs.load + ' MW @ $' + inputs.rate.toFixed(2) + '/kWh</span></div>';
 
-            // Summary
+            // Summary hero
             html += '<div class="score-hero">';
             html += '<div class="score">' + fmt(tco.savingsDLC10yr) + '</div>';
             html += '<div class="label">10-Year NPV Savings (DLC vs Traditional)</div>';
-            html += '<div style="margin-top:8px;font-size:12px;color:#6b7280;">Payback: ' + tco.paybackDLC.toFixed(1) + ' years | IRR: ' + (tco.irrDLC * 100).toFixed(1) + '%</div>';
+            html += '<div style="margin-top:8px;font-size:12px;color:#6b7280;">Payback: ' + tco.paybackDLC.toFixed(1) + ' years | IRR: ' + (tco.irrDLC * 100).toFixed(1) + '% | CO2 Offset: ' + Math.round(tco.carbonOffsetDLC).toLocaleString() + ' tons/yr</div>';
             html += '</div>';
 
             // TCO Table
@@ -3817,18 +4388,27 @@ Where LMTD (Log Mean Temperature Difference) requires:
             });
             html += '</table>';
 
+            // Energy & Environmental
+            html += '<h3>Energy & Environmental Impact</h3>';
+            html += '<div class="kpi-grid-4">';
+            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.annualEnergySavingsDLC) + '</div><div class="kpi-label">Annual Energy Savings</div><div class="kpi-sub">' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/yr</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value badge-good">' + Math.round(tco.carbonOffsetDLC).toLocaleString() + '</div><div class="kpi-label">CO2 Offset (tons/yr)</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + (tco.waterSavingsDLC / 1e6).toFixed(1) + 'M</div><div class="kpi-label">Water Savings (gal/yr)</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">$' + tco.lifecycleCostPerKW_dlc.toFixed(0) + '</div><div class="kpi-label">DLC Lifecycle $/kW</div><div class="kpi-sub">vs $' + tco.lifecycleCostPerKW_trad.toFixed(0) + ' traditional</div></div>';
+            html += '</div>';
+
             html += waterfallSVG(tco);
 
             // Regional Risk
             html += '<h2>Regional Risk Assessment</h2>';
-            html += '<table><tr><th>Region</th><th>Temp</th><th>RH</th><th>Free Cooling Hrs</th><th>Risk Score</th><th>PUE (DLC)</th></tr>';
+            html += '<table><tr><th>Region</th><th>Temp</th><th>RH</th><th>Free Hrs</th><th>Risk</th><th>PUE</th><th>TRL</th><th>Supply</th></tr>';
             Object.keys(HVAC_REGIONS).forEach(function(key) {
                 var r = HVAC_REGIONS[key];
                 var isSelected = key === inputs.region;
                 html += '<tr' + (isSelected ? ' style="background:#eff6ff;font-weight:600;"' : '') + '>';
                 html += '<td>' + r.label + (isSelected ? ' *' : '') + '</td><td>' + r.temp + '\u00B0C</td><td>' + r.humidity + '%</td><td>' + r.freeHours.toLocaleString() + '</td>';
-                html += '<td class="' + (r.riskScore >= 6 ? 'badge-bad' : r.riskScore >= 3 ? 'badge-warn' : 'badge-good') + '">' + r.riskScore.toFixed(1) + '/10</td>';
-                html += '<td>' + r.pueDLC.toFixed(2) + '</td></tr>';
+                html += '<td class="' + (r.riskScore >= 6 ? 'badge-bad' : r.riskScore >= 3 ? 'badge-warn' : 'badge-good') + '">' + r.riskScore.toFixed(1) + '</td>';
+                html += '<td>' + r.pueDLC.toFixed(2) + '</td><td>TRL ' + r.trl + '</td><td>' + r.supplyChain.toFixed(1) + '</td></tr>';
             });
             html += '</table>';
 
@@ -3837,7 +4417,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
             var phase1 = tco.dlc.capex * 0.4;
             var phase2 = tco.dlc.capex * 0.35;
             var phase3 = tco.dlc.capex * 0.25;
-            var training = inputs.load * 25000;
+            var training = tco.retrainingCost;
             html += '<table><tr><th>Phase</th><th>Timeline</th><th>Investment</th><th>Focus</th></tr>';
             html += '<tr><td>Phase 1</td><td>Year 0-1</td><td>' + fmt(phase1) + '</td><td>CDU infrastructure, piping, controls</td></tr>';
             html += '<tr><td>Phase 2</td><td>Year 2-3</td><td>' + fmt(phase2) + '</td><td>High-density rack DLC expansion</td></tr>';
@@ -3845,46 +4425,63 @@ Where LMTD (Log Mean Temperature Difference) requires:
             html += '<tr><td>Training</td><td>Ongoing</td><td>' + fmt(training) + '</td><td>Liquid cooling certification, procedures</td></tr>';
             html += '</table>';
 
+            html += '<h3>Operational Impact</h3>';
+            html += '<div class="kpi-grid-4">';
+            html += '<div class="kpi-card"><div class="kpi-value">' + tco.downtimeHoursPhased + ' hrs</div><div class="kpi-label">Downtime (Phased)</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value badge-warn">' + tco.downtimeHoursFull + ' hrs</div><div class="kpi-label">Downtime (Full Cutover)</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.phasedDeploymentCost) + '</div><div class="kpi-label">Phased Cost (+12%)</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.fullDeploymentCost) + '</div><div class="kpi-label">Full Deploy Cost</div></div>';
+            html += '</div>';
+
             if (proMode && mc) {
                 // Monte Carlo
-                html += '<h2>Monte Carlo Simulation</h2>';
+                html += '<h2>Monte Carlo Simulation (10,000 iterations)</h2>';
                 html += '<div class="kpi-grid">';
                 html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.mean) + '</div><div class="kpi-label">Mean Annual Savings</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p5) + '</div><div class="kpi-label">P5 (Worst Case)</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + fmt(mc.p95) + '</div><div class="kpi-label">P95 (Best Case)</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p5) + '</div><div class="kpi-label">P5 (Conservative)</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + fmt(mc.p95) + '</div><div class="kpi-label">P95 (Optimistic)</div></div>';
                 html += '</div>';
+
+                html += '<h3>Tail Risk & Break-Even</h3>';
+                html += '<div class="kpi-grid-4">';
+                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p1) + '</div><div class="kpi-label">P1 (Worst-Case)</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.cvar95) + '</div><div class="kpi-label">CVaR at 95%</div><div class="kpi-sub">Expected shortfall</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value">' + (mc.probNegativeROI * 100).toFixed(2) + '%</div><div class="kpi-label">Prob. Negative Savings</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + (mc.probBreakEven * 100).toFixed(1) + '%</div><div class="kpi-label">Break-Even Probability</div></div>';
+                html += '</div>';
+
                 html += histogramSVG(mc);
 
-                // Sensitivity
+                // Sensitivity Tornado
                 html += '<h2>Sensitivity Analysis</h2>';
-                html += '<table><tr><th>Variable</th><th>Impact (+15%)</th><th>Relative Weight</th></tr>';
-                sensitivity.forEach(function(s) {
-                    html += '<tr><td>' + s.label + '</td><td>' + fmt(s.impact) + '</td><td>' + (s.pct * 100).toFixed(0) + '%</td></tr>';
+                html += '<table><tr><th>Variable</th><th>Downside</th><th>Upside</th><th>Total Swing</th><th>Weight</th></tr>';
+                sensitivity.items.forEach(function(s) {
+                    html += '<tr><td>' + s.label + '</td><td class="badge-bad">' + fmt(s.downside) + '</td><td class="badge-good">+' + fmt(s.upside) + '</td><td>' + fmt(s.totalSwing) + '</td><td>' + (s.pct * 100).toFixed(0) + '%</td></tr>';
                 });
                 html += '</table>';
+                html += tornadoSVG(sensitivity);
             }
 
-            // Narrative
-            html += '<h2>Analysis Narrative</h2>';
-            html += '<div class="narrative">' + narrative + '</div>';
+            // Narrative (multi-paragraph)
+            html += '<h2>Comprehensive Analysis</h2>';
+            html += '<div class="narrative">';
+            narrativeParagraphs.forEach(function(p) {
+                html += '<p>' + p + '</p>';
+            });
+            html += '</div>';
 
             html += '<div class="footer">';
             html += '<p>HVAC Cooling Architecture Report | ResistanceZero.com | ' + today + '</p>';
-            html += '<p>Model: HVAC-TCO-v1.0 | Discount Rate: 8% | Sources: ASHRAE TC 9.9, Uptime Institute 2024, Nvidia Rubin Thermal Specs</p>';
+            html += '<p>Model: HVAC-TCO-v2.0 | Discount Rate: 8% | Monte Carlo: 10K iterations | Sources: ASHRAE TC 9.9, Uptime Institute 2024, Nvidia Rubin Thermal Specs, DCD 2025</p>';
             html += '<p style="font-style:italic;">Generated client-side — no data transmitted to any server</p>';
             html += '</div>';
 
             html += '</body></html>';
 
-            var blob = new Blob([html], { type: 'text/html' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'HVAC_Cooling_Report_' + inputs.region + '_' + inputs.load + 'MW.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+            setTimeout(function() { w.print(); }, 600);
         };
 
         // === TOOLTIP POSITIONING ===

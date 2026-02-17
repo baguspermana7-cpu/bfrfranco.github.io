@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Audit Report — ResistanceZero Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --navy-900: #0b1120;
+            --navy-800: #111827;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --white: #ffffff;
+            --purple-600: #7c3aed;
+            --purple-500: #8b5cf6;
+            --purple-400: #a78bfa;
+            --purple-100: rgba(139,92,246,0.1);
+            --green-500: #10b981;
+            --green-400: #34d399;
+            --green-100: rgba(16,185,129,0.1);
+            --amber-500: #f59e0b;
+            --amber-400: #fbbf24;
+            --amber-100: rgba(245,158,11,0.1);
+            --red-500: #ef4444;
+            --red-400: #f87171;
+            --red-100: rgba(239,68,68,0.1);
+            --blue-500: #3b82f6;
+            --blue-100: rgba(59,130,246,0.1);
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --orange-100: rgba(249,115,22,0.1);
+            --teal-500: #14b8a6;
+            --teal-400: #2dd4bf;
+            --teal-100: rgba(20,184,166,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--navy-900);
+            color: var(--slate-300);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        @media print {
+            body { background: #fff; color: #1e293b; font-size: 11pt; line-height: 1.5; }
+            .cover-page { page-break-after: always; background: #0b1120 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cover-page * { color: #fff !important; }
+            .section { page-break-inside: avoid; }
+            .finding-card { break-inside: avoid; border: 1px solid #e2e8f0 !important; background: #f8fafc !important; }
+            .finding-card * { color: #1e293b !important; }
+            .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .category-header { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            h1, h2, h3 { color: #0b1120 !important; }
+            .summary-table th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .summary-table td { border: 1px solid #e2e8f0; color: #1e293b !important; }
+        }
+
+        /* ═══ COVER PAGE ═══ */
+        .cover-page {
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--navy-900) 0%, #0f1a2e 50%, var(--navy-900) 100%);
+            text-align: center; padding: 4rem 2rem; position: relative; overflow: hidden;
+        }
+        .cover-page::before {
+            content: '';
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(20,184,166,0.07) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(59,130,246,0.05) 0%, transparent 50%);
+        }
+        .cover-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 20px; border-radius: 50px;
+            background: var(--teal-100); color: var(--teal-400);
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 2rem; position: relative;
+        }
+        .cover-title {
+            font-size: 3rem; font-weight: 800; color: var(--white);
+            letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 1rem; position: relative;
+        }
+        .cover-title span { color: var(--teal-400); }
+        .cover-subtitle {
+            font-size: 1.15rem; color: var(--slate-400);
+            max-width: 600px; margin: 0 auto 3rem; position: relative;
+        }
+        .cover-meta { display: flex; gap: 3rem; position: relative; }
+        .cover-meta-item { text-align: center; }
+        .cover-meta-label { font-size: 0.65rem; color: var(--slate-400); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .cover-meta-value { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 4px; }
+
+        /* ═══ CONTENT ═══ */
+        .content-wrap { max-width: 960px; margin: 0 auto; padding: 3rem 2rem; }
+        h1 { font-size: 1.8rem; font-weight: 800; color: var(--white); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--white); margin: 2.5rem 0 1rem; letter-spacing: -0.01em; }
+        h3 { font-size: 1.1rem; font-weight: 700; color: var(--slate-200); margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+
+        /* ═══ EXEC SUMMARY ═══ */
+        .exec-summary {
+            background: var(--navy-800); border: 1px solid var(--navy-600);
+            border-radius: 16px; padding: 2rem; margin-bottom: 2.5rem;
+        }
+        .exec-summary h2 { margin-top: 0; }
+
+        .overall-score-wrap {
+            display: flex; align-items: center; gap: 2rem; margin: 1.5rem 0; padding: 1.5rem;
+            background: rgba(20,184,166,0.04); border: 1px solid rgba(20,184,166,0.15); border-radius: 12px;
+        }
+        .score-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .score-circle.excellent { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05)); border: 3px solid var(--green-500); }
+        .score-circle.good { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.05)); border: 3px solid var(--blue-500); }
+        .score-circle.fair { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05)); border: 3px solid var(--amber-500); }
+        .score-circle.poor { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05)); border: 3px solid var(--red-500); }
+        .score-number { font-size: 2rem; font-weight: 800; color: var(--white); line-height: 1; }
+        .score-label { font-size: 0.6rem; color: var(--slate-400); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px; }
+        .score-commentary { flex: 1; }
+        .score-commentary h3 { margin-top: 0; color: var(--white); }
+
+        /* ═══ CATEGORY ═══ */
+        .category-section { margin-bottom: 2.5rem; }
+        .category-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: var(--navy-800); border: 1px solid var(--navy-600); border-radius: 12px 12px 0 0;
+        }
+        .category-header h2 { margin: 0; font-size: 1.15rem; }
+        .category-scores { display: flex; gap: 1.5rem; align-items: center; }
+        .cat-score { text-align: center; }
+        .cat-score-val { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+        .cat-score-val.current { color: var(--amber-400); }
+        .cat-score-val.expected { color: var(--green-400); }
+        .cat-score-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--slate-400); font-weight: 600; }
+        .score-arrow { color: var(--slate-400); font-size: 1.2rem; }
+        .category-body {
+            background: rgba(17,24,39,0.5); border: 1px solid var(--navy-600);
+            border-top: none; border-radius: 0 0 12px 12px; padding: 1.5rem;
+        }
+
+        /* ═══ FINDING CARDS ═══ */
+        .finding-card {
+            background: var(--navy-800); border: 1px solid var(--navy-600);
+            border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;
+            border-left: 4px solid var(--navy-600);
+        }
+        .finding-card.critical { border-left-color: var(--red-500); }
+        .finding-card.high { border-left-color: var(--orange-500); }
+        .finding-card.medium { border-left-color: var(--amber-500); }
+        .finding-card.low { border-left-color: var(--blue-500); }
+        .finding-card.info { border-left-color: var(--slate-400); }
+
+        .finding-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+        .badge {
+            display: inline-flex; padding: 3px 10px; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge.critical { background: var(--red-100); color: var(--red-400); }
+        .badge.high { background: var(--orange-100); color: var(--orange-400); }
+        .badge.medium { background: var(--amber-100); color: var(--amber-400); }
+        .badge.low { background: var(--blue-100); color: #60a5fa; }
+        .badge.info { background: rgba(148,163,184,0.1); color: var(--slate-400); }
+        .badge.pass { background: var(--green-100); color: var(--green-400); }
+
+        .finding-title { font-weight: 700; color: var(--white); font-size: 0.95rem; }
+        .finding-body { font-size: 0.88rem; color: var(--slate-300); }
+        .finding-body code {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+            background: rgba(139,92,246,0.1); color: var(--purple-400); padding: 2px 6px; border-radius: 4px;
+        }
+        .finding-file { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--slate-400); margin-top: 0.5rem; }
+        .finding-recommendation {
+            margin-top: 0.75rem; padding: 0.75rem;
+            background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.15); border-radius: 8px; font-size: 0.85rem;
+        }
+        .finding-recommendation strong { color: var(--green-400); }
+
+        /* ═══ SUMMARY TABLE ═══ */
+        .summary-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+        .summary-table th {
+            text-align: left; padding: 10px 14px; background: var(--navy-700);
+            color: var(--white); font-weight: 700; border-bottom: 2px solid var(--teal-500);
+        }
+        .summary-table td { padding: 10px 14px; border-bottom: 1px solid var(--navy-600); }
+        .summary-table .score-current { color: var(--amber-400); font-weight: 700; }
+        .summary-table .score-expected { color: var(--green-400); font-weight: 700; }
+        .summary-table .score-delta { color: var(--purple-400); font-weight: 600; }
+
+        .methodology {
+            background: var(--navy-800); border: 1px solid var(--navy-600);
+            border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;
+        }
+        .methodology h3 { margin-top: 0; }
+
+        hr { border: none; border-top: 1px solid var(--navy-600); margin: 2rem 0; }
+
+        .footer-note {
+            text-align: center; font-size: 0.75rem; color: var(--slate-400);
+            padding: 2rem 0; border-top: 1px solid var(--navy-600); margin-top: 3rem;
+        }
+
+        .priority-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .priority-quadrant { padding: 1.25rem; border-radius: 12px; border: 1px solid var(--navy-600); }
+        .priority-quadrant h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; font-weight: 700; }
+        .priority-quadrant.urgent { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+        .priority-quadrant.urgent h4 { color: var(--red-400); }
+        .priority-quadrant.important { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); }
+        .priority-quadrant.important h4 { color: var(--amber-400); }
+        .priority-quadrant.moderate { background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.2); }
+        .priority-quadrant.moderate h4 { color: #60a5fa; }
+        .priority-quadrant.minor { background: rgba(148,163,184,0.05); border-color: rgba(148,163,184,0.2); }
+        .priority-quadrant.minor h4 { color: var(--slate-400); }
+        .priority-item { font-size: 0.82rem; padding: 4px 0; color: var(--slate-300); display: flex; gap: 8px; }
+        .priority-item::before { content: '\2022'; color: var(--slate-400); }
+
+        /* SEO Score Checklist */
+        .seo-checklist {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            font-size: 0.82rem;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: var(--navy-800);
+        }
+        .check-pass { color: var(--green-400); }
+        .check-fail { color: var(--red-400); }
+        .check-warn { color: var(--amber-400); }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COVER PAGE                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="cover-page">
+    <div class="cover-badge">ResistanceZero &mdash; SEO Audit</div>
+    <h1 class="cover-title">SEO <span>Audit Report</span></h1>
+    <p class="cover-subtitle">
+        Comprehensive search engine optimization analysis covering technical SEO, on-page optimization, structured data, performance, content strategy, and social media integration for the ResistanceZero portfolio website.
+    </p>
+    <div class="cover-meta">
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Report Date</div>
+            <div class="cover-meta-value">2026-02-17</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Version</div>
+            <div class="cover-meta-value">1.0</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Domain</div>
+            <div class="cover-meta-value">resistancezero.com</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Pages Indexed</div>
+            <div class="cover-meta-value">30+</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- REPORT CONTENT                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="content-wrap">
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="exec-summary">
+        <h2>Executive Summary</h2>
+        <p>
+            The ResistanceZero portfolio website demonstrates <strong>excellent SEO fundamentals</strong>. The site has comprehensive meta tags, well-structured XML sitemap, extensive structured data (JSON-LD), RSS feed, canonical URLs, proper robots.txt, and consistent Open Graph/Twitter Card metadata across all 30+ pages. The technical SEO foundation is among the strongest areas of the site.
+        </p>
+        <p>
+            The main improvement opportunities are in performance optimization (inline CSS bloat, render-blocking resources), missing hreflang for bilingual content (Indonesian/English), and incomplete image SEO on some infrastructure pages. The site is well-positioned for search visibility in the data center engineering niche.
+        </p>
+        <div class="overall-score-wrap">
+            <div class="score-circle good">
+                <div class="score-number">79</div>
+                <div class="score-label">Overall</div>
+            </div>
+            <div class="score-commentary">
+                <h3>Good &mdash; Strong Foundation With Optimization Opportunities</h3>
+                <p style="margin-bottom:0">
+                    The weighted SEO score of 79/100 reflects excellent on-page and structured data implementation with room for improvement in technical performance and internationalization. With targeted fixes, the expected score rises to <strong style="color:#34d399;">90/100</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- METHODOLOGY -->
+    <div class="methodology">
+        <h3>Scoring Methodology</h3>
+        <p>Each category is scored 0&ndash;100 based on Google Search Central guidelines, Core Web Vitals thresholds, Schema.org validation, and SEO industry best practices (Moz, Ahrefs, Semrush standards). Severity reflects impact on organic search ranking and click-through rate.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 1: Technical SEO                -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>1. Technical SEO</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">82</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">92</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Comprehensive XML Sitemap</span>
+                </div>
+                <div class="finding-body">
+                    The <code>sitemap.xml</code> includes 28 URLs covering all public pages with <code>lastmod</code>, <code>changefreq</code>, and <code>priority</code> attributes. Articles use priority 0.8&ndash;0.95, hub pages 0.85, infrastructure pages 0.6. The sitemap uses the <code>image:image</code> extension for article cover images with descriptive captions.
+                </div>
+                <div class="finding-file">sitemap.xml (28 URLs, image extensions on 12 URLs)</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Canonical URLs on All Pages</span>
+                </div>
+                <div class="finding-body">
+                    Every audited page includes a <code>&lt;link rel="canonical"&gt;</code> tag pointing to the HTTPS version on <code>resistancezero.com</code>. This prevents duplicate content issues between <code>www</code> and non-www, or between Cloud Run URLs and the custom domain.
+                </div>
+                <div class="finding-file">index.html:23, article-1.html:23, article-17.html:23, dashboard.html:20</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Robots.txt Properly Configured</span>
+                </div>
+                <div class="finding-body">
+                    The robots.txt allows all crawlers, specifies the sitemap location, and disallows only non-content directories (<code>/node_modules/</code>, <code>/Article/</code>). The admin panel and dashboard are additionally protected via <code>noindex</code> meta tags.
+                </div>
+                <div class="finding-file">robots.txt:1&ndash;12</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">RSS Feed for Content Syndication</span>
+                </div>
+                <div class="finding-body">
+                    An RSS 2.0 feed is available at <code>feed.xml</code> with Atom namespace support. The feed includes all articles with titles, descriptions, publication dates, and GUIDs. The homepage links to the feed via <code>&lt;link rel="alternate" type="application/rss+xml"&gt;</code>.
+                </div>
+                <div class="finding-file">feed.xml (17 items), index.html:56</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Custom 404 Page Configured</span>
+                </div>
+                <div class="finding-body">
+                    The nginx.conf defines a custom 404 page via <code>error_page 404 /404.html</code>. The 404 page includes a link back to the homepage. The <code>try_files</code> directive falls through to <code>=404</code> correctly.
+                </div>
+                <div class="finding-file">nginx.conf:8&ndash;11, 404.html</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">No hreflang Tags for Bilingual Content</span>
+                </div>
+                <div class="finding-body">
+                    The site declares <code>lang="en"</code> on all pages and uses <code>og:locale" content="en_US"</code>. However, the structured data declares <code>"inLanguage": ["en", "id"]</code> (English and Indonesian). Article content mixes English and Indonesian (e.g., "Ahli K3 Listrik" in the title, "ESDM Indonesia" references). Without hreflang annotations, Google cannot properly classify the language of each page.
+                </div>
+                <div class="finding-file">index.html:78 (schema inLanguage), index.html:2 (lang="en")</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Since the site is primarily English with Indonesian terminology, keep <code>lang="en"</code>. Remove <code>"id"</code> from the schema <code>inLanguage</code> array, or add <code>&lt;link rel="alternate" hreflang="en" href="..."&gt;</code> to clarify to Google that the primary language is English.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Sitemap Missing Dashboard and Admin Pages (Intentional)</span>
+                </div>
+                <div class="finding-body">
+                    The sitemap does not include <code>dashboard.html</code> or <code>rz-ops-p7x3k9m.html</code>. This is correct since both pages have <code>noindex</code> directives. Noted here for completeness only.
+                </div>
+                <div class="finding-file">sitemap.xml (verified: dashboard and admin excluded)</div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Article-9 Paper Variant Not in Sitemap</span>
+                </div>
+                <div class="finding-body">
+                    The file <code>article-9-paper.html</code> exists but is not included in the sitemap. If this is a printable version, it should either be excluded via <code>noindex</code> or canonicalized to the main <code>article-9.html</code>.
+                </div>
+                <div class="finding-file">sitemap.xml (article-9-paper.html absent)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>&lt;link rel="canonical" href="https://resistancezero.com/article-9.html"&gt;</code> to the paper variant to consolidate ranking signals.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 2: On-Page SEO                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>2. On-Page SEO</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">88</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">94</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Unique, Descriptive Title Tags on All Pages</span>
+                </div>
+                <div class="finding-body">
+                    Each page has a unique, keyword-rich title tag. Examples: homepage uses "Bagus Dwi Permana | Engineering Operations Manager &amp; Ahli K3 Listrik" (74 chars), article-17 uses "The $37 Billion SEA Data Center Opportunity | ResistanceZero" (60 chars). Titles are within the recommended 50&ndash;60 character display range for most pages.
+                </div>
+                <div class="finding-file">index.html:18, article-1.html:17, article-17.html:17</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Meta Descriptions on All Public Pages</span>
+                </div>
+                <div class="finding-body">
+                    All audited pages have descriptive, unique meta descriptions with relevant keywords. Article descriptions include compelling hooks: "A structural demand analysis: $602B hyperscaler capex, Jevons Paradox..." (article-17). Most are within the 150&ndash;160 character optimal range.
+                </div>
+                <div class="finding-file">index.html:19, article-1.html:18, article-17.html:18</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Keywords Meta Tags Present</span>
+                </div>
+                <div class="finding-body">
+                    All pages include <code>&lt;meta name="keywords"&gt;</code> with relevant, specific terms. While Google does not use meta keywords for ranking, other search engines (Bing, Yandex) may consider them, and they serve as documentation for content focus.
+                </div>
+                <div class="finding-file">index.html:20, article-1.html:19</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Comprehensive Image Alt Text</span>
+                </div>
+                <div class="finding-body">
+                    Images across the site use descriptive alt text. The homepage has 19 alt attributes with contextual descriptions. Cover images in the sitemap include <code>image:caption</code> elements for enhanced image search visibility.
+                </div>
+                <div class="finding-file">index.html (19 alt attrs), sitemap.xml (12 image:caption elements)</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Article Dates with Schema-Compliant Timestamps</span>
+                </div>
+                <div class="finding-body">
+                    Articles include <code>article:published_time</code> and <code>article:modified_time</code> meta tags in ISO 8601 format. Schema.org articles also include <code>datePublished</code> and <code>dateModified</code>. This enables Google to display date snippets in search results.
+                </div>
+                <div class="finding-file">article-1.html:37&ndash;38, article-17.html:37&ndash;38</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Homepage Title Exceeds Optimal Length</span>
+                </div>
+                <div class="finding-body">
+                    The homepage title "Bagus Dwi Permana | Engineering Operations Manager &amp; Ahli K3 Listrik" is 74 characters. Google typically truncates titles at ~60 characters in SERPs. The "&amp; Ahli K3 Listrik" portion may be cut off, losing the Indonesian certification keyword.
+                </div>
+                <div class="finding-file">index.html:18</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Shorten to: "Bagus Dwi Permana | Engineering Operations Manager" (52 chars) or use a pipe separator: "Bagus Dwi Permana | DC Operations &amp; Safety Expert" (51 chars). Keep "Ahli K3 Listrik" in the meta description instead.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Some Articles Lack article:tag Diversity</span>
+                </div>
+                <div class="finding-body">
+                    Article-1 has only 4 article:tag values while article-17 has 4. For comprehensive topic coverage and related content discovery, each article should have 5&ndash;8 tags covering both broad and specific terms.
+                </div>
+                <div class="finding-file">article-1.html:40&ndash;43, article-17.html:40&ndash;43</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add 2&ndash;4 more article:tag entries per article covering related terms. For article-1: add "CMMS", "BMS", "Predictive Maintenance", "DCIM".
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 3: Schema / Structured Data     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>3. Schema &amp; Structured Data</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">90</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">95</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Homepage: 4 Schema Types Implemented</span>
+                </div>
+                <div class="finding-body">
+                    The homepage includes: <code>WebSite</code> (with SearchAction for sitelinks search box), <code>SiteNavigationElement</code> (6 navigation items), <code>Organization</code> (with logo, founder, sameAs, contactPoint), and <code>Person</code> (within organization). This is above-average structured data coverage.
+                </div>
+                <div class="finding-file">index.html:70&ndash;142</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Articles: TechnicalArticle + BreadcrumbList</span>
+                </div>
+                <div class="finding-body">
+                    Every article page includes <code>TechnicalArticle</code> schema with headline, description, image, author (Person), publisher, dates, keywords, wordCount, and mainEntityOfPage. Additionally, <code>BreadcrumbList</code> schema provides search breadcrumb navigation. Article-17 also includes sameAs links for the author.
+                </div>
+                <div class="finding-file">article-1.html:64&ndash;92, article-17.html:64&ndash;90</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">sameAs Links for Social Proof</span>
+                </div>
+                <div class="finding-body">
+                    The Organization and Author schemas include <code>sameAs</code> links to LinkedIn, GitHub, and WhatsApp. This establishes entity identity across platforms and contributes to Knowledge Panel eligibility.
+                </div>
+                <div class="finding-file">index.html:129&ndash;133</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Missing FAQPage Schema on Homepage</span>
+                </div>
+                <div class="finding-body">
+                    The homepage has an FAQ section (<code>#faq</code> in the navigation), but no <code>FAQPage</code> structured data. This means the FAQ content cannot appear as rich results in Google search. FAQ rich results significantly increase SERP real estate and CTR.
+                </div>
+                <div class="finding-file">index.html:193 (nav link to #faq, no FAQPage schema)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a <code>FAQPage</code> JSON-LD block with <code>Question</code> and <code>AcceptedAnswer</code> entries for each FAQ item. This can generate FAQ rich results in Google SERPs.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Calculator Pages Missing SoftwareApplication Schema</span>
+                </div>
+                <div class="finding-body">
+                    The CAPEX and OPEX calculators are valuable interactive tools but lack <code>SoftwareApplication</code> or <code>WebApplication</code> schema. Adding this could help the tools surface in Google search for calculator-related queries.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>WebApplication</code> schema with <code>applicationCategory: "FinanceApplication"</code>, <code>operatingSystem: "Web"</code>, and <code>offers</code> for the free/pro tiers.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 4: Performance & Core Web Vitals -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>4. Performance &amp; Core Web Vitals</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">68</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">82</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">LCP Optimization: Hero Image Preloaded</span>
+                </div>
+                <div class="finding-body">
+                    The Largest Contentful Paint element (hero profile photo) uses <code>&lt;link rel="preload" as="image" fetchpriority="high"&gt;</code> and the <code>&lt;img&gt;</code> tag has <code>fetchpriority="high"</code>. This is best-practice LCP optimization. Article cover images also use <code>&lt;link rel="preload" as="image"&gt;</code>.
+                </div>
+                <div class="finding-file">index.html:59, 264&ndash;265, article-1.html:61</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Gzip Compression Enabled</span>
+                </div>
+                <div class="finding-body">
+                    Nginx gzip is enabled for all text-based content types with a minimum size of 256 bytes. This reduces transfer size by 60&ndash;80% for CSS, JS, HTML, and SVG files.
+                </div>
+                <div class="finding-file">nginx.conf:30&ndash;32</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Font Loading Prevents Layout Shift</span>
+                </div>
+                <div class="finding-body">
+                    Fonts use <code>display=swap</code> and preconnect to <code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code>. The preload-as-style pattern with <code>onload</code> fallback ensures non-render-blocking font loading.
+                </div>
+                <div class="finding-file">index.html:63&ndash;66</div>
+            </div>
+
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">Massive Inline CSS Blocks Increase HTML Payload</span>
+                </div>
+                <div class="finding-body">
+                    Article pages contain thousands of lines of inline CSS for Pro Mode calculators, charts, and interactive components. This CSS is included in every page load even for free users who do not see Pro features. Combined with the 5000+ line <code>styles.css</code>, the total CSS payload per article page is estimated at 100&ndash;200KB (uncompressed). This impacts First Contentful Paint (FCP) and Time to Interactive (TTI).
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Move Pro Mode CSS to an external <code>pro-mode.css</code> file loaded only when needed. Use critical CSS extraction for above-the-fold content inline, and defer the rest. The styles.css file should be split into <code>base.css</code> (critical) and <code>components.css</code> (deferred).
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Google Analytics Blocks Initial Rendering</span>
+                </div>
+                <div class="finding-body">
+                    The Google Analytics script is the first element in <code>&lt;head&gt;</code>, loaded before meta tags. While it uses <code>async</code>, the inline gtag initialization script executes synchronously. Moving it to the end of <code>&lt;body&gt;</code> or using <code>defer</code> would improve First Contentful Paint.
+                </div>
+                <div class="finding-file">index.html:5&ndash;12</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Move the Google Analytics script block to just before <code>&lt;/body&gt;</code>, or use the Google Tag Manager with delayed initialization (load after DOMContentLoaded).
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Universal CSS Transition Causes CLS Risk</span>
+                </div>
+                <div class="finding-body">
+                    The rule <code>*, *::before, *::after { transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; }</code> causes all elements to animate on theme switch. During initial paint, if the theme is loaded from localStorage, elements may visually transition from default to dark theme, causing a perceptible Cumulative Layout Shift (CLS) and visual jank.
+                </div>
+                <div class="finding-file">styles.css:147&ndash;149</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Apply theme before first render (inline script in <code>&lt;head&gt;</code> that sets <code>data-theme</code> before CSS loads). Remove the universal transition rule and apply transitions only to theme-sensitive elements.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Lazy Loading on Above-Fold Avatar</span>
+                </div>
+                <div class="finding-body">
+                    The navbar avatar uses <code>loading="lazy"</code> despite being visible on initial load. This delays rendering of a visible LCP-adjacent element. The 9 total lazy-loaded images on the homepage are otherwise appropriately applied to below-fold content.
+                </div>
+                <div class="finding-file">index.html:156</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Remove <code>loading="lazy"</code> from the navbar avatar. Keep lazy loading on below-fold images.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 5: Content SEO                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>5. Content SEO</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">84</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">90</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">High-Quality Long-Form Content</span>
+                </div>
+                <div class="finding-body">
+                    Articles are substantial technical content (article-1 is 9,000 words per schema). Topics cover specific, searchable niches: data center power distribution, HVAC free cooling, water stress, community backlash, service catalogs. This positions content for long-tail keyword rankings and featured snippets.
+                </div>
+                <div class="finding-file">article-1.html:89 (wordCount: 9000)</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Topical Authority Through Content Clustering</span>
+                </div>
+                <div class="finding-body">
+                    The 17 articles form coherent topic clusters: Operations (articles 1&ndash;8), Energy &amp; Sustainability (9&ndash;12), Design &amp; Economics (13&ndash;17). The hub pages (articles.html, insights.html, geopolitics.html) create pillar-cluster architecture. This is excellent for establishing topical authority.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Interactive Tools Boost Engagement Signals</span>
+                </div>
+                <div class="finding-body">
+                    Each article includes interactive calculators and tools that increase time-on-page and reduce bounce rate. The CAPEX/OPEX calculators serve as standalone utility pages that can attract direct search traffic. These engagement metrics indirectly benefit SEO rankings.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">News Ticker Content Is JavaScript-Only</span>
+                </div>
+                <div class="finding-body">
+                    The homepage news ticker (<code>#tickerContent</code>) is "Auto-populated by JavaScript". Search engine crawlers may not execute this JavaScript, meaning the ticker content (latest article updates, announcements) is invisible to Google. This represents missed keyword/freshness signals.
+                </div>
+                <div class="finding-file">index.html:227&ndash;229</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Hardcode the ticker items as HTML with the latest 3&ndash;5 article titles and links. Let JavaScript enhance/animate them. This ensures crawlers see the content.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Article Dates Show 2025 for Some Articles</span>
+                </div>
+                <div class="finding-body">
+                    Article-1 shows <code>article:published_time" content="2025-12-06"</code> while newer articles show 2026 dates. While this correctly reflects actual publication dates, the 2025 date may appear stale to users. The <code>article:modified_time</code> should be updated to reflect recent content updates.
+                </div>
+                <div class="finding-file">article-1.html:37&ndash;38</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Update <code>article:modified_time</code> on articles 1&ndash;8 to reflect their recent Pro Mode enhancement dates (2026-02-XX). This signals freshness to Google.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 6: Social Media Integration     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>6. Social Media &amp; Open Graph</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">88</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">92</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Complete Open Graph Implementation</span>
+                </div>
+                <div class="finding-body">
+                    All pages include: <code>og:type</code> (profile for homepage, article for articles), <code>og:url</code>, <code>og:title</code>, <code>og:description</code>, <code>og:image</code> (with width/height/alt), <code>og:locale</code>, <code>og:site_name</code>. The homepage uses <code>og:type=profile</code> with <code>profile:first_name</code> and <code>profile:last_name</code> &mdash; this is the correct type for a personal portfolio.
+                </div>
+                <div class="finding-file">index.html:26&ndash;37, article-1.html:25&ndash;35</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Twitter Card Implementation</span>
+                </div>
+                <div class="finding-body">
+                    All pages include <code>twitter:card=summary_large_image</code>, <code>twitter:site</code>, <code>twitter:title</code>, <code>twitter:description</code>, <code>twitter:image</code>, and <code>twitter:image:alt</code>. Article-17 also includes <code>twitter:creator</code> for author attribution.
+                </div>
+                <div class="finding-file">index.html:40&ndash;45, article-17.html:46&ndash;52</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">OG Images Include Dimensions and Alt Text</span>
+                </div>
+                <div class="finding-body">
+                    All OG image tags include <code>og:image:width</code>, <code>og:image:height</code>, and <code>og:image:alt</code>. Image dimensions are specified as 1200x630 (standard for social sharing) or 1200x669. This ensures optimal rendering on Facebook, LinkedIn, and Twitter.
+                </div>
+                <div class="finding-file">index.html:32&ndash;34, article-17.html:31&ndash;33</div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Missing twitter:creator on Some Articles</span>
+                </div>
+                <div class="finding-body">
+                    Article-17 includes <code>twitter:creator</code> but article-1 does not. The <code>twitter:creator</code> tag attributes tweets about the article to the author's Twitter/X account, increasing personal brand visibility.
+                </div>
+                <div class="finding-file">article-1.html (twitter:creator absent), article-17.html:48</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>&lt;meta name="twitter:creator" content="@BagusDPermana"&gt;</code> to all article pages.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">No LinkedIn-Specific Article Tags</span>
+                </div>
+                <div class="finding-body">
+                    While Open Graph tags are used by LinkedIn, adding <code>article:author</code> (URL to LinkedIn profile) can improve LinkedIn article card rendering and author attribution. Given the site owner's active LinkedIn presence, this is a worthwhile addition.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>&lt;meta property="article:author" content="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092"&gt;</code> to all article pages.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 7: Local & Professional SEO     -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>7. Local &amp; Professional SEO</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">72</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">85</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Person and Organization Schema with Contact Info</span>
+                </div>
+                <div class="finding-body">
+                    The Organization schema includes <code>contactPoint</code> with phone, email, contact type, and available languages. The <code>sameAs</code> array links to LinkedIn, GitHub, and WhatsApp. This helps Google build a Knowledge Panel for the author.
+                </div>
+                <div class="finding-file">index.html:115&ndash;142</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Professional Credentials Highlighted in Content</span>
+                </div>
+                <div class="finding-body">
+                    The homepage prominently features certifications (AK3L Expert, SKTTK Level 6, CDFOM, IOSH) and career history with named companies (AWS, Cargill, Pure Data Centres). This E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) signal is crucial for ranking in YMYL-adjacent technical content.
+                </div>
+                <div class="finding-file">index.html:335&ndash;348 (governance section)</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Missing ProfilePage Schema</span>
+                </div>
+                <div class="finding-body">
+                    The homepage uses <code>og:type=profile</code> which is correct, but the JSON-LD does not include a <code>ProfilePage</code> schema type. Google has recently started supporting ProfilePage for creator profiles, which can enable enhanced author results in search.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a <code>ProfilePage</code> JSON-LD block with: <code>mainEntity</code> pointing to a <code>Person</code> entity with <code>name</code>, <code>jobTitle</code>, <code>worksFor</code>, <code>alumniOf</code>, <code>knowsAbout</code>, and <code>credential</code> properties.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">No Google Business Profile Integration</span>
+                </div>
+                <div class="finding-body">
+                    For a professional services portfolio targeting regional clients (Indonesia, Southeast Asia), a Google Business Profile would significantly boost local search visibility for queries like "data center operations manager Indonesia" or "engineering consultant Jakarta".
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Create a Google Business Profile for "Bagus Dwi Permana - Engineering Consultant" with the website URL. Link it via the Organization schema's <code>sameAs</code> property.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 8: Mobile SEO                   -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>8. Mobile SEO</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">75</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">88</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Mobile Viewport Correctly Configured</span>
+                </div>
+                <div class="finding-body">
+                    All pages include <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>. The <code>theme-color</code> meta tag is set for mobile browser chrome coloring.
+                </div>
+                <div class="finding-file">index.html:14, 48</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Touch-Friendly Navigation Elements</span>
+                </div>
+                <div class="finding-body">
+                    The theme toggle button is 44x44px (meeting the 44px minimum touch target), the login button has adequate padding (8px 16px), and the hamburger menu uses visible bar elements.
+                </div>
+                <div class="finding-file">styles.css:352&ndash;363 (theme-toggle 44x44)</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Horizontal Scroll Risk on Complex Article Layouts</span>
+                </div>
+                <div class="finding-body">
+                    The bento grid career timeline (5 cards in a row), calculator tables, and Pro Mode panels may cause horizontal overflow on narrow mobile screens if responsive breakpoints are not exhaustively tested. Google's Mobile-Friendly Test penalizes pages with horizontal scrolling.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Run Google's Mobile-Friendly Test on each article page. Add <code>overflow-x: hidden</code> to the body as a safety net, and ensure all grid/table layouts have mobile breakpoints.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Heavy JavaScript Impacts Mobile TTI</span>
+                </div>
+                <div class="finding-body">
+                    Article pages with Pro Mode include heavy JavaScript for Monte Carlo simulations (10K iterations), canvas chart rendering, SVG generation for PDF export, and real-time sensitivity analysis. On mobile devices, this JavaScript execution can push Time to Interactive (TTI) well beyond the 3.8s "good" threshold. Google uses mobile-first indexing.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Defer Pro Mode JavaScript loading until the user explicitly activates Pro features. Use <code>&lt;script defer&gt;</code> or dynamic <code>import()</code> for calculator modules. Consider a Service Worker for offline caching of heavy scripts.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Apple Touch Icon Configured</span>
+                </div>
+                <div class="finding-body">
+                    All pages include <code>&lt;link rel="apple-touch-icon" href="assets/Favicon.png"&gt;</code> alongside the standard favicon. The <code>msapplication-TileColor</code> meta tag on the homepage supports Windows tile rendering.
+                </div>
+                <div class="finding-file">index.html:52&ndash;53, 49</div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SUMMARY TABLE                            -->
+    <!-- ═══════════════════════════════════════ -->
+    <h2>Summary: Score Comparison Table</h2>
+    <p>Weighted overall score uses the following weights: Technical SEO (20%), On-Page (15%), Schema (10%), Performance (20%), Content (15%), Social Media (5%), Local SEO (5%), Mobile (10%).</p>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Weight</th>
+                <th>Current Score</th>
+                <th>Expected Score</th>
+                <th>Delta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Technical SEO</td>
+                <td>20%</td>
+                <td class="score-current">82</td>
+                <td class="score-expected">92</td>
+                <td class="score-delta">+10</td>
+            </tr>
+            <tr>
+                <td>2. On-Page SEO</td>
+                <td>15%</td>
+                <td class="score-current">88</td>
+                <td class="score-expected">94</td>
+                <td class="score-delta">+6</td>
+            </tr>
+            <tr>
+                <td>3. Schema &amp; Structured Data</td>
+                <td>10%</td>
+                <td class="score-current">90</td>
+                <td class="score-expected">95</td>
+                <td class="score-delta">+5</td>
+            </tr>
+            <tr>
+                <td>4. Performance &amp; Core Web Vitals</td>
+                <td>20%</td>
+                <td class="score-current">68</td>
+                <td class="score-expected">82</td>
+                <td class="score-delta">+14</td>
+            </tr>
+            <tr>
+                <td>5. Content SEO</td>
+                <td>15%</td>
+                <td class="score-current">84</td>
+                <td class="score-expected">90</td>
+                <td class="score-delta">+6</td>
+            </tr>
+            <tr>
+                <td>6. Social Media &amp; Open Graph</td>
+                <td>5%</td>
+                <td class="score-current">88</td>
+                <td class="score-expected">92</td>
+                <td class="score-delta">+4</td>
+            </tr>
+            <tr>
+                <td>7. Local &amp; Professional SEO</td>
+                <td>5%</td>
+                <td class="score-current">72</td>
+                <td class="score-expected">85</td>
+                <td class="score-delta">+13</td>
+            </tr>
+            <tr>
+                <td>8. Mobile SEO</td>
+                <td>10%</td>
+                <td class="score-current">75</td>
+                <td class="score-expected">88</td>
+                <td class="score-delta">+13</td>
+            </tr>
+            <tr style="border-top: 2px solid var(--teal-500);">
+                <td><strong>WEIGHTED OVERALL</strong></td>
+                <td><strong>100%</strong></td>
+                <td class="score-current"><strong>79.3</strong></td>
+                <td class="score-expected"><strong>89.4</strong></td>
+                <td class="score-delta"><strong>+10.1</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- SEO QUICK CHECKLIST -->
+    <h2>SEO Quick Checklist</h2>
+    <div class="seo-checklist">
+        <div class="check-item"><span class="check-pass">&#10003;</span> XML Sitemap</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Robots.txt</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Canonical URLs</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> RSS Feed</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> HTTPS</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Custom 404 Page</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Meta Descriptions</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Open Graph Tags</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Twitter Cards</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Schema.org JSON-LD</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Image Alt Text</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Image Preloading</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Font Optimization</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Gzip Compression</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Mobile Viewport</div>
+        <div class="check-item"><span class="check-pass">&#10003;</span> Apple Touch Icon</div>
+        <div class="check-item"><span class="check-warn">&#9888;</span> hreflang Tags</div>
+        <div class="check-item"><span class="check-warn">&#9888;</span> FAQPage Schema</div>
+        <div class="check-item"><span class="check-warn">&#9888;</span> ProfilePage Schema</div>
+        <div class="check-item"><span class="check-warn">&#9888;</span> CSS Performance</div>
+        <div class="check-item"><span class="check-fail">&#10007;</span> Google Business Profile</div>
+        <div class="check-item"><span class="check-warn">&#9888;</span> Mobile TTI</div>
+    </div>
+
+    <hr>
+
+    <!-- PRIORITY MATRIX -->
+    <h2>Priority Action Items</h2>
+
+    <div class="priority-matrix">
+        <div class="priority-quadrant urgent">
+            <h4>P0 &mdash; High Impact, Quick Wins</h4>
+            <div class="priority-item">Extract Pro Mode CSS into separate file to reduce HTML payload</div>
+            <div class="priority-item">Move Google Analytics to end of body</div>
+            <div class="priority-item">Remove universal CSS transition rule</div>
+        </div>
+        <div class="priority-quadrant important">
+            <h4>P1 &mdash; Important (This Sprint)</h4>
+            <div class="priority-item">Add FAQPage schema to homepage</div>
+            <div class="priority-item">Add ProfilePage schema to homepage</div>
+            <div class="priority-item">Fix homepage title length (under 60 chars)</div>
+            <div class="priority-item">Remove lazy loading from above-fold avatar</div>
+            <div class="priority-item">Defer Pro Mode JavaScript loading</div>
+        </div>
+        <div class="priority-quadrant moderate">
+            <h4>P2 &mdash; Medium Impact</h4>
+            <div class="priority-item">Fix hreflang / inLanguage inconsistency</div>
+            <div class="priority-item">Update article:modified_time on articles 1-8</div>
+            <div class="priority-item">Add twitter:creator to all article pages</div>
+            <div class="priority-item">Hardcode ticker content as HTML fallback</div>
+            <div class="priority-item">Add canonical to article-9-paper variant</div>
+        </div>
+        <div class="priority-quadrant minor">
+            <h4>P3 &mdash; Nice to Have</h4>
+            <div class="priority-item">Create Google Business Profile</div>
+            <div class="priority-item">Add WebApplication schema to calculators</div>
+            <div class="priority-item">Add more article:tag entries (5-8 per article)</div>
+            <div class="priority-item">Add article:author LinkedIn URL to articles</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        ResistanceZero SEO Audit Report v1.0 &mdash; Generated 2026-02-17<br>
+        This report was produced through manual code inspection, sitemap analysis, and structured data validation.
+    </div>
+</div>
+
+</body>
+</html>

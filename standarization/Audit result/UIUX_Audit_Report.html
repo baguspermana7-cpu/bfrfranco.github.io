@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI/UX Audit Report — ResistanceZero Portfolio</title>
+    <style>
+        /* ═══ BASE ═══ */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --navy-900: #0b1120;
+            --navy-800: #111827;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --white: #ffffff;
+            --purple-600: #7c3aed;
+            --purple-500: #8b5cf6;
+            --purple-400: #a78bfa;
+            --purple-100: rgba(139,92,246,0.1);
+            --green-500: #10b981;
+            --green-400: #34d399;
+            --green-100: rgba(16,185,129,0.1);
+            --amber-500: #f59e0b;
+            --amber-400: #fbbf24;
+            --amber-100: rgba(245,158,11,0.1);
+            --red-500: #ef4444;
+            --red-400: #f87171;
+            --red-100: rgba(239,68,68,0.1);
+            --blue-500: #3b82f6;
+            --blue-100: rgba(59,130,246,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--navy-900);
+            color: var(--slate-300);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        /* ═══ PRINT STYLES ═══ */
+        @media print {
+            body { background: #fff; color: #1e293b; font-size: 11pt; line-height: 1.5; }
+            .cover-page { page-break-after: always; background: #0b1120 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cover-page * { color: #fff !important; }
+            .section { page-break-inside: avoid; }
+            .finding-card { break-inside: avoid; border: 1px solid #e2e8f0 !important; background: #f8fafc !important; }
+            .finding-card * { color: #1e293b !important; }
+            .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .category-header { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .score-circle { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .toc, .nav-print { display: none; }
+            h1, h2, h3 { color: #0b1120 !important; }
+            .summary-table { border: 1px solid #e2e8f0; }
+            .summary-table th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .summary-table td { border: 1px solid #e2e8f0; color: #1e293b !important; }
+        }
+
+        /* ═══ COVER PAGE ═══ */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--navy-900) 0%, #1a1040 50%, var(--navy-900) 100%);
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(139,92,246,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(59,130,246,0.06) 0%, transparent 50%);
+        }
+        .cover-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: var(--purple-100);
+            color: var(--purple-400);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .cover-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .cover-title span { color: var(--purple-400); }
+        .cover-subtitle {
+            font-size: 1.15rem;
+            color: var(--slate-400);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+        .cover-meta {
+            display: flex;
+            gap: 3rem;
+            position: relative;
+        }
+        .cover-meta-item {
+            text-align: center;
+        }
+        .cover-meta-label {
+            font-size: 0.65rem;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .cover-meta-value {
+            font-size: 1rem;
+            color: var(--white);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* ═══ CONTENT ═══ */
+        .content-wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 800; color: var(--white); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--white); margin: 2.5rem 0 1rem; letter-spacing: -0.01em; }
+        h3 { font-size: 1.1rem; font-weight: 700; color: var(--slate-200); margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+
+        /* ═══ EXECUTIVE SUMMARY ═══ */
+        .exec-summary {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .exec-summary h2 { margin-top: 0; }
+
+        .overall-score-wrap {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(139,92,246,0.06);
+            border: 1px solid rgba(139,92,246,0.15);
+            border-radius: 12px;
+        }
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .score-circle.excellent { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05)); border: 3px solid var(--green-500); }
+        .score-circle.good { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.05)); border: 3px solid var(--blue-500); }
+        .score-circle.fair { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05)); border: 3px solid var(--amber-500); }
+        .score-circle.poor { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05)); border: 3px solid var(--red-500); }
+        .score-number { font-size: 2rem; font-weight: 800; color: var(--white); line-height: 1; }
+        .score-label { font-size: 0.6rem; color: var(--slate-400); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px; }
+        .score-commentary { flex: 1; }
+        .score-commentary h3 { margin-top: 0; color: var(--white); }
+
+        /* ═══ METHODOLOGY ═══ */
+        .methodology {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .methodology h3 { margin-top: 0; }
+        .scale-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+        .scale-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: var(--navy-700);
+            color: var(--slate-200);
+            font-weight: 600;
+            border-bottom: 1px solid var(--navy-600);
+        }
+        .scale-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        /* ═══ CATEGORY SECTION ═══ */
+        .category-section {
+            margin-bottom: 2.5rem;
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px 12px 0 0;
+        }
+        .category-header h2 { margin: 0; font-size: 1.15rem; }
+        .category-scores {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .cat-score {
+            text-align: center;
+        }
+        .cat-score-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .cat-score-val.current { color: var(--amber-400); }
+        .cat-score-val.expected { color: var(--green-400); }
+        .cat-score-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--slate-400);
+            font-weight: 600;
+        }
+        .score-arrow {
+            color: var(--slate-400);
+            font-size: 1.2rem;
+        }
+        .category-body {
+            background: rgba(17,24,39,0.5);
+            border: 1px solid var(--navy-600);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 1.5rem;
+        }
+
+        /* ═══ FINDING CARDS ═══ */
+        .finding-card {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--navy-600);
+        }
+        .finding-card.critical { border-left-color: var(--red-500); }
+        .finding-card.high { border-left-color: #f97316; }
+        .finding-card.medium { border-left-color: var(--amber-500); }
+        .finding-card.low { border-left-color: var(--blue-500); }
+        .finding-card.info { border-left-color: var(--slate-400); }
+
+        .finding-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+        }
+        .badge {
+            display: inline-flex;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge.critical { background: var(--red-100); color: var(--red-400); }
+        .badge.high { background: rgba(249,115,22,0.1); color: #fb923c; }
+        .badge.medium { background: var(--amber-100); color: var(--amber-400); }
+        .badge.low { background: var(--blue-100); color: #60a5fa; }
+        .badge.info { background: rgba(148,163,184,0.1); color: var(--slate-400); }
+        .badge.pass { background: var(--green-100); color: var(--green-400); }
+
+        .finding-title {
+            font-weight: 700;
+            color: var(--white);
+            font-size: 0.95rem;
+        }
+        .finding-body { font-size: 0.88rem; color: var(--slate-300); }
+        .finding-body code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            background: rgba(139,92,246,0.1);
+            color: var(--purple-400);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .finding-file {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--slate-400);
+            margin-top: 0.5rem;
+        }
+        .finding-recommendation {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(16,185,129,0.05);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .finding-recommendation strong { color: var(--green-400); }
+
+        /* ═══ SUMMARY TABLE ═══ */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.85rem;
+        }
+        .summary-table th {
+            text-align: left;
+            padding: 10px 14px;
+            background: var(--navy-700);
+            color: var(--white);
+            font-weight: 700;
+            border-bottom: 2px solid var(--purple-500);
+        }
+        .summary-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--navy-600);
+        }
+        .summary-table tr:hover td { background: rgba(139,92,246,0.03); }
+        .summary-table .score-current { color: var(--amber-400); font-weight: 700; }
+        .summary-table .score-expected { color: var(--green-400); font-weight: 700; }
+        .summary-table .score-delta { color: var(--purple-400); font-weight: 600; }
+
+        /* ═══ PRIORITY MATRIX ═══ */
+        .priority-matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .priority-quadrant {
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--navy-600);
+        }
+        .priority-quadrant h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+        .priority-quadrant.urgent { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+        .priority-quadrant.urgent h4 { color: var(--red-400); }
+        .priority-quadrant.important { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); }
+        .priority-quadrant.important h4 { color: var(--amber-400); }
+        .priority-quadrant.moderate { background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.2); }
+        .priority-quadrant.moderate h4 { color: #60a5fa; }
+        .priority-quadrant.minor { background: rgba(148,163,184,0.05); border-color: rgba(148,163,184,0.2); }
+        .priority-quadrant.minor h4 { color: var(--slate-400); }
+        .priority-item {
+            font-size: 0.82rem;
+            padding: 4px 0;
+            color: var(--slate-300);
+            display: flex;
+            gap: 8px;
+        }
+        .priority-item::before {
+            content: '\2022';
+            color: var(--slate-400);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--navy-600);
+            margin: 2rem 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--slate-400);
+            padding: 2rem 0;
+            border-top: 1px solid var(--navy-600);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COVER PAGE                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="cover-page">
+    <div class="cover-badge">ResistanceZero &mdash; Audit Program</div>
+    <h1 class="cover-title">UI/UX <span>Audit Report</span></h1>
+    <p class="cover-subtitle">
+        Comprehensive evaluation of user interface design, user experience patterns, accessibility compliance, and interaction quality across the ResistanceZero portfolio website.
+    </p>
+    <div class="cover-meta">
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Report Date</div>
+            <div class="cover-meta-value">2026-02-17</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Version</div>
+            <div class="cover-meta-value">1.0</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Domain</div>
+            <div class="cover-meta-value">resistancezero.com</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Pages Audited</div>
+            <div class="cover-meta-value">30+</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- REPORT CONTENT                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="content-wrap">
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="exec-summary">
+        <h2>Executive Summary</h2>
+        <p>
+            The ResistanceZero portfolio website demonstrates strong visual design, a cohesive dark/light theme system, and well-structured content hierarchy. The site presents a professional, modern aesthetic with glassmorphism effects, thoughtful typography (Inter + JetBrains Mono), and smooth transitions. The bento-grid hero layout is particularly distinctive and effective.
+        </p>
+        <p>
+            However, several areas require attention: mobile navigation accessibility, inconsistent interaction patterns across 17+ articles with self-contained CSS, some WCAG contrast issues in secondary text elements, and keyboard navigation gaps. The sheer scale of the site (30+ HTML files with inline styles) creates maintainability challenges that impact UI/UX consistency.
+        </p>
+        <div class="overall-score-wrap">
+            <div class="score-circle good">
+                <div class="score-number">72</div>
+                <div class="score-label">Overall</div>
+            </div>
+            <div class="score-commentary">
+                <h3>Good &mdash; With Targeted Improvements Needed</h3>
+                <p style="margin-bottom:0">
+                    The website scores well in visual design and content structure but loses points in accessibility, responsive edge cases, and interaction consistency. The weighted overall score of 72/100 reflects a professional site with specific, addressable gaps. With the recommended fixes, the expected score rises to <strong style="color:#34d399;">86/100</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCORING METHODOLOGY -->
+    <div class="methodology">
+        <h3>Scoring Methodology</h3>
+        <p>Each category is scored 0&ndash;100 based on manual code inspection, heuristic evaluation (Nielsen), WCAG 2.1 AA criteria, and industry best practices. The overall score uses weighted averages reflecting business impact.</p>
+        <table class="scale-table">
+            <thead>
+                <tr><th>Range</th><th>Rating</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>90&ndash;100</td><td><span class="badge pass">Excellent</span></td><td>Industry-leading; minimal or no issues</td></tr>
+                <tr><td>75&ndash;89</td><td><span class="badge" style="background:rgba(59,130,246,0.1);color:#60a5fa;">Good</span></td><td>Solid implementation with minor gaps</td></tr>
+                <tr><td>60&ndash;74</td><td><span class="badge medium">Fair</span></td><td>Functional but with notable improvement areas</td></tr>
+                <tr><td>40&ndash;59</td><td><span class="badge high">Needs Work</span></td><td>Significant issues impacting user experience</td></tr>
+                <tr><td>0&ndash;39</td><td><span class="badge critical">Poor</span></td><td>Critical failures requiring immediate attention</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 1: Navigation & IA              -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>1. Navigation &amp; Information Architecture</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">75</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">88</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Well-Structured Primary Navigation</span>
+                </div>
+                <div class="finding-body">
+                    The navbar uses a clear hierarchy: Home, DC Solutions (with dropdown), Results, Case Studies, Insights (with dropdown), FAQ, Contact. Dropdown menus provide logical groupings for DC Solutions and Insights sub-pages. The <code>&lt;nav class="navbar"&gt;</code> element is correctly fixed-position with glassmorphism backdrop.
+                </div>
+                <div class="finding-file">index.html:153&ndash;195</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Consistent Auth Button Injection Across 4 Navbar Types</span>
+                </div>
+                <div class="finding-body">
+                    The <code>auth.js</code> module detects 4 different navbar patterns (Type A: portfolio nav, Type B: calculator nav, Type C: datahallAI header, Type D: fallback) and injects the login/user button consistently. This is a well-engineered approach for a multi-page static site.
+                </div>
+                <div class="finding-file">auth.js:206&ndash;263</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Hamburger Menu &mdash; No Visible Mobile Nav Implementation in CSS</span>
+                </div>
+                <div class="finding-body">
+                    The HTML includes a <code>&lt;div class="hamburger"&gt;</code> with bar spans, but the mobile menu toggle behavior and the slide-out panel are managed entirely via JavaScript. If JS fails to load, mobile users have no navigation. The hamburger is rendered but the responsive breakpoint handling could not be confirmed to include a <code>nav-menu.active</code> display toggle in the audited CSS lines.
+                </div>
+                <div class="finding-file">index.html:212&ndash;216, styles.css (responsive section)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a CSS-only fallback for mobile navigation (e.g., <code>:target</code> based menu) or ensure the hamburger JS is inline in the HTML to avoid render-blocking dependency.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">No Breadcrumb Visual Navigation on Article Pages</span>
+                </div>
+                <div class="finding-body">
+                    Article pages include <code>BreadcrumbList</code> structured data (JSON-LD) but do not render visible breadcrumb navigation in the UI. Users navigating deep into article-13 or article-17 have no visual trail back to the parent section.
+                </div>
+                <div class="finding-file">article-1.html:94&ndash;120 (schema only, no visible breadcrumb)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a visible breadcrumb bar below the navbar: Home &gt; Engineering Journal &gt; Article Title. This improves both UX wayfinding and SEO.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Dashboard Page Lacks Navigation Back to Main Site</span>
+                </div>
+                <div class="finding-body">
+                    The <code>dashboard.html</code> shares <code>styles.css</code> and the main navbar, but its <code>noindex, nofollow</code> status and SaaS-focused layout create a disconnected experience. Users may not realize they are still on the same site.
+                </div>
+                <div class="finding-file">dashboard.html:19</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a clear "Back to Portfolio" link or a simplified sub-navbar in the dashboard context.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 2: Visual Design & Consistency  -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>2. Visual Design &amp; Consistency</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">82</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">90</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Comprehensive CSS Variable System</span>
+                </div>
+                <div class="finding-body">
+                    The <code>:root</code> block in styles.css defines 40+ CSS custom properties covering colors, gradients, shadows, glass effects, and transitions. Dark mode overrides are cleanly handled via <code>[data-theme="dark"]</code> attribute selector with complete variable re-definitions.
+                </div>
+                <div class="finding-file">styles.css:29&ndash;121</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Professional Glassmorphism Theme</span>
+                </div>
+                <div class="finding-body">
+                    Consistent use of <code>backdrop-filter: blur(10px)</code>, semi-transparent backgrounds, and subtle border colors creates a cohesive glass effect throughout the site. The navbar, cards, and modals all follow this pattern.
+                </div>
+                <div class="finding-file">styles.css:56&ndash;60, 186&ndash;191</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Per-Article CSS Prefix Isolation Creates Drift Risk</span>
+                </div>
+                <div class="finding-body">
+                    Each article uses unique CSS prefixes (art-6: <code>.rca-</code>, art-7: <code>.res-</code>, art-8: <code>.shi-</code>, etc.) with massive inline <code>&lt;style&gt;</code> blocks. While this prevents collisions, it means visual changes (KPI card sizes, panel fonts, chart colors) must be updated in 15+ files individually. Documented in standardization files but still error-prone.
+                </div>
+                <div class="finding-file">Per article-N.html inline styles, standarization/ docs</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Extract shared Pro Mode component CSS into a <code>pro-components.css</code> file. Keep per-article prefixes for uniqueness but share base rules via CSS layers or shared class names.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">CSS Specificity Conflicts With Global vs. Article Styles</span>
+                </div>
+                <div class="finding-body">
+                    The global selector <code>[class*="-kpi-value"]</code> in styles.css has lower specificity than per-article class selectors like <code>.ws-kpi-value</code>. This was previously identified and fixed with <code>!important</code> overrides, but the pattern indicates an architectural fragility.
+                </div>
+                <div class="finding-file">styles.css (bottom section), per-article styles</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Use CSS Cascade Layers (<code>@layer</code>) to establish clear priority: base &gt; components &gt; article-specific.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Inline Style Attributes in Navigation HTML</span>
+                </div>
+                <div class="finding-body">
+                    The dropdown menu items use inline <code>style="color: #06b6d4; font-weight: 600;"</code> and <code>style="color: #8b5cf6;"</code> directly in the HTML. This bypasses the theming system and these colors do not adapt to dark mode.
+                </div>
+                <div class="finding-file">index.html:168&ndash;174</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Move these color assignments to CSS classes like <code>.dropdown-item--featured</code> with dark mode variants.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 3: Responsive Design            -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>3. Responsive Design</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">70</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">85</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Viewport Meta Tag Present on All Pages</span>
+                </div>
+                <div class="finding-body">
+                    All audited pages include <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Auth Module Responsive Handling Is Minimal</span>
+                </div>
+                <div class="finding-body">
+                    The auth.js responsive CSS only hides <code>.rz-user-email</code> and <code>.rz-login-text</code> below 768px. The login modal (<code>.rz-modal</code>) uses <code>max-width:90vw</code> which is good, but there are no responsive adjustments for the dropdown positioning on small screens. The dropdown could overflow the viewport on narrow devices.
+                </div>
+                <div class="finding-file">auth.js:145 (@media max-width:768px)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Make <code>.rz-user-dropdown</code> full-width on mobile with <code>position:fixed; bottom:0; left:0; right:0;</code> as a bottom sheet pattern.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Bento Grid Career Timeline May Overflow on Tablets</span>
+                </div>
+                <div class="finding-body">
+                    The career timeline row (<code>.bento-row-career</code>) renders 5 company cards horizontally. On tablet viewports (768&ndash;1024px) this row will require complex responsive breakpoints. Each card contains company logos, badges, and descriptions that need careful reflow.
+                </div>
+                <div class="finding-file">index.html:274&ndash;331</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a 1024px breakpoint that wraps the career cards into a 2x3 or scrollable horizontal layout with snap points.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Admin Panel Not Responsive</span>
+                </div>
+                <div class="finding-body">
+                    The admin panel (<code>rz-ops-p7x3k9m.html</code>) uses a fixed 260px sidebar (<code>.sidebar{width:260px;position:fixed}</code>) and <code>.main-wrap{margin-left:260px}</code>. No mobile breakpoints are present. While this is an internal tool, it is inaccessible on mobile devices.
+                </div>
+                <div class="finding-file">rz-ops-p7x3k9m.html:22, 47</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a collapsible sidebar with a hamburger toggle for the admin panel at breakpoints below 1024px.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 4: Accessibility (WCAG)         -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>4. Accessibility (WCAG 2.1 AA)</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">62</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">82</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Skip Navigation Link Present</span>
+                </div>
+                <div class="finding-body">
+                    The homepage includes <code>&lt;a href="#main-content" class="skip-link"&gt;Skip to main content&lt;/a&gt;</code> with proper focus-visible styling. The skip link targets <code>&lt;main id="main-content"&gt;</code>.
+                </div>
+                <div class="finding-file">index.html:145, styles.css:6&ndash;22</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Images Have Descriptive Alt Text</span>
+                </div>
+                <div class="finding-body">
+                    All <code>&lt;img&gt;</code> tags in index.html have descriptive alt attributes. The hero photos include full alt text like "Bagus Dwi Permana - Engineering Operations Manager". Company logos also have alt text (e.g., "ZTE", "AWS"). 19 alt attributes were found across the homepage.
+                </div>
+                <div class="finding-file">index.html (19 alt attributes found)</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Decorative SVGs Use aria-hidden</span>
+                </div>
+                <div class="finding-body">
+                    SVG icons in the metrics section correctly use <code>aria-hidden="true"</code>, and article cards use <code>aria-label</code> attributes to provide context for screen readers.
+                </div>
+                <div class="finding-file">index.html:463, 485, 509 etc.</div>
+            </div>
+
+            <div class="finding-card high">
+                <div class="finding-header">
+                    <span class="badge high">High</span>
+                    <span class="finding-title">Auth Modal Lacks ARIA Dialog Attributes</span>
+                </div>
+                <div class="finding-body">
+                    The login modal (<code>.rz-modal-overlay</code>) does not use <code>role="dialog"</code>, <code>aria-modal="true"</code>, or <code>aria-labelledby</code>. Screen readers will not announce the modal context. Focus is not trapped within the modal &mdash; users can tab to elements behind the overlay.
+                </div>
+                <div class="finding-file">auth.js:175&ndash;203 (loginModalHTML function)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>role="dialog"</code> and <code>aria-modal="true"</code> to <code>.rz-modal</code>. Add <code>aria-labelledby="rzModalTitle"</code> pointing to the h3. Implement focus trapping with a focus loop on first/last focusable elements.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Color Contrast Issues in Secondary Text</span>
+                </div>
+                <div class="finding-body">
+                    Several text elements use colors with insufficient contrast against dark backgrounds: <code>#64748b</code> on <code>#0f172a</code> (ratio ~3.8:1, below 4.5:1 AA minimum), <code>#94a3b8</code> meta text on dark cards (~4.3:1, borderline). The <code>.bento-exp-desc</code> and <code>.rz-modal-sub</code> elements are affected.
+                </div>
+                <div class="finding-file">styles.css (--gray-600 / --slate-400 usage), auth.js:109</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Increase secondary text color brightness to at minimum <code>#9ca3af</code> on dark backgrounds to achieve 4.5:1 contrast ratio.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Keyboard Navigation Incomplete for Dropdown Menus</span>
+                </div>
+                <div class="finding-body">
+                    The navigation dropdown menus (<code>.dropdown-menu</code>) are triggered by CSS <code>:hover</code> only (<code>.nav-dropdown:hover .dropdown-menu</code>). There is no <code>:focus-within</code> support, meaning keyboard users cannot access DC Solutions or Insights sub-pages via the dropdown.
+                </div>
+                <div class="finding-file">styles.css:324 (.nav-dropdown:hover only)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>.nav-dropdown:focus-within .dropdown-menu { opacity:1; visibility:visible; }</code> to enable keyboard access to dropdown items.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">No ARIA Roles on Major Landmark Sections</span>
+                </div>
+                <div class="finding-body">
+                    The page uses semantic HTML5 elements (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>) but no explicit <code>role</code> attributes were found. While HTML5 semantics provide implicit roles, the article pages with complex calculator interfaces would benefit from explicit ARIA landmarks for regions, complementary content, and form groups.
+                </div>
+                <div class="finding-file">index.html (0 role= attributes found)</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>role="banner"</code> to header, <code>role="navigation"</code> with <code>aria-label</code> to nav elements, and <code>role="region" aria-label="..."</code> to distinct calculator sections in articles.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Theme Toggle Button Accessible but Missing State</span>
+                </div>
+                <div class="finding-body">
+                    The theme toggle has <code>aria-label="Toggle dark mode"</code> which is good, but lacks <code>aria-pressed</code> to indicate current state. Screen reader users cannot tell if dark mode is currently active.
+                </div>
+                <div class="finding-file">index.html:196</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add <code>aria-pressed="false"</code> to the button and toggle it to <code>"true"</code> when dark mode is active.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 5: Interaction Design            -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>5. Interaction Design</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">78</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">88</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Smooth Scroll Progress Indicator</span>
+                </div>
+                <div class="finding-body">
+                    A scroll progress bar (<code>#scrollProgress</code>) provides visual feedback of reading position. Combined with <code>html{scroll-behavior:smooth}</code>, the page navigation feels polished.
+                </div>
+                <div class="finding-file">index.html:147, styles.css:133</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Auth State Transitions Are Elegant</span>
+                </div>
+                <div class="finding-body">
+                    The login flow includes: modal slide-in with backdrop blur, success animation with checkmark icon, auto-close after 1.5s, and event dispatch via <code>CustomEvent('rz-auth-change')</code>. The logout dropdown uses smooth opacity/transform transitions.
+                </div>
+                <div class="finding-file">auth.js:93&ndash;94 (CSS transitions), auth.js:374&ndash;384 (flow)</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">No Loading States for Calculator Operations</span>
+                </div>
+                <div class="finding-body">
+                    The CAPEX and OPEX calculators, as well as Pro Mode features (Monte Carlo simulations with 10K iterations, sensitivity analysis), perform heavy JavaScript operations. There is no visible loading spinner or progress indicator during computation, leading to a "frozen UI" perception.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a skeleton loader or progress bar for Monte Carlo simulations. Use <code>requestAnimationFrame</code> or Web Workers for heavy calculations to keep the UI responsive.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Cursor Spotlight Effect May Cause Performance Issues</span>
+                </div>
+                <div class="finding-body">
+                    The <code>#cursorSpotlight</code> element follows mouse movement across the page. This requires continuous <code>mousemove</code> event handling and CSS transforms on every frame. On low-powered devices this could cause jank.
+                </div>
+                <div class="finding-file">index.html:150</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Throttle the mousemove handler to 60fps and disable the effect on mobile/touch devices and via <code>prefers-reduced-motion</code> media query.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 6: Performance UX               -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>6. Performance UX</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">74</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">86</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Critical Resource Preloading</span>
+                </div>
+                <div class="finding-body">
+                    The homepage preloads the hero image (<code>fetchpriority="high"</code>), the CSS file, and fonts via <code>&lt;link rel="preload"&gt;</code> and <code>&lt;link rel="preconnect"&gt;</code>. Article pages also preload cover images.
+                </div>
+                <div class="finding-file">index.html:58&ndash;65, article-1.html:61</div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Font Loading Strategy</span>
+                </div>
+                <div class="finding-body">
+                    Fonts use preload-as-style with <code>onload="this.onload=null;this.rel='stylesheet'"</code> pattern plus a <code>&lt;noscript&gt;</code> fallback. The <code>display=swap</code> parameter ensures text remains visible during font loading.
+                </div>
+                <div class="finding-file">index.html:65&ndash;66</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Large Inline CSS in Article Pages</span>
+                </div>
+                <div class="finding-body">
+                    Each article page contains thousands of lines of inline CSS for Pro Mode calculators, charts, panels, and tooltips. Article-15 and Article-13 are particularly large. This increases initial HTML payload and time-to-interactive. The styles.css file alone is 5000+ lines.
+                </div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Extract Pro Mode CSS into a separate <code>pro-mode.css</code> that is loaded conditionally (only when user has Pro session), reducing initial page weight for free users.
+                </div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">Global CSS Transition on All Elements</span>
+                </div>
+                <div class="finding-body">
+                    The rule <code>*, *::before, *::after { transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; }</code> applies transitions to every element in the DOM. This causes unnecessary style recalculations and compositor work, especially during theme switching on pages with hundreds of elements.
+                </div>
+                <div class="finding-file">styles.css:147&ndash;149</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Remove the universal transition rule. Apply transitions only to elements that actually change during theme switching: <code>.navbar</code>, <code>.card</code>, <code>body</code>, etc.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">Lazy Loading Applied to Hero Avatar</span>
+                </div>
+                <div class="finding-body">
+                    The navbar avatar image uses <code>loading="lazy"</code> despite being above the fold: <code>&lt;img loading="lazy" src="assets/profile-photo.jpg"&gt;</code>. This delays rendering of a visible element.
+                </div>
+                <div class="finding-file">index.html:156</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Remove <code>loading="lazy"</code> from the navbar avatar since it is visible on initial load. Only apply lazy loading to below-fold images.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CATEGORY 7: Content Structure            -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <h2>7. Content Structure</h2>
+            <div class="category-scores">
+                <div class="cat-score">
+                    <div class="cat-score-val current">80</div>
+                    <div class="cat-score-label">Current</div>
+                </div>
+                <span class="score-arrow">&rarr;</span>
+                <div class="cat-score">
+                    <div class="cat-score-val expected">88</div>
+                    <div class="cat-score-label">Expected</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-body">
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Consistent Article Page Structure</span>
+                </div>
+                <div class="finding-body">
+                    All 17 articles follow a consistent template: hero section with cover image, metadata bar (author, date, read time), article body with structured headings, interactive calculator/tool section, references section, and related articles. This consistency creates strong user expectations and learnability.
+                </div>
+            </div>
+
+            <div class="finding-card pass">
+                <div class="finding-header">
+                    <span class="badge pass">Pass</span>
+                    <span class="finding-title">Rich Structured Data on All Content Pages</span>
+                </div>
+                <div class="finding-body">
+                    Article pages include <code>TechnicalArticle</code> schema, <code>BreadcrumbList</code>, and author/publisher data. The homepage includes <code>WebSite</code>, <code>SiteNavigationElement</code>, and <code>Organization</code> schemas. This is above-average structured data coverage.
+                </div>
+                <div class="finding-file">article-1.html:64&ndash;92, index.html:70&ndash;142</div>
+            </div>
+
+            <div class="finding-card medium">
+                <div class="finding-header">
+                    <span class="badge medium">Medium</span>
+                    <span class="finding-title">404 Page Lacks Search Functionality</span>
+                </div>
+                <div class="finding-body">
+                    The custom 404 page is visually attractive with animated elements but only provides a "Back to Home" link. Users who reach a broken link should be offered search or suggested content to find what they were looking for.
+                </div>
+                <div class="finding-file">404.html</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Add a search input and/or "Popular Articles" links on the 404 page to reduce bounce rate.
+                </div>
+            </div>
+
+            <div class="finding-card low">
+                <div class="finding-header">
+                    <span class="badge low">Low</span>
+                    <span class="finding-title">News Ticker Content Auto-Populated But Not Visible in Source</span>
+                </div>
+                <div class="finding-body">
+                    The <code>#tickerContent</code> element is marked as "Auto-populated by JavaScript". This means the ticker content is invisible to search engines and will show as empty if JS fails. No <code>&lt;noscript&gt;</code> fallback is provided.
+                </div>
+                <div class="finding-file">index.html:227&ndash;229</div>
+                <div class="finding-recommendation">
+                    <strong>Recommendation:</strong> Hardcode the default ticker items in the HTML and let JavaScript enhance/update them. This provides both SEO content and a no-JS fallback.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SUMMARY COMPARISON TABLE                 -->
+    <!-- ═══════════════════════════════════════ -->
+    <h2>Summary: Score Comparison Table</h2>
+    <p>Weighted overall score uses the following weights: Navigation (10%), Visual Design (15%), Responsive (15%), Accessibility (20%), Interaction (15%), Performance UX (15%), Content Structure (10%).</p>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Weight</th>
+                <th>Current Score</th>
+                <th>Expected Score</th>
+                <th>Delta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Navigation &amp; Information Architecture</td>
+                <td>10%</td>
+                <td class="score-current">75</td>
+                <td class="score-expected">88</td>
+                <td class="score-delta">+13</td>
+            </tr>
+            <tr>
+                <td>2. Visual Design &amp; Consistency</td>
+                <td>15%</td>
+                <td class="score-current">82</td>
+                <td class="score-expected">90</td>
+                <td class="score-delta">+8</td>
+            </tr>
+            <tr>
+                <td>3. Responsive Design</td>
+                <td>15%</td>
+                <td class="score-current">70</td>
+                <td class="score-expected">85</td>
+                <td class="score-delta">+15</td>
+            </tr>
+            <tr>
+                <td>4. Accessibility (WCAG 2.1 AA)</td>
+                <td>20%</td>
+                <td class="score-current">62</td>
+                <td class="score-expected">82</td>
+                <td class="score-delta">+20</td>
+            </tr>
+            <tr>
+                <td>5. Interaction Design</td>
+                <td>15%</td>
+                <td class="score-current">78</td>
+                <td class="score-expected">88</td>
+                <td class="score-delta">+10</td>
+            </tr>
+            <tr>
+                <td>6. Performance UX</td>
+                <td>15%</td>
+                <td class="score-current">74</td>
+                <td class="score-expected">86</td>
+                <td class="score-delta">+12</td>
+            </tr>
+            <tr>
+                <td>7. Content Structure</td>
+                <td>10%</td>
+                <td class="score-current">80</td>
+                <td class="score-expected">88</td>
+                <td class="score-delta">+8</td>
+            </tr>
+            <tr style="border-top: 2px solid var(--purple-500);">
+                <td><strong>WEIGHTED OVERALL</strong></td>
+                <td><strong>100%</strong></td>
+                <td class="score-current"><strong>72.9</strong></td>
+                <td class="score-expected"><strong>86.1</strong></td>
+                <td class="score-delta"><strong>+13.2</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- PRIORITY ACTION MATRIX                   -->
+    <!-- ═══════════════════════════════════════ -->
+    <h2>Priority Action Items Matrix</h2>
+
+    <div class="priority-matrix">
+        <div class="priority-quadrant urgent">
+            <h4>P0 &mdash; Urgent (Do Immediately)</h4>
+            <div class="priority-item">Add ARIA dialog attributes to auth modal (role, aria-modal, focus trap)</div>
+            <div class="priority-item">Add :focus-within to dropdown menus for keyboard accessibility</div>
+            <div class="priority-item">Fix color contrast on secondary text elements (#64748b on dark)</div>
+        </div>
+        <div class="priority-quadrant important">
+            <h4>P1 &mdash; Important (This Sprint)</h4>
+            <div class="priority-item">Improve mobile auth dropdown (bottom sheet pattern)</div>
+            <div class="priority-item">Add responsive breakpoints for bento career grid</div>
+            <div class="priority-item">Remove universal CSS transition rule (*, *::before, *::after)</div>
+            <div class="priority-item">Fix lazy loading on above-fold hero avatar</div>
+        </div>
+        <div class="priority-quadrant moderate">
+            <h4>P2 &mdash; Moderate (Next Sprint)</h4>
+            <div class="priority-item">Extract shared Pro Mode CSS into separate file</div>
+            <div class="priority-item">Add visible breadcrumbs to article pages</div>
+            <div class="priority-item">Add loading states for Monte Carlo simulations</div>
+            <div class="priority-item">Move inline nav styles to CSS classes</div>
+        </div>
+        <div class="priority-quadrant minor">
+            <h4>P3 &mdash; Minor (Backlog)</h4>
+            <div class="priority-item">Add aria-pressed to theme toggle button</div>
+            <div class="priority-item">Add search/suggestions to 404 page</div>
+            <div class="priority-item">Hardcode ticker content as HTML fallback</div>
+            <div class="priority-item">Add responsive sidebar to admin panel</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        ResistanceZero UI/UX Audit Report v1.0 &mdash; Generated 2026-02-17<br>
+        This report was produced through manual code inspection and heuristic evaluation of the production codebase.
+    </div>
+</div>
+
+</body>
+</html>

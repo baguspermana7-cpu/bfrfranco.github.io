@@ -1,11 +1,295 @@
 # Claude Code Session Notes
-**Date:** 2026-02-15
+**Date:** 2026-02-16
 **Project:** Portfolio Website - baguspermana7-cpu.github.io
 **Domain:** resistancezero.com (GitHub Pages)
 
 ## Current State
 - Branch: `main`
 - Working directory: `C:\Users\User\Sandbox`
+
+---
+
+## Session: 2026-02-16 (Cont. #3) — Article-6 Enhancement + LinkedIn CAPEX Captions
+
+### Summary
+Implemented deep research review enhancements for article-6 (RCA + Design Authority). Built full Pro mode infrastructure from scratch with 4 gated panels, evidence block, CTA, TOC highlights, PDF export, privacy badge, and benchmark meta. Also created 5 LinkedIn comment captions for CAPEX Calculator PDF export pages.
+
+### Completed Work
+
+#### A. Article-6 Full Enhancement (based on deep research report — +514 lines)
+1. **Font Awesome CDN**: Added
+2. **TOC calculator highlights**: Sections 8 (RCA Authority Canvas) and 10 (RCA Effectiveness Scorecard) with "Interactive" badges
+3. **Executive Evidence Block**: Key Evidence at a Glance:
+   - 30%+ Incident Recurrence (within 12 months of completed RCA)
+   - 60% Findings Unaddressed (contributing factors already identified)
+   - 6x Faster Learning (with design authority integration)
+   - 97% False Alarm Reduction (RCA-driven system redesign case)
+   - $40-50K Annual OPEX Savings (achieved through design authority)
+4. **CTA block**: "Is Your RCA Process Creating Reports or Driving Real Change?" + "Calculate Your RCA Score"
+5. **Pro Mode infrastructure** (built from scratch):
+   - Mode toggle: Free / Pro Analysis (cyan theme)
+   - 4 gated Pro panels with lock overlays:
+     1. Organizational Maturity Deep Dive (6 KPIs: maturity level, loop type, cultural gap, safety paradigm, CAPA, DA readiness)
+     2. Cost Impact Analysis (6 KPIs: recurrence cost, DA ROI, cost/incident, 12mo savings, payback, risk exposure)
+     3. Methodology Effectiveness Matrix (4 KPIs: recommended method, fit score, complexity class, team size)
+     4. Predictive Analytics (4 KPIs: predicted incidents 6mo, trend direction, breakeven DA, time to grade A)
+   - Login modal with demo credentials (demo@resistancezero.com / demo2026)
+   - Session auth (localStorage, 30-day expiry, rz-auth-change events)
+   - switchRcaMode() / rcaShowLogin() / rcaHandleLogin() / rcaResetDefaults()
+6. **PDF export function**: exportRcaPDF() — full executive report with:
+   - Score gauge and grade display (color-coded A-F)
+   - Input parameter summary table
+   - 4-metric derived results (Learning Rate, Predicted Recurrence, DA Gap, Total Recs)
+   - 6-dimension score breakdown table
+   - Top 3 recommendations
+   - Methodology note (Leveson STAMP, Hollnagel Safety-II/FRAM, Uptime 2023)
+7. **Toolbar row**: Mode toggle (left) + Reset + Export PDF (right) — consistent pattern
+8. **Privacy badge**: "PDF generated in your browser — no data is sent to any server"
+9. **Benchmark meta**: Model v1.0, Feb 2026, Uptime 2023/DOE-HDBK-1208/Leveson STAMP 2011, 6-dimension weighted scorecard
+
+#### B. LinkedIn CAPEX Comment Captions
+Created 5 brief comment drafts for LinkedIn post comments (one per PDF page):
+- Comment 1: Configuration & Cost Breakdown (Page 1)
+- Comment 2: Equipment Specifications (Page 2)
+- Comment 3: Construction Timeline (Page 3)
+- Comment 4: Sustainability Metrics (Page 4)
+- Comment 5: Executive Narrative (Page 5)
+File: `Sandbox/Article/Opex and Capex/LinkedIn_CAPEX_Calculator.txt`
+
+### Consistency Matrix (Articles 1-6)
+
+| Feature | Art 1 | Art 2 | Art 3 | Art 4 | Art 5 | Art 6 |
+|---------|-------|-------|-------|-------|-------|-------|
+| Evidence Block | ✅ | ✅ | ✅ | — | ✅ | ✅ |
+| CTA (results-oriented) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| TOC Calculator Highlight | — | ✅ | ✅ | — | ✅ | ✅ |
+| Privacy Badge | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Benchmark Meta | ✅ | ✅ | ✅ | — | ✅ | ✅ |
+| Export PDF at Top | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Pro Mode | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Files Modified/Created
+```
+article-6.html  | Full enhancement: FA CDN, TOC, evidence, CTA, Pro mode (4 panels), login, PDF, privacy, benchmark (+514 lines)
+Article/Opex and Capex/LinkedIn_CAPEX_Calculator.txt | 5 LinkedIn comment captions added
+```
+
+### Review Files Consumed
+- `Data/Freemium Scheme/article 6 deep-research-report.md` (229 lines)
+
+---
+
+## Session: 2026-02-16 (Cont. #2) — Article Enhancements (2, 3, 5) + Export PDF Repositioning
+
+### Summary
+Continued implementing deep research review improvements across articles 2, 3, and 5. Added evidence blocks, CTA improvements, TOC calculator highlights, privacy badges, and benchmark meta to all three. Built full Pro mode infrastructure for article-5 from scratch. Repositioned Export PDF buttons from bottom of calculators to top toolbar row across all 5 articles.
+
+### Completed Work
+
+#### A. Export PDF Button Repositioning (ALL 5 ARTICLES)
+**Problem**: Export PDF button was buried at the bottom of calculators after 5+ Pro panels — users wouldn't see it.
+**Solution**: Created a toolbar row pattern with mode toggle on the left and action buttons (Reset + Export PDF) on the right, same row.
+
+| Article | CSS Class | Old Position | New Position |
+|---------|-----------|-------------|-------------|
+| 1 | `.maturity-toolbar-row` | After benchmark grid (middle) | Toolbar row next to mode toggle |
+| 2 | `.alarm-toolbar-row` | Bottom action toolbar after Pro panels | Toolbar row next to mode toggle |
+| 3 | `.maint-toolbar-row` | Bottom action toolbar after Pro panels | Toolbar row next to mode toggle |
+| 4 | `.mode-toolbar-row` | Bottom after narrative box | Toolbar row next to mode toggle |
+| 5 | `.debt-toolbar-row` | N/A (didn't exist) | Toolbar row next to mode toggle |
+
+#### B. Article-2 Enhancements (based on deep research report)
+1. **Executive Evidence Block**: 5 metric cards after Abstract:
+   - >90% Alarm Reduction (800+ → <80/day)
+   - 12% → 89% ISA-18.2 Compliance
+   - 75% Response Time Improvement
+   - 0 Missed Critical Alarms (6-month track)
+   - ≤1.0 Alarms/Op/10min (ISA target achieved)
+2. **CTA copy improved**: "Find Out If Your Alarm System Is Overloading Your Operators" + "Start Assessment"
+3. **TOC calculator highlight**: Section 10 with `.toc-calculator` class and "Interactive" badge (done in previous session)
+4. **Privacy microcopy**: "PDF generated in your browser — no data is sent to any server"
+5. **Benchmark meta tags**: Model v1.0, Feb 2026, ISA-18.2-2022/EEMUA 191/IEC 62682, Poisson flood model + Erlang-C
+
+#### C. Article-3 Enhancements (based on deep research report)
+1. **Executive Evidence Block**: 5 metric cards after Abstract:
+   - 74% → 97.2% PM Compliance (+23.2 pts in 18 weeks)
+   - 0 Headcount Added (systems-only interventions)
+   - 5 Systemic Drivers Identified
+   - 80% Failures from Planning (Smith & Hinchcliffe)
+   - 18 weeks to Sustained >95%
+2. **CTA copy improved**: "Find Out Why Your PM Compliance Is Stuck Below 85%" + "Start Assessment"
+3. **TOC calculator highlights**: Sections 11 (Compliance Canvas) and 12 (Compliance Predictor Calculator) with "Interactive" badges
+4. **Privacy badge**: Already added in repositioning work
+5. **Benchmark meta tags**: Model v1.0, Feb 2026, Palmer (2006)/Smith & Hinchcliffe (2004)/RCM III
+6. **CSS added**: TOC calculator, evidence block, benchmark meta styles (was missing)
+
+#### D. Article-5 Full Enhancement (based on deep research report — built from scratch)
+1. **Font Awesome CDN**: Added (was missing entirely)
+2. **TOC calculator highlights**: Sections 9 (Debt Accumulation Chart) and 10 (Risk Analyzer) with gold-themed "Interactive" badges
+3. **Executive Evidence Block**: Case Study: 15MW Facility — 127 Deferred Items
+   - 127 Deferred Items (across 5 system categories)
+   - 15%/yr Risk Compounding Rate (Weibull-modeled)
+   - 2–3× Remediation Cost Multiplier
+   - 44% Outages Preventable (Uptime Institute 2023)
+   - β = 2.5 Weibull Shape Parameter
+4. **CTA block**: "Quantify Your Facility's Deferred Maintenance Risk" + "Start Risk Analysis"
+5. **Pro Mode infrastructure** (built from scratch):
+   - Mode toggle: Free Assessment / Pro Analysis (gold theme #f59e0b)
+   - 5 gated Pro panels with lock overlays:
+     1. Monte Carlo Risk Distribution (6 KPIs: p50/p80/p95, confidence band, sim runs, shape)
+     2. Cost & ROI Deep Dive (6 KPIs: NPV, inaction cost, break-even, ROI 3yr, SLA penalty, insurance)
+     3. Weibull Parameter Analysis (6 KPIs: β, η, MTTF, reliability, hazard trend, B10 life)
+     4. Remediation Capacity Planner (4 KPIs: crew-months, phasing, queue prob, throughput)
+     5. Scenario Sensitivity (4 KPIs: fix top 20%, +50% budget, defer 2yr, shift criticality)
+   - Login modal with demo credentials
+   - Session auth (localStorage, 30-day expiry, rz-auth-change events)
+   - switchDebtMode() / debtShowLogin() / debtHandleLogin() / debtResetDefaults()
+6. **PDF export function**: exportDebtPDF() — full executive report with:
+   - Risk score display with color-coded severity
+   - Input parameter summary table
+   - 8-metric results grid
+   - Methodology note (Weibull β=2.5 η=60mo, 15% compounding, sources)
+7. **Privacy badge**: "All calculations run in your browser — no data is sent to any server"
+8. **Benchmark meta tags**: Model v1.0, Feb 2026, NIST Weibull/ISO 55001/Uptime 2023
+
+#### E. Privacy Badges Added (Articles 3 & 4)
+- Both articles now have "PDF generated in your browser — no data is sent to any server" (were missing)
+- Article 4 also got `.privacy-badge` CSS added
+
+### Consistency Matrix (Articles 1-5)
+
+| Feature | Art 1 | Art 2 | Art 3 | Art 4 | Art 5 |
+|---------|-------|-------|-------|-------|-------|
+| Evidence Block | ✅ | ✅ | ✅ | — | ✅ |
+| CTA (results-oriented) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| TOC Calculator Highlight | — | ✅ | ✅ | — | ✅ |
+| Privacy Badge | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Benchmark Meta | ✅ | ✅ | ✅ | — | ✅ |
+| Export PDF at Top | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Pro Mode | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Files Modified
+```
+article-1.html  | PDF button moved to toolbar, old bottom button removed
+article-2.html  | Evidence block, CTA, PDF toolbar, privacy, benchmark meta
+article-3.html  | Evidence block, CTA, TOC highlights, benchmark meta, PDF toolbar, CSS
+article-4.html  | PDF button moved to toolbar, privacy badge + CSS added
+article-5.html  | Full enhancement: FA, TOC, evidence, CTA, Pro mode, 5 panels, login, PDF, privacy, benchmark (+447 lines)
+```
+
+### Review Files Consumed
+- `Data/Freemium Scheme/article 2 review after deep-research-report.md` (433 lines)
+- `Data/Freemium Scheme/article-5 deep-research-report.md` (343 lines)
+- `Data/Freemium Scheme/article 3 review after deep-research-report.md` (188 lines)
+
+---
+
+## Session: 2026-02-16 — Article-4 Pro Enhancement Mode + Article Navigation
+
+### Summary
+Implemented full Pro Enhancement Mode for Article 4 (In-House Capability Is a Reliability Strategy) and added prev/next navigation to all 17 article pages.
+
+### Completed Work
+
+#### A. Article-4 Pro Enhancement Mode (+761 lines)
+- **Font Awesome CDN**: Added for icon support
+- **Mode Toggle**: Free Assessment / Pro Analysis with blue theme (#3b82f6)
+- **CTA Card**: Promoting Pro features (Monte Carlo, Erlang-C, PDF export)
+- **Tooltips**: 15 engineering-grade tooltips across all inputs (Free + Pro), each with Title, Description, and Formula/Reference
+- **7 Free Inputs** (existing, enhanced with tooltips): Category, Vendor SLA, Skill Level, Annual Incidents, Downtime $/hr, Vendor Callout $, Training Investment
+- **8 Pro Inputs** (new): MTBF hours, Off-Hours SLA Multiplier, In-House Coverage model (24/7, 16/7, 12/5), Spare Parts Readiness %, Team Size (for Erlang-C), Vendor Retainer $/yr, Critical Severity %, Duration Variability
+- **7 Free Output KPIs** (existing): Vendor MTTR, In-House MTTR, Vendor/In-House Annual Downtime, Net Savings, ROI, Breakeven
+- **26 Pro KPIs across 5 panels**:
+  1. MTTR Distribution (6): Mean, Median(p50), p90, Mobilization%, Bottleneck, Reduction%
+  2. Availability & Downtime (6): Vendor/In-House Availability, Delta, p50 Downtime, Hours Saved
+  3. Financial Deep Dive (6): 3-Year NPV, Cost/Incident Vendor vs In-House, Breakeven p50/p90, 3-Year Cumulative
+  4. Staffing & Queueing (4): Erlang-C Wait Probability, Queue Delay, Optimal Team Size, Utilization Rate
+  5. Scenario Sensitivity (4): +1 Technician, +1 Skill Level, 2x Incidents, -50% Vendor SLA
+- **Monte Carlo Simulation**: 5,000 iterations with lognormal phase distributions, off-hours variance modeling, Poisson incident arrival
+- **Erlang-C Queueing Model**: M/M/c model for staffing optimization — calculates wait probability, queue delay, optimal team size
+- **Narrative Conclusion Algorithm**: Capability Maturity Grade (A-F) based on 5 weighted dimensions (skill, reduction, queueing, NPV, spares), executive summary paragraph, domain-specific analysis, prioritized actions (CRITICAL/HIGH/MEDIUM/LOW)
+- **PDF Export**: Full executive report with grade box, 12-KPI grid, phase decomposition table, Monte Carlo distribution summary, prioritized recommendations
+- **Login Modal**: Blue theme, demo credentials, session auth (localStorage 30-day)
+- **Gated Overlays**: Blur + lock icon on all 5 Pro panels
+- **Article Navigation**: Added prev (article-3) / next (article-5) links
+
+#### B. Article Navigation — All 17 Pages
+Added consistent prev/next article navigation links to 11 articles that were missing them:
+- article-1: next→article-2
+- article-5: prev→article-4, next→article-6
+- article-8: prev→article-7, next→article-9
+- article-10: updated next→article-11 (was "All Articles" only)
+- article-11: prev→article-10, next→article-12
+- article-12: prev→article-11, next→article-13
+- article-13: prev→article-12, next→article-14
+- article-14: prev→article-13, next→article-15
+- article-15: prev→article-14, next→article-16
+- article-16: prev→article-15, next→article-17
+- article-17: prev→article-16, next→All Articles
+
+Previously working: articles 2, 3, 4, 6, 7, 9 (verified)
+
+### File Statistics
+```
+article-4.html    | +761 lines (2,181 → 2,974)
+article-1.html    | +nav links
+article-5.html    | +nav links + CSS
+article-8.html    | +nav links + CSS
+article-10.html   | +nav fix (next link)
+article-11.html   | +nav links + CSS
+article-12.html   | +nav links + CSS
+article-13.html   | +nav links + CSS
+article-14.html   | +nav links + CSS
+article-15.html   | +nav links + CSS
+article-16.html   | +nav links + CSS
+article-17.html   | +nav links + CSS
+```
+
+---
+
+## Session: 2026-02-16 (Cont.) — Article-1 Enhancements + Auth Fixes
+
+### Summary
+Implemented improvements to Article 1 based on deep research review, plus fixed auth/session inconsistencies across articles 1, 3, 4.
+
+### Completed Work
+
+#### A. Article-1 Enhancements (based on deep research report review)
+1. **Executive Evidence Block**: Added prominent visual block after opening paragraphs showcasing key case data:
+   - 12 Prevented Incidents, $1.2M+ Avoided Costs, 99.999% Uptime, PUE 1.65→1.48, ROI 4:1–10:1
+   - Source attribution to article sections 5-7
+2. **CTA Copy Improvement**: Changed from "Try the Calculator" to "Start Assessment" with results-oriented messaging: "Get Your 3 Operational Investment Priorities in 10 Minutes"
+3. **Privacy Microcopy**: Added badge below PDF export: "PDF generated in your browser — no data is sent to any server"
+4. **Benchmark Versioning**: Added metadata tags showing Model v1.1, Updated Feb 2026, Sources (Uptime 2023-2024, EN 50600), benchmark type (directional, median, enterprise+colo)
+5. **Risk & Cost Translation Panel**: New panel below benchmark grid that maps maturity score to:
+   - Operational Risk Level (LOW/MODERATE/ELEVATED/HIGH)
+   - Est. Annual Exposure ($K-$M)
+   - Est. Incidents/Year
+   - Value of +10pt Improvement
+   - Top Risk Drivers (weakest dimensions with severity descriptions)
+   - Explicit assumptions stated (10MW facility, $200K avg outage cost)
+
+#### B. Auth/Session Format Fixes (cross-article)
+**Problem**: Session storage format inconsistency between auth.js (`{email, tier, expires: ISO}`) and article built-in logins (`{email, name, ts: epoch}`). This caused:
+- Cross-page session detection failures
+- Pro mode not auto-unlocking after navbar login
+
+**Fixes applied**:
+- **article-1.html**: Login now uses `window._rzAuth.showModal()` instead of alert(); `rz-auth-change` listener now checks `e.detail.action === 'login'` (was checking `e.detail.premium`); session check handles both `expires` and `ts` fields
+- **article-3.html**: `handleLogin` now stores `{email, tier, expires}` format (was `{email, name, tier, ts}`); session restore handles both formats
+- **article-4.html**: `handleLogin` now stores `{email, tier, expires}` format (was `{email, name, ts}`); dispatches `rz-auth-change` event on login; session restore handles both formats; added `position: relative` to `.calculator-section` (tooltip fix)
+
+#### C. Article-4 Tooltip Fix
+**Problem**: Tooltip content wasn't appearing on hover — only the "?" circle showed.
+**Cause**: `.calculator-section` missing `position: relative`, so the absolutely-positioned `#calc-tooltip-container` anchored to the wrong parent.
+**Fix**: Added `position: relative` to `.calculator-section` CSS.
+
+### Files Modified
+```
+article-1.html    | +Evidence block, CTA, privacy, benchmarks, risk panel, auth fix
+article-3.html    | Auth session format fix
+article-4.html    | Tooltip fix + auth session format fix
+```
 
 ---
 
@@ -498,8 +782,149 @@ git push
 - [x] Updated articles.html with Article 12 listing and Schema.org data
 - [x] Updated news ticker with Article 12
 
+---
+
+## Session: 2026-02-17 (Cont. #6) — CSS Consistency Final + Dark Mode + Admin Login + PDF Fix
+
+### Summary
+Continued comprehensive CSS consistency audit and dark mode fixes. Fixed admin login UI/UX, auth.js modal transparency, PDF export for articles 9 & 10, and standardized font sizes across all 17 articles to match article-15 gold standard.
+
+### Completed Work
+
+#### A. Admin Console Login Redesign (rz-ops-p7x3k9m.html)
+- Professional login form with glassmorphism card, animated background (grid + conic gradient + floating orbs)
+- Show/hide password toggle, Remember Me checkbox, Forgot Password link
+- Email validation, loading state with spinner, error shake animation
+- Credentials: `bagus@resistancezero.com` / `admin@resistancezero.com` with `RZ@Premium2026!`
+- Demo account (demo@resistancezero.com) visible in data but CANNOT login to admin
+- Logo: Favicon.png instead of RZ text box
+- Fixed checkbox garbled text (`\\2713` → `\2713`)
+
+#### B. Auth.js Modal Transparency Fix
+- Overlay opacity 0.6→0.75, blur 4px→8px
+- Modal bg: gradient → solid `#0f172a`, inputs solid `#1e293b`
+- Light theme modal: solid `#ffffff`
+
+#### C. PDF Export Fix (Articles 9 & 10)
+- Both used broken Blob URL pattern → fixed to window.open('','_blank') + document.write
+- window.open MUST be called before computation (popup blocker prevention)
+
+#### D. Comprehensive CSS Consistency (All 17 Articles)
+Gold standard (article-15): body 0.95rem, line-height 1.7, h2 1.4rem, h3 1.1rem
+- **Article 10** (biggest outlier): body 1.125→0.95, h2 1.75→1.4, h3 1.375→1.1, h2 color→#1e3a5f
+- **Articles 1-9, 11-14, 16-17**: body 0.9→0.95, h2 1.35→1.4, h3 1.05→1.1
+- **Dark mode h2 color**: 8 articles fixed (#f1f5f9 → #93c5fd): 1, 3, 5, 6, 8, 12, 13, 14
+- **Dark mode callout boxes**: Added overrides to articles 9, 10, 11, 16
+- **Article 16**: Added comprehensive dark mode content rules (was almost entirely missing)
+
+### PENDING (Not Yet Done)
+- **Article 7**: Missing dark mode content rules for `.article-body h2`, `h3`, `p`, `strong`, `a`, `ul li`, `ol li`
+  - Has partial dark mode (info-box, key-insight, blockquote, comparison-card) but no text color overrides
+  - Add after line 155 (after blockquote dark rule)
+- **Article 17**: Almost no dark mode support — only has `[data-theme="dark"] .toc-item.toc-calculator`
+  - Needs full dark mode content block before `/* Responsive */` at line 961
+  - Include: article-content bg, h2 #93c5fd, h3 #cbd5e1, p, blockquote, info-box, highlight-box, warning-box, result-box, references, table, ul li, ol li, a, strong
+- **Verify articles 2 & 4**: Check dark mode callout box support
+
+### Files Modified This Session
+```
+rz-ops-p7x3k9m.html  | Complete login redesign + credential update
+auth.js               | Modal transparency fix (solid backgrounds)
+article-9.html        | PDF fix + font alignment + dark mode fixes
+article-10.html       | PDF fix + comprehensive CSS overhaul + dark mode
+article-1.html        | Font alignment + dark h2 color fix
+article-2.html        | Font alignment
+article-3.html        | Font alignment + dark h2 color fix
+article-4.html        | Font alignment
+article-5.html        | Font alignment + dark h2 color fix
+article-6.html        | Font alignment + dark h2 color fix
+article-7.html        | Font alignment (dark mode PENDING)
+article-8.html        | Font alignment + dark h2 color fix
+article-11.html       | Font alignment + dark mode callout boxes
+article-12.html       | Font alignment + dark h2 color fix
+article-13.html       | Font alignment + dark h2 color fix + 4 tooltips added
+article-14.html       | Font alignment + dark h2 color fix
+article-15.html       | 6 filter tooltips added
+article-16.html       | Font alignment + full dark mode content rules added
+article-17.html       | Font alignment (dark mode PENDING)
+```
+
+---
+
+## Session: 2026-02-16 (Cont. #5) — Articles 12-15 Pro Mode + Dashboard
+
+### Summary
+Implemented Pro Enhancement Mode for articles 12, 13, 14, 15. Created dashboard.html page.
+
+### Completed Work
+- **Article 12**: Full Pro Mode with Strategic Intelligence Engine, 4 panels, Monte Carlo, PDF export
+- **Article 13**: Full Pro Mode with AI Power Grid Analyzer, 4 panels, Monte Carlo, PDF export
+- **Article 14**: Full Pro Mode with Risk Assessment Engine, 4 panels, Monte Carlo, PDF export
+- **Article 15**: Full Pro Mode with Contract Intelligence Engine, 4 panels, Monte Carlo, PDF export
+- **Dashboard.html**: User dashboard page with project management, export tracking
+
+---
+
+## Session: 2026-02-16 (Cont. #4) — Cross-Article Consistency + Pro Mode + SEO + Tooltips
+
+### Summary
+Massive cross-article standardization session: TOC consistency, Pro Mode implementations (articles 9, 10, 11), SEO audit fixes, author bio standardization, newsletter/related articles/share buttons, dark mode fixes, tooltip bugs, PDF optimization, and standardization doc updates.
+
+### Completed Work
+
+#### A. TOC Consistency Fix
+- Added global `.toc-section` CSS to styles.css (articles 9, 10, 11 had HTML but no CSS)
+- TOC calculator badges added to articles 9, 10, 11, 12
+
+#### B. Pro Mode Implementations
+- **Article 11**: Full Strategic Intelligence Engine from scratch (+1,508 lines)
+  - 6 strategic inputs, 4 Pro panels, Monte Carlo 10K, PDF export
+  - CSS prefix `.eeq-`, amber theme
+  - Pro CTA teaser block added
+- **Article 9**: Enhanced Pro Mode (+818 lines)
+  - 8-region data expanded with 7 new fields per region
+  - 4 panels upgraded with additional KPIs
+  - Narrative rewritten to 4 structured paragraphs
+- **Article 10**: Enhanced Pro Mode (+833 lines)
+  - New Panel 5: Dedicated AI-Generated Narrative
+  - 8-region data expanded with 6 new fields
+  - New tornado sensitivity chart
+
+#### C. Cross-Article Standardization
+- Author bio Pattern A applied to articles 2, 4, 5, 6, 7, 8, 11, 12, 14, 15
+- Newsletter signup added to articles 1-8, 11-13, 15
+- Related articles/Continue Reading to articles 1-8, 11, 12, 13, 15
+- Share buttons to articles 13, 15
+- Articles 16, 17 fully standardized
+- Prev/next nav to articles 3, 7
+- Dark mode fixes for articles 1, 3, 5, 6, 8, 9, 10, 11, 12, 13, 14
+
+#### D. SEO Audit Fixes
+- og:image:alt + twitter:image:alt on all pages
+- Skip navigation links (`#main-content`) on all pages
+- `<main id="main-content">` landmark on all pages
+- Hero image preload (`<link rel="preload">`) on all articles
+- Title tag optimization for all pages
+
+#### E. Article 3 Tooltip Bug Fixes
+- Added missing `#maint-tooltip-container` div to DOM
+- Fixed JS mechanism: `classList.add('visible')` instead of `style.display`
+- Broadened JS selector from `#section-12` to global `.tooltip-trigger`
+- Added wrench time term-tooltip
+
+#### F. Standardization Doc Updates
+- TOOLTIP_STANDARD.md v1.2: Added term-tooltip system, bug history (BUG-001 through BUG-004), pre-deployment checklist, article 11 entry
+- PDF_EXPORT_STANDARD.md v1.1: Added white space minimization rules, side-by-side chart layout pattern, KPI grid layout, compact spacing rules, pre-deployment checklist, article 11 entry
+
+#### G. PDF Layout Optimization (Partial — agent hit rate limit)
+- Article 2: Full side-by-side optimization applied (config+KPIs, narratives, 6-col KPI grid)
+- Remaining articles: Standardization rules documented for future application
+
+### Files Changed (36 files, +4,095 / -722)
+
 ## Pending/Future Tasks
 - Commit and push changes to GitHub
+- Apply PDF side-by-side optimization to remaining articles (1, 4, 5, 6, 7, 8, 9, 10, 11, 15)
 - Test dark mode on actual mobile devices
 - Consider adding dark mode to dashboard pages (datahallAI.html, dc-conventional.html, etc.)
 - Create cover image for Article 12 (assets/article-12-cover.jpg)

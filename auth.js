@@ -100,16 +100,16 @@
             '.rz-dd-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;border-radius:8px;background:rgba(239,68,68,0.1);color:#f87171;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:all 0.2s;}',
             '.rz-dd-logout:hover{background:rgba(239,68,68,0.2);}',
             /* Login Modal */
-            '.rz-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:99999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}',
+            '.rz-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}',
             '.rz-modal-overlay.show{display:flex;}',
-            '.rz-modal{width:380px;max-width:90vw;background:linear-gradient(145deg,#0f172a,#1e293b);border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:32px;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.5);}',
+            '.rz-modal{width:380px;max-width:90vw;background:#0f172a;border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:32px;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;}',
             '.rz-modal-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border:none;border-radius:8px;background:rgba(255,255,255,0.05);color:#94a3b8;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}',
             '.rz-modal-close:hover{background:rgba(255,255,255,0.1);color:#fff;}',
             '.rz-modal h3{margin:0 0 6px;font-size:1.3rem;color:#f1f5f9;font-weight:700;}',
-            '.rz-modal .rz-modal-sub{font-size:0.82rem;color:#64748b;margin:0 0 24px;}',
+            '.rz-modal .rz-modal-sub{font-size:0.82rem;color:#94a3b8;margin:0 0 24px;}',
             '.rz-modal label{display:block;font-size:0.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}',
-            '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.9rem;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 0.2s;}',
-            '.rz-modal input:focus{border-color:rgba(139,92,246,0.5);}',
+            '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#f1f5f9;font-size:0.9rem;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}',
+            '.rz-modal input:focus{border-color:rgba(139,92,246,0.5);box-shadow:0 0 0 3px rgba(139,92,246,0.1);}',
             '.rz-modal .rz-submit-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.3s;}',
             '.rz-modal .rz-submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(139,92,246,0.3);}',
             '.rz-modal .rz-submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}',
@@ -127,10 +127,20 @@
             '[data-theme="light"] .rz-user-dropdown{background:rgba(255,255,255,0.98);border-color:rgba(139,92,246,0.2);box-shadow:0 10px 40px rgba(0,0,0,0.12);}',
             '[data-theme="light"] .rz-dd-email{color:#475569;}',
             '[data-theme="light"] .rz-dd-logout{background:rgba(239,68,68,0.06);color:#dc2626;}',
-            '[data-theme="light"] .rz-modal{background:linear-gradient(145deg,#ffffff,#f8fafc);border-color:rgba(139,92,246,0.2);}',
+            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:rgba(139,92,246,0.2);box-shadow:0 25px 60px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.04) inset;}',
             '[data-theme="light"] .rz-modal h3{color:#1e293b;}',
-            '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f8fafc;border-color:#e2e8f0;color:#1e293b;}',
+            '[data-theme="light"] .rz-modal .rz-modal-sub{color:#64748b;}',
+            '[data-theme="light"] .rz-modal label{color:#475569;}',
+            '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}',
+            '[data-theme="light"] .rz-modal input:focus{border-color:rgba(139,92,246,0.5);background:#fff;}',
             '[data-theme="light"] .rz-modal-close{background:rgba(0,0,0,0.05);color:#64748b;}',
+            '[data-theme="light"] .rz-demo-hint{background:rgba(139,92,246,0.06) !important;border-color:rgba(139,92,246,0.15) !important;color:#475569 !important;}',
+            '[data-theme="light"] .rz-demo-hint code{background:rgba(139,92,246,0.1) !important;color:#6d28d9 !important;}',
+            '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#7c3aed !important;}',
+            '[data-theme="light"] .rz-pro-link{color:#7c3aed !important;}',
+            '[data-theme="light"] .rz-pro-link:hover{color:#6d28d9 !important;}',
+            /* Pro link */
+            '.rz-pro-link:hover{color:#a78bfa !important;text-decoration:underline !important;}',
             /* Responsive */
             '@media(max-width:768px){.rz-user-email{display:none;}.rz-login-btn .rz-login-text{display:none;}.rz-login-btn{padding:8px 12px;}}'
         ].join('\n');
@@ -162,11 +172,11 @@
     }
 
     function loginModalHTML() {
-        return '<div class="rz-modal-overlay" id="rzModalOverlay">' +
+        return '<div class="rz-modal-overlay" id="rzModalOverlay" role="dialog" aria-modal="true" aria-labelledby="rzModalTitle">' +
             '<div class="rz-modal">' +
-                '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()">&times;</button>' +
+                '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()" aria-label="Close login dialog">&times;</button>' +
                 '<div id="rzModalForm">' +
-                    '<h3><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Premium Access</h3>' +
+                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Premium Access</h3>' +
                     '<p class="rz-modal-sub">Sign in to unlock advanced features and full calculator access.</p>' +
                     '<div class="rz-error" id="rzModalError">Invalid email or password.</div>' +
                     '<label>Email</label>' +
@@ -174,10 +184,13 @@
                     '<label>Password</label>' +
                     '<input type="password" id="rzModalPassword" placeholder="Enter password" autocomplete="current-password">' +
                     '<button class="rz-submit-btn" id="rzModalSubmit" onclick="window._rzAuth.doLogin()">Sign In</button>' +
-                    '<div style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
-                        '<span style="color:#a78bfa;font-weight:600;">Demo:</span> ' +
-                        '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo@resistancezero.com</code> / ' +
-                        '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo2026</code>' +
+                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
+                        '<span class="rz-demo-label" style="color:#a78bfa;font-weight:600;">Demo:</span> ' +
+                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo2026</code>' +
+                    '</div>' +
+                    '<div style="text-align:center;margin-top:8px;">' +
+                        '<a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" rel="noopener" class="rz-pro-link" style="font-size:0.68rem;color:#64748b;text-decoration:none;transition:color 0.2s;">Unlock Pro Mode &rarr;</a>' +
                     '</div>' +
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +
@@ -317,15 +330,34 @@
             if (success) success.className = 'rz-success';
             if (error) error.className = 'rz-error';
             if (overlay) overlay.classList.add('show');
+            this._prevFocus = document.activeElement;
             setTimeout(function () {
                 var em = document.getElementById('rzModalEmail');
                 if (em) em.focus();
             }, 100);
+            // Focus trap
+            if (!this._trapHandler) {
+                var self = this;
+                this._trapHandler = function(e) {
+                    if (e.key === 'Escape') { self.hideModal(); return; }
+                    if (e.key !== 'Tab') return;
+                    var modal = document.querySelector('.rz-modal');
+                    if (!modal) return;
+                    var focusable = modal.querySelectorAll('input,button,a,[tabindex]:not([tabindex="-1"])');
+                    if (!focusable.length) return;
+                    var first = focusable[0], last = focusable[focusable.length - 1];
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                };
+            }
+            document.addEventListener('keydown', this._trapHandler);
         },
 
         hideModal: function () {
             var overlay = document.getElementById('rzModalOverlay');
             if (overlay) overlay.classList.remove('show');
+            if (this._trapHandler) document.removeEventListener('keydown', this._trapHandler);
+            if (this._prevFocus) { try { this._prevFocus.focus(); } catch(e){} }
         },
 
         doLogin: function () {
