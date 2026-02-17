@@ -18,6 +18,9 @@
  *   POST /api/reconcile       — admin: manual entitlement reconciliation
  */
 
+// Load .env for local development (no-op if file missing)
+try { require('dotenv').config(); } catch (e) { /* dotenv not installed in production */ }
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');

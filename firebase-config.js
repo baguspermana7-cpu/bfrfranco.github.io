@@ -5,13 +5,13 @@
  *   Firebase Console → Project Settings → General → Your apps → Web app
  */
 const FIREBASE_CONFIG = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.firebasestorage.app",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyCXlJbZyWHr74vkJOJaUsjVdv6iAa0kt6A",
+  authDomain: "resistancezero-a5ad5.firebaseapp.com",
+  projectId: "resistancezero-a5ad5",
+  storageBucket: "resistancezero-a5ad5.firebasestorage.app",
+  messagingSenderId: "416280004490",
+  appId: "1:416280004490:web:9cc660ea78df69e1636a73",
+  measurementId: "G-4K4RPGTHV5"
 };
 
 /**

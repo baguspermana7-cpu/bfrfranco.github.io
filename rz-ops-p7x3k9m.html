@@ -153,7 +153,7 @@
 
         /* ═══ BENCHMARK ═══ */
         .bench-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
-        .bench-card{background:linear-gradient(135deg,#1a1f35,#1e293b);border:1px solid #334155;border-radius:12px;padding:1.25rem;position:relative;overflow:hidden}
+        .bench-card{background:linear-gradient(135deg,#1a1f35,#1e293b);border:1px solid #334155;border-radius:10px;padding:0.85rem;position:relative;overflow:hidden}
         .bench-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
         .bench-card.green::before{background:linear-gradient(90deg,#059669,#34d399)}
         .bench-card.purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
@@ -161,15 +161,72 @@
         .bench-card.blue::before{background:linear-gradient(90deg,#2563eb,#60a5fa)}
         .bench-card.red::before{background:linear-gradient(90deg,#dc2626,#f87171)}
         .bench-card.cyan::before{background:linear-gradient(90deg,#0891b2,#22d3ee)}
-        .bench-label{font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:0.5rem}
-        .bench-val{font-size:1.6rem;font-weight:800;color:#f1f5f9}
-        .bench-sub{font-size:0.72rem;color:#94a3b8;margin-top:0.25rem}
+        .bench-label{font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:0.3rem}
+        .bench-val{font-size:1.2rem;font-weight:800;color:#f1f5f9}
+        .bench-sub{font-size:0.65rem;color:#94a3b8;margin-top:0.15rem}
         .bench-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:0.5rem}
-        .bench-table th{text-align:left;padding:8px 10px;color:#64748b;font-weight:600;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #334155}
+        .bench-table th{text-align:left;padding:8px 10px;color:#64748b;font-weight:600;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #334155;cursor:pointer;user-select:none;white-space:nowrap}
+        .bench-table th:hover{color:#a78bfa}
+        .bench-table th .sort-icon{margin-left:3px;font-size:0.55rem;opacity:0.5}
+        .bench-table th.sorted .sort-icon{opacity:1;color:#a78bfa}
         .bench-table td{padding:8px 10px;color:#cbd5e1;border-bottom:1px solid rgba(51,65,85,0.4)}
         .bench-table tr:hover td{background:rgba(139,92,246,0.04)}
         .bench-bar{height:6px;border-radius:3px;background:#1e293b;position:relative;margin-top:4px}
         .bench-bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+        /* Bench sub-tabs */
+        .bench-tabs{display:flex;gap:2px;margin-bottom:1rem;background:#0f172a;border-radius:10px;padding:3px;border:1px solid #1f2937}
+        .bench-tab{padding:0.5rem 1rem;font-size:0.75rem;font-weight:600;color:#64748b;background:transparent;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+        .bench-tab:hover{color:#e2e8f0;background:rgba(139,92,246,0.08)}
+        .bench-tab.active{background:rgba(139,92,246,0.15);color:#a78bfa}
+        .bench-panel{display:none}
+        .bench-panel.active{display:block}
+        /* Filter bar */
+        .bench-filters{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;align-items:center}
+        .bench-filter-group{display:flex;align-items:center;gap:4px}
+        .bench-filter-label{font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+        .bench-select{background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:5px 8px;font-size:0.72rem;font-family:'Inter',sans-serif;outline:none;cursor:pointer;min-width:100px}
+        .bench-select:focus{border-color:#8b5cf6}
+        .bench-input{background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:5px 8px;font-size:0.72rem;font-family:'Inter',sans-serif;outline:none;width:140px}
+        .bench-input:focus{border-color:#8b5cf6}
+        .bench-input::placeholder{color:#475569}
+        .bench-btn{padding:5px 12px;border-radius:6px;font-size:0.7rem;font-weight:600;border:none;cursor:pointer;transition:all 0.15s}
+        .bench-btn-primary{background:rgba(139,92,246,0.2);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)}
+        .bench-btn-primary:hover{background:rgba(139,92,246,0.3)}
+        .bench-btn-ghost{background:transparent;color:#64748b;border:1px solid #334155}
+        .bench-btn-ghost:hover{color:#e2e8f0;border-color:#475569}
+        .bench-btn-ghost.active{background:rgba(139,92,246,0.12);color:#a78bfa;border-color:rgba(139,92,246,0.3)}
+        /* Pagination */
+        .bench-pagination{display:flex;align-items:center;justify-content:space-between;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(51,65,85,0.3)}
+        .bench-page-info{font-size:0.7rem;color:#64748b}
+        .bench-page-btns{display:flex;gap:4px}
+        .bench-page-btn{padding:4px 10px;font-size:0.68rem;border-radius:4px;border:1px solid #334155;background:transparent;color:#94a3b8;cursor:pointer}
+        .bench-page-btn:hover{border-color:#8b5cf6;color:#a78bfa}
+        .bench-page-btn.active{background:rgba(139,92,246,0.2);border-color:#8b5cf6;color:#a78bfa}
+        .bench-page-btn:disabled{opacity:0.3;cursor:not-allowed}
+        /* Type badges */
+        .bench-type{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.62rem;font-weight:600;letter-spacing:0.3px}
+        .bench-type.hyperscale{background:rgba(96,165,250,0.15);color:#60a5fa}
+        .bench-type.colocation{background:rgba(167,139,250,0.15);color:#a78bfa}
+        .bench-type.wholesale{background:rgba(251,191,36,0.15);color:#fbbf24}
+        .bench-type.edge{background:rgba(52,211,153,0.15);color:#34d399}
+        .bench-type.government{background:rgba(248,113,113,0.15);color:#f87171}
+        .bench-type.enterprise{background:rgba(34,211,238,0.15);color:#22d3ee}
+        /* Region badges */
+        .bench-region{display:inline-block;padding:1px 6px;border-radius:3px;font-size:0.6rem;font-weight:600}
+        .bench-region.americas{background:rgba(96,165,250,0.12);color:#60a5fa}
+        .bench-region.emea{background:rgba(251,191,36,0.12);color:#fbbf24}
+        .bench-region.apac{background:rgba(52,211,153,0.12);color:#34d399}
+        .bench-region.latam{background:rgba(167,139,250,0.12);color:#a78bfa}
+        .bench-region.mea{background:rgba(248,113,113,0.12);color:#f87171}
+        /* Capacity bar inline */
+        .cap-bar{display:inline-flex;align-items:center;gap:6px;width:100%}
+        .cap-bar-track{flex:1;height:5px;background:#1e293b;border-radius:3px;overflow:hidden;min-width:40px}
+        .cap-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#8b5cf6,#a78bfa);transition:width 0.5s}
+        .cap-bar-val{font-size:0.72rem;color:#e2e8f0;font-weight:600;white-space:nowrap;min-width:50px}
+        /* Growth indicator */
+        .growth-up{color:#34d399;font-weight:600}
+        .growth-down{color:#f87171;font-weight:600}
+        .growth-neutral{color:#64748b}
 
         /* ═══ TIMELINE ═══ */
         .tl-item{display:flex;gap:12px;padding:10px 0;border-left:2px solid #334155;margin-left:11px;padding-left:20px;position:relative}
@@ -218,6 +275,10 @@
             .hamburger{display:block}
             .kpi-grid{grid-template-columns:1fr}
             .bench-grid{grid-template-columns:1fr}
+            .bench-tabs{flex-wrap:wrap}
+            .bench-filters{flex-direction:column;align-items:stretch}
+            .bench-filter-group{width:100%}
+            .bench-select,.bench-input{width:100%}
             .main-content{padding:1rem}
             .cred-row{grid-template-columns:30px 1fr 1fr 0.7fr 80px;font-size:0.72rem}
             .feat-row{grid-template-columns:1.5fr repeat(3,1fr);padding:10px 8px}
@@ -347,6 +408,15 @@
         body.light-mode .bench-val{color:#1e293b}
         body.light-mode .bench-label{color:#64748b}
         body.light-mode .bench-sub{color:#64748b}
+        body.light-mode .bench-tabs{background:#f1f5f9;border-color:#e2e8f0}
+        body.light-mode .bench-tab{color:#64748b}
+        body.light-mode .bench-tab.active{background:rgba(139,92,246,0.12);color:#7c3aed}
+        body.light-mode .bench-select{background:#fff;border-color:#e2e8f0;color:#1e293b}
+        body.light-mode .bench-input{background:#fff;border-color:#e2e8f0;color:#1e293b}
+        body.light-mode .bench-table th{color:#475569;border-bottom-color:#e2e8f0}
+        body.light-mode .bench-table td{color:#334155;border-bottom-color:#f1f5f9}
+        body.light-mode .cap-bar-track{background:#e2e8f0}
+        body.light-mode .bench-page-btn{border-color:#e2e8f0;color:#475569}
         body.light-mode .bench-table th{color:#64748b;border-color:#e2e8f0}
         body.light-mode .bench-table td{color:#334155;border-color:#f1f5f9}
         body.light-mode .tl-item{border-color:#e2e8f0}
@@ -418,6 +488,74 @@
         body.light-mode .mayar-status.paid{background:rgba(16,185,129,0.1)}
         body.light-mode .mayar-status.unpaid{background:rgba(245,158,11,0.1)}
         body.light-mode .mayar-rate-bar{background:#e2e8f0}
+
+        /* ═══ USER ACTIVITY ═══ */
+        .ua-filter-bar{display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;padding:8px 12px;background:#0f172a;border:1px solid #1f2937;border-radius:10px}
+        .ua-filter-bar label{font-size:0.68rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px}
+        .ua-filter-bar input[type="date"]{padding:5px 8px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;font-family:inherit;outline:none}
+        .ua-filter-bar input[type="date"]:focus{border-color:#8b5cf6}
+        .ua-period-btn{padding:4px 10px;border-radius:6px;border:1px solid #334155;background:transparent;color:#94a3b8;font-size:0.68rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s}
+        .ua-period-btn:hover{border-color:#8b5cf6;color:#a78bfa}
+        .ua-period-btn.active{background:linear-gradient(135deg,#7c3aed,#8b5cf6);border-color:#8b5cf6;color:#fff;box-shadow:0 2px 8px rgba(139,92,246,0.3)}
+        .ua-cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:1rem}
+        .ua-cat-card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:0.65rem 0.75rem;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;cursor:default}
+        .ua-cat-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.25)}
+        .ua-cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+        .ua-cat-card.purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+        .ua-cat-card.green::before{background:linear-gradient(90deg,#059669,#34d399)}
+        .ua-cat-card.blue::before{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+        .ua-cat-card.amber::before{background:linear-gradient(90deg,#d97706,#fbbf24)}
+        .ua-cat-card.red::before{background:linear-gradient(90deg,#dc2626,#f87171)}
+        .ua-cat-card.cyan::before{background:linear-gradient(90deg,#0891b2,#22d3ee)}
+        .ua-cat-card.pink::before{background:linear-gradient(90deg,#db2777,#f472b6)}
+        .ua-cat-card.indigo::before{background:linear-gradient(90deg,#4f46e5,#818cf8)}
+        .ua-cat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;margin-bottom:0.35rem}
+        .ua-cat-count{font-size:1.15rem;font-weight:800;color:#f1f5f9;line-height:1.2}
+        .ua-cat-label{font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-top:1px}
+        .ua-cat-sub{font-size:0.58rem;color:#475569;margin-top:2px}
+        .ua-event-log{max-height:400px;overflow-y:auto}
+        .ua-event-row{display:grid;grid-template-columns:28px 1fr 110px 100px 90px 80px;align-items:center;padding:5px 10px;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.72rem;transition:background 0.15s}
+        .ua-event-loc{color:#94a3b8;font-size:0.65rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ua-event-loc i{margin-right:3px;font-size:0.55rem}
+        .ua-event-row:hover{background:rgba(139,92,246,0.04)}
+        .ua-event-row.header{background:#0f172a;border-radius:8px 8px 0 0;border-bottom:2px solid #334155;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;position:sticky;top:0;z-index:1}
+        .ua-event-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem}
+        .ua-event-icon.pro{background:rgba(139,92,246,0.15);color:#a78bfa}
+        .ua-event-icon.login{background:rgba(52,211,153,0.15);color:#34d399}
+        .ua-event-icon.pdf{background:rgba(96,165,250,0.15);color:#60a5fa}
+        .ua-event-icon.cv{background:rgba(245,158,11,0.15);color:#fbbf24}
+        .ua-event-icon.ws{background:rgba(236,72,153,0.15);color:#f472b6}
+        .ua-event-icon.page{background:rgba(100,116,139,0.15);color:#94a3b8}
+        .ua-event-icon.calc{background:rgba(34,211,238,0.15);color:#22d3ee}
+        .ua-event-icon.signup{background:rgba(52,211,153,0.15);color:#34d399}
+        .ua-event-detail{color:#cbd5e1;font-weight:500}
+        .ua-event-detail small{display:block;color:#64748b;font-weight:400;font-size:0.68rem;margin-top:1px}
+        .ua-event-page{color:#94a3b8;font-size:0.72rem}
+        .ua-event-time{color:#64748b;font-size:0.72rem;font-family:'JetBrains Mono',monospace}
+        .ua-event-type{font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:50px;display:inline-block}
+        .ua-event-type.pro{background:rgba(139,92,246,0.2);color:#a78bfa}
+        .ua-event-type.login{background:rgba(52,211,153,0.2);color:#34d399}
+        .ua-event-type.pdf{background:rgba(96,165,250,0.2);color:#60a5fa}
+        .ua-event-type.cv{background:rgba(245,158,11,0.2);color:#fbbf24}
+        .ua-event-type.ws{background:rgba(236,72,153,0.2);color:#f472b6}
+        .ua-event-type.page{background:rgba(100,116,139,0.2);color:#94a3b8}
+        .ua-event-type.calc{background:rgba(34,211,238,0.2);color:#22d3ee}
+        .ua-event-type.signup{background:rgba(52,211,153,0.2);color:#34d399}
+
+        @media(max-width:1200px){.ua-cat-grid{grid-template-columns:repeat(4,1fr)} #sec-activity .charts-row{grid-template-columns:1fr}}
+        @media(max-width:768px){.ua-cat-grid{grid-template-columns:repeat(2,1fr)}.ua-event-row{grid-template-columns:24px 1fr 80px 60px}.ua-event-row .ua-event-page,.ua-event-row .ua-event-loc{display:none}}
+
+        body.light-mode .ua-filter-bar{background:#f8fafc;border-color:#e2e8f0}
+        body.light-mode .ua-filter-bar input[type="date"]{background:#fff;border-color:#e2e8f0;color:#1e293b}
+        body.light-mode .ua-period-btn{border-color:#e2e8f0;color:#64748b}
+        body.light-mode .ua-cat-card{background:#fff;border-color:#e2e8f0}
+        body.light-mode .ua-cat-card:hover{box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+        body.light-mode .ua-cat-count{color:#1e293b}
+        body.light-mode .ua-event-row{border-color:#f1f5f9}
+        body.light-mode .ua-event-row.header{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+        body.light-mode .ua-event-row:hover{background:rgba(139,92,246,0.04)}
+        body.light-mode .ua-event-detail{color:#334155}
+        body.light-mode .ua-event-page{color:#64748b}
     </style>
 </head>
 <body>
@@ -500,6 +638,10 @@
                 <i class="fas fa-credit-card"></i> Mayar Payments
                 <span class="badge green">Live</span>
             </a>
+            <a class="nav-item" data-section="activity" onclick="showSection('activity')">
+                <i class="fas fa-chart-area"></i> User Activity
+                <span class="badge purple" id="navActivityCount">0</span>
+            </a>
 
             <div class="nav-group-label" style="margin-top:0.75rem">Management</div>
             <a class="nav-item" data-section="users" onclick="showSection('users')">
@@ -521,7 +663,7 @@
 
             <div class="nav-group-label" style="margin-top:0.75rem">Intelligence</div>
             <a class="nav-item" data-section="benchmarks" onclick="showSection('benchmarks')">
-                <i class="fas fa-landmark"></i> DC Benchmarks
+                <i class="fas fa-landmark"></i> DC Intelligence
             </a>
 
             <div class="nav-group-label" style="margin-top:0.75rem">System</div>
@@ -566,9 +708,12 @@
 
 <!-- ══════════════════════════════════════ DASHBOARD ══════════════════════════════════════ -->
 <div class="section active" id="sec-dashboard">
-    <div class="section-header">
-        <h1>Dashboard Overview</h1>
-        <p>Real-time platform metrics and analytics</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Dashboard Overview</h1><p>Real-time platform metrics and analytics</p></div>
+        <div style="display:flex;gap:0.5rem;flex-shrink:0">
+            <button class="btn btn-green btn-sm" onclick="exportDashboardCSV()"><i class="fas fa-download"></i> CSV</button>
+            <button class="btn btn-purple btn-sm" onclick="openReport('dashboard')"><i class="fas fa-file-alt"></i> Report</button>
+        </div>
     </div>
     <div class="kpi-grid" id="kpiGrid"></div>
 
@@ -620,9 +765,12 @@
 
 <!-- ══════════════════════════════════════ REVENUE ══════════════════════════════════════ -->
 <div class="section" id="sec-revenue">
-    <div class="section-header">
-        <h1>Revenue Analytics</h1>
-        <p>Subscription revenue, LTV, churn, and financial metrics</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Revenue Analytics</h1><p>Subscription revenue, LTV, churn, and financial metrics</p></div>
+        <div style="display:flex;gap:0.5rem;flex-shrink:0">
+            <button class="btn btn-green btn-sm" onclick="exportRevenueCSV()"><i class="fas fa-download"></i> CSV</button>
+            <button class="btn btn-purple btn-sm" onclick="openReport('revenue')"><i class="fas fa-file-alt"></i> Report</button>
+        </div>
     </div>
     <div class="kpi-grid" id="revenueKpis"></div>
     <div class="charts-row">
@@ -637,9 +785,9 @@
 
 <!-- ══════════════════════════════════════ USERS ══════════════════════════════════════ -->
 <div class="section" id="sec-users">
-    <div class="section-header">
-        <h1>User Management</h1>
-        <p>Manage accounts, tiers, status, and access</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>User Management</h1><p>Manage accounts, tiers, status, and access</p></div>
+        <button class="btn btn-purple btn-sm" onclick="openReport('users')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
     <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
@@ -692,9 +840,12 @@
 
 <!-- ══════════════════════════════════════ FEATURES ══════════════════════════════════════ -->
 <div class="section" id="sec-features">
-    <div class="section-header">
-        <h1>Feature Flags</h1>
-        <p>Toggle calculator features per subscription tier in real-time</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Feature Flags</h1><p>Toggle calculator features per subscription tier in real-time</p></div>
+        <div style="display:flex;gap:0.5rem;flex-shrink:0">
+            <button class="btn btn-green btn-sm" onclick="exportFeaturesCSV()"><i class="fas fa-download"></i> CSV</button>
+            <button class="btn btn-purple btn-sm" onclick="openReport('features')"><i class="fas fa-file-alt"></i> Report</button>
+        </div>
     </div>
     <div class="card">
         <div class="card-title"><i class="fas fa-sliders-h" style="color:#22d3ee"></i> Tier-Level Feature Matrix</div>
@@ -714,34 +865,183 @@
 
 <!-- ══════════════════════════════════════ BENCHMARKS ══════════════════════════════════════ -->
 <div class="section" id="sec-benchmarks">
-    <div class="section-header">
-        <h1>Data Center Industry Benchmarks</h1>
-        <p>Professional reference data from Equinix, Digital Realty, Google, Microsoft, and industry reports</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Data Center Industry Intelligence</h1><p>Comprehensive global DC capacity data — 50+ operators, 28 countries, 35 facilities · Synergy, CBRE, JLL, C&W 2025-2026</p></div>
+        <div style="display:flex;gap:0.5rem;flex-shrink:0">
+            <button class="btn btn-green btn-sm" onclick="exportBenchmarksCSV()"><i class="fas fa-download"></i> CSV</button>
+            <button class="btn btn-purple btn-sm" onclick="openReport('benchmarks')"><i class="fas fa-file-alt"></i> Report</button>
+        </div>
     </div>
-    <div class="bench-grid" id="benchKpis"></div>
-    <div class="charts-row">
-        <div class="card"><div class="card-title"><i class="fas fa-building" style="color:#60a5fa"></i> $/kW Construction Cost by Operator</div><canvas id="chartCostKW" height="110"></canvas></div>
-        <div class="card"><div class="card-title"><i class="fas fa-leaf" style="color:#34d399"></i> PUE by Operator</div><canvas id="chartPUE" height="220"></canvas></div>
+
+    <!-- KPI Summary Row -->
+    <div class="bench-grid" id="benchKpis" style="gap:0.6rem;margin-bottom:1rem"></div>
+
+    <!-- Sub-tabs -->
+    <div class="bench-tabs">
+        <button class="bench-tab active" onclick="showBenchTab('overview')"><i class="fas fa-chart-pie" style="margin-right:4px"></i>Overview</button>
+        <button class="bench-tab" onclick="showBenchTab('operators')"><i class="fas fa-building" style="margin-right:4px"></i>Operators (50+)</button>
+        <button class="bench-tab" onclick="showBenchTab('countries')"><i class="fas fa-globe-americas" style="margin-right:4px"></i>Countries (28)</button>
+        <button class="bench-tab" onclick="showBenchTab('facilities')"><i class="fas fa-server" style="margin-right:4px"></i>Facilities (35)</button>
+        <button class="bench-tab" onclick="showBenchTab('market')"><i class="fas fa-chart-line" style="margin-right:4px"></i>Market Intel</button>
     </div>
-    <div class="card">
-        <div class="card-title"><i class="fas fa-server" style="color:#a78bfa"></i> Operator Benchmark Comparison</div>
-        <div class="tbl-overflow" id="benchTable"></div>
+
+    <!-- ═══ OVERVIEW TAB ═══ -->
+    <div class="bench-panel active" id="bp-overview">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-building" style="color:#60a5fa"></i> Top 15 Operators by Capacity (MW)</div><canvas id="chartTopOperators" height="100"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-globe" style="color:#34d399"></i> Capacity by Region</div><canvas id="chartRegionCap" height="100"></canvas></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-flag" style="color:#fbbf24"></i> Top 15 Countries by Capacity (MW)</div><canvas id="chartTopCountries" height="100"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-dollar-sign" style="color:#a78bfa"></i> Hyperscaler CapEx 2025 ($B)</div><canvas id="chartCapex" height="100"></canvas></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-area" style="color:#22d3ee"></i> Growth Rate by Country (% YoY)</div><canvas id="chartGrowthRate" height="100"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-layer-group" style="color:#f87171"></i> Operator Type Distribution</div><canvas id="chartTypeDistrib" height="100"></canvas></div>
+        </div>
     </div>
-    <div class="charts-row" style="margin-top:1.5rem">
-        <div class="card"><div class="card-title"><i class="fas fa-globe-americas" style="color:#fbbf24"></i> Regional $/kW Construction Cost</div><canvas id="chartRegionCost" height="110"></canvas></div>
-        <div class="card"><div class="card-title"><i class="fas fa-bolt" style="color:#22d3ee"></i> Energy Cost by Market ($/kWh)</div><canvas id="chartEnergyCost" height="220"></canvas></div>
+
+    <!-- ═══ OPERATORS TAB ═══ -->
+    <div class="bench-panel" id="bp-operators">
+        <div class="bench-filters">
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Type:</span>
+                <select class="bench-select" id="benchOpType" onchange="filterBenchOps()">
+                    <option value="all">All Types</option>
+                    <option value="Hyperscale">Hyperscale</option>
+                    <option value="Colocation">Colocation</option>
+                    <option value="Wholesale">Wholesale</option>
+                    <option value="Edge">Edge</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Region:</span>
+                <select class="bench-select" id="benchOpRegion" onchange="filterBenchOps()">
+                    <option value="all">All Regions</option>
+                    <option value="Americas">Americas</option>
+                    <option value="EMEA">EMEA</option>
+                    <option value="APAC">APAC</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Search:</span>
+                <input type="text" class="bench-input" id="benchOpSearch" placeholder="Search operator..." oninput="filterBenchOps()">
+            </div>
+            <div class="bench-filter-group" style="margin-left:auto">
+                <span style="font-size:0.65rem;color:#64748b" id="benchOpCount">50 operators</span>
+            </div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="tbl-overflow" id="benchOpTable"></div>
+            <div class="bench-pagination" id="benchOpPagination"></div>
+        </div>
     </div>
-    <div class="card">
-        <div class="card-title"><i class="fas fa-book" style="color:#64748b"></i> Sources &amp; Methodology</div>
-        <p style="font-size:0.78rem;color:#94a3b8;line-height:1.7" id="benchSources"></p>
+
+    <!-- ═══ COUNTRIES TAB ═══ -->
+    <div class="bench-panel" id="bp-countries">
+        <div class="bench-filters">
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Region:</span>
+                <select class="bench-select" id="benchCountryRegion" onchange="filterBenchCountries()">
+                    <option value="all">All Regions</option>
+                    <option value="Americas">Americas</option>
+                    <option value="EMEA">EMEA</option>
+                    <option value="APAC">APAC</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Growth:</span>
+                <select class="bench-select" id="benchCountryGrowth" onchange="filterBenchCountries()">
+                    <option value="all">All</option>
+                    <option value="high">High Growth (>15%)</option>
+                    <option value="medium">Medium (8-15%)</option>
+                    <option value="low">Low (<8%)</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Search:</span>
+                <input type="text" class="bench-input" id="benchCountrySearch" placeholder="Search country..." oninput="filterBenchCountries()">
+            </div>
+            <div class="bench-filter-group" style="margin-left:auto">
+                <span style="font-size:0.65rem;color:#64748b" id="benchCountryCount">28 countries</span>
+            </div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="tbl-overflow" id="benchCountryTable"></div>
+        </div>
+    </div>
+
+    <!-- ═══ FACILITIES TAB ═══ -->
+    <div class="bench-panel" id="bp-facilities">
+        <div class="bench-filters">
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Size:</span>
+                <select class="bench-select" id="benchFacSize" onchange="filterBenchFacilities()">
+                    <option value="all">All Sizes</option>
+                    <option value="mega">Mega (500+ MW)</option>
+                    <option value="large">Large (200-500 MW)</option>
+                    <option value="medium">Medium (100-200 MW)</option>
+                    <option value="standard">Standard (<100 MW)</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Country:</span>
+                <select class="bench-select" id="benchFacCountry" onchange="filterBenchFacilities()">
+                    <option value="all">All Countries</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Year:</span>
+                <select class="bench-select" id="benchFacYear" onchange="filterBenchFacilities()">
+                    <option value="all">All Years</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="pre2024">Pre-2024</option>
+                </select>
+            </div>
+            <div class="bench-filter-group" style="margin-left:auto">
+                <span style="font-size:0.65rem;color:#64748b" id="benchFacCount">35 facilities</span>
+            </div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="tbl-overflow" id="benchFacTable"></div>
+        </div>
+    </div>
+
+    <!-- ═══ MARKET INTEL TAB ═══ -->
+    <div class="bench-panel" id="bp-market">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem" id="benchMarketKpis"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0">
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-cloud" style="color:#60a5fa"></i> Hyperscale Metrics</div>
+                <div id="benchHyperscaleInfo"></div>
+            </div>
+            <div class="card" style="padding:1rem;margin-bottom:0">
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-coins" style="color:#fbbf24"></i> Investment Outlook</div>
+                <div id="benchInvestmentInfo"></div>
+            </div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-map-marked-alt" style="color:#34d399"></i> Regional Breakdown</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem" id="benchRegionalInfo"></div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-exclamation-triangle" style="color:#f87171"></i> Key Market Constraints</div>
+            <div id="benchConstraints"></div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-book" style="color:#64748b"></i> Sources & Methodology</div>
+            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.5" id="benchSources"></p>
+        </div>
     </div>
 </div>
 
 <!-- ══════════════════════════════════════ AUDIT ══════════════════════════════════════ -->
 <div class="section" id="sec-audit">
-    <div class="section-header">
-        <h1>Audit Log</h1>
-        <p>Complete system event timeline with filters</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Audit Log</h1><p>Complete system event timeline with filters</p></div>
+        <button class="btn btn-purple btn-sm" onclick="openReport('audit')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
     <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
@@ -757,9 +1057,9 @@
 
 <!-- ══════════════════════════════════════ SUBSCRIBERS ══════════════════════════════════════ -->
 <div class="section" id="sec-subscribers">
-    <div class="section-header">
-        <h1>Newsletter Subscribers</h1>
-        <p>Manage email subscribers from article newsletter forms</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Newsletter Subscribers</h1><p>Manage email subscribers from article newsletter forms</p></div>
+        <button class="btn btn-purple btn-sm" onclick="openReport('subscribers')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
     <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
@@ -786,9 +1086,9 @@
 
 <!-- ══════════════════════════════════════ MAYAR PAYMENTS ══════════════════════════════════════ -->
 <div class="section" id="sec-mayar">
-    <div class="section-header">
-        <h1>Mayar Payments</h1>
-        <p>Live payment operations dashboard — Mayar API integration</p>
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>Mayar Payments</h1><p>Live payment operations dashboard — Mayar API integration</p></div>
+        <button class="btn btn-purple btn-sm" onclick="openReport('mayar')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
 
     <!-- Sub-tabs -->
@@ -1021,6 +1321,102 @@
                     <button class="btn btn-green btn-sm" onclick="checkMayarHealth()" style="width:100%;justify-content:center"><i class="fas fa-stethoscope"></i> Check Health</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ USER ACTIVITY ══════════════════════════════════════ -->
+<div class="section" id="sec-activity">
+    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h1>User Activity</h1><p>Real-time tracking — Pro clicks, demo logins, PDF exports, CV downloads, calculator usage <span id="uaDataSource" style="font-size:0.68rem;color:#475569;margin-left:6px"></span></p></div>
+        <button class="btn btn-purple btn-sm" onclick="openReport('activity')"><i class="fas fa-file-alt"></i> Report</button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="ua-filter-bar">
+        <label>Period:</label>
+        <button class="ua-period-btn active" onclick="setUAPeriod('today',this)">Today</button>
+        <button class="ua-period-btn" onclick="setUAPeriod('week',this)">This Week</button>
+        <button class="ua-period-btn" onclick="setUAPeriod('month',this)">This Month</button>
+        <button class="ua-period-btn" onclick="setUAPeriod('year',this)">This Year</button>
+        <button class="ua-period-btn" onclick="setUAPeriod('all',this)">All Time</button>
+        <span style="color:#334155;margin:0 4px">|</span>
+        <label>Custom:</label>
+        <input type="date" id="uaDateFrom" onchange="applyUACustomDate()">
+        <span style="color:#64748b;font-size:0.75rem">to</span>
+        <input type="date" id="uaDateTo" onchange="applyUACustomDate()">
+        <span style="color:#334155;margin:0 4px">|</span>
+        <label>Category:</label>
+        <select class="tbl-select" id="uaCatFilter" onchange="renderActivity()" style="min-width:140px">
+            <option value="all">All Categories</option>
+            <option value="pro_click">Pro Mode Click</option>
+            <option value="demo_login">Demo Login</option>
+            <option value="pdf_export">PDF Export</option>
+            <option value="cv_download">CV Download</option>
+            <option value="ws_download">Work Sample DL</option>
+            <option value="page_view">Page View</option>
+            <option value="calc_use">Calculator Use</option>
+            <option value="signup">Sign Up</option>
+        </select>
+        <button class="btn btn-purple btn-sm" onclick="renderActivity()" style="margin-left:auto"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-grid" id="uaKpiGrid" style="gap:0.6rem;margin-bottom:1rem"></div>
+
+    <!-- Category Breakdown -->
+    <div class="ua-cat-grid" id="uaCatGrid" style="gap:0.5rem;margin-bottom:1rem"></div>
+
+    <!-- Charts Row: Timeline + Category + Hourly -->
+    <div style="display:grid;grid-template-columns:1.5fr 0.8fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-line" style="color:#8b5cf6"></i> Timeline</div>
+            <canvas id="uaTimelineChart" height="70"></canvas>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-pie" style="color:#f472b6"></i> Categories</div>
+            <canvas id="uaCatChart" height="130"></canvas>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-th" style="color:#22d3ee"></i> By Hour</div>
+            <canvas id="uaHourChart" height="70"></canvas>
+        </div>
+    </div>
+
+    <!-- Top Pages + Visitors -->
+    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-file-alt" style="color:#60a5fa"></i> Top Pages</div>
+            <canvas id="uaTopPagesChart" height="80"></canvas>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-users" style="color:#34d399"></i> Visitors</div>
+            <div id="uaVisitorStats"></div>
+        </div>
+    </div>
+
+    <!-- Event Log -->
+    <div class="card" style="padding:1rem;margin-bottom:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem">
+            <div class="card-title" style="margin:0;font-size:0.78rem"><i class="fas fa-stream" style="color:#a78bfa"></i> Event Log</div>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+                <div class="tbl-search"><i class="fas fa-search"></i><input id="uaEventSearch" placeholder="Search..." oninput="filterUAEvents()" style="width:160px"></div>
+                <button class="btn btn-ghost btn-sm" onclick="exportUAEventsCSV()"><i class="fas fa-download"></i> CSV</button>
+            </div>
+        </div>
+        <div class="ua-event-log" id="uaEventLog" style="max-height:320px">
+            <div class="ua-event-row header">
+                <span></span>
+                <span>Event / Visitor</span>
+                <span>Location</span>
+                <span>Page</span>
+                <span>Type</span>
+                <span>Time</span>
+            </div>
+        </div>
+        <div class="pagination" style="margin-top:0.6rem;padding-top:0.6rem;display:flex;justify-content:space-between;align-items:center">
+            <div id="uaPageInfo"><span style="color:#64748b;font-size:0.72rem">Page 1 of 1</span></div>
+            <div id="uaPageBtns" style="display:flex;gap:3px;align-items:center"></div>
         </div>
     </div>
 </div>
@@ -1270,7 +1666,7 @@ function handleAdminLogin(e){
     activities=generateActivities();
     applySort();renderKPIs();renderDashboardCharts();renderRevenue();
     renderTable();renderCredentials();renderFeatures();renderBenchmarks();
-    renderAudit();renderSubscribers();renderSettings();renderMayar();
+    renderAudit();renderSubscribers();renderSettings();renderMayar();renderActivity();
     },600);
     return false;
 }
@@ -1283,8 +1679,9 @@ function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     document.getElementById('sec-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
-    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Benchmarks',audit:'Audit Log',settings:'System Settings'};
+    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings'};
     if(id==='mayar'&&typeof renderMayar==='function')renderMayar();
+    if(id==='activity'&&typeof renderActivity==='function')renderActivity();
     document.getElementById('topbarTitle').textContent=titles[id]||id;
     if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
 }
@@ -1532,6 +1929,297 @@ function exportCSV(){
 }
 function downloadCSV(csv,fn){const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u)}
 
+// ═══ SECTION CSV EXPORTS ═══
+function exportDashboardCSV(){
+    var pro=allUsers.filter(u=>u.tier==='pro').length;
+    var free=allUsers.filter(u=>u.tier==='free').length;
+    var active=allUsers.filter(u=>u.status==='active').length;
+    var totalCalcs=allUsers.reduce((s,u)=>s+u.usage,0);
+    var csv='Metric,Value\nTotal Users,'+allUsers.length+'\nPro Users,'+pro+'\nFree Users,'+free+'\nActive Users,'+active+'\nTotal Calculations,'+totalCalcs+'\nPDF Exports,234\nSystem Uptime,99.97%\n';
+    csv+='\nUser,Email,Tier,Status,Country,Calculations\n';
+    allUsers.forEach(u=>{csv+='"'+u.name+'","'+u.email+'",'+u.tier+','+u.status+',"'+(u.country||'')+'",'+u.usage+'\n'});
+    downloadCSV(csv,'rz_dashboard_'+fmtDate(new Date())+'.csv');
+}
+
+function exportRevenueCSV(){
+    var pro=allUsers.filter(u=>u.tier==='pro').length;
+    var mrr=pro*49;
+    var csv='Metric,Value\nMRR,$'+mrr+'\nARR,$'+(mrr*12)+'\nAvg LTV,$697\nChurn Rate,2.1%\nPro Users,'+pro+'\n';
+    csv+='\nAccount,Email,Tier,Last Payment,Amount Paid,Est LTV\n';
+    allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid).forEach(u=>{
+        csv+='"'+u.name+'","'+u.email+'",'+u.tier+','+(u.lastPayment||'')+','+u.amountPaid.toFixed(2)+','+(u.amountPaid*10).toFixed(0)+'\n';
+    });
+    downloadCSV(csv,'rz_revenue_'+fmtDate(new Date())+'.csv');
+}
+
+function exportFeaturesCSV(){
+    var csv='Feature,Label,Description,Free Tier,Pro Tier\n';
+    Object.keys(featureFlags).forEach(k=>{
+        var f=featureFlags[k];
+        csv+='"'+k+'","'+f.label+'","'+f.desc+'",'+f.free+','+f.pro+'\n';
+    });
+    downloadCSV(csv,'rz_features_'+fmtDate(new Date())+'.csv');
+}
+
+// exportBenchmarksCSV moved to benchmarks section below
+
+// ═══ UNIVERSAL REPORT GENERATOR ═══
+function openReport(section){
+    var now=new Date();
+    var dateStr=now.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+
+    var reportCSS='*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,-apple-system,sans-serif;background:#fff;color:#1e293b;padding:2rem;max-width:1000px;margin:0 auto;font-size:13px}'+
+        'h1{font-size:1.6rem;font-weight:800;color:#0f172a;margin-bottom:0.25rem}h2{font-size:1.1rem;font-weight:700;color:#1e293b;margin:1.5rem 0 0.75rem;padding-bottom:0.3rem;border-bottom:2px solid #e2e8f0}'+
+        '.subtitle{font-size:0.85rem;color:#64748b;margin-bottom:1.5rem}.meta{font-size:0.75rem;color:#94a3b8;margin-bottom:2rem}'+
+        '.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.5rem}.kpi-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;text-align:center}'+
+        '.kpi-box .label{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}.kpi-box .value{font-size:1.5rem;font-weight:800;color:#0f172a;margin:0.25rem 0}'+
+        '.kpi-box .sub{font-size:0.68rem;color:#94a3b8}'+
+        'table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.8rem}th{background:#f1f5f9;padding:8px 10px;text-align:left;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#475569;border-bottom:2px solid #e2e8f0}'+
+        'td{padding:7px 10px;border-bottom:1px solid #f1f5f9;color:#334155}tr:hover{background:#f8fafc}'+
+        '.badge{padding:2px 8px;border-radius:50px;font-size:0.65rem;font-weight:700}.badge.pro{background:#ede9fe;color:#7c3aed}.badge.free{background:#f1f5f9;color:#64748b}'+
+        '.badge.active{background:#d1fae5;color:#059669}.badge.inactive{background:#fef3c7;color:#d97706}.badge.paid{background:#d1fae5;color:#059669}.badge.unpaid{background:#fee2e2;color:#dc2626}'+
+        '.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}.stat-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:1rem}'+
+        '.stat-card h3{font-size:0.8rem;font-weight:700;margin-bottom:0.5rem;color:#475569}'+
+        '.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:0.75rem}.bar-fill{height:6px;border-radius:3px;background:#8b5cf6}.bar-label{min-width:100px;color:#64748b}.bar-val{font-weight:600;min-width:35px;text-align:right}'+
+        '.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e2e8f0;font-size:0.7rem;color:#94a3b8;text-align:center}'+
+        '@media print{body{padding:1rem}h1{font-size:1.2rem}.kpi-row{grid-template-columns:repeat(4,1fr)}}'+
+        '.print-btn{position:fixed;top:1rem;right:1rem;padding:8px 16px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;z-index:100;font-family:inherit}'+
+        '.print-btn:hover{background:#6d28d9}@media print{.print-btn{display:none}}';
+
+    var body='';
+    var title='';
+    var subtitle='';
+
+    if(section==='dashboard'){
+        title='Dashboard Overview Report';
+        subtitle='Platform metrics and user analytics';
+        var pro=allUsers.filter(u=>u.tier==='pro').length;
+        var free=allUsers.filter(u=>u.tier==='free').length;
+        var active=allUsers.filter(u=>u.status==='active').length;
+        var totalCalcs=allUsers.reduce((s,u)=>s+u.usage,0);
+        var countries={};allUsers.forEach(u=>{countries[u.country]=(countries[u.country]||0)+1});
+        body+='<div class="kpi-row">';
+        body+='<div class="kpi-box"><div class="label">Total Users</div><div class="value">'+allUsers.length+'</div><div class="sub">All accounts</div></div>';
+        body+='<div class="kpi-box"><div class="label">Pro Users</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'% of total</div></div>';
+        body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+active+'</div><div class="sub">'+Math.round(active/allUsers.length*100)+'% active rate</div></div>';
+        body+='<div class="kpi-box"><div class="label">Calculations</div><div class="value">'+totalCalcs.toLocaleString()+'</div><div class="sub">All time</div></div>';
+        body+='</div>';
+        body+='<h2>Tier Distribution</h2><div class="stats-grid"><div class="stat-card"><h3>By Tier</h3>';
+        body+='<div class="bar"><span class="bar-label">Pro</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(pro/allUsers.length*100)+'%"></div></div><span class="bar-val">'+pro+'</span></div>';
+        body+='<div class="bar"><span class="bar-label">Free</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(free/allUsers.length*100)+'%;background:#64748b"></div></div><span class="bar-val">'+free+'</span></div>';
+        body+='</div><div class="stat-card"><h3>By Status</h3>';
+        ['active','inactive','suspended'].forEach(function(s){var c=allUsers.filter(u=>u.status===s).length;
+            body+='<div class="bar"><span class="bar-label">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(c/allUsers.length*100)+'%;background:'+(s==='active'?'#34d399':s==='inactive'?'#fbbf24':'#f87171')+'"></div></div><span class="bar-val">'+c+'</span></div>';
+        });
+        body+='</div></div>';
+        body+='<h2>Geographic Distribution</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Top Countries</h3>';
+        Object.entries(countries).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(function(c){
+            body+='<div class="bar"><span class="bar-label">'+c[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(c[1]/allUsers.length*100)+'%"></div></div><span class="bar-val">'+c[1]+'</span></div>';
+        });
+        body+='</div>';
+        body+='<h2>User List</h2><table><thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Status</th><th>Country</th><th>Calcs</th></tr></thead><tbody>';
+        allUsers.slice(0,50).forEach(u=>{body+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td><span class="badge '+u.tier+'">'+u.tier.toUpperCase()+'</span></td><td><span class="badge '+u.status+'">'+u.status+'</span></td><td>'+(u.country||'—')+'</td><td>'+u.usage+'</td></tr>'});
+        body+='</tbody></table>';
+    }
+    else if(section==='revenue'){
+        title='Revenue Analytics Report';
+        subtitle='Subscription revenue, LTV, and financial metrics';
+        var pro=allUsers.filter(u=>u.tier==='pro').length;
+        var mrr=pro*49,arr=mrr*12;
+        body+='<div class="kpi-row">';
+        body+='<div class="kpi-box"><div class="label">MRR</div><div class="value">$'+mrr.toLocaleString()+'</div><div class="sub">Monthly Recurring</div></div>';
+        body+='<div class="kpi-box"><div class="label">ARR</div><div class="value">$'+arr.toLocaleString()+'</div><div class="sub">Annual Recurring</div></div>';
+        body+='<div class="kpi-box"><div class="label">Avg LTV</div><div class="value">$697</div><div class="sub">14.2 mo retention</div></div>';
+        body+='<div class="kpi-box"><div class="label">Churn</div><div class="value">2.1%</div><div class="sub">Last 30 days</div></div>';
+        body+='</div>';
+        body+='<h2>Revenue by Account</h2><table><thead><tr><th>Name</th><th>Email</th><th>Last Payment</th><th>Amount</th><th>Est. LTV</th></tr></thead><tbody>';
+        allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid).forEach(u=>{
+            body+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td>'+(u.lastPayment||'—')+'</td><td style="font-weight:600;color:#059669">$'+u.amountPaid.toFixed(2)+'</td><td>$'+(u.amountPaid*10).toFixed(0)+'</td></tr>';
+        });
+        body+='</tbody></table>';
+        body+='<h2>Revenue Growth</h2><div class="stat-card"><h3>MRR Trend (6 Months)</h3>';
+        ['Sep $98','Oct $147','Nov $196','Dec $245','Jan $343','Feb $'+mrr].forEach(function(m){
+            var val=parseInt(m.split('$')[1]);
+            body+='<div class="bar"><span class="bar-label">'+m.split(' ')[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(val/(mrr||1)*100)+'%;background:#34d399"></div></div><span class="bar-val">$'+val+'</span></div>';
+        });
+        body+='</div>';
+    }
+    else if(section==='users'){
+        title='User Management Report';
+        subtitle='Complete user account listing and analytics';
+        var pro=allUsers.filter(u=>u.tier==='pro').length;
+        var active=allUsers.filter(u=>u.status==='active').length;
+        body+='<div class="kpi-row">';
+        body+='<div class="kpi-box"><div class="label">Total</div><div class="value">'+allUsers.length+'</div><div class="sub">All accounts</div></div>';
+        body+='<div class="kpi-box"><div class="label">Pro</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'%</div></div>';
+        body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+active+'</div><div class="sub">'+Math.round(active/allUsers.length*100)+'%</div></div>';
+        body+='<div class="kpi-box"><div class="label">Avg Calcs</div><div class="value">'+Math.round(allUsers.reduce((s,u)=>s+u.usage,0)/allUsers.length)+'</div><div class="sub">Per user</div></div>';
+        body+='</div>';
+        body+='<h2>All Users ('+filteredUsers.length+')</h2><table><thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Status</th><th>Registered</th><th>Last Login</th><th>Calcs</th><th>Payment</th></tr></thead><tbody>';
+        filteredUsers.forEach(u=>{body+='<tr><td>'+u.name+'</td><td style="font-size:0.72rem">'+u.email+'</td><td><span class="badge '+u.tier+'">'+u.tier.toUpperCase()+'</span></td><td><span class="badge '+u.status+'">'+u.status+'</span></td><td>'+u.registered+'</td><td>'+u.lastLogin+'</td><td>'+u.usage+'</td><td>'+(u.lastPayment||'—')+'</td></tr>'});
+        body+='</tbody></table>';
+    }
+    else if(section==='features'){
+        title='Feature Flags Report';
+        subtitle='Current tier-level feature matrix configuration';
+        var keys=Object.keys(featureFlags);
+        var proEnabled=keys.filter(k=>featureFlags[k].pro).length;
+        var freeEnabled=keys.filter(k=>featureFlags[k].free).length;
+        body+='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
+        body+='<div class="kpi-box"><div class="label">Total Features</div><div class="value">'+keys.length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Pro Enabled</div><div class="value">'+proEnabled+'</div><div class="sub">of '+keys.length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Free Enabled</div><div class="value">'+freeEnabled+'</div><div class="sub">of '+keys.length+'</div></div>';
+        body+='</div>';
+        body+='<h2>Feature Matrix</h2><table><thead><tr><th>Feature</th><th>Description</th><th>Free</th><th>Pro</th></tr></thead><tbody>';
+        keys.forEach(k=>{var f=featureFlags[k];
+            body+='<tr><td style="font-weight:600">'+f.label+'</td><td style="color:#64748b">'+f.desc+'</td><td style="text-align:center;color:'+(f.free?'#059669':'#dc2626')+';font-weight:700">'+(f.free?'ON':'OFF')+'</td><td style="text-align:center;color:'+(f.pro?'#059669':'#dc2626')+';font-weight:700">'+(f.pro?'ON':'OFF')+'</td></tr>';
+        });
+        body+='</tbody></table>';
+    }
+    else if(section==='benchmarks'){
+        title='DC Industry Intelligence Report';
+        subtitle='Global operator capacity, country analysis, and market intelligence — '+DC_OPERATORS.length+' operators, '+DC_COUNTRIES.length+' countries';
+        var totalMW=DC_OPERATORS.reduce((s,o)=>s+o.mw,0);
+        body+='<div class="kpi-row">';
+        body+='<div class="kpi-box"><div class="label">Total Installed</div><div class="value">'+DC_SUMMARY.totalInstalledGW+' GW</div><div class="sub">Synergy Q1 2025</div></div>';
+        body+='<div class="kpi-box"><div class="label">Operators Tracked</div><div class="value">'+DC_OPERATORS.length+'</div><div class="sub">'+(totalMW/1000).toFixed(1)+' GW combined</div></div>';
+        body+='<div class="kpi-box"><div class="label">Hyperscale DCs</div><div class="value">'+DC_SUMMARY.hyperscaleDCs.toLocaleString()+'</div><div class="sub">'+Math.round(DC_SUMMARY.hyperscaleShare*100)+'% of global</div></div>';
+        body+='<div class="kpi-box"><div class="label">2030 Projection</div><div class="value">'+DC_SUMMARY.projected2030GW+' GW</div><div class="sub">$'+DC_SUMMARY.investmentRequired2030T+'T needed</div></div>';
+        body+='</div>';
+        body+='<h2>Top Operators by Capacity</h2><table><thead><tr><th>#</th><th>Operator</th><th>HQ</th><th>Type</th><th>Capacity (MW)</th><th>Facilities</th><th>Countries</th><th>CapEx 2025</th></tr></thead><tbody>';
+        DC_OPERATORS.forEach(o=>{body+='<tr><td>'+o.rank+'</td><td style="font-weight:600">'+o.company+'</td><td>'+o.hq+'</td><td>'+o.type+'</td><td>'+o.mw.toLocaleString()+'</td><td>'+o.facilities+'</td><td>'+o.countries+'</td><td>'+(o.capex>=1?'$'+o.capex+'B':'$'+Math.round(o.capex*1000)+'M')+'</td></tr>'});
+        body+='</tbody></table>';
+        body+='<h2>Capacity by Country</h2><table><thead><tr><th>#</th><th>Country</th><th>Region</th><th>Capacity (MW)</th><th>Facilities</th><th>Growth YoY</th></tr></thead><tbody>';
+        DC_COUNTRIES.forEach(c=>{body+='<tr><td>'+c.rank+'</td><td>'+c.country+'</td><td>'+c.region+'</td><td>'+c.mw.toLocaleString()+'</td><td>'+c.facilities.toLocaleString()+'</td><td>'+c.growth+'%</td></tr>'});
+        body+='</tbody></table>';
+    }
+    else if(section==='audit'){
+        title='Audit Log Report';
+        subtitle='System event timeline and activity history';
+        var byType={};activities.forEach(a=>{byType[a.type]=(byType[a.type]||0)+1});
+        body+='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
+        body+='<div class="kpi-box"><div class="label">Total Events</div><div class="value">'+activities.length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Event Types</div><div class="value">'+Object.keys(byType).length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Unique Users</div><div class="value">'+(new Set(activities.map(a=>a.email))).size+'</div></div>';
+        body+='</div>';
+        body+='<h2>Events by Type</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Distribution</h3>';
+        Object.entries(byType).sort((a,b)=>b[1]-a[1]).forEach(function(t){
+            body+='<div class="bar"><span class="bar-label">'+t[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(t[1]/activities.length*100)+'%"></div></div><span class="bar-val">'+t[1]+'</span></div>';
+        });
+        body+='</div>';
+        body+='<h2>Event Log</h2><table><thead><tr><th>Time</th><th>User</th><th>Type</th><th>Detail</th></tr></thead><tbody>';
+        activities.slice(0,100).forEach(a=>{body+='<tr><td style="white-space:nowrap;font-size:0.72rem">'+a.time+'</td><td>'+a.email+'</td><td><span class="badge">'+a.type+'</span></td><td>'+a.detail+'</td></tr>'});
+        body+='</tbody></table>';
+    }
+    else if(section==='subscribers'){
+        title='Newsletter Subscribers Report';
+        subtitle='Email subscriber listing and source analytics';
+        var subs=typeof getSubscribers==='function'?getSubscribers():[];
+        var bySource={};subs.forEach(s=>{bySource[s.source]=(bySource[s.source]||0)+1});
+        var activeSubs=subs.filter(s=>s.status==='active').length;
+        body+='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
+        body+='<div class="kpi-box"><div class="label">Total</div><div class="value">'+subs.length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+activeSubs+'</div><div class="sub">'+Math.round(activeSubs/(subs.length||1)*100)+'%</div></div>';
+        body+='<div class="kpi-box"><div class="label">Sources</div><div class="value">'+Object.keys(bySource).length+'</div></div>';
+        body+='</div>';
+        if(Object.keys(bySource).length){
+            body+='<h2>By Source</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Source Breakdown</h3>';
+            Object.entries(bySource).sort((a,b)=>b[1]-a[1]).forEach(function(s){
+                body+='<div class="bar"><span class="bar-label">'+s[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(s[1]/(subs.length||1)*100)+'%"></div></div><span class="bar-val">'+s[1]+'</span></div>';
+            });
+            body+='</div>';
+        }
+        body+='<h2>Subscriber List</h2><table><thead><tr><th>Email</th><th>Date</th><th>Source</th><th>Status</th></tr></thead><tbody>';
+        subs.forEach(s=>{body+='<tr><td>'+s.email+'</td><td>'+(s.date||'—')+'</td><td>'+(s.source||'—')+'</td><td><span class="badge '+(s.status||'active')+'">'+(s.status||'active')+'</span></td></tr>'});
+        body+='</tbody></table>';
+    }
+    else if(section==='activity'){
+        title='User Activity Report';
+        subtitle='Event tracking analytics — '+uaPeriod+' period';
+        var events=uaFilteredEvents||[];
+        var byType={};var byPage={};var byCountry={};var byDevice={};var byBrowser={};
+        events.forEach(function(e){
+            byType[e.type]=(byType[e.type]||0)+1;
+            byPage[e.page]=(byPage[e.page]||0)+1;
+            if(e.country)byCountry[e.country]=(byCountry[e.country]||0)+1;
+            if(e.device)byDevice[e.device]=(byDevice[e.device]||0)+1;
+            if(e.browser)byBrowser[e.browser]=(byBrowser[e.browser]||0)+1;
+        });
+        var ips=new Set(events.map(e=>e.ip).filter(Boolean));
+        body+='<div class="kpi-row">';
+        body+='<div class="kpi-box"><div class="label">Total Events</div><div class="value">'+events.length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Unique IPs</div><div class="value">'+ips.size+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Countries</div><div class="value">'+Object.keys(byCountry).length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Event Types</div><div class="value">'+Object.keys(byType).length+'</div></div>';
+        body+='</div>';
+        body+='<h2>Events by Type</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Category Breakdown</h3>';
+        Object.entries(byType).sort((a,b)=>b[1]-a[1]).forEach(function(t){
+            body+='<div class="bar"><span class="bar-label">'+t[0].replace(/_/g,' ')+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(t[1]/events.length*100)+'%"></div></div><span class="bar-val">'+t[1]+' ('+Math.round(t[1]/events.length*100)+'%)</span></div>';
+        });
+        body+='</div>';
+        body+='<div class="stats-grid"><div class="stat-card"><h3>Top Pages</h3>';
+        Object.entries(byPage).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(function(p){
+            body+='<div class="bar"><span class="bar-label">'+p[0].replace('.html','')+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(p[1]/(events.length||1)*100)+'%;background:#60a5fa"></div></div><span class="bar-val">'+p[1]+'</span></div>';
+        });
+        body+='</div><div class="stat-card"><h3>Top Countries</h3>';
+        Object.entries(byCountry).sort((a,b)=>b[1]-a[1]).slice(0,8).forEach(function(c){
+            body+='<div class="bar"><span class="bar-label">'+c[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(c[1]/(events.length||1)*100)+'%;background:#fbbf24"></div></div><span class="bar-val">'+c[1]+'</span></div>';
+        });
+        body+='</div></div>';
+        body+='<div class="stats-grid"><div class="stat-card"><h3>Device</h3>';
+        Object.entries(byDevice).sort((a,b)=>b[1]-a[1]).forEach(function(d){
+            body+='<div class="bar"><span class="bar-label">'+d[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(d[1]/(events.length||1)*100)+'%;background:#f472b6"></div></div><span class="bar-val">'+Math.round(d[1]/(events.length||1)*100)+'%</span></div>';
+        });
+        body+='</div><div class="stat-card"><h3>Browser</h3>';
+        Object.entries(byBrowser).sort((a,b)=>b[1]-a[1]).forEach(function(b){
+            body+='<div class="bar"><span class="bar-label">'+b[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(b[1]/(events.length||1)*100)+'%;background:#22d3ee"></div></div><span class="bar-val">'+b[1]+'</span></div>';
+        });
+        body+='</div></div>';
+        body+='<h2>Recent Events (Last 100)</h2><table><thead><tr><th>Time</th><th>Type</th><th>Page</th><th>IP</th><th>Country</th><th>City</th><th>Device</th><th>Browser</th></tr></thead><tbody>';
+        events.slice(0,100).forEach(function(e){var dt=new Date(e.ts);
+            body+='<tr><td style="white-space:nowrap;font-size:0.72rem">'+dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0')+'</td><td><span class="badge">'+e.type+'</span></td><td>'+e.page.replace('.html','')+'</td><td style="font-family:monospace;font-size:0.68rem">'+(e.ip||'—')+'</td><td>'+(e.country||'—')+'</td><td>'+(e.city||'—')+'</td><td>'+(e.device||'—')+'</td><td>'+(e.browser||'—')+'</td></tr>';
+        });
+        body+='</tbody></table>';
+    }
+    else if(section==='mayar'){
+        title='Mayar Payments Report';
+        subtitle='Payment gateway transactions and balance';
+        var bal=document.getElementById('mayarBalance').textContent;
+        var paid=document.getElementById('mayarPaidCount').textContent;
+        var unpaid=document.getElementById('mayarUnpaidCount').textContent;
+        var gross=document.getElementById('mayarGrossRevenue').textContent;
+        body+='<div class="kpi-row">';
+        body+='<div class="kpi-box"><div class="label">Balance</div><div class="value">'+bal+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Paid Tx</div><div class="value">'+paid+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Unpaid</div><div class="value">'+unpaid+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Gross Revenue</div><div class="value">'+gross+'</div></div>';
+        body+='</div>';
+        var tbl=document.getElementById('mayarRecentBody');
+        if(tbl&&tbl.rows.length>0){
+            body+='<h2>Recent Transactions</h2><table><thead><tr><th>Date</th><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>';
+            for(var i=0;i<tbl.rows.length;i++){var r=tbl.rows[i];if(r.cells.length>=5){
+                body+='<tr><td>'+r.cells[0].textContent+'</td><td>'+r.cells[1].textContent+'</td><td>'+r.cells[2].textContent+'</td><td>'+r.cells[3].textContent+'</td><td>'+r.cells[4].textContent+'</td></tr>';
+            }}
+            body+='</tbody></table>';
+        }
+    }
+
+    var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+' — ResistanceZero</title>'+
+        '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
+        '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">'+
+        '<style>'+reportCSS+'</style></head><body>'+
+        '<button class="print-btn" onclick="window.print()">Print / Save PDF</button>'+
+        '<h1>'+title+'</h1><div class="subtitle">'+subtitle+'</div>'+
+        '<div class="meta">Generated: '+dateStr+' | ResistanceZero Admin Console</div>'+
+        body+
+        '<div class="footer">ResistanceZero Admin Console — Report generated '+dateStr+'</div>'+
+        '</body></html>';
+
+    var win=window.open('','_blank');
+    win.document.write(html);
+    win.document.close();
+}
+
 function openUserModal(id){
     const u=allUsers.find(x=>x.id===id);if(!u)return;
     const ua=activities.filter(a=>a.email===u.email).slice(0,10);
@@ -1767,77 +2455,458 @@ function toggleFeature(key,tier,val){featureFlags[key][tier]=val;localStorage.se
 function toggleExperimental(key,val){if(featureFlags[key]){featureFlags[key].free=val;featureFlags[key].pro=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags));renderFeatures()}}
 
 // ═══════════════════════════════════════════════════════════════
-// BENCHMARKS
+// BENCHMARKS — Global DC Intelligence Database
 // ═══════════════════════════════════════════════════════════════
-const BENCH_OPERATORS=[
-    {name:'Equinix',pue:1.28,costKw:12500,capacity:'380 MW',markets:62,uptime:99.9999,certifications:'ISO 27001, SOC 2, PCI DSS',cooling:'Chilled Water + Indirect Evap',renewableTarget:'100% by 2030',revenue:'$8.2B (2025)',region:'Global'},
-    {name:'Digital Realty',pue:1.30,costKw:11800,capacity:'520 MW',markets:53,uptime:99.999,certifications:'ISO 27001, SOC 2',cooling:'Chilled Water + Free Cooling',renewableTarget:'100% by 2030',revenue:'$5.5B (2025)',region:'Global'},
-    {name:'Google Cloud',pue:1.10,costKw:14200,capacity:'2800 MW',markets:40,uptime:99.999,certifications:'ISO 27001, SOC 2/3, FedRAMP',cooling:'DLC + Seawater + AI-Optimized',renewableTarget:'24/7 CFE by 2030',revenue:'$44B (Cloud, 2025)',region:'Global'},
-    {name:'Microsoft Azure',pue:1.12,costKw:13800,capacity:'3200 MW',markets:65,uptime:99.999,certifications:'ISO 27001, SOC 2, HIPAA, FedRAMP',cooling:'Liquid Immersion + Evap',renewableTarget:'100/75/0 by 2030',revenue:'$97B (Cloud, 2025)',region:'Global'},
-    {name:'AWS',pue:1.15,costKw:13500,capacity:'4500+ MW',markets:34,uptime:99.999,certifications:'ISO 27001, SOC 2/3, FedRAMP, HIPAA',cooling:'Custom Evap + DLC',renewableTarget:'100% by 2025 (achieved)',revenue:'$107B (2025)',region:'Global'},
-    {name:'NTT Global',pue:1.25,costKw:11200,capacity:'210 MW',markets:29,uptime:99.999,certifications:'ISO 27001, SOC 2',cooling:'Chilled Water + Free Cooling',renewableTarget:'80% by 2030',revenue:'$3.8B (2025)',region:'APAC/Global'},
-    {name:'CyrusOne',pue:1.31,costKw:10500,capacity:'140 MW',markets:12,uptime:99.999,certifications:'SOC 2, ISO 27001',cooling:'Chilled Water',renewableTarget:'Committed',revenue:'$1.4B (2025)',region:'Americas/EU'},
-    {name:'Keppel DC',pue:1.35,costKw:13000,capacity:'85 MW',markets:8,uptime:99.99,certifications:'ISO 27001, SS 564',cooling:'Chilled Water + Tropical Optimized',renewableTarget:'In progress',revenue:'$380M (2025)',region:'APAC'},
-    {name:'STACK Infra',pue:1.27,costKw:11500,capacity:'110 MW',markets:6,uptime:99.999,certifications:'SOC 2, ISO 27001',cooling:'Indirect Evap + Chilled Water',renewableTarget:'80% by 2030',revenue:'$650M (2025)',region:'Americas/APAC'},
-    {name:'EdgeConneX',pue:1.29,costKw:10800,capacity:'75 MW',markets:50,uptime:99.999,certifications:'SOC 2',cooling:'Mixed / Edge-Optimized',renewableTarget:'Committed',revenue:'$480M (2025)',region:'Global Edge'}
+
+// Region classifier helper
+function getHQRegion(hq){
+    const americas=['United States','Brazil','Canada','Chile','Mexico'];
+    const apac=['China','Japan','Singapore','Australia','India','South Korea','Hong Kong','Malaysia','Indonesia','Thailand','Taiwan'];
+    if(americas.includes(hq)) return 'Americas';
+    if(apac.includes(hq)) return 'APAC';
+    return 'EMEA';
+}
+function getCountryRegion(c){
+    const americas=['United States','Canada','Brazil','Chile','Mexico'];
+    const apac=['China','Japan','Singapore','Australia','India','South Korea','Hong Kong','Malaysia','Indonesia','Thailand','Taiwan'];
+    if(americas.includes(c)) return 'Americas';
+    if(apac.includes(c)) return 'APAC';
+    return 'EMEA';
+}
+
+const DC_OPERATORS=[
+  {rank:1,company:'Amazon Web Services (AWS)',hq:'United States',type:'Hyperscale',mw:7500,facilities:130,countries:27,keyMarkets:['N. Virginia','Oregon','Ohio','Ireland','Frankfurt','Singapore'],capex:105,source:'Synergy Q3 2025'},
+  {rank:2,company:'Microsoft Azure',hq:'United States',type:'Hyperscale',mw:7000,facilities:400,countries:60,keyMarkets:['N. Virginia','Chicago','Dublin','Amsterdam','Singapore','Phoenix'],capex:95,source:'Microsoft FY2025'},
+  {rank:3,company:'Google Cloud',hq:'United States',type:'Hyperscale',mw:5500,facilities:100,countries:25,keyMarkets:['Oregon','Iowa','Finland','Singapore','Taiwan','Netherlands'],capex:75,source:'Synergy Q3 2025'},
+  {rank:4,company:'Meta Platforms',hq:'United States',type:'Hyperscale',mw:4500,facilities:30,countries:6,keyMarkets:['Oregon','Iowa','Texas','Sweden','Ireland','Louisiana'],capex:72,source:'Meta Q3 2025'},
+  {rank:5,company:'Equinix',hq:'United States',type:'Colocation',mw:3000,facilities:260,countries:33,keyMarkets:['N. Virginia','Silicon Valley','Amsterdam','Frankfurt','Singapore','Tokyo'],capex:4.2,source:'Equinix Q4 2025'},
+  {rank:6,company:'Alibaba Cloud',hq:'China',type:'Hyperscale',mw:2800,facilities:85,countries:15,keyMarkets:['Hangzhou','Shanghai','Singapore','KL','Jakarta','Tokyo'],capex:23,source:'Alibaba FY2025'},
+  {rank:7,company:'Digital Realty',hq:'United States',type:'Colocation / Wholesale',mw:2760,facilities:300,countries:25,keyMarkets:['N. Virginia','Dallas','Chicago','Amsterdam','Frankfurt','Singapore'],capex:3.8,source:'Digital Realty Q3 2025'},
+  {rank:8,company:'Vantage Data Centers',hq:'United States',type:'Hyperscale / Wholesale',mw:2600,facilities:35,countries:6,keyMarkets:['N. Virginia','Phoenix','Santa Clara','Zurich','Johannesburg','Melbourne'],capex:5.0,source:'Data Centre Magazine'},
+  {rank:9,company:'Oracle',hq:'United States',type:'Hyperscale',mw:2200,facilities:147,countries:40,keyMarkets:['Abilene TX','Ashburn VA','Phoenix','London','Amsterdam','Tokyo'],capex:25,source:'Oracle Q2 FY2026'},
+  {rank:10,company:'NTT Global Data Centers',hq:'Japan',type:'Colocation / Wholesale',mw:2100,facilities:150,countries:20,keyMarkets:['Tokyo','Osaka','London','Frankfurt','Virginia','Mumbai','Singapore'],capex:3.5,source:'NTT GDC'},
+  {rank:11,company:'AirTrunk',hq:'Australia',type:'Hyperscale',mw:1800,facilities:11,countries:4,keyMarkets:['Sydney','Melbourne','Singapore','Tokyo','Hong Kong'],capex:3.0,source:'DCD, Blackstone'},
+  {rank:12,company:'Tencent Cloud',hq:'China',type:'Hyperscale',mw:1800,facilities:70,countries:12,keyMarkets:['Shenzhen','Shanghai','Beijing','Singapore','Tokyo','Frankfurt'],capex:15,source:'Tencent'},
+  {rank:13,company:'ByteDance / Volcano Engine',hq:'China',type:'Hyperscale',mw:1200,facilities:40,countries:8,keyMarkets:['Beijing','Shanghai','Singapore','Virginia','Jakarta'],capex:14,source:'SCMP, DCD'},
+  {rank:14,company:'Lumen Technologies',hq:'United States',type:'Colocation / Enterprise',mw:1200,facilities:55,countries:8,keyMarkets:['Denver','Minneapolis','Phoenix','London','Amsterdam'],capex:1.5,source:'Lumen IR'},
+  {rank:15,company:'Apple',hq:'United States',type:'Hyperscale',mw:1000,facilities:12,countries:5,keyMarkets:['Mesa AZ','Maiden NC','Reno NV','Waukee IA','Viborg DK'],capex:8,source:'Apple sustainability'},
+  {rank:16,company:'CyrusOne',hq:'United States',type:'Colocation / Wholesale',mw:1000,facilities:55,countries:3,keyMarkets:['Dallas','Houston','N. Virginia','Phoenix','London','Frankfurt'],capex:2.0,source:'CyrusOne'},
+  {rank:17,company:'QTS Realty Trust (Blackstone)',hq:'United States',type:'Hyperscale / Wholesale',mw:950,facilities:63,countries:2,keyMarkets:['Atlanta','Dallas','Chicago','N. Virginia','Phoenix'],capex:2.5,source:'QTS'},
+  {rank:18,company:'VNET Group (21Vianet)',hq:'China',type:'Colocation / Wholesale',mw:783,facilities:52,countries:1,keyMarkets:['Beijing','Shanghai','Shenzhen','Hebei','Inner Mongolia'],capex:1.0,source:'VNET Q3 2025'},
+  {rank:19,company:'GDS Holdings',hq:'China',type:'Colocation / Hyperscale',mw:750,facilities:102,countries:5,keyMarkets:['Shanghai','Beijing','Shenzhen','Johor','Batam'],capex:2.0,source:'GDS Q2 2025'},
+  {rank:20,company:'Keppel Data Centres',hq:'Singapore',type:'Colocation / Wholesale',mw:650,facilities:35,countries:8,keyMarkets:['Singapore','Dublin','London','Amsterdam','Johor','Sydney'],capex:1.5,source:'Keppel DC'},
+  {rank:21,company:'Switch (DigitalBridge)',hq:'United States',type:'Hyperscale / Wholesale',mw:650,facilities:8,countries:2,keyMarkets:['Las Vegas','Reno','Grand Rapids','Atlanta','Milan'],capex:1.8,source:'Switch'},
+  {rank:22,company:'Chindata / WinTriX DC',hq:'China',type:'Hyperscale',mw:650,facilities:30,countries:5,keyMarkets:['Beijing','Datong','Hebei','Johor','Cyberjaya','Mumbai'],capex:1.2,source:'DCD, Bain Capital'},
+  {rank:23,company:'STT GDC (ST Telemedia)',hq:'Singapore',type:'Colocation / Wholesale',mw:500,facilities:40,countries:10,keyMarkets:['Singapore','London','Bangkok','Mumbai','Guangzhou','Seoul'],capex:1.0,source:'STT GDC'},
+  {rank:24,company:'Yondr Group',hq:'Netherlands',type:'Hyperscale / Wholesale',mw:450,facilities:10,countries:6,keyMarkets:['N. Virginia','Dallas','London','Frankfurt','Paris','Johannesburg'],capex:2.5,source:'Yondr Group'},
+  {rank:25,company:'Iron Mountain Data Centers',hq:'United States',type:'Colocation',mw:400,facilities:30,countries:10,keyMarkets:['N. Virginia','New Jersey','Phoenix','Denver','Amsterdam','London'],capex:1.2,source:'Iron Mountain'},
+  {rank:26,company:'STACK Infrastructure',hq:'United States',type:'Hyperscale / Wholesale',mw:380,facilities:25,countries:5,keyMarkets:['N. Virginia','Dallas','Chicago','Silicon Valley','Milan','Johor'],capex:1.5,source:'STACK'},
+  {rank:27,company:'Compass Datacenters',hq:'United States',type:'Hyperscale / Wholesale',mw:360,facilities:15,countries:3,keyMarkets:['Dallas-FW','N. Virginia','Phoenix','Mississippi','Montreal'],capex:2.0,source:'Compass'},
+  {rank:28,company:'Digital Edge',hq:'Singapore',type:'Colocation / Wholesale',mw:340,facilities:18,countries:7,keyMarkets:['Tokyo','Seoul','Jakarta','Mumbai','Manila','Singapore','KL'],capex:1.0,source:'Digital Edge, Stonepeak'},
+  {rank:29,company:'Princeton Digital Group',hq:'Singapore',type:'Hyperscale / Colocation',mw:300,facilities:20,countries:5,keyMarkets:['Jakarta','Mumbai','Tokyo','Shanghai','Singapore'],capex:0.8,source:'Princeton Digital'},
+  {rank:30,company:'CoreSite (American Tower)',hq:'United States',type:'Colocation',mw:253,facilities:28,countries:1,keyMarkets:['N. Virginia','Silicon Valley','LA','Denver','Chicago','NYC'],capex:0.8,source:'CoreSite Q3 2025'},
+  {rank:31,company:'PureDC',hq:'Netherlands',type:'Colocation / Wholesale',mw:240,facilities:8,countries:5,keyMarkets:['Amsterdam','London','UAE','Indonesia','Spain'],capex:0.6,source:'PureDC, DCD'},
+  {rank:32,company:'Flexential',hq:'United States',type:'Colocation / Hybrid',mw:220,facilities:40,countries:1,keyMarkets:['Portland','Denver','Dallas','Charlotte','Tampa','Nashville'],capex:0.5,source:'Flexential'},
+  {rank:33,company:'Aligned Data Centers',hq:'United States',type:'Hyperscale / Wholesale',mw:200,facilities:12,countries:1,keyMarkets:['N. Virginia','Dallas','Phoenix','Chicago','Salt Lake City'],capex:1.0,source:'Aligned'},
+  {rank:34,company:'Scala Data Centers',hq:'Brazil',type:'Hyperscale / Colocation',mw:180,facilities:15,countries:3,keyMarkets:['Sao Paulo','Rio de Janeiro','Santiago','Bogota'],capex:0.8,source:'Scala DC'},
+  {rank:35,company:'EdgeConneX',hq:'United States',type:'Edge / Colocation',mw:170,facilities:80,countries:20,keyMarkets:['N. Virginia','Portland','Amsterdam','Jakarta','Santiago'],capex:0.7,source:'EdgeConneX'},
+  {rank:36,company:'DataBank',hq:'United States',type:'Colocation / Edge',mw:150,facilities:65,countries:1,keyMarkets:['Dallas','Minneapolis','Salt Lake City','Atlanta','Denver'],capex:0.4,source:'DataBank'},
+  {rank:37,company:'Sabey Data Centers',hq:'United States',type:'Colocation / Wholesale',mw:130,facilities:5,countries:1,keyMarkets:['Seattle','New York','Ashburn'],capex:0.3,source:'Sabey'},
+  {rank:38,company:'Yotta Infrastructure',hq:'India',type:'Hyperscale / Colocation',mw:300,facilities:5,countries:1,keyMarkets:['Navi Mumbai','Greater Noida','GIFT City'],capex:0.5,source:'Yotta, RankRed'},
+  {rank:39,company:'Colt DCS',hq:'United Kingdom',type:'Colocation',mw:260,facilities:17,countries:8,keyMarkets:['London','Frankfurt','Tokyo','Osaka','Mumbai','Singapore'],capex:0.8,source:'Colt DCS'},
+  {rank:40,company:'Cyxtera Technologies',hq:'United States',type:'Colocation',mw:220,facilities:60,countries:5,keyMarkets:['N. Virginia','Dallas','Chicago','London','Singapore','Sao Paulo'],capex:0.4,source:'Cyxtera'},
+  {rank:41,company:'T5 Data Centers',hq:'United States',type:'Wholesale',mw:200,facilities:8,countries:1,keyMarkets:['Dallas','Atlanta','Portland','Chicago','Colorado Springs'],capex:0.5,source:'T5'},
+  {rank:42,company:'TelecityGroup (Equinix acquired)',hq:'United Kingdom',type:'Colocation',mw:190,facilities:40,countries:10,keyMarkets:['London','Amsterdam','Paris','Stockholm','Dublin'],capex:0,source:'Legacy Equinix'},
+  {rank:43,company:'SpaceDC',hq:'Singapore',type:'Hyperscale',mw:180,facilities:6,countries:4,keyMarkets:['Jakarta','Singapore','Tokyo','Sydney'],capex:0.6,source:'SpaceDC'},
+  {rank:44,company:'CtrlS Datacenters',hq:'India',type:'Colocation / Hyperscale',mw:160,facilities:7,countries:1,keyMarkets:['Hyderabad','Mumbai','Chennai','Noida'],capex:0.3,source:'CtrlS'},
+  {rank:45,company:'Global Switch',hq:'United Kingdom',type:'Colocation / Wholesale',mw:400,facilities:13,countries:5,keyMarkets:['London','Sydney','Hong Kong','Singapore','Frankfurt','Amsterdam'],capex:1.2,source:'Global Switch'},
+  {rank:46,company:'Raxio Group',hq:'United Kingdom',type:'Colocation',mw:50,facilities:8,countries:8,keyMarkets:['Kampala','Kinshasa','Addis Ababa','Dar es Salaam','Maputo'],capex:0.2,source:'Raxio'},
+  {rank:47,company:'AIMS Data Centre',hq:'Malaysia',type:'Colocation',mw:60,facilities:5,countries:3,keyMarkets:['Kuala Lumpur','Cyberjaya','Bangkok','Ho Chi Minh'],capex:0.1,source:'AIMS'},
+  {rank:48,company:'CDC Data Centres',hq:'Australia',type:'Colocation / Government',mw:150,facilities:5,countries:1,keyMarkets:['Canberra','Sydney','Melbourne'],capex:0.5,source:'CDC'},
+  {rank:49,company:'NEXTDC',hq:'Australia',type:'Colocation',mw:420,facilities:14,countries:2,keyMarkets:['Sydney','Melbourne','Perth','Brisbane','Auckland'],capex:1.5,source:'NEXTDC'},
+  {rank:50,company:'Telehouse (KDDI)',hq:'Japan',type:'Colocation',mw:200,facilities:20,countries:8,keyMarkets:['Tokyo','London','Paris','Frankfurt','New York','Hong Kong'],capex:0.5,source:'Telehouse'}
 ];
 
-const BENCH_REGIONS=[
-    {region:'North America (Avg)',costKw:12200,energy:0.068,landCost:'High',constructTime:'18-24 mo'},
-    {region:'Northern Virginia (US)',costKw:10500,energy:0.055,landCost:'Very High',constructTime:'14-18 mo'},
-    {region:'Silicon Valley (US)',costKw:14800,energy:0.095,landCost:'Very High',constructTime:'18-24 mo'},
-    {region:'Western Europe (Avg)',costKw:13500,energy:0.120,landCost:'High',constructTime:'20-28 mo'},
-    {region:'London (UK)',costKw:14200,energy:0.145,landCost:'Very High',constructTime:'22-30 mo'},
-    {region:'Frankfurt (DE)',costKw:13800,energy:0.130,landCost:'High',constructTime:'24-30 mo'},
-    {region:'Amsterdam (NL)',costKw:12800,energy:0.088,landCost:'High',constructTime:'18-24 mo'},
-    {region:'Singapore',costKw:14500,energy:0.095,landCost:'Very High',constructTime:'24-30 mo'},
-    {region:'Tokyo (JP)',costKw:15200,energy:0.110,landCost:'Very High',constructTime:'24-36 mo'},
-    {region:'Sydney (AU)',costKw:13200,energy:0.085,landCost:'Medium',constructTime:'18-24 mo'},
-    {region:'India (Avg)',costKw:7800,energy:0.058,landCost:'Low',constructTime:'18-24 mo'},
-    {region:'Jakarta (ID)',costKw:8500,energy:0.068,landCost:'Medium',constructTime:'20-28 mo'},
-    {region:'Middle East (Avg)',costKw:11500,energy:0.045,landCost:'Low-Med',constructTime:'16-22 mo'},
-    {region:'Nordics (Avg)',costKw:11200,energy:0.035,landCost:'Low',constructTime:'14-20 mo'}
+const DC_COUNTRIES=[
+  {rank:1,country:'United States',region:'Americas',mw:28500,facilities:5427,keyCities:['N. Virginia 5,600MW','Dallas-FW 1,500MW','Phoenix 2,800MW','Chicago 692MW','Silicon Valley'],growth:17.0,source:'CBRE H1 2025'},
+  {rank:2,country:'China',region:'APAC',mw:7050,facilities:449,keyCities:['Beijing 28.7%','Shanghai','Shenzhen','Hangzhou','Inner Mongolia'],growth:12.0,source:'Mordor Intelligence'},
+  {rank:3,country:'United Kingdom',region:'EMEA',mw:2590,facilities:523,keyCities:['London 1,189MW','Slough','Manchester'],growth:14.0,source:'C&W EMEA H1 2025'},
+  {rank:4,country:'Germany',region:'EMEA',mw:1800,facilities:529,keyCities:['Frankfurt 900+MW','Berlin','Munich'],growth:13.7,source:'C&W EMEA H1 2025'},
+  {rank:5,country:'Japan',region:'APAC',mw:1700,facilities:222,keyCities:['Tokyo 1,300+MW','Osaka','Inzai'],growth:10.0,source:'CBRE Global 2025'},
+  {rank:6,country:'Ireland',region:'EMEA',mw:1500,facilities:55,keyCities:['Dublin 1,200+MW'],growth:11.0,source:'C&W EMEA'},
+  {rank:7,country:'Netherlands',region:'EMEA',mw:1200,facilities:298,keyCities:['Amsterdam 800+MW','Eemshaven'],growth:8.0,source:'C&W EMEA'},
+  {rank:8,country:'Australia',region:'APAC',mw:1200,facilities:314,keyCities:['Sydney 700+MW','Melbourne 500+MW'],growth:15.0,source:'CBRE, C&W APAC'},
+  {rank:9,country:'Singapore',region:'APAC',mw:1100,facilities:99,keyCities:['Singapore (city-state)'],growth:4.4,source:'CBRE Global 2025'},
+  {rank:10,country:'France',region:'EMEA',mw:1000,facilities:322,keyCities:['Paris 700+MW','Marseille'],growth:11.2,source:'C&W EMEA'},
+  {rank:11,country:'India',region:'APAC',mw:950,facilities:153,keyCities:['Mumbai 335MW u/c','Chennai','Hyderabad','Pune'],growth:20.5,source:'CBRE, C&W APAC'},
+  {rank:12,country:'Canada',region:'Americas',mw:850,facilities:337,keyCities:['Toronto','Montreal','Vancouver'],growth:12.0,source:'CBRE NA H1 2025'},
+  {rank:13,country:'Brazil',region:'Americas',mw:550,facilities:197,keyCities:['Sao Paulo 493MW','Rio de Janeiro'],growth:15.0,source:'C&W Americas'},
+  {rank:14,country:'South Korea',region:'APAC',mw:500,facilities:43,keyCities:['Seoul','Busan','Incheon'],growth:10.0,source:'CBRE APAC'},
+  {rank:15,country:'Hong Kong',region:'APAC',mw:480,facilities:122,keyCities:['Tseung Kwan O','Chai Wan'],growth:6.0,source:'C&W APAC'},
+  {rank:16,country:'Italy',region:'EMEA',mw:400,facilities:168,keyCities:['Milan','Rome'],growth:12.0,source:'C&W EMEA'},
+  {rank:17,country:'Malaysia',region:'APAC',mw:380,facilities:41,keyCities:['Johor 700-900MW planned','KL','Cyberjaya'],growth:25.0,source:'GlobeNewsWire'},
+  {rank:18,country:'Indonesia',region:'APAC',mw:350,facilities:88,keyCities:['Jakarta','Batam','Bekasi'],growth:18.0,source:'C&W APAC'},
+  {rank:19,country:'Russia',region:'EMEA',mw:350,facilities:251,keyCities:['Moscow','St. Petersburg'],growth:5.0,source:'Cargoson'},
+  {rank:20,country:'Switzerland',region:'EMEA',mw:280,facilities:121,keyCities:['Zurich','Geneva'],growth:7.0,source:'C&W EMEA'},
+  {rank:21,country:'Sweden',region:'EMEA',mw:250,facilities:95,keyCities:['Stockholm','Lulea'],growth:10.0,source:'C&W EMEA'},
+  {rank:22,country:'Spain',region:'EMEA',mw:220,facilities:144,keyCities:['Madrid','Barcelona'],growth:15.0,source:'C&W EMEA'},
+  {rank:23,country:'Poland',region:'EMEA',mw:200,facilities:144,keyCities:['Warsaw','Krakow'],growth:14.0,source:'C&W EMEA'},
+  {rank:24,country:'Chile',region:'Americas',mw:180,facilities:59,keyCities:['Santiago 148MW'],growth:12.0,source:'C&W Americas'},
+  {rank:25,country:'Mexico',region:'Americas',mw:170,facilities:173,keyCities:['Queretaro','Mexico City'],growth:14.0,source:'C&W Americas'},
+  {rank:26,country:'Thailand',region:'APAC',mw:130,facilities:42,keyCities:['Bangkok','Chonburi'],growth:15.0,source:'C&W APAC'},
+  {rank:27,country:'South Africa',region:'EMEA',mw:120,facilities:25,keyCities:['Johannesburg','Cape Town'],growth:16.0,source:'C&W EMEA/MEA'},
+  {rank:28,country:'UAE',region:'EMEA',mw:110,facilities:20,keyCities:['Dubai','Abu Dhabi'],growth:18.0,source:'JLL 2026'}
 ];
+
+const DC_FACILITIES=[
+  {rank:1,name:'Meta Altoona Campus',company:'Meta',city:'Altoona',country:'United States',mw:1401,type:'Hyperscale',year:2014,notes:'Multiple buildings; Iowa'},
+  {rank:2,name:'Vantage Shackelford County',company:'Vantage',city:'Shackelford',country:'United States',mw:1400,type:'Hyperscale',year:2026,notes:'$25B+ investment; Texas'},
+  {rank:3,name:'Meta Prineville Campus',company:'Meta',city:'Prineville',country:'United States',mw:1289,type:'Hyperscale',year:2011,notes:'3.2M sqft; Oregon'},
+  {rank:4,name:'Stargate Campus Phase 1',company:'Oracle/OpenAI',city:'Abilene',country:'United States',mw:1200,type:'Hyperscale/AI',year:2025,notes:'450K+ NVIDIA GB200 GPUs; Texas'},
+  {rank:5,name:'Meta Hyperion Campus',company:'Meta',city:'Richland Parish',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$27B; scaling to 5GW; Louisiana'},
+  {rank:6,name:'Meta Prometheus Campus',company:'Meta',city:'Columbus',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'1GW target; Ohio'},
+  {rank:7,name:'Vantage Port Washington',company:'Vantage/OpenAI',city:'Port Washington',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$15B; Stargate II; Wisconsin'},
+  {rank:8,name:'Switch Citadel Campus',company:'Switch',city:'Reno',country:'United States',mw:650,type:'Hyperscale',year:2017,notes:'Largest operational DC; 7.2M sqft; Nevada'},
+  {rank:9,name:'Microsoft Quincy Campus',company:'Microsoft',city:'Quincy',country:'United States',mw:622,type:'Hyperscale',year:2007,notes:'270 acres; hydropower; Washington'},
+  {rank:10,name:'CWL1 Data Centre',company:'Vantage',city:'Newport',country:'United Kingdom',mw:400,type:'Hyperscale',year:2024,notes:'1.85M sqft; Wales'},
+  {rank:11,name:'Compass Red Oak',company:'Compass',city:'Red Oak (DFW)',country:'United States',mw:360,type:'Hyperscale',year:2023,notes:'Multi-phase; Texas'},
+  {rank:12,name:'Yondr N. Virginia',company:'Yondr',city:'N. Virginia',country:'United States',mw:336,type:'Hyperscale',year:2024,notes:'96MW Phase 1; 336MW full'},
+  {rank:13,name:'AirTrunk MEL1',company:'AirTrunk',city:'Melbourne',country:'Australia',mw:280,type:'Hyperscale',year:2020,notes:'630MW total Melbourne portfolio'},
+  {rank:14,name:'Switch SuperNAP',company:'Switch',city:'Las Vegas',country:'United States',mw:280,type:'Hyperscale/Colo',year:2010,notes:'3.5M sqft; Tier IV Gold; Nevada'},
+  {rank:15,name:'QTS Atlanta Metro',company:'QTS',city:'Atlanta',country:'United States',mw:278,type:'Hyperscale',year:2011,notes:'990K sqft; flagship; Georgia'},
+  {rank:16,name:'QTS Excalibur Project',company:'QTS',city:'Fayetteville',country:'United States',mw:250,type:'Hyperscale',year:2023,notes:'615 acres; 7M sqft; Georgia'},
+  {rank:17,name:'Yotta NM1',company:'Yotta',city:'Navi Mumbai',country:'India',mw:250,type:'Hyperscale/Colo',year:2019,notes:'30,000 racks; 820K sqft'},
+  {rank:18,name:'AirTrunk SYD1',company:'AirTrunk',city:'Sydney',country:'Australia',mw:220,type:'Hyperscale',year:2018,notes:'First AirTrunk; APAC hub'},
+  {rank:19,name:'Microsoft Dublin Campus',company:'Microsoft',city:'Dublin',country:'Ireland',mw:200,type:'Hyperscale',year:2009,notes:'Azure Europe West anchor'},
+  {rank:20,name:'China Telecom Inner Mongolia',company:'China Telecom',city:'Hohhot',country:'China',mw:150,type:'Hyperscale/Cloud',year:2013,notes:'10.76M sqft; largest by area'},
+  {rank:21,name:'Apple Mesa Data Center',company:'Apple',city:'Mesa',country:'United States',mw:150,type:'Hyperscale',year:2018,notes:'1.3M sqft; 50MW solar; Arizona'},
+  {rank:22,name:'China Mobile Hohhot',company:'China Mobile',city:'Hohhot',country:'China',mw:140,type:'Hyperscale/Cloud',year:2014,notes:'7.75M sqft'},
+  {rank:23,name:'NTT Tokyo 1',company:'NTT',city:'Tokyo',country:'Japan',mw:120,type:'Colocation',year:2019,notes:'Flagship APAC facility'},
+  {rank:24,name:'Google Hamina',company:'Google',city:'Hamina',country:'Finland',mw:120,type:'Hyperscale',year:2011,notes:'Former paper mill; seawater cooling'},
+  {rank:25,name:'Meta Lulea',company:'Meta',city:'Lulea',country:'Sweden',mw:120,type:'Hyperscale',year:2013,notes:'Arctic climate; 100% hydro'},
+  {rank:26,name:'Equinix SV5/SV11',company:'Equinix',city:'San Jose',country:'United States',mw:110,type:'Colocation',year:2012,notes:'Silicon Valley flagship'},
+  {rank:27,name:'Lakeside Tech Center',company:'Digital Realty',city:'Chicago',country:'United States',mw:100,type:'Colocation',year:1999,notes:'1.1M sqft; 8-story; iconic'},
+  {rank:28,name:'Tulip Data Center',company:'Tulip Telecom',city:'Bengaluru',country:'India',mw:100,type:'Colocation',year:2015,notes:'950K sqft; one of Asia largest'},
+  {rank:29,name:'Sabey Intergate Seattle',company:'Sabey',city:'Seattle',country:'United States',mw:70,type:'Colocation',year:2011,notes:'900K sqft; green design'},
+  {rank:30,name:'Utah Data Center (IC)',company:'US Gov',city:'Bluffdale',country:'United States',mw:65,type:'Government',year:2014,notes:'1.5M sqft campus; Utah'},
+  {rank:31,name:'CoreSite VA3',company:'CoreSite',city:'Reston',country:'United States',mw:60,type:'Colocation',year:2017,notes:'940K sqft; N. Virginia hub'},
+  {rank:32,name:'Equinix AM5/AM17',company:'Equinix',city:'Amsterdam',country:'Netherlands',mw:55,type:'Colocation',year:2017,notes:'AMS-IX peering point'},
+  {rank:33,name:'Keppel Singapore T27',company:'Keppel',city:'Singapore',country:'Singapore',mw:52,type:'Colocation',year:2021,notes:'Tropical cooling innovation'},
+  {rank:34,name:'Equinix FR5/FR9',company:'Equinix',city:'Frankfurt',country:'Germany',mw:48,type:'Colocation',year:2015,notes:'DE-CIX adjacent; finserv hub'},
+  {rank:35,name:'Iron Mountain NJE-1',company:'Iron Mountain',city:'Edison',country:'United States',mw:26,type:'Colocation',year:2016,notes:'830K sqft; former vault; NJ'}
+];
+
+const DC_SUMMARY={
+  totalInstalledGW:122.2,liveITMW:52000,projected2026MW:66504,projected2030GW:200,
+  hyperscaleDCs:1297,hyperscaleShare:0.44,top3share:0.58,hyperscaleCapexQ3:142,
+  pipelineFacilities:770,investmentRequired2030T:3.0,
+  americas:{share:0.50,supplyCAGR:0.17,constructionGW:7.8},
+  apac:{capacityGW:32,projected2030GW:57,growthCAGR:0.12,indiaCAGR:0.205},
+  emea:{operationalGW:10.3,yoyGrowth:0.21,pipelineGW:14.1},
+  constraints:['Power availability — primary bottleneck in most major markets','Grid connection delays (2-5 years in parts of Europe)','Singapore: <4 MW available, <2% vacancy (most constrained)','Northern Virginia: 80% increase in u/c but still 3% vacancy','Skilled labor shortage for construction and operations','Water usage concerns in arid regions (Phoenix, Middle East)','Permitting and regulatory complexity increasing globally'],
+  sources:['Synergy Research Group — Hyperscale Market Tracker Q3 2025','CBRE — Global Data Center Trends 2025','CBRE — North America Data Center Trends H1 2025','JLL — 2026 Global Data Center Outlook','Cushman & Wakefield — 2025 Global DC Market Comparison','Cushman & Wakefield — EMEA H1 2025, APAC H2 2025','Company earnings: Equinix Q4 2025, Digital Realty Q3 2025, NTT, GDS, VNET','Datacenter Dynamics, DatacenterKnowledge, Data Center Frontier','Blackridge Research, Cargoson Nov 2025, RankRed, Brightlio','Mordor Intelligence, Arizton, MarketsAndMarkets']
+};
+
+// Bench state
+let benchOpPage=1,benchOpPerPage=15,benchOpSort={col:'mw',dir:'desc'},benchCharts={};
+function destroyChart(key){if(benchCharts[key]){benchCharts[key].destroy();delete benchCharts[key]}}
+
+function showBenchTab(tab){
+    document.querySelectorAll('.bench-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.bench-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelector(`.bench-tab[onclick="showBenchTab('${tab}')"]`).classList.add('active');
+    document.getElementById('bp-'+tab).classList.add('active');
+    if(tab==='operators') filterBenchOps();
+    if(tab==='countries') filterBenchCountries();
+    if(tab==='facilities') filterBenchFacilities();
+}
 
 function renderBenchmarks(){
-    // KPI cards
-    const avgPUE=(BENCH_OPERATORS.reduce((s,o)=>s+o.pue,0)/BENCH_OPERATORS.length).toFixed(2);
-    const avgCost=Math.round(BENCH_OPERATORS.reduce((s,o)=>s+o.costKw,0)/BENCH_OPERATORS.length);
-    const totalCap=BENCH_OPERATORS.reduce((s,o)=>s+parseInt(o.capacity),0);
+    renderBenchKpis();
+    renderBenchOverview();
+    renderBenchMarket();
+    // Populate facility country filter
+    const facCountries=[...new Set(DC_FACILITIES.map(f=>f.country))].sort();
+    const sel=document.getElementById('benchFacCountry');
+    if(sel) facCountries.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+}
+
+function renderBenchKpis(){
+    const totalOpMW=DC_OPERATORS.reduce((s,o)=>s+o.mw,0);
+    const totalCountryMW=DC_COUNTRIES.reduce((s,c)=>s+c.mw,0);
+    const avgGrowth=(DC_COUNTRIES.reduce((s,c)=>s+c.growth,0)/DC_COUNTRIES.length).toFixed(1);
+    const totalFacMW=DC_FACILITIES.reduce((s,f)=>s+f.mw,0);
+    const topGrowth=DC_COUNTRIES.reduce((a,b)=>a.growth>b.growth?a:b);
     document.getElementById('benchKpis').innerHTML=[
-        {label:'Industry Avg PUE',val:avgPUE,sub:'Uptime Institute 2025',cls:'green',icon:'fa-leaf'},
-        {label:'Avg $/kW Build Cost',val:'$'+avgCost.toLocaleString(),sub:'Turner & Townsend 2025',cls:'purple',icon:'fa-hammer'},
-        {label:'Hyperscaler Best PUE',val:'1.10',sub:'Google — ML-optimized cooling',cls:'blue',icon:'fa-trophy'},
-        {label:'Total Tracked Capacity',val:(totalCap/1000).toFixed(1)+' GW',sub:'Top 10 operators sampled',cls:'amber',icon:'fa-bolt'},
-        {label:'Lowest $/kW (India)',val:'$7,800',sub:'Labor + materials advantage',cls:'green',icon:'fa-rupee-sign'},
-        {label:'Highest $/kW (Tokyo)',val:'$15,200',sub:'Land + seismic + energy costs',cls:'red',icon:'fa-yen-sign'}
+        {label:'Total Installed Capacity',val:DC_SUMMARY.totalInstalledGW+' GW',sub:'Synergy Research Q1 2025',cls:'purple',icon:'fa-bolt'},
+        {label:'Tracked Operators',val:DC_OPERATORS.length,sub:(totalOpMW/1000).toFixed(1)+' GW combined capacity',cls:'blue',icon:'fa-building'},
+        {label:'Countries Tracked',val:DC_COUNTRIES.length,sub:(totalCountryMW/1000).toFixed(1)+' GW mapped',cls:'green',icon:'fa-globe-americas'},
+        {label:'Hyperscale DCs',val:DC_SUMMARY.hyperscaleDCs.toLocaleString(),sub:Math.round(DC_SUMMARY.hyperscaleShare*100)+'% of global capacity',cls:'amber',icon:'fa-cloud'},
+        {label:'Fastest Growing',val:topGrowth.country,sub:topGrowth.growth+'% YoY growth',cls:'cyan',icon:'fa-chart-line'},
+        {label:'2030 Projection',val:DC_SUMMARY.projected2030GW+' GW',sub:'$'+DC_SUMMARY.investmentRequired2030T+'T investment needed',cls:'red',icon:'fa-rocket'}
+    ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+}
+
+function renderBenchOverview(){
+    // Top 15 operators chart
+    const top15=DC_OPERATORS.slice(0,15);
+    destroyChart('topOps');
+    benchCharts.topOps=new Chart(document.getElementById('chartTopOperators'),{type:'bar',data:{labels:top15.map(o=>o.company.split('(')[0].split('/')[0].trim().substring(0,18)),datasets:[{label:'Capacity (MW)',data:top15.map(o=>o.mw),backgroundColor:top15.map((_,i)=>`hsla(${250-i*12},65%,55%,0.65)`),borderColor:top15.map((_,i)=>`hsla(${250-i*12},65%,55%,1)`),borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toLocaleString()+' MW'}}},scales:{x:{ticks:{color:'#475569',font:{size:7},callback:v=>(v/1000).toFixed(1)+'GW'},grid:{color:'rgba(51,65,85,0.15)'}},y:{ticks:{color:'#e2e8f0',font:{size:7}},grid:{display:false}}}}});
+
+    // Region capacity doughnut
+    const regionData={Americas:0,EMEA:0,APAC:0};
+    DC_COUNTRIES.forEach(c=>regionData[c.region]=(regionData[c.region]||0)+c.mw);
+    destroyChart('regionCap');
+    benchCharts.regionCap=new Chart(document.getElementById('chartRegionCap'),{type:'doughnut',data:{labels:Object.keys(regionData).map(r=>r+' ('+(regionData[r]/1000).toFixed(1)+'GW)'),datasets:[{data:Object.values(regionData),backgroundColor:['#60a5fa','#fbbf24','#34d399'],borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,cutout:'50%',plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:9},padding:8,boxWidth:10,usePointStyle:true}}}}});
+
+    // Top 15 countries chart
+    const top15c=DC_COUNTRIES.slice(0,15);
+    destroyChart('topCountries');
+    benchCharts.topCountries=new Chart(document.getElementById('chartTopCountries'),{type:'bar',data:{labels:top15c.map(c=>c.country.substring(0,14)),datasets:[{label:'Capacity (MW)',data:top15c.map(c=>c.mw),backgroundColor:top15c.map(c=>c.region==='Americas'?'rgba(96,165,250,0.55)':c.region==='APAC'?'rgba(52,211,153,0.55)':'rgba(251,191,36,0.55)'),borderColor:top15c.map(c=>c.region==='Americas'?'#60a5fa':c.region==='APAC'?'#34d399':'#fbbf24'),borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toLocaleString()+' MW'}}},scales:{x:{ticks:{color:'#475569',font:{size:7},callback:v=>(v/1000).toFixed(1)+'GW'},grid:{color:'rgba(51,65,85,0.15)'}},y:{ticks:{color:'#e2e8f0',font:{size:7}},grid:{display:false}}}}});
+
+    // CapEx chart
+    const capOps=DC_OPERATORS.filter(o=>o.capex>=5).sort((a,b)=>b.capex-a.capex);
+    destroyChart('capex');
+    benchCharts.capex=new Chart(document.getElementById('chartCapex'),{type:'bar',data:{labels:capOps.map(o=>o.company.split('(')[0].split('/')[0].trim().substring(0,14)),datasets:[{label:'CapEx ($B)',data:capOps.map(o=>o.capex),backgroundColor:capOps.map((_,i)=>`hsla(${40+i*18},70%,55%,0.6)`),borderColor:capOps.map((_,i)=>`hsla(${40+i*18},70%,55%,1)`),borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.raw+'B'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7},maxRotation:45},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:7},callback:v=>'$'+v+'B'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // Growth rate chart
+    const growthCountries=DC_COUNTRIES.filter(c=>c.growth>=10).sort((a,b)=>b.growth-a.growth).slice(0,12);
+    destroyChart('growth');
+    benchCharts.growth=new Chart(document.getElementById('chartGrowthRate'),{type:'bar',data:{labels:growthCountries.map(c=>c.country.substring(0,12)),datasets:[{label:'Growth %',data:growthCountries.map(c=>c.growth),backgroundColor:growthCountries.map(c=>c.growth>=18?'rgba(52,211,153,0.6)':c.growth>=14?'rgba(251,191,36,0.6)':'rgba(96,165,250,0.6)'),borderColor:growthCountries.map(c=>c.growth>=18?'#34d399':c.growth>=14?'#fbbf24':'#60a5fa'),borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'% YoY'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7},maxRotation:45},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:7},callback:v=>v+'%'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // Type distribution doughnut
+    const typeCounts={};
+    DC_OPERATORS.forEach(o=>{const t=o.type.includes('Hyperscale')?'Hyperscale':o.type.includes('Colocation')?'Colocation':o.type.includes('Wholesale')?'Wholesale':o.type.includes('Edge')?'Edge':'Other';typeCounts[t]=(typeCounts[t]||0)+1});
+    destroyChart('typeDistrib');
+    benchCharts.typeDistrib=new Chart(document.getElementById('chartTypeDistrib'),{type:'doughnut',data:{labels:Object.keys(typeCounts),datasets:[{data:Object.values(typeCounts),backgroundColor:['#60a5fa','#a78bfa','#fbbf24','#34d399','#f87171'],borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,cutout:'50%',plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:9},padding:8,boxWidth:10,usePointStyle:true}}}}});
+}
+
+function filterBenchOps(){
+    const type=document.getElementById('benchOpType').value;
+    const region=document.getElementById('benchOpRegion').value;
+    const search=document.getElementById('benchOpSearch').value.toLowerCase();
+    let data=[...DC_OPERATORS];
+    if(type!=='all') data=data.filter(o=>o.type.includes(type));
+    if(region!=='all') data=data.filter(o=>getHQRegion(o.hq)===region);
+    if(search) data=data.filter(o=>o.company.toLowerCase().includes(search)||o.hq.toLowerCase().includes(search));
+    // Sort
+    data.sort((a,b)=>{
+        let va=a[benchOpSort.col],vb=b[benchOpSort.col];
+        if(typeof va==='string') va=va.toLowerCase();
+        if(typeof vb==='string') vb=vb.toLowerCase();
+        return benchOpSort.dir==='asc'?(va>vb?1:-1):(va<vb?1:-1);
+    });
+    document.getElementById('benchOpCount').textContent=data.length+' operators';
+    // Paginate
+    const totalPages=Math.ceil(data.length/benchOpPerPage);
+    if(benchOpPage>totalPages) benchOpPage=1;
+    const start=(benchOpPage-1)*benchOpPerPage;
+    const pageData=data.slice(start,start+benchOpPerPage);
+    const maxMW=Math.max(...DC_OPERATORS.map(o=>o.mw));
+    const sortIcon=(col)=>`<span class="sort-icon">${benchOpSort.col===col?(benchOpSort.dir==='asc'?'&#9650;':'&#9660;'):'&#9650;'}</span>`;
+    const sortCls=(col)=>benchOpSort.col===col?' sorted':'';
+    document.getElementById('benchOpTable').innerHTML=`<table class="bench-table"><thead><tr>
+        <th class="${sortCls('rank')}" onclick="sortBenchOps('rank')">#${sortIcon('rank')}</th>
+        <th class="${sortCls('company')}" onclick="sortBenchOps('company')">Operator${sortIcon('company')}</th>
+        <th>Type</th>
+        <th class="${sortCls('mw')}" onclick="sortBenchOps('mw')">Capacity${sortIcon('mw')}</th>
+        <th class="${sortCls('facilities')}" onclick="sortBenchOps('facilities')">Sites${sortIcon('facilities')}</th>
+        <th class="${sortCls('countries')}" onclick="sortBenchOps('countries')">Countries${sortIcon('countries')}</th>
+        <th class="${sortCls('capex')}" onclick="sortBenchOps('capex')">CapEx '25${sortIcon('capex')}</th>
+        <th>Key Markets</th>
+    </tr></thead><tbody>
+        ${pageData.map(o=>{
+            const pct=Math.round(o.mw/maxMW*100);
+            const typeCls=o.type.includes('Hyperscale')?'hyperscale':o.type.includes('Colocation')?'colocation':o.type.includes('Wholesale')?'wholesale':o.type.includes('Edge')?'edge':'enterprise';
+            const regionCls=getHQRegion(o.hq).toLowerCase();
+            return `<tr>
+                <td style="color:#64748b;font-size:0.7rem">${o.rank}</td>
+                <td><div style="font-weight:600;color:#f1f5f9;font-size:0.78rem">${o.company}</div><div style="font-size:0.62rem;color:#64748b"><span class="bench-region ${regionCls}">${getHQRegion(o.hq)}</span> ${o.hq}</div></td>
+                <td><span class="bench-type ${typeCls}">${o.type.split('/')[0].trim()}</span></td>
+                <td><div class="cap-bar"><span class="cap-bar-val">${o.mw>=1000?(o.mw/1000).toFixed(1)+'GW':o.mw+'MW'}</span><div class="cap-bar-track"><div class="cap-bar-fill" style="width:${pct}%"></div></div></div></td>
+                <td>${o.facilities}</td>
+                <td>${o.countries}</td>
+                <td>${o.capex>=1?'$'+o.capex+'B':o.capex>0?'$'+Math.round(o.capex*1000)+'M':'—'}</td>
+                <td style="font-size:0.68rem;color:#94a3b8;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.keyMarkets.join(', ')}">${o.keyMarkets.slice(0,3).join(', ')}</td>
+            </tr>`;
+        }).join('')}
+    </tbody></table>`;
+    // Pagination
+    let pagHtml=`<div class="bench-page-info">Showing ${start+1}-${Math.min(start+benchOpPerPage,data.length)} of ${data.length}</div><div class="bench-page-btns">`;
+    pagHtml+=`<button class="bench-page-btn" onclick="benchOpPage=1;filterBenchOps()" ${benchOpPage===1?'disabled':''}>&laquo;</button>`;
+    pagHtml+=`<button class="bench-page-btn" onclick="benchOpPage--;filterBenchOps()" ${benchOpPage===1?'disabled':''}>&lsaquo;</button>`;
+    for(let i=1;i<=totalPages;i++){
+        if(totalPages<=7||Math.abs(i-benchOpPage)<=2||i===1||i===totalPages){
+            pagHtml+=`<button class="bench-page-btn ${i===benchOpPage?'active':''}" onclick="benchOpPage=${i};filterBenchOps()">${i}</button>`;
+        }else if(i===benchOpPage-3||i===benchOpPage+3) pagHtml+=`<span style="color:#64748b;font-size:0.7rem;padding:0 4px">…</span>`;
+    }
+    pagHtml+=`<button class="bench-page-btn" onclick="benchOpPage++;filterBenchOps()" ${benchOpPage>=totalPages?'disabled':''}>&rsaquo;</button>`;
+    pagHtml+=`<button class="bench-page-btn" onclick="benchOpPage=${totalPages};filterBenchOps()" ${benchOpPage>=totalPages?'disabled':''}>&raquo;</button></div>`;
+    document.getElementById('benchOpPagination').innerHTML=pagHtml;
+}
+
+function sortBenchOps(col){
+    if(benchOpSort.col===col) benchOpSort.dir=benchOpSort.dir==='asc'?'desc':'asc';
+    else{benchOpSort.col=col;benchOpSort.dir=col==='company'?'asc':'desc'}
+    benchOpPage=1;filterBenchOps();
+}
+
+function filterBenchCountries(){
+    const region=document.getElementById('benchCountryRegion').value;
+    const growth=document.getElementById('benchCountryGrowth').value;
+    const search=document.getElementById('benchCountrySearch').value.toLowerCase();
+    let data=[...DC_COUNTRIES];
+    if(region!=='all') data=data.filter(c=>c.region===region);
+    if(growth==='high') data=data.filter(c=>c.growth>15);
+    else if(growth==='medium') data=data.filter(c=>c.growth>=8&&c.growth<=15);
+    else if(growth==='low') data=data.filter(c=>c.growth<8);
+    if(search) data=data.filter(c=>c.country.toLowerCase().includes(search));
+    data.sort((a,b)=>b.mw-a.mw);
+    const maxMW=Math.max(...DC_COUNTRIES.map(c=>c.mw));
+    document.getElementById('benchCountryCount').textContent=data.length+' countries';
+    document.getElementById('benchCountryTable').innerHTML=`<table class="bench-table"><thead><tr>
+        <th>#</th><th>Country</th><th>Region</th><th>Capacity</th><th>Facilities</th><th>Growth YoY</th><th>Key Cities</th>
+    </tr></thead><tbody>
+        ${data.map((c,i)=>{
+            const pct=Math.round(c.mw/maxMW*100);
+            const regionCls=c.region.toLowerCase();
+            const growthCls=c.growth>=15?'growth-up':c.growth>=8?'growth-neutral':'growth-down';
+            return `<tr>
+                <td style="color:#64748b;font-size:0.7rem">${i+1}</td>
+                <td style="font-weight:600;color:#f1f5f9">${c.country}</td>
+                <td><span class="bench-region ${regionCls}">${c.region}</span></td>
+                <td><div class="cap-bar"><span class="cap-bar-val">${c.mw>=1000?(c.mw/1000).toFixed(1)+'GW':c.mw+'MW'}</span><div class="cap-bar-track"><div class="cap-bar-fill" style="width:${pct}%"></div></div></div></td>
+                <td>${c.facilities.toLocaleString()}</td>
+                <td><span class="${growthCls}">${c.growth>=0?'+':''}${c.growth}%</span></td>
+                <td style="font-size:0.68rem;color:#94a3b8;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.keyCities.join(', ')}">${c.keyCities.slice(0,3).join(', ')}</td>
+            </tr>`;
+        }).join('')}
+    </tbody></table>`;
+}
+
+function filterBenchFacilities(){
+    const size=document.getElementById('benchFacSize').value;
+    const country=document.getElementById('benchFacCountry').value;
+    const year=document.getElementById('benchFacYear').value;
+    let data=[...DC_FACILITIES];
+    if(size==='mega') data=data.filter(f=>f.mw>=500);
+    else if(size==='large') data=data.filter(f=>f.mw>=200&&f.mw<500);
+    else if(size==='medium') data=data.filter(f=>f.mw>=100&&f.mw<200);
+    else if(size==='standard') data=data.filter(f=>f.mw<100);
+    if(country!=='all') data=data.filter(f=>f.country===country);
+    if(year==='2026') data=data.filter(f=>f.year===2026);
+    else if(year==='2025') data=data.filter(f=>f.year===2025);
+    else if(year==='2024') data=data.filter(f=>f.year===2024);
+    else if(year==='pre2024') data=data.filter(f=>f.year<2024);
+    data.sort((a,b)=>b.mw-a.mw);
+    const maxMW=Math.max(...DC_FACILITIES.map(f=>f.mw));
+    document.getElementById('benchFacCount').textContent=data.length+' facilities';
+    document.getElementById('benchFacTable').innerHTML=`<table class="bench-table"><thead><tr>
+        <th>#</th><th>Facility</th><th>Company</th><th>Location</th><th>Capacity</th><th>Type</th><th>Year</th><th>Notes</th>
+    </tr></thead><tbody>
+        ${data.map((f,i)=>{
+            const pct=Math.round(f.mw/maxMW*100);
+            return `<tr>
+                <td style="color:#64748b;font-size:0.7rem">${i+1}</td>
+                <td style="font-weight:600;color:#f1f5f9;font-size:0.78rem">${f.name}</td>
+                <td style="font-size:0.75rem">${f.company}</td>
+                <td style="font-size:0.72rem">${f.city}, ${f.country}</td>
+                <td><div class="cap-bar"><span class="cap-bar-val">${f.mw>=1000?(f.mw/1000).toFixed(1)+'GW':f.mw+'MW'}</span><div class="cap-bar-track"><div class="cap-bar-fill" style="width:${pct}%"></div></div></div></td>
+                <td><span class="bench-type ${f.type.includes('Hyperscale')?'hyperscale':f.type.includes('Colo')?'colocation':f.type.includes('Gov')?'government':'wholesale'}">${f.type.split('/')[0]}</span></td>
+                <td style="font-size:0.72rem">${f.year}</td>
+                <td style="font-size:0.65rem;color:#94a3b8;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.notes}">${f.notes}</td>
+            </tr>`;
+        }).join('')}
+    </tbody></table>`;
+}
+
+function renderBenchMarket(){
+    // Market KPIs
+    document.getElementById('benchMarketKpis').innerHTML=[
+        {label:'Global Installed',val:DC_SUMMARY.totalInstalledGW+' GW',sub:'Synergy Q1 2025',cls:'purple',icon:'fa-globe'},
+        {label:'Live IT Load (est.)',val:(DC_SUMMARY.liveITMW/1000).toFixed(0)+' GW',sub:'Mid-2025 estimate',cls:'blue',icon:'fa-microchip'},
+        {label:'Projected 2026',val:(DC_SUMMARY.projected2026MW/1000).toFixed(1)+' GW',sub:'JLL 2026 Outlook',cls:'green',icon:'fa-chart-line'},
+        {label:'Projected 2030',val:DC_SUMMARY.projected2030GW+' GW',sub:'100GW to add',cls:'amber',icon:'fa-rocket'},
+        {label:'Hyperscale DCs',val:DC_SUMMARY.hyperscaleDCs.toLocaleString(),sub:DC_SUMMARY.pipelineFacilities+' in pipeline',cls:'cyan',icon:'fa-cloud'},
+        {label:'Investment to 2030',val:'$'+DC_SUMMARY.investmentRequired2030T+'T',sub:'Real estate + IT infra',cls:'red',icon:'fa-dollar-sign'}
     ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
 
-    // $/kW chart
-    new Chart(document.getElementById('chartCostKW'),{type:'bar',data:{labels:BENCH_OPERATORS.map(o=>o.name),datasets:[{label:'$/kW',data:BENCH_OPERATORS.map(o=>o.costKw),backgroundColor:BENCH_OPERATORS.map((_,i)=>`hsla(${250-i*20},70%,60%,0.6)`),borderColor:BENCH_OPERATORS.map((_,i)=>`hsla(${250-i*20},70%,60%,1)`),borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:9},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:false}}}});
+    // Hyperscale info
+    document.getElementById('benchHyperscaleInfo').innerHTML=`
+        <div style="display:grid;gap:8px">
+            ${[
+                {l:'Total Hyperscale DCs',v:DC_SUMMARY.hyperscaleDCs.toLocaleString()},
+                {l:'Share of Global Capacity',v:Math.round(DC_SUMMARY.hyperscaleShare*100)+'%'},
+                {l:'Top 3 (AWS+MSFT+GOOG) Share',v:Math.round(DC_SUMMARY.top3share*100)+'%'},
+                {l:'Q3 2025 CapEx',v:'$'+DC_SUMMARY.hyperscaleCapexQ3+'B'},
+                {l:'Pipeline Facilities',v:DC_SUMMARY.pipelineFacilities},
+                {l:'Capacity Doubling Period',v:'~3 years'}
+            ].map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(51,65,85,0.3)"><span style="font-size:0.75rem;color:#94a3b8">${r.l}</span><span style="font-size:0.75rem;color:#e2e8f0;font-weight:600">${r.v}</span></div>`).join('')}
+        </div>`;
 
-    // PUE chart
-    new Chart(document.getElementById('chartPUE'),{type:'polarArea',data:{labels:BENCH_OPERATORS.map(o=>o.name),datasets:[{data:BENCH_OPERATORS.map(o=>o.pue),backgroundColor:BENCH_OPERATORS.map((_,i)=>`hsla(${130+i*25},60%,45%,0.5)`),borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:8},padding:8,usePointStyle:true}}},scales:{r:{ticks:{color:'#475569',font:{size:8},backdropColor:'transparent'},grid:{color:'rgba(51,65,85,0.3)'}}}}});
+    // Investment info
+    document.getElementById('benchInvestmentInfo').innerHTML=`
+        <div style="display:grid;gap:8px">
+            ${[
+                {l:'Total Required by 2030',v:'$3.0 Trillion'},
+                {l:'Real Estate Asset Creation',v:'$1.2 Trillion'},
+                {l:'Tenant IT Infra Spend',v:'$1-2 Trillion'},
+                {l:'Top 4 CapEx 2025',v:'$370B'},
+                {l:'Projected All CapEx 2026',v:'$600B+'},
+                {l:'Data Source',v:'JLL 2026 Outlook'}
+            ].map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(51,65,85,0.3)"><span style="font-size:0.75rem;color:#94a3b8">${r.l}</span><span style="font-size:0.75rem;color:#e2e8f0;font-weight:600">${r.v}</span></div>`).join('')}
+        </div>`;
 
-    // Operator table
-    document.getElementById('benchTable').innerHTML=`<table class="data-tbl"><thead><tr><th>Operator</th><th>PUE</th><th>$/kW</th><th>Capacity</th><th>Markets</th><th>Uptime</th><th>Cooling</th><th>Renewable Target</th></tr></thead><tbody>
-        ${BENCH_OPERATORS.map(o=>`<tr><td style="font-weight:600;color:#f1f5f9">${o.name}<br><span style="font-size:0.65rem;color:#64748b">${o.region}</span></td><td><span style="color:${o.pue<=1.15?'#34d399':o.pue<=1.28?'#fbbf24':'#f87171'};font-weight:600">${o.pue}</span></td><td>$${o.costKw.toLocaleString()}</td><td>${o.capacity}</td><td>${o.markets}</td><td>${o.uptime}%</td><td style="font-size:0.72rem">${o.cooling}</td><td style="font-size:0.72rem">${o.renewableTarget}</td></tr>`).join('')}
-    </tbody></table>`;
+    // Regional breakdown
+    document.getElementById('benchRegionalInfo').innerHTML=[
+        {title:'Americas',icon:'fa-flag-usa',color:'#60a5fa',items:[
+            {l:'Share of Global',v:Math.round(DC_SUMMARY.americas.share*100)+'%'},
+            {l:'Supply CAGR',v:Math.round(DC_SUMMARY.americas.supplyCAGR*100)+'%'},
+            {l:'Construction Pipeline',v:DC_SUMMARY.americas.constructionGW+'GW'}
+        ]},
+        {title:'APAC',icon:'fa-globe-asia',color:'#34d399',items:[
+            {l:'Current Capacity',v:DC_SUMMARY.apac.capacityGW+'GW'},
+            {l:'Projected 2030',v:DC_SUMMARY.apac.projected2030GW+'GW'},
+            {l:'India CAGR',v:Math.round(DC_SUMMARY.apac.indiaCAGR*100)+'%'}
+        ]},
+        {title:'EMEA',icon:'fa-globe-europe',color:'#fbbf24',items:[
+            {l:'Operational',v:DC_SUMMARY.emea.operationalGW+'GW'},
+            {l:'YoY Growth',v:Math.round(DC_SUMMARY.emea.yoyGrowth*100)+'%'},
+            {l:'Pipeline',v:DC_SUMMARY.emea.pipelineGW+'GW'}
+        ]}
+    ].map(r=>`<div style="background:#0f172a;border:1px solid #1f2937;border-radius:10px;padding:1rem">
+        <div style="font-size:0.82rem;font-weight:700;color:${r.color};margin-bottom:0.6rem"><i class="fas ${r.icon}" style="margin-right:4px"></i>${r.title}</div>
+        ${r.items.map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(51,65,85,0.2)"><span style="font-size:0.72rem;color:#94a3b8">${i.l}</span><span style="font-size:0.72rem;color:#e2e8f0;font-weight:600">${i.v}</span></div>`).join('')}
+    </div>`).join('');
 
-    // Regional cost chart
-    new Chart(document.getElementById('chartRegionCost'),{type:'bar',data:{labels:BENCH_REGIONS.map(r=>r.region),datasets:[{label:'$/kW',data:BENCH_REGIONS.map(r=>r.costKw),backgroundColor:'rgba(251,191,36,0.4)',borderColor:'#fbbf24',borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:8},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#e2e8f0',font:{size:8}},grid:{display:false}}}}});
-
-    // Energy cost chart
-    new Chart(document.getElementById('chartEnergyCost'),{type:'doughnut',data:{labels:BENCH_REGIONS.slice(0,8).map(r=>r.region),datasets:[{data:BENCH_REGIONS.slice(0,8).map(r=>r.energy*1000),backgroundColor:['#60a5fa','#818cf8','#a78bfa','#c084fc','#e879f9','#f472b6','#fb7185','#f87171'],borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:8},padding:10,usePointStyle:true}}}}});
+    // Constraints
+    document.getElementById('benchConstraints').innerHTML=DC_SUMMARY.constraints.map(c=>
+        `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(51,65,85,0.2)"><i class="fas fa-exclamation-circle" style="color:#f87171;font-size:0.65rem;margin-top:3px"></i><span style="font-size:0.75rem;color:#cbd5e1">${c}</span></div>`
+    ).join('');
 
     // Sources
     document.getElementById('benchSources').innerHTML=`
-        <strong>Data Sources & Methodology:</strong><br>
-        PUE data sourced from Uptime Institute Global Survey 2025, operator sustainability reports (Equinix ESG 2025, Google Environmental Report 2025, Microsoft Sustainability Report 2025, AWS Sustainability Report 2025), and independent audits.<br><br>
-        Construction cost ($/kW) estimates derived from Turner & Townsend Data Centre Cost Index 2025, JLL Global Data Center Outlook 2025, CBRE North America Data Center Report H2 2025, and proprietary project benchmarks across 50+ facilities.<br><br>
-        Energy pricing based on IEA World Energy Outlook 2025, regional utility tariffs (PJM, NEM, EMA Singapore, PLN Indonesia), and operator-disclosed rates where available.<br><br>
-        Capacity figures from Datacenter Dynamics Intelligence, Synergy Research Group Q4 2025, and operator earnings disclosures.<br><br>
-        <em style="color:#64748b">Note: All benchmark data is approximate and represents industry averages. Actual figures vary by specific facility, design, and contract terms. Data refreshed quarterly.</em>`;
+        <strong>Sources:</strong> ${DC_SUMMARY.sources.join(' · ')}<br>
+        <em style="color:#475569">Compiled 2026-02-17. MW figures represent IT load capacity unless noted. Country totals include colocation, hyperscale, and enterprise DCs.</em>`;
+}
+
+function exportBenchmarksCSV(){
+    const tab=document.querySelector('.bench-tab.active').textContent.trim();
+    let csv='';
+    if(tab.includes('Operators')){
+        csv='Rank,Company,HQ,Type,Capacity_MW,Facilities,Countries,CapEx_2025_B,Source\n';
+        DC_OPERATORS.forEach(o=>csv+=`${o.rank},"${o.company}",${o.hq},"${o.type}",${o.mw},${o.facilities},${o.countries},${o.capex},"${o.source}"\n`);
+    }else if(tab.includes('Countries')){
+        csv='Rank,Country,Region,Capacity_MW,Facilities,Growth_YoY,Source\n';
+        DC_COUNTRIES.forEach(c=>csv+=`${c.rank},${c.country},${c.region},${c.mw},${c.facilities},${c.growth},"${c.source}"\n`);
+    }else if(tab.includes('Facilities')){
+        csv='Rank,Name,Company,City,Country,Capacity_MW,Type,Year,Notes\n';
+        DC_FACILITIES.forEach(f=>csv+=`${f.rank},"${f.name}","${f.company}",${f.city},${f.country},${f.mw},"${f.type}",${f.year},"${f.notes}"\n`);
+    }else{
+        csv='Rank,Company,HQ,Type,Capacity_MW,Facilities,Countries,CapEx_2025_B\n';
+        DC_OPERATORS.forEach(o=>csv+=`${o.rank},"${o.company}",${o.hq},"${o.type}",${o.mw},${o.facilities},${o.countries},${o.capex}\n`);
+    }
+    downloadCSV(csv,'rz_dc_intelligence_'+fmtDate(new Date())+'.csv');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2467,6 +3536,561 @@ function exportMayarTxCSV(){
     showMayarToast('CSV exported','success');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// USER ACTIVITY DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+var UA_STORAGE_KEY='rz_user_events';
+var uaPeriod='today';
+var uaFilteredEvents=[];
+var uaPageNum=0;
+var UA_PAGE_SIZE=15;
+var uaIpPage=0;
+var UA_IP_PAGE_SIZE=2;
+var uaAllIPs=[];
+var uaAllIPEvents=[];
+var uaTimelineChartInst=null;
+var uaCatChartInst=null;
+var uaHourChartInst=null;
+var uaTopPagesChartInst=null;
+var uaActivityRendered=false;
+
+// ═══ EVENT CATEGORIES ═══
+var UA_CATEGORIES={
+    pro_click:   {label:'Pro Mode Click',  icon:'fa-crown',       color:'#a78bfa',bg:'rgba(139,92,246,0.15)',cardClass:'purple'},
+    demo_login:  {label:'Demo Login',      icon:'fa-sign-in-alt', color:'#34d399',bg:'rgba(52,211,153,0.15)',cardClass:'green'},
+    pdf_export:  {label:'PDF Export',      icon:'fa-file-pdf',    color:'#60a5fa',bg:'rgba(96,165,250,0.15)',cardClass:'blue'},
+    cv_download: {label:'CV Download',     icon:'fa-id-card',     color:'#fbbf24',bg:'rgba(245,158,11,0.15)',cardClass:'amber'},
+    ws_download: {label:'Work Sample DL',  icon:'fa-briefcase',   color:'#f472b6',bg:'rgba(236,72,153,0.15)',cardClass:'pink'},
+    page_view:   {label:'Page View',       icon:'fa-eye',         color:'#94a3b8',bg:'rgba(100,116,139,0.15)',cardClass:'indigo'},
+    calc_use:    {label:'Calculator Use',  icon:'fa-calculator',  color:'#22d3ee',bg:'rgba(34,211,238,0.15)',cardClass:'cyan'},
+    signup:      {label:'Sign Up',         icon:'fa-user-plus',   color:'#34d399',bg:'rgba(52,211,153,0.15)',cardClass:'green'}
+};
+
+// ═══ STORAGE ═══
+function getUAEvents(){
+    try{
+        var raw=localStorage.getItem(UA_STORAGE_KEY);
+        if(!raw)return[];
+        return JSON.parse(raw);
+    }catch(e){return[]}
+}
+function saveUAEvents(events){
+    try{localStorage.setItem(UA_STORAGE_KEY,JSON.stringify(events))}catch(e){}
+}
+
+// ═══ SEED DEMO DATA ═══
+function seedUADemoData(){
+    var existing=getUAEvents();
+    // Re-seed if old format (no country field) or too few events
+    var hasGeo=existing.length>0&&existing[0].country;
+    if(existing.length>50&&hasGeo)return;
+    if(!hasGeo)existing=[]; // clear old format data
+    var events=existing.slice();
+    var pages=['index.html','article-1.html','article-2.html','article-3.html','article-4.html','article-5.html','article-6.html','article-7.html','article-8.html','article-9.html','article-10.html','article-11.html','article-12.html','article-13.html','article-14.html','article-15.html','article-16.html','article-17.html','capex-calculator.html','opex-calculator.html','geopolitics-1.html','insights.html','datahall.html','articles.html'];
+    var types=Object.keys(UA_CATEGORIES);
+    var ips=['103.28.'+rand(100,255)+'.'+rand(1,254),'202.46.'+rand(100,255)+'.'+rand(1,254),'118.97.'+rand(100,255)+'.'+rand(1,254),'180.244.'+rand(100,255)+'.'+rand(1,254),'36.68.'+rand(100,255)+'.'+rand(1,254),'103.10.'+rand(100,255)+'.'+rand(1,254),'110.137.'+rand(100,255)+'.'+rand(1,254),'114.124.'+rand(100,255)+'.'+rand(1,254)];
+    var agents=['Mozilla/5.0 Chrome/121','Mozilla/5.0 Safari/17','Mozilla/5.0 Firefox/122','Mozilla/5.0 Edge/121','Mozilla/5.0 Mobile Safari','Mozilla/5.0 Chrome Mobile'];
+    var geos=[
+        {country:'Indonesia',cc:'ID',city:'Jakarta',region:'Jakarta'},
+        {country:'Indonesia',cc:'ID',city:'Surabaya',region:'East Java'},
+        {country:'Indonesia',cc:'ID',city:'Bandung',region:'West Java'},
+        {country:'Indonesia',cc:'ID',city:'Medan',region:'North Sumatra'},
+        {country:'Singapore',cc:'SG',city:'Singapore',region:'Central'},
+        {country:'United States',cc:'US',city:'San Francisco',region:'California'},
+        {country:'United States',cc:'US',city:'New York',region:'New York'},
+        {country:'Malaysia',cc:'MY',city:'Kuala Lumpur',region:'Federal Territory'},
+        {country:'Australia',cc:'AU',city:'Sydney',region:'NSW'},
+        {country:'Germany',cc:'DE',city:'Frankfurt',region:'Hessen'},
+        {country:'India',cc:'IN',city:'Mumbai',region:'Maharashtra'},
+        {country:'Japan',cc:'JP',city:'Tokyo',region:'Kanto'}
+    ];
+    var browsers=['Chrome','Safari','Firefox','Edge','Chrome','Chrome'];
+    var devices=['Desktop','Desktop','Desktop','Mobile','Mobile','Tablet'];
+    var screens=['1920x1080','1366x768','2560x1440','390x844','412x915','1024x768'];
+    var langs=['id','en-US','en-GB','ms','ja','de'];
+    var refs=['direct','google.com','linkedin.com','github.com','direct','direct'];
+    var now=Date.now();
+    // Generate events for last 30 days
+    for(var d=0;d<30;d++){
+        var dayTs=now-(d*86400000);
+        var eventsPerDay=d<1?rand(15,35):d<7?rand(8,20):rand(3,12);
+        for(var e=0;e<eventsPerDay;e++){
+            var ts=dayTs-rand(0,86399999);
+            var type=types[rand(0,types.length-1)];
+            // Adjust probabilities: page_view most common
+            var r=Math.random();
+            if(r<0.35)type='page_view';
+            else if(r<0.50)type='pro_click';
+            else if(r<0.62)type='calc_use';
+            else if(r<0.72)type='demo_login';
+            else if(r<0.82)type='pdf_export';
+            else if(r<0.88)type='cv_download';
+            else if(r<0.94)type='ws_download';
+            else type='signup';
+            var page=pages[rand(0,pages.length-1)];
+            // Make some types more page-specific
+            if(type==='calc_use')page=['capex-calculator.html','opex-calculator.html','article-1.html','article-5.html'][rand(0,3)];
+            if(type==='pro_click')page=pages[rand(1,17)]; // articles only
+            if(type==='pdf_export')page=['capex-calculator.html','opex-calculator.html','article-1.html'][rand(0,2)];
+            var geo=geos[rand(0,geos.length-1)];
+            var devIdx=rand(0,devices.length-1);
+            events.push({
+                type:type,
+                page:page,
+                ts:ts,
+                ip:ips[rand(0,ips.length-1)],
+                country:geo.country,
+                cc:geo.cc,
+                city:geo.city,
+                region:geo.region,
+                tz:'Asia/Jakarta',
+                device:devices[devIdx],
+                browser:browsers[rand(0,browsers.length-1)],
+                screen:screens[devIdx],
+                lang:langs[rand(0,langs.length-1)],
+                ref:refs[rand(0,refs.length-1)],
+                ua:agents[rand(0,agents.length-1)],
+                sid:'ses_'+Math.random().toString(36).substring(2,10)
+            });
+        }
+    }
+    // Sort by timestamp descending
+    events.sort(function(a,b){return b.ts-a.ts});
+    saveUAEvents(events);
+    return events;
+}
+
+// ═══ PERIOD FILTER ═══
+function setUAPeriod(period,btn){
+    uaPeriod=period;
+    document.querySelectorAll('.ua-period-btn').forEach(function(b){b.classList.remove('active')});
+    if(btn)btn.classList.add('active');
+    // Clear custom date if preset used
+    if(period!=='custom'){
+        document.getElementById('uaDateFrom').value='';
+        document.getElementById('uaDateTo').value='';
+    }
+    renderActivity();
+}
+
+function applyUACustomDate(){
+    var from=document.getElementById('uaDateFrom').value;
+    var to=document.getElementById('uaDateTo').value;
+    if(from&&to){
+        uaPeriod='custom';
+        document.querySelectorAll('.ua-period-btn').forEach(function(b){b.classList.remove('active')});
+        renderActivity();
+    }
+}
+
+function filterEventsByPeriod(events){
+    var now=new Date();
+    var startOfDay=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+    var from,to=Date.now();
+
+    switch(uaPeriod){
+        case 'today':from=startOfDay;break;
+        case 'week':from=startOfDay-(now.getDay()*86400000);break;
+        case 'month':from=new Date(now.getFullYear(),now.getMonth(),1).getTime();break;
+        case 'year':from=new Date(now.getFullYear(),0,1).getTime();break;
+        case 'all':from=0;break;
+        case 'custom':
+            var df=document.getElementById('uaDateFrom').value;
+            var dt=document.getElementById('uaDateTo').value;
+            from=df?new Date(df).getTime():0;
+            to=dt?new Date(dt+'T23:59:59').getTime():Date.now();
+            break;
+        default:from=startOfDay;
+    }
+
+    return events.filter(function(e){return e.ts>=from&&e.ts<=to});
+}
+
+// ═══ MAIN RENDER ═══
+function renderActivity(){
+    var allEvents=getUAEvents();
+    if(allEvents.length<50)allEvents=seedUADemoData();
+
+    // Filter by period
+    var periodEvents=filterEventsByPeriod(allEvents);
+
+    // Filter by category
+    var catFilter=document.getElementById('uaCatFilter').value;
+    if(catFilter!=='all'){
+        uaFilteredEvents=periodEvents.filter(function(e){return e.type===catFilter});
+    } else {
+        uaFilteredEvents=periodEvents;
+    }
+
+    // Update nav badge + data source label
+    var todayStart=new Date();todayStart.setHours(0,0,0,0);
+    var todayCount=allEvents.filter(function(e){return e.ts>=todayStart.getTime()}).length;
+    var navBadge=document.getElementById('navActivityCount');
+    if(navBadge)navBadge.textContent=todayCount;
+    var srcEl=document.getElementById('uaDataSource');
+    if(srcEl)srcEl.textContent='('+allEvents.length+' events in localStorage)';
+
+    renderUAKpis(periodEvents);
+    renderUACatGrid(periodEvents);
+    renderUATimelineChart(periodEvents);
+    renderUACatChart(periodEvents);
+    renderUAHourChart(periodEvents);
+    renderUATopPages(periodEvents);
+    renderUAVisitorStats(periodEvents);
+    uaPageNum=0;
+    renderUAEventLog();
+    uaActivityRendered=true;
+}
+
+// ═══ KPI CARDS ═══
+function renderUAKpis(events){
+    var total=events.length;
+    var uniqueIPs={};
+    var uniqueSessions={};
+    events.forEach(function(e){
+        if(e.ip)uniqueIPs[e.ip]=1;
+        if(e.sid)uniqueSessions[e.sid]=1;
+    });
+    var visitors=Object.keys(uniqueIPs).length;
+    var sessions=Object.keys(uniqueSessions).length;
+    var proClicks=events.filter(function(e){return e.type==='pro_click'}).length;
+
+    var kpis=[
+        {icon:'fa-mouse-pointer',bg:'rgba(139,92,246,0.15)',color:'#a78bfa',label:'Total Events',val:total.toLocaleString(),sub:uaPeriod==='today'?'Today':'Period total',cls:'neutral'},
+        {icon:'fa-users',bg:'rgba(52,211,153,0.15)',color:'#34d399',label:'Unique Visitors',val:visitors.toLocaleString(),sub:sessions+' sessions',cls:'up'},
+        {icon:'fa-crown',bg:'rgba(167,139,250,0.15)',color:'#a78bfa',label:'Pro Clicks',val:proClicks.toLocaleString(),sub:total>0?((proClicks/total*100).toFixed(1)+'% of events'):'No events',cls:'up'},
+        {icon:'fa-chart-bar',bg:'rgba(96,165,250,0.15)',color:'#60a5fa',label:'Avg Events/Day',val:calcAvgPerDay(events),sub:'Per active day',cls:'neutral'}
+    ];
+
+    document.getElementById('uaKpiGrid').innerHTML=kpis.map(function(k){
+        return '<div class="kpi" style="padding:0.85rem"><div class="kpi-icon" style="background:'+k.bg+';color:'+k.color+';width:32px;height:32px;border-radius:8px;font-size:0.8rem;margin-bottom:0.4rem"><i class="fas '+k.icon+'"></i></div>'+
+            '<div class="kpi-label">'+k.label+'</div><div class="kpi-val" style="font-size:1.3rem">'+k.val+'</div>'+
+            '<span class="kpi-sub '+k.cls+'"><i class="fas fa-arrow-'+(k.cls==='up'?'up':k.cls==='down'?'down':'right')+'"></i> '+k.sub+'</span></div>';
+    }).join('');
+}
+
+function calcAvgPerDay(events){
+    if(!events.length)return '0';
+    var days={};
+    events.forEach(function(e){
+        var d=new Date(e.ts).toISOString().split('T')[0];
+        days[d]=1;
+    });
+    var activeDays=Object.keys(days).length;
+    return activeDays>0?Math.round(events.length/activeDays).toString():'0';
+}
+
+// ═══ CATEGORY GRID ═══
+function renderUACatGrid(events){
+    var counts={};
+    Object.keys(UA_CATEGORIES).forEach(function(k){counts[k]=0});
+    events.forEach(function(e){if(counts[e.type]!==undefined)counts[e.type]++});
+
+    var html='';
+    Object.keys(UA_CATEGORIES).forEach(function(key){
+        var cat=UA_CATEGORIES[key];
+        var count=counts[key]||0;
+        var pct=events.length>0?((count/events.length)*100).toFixed(1):'0';
+        html+='<div class="ua-cat-card '+cat.cardClass+'">'+
+            '<div class="ua-cat-icon" style="background:'+cat.bg+';color:'+cat.color+'"><i class="fas '+cat.icon+'"></i></div>'+
+            '<div class="ua-cat-count">'+count.toLocaleString()+'</div>'+
+            '<div class="ua-cat-label">'+cat.label+'</div>'+
+            '<div class="ua-cat-sub">'+pct+'% of total</div>'+
+            '</div>';
+    });
+    document.getElementById('uaCatGrid').innerHTML=html;
+}
+
+// ═══ TIMELINE CHART ═══
+function renderUATimelineChart(events){
+    var canvas=document.getElementById('uaTimelineChart');
+    if(!canvas)return;
+    if(uaTimelineChartInst)uaTimelineChartInst.destroy();
+
+    // Group by day (sorted by date)
+    var grouped={};
+    events.forEach(function(e){
+        var d=new Date(e.ts);
+        var sortKey=d.toISOString().split('T')[0]; // YYYY-MM-DD for sorting
+        var label=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+        if(!grouped[sortKey])grouped[sortKey]={label:label,total:0,pro:0,pdf:0,demo:0,cv:0,calc:0};
+        grouped[sortKey].total++;
+        if(e.type==='pro_click')grouped[sortKey].pro++;
+        if(e.type==='pdf_export')grouped[sortKey].pdf++;
+        if(e.type==='demo_login')grouped[sortKey].demo++;
+        if(e.type==='cv_download')grouped[sortKey].cv++;
+        if(e.type==='calc_use')grouped[sortKey].calc++;
+    });
+
+    var sortedKeys=Object.keys(grouped).sort();
+    var labels=sortedKeys.map(function(k){return grouped[k].label});
+    var isDark=!document.body.classList.contains('light-mode');
+    uaTimelineChartInst=new Chart(canvas,{type:'line',data:{
+        labels:labels,
+        datasets:[
+            {label:'All Events',data:sortedKeys.map(function(k){return grouped[k].total}),borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2,pointBackgroundColor:'#8b5cf6'},
+            {label:'Pro Clicks',data:sortedKeys.map(function(k){return grouped[k].pro}),borderColor:'#a78bfa',fill:false,tension:0.4,pointRadius:1,borderWidth:1.5,borderDash:[4,4]},
+            {label:'PDF Exports',data:sortedKeys.map(function(k){return grouped[k].pdf}),borderColor:'#60a5fa',fill:false,tension:0.4,pointRadius:1,borderWidth:1.5,borderDash:[4,4]},
+            {label:'Demo Login',data:sortedKeys.map(function(k){return grouped[k].demo}),borderColor:'#34d399',fill:false,tension:0.4,pointRadius:1,borderWidth:1.5,borderDash:[4,4]}
+        ]
+    },options:{responsive:true,plugins:{legend:{labels:{color:isDark?'#94a3b8':'#64748b',font:{size:9},boxWidth:12,padding:8}}},scales:{x:{ticks:{color:isDark?'#475569':'#94a3b8',font:{size:8},maxRotation:45},grid:{color:isDark?'rgba(51,65,85,0.2)':'rgba(226,232,240,0.5)'}},y:{ticks:{color:isDark?'#475569':'#94a3b8',font:{size:8},stepSize:1},grid:{color:isDark?'rgba(51,65,85,0.2)':'rgba(226,232,240,0.5)'},beginAtZero:true}}}});
+}
+
+// ═══ CATEGORY DISTRIBUTION CHART ═══
+function renderUACatChart(events){
+    var canvas=document.getElementById('uaCatChart');
+    if(!canvas)return;
+    if(uaCatChartInst)uaCatChartInst.destroy();
+
+    var counts={};
+    events.forEach(function(e){counts[e.type]=(counts[e.type]||0)+1});
+
+    var keys=Object.keys(UA_CATEGORIES).filter(function(k){return counts[k]>0});
+    var isDark=!document.body.classList.contains('light-mode');
+    uaCatChartInst=new Chart(canvas,{type:'doughnut',data:{
+        labels:keys.map(function(k){return UA_CATEGORIES[k].label}),
+        datasets:[{
+            data:keys.map(function(k){return counts[k]}),
+            backgroundColor:keys.map(function(k){return UA_CATEGORIES[k].color}),
+            borderColor:isDark?'#1e293b':'#fff',
+            borderWidth:3
+        }]
+    },options:{responsive:true,cutout:'55%',plugins:{legend:{position:'right',labels:{color:isDark?'#94a3b8':'#64748b',font:{size:8},padding:6,boxWidth:10,usePointStyle:true}}}}});
+}
+
+// ═══ HOURLY CHART ═══
+function renderUAHourChart(events){
+    var canvas=document.getElementById('uaHourChart');
+    if(!canvas)return;
+    if(uaHourChartInst)uaHourChartInst.destroy();
+
+    var hours=Array.from({length:24},function(){return 0});
+    events.forEach(function(e){
+        var h=new Date(e.ts).getHours();
+        hours[h]++;
+    });
+
+    var isDark=!document.body.classList.contains('light-mode');
+    uaHourChartInst=new Chart(canvas,{type:'bar',data:{
+        labels:Array.from({length:24},function(_,i){return String(i).padStart(2,'0')+':00'}),
+        datasets:[{label:'Events',data:hours,backgroundColor:hours.map(function(v,i){
+            var max=Math.max.apply(null,hours)||1;
+            var intensity=v/max;
+            return 'rgba(139,92,246,'+(0.15+intensity*0.65)+')';
+        }),borderRadius:3}]
+    },options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:isDark?'#475569':'#94a3b8',font:{size:8}},grid:{display:false}},y:{ticks:{color:isDark?'#475569':'#94a3b8',font:{size:9}},grid:{color:isDark?'rgba(51,65,85,0.2)':'rgba(226,232,240,0.5)'},beginAtZero:true}}}});
+}
+
+// ═══ TOP PAGES CHART ═══
+function renderUATopPages(events){
+    var canvas=document.getElementById('uaTopPagesChart');
+    if(!canvas)return;
+    if(uaTopPagesChartInst)uaTopPagesChartInst.destroy();
+
+    var pages={};
+    events.forEach(function(e){pages[e.page]=(pages[e.page]||0)+1});
+
+    var sorted=Object.entries(pages).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
+    var isDark=!document.body.classList.contains('light-mode');
+    uaTopPagesChartInst=new Chart(canvas,{type:'bar',data:{
+        labels:sorted.map(function(p){return p[0].replace('.html','')}),
+        datasets:[{label:'Events',data:sorted.map(function(p){return p[1]}),backgroundColor:'rgba(96,165,250,0.5)',borderColor:'#60a5fa',borderWidth:1,borderRadius:4}]
+    },options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:isDark?'#475569':'#94a3b8',font:{size:9}},grid:{color:isDark?'rgba(51,65,85,0.2)':'rgba(226,232,240,0.5)'}},y:{ticks:{color:isDark?'#e2e8f0':'#1e293b',font:{size:9}},grid:{display:false}}}}});
+}
+
+// ═══ VISITOR STATS ═══
+function renderUAVisitorStats(events){
+    var el=document.getElementById('uaVisitorStats');
+    if(!el)return;
+
+    var byIP={};var bySess={};var byDev={};var byBrowser={};var byCountry={};var byRef={};
+    events.forEach(function(e){
+        if(e.ip){byIP[e.ip]=(byIP[e.ip]||0)+1}
+        if(e.sid){bySess[e.sid]=(bySess[e.sid]||0)+1}
+        var dev=e.device||(e.ua&&e.ua.indexOf('Mobile')!==-1?'Mobile':'Desktop');
+        byDev[dev]=(byDev[dev]||0)+1;
+        if(e.browser){byBrowser[e.browser]=(byBrowser[e.browser]||0)+1}
+        if(e.country){byCountry[e.country]=(byCountry[e.country]||0)+1}
+        if(e.ref){byRef[e.ref]=(byRef[e.ref]||0)+1}
+    });
+
+    var ccFlags={'Indonesia':'\ud83c\uddee\ud83c\udde9','Singapore':'\ud83c\uddf8\ud83c\uddec','United States':'\ud83c\uddfa\ud83c\uddf8','Malaysia':'\ud83c\uddf2\ud83c\uddfe','Australia':'\ud83c\udde6\ud83c\uddfa','Germany':'\ud83c\udde9\ud83c\uddea','India':'\ud83c\uddee\ud83c\uddf3','Japan':'\ud83c\uddef\ud83c\uddf5','United Kingdom':'\ud83c\uddec\ud83c\udde7','Netherlands':'\ud83c\uddf3\ud83c\uddf1','France':'\ud83c\uddeb\ud83c\uddf7','South Korea':'\ud83c\uddf0\ud83c\uddf7'};
+    var mobile=(byDev['Mobile']||0);var desktop=(byDev['Desktop']||0);var tablet=(byDev['Tablet']||0);
+    var totalDev=mobile+desktop+tablet||1;
+
+    var html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:0.6rem">';
+    html+='<div class="health-stat" style="padding:0.5rem"><div class="health-stat-label" style="font-size:0.58rem">Unique IPs</div><div class="health-stat-value" style="color:#34d399;font-size:1.1rem">'+Object.keys(byIP).length+'</div></div>';
+    html+='<div class="health-stat" style="padding:0.5rem"><div class="health-stat-label" style="font-size:0.58rem">Sessions</div><div class="health-stat-value" style="color:#60a5fa;font-size:1.1rem">'+Object.keys(bySess).length+'</div></div>';
+    html+='<div class="health-stat" style="padding:0.5rem"><div class="health-stat-label" style="font-size:0.58rem">Countries</div><div class="health-stat-value" style="color:#fbbf24;font-size:1.1rem">'+Object.keys(byCountry).length+'</div></div>';
+    html+='<div class="health-stat" style="padding:0.5rem"><div class="health-stat-label" style="font-size:0.58rem">Browsers</div><div class="health-stat-value" style="color:#a78bfa;font-size:1.1rem">'+Object.keys(byBrowser).length+'</div></div>';
+    html+='</div>';
+
+    // Device + Browser breakdown row
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem">';
+    html+='<div style="font-size:0.6rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.2rem">Device</div>';
+    html+='<div style="font-size:0.6rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.2rem">Browser</div>';
+    html+='</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem">';
+    html+='<div>';
+    [['Desktop','fa-desktop','#a78bfa'],['Mobile','fa-mobile-alt','#f472b6'],['Tablet','fa-tablet-alt','#22d3ee']].forEach(function(d){
+        var ct=byDev[d[0]]||0;if(!ct)return;
+        html+='<div style="display:flex;align-items:center;gap:5px;padding:2px 0;font-size:0.68rem"><i class="fas '+d[1]+'" style="color:'+d[2]+';width:14px;text-align:center;font-size:0.6rem"></i><span style="color:#cbd5e1">'+d[0]+'</span><span style="margin-left:auto;color:'+d[2]+';font-weight:600">'+Math.round(ct/totalDev*100)+'%</span></div>';
+    });
+    html+='</div><div>';
+    Object.entries(byBrowser).sort(function(a,b){return b[1]-a[1]}).slice(0,4).forEach(function(b){
+        html+='<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:0.68rem"><span style="color:#cbd5e1">'+b[0]+'</span><span style="color:#60a5fa;font-weight:600">'+b[1]+'</span></div>';
+    });
+    html+='</div></div>';
+
+    // Country breakdown
+    var topCountries=Object.entries(byCountry).sort(function(a,b){return b[1]-a[1]}).slice(0,6);
+    html+='<div style="font-size:0.6rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Top Countries</div>';
+    topCountries.forEach(function(c){
+        var pct=Math.round(c[1]/events.length*100);
+        var flag=ccFlags[c[0]]||'';
+        html+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(51,65,85,0.3);font-size:0.68rem">'+
+            '<span>'+flag+'</span><span style="color:#cbd5e1;flex:1">'+c[0]+'</span>'+
+            '<span style="color:#94a3b8;font-size:0.62rem">'+pct+'%</span>'+
+            '<span style="color:#e2e8f0;font-weight:600;min-width:28px;text-align:right">'+c[1]+'</span></div>';
+    });
+
+    // Top Visitors by IP — store globally for pagination
+    uaAllIPs=Object.entries(byIP).sort(function(a,b){return b[1]-a[1]});
+    uaAllIPEvents=events;
+    uaIpPage=0;
+    html+='<div style="font-size:0.6rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0.5rem 0 0.3rem">Top Visitors (IP)</div>';
+    html+='<div id="uaIpList"></div>';
+    html+='<div id="uaIpPagination" style="display:flex;align-items:center;justify-content:space-between;margin-top:0.4rem"></div>';
+
+    // Referrers
+    var topRefs=Object.entries(byRef).sort(function(a,b){return b[1]-a[1]}).slice(0,4);
+    if(topRefs.length){
+        html+='<div style="font-size:0.6rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0.5rem 0 0.3rem">Referrers</div>';
+        topRefs.forEach(function(r){
+            html+='<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:0.68rem"><span style="color:#94a3b8">'+r[0]+'</span><span style="color:#e2e8f0;font-weight:600">'+r[1]+'</span></div>';
+        });
+    }
+
+    el.innerHTML=html;
+    renderUAIpList();
+}
+
+function renderUAIpList(){
+    var list=document.getElementById('uaIpList');
+    var pag=document.getElementById('uaIpPagination');
+    if(!list||!pag)return;
+    var ccFlags={'Indonesia':'\ud83c\uddee\ud83c\udde9','Singapore':'\ud83c\uddf8\ud83c\uddec','United States':'\ud83c\uddfa\ud83c\uddf8','Malaysia':'\ud83c\uddf2\ud83c\uddfe','Australia':'\ud83c\udde6\ud83c\uddfa','Germany':'\ud83c\udde9\ud83c\uddea','India':'\ud83c\uddee\ud83c\uddf3','Japan':'\ud83c\uddef\ud83c\uddf5','United Kingdom':'\ud83c\uddec\ud83c\udde7','Netherlands':'\ud83c\uddf3\ud83c\uddf1','France':'\ud83c\uddeb\ud83c\uddf7','South Korea':'\ud83c\uddf0\ud83c\uddf7'};
+    var total=uaAllIPs.length;
+    var totalPages=Math.ceil(total/UA_IP_PAGE_SIZE)||1;
+    if(uaIpPage>=totalPages)uaIpPage=totalPages-1;
+    if(uaIpPage<0)uaIpPage=0;
+    var start=uaIpPage*UA_IP_PAGE_SIZE;
+    var slice=uaAllIPs.slice(start,start+UA_IP_PAGE_SIZE);
+    var html='';
+    slice.forEach(function(ip){
+        var ipCountry='';
+        for(var i=0;i<uaAllIPEvents.length;i++){if(uaAllIPEvents[i].ip===ip[0]&&uaAllIPEvents[i].country){ipCountry=uaAllIPEvents[i].country;break}}
+        var ipFlag=ccFlags[ipCountry]||'';
+        html+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(51,65,85,0.3);font-size:0.68rem">'+
+            '<span style="color:#94a3b8;font-family:JetBrains Mono,monospace;font-size:0.62rem;flex:1">'+ip[0]+'</span>'+
+            '<span style="font-size:0.6rem">'+ipFlag+'</span>'+
+            '<span style="color:#64748b;font-size:0.58rem;margin-right:2px">'+(ipCountry?ipCountry.substring(0,3).toUpperCase():'')+'</span>'+
+            '<span style="color:#e2e8f0;font-weight:600;min-width:24px;text-align:right">'+ip[1]+'</span></div>';
+    });
+    list.innerHTML=html;
+    // Pagination
+    if(total>UA_IP_PAGE_SIZE){
+        pag.innerHTML='<span style="font-size:0.58rem;color:#64748b">Page '+(uaIpPage+1)+' of '+totalPages+' ('+total+' IPs)</span>'+
+            '<div style="display:flex;gap:3px">'+
+            '<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:0.6rem" onclick="uaIpGoPage(-1)"'+(uaIpPage===0?' disabled':'')+'>&laquo;</button>'+
+            '<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:0.6rem" onclick="uaIpGoPage(1)"'+(uaIpPage>=totalPages-1?' disabled':'')+'>&raquo;</button></div>';
+    } else {
+        pag.innerHTML='<span style="font-size:0.58rem;color:#64748b">'+total+' IPs</span>';
+    }
+}
+function uaIpGoPage(dir){uaIpPage+=dir;renderUAIpList()}
+
+// ═══ EVENT LOG ═══
+function renderUAEventLog(){
+    var container=document.getElementById('uaEventLog');
+    if(!container)return;
+
+    var search=document.getElementById('uaEventSearch').value.toLowerCase();
+    var displayEvents=uaFilteredEvents;
+    if(search){
+        displayEvents=displayEvents.filter(function(e){
+            return e.type.indexOf(search)!==-1||e.page.indexOf(search)!==-1||(e.ip||'').indexOf(search)!==-1||(e.country||'').toLowerCase().indexOf(search)!==-1||(e.city||'').toLowerCase().indexOf(search)!==-1||(e.browser||'').toLowerCase().indexOf(search)!==-1;
+        });
+    }
+
+    var start=uaPageNum*UA_PAGE_SIZE;
+    var page=displayEvents.slice(start,start+UA_PAGE_SIZE);
+
+    var headerRow='<div class="ua-event-row header"><span></span><span>Event / Visitor</span><span>Location</span><span>Page</span><span>Type</span><span>Time</span></div>';
+    var html=headerRow;
+
+    var ccFlags={'ID':'\ud83c\uddee\ud83c\udde9','SG':'\ud83c\uddf8\ud83c\uddec','US':'\ud83c\uddfa\ud83c\uddf8','MY':'\ud83c\uddf2\ud83c\uddfe','AU':'\ud83c\udde6\ud83c\uddfa','DE':'\ud83c\udde9\ud83c\uddea','IN':'\ud83c\uddee\ud83c\uddf3','JP':'\ud83c\uddef\ud83c\uddf5','GB':'\ud83c\uddec\ud83c\udde7','NL':'\ud83c\uddf3\ud83c\uddf1','FR':'\ud83c\uddeb\ud83c\uddf7','KR':'\ud83c\uddf0\ud83c\uddf7'};
+    page.forEach(function(e){
+        var cat=UA_CATEGORIES[e.type]||{icon:'fa-circle',color:'#94a3b8',label:e.type};
+        var dt=new Date(e.ts);
+        var timeStr=String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+        var dateStr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+        var flag=ccFlags[e.cc]||'';
+        var locStr=e.city?(flag+' '+e.city):(e.country?(flag+' '+e.country):'—');
+        var devIcon=e.device==='Mobile'?'fa-mobile-alt':e.device==='Tablet'?'fa-tablet-alt':'fa-desktop';
+        html+='<div class="ua-event-row">'+
+            '<div class="ua-event-icon '+e.type+'"><i class="fas '+cat.icon+'"></i></div>'+
+            '<div class="ua-event-detail">'+cat.label+'<small><span style="font-family:JetBrains Mono,monospace;color:#94a3b8">'+(e.ip||'—')+'</span> &middot; '+(e.browser||'')+' <i class="fas '+devIcon+'" style="font-size:0.55rem;opacity:0.6"></i></small></div>'+
+            '<span class="ua-event-loc" title="'+(e.city||'')+', '+(e.country||'')+'">'+locStr+'</span>'+
+            '<span class="ua-event-page">'+e.page.replace('.html','')+'</span>'+
+            '<span class="ua-event-type '+e.type+'">'+e.type.replace('_',' ')+'</span>'+
+            '<span class="ua-event-time">'+dateStr+' '+timeStr+'</span>'+
+            '</div>';
+    });
+
+    container.innerHTML=html;
+
+    // Pagination
+    var totalPages=Math.ceil(displayEvents.length/UA_PAGE_SIZE)||1;
+    var curPage=uaPageNum+1;
+    // Page number buttons
+    var pgNums='';
+    var maxBtns=5;
+    var startPg=Math.max(0,uaPageNum-2);
+    var endPg=Math.min(totalPages,startPg+maxBtns);
+    if(endPg-startPg<maxBtns)startPg=Math.max(0,endPg-maxBtns);
+    for(var p=startPg;p<endPg;p++){
+        pgNums+='<button class="pg-btn'+(p===uaPageNum?' active':'')+'" style="min-width:26px;padding:3px 6px;font-size:0.68rem" onclick="uaGoToPage('+p+')">'+(p+1)+'</button>';
+    }
+    document.getElementById('uaPageInfo').innerHTML='<span style="color:#64748b;font-size:0.72rem">Page '+curPage+' of '+totalPages+' &middot; '+displayEvents.length+' events</span>';
+    document.getElementById('uaPageBtns').innerHTML='<button class="pg-btn" onclick="uaGoPage(-1)"'+(uaPageNum===0?' disabled':'')+'>&laquo;</button>'+pgNums+'<button class="pg-btn" onclick="uaGoPage(1)"'+(start+UA_PAGE_SIZE>=displayEvents.length?' disabled':'')+'>&raquo;</button>';
+}
+
+function uaGoPage(dir){
+    uaPageNum+=dir;
+    if(uaPageNum<0)uaPageNum=0;
+    renderUAEventLog();
+}
+function uaGoToPage(p){uaPageNum=p;renderUAEventLog()}
+
+function filterUAEvents(){
+    uaPageNum=0;
+    renderUAEventLog();
+}
+
+// ═══ CSV EXPORT ═══
+function exportUAEventsCSV(){
+    if(!uaFilteredEvents.length){alert('No events to export');return}
+    var csv='Timestamp,Type,Page,IP,Country,City,Device,Browser,Screen,Language,Referrer,Session,UserAgent\n';
+    uaFilteredEvents.forEach(function(e){
+        csv+='"'+new Date(e.ts).toISOString()+'","'+e.type+'","'+e.page+'","'+(e.ip||'')+'","'+(e.country||'')+'","'+(e.city||'')+'","'+(e.device||'')+'","'+(e.browser||'')+'","'+(e.screen||'')+'","'+(e.lang||'')+'","'+(e.ref||'')+'","'+(e.sid||'')+'","'+(e.ua||'')+'"\n';
+    });
+    var blob=new Blob([csv],{type:'text/csv'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='rz-user-activity-'+new Date().toISOString().slice(0,10)+'.csv';
+    a.click();
+}
+
 // Load saved theme
 (function(){
     var saved=localStorage.getItem('rz_admin_theme');
@@ -2498,6 +4122,7 @@ if(checkAccess()){
     renderSubscribers();
     renderSettings();
     renderMayar();
+    renderActivity();
 }
 </script>
 </body>

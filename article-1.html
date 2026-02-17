@@ -61,6 +61,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-1-cover.jpg">
 
+    <style>
+        /* Dimension Card Interface */
+        .dim-cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.85rem;margin-bottom:1.5rem}
+        .dim-card{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.1rem;transition:border-color 0.3s,box-shadow 0.3s}
+        .dim-card:hover{border-color:rgba(96,165,250,0.25);box-shadow:0 0 12px rgba(96,165,250,0.06)}
+        .dim-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem}
+        .dim-card-name{font-weight:600;color:#e2e8f0;font-size:0.88rem}
+        .dim-card-weight{background:rgba(59,130,246,0.15);color:#60a5fa;padding:2px 8px;border-radius:20px;font-size:0.68rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+        .dim-card-desc{color:#94a3b8;font-size:0.72rem;line-height:1.4;margin-bottom:0.65rem}
+        .dim-score-btns{display:flex;gap:5px;margin-bottom:0.5rem}
+        .dim-score-btn{flex:1;padding:7px 0;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.03);color:#94a3b8;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'JetBrains Mono',monospace}
+        .dim-score-btn:hover{border-color:rgba(96,165,250,0.4);background:rgba(96,165,250,0.08);color:#e2e8f0}
+        .dim-score-btn.active{border-color:#3b82f6;background:rgba(59,130,246,0.18);color:#60a5fa;box-shadow:0 0 8px rgba(59,130,246,0.15)}
+        .dim-level-def{font-size:0.7rem;color:#94a3b8;line-height:1.4;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid #3b82f6;min-height:1.8em;transition:all 0.25s}
+        /* ISO 55001 Roadmap */
+        .iso-roadmap-section{margin:2rem 0 0}
+        .iso-stages{display:flex;gap:6px;margin-top:0.75rem}
+        .iso-stage{flex:1;padding:0.75rem 0.5rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;text-align:center;transition:all 0.3s}
+        .iso-stage.active{border-color:#3b82f6;background:rgba(59,130,246,0.12);box-shadow:0 0 12px rgba(59,130,246,0.12)}
+        .iso-stage-num{font-size:1.1rem;font-weight:800;color:#475569;margin-bottom:2px;font-family:'JetBrains Mono',monospace}
+        .iso-stage.active .iso-stage-num{color:#60a5fa}
+        .iso-stage-label{font-size:0.68rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+        .iso-stage.active .iso-stage-label{color:#93c5fd}
+        .iso-stage-clauses{font-size:0.62rem;color:#475569;margin-top:4px;line-height:1.3}
+        .iso-stage.active .iso-stage-clauses{color:#94a3b8}
+        .iso-stage-connector{width:24px;display:flex;align-items:center;justify-content:center;color:#334155;font-size:0.8rem;flex-shrink:0}
+        .iso-mapping-note{font-size:0.65rem;color:#64748b;margin-top:8px;font-style:italic}
+        @media(max-width:768px){.dim-cards-grid{grid-template-columns:1fr}.iso-stages{flex-direction:column}.iso-stage-connector{transform:rotate(90deg);width:auto;height:20px}}
+    </style>
+
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
     {
@@ -680,7 +710,7 @@
 
         .calc-results {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1rem;
             background: rgba(255,255,255,0.05);
             border-radius: 16px;
@@ -713,8 +743,103 @@
         }
 
         .radar-chart-container canvas {
-            max-width: 100%;
-            height: auto;
+            max-width: 400px;
+            width: 100%;
+            aspect-ratio: 1;
+        }
+
+        /* Executive Summary Cards */
+        .exec-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .exec-card {
+            border-radius: 12px;
+            padding: 14px 12px;
+            text-align: center;
+        }
+        .exec-card-label,
+        .exec-card-value,
+        .exec-card-sub {
+            background: none !important;
+            color: inherit;
+        }
+        .exec-card-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.6) !important;
+            margin-bottom: 6px;
+        }
+        .exec-card-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        .exec-card-sub {
+            font-size: 0.65rem;
+            margin-top: 4px;
+            opacity: 0.75;
+        }
+
+        /* Radar Panel (Maturity Profile) */
+        .radar-panel {
+            background: rgba(15,23,42,0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .radar-panel-header {
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+        .radar-panel-title {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0 0 8px;
+        }
+        .radar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        .radar-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .radar-legend-swatch {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        .strategic-insight {
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 1rem;
+        }
+        .strategic-insight-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 6px;
+        }
+        .strategic-insight-text {
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 640px) {
+            .exec-cards { grid-template-columns: repeat(2, 1fr); }
         }
 
         /* Dimension Bars */
@@ -2376,75 +2501,86 @@
                         </div>
                     </div>
 
-                    <!-- ─── 8 DIMENSION INPUTS ─── -->
-                    <div class="calc-grid">
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Documentation
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Documentation (Weight: 10%)</div><div class="tooltip-desc">SOPs, MOPs, EOPs, as-built drawings, version control, CMMS integration.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No formal docs; tribal knowledge only<br><strong>2 Repeatable:</strong> Some docs exist but outdated or incomplete<br><strong>3 Defined:</strong> All critical SOPs documented, version-controlled<br><strong>4 Managed:</strong> Docs linked to CMMS, audit trail, regular reviews<br><strong>5 Optimized:</strong> Automated doc workflows, real-time as-builts, integrated knowledge base</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-doc" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
+                    <!-- ─── 8 DIMENSION INPUTS (Visual Card Interface) ─── -->
+                    <div class="dim-cards-grid" id="dimCardsGrid"></div>
+
+                    <!-- ─── EXECUTIVE SUMMARY CARDS ─── -->
+                    <div class="exec-cards" id="execCards">
+                        <div class="exec-card" id="exec-health" style="background:linear-gradient(135deg,rgba(234,179,8,0.15),rgba(234,179,8,0.05));border-color:rgba(234,179,8,0.3);">
+                            <div class="exec-card-label">Operational Health</div>
+                            <div class="exec-card-value" id="exec-health-val" style="color:#eab308;">50/100</div>
+                            <div class="exec-card-sub" id="exec-health-sub" style="color:#eab308;">Benchmark: Tier II</div>
                         </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Training
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Training (Weight: 15%)</div><div class="tooltip-desc">Competency programs, cross-training, certifications, drill frequency, skill gap analysis.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> OJT only, no structured program<br><strong>2 Repeatable:</strong> Annual training schedule, basic orientation<br><strong>3 Defined:</strong> Role-based competency matrix, regular drills<br><strong>4 Managed:</strong> Cross-training across systems, skill gap tracking, certifications required<br><strong>5 Optimized:</strong> Continuous learning culture, external benchmarking, advanced simulation drills</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-train" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
+                        <div class="exec-card" id="exec-risk" style="background:linear-gradient(135deg,rgba(234,179,8,0.15),rgba(234,179,8,0.05));border-color:rgba(234,179,8,0.3);">
+                            <div class="exec-card-label">Risk Exposure</div>
+                            <div class="exec-card-value" id="exec-risk-val" style="color:#eab308;">MODERATE</div>
+                            <div class="exec-card-sub" id="exec-risk-sub" style="color:#eab308;">$292K · Est. Annual</div>
                         </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Change Management
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Change Management (Weight: 15%)</div><div class="tooltip-desc">MOC process, risk assessment, CAB governance, rollback procedures. Prevents ~70% of human-caused outages.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> Changes made without formal process or approval<br><strong>2 Repeatable:</strong> Change requests logged, basic approvals<br><strong>3 Defined:</strong> Formal MOC with risk assessment, CAB reviews<br><strong>4 Managed:</strong> Automated workflows, rollback plans mandatory, post-change verification<br><strong>5 Optimized:</strong> Predictive impact analysis, zero-downtime change windows, automated validation</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-change" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
+                        <div class="exec-card" id="exec-bottleneck" style="background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04));border-color:rgba(239,68,68,0.25);">
+                            <div class="exec-card-label">Critical Bottleneck</div>
+                            <div class="exec-card-value" id="exec-bottleneck-val" style="color:#f87171;font-size:1rem;font-weight:800;">CHANGE MGMT</div>
+                            <div class="exec-card-sub" id="exec-bottleneck-sub" style="color:#f87171;">Score: 3/5 · Priority: 0.195</div>
                         </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Monitoring
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monitoring (Weight: 15%)</div><div class="tooltip-desc">BMS/DCIM coverage, alarm hierarchy, dashboards, trend analysis, predictive analytics.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> Manual readings, no centralized monitoring<br><strong>2 Repeatable:</strong> BMS installed but limited coverage, alarm fatigue<br><strong>3 Defined:</strong> Full BMS coverage, tiered alarm hierarchy, basic dashboards<br><strong>4 Managed:</strong> DCIM integrated, trend analysis, KPI dashboards, automated reporting<br><strong>5 Optimized:</strong> Predictive analytics (ML/AI), anomaly detection, digital twin integration</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-monitor" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
-                        </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Maintenance
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maintenance (Weight: 15%)</div><div class="tooltip-desc">PM program, CMMS utilization, PdM integration, spare parts strategy, vendor management.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> Reactive only (fix when broken), no PM schedule<br><strong>2 Repeatable:</strong> Basic PM schedule, manual tracking<br><strong>3 Defined:</strong> CMMS-driven PM program, work order tracking, spare parts inventory<br><strong>4 Managed:</strong> PdM integration (vibration, thermal), vendor SLA tracking, KPIs<br><strong>5 Optimized:</strong> Condition-based maintenance, AI-driven scheduling, RCM methodology</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-maint" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
-                        </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Emergency Readiness
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Emergency Readiness (Weight: 10%)</div><div class="tooltip-desc">EOP completeness, drill realism, escalation matrix, communication protocols, RTO/RPO.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No written EOPs, ad-hoc response<br><strong>2 Repeatable:</strong> Basic EOPs exist, annual drills<br><strong>3 Defined:</strong> Comprehensive EOPs, quarterly drills, clear escalation matrix<br><strong>4 Managed:</strong> Realistic drills with measured MTTR, automated communication, tabletop exercises<br><strong>5 Optimized:</strong> Continuous readiness assessment, cross-site drills, post-incident improvement loop</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-emergency" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
-                        </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Continuous Improvement
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Continuous Improvement (Weight: 10%)</div><div class="tooltip-desc">RCA depth, CAPA tracking, lessons learned, benchmarking practices.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No formal RCA process, repeat incidents<br><strong>2 Repeatable:</strong> Basic incident reports, some follow-up<br><strong>3 Defined:</strong> Structured RCA (5-Why, Ishikawa), CAPA tracking<br><strong>4 Managed:</strong> Lessons learned database, proactive CAPA, industry benchmarking<br><strong>5 Optimized:</strong> Self-improving system (Safety-II), data-driven optimization, cross-industry learning</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-improve" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
-                        </div>
-                        <div class="calc-input-group">
-                            <label class="calc-label" style="display:flex;align-items:center;">Leadership
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Leadership (Weight: 10%)</div><div class="tooltip-desc">Management commitment, resource allocation, safety culture, strategic planning. Impact multiplier: 1.5x.</div><div class="tooltip-desc" style="margin-top:6px;font-size:11px;"><strong>1 Ad-hoc:</strong> No executive sponsorship, ops seen as cost center<br><strong>2 Repeatable:</strong> Basic management oversight, reactive budget allocation<br><strong>3 Defined:</strong> Dedicated ops leadership, annual budget planning, safety awareness<br><strong>4 Managed:</strong> Just culture established, cross-functional alignment, strategic roadmap<br><strong>5 Optimized:</strong> Ops excellence as competitive advantage, full executive buy-in, generative culture</div></span></span>
-                            </label>
-                            <select class="calc-select" id="calc-leadership" onchange="calculateMaturity()">
-                                <option value="1">1 - Ad-hoc</option><option value="2">2 - Repeatable</option><option value="3" selected>3 - Defined</option><option value="4">4 - Managed</option><option value="5">5 - Optimized</option>
-                            </select>
+                        <div class="exec-card" id="exec-milestone" style="background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(59,130,246,0.04));border-color:rgba(59,130,246,0.25);">
+                            <div class="exec-card-label">Next Milestone</div>
+                            <div class="exec-card-value" id="exec-milestone-val" style="color:#60a5fa;">80</div>
+                            <div class="exec-card-sub" id="exec-milestone-sub" style="color:#60a5fa;">+11 pts · Proactive</div>
                         </div>
                     </div>
 
-                    <!-- ─── PRO INPUT PANELS (appear right after dimension inputs, BEFORE results) ─── -->
+                    <!-- ─── RESULTS ─── -->
+                    <div class="calc-results">
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-score">50</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Composite Score (0-100)
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Composite Score</div><div class="tooltip-desc">Normalized score mapping 1-5 weighted average to 0-100 scale.</div><div class="tooltip-formula">((WeightedSum - 1) / 4) &times; 100</div><div class="tooltip-desc" style="margin-top:6px;">Score of 50 = all dimensions at Level 3 (Defined).</div></span></span>
+                            </div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-level">3</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Maturity Level
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maturity Level (1-5)</div><div class="tooltip-desc">1 = Reactive (0-20): Firefighting mode<br>2 = Preventive (21-40): Basic PM in place<br>3 = Predictive (41-60): Data-driven decisions<br>4 = Proactive (61-80): Risk anticipation<br>5 = Generative (81-100): Self-improving system</div></span></span>
+                            </div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-label" style="font-size: 1.1rem;">Predictive</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Maturity Category
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maturity Category</div><div class="tooltip-desc"><strong>Reactive</strong> — Firefighting, no process, high incident rate<br><strong>Preventive</strong> — Scheduled maintenance, some structure<br><strong>Predictive</strong> — Data-driven, trending, condition monitoring<br><strong>Proactive</strong> — Anticipatory risk management, leading indicators<br><strong>Generative</strong> — Self-improving, Safety-II, organizational learning</div></span></span>
+                            </div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-weighted">3.00</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Weighted Average (1-5)
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weighted Average</div><div class="tooltip-desc">Raw weighted mean before normalization. Each dimension score (1-5) multiplied by its percentage weight. Range: 1.00 (all Level 1) to 5.00 (all Level 5).</div></span></span>
+                            </div>
+                        </div>
+                        <div class="calc-result-item">
+                            <div class="calc-result-value" id="result-rmi" style="color:#10b981;">50%</div>
+                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Risk Mitigation Index
+                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Risk Mitigation Index (RMI)</div><div class="tooltip-desc">Percentage of potential operational risk currently mitigated, based on weighted impact factors.<br><br><strong>Formula:</strong> RMI = &Sigma;(score &times; weight &times; impact) / &Sigma;(5 &times; weight &times; impact) &times; 100<br><br>100% = all dimensions at Level 5 with maximum risk coverage. &lt;40% = critical exposure.</div></span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Radar Panel — Maturity Profile -->
+                    <div class="radar-panel">
+                        <div class="radar-panel-header">
+                            <div class="radar-panel-title">Maturity Profile</div>
+                            <div class="radar-legend">
+                                <div class="radar-legend-item"><div class="radar-legend-swatch" style="background:#60a5fa;"></div> Current Maturity</div>
+                                <div class="radar-legend-item"><div class="radar-legend-swatch" style="background:#a78bfa;border:1px dashed #c4b5fd;"></div> ISO 55001 Target</div>
+                            </div>
+                        </div>
+                        <div class="radar-chart-container">
+                            <canvas id="radarCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="strategic-insight">
+                            <div class="strategic-insight-title">Strategic Insight</div>
+                            <div class="strategic-insight-text" id="strategicInsightText">Calculating...</div>
+                        </div>
+                    </div>
+
+                    <!-- ─── PRO INPUT PANELS ─── -->
                     <div id="maturityProInputs" style="display:none;">
 
                         <!-- 1. Facility Context -->
@@ -2521,40 +2657,6 @@
                         </div>
                     </div>
 
-                    <!-- ─── RESULTS ─── -->
-                    <div class="calc-results">
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="result-score">50</div>
-                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Composite Score (0-100)
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Composite Score</div><div class="tooltip-desc">Normalized score mapping 1-5 weighted average to 0-100 scale.</div><div class="tooltip-formula">((WeightedSum - 1) / 4) &times; 100</div><div class="tooltip-desc" style="margin-top:6px;">Score of 50 = all dimensions at Level 3 (Defined).</div></span></span>
-                            </div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="result-level">3</div>
-                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Maturity Level
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maturity Level (1-5)</div><div class="tooltip-desc">1 = Reactive (0-20): Firefighting mode<br>2 = Preventive (21-40): Basic PM in place<br>3 = Predictive (41-60): Data-driven decisions<br>4 = Proactive (61-80): Risk anticipation<br>5 = Generative (81-100): Self-improving system</div></span></span>
-                            </div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="result-label" style="font-size: 1.1rem;">Predictive</div>
-                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Maturity Category
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Maturity Category</div><div class="tooltip-desc"><strong>Reactive</strong> — Firefighting, no process, high incident rate<br><strong>Preventive</strong> — Scheduled maintenance, some structure<br><strong>Predictive</strong> — Data-driven, trending, condition monitoring<br><strong>Proactive</strong> — Anticipatory risk management, leading indicators<br><strong>Generative</strong> — Self-improving, Safety-II, organizational learning</div></span></span>
-                            </div>
-                        </div>
-                        <div class="calc-result-item">
-                            <div class="calc-result-value" id="result-weighted">3.00</div>
-                            <div class="calc-result-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">Weighted Average (1-5)
-                                <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weighted Average</div><div class="tooltip-desc">Raw weighted mean before normalization. Each dimension score (1-5) multiplied by its percentage weight. Range: 1.00 (all Level 1) to 5.00 (all Level 5).</div></span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Radar Chart -->
-                    <h4 style="color: #e2e8f0; text-align: center; margin: 2rem 0 0.5rem; font-size: 0.95rem;">Eight-Dimension Radar Chart</h4>
-                    <div class="radar-chart-container">
-                        <canvas id="radarCanvas" width="400" height="400"></canvas>
-                    </div>
-
                     <!-- Dimension Bars -->
                     <h4 style="color: #e2e8f0; margin: 2rem 0 1rem; font-size: 0.95rem;">Dimension Scores</h4>
                     <div class="dimension-bars" id="dimensionBars"></div>
@@ -2571,10 +2673,38 @@
                     </h4>
                     <div class="benchmark-grid" id="benchmarkGrid"></div>
                     <div class="benchmark-meta">
-                        <span class="benchmark-meta-tag"><i class="fas fa-code-branch"></i> Model v1.1</span>
+                        <span class="benchmark-meta-tag"><i class="fas fa-code-branch"></i> Model v1.2</span>
                         <span class="benchmark-meta-tag"><i class="fas fa-calendar"></i> Updated Feb 2026</span>
                         <span class="benchmark-meta-tag"><i class="fas fa-book"></i> Sources: Uptime Institute 2023-2024, EN 50600</span>
                         <span class="benchmark-meta-tag"><i class="fas fa-info-circle"></i> Directional benchmarks (median, enterprise + colo)</span>
+                    </div>
+
+                    <!-- ISO 55001 Roadmap -->
+                    <h4 style="color: #e2e8f0; margin: 2rem 0 0.5rem; font-size: 0.95rem; display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-road" style="color:#3b82f6;"></i> ISO 55001 Asset Management Roadmap
+                        <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">ISO 55001 Mapping</div><div class="tooltip-desc">Maps your maturity level to ISO 55001:2014 asset management stages.<br><br><strong>Awareness</strong> (Cl. 4-5): Establishing context, leadership commitment<br><strong>Managed</strong> (Cl. 6-8): Planning, support systems, operational control<br><strong>Optimization</strong> (Cl. 9-10): Performance evaluation, continual improvement<br><br>Each stage corresponds to specific ISO clauses and audit requirements.</div></span></span>
+                    </h4>
+                    <div class="iso-roadmap-section">
+                        <div class="iso-stages" id="isoStages">
+                            <div class="iso-stage" id="iso-awareness">
+                                <div class="iso-stage-num">1</div>
+                                <div class="iso-stage-label">Awareness</div>
+                                <div class="iso-stage-clauses">Cl. 4-5: Context &amp; Leadership</div>
+                            </div>
+                            <div class="iso-stage-connector"><i class="fas fa-chevron-right"></i></div>
+                            <div class="iso-stage" id="iso-managed">
+                                <div class="iso-stage-num">2</div>
+                                <div class="iso-stage-label">Managed</div>
+                                <div class="iso-stage-clauses">Cl. 6-8: Planning, Support &amp; Operations</div>
+                            </div>
+                            <div class="iso-stage-connector"><i class="fas fa-chevron-right"></i></div>
+                            <div class="iso-stage" id="iso-optimization">
+                                <div class="iso-stage-num">3</div>
+                                <div class="iso-stage-label">Optimization</div>
+                                <div class="iso-stage-clauses">Cl. 9-10: Performance &amp; Improvement</div>
+                            </div>
+                        </div>
+                        <div class="iso-mapping-note" id="isoMappingNote">Your maturity maps to ISO 55001 Stage 2 (Managed) — formal planning and support systems in place.</div>
                     </div>
 
                     <div class="privacy-badge" style="margin-top:1.5rem;">
@@ -3086,11 +3216,81 @@
             ]
         };
 
+        const levelLabels = ['Ad-hoc','Repeatable','Defined','Managed','Optimized'];
+        const levelDefs = {
+            doc: ['No formal docs; tribal knowledge only','Some docs exist but outdated or incomplete','All critical SOPs documented, version-controlled','Docs linked to CMMS, audit trail, regular reviews','Automated doc workflows, real-time as-builts, integrated KB'],
+            train: ['OJT only, no structured program','Annual training schedule, basic orientation','Role-based competency matrix, regular drills','Cross-training, skill gap tracking, certifications required','Continuous learning culture, advanced simulation drills'],
+            change: ['Changes without formal process or approval','Change requests logged, basic approvals','Formal MOC with risk assessment, CAB reviews','Automated workflows, rollback plans, post-change verification','Predictive impact analysis, zero-downtime windows'],
+            monitor: ['Manual readings, no centralized monitoring','BMS installed but limited coverage, alarm fatigue','Full BMS coverage, tiered alarms, basic dashboards','DCIM integrated, trend analysis, KPI dashboards','Predictive analytics (ML/AI), anomaly detection, digital twin'],
+            maint: ['Reactive only (fix when broken), no PM schedule','Basic PM schedule, manual tracking','CMMS-driven PM, work order tracking, spare parts','PdM integration (vibration, thermal), vendor SLA tracking','Condition-based maintenance, AI-driven scheduling, RCM'],
+            emergency: ['No written EOPs, ad-hoc response','Basic EOPs exist, annual drills','Comprehensive EOPs, quarterly drills, escalation matrix','Realistic drills, measured MTTR, tabletop exercises','Continuous readiness, cross-site drills, improvement loop'],
+            improve: ['No formal RCA process, repeat incidents','Basic incident reports, some follow-up','Structured RCA (5-Why, Ishikawa), CAPA tracking','Lessons learned database, proactive CAPA, benchmarking','Self-improving system (Safety-II), cross-industry learning'],
+            leadership: ['No executive sponsorship, ops = cost center','Basic management oversight, reactive budget','Dedicated ops leadership, annual budget, safety awareness','Just culture, cross-functional alignment, strategic roadmap','Ops excellence as competitive advantage, generative culture']
+        };
+        const dimDescriptions = {
+            doc: 'SOPs, MOPs, EOPs, as-built drawings, version control, CMMS integration.',
+            train: 'Competency programs, cross-training, certifications, drill frequency.',
+            change: 'MOC process, risk assessment, CAB governance, rollback procedures.',
+            monitor: 'BMS/DCIM coverage, alarm hierarchy, dashboards, trend analysis.',
+            maint: 'PM program, CMMS utilization, PdM integration, spare parts strategy.',
+            emergency: 'EOP completeness, drill realism, escalation matrix, communication.',
+            improve: 'RCA depth, CAPA tracking, lessons learned, benchmarking practices.',
+            leadership: 'Management commitment, resource allocation, safety culture, strategic vision.'
+        };
+
         // ═══ STATE ═══
         let isPremiumMaturity = false;
         let maturityMode = 'free';
         let customWeights = dimensions.map(d => d.weight);
         let proBuilt = false;
+
+        // ═══ BUILD DIMENSION CARDS ═══
+        function buildDimensionCards() {
+            var grid = document.getElementById('dimCardsGrid');
+            if (!grid) return;
+            grid.innerHTML = dimensions.map(function(d) {
+                var defs = levelDefs[d.id];
+                var desc = dimDescriptions[d.id];
+                var opts = [1,2,3,4,5].map(function(v) {
+                    return '<option value="'+v+'"'+(v===3?' selected':'')+'>'+v+'</option>';
+                }).join('');
+                var btns = [1,2,3,4,5].map(function(v) {
+                    return '<button class="dim-score-btn'+(v===3?' active':'')+'" data-val="'+v+'" title="'+levelLabels[v-1]+'">'+v+'</button>';
+                }).join('');
+                var tooltipDefs = defs.map(function(def, i) {
+                    return '<strong>'+(i+1)+' '+levelLabels[i]+':</strong> '+def;
+                }).join('<br>');
+                var tooltip = '<span class="tooltip-trigger" style="margin-left:auto;flex-shrink:0;">?<span class="tooltip-content">'+
+                    '<div class="tooltip-title">'+d.label+' (Weight: '+(d.weight*100)+'%, Impact: '+d.impact+'x)</div>'+
+                    '<div class="tooltip-desc">'+desc+'</div>'+
+                    '<div class="tooltip-desc" style="margin-top:6px;font-size:11px;">'+tooltipDefs+'</div>'+
+                    '</span></span>';
+                return '<div class="dim-card" data-dim="'+d.id+'">'+
+                    '<div class="dim-card-header"><span class="dim-card-name">'+d.label+'</span>'+tooltip+'<span class="dim-card-weight">'+(d.weight*100)+'%</span></div>'+
+                    '<div class="dim-card-desc">'+desc+'</div>'+
+                    '<div class="dim-score-btns">'+btns+'</div>'+
+                    '<div class="dim-level-def" id="def-'+d.id+'">3 — Defined: '+defs[2]+'</div>'+
+                    '<select class="calc-select" id="'+d.el+'" style="display:none" onchange="calculateMaturity()">'+opts+'</select>'+
+                    '</div>';
+            }).join('');
+
+            grid.addEventListener('click', function(e) {
+                var btn = e.target.closest('.dim-score-btn');
+                if (!btn) return;
+                var card = btn.closest('.dim-card');
+                var val = parseInt(btn.getAttribute('data-val'));
+                var dimId = card.getAttribute('data-dim');
+                var select = card.querySelector('select');
+                if (select) select.value = val;
+                card.querySelectorAll('.dim-score-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                var defEl = document.getElementById('def-'+dimId);
+                if (defEl && levelDefs[dimId]) {
+                    defEl.textContent = val+' — '+levelLabels[val-1]+': '+levelDefs[dimId][val-1];
+                }
+                calculateMaturity();
+            });
+        }
 
         // ═══ CORE FUNCTIONS ═══
         function getMaturityLabel(score) {
@@ -3179,6 +3379,144 @@
             document.getElementById('result-label').style.color = maturity.color;
             document.getElementById('result-weighted').textContent = weightedSum.toFixed(2);
 
+            // RMI — Risk Mitigation Index
+            const rmiNumerator = values.reduce((s, d) => s + d.value * d.weight * d.impact, 0);
+            const rmiDenominator = values.reduce((s, d) => s + 5 * d.weight * d.impact, 0);
+            const rmi = (rmiNumerator / rmiDenominator) * 100;
+            const rmiEl = document.getElementById('result-rmi');
+            if (rmiEl) {
+                rmiEl.textContent = Math.round(rmi) + '%';
+                rmiEl.style.color = rmi >= 80 ? '#10b981' : rmi >= 60 ? '#f59e0b' : rmi >= 40 ? '#ea580c' : '#ef4444';
+            }
+
+            // Executive Summary Cards
+            (function updateExecCards() {
+                const sc = Math.round(compositeScore);
+                function hexToRgba(hex, a) {
+                    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+                    return `rgba(${r},${g},${b},${a})`;
+                }
+                // Operational Health
+                const healthEl = document.getElementById('exec-health');
+                const healthValEl = document.getElementById('exec-health-val');
+                const healthSubEl = document.getElementById('exec-health-sub');
+                if (healthEl) {
+                    healthValEl.textContent = sc + '/100';
+                    const closestBench = benchmarks.reduce((prev, b) => Math.abs(sc - b.avg) < Math.abs(sc - prev.avg) ? b : prev);
+                    healthSubEl.textContent = (sc >= closestBench.avg ? '\u25B2 Above ' : '\u25BC Below ') + closestBench.tier;
+                    const hColor = maturity.color;
+                    healthValEl.style.color = hColor;
+                    healthSubEl.style.color = hColor;
+                    healthEl.style.setProperty('background', `linear-gradient(135deg,${hexToRgba(hColor,0.15)},${hexToRgba(hColor,0.05)})`, 'important');
+                    healthEl.style.borderColor = hexToRgba(hColor,0.3);
+                }
+                // Risk Exposure
+                const riskEl = document.getElementById('exec-risk');
+                const riskValEl = document.getElementById('exec-risk-val');
+                const riskSubEl = document.getElementById('exec-risk-sub');
+                if (riskEl) {
+                    let rLvl, rClr;
+                    if (sc >= 80) { rLvl='LOW'; rClr='#10b981'; }
+                    else if (sc >= 60) { rLvl='MODERATE'; rClr='#f59e0b'; }
+                    else if (sc >= 40) { rLvl='ELEVATED'; rClr='#ea580c'; }
+                    else { rLvl='HIGH'; rClr='#ef4444'; }
+                    const mf = Math.max(0.05, 1 - (sc / 120));
+                    const ae = 2.5 * mf * 200000;
+                    const aeStr = ae >= 1000000 ? '$' + (ae/1000000).toFixed(1) + 'M' : '$' + Math.round(ae/1000) + 'K';
+                    riskValEl.textContent = rLvl;
+                    riskSubEl.textContent = aeStr + ' \u00B7 Est. Annual';
+                    riskValEl.style.color = rClr;
+                    riskSubEl.style.color = rClr;
+                    riskEl.style.setProperty('background', `linear-gradient(135deg,${hexToRgba(rClr,0.15)},${hexToRgba(rClr,0.05)})`, 'important');
+                    riskEl.style.borderColor = hexToRgba(rClr,0.3);
+                }
+                // Critical Bottleneck
+                const bnEl = document.getElementById('exec-bottleneck');
+                const bnValEl = document.getElementById('exec-bottleneck-val');
+                const bnSubEl = document.getElementById('exec-bottleneck-sub');
+                if (bnEl) {
+                    const sorted = [...values].sort((a, b) => ((5 - a.value) * a.weight * a.impact) - ((5 - b.value) * b.weight * b.impact)).reverse();
+                    const top = sorted[0];
+                    const topGap = (5 - top.value) * top.weight * top.impact;
+                    if (top.value >= 5) {
+                        bnValEl.textContent = 'NONE';
+                        bnSubEl.textContent = 'All dimensions at max';
+                        bnValEl.style.color = '#10b981';
+                        bnSubEl.style.color = '#10b981';
+                        bnEl.style.setProperty('background', 'linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04))', 'important');
+                        bnEl.style.borderColor = 'rgba(16,185,129,0.25)';
+                    } else {
+                        bnValEl.textContent = top.label.toUpperCase();
+                        bnSubEl.textContent = 'Score: ' + top.value + '/5 \u00B7 Priority: ' + topGap.toFixed(3);
+                        const bClr = top.value <= 2 ? '#ef4444' : '#f87171';
+                        bnValEl.style.color = bClr;
+                        bnSubEl.style.color = bClr;
+                    }
+                }
+                // Next Milestone
+                const msEl = document.getElementById('exec-milestone');
+                const msValEl = document.getElementById('exec-milestone-val');
+                const msSubEl = document.getElementById('exec-milestone-sub');
+                if (msEl) {
+                    const nextLevel = maturity.level < 5 ? maturity.level + 1 : 5;
+                    const nextThreshold = maturity.level * 20 + 1;
+                    const labels = ['','Preventive','Predictive','Proactive','Generative','Generative'];
+                    if (maturity.level >= 5) {
+                        msValEl.textContent = '\u2605';
+                        msSubEl.textContent = 'Peak · Generative';
+                    } else {
+                        const gap = nextThreshold - sc;
+                        msValEl.textContent = nextThreshold;
+                        msSubEl.textContent = '+' + (gap > 0 ? gap : 0) + ' pts \u00B7 ' + labels[nextLevel];
+                    }
+                }
+            })();
+
+            // Strategic Insight
+            (function updateStrategicInsight() {
+                const el = document.getElementById('strategicInsightText');
+                if (!el) return;
+                const sc = Math.round(compositeScore);
+                const sorted = [...values].sort((a, b) => ((5 - a.value) * a.weight * a.impact) - ((5 - b.value) * b.weight * b.impact)).reverse();
+                const topGap = sorted[0];
+                const strongest = [...values].sort((a, b) => b.value - a.value)[0];
+                let insight = '';
+                if (sc >= 80) {
+                    insight = 'Facility is <strong style="color:#10b981;">Proactive/Generative</strong>. Operational systems are mature, risk is well-mitigated. Focus on sustaining excellence through audit cycles and knowledge transfer.';
+                } else if (sc >= 60) {
+                    insight = 'Facility is <strong style="color:#f59e0b;">Managed but Inconsistent</strong>. Processes exist but rely on individual heroics rather than system reliability. Elevating <strong>' + topGap.label + '</strong> will yield the highest ROI for reliability.';
+                } else if (sc >= 40) {
+                    insight = 'Facility is <strong style="color:#ea580c;">Developing with Gaps</strong>. ' + (values.filter(v => v.value <= 2).length) + ' dimension(s) at critical levels create compounding failure risk. Prioritize <strong>' + topGap.label + '</strong> (Level ' + topGap.value + ') — it has the highest weighted impact on overall maturity.';
+                } else {
+                    insight = '<strong style="color:#ef4444;">Reactive Mode Detected.</strong> Operations depend entirely on ad-hoc responses. <strong>' + topGap.label + '</strong> is the most urgent gap. Establish minimum viable processes across all 8 dimensions within 90 days.';
+                }
+                el.innerHTML = insight;
+            })();
+
+            // ISO 55001 Roadmap
+            var isoAwareness = document.getElementById('iso-awareness');
+            var isoManaged = document.getElementById('iso-managed');
+            var isoOptimization = document.getElementById('iso-optimization');
+            var isoNote = document.getElementById('isoMappingNote');
+            if (isoAwareness && isoManaged && isoOptimization) {
+                isoAwareness.classList.remove('active');
+                isoManaged.classList.remove('active');
+                isoOptimization.classList.remove('active');
+                if (compositeScore >= 71) {
+                    isoOptimization.classList.add('active');
+                    isoManaged.classList.add('active');
+                    isoAwareness.classList.add('active');
+                    if (isoNote) isoNote.textContent = 'Your maturity maps to ISO 55001 Stage 3 (Optimization) — performance evaluation and continual improvement processes established. Ready for ISO 55001 certification audit.';
+                } else if (compositeScore >= 41) {
+                    isoManaged.classList.add('active');
+                    isoAwareness.classList.add('active');
+                    if (isoNote) isoNote.textContent = 'Your maturity maps to ISO 55001 Stage 2 (Managed) — formal planning, support systems, and operational controls in place. Focus on Cl. 9-10 (performance evaluation) to advance.';
+                } else {
+                    isoAwareness.classList.add('active');
+                    if (isoNote) isoNote.textContent = 'Your maturity maps to ISO 55001 Stage 1 (Awareness) — establishing organizational context and leadership commitment. Build foundational processes before pursuing certification.';
+                }
+            }
+
             const gaps = values.map(d => ({
                 label: d.label,
                 gap: 5 - d.value,
@@ -3219,7 +3557,9 @@
         function drawRadarChart(values) {
             const canvas = document.getElementById('radarCanvas');
             if (!canvas) return;
-            drawRadarOnCanvas(canvas, values, null, 400);
+            // ISO 55001 target = Level 4 for all dimensions (proactive baseline)
+            const isoTarget = values.map(() => 4);
+            drawRadarOnCanvas(canvas, values, isoTarget, 400);
         }
 
         function drawRadarOnCanvas(canvas, values, targetValues, size) {
@@ -3230,7 +3570,7 @@
             canvas.style.width = size + 'px';
             canvas.style.height = size + 'px';
             ctx.scale(dpr, dpr);
-            const cx = size / 2, cy = size / 2, maxR = size * 0.375;
+            const cx = size / 2, cy = size / 2, maxR = size * 0.28;
             const n = values.length, step = (2 * Math.PI) / n, start = -Math.PI / 2;
             ctx.clearRect(0, 0, size, size);
 
@@ -3260,12 +3600,14 @@
             // Data points
             values.forEach((d, i) => { const a = start + i * step; const r = (d.value / 5) * maxR; ctx.beginPath(); ctx.arc(cx + r * Math.cos(a), cy + r * Math.sin(a), 4, 0, 2 * Math.PI); ctx.fillStyle = '#60a5fa'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); });
 
-            // Labels
-            ctx.fillStyle = '#e2e8f0'; ctx.font = '11px Inter,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            // Labels (multi-line wrap for long names)
+            ctx.fillStyle = '#e2e8f0'; ctx.font = '10px Inter,sans-serif'; ctx.textBaseline = 'middle';
             values.forEach((d, i) => {
-                const a = start + i * step; const lR = maxR + 24; const x = cx + lR * Math.cos(a); const y = cy + lR * Math.sin(a);
+                const a = start + i * step; const lR = maxR + 22; const x = cx + lR * Math.cos(a); const y = cy + lR * Math.sin(a);
                 if (Math.abs(Math.cos(a)) > 0.8) ctx.textAlign = Math.cos(a) > 0 ? 'left' : 'right'; else ctx.textAlign = 'center';
-                ctx.fillText(d.label, x, y);
+                const words = d.label.split(' ');
+                if (words.length <= 2) { ctx.fillText(d.label, x, y); }
+                else { const mid = Math.ceil(words.length / 2); ctx.fillText(words.slice(0, mid).join(' '), x, y - 6); ctx.fillText(words.slice(mid).join(' '), x, y + 6); }
             });
         }
 
@@ -3473,6 +3815,17 @@
             document.getElementById(dimensions.find(d => d.id === dimId).el).value = rounded;
             const avgEl = document.getElementById('subdim-avg-' + dimId);
             if (avgEl) avgEl.textContent = avg.toFixed(1);
+            // Sync card button states
+            var card = document.querySelector('.dim-card[data-dim="' + dimId + '"]');
+            if (card) {
+                card.querySelectorAll('.dim-score-btn').forEach(function(b) {
+                    b.classList.toggle('active', parseInt(b.getAttribute('data-val')) === rounded);
+                });
+                var defEl = document.getElementById('def-' + dimId);
+                if (defEl && levelDefs[dimId]) {
+                    defEl.textContent = rounded + ' — ' + levelLabels[rounded-1] + ': ' + levelDefs[dimId][rounded-1];
+                }
+            }
             calculateMaturity();
         };
 
@@ -3699,6 +4052,10 @@
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+            const rmiNum = values.reduce((s, d) => s + d.value * d.weight * d.impact, 0);
+            const rmiDen = values.reduce((s, d) => s + 5 * d.weight * d.impact, 0);
+            const rmi = (rmiNum / rmiDen) * 100;
+
             const gaps = values.map(d => ({
                 label: d.label, gap: 5 - d.value, priority: (5 - d.value) * d.weight * d.impact, value: d.value, weight: d.weight
             })).sort((a, b) => b.priority - a.priority);
@@ -3743,6 +4100,10 @@
                 }
                 // Axis lines
                 vals.forEach((v,i) => { const a = start+i*step; const r = maxR; svg += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`; });
+                // ISO 55001 Target polygon (Level 4 = Proactive baseline)
+                let targetPts = '';
+                vals.forEach((v, i) => { const a = start+i*step; const r = (4/5)*maxR; targetPts += `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `; });
+                svg += `<polygon points="${targetPts}" fill="rgba(168,85,247,0.08)" stroke="rgba(192,132,252,0.5)" stroke-width="1.5" stroke-dasharray="6,3"/>`;
                 // Data polygon fill + stroke
                 let dataPts = '';
                 vals.forEach((v, i) => { const a = start+i*step; const r = (v.value/5)*maxR; dataPts += `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `; });
@@ -3840,8 +4201,49 @@
                     </div>
                 </div>
 
-                <!-- Executive Summary -->
-                <div style="display:flex;gap:12px;margin-bottom:20px;">
+                <!-- Executive Overview Cards -->
+                ${(function(){
+                    var sc = Math.round(compositeScore);
+                    var rLvl, rClr;
+                    if (sc >= 80) { rLvl='LOW'; rClr='#059669'; }
+                    else if (sc >= 60) { rLvl='MODERATE'; rClr='#d97706'; }
+                    else if (sc >= 40) { rLvl='ELEVATED'; rClr='#ea580c'; }
+                    else { rLvl='HIGH'; rClr='#dc2626'; }
+                    var mf = Math.max(0.05, 1 - (sc / 120));
+                    var ae = 2.5 * mf * 200000;
+                    var aeStr = ae >= 1000000 ? '$' + (ae/1000000).toFixed(1) + 'M' : '$' + Math.round(ae/1000) + 'K';
+                    var topGap = gaps.filter(function(g){ return g.gap > 0; })[0];
+                    var nextThreshold = maturity.level < 5 ? maturity.level * 20 + 1 : 100;
+                    var nextLabel = ['','Preventive','Predictive','Proactive','Generative','Generative'][maturity.level < 5 ? maturity.level + 1 : 5];
+                    var gapPts = nextThreshold - sc;
+                    return '<div style="display:flex;gap:10px;margin-bottom:14px;">' +
+                        '<div style="flex:1;background:' + maturity.color + ';color:white;border-radius:10px;padding:14px 10px;text-align:center;">' +
+                            '<div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.8;">Operational Health</div>' +
+                            '<div style="font-size:26px;font-weight:900;margin:4px 0;">' + sc + '/100</div>' +
+                            '<div style="font-size:9px;opacity:0.85;">' + maturity.label + ' (Level ' + maturity.level + ')</div>' +
+                        '</div>' +
+                        '<div style="flex:1;background:' + rClr + ';color:white;border-radius:10px;padding:14px 10px;text-align:center;">' +
+                            '<div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.8;">Risk Exposure</div>' +
+                            '<div style="font-size:22px;font-weight:900;margin:4px 0;">' + rLvl + '</div>' +
+                            '<div style="font-size:9px;opacity:0.85;">' + aeStr + ' \u00B7 Est. Annual</div>' +
+                        '</div>' +
+                        '<div style="flex:1;background:#1e293b;color:white;border-radius:10px;padding:14px 10px;text-align:center;">' +
+                            '<div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;">Critical Bottleneck</div>' +
+                            (topGap ? '<div style="font-size:14px;font-weight:900;margin:4px 0;color:#f87171;">' + topGap.label.toUpperCase() + '</div>' +
+                                '<div style="font-size:9px;color:#94a3b8;">Score: ' + topGap.value + '/5 \u00B7 Priority: ' + topGap.priority.toFixed(3) + '</div>'
+                            : '<div style="font-size:14px;font-weight:900;margin:4px 0;color:#10b981;">NONE</div><div style="font-size:9px;color:#94a3b8;">All dimensions at max</div>') +
+                        '</div>' +
+                        '<div style="flex:1;background:#1e3a5f;color:white;border-radius:10px;padding:14px 10px;text-align:center;">' +
+                            '<div style="font-size:8px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;">Next Milestone</div>' +
+                            (maturity.level < 5 ? '<div style="font-size:26px;font-weight:900;margin:4px 0;">' + nextThreshold + '</div>' +
+                                '<div style="font-size:9px;opacity:0.85;">+' + (gapPts > 0 ? gapPts : 0) + ' pts \u00B7 ' + nextLabel + '</div>'
+                            : '<div style="font-size:26px;font-weight:900;margin:4px 0;">\u2605</div><div style="font-size:9px;opacity:0.85;">Peak \u00B7 Generative</div>') +
+                        '</div>' +
+                    '</div>';
+                })()}
+
+                <!-- Executive Summary KPI -->
+                <div style="display:flex;gap:12px;margin-bottom:14px;">
                     <div style="flex:1;background:${maturity.color};color:white;border-radius:10px;padding:16px;text-align:center;">
                         <div style="font-size:11px;opacity:0.8;">Composite Score</div>
                         <div style="font-size:28px;font-weight:800;">${Math.round(compositeScore)}/100</div>
@@ -3856,15 +4258,120 @@
                         <div style="font-size:22px;font-weight:700;color:#1e3a5f;font-family:monospace;">${weightedSum.toFixed(2)}</div>
                         <div style="font-size:11px;color:#6b7280;">out of 5.00</div>
                     </div>
+                    <div style="flex:1;background:${rmi >= 80 ? '#ecfdf5' : rmi >= 60 ? '#fffbeb' : rmi >= 40 ? '#fff7ed' : '#fef2f2'};border:1px solid ${rmi >= 80 ? '#a7f3d0' : rmi >= 60 ? '#fde68a' : rmi >= 40 ? '#fed7aa' : '#fecaca'};border-radius:10px;padding:16px;text-align:center;">
+                        <div style="font-size:11px;color:#6b7280;">Risk Mitigation Index</div>
+                        <div style="font-size:22px;font-weight:700;color:${rmi >= 80 ? '#059669' : rmi >= 60 ? '#d97706' : rmi >= 40 ? '#ea580c' : '#dc2626'};font-family:monospace;">${Math.round(rmi)}%</div>
+                        <div style="font-size:11px;color:#6b7280;">${rmi >= 80 ? 'Well-Mitigated' : rmi >= 60 ? 'Moderate Coverage' : rmi >= 40 ? 'Gaps Identified' : 'Critical Exposure'}</div>
+                    </div>
+                </div>
+
+                <!-- RISK CLASSIFICATION BANNER -->
+                ${(function(){
+                    var sc = Math.round(compositeScore);
+                    var riskLvl, riskBg, riskIcon, riskTag;
+                    if (sc >= 80) { riskLvl='LOW'; riskBg='#059669'; riskIcon='\u2705'; riskTag='Operational risk within acceptable tolerance.'; }
+                    else if (sc >= 60) { riskLvl='MODERATE'; riskBg='#d97706'; riskIcon='\u26A0\uFE0F'; riskTag='Vulnerability windows exist — targeted mitigation required.'; }
+                    else if (sc >= 40) { riskLvl='ELEVATED'; riskBg='#ea580c'; riskIcon='\u26A0\uFE0F'; riskTag='Multiple gaps create compounding failure risk.'; }
+                    else { riskLvl='CRITICAL'; riskBg='#dc2626'; riskIcon='\uD83D\uDED1'; riskTag='Immediate executive intervention required.'; }
+                    var gapCount = values.filter(function(v){ return v.value <= 2; }).length;
+                    var leakStatus, leakColor;
+                    if (gapCount === 0 && sc >= 70) { leakStatus='MINIMAL'; leakColor='#059669'; }
+                    else if (gapCount <= 1 && sc >= 50) { leakStatus='DETECTED'; leakColor='#d97706'; }
+                    else { leakStatus='SIGNIFICANT'; leakColor='#dc2626'; }
+                    var isoReady, isoColor;
+                    if (sc >= 71) { isoReady='READY'; isoColor='#059669'; }
+                    else if (sc >= 41) { isoReady='PARTIAL'; isoColor='#d97706'; }
+                    else { isoReady='NOT READY'; isoColor='#dc2626'; }
+                    var baseOutageRate = 2.5;
+                    var maturityFactor = Math.max(0.05, 1 - (sc / 120));
+                    var estOutages = baseOutageRate * maturityFactor;
+                    var annualExposure = estOutages * 200000;
+                    var exposureStr = annualExposure >= 1000000 ? '$' + (annualExposure/1000000).toFixed(1) + 'M' : '$' + Math.round(annualExposure/1000) + 'K';
+                    var topWeakness = gaps.filter(function(g){ return g.gap > 0; })[0];
+                    var bottomLine = '';
+                    if (sc >= 80) bottomLine = 'This facility operates at industry-leading maturity. Operational processes are robust, risk exposure is minimized, and the organization is positioned for ISO 55001 certification. Sustain performance through continuous audit and benchmarking.';
+                    else if (sc >= 60) bottomLine = 'Core operational processes are established but ' + (topWeakness ? '<strong>' + topWeakness.label + '</strong> (Level ' + topWeakness.value + ')' : 'key dimensions') + ' creates residual exposure of <strong>' + exposureStr + '/year</strong> in estimated outage cost. A targeted 10-point improvement in priority dimensions would transition this facility from Predictive to Proactive maturity within 6\u201312 months.';
+                    else if (sc >= 40) bottomLine = 'This facility has <strong>' + gapCount + ' dimension(s) at critical levels</strong> (Level 1\u20132), driving an estimated annual risk exposure of <strong>' + exposureStr + '</strong>. ' + (topWeakness ? 'The highest-impact vulnerability is <strong>' + topWeakness.label + '</strong> (Level ' + topWeakness.value + '/5, priority score ' + topWeakness.priority.toFixed(2) + '). ' : '') + 'Without intervention, operational incidents are statistically likely within the next 12 months. A 90-day remediation sprint on the top 3 priority dimensions is recommended.';
+                    else bottomLine = '<strong style="color:#dc2626;">IMMEDIATE ACTION REQUIRED.</strong> This facility scores below Tier I baseline, with <strong>' + gapCount + ' critical-level dimensions</strong> and an estimated annual exposure of <strong>' + exposureStr + '</strong>. The organization operates in reactive mode\u2014dependent on individual heroics rather than systematic processes. ' + (topWeakness ? 'Begin with <strong>' + topWeakness.label + '</strong>: establish minimum viable documentation and assign an accountable owner within 30 days.' : 'Establish emergency operational procedures within 30 days.');
+                    return '<div style="background:linear-gradient(135deg,' + riskBg + ',' + riskBg + 'dd);border-radius:12px;padding:18px 20px;margin-bottom:14px;color:white;">' +
+                        '<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">' +
+                            '<div style="text-align:center;min-width:140px;">' +
+                                '<div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;opacity:0.8;">Operational Risk</div>' +
+                                '<div style="font-size:30px;font-weight:900;letter-spacing:2px;margin:2px 0;">' + riskLvl + '</div>' +
+                                '<div style="font-size:10px;opacity:0.85;">' + riskTag + '</div>' +
+                            '</div>' +
+                            '<div style="width:1px;height:50px;background:rgba(255,255,255,0.3);"></div>' +
+                            '<div style="flex:1;display:flex;gap:12px;">' +
+                                '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:10px 8px;">' +
+                                    '<div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">Efficiency Leakage</div>' +
+                                    '<div style="font-size:18px;font-weight:800;margin:2px 0;">' + leakStatus + '</div>' +
+                                    '<div style="font-size:9px;opacity:0.8;">' + gapCount + ' dim. below Level 3</div>' +
+                                '</div>' +
+                                '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:10px 8px;">' +
+                                    '<div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">ISO 55001 Readiness</div>' +
+                                    '<div style="font-size:18px;font-weight:800;margin:2px 0;">' + isoReady + '</div>' +
+                                    '<div style="font-size:9px;opacity:0.8;">Asset Mgmt Compliance</div>' +
+                                '</div>' +
+                                '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:10px 8px;">' +
+                                    '<div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">Annual Exposure</div>' +
+                                    '<div style="font-size:18px;font-weight:800;margin:2px 0;">' + exposureStr + '</div>' +
+                                    '<div style="font-size:9px;opacity:0.8;">~' + estOutages.toFixed(1) + ' incidents/yr</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div style="background:rgba(0,0,0,0.15);border-radius:8px;padding:12px 14px;">' +
+                            '<div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:6px;opacity:0.85;">Executive Summary</div>' +
+                            '<p style="font-size:11.5px;line-height:1.7;margin:0;">' + bottomLine + '</p>' +
+                        '</div>' +
+                    '</div>';
+                })()}
+
+                <!-- ISO 55001 Roadmap -->
+                <div style="margin-bottom:20px;">
+                    <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #6366f1;padding-bottom:5px;margin-bottom:10px;">ISO 55001 Asset Management Roadmap</h2>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        ${[{num:'1',label:'Awareness',cl:'Cl. 4-5',min:0},{num:'2',label:'Managed',cl:'Cl. 6-8',min:41},{num:'3',label:'Optimization',cl:'Cl. 9-10',min:71}].map(function(s) {
+                            var isActive = compositeScore >= s.min;
+                            return '<div style="flex:1;padding:12px;text-align:center;border-radius:10px;border:2px solid '+(isActive ? '#3b82f6' : '#e5e7eb')+';background:'+(isActive ? '#eff6ff' : '#f8fafc')+';">'+
+                                '<div style="font-size:18px;font-weight:800;color:'+(isActive ? '#2563eb' : '#94a3b8')+';">'+s.num+'</div>'+
+                                '<div style="font-size:11px;font-weight:600;color:'+(isActive ? '#1e3a5f' : '#94a3b8')+';">'+s.label+'</div>'+
+                                '<div style="font-size:9px;color:#6b7280;margin-top:2px;">'+s.cl+'</div></div>';
+                        }).join('<div style="color:#94a3b8;font-size:14px;">→</div>')}
+                    </div>
+                    <p style="font-size:10px;color:#6b7280;margin-top:6px;font-style:italic;">
+                        ${compositeScore >= 71 ? 'Stage 3 (Optimization): Performance evaluation and continual improvement established. Ready for ISO 55001 certification.' :
+                          compositeScore >= 41 ? 'Stage 2 (Managed): Formal planning and operational controls in place. Focus on performance evaluation to advance.' :
+                          'Stage 1 (Awareness): Establishing context and leadership commitment. Build foundational processes before certification.'}
+                    </p>
                 </div>
 
                 ${facilityHTML}
 
                 <!-- Charts: Radar + Gap Analysis side by side -->
-                <div style="display:flex;gap:12px;margin-bottom:20px;align-items:flex-start;">
-                    <div style="flex:1;text-align:center;">${radarSVG(values, 280)}</div>
+                <div style="display:flex;gap:12px;margin-bottom:8px;align-items:flex-start;">
+                    <div style="flex:1;text-align:center;">
+                        <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:4px;">Maturity Profile</div>
+                        <div style="display:flex;justify-content:center;gap:14px;margin-bottom:6px;font-size:9px;color:#6b7280;">
+                            <span>\u25A0 <span style="color:#3b82f6;">\u2501\u2501</span> Current Maturity</span>
+                            <span>\u25A1 <span style="color:#a78bfa;">- - -</span> ISO 55001 Target</span>
+                        </div>
+                        ${radarSVG(values, 280)}
+                    </div>
                     <div style="flex:1;text-align:center;">${gapBarSVG(values, gaps, compositeScore, maturity.label)}</div>
                 </div>
+                <!-- Strategic Insight -->
+                ${(function(){
+                    var sc = Math.round(compositeScore);
+                    var topGap = gaps.filter(function(g){ return g.gap > 0; })[0];
+                    var insight = '';
+                    if (sc >= 80) insight = 'Facility is <strong>Proactive/Generative</strong>. Operational systems are mature, risk is well-mitigated. Focus on sustaining excellence through audit cycles and knowledge transfer.';
+                    else if (sc >= 60) insight = 'Facility is <strong>Managed but Inconsistent</strong>. Processes exist but rely on individual heroics rather than system reliability.' + (topGap ? ' Elevating <strong>' + topGap.label + '</strong> will yield the highest ROI for reliability.' : '');
+                    else if (sc >= 40) insight = 'Facility is <strong>Developing with Gaps</strong>.' + (topGap ? ' Prioritize <strong>' + topGap.label + '</strong> (Level ' + topGap.value + ') \u2014 it has the highest weighted impact on overall maturity.' : '') + ' Multiple dimensions require systematic process establishment.';
+                    else insight = '<strong style="color:#dc2626;">Reactive Mode Detected.</strong>' + (topGap ? ' <strong>' + topGap.label + '</strong> is the most urgent gap.' : '') + ' Establish minimum viable processes across all 8 dimensions within 90 days.';
+                    return '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;margin-bottom:20px;">' +
+                        '<div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:4px;">Strategic Insight</div>' +
+                        '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0;">' + insight + '</p></div>';
+                })()}
 
                 <!-- Dimension Scores -->
                 <h2 style="font-size:14px;color:#1e3a5f;border-bottom:2px solid #3b82f6;padding-bottom:5px;margin-bottom:10px;">Dimension Scores</h2>
@@ -3966,6 +4473,7 @@
         });
 
         // ═══ INIT ═══
+        buildDimensionCards();
         calculateMaturity();
         initMaturityTooltips();
     })();
@@ -3974,5 +4482,6 @@
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
 </script>
 <script src="auth.js"></script>
+<script src="rz-tracker.js"></script>
 </body>
 </html>

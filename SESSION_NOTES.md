@@ -1,11 +1,86 @@
 # Claude Code Session Notes
-**Date:** 2026-02-16
+**Date:** 2026-02-17
 **Project:** Portfolio Website - baguspermana7-cpu.github.io
-**Domain:** resistancezero.com (GitHub Pages)
+**Domain:** resistancezero.com (Cloud Run)
 
 ## Current State
 - Branch: `main`
 - Working directory: `C:\Users\User\Sandbox`
+
+---
+
+## Session: 2026-02-17 — Article-1 Calculator v1.2 Enhancements + PDF Executive Upgrade + Social Media
+
+### Summary
+Major enhancements to article-1 Operational Maturity Calculator: added Visual Card Interface, RMI, ISO 55001 Roadmap, 4 executive summary cards, radar chart restyling with ISO target overlay & strategic insight, and PDF executive risk classification banner. Fixed Pro mode layout bug (results pushed below fold), dark mode CSS conflict, and radar label clipping. Also improved LinkedIn post and created 23 X posts for all content.
+
+### Completed Work
+
+#### A. Article-1 Calculator v1.2 Enhancements
+1. **Visual Card Interface**: Replaced 8 `<select>` dropdowns with interactive score cards (JS-generated). Each card has: header with dimension name + tooltip + weight badge, description, 5 score buttons (1-5), level definition text. Hidden `<select>` maintained for backward compatibility.
+2. **RMI (Risk Mitigation Index)**: New 5th KPI — `RMI = Σ(score × weight × impact) / Σ(5 × weight × impact) × 100`. Color-coded: green ≥80%, yellow ≥60%, orange ≥40%, red <40%.
+3. **ISO 55001 Asset Management Roadmap**: 3-stage visual roadmap (Awareness → Managed → Optimization) with dynamic highlighting and mapping note.
+4. **4 Executive Summary Cards** (above KPI row):
+   - Operational Health: score/100 + nearest benchmark tier
+   - Risk Exposure: MODERATE/ELEVATED/HIGH/LOW + est. annual $ exposure
+   - Critical Bottleneck: weakest dimension by priority score
+   - Next Milestone: target score + gap to next maturity level
+5. **Radar Chart Restyling**:
+   - Renamed to "Maturity Profile" with panel container
+   - Added legend: solid blue = Current Maturity, dashed purple = ISO 55001 Target
+   - ISO target polygon (Level 4 all dims) rendered as dashed purple overlay
+   - "Strategic Insight" box below radar — dynamic narrative per score tier
+6. **Radar Label Fix**: Reduced `maxR` from `0.375` to `0.28`, added multi-line word wrapping for long labels (3+ words split at midpoint), font 10px.
+7. **Model version**: bumped to v1.2
+
+#### B. PDF Export Executive Upgrade
+1. **4 Executive Overview Cards** at top of PDF: Operational Health, Risk Exposure, Critical Bottleneck, Next Milestone
+2. **Risk Classification Banner** (full-width, color-coded):
+   - Operational Risk: CRITICAL/ELEVATED/MODERATE/LOW
+   - Efficiency Leakage: SIGNIFICANT/DETECTED/MINIMAL
+   - ISO 55001 Readiness: NOT READY/PARTIAL/READY
+   - Annual Exposure: dollar figure + incidents/year
+3. **Executive Summary** panel (dark overlay in banner): Dynamic narrative translating score to business language, names specific weakness, recommends action with timeline
+4. **Maturity Profile** header + legend + ISO target polygon in radar SVG
+5. **Strategic Insight** box between charts and dimension table
+6. **RMI KPI card** in executive summary row
+7. **ISO 55001 Roadmap** section with 3 visual stages
+
+#### C. Bug Fixes
+1. **Pro mode "results disappear"**: Root cause — exec cards + calc-results + radar were positioned AFTER `maturityProInputs` div. When Pro mode expanded (facility context, weights, sub-dimensions = 2000+ px), results pushed far below fold. Fix: moved all result elements BEFORE `maturityProInputs`. New order: dim cards → exec cards → KPI results → radar → Pro settings → dimension bars → Pro analysis.
+2. **Dark mode black blocks on exec cards**: Root cause — `styles.css` global rule `[data-theme="dark"] .article-body [class*="-card"]` applied `background: rgba(15,23,42,0.8)` to `.exec-card`. Fix: used `style.setProperty('background', ..., 'important')` in JS + `background: none !important` on child elements. Also replaced all hex-alpha colors (`${color}20`) with proper `rgba()` via `hexToRgba()` helper.
+3. **Articles.html green particles**: Canvas z-index fixed to 50 (above content z-index 1, below navbar z-index 1000). Full-page coverage with `position: fixed`.
+
+#### D. LinkedIn Post Update
+- Updated `Article/Article_1 02.02.26/linkedin-post-article1.txt`
+- Moved paradox punchline to top (stronger hook)
+- Updated Pro Mode features to v1.2: RMI, ISO 55001, Monte Carlo, Tornado, Risk Classification
+- Added PDF sell ("Operational Risk: ELEVATED. Efficiency Leakage: DETECTED. Annual Exposure: $292K.")
+- Removed "C-Level" text from PDF export label (changed to "Executive Summary")
+
+#### E. X (Twitter) Posts — All Content
+- Created `Article/Social Media/X/x-posts-all.txt`
+- 23 posts total, all under 280 chars:
+  - Articles 1-17 (each with hook + link)
+  - Geopolitics 1
+  - OPEX Calculator
+  - CAPEX Calculator
+  - Insights Hub
+  - Datahall SCADA demo
+  - Portfolio overview
+- Professional tone, 1-2 hashtags each
+
+### Key Files Modified
+- `article-1.html` — calculator v1.2, PDF export, exec cards, radar panel
+- `articles.html` — green particle effect (z-index fix)
+- `Article/Article_1 02.02.26/linkedin-post-article1.txt` — updated post
+- `Article/Social Media/X/x-posts-all.txt` — NEW, 23 X posts
+
+### Architecture Notes
+- Exec cards use `hexToRgba()` helper + `setProperty(..., 'important')` to override global dark mode CSS
+- Radar chart draws ISO 55001 target at Level 4 as dashed purple polygon
+- Strategic insight text is dynamic per score tier (4 levels)
+- PDF risk classification banner uses IIFE for scoped variables
 
 ---
 

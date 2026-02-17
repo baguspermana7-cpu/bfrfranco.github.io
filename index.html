@@ -1340,6 +1340,152 @@
         }, 100);
     })();
     </script>
+
+    <!-- Hero Particle System -->
+    <script>
+    (function(){
+        var cv=document.getElementById('particles-canvas');
+        if(!cv)return;
+        var ctx=cv.getContext('2d',{alpha:true,desynchronized:true});
+        var W,H,dpr,particles=[],mouse={x:-9999,y:-9999},raf;
+        var COUNT=22,CONNECT_DIST=140,MOUSE_R=100,FRICTION=0.97;
+
+        function isDark(){return document.documentElement.getAttribute('data-theme')==='dark'}
+
+        function palette(){
+            if(isDark()) return {
+                fill:['rgba(96,165,250,0.45)','rgba(74,144,184,0.40)','rgba(91,163,203,0.35)','rgba(124,196,230,0.30)','rgba(148,163,184,0.25)'],
+                line:'rgba(96,165,250,0.15)'
+            };
+            return {
+                fill:['rgba(245,158,11,0.40)','rgba(217,119,6,0.35)','rgba(234,88,12,0.30)','rgba(146,64,14,0.25)','rgba(251,191,36,0.35)'],
+                line:'rgba(245,158,11,0.12)'
+            };
+        }
+
+        function resize(){
+            dpr=window.devicePixelRatio||1;
+            var hero=cv.parentElement;
+            W=hero.offsetWidth;H=hero.offsetHeight;
+            cv.width=W*dpr;cv.height=H*dpr;
+            cv.style.width=W+'px';cv.style.height=H+'px';
+            ctx.scale(dpr,dpr);
+        }
+
+        function Particle(i){
+            this.i=i;this.init(true);
+        }
+        Particle.prototype.init=function(scatter){
+            this.x=Math.random()*W;
+            this.y=scatter?Math.random()*H:H+30;
+            this.r=Math.random()*4+3;
+            this.vx=(Math.random()-0.5)*0.6;
+            this.vy=-(Math.random()*0.3+0.1);
+            this.depth=Math.random()*0.5+0.5;
+            var p=palette();
+            this.color=p.fill[Math.floor(Math.random()*p.fill.length)];
+        };
+        Particle.prototype.update=function(){
+            this.vy-=0.003*this.depth;
+            this.x+=this.vx*this.depth;
+            this.y+=this.vy*this.depth;
+            var dx=this.x-mouse.x,dy=this.y-mouse.y;
+            var dist=Math.sqrt(dx*dx+dy*dy);
+            if(dist<MOUSE_R&&dist>0){
+                var force=(MOUSE_R-dist)/MOUSE_R*1.2;
+                var angle=Math.atan2(dy,dx);
+                this.vx+=Math.cos(angle)*force*0.3;
+                this.vy+=Math.sin(angle)*force*0.3;
+            }
+            this.vx*=FRICTION;this.vy*=FRICTION;
+            if(this.x<-20)this.x=W+20;
+            if(this.x>W+20)this.x=-20;
+            if(this.y<-30)this.init(false);
+        };
+        Particle.prototype.draw=function(){
+            ctx.beginPath();
+            ctx.arc(this.x,this.y,this.r*this.depth,0,Math.PI*2);
+            ctx.fillStyle=this.color;
+            ctx.fill();
+        };
+
+        function drawConnections(){
+            var p=palette();
+            ctx.strokeStyle=p.line;
+            ctx.lineWidth=0.8;
+            for(var i=0;i<particles.length;i++){
+                for(var j=i+1;j<particles.length;j++){
+                    var dx=particles[i].x-particles[j].x;
+                    var dy=particles[i].y-particles[j].y;
+                    var dist=Math.sqrt(dx*dx+dy*dy);
+                    if(dist<CONNECT_DIST){
+                        ctx.globalAlpha=(1-dist/CONNECT_DIST)*0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x,particles[i].y);
+                        ctx.lineTo(particles[j].x,particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            ctx.globalAlpha=1;
+        }
+
+        function animate(){
+            ctx.clearRect(0,0,W,H);
+            for(var i=0;i<particles.length;i++){
+                particles[i].update();
+                particles[i].draw();
+            }
+            drawConnections();
+            raf=requestAnimationFrame(animate);
+        }
+
+        function isVisible(){return cv.offsetWidth>0&&cv.offsetHeight>0}
+
+        function init(){
+            if(!isVisible())return;
+            resize();
+            particles=[];
+            for(var i=0;i<COUNT;i++) particles.push(new Particle(i));
+            if(raf) cancelAnimationFrame(raf);
+            animate();
+        }
+
+        // Theme change — refresh palette
+        var obs=new MutationObserver(function(muts){
+            muts.forEach(function(m){
+                if(m.attributeName==='data-theme'){
+                    var p=palette();
+                    for(var i=0;i<particles.length;i++){
+                        particles[i].color=p.fill[Math.floor(Math.random()*p.fill.length)];
+                    }
+                }
+            });
+        });
+        obs.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+        window.addEventListener('resize',function(){resize();ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr)});
+        cv.parentElement.addEventListener('mousemove',function(e){
+            var rect=cv.parentElement.getBoundingClientRect();
+            mouse.x=e.clientX-rect.left;mouse.y=e.clientY-rect.top;
+        });
+        cv.parentElement.addEventListener('mouseleave',function(){mouse.x=-9999;mouse.y=-9999});
+        cv.parentElement.addEventListener('touchmove',function(e){
+            var rect=cv.parentElement.getBoundingClientRect();
+            mouse.x=e.touches[0].clientX-rect.left;mouse.y=e.touches[0].clientY-rect.top;
+        },{passive:true});
+        cv.parentElement.addEventListener('touchend',function(){mouse.x=-9999;mouse.y=-9999});
+
+        // Pause when not visible or canvas hidden (mobile)
+        document.addEventListener('visibilitychange',function(){
+            if(document.hidden){if(raf){cancelAnimationFrame(raf);raf=null}}
+            else if(!raf&&isVisible()){animate()}
+        });
+
+        init();
+    })();
+    </script>
 <script src="auth.js"></script>
+<script src="rz-tracker.js"></script>
 </body>
 </html>
