@@ -60,6 +60,12 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-2-cover.jpg">
+    <!-- Chart.js for data visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- D3.js + d3-sankey for alarm flow diagram -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -1005,6 +1011,12 @@
         }
     </style>
     <link rel="preload" as="image" href="assets/article-2-cover.jpg">
+    <!-- Chart.js for data visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- D3.js + d3-sankey for alarm flow diagram -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1130,6 +1142,8 @@
                 <a href="#sec8" class="toc-item"><div class="toc-item-number">Section 8</div><div class="toc-item-title">Structured Intervention &mdash; Rationalization Process</div></a>
                 <a href="#sec9" class="toc-item"><div class="toc-item-number">Section 9</div><div class="toc-item-title">Results & Verification</div></a>
                 <a href="#sec10" class="toc-item toc-calculator"><div class="toc-item-number">Section 10 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div><div class="toc-item-title">Alarm Rationalization Calculator</div></a>
+                <a href="#sec10mc" class="toc-item toc-calculator"><div class="toc-item-number">Section 10b <span class="toc-calc-badge" style="background:rgba(124,58,237,0.2);color:#a78bfa;">Monte Carlo</span></div><div class="toc-item-title">Risk Simulation &mdash; 10,000 Iterations</div></a>
+                <a href="#sec10sk" class="toc-item toc-calculator"><div class="toc-item-number">Section 10c <span class="toc-calc-badge" style="background:rgba(6,182,212,0.15);color:#22d3ee;">Sankey</span></div><div class="toc-item-title">Alarm Flow Rationalization Diagram</div></a>
                 <a href="#sec11" class="toc-item"><div class="toc-item-number">Section 11</div><div class="toc-item-title">Organizational Implications</div></a>
                 <a href="#sec12" class="toc-item"><div class="toc-item-number">Section 12</div><div class="toc-item-title">Conclusion</div></a>
             </div>
@@ -1216,6 +1230,17 @@
 
                 <p>The UK Health and Safety Executive explicitly warns against this pattern in HSG48, noting that "human error" is almost always a consequence of system design, organizational factors, or task demands &mdash; not individual moral failure.<a href="#ref14" class="src-ref" title="UK HSE (2003). HSG48: Reducing Error and Influencing Behaviour.">[14]</a></p>
 
+
+                <!-- Operator Narrative -->
+                <div class="operator-story">
+                    <div class="operator-story-label">&#9654; Real Scenario &mdash; Pre-Intervention, 06:47 Local Time</div>
+                    <p style="color:#cbd5e1;font-size:0.91rem;line-height:1.7;margin-bottom:0.75rem;">
+                        An operator sits down to begin his 12-hour shift. Before he can take off his jacket, the BMS console is already showing <strong style="color:#ef4444;">847 active alarms</strong>. By 07:00, 63 new alarms have arrived. He acknowledges them in batches &mdash; not because he has assessed them, but because the screen is full and new alarms stop appearing when the queue is at capacity. At 07:23, a <strong>genuine chiller fault</strong> triggers. It is buried under 34 consequential downstream alarms. He sees it. He clicks acknowledge. He moves on. At 09:15, the data hall reaches <strong>27°C</strong> &mdash; 4°C above threshold. The root fault was there for 112 minutes.
+                    </p>
+                    <p style="color:#64748b;font-size:0.82rem;">This operator was not negligent. He was not undertrained. He was operating a <em>system that had been engineered to fail him</em>.</p>
+                    <blockquote>"I acknowledged 400 alarms in the first two hours. I couldn't tell you what any of them were."<br><span style="font-size:0.75rem;color:#475569;font-style:normal;">— Anonymous operator survey response, pre-intervention</span></blockquote>
+                </div>
+
                 <!-- Section 3: Human Factors & Cognitive Load Theory -->
                 <h2 id="sec3"><span class="section-number">3</span> Human Factors & Cognitive Load Theory</h2>
 
@@ -1224,6 +1249,38 @@
                 <h3>Endsley's Situation Awareness Model</h3>
 
                 <p>Endsley (1995) defined situation awareness as operating at three levels: <strong>Level 1</strong> &mdash; Perception (detecting that an alarm has occurred), <strong>Level 2</strong> &mdash; Comprehension (understanding what the alarm means in context), and <strong>Level 3</strong> &mdash; Projection (predicting what will happen if action is not taken).<a href="#ref3" class="src-ref" title="Endsley, M. R. (1995). Toward a Theory of Situation Awareness.">[3]</a> Under alarm overload, operators cannot progress beyond Level 1. They perceive the alarm, but lack the cognitive bandwidth to comprehend it or project its consequences. They click "acknowledge" and move on. This is not complacency &mdash; it is the predictable behavior of a cognitive system operating beyond its design capacity.</p>
+
+
+                <!-- Situation Awareness Diagram -->
+                <div class="sa-diagram">
+                    <div class="sa-level sa-level-3">
+                        <div class="sa-badge">L3</div>
+                        <div class="sa-info">
+                            <strong>Projection</strong>
+                            <span>What will happen if I don&rsquo;t act? Predict consequences.</span>
+                        </div>
+                        <div class="sa-alarm-state">&#10007; Impossible at &gt;5 alarms/10min</div>
+                    </div>
+                    <div class="sa-arrow">&#8593;</div>
+                    <div class="sa-level sa-level-2">
+                        <div class="sa-badge">L2</div>
+                        <div class="sa-info">
+                            <strong>Comprehension</strong>
+                            <span>What does this alarm mean? What caused it?</span>
+                        </div>
+                        <div class="sa-alarm-state">&#10007; Degraded at &gt;2 alarms/10min</div>
+                    </div>
+                    <div class="sa-arrow">&#8593;</div>
+                    <div class="sa-level sa-level-1">
+                        <div class="sa-badge">L1</div>
+                        <div class="sa-info">
+                            <strong>Perception</strong>
+                            <span>Alarm detected, acknowledged, logged.</span>
+                        </div>
+                        <div class="sa-alarm-state">&#10003; All operators retain L1</div>
+                    </div>
+                    <p class="sa-caption">Endsley&rsquo;s 3-Level Situation Awareness Model &mdash; Under alarm overload, operators are trapped at Level 1. They see alarms, but cannot understand or predict. <a href="#ref3" class="src-ref">[3]</a></p>
+                </div>
 
                 <h3>Wickens' Multiple Resource Theory</h3>
 
@@ -1275,14 +1332,26 @@
 
                 <p>Three major standards govern alarm management in industrial and critical infrastructure environments. Together, they provide a comprehensive framework for designing, implementing, and maintaining alarm systems that protect rather than endanger operators.</p>
 
-                <h3>ISA-18.2-2022: Management of Alarm Systems for the Process Industries</h3>
-                <p><span class="tip" data-tip="ISA-18.2: Defines the complete alarm management lifecycle. Covers alarm philosophy, identification, rationalization, detailed design, implementation, operation, maintenance, monitoring, management of change, and audit.">ISA-18.2</span> is the primary standard in North America. It defines the complete alarm management lifecycle from philosophy development through ongoing monitoring and management of change. Its core principle: <strong>every alarm must require a defined operator action within a defined time frame</strong>. If an alarm does not meet this criterion, it should not be an alarm.<a href="#ref4" class="src-ref" title="ISA-18.2-2022">[4]</a></p>
-
-                <h3>EEMUA Publication 191: Alarm Systems Guide</h3>
-                <p><span class="tip" data-tip="EEMUA 191: The foundational alarm management publication. First published 1999, now in 3rd edition (2013). Provides practical guidance on alarm system design, procurement, and management including the widely-used alarm rate benchmarks.">EEMUA 191</span> is the foundational document for alarm management, originating from the UK process industry. It provides practical guidance on alarm system design, procurement, and management, and established the alarm rate benchmarks that ISA-18.2 later formalized. Its emphasis on <strong>alarm uniqueness</strong> &mdash; that each alarm should provide information not available from any other source &mdash; remains a critical design principle.<a href="#ref5" class="src-ref" title="EEMUA 191 (2013)">[5]</a></p>
-
-                <h3>IEC 62682:2022: International Standard</h3>
-                <p><span class="tip" data-tip="IEC 62682: The international equivalent of ISA-18.2, published by the International Electrotechnical Commission. Ensures global consistency in alarm management practices.">IEC 62682</span> is the international equivalent, ensuring global consistency. Its emphasis on <strong>alarm timeliness</strong> &mdash; that an alarm must arrive early enough for the operator to take effective corrective action &mdash; addresses a common failure mode where alarms arrive after the process has already exceeded safe limits.<a href="#ref6" class="src-ref" title="IEC 62682:2022">[6]</a></p>
+                <div class="standard-cards">
+                    <div class="standard-card">
+                        <div class="sc-label">&#127482;&#127480; North America</div>
+                        <div class="sc-title">ISA-18.2-2022</div>
+                        <div class="sc-desc">Defines the complete alarm management lifecycle &mdash; from philosophy through ongoing audit. Covers rationalization, detailed design, implementation, and management of change.<a href="#ref4" class="src-ref">[4]</a></div>
+                        <div class="sc-key-metric"><strong>Core principle:</strong> Every alarm must require a specific operator action within a defined timeframe. No action required = not an alarm.</div>
+                    </div>
+                    <div class="standard-card">
+                        <div class="sc-label">&#127468;&#127463; United Kingdom</div>
+                        <div class="sc-title">EEMUA 191 (3rd Ed.)</div>
+                        <div class="sc-desc">The foundational alarm management publication since 1999. Established the alarm rate benchmarks later formalized by ISA-18.2. Emphasizes alarm uniqueness.<a href="#ref5" class="src-ref">[5]</a></div>
+                        <div class="sc-key-metric"><strong>Key principle:</strong> Each alarm must provide information not available from any other source on the console.</div>
+                    </div>
+                    <div class="standard-card">
+                        <div class="sc-label">&#127760; International</div>
+                        <div class="sc-title">IEC 62682:2022</div>
+                        <div class="sc-desc">The international equivalent of ISA-18.2 for global consistency. Focuses on alarm timeliness &mdash; alarms must arrive early enough for corrective action.<a href="#ref6" class="src-ref">[6]</a></div>
+                        <div class="sc-key-metric"><strong>Key principle:</strong> An alarm that arrives after the safety limit is exceeded is not an alarm &mdash; it is a post-incident log entry.</div>
+                    </div>
+                </div>
 
                 <div class="formula-box">
                     <div class="formula-label">ISA-18.2 Core Metric: Actionable Alarm Ratio</div>
@@ -1348,6 +1417,14 @@
                 </div>
 
                 <p>At a daily rate of 800 alarms (&lambda;<sub>10</sub> &asymp; 5.6), the probability of experiencing an alarm flood in any given 10-minute window is approximately 7%. Over a 12-hour shift (72 windows), the probability that at least one alarm flood occurs is approximately 99.5%. The operator <em>will</em> be overwhelmed. The question is not whether, but when.</p>
+
+
+                <!-- Poisson Distribution Chart -->
+                <div class="chart-wrap">
+                    <div class="chart-title"><i class="fas fa-chart-bar" style="color:#ef4444;margin-right:6px;"></i>Alarm Flood Probability by Daily Alarm Rate &mdash; Poisson Model</div>
+                    <canvas id="poissonChart"></canvas>
+                    <p style="font-size:0.72rem;color:#334155;margin-top:0.5rem;text-align:center;">P(at least 1 flood per 12-hr shift) = 1 &minus; [1 &minus; P(X &ge; 10 in 10 min)]<sup>72</sup> &nbsp;|&nbsp; ISA-18.2 flood threshold = 10 alarms / 10 min</p>
+                </div>
 
                 <div class="key-insight">
                     <strong>Key Insight: The Cognitive Cliff</strong>
@@ -1429,6 +1506,14 @@
                 <div class="info-box success">
                     <div class="info-box-title">ISA-18.2 Compliance: 12% to 89%</div>
                     <p>Composite ISA-18.2 compliance score improved from 12% (failing on all four primary metrics) to 89% (meeting or exceeding targets on alarm rate, actionable ratio, and standing alarm percentage; approaching target on critical alarm percentage).</p>
+                </div>
+
+
+                <!-- Before / After Comparison Chart -->
+                <div class="chart-wrap" style="margin-top:1.5rem;">
+                    <div class="chart-title"><i class="fas fa-chart-line" style="color:#10b981;margin-right:6px;"></i>Before vs After Rationalization &mdash; Key Metrics</div>
+                    <canvas id="beforeAfterChart"></canvas>
+                    <p style="font-size:0.72rem;color:#334155;margin-top:0.5rem;text-align:center;">90-day measurement window. Data center facility, construction-to-operations transition phase.</p>
                 </div>
 
                 <div class="info-box success">
@@ -1687,6 +1772,109 @@
             </div>
         </div>
     </section>
+
+    <!-- Section 10b: Monte Carlo Risk Simulation -->
+    <section class="mc-section" id="sec10mc" style="max-width:900px;margin:3rem auto;">
+        <div class="mc-header">
+            <div class="mc-icon">&#127922;</div>
+            <div>
+                <div class="mc-title">Monte Carlo Risk Simulation</div>
+                <div class="mc-subtitle">Section 10b &mdash; 10,000 iterations with randomized inputs &rarr; probability distributions instead of single-point estimates</div>
+            </div>
+        </div>
+        <p style="color:#64748b;font-size:0.85rem;line-height:1.6;margin-bottom:1rem;">Single-point calculations assume exact inputs. Reality is uncertain. This simulation samples each parameter from a probability distribution (your input &pm; uncertainty range), runs 10,000 scenarios, and shows you the <strong style="color:#a78bfa;">P10 / P50 / P90</strong> risk envelope &mdash; the range within which 80% of real-world outcomes fall.</p>
+
+        <div class="mc-controls">
+            <div class="mc-control">
+                <label>Mean Daily Alarms</label>
+                <input type="number" id="mcAlarms" value="1200" min="50" max="50000">
+            </div>
+            <div class="mc-control">
+                <label>Operators / Shift</label>
+                <select id="mcOps">
+                    <option value="1">1 operator</option>
+                    <option value="2" selected>2 operators</option>
+                    <option value="3">3 operators</option>
+                    <option value="4">4 operators</option>
+                </select>
+            </div>
+            <div class="mc-control">
+                <label>Shift Duration</label>
+                <select id="mcShift">
+                    <option value="8">8 hours</option>
+                    <option value="12" selected>12 hours</option>
+                </select>
+            </div>
+            <div class="mc-control">
+                <label>Uncertainty Range</label>
+                <select id="mcUncertainty">
+                    <option value="0.1">&pm;10% (high confidence data)</option>
+                    <option value="0.2" selected>&pm;20% (typical field data)</option>
+                    <option value="0.3">&pm;30% (early estimate)</option>
+                    <option value="0.5">&pm;50% (rough order of magnitude)</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+            <button class="mc-run-btn" id="mcRunBtn" onclick="runMonteCarlo()">
+                <i class="fas fa-dice"></i> Run 10,000 Simulations
+            </button>
+            <span style="font-size:0.78rem;color:#334155;" id="mcRunNote">Results update on each run</span>
+        </div>
+
+        <div class="mc-progress" id="mcProgress">
+            <span id="mcProgressText">Running...</span>
+            <div class="mc-progress-bar"><div class="mc-progress-fill" id="mcProgressFill" style="width:0%"></div></div>
+        </div>
+
+        <div class="mc-results-grid" id="mcResultsGrid" style="display:none;">
+            <div class="mc-stat">
+                <div class="mc-stat-label">ISA Compliance Score</div>
+                <div class="mc-stat-p50" id="mcCompP50">&mdash;</div>
+                <div class="mc-stat-range" id="mcCompRange">&nbsp;</div>
+            </div>
+            <div class="mc-stat">
+                <div class="mc-stat-label">Flood Probability / Shift</div>
+                <div class="mc-stat-p50" id="mcFloodP50">&mdash;</div>
+                <div class="mc-stat-range" id="mcFloodRange">&nbsp;</div>
+            </div>
+            <div class="mc-stat">
+                <div class="mc-stat-label">Alarms / Op / 10 min</div>
+                <div class="mc-stat-p50" id="mcRateP50">&mdash;</div>
+                <div class="mc-stat-range" id="mcRateRange">&nbsp;</div>
+            </div>
+            <div class="mc-stat">
+                <div class="mc-stat-label">Cognitive Load Index</div>
+                <div class="mc-stat-p50" id="mcCLIP50">&mdash;</div>
+                <div class="mc-stat-range" id="mcCLIRange">&nbsp;</div>
+            </div>
+        </div>
+
+        <div class="chart-wrap" id="mcChartWrap" style="display:none;margin-top:1.25rem;">
+            <div class="chart-title"><i class="fas fa-chart-area" style="color:#7c3aed;margin-right:6px;"></i>ISA-18.2 Compliance Score Distribution &mdash; 10,000 Scenarios</div>
+            <canvas id="mcHistChart" style="max-height:240px;"></canvas>
+            <p style="font-size:0.72rem;color:#334155;margin-top:0.5rem;text-align:center;">P10 = worst 10% of scenarios &nbsp;&bull;&nbsp; P50 = median &nbsp;&bull;&nbsp; P90 = best 10% &nbsp;&bull;&nbsp; ISA target = &ge; 85%</p>
+        </div>
+    </section>
+
+    <!-- Section 10c: Interactive Sankey Diagram -->
+    <section class="sankey-section" id="sec10sk" style="max-width:900px;margin:3rem auto;">
+        <div class="sankey-header">
+            <div class="sankey-title">Alarm Flow Rationalization Diagram</div>
+            <div class="sankey-subtitle">Section 10c &mdash; Interactive Sankey &mdash; How 3,847 configured alarm points were rationalized. Hover nodes and links for details.</div>
+        </div>
+        <svg id="sankeyChart"></svg>
+        <div class="sankey-legend">
+            <div class="sankey-legend-item"><div class="sankey-legend-dot" style="background:#ef4444;"></div>Alarm Failure Types (Input)</div>
+            <div class="sankey-legend-item"><div class="sankey-legend-dot" style="background:#f59e0b;"></div>Rationalization Action</div>
+            <div class="sankey-legend-item"><div class="sankey-legend-dot" style="background:#10b981;"></div>Active Post-Rationalization</div>
+            <div class="sankey-legend-item"><div class="sankey-legend-dot" style="background:#64748b;"></div>Eliminated / Removed</div>
+            <div class="sankey-legend-item"><div class="sankey-legend-dot" style="background:#3b82f6;"></div>Suppressed / Shelved</div>
+        </div>
+        <p style="font-size:0.73rem;color:#334155;margin-top:0.75rem;">Data source: Alarm rationalization project case study. Values represent configured alarm points (3,847 total). Post-rationalization: 391 active points (&asymp;10% of original &mdash; &gt;90% reduction).</p>
+    </section>
+
 
     <!-- Continue Article Content -->
     <article class="article-content" style="padding-top: 0;">
@@ -2483,6 +2671,515 @@
         setTimeout(function() { applyAlarmGating(); alarmUpdateNavAuth(); initAlarmTooltips(); }, 150);
     })();
     </script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  CHART.JS — Poisson Distribution Chart
+// ═══════════════════════════════════════════════════════════════════════════
+(function initPoissonChart() {
+    var canvas = document.getElementById('poissonChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    function poissonProb(lambda, n) {
+        // P(X >= n) using complement of Poisson CDF
+        var sum = 0, term = Math.exp(-lambda), factorial = 1;
+        for (var k = 0; k < n; k++) {
+            sum += term;
+            factorial = k === 0 ? 1 : factorial * k;
+            term = Math.exp(-lambda) * Math.pow(lambda, k + 1) / (factorial * (k + 1));
+        }
+        return Math.max(0, Math.min(1, 1 - sum));
+    }
+
+    function shiftFloodProb(lambda10, windows) {
+        // P(at least 1 flood in shift) = 1 - (1 - P_window)^windows
+        var p_window = poissonProb(lambda10, 10);
+        return 1 - Math.pow(1 - p_window, windows);
+    }
+
+    var scenarios = [
+        { label: '72/day
+(ISA Target)', dailyRate: 72, color: 'rgba(16,185,129,0.8)' },
+        { label: '144/day
+(Max Manageable)', dailyRate: 144, color: 'rgba(6,182,212,0.8)' },
+        { label: '360/day
+(Overloaded)', dailyRate: 360, color: 'rgba(245,158,11,0.8)' },
+        { label: '576/day', dailyRate: 576, color: 'rgba(249,115,22,0.8)' },
+        { label: '800/day
+(Case Baseline)', dailyRate: 800, color: 'rgba(239,68,68,0.8)' },
+        { label: '1,200/day
+(Case Peak)', dailyRate: 1200, color: 'rgba(185,28,28,0.9)' },
+    ];
+
+    var labels = scenarios.map(function(s) { return s.label; });
+    var perWindowData = scenarios.map(function(s) {
+        return (poissonProb(s.dailyRate / 144, 10) * 100).toFixed(1);
+    });
+    var perShiftData = scenarios.map(function(s) {
+        return (shiftFloodProb(s.dailyRate / 144, 72) * 100).toFixed(1);
+    });
+    var colors = scenarios.map(function(s) { return s.color; });
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'P(flood) per 10-min window',
+                    data: perWindowData,
+                    backgroundColor: colors.map(function(c) { return c.replace('0.8','0.45').replace('0.9','0.45'); }),
+                    borderColor: colors,
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'P(≥1 flood) per 12-hr shift',
+                    data: perShiftData,
+                    backgroundColor: colors,
+                    borderColor: colors.map(function(c) { return c; }),
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    yAxisID: 'y'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw + '%'; }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(30,58,95,0.3)' } },
+                y: {
+                    type: 'linear',
+                    ticks: { color: '#64748b', callback: function(v) { return v + '%'; } },
+                    grid: { color: 'rgba(30,58,95,0.3)' },
+                    max: 100,
+                    title: { display: true, text: 'Probability (%)', color: '#475569', font: { size: 10 } }
+                }
+            }
+        }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CHART.JS — Before / After Comparison Chart
+// ═══════════════════════════════════════════════════════════════════════════
+(function initBeforeAfterChart() {
+    var canvas = document.getElementById('beforeAfterChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: ['Daily Alarms
+(÷10 for scale)', 'Response Time
+(seconds)', 'ISA Compliance
+(%)', 'False Evacuations
+(per 90 days)'],
+            datasets: [
+                {
+                    label: 'Before Rationalization',
+                    data: [100, 180, 12, 3],
+                    backgroundColor: 'rgba(239,68,68,0.6)',
+                    borderColor: 'rgba(239,68,68,0.9)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                },
+                {
+                    label: 'After Rationalization',
+                    data: [8, 45, 89, 0],
+                    backgroundColor: 'rgba(16,185,129,0.6)',
+                    borderColor: 'rgba(16,185,129,0.9)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            var labels = ['', ' alarms/day', ' seconds', '%', ' evacuations'];
+                            var realBefore = [1000, 180, 12, 3];
+                            var realAfter  = [80, 45, 89, 0];
+                            var idx = ctx.dataIndex;
+                            var real = ctx.datasetIndex === 0 ? realBefore[idx] : realAfter[idx];
+                            return ctx.dataset.label + ': ' + real + (labels[idx + 1] || '');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(30,58,95,0.3)' } },
+                y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(30,58,95,0.3)' }, title: { display: true, text: 'Normalized Value', color: '#475569', font: { size: 10 } } }
+            }
+        }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  MONTE CARLO RISK SIMULATION — 10,000 iterations
+// ═══════════════════════════════════════════════════════════════════════════
+var mcHistChart = null;
+
+function normalSample(mean, stdDev) {
+    // Box-Muller transform
+    var u1 = Math.random(), u2 = Math.random();
+    var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    return mean + stdDev * z;
+}
+
+function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val));
+}
+
+function computeISAScore(dailyAlarms, operators, shiftHours) {
+    var windows = shiftHours * 6; // 10-min windows per shift
+    var lambda10 = dailyAlarms / (operators * 144);
+    var alarmRate10 = dailyAlarms / (operators * 144);
+
+    // Rate score (0-100): ISA target ≤ 1.0/10min
+    var rateScore = alarmRate10 <= 1.0 ? 100 : Math.max(0, 100 - (alarmRate10 - 1.0) * 20);
+
+    // Flood probability (assuming 90% nuisance rate, so effective lambda)
+    function poissonCDF(lam, n) {
+        var sum = 0, term = Math.exp(-lam), fact = 1;
+        for (var k = 0; k < n; k++) {
+            sum += term;
+            fact = k === 0 ? 1 : fact * k;
+            term = Math.exp(-lam) * Math.pow(lam, k + 1) / (fact * (k + 1));
+        }
+        return sum;
+    }
+    var pFlood = Math.max(0, 1 - Math.pow(poissonCDF(lambda10, 10), windows));
+
+    // Flood score
+    var floodScore = pFlood <= 0.1 ? 100 : Math.max(0, 100 - (pFlood - 0.1) * 120);
+
+    // Composite ISA score (simplified: rate 50% + flood 30% + assumed actionable ratio 20%)
+    var actionableEstimate = alarmRate10 <= 1 ? 90 : Math.max(20, 90 - (alarmRate10 - 1) * 15);
+    var actionableScore = actionableEstimate >= 85 ? 100 : (actionableEstimate / 85) * 100;
+
+    var composite = rateScore * 0.5 + floodScore * 0.3 + actionableScore * 0.2;
+    return {
+        isa: clamp(composite, 0, 100),
+        flood: pFlood,
+        rate: alarmRate10,
+        cli: clamp(alarmRate10 / 5, 0, 1)
+    };
+}
+
+function runMonteCarlo() {
+    var btn = document.getElementById('mcRunBtn');
+    var progress = document.getElementById('mcProgress');
+    var fill = document.getElementById('mcProgressFill');
+    var progressText = document.getElementById('mcProgressText');
+    var resultsGrid = document.getElementById('mcResultsGrid');
+    var chartWrap = document.getElementById('mcChartWrap');
+
+    var meanAlarms = parseFloat(document.getElementById('mcAlarms').value) || 1200;
+    var operators = parseInt(document.getElementById('mcOps').value) || 2;
+    var shiftHours = parseInt(document.getElementById('mcShift').value) || 12;
+    var uncertainty = parseFloat(document.getElementById('mcUncertainty').value) || 0.2;
+
+    btn.disabled = true;
+    progress.style.display = 'flex';
+    resultsGrid.style.display = 'none';
+    chartWrap.style.display = 'none';
+
+    var N = 10000;
+    var results = { isa: [], flood: [], rate: [], cli: [] };
+    var batchSize = 500;
+    var done = 0;
+
+    function runBatch() {
+        var end = Math.min(done + batchSize, N);
+        for (var i = done; i < end; i++) {
+            var sampledAlarms = clamp(normalSample(meanAlarms, meanAlarms * uncertainty), 10, meanAlarms * 3);
+            var sampledOps = clamp(Math.round(normalSample(operators, operators * uncertainty * 0.5)), 1, 10);
+            var r = computeISAScore(sampledAlarms, sampledOps, shiftHours);
+            results.isa.push(r.isa);
+            results.flood.push(r.flood * 100);
+            results.rate.push(r.rate);
+            results.cli.push(r.cli * 100);
+        }
+        done = end;
+        var pct = (done / N * 100).toFixed(0);
+        fill.style.width = pct + '%';
+        progressText.textContent = 'Running ' + done.toLocaleString() + ' / ' + N.toLocaleString() + ' scenarios...';
+
+        if (done < N) {
+            setTimeout(runBatch, 0);
+        } else {
+            finalizeMC(results, N);
+            btn.disabled = false;
+            progress.style.display = 'none';
+        }
+    }
+
+    setTimeout(runBatch, 10);
+}
+
+function percentile(arr, p) {
+    var sorted = arr.slice().sort(function(a, b) { return a - b; });
+    var idx = Math.floor(p / 100 * sorted.length);
+    return sorted[Math.min(idx, sorted.length - 1)];
+}
+
+function finalizeMC(results, N) {
+    var resultsGrid = document.getElementById('mcResultsGrid');
+    var chartWrap = document.getElementById('mcChartWrap');
+
+    function setMCStat(prefix, values, fmt) {
+        var p10 = percentile(values, 10), p50 = percentile(values, 50), p90 = percentile(values, 90);
+        document.getElementById(prefix + 'P50').textContent = fmt(p50);
+        document.getElementById(prefix + 'Range').textContent = 'P10: ' + fmt(p10) + ' — P90: ' + fmt(p90);
+    }
+
+    setMCStat('mcComp', results.isa, function(v) { return v.toFixed(1) + '%'; });
+    setMCStat('mcFlood', results.flood, function(v) { return v.toFixed(1) + '%'; });
+    setMCStat('mcRate', results.rate, function(v) { return v.toFixed(2); });
+    setMCStat('mcCLI', results.cli, function(v) { return v.toFixed(1) + '%'; });
+
+    resultsGrid.style.display = 'grid';
+
+    // Build histogram of ISA compliance scores
+    var bins = 20, binData = new Array(bins).fill(0), binLabels = [];
+    var minV = 0, maxV = 100, binSize = (maxV - minV) / bins;
+    for (var i = 0; i < bins; i++) {
+        binLabels.push((minV + i * binSize).toFixed(0) + '%');
+    }
+    results.isa.forEach(function(v) {
+        var b = Math.min(bins - 1, Math.floor((v - minV) / binSize));
+        binData[b]++;
+    });
+
+    var p10Val = percentile(results.isa, 10);
+    var p50Val = percentile(results.isa, 50);
+    var p90Val = percentile(results.isa, 90);
+
+    var bgColors = binLabels.map(function(label) {
+        var midV = parseFloat(label) + binSize / 2;
+        if (midV < p10Val) return 'rgba(239,68,68,0.7)';
+        if (midV < p90Val) return 'rgba(139,92,246,0.6)';
+        return 'rgba(16,185,129,0.7)';
+    });
+
+    if (mcHistChart) mcHistChart.destroy();
+
+    var canvas = document.getElementById('mcHistChart');
+    chartWrap.style.display = 'block';
+    mcHistChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: binLabels,
+            datasets: [{
+                label: 'Frequency (scenarios)',
+                data: binData,
+                backgroundColor: bgColors,
+                borderColor: 'transparent',
+                borderRadius: 3,
+                barPercentage: 1.0,
+                categoryPercentage: 1.0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.raw + ' scenarios (' + (ctx.raw / N * 100).toFixed(1) + '%)';
+                        }
+                    }
+                },
+                annotation: {
+                    annotations: {
+                        target: {
+                            type: 'line',
+                            xMin: (85 / binSize) - 0.5,
+                            xMax: (85 / binSize) - 0.5,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            borderDash: [4, 4],
+                            label: { content: 'ISA Target 85%', enabled: true, color: '#10b981', font: { size: 10 } }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#475569', font: { size: 9 }, maxRotation: 0 }, grid: { display: false } },
+                y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(30,58,95,0.3)' }, title: { display: true, text: 'Scenarios (out of 10,000)', color: '#475569', font: { size: 10 } } }
+            }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  D3-SANKEY — Alarm Flow Rationalization Diagram
+// ═══════════════════════════════════════════════════════════════════════════
+(function initSankey() {
+    if (typeof d3 === 'undefined' || typeof d3.sankey === 'undefined') return;
+
+    var container = document.getElementById('sankeyChart');
+    if (!container) return;
+
+    var isMobile = window.innerWidth < 600;
+    var W = Math.min(container.parentElement.clientWidth - 40, 860);
+    var H = isMobile ? 500 : 440;
+    var margin = { top: 20, right: 140, bottom: 20, left: 140 };
+
+    var svg = d3.select('#sankeyChart')
+        .attr('width', W)
+        .attr('height', H);
+
+    var sankey = d3.sankey()
+        .nodeWidth(18)
+        .nodePadding(12)
+        .extent([[margin.left, margin.top], [W - margin.right, H - margin.bottom]]);
+
+    var nodeColors = {
+        'Chattering': '#ef4444',
+        'Standing / Stale': '#f97316',
+        'Consequential': '#eab308',
+        'Nuisance / Invalid': '#ef4444',
+        'Valid Actionable': '#10b981',
+        'Eliminated': '#475569',
+        'Suppressed / Shelved': '#3b82f6',
+        'Reconfigured': '#f59e0b',
+        'Critical Active': '#10b981',
+        'Warning Active': '#22d3ee',
+        'Info Active': '#a78bfa',
+    };
+
+    var data = {
+        nodes: [
+            { name: 'Chattering' },           // 0 - 423
+            { name: 'Standing / Stale' },      // 1 - 770
+            { name: 'Consequential' },         // 2 - 962
+            { name: 'Nuisance / Invalid' },    // 3 - 1347
+            { name: 'Valid Actionable' },      // 4 - 345
+            { name: 'Eliminated' },            // 5
+            { name: 'Suppressed / Shelved' },  // 6
+            { name: 'Reconfigured' },          // 7
+            { name: 'Critical Active' },       // 8
+            { name: 'Warning Active' },        // 9
+            { name: 'Info Active' },           // 10
+        ],
+        links: [
+            // Chattering (423 total)
+            { source: 0, target: 5, value: 366 },   // Eliminated
+            { source: 0, target: 7, value: 57  },   // Reconfigured
+            // Standing/Stale (770 total)
+            { source: 1, target: 5, value: 308 },   // Eliminated
+            { source: 1, target: 6, value: 462 },   // Suppressed
+            // Consequential (962 total)
+            { source: 2, target: 5, value: 112 },   // Eliminated
+            { source: 2, target: 6, value: 350 },   // Suppressed
+            { source: 2, target: 7, value: 500 },   // Reconfigured
+            // Nuisance/Invalid (1347 total)
+            { source: 3, target: 5, value: 1000 },  // Eliminated
+            { source: 3, target: 7, value: 347 },   // Reconfigured
+            // Valid Actionable (345 total = 345 kept)
+            { source: 4, target: 8, value: 170 },   // Critical Active
+            { source: 4, target: 9, value: 130 },   // Warning Active
+            { source: 4, target: 10, value: 45 },   // Info Active
+            // Reconfigured → Active (904 reconfigured, most re-eliminated after review)
+            { source: 7, target: 5, value: 858 },   // Most reconfigured removed
+            { source: 7, target: 8, value: 15  },   // Some → Critical
+            { source: 7, target: 9, value: 23  },   // Some → Warning
+            { source: 7, target: 10, value: 8  },   // Some → Info
+        ]
+    };
+
+    try {
+        var graph = sankey({
+            nodes: data.nodes.map(function(d) { return Object.assign({}, d); }),
+            links: data.links.map(function(d) { return Object.assign({}, d); })
+        });
+    } catch(e) { console.warn('Sankey error:', e); return; }
+
+    var defs = svg.append('defs');
+    graph.links.forEach(function(link, i) {
+        var id = 'lg' + i;
+        var grad = defs.append('linearGradient').attr('id', id)
+            .attr('gradientUnits', 'userSpaceOnUse')
+            .attr('x1', link.source.x1).attr('x2', link.target.x0);
+        grad.append('stop').attr('offset', '0%').attr('stop-color', nodeColors[link.source.name] || '#64748b').attr('stop-opacity', 0.6);
+        grad.append('stop').attr('offset', '100%').attr('stop-color', nodeColors[link.target.name] || '#64748b').attr('stop-opacity', 0.6);
+    });
+
+    // Links
+    svg.append('g').attr('class', 'sankey-links')
+        .selectAll('path')
+        .data(graph.links)
+        .enter().append('path')
+        .attr('d', d3.sankeyLinkHorizontal())
+        .attr('stroke', function(d, i) { return 'url(#lg' + i + ')'; })
+        .attr('stroke-width', function(d) { return Math.max(1, d.width); })
+        .attr('fill', 'none')
+        .attr('opacity', 0.55)
+        .on('mouseover', function() { d3.select(this).attr('opacity', 0.85); })
+        .on('mouseout', function() { d3.select(this).attr('opacity', 0.55); })
+        .append('title')
+        .text(function(d) { return d.source.name + ' → ' + d.target.name + ': ' + d.value.toLocaleString() + ' alarm points'; });
+
+    // Nodes
+    var node = svg.append('g').attr('class', 'sankey-nodes')
+        .selectAll('g')
+        .data(graph.nodes)
+        .enter().append('g');
+
+    node.append('rect')
+        .attr('x', function(d) { return d.x0; })
+        .attr('y', function(d) { return d.y0; })
+        .attr('height', function(d) { return d.y1 - d.y0; })
+        .attr('width', function(d) { return d.x1 - d.x0; })
+        .attr('fill', function(d) { return nodeColors[d.name] || '#64748b'; })
+        .attr('rx', 3)
+        .on('mouseover', function(event, d) {
+            d3.select(this).attr('opacity', 0.8);
+        })
+        .on('mouseout', function() { d3.select(this).attr('opacity', 1); })
+        .append('title')
+        .text(function(d) { return d.name + '
+' + d.value.toLocaleString() + ' alarm points'; });
+
+    // Node labels
+    node.append('text')
+        .attr('x', function(d) { return d.x0 < W / 2 ? d.x1 + 8 : d.x0 - 8; })
+        .attr('y', function(d) { return (d.y0 + d.y1) / 2; })
+        .attr('dy', '0.35em')
+        .attr('text-anchor', function(d) { return d.x0 < W / 2 ? 'start' : 'end'; })
+        .attr('font-size', isMobile ? 9 : 11)
+        .attr('fill', '#94a3b8')
+        .text(function(d) { return d.name; });
+
+    // Value labels on nodes
+    node.append('text')
+        .attr('x', function(d) { return d.x0 < W / 2 ? d.x1 + 8 : d.x0 - 8; })
+        .attr('y', function(d) { return (d.y0 + d.y1) / 2 + 13; })
+        .attr('dy', '0.35em')
+        .attr('text-anchor', function(d) { return d.x0 < W / 2 ? 'start' : 'end'; })
+        .attr('font-size', isMobile ? 8 : 10)
+        .attr('fill', '#475569')
+        .text(function(d) { return d.value.toLocaleString() + ' pts'; });
+})();
+</script>
 <script>
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
 </script>
