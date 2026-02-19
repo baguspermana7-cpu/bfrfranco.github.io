@@ -60,11 +60,6 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-2-cover.jpg">
-    <!-- Chart.js for data visualizations -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- D3.js + d3-sankey for alarm flow diagram -->
-    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
 
 
     <!-- Structured Data - TechnicalArticle -->
@@ -2698,17 +2693,12 @@
     }
 
     var scenarios = [
-        { label: '72/day
-(ISA Target)', dailyRate: 72, color: 'rgba(16,185,129,0.8)' },
-        { label: '144/day
-(Max Manageable)', dailyRate: 144, color: 'rgba(6,182,212,0.8)' },
-        { label: '360/day
-(Overloaded)', dailyRate: 360, color: 'rgba(245,158,11,0.8)' },
+        { label: '72/day\n(ISA Target)', dailyRate: 72, color: 'rgba(16,185,129,0.8)' },
+        { label: '144/day\n(Max Manageable)', dailyRate: 144, color: 'rgba(6,182,212,0.8)' },
+        { label: '360/day\n(Overloaded)', dailyRate: 360, color: 'rgba(245,158,11,0.8)' },
         { label: '576/day', dailyRate: 576, color: 'rgba(249,115,22,0.8)' },
-        { label: '800/day
-(Case Baseline)', dailyRate: 800, color: 'rgba(239,68,68,0.8)' },
-        { label: '1,200/day
-(Case Peak)', dailyRate: 1200, color: 'rgba(185,28,28,0.9)' },
+        { label: '800/day\n(Case Baseline)', dailyRate: 800, color: 'rgba(239,68,68,0.8)' },
+        { label: '1,200/day\n(Case Peak)', dailyRate: 1200, color: 'rgba(185,28,28,0.9)' },
     ];
 
     var labels = scenarios.map(function(s) { return s.label; });
@@ -2780,11 +2770,7 @@
     new Chart(canvas, {
         type: 'bar',
         data: {
-            labels: ['Daily Alarms
-(÷10 for scale)', 'Response Time
-(seconds)', 'ISA Compliance
-(%)', 'False Evacuations
-(per 90 days)'],
+            labels: ['Daily Alarms\n(÷10 for scale)', 'Response Time\n(seconds)', 'ISA Compliance\n(%)', 'False Evacuations\n(per 90 days)'],
             datasets: [
                 {
                     label: 'Before Rationalization',
@@ -3156,8 +3142,7 @@ function finalizeMC(results, N) {
         })
         .on('mouseout', function() { d3.select(this).attr('opacity', 1); })
         .append('title')
-        .text(function(d) { return d.name + '
-' + d.value.toLocaleString() + ' alarm points'; });
+        .text(function(d) { return d.name + '\n' + d.value.toLocaleString() + ' alarm points'; });
 
     // Node labels
     node.append('text')
@@ -3179,6 +3164,8 @@ function finalizeMC(results, N) {
         .attr('fill', '#475569')
         .text(function(d) { return d.value.toLocaleString() + ' pts'; });
 })();
+</script>
+
 </script>
 <script>
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
