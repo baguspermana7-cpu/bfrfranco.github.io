@@ -16,6 +16,7 @@
  *   GET  /api/exports         — user's export history
  *   GET  /api/dashboard       — aggregated dashboard data
  *   POST /api/reconcile       — admin: manual entitlement reconciliation
+ *   POST /api/chat            — AI chatbot (streaming SSE, public)
  */
 
 // Load .env for local development (no-op if file missing)
@@ -33,6 +34,7 @@ const webhookRoutes = require('./routes/webhook');
 const projectRoutes = require('./routes/projects');
 const analyticsRoutes = require('./routes/analytics');
 const adminRoutes = require('./routes/admin');
+const chatRoutes = require('./routes/chat');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -76,6 +78,7 @@ app.use('/api/webhook', webhookRoutes); // /api/webhook/mayar
 app.use('/api/projects', projectRoutes); // /api/projects CRUD
 app.use('/api', analyticsRoutes);      // /api/usage, /api/exports, /api/dashboard
 app.use('/api', adminRoutes);          // /api/reconcile
+app.use('/api', chatRoutes);           // /api/chat
 
 // ─── 404 handler ────────────────────────────────────────────────────────────
 app.use((req, res) => {

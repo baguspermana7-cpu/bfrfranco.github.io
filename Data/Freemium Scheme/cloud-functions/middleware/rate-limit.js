@@ -40,4 +40,13 @@ const checkoutLimiter = rateLimit({
   message: { error: 'Too many checkout requests, please wait' }
 });
 
-module.exports = { apiLimiter, authLimiter, webhookLimiter, checkoutLimiter };
+// Chat: 15 messages per minute per IP
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many chat messages, please wait a moment' }
+});
+
+module.exports = { apiLimiter, authLimiter, webhookLimiter, checkoutLimiter, chatLimiter };
