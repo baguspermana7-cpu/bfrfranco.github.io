@@ -1,11 +1,52 @@
 # Claude Code Session Notes
-**Date:** 2026-02-17
+**Date:** 2026-02-18
 **Project:** Portfolio Website - baguspermana7-cpu.github.io
 **Domain:** resistancezero.com (Cloud Run)
 
 ## Current State
 - Branch: `main`
-- Working directory: `C:\Users\User\Sandbox`
+- Working directory: `C:\Users\User\Sandbox` (all project files relocated here)
+- All 334 files now under `Sandbox/`, `.gitignore` at repo root
+
+---
+
+## Session: 2026-02-18 — Critical Security Fix + File Relocation
+
+### Summary
+Scrubbed sensitive credentials from public git history, fixed article-7 dark mode gaps, and relocated all project files from repo root into `Sandbox/` directory for cleaner organization.
+
+### Completed Work
+
+#### A. CRITICAL: Git History Scrub (standarization/ credentials)
+- **Problem**: `standarization/SUPABASE_FIREBASE_SETUP.md` contained Supabase service role key, DB password, and Firebase API key — was in git history of a PUBLIC repo even after `git rm --cached`
+- **Fix**: `git filter-branch --index-filter` removed `standarization/` from ALL 68 commits
+- **Cleanup**: `rm -rf .git/refs/original/`, `git reflog expire --expire=now --all`, `git gc --prune=now --aggressive`
+- **Pushed**: `git push --force origin main` — all commit hashes rewritten
+- **Verified**: `git log -p --all -- "standarization/"` returns 0 lines
+
+#### B. Article-7 Dark Mode Fix
+- **File**: `Sandbox/article-7.html` (line ~169)
+- **Added 3 CSS rules**:
+  - `[data-theme="dark"] .highlight-box` — blue tint
+  - `[data-theme="dark"] .warning-box` — amber tint
+  - `[data-theme="dark"] .result-box` — green tint
+
+#### C. File Relocation (root → Sandbox/)
+- **Before**: All 334 tracked files at `C:\Users\User\` (repo root) — cluttered with personal files
+- **After**: All files under `C:\Users\User\Sandbox\` via `git mv`
+- **Only `.gitignore` stays at root** (git requires it)
+- **Updated `.gitignore`**: Added `Sandbox/standarization/` and `Sandbox/node_modules/`
+- **Dockerfile + nginx.conf**: Already use relative paths, work from Sandbox/ context
+- **Deploy note**: `gcloud run deploy --source .` must now run from `Sandbox/`
+
+### Commits
+1. `97f753c` — git history rewrite (filter-branch, force-pushed)
+2. `922188a` — `refactor: relocate all project files into Sandbox/ directory`
+
+### Pending User Actions
+1. **URGENT: Rotate Supabase credentials** — DB password + service role key were exposed on public repo. Even though history is scrubbed, anyone who cloned before still has them.
+2. **Rotate Firebase API key** if concerned (lower risk since Firebase keys are client-side)
+3. **Deploy**: Run `gcloud run deploy --source .` from `Sandbox/` to update Cloud Run
 
 ---
 
