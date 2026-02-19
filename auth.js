@@ -184,13 +184,13 @@
                     '<label>Password</label>' +
                     '<input type="password" id="rzModalPassword" placeholder="Enter password" autocomplete="current-password">' +
                     '<button class="rz-submit-btn" id="rzModalSubmit" onclick="window._rzAuth.doLogin()">Sign In</button>' +
-                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
-                        '<span class="rz-demo-label" style="color:#a78bfa;font-weight:600;">Demo:</span> ' +
-                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo@resistancezero.com</code> / ' +
-                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo2026</code>' +
-                    '</div>' +
                     '<div style="text-align:center;margin-top:8px;">' +
                         '<a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" rel="noopener" class="rz-pro-link" style="font-size:0.68rem;color:#64748b;text-decoration:none;transition:color 0.2s;">Unlock Pro Mode &rarr;</a>' +
+                    '</div>' +
+                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
+                        '<span class="rz-demo-label" style="color:#a78bfa;font-weight:600;">Demo Account:</span><br>' +
+                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo2026</code>' +
                     '</div>' +
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +
