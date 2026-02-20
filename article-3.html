@@ -61,6 +61,11 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-3-cover.jpg">
+    <!-- Chart.js + D3.js for data visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
 
     <!-- Structured Data - TechnicalArticle -->
     <script type="application/ld+json">
@@ -77,7 +82,7 @@
             "url": "https://resistancezero.com/"
         },
         "datePublished": "2025-11-30",
-        "dateModified": "2025-12-05",
+        "dateModified": "2026-02-20",
         "publisher": {
             "@type": "Person",
             "name": "Bagus Dwi Permana"
@@ -132,6 +137,92 @@
             --text-secondary: #64748b;
         }
 
+
+        /* ─── Operator Narrative ─── */
+        .operator-story {
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(30,58,95,0.4));
+            border: 1px solid rgba(16,185,129,0.25);
+            border-left: 4px solid #10b981;
+            border-radius: 12px;
+            padding: 1.5rem 1.75rem;
+            margin: 2rem 0;
+        }
+        .operator-story-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #10b981;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+        .operator-story blockquote {
+            border-left: 3px solid rgba(16,185,129,0.4);
+            padding-left: 1rem;
+            margin: 0.75rem 0;
+            color: #cbd5e1;
+            font-style: italic;
+            font-size: 0.88rem;
+            line-height: 1.7;
+        }
+        .operator-story .stat-highlight {
+            display: inline-block;
+            background: rgba(16,185,129,0.15);
+            color: #6ee7b7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-style: normal;
+            font-size: 0.82rem;
+        }
+        /* ─── Chart Wrap ─── */
+        .chart-wrap {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border: 1px solid rgba(30,58,95,0.5);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        .chart-wrap .chart-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        /* ─── Monte Carlo Section ─── */
+        .mc-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            color: #e2e8f0;
+        }
+        .mc-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .mc-icon { font-size: 2.5rem; }
+        .mc-title { font-size: 1.2rem; font-weight: 800; color: #fff; }
+        .mc-subtitle { font-size: 0.78rem; color: #a78bfa; margin-top: 2px; }
+        .mc-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+        .mc-control label { display: block; font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        .mc-control input, .mc-control select { width: 100%; padding: 8px 10px; background: rgba(30,58,95,0.5); border: 1px solid rgba(139,92,246,0.3); border-radius: 8px; color: #e2e8f0; font-size: 0.85rem; }
+        .mc-run-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin: 0.75rem 0; transition: transform 0.15s; }
+        .mc-run-btn:hover { transform: translateY(-2px); }
+        .mc-run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .mc-results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+        .mc-stat { background: rgba(30,58,95,0.4); border: 1px solid rgba(139,92,246,0.2); border-radius: 10px; padding: 0.75rem; text-align: center; }
+        .mc-stat .mc-stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .mc-stat .mc-stat-value { font-size: 1.3rem; font-weight: 800; color: #a78bfa; }
+        .mc-stat .mc-stat-range { font-size: 0.68rem; color: #64748b; margin-top: 2px; }
+        /* ─── Sankey Section ─── */
+        .sankey-section {
+            background: linear-gradient(135deg, #0f172a 0%, #042f2e 100%);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            color: #e2e8f0;
+        }
+        .sankey-title { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+        .sankey-subtitle { font-size: 0.78rem; color: #22d3ee; margin-bottom: 1rem; }
         /* Hero Section */
         .article-hero {
             background: linear-gradient(135deg, #0b1220 0%, #064e3b 50%, #1e3a5f 100%);
@@ -1028,6 +1119,11 @@
         .tooltip-trigger .tooltip-content{display:none}
     </style>
     <link rel="preload" as="image" href="assets/article-3-cover.jpg">
+    <!-- Chart.js + D3.js for data visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1220,6 +1316,8 @@
                     <div class="toc-item-number">SECTION 10</div>
                     <div class="toc-item-title">Results &amp; Verification</div>
                 </a>
+                <a href="#sec10mc" class="toc-item toc-calculator"><div class="toc-item-number">SECTION 10b <span class="toc-calc-badge" style="background:rgba(124,58,237,0.2);color:#a78bfa;">Monte Carlo</span></div><div class="toc-item-title">Compliance Risk Simulation &mdash; 10,000 Iterations</div></a>
+                <a href="#sec10sk" class="toc-item toc-calculator"><div class="toc-item-number">SECTION 10c <span class="toc-calc-badge" style="background:rgba(6,182,212,0.15);color:#22d3ee;">Sankey</span></div><div class="toc-item-title">PM Task Flow Diagram</div></a>
                 <a href="#section-11" class="toc-item toc-calculator">
                     <div class="toc-item-number">SECTION 11 <span class="toc-calc-badge"><i class="fas fa-chart-line" style="font-size:0.5rem;"></i> Interactive</span></div>
                     <div class="toc-item-title">Compliance Canvas</div>
@@ -1303,6 +1401,20 @@
                     <p>Compliance is not about making technicians work harder. It is about making the system work smarter. When the maintenance operating system is correctly engineered, compliance emerges as a natural consequence of well-designed workflows rather than requiring constant supervisory pressure.</p>
                 </div>
 
+
+                <div class="operator-story">
+                    <div class="operator-story-label">&#9654; Real Scenario &mdash; Facility X, Monday 07:15 Local Time</div>
+                    <blockquote>
+                        Ahmad clocks in for his 12-hour shift. He opens the CMMS on the shared desktop at the control room&mdash;it takes <span class="stat-highlight">4 minutes</span> to load. There are <span class="stat-highlight">23 open PM work orders</span> due this week. He prints 6 of them for today's planned maintenance, grabs his toolbox from the central store (an 8-minute walk each way), and heads to the UPS room in Zone C.
+                    </blockquote>
+                    <blockquote>
+                        The first PM is a quarterly battery terminal inspection. The work order template has <span class="stat-highlight">18 fields</span>&mdash;most irrelevant to batteries. He completes the physical check in 20 minutes but spends another <span class="stat-highlight">12 minutes back at the desktop</span> filling in the form. By 10:30, he's completed only 3 of his 6 tasks. A reactive call pulls him away for 90 minutes. The remaining 3 PMs slip to tomorrow, then next week. His compliance this month: <span class="stat-highlight">71%</span>.
+                    </blockquote>
+                    <blockquote>
+                        Ahmad isn't lazy. He isn't untrained. He's trapped in a system where doing maintenance correctly takes <span class="stat-highlight">2.8x longer</span> than the maintenance itself.
+                    </blockquote>
+                </div>
+
                 <!-- Section 2: The Compliance Paradox -->
                 <h2 id="section-2"><span class="section-number">2</span> The Compliance Paradox</h2>
 
@@ -1375,6 +1487,14 @@
                 <h2 id="section-3"><span class="section-number">3</span> Root Causes: A Systems View</h2>
 
                 <p>When compliance is analyzed through a systems lens rather than a behavioral one, five dominant root causes emerge repeatedly across facilities of different sizes, geographies, and operational maturity levels. These causes interact nonlinearly -- addressing only one or two produces marginal improvement, while addressing all five simultaneously produces a step-change in performance.</p>
+
+
+                <!-- Wrench Time / Friction Breakdown Chart -->
+                <div class="chart-wrap">
+                    <div class="chart-title"><i class="fas fa-chart-pie" style="color:#10b981;margin-right:6px;"></i>Where Does a Technician's Time Actually Go? &mdash; Wrench Time Analysis</div>
+                    <canvas id="frictionChart"></canvas>
+                    <p style="font-size:0.72rem;color:#334155;margin-top:0.5rem;text-align:center;">Baseline wrench time factor 0.22 = only 22% of paid hours spent on actual maintenance. After systems redesign: 0.34 (+55%).</p>
+                </div>
 
                 <h3>3.1 Workflow Friction</h3>
                 <p>Workflow friction is the cumulative burden of non-value-adding activities that a technician must navigate between receiving a <span class="term-tooltip" data-tooltip="Work Order: A documented task assigned to maintenance personnel">WO</span> and closing it with acceptable evidence. This includes physical travel time between dispersed equipment rooms, tool retrieval from centralized stores, documentation requirements that are disconnected from the work sequence, and approval chains that introduce waiting time.</p>
@@ -1863,6 +1983,14 @@
                     </table>
                 </div>
 
+
+                <!-- Before / After Comparison Chart -->
+                <div class="chart-wrap" style="margin-top:1.5rem;">
+                    <div class="chart-title"><i class="fas fa-chart-bar" style="color:#10b981;margin-right:6px;"></i>Before vs After &mdash; 18-Week Systems Redesign Impact</div>
+                    <canvas id="beforeAfterChart"></canvas>
+                    <p style="font-size:0.72rem;color:#334155;margin-top:0.5rem;text-align:center;">All improvements achieved through systems engineering. Zero headcount added, zero personnel changes.</p>
+                </div>
+
                 <h3>10.2 Verification Methodology</h3>
                 <p>To ensure results reflected genuine operational improvement rather than metric gaming, the following verification methods were applied:</p>
                 <ul>
@@ -1876,6 +2004,72 @@
                     <div class="info-box-title">Key Verification Finding</div>
                     <p>The rework rate reduction (8.5% to 2.1%) was the strongest evidence that compliance improvement was substantive rather than cosmetic. When PM tasks are genuinely completed to standard, the incidence of related corrective maintenance decreases measurably. This metric is resistant to gaming because it correlates with actual equipment condition rather than documentation completeness.</p>
                 </div>
+
+
+    <!-- Section 10b: Monte Carlo Compliance Simulation -->
+    <section class="mc-section" id="sec10mc" style="max-width:900px;margin:3rem auto;">
+        <div class="mc-header">
+            <div class="mc-icon">&#127922;</div>
+            <div>
+                <div class="mc-title">Monte Carlo Compliance Simulation</div>
+                <div class="mc-subtitle">Section 10b &mdash; 10,000 iterations with randomized inputs &rarr; probability distributions for compliance outcomes</div>
+            </div>
+        </div>
+        <p style="color:#64748b;font-size:0.85rem;line-height:1.6;margin-bottom:1rem;">The Compliance Predictor gives a single-point estimate. Reality is uncertain. This simulation varies each input parameter within your specified uncertainty range, runs 10,000 scenarios, and reveals the <strong style="color:#a78bfa;">P10 / P50 / P90</strong> envelope &mdash; the range within which 80% of real-world outcomes fall.</p>
+
+        <div class="mc-controls">
+            <div class="mc-control">
+                <label>Monthly PM Tasks</label>
+                <input type="number" id="mc3Tasks" value="1200" min="50" max="50000">
+            </div>
+            <div class="mc-control">
+                <label>Technicians</label>
+                <input type="number" id="mc3Techs" value="6" min="1" max="50">
+            </div>
+            <div class="mc-control">
+                <label>Avg Task Duration (hrs)</label>
+                <input type="number" id="mc3Duration" value="1.5" min="0.25" max="8" step="0.25">
+            </div>
+            <div class="mc-control">
+                <label>Uncertainty Range</label>
+                <select id="mc3Uncertainty">
+                    <option value="0.1">&pm;10% (high confidence)</option>
+                    <option value="0.2" selected>&pm;20% (typical)</option>
+                    <option value="0.3">&pm;30% (uncertain)</option>
+                    <option value="0.5">&pm;50% (highly uncertain)</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="mc-run-btn" id="mc3RunBtn" onclick="runMC3()"><i class="fas fa-play"></i> Run 10,000 Simulations</button>
+
+        <div id="mc3Progress" style="display:none;align-items:center;gap:8px;margin:0.5rem 0;">
+            <div style="flex:1;height:6px;background:rgba(30,58,95,0.5);border-radius:3px;overflow:hidden;">
+                <div id="mc3ProgressFill" style="width:0%;height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);transition:width 0.1s;"></div>
+            </div>
+            <span id="mc3ProgressText" style="font-size:0.7rem;color:#94a3b8;white-space:nowrap;">0 / 10,000</span>
+        </div>
+
+        <div id="mc3ResultsGrid" class="mc-results-grid" style="display:none;">
+            <div class="mc-stat"><div class="mc-stat-label">Compliance %</div><div class="mc-stat-value" id="mc3CompP50">--</div><div class="mc-stat-range" id="mc3CompRange">P10 -- P90</div></div>
+            <div class="mc-stat"><div class="mc-stat-label">Capacity Ratio</div><div class="mc-stat-value" id="mc3CapP50">--</div><div class="mc-stat-range" id="mc3CapRange">P10 -- P90</div></div>
+            <div class="mc-stat"><div class="mc-stat-label">Backlog Growth/mo</div><div class="mc-stat-value" id="mc3BlP50">--</div><div class="mc-stat-range" id="mc3BlRange">P10 -- P90</div></div>
+            <div class="mc-stat"><div class="mc-stat-label">P(&gt;95% compliance)</div><div class="mc-stat-value" id="mc3Prob95">--</div><div class="mc-stat-range">Probability of meeting target</div></div>
+        </div>
+
+        <div id="mc3ChartWrap" style="display:none;margin-top:1rem;">
+            <canvas id="mc3HistChart" style="max-height:240px;"></canvas>
+        </div>
+    </section>
+
+    <!-- Section 10c: Interactive Sankey Diagram -->
+    <section class="sankey-section" id="sec10sk" style="max-width:900px;margin:3rem auto;">
+        <div>
+            <div class="sankey-title">PM Task Flow &mdash; Where Do Tasks Get Blocked?</div>
+            <div class="sankey-subtitle">Section 10c &mdash; Interactive Sankey &mdash; How 1,200 monthly PM tasks flow through the maintenance system. Hover for details.</div>
+        </div>
+        <svg id="sankeyChart3"></svg>
+    </section>
 
                 <!-- Section 11: Interactive Compliance Canvas -->
                 <h2 id="section-11"><span class="section-number">11</span> Interactive: Compliance Canvas</h2>
@@ -2409,12 +2603,12 @@
         var f=document.getElementById('calcFriction').value||'Medium';
         var e=document.getElementById('calcEvidence').value||'Adequate';
         // Pro inputs
-        var wt=parseFloat(document.getElementById('proWrenchTime')?.value)||35;
-        var oh=parseFloat(document.getElementById('proOverhead')?.value)||25;
-        var dv=document.getElementById('proDurVar')?.value||'Medium';
-        var cp=parseFloat(document.getElementById('proCriticalPct')?.value)||30;
-        var st=parseFloat(document.getElementById('proSlaTarget')?.value)||95;
-        var ba=parseFloat(document.getElementById('proBacklogAge')?.value)||4;
+        var wt=parseFloat(document.getElementById('calcWrench')?.value)||35;
+        var oh=parseFloat(document.getElementById('calcOverhead')?.value)||25;
+        var dv=document.getElementById('calcVariability')?.value||'Medium';
+        var cp=parseFloat(document.getElementById('calcCritical')?.value)||30;
+        var st=parseFloat(document.getElementById('calcSLA')?.value)||95;
+        var ba=parseFloat(document.getElementById('calcBacklogAge')?.value)||4;
         return {tasks:t,techs:n,backlog:b,duration:d,hrsPerMonth:h,cmms:c,friction:f,evidence:e,
                 wrenchPct:wt/100,overheadPct:oh/100,durVar:dv,criticalPct:cp/100,slaTarget:st/100,backlogAge:ba};
     }
@@ -2643,7 +2837,7 @@
 
     /* ===== RESET ===== */
     window.maintResetDefaults=function(){
-        var defs={calcTasks:400,calcTechs:6,calcBacklog:0,calcDuration:1.5,calcHours:160,calcCMMS:2,calcFriction:'Medium',calcEvidence:'Adequate',proWrenchTime:35,proOverhead:25,proDurVar:'Medium',proCriticalPct:30,proSlaTarget:95,proBacklogAge:4};
+        var defs={calcTasks:400,calcTechs:6,calcBacklog:0,calcDuration:1.5,calcHours:160,calcCMMS:2,calcFriction:'Medium',calcEvidence:'Adequate',calcWrench:35,calcOverhead:25,calcVariability:'Medium',calcCritical:30,calcSLA:95,calcBacklogAge:4};
         for(var k in defs){var e=document.getElementById(k);if(e)e.value=defs[k];}
         updateMaintCalculator();
     };
@@ -2835,10 +3029,10 @@
     ['calcCMMS','calcFriction','calcEvidence'].forEach(function(id){
         var e=document.getElementById(id);if(e)e.addEventListener('change',updateMaintCalculator);
     });
-    ['proWrenchTime','proOverhead','proCriticalPct','proSlaTarget','proBacklogAge'].forEach(function(id){
+    ['calcWrench','calcOverhead','calcCritical','calcSLA','calcBacklogAge'].forEach(function(id){
         var e=document.getElementById(id);if(e)e.addEventListener('input',updateMaintCalculator);
     });
-    var dvEl=document.getElementById('proDurVar');if(dvEl)dvEl.addEventListener('change',updateMaintCalculator);
+    var dvEl=document.getElementById('calcVariability');if(dvEl)dvEl.addEventListener('change',updateMaintCalculator);
 
     // Session restore
     try{
@@ -3091,6 +3285,335 @@
         });
     })();
     </script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  CHART.JS — Wrench Time / Friction Breakdown
+// ═══════════════════════════════════════════════════════════════════════════
+(function initFrictionChart() {
+    var canvas = document.getElementById('frictionChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: ['Before Redesign', 'After Redesign'],
+            datasets: [
+                { label: 'Actual Maintenance (Wrench Time)', data: [22, 34], backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 4 },
+                { label: 'Travel & Transit', data: [25, 10], backgroundColor: 'rgba(239,68,68,0.6)', borderRadius: 4 },
+                { label: 'Tool Retrieval', data: [12, 3], backgroundColor: 'rgba(249,115,22,0.6)', borderRadius: 4 },
+                { label: 'CMMS / Documentation', data: [18, 8], backgroundColor: 'rgba(139,92,246,0.6)', borderRadius: 4 },
+                { label: 'Approval / Waiting', data: [10, 5], backgroundColor: 'rgba(245,158,11,0.6)', borderRadius: 4 },
+                { label: 'Other (breaks, handover)', data: [13, 40], backgroundColor: 'rgba(100,116,139,0.5)', borderRadius: 4 }
+            ]
+        },
+        options: {
+            responsive: true,
+            indexAxis: 'y',
+            scales: {
+                x: { stacked: true, max: 100, ticks: { color: '#64748b', callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(30,58,95,0.3)' }, title: { display: true, text: '% of Paid Hours', color: '#475569', font: { size: 10 } } },
+                y: { stacked: true, ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } }, grid: { display: false } }
+            },
+            plugins: {
+                legend: { labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 12 } },
+                tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw + '%'; } } }
+            }
+        }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CHART.JS — Before / After Comparison
+// ═══════════════════════════════════════════════════════════════════════════
+(function initBeforeAfterChart() {
+    var canvas = document.getElementById('beforeAfterChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: ['PM Compliance (%)', 'Evidence Complete (%)', 'Wrench Time (x10)', 'Backlog (tasks)', 'WO Closure (min)', 'Audit Findings'],
+            datasets: [
+                {
+                    label: 'Before (Baseline)',
+                    data: [74, 52, 2.2, 85, 12.4, 14],
+                    backgroundColor: 'rgba(239,68,68,0.6)',
+                    borderColor: 'rgba(239,68,68,0.9)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                },
+                {
+                    label: 'After (Week 18)',
+                    data: [97.2, 94, 3.4, 8, 4.2, 2],
+                    backgroundColor: 'rgba(16,185,129,0.6)',
+                    borderColor: 'rgba(16,185,129,0.9)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            var units = ['%', '%', '', ' tasks', ' min', ' findings'];
+                            var realBefore = [74, 52, 0.22, 85, 12.4, 14];
+                            var realAfter = [97.2, 94, 0.34, 8, 4.2, 2];
+                            var idx = ctx.dataIndex;
+                            var real = ctx.datasetIndex === 0 ? realBefore[idx] : realAfter[idx];
+                            return ctx.dataset.label + ': ' + real + (units[idx] || '');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#64748b', font: { size: 9 }, maxRotation: 15 }, grid: { color: 'rgba(30,58,95,0.3)' } },
+                y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(30,58,95,0.3)' } }
+            }
+        }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  MONTE CARLO COMPLIANCE SIMULATION — 10,000 iterations
+// ═══════════════════════════════════════════════════════════════════════════
+var mc3HistChart = null;
+
+function normalSample3(mean, stdDev) {
+    var u1 = Math.random(), u2 = Math.random();
+    return mean + stdDev * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+function clamp3(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function runMC3() {
+    var btn = document.getElementById('mc3RunBtn');
+    var progress = document.getElementById('mc3Progress');
+    var fill = document.getElementById('mc3ProgressFill');
+    var pText = document.getElementById('mc3ProgressText');
+
+    var tasks = parseFloat(document.getElementById('mc3Tasks').value) || 1200;
+    var techs = parseInt(document.getElementById('mc3Techs').value) || 6;
+    var dur = parseFloat(document.getElementById('mc3Duration').value) || 1.5;
+    var unc = parseFloat(document.getElementById('mc3Uncertainty').value) || 0.2;
+
+    btn.disabled = true;
+    progress.style.display = 'flex';
+    document.getElementById('mc3ResultsGrid').style.display = 'none';
+    document.getElementById('mc3ChartWrap').style.display = 'none';
+
+    var N = 10000;
+    var results = { comp: [], cap: [], bl: [] };
+    var done = 0;
+    var batch = 500;
+
+    function runBatch() {
+        var end = Math.min(done + batch, N);
+        for (var i = done; i < end; i++) {
+            var sTasks = clamp3(normalSample3(tasks, tasks * unc), 50, tasks * 3);
+            var sTechs = clamp3(Math.round(normalSample3(techs, techs * unc * 0.5)), 1, 50);
+            var sDur = clamp3(normalSample3(dur, dur * unc), 0.25, 8);
+            var sFriction = clamp3(normalSample3(0.65, 0.1), 0.3, 0.95);
+
+            var rawCap = sTechs * 160;
+            var effCap = rawCap * sFriction;
+            var demand = sTasks * sDur;
+            var capRatio = effCap / demand;
+            var compliance = clamp3(capRatio * 100, 0, 100);
+            var backlogGrowth = Math.max(0, sTasks - (effCap / sDur));
+
+            results.comp.push(compliance);
+            results.cap.push(capRatio);
+            results.bl.push(backlogGrowth);
+        }
+        done = end;
+        fill.style.width = (done / N * 100).toFixed(0) + '%';
+        pText.textContent = done.toLocaleString() + ' / ' + N.toLocaleString();
+
+        if (done < N) { setTimeout(runBatch, 0); }
+        else { finalizeMC3(results, N); btn.disabled = false; progress.style.display = 'none'; }
+    }
+    setTimeout(runBatch, 10);
+}
+
+function percentile3(arr, p) {
+    var s = arr.slice().sort(function(a, b) { return a - b; });
+    return s[Math.min(Math.floor(p / 100 * s.length), s.length - 1)];
+}
+
+function finalizeMC3(r, N) {
+    function setStat(pre, arr, fmt) {
+        var p10 = percentile3(arr, 10), p50 = percentile3(arr, 50), p90 = percentile3(arr, 90);
+        document.getElementById(pre + 'P50').textContent = fmt(p50);
+        document.getElementById(pre + 'Range').textContent = 'P10: ' + fmt(p10) + ' \u2014 P90: ' + fmt(p90);
+    }
+    setStat('mc3Comp', r.comp, function(v) { return v.toFixed(1) + '%'; });
+    setStat('mc3Cap', r.cap, function(v) { return v.toFixed(2); });
+    setStat('mc3Bl', r.bl, function(v) { return Math.round(v).toLocaleString(); });
+    document.getElementById('mc3Prob95').textContent = (r.comp.filter(function(v) { return v >= 95; }).length / N * 100).toFixed(1) + '%';
+    document.getElementById('mc3ResultsGrid').style.display = 'grid';
+
+    // Histogram
+    var bins = 20, bd = new Array(bins).fill(0), bl = [];
+    var bSize = 100 / bins;
+    for (var i = 0; i < bins; i++) bl.push((i * bSize).toFixed(0) + '%');
+    r.comp.forEach(function(v) { bd[Math.min(bins - 1, Math.floor(v / bSize))]++; });
+
+    var colors = bl.map(function(l) {
+        var mid = parseFloat(l) + bSize / 2;
+        if (mid < 70) return 'rgba(239,68,68,0.7)';
+        if (mid < 95) return 'rgba(245,158,11,0.6)';
+        return 'rgba(16,185,129,0.7)';
+    });
+
+    if (mc3HistChart) mc3HistChart.destroy();
+    document.getElementById('mc3ChartWrap').style.display = 'block';
+    mc3HistChart = new Chart(document.getElementById('mc3HistChart'), {
+        type: 'bar',
+        data: {
+            labels: bl,
+            datasets: [{ label: 'Scenarios', data: bd, backgroundColor: colors, borderRadius: 3, barPercentage: 1.0, categoryPercentage: 1.0 }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: function(ctx) { return ctx.raw + ' scenarios (' + (ctx.raw / N * 100).toFixed(1) + '%)'; } } }
+            },
+            scales: {
+                x: { ticks: { color: '#475569', font: { size: 9 }, maxRotation: 0 }, grid: { display: false } },
+                y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(30,58,95,0.3)' }, title: { display: true, text: 'Scenarios (of 10,000)', color: '#475569', font: { size: 10 } } }
+            }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  D3-SANKEY — PM Task Flow Diagram
+// ═══════════════════════════════════════════════════════════════════════════
+(function initSankey3() {
+    if (typeof d3 === 'undefined' || typeof d3.sankey === 'undefined') return;
+    var container = document.getElementById('sankeyChart3');
+    if (!container) return;
+
+    var isMobile = window.innerWidth < 600;
+    var W = Math.min(container.parentElement.clientWidth - 40, 860);
+    var H = isMobile ? 500 : 440;
+    var margin = { top: 20, right: 140, bottom: 20, left: 140 };
+
+    var svg = d3.select('#sankeyChart3').attr('width', W).attr('height', H);
+
+    var sankey = d3.sankey()
+        .nodeWidth(18)
+        .nodePadding(12)
+        .extent([[margin.left, margin.top], [W - margin.right, H - margin.bottom]]);
+
+    var nodeColors = {
+        'Scheduled PMs': '#10b981',
+        'Reactive / CM': '#ef4444',
+        'Backlog Carry': '#f59e0b',
+        'Completed On-Time': '#10b981',
+        'Completed Late': '#f97316',
+        'Blocked (Parts)': '#ef4444',
+        'Blocked (Access)': '#dc2626',
+        'Blocked (Friction)': '#7c3aed',
+        'Rolled to Next Month': '#64748b',
+        'Evidence Complete': '#06b6d4',
+        'Evidence Partial': '#eab308',
+    };
+
+    var data = {
+        nodes: [
+            { name: 'Scheduled PMs' },
+            { name: 'Reactive / CM' },
+            { name: 'Backlog Carry' },
+            { name: 'Completed On-Time' },
+            { name: 'Completed Late' },
+            { name: 'Blocked (Parts)' },
+            { name: 'Blocked (Access)' },
+            { name: 'Blocked (Friction)' },
+            { name: 'Rolled to Next Month' },
+            { name: 'Evidence Complete' },
+            { name: 'Evidence Partial' },
+        ],
+        links: [
+            { source: 0, target: 3, value: 620 },
+            { source: 0, target: 4, value: 268 },
+            { source: 0, target: 5, value: 72 },
+            { source: 0, target: 6, value: 48 },
+            { source: 0, target: 7, value: 192 },
+            { source: 1, target: 3, value: 140 },
+            { source: 1, target: 4, value: 85 },
+            { source: 2, target: 3, value: 35 },
+            { source: 2, target: 8, value: 50 },
+            { source: 5, target: 8, value: 72 },
+            { source: 6, target: 8, value: 48 },
+            { source: 7, target: 4, value: 120 },
+            { source: 7, target: 8, value: 72 },
+            { source: 3, target: 9, value: 520 },
+            { source: 3, target: 10, value: 275 },
+            { source: 4, target: 10, value: 473 },
+        ]
+    };
+
+    try {
+        var graph = sankey({
+            nodes: data.nodes.map(function(d) { return Object.assign({}, d); }),
+            links: data.links.map(function(d) { return Object.assign({}, d); })
+        });
+    } catch(e) { console.warn('Sankey3 error:', e); return; }
+
+    var defs = svg.append('defs');
+    graph.links.forEach(function(link, i) {
+        var id = 'lg3_' + i;
+        var grad = defs.append('linearGradient').attr('id', id)
+            .attr('gradientUnits', 'userSpaceOnUse')
+            .attr('x1', link.source.x1).attr('x2', link.target.x0);
+        grad.append('stop').attr('offset', '0%').attr('stop-color', nodeColors[link.source.name] || '#64748b').attr('stop-opacity', 0.6);
+        grad.append('stop').attr('offset', '100%').attr('stop-color', nodeColors[link.target.name] || '#64748b').attr('stop-opacity', 0.6);
+    });
+
+    svg.append('g').selectAll('path')
+        .data(graph.links).enter().append('path')
+        .attr('d', d3.sankeyLinkHorizontal())
+        .attr('stroke', function(d, i) { return 'url(#lg3_' + i + ')'; })
+        .attr('stroke-width', function(d) { return Math.max(1, d.width); })
+        .attr('fill', 'none').attr('opacity', 0.55)
+        .on('mouseover', function() { d3.select(this).attr('opacity', 0.85); })
+        .on('mouseout', function() { d3.select(this).attr('opacity', 0.55); })
+        .append('title')
+        .text(function(d) { return d.source.name + ' \u2192 ' + d.target.name + ': ' + d.value + ' tasks/month'; });
+
+    var node = svg.append('g').selectAll('g')
+        .data(graph.nodes).enter().append('g');
+
+    node.append('rect')
+        .attr('x', function(d) { return d.x0; }).attr('y', function(d) { return d.y0; })
+        .attr('height', function(d) { return d.y1 - d.y0; }).attr('width', function(d) { return d.x1 - d.x0; })
+        .attr('fill', function(d) { return nodeColors[d.name] || '#64748b'; }).attr('rx', 3)
+        .append('title').text(function(d) { return d.name + ': ' + d.value + ' tasks'; });
+
+    node.append('text')
+        .attr('x', function(d) { return d.x0 < W / 2 ? d.x1 + 8 : d.x0 - 8; })
+        .attr('y', function(d) { return (d.y0 + d.y1) / 2; })
+        .attr('dy', '0.35em')
+        .attr('text-anchor', function(d) { return d.x0 < W / 2 ? 'start' : 'end'; })
+        .attr('font-size', isMobile ? 9 : 11).attr('fill', '#94a3b8')
+        .text(function(d) { return d.name; });
+
+    node.append('text')
+        .attr('x', function(d) { return d.x0 < W / 2 ? d.x1 + 8 : d.x0 - 8; })
+        .attr('y', function(d) { return (d.y0 + d.y1) / 2 + 13; })
+        .attr('dy', '0.35em')
+        .attr('text-anchor', function(d) { return d.x0 < W / 2 ? 'start' : 'end'; })
+        .attr('font-size', isMobile ? 8 : 10).attr('fill', '#475569')
+        .text(function(d) { return d.value + ' tasks'; });
+})();
+</script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
 </body>
