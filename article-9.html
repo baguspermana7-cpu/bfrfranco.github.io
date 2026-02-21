@@ -115,6 +115,40 @@
     }
     </script>
 
+    <!-- Structured Data - FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Can a data center operate without chillers in tropical climates?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Not entirely. While Direct Liquid Cooling (DLC) and rear-door heat exchangers can eliminate traditional chillers for IT load cooling, heat rejection to the environment still requires cooling towers or dry coolers. In tropical climates with 28-35°C wet-bulb temperatures, completely chiller-free operation faces physics constraints that limit effectiveness to approximately 60-70% of total cooling capacity."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the ROI of switching from air cooling to liquid cooling in data centers?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The ROI varies by climate zone and rack density. For high-density AI/HPC deployments (>30kW/rack), liquid cooling delivers 30-40% energy savings with a 2-3 year payback period. For standard enterprise loads (<10kW/rack), the business case is weaker with payback periods of 5-7 years. Tropical deployments see slower ROI due to higher ambient temperatures reducing free cooling hours."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What does Nvidia's 'no chillers needed' claim mean for GB200 NVL72?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Nvidia's claim refers to eliminating mechanical refrigeration chillers from the IT cooling loop by using warm-water direct liquid cooling at 40-45°C supply temperatures. However, this does not eliminate the need for heat rejection infrastructure. Cooling towers, dry coolers, or hybrid systems are still required to reject heat to the atmosphere, especially in warm climates."
+                }
+            }
+        ]
+    }
+    </script>
+
     <style>
         :root {
             --spacing-xs: 0.25rem;
@@ -2055,6 +2089,8 @@
                     <li><strong>Marketing spin:</strong> Hot/humid regions or tight SLA requirements where warm-water loops would drive unacceptable outlet temperatures; mechanical chillers remain primary, but marketing emphasises "reduced chiller load".</li>
                 </ul>
 
+                <h2 id="chiller-free-tropical">Is Chiller-Free Cooling Possible in Tropical Data Centers?</h2>
+
                 <h2 id="section-4">4. Tropical Climate: The Physics Problem</h2>
 
                 <!-- Enhanced Physics Problem Box -->
@@ -2614,6 +2650,8 @@ Where LMTD (Log Mean Temperature Difference) requires:
                     </div>
                 </div>
 
+                <h2 id="dlc-vs-crac-roi">Direct Liquid Cooling vs Traditional CRAC: ROI Comparison</h2>
+
                 <h2 id="section-7">7. Pros and Cons Analysis</h2>
 
                 <h3>Short-Term (0-3 Years)</h3>
@@ -2837,6 +2875,13 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <div class="related-card-content">
                                 <h4>Water Stress and AI Data Centers</h4>
                                 <p>The hidden crisis in Southeast Asia</p>
+                            </div>
+                        </a>
+                        <a href="article-13.html" class="related-card">
+                            <div class="related-card-number">13</div>
+                            <div class="related-card-content">
+                                <h4>Data Center Power Distribution: Hyperscaler Architecture Deep Dive</h4>
+                                <p>AWS vs Google vs Microsoft power design compared</p>
                             </div>
                         </a>
                     </div>
