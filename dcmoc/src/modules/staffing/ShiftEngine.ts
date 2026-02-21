@@ -42,11 +42,11 @@ export const SHIFT_PATTERNS: Record<ShiftPattern, ShiftPatternConfig> = {
         cycleDays: 8,
         workDays: 4,
         offDays: 4,
-        teamsRequired: 2,
+        teamsRequired: 4,
         avgWeeklyScheduled: (4 * 12 / 8) * 7,  // = 42h
         avgWeeklyEffective: (4 * 11 / 8) * 7,   // = 38.5h
         overtimeHours: 0,
-        description: '2-team compressed schedule. 4 consecutive 12h shifts then 4 days off. Zero overtime. Best work-life balance. Effective weekly hours ~38.5h (<40h).',
+        description: '4-team compressed schedule. 4 consecutive 12h shifts then 4 days off. Zero overtime. Best work-life balance. Effective weekly hours ~38.5h (<40h).',
     },
     '4on3off': {
         id: '4on3off',
@@ -58,11 +58,11 @@ export const SHIFT_PATTERNS: Record<ShiftPattern, ShiftPatternConfig> = {
         cycleDays: 7,
         workDays: 4,
         offDays: 3,
-        teamsRequired: 2,
+        teamsRequired: 4,
         avgWeeklyScheduled: (4 * 12 / 7) * 7,   // = 48h scheduled
         avgWeeklyEffective: (4 * 10 / 7) * 7,    // = 40h effective — exactly 40h
         overtimeHours: 0,
-        description: '2-team compressed schedule. 4 consecutive 12h shifts (2h mandatory breaks) then 3 days off. Exactly 40h effective/week. Optimal work-life balance with full productivity.',
+        description: '4-team compressed schedule. 4 consecutive 12h shifts (2h mandatory breaks) then 3 days off. Exactly 40h effective/week. Optimal work-life balance with full productivity.',
     },
     'continental-8h': {
         id: 'continental-8h',
@@ -168,17 +168,20 @@ export const calculateStaffing = (
     is24x7: boolean = true,
     patternOverride?: ShiftPattern,
     aqiOverride?: number | null,
-    operatingModel: 'in-house' | 'hybrid' | 'vendor' = 'in-house'
+    operatingModel: 'in-house' | 'hybrid' | 'vendor' = 'in-house',
+    hybridRatio: number = 0.5
 ): StaffingResult => {
     const baseSalary = getBaseSalary(role, country);
     const hourlyRate = baseSalary / 173;
     const aqiMult = aqiCostMultiplier(aqiOverride ?? country.environment.baselineAQI);
 
-    // Operating Model Multipliers (How much headcount is retained internally vs outsourced to vendors)
+    // Operating Model Multipliers — hybridRatio drives the in-house retention portion
     // In-House: 1.0 (keep everyone)
-    // Hybrid: 0.5 (keep half internal, rest is vendor OPEX which would be calculated elsewhere, but reduces headcount here)
-    // Vendor: 0.1 (only keep a skeleton oversight crew)
-    const opModelMult = operatingModel === 'in-house' ? 1.0 : operatingModel === 'hybrid' ? 0.5 : 0.1;
+    // Hybrid: hybridRatio (e.g. 0.3 = 30% in-house, 70% vendor)
+    // Vendor: 0.1 (skeleton oversight crew)
+    const opModelMult = operatingModel === 'in-house' ? 1.0
+        : operatingModel === 'hybrid' ? Math.max(0.1, hybridRatio)
+        : 0.1;
 
     // Resolve pattern — 12H defaults to 4on3off (Day/Night only, 40h effective/week)
     const patternId: ShiftPattern = patternOverride
@@ -228,16 +231,14 @@ export const calculateStaffing = (
     }
 
     // ─── SHIFT STAFF (24/7) ─────────────────────────────
-    // `quantity` = desired persons PER SHIFT position.
-    // Total raw heads = quantity × teamsRequired (each team needs `quantity` people)
-    //   8H Continental → 4 teams → rawHeads = quantity × 4
-    //   12H 4on4off    → 2 teams → rawHeads = quantity × 2
-    // This naturally produces more headcount for 8H than 12H.
+    // `quantity` = total FTE headcount for this role (across all teams).
+    // rawHeads = quantity adjusted for operating model.
+    // On-shift at any moment = quantity / teamsRequired (one team on duty).
     const teamsNeeded = pattern.teamsRequired;
-    const rawHeads = quantity * teamsNeeded;
+    const rawHeads = Math.ceil(quantity * opModelMult);
 
-    // On-shift at any moment = quantity (one team on duty)
-    const onShiftAtAnyTime = Math.ceil(quantity * opModelMult);
+    // On-shift at any moment = total / teams (one team on duty)
+    const onShiftAtAnyTime = Math.max(1, Math.ceil(quantity / teamsNeeded * opModelMult));
 
     const shrinkageMult = patternId === '4on4off' ? 0.5 : patternId === '4on3off' ? 0.6 : 1.0;
     const shrinkageFactor = country.labor.shrinkageFactor * shrinkageMult;
@@ -315,11 +316,12 @@ export const compareAllShiftModels = (
     quantity: number,
     country: CountryProfile,
     is24x7: boolean = true,
-    operatingModel: 'in-house' | 'hybrid' | 'vendor' = 'in-house'
+    operatingModel: 'in-house' | 'hybrid' | 'vendor' = 'in-house',
+    hybridRatio: number = 0.5
 ): ShiftComparison => {
-    const model8h = calculateStaffing(role, quantity, '8h', country, is24x7, 'continental-8h', null, operatingModel);
-    const model12h_4on4off = calculateStaffing(role, quantity, '12h', country, is24x7, '4on4off', null, operatingModel);
-    const model12h_4on3off = calculateStaffing(role, quantity, '12h', country, is24x7, '4on3off', null, operatingModel);
+    const model8h = calculateStaffing(role, quantity, '8h', country, is24x7, 'continental-8h', null, operatingModel, hybridRatio);
+    const model12h_4on4off = calculateStaffing(role, quantity, '12h', country, is24x7, '4on4off', null, operatingModel, hybridRatio);
+    const model12h_4on3off = calculateStaffing(role, quantity, '12h', country, is24x7, '4on3off', null, operatingModel, hybridRatio);
 
     const costs = [
         { id: '4on4off' as ShiftPattern, cost: model12h_4on4off.monthlyCost },
@@ -419,7 +421,8 @@ export function calculateAutoHeadcount(
     shiftModel: '8h' | '12h',
     staffingModel: 'in-house' | 'outsourced' | 'hybrid',
     maintenanceModel: 'in-house' | 'hybrid' | 'vendor',
-    maintenanceStrategy: 'reactive' | 'planned' | 'predictive'
+    maintenanceStrategy: 'reactive' | 'planned' | 'predictive',
+    hybridRatio: number = 0.5
 ): AutoHeadcountResult {
     const mw = itLoadKw / 1000;
 
@@ -438,14 +441,20 @@ export function calculateAutoHeadcount(
     // Staffing model multiplier
     const staffMult = staffingModel === 'in-house' ? 1.0 : staffingModel === 'hybrid' ? 0.6 : 0.3;
 
-    // Maintenance model affects technicians
-    const maintModelMult = maintenanceModel === 'in-house' ? 1.0 : maintenanceModel === 'hybrid' ? 0.5 : 0.2;
+    // Maintenance model affects technicians — hybridRatio drives the in-house portion
+    const maintModelMult = maintenanceModel === 'in-house' ? 1.0
+        : maintenanceModel === 'hybrid' ? Math.max(0.2, hybridRatio)
+        : 0.2;
 
     // Maintenance strategy affects engineers
     const strategyMult = maintenanceStrategy === 'predictive' ? 1.15 : maintenanceStrategy === 'planned' ? 1.0 : 0.9;
 
     // 8h shift needs more people (4 teams vs 2)
     const shiftMult = shiftModel === '8h' ? 1.1 : 1.0;
+
+    // Determine teams required for minimum enforcement on 24/7 roles
+    const patternId: ShiftPattern = shiftModel === '12h' ? '4on3off' : 'continental-8h';
+    const teamsRequired = SHIFT_PATTERNS[patternId].teamsRequired;
 
     const headcounts = {} as Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', number>;
     const rationale = {} as Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', string>;
@@ -476,6 +485,13 @@ export function calculateAutoHeadcount(
         if (role === 'engineer') {
             count *= strategyMult;
             if (strategyMult !== 1.0) parts.push(`x${strategyMult} (${maintenanceStrategy})`);
+        }
+
+        // Enforce minimum = teamsRequired for 24/7 shift roles (1 per team)
+        if (role === 'shift-lead' || role === 'engineer') {
+            const preEnforce = Math.round(count);
+            count = Math.max(count, teamsRequired);
+            if (preEnforce < teamsRequired) parts.push(`min ${teamsRequired} (1/team)`);
         }
 
         headcounts[role] = Math.max(1, Math.round(count));

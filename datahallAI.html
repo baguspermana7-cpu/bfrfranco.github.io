@@ -214,7 +214,7 @@ svg text{user-select:none}
 <div class="rw"><span class="l">TCS Sup</span><span class="v vc" id="sTS">35.2&#176;C</span></div>
 <div class="rw"><span class="l">TCS Ret</span><span class="v vo" id="sTR">44.8&#176;C</span></div>
 <div class="rw"><span class="l">TCS &#916;T</span><span class="v vc" id="sDT">9.6&#176;C</span></div>
-<div class="rw"><span class="l">CDUs</span><span class="v vg">23/24 N+1</span></div>
+<div class="rw"><span class="l">CDUs</span><span class="v vg">5/6 N+1 (2/RP EoR)</span></div>
 <div class="rw"><span class="l">Chillers</span><span class="v vg" id="sCH">3/4 Run</span></div>
 <div class="rw"><span class="l">CRAHs</span><span class="v vg">5/6 Act</span></div></div>
 <div class="sb"><h4><i style="background:var(--b)"></i>Network</h4>
@@ -311,7 +311,7 @@ svg text{user-select:none}
 <rect x="10" y="8" width="940" height="604" rx="3" fill="none" stroke="var(--bd2)" stroke-width="1"/>
 <text x="22" y="21" fill="var(--t3)" font-family="JetBrains Mono" font-size="7" font-weight="600">DATA HALL &#8212; 32m&#215;20m &#8212; 640m&#178; &#8212; &#8805;3,500kg/m&#178; &#8212; 4.2m clear &#8212; Zone 4</text>
 <g id="hc"></g></svg>
-<div class="lg"><span><i style="background:#22c55e;box-shadow:0 0 3px rgba(34,197,94,.5)"></i>AI Rack</span><span><i style="background:#3b82f6"></i>Network</span><span><i style="background:#555"></i>Passive</span><span><i style="background:var(--c)"></i>CDU</span><span style="color:var(--r)">&#9650;Hot</span><span style="color:var(--c)">&#9660;Cold</span><span style="color:var(--o)">&#9670;TTHT</span></div>
+<div class="lg"><span><i style="background:#22c55e;box-shadow:0 0 3px rgba(34,197,94,.5)"></i>AI Rack</span><span><i style="background:#3b82f6"></i>Network</span><span><i style="background:#555"></i>Passive</span><span><i style="background:var(--c)"></i>CDU (EoR)</span><span style="color:var(--r)">&#9650;Hot</span><span style="color:var(--c)">&#9660;Cold</span><span style="color:var(--o)">&#9670;TTHT</span><span style="color:rgba(6,182,212,.4)">&#8213; OH Pipe</span></div>
 </div>
 
 <div class="pn" id="p-rack">
@@ -378,6 +378,10 @@ const LH=7,SH=11,HAH=20,CLH=28,GV=3;
 function rpY(b){return{la:b,rA:b+LH+2,sH:b+LH+2+RH+GV,hot:b+LH+2+RH+GV+SH+2,lB:b+LH+2+RH+GV+SH+2+HAH+2,rB:b+LH+2+RH+GV+SH+2+HAH+2+LH+2,cold:b+LH+2+RH+GV+SH+2+HAH+2+LH+2+RH+GV,sC:b+LH+2+RH+GV+SH+2+HAH+2+LH+2+RH+GV+CLH-SH-2}}
 const RP=[{y:rpY(32),lA:'ROW A',lB:'ROW B',p:'1'},{y:rpY(162),lA:'ROW C',lB:'ROW D',p:'2'},{y:rpY(292),lA:'ROW E',lB:'ROW F',p:'3'}];
 function rk(x,y,id){let r=`<g class="rg" filter="url(#gG)"><rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="2" fill="rgba(34,197,94,.18)" stroke="rgba(34,197,94,.5)" stroke-width=".6"/>`;for(let i=0;i<4;i++)r+=`<rect x="${x+2}" y="${y+2.5+i*3.5}" width="${RW-4}" height="2" rx=".3" fill="rgba(34,197,94,${.4-i*.07})"/>`;r+=`<circle cx="${x+RW-3}" cy="${y+RH-3}" r="1.1" fill="var(--g)" opacity=".8"/><text x="${x+RW/2}" y="${y+RH-1}" fill="var(--t3)" font-family="${J}" font-size="3" text-anchor="middle">${id}</text></g>`;return r}
+// === OVERHEAD TCS PIPING (ceiling level, DN150 SS316L) ===
+s+=`<line x1="${LX}" y1="26" x2="${LX+TW}" y2="26" stroke="rgba(6,182,212,.2)" stroke-width="2" stroke-dasharray="10 5"><animate attributeName="stroke-dashoffset" values="0;-30" dur="2s" repeatCount="indefinite"/></line>`;
+s+=`<line x1="${LX}" y1="29" x2="${LX+TW}" y2="29" stroke="rgba(239,68,68,.15)" stroke-width="2" stroke-dasharray="10 5"><animate attributeName="stroke-dashoffset" values="0;30" dur="2s" repeatCount="indefinite"/></line>`;
+s+=tx(LX+TW/2,22,'OVERHEAD TCS PIPING DN150 SS316L','rgba(6,182,212,.25)',4,'middle');
 RP.forEach((rp,ri)=>{const Y=rp.y;
 s+=tx(LX,Y.la+7,rp.lA+' \u2014 NVL36-L','var(--g)',6.5,0,1);
 for(let c=0;c<COLS;c++){const x=LX+c*(PR+CG);s+=rk(x,Y.rA,rp.p+'.'+String(c+1).padStart(2,'0'));s+=rk(x+RW+GAP,Y.rA,rp.p+'.'+String(c+1).padStart(2,'0')+'b')}
@@ -388,15 +392,15 @@ for(let p=0;p<24;p++){const px=LX+6+p*(TW/24),dl=(p*.2)%2;s+=`<text x="${px}" y=
 s+=tx(LX,Y.lB+7,rp.lB+' \u2014 NVL36-R','var(--g)',6.5,0,1);
 for(let c=0;c<COLS;c++){const x=LX+c*(PR+CG);s+=rk(x,Y.rB,rp.p+'.'+String(c+10).padStart(2,'0'));s+=rk(x+RW+GAP,Y.rB,rp.p+'.'+String(c+10).padStart(2,'0')+'b')}
 s+=`<rect x="${LX}" y="${Y.cold}" width="${TW}" height="${CLH}" rx="3" fill="rgba(6,182,212,.04)" stroke="rgba(6,182,212,.12)" stroke-width=".6"/>`;
-s+=tx(LX+TW/2,Y.cold+10,'COLD AISLE 18\u00B0C AIR + 35\u00B0C DLC','rgba(6,182,212,.2)',5.5,'middle');
+s+=tx(LX+TW/2,Y.cold+10,'COLD AISLE 18\u00B0C SUPPLY AIR','rgba(6,182,212,.2)',5.5,'middle');
 // Enhanced cold aisle animation - flowing coolant effect
 for(let p=0;p<20;p++){const px=LX+5+p*(TW/20),dl=(p*.22)%2.2;
 s+=`<text x="${px}" y="${Y.cold+20}" fill="rgba(6,182,212,.18)" font-size="5" class="cp" style="animation-delay:${dl}s">\u25BC</text>`;
 s+=`<circle cx="${px+8}" cy="${Y.cold+28}" r="2" fill="rgba(6,182,212,.12)"><animate attributeName="r" values="1;3;1" dur="${1.5+p*0.08}s" repeatCount="indefinite"/><animate attributeName="fill-opacity" values="0.1;0.3;0.1" dur="${1.5+p*0.08}s" repeatCount="indefinite"/></circle>`;
 }
-// DLC manifold flowing lines
-for(let m=0;m<8;m++){const mx=LX+35+m*(TW/8);
-s+=`<line x1="${mx}" y1="${Y.cold+5}" x2="${mx}" y2="${Y.cold+CLH-5}" stroke="rgba(6,182,212,.15)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.5s" repeatCount="indefinite"/></line>`;
+// DLC manifold flowing lines (light - actual piping is overhead via CDU)
+for(let m=0;m<COLS;m++){const mx=LX+RW+m*(PR+CG);
+s+=`<line x1="${mx}" y1="${Y.cold+5}" x2="${mx}" y2="${Y.cold+CLH-5}" stroke="rgba(6,182,212,.08)" stroke-width="1" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.5s" repeatCount="indefinite"/></line>`;
 }
 for(let si=0;si<4;si++){const sx=LX+20+si*(TW/4),sy=Y.sC;s+=`<rect x="${sx}" y="${sy}" width="52" height="${SH}" rx="2" fill="rgba(6,182,212,.05)" stroke="rgba(6,182,212,.15)" stroke-width=".4"/>`+tx(sx+2,sy+4.5,'\u25C6 TTHT-C'+(ri+1)+'.'+(si+1),'var(--c)',3.2)+`<text x="${sx+16}" y="${sy+11}" fill="var(--g)" font-family="${J}" font-size="5" font-weight="600" id="C${ri}${si}t">--</text><text x="${sx+36}" y="${sy+11}" fill="var(--c)" font-family="${J}" font-size="5" font-weight="600" id="C${ri}${si}h">--</text>`}});
 RP.forEach((rp,i)=>{const cy=rp.y.hot+HAH/2-15;
@@ -408,17 +412,33 @@ s+=`<text x="${rx+7}" y="${cy+17}" fill="var(--c)" font-family="${J}" font-size=
 for(let a=0;a<6;a++)s+=`<text x="${rx-5-a*11}" y="${cy+17}" fill="rgba(6,182,212,.18)" font-size="6" class="wl" style="animation-delay:${a*.25}s">\u2039</text>`});
 const nwY=420;s+=tx(LX,nwY-4,'NETWORK / DWDM','var(--b)',5.5,0,1);['IB-Leaf','IB-Spine','ODF','DWDM','OOB','Storage'].forEach((l,i)=>{const x=LX+i*78;s+=`<g filter="url(#gB)"><rect x="${x}" y="${nwY}" width="62" height="22" rx="2" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.4)" stroke-width=".6"/>`+tx(x+31,nwY+9,l,'var(--b)',5,'middle',1)+tx(x+31,nwY+18,'N.0'+(i+1),'var(--t3)',3.5,'middle')+'</g>'});
 s+=tx(LX+490,nwY-4,'PASSIVE','var(--t3)',5.5,0,1);['CblMgmt','PDU/Mtr','Patch','Spare'].forEach((l,i)=>{const x=LX+490+i*68;s+=`<rect x="${x}" y="${nwY}" width="55" height="22" rx="2" fill="rgba(107,114,128,.06)" stroke="rgba(107,114,128,.2)" stroke-width=".5"/>`+tx(x+27,nwY+9,l,'var(--t3)',4.5,'middle')+tx(x+27,nwY+18,'P.0'+(i+1),'var(--t3)',3.5,'middle')});
-const cdY=450;s+=`<rect x="${LX}" y="${cdY}" width="${TW}" height="32" rx="3" fill="rgba(6,182,212,.025)" stroke="rgba(6,182,212,.12)" stroke-width=".6"/>`+tx(LX+4,cdY+8,'CDU ZONE 24\u00D7 L2L 350kW N+1','var(--c)',5.5,0,1);
-for(let i=0;i<12;i++){const cx=LX+3+i*53;s+=`<rect x="${cx}" y="${cdY+12}" width="46" height="10" rx="2" fill="rgba(6,182,212,.08)" stroke="var(--c)" stroke-width=".4" filter="url(#gC)"/>`+tx(cx+23,cdY+20,'CDU-'+String(i+1).padStart(2,'0'),'var(--c)',4,'middle');s+=fl(cx+14,cdY+12,cx+14,RP[0].y.cold,'rgba(6,182,212,.18)','fU',.7,1.2)+fl(cx+32,cdY+12,cx+32,RP[0].y.cold,'rgba(239,68,68,.12)','fD',.7,1.2);RP.forEach(function(rr){s+=`<circle cx="${cx+14}" cy="${rr.y.cold+CLH/2}" r="2.5" fill="rgba(6,182,212,.25)" stroke="var(--c)" stroke-width=".5"><animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite"/></circle><circle cx="${cx+32}" cy="${rr.y.cold+CLH/2}" r="2.5" fill="rgba(239,68,68,.25)" stroke="var(--r)" stroke-width=".5"><animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite"/></circle><line x1="${cx+14}" y1="${rr.y.cold+CLH/2}" x2="${cx+23}" y2="${rr.y.cold+CLH/2}" stroke="rgba(6,182,212,.2)" stroke-width=".8" stroke-dasharray="2 2"><animate attributeName="stroke-dashoffset" values="0;-8" dur="1s" repeatCount="indefinite"/></line><line x1="${cx+23}" y1="${rr.y.cold+CLH/2}" x2="${cx+32}" y2="${rr.y.cold+CLH/2}" stroke="rgba(239,68,68,.2)" stroke-width=".8" stroke-dasharray="2 2"><animate attributeName="stroke-dashoffset" values="0;8" dur="1s" repeatCount="indefinite"/></line>`})}
-s+=fl(LX,cdY+26,LX+TW,cdY+26,'var(--c)','fR',.5,1.8)+fl(LX,cdY+30,LX+TW,cdY+30,'var(--r)','fL',.5,1.8);
-s+=tx(LX+TW/4,cdY+25,'\u25B2 Cool Supply 35\u00B0C','var(--c)',3.5,'middle')+tx(LX+TW*3/4,cdY+25,'\u25BC Hot Return 45\u00B0C','var(--r)',3.5,'middle');
-const pY=490;s+=tx(LX,pY,'PIPING HEADERS','var(--t1)',5.5,0,1);
-s+=fl(LX,pY+7,LX+TW,pY+7,'var(--c)','fR',.4,2.5)+tx(LX+TW/2,pY+5,'TCS SUP DN150 SS316L 35\u00B0C 260m\u00B3/h','var(--c)',4,'middle');
-s+=fl(LX,pY+14,LX+TW,pY+14,'var(--r)','fL',.4,2.5)+tx(LX+TW/2,pY+12,'TCS RET DN150 SS316L 45\u00B0C','var(--r)',4,'middle');
-s+=fl(LX,pY+21,LX+TW,pY+21,'var(--g)','fR',.3,2.5)+tx(LX+TW/2,pY+19,'FWS SUP DN250 CS 12\u00B0C 500m\u00B3/h','var(--g)',4,'middle');
-s+=fl(LX,pY+28,LX+TW,pY+28,'var(--o)','fL',.3,2.5)+tx(LX+TW/2,pY+26,'FWS RET DN250 CS 22\u00B0C','var(--o)',4,'middle');
-for(let i=0;i<6;i++){const px=LX+45+i*110;s+=fl(px,pY+7,px,cdY+30,'rgba(6,182,212,.15)','fU',.6,1)+fl(px+7,pY+14,px+7,cdY+30,'rgba(239,68,68,.12)','fD',.6,1)}
-s+=`<rect x="${LX}" y="${pY+35}" width="${TW}" height="9" rx="2" fill="rgba(139,92,246,.02)" stroke="rgba(139,92,246,.07)" stroke-width=".4"/>`+tx(LX+TW/2,pY+41,'CABLE TRAY: Power (300mm) | Fiber (450mm) | Cu (300mm)','var(--p)',3.5,'middle');
+// CDUs at End-of-Row (2 per row-pair, right side between racks and panels)
+RP.forEach(function(rr,ri){const cY=rr.y.cold,cH=CLH;
+const cduX=LX+TW+20,cduW=42,cduH=14;
+for(let ci=0;ci<2;ci++){const cy=rr.y.rA+ci*(rr.y.rB-rr.y.rA);
+// CDU box at end-of-row
+s+=`<rect x="${cduX}" y="${cy}" width="${cduW}" height="${cduH}" rx="3" fill="rgba(6,182,212,.15)" stroke="var(--c)" stroke-width=".8" filter="url(#gC)"/>`;
+s+=tx(cduX+cduW/2,cy+10,'CDU-'+String(ri*2+ci+1).padStart(2,'0'),'var(--c)',4,'middle',1);
+// Vertical riser from overhead TCS down to CDU (supply)
+s+=`<line x1="${cduX+10}" y1="26" x2="${cduX+10}" y2="${cy}" stroke="rgba(6,182,212,.25)" stroke-width="1.5" stroke-dasharray="6 3"><animate attributeName="stroke-dashoffset" values="0;-18" dur="1.5s" repeatCount="indefinite"/></line>`;
+// Vertical riser (return)
+s+=`<line x1="${cduX+32}" y1="29" x2="${cduX+32}" y2="${cy+cduH}" stroke="rgba(239,68,68,.2)" stroke-width="1.5" stroke-dasharray="6 3"><animate attributeName="stroke-dashoffset" values="0;18" dur="1.5s" repeatCount="indefinite"/></line>`;
+// Connection dots at CDU ports
+s+=`<circle cx="${cduX+10}" cy="${cy}" r="2.5" fill="rgba(6,182,212,.4)" stroke="var(--c)" stroke-width=".4"><animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite"/></circle>`;
+s+=`<circle cx="${cduX+32}" cy="${cy+cduH}" r="2.5" fill="rgba(239,68,68,.35)" stroke="var(--r)" stroke-width=".4"><animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite"/></circle>`;
+// Horizontal distribution from CDU back to rack rear-doors
+s+=`<line x1="${cduX}" y1="${cy+5}" x2="${LX+TW}" y2="${cy+5}" stroke="rgba(6,182,212,.12)" stroke-width="1" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" values="0;-18" dur="1.2s" repeatCount="indefinite"/></line>`;
+s+=`<line x1="${cduX}" y1="${cy+9}" x2="${LX+TW}" y2="${cy+9}" stroke="rgba(239,68,68,.09)" stroke-width="1" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" values="0;18" dur="1.2s" repeatCount="indefinite"/></line>`;
+}
+});
+const pY=455;s+=tx(LX,pY,'CORRIDOR SERVICES','var(--t1)',5.5,0,1);
+s+=fl(LX,pY+7,LX+TW,pY+7,'var(--g)','fR',.3,2.5)+tx(LX+TW/2,pY+5,'FWS SUP DN250 CS 12\u00B0C 500m\u00B3/h','var(--g)',4,'middle');
+s+=fl(LX,pY+14,LX+TW,pY+14,'var(--o)','fL',.3,2.5)+tx(LX+TW/2,pY+12,'FWS RET DN250 CS 22\u00B0C','var(--o)',4,'middle');
+s+=fl(LX,pY+21,LX+TW,pY+21,'rgba(139,92,246,.3)','fR',.25,1.5)+tx(LX+TW/2,pY+19,'CONDENSATE DRAIN DN50 CPVC 1:100 SLOPE','var(--p)',3.5,'middle');
+s+=fl(LX,pY+28,LX+TW,pY+28,'rgba(245,158,11,.3)','fR',.25,1.5)+tx(LX+TW/2,pY+26,'LEAK DETECTION ROPE (24 ZONES)','var(--o)',3.5,'middle');
+// TCS piping note (overhead, not at corridor level)
+s+=tx(LX+TW/2,pY+38,'TCS SUP/RET DN150 SS316L \u2192 OVERHEAD (see top of diagram)','rgba(6,182,212,.2)',3.5,'middle');
+s+=`<rect x="${LX}" y="${pY+44}" width="${TW}" height="9" rx="2" fill="rgba(139,92,246,.02)" stroke="rgba(139,92,246,.07)" stroke-width=".4"/>`+tx(LX+TW/2,pY+50,'CABLE TRAY: Power (300mm) | Fiber (450mm) | Cu (300mm)','var(--p)',3.5,'middle');
 s+=bx(752,30,190,130,'rgba(245,158,11,.12)',4)+tx(847,42,'ELECTRICAL','var(--o)',7,'middle',1);['TX-A/B 5MVA','UPS-A/B 4.5MW','Busway 2\u00D74,000A','RPP 12\u00D7 630A','GenSet 4\u00D72.5MW','ATS-LV <100ms','Battery 10min'].forEach((l,i)=>s+=tx(847,54+i*11,l,'var(--t2)',4.5,'middle'));
 s+=bx(752,170,190,70,'rgba(59,130,246,.12)',4)+tx(847,183,'NETWORK MDF','var(--b)',7,'middle',1);['IB Leaf\u00D78 Spine\u00D74','OOB 25G BMC 1G','DWDM ODF Patch'].forEach((l,i)=>s+=tx(847,195+i*11,l,'var(--t2)',4.5,'middle'));
 s+=bx(752,250,90,50,'rgba(239,68,68,.12)',4)+tx(797,263,'FIRE','var(--r)',6,'middle',1)+tx(797,275,'Novec 1230','var(--t3)',4,'middle')+tx(797,293,'\u25CF NORMAL','var(--g)',4.5,'middle',1);
@@ -649,7 +669,7 @@ $('eLive').textContent='TX-A: '+RI(396,400)+'V '+RI(3350,3500)+'A | TX-B: '+RI(3
 },4000)})();
 
 
-$('coolSu').textContent='Comprehensive P&ID: Cooling Tower → Chiller Plant → CDU Distribution → TCS to Racks → Cold Plates | All flows, temps, pressures shown';
+$('coolSu').textContent='Comprehensive P&ID: Cooling Tower → Chiller Plant → Overhead TCS Header → End-of-Row CDU → Rack Cold Plates | All flows, temps, pressures shown';
 (function(){const el=$('coolC');if(!el)return;let s='';
 // Background
 s+=`<rect width="960" height="560" fill="var(--bg2)"/>`;
@@ -1027,7 +1047,7 @@ el.innerHTML=s})();
 
 // RACK CARDS
 $('rackCards').innerHTML=[
-mc('var(--c)','Liquid Cooling Per Rack','DLC Cold Plate Circuit',[['Supply','35\u00B0C \u00B12\u00B0C from CDU'],['Return','45\u00B0C max to CDU'],['\u0394T','10\u00B0C nominal design'],['Flow','4.8 m\u00B3/h (80 LPM) per rack'],['Plates/rack','36 GPU + 18 CPU + 18 NVS = 72'],['Plate type','Cu microchannel brazed'],['Manifold','SS316L + QD drip-free'],['Hose','DN25 flex EPDM 6 bar rated'],['Coolant','DI water <5\u00B5S/cm pH 7-9'],['Pressure','2-3 bar at rack inlet'],['Filter','25\u00B5m inline per branch'],['Leak','Rope full length + 2\u00D7point at QD'],['Drip tray','SS under manifold'],['Drain','Manual valve per rack manifold'],['TIM','Indium/graphite on cold plate'],['Test','Annual thermal resistance check']]),
+mc('var(--c)','Liquid Cooling Per Rack','DLC Cold Plate Circuit',[['Path','OH TCS \u2192 EoR CDU \u2192 rack manifold \u2192 cold plates'],['Supply','35\u00B0C \u00B12\u00B0C from CDU'],['Return','45\u00B0C max to CDU'],['\u0394T','10\u00B0C nominal design'],['Flow','4.8 m\u00B3/h (80 LPM) per rack'],['Plates/rack','36 GPU + 18 CPU + 18 NVS = 72'],['Plate type','Cu microchannel brazed'],['Manifold','SS316L + QD drip-free'],['Hose','DN25 flex EPDM 6 bar rated'],['Coolant','DI water <5\u00B5S/cm pH 7-9'],['Pressure','2-3 bar at rack inlet'],['Filter','25\u00B5m inline per branch'],['Leak','Rope full length + 2\u00D7point at QD'],['Drip tray','SS under manifold'],['TIM','Indium/graphite on cold plate'],['Test','Annual thermal resistance check']]),
 mc('var(--p)','NVLink Cable System','Passive Cu Interconnect',[['Type','Passive coaxial copper'],['Count','5,000+ per NVL72 pair'],['Cartridge','Pre-assembled blind-mate module'],['Mating','~6,000 lbs per rack pair'],['Lane speed','200 Gb/s NRZ (NVLink5)'],['Lanes/GPU','36 Tx + 36 Rx bidirectional'],['Cross-rack','18\u00D71.6T OSFP front NVS'],['Insertion loss','<20 dB at 56 GHz'],['BER','<1E-12 post-FEC target'],['Retimer','None (passive direct)'],['Maintenance','Cartridge hot-swap as unit'],['Spare','1 cartridge per 9 domains'],['Bend radius','Per NVIDIA mech spec'],['Shielding','Individual coax + tray EMI']]),
 mc('var(--t2)','Physical Rack','Mechanical Specs',[['Standard','48U OCP Open Rack v3'],['Width','600mm (19\" EIA)'],['Depth','1,200mm + rear extension'],['Height','2,200mm (48U usable)'],['Weight empty','~350 kg steel frame'],['Weight loaded','~2,700 kg operational'],['Anchor','4\u00D7 M16 expansion \u226550kN shear'],['Seismic brace','Top-of-rack tie to grid'],['ESD','Bonded to building ground bus'],['Leveling','\u00B120mm adjustable feet'],['Door','Perforated front 65% open'],['Rear','Open + cable cartridge mount'],['Entry','Top (overhead tray) + rear'],['Paint','RAL 7016 powder coat']]),
 ].join('');
@@ -1178,7 +1198,7 @@ setTimeout(()=>{if(ab&&at){ab.style.fill='rgba(34,197,94,.1)';ab.style.stroke='v
 $('netCards').innerHTML=[
 mc('var(--pk)','NVLink5 Intra-Domain','72-GPU All-to-All',[['Generation','5th Gen NVLink5'],['BW/GPU','1.8 TB/s bidirectional'],['Lane speed','200 Gb/s NRZ per lane'],['Lanes/GPU','36 Tx + 36 Rx'],['Domain BW','130 TB/s bisection'],['NVSwitch5','18\u00D7 per domain (28.8 Tb/s ea)'],['Topology','Full-mesh all-to-all'],['Cable','Passive coax Cu 5,000+'],['Backplane','Cable cartridge blind-mate'],['Cross-rack','18\u00D71.6T OSFP (NVS front)'],['Latency','<1\u00B5s intra-domain'],['BER','<1E-12 post-FEC'],['Error','Auto-retrain + lane remap'],['Telemetry','NVOS 2.0 per-port counters']]),
 mc('var(--p)','IB XDR 800G Scale-Out','Inter-Domain Fabric',[['Standard','InfiniBand XDR'],['Speed','800 Gb/s per port'],['NIC','CX-8 twin OSFP (9/rack)'],['Optics','800G DR4/SR4 OSFP'],['Leaf','QX800 Q3400 \u00D78 (64p ea)'],['Spine','QX800 Q3400 \u00D74 (64p ea)'],['Topology','4-Rail Fat-Tree 1:1'],['RDMA','GPUDirect RDMA v3'],['SHARP','In-network allreduce'],['Congestion','DCQCN + adaptive routing'],['WJH','What Just Happened telemetry'],['Firmware','MLNX-OS / NVOS 2.0']]),
-mc('var(--b)','Structured Cabling','Physical Layer',[['SM fiber','OS2 9/125\u00B5m LC/APC'],['MM fiber','OM5 50/125\u00B5m MPO-16'],['Fiber count','~4,200 LC/MPO per hall'],['Cu','~540 Cat6A drops (OOB+BMC)'],['Coax','~135K NVLink lanes total'],['Tray','3-tier overhead SS ladder'],['Power tray','Left 300mm (A+B sep)'],['Fiber tray','Center 450mm'],['Cu tray','Right 300mm + NVLink'],['EMI sep','300mm min pwr-to-signal'],['Testing','100% Tier 2 OTDR + Fluke'],['Labeling','TIA-606-C structured']]),
+mc('var(--b)','Structured Cabling','Physical Layer (DLC-Adapted)',[['SM fiber','OS2 9/125\u00B5m LC/APC'],['MM fiber','OM5 50/125\u00B5m MPO-16'],['Fiber count','~4,200 LC/MPO per hall'],['Cu','~540 Cat6A drops (OOB+BMC)'],['Coax','~135K NVLink lanes total'],['Tray','3-tier overhead SS ladder'],['Power tray','Left 300mm (A+B sep)'],['Fiber tray','Center 450mm'],['Cu tray','Right 300mm + NVLink'],['TCS pipe','OH DN150 SS316L \u2192 EoR CDU \u2192 rack'],['Slab','Solid slab-on-grade (no raised floor)'],['Labeling','TIA-606-C structured']]),
 mc('var(--g)','Management OOB','BMC / Storage / Telemetry',[['OOB','25GbE ToR per rack'],['BMC','1GbE/tray mgmt VLAN'],['HMC','Host Mgmt Controller'],['Storage','100GbE NVMe-oF RDMA'],['NTP','Stratum 2 GPS-synced'],['DNS','Redundant internal'],['Syslog','rsyslog \u2192 ELK'],['SNMP','v3 encrypted to NMS'],['Prometheus','dcgm_exporter/GPU'],['Grafana','Real-time dashboards'],['IP-KVM','1/rack pair (console)'],['Firmware','Centralized FOTA']])
 ].join('');
 // FIRE
@@ -1654,7 +1674,7 @@ if($('dashCards'))$('dashCards').innerHTML=[
 mc('var(--t2)','Floor Slab-on-Grade','No Raised Floor',[['Type','Post-tensioned RC slab'],['Thickness','300mm + 150mm sub-base'],['Live load','\u22653,500 kg/m\u00B2'],['Point load','\u22651,500 kg per foot'],['Concrete','C40/50 (40 MPa)'],['Finish','Epoxy ESD conductive'],['ESD','<1M\u03A9 (IEC 61340)'],['Flatness','FM2 / DIN 18202'],['Drain','Trapped 1:100 under CDU'],['Membrane','2mm PU waterproof']]),
 mc('var(--o)','Seismic Zone 4','SNI 1726:2019',[['Zone','4 (high seismicity)'],['Building','SMRF moment frame'],['Rack','M16 anchor \u226550kN shear'],['Brace','Top-of-rack to ceiling'],['Tray','Lateral+long brace @6m'],['Busway','Seismic hanger + exp joint'],['Piping','Brace @3m + flex joint'],['CDU','Anti-vib + M12 anchor'],['Chiller','Spring + snubber'],['Standard','SNI 1726 + ASCE 7-22']]),
 mc('var(--c)','Environmental','ASHRAE A1 + DLC',[['Dry bulb','18-27\u00B0C'],['Humidity','20-80% RH'],['TCS supply','35\u00B0C \u00B12\u00B0C'],['TCS return','45\u00B0C max'],['Filtration','MERV 11 min'],['Pressure','+5 to +10 Pa positive'],['Particulate','ISO 14644-1 Class 8'],['Vibration','<0.5 mm/s RMS'],['Noise','<85 dBA at 1m'],['Lighting','500 lux LED 4000K']]),
-mc('var(--p)','Hall Layout','Dimensions',[['Size','32m\u00D720m (640m\u00B2)'],['Height','4.2m clear'],['Hot aisle','1.2m contained'],['Cold aisle','1.2m + DLC manifold'],['End-of-row','1.5m walkway'],['CDU zone','32m\u00D72m rear'],['Elec room','80m\u00B2 adjacent'],['MDF','30m\u00B2 adjacent'],['Fire wall','2-hour rated'],['Emergency exit','2\u00D7 opposite corners']])
+mc('var(--p)','Hall Layout','Dimensions (DLC-Adapted)',[['Size','32m\u00D720m (640m\u00B2)'],['Height','4.2m clear'],['Floor','Slab-on-grade (no raised floor)'],['Hot aisle','1.2m contained'],['Cold aisle','1.2m supply air'],['End-of-row','1.5m CDU + walkway'],['CDU','2\u00D7 EoR per row-pair (6 total)'],['TCS routing','Overhead \u2192 vertical riser \u2192 CDU \u2192 rack'],['Elec room','80m\u00B2 adjacent'],['Emergency exit','2\u00D7 opposite corners']])
 ].join('');
 // BMS ARCHITECTURE DIAGRAM - Ring Topology with Field to Server
 $('bmsSu').textContent='Field Devices → Gateways → PLC/DDC → Ring Network → Redundant Servers (MMR01/MMR02) → DCIM/SCADA';

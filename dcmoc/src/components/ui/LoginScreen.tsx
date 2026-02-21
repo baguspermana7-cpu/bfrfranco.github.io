@@ -68,7 +68,12 @@ export function LoginScreen() {
                     </button>
                 </form>
 
-                <p className="text-center text-slate-600 text-[10px] mt-6">ResistanceZero Pro Platform</p>
+                <p className="text-center text-slate-500 text-[10px] mt-6 leading-relaxed">
+                    By signing in, you agree to our{' '}
+                    <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="text-cyan-500 underline hover:text-cyan-400">Terms of Service</a>
+                    {' '}and{' '}
+                    <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-cyan-500 underline hover:text-cyan-400">Privacy Policy</a>.
+                </p>
             </div>
         </div>
     );

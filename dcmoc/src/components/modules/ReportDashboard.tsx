@@ -944,6 +944,7 @@ export function ReportDashboard() {
                         fuelHours: capexInputs.fuelHours,
                         turnoverRate: inputs.turnoverRate,
                         hybridRatio: inputs.hybridRatio,
+                        maintenanceModel: inputs.maintenanceModel,
                         buildingSize: inputs.buildingSize,
                     },
                     selectedCountry.labor.baseSalary_Engineer,

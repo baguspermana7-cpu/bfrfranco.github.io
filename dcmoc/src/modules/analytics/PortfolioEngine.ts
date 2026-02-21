@@ -85,6 +85,7 @@ export function calculatePortfolio(sites: SiteConfig[]): PortfolioResult {
             site.staffingModel,
             site.maintenanceStrategy === 'predictive' ? 'in-house' : 'hybrid',
             site.maintenanceStrategy,
+            0.5
         );
 
         // Calculate staffing costs

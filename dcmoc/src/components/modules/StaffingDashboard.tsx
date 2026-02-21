@@ -32,9 +32,10 @@ export function StaffingDashboard() {
             inputs.shiftModel,
             inputs.staffingModel === 'outsourced' ? 'outsourced' : inputs.staffingModel,
             inputs.maintenanceModel,
-            inputs.maintenanceStrategy
+            inputs.maintenanceStrategy,
+            inputs.hybridRatio ?? 0.5
         );
-    }, [inputs.itLoad, inputs.tierLevel, inputs.shiftModel, inputs.staffingModel, inputs.maintenanceModel, inputs.maintenanceStrategy]);
+    }, [inputs.itLoad, inputs.tierLevel, inputs.shiftModel, inputs.staffingModel, inputs.maintenanceModel, inputs.maintenanceStrategy, inputs.hybridRatio]);
 
     // Memoized calculations
     const results = useMemo(() => {
@@ -51,7 +52,7 @@ export function StaffingDashboard() {
         const staffingResults: StaffingResult[] = roleConfigs.map(cfg => {
             const qty = (effectiveInputs as any)[cfg.qtyKey] || 1;
             const opModel = inputs.staffingModel === 'outsourced' ? 'vendor' : inputs.staffingModel;
-            return calculateStaffing(cfg.role, qty, inputs.shiftModel, selectedCountry, cfg.is24x7, undefined, undefined, opModel);
+            return calculateStaffing(cfg.role, qty, inputs.shiftModel, selectedCountry, cfg.is24x7, undefined, undefined, opModel, inputs.hybridRatio ?? 0.5);
         });
 
         const totalHeadcount = staffingResults.reduce((acc, r) => acc + r.headcount, 0);
@@ -328,9 +329,9 @@ export function StaffingDashboard() {
                             </div>
                             <div className="mt-auto">
                                 <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                                    {inputs.shiftModel === '8h' ? 42 : 42}h <span className="text-sm font-normal text-slate-500">/person</span>
+                                    {inputs.shiftModel === '8h' ? '42' : '40'}h <span className="text-sm font-normal text-slate-500">eff./person</span>
                                 </div>
-                                <div className="text-xs text-amber-500 mt-1">1.5h OT (handover)</div>
+                                <div className="text-xs text-amber-500 mt-1">{inputs.shiftModel === '8h' ? '1.5h OT (handover)' : 'Zero OT (12h compressed)'}</div>
                             </div>
                         </div>
 
@@ -379,7 +380,7 @@ export function StaffingDashboard() {
                             </div>
                             <div>
                                 <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Teams Required</dt>
-                                <dd className="text-slate-900 dark:text-white font-mono font-bold">{inputs.shiftModel === '8h' ? '4' : '2'}</dd>
+                                <dd className="text-slate-900 dark:text-white font-mono font-bold">4</dd>
                             </div>
                         </div>
 
@@ -442,7 +443,7 @@ export function StaffingDashboard() {
                                             <td className="px-4 py-3 text-center text-cyan-600 dark:text-cyan-400 font-bold">{r.headcount}</td>
                                             <td className="px-4 py-3 text-center text-slate-500">{r.onShiftCount}</td>
                                             <td className="px-4 py-3 text-slate-500">
-                                                {r.is24x7 ? (inputs.shiftModel === '8h' ? 'Continental 3-Shift (8h)' : '2-Shift 12h') : 'Mon-Fri 08:00-17:00'}
+                                                {r.is24x7 ? (inputs.shiftModel === '8h' ? 'Continental 3-Shift (8h)' : '4-Team 12h (4on/3off)') : 'Mon-Fri 08:00-17:00'}
                                             </td>
                                             <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-400">{formatMoney(r.breakdown.baseSalaries)}</td>
                                             <td className="px-4 py-3 text-right text-cyan-600 dark:text-cyan-400">{formatMoney(r.breakdown.shiftAllowance)}</td>
@@ -692,7 +693,7 @@ export function StaffingDashboard() {
             )} {/* End Org Tab */}
 
             {activeTab === 'roster' && (
-                <RosterVisualizer roster={results.roster} year={2025} shiftModel={inputs.shiftModel as '8h' | '12h'} />
+                <RosterVisualizer roster={results.roster} year={2025} shiftModel={inputs.shiftModel as '8h' | '12h'} staffingResults={results.staffingResults} />
             )} {/* End Roster Tab */}
 
             {activeTab === 'waterfall' && (

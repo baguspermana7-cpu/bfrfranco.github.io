@@ -236,7 +236,9 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     </button>
 
                     <div className="flex items-center justify-between px-3 py-2 mt-1 border-t border-slate-200 dark:border-slate-800 pt-3">
-                        <div className="text-[10px] text-slate-500 truncate">{user.email}</div>
+                        <div className="text-[10px] text-slate-500 truncate">
+                            {user.role === 'root' ? 'Administrator' : 'Pro User'}
+                        </div>
                         <button
                             onClick={logout}
                             className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-slate-400 hover:text-red-500 transition-colors"

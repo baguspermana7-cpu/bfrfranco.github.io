@@ -54,6 +54,7 @@ Every article with an interactive calculator follows a **unified Pro Enhancement
 | 13 | AI Governance | `.aig-` | `#6366f1` indigo | `#818cf8` | Full (Feb 2026) |
 | 14 | Maintenance Staffing | `.msf-` | `#f97316` orange | `#fb923c` | Full (Feb 2026) |
 | 15 | Mission Critical Leadership | `.mcl-` | `#ec4899` pink | `#f472b6` | Full (Feb 2026) |
+| PUE | PUE Calculator (standalone) | `.pue-` | `#06b6d4` cyan | `#22d3ee` | Full (Feb 2026) |
 
 ---
 
@@ -540,6 +541,9 @@ Sandbox/
 10. **TOC calculator badges require Font Awesome** to render the calculator icon
 11. **PDF export MUST open window FIRST** — `var w = window.open('', '_blank')` must be called **immediately** in the click handler, BEFORE any computation (Monte Carlo 10K, sensitivity, etc.). Browsers block `window.open` if called after async or heavy synchronous work. Then use `w.document.write(html); w.document.close();` to render content. NEVER use the Blob URL pattern (`URL.createObjectURL` → `window.open(url)`) for PDF export.
 12. **PDF export pattern**: `var w = window.open('', '_blank'); if(!w){alert('Allow popups'); return;} /* compute */ w.document.write(html); w.document.close(); setTimeout(function(){w.print();},500);`
+13. **Free/Pro mode buttons MUST be separate** — use a mode-bar with two buttons (Free Assessment + Pro Analysis), not a single toggle. Active button gets distinct styling (gradient background + shadow). Include a mode indicator badge showing current mode.
+14. **PDF export MUST include executive summary KPI cards** — never just tables. Use `pdf-kpi-grid` with 4 columns, `pdf-score-card` for the hero metric, and side-by-side SVG charts (`pdf-chart-row`).
+15. **PDF narrative section is MANDATORY** — generate dynamic assessment paragraphs referencing actual calculated values, industry benchmarks, and financial impact. Use `pdf-narrative` with left border accent.
 
 ---
 

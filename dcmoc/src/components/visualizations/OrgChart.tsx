@@ -20,6 +20,16 @@ interface NodeProps {
     children?: React.ReactNode;
 }
 
+// Static color map — avoids dynamic Tailwind class generation issues
+const COLOR_MAP: Record<string, { card: string; icon: string }> = {
+    purple:  { card: 'bg-purple-950/30 border-purple-800',   icon: 'bg-purple-500/20 text-purple-400' },
+    slate:   { card: 'bg-slate-800/30 border-slate-700',     icon: 'bg-slate-500/20 text-slate-400' },
+    cyan:    { card: 'bg-cyan-950/30 border-cyan-800',       icon: 'bg-cyan-500/20 text-cyan-400' },
+    blue:    { card: 'bg-blue-950/30 border-blue-800',       icon: 'bg-blue-500/20 text-blue-400' },
+    emerald: { card: 'bg-emerald-950/30 border-emerald-800', icon: 'bg-emerald-500/20 text-emerald-400' },
+    amber:   { card: 'bg-amber-950/30 border-amber-800',     icon: 'bg-amber-500/20 text-amber-400' },
+};
+
 // B2: Interactive OrgNode with click-to-expand detail
 const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, children }: NodeProps) => {
     const [expanded, setExpanded] = useState(false);
@@ -33,7 +43,7 @@ const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, childr
             <div
                 className={clsx(
                     "p-3 rounded-xl border w-52 transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-900/20 z-10 cursor-pointer",
-                    `bg-${color}-100 dark:bg-${color}-950/30 border-${color}-300 dark:border-${color}-800`
+                    COLOR_MAP[color]?.card
                 )}
                 onClick={() => setExpanded(!expanded)}
                 role="button"
@@ -42,7 +52,7 @@ const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, childr
             >
                 <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                        <div className={`p-1.5 rounded-lg bg-${color}-500/10 dark:bg-${color}-500/20 text-${color}-600 dark:text-${color}-400`}>
+                        <div className={`p-1.5 rounded-lg ${COLOR_MAP[color]?.icon}`}>
                             <User className="w-4 h-4" />
                         </div>
                         <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
@@ -88,9 +98,16 @@ const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, childr
 
             {children && (
                 <>
-                    <div className="h-6 w-px bg-slate-300 dark:bg-slate-700"></div>
-                    <div className="flex gap-4 relative">
-                        <div className="flex gap-4 items-start">
+                    <div className="h-6 w-px bg-slate-700"></div>
+                    <div className="relative">
+                        {/* Horizontal bar connecting siblings */}
+                        {React.Children.count(children) > 1 && (
+                            <div
+                                className="absolute top-0 h-px bg-slate-700"
+                                style={{ left: '104px', right: '104px' }}
+                            />
+                        )}
+                        <div className="flex gap-8 items-start">
                             {children}
                         </div>
                     </div>

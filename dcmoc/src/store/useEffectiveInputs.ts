@@ -18,7 +18,8 @@ export function useEffectiveInputs() {
             inputs.shiftModel,
             inputs.staffingModel === 'outsourced' ? 'outsourced' : inputs.staffingModel,
             inputs.maintenanceModel,
-            inputs.maintenanceStrategy
+            inputs.maintenanceStrategy,
+            inputs.hybridRatio ?? 0.5
         );
 
         return {

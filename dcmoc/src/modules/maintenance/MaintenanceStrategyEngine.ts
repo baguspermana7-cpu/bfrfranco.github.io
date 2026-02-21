@@ -166,11 +166,23 @@ function calculatePartsCost(assets: AssetCount[]): number {
     let total = 0;
     assets.forEach(ac => {
         const template = ASSETS.find(a => a.id === ac.assetId);
-        if (!template?.consumables) return;
-        template.consumables.forEach(c => {
-            const replacementsPerYear = 12 / c.baseLifeMonths;
-            total += replacementsPerYear * c.costPerUnit * ac.count;
-        });
+        if (!template) return;
+        // Consumables
+        if (template.consumables) {
+            template.consumables.forEach(c => {
+                const replacementsPerYear = 12 / c.baseLifeMonths;
+                total += replacementsPerYear * c.costPerUnit * ac.count;
+            });
+        }
+        // Critical spares annualized cost (holding + expected consumption)
+        if (template.criticalSpares) {
+            template.criticalSpares.forEach(cs => {
+                const qty = Math.max(cs.minStock, Math.ceil(ac.count * cs.stockPercent));
+                const holdingCost = qty * cs.costPerUnit * HOLDING_COST_RATE;
+                const expectedConsumption = ac.count * cs.stockPercent * 0.3 * cs.costPerUnit;
+                total += holdingCost + expectedConsumption;
+            });
+        }
     });
     return total;
 }
@@ -358,44 +370,72 @@ export const calculateSparesOptimization = (
 
     assets.forEach(ac => {
         const template = ASSETS.find(a => a.id === ac.assetId);
-        if (!template?.consumables) return;
+        if (!template) return;
 
         const criticality = CRITICALITY_MAP[template.category] || 'Minor';
 
-        template.consumables.forEach(c => {
-            const annualConsumption = (12 / c.baseLifeMonths) * ac.count;
+        // Consumables (regular replacement items)
+        if (template.consumables) {
+            template.consumables.forEach(c => {
+                const annualConsumption = (12 / c.baseLifeMonths) * ac.count;
 
-            // Safety stock: Critical = 3 months, Major = 2 months, Minor = 1 month
-            const safetyMonths = criticality === 'Critical' ? 3 : criticality === 'Major' ? 2 : 1;
-            const safetyStock = Math.ceil((annualConsumption / 12) * safetyMonths);
+                // Safety stock: Critical = 3 months, Major = 2 months, Minor = 1 month
+                const safetyMonths = criticality === 'Critical' ? 3 : criticality === 'Major' ? 2 : 1;
+                const safetyStock = Math.ceil((annualConsumption / 12) * safetyMonths);
 
-            // Lead time demand
-            const leadTimeDemand = Math.ceil((annualConsumption / 365) * leadTime);
+                // Lead time demand
+                const leadTimeDemand = Math.ceil((annualConsumption / 365) * leadTime);
 
-            // Reorder point = lead time demand + safety stock
-            const reorderPoint = leadTimeDemand + safetyStock;
+                // Reorder point = lead time demand + safety stock
+                const reorderPoint = leadTimeDemand + safetyStock;
 
-            // Recommended quantity = reorder point + 1 buffer
-            const quantity = Math.max(1, reorderPoint + 1);
+                // Recommended quantity = reorder point + 1 buffer
+                const quantity = Math.max(1, reorderPoint + 1);
 
-            const holdingCost = quantity * c.costPerUnit * HOLDING_COST_RATE;
-            const consumptionCost = annualConsumption * c.costPerUnit;
+                const holdingCost = quantity * c.costPerUnit * HOLDING_COST_RATE;
+                const consumptionCost = annualConsumption * c.costPerUnit;
 
-            items.push({
-                assetId: template.id,
-                assetName: template.name,
-                partName: c.name,
-                category: template.category,
-                criticality,
-                quantity,
-                unitCost: c.costPerUnit,
-                annualConsumption: Math.round(annualConsumption * 10) / 10,
-                holdingCost: Math.round(holdingCost),
-                leadTimeDays: leadTime,
-                reorderPoint,
-                totalAnnualCost: Math.round(consumptionCost + holdingCost)
+                items.push({
+                    assetId: template.id,
+                    assetName: template.name,
+                    partName: c.name,
+                    category: template.category,
+                    criticality,
+                    quantity,
+                    unitCost: c.costPerUnit,
+                    annualConsumption: Math.round(annualConsumption * 10) / 10,
+                    holdingCost: Math.round(holdingCost),
+                    leadTimeDays: leadTime,
+                    reorderPoint,
+                    totalAnnualCost: Math.round(consumptionCost + holdingCost)
+                });
             });
-        });
+        }
+
+        // Critical Spares (insurance stock — rarely consumed but essential)
+        if (template.criticalSpares) {
+            template.criticalSpares.forEach(cs => {
+                const quantity = Math.max(cs.minStock, Math.ceil(ac.count * cs.stockPercent));
+                const holdingCost = quantity * cs.costPerUnit * HOLDING_COST_RATE;
+                // Critical spares have very low annual consumption (typically 0-1 per year)
+                const annualConsumption = Math.max(0.1, ac.count * cs.stockPercent * 0.3); // ~30% chance of use per year
+
+                items.push({
+                    assetId: template.id,
+                    assetName: template.name,
+                    partName: `[SPARE] ${cs.name}`,
+                    category: template.category,
+                    criticality: 'Critical',
+                    quantity,
+                    unitCost: cs.costPerUnit,
+                    annualConsumption: Math.round(annualConsumption * 10) / 10,
+                    holdingCost: Math.round(holdingCost),
+                    leadTimeDays: cs.leadTimeWeeks * 7,
+                    reorderPoint: quantity, // Always keep at minimum stock
+                    totalAnnualCost: Math.round(annualConsumption * cs.costPerUnit + holdingCost)
+                });
+            });
+        }
     });
 
     // Sort by criticality then cost

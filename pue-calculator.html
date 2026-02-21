@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUE Calculator | Data Center Power Usage Effectiveness</title>
+    <meta name="description" content="Calculate Power Usage Effectiveness (PUE) for data centers. Analyze cooling efficiency, UPS losses, and facility overhead based on ASHRAE TC 9.9 and Green Grid standards.">
+    <meta name="keywords" content="PUE Calculator, Power Usage Effectiveness, Data Center Efficiency, DCiE, ASHRAE TC 9.9, Green Grid, Cooling Efficiency">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://resistancezero.com/pue-calculator.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/pue-calculator.html">
+    <meta property="og:title" content="PUE Calculator — Data Center Power Efficiency">
+    <meta property="og:description" content="Calculate PUE based on cooling type, climate zone, UPS config, and facility loads. ASHRAE TC 9.9 and Green Grid compliant.">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="PUE Calculator — Data Center Power Efficiency">
+    <meta name="twitter:description" content="Calculate PUE for data centers with cooling, UPS, and facility analysis.">
+
+    <!-- Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "PUE Calculator",
+        "applicationCategory": "UtilityApplication",
+        "description": "Calculate Power Usage Effectiveness for data centers based on cooling, UPS, and facility parameters.",
+        "url": "https://resistancezero.com/pue-calculator.html",
+        "operatingSystem": "Web Browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "creator": { "@type": "Person", "name": "Bagus Dwi Permana" }
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0e4d6e 0%, #0891b2 50%, #06b6d4 100%);
+            --secondary-gradient: linear-gradient(135deg, #0891b2 0%, #0e4d6e 100%);
+            --dark-blue: #0e4d6e;
+            --medium-blue: #0891b2;
+            --light-blue: #06b6d4;
+            --accent-cyan: #06b6d4;
+            --accent-gold: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg-dark: rgba(14, 77, 110, 0.95);
+            --glass-border: rgba(6, 182, 212, 0.1);
+            --glass-blur: blur(20px);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+
+        .page-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+            background: radial-gradient(ellipse at top right, rgba(6, 182, 212, 0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(8, 145, 178, 0.05) 0%, transparent 50%), linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-blue); }
+        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); letter-spacing: -0.5px; }
+        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
+        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
+        .nav-link:hover { color: var(--dark-blue); }
+        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25); }
+        .nav-back:hover { transform: translateY(-2px); }
+
+        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
+        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(139,92,246,0.3); white-space: nowrap; }
+        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,92,246,0.4); }
+        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
+        .nav-user-btn:hover { background: rgba(139,92,246,0.14); }
+        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
+        .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
+        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
+        .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
+        .nav-user-dropdown.show { display: block; }
+        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+        .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: white; }
+        .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
+        .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+        .nav-dd-logout:hover { background: #fef2f2; }
+
+        .main-content { position: relative; z-index: 10; padding-top: 80px; }
+
+        /* Hero */
+        .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05)); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 50px; font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600; margin-bottom: 1.5rem; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
+
+        /* Quick Stats */
+        .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
+        .quick-stat i { color: var(--accent-cyan); }
+
+        /* Calculator */
+        .calculator-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .calculator-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
+
+        /* Input Panel */
+        .input-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+        .input-section { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; cursor: pointer; }
+        .section-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        .section-subtitle { font-size: 0.72rem; color: var(--text-muted); }
+
+        .input-group { margin-bottom: 1rem; }
+        .input-group:last-child { margin-bottom: 0; }
+        .input-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
+        .input-field:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1); }
+        select.input-field { cursor: pointer; }
+
+        /* Preset buttons */
+        .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .preset-btn { padding: 5px 12px; border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 50px; background: rgba(6, 182, 212, 0.05); color: var(--accent-cyan); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+        .preset-btn:hover, .preset-btn.active { background: var(--accent-cyan); color: white; border-color: var(--accent-cyan); }
+
+        /* Range slider */
+        .range-wrap { display: flex; align-items: center; gap: 12px; }
+        .range-wrap input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; background: #e2e8f0; border-radius: 3px; outline: none; }
+        .range-wrap input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-cyan); cursor: pointer; box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3); }
+        .range-value { min-width: 48px; text-align: center; font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); }
+
+        /* Results Panel */
+        .results-panel { position: sticky; top: 100px; }
+        .results-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .pue-display { text-align: center; padding: 1.5rem 0; }
+        .pue-value { font-size: 4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; }
+        .pue-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
+        .pue-rating { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-top: 0.75rem; }
+
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
+        .metric-box { background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.1); border-radius: 10px; padding: 0.75rem; text-align: center; }
+        .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+        .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
+
+        /* Recommendations */
+        .rec-section { margin-top: 1.25rem; }
+        .rec-title { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
+        .rec-card { display: flex; gap: 10px; padding: 0.75rem; background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.1); border-radius: 10px; margin-bottom: 0.5rem; }
+        .rec-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(6, 182, 212, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 0.8rem; flex-shrink: 0; }
+        .rec-text h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
+        .rec-text p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+        .rec-impact { font-size: 0.65rem; font-weight: 700; color: var(--accent-emerald); background: rgba(16, 185, 129, 0.08); padding: 2px 8px; border-radius: 50px; margin-top: 4px; display: inline-block; }
+
+        /* Charts */
+        .charts-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .chart-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .chart-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+        .chart-container { position: relative; height: 280px; }
+
+        /* Tooltip System */
+        .tooltip-trigger { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); border-radius: 50%; font-size: 10px; color: var(--accent-cyan); cursor: help; margin-left: auto; transition: all 0.3s; flex-shrink: 0; }
+        .tooltip-trigger:hover { background: rgba(6,182,212,0.2); transform: scale(1.1); }
+        #tooltip-container { position: fixed; width: 320px; max-width: calc(100vw - 40px); padding: 16px; background: linear-gradient(135deg, #1e3a5f, #2d5a87); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); z-index: 999999; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.15s ease; color: white; font-size: 12px; line-height: 1.5; }
+        #tooltip-container.visible { opacity: 1; visibility: visible; }
+        #tooltip-container .tooltip-title { font-size: 13px; font-weight: 700; color: #22d3ee; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        #tooltip-container .tooltip-desc { color: rgba(255,255,255,0.9); }
+        .tooltip-trigger .tooltip-content { display: none; }
+
+        /* Toolbar Row */
+        .pue-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 auto; max-width: 1400px; padding: 0 2rem 1.25rem; flex-wrap: wrap; }
+        .pue-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
+        .pue-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .pue-btn-free { background: transparent; color: #64748b; }
+        .pue-btn-free.active { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; box-shadow: 0 2px 8px rgba(6,182,212,0.3); }
+        .pue-btn-free:not(.active):hover { background: rgba(6,182,212,0.08); color: #0891b2; }
+        .pue-btn-pro { background: transparent; color: #64748b; }
+        .pue-btn-pro.active { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+        .pue-btn-pro:not(.active):hover { background: rgba(139,92,246,0.08); color: #8b5cf6; }
+        .pue-btn-pro.locked-hint { position: relative; }
+        .pue-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
+        .pue-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .pue-btn-reset { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .pue-btn-reset:hover { border-color: #06b6d4; color: #06b6d4; background: rgba(6,182,212,0.04); }
+        .pue-btn-pdf { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); color: #ef4444; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .pue-btn-pdf:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
+        .pue-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
+        .pue-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
+        .pue-mode-indicator.free-active { display: inline-flex; background: rgba(6,182,212,0.1); color: #0891b2; }
+        .pue-mode-indicator.pro-active { display: inline-flex; background: rgba(139,92,246,0.1); color: #8b5cf6; }
+
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .navbar, .hero, .pue-toolbar, #loginModal, .nav-back, footer, .tooltip-trigger, .pro-overlay, .pro-badge, .preset-row { display: none !important; }
+            .main-content { padding-top: 0 !important; }
+            .calculator-section { padding: 0 !important; }
+            .calculator-grid { display: block !important; }
+            .pro-section.locked > *:not(.pro-overlay) { filter: none !important; user-select: auto !important; pointer-events: auto !important; }
+            .results-panel { position: static !important; }
+            @page { margin: 1cm; size: A4; }
+        }
+
+        /* PRO Sections */
+        .pro-section { position: relative; }
+        .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
+        .pro-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; pointer-events: all; cursor: pointer; }
+        .pro-section.locked .pro-overlay { display: flex; }
+        .pro-overlay i { font-size: 2rem; color: var(--accent-purple); }
+        .pro-overlay-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
+        .pro-overlay-btn { padding: 8px 20px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .pro-overlay-btn:hover { transform: translateY(-1px); }
+        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; font-size: 0.6rem; font-weight: 700; border-radius: 50px; letter-spacing: 0.5px; vertical-align: middle; }
+
+        /* Industry Comparison */
+        .comparison-bar { height: 8px; border-radius: 4px; background: #e2e8f0; position: relative; margin: 8px 0 4px; }
+        .comparison-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .comparison-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
+
+        /* Login Modal */
+        @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .calculator-grid { grid-template-columns: 1fr; }
+            .results-panel { position: static; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.8rem; }
+            .pue-value { font-size: 3rem; }
+            .metric-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">PUE</div>
+                <div>
+                    <div class="nav-title">PUE Calculator</div>
+                    <div class="nav-subtitle">Power Usage Effectiveness</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
+                <a href="capex-calculator.html" class="nav-link" style="color: #f59e0b;">CAPEX Calc</a>
+                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
+                <a href="tia-942-checklist.html" class="nav-link" style="color: #10b981;">TIA-942</a>
+                <a href="dcmoc/" class="nav-link" style="color: #ef4444;">DC MOC</a>
+                <div class="nav-auth-wrap" id="navAuthWrap">
+                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="nav-login-text">Login</span>
+                    </button>
+                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
+                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
+                        <span class="nav-user-email" id="navUserEmail"></span>
+                        <i class="fas fa-chevron-down nav-user-chevron"></i>
+                    </button>
+                    <div class="nav-user-dropdown" id="navUserDropdown">
+                        <div class="nav-dd-header">
+                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">PRO</div>
+                            <div class="nav-dd-email" id="navDdEmail"></div>
+                        </div>
+                        <button class="nav-dd-logout" onclick="logoutPremium()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+                <a href="index.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Portfolio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-tachometer-alt"></i>
+                Power Usage Effectiveness
+            </div>
+            <h1>PUE Calculator</h1>
+            <p>Analyze data center power efficiency based on cooling architecture, UPS configuration, climate zone, and facility loads. Aligned with ASHRAE TC 9.9 and Green Grid standards.</p>
+            <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(6,182,212,0.15);">
+                <img src="assets/pue-calculator-hero.jpg" alt="PUE — Power Usage Effectiveness for Data Centers" style="width:100%;height:auto;display:block;" loading="lazy">
+            </div>
+            <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(6,182,212,0.04);border:1px solid rgba(6,182,212,0.12);border-radius:12px;">
+                <h3 style="font-size:0.95rem;font-weight:700;color:#164e63;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#06b6d4;"></i> What is PUE?</h3>
+                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">
+                    <strong>Power Usage Effectiveness (PUE)</strong> is the globally accepted metric for measuring data center energy efficiency, developed by <strong>The Green Grid</strong> and standardized in <strong>ISO/IEC 30134-2</strong>. It is defined by a simple formula:
+                </p>
+                <div style="text-align:center;padding:0.75rem;background:rgba(6,182,212,0.06);border-radius:10px;margin-bottom:0.75rem;">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#164e63;">PUE = Total Facility Power / IT Equipment Power</span>
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.5rem 0;">
+                    A <strong>PUE of 1.0</strong> means 100% of power reaches IT equipment (theoretical ideal). The <strong>global average is ~1.58</strong> (Uptime Institute 2024), meaning 37% of power is consumed by cooling, UPS losses, lighting, and other overhead. Leading hyperscalers achieve <strong>PUE 1.1-1.2</strong> through advanced cooling, economizers, and optimized power distribution.
+                </p>
+                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">
+                    This calculator models PUE from <strong>first principles</strong> — accounting for cooling COP, UPS topology, transformer losses, PDU efficiency, containment strategy, climate zone, and economizer mode. It helps operators identify the highest-impact efficiency improvements and project energy costs over time.
+                </p>
+            </div>
+            <div class="quick-stats">
+                <span class="quick-stat"><i class="fas fa-snowflake"></i> 6 cooling types</span>
+                <span class="quick-stat"><i class="fas fa-globe"></i> 6 climate zones</span>
+                <span class="quick-stat"><i class="fas fa-bolt"></i> 4 UPS types</span>
+                <span class="quick-stat"><i class="fas fa-chart-bar"></i> Real-time charts</span>
+            </div>
+        </section>
+
+        <!-- Toolbar Row -->
+        <div class="pue-toolbar">
+            <div class="pue-mode-bar">
+                <button class="pue-toolbar-btn pue-btn-free active" id="btnFreeMode" onclick="setMode('free')">
+                    <i class="fas fa-chart-bar"></i> Free Assessment
+                </button>
+                <button class="pue-toolbar-btn pue-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
+                    <i class="fas fa-crown"></i> Pro Analysis
+                </button>
+            </div>
+            <span class="pue-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
+            <div class="pue-toolbar-actions">
+                <button class="pue-btn-reset" onclick="resetDefaults()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button class="pue-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Calculator -->
+        <section class="calculator-section">
+            <div class="calculator-grid">
+                <!-- Input Panel -->
+                <div class="input-panel">
+
+                    <!-- Section 1: IT Infrastructure -->
+                    <div class="input-section">
+                        <div class="section-header">
+                            <div class="section-icon" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div>
+                                <div class="section-title">IT Infrastructure</div>
+                                <div class="section-subtitle">Load capacity and rack configuration</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">IT Load (kW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Load</div><div class="tooltip-desc">Total IT power consumption in kilowatts. This is the denominator of the PUE formula (PUE = Total Facility Power / IT Load). Typical ranges: 100kW (edge) to 10MW+ (hyperscale).</div></div></span></label>
+                            <div class="preset-row">
+                                <button class="preset-btn" onclick="setITLoad(100)">100kW Edge</button>
+                                <button class="preset-btn" onclick="setITLoad(500)">500kW Enterprise</button>
+                                <button class="preset-btn active" onclick="setITLoad(1000)">1MW Colo</button>
+                                <button class="preset-btn" onclick="setITLoad(5000)">5MW Hyperscale</button>
+                                <button class="preset-btn" onclick="setITLoad(10000)">10MW+ Mega</button>
+                            </div>
+                            <input type="number" id="itLoad" class="input-field" value="1000" min="50" max="100000" step="50" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Rack Density <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Rack Density</div><div class="tooltip-desc">Power per rack in kW. Higher density (AI/HPC 30kW+) requires more efficient cooling. Standard enterprise is 5-8 kW/rack, high-density 15kW+, AI/HPC 30kW+.</div></div></span></label>
+                            <select id="rackDensity" class="input-field" onchange="calculate()">
+                                <option value="5">Standard (5 kW/rack)</option>
+                                <option value="8" selected>Medium (8 kW/rack)</option>
+                                <option value="15">High Density (15 kW/rack)</option>
+                                <option value="30">AI/HPC (30 kW/rack)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Rack Count <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Rack Count</div><div class="tooltip-desc">Total number of racks in the facility. Auto-calculated from IT Load ÷ Rack Density, but can be manually overridden. Used to scale security and fire suppression facility loads (kW/rack × rack count).</div></div></span> <span style="font-weight:400;color:var(--text-muted);">(auto-calculated)</span></label>
+                            <input type="number" id="rackCount" class="input-field" value="125" min="1" max="10000" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Cooling System -->
+                    <div class="input-section">
+                        <div class="section-header">
+                            <div class="section-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
+                                <i class="fas fa-snowflake"></i>
+                            </div>
+                            <div>
+                                <div class="section-title">Cooling System</div>
+                                <div class="section-subtitle">Cooling architecture and climate</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Type</div><div class="tooltip-desc">Cooling architecture determines the Coefficient of Performance (COP). Higher COP = less energy per kW of heat removed. CRAC (COP ~2.8) is least efficient; Immersion (COP ~25) is most efficient.</div></div></span></label>
+                            <select id="coolingType" class="input-field" onchange="calculate()">
+                                <option value="crac">CRAC — Computer Room AC (COP ~2.8)</option>
+                                <option value="crah" selected>CRAH — Computer Room Air Handler (COP ~4.0)</option>
+                                <option value="inrow">In-Row Cooling (COP ~5.0)</option>
+                                <option value="rdhx">Rear-Door Heat Exchanger (COP ~8.0)</option>
+                                <option value="dlc">Direct Liquid Cooling (COP ~15)</option>
+                                <option value="immersion">Immersion Cooling (COP ~25)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Containment Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-box"></i> Containment</div><div class="tooltip-desc">Airflow containment prevents hot/cold air mixing, improving cooling efficiency by 10-25%. Cold-aisle containment is most common. Chimney cabinets exhaust directly to plenum.</div></div></span></label>
+                            <select id="containment" class="input-field" onchange="calculate()">
+                                <option value="none">None</option>
+                                <option value="hot">Hot-Aisle Containment</option>
+                                <option value="cold" selected>Cold-Aisle Containment</option>
+                                <option value="chimney">Chimney Cabinet</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Climate Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-globe"></i> Climate Zone</div><div class="tooltip-desc">Ambient temperature affects cooling energy. Tropical humid zones (avg 28°C+) have highest cooling overhead. Cold climates enable free cooling for 4,000+ hours/year, significantly reducing PUE.</div></div></span></label>
+                            <select id="climateZone" class="input-field" onchange="calculate()">
+                                <option value="tropical_humid">Tropical Humid (e.g., Jakarta, Singapore)</option>
+                                <option value="tropical_dry">Tropical Dry (e.g., Dubai, Phoenix)</option>
+                                <option value="subtropical" selected>Subtropical (e.g., Hong Kong, Sydney)</option>
+                                <option value="temperate">Temperate (e.g., London, San Francisco)</option>
+                                <option value="continental">Continental (e.g., Chicago, Frankfurt)</option>
+                                <option value="cold">Cold (e.g., Stockholm, Helsinki)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Power Distribution -->
+                    <div class="input-section">
+                        <div class="section-header">
+                            <div class="section-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <div class="section-title">Power Distribution</div>
+                                <div class="section-subtitle">UPS and redundancy configuration</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">UPS Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bolt"></i> UPS Type</div><div class="tooltip-desc">UPS efficiency varies by topology. Double-conversion (92-96%) is most common but least efficient. Rotary/DRUPS (95-97%) and flywheel hybrid (97-99%) minimize conversion losses.</div></div></span></label>
+                            <select id="upsType" class="input-field" onchange="calculate()">
+                                <option value="double" selected>Double-Conversion (Online)</option>
+                                <option value="line">Line-Interactive</option>
+                                <option value="rotary">Rotary / DRUPS</option>
+                                <option value="flywheel">Flywheel Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">UPS Load Factor: <span id="upsLoadDisplay" style="color:var(--accent-cyan);font-family:'JetBrains Mono',monospace;">50%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-half"></i> UPS Load Factor</div><div class="tooltip-desc">Percentage of UPS rated capacity actually utilized. UPS efficiency varies with load — most units are least efficient at low loads (25-40%) and peak efficiency at 50-75%. Running at 40-60% provides optimal efficiency while maintaining headroom for growth and failover.</div></div></span></label>
+                            <div class="range-wrap">
+                                <input type="range" id="upsLoadFactor" min="25" max="100" value="50" step="5" oninput="updateUpsLoad(); calculate()">
+                                <span class="range-value" id="upsLoadValue">50%</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Redundancy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Redundancy</div><div class="tooltip-desc">Higher redundancy increases reliability but adds power overhead. N = no spare, N+1 = one spare module (+2-5%), 2N = fully mirrored (+5-10%), 2N+1 = mirrored plus spare (+8-15%).</div></div></span></label>
+                            <select id="redundancy" class="input-field" onchange="calculate()">
+                                <option value="n">N (no redundancy)</option>
+                                <option value="n1" selected>N+1</option>
+                                <option value="2n">2N</option>
+                                <option value="2n1">2N+1</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Facility Loads -->
+                    <div class="input-section">
+                        <div class="section-header">
+                            <div class="section-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <div class="section-title">Facility Loads</div>
+                                <div class="section-subtitle">Lighting, security, and fire systems</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Lighting <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-lightbulb"></i> Lighting</div><div class="tooltip-desc">Lighting power density in W/m². Modern DCs use LED with occupancy sensors (3 W/m²). Standard fluorescent is 8 W/m². Typically 1-3% of total facility power.</div></div></span></label>
+                            <select id="lighting" class="input-field" onchange="calculate()">
+                                <option value="3">Minimal (3 W/m²) — LED + sensors</option>
+                                <option value="8" selected>Standard (8 W/m²)</option>
+                                <option value="12">High (12 W/m²)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Security Systems <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Security Systems</div><div class="tooltip-desc">Power consumed by physical security infrastructure per rack — CCTV cameras, access control readers, intrusion detection, monitoring displays, and NVR/DVR storage. Enhanced biometric systems (iris/facial recognition, man-traps) consume significantly more power. Typically 0.5-2% of total facility power.</div></div></span></label>
+                            <select id="security" class="input-field" onchange="calculate()">
+                                <option value="0.2">Basic (0.2 kW/rack) — CCTV only</option>
+                                <option value="0.5" selected>Standard (0.5 kW/rack) — CCTV + Access</option>
+                                <option value="1.0">Enhanced (1.0 kW/rack) — Full biometric</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Fire Suppression <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-fire-extinguisher"></i> Fire Suppression</div><div class="tooltip-desc">Power for fire detection and suppression systems per rack. FM-200/Novec 1230 gaseous systems use minimal power (detection panels only). VESDA aspirating smoke detection adds continuous air sampling pumps. Water mist systems require pressurization pumps and valve actuators, consuming more power but providing unlimited discharge duration.</div></div></span></label>
+                            <select id="fire" class="input-field" onchange="calculate()">
+                                <option value="0.1" selected>FM-200/Novec (0.1 kW/rack)</option>
+                                <option value="0.3">VESDA + FM-200 (0.3 kW/rack)</option>
+                                <option value="0.5">Water Mist (0.5 kW/rack)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: PRO Advanced -->
+                    <div class="input-section pro-section locked" id="proAdvancedSection">
+                        <div class="pro-overlay" onclick="handlePremiumTab()">
+                            <i class="fas fa-crown"></i>
+                            <div class="pro-overlay-title">PRO Advanced Parameters</div>
+                            <div class="pro-overlay-desc">Economizer, ASHRAE temp, transformer losses, PDU efficiency, and more</div>
+                            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock PRO</button>
+                        </div>
+                        <div class="section-header">
+                            <div class="section-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div>
+                                <div class="section-title">Advanced Parameters <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                                <div class="section-subtitle">Fine-tune efficiency calculations</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Utilization: <span id="utilDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">70%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> IT Utilization</div><div class="tooltip-desc">Percentage of IT capacity actually in use. At low utilization (10-30%), PUE appears worse because fixed facility overhead is divided by less IT load. Most enterprise DCs run 50-70% utilization. Hyperscalers target 80%+ through workload management and dynamic provisioning.</div></div></span></label>
+                            <div class="range-wrap">
+                                <input type="range" id="utilization" min="10" max="100" value="70" step="5" oninput="updateUtil(); calculate()">
+                                <span class="range-value" id="utilValue">70%</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Economizer Mode <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wind"></i> Economizer Mode</div><div class="tooltip-desc">Free cooling using outside air or water when ambient conditions permit. Air-side economizers filter and introduce outside air directly (saves ~15% cooling energy). Water-side economizers use cooling towers or dry coolers to pre-cool chilled water loops (saves ~25%). Effectiveness depends heavily on climate zone — cold/temperate climates benefit most (4,000-6,000+ free-cooling hours/year).</div></div></span></label>
+                            <select id="economizer" class="input-field" onchange="calculate()">
+                                <option value="none" selected>None</option>
+                                <option value="airside">Air-Side Economizer (-15% cooling)</option>
+                                <option value="waterside">Water-Side Economizer (-25% cooling)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">ASHRAE Supply Air Temp: <span id="tempDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">20°C</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-thermometer-half"></i> Supply Air Temperature</div><div class="tooltip-desc">Cold-aisle supply air temperature per ASHRAE TC 9.9 guidelines. Recommended range: 18-27°C (A1 class). Raising from 20°C to 25°C can reduce cooling energy by 2-4% per degree through higher chiller efficiency and extended economizer hours. Google, Facebook, and Microsoft operate at 26-27°C. Below 18°C wastes energy; above 27°C increases server fan speeds.</div></div></span></label>
+                            <div class="range-wrap">
+                                <input type="range" id="supplyTemp" min="18" max="27" value="20" step="0.5" oninput="updateTemp(); calculate()">
+                                <span class="range-value" id="tempValue">20°C</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Transformer Loss: <span id="txDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">1.5%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-random"></i> Transformer Loss</div><div class="tooltip-desc">Energy lost as heat during voltage transformation (typically MV→LV: 12kV→480V and 480V→208V). Standard dry-type transformers lose 1.5-2.5%. High-efficiency (DOE 2016 compliant) units achieve 0.5-1.5%. Losses are constant regardless of load, making them more impactful at lower utilization. Two transformation stages double the loss.</div></div></span></label>
+                            <div class="range-wrap">
+                                <input type="range" id="transformerLoss" min="0.5" max="3" value="1.5" step="0.1" oninput="updateTx(); calculate()">
+                                <span class="range-value" id="txValue">1.5%</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">PDU Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> PDU Type</div><div class="tooltip-desc">Power Distribution Unit efficiency varies by feature level. Basic PDUs (breaker panels) are ~98% efficient. Metered PDUs add monitoring with minimal overhead (98.5%). Monitored and switched PDUs (per-outlet metering + remote switching) achieve 99% through better power factor correction. Higher-tier PDUs enable granular capacity management and reduce stranded power.</div></div></span></label>
+                            <select id="pduType" class="input-field" onchange="calculate()">
+                                <option value="basic">Basic (98% efficiency)</option>
+                                <option value="metered" selected>Metered (98.5%)</option>
+                                <option value="monitored">Monitored (99%)</option>
+                                <option value="switched">Switched (99%)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Section 6: PRO Seasonal & Growth -->
+                    <div class="input-section pro-section locked" id="proSeasonalSection">
+                        <div class="pro-overlay" onclick="handlePremiumTab()">
+                            <i class="fas fa-crown"></i>
+                            <div class="pro-overlay-title">PRO Seasonal & Growth</div>
+                            <div class="pro-overlay-desc">Monthly PUE variation, load growth projection, and Green Grid classification</div>
+                            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock PRO</button>
+                        </div>
+                        <div class="section-header">
+                            <div class="section-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="section-title">Seasonal & Growth <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                                <div class="section-subtitle">Projections and classification</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">IT Load Growth/Year: <span id="growthDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">10%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> IT Load Growth</div><div class="tooltip-desc">Annual IT load growth rate for 5-year projections. Enterprise DCs typically grow 5-15%/year. AI/ML workloads can drive 20-30%+ growth. As IT load increases, cooling and power distribution must scale proportionally. Higher utilization generally improves PUE as fixed overhead is spread across more IT load.</div></div></span></label>
+                            <div class="range-wrap">
+                                <input type="range" id="loadGrowth" min="0" max="30" value="10" step="1" oninput="updateGrowth(); calculate()">
+                                <span class="range-value" id="growthValue">10%</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Green Grid Measurement Level <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ruler-combined"></i> Green Grid Level</div><div class="tooltip-desc">The Green Grid's PUE measurement classification defines measurement granularity and accuracy. L1 (Basic): annual utility meter readings — simplest but least accurate, masks seasonal variation. L2 (Intermediate): monthly sub-metered readings per major system — better for identifying waste. L3 (Advanced): continuous real-time monitoring at 15-min intervals — enables dynamic optimization and immediate anomaly detection.</div></div></span></label>
+                            <select id="greenGridLevel" class="input-field" onchange="calculate()">
+                                <option value="L1" selected>L1 — Annual (utility meter)</option>
+                                <option value="L2">L2 — Monthly (sub-metering)</option>
+                                <option value="L3">L3 — Continuous (real-time)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">ASHRAE Class <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-temperature-high"></i> ASHRAE Class</div><div class="tooltip-desc">ASHRAE TC 9.9 thermal envelope classification for IT equipment. A1: tightest range (15-32°C), standard enterprise servers. A2: wider range (10-35°C), ruggedized equipment. A3/A4: extended ranges (5-40/45°C) for hardened IT in extreme environments. Higher classes enable free cooling in hotter climates but require equipment rated for wider temperature swings. Most enterprise equipment is A1-rated.</div></div></span></label>
+                            <select id="ashraeClass" class="input-field" onchange="calculate()">
+                                <option value="A1" selected>A1 (15-32°C, 20-80% RH)</option>
+                                <option value="A2">A2 (10-35°C, 20-80% RH)</option>
+                                <option value="A3">A3 (5-40°C, 8-85% RH)</option>
+                                <option value="A4">A4 (5-45°C, 8-90% RH)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Energy Cost ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Energy Cost</div><div class="tooltip-desc">Blended electricity rate per kilowatt-hour including demand charges, transmission, and distribution. US average: $0.07-0.12/kWh. Europe: $0.12-0.25/kWh. Singapore: $0.15-0.20/kWh. Hyperscalers often negotiate $0.03-0.05/kWh through long-term PPAs and renewable energy contracts. Used to calculate annual energy costs and cost savings from PUE improvements.</div></div></span></label>
+                            <input type="number" id="energyCost" class="input-field" value="0.10" min="0.01" max="1.00" step="0.01" oninput="calculate()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="results-panel">
+                    <div class="results-card">
+                        <div class="pue-display">
+                            <div class="pue-value" id="pueValue" style="color: #06b6d4;">1.55</div>
+                            <div class="pue-label">Power Usage Effectiveness</div>
+                            <div class="pue-rating" id="pueRating" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
+                                <i class="fas fa-star"></i> <span id="ratingText">B — Good</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-grid">
+                            <div class="metric-box">
+                                <div class="metric-label">DCiE <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> DCiE</div><div class="tooltip-desc">Data Center Infrastructure Efficiency — inverse of PUE (DCiE = 1/PUE × 100%). Shows what percentage of total power actually reaches IT equipment. Higher is better: 80%+ is excellent, 50-65% is average. DCiE = 64.5% means 35.5% of power is consumed by non-IT infrastructure.</div></div></span></div>
+                                <div class="metric-value" id="dcieValue">64.5%</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Total Power <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> Total Facility Power</div><div class="tooltip-desc">Total electrical power drawn by the entire facility — IT load plus all overhead (cooling, UPS losses, lighting, security, fire suppression, transformer losses, PDU losses). This is the numerator in PUE = Total Power / IT Power.</div></div></span></div>
+                                <div class="metric-value" id="totalPowerValue">1,550 kW</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Annual Energy <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bolt"></i> Annual Energy</div><div class="tooltip-desc">Total annual energy consumption (Total Power × 8,760 hours). Expressed in GWh (gigawatt-hours) or MWh. This drives total electricity costs and carbon footprint. A 1 MW facility at PUE 1.5 consumes ~13.1 GWh/year.</div></div></span></div>
+                                <div class="metric-value" id="annualEnergyValue">13.6 GWh</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Annual Cost <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Annual Cost</div><div class="tooltip-desc">Estimated annual electricity cost (Annual Energy × Energy Cost per kWh). Does not include demand charges, power factor penalties, or time-of-use rate variations. Actual costs may be 10-20% higher depending on utility tariff structure.</div></div></span></div>
+                                <div class="metric-value" id="annualCostValue">$1.36M</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Cooling Load <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Load</div><div class="tooltip-desc">Total power consumed by the cooling infrastructure — CRAC/CRAH units, chillers, cooling towers, pumps, and fans. Typically the largest non-IT load (30-50% of overhead). Cooling load = IT heat load / Cooling COP, adjusted for containment efficiency and economizer savings.</div></div></span></div>
+                                <div class="metric-value" id="coolingLoadValue">380 kW</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">UPS Loss <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-three-quarters"></i> UPS Loss</div><div class="tooltip-desc">Power lost as heat in the UPS during AC-DC-AC conversion. Varies by topology and load factor: double-conversion loses 4-8%, line-interactive 2-4%, flywheel hybrid 1-3%. UPS losses are proportional to IT load and decrease in percentage as load factor approaches optimal range (50-75%).</div></div></span></div>
+                                <div class="metric-value" id="upsLossValue">96 kW</div>
+                            </div>
+                        </div>
+
+                        <!-- Industry Comparison -->
+                        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid rgba(6,182,212,0.1);">
+                            <div style="font-size:0.78rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
+                                <i class="fas fa-chart-bar" style="color:var(--accent-cyan); margin-right:6px;"></i> Industry Comparison
+                            </div>
+                            <div id="industryComparison"></div>
+                        </div>
+
+                        <!-- Recommendations -->
+                        <div class="rec-section">
+                            <div class="rec-title"><i class="fas fa-lightbulb" style="color: var(--accent-gold);"></i> Recommendations</div>
+                            <div id="recommendations"></div>
+                        </div>
+
+                        <!-- PRO Metrics -->
+                        <div class="pro-section locked" id="proResultsSection" style="margin-top:1.25rem;">
+                            <div class="pro-overlay" onclick="handlePremiumTab()">
+                                <i class="fas fa-crown"></i>
+                                <div class="pro-overlay-title">PRO Analytics</div>
+                                <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock</button>
+                            </div>
+                            <div style="padding-top:1rem; border-top:1px solid rgba(139,92,246,0.15);">
+                                <div style="font-size:0.78rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
+                                    <i class="fas fa-crown" style="color:#8b5cf6; margin-right:6px;"></i> PRO Analytics
+                                </div>
+                                <div class="metric-grid">
+                                    <div class="metric-box" style="border-color:rgba(139,92,246,0.15);">
+                                        <div class="metric-label">CO2/Year</div>
+                                        <div class="metric-value" id="co2Value" style="color:#8b5cf6;">6,789 t</div>
+                                    </div>
+                                    <div class="metric-box" style="border-color:rgba(139,92,246,0.15);">
+                                        <div class="metric-label">Free Cooling Hrs</div>
+                                        <div class="metric-value" id="freeCoolingValue" style="color:#8b5cf6;">1,500</div>
+                                    </div>
+                                    <div class="metric-box" style="border-color:rgba(139,92,246,0.15);">
+                                        <div class="metric-label">Percentile</div>
+                                        <div class="metric-value" id="percentileValue" style="color:#8b5cf6;">p45</div>
+                                    </div>
+                                    <div class="metric-box" style="border-color:rgba(139,92,246,0.15);">
+                                        <div class="metric-label">Green Grid</div>
+                                        <div class="metric-value" id="greenGridValue" style="color:#8b5cf6;">L1</div>
+                                    </div>
+                                </div>
+                                <!-- Cost per 0.1 PUE improvement -->
+                                <div style="margin-top:0.75rem;">
+                                    <div style="font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:0.5rem;">Cost per 0.1 PUE Improvement</div>
+                                    <div id="pueImprovementTable" style="font-size:0.78rem;"></div>
+                                </div>
+                                <!-- What-if scenarios -->
+                                <div style="margin-top:0.75rem;">
+                                    <div style="font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:0.5rem;">What-If Scenarios</div>
+                                    <div id="whatIfScenarios" style="font-size:0.78rem;"></div>
+                                </div>
+                                <!-- ASHRAE Compliance -->
+                                <div style="margin-top:0.75rem;">
+                                    <div style="font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:0.5rem;">ASHRAE TC 9.9 Compliance</div>
+                                    <div id="ashraeCompliance" style="font-size:0.78rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="charts-section">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title"><i class="fas fa-chart-pie" style="color: var(--accent-cyan);"></i> Power Breakdown</div>
+                    <div class="chart-container"><canvas id="breakdownChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title"><i class="fas fa-chart-bar" style="color: var(--accent-cyan);"></i> PUE Comparison</div>
+                    <div class="chart-container"><canvas id="comparisonChart"></canvas></div>
+                </div>
+            </div>
+            <!-- PRO Charts -->
+            <div class="charts-grid pro-section locked" id="proChartsSection" style="margin-top:1.5rem;">
+                <div class="pro-overlay" onclick="handlePremiumTab()">
+                    <i class="fas fa-crown"></i>
+                    <div class="pro-overlay-title">PRO Charts</div>
+                    <div class="pro-overlay-desc">Monthly seasonal PUE, waterfall breakdown, and percentile gauge</div>
+                    <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock PRO</button>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title"><i class="fas fa-calendar-alt" style="color: #8b5cf6;"></i> Monthly PUE Variation <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title"><i class="fas fa-water" style="color: #8b5cf6;"></i> PUE Waterfall <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                    <div class="chart-container"><canvas id="waterfallChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:modalSlideIn 0.3s ease;">
+            <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;padding:4px;">&times;</button>
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="width:56px;height:56px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
+                </div>
+                <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;margin-bottom:0.25rem;">Premium Access</h3>
+                <p style="font-size:0.85rem;color:#64748b;">Login to unlock all premium features</p>
+            </div>
+            <div id="loginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#dc2626;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Invalid credentials</div>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                    <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                <div>
+                    <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')attemptLogin()">
+                </div>
+                <button onclick="attemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(139,92,246,0.3);">
+                    <i class="fas fa-unlock" style="margin-right:8px;"></i>Unlock Premium
+                </button>
+            </div>
+            <div style="text-align:center;margin-top:1.25rem;padding-top:1rem;border-top:1px solid #f1f5f9;">
+                <p style="font-size:0.75rem;color:#94a3b8;">PRO: Monthly PUE, waterfall chart, CO2 impact, ASHRAE compliance, PDF export</p>
+                <a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" style="display:inline-block;margin-top:8px;font-size:0.78rem;color:#8b5cf6;text-decoration:none;font-weight:600;">Don't have an account? Subscribe to PRO &rarr;</a>
+                <div style="margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);font-size:0.78rem;color:#64748b;line-height:1.6;">
+                    <span style="color:#8b5cf6;font-weight:600;">Demo Account:</span><br>
+                    <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo@resistancezero.com</code> / <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo2026</code>
+                </div>
+                <p style="font-size:0.68rem;color:#64748b;margin-top:12px;line-height:1.5;">By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;">
+                <div>
+                    <p style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; line-height: 1.6; margin-bottom: 1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p style="font-size: 0.65rem; letter-spacing: 0.1em; color: #475569; margin-bottom: 0.75rem;">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p style="font-size: 0.75rem; color: #64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; margin-bottom: 1rem;">NAVIGATION</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li><a href="index.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Home Dashboard</a></li>
+                        <li><a href="articles.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Technical Journal</a></li>
+                        <li><a href="datacenter-solutions.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">DC Solutions</a></li>
+                        <li><a href="capex-calculator.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">CAPEX Calculator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; margin-bottom: 1rem;">CONNECT</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">LinkedIn Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+    // ═══════════════════════════════════════════════════════════════
+    // PUE CALCULATOR ENGINE
+    // ═══════════════════════════════════════════════════════════════
+
+    // Data tables
+    const coolingOverhead = { crac: 0.45, crah: 0.38, inrow: 0.32, rdhx: 0.22, dlc: 0.12, immersion: 0.08 };
+    const containmentReduction = { none: 0, hot: 0.10, cold: 0.12, chimney: 0.15 };
+    const climateData = {
+        tropical_humid: { mult: 1.15, freeCoolingHrs: 0, label: 'Tropical Humid', monthlyTemp: [28,28,29,29,30,30,29,29,29,29,28,28] },
+        tropical_dry:   { mult: 1.08, freeCoolingHrs: 500, label: 'Tropical Dry', monthlyTemp: [18,20,24,28,33,38,40,39,36,30,24,19] },
+        subtropical:    { mult: 1.00, freeCoolingHrs: 1500, label: 'Subtropical', monthlyTemp: [17,17,19,22,25,28,29,29,27,24,21,18] },
+        temperate:      { mult: 0.92, freeCoolingHrs: 3000, label: 'Temperate', monthlyTemp: [5,6,9,12,15,18,20,20,17,13,9,6] },
+        continental:    { mult: 0.85, freeCoolingHrs: 4500, label: 'Continental', monthlyTemp: [-2,0,5,11,17,22,24,23,18,11,5,0] },
+        cold:           { mult: 0.78, freeCoolingHrs: 6000, label: 'Cold', monthlyTemp: [-5,-4,0,5,11,16,19,18,13,7,2,-3] }
+    };
+    const upsEfficiency = {
+        double:   { 25: 0.88, 50: 0.92, 75: 0.94, 100: 0.95 },
+        line:     { 25: 0.93, 50: 0.96, 75: 0.97, 100: 0.975 },
+        rotary:   { 25: 0.90, 50: 0.94, 75: 0.96, 100: 0.97 },
+        flywheel: { 25: 0.95, 50: 0.97, 75: 0.98, 100: 0.985 }
+    };
+    const redundancyMult = { n: 1.0, n1: 1.1, '2n': 1.25, '2n1': 1.35 };
+    const pduEfficiency = { basic: 0.98, metered: 0.985, monitored: 0.99, switched: 0.99 };
+
+    // Premium state
+    var isPremiumUser = false;
+    var userTier = 'free';
+
+    // Charts
+    var breakdownChart = null;
+    var comparisonChart = null;
+    var monthlyChart = null;
+    var waterfallChart = null;
+
+    // Interpolate UPS efficiency
+    function interpolateUPS(type, loadPct) {
+        const curve = upsEfficiency[type];
+        const points = [25, 50, 75, 100];
+        if (loadPct <= 25) return curve[25];
+        if (loadPct >= 100) return curve[100];
+        for (let i = 0; i < points.length - 1; i++) {
+            if (loadPct >= points[i] && loadPct <= points[i+1]) {
+                const ratio = (loadPct - points[i]) / (points[i+1] - points[i]);
+                return curve[points[i]] + ratio * (curve[points[i+1]] - curve[points[i]]);
+            }
+        }
+        return curve[50];
+    }
+
+    // Format number
+    function fmt(n, d) { return n.toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+
+    // Main calculation
+    function calculate() {
+        const itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+        const rackDensity = parseFloat(document.getElementById('rackDensity').value) || 8;
+        const coolingType = document.getElementById('coolingType').value;
+        const containment = document.getElementById('containment').value;
+        const zone = document.getElementById('climateZone').value;
+        const upsType = document.getElementById('upsType').value;
+        const upsLoad = parseFloat(document.getElementById('upsLoadFactor').value) || 50;
+        const redund = document.getElementById('redundancy').value;
+        const lightWm2 = parseFloat(document.getElementById('lighting').value) || 8;
+        const secKW = parseFloat(document.getElementById('security').value) || 0.5;
+        const fireKW = parseFloat(document.getElementById('fire').value) || 0.1;
+
+        // Auto-calc rack count
+        const autoRacks = Math.ceil(itLoad / rackDensity);
+        document.getElementById('rackCount').value = autoRacks;
+        const rackCount = autoRacks;
+
+        // PRO params
+        const econMode = isPremiumUser ? document.getElementById('economizer').value : 'none';
+        const supplyTemp = isPremiumUser ? parseFloat(document.getElementById('supplyTemp').value) : 20;
+        const txLoss = isPremiumUser ? parseFloat(document.getElementById('transformerLoss').value) / 100 : 0.015;
+        const pduType = isPremiumUser ? document.getElementById('pduType').value : 'metered';
+        const energyCostPerKWh = isPremiumUser ? parseFloat(document.getElementById('energyCost').value) || 0.10 : 0.10;
+
+        // Cooling calculation
+        let coolingKW = itLoad * (coolingOverhead[coolingType] * climateData[zone].mult - containmentReduction[containment]);
+        if (econMode === 'airside') coolingKW *= 0.85;
+        if (econMode === 'waterside') coolingKW *= 0.75;
+        if (isPremiumUser) {
+            const tempDelta = supplyTemp - 20;
+            coolingKW *= (1 - tempDelta * 0.03);
+        }
+        coolingKW = Math.max(coolingKW, itLoad * 0.02);
+
+        // UPS losses
+        const upsEff = interpolateUPS(upsType, upsLoad);
+        const upsLossKW = itLoad * ((1 / upsEff) - 1) * redundancyMult[redund];
+
+        // Transformer losses
+        const transformerKW = itLoad * txLoss;
+
+        // PDU losses
+        const pduLossKW = itLoad * (1 - pduEfficiency[pduType]);
+
+        // Facility loads
+        const floorArea = rackCount * 3;
+        const lightingKW = lightWm2 * floorArea / 1000;
+        const securityKW = secKW * rackCount;
+        const fireSuppKW = fireKW * rackCount;
+        const facilityKW = lightingKW + securityKW + fireSuppKW;
+
+        // Totals
+        const totalPower = itLoad + coolingKW + upsLossKW + transformerKW + pduLossKW + facilityKW;
+        const pue = totalPower / itLoad;
+        const dcie = (1 / pue) * 100;
+        const annualEnergy = totalPower * 8760;
+        const annualCost = annualEnergy * energyCostPerKWh;
+
+        // Update UI
+        document.getElementById('pueValue').textContent = pue.toFixed(2);
+        document.getElementById('dcieValue').textContent = dcie.toFixed(1) + '%';
+        document.getElementById('totalPowerValue').textContent = fmt(Math.round(totalPower)) + ' kW';
+        document.getElementById('coolingLoadValue').textContent = fmt(Math.round(coolingKW)) + ' kW';
+        document.getElementById('upsLossValue').textContent = fmt(Math.round(upsLossKW)) + ' kW';
+
+        if (annualEnergy >= 1e6) {
+            document.getElementById('annualEnergyValue').textContent = (annualEnergy / 1e6).toFixed(1) + ' GWh';
+        } else {
+            document.getElementById('annualEnergyValue').textContent = fmt(Math.round(annualEnergy / 1000)) + ' MWh';
+        }
+
+        if (annualCost >= 1e6) {
+            document.getElementById('annualCostValue').textContent = '$' + (annualCost / 1e6).toFixed(2) + 'M';
+        } else {
+            document.getElementById('annualCostValue').textContent = '$' + fmt(Math.round(annualCost / 1000)) + 'K';
+        }
+
+        // PUE Rating
+        let rating, ratingColor, ratingBg;
+        if (pue <= 1.2) { rating = 'A+ — Excellent'; ratingColor = '#10b981'; ratingBg = 'rgba(16,185,129,0.1)'; }
+        else if (pue <= 1.4) { rating = 'A — Very Good'; ratingColor = '#06b6d4'; ratingBg = 'rgba(6,182,212,0.1)'; }
+        else if (pue <= 1.6) { rating = 'B — Good'; ratingColor = '#3b82f6'; ratingBg = 'rgba(59,130,246,0.1)'; }
+        else if (pue <= 1.8) { rating = 'C — Average'; ratingColor = '#f59e0b'; ratingBg = 'rgba(245,158,11,0.1)'; }
+        else if (pue <= 2.0) { rating = 'D — Below Average'; ratingColor = '#f97316'; ratingBg = 'rgba(249,115,22,0.1)'; }
+        else { rating = 'F — Poor'; ratingColor = '#ef4444'; ratingBg = 'rgba(239,68,68,0.1)'; }
+
+        document.getElementById('pueValue').style.color = ratingColor;
+        document.getElementById('ratingText').textContent = rating;
+        document.getElementById('pueRating').style.background = ratingBg;
+        document.getElementById('pueRating').style.color = ratingColor;
+
+        // Industry comparison
+        renderIndustryComparison(pue);
+
+        // Recommendations
+        renderRecommendations(pue, coolingType, containment, upsType, zone, econMode);
+
+        // Charts
+        renderCharts(itLoad, coolingKW, upsLossKW, transformerKW, pduLossKW, facilityKW, pue);
+
+        // PRO outputs
+        if (isPremiumUser) {
+            renderProOutputs(pue, itLoad, coolingKW, totalPower, annualEnergy, annualCost, zone, supplyTemp, coolingType, containment, upsType, econMode);
+        }
+    }
+
+    // Industry comparison bars
+    function renderIndustryComparison(yourPue) {
+        const benchmarks = [
+            { label: 'Your Facility', value: yourPue, color: '#06b6d4' },
+            { label: 'Industry Average', value: 1.58, color: '#94a3b8' },
+            { label: 'Enterprise Target', value: 1.40, color: '#3b82f6' },
+            { label: 'Colo Best-in-Class', value: 1.20, color: '#10b981' },
+            { label: 'Hyperscale Leader', value: 1.10, color: '#22c55e' },
+        ];
+        const maxPue = Math.max(2.5, yourPue + 0.3);
+        let html = '';
+        benchmarks.forEach(b => {
+            const pct = Math.min((b.value / maxPue) * 100, 100);
+            html += '<div style="margin-bottom:8px;"><div class="comparison-label"><span>' + b.label + '</span><span style="font-family:\'JetBrains Mono\',monospace;font-weight:600;color:' + b.color + ';">' + b.value.toFixed(2) + '</span></div>';
+            html += '<div class="comparison-bar"><div class="comparison-fill" style="width:' + pct + '%;background:' + b.color + ';"></div></div></div>';
+        });
+        document.getElementById('industryComparison').innerHTML = html;
+    }
+
+    // Recommendations
+    function renderRecommendations(pue, cooling, containment, ups, zone, econ) {
+        const recs = [];
+        if (containment === 'none') recs.push({ icon: 'wind', title: 'Add Containment', desc: 'Hot or cold aisle containment can reduce PUE by 0.10-0.15', impact: '-0.10 to -0.15 PUE' });
+        if (['crac','crah'].includes(cooling) && pue > 1.4) recs.push({ icon: 'snowflake', title: 'Upgrade Cooling', desc: 'In-row or rear-door heat exchangers offer significant efficiency gains', impact: '-0.10 to -0.20 PUE' });
+        if (ups === 'double') recs.push({ icon: 'bolt', title: 'Consider Flywheel UPS', desc: 'Flywheel or rotary UPS systems have higher efficiency at partial loads', impact: '-0.02 to -0.05 PUE' });
+        if (pue > 1.5 && econ === 'none') recs.push({ icon: 'leaf', title: 'Implement Economizer', desc: 'Air-side or water-side economizers can reduce cooling energy 15-25%', impact: '-0.05 to -0.15 PUE' });
+        if (pue > 1.3) recs.push({ icon: 'temperature-low', title: 'Raise Supply Air Temp', desc: 'ASHRAE allows up to 27°C — each degree saves ~3% cooling energy', impact: '-0.02 to -0.08 PUE' });
+        if (containment !== 'chimney' && containment !== 'none') recs.push({ icon: 'arrows-alt-v', title: 'Upgrade to Chimney', desc: 'Chimney cabinets provide best containment effectiveness', impact: '-0.03 to -0.05 PUE' });
+
+        const top3 = recs.slice(0, 3);
+        let html = '';
+        if (top3.length === 0) {
+            html = '<div style="text-align:center;padding:1rem;color:var(--accent-emerald);font-size:0.82rem;"><i class="fas fa-check-circle" style="margin-right:6px;"></i>Excellent efficiency! No major improvements needed.</div>';
+        }
+        top3.forEach(r => {
+            html += '<div class="rec-card"><div class="rec-icon"><i class="fas fa-' + r.icon + '"></i></div><div class="rec-text"><h4>' + r.title + '</h4><p>' + r.desc + '</p><span class="rec-impact">' + r.impact + '</span></div></div>';
+        });
+        document.getElementById('recommendations').innerHTML = html;
+    }
+
+    // Charts
+    function renderCharts(itLoad, cooling, ups, tx, pdu, facility, pue) {
+        const labels = ['IT Load', 'Cooling', 'UPS Loss', 'Transformer', 'PDU Loss', 'Facility'];
+        const data = [itLoad, cooling, ups, tx, pdu, facility];
+        const colors = ['#06b6d4', '#3b82f6', '#f59e0b', '#8b5cf6', '#f97316', '#10b981'];
+
+        // Breakdown doughnut
+        if (breakdownChart) breakdownChart.destroy();
+        breakdownChart = new Chart(document.getElementById('breakdownChart'), {
+            type: 'doughnut',
+            data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 11 }, padding: 12 } } }, cutout: '60%' }
+        });
+
+        // Comparison bar
+        if (comparisonChart) comparisonChart.destroy();
+        comparisonChart = new Chart(document.getElementById('comparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Your PUE', 'Industry Avg', 'Enterprise', 'Colo', 'Hyperscale'],
+                datasets: [{
+                    label: 'PUE',
+                    data: [pue, 1.58, 1.40, 1.20, 1.10],
+                    backgroundColor: ['#06b6d4', '#94a3b8', '#3b82f6', '#10b981', '#22c55e'],
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, max: Math.max(2.5, pue + 0.3), ticks: { callback: v => v.toFixed(1) } }
+                }
+            }
+        });
+
+        // PRO charts
+        if (isPremiumUser) renderProCharts(pue);
+    }
+
+    // PRO charts
+    function renderProCharts(basePue) {
+        const zone = document.getElementById('climateZone').value;
+        const temps = climateData[zone].monthlyTemp;
+        const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const monthlyPue = temps.map(t => {
+            const tempFactor = 1 + (t - 20) * 0.008;
+            return Math.max(1.02, basePue * tempFactor);
+        });
+
+        if (monthlyChart) monthlyChart.destroy();
+        monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Monthly PUE',
+                    data: monthlyPue,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139,92,246,0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#8b5cf6'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { ticks: { callback: v => v.toFixed(2) } } }
+            }
+        });
+
+        // Waterfall
+        const itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+        const result = getBreakdownValues();
+        const waterfallData = [
+            { label: 'IT (Base)', value: 1.0 },
+            { label: '+ Cooling', value: result.cooling / itLoad },
+            { label: '+ UPS', value: result.ups / itLoad },
+            { label: '+ Transformer', value: result.tx / itLoad },
+            { label: '+ PDU', value: result.pdu / itLoad },
+            { label: '+ Facility', value: result.facility / itLoad },
+        ];
+        const cumulative = [1.0];
+        for (let i = 1; i < waterfallData.length; i++) {
+            cumulative.push(cumulative[i-1] + waterfallData[i].value);
+        }
+
+        if (waterfallChart) waterfallChart.destroy();
+        waterfallChart = new Chart(document.getElementById('waterfallChart'), {
+            type: 'bar',
+            data: {
+                labels: waterfallData.map(d => d.label),
+                datasets: [
+                    { label: 'Base', data: waterfallData.map((d,i) => i === 0 ? 0 : cumulative[i] - waterfallData[i].value), backgroundColor: 'transparent', borderWidth: 0 },
+                    { label: 'Addition', data: waterfallData.map(d => d.value), backgroundColor: ['#06b6d4','#3b82f6','#f59e0b','#8b5cf6','#f97316','#10b981'], borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true, ticks: { callback: v => v.toFixed(2) } }
+                }
+            }
+        });
+    }
+
+    function getBreakdownValues() {
+        const itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+        const coolingType = document.getElementById('coolingType').value;
+        const containment = document.getElementById('containment').value;
+        const zone = document.getElementById('climateZone').value;
+        const upsType = document.getElementById('upsType').value;
+        const upsLoad = parseFloat(document.getElementById('upsLoadFactor').value) || 50;
+        const redund = document.getElementById('redundancy').value;
+        const econMode = isPremiumUser ? document.getElementById('economizer').value : 'none';
+        const supplyTemp = isPremiumUser ? parseFloat(document.getElementById('supplyTemp').value) : 20;
+        const txLoss = isPremiumUser ? parseFloat(document.getElementById('transformerLoss').value) / 100 : 0.015;
+        const pduType = isPremiumUser ? document.getElementById('pduType').value : 'metered';
+        const rackCount = parseInt(document.getElementById('rackCount').value) || 125;
+
+        let cooling = itLoad * (coolingOverhead[coolingType] * climateData[zone].mult - containmentReduction[containment]);
+        if (econMode === 'airside') cooling *= 0.85;
+        if (econMode === 'waterside') cooling *= 0.75;
+        if (isPremiumUser) cooling *= (1 - (supplyTemp - 20) * 0.03);
+        cooling = Math.max(cooling, itLoad * 0.02);
+
+        const upsEff = interpolateUPS(upsType, upsLoad);
+        const ups = itLoad * ((1 / upsEff) - 1) * redundancyMult[redund];
+        const tx = itLoad * txLoss;
+        const pdu = itLoad * (1 - pduEfficiency[pduType]);
+        const floorArea = rackCount * 3;
+        const facility = (parseFloat(document.getElementById('lighting').value) * floorArea / 1000) + (parseFloat(document.getElementById('security').value) * rackCount) + (parseFloat(document.getElementById('fire').value) * rackCount);
+
+        return { cooling, ups, tx, pdu, facility };
+    }
+
+    // PRO outputs
+    function renderProOutputs(pue, itLoad, coolingKW, totalPower, annualEnergy, annualCost, zone, supplyTemp, coolingType, containment, upsType, econMode) {
+        // CO2
+        const co2 = (annualEnergy * 0.5) / 1000; // 0.5 kg CO2/kWh
+        document.getElementById('co2Value').textContent = fmt(Math.round(co2)) + ' t';
+
+        // Free cooling hours
+        document.getElementById('freeCoolingValue').textContent = fmt(climateData[zone].freeCoolingHrs);
+
+        // Percentile
+        let percentile;
+        if (pue <= 1.10) percentile = 'p10 (Top 10%)';
+        else if (pue <= 1.20) percentile = 'p25 (Top 25%)';
+        else if (pue <= 1.35) percentile = 'p50 (Median)';
+        else if (pue <= 1.55) percentile = 'p75';
+        else if (pue <= 1.80) percentile = 'p90';
+        else percentile = '>p90';
+        document.getElementById('percentileValue').textContent = percentile;
+
+        // Green Grid
+        document.getElementById('greenGridValue').textContent = document.getElementById('greenGridLevel').value;
+
+        // Cost per 0.1 PUE improvement
+        const annualCostVal = annualCost;
+        const currentPue = pue;
+        let improvementHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+        for (let delta = 0.1; delta <= 0.3; delta += 0.1) {
+            const newPue = Math.max(1.02, currentPue - delta);
+            const newTotal = itLoad * newPue;
+            const newAnnualCost = newTotal * 8760 * (parseFloat(document.getElementById('energyCost').value) || 0.10);
+            const savings = annualCostVal - newAnnualCost;
+            improvementHtml += '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:6px;padding:6px 8px;text-align:center;">';
+            improvementHtml += '<div style="font-size:0.68rem;color:var(--text-muted);">-' + delta.toFixed(1) + ' PUE</div>';
+            improvementHtml += '<div style="font-size:0.82rem;font-weight:700;color:#10b981;font-family:\'JetBrains Mono\',monospace;">$' + fmt(Math.round(savings / 1000)) + 'K/yr</div>';
+            improvementHtml += '</div>';
+        }
+        improvementHtml += '</div>';
+        document.getElementById('pueImprovementTable').innerHTML = improvementHtml;
+
+        // What-if scenarios
+        let whatIfHtml = '';
+        const scenarios = [];
+        if (coolingType !== 'dlc') {
+            const dlcPue = estimatePue('dlc', containment, zone, upsType, econMode, supplyTemp);
+            scenarios.push({ label: 'Switch to DLC', pue: dlcPue });
+        }
+        if (containment === 'none') {
+            const coldPue = estimatePue(coolingType, 'cold', zone, upsType, econMode, supplyTemp);
+            scenarios.push({ label: 'Add Cold-Aisle', pue: coldPue });
+        }
+        if (econMode === 'none') {
+            const airEconPue = estimatePue(coolingType, containment, zone, upsType, 'airside', supplyTemp);
+            scenarios.push({ label: 'Add Air Economizer', pue: airEconPue });
+        }
+
+        whatIfHtml = '<div style="display:flex;flex-direction:column;gap:4px;">';
+        scenarios.slice(0, 3).forEach(s => {
+            const delta = pue - s.pue;
+            whatIfHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.1);border-radius:6px;">';
+            whatIfHtml += '<span style="font-size:0.75rem;color:var(--text-secondary);">' + s.label + '</span>';
+            whatIfHtml += '<span style="font-size:0.78rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#10b981;">' + s.pue.toFixed(2) + ' <span style="font-size:0.65rem;color:#10b981;">(-' + delta.toFixed(2) + ')</span></span>';
+            whatIfHtml += '</div>';
+        });
+        whatIfHtml += '</div>';
+        document.getElementById('whatIfScenarios').innerHTML = whatIfHtml;
+
+        // ASHRAE compliance
+        let ashraeHtml = '';
+        const ashraeClass = document.getElementById('ashraeClass').value;
+        const ashraeRanges = { A1: [15,32], A2: [10,35], A3: [5,40], A4: [5,45] };
+        const range = ashraeRanges[ashraeClass];
+        const isCompliant = supplyTemp >= range[0] && supplyTemp <= range[1];
+        ashraeHtml = '<div style="padding:8px 10px;border-radius:8px;background:' + (isCompliant ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)') + ';border:1px solid ' + (isCompliant ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)') + ';">';
+        ashraeHtml += '<div style="font-size:0.75rem;font-weight:600;color:' + (isCompliant ? '#10b981' : '#ef4444') + ';"><i class="fas fa-' + (isCompliant ? 'check-circle' : 'exclamation-triangle') + '" style="margin-right:4px;"></i>' + (isCompliant ? 'Compliant' : 'Non-Compliant') + ' — ASHRAE Class ' + ashraeClass + '</div>';
+        ashraeHtml += '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">Allowable range: ' + range[0] + '-' + range[1] + '°C | Current supply: ' + supplyTemp + '°C</div>';
+        ashraeHtml += '</div>';
+        document.getElementById('ashraeCompliance').innerHTML = ashraeHtml;
+    }
+
+    // Estimate PUE for what-if
+    function estimatePue(cooling, contain, zone, ups, econ, temp) {
+        const itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+        const upsLoad = parseFloat(document.getElementById('upsLoadFactor').value) || 50;
+        const redund = document.getElementById('redundancy').value;
+        const rackCount = parseInt(document.getElementById('rackCount').value) || 125;
+
+        let coolingKW = itLoad * (coolingOverhead[cooling] * climateData[zone].mult - containmentReduction[contain]);
+        if (econ === 'airside') coolingKW *= 0.85;
+        if (econ === 'waterside') coolingKW *= 0.75;
+        coolingKW *= (1 - (temp - 20) * 0.03);
+        coolingKW = Math.max(coolingKW, itLoad * 0.02);
+
+        const upsEff = interpolateUPS(ups, upsLoad);
+        const upsLoss = itLoad * ((1 / upsEff) - 1) * redundancyMult[redund];
+        const txLoss = itLoad * 0.015;
+        const pduLoss = itLoad * 0.015;
+        const floorArea = rackCount * 3;
+        const facility = (parseFloat(document.getElementById('lighting').value) * floorArea / 1000) + (parseFloat(document.getElementById('security').value) * rackCount) + (parseFloat(document.getElementById('fire').value) * rackCount);
+
+        return (itLoad + coolingKW + upsLoss + txLoss + pduLoss + facility) / itLoad;
+    }
+
+    // UI helpers
+    function setITLoad(kw) {
+        document.getElementById('itLoad').value = kw;
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        calculate();
+    }
+    function updateUpsLoad() {
+        const v = document.getElementById('upsLoadFactor').value;
+        document.getElementById('upsLoadDisplay').textContent = v + '%';
+        document.getElementById('upsLoadValue').textContent = v + '%';
+    }
+    function updateUtil() {
+        const v = document.getElementById('utilization').value;
+        document.getElementById('utilDisplay').textContent = v + '%';
+        document.getElementById('utilValue').textContent = v + '%';
+    }
+    function updateTemp() {
+        const v = document.getElementById('supplyTemp').value;
+        document.getElementById('tempDisplay').textContent = v + '°C';
+        document.getElementById('tempValue').textContent = v + '°C';
+    }
+    function updateTx() {
+        const v = document.getElementById('transformerLoss').value;
+        document.getElementById('txDisplay').textContent = v + '%';
+        document.getElementById('txValue').textContent = v + '%';
+    }
+    function updateGrowth() {
+        const v = document.getElementById('loadGrowth').value;
+        document.getElementById('growthDisplay').textContent = v + '%';
+        document.getElementById('growthValue').textContent = v + '%';
+    }
+
+    // ═══ PREMIUM AUTH SYSTEM ═══
+    (function checkPremiumSession() {
+        const session = localStorage.getItem('rz_premium_session');
+        if (session) {
+            try {
+                const data = JSON.parse(session);
+                const expiresMs = typeof data.expires === 'string' ? new Date(data.expires).getTime() : data.expires;
+                if (expiresMs > Date.now()) {
+                    isPremiumUser = true;
+                    userTier = data.tier || 'pro';
+                    activatePremiumUI();
+                    return;
+                } else { localStorage.removeItem('rz_premium_session'); }
+            } catch(e) { localStorage.removeItem('rz_premium_session'); }
+        }
+        const dcmocAuth = localStorage.getItem('dcmoc-auth');
+        if (dcmocAuth) {
+            try {
+                const data = JSON.parse(dcmocAuth);
+                if (data.state && data.state.user) {
+                    isPremiumUser = true;
+                    userTier = 'pro';
+                    activatePremiumUI();
+                    return;
+                }
+            } catch(e) {}
+        }
+    })();
+
+    var currentMode = 'free';
+
+    function handlePremiumTab() {
+        if (isPremiumUser) return;
+        const modal = document.getElementById('loginModal');
+        modal.style.display = 'flex';
+        document.getElementById('loginError').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        setTimeout(() => document.getElementById('loginEmail').focus(), 100);
+    }
+
+    function setMode(mode) {
+        if (mode === 'pro' && !isPremiumUser) { handlePremiumTab(); return; }
+        currentMode = mode;
+        const btnFree = document.getElementById('btnFreeMode');
+        const btnPro = document.getElementById('btnProMode');
+        const indicator = document.getElementById('modeIndicator');
+        const btnPdf = document.getElementById('btnExportPDF');
+        if (mode === 'free') {
+            btnFree.classList.add('active');
+            btnPro.classList.remove('active');
+            indicator.className = 'pue-mode-indicator free-active';
+            indicator.textContent = 'FREE MODE';
+            document.querySelectorAll('.pro-section').forEach(s => s.classList.add('locked'));
+            btnPdf.classList.add('disabled');
+        } else {
+            btnPro.classList.add('active');
+            btnFree.classList.remove('active');
+            indicator.className = 'pue-mode-indicator pro-active';
+            indicator.textContent = 'PRO MODE';
+            document.querySelectorAll('.pro-section').forEach(s => s.classList.remove('locked'));
+            btnPdf.classList.remove('disabled');
+        }
+        calculate();
+    }
+
+    function resetDefaults() {
+        document.getElementById('itLoad').value = 1000;
+        document.getElementById('rackDensity').value = '8';
+        document.getElementById('coolingType').value = 'crah';
+        document.getElementById('containment').value = 'cold';
+        document.getElementById('climateZone').value = 'temperate';
+        document.getElementById('upsType').value = 'online';
+        document.getElementById('upsLoadFactor').value = 50; updateUpsLoad();
+        document.getElementById('redundancy').value = 'N1';
+        document.getElementById('lighting').value = 8;
+        document.getElementById('security').value = 0.5;
+        document.getElementById('fire').value = 0.1;
+        if (isPremiumUser) {
+            document.getElementById('utilization').value = 70; updateUtil();
+            document.getElementById('economizer').value = 'none';
+            document.getElementById('supplyTemp').value = 20; updateTemp();
+            document.getElementById('transformerLoss').value = 1.5; updateTx();
+            document.getElementById('pduType').value = 'metered';
+            document.getElementById('loadGrowth').value = 10; updateGrowth();
+            document.getElementById('greenGridLevel').value = 'L1';
+            document.getElementById('ashraeClass').value = 'A1';
+            document.getElementById('energyCost').value = 0.10;
+        }
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.preset-btn:nth-child(3)').classList.add('active');
+        calculate();
+    }
+
+    function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+    document.getElementById('loginModal').addEventListener('click', function(e) { if (e.target === this) closeLoginModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLoginModal(); });
+
+    function attemptLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+        if (!email || !password) { errorEl.textContent = 'Please enter email and password'; errorEl.style.display = 'block'; return; }
+        const validUsers = [{ email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' }];
+        const match = validUsers.find(u => u.email === email && u.password === password);
+        if (match) {
+            var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
+            localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, expires: expDate.toISOString() }));
+            isPremiumUser = true;
+            userTier = match.tier;
+            closeLoginModal();
+            activatePremiumUI();
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, action: 'login' } }));
+        } else {
+            errorEl.textContent = 'Invalid email or password';
+            errorEl.style.display = 'block';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginPassword').focus();
+        }
+    }
+
+    function activatePremiumUI() {
+        // Update toolbar buttons
+        const btnPro = document.getElementById('btnProMode');
+        if (btnPro) btnPro.classList.remove('locked-hint');
+        // Auto-switch to Pro mode
+        setMode('pro');
+        updateNavbarAuthUI();
+    }
+
+    function logoutPremium() {
+        if (!confirm('Logout from your account?')) return;
+        isPremiumUser = false;
+        userTier = 'free';
+        localStorage.removeItem('rz_premium_session');
+        // Reset to free mode
+        const btnPro = document.getElementById('btnProMode');
+        if (btnPro) btnPro.classList.add('locked-hint');
+        setMode('free');
+        updateNavbarAuthUI();
+        window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { action: 'logout' } }));
+    }
+
+    // ═══ EXPORT PDF ═══
+    function exportPDF() {
+        if (!isPremiumUser) { handlePremiumTab(); return; }
+        var w = window.open('', '_blank');
+        if (!w) { alert('Please allow popups for PDF export.'); return; }
+
+        // Gather all values
+        var pueVal = document.getElementById('pueValue').textContent;
+        var ratingVal = document.getElementById('ratingText').textContent;
+        var dcieVal = document.getElementById('dcieValue').textContent;
+        var totalPowerVal = document.getElementById('totalPowerValue').textContent;
+        var annualEnergyVal = document.getElementById('annualEnergyValue').textContent;
+        var annualCostVal = document.getElementById('annualCostValue').textContent;
+        var coolingVal = document.getElementById('coolingLoadValue').textContent;
+        var upsLossVal = document.getElementById('upsLossValue').textContent;
+        var co2Val = document.getElementById('co2Value').textContent;
+        var freeCoolingVal = document.getElementById('freeCoolingValue').textContent;
+        var percentileVal = document.getElementById('percentileValue').textContent;
+        var greenGridVal = document.getElementById('greenGridValue').textContent;
+
+        var itLoadVal = document.getElementById('itLoad').value;
+        var coolingTypeText = document.getElementById('coolingType').selectedOptions[0].text;
+        var upsTypeText = document.getElementById('upsType').selectedOptions[0].text;
+        var climateZoneText = document.getElementById('climateZone').selectedOptions[0].text;
+        var containmentText = document.getElementById('containment').selectedOptions[0].text;
+        var redundancyText = document.getElementById('redundancy').selectedOptions[0].text;
+        var rackDensityText = document.getElementById('rackDensity').selectedOptions[0].text;
+        var rackCountVal = document.getElementById('rackCount').value;
+
+        var pue = parseFloat(pueVal);
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+        // Rating color
+        var rColor = '#06b6d4';
+        if (pue <= 1.2) rColor = '#10b981';
+        else if (pue <= 1.4) rColor = '#06b6d4';
+        else if (pue <= 1.6) rColor = '#3b82f6';
+        else if (pue <= 1.8) rColor = '#f59e0b';
+        else if (pue <= 2.0) rColor = '#f97316';
+        else rColor = '#ef4444';
+
+        // Generate SVG Power Breakdown Bar Chart
+        var bd = getBreakdownValues();
+        var itLoad = parseFloat(itLoadVal);
+        var barData = [
+            { label: 'IT Load', value: itLoad, color: '#06b6d4' },
+            { label: 'Cooling', value: bd.cooling, color: '#3b82f6' },
+            { label: 'UPS Loss', value: bd.ups, color: '#f59e0b' },
+            { label: 'Transformer', value: bd.tx, color: '#8b5cf6' },
+            { label: 'PDU Loss', value: bd.pdu, color: '#f97316' },
+            { label: 'Facility', value: bd.facility, color: '#10b981' }
+        ];
+        var maxBarVal = Math.max.apply(null, barData.map(function(d){ return d.value; }));
+        var svgBar = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" style="width:100%;height:auto;">';
+        svgBar += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">Power Breakdown (kW)</text>';
+        barData.forEach(function(d, i) {
+            var barW = 42, gap = 6, startX = 18;
+            var x = startX + i * (barW + gap);
+            var maxH = 155;
+            var h = Math.max(4, (d.value / maxBarVal) * maxH);
+            var y = 180 - h;
+            svgBar += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" fill="'+d.color+'" rx="3"/>';
+            svgBar += '<text x="'+(x+barW/2)+'" y="'+(y-5)+'" text-anchor="middle" font-size="9" font-weight="600" fill="#1f2937">'+Math.round(d.value)+'</text>';
+            svgBar += '<text x="'+(x+barW/2)+'" y="198" text-anchor="middle" font-size="8" fill="#64748b">'+d.label+'</text>';
+        });
+        svgBar += '</svg>';
+
+        // Generate SVG Industry Comparison Chart
+        var compData = [
+            { label: 'Your PUE', value: pue, color: rColor },
+            { label: 'Industry Avg', value: 1.58, color: '#94a3b8' },
+            { label: 'Enterprise', value: 1.40, color: '#3b82f6' },
+            { label: 'Colo Best', value: 1.20, color: '#10b981' },
+            { label: 'Hyperscale', value: 1.10, color: '#22c55e' }
+        ];
+        var maxComp = Math.max(2.2, pue + 0.3);
+        var svgComp = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" style="width:100%;height:auto;">';
+        svgComp += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">PUE Industry Comparison</text>';
+        compData.forEach(function(d, i) {
+            var barW = 48, gap = 12, startX = 22;
+            var x = startX + i * (barW + gap);
+            var maxH = 150;
+            var h = Math.max(4, (d.value / maxComp) * maxH);
+            var y = 180 - h;
+            svgComp += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" fill="'+d.color+'" rx="3"/>';
+            svgComp += '<text x="'+(x+barW/2)+'" y="'+(y-5)+'" text-anchor="middle" font-size="10" font-weight="600" fill="#1f2937">'+d.value.toFixed(2)+'</text>';
+            svgComp += '<text x="'+(x+barW/2)+'" y="198" text-anchor="middle" font-size="8" fill="#64748b">'+d.label+'</text>';
+        });
+        svgComp += '</svg>';
+
+        // Generate SVG Monthly PUE Chart
+        var zone = document.getElementById('climateZone').value;
+        var temps = climateData[zone].monthlyTemp;
+        var monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var monthlyPue = temps.map(function(t) { return Math.max(1.02, pue * (1 + (t - 20) * 0.008)); });
+        var minMPue = Math.min.apply(null, monthlyPue) - 0.05;
+        var maxMPue = Math.max.apply(null, monthlyPue) + 0.05;
+        var svgMonthly = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" style="width:100%;height:auto;">';
+        svgMonthly += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">Monthly PUE Seasonal Variation</text>';
+        // Grid lines
+        for (var gi = 0; gi <= 4; gi++) {
+            var gy = 30 + gi * 35;
+            var gv = maxMPue - (gi / 4) * (maxMPue - minMPue);
+            svgMonthly += '<line x1="40" y1="'+gy+'" x2="345" y2="'+gy+'" stroke="#e5e7eb" stroke-dasharray="3,3"/>';
+            svgMonthly += '<text x="36" y="'+(gy+3)+'" text-anchor="end" font-size="8" fill="#94a3b8">'+gv.toFixed(2)+'</text>';
+        }
+        // Line path
+        var points = monthlyPue.map(function(v, i) {
+            var x = 45 + i * (300 / 11);
+            var y = 30 + ((maxMPue - v) / (maxMPue - minMPue)) * 140;
+            return x + ',' + y;
+        });
+        // Fill area
+        var areaPath = 'M' + points[0];
+        for (var ai = 1; ai < points.length; ai++) areaPath += ' L' + points[ai];
+        areaPath += ' L' + (45 + 11 * (300/11)) + ',170 L45,170 Z';
+        svgMonthly += '<path d="'+areaPath+'" fill="rgba(139,92,246,0.12)"/>';
+        svgMonthly += '<polyline points="'+points.join(' ')+'" fill="none" stroke="#8b5cf6" stroke-width="2"/>';
+        monthlyPue.forEach(function(v, i) {
+            var x = 45 + i * (300 / 11);
+            var y = 30 + ((maxMPue - v) / (maxMPue - minMPue)) * 140;
+            svgMonthly += '<circle cx="'+x+'" cy="'+y+'" r="3" fill="#8b5cf6"/>';
+            svgMonthly += '<text x="'+x+'" y="186" text-anchor="middle" font-size="7" fill="#64748b">'+monthLabels[i]+'</text>';
+        });
+        svgMonthly += '</svg>';
+
+        // Generate SVG PUE Waterfall
+        var wfData = [
+            { label: 'IT Base', value: 1.0, color: '#06b6d4' },
+            { label: '+Cooling', value: bd.cooling / itLoad, color: '#3b82f6' },
+            { label: '+UPS', value: bd.ups / itLoad, color: '#f59e0b' },
+            { label: '+TX', value: bd.tx / itLoad, color: '#8b5cf6' },
+            { label: '+PDU', value: bd.pdu / itLoad, color: '#f97316' },
+            { label: '+Facility', value: bd.facility / itLoad, color: '#10b981' }
+        ];
+        var wfCum = [0]; wfData.forEach(function(d, i) { wfCum.push((wfCum[i] || 0) + d.value); });
+        var wfMax = wfCum[wfCum.length - 1] + 0.1;
+        var svgWF = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" style="width:100%;height:auto;">';
+        svgWF += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">PUE Waterfall Breakdown</text>';
+        wfData.forEach(function(d, i) {
+            var barW = 42, gap = 8, startX = 22;
+            var x = startX + i * (barW + gap);
+            var maxH = 140;
+            var base = wfCum[i];
+            var h = Math.max(3, (d.value / wfMax) * maxH);
+            var y = 170 - ((base + d.value) / wfMax) * maxH;
+            svgWF += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" fill="'+d.color+'" rx="2"/>';
+            svgWF += '<text x="'+(x+barW/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="8" font-weight="600" fill="#1f2937">'+d.value.toFixed(3)+'</text>';
+            svgWF += '<text x="'+(x+barW/2)+'" y="186" text-anchor="middle" font-size="7" fill="#64748b">'+d.label+'</text>';
+            // Connector line
+            if (i < wfData.length - 1) {
+                var yConn = 170 - ((base + d.value) / wfMax) * maxH;
+                svgWF += '<line x1="'+(x+barW)+'" y1="'+yConn+'" x2="'+(x+barW+gap)+'" y2="'+yConn+'" stroke="#cbd5e1" stroke-dasharray="2,2"/>';
+            }
+        });
+        // Total line
+        var totalY = 170 - (pue / wfMax) * 140;
+        svgWF += '<line x1="18" y1="'+totalY+'" x2="345" y2="'+totalY+'" stroke="'+rColor+'" stroke-dasharray="4,3" stroke-width="1.5"/>';
+        svgWF += '<text x="348" y="'+(totalY+3)+'" font-size="9" font-weight="700" fill="'+rColor+'">PUE '+pue.toFixed(2)+'</text>';
+        svgWF += '</svg>';
+
+        // Executive narrative
+        var narrativeGrade = ratingVal.split('—')[0].trim();
+        var narrative = '<p><strong>Current Assessment:</strong> Your data center achieves a PUE of <strong>' + pue.toFixed(2) + '</strong> (' + ratingVal + '), ';
+        if (pue <= 1.2) narrative += 'placing it among the most efficient facilities globally. This is comparable to hyperscale operators like Google (PUE 1.10) and Microsoft Azure (PUE 1.12).';
+        else if (pue <= 1.4) narrative += 'well below the industry average of 1.58. This indicates strong operational efficiency with room for incremental improvements.';
+        else if (pue <= 1.6) narrative += 'close to the global industry average of 1.58. Targeted cooling and containment upgrades could yield significant savings.';
+        else narrative += 'above the industry average of 1.58, indicating substantial opportunity for efficiency improvements and cost reduction.';
+        narrative += '</p>';
+
+        narrative += '<p><strong>Financial Impact:</strong> At the current PUE of ' + pue.toFixed(2) + ', your facility consumes ' + annualEnergyVal + ' annually at a cost of ' + annualCostVal + '. ';
+        var savingsPerPoint = itLoad * 8760 * 0.1 * 0.10; // per 0.1 PUE, at $0.10/kWh
+        narrative += 'Each 0.1 improvement in PUE could save approximately $' + fmt(Math.round(savingsPerPoint / 1000)) + 'K per year in energy costs.</p>';
+
+        narrative += '<p><strong>Environmental Impact:</strong> Your facility generates approximately ' + co2Val + ' of CO2 per year. ';
+        narrative += 'With ' + freeCoolingVal + ' free cooling hours available in your climate zone (' + climateZoneText + '), economizer strategies could further reduce both energy consumption and carbon footprint.</p>';
+
+        // What-If scenarios text
+        var whatIfHtml = document.getElementById('whatIfScenarios').innerHTML;
+
+        // Recommendations
+        var recsHtml = '';
+        var recCards = document.querySelectorAll('.rec-card');
+        recCards.forEach(function(card) {
+            var title = card.querySelector('h4') ? card.querySelector('h4').textContent : '';
+            var desc = card.querySelector('p') ? card.querySelector('p').textContent : '';
+            var impact = card.querySelector('.rec-impact') ? card.querySelector('.rec-impact').textContent : '';
+            recsHtml += '<tr><td style="font-weight:600;">' + title + '</td><td>' + desc + '</td><td style="color:#10b981;font-weight:700;font-family:\'JetBrains Mono\',monospace;white-space:nowrap;">' + impact + '</td></tr>';
+        });
+
+        // Build PDF HTML
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        html += '<title>PUE Analysis Report — ' + dateStr + '</title>';
+        html += '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">';
+        html += '<style>';
+        html += '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { margin: 15mm; } }';
+        html += '* { margin:0; padding:0; box-sizing:border-box; }';
+        html += 'body { font-family: "Inter", Arial, sans-serif; max-width: 820px; margin: 0 auto; padding: 20px 30px; color: #1f2937; font-size: 12px; line-height: 1.5; }';
+        html += 'h1 { color: #1e3a5f; font-size: 20px; margin-bottom: 2px; }';
+        html += 'h2 { color: #1e3a5f; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #06b6d4; }';
+        html += 'h3 { color: #374151; font-size: 12px; margin: 12px 0 6px; }';
+        html += 'p { margin: 6px 0; color: #1f2937; font-size: 11px; line-height: 1.6; }';
+        html += 'table { width: 100%; border-collapse: collapse; margin: 8px 0; }';
+        html += 'th { background: #f8fafc; padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e5e7eb; letter-spacing: 0.5px; }';
+        html += 'td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }';
+        html += '.pdf-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #06b6d4; }';
+        html += '.pdf-brand { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }';
+        html += '.pdf-brand span { color: #06b6d4; }';
+        html += '.pdf-date { font-size: 9px; color: #94a3b8; text-align: right; }';
+        html += '.pdf-score-row { display: flex; gap: 16px; margin: 12px 0; }';
+        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: linear-gradient(135deg, #ecfeff, #f0f9ff); border: 2px solid ' + rColor + '; border-radius: 12px; }';
+        html += '.pdf-score-value { font-size: 42px; font-weight: 800; color: ' + rColor + '; font-family: "JetBrains Mono", monospace; line-height: 1; }';
+        html += '.pdf-score-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }';
+        html += '.pdf-score-rating { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 10px; font-weight: 700; margin-top: 6px; background: ' + rColor + '18; color: ' + rColor + '; }';
+        html += '.pdf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }';
+        html += '.pdf-kpi-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; }';
+        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #1e3a5f; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-kpi-label { font-size: 8px; color: #6b7280; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }';
+        html += '.pdf-chart-row { display: flex; gap: 16px; margin: 12px 0; }';
+        html += '.pdf-chart-row > div { flex: 1; min-width: 0; background: #fafbfc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; }';
+        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #06b6d4; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
+        html += '.pdf-narrative p { font-size: 10.5px; color: #374151; }';
+        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #06b6d4; text-align: center; font-size: 8px; color: #94a3b8; }';
+        html += '.pdf-rec-badge { display: inline-block; padding: 2px 8px; border-radius: 50px; font-size: 8px; font-weight: 700; }';
+        html += '</style></head><body>';
+
+        // Header
+        html += '<div class="pdf-header"><div><h1>PUE Analysis Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO &mdash; Pro Analysis</div></div>';
+        html += '<div class="pdf-date">Generated ' + dateStr + '<br>resistancezero.com</div></div>';
+
+        // Executive Score Row
+        html += '<div class="pdf-score-row">';
+        html += '<div class="pdf-score-card"><div class="pdf-score-value">' + pue.toFixed(2) + '</div><div class="pdf-score-label">Power Usage Effectiveness</div><div class="pdf-score-rating">' + ratingVal + '</div></div>';
+        html += '<div style="flex:1.2;">';
+        html += '<div class="pdf-kpi-grid" style="grid-template-columns: repeat(2, 1fr); height:100%;">';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + dcieVal + '</div><div class="pdf-kpi-label">DCiE</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + totalPowerVal + '</div><div class="pdf-kpi-label">Total Power</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + annualEnergyVal + '</div><div class="pdf-kpi-label">Annual Energy</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + annualCostVal + '</div><div class="pdf-kpi-label">Annual Cost</div></div>';
+        html += '</div></div></div>';
+
+        // KPI cards row 2
+        html += '<div class="pdf-kpi-grid">';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + coolingVal + '</div><div class="pdf-kpi-label">Cooling Load</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + upsLossVal + '</div><div class="pdf-kpi-label">UPS Loss</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + co2Val + '</div><div class="pdf-kpi-label">CO\u2082 / Year</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + freeCoolingVal + '</div><div class="pdf-kpi-label">Free Cooling Hrs</div></div>';
+        html += '</div>';
+
+        // Configuration Table (2-column)
+        html += '<h2>Configuration Parameters</h2>';
+        html += '<table><tr><td style="width:30%;font-weight:600;">IT Load</td><td style="width:20%;font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + itLoadVal + ' kW</td>';
+        html += '<td style="width:30%;font-weight:600;">Rack Density</td><td style="width:20%;font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + rackDensityText + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Cooling Type</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + coolingTypeText + '</td>';
+        html += '<td style="font-weight:600;">Containment</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + containmentText + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">UPS Type</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + upsTypeText + '</td>';
+        html += '<td style="font-weight:600;">Redundancy</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + redundancyText + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Climate Zone</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + climateZoneText + '</td>';
+        html += '<td style="font-weight:600;">Green Grid Level</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + greenGridVal + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Industry Percentile</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + percentileVal + '</td>';
+        html += '<td style="font-weight:600;">Racks</td><td style="font-family:\'JetBrains Mono\',monospace;color:#0891b2;">' + rackCountVal + '</td></tr>';
+        html += '</table>';
+
+        // Charts Row 1: Power Breakdown + Industry Comparison
+        html += '<h2>Power Analysis</h2>';
+        html += '<div class="pdf-chart-row"><div>' + svgBar + '</div><div>' + svgComp + '</div></div>';
+
+        // Charts Row 2: Monthly PUE + Waterfall
+        html += '<h2>Pro Analytics</h2>';
+        html += '<div class="pdf-chart-row"><div>' + svgMonthly + '</div><div>' + svgWF + '</div></div>';
+
+        // Narrative Assessment
+        html += '<h2>Executive Assessment</h2>';
+        html += '<div class="pdf-narrative">' + narrative + '</div>';
+
+        // Recommendations
+        if (recsHtml) {
+            html += '<h2>Recommendations</h2>';
+            html += '<table><tr><th style="width:22%;">Action</th><th>Description</th><th style="width:18%;">Impact</th></tr>';
+            html += recsHtml;
+            html += '</table>';
+        }
+
+        // Methodology
+        html += '<h2>Methodology</h2>';
+        html += '<p style="font-size:10px;color:#6b7280;">PUE calculated as Total Facility Power / IT Equipment Power per The Green Grid standard. Cooling COP values derived from ASHRAE TC 9.9 (2021) reference data. UPS efficiency curves based on IEC 62040-3 manufacturer benchmarks. Climate zone free cooling hours from ASHRAE weather data with 18&deg;C economizer threshold. Industry comparison baselines from Uptime Institute 2024 Global Survey (n=900+). Monthly variation modeled using a linear temperature-PUE coefficient of 0.8% per &deg;C deviation from 20&deg;C baseline.</p>';
+
+        // Footer
+        html += '<div class="pdf-footer">resistancezero.com &middot; Generated ' + dateStr + ' &middot; All calculations performed client-side &middot; No data transmitted to any server<br>PUE Calculator v1.0 &mdash; Bagus Dwi Permana Portfolio</div>';
+
+        html += '</body></html>';
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 500);
+    }
+
+    function toggleUserDropdown() {
+        document.getElementById('navUserBtn').classList.toggle('open');
+        document.getElementById('navUserDropdown').classList.toggle('show');
+    }
+    document.addEventListener('click', function(e) {
+        const wrap = document.getElementById('navAuthWrap');
+        if (wrap && !wrap.contains(e.target)) {
+            const dd = document.getElementById('navUserDropdown');
+            const btn = document.getElementById('navUserBtn');
+            if (dd) dd.classList.remove('show');
+            if (btn) btn.classList.remove('open');
+        }
+    });
+    function updateNavbarAuthUI() {
+        const loginBtn = document.getElementById('navLoginBtn');
+        const userBtn = document.getElementById('navUserBtn');
+        if (isPremiumUser) {
+            const session = JSON.parse(localStorage.getItem('rz_premium_session') || '{}');
+            const email = session.email || 'PRO User';
+            loginBtn.style.display = 'none';
+            userBtn.style.display = 'flex';
+            document.getElementById('navUserAvatar').textContent = email.charAt(0).toUpperCase();
+            document.getElementById('navUserEmail').textContent = email;
+            document.getElementById('navDdEmail').textContent = email;
+            document.getElementById('navDdTierBadge').textContent = 'PRO';
+            document.getElementById('navDdTierBadge').className = 'nav-dd-tier-badge pro';
+        } else {
+            loginBtn.style.display = 'flex';
+            userBtn.style.display = 'none';
+        }
+    }
+
+    // ═══ TOOLTIP SYSTEM ═══
+    function initTooltipSystem() {
+        const tooltipEl = document.createElement('div');
+        tooltipEl.id = 'tooltip-container';
+        document.body.appendChild(tooltipEl);
+
+        document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+            const content = trigger.querySelector('.tooltip-content');
+            if (!content) return;
+
+            trigger.addEventListener('mouseenter', () => {
+                tooltipEl.innerHTML = content.innerHTML;
+
+                const rect = trigger.getBoundingClientRect();
+                const tooltipWidth = 320;
+                const tooltipHeight = tooltipEl.offsetHeight || 200;
+                const padding = 15;
+
+                let left = rect.right + padding;
+                let top = rect.top + rect.height / 2;
+
+                if (left + tooltipWidth > window.innerWidth - 20) {
+                    left = rect.left - tooltipWidth - padding;
+                }
+                if (left < 20) left = 20;
+
+                top = top - tooltipHeight / 2;
+                if (top < 20) top = 20;
+                if (top + tooltipHeight > window.innerHeight - 20) {
+                    top = window.innerHeight - tooltipHeight - 20;
+                }
+
+                tooltipEl.style.left = left + 'px';
+                tooltipEl.style.top = top + 'px';
+                tooltipEl.classList.add('visible');
+            });
+
+            trigger.addEventListener('mouseleave', () => {
+                tooltipEl.classList.remove('visible');
+            });
+        });
+    }
+
+    // Initial calculation
+    document.addEventListener('DOMContentLoaded', function() {
+        calculate();
+        updateNavbarAuthUI();
+        initTooltipSystem();
+        // PDF button starts disabled (CSS class handles it)
+        // activatePremiumUI() will enable it via setMode('pro') if user is authenticated
+    });
+    </script>
+    <script src="rz-tracker.js"></script>
+</body>
+</html>

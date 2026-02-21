@@ -29,6 +29,7 @@ interface SensitivityInputs {
     fuelHours: number;
     turnoverRate: number | null;
     hybridRatio: number;
+    maintenanceModel: 'in-house' | 'hybrid' | 'vendor';
     buildingSize: number;
 }
 
@@ -44,8 +45,14 @@ const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerK
     // Turnover cost
     const turnover = (inputs.turnoverRate || 0.15) * totalStaff * baseSalaryAvg * 3; // 3 months replacement cost
 
-    // Maintenance OPEX (simplified)
-    const maintenanceOpex = inputs.itLoad * 50 * (1 - inputs.hybridRatio * 0.1); // $50/kW base
+    // Maintenance OPEX — in-house is cheapest labor but needs full staff; vendor adds 30% premium
+    // hybridRatio=1.0 (fully in-house) → 1.0x, hybridRatio=0 (fully vendor) → 1.30x
+    const maintModel = inputs.maintenanceModel || 'hybrid';
+    const hr = inputs.hybridRatio ?? 0.5;
+    const maintCostMult = maintModel === 'in-house' ? 1.0
+        : maintModel === 'vendor' ? 1.30
+        : (hr * 1.0) + ((1 - hr) * 1.30); // blend
+    const maintenanceOpex = inputs.itLoad * 50 * maintCostMult; // $50/kW base
 
     // A4: Country-specific electricity rate (default $0.10/kWh for backward compat)
     const electricityRate = country?.economy?.electricityRate ?? 0.10;

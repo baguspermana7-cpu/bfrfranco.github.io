@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PUE Calculator — Technical Documentation & Algorithm Reference</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1e293b;line-height:1.7;font-size:11.5px;background:#fff}
+.page{max-width:850px;margin:0 auto;padding:50px 60px}
+h1{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:6px;letter-spacing:-0.5px}
+h2{font-size:16px;font-weight:700;color:#0f172a;border-bottom:2.5px solid #3b82f6;padding-bottom:6px;margin:32px 0 14px;page-break-after:avoid}
+h3{font-size:13px;font-weight:700;color:#1e40af;margin:20px 0 8px}
+h4{font-size:12px;font-weight:600;color:#334155;margin:14px 0 6px}
+p{margin-bottom:10px}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:10.5px}
+th{background:#f1f5f9;padding:7px 10px;text-align:left;font-weight:600;color:#334155;border:1px solid #e2e8f0}
+td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top}
+tr:nth-child(even) td{background:#f8fafc}
+code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:10px;color:#7c3aed}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 18px;border-radius:8px;overflow-x:auto;margin:10px 0 16px;font-size:10px;line-height:1.6;font-family:'JetBrains Mono',monospace}
+pre .kw{color:#c084fc}pre .fn{color:#38bdf8}pre .cm{color:#64748b}pre .st{color:#4ade80}pre .num{color:#fbbf24}
+.formula{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#1e40af}
+.note{background:#fffbeb;border-left:3px solid #f59e0b;padding:10px 14px;margin:10px 0;font-size:10.5px;border-radius:0 6px 6px 0}
+.note strong{color:#92400e}
+.section-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;margin-right:6px}
+.free-tag{background:#dbeafe;color:#1e40af}.pro-tag{background:#f3e8ff;color:#7c3aed}
+.toc{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px 24px;margin:20px 0}
+.toc a{color:#2563eb;text-decoration:none;font-size:11px;display:block;padding:3px 0}
+.toc a:hover{text-decoration:underline}
+.cover-header{text-align:center;padding:40px 0 30px;border-bottom:3px solid #1e40af}
+.cover-header .subtitle{color:#64748b;font-size:13px;margin-top:8px}
+.cover-header .version{color:#94a3b8;font-size:10px;margin-top:12px;letter-spacing:0.5px}
+.ref{font-size:9.5px;color:#64748b;font-style:italic;margin:4px 0}
+@media print{
+  .page{padding:30px 40px}
+  h2{page-break-before:always}
+  h2:first-of-type{page-break-before:avoid}
+  pre{font-size:9px;padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- COVER -->
+<div class="cover-header">
+<h1>PUE Calculator &mdash; Technical Documentation</h1>
+<div style="font-size:17px;font-weight:700;color:#3b82f6;margin:8px 0;">Algorithm Reference &amp; Engineering Manual</div>
+<div class="subtitle">Complete Manual: Calculation Methodology, Cooling Models, UPS Efficiency Curves, Climate Data &amp; Validation</div>
+<div class="version">Version 1.0 | February 2026 | ResistanceZero Engineering Tools</div>
+<div style="margin-top:16px;font-size:10px;color:#94a3b8;">Author: Bagus Dwi Permana | Engineering Operations Manager | Ahli K3 Listrik</div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+<h3 style="margin-top:0;color:#0f172a;">Table of Contents</h3>
+<div style="columns:2;column-gap:30px;">
+<strong style="font-size:10px;color:#1e40af;">CORE CALCULATOR</strong>
+<a href="#s1">1. Architecture Overview</a>
+<a href="#s2">2. Input Parameters</a>
+<a href="#s3">3. PUE Calculation Algorithm</a>
+<a href="#s4">4. UPS Efficiency Model</a>
+<a href="#s5">5. Facility Loads Model</a>
+<strong style="font-size:10px;color:#7c3aed;margin-top:8px;display:block;">PRO FEATURES</strong>
+<a href="#s6">6. Climate Data &amp; Seasonal Model (PRO)</a>
+<a href="#s7">7. Industry Comparison &amp; Rating</a>
+<a href="#s8">8. PRO Analytics</a>
+<a href="#s9">9. Chart.js Visualizations</a>
+<a href="#s10">10. PDF Export &amp; Premium System</a>
+</div>
+</div>
+
+<!-- ======================================= -->
+<!-- SECTION 1 -->
+<!-- ======================================= -->
+
+<h2 id="s1"><span class="section-tag free-tag">CORE</span> 1. Architecture Overview</h2>
+
+<p>The PUE Calculator is a single-page, client-side web application that computes Power Usage Effectiveness for data center facilities. It operates entirely in the browser with zero server dependencies, making it suitable for offline use and air-gapped environments. The calculator uses Chart.js for real-time visualization and supports a two-tier access model (Free and PRO).</p>
+
+<table>
+<tr><th>Tier</th><th>Access</th><th>Inputs</th><th>Outputs</th></tr>
+<tr><td><strong>Free</strong></td><td>Open</td><td>4 input sections (IT Infrastructure, Cooling, Power Distribution, Facility Loads)</td><td>PUE, DCiE, total power, annual energy/cost, cooling load, UPS loss, rating, industry comparison, recommendations, 2 charts</td></tr>
+<tr><td><strong>PRO</strong></td><td>Authenticated</td><td>All Free inputs + 2 PRO sections (Advanced Parameters, Seasonal &amp; Growth)</td><td>All Free outputs + CO2/year, free cooling hours, percentile ranking, Green Grid level, cost per 0.1 PUE improvement, what-if scenarios, ASHRAE compliance, monthly PUE chart, waterfall chart, PDF export</td></tr>
+</table>
+
+<h3>1.1 Technology Stack</h3>
+<table>
+<tr><th>Component</th><th>Technology</th><th>Purpose</th></tr>
+<tr><td>Layout &amp; UI</td><td>HTML5, CSS3 (custom properties, grid, backdrop-filter)</td><td>Glassmorphism design, responsive from mobile to desktop</td></tr>
+<tr><td>Calculation Engine</td><td>Vanilla JavaScript (no framework)</td><td>All PUE math, interpolation, scenario estimation</td></tr>
+<tr><td>Charting</td><td>Chart.js (CDN)</td><td>Doughnut, bar, line, and waterfall charts</td></tr>
+<tr><td>Auth / Session</td><td>localStorage (<code>rz_premium_session</code>, <code>dcmoc-auth</code>)</td><td>PRO tier gating, 30-day session persistence</td></tr>
+<tr><td>Tooltip System</td><td>Custom JS + CSS (<code>.tooltip-trigger</code>)</td><td>Contextual engineering help on every input</td></tr>
+<tr><td>PDF Export</td><td><code>window.open()</code> with inline HTML</td><td>Print-optimized report generation (PRO only)</td></tr>
+</table>
+
+<h3>1.2 Calculation Flow</h3>
+<pre>
+<span class="cm">// Triggered on every input change via oninput/onchange handlers</span>
+<span class="fn">calculate</span>() {
+    <span class="cm">// 1. Read all input values from DOM</span>
+    <span class="cm">// 2. Auto-calculate rack count = ceil(IT_Load / rackDensity)</span>
+    <span class="cm">// 3. Compute cooling overhead (COP + containment + climate + PRO adjustments)</span>
+    <span class="cm">// 4. Compute UPS losses (interpolated efficiency curve + redundancy)</span>
+    <span class="cm">// 5. Compute transformer + PDU losses</span>
+    <span class="cm">// 6. Compute facility loads (lighting + security + fire)</span>
+    <span class="cm">// 7. PUE = (IT + cooling + UPS + TX + PDU + facility) / IT</span>
+    <span class="cm">// 8. Update all UI: PUE display, metrics, rating, comparison, recommendations</span>
+    <span class="cm">// 9. Render charts (always: doughnut + bar; PRO: monthly line + waterfall)</span>
+    <span class="cm">// 10. If PRO: render CO2, free cooling, percentile, what-if, ASHRAE</span>
+}
+</pre>
+
+<div class="note"><strong>Real-time Computation:</strong> Every input change triggers a full recalculation. There is no "Calculate" button. The architecture ensures sub-10ms computation time on modern browsers, giving users immediate feedback as they adjust parameters. This enables rapid design iteration and what-if analysis.</div>
+
+<!-- ======================================= -->
+<!-- SECTION 2 -->
+<!-- ======================================= -->
+
+<h2 id="s2"><span class="section-tag free-tag">CORE</span> 2. Input Parameters</h2>
+
+<h3>2.1 Section 1: IT Infrastructure</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options / Range</th><th>Default</th></tr>
+<tr><td>IT Load (kW)</td><td>Number + Presets</td><td>50 &ndash; 100,000 kW. Presets: 100kW Edge, 500kW Enterprise, 1MW Colo, 5MW Hyperscale, 10MW+ Mega</td><td>1,000 kW</td></tr>
+<tr><td>Rack Density</td><td>Select</td><td>Standard (5 kW/rack), Medium (8 kW/rack), High Density (15 kW/rack), AI/HPC (30 kW/rack)</td><td>Medium (8 kW)</td></tr>
+<tr><td>Rack Count</td><td>Number (auto-calculated)</td><td>1 &ndash; 10,000. Auto: <code>ceil(IT_Load / rackDensity)</code></td><td>125 (auto)</td></tr>
+</table>
+
+<h3>2.2 Section 2: Cooling System</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options</th><th>Default</th></tr>
+<tr><td>Cooling Type</td><td>Select</td><td>CRAC (COP ~2.8), CRAH (COP ~4.0), In-Row (COP ~5.0), RDHX (COP ~8.0), DLC (COP ~15), Immersion (COP ~25)</td><td>CRAH</td></tr>
+<tr><td>Containment Strategy</td><td>Select</td><td>None, Hot-Aisle, Cold-Aisle, Chimney Cabinet</td><td>Cold-Aisle</td></tr>
+<tr><td>Climate Zone</td><td>Select</td><td>Tropical Humid, Tropical Dry, Subtropical, Temperate, Continental, Cold</td><td>Subtropical</td></tr>
+</table>
+
+<h3>2.3 Section 3: Power Distribution</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options</th><th>Default</th></tr>
+<tr><td>UPS Type</td><td>Select</td><td>Double-Conversion (Online), Line-Interactive, Rotary / DRUPS, Flywheel Hybrid</td><td>Double-Conversion</td></tr>
+<tr><td>UPS Load Factor</td><td>Range slider</td><td>25% &ndash; 100% (step 5%)</td><td>50%</td></tr>
+<tr><td>Redundancy</td><td>Select</td><td>N (no redundancy), N+1, 2N, 2N+1</td><td>N+1</td></tr>
+</table>
+
+<h3>2.4 Section 4: Facility Loads</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options</th><th>Default</th></tr>
+<tr><td>Lighting</td><td>Select</td><td>Minimal (3 W/m&sup2;) &mdash; LED + sensors, Standard (8 W/m&sup2;), High (12 W/m&sup2;)</td><td>Standard (8 W/m&sup2;)</td></tr>
+<tr><td>Security Systems</td><td>Select</td><td>Basic (0.2 kW/rack) &mdash; CCTV only, Standard (0.5 kW/rack), Enhanced (1.0 kW/rack) &mdash; Full biometric</td><td>Standard (0.5 kW/rack)</td></tr>
+<tr><td>Fire Suppression</td><td>Select</td><td>FM-200/Novec (0.1 kW/rack), VESDA + FM-200 (0.3 kW/rack), Water Mist (0.5 kW/rack)</td><td>FM-200/Novec (0.1 kW/rack)</td></tr>
+</table>
+
+<h3>2.5 Section 5: PRO Advanced Parameters</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options / Range</th><th>Default</th></tr>
+<tr><td>Utilization</td><td>Range slider</td><td>10% &ndash; 100% (step 5%)</td><td>70%</td></tr>
+<tr><td>Economizer Mode</td><td>Select</td><td>None, Air-Side (-15% cooling), Water-Side (-25% cooling)</td><td>None</td></tr>
+<tr><td>ASHRAE Supply Air Temp</td><td>Range slider</td><td>18&deg;C &ndash; 27&deg;C (step 0.5&deg;C)</td><td>20&deg;C</td></tr>
+<tr><td>Transformer Loss</td><td>Range slider</td><td>0.5% &ndash; 3.0% (step 0.1%)</td><td>1.5%</td></tr>
+<tr><td>PDU Type</td><td>Select</td><td>Basic (98%), Metered (98.5%), Monitored (99%), Switched (99%)</td><td>Metered (98.5%)</td></tr>
+</table>
+
+<h3>2.6 Section 6: PRO Seasonal &amp; Growth</h3>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Options / Range</th><th>Default</th></tr>
+<tr><td>IT Load Growth/Year</td><td>Range slider</td><td>0% &ndash; 30% (step 1%)</td><td>10%</td></tr>
+<tr><td>Green Grid Measurement Level</td><td>Select</td><td>L1 &mdash; Annual (utility meter), L2 &mdash; Monthly (sub-metering), L3 &mdash; Continuous (real-time)</td><td>L1</td></tr>
+<tr><td>ASHRAE Class</td><td>Select</td><td>A1 (15-32&deg;C), A2 (10-35&deg;C), A3 (5-40&deg;C), A4 (5-45&deg;C)</td><td>A1</td></tr>
+<tr><td>Energy Cost ($/kWh)</td><td>Number</td><td>$0.01 &ndash; $1.00</td><td>$0.10</td></tr>
+</table>
+
+<!-- ======================================= -->
+<!-- SECTION 3 -->
+<!-- ======================================= -->
+
+<h2 id="s3"><span class="section-tag free-tag">CORE</span> 3. PUE Calculation Algorithm</h2>
+
+<p>The calculator implements the Green Grid's standard PUE formula with a component-level breakdown that decomposes total facility power into six categories. This enables engineers to identify exactly where overhead originates and target specific subsystems for optimization.</p>
+
+<div class="formula">
+<strong>Core PUE Formula:</strong><br>
+PUE = Total Facility Power / IT Equipment Power<br><br>
+PUE = (IT_Load + Cooling_kW + UPS_Loss_kW + Transformer_kW + PDU_Loss_kW + Facility_kW) / IT_Load
+</div>
+
+<h3>3.1 Cooling Overhead Calculation</h3>
+<p>Cooling is the single largest PUE contributor in most data centers (typically 30-50% of total overhead). The model uses a base cooling overhead factor per technology, modified by containment effectiveness and climate zone.</p>
+
+<h4>3.1.1 Base Cooling Overhead Factors</h4>
+<p>These represent the fraction of IT load required for cooling at the reference climate (subtropical, 1.0x multiplier):</p>
+<table>
+<tr><th>Cooling Type</th><th>Overhead Factor</th><th>Equivalent COP</th><th>Technology Description</th></tr>
+<tr><td>CRAC</td><td>0.45</td><td>~2.2</td><td>Computer Room Air Conditioner &mdash; DX compressor-based, room-level</td></tr>
+<tr><td>CRAH</td><td>0.38</td><td>~2.6</td><td>Computer Room Air Handler &mdash; chilled water, room-level</td></tr>
+<tr><td>In-Row</td><td>0.32</td><td>~3.1</td><td>Row-level cooling, closer coupling to heat source</td></tr>
+<tr><td>RDHX</td><td>0.22</td><td>~4.5</td><td>Rear-Door Heat Exchanger &mdash; rack-level passive/active</td></tr>
+<tr><td>DLC</td><td>0.12</td><td>~8.3</td><td>Direct Liquid Cooling &mdash; cold plates on CPU/GPU</td></tr>
+<tr><td>Immersion</td><td>0.08</td><td>~12.5</td><td>Full or partial immersion in dielectric fluid</td></tr>
+</table>
+
+<div class="note"><strong>Engineering Note:</strong> The overhead factors in this model represent the total cooling power fraction (including chillers, pumps, fans, and cooling towers) relative to IT load. They are not direct COP inversions because COP measures only the chiller efficiency, while overhead includes the full cooling chain. For example, a CRAH system with a chiller COP of 4.0 still has ~38% overhead due to pump energy, fan energy, and cooling tower parasitic loads.</div>
+
+<h4>3.1.2 Containment Reduction Factors</h4>
+<p>Airflow containment prevents mixing of hot exhaust and cold supply air, directly reducing the cooling energy required:</p>
+<table>
+<tr><th>Containment</th><th>Reduction Factor</th><th>Effective Saving</th><th>Description</th></tr>
+<tr><td>None</td><td>0.00</td><td>0%</td><td>Open data hall, no physical separation of air streams</td></tr>
+<tr><td>Hot-Aisle</td><td>0.10</td><td>~10%</td><td>Enclosed hot aisle with ceiling return to CRAH/plenum</td></tr>
+<tr><td>Cold-Aisle</td><td>0.12</td><td>~12%</td><td>Enclosed cold aisle with raised floor or overhead supply</td></tr>
+<tr><td>Chimney Cabinet</td><td>0.15</td><td>~15%</td><td>Rack-integrated chimney exhausting directly to return plenum</td></tr>
+</table>
+
+<h4>3.1.3 Climate Zone Multipliers</h4>
+<table>
+<tr><th>Climate Zone</th><th>Multiplier</th><th>Free Cooling Hours/yr</th><th>Example Locations</th></tr>
+<tr><td>Tropical Humid</td><td>1.15</td><td>0</td><td>Jakarta, Singapore, Kuala Lumpur</td></tr>
+<tr><td>Tropical Dry</td><td>1.08</td><td>500</td><td>Dubai, Phoenix, Riyadh</td></tr>
+<tr><td>Subtropical</td><td>1.00</td><td>1,500</td><td>Hong Kong, Sydney, Miami</td></tr>
+<tr><td>Temperate</td><td>0.92</td><td>3,000</td><td>London, San Francisco, Tokyo</td></tr>
+<tr><td>Continental</td><td>0.85</td><td>4,500</td><td>Chicago, Frankfurt, Beijing</td></tr>
+<tr><td>Cold</td><td>0.78</td><td>6,000</td><td>Stockholm, Helsinki, Reykjavik</td></tr>
+</table>
+
+<h4>3.1.4 Complete Cooling Formula</h4>
+<div class="formula">
+<strong>Step 1 &mdash; Base cooling:</strong><br>
+Cooling_kW = IT_Load &times; (coolingOverhead[type] &times; climateMultiplier[zone] - containmentReduction[strategy])<br><br>
+<strong>Step 2 &mdash; Economizer adjustment (PRO):</strong><br>
+if airside: Cooling_kW &times;= 0.85 <span style="color:#64748b">&nbsp;// 15% reduction</span><br>
+if waterside: Cooling_kW &times;= 0.75 <span style="color:#64748b">&nbsp;// 25% reduction</span><br><br>
+<strong>Step 3 &mdash; Supply temperature adjustment (PRO):</strong><br>
+tempDelta = supplyTemp - 20<br>
+Cooling_kW &times;= (1 - tempDelta &times; 0.03) <span style="color:#64748b">&nbsp;// 3% per degree above 20&deg;C</span><br><br>
+<strong>Step 4 &mdash; Floor:</strong><br>
+Cooling_kW = max(Cooling_kW, IT_Load &times; 0.02) <span style="color:#64748b">&nbsp;// minimum 2% of IT load</span>
+</div>
+
+<h3>3.2 Calculation Example</h3>
+<pre>
+<span class="cm">// Example: 1MW facility, CRAH cooling, cold-aisle containment, subtropical climate</span>
+IT_Load = <span class="num">1000</span> kW
+coolingOverhead[crah] = <span class="num">0.38</span>
+climateMult[subtropical] = <span class="num">1.00</span>
+containmentReduction[cold] = <span class="num">0.12</span>
+
+<span class="cm">// Cooling</span>
+Cooling = <span class="num">1000</span> &times; (<span class="num">0.38</span> &times; <span class="num">1.00</span> - <span class="num">0.12</span>) = <span class="num">1000</span> &times; <span class="num">0.26</span> = <span class="num">260</span> kW
+
+<span class="cm">// UPS (double-conversion @ 50% load, N+1 redundancy)</span>
+UPS_Eff = <span class="fn">interpolate</span>(<span class="st">'double'</span>, <span class="num">50</span>) = <span class="num">0.92</span>
+UPS_Loss = <span class="num">1000</span> &times; (1/<span class="num">0.92</span> - 1) &times; <span class="num">1.10</span> = <span class="num">1000</span> &times; <span class="num">0.0870</span> &times; <span class="num">1.10</span> = <span class="num">95.6</span> kW
+
+<span class="cm">// Transformer + PDU</span>
+TX_Loss = <span class="num">1000</span> &times; <span class="num">0.015</span> = <span class="num">15.0</span> kW
+PDU_Loss = <span class="num">1000</span> &times; (1 - <span class="num">0.985</span>) = <span class="num">15.0</span> kW
+
+<span class="cm">// Facility loads (125 racks, 3 m&sup2;/rack = 375 m&sup2;)</span>
+Lighting = <span class="num">8</span> W/m&sup2; &times; <span class="num">375</span> m&sup2; / <span class="num">1000</span> = <span class="num">3.0</span> kW
+Security = <span class="num">0.5</span> kW/rack &times; <span class="num">125</span> = <span class="num">62.5</span> kW
+Fire = <span class="num">0.1</span> kW/rack &times; <span class="num">125</span> = <span class="num">12.5</span> kW
+Facility_Total = <span class="num">78.0</span> kW
+
+<span class="cm">// RESULT</span>
+Total = <span class="num">1000</span> + <span class="num">260</span> + <span class="num">95.6</span> + <span class="num">15</span> + <span class="num">15</span> + <span class="num">78</span> = <span class="num">1463.6</span> kW
+<span class="kw">PUE</span> = <span class="num">1463.6</span> / <span class="num">1000</span> = <span class="num">1.46</span>
+DCiE = 1 / <span class="num">1.46</span> &times; 100 = <span class="num">68.4%</span>
+</pre>
+
+<div class="note"><strong>Validation Check:</strong> A PUE of 1.46 for a CRAH-cooled, cold-aisle contained, N+1 facility in a subtropical climate is consistent with Uptime Institute survey data showing enterprise average PUE of 1.55 (2023) and best-in-class enterprise at 1.3-1.4. The containment and modern CRAH bring it below average, which is expected.</div>
+
+<!-- ======================================= -->
+<!-- SECTION 4 -->
+<!-- ======================================= -->
+
+<h2 id="s4"><span class="section-tag free-tag">CORE</span> 4. UPS Efficiency Model</h2>
+
+<p>UPS systems are the second-largest PUE contributor in well-cooled facilities, adding 3-12% overhead depending on topology and loading. The calculator models efficiency as a function of UPS type and load factor using discrete data points with linear interpolation between them.</p>
+
+<h3>4.1 Efficiency Curves by UPS Type</h3>
+<table>
+<tr><th>UPS Type</th><th>25% Load</th><th>50% Load</th><th>75% Load</th><th>100% Load</th><th>Topology</th></tr>
+<tr><td>Double-Conversion</td><td>88.0%</td><td>92.0%</td><td>94.0%</td><td>95.0%</td><td>AC&rarr;DC&rarr;AC, always online, highest protection</td></tr>
+<tr><td>Line-Interactive</td><td>93.0%</td><td>96.0%</td><td>97.0%</td><td>97.5%</td><td>Auto-transformer voltage regulation, switches to inverter on failure</td></tr>
+<tr><td>Rotary / DRUPS</td><td>90.0%</td><td>94.0%</td><td>96.0%</td><td>97.0%</td><td>Diesel rotary, kinetic energy storage, integrated generator</td></tr>
+<tr><td>Flywheel Hybrid</td><td>95.0%</td><td>97.0%</td><td>98.0%</td><td>98.5%</td><td>Flywheel kinetic storage + VFD, minimal conversion losses</td></tr>
+</table>
+
+<h3>4.2 Interpolation Algorithm</h3>
+<p>For load factors between data points, the calculator uses piecewise linear interpolation:</p>
+
+<pre>
+<span class="kw">function</span> <span class="fn">interpolateUPS</span>(type, loadPct) {
+    <span class="kw">const</span> curve = upsEfficiency[type];
+    <span class="kw">const</span> points = [<span class="num">25</span>, <span class="num">50</span>, <span class="num">75</span>, <span class="num">100</span>];
+
+    <span class="kw">if</span> (loadPct &lt;= <span class="num">25</span>) <span class="kw">return</span> curve[<span class="num">25</span>];     <span class="cm">// clamp at minimum</span>
+    <span class="kw">if</span> (loadPct &gt;= <span class="num">100</span>) <span class="kw">return</span> curve[<span class="num">100</span>];   <span class="cm">// clamp at maximum</span>
+
+    <span class="cm">// Find the bracket and interpolate linearly</span>
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; points.length - <span class="num">1</span>; i++) {
+        <span class="kw">if</span> (loadPct &gt;= points[i] &amp;&amp; loadPct &lt;= points[i+<span class="num">1</span>]) {
+            <span class="kw">const</span> ratio = (loadPct - points[i]) / (points[i+<span class="num">1</span>] - points[i]);
+            <span class="kw">return</span> curve[points[i]] + ratio &times; (curve[points[i+<span class="num">1</span>]] - curve[points[i]]);
+        }
+    }
+    <span class="kw">return</span> curve[<span class="num">50</span>]; <span class="cm">// fallback</span>
+}
+</pre>
+
+<h4>Interpolation Example</h4>
+<div class="formula">
+<strong>Double-Conversion at 65% load:</strong><br>
+Points: 50% &rarr; 0.92, 75% &rarr; 0.94<br>
+ratio = (65 - 50) / (75 - 50) = 15 / 25 = 0.60<br>
+efficiency = 0.92 + 0.60 &times; (0.94 - 0.92) = 0.92 + 0.012 = 0.932 (93.2%)
+</div>
+
+<h3>4.3 UPS Loss Calculation</h3>
+<div class="formula">
+<strong>UPS Power Loss Formula:</strong><br>
+UPS_Loss_kW = IT_Load &times; (1 / UPS_Efficiency - 1) &times; redundancyMultiplier
+</div>
+
+<h4>Redundancy Overhead Multipliers</h4>
+<table>
+<tr><th>Configuration</th><th>Multiplier</th><th>Description</th><th>Effective Overhead Example (at 92% eff)</th></tr>
+<tr><td>N</td><td>1.00</td><td>No spare modules &mdash; all capacity in active use</td><td>8.7% of IT load</td></tr>
+<tr><td>N+1</td><td>1.10</td><td>One spare module running at partial load</td><td>9.6% of IT load</td></tr>
+<tr><td>2N</td><td>1.25</td><td>Fully mirrored &mdash; each path at ~50% capacity</td><td>10.9% of IT load</td></tr>
+<tr><td>2N+1</td><td>1.35</td><td>Mirrored plus spare &mdash; highest reliability</td><td>11.7% of IT load</td></tr>
+</table>
+
+<div class="note"><strong>Why 2N has higher loss than N:</strong> In a 2N configuration, each UPS path runs at approximately half load. Since UPS efficiency drops at lower load factors, the aggregate loss is higher than a single path at full load. For example, two double-conversion UPS at 40% load each (89.6% efficiency) produce more total loss than one UPS at 80% load (93.2% efficiency). The multiplier accounts for this non-linear effect.</div>
+
+<h3>4.4 UPS Loss Examples by Configuration</h3>
+<table>
+<tr><th>UPS Type</th><th>Load Factor</th><th>Efficiency</th><th>Redundancy</th><th>Loss (per 1000 kW IT)</th></tr>
+<tr><td>Double-Conversion</td><td>50%</td><td>92.0%</td><td>N+1 (1.10)</td><td>95.7 kW</td></tr>
+<tr><td>Double-Conversion</td><td>75%</td><td>94.0%</td><td>2N (1.25)</td><td>79.8 kW</td></tr>
+<tr><td>Line-Interactive</td><td>50%</td><td>96.0%</td><td>N+1 (1.10)</td><td>45.8 kW</td></tr>
+<tr><td>Rotary / DRUPS</td><td>75%</td><td>96.0%</td><td>N+1 (1.10)</td><td>45.8 kW</td></tr>
+<tr><td>Flywheel Hybrid</td><td>50%</td><td>97.0%</td><td>N+1 (1.10)</td><td>34.0 kW</td></tr>
+<tr><td>Flywheel Hybrid</td><td>75%</td><td>98.0%</td><td>N (1.00)</td><td>20.4 kW</td></tr>
+</table>
+
+<!-- ======================================= -->
+<!-- SECTION 5 -->
+<!-- ======================================= -->
+
+<h2 id="s5"><span class="section-tag free-tag">CORE</span> 5. Facility Loads Model</h2>
+
+<p>Facility loads represent all non-IT, non-cooling, non-UPS electrical consumption in the data center. While typically only 2-8% of total power, these loads are often overlooked in preliminary PUE estimates and can make the difference between achieving and missing a PUE target.</p>
+
+<h3>5.1 Floor Area Calculation</h3>
+<div class="formula">
+<strong>Floor Area:</strong><br>
+floorArea_m2 = rackCount &times; 3.0 m&sup2;/rack<br><br>
+<span style="color:#64748b">// 3.0 m&sup2;/rack accounts for hot/cold aisle spacing, end-of-row clearance,</span><br>
+<span style="color:#64748b">// and cable pathways. Industry typical range: 2.5 - 4.0 m&sup2;/rack.</span>
+</div>
+
+<h3>5.2 Lighting Power</h3>
+<table>
+<tr><th>Option</th><th>W/m&sup2;</th><th>Technology</th><th>Example (375 m&sup2;, 125 racks)</th></tr>
+<tr><td>Minimal</td><td>3</td><td>LED with occupancy sensors, dimmable controls</td><td>1.13 kW</td></tr>
+<tr><td>Standard</td><td>8</td><td>Standard LED or fluorescent, always-on corridors</td><td>3.00 kW</td></tr>
+<tr><td>High</td><td>12</td><td>High-bay fluorescent, legacy lighting, no controls</td><td>4.50 kW</td></tr>
+</table>
+
+<div class="formula">
+Lighting_kW = lightingWperM2 &times; floorArea_m2 / 1000
+</div>
+
+<h3>5.3 Security Systems Power</h3>
+<table>
+<tr><th>Level</th><th>kW/rack</th><th>Components</th><th>Example (125 racks)</th></tr>
+<tr><td>Basic</td><td>0.2</td><td>CCTV cameras, basic access control at perimeter</td><td>25.0 kW</td></tr>
+<tr><td>Standard</td><td>0.5</td><td>CCTV + card access per row + monitoring station</td><td>62.5 kW</td></tr>
+<tr><td>Enhanced</td><td>1.0</td><td>Full biometric, mantrap, video analytics, rack-level access</td><td>125.0 kW</td></tr>
+</table>
+
+<div class="formula">
+Security_kW = securityKwPerRack &times; rackCount
+</div>
+
+<h3>5.4 Fire Suppression Systems Power</h3>
+<table>
+<tr><th>System</th><th>kW/rack</th><th>Components</th><th>Example (125 racks)</th></tr>
+<tr><td>FM-200 / Novec</td><td>0.1</td><td>Detection panel, solenoid valves, VESDA sampling (standby mode)</td><td>12.5 kW</td></tr>
+<tr><td>VESDA + FM-200</td><td>0.3</td><td>Active VESDA aspirating detection + suppression, enhanced monitoring</td><td>37.5 kW</td></tr>
+<tr><td>Water Mist</td><td>0.5</td><td>High-pressure pump, zone valves, mist nozzles, active pressurization</td><td>62.5 kW</td></tr>
+</table>
+
+<div class="formula">
+Fire_kW = fireKwPerRack &times; rackCount
+</div>
+
+<h3>5.5 Total Facility Load</h3>
+<div class="formula">
+Facility_kW = Lighting_kW + Security_kW + Fire_kW
+</div>
+
+<div class="note"><strong>PUE Impact:</strong> For a typical 1 MW, 125-rack facility with standard settings, facility loads total approximately 78 kW (3 + 62.5 + 12.5), adding 0.078 to PUE. While seemingly small, this is larger than the transformer and PDU losses combined. Upgrading to LED lighting with occupancy sensors and right-sizing security can recover 0.02-0.04 PUE points.</div>
+
+<!-- ======================================= -->
+<!-- SECTION 6 -->
+<!-- ======================================= -->
+
+<h2 id="s6"><span class="section-tag pro-tag">PRO</span> 6. Climate Data &amp; Seasonal Model</h2>
+
+<p>The PRO seasonal model adds time-varying PUE analysis by incorporating monthly average ambient temperatures for each climate zone. This enables identification of seasonal cooling peaks and estimation of free cooling potential.</p>
+
+<h3>6.1 Monthly Average Temperature Data (&deg;C)</h3>
+<table>
+<tr><th>Zone</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th></tr>
+<tr><td>Tropical Humid</td><td>28</td><td>28</td><td>29</td><td>29</td><td>30</td><td>30</td><td>29</td><td>29</td><td>29</td><td>29</td><td>28</td><td>28</td></tr>
+<tr><td>Tropical Dry</td><td>18</td><td>20</td><td>24</td><td>28</td><td>33</td><td>38</td><td>40</td><td>39</td><td>36</td><td>30</td><td>24</td><td>19</td></tr>
+<tr><td>Subtropical</td><td>17</td><td>17</td><td>19</td><td>22</td><td>25</td><td>28</td><td>29</td><td>29</td><td>27</td><td>24</td><td>21</td><td>18</td></tr>
+<tr><td>Temperate</td><td>5</td><td>6</td><td>9</td><td>12</td><td>15</td><td>18</td><td>20</td><td>20</td><td>17</td><td>13</td><td>9</td><td>6</td></tr>
+<tr><td>Continental</td><td>-2</td><td>0</td><td>5</td><td>11</td><td>17</td><td>22</td><td>24</td><td>23</td><td>18</td><td>11</td><td>5</td><td>0</td></tr>
+<tr><td>Cold</td><td>-5</td><td>-4</td><td>0</td><td>5</td><td>11</td><td>16</td><td>19</td><td>18</td><td>13</td><td>7</td><td>2</td><td>-3</td></tr>
+</table>
+
+<h3>6.2 Seasonal PUE Variation Formula</h3>
+<div class="formula">
+<strong>Monthly PUE Calculation:</strong><br>
+tempFactor[month] = 1 + (monthlyTemp[month] - 20) &times; 0.008<br>
+monthlyPUE[month] = max(1.02, basePUE &times; tempFactor[month])
+</div>
+
+<p>The 0.008 coefficient means each degree above 20&deg;C increases the base PUE by 0.8%, and each degree below 20&deg;C decreases it by 0.8%. This models the relationship between ambient temperature and cooling energy consumption.</p>
+
+<pre>
+<span class="cm">// Example: Base PUE 1.46 in Continental climate</span>
+<span class="cm">// January:  temp = -2&deg;C, factor = 1 + (-2 - 20) &times; 0.008 = 0.824</span>
+<span class="cm">//           PUE = 1.46 &times; 0.824 = 1.20 (cold ambient = free cooling)</span>
+<span class="cm">// July:     temp = 24&deg;C, factor = 1 + (24 - 20) &times; 0.008 = 1.032</span>
+<span class="cm">//           PUE = 1.46 &times; 1.032 = 1.51 (summer peak)</span>
+<span class="cm">// Spread:   0.31 PUE variation = significant seasonal impact</span>
+</pre>
+
+<h3>6.3 Free Cooling Hours</h3>
+<p>Free cooling hours represent the annual hours when ambient conditions allow the economizer to provide partial or full cooling without mechanical refrigeration (typically when outside air temperature is below 18-22&deg;C):</p>
+<table>
+<tr><th>Climate Zone</th><th>Free Cooling Hours/Year</th><th>% of Year</th><th>Implication</th></tr>
+<tr><td>Tropical Humid</td><td>0</td><td>0%</td><td>No free cooling opportunity &mdash; mechanical cooling year-round</td></tr>
+<tr><td>Tropical Dry</td><td>500</td><td>5.7%</td><td>Brief winter windows &mdash; limited economizer benefit</td></tr>
+<tr><td>Subtropical</td><td>1,500</td><td>17.1%</td><td>Moderate economizer potential in winter months</td></tr>
+<tr><td>Temperate</td><td>3,000</td><td>34.2%</td><td>Strong free cooling &mdash; economizer investment pays back quickly</td></tr>
+<tr><td>Continental</td><td>4,500</td><td>51.4%</td><td>Majority of year &mdash; air-side economizer strongly recommended</td></tr>
+<tr><td>Cold</td><td>6,000</td><td>68.5%</td><td>Most of year &mdash; some operators run free cooling exclusively</td></tr>
+</table>
+
+<div class="note"><strong>Design Implication:</strong> For continental and cold climates, the capital cost of an economizer system (typically $50-150/kW) can pay for itself in 12-24 months through energy savings of 15-25%. In tropical humid climates, economizers provide no benefit and should not be specified.</div>
+
+<!-- ======================================= -->
+<!-- SECTION 7 -->
+<!-- ======================================= -->
+
+<h2 id="s7"><span class="section-tag free-tag">CORE</span> 7. Industry Comparison &amp; Rating</h2>
+
+<h3>7.1 PUE Rating Bands</h3>
+<p>The calculator assigns a letter grade based on the computed PUE, aligned with industry best practices and Uptime Institute survey distributions:</p>
+<table>
+<tr><th>Rating</th><th>PUE Range</th><th>Color Code</th><th>Description</th><th>Typical Facility Type</th></tr>
+<tr><td><strong>A+</strong></td><td>&le; 1.20</td><td style="color:#10b981;">Green</td><td>Excellent &mdash; world-class efficiency</td><td>Hyperscale, purpose-built with DLC/immersion</td></tr>
+<tr><td><strong>A</strong></td><td>1.21 &ndash; 1.40</td><td style="color:#06b6d4;">Cyan</td><td>Very Good &mdash; optimized facility</td><td>Modern colocation, well-designed enterprise</td></tr>
+<tr><td><strong>B</strong></td><td>1.41 &ndash; 1.60</td><td style="color:#3b82f6;">Blue</td><td>Good &mdash; above average</td><td>Enterprise with containment, reasonable cooling</td></tr>
+<tr><td><strong>C</strong></td><td>1.61 &ndash; 1.80</td><td style="color:#f59e0b;">Amber</td><td>Average &mdash; room for improvement</td><td>Older enterprise, minimal optimization</td></tr>
+<tr><td><strong>D</strong></td><td>1.81 &ndash; 2.00</td><td style="color:#f97316;">Orange</td><td>Below Average &mdash; significant waste</td><td>Legacy facility, no containment, poor cooling</td></tr>
+<tr><td><strong>F</strong></td><td>&gt; 2.00</td><td style="color:#ef4444;">Red</td><td>Poor &mdash; urgent remediation needed</td><td>Server closet, unmanaged, no optimization</td></tr>
+</table>
+
+<h3>7.2 Industry Benchmarks</h3>
+<table>
+<tr><th>Benchmark Category</th><th>PUE Value</th><th>Source</th></tr>
+<tr><td>Hyperscale Leader (Google/Meta/Microsoft)</td><td>1.10</td><td>Google Environmental Report 2024</td></tr>
+<tr><td>Colocation Best-in-Class</td><td>1.20</td><td>Equinix Sustainability Report 2024</td></tr>
+<tr><td>Enterprise Target</td><td>1.40</td><td>Uptime Institute Survey 2023</td></tr>
+<tr><td>Industry Average (Global)</td><td>1.58</td><td>Uptime Institute Global Survey 2023</td></tr>
+</table>
+
+<h3>7.3 Comparison Visualization</h3>
+<p>The results panel renders horizontal bar charts comparing the user's computed PUE against all four benchmarks, with the user's facility highlighted in cyan. This provides immediate visual context for the calculated value.</p>
+
+<pre>
+<span class="cm">// Benchmark data used for comparison bars</span>
+benchmarks = [
+    { label: <span class="st">'Your Facility'</span>,      value: calculatedPUE, color: <span class="st">'#06b6d4'</span> },
+    { label: <span class="st">'Industry Average'</span>,    value: <span class="num">1.58</span>,           color: <span class="st">'#94a3b8'</span> },
+    { label: <span class="st">'Enterprise Target'</span>,   value: <span class="num">1.40</span>,           color: <span class="st">'#3b82f6'</span> },
+    { label: <span class="st">'Colo Best-in-Class'</span>,  value: <span class="num">1.20</span>,           color: <span class="st">'#10b981'</span> },
+    { label: <span class="st">'Hyperscale Leader'</span>,   value: <span class="num">1.10</span>,           color: <span class="st">'#22c55e'</span> },
+];
+</pre>
+
+<h3>7.4 Percentile Ranking (PRO)</h3>
+<table>
+<tr><th>PUE Range</th><th>Percentile</th><th>Interpretation</th></tr>
+<tr><td>&le; 1.10</td><td>p10 (Top 10%)</td><td>Among the most efficient facilities globally</td></tr>
+<tr><td>1.11 &ndash; 1.20</td><td>p25 (Top 25%)</td><td>Excellent &mdash; better than 75% of facilities</td></tr>
+<tr><td>1.21 &ndash; 1.35</td><td>p50 (Median)</td><td>Average &mdash; at the midpoint of the industry</td></tr>
+<tr><td>1.36 &ndash; 1.55</td><td>p75</td><td>Below median &mdash; improvement opportunities exist</td></tr>
+<tr><td>1.56 &ndash; 1.80</td><td>p90</td><td>Bottom quartile &mdash; significant efficiency gap</td></tr>
+<tr><td>&gt; 1.80</td><td>&gt;p90</td><td>Among the least efficient &mdash; urgent action needed</td></tr>
+</table>
+
+<!-- ======================================= -->
+<!-- SECTION 8 -->
+<!-- ======================================= -->
+
+<h2 id="s8"><span class="section-tag pro-tag">PRO</span> 8. PRO Analytics</h2>
+
+<p>The PRO tier unlocks advanced analytics that go beyond the core PUE number to provide actionable engineering and financial insights. These metrics are computed in the <code>renderProOutputs()</code> function.</p>
+
+<h3>8.1 Carbon Emissions (CO2/Year)</h3>
+<div class="formula">
+<strong>Annual CO2 Calculation:</strong><br>
+annualEnergy_kWh = totalPower_kW &times; 8,760 hours/year<br>
+CO2_tonnes = (annualEnergy_kWh &times; gridEmissionFactor) / 1,000<br><br>
+<span style="color:#64748b">// Default gridEmissionFactor: 0.5 kg CO2/kWh (global average)</span>
+</div>
+
+<table>
+<tr><th>Grid Emission Factor</th><th>Region Example</th><th>CO2/year (1 MW, PUE 1.5)</th></tr>
+<tr><td>0.23 tCO2/MWh</td><td>Europe (nuclear/renewable heavy grid)</td><td>3,022 tonnes</td></tr>
+<tr><td>0.39 tCO2/MWh</td><td>USA (mixed grid)</td><td>5,124 tonnes</td></tr>
+<tr><td>0.50 tCO2/MWh</td><td>Global average (calculator default)</td><td>6,570 tonnes</td></tr>
+<tr><td>0.72 tCO2/MWh</td><td>Southeast Asia (coal-heavy grid)</td><td>9,461 tonnes</td></tr>
+</table>
+
+<h3>8.2 Data Center Infrastructure Efficiency (DCiE)</h3>
+<div class="formula">
+DCiE = (1 / PUE) &times; 100%<br><br>
+<span style="color:#64748b">// DCiE is the reciprocal of PUE expressed as a percentage.</span><br>
+<span style="color:#64748b">// PUE 1.50 = DCiE 66.7% (meaning 66.7% of total power reaches IT)</span><br>
+<span style="color:#64748b">// PUE 1.20 = DCiE 83.3% (ideal modern facility)</span>
+</div>
+
+<h3>8.3 Cost per 0.1 PUE Improvement</h3>
+<p>This metric quantifies the annual energy cost savings from incremental PUE reduction, giving engineers a financial justification for efficiency investments:</p>
+<div class="formula">
+<strong>Savings from PUE reduction of &Delta;:</strong><br>
+newPUE = max(1.02, currentPUE - &Delta;)<br>
+newTotalPower = IT_Load &times; newPUE<br>
+newAnnualCost = newTotalPower &times; 8,760 &times; energyCostPerKWh<br>
+annualSavings = currentAnnualCost - newAnnualCost
+</div>
+
+<pre>
+<span class="cm">// Example: 1 MW facility, PUE 1.50, energy cost $0.10/kWh</span>
+<span class="cm">// Current annual energy cost: 1000 &times; 1.50 &times; 8760 &times; $0.10 = $1,314,000/yr</span>
+<span class="cm">// At PUE 1.40 (-0.10):       1000 &times; 1.40 &times; 8760 &times; $0.10 = $1,226,400/yr</span>
+<span class="cm">// Savings: $87,600/yr</span>
+<span class="cm">//</span>
+<span class="cm">// At PUE 1.30 (-0.20):       1000 &times; 1.30 &times; 8760 &times; $0.10 = $1,138,800/yr</span>
+<span class="cm">// Savings: $175,200/yr</span>
+<span class="cm">//</span>
+<span class="cm">// At PUE 1.20 (-0.30):       1000 &times; 1.20 &times; 8760 &times; $0.10 = $1,051,200/yr</span>
+<span class="cm">// Savings: $262,800/yr</span>
+</pre>
+
+<h3>8.4 Green Grid Measurement Levels</h3>
+<table>
+<tr><th>Level</th><th>Measurement Method</th><th>Accuracy</th><th>Recommended For</th></tr>
+<tr><td>L1</td><td>Annual total from utility meter</td><td>&plusmn;10-15%</td><td>Small/edge sites, initial benchmarking</td></tr>
+<tr><td>L2</td><td>Monthly sub-metering (UPS, cooling, PDU)</td><td>&plusmn;5-10%</td><td>Enterprise, colocation (most common)</td></tr>
+<tr><td>L3</td><td>Continuous real-time (BMS/DCIM integration)</td><td>&plusmn;1-3%</td><td>Hyperscale, Tier III/IV with DCIM</td></tr>
+</table>
+
+<div class="note"><strong>Important:</strong> Green Grid L1 measurement (annual utility-level) can mask significant seasonal and operational PUE variation. A facility that measures PUE 1.50 at L1 may actually range from 1.30 (winter) to 1.70 (summer peak) when measured at L2/L3. The PRO monthly PUE chart reveals this hidden variation.</div>
+
+<h3>8.5 What-If Scenario Analysis</h3>
+<p>The calculator generates up to three what-if scenarios based on the current configuration, showing the PUE impact of specific upgrades:</p>
+
+<pre>
+<span class="cm">// What-If Scenario Generation Logic</span>
+scenarios = [];
+
+<span class="kw">if</span> (coolingType !== <span class="st">'dlc'</span>) {
+    <span class="cm">// Show impact of switching to Direct Liquid Cooling</span>
+    dlcPue = <span class="fn">estimatePue</span>(<span class="st">'dlc'</span>, currentContainment, currentZone, ...);
+    scenarios.push({ label: <span class="st">'Switch to DLC'</span>, pue: dlcPue });
+}
+
+<span class="kw">if</span> (containment === <span class="st">'none'</span>) {
+    <span class="cm">// Show impact of adding cold-aisle containment</span>
+    coldPue = <span class="fn">estimatePue</span>(currentCooling, <span class="st">'cold'</span>, currentZone, ...);
+    scenarios.push({ label: <span class="st">'Add Cold-Aisle'</span>, pue: coldPue });
+}
+
+<span class="kw">if</span> (econMode === <span class="st">'none'</span>) {
+    <span class="cm">// Show impact of air-side economizer</span>
+    econPue = <span class="fn">estimatePue</span>(currentCooling, currentContainment, currentZone, ..., <span class="st">'airside'</span>);
+    scenarios.push({ label: <span class="st">'Add Air Economizer'</span>, pue: econPue });
+}
+</pre>
+
+<h3>8.6 ASHRAE TC 9.9 Compliance Check</h3>
+<table>
+<tr><th>ASHRAE Class</th><th>Dry-Bulb Range (&deg;C)</th><th>Humidity Range (% RH)</th><th>Typical Equipment</th></tr>
+<tr><td>A1</td><td>15 &ndash; 32</td><td>20 &ndash; 80%</td><td>Enterprise servers, storage (most restrictive)</td></tr>
+<tr><td>A2</td><td>10 &ndash; 35</td><td>20 &ndash; 80%</td><td>Volume servers, IT networking equipment</td></tr>
+<tr><td>A3</td><td>5 &ndash; 40</td><td>8 &ndash; 85%</td><td>IT equipment designed for broad conditions</td></tr>
+<tr><td>A4</td><td>5 &ndash; 45</td><td>8 &ndash; 90%</td><td>Edge/ruggedized, designed for harsh environments</td></tr>
+</table>
+
+<div class="formula">
+<strong>Compliance Check:</strong><br>
+isCompliant = (supplyTemp &ge; classRange.min) AND (supplyTemp &le; classRange.max)<br><br>
+<span style="color:#64748b">// A1 at 27&deg;C: 27 &ge; 15 AND 27 &le; 32 &rarr; COMPLIANT</span><br>
+<span style="color:#64748b">// A1 at 34&deg;C: 34 &ge; 15 AND 34 &le; 32 &rarr; NON-COMPLIANT (exceeds max)</span>
+</div>
+
+<div class="note"><strong>Design Trade-off:</strong> Raising supply air temperature from 20&deg;C to 27&deg;C saves approximately 21% in cooling energy (7 degrees &times; 3%/degree), translating to a PUE reduction of 0.06-0.10 for typical CRAH-cooled facilities. However, this requires server inlet temperature monitoring, robust airflow management, and confirmation that all IT equipment is rated for A1 or higher class. Do not raise supply temperature without verifying ASHRAE class compliance for all installed hardware.</div>
+
+<!-- ======================================= -->
+<!-- SECTION 9 -->
+<!-- ======================================= -->
+
+<h2 id="s9"><span class="section-tag free-tag">CORE</span> 9. Chart.js Visualizations</h2>
+
+<p>The calculator renders four charts using Chart.js, two available to all users and two gated behind PRO. All charts update in real-time as inputs change.</p>
+
+<h3>9.1 Power Breakdown Doughnut (Free)</h3>
+<table>
+<tr><th>Segment</th><th>Data Source</th><th>Color</th></tr>
+<tr><td>IT Load</td><td>User input (kW)</td><td>#06b6d4 (Cyan)</td></tr>
+<tr><td>Cooling</td><td>Calculated cooling overhead (kW)</td><td>#3b82f6 (Blue)</td></tr>
+<tr><td>UPS Loss</td><td>Calculated UPS loss (kW)</td><td>#f59e0b (Amber)</td></tr>
+<tr><td>Transformer</td><td>IT_Load &times; txLoss% (kW)</td><td>#8b5cf6 (Purple)</td></tr>
+<tr><td>PDU Loss</td><td>IT_Load &times; (1 - pduEfficiency) (kW)</td><td>#f97316 (Orange)</td></tr>
+<tr><td>Facility</td><td>Lighting + Security + Fire (kW)</td><td>#10b981 (Green)</td></tr>
+</table>
+
+<pre>
+<span class="cm">// Doughnut chart configuration</span>
+<span class="kw">new</span> Chart(canvas, {
+    type: <span class="st">'doughnut'</span>,
+    data: {
+        labels: [<span class="st">'IT Load'</span>, <span class="st">'Cooling'</span>, <span class="st">'UPS Loss'</span>, <span class="st">'Transformer'</span>, <span class="st">'PDU Loss'</span>, <span class="st">'Facility'</span>],
+        datasets: [{ data: [itLoad, cooling, ups, tx, pdu, facility], backgroundColor: colors }]
+    },
+    options: { cutout: <span class="st">'60%'</span>, plugins: { legend: { position: <span class="st">'right'</span> } } }
+});
+</pre>
+
+<h3>9.2 PUE Comparison Bar Chart (Free)</h3>
+<p>Vertical bar chart comparing the user's PUE against four industry benchmarks. The user's bar is highlighted in cyan while benchmarks use progressively greener colors.</p>
+<table>
+<tr><th>Bar</th><th>Value</th><th>Color</th></tr>
+<tr><td>Your PUE</td><td>Calculated</td><td>#06b6d4</td></tr>
+<tr><td>Industry Avg</td><td>1.58</td><td>#94a3b8</td></tr>
+<tr><td>Enterprise</td><td>1.40</td><td>#3b82f6</td></tr>
+<tr><td>Colo</td><td>1.20</td><td>#10b981</td></tr>
+<tr><td>Hyperscale</td><td>1.10</td><td>#22c55e</td></tr>
+</table>
+
+<h3>9.3 Monthly PUE Variation Line Chart (PRO)</h3>
+<p>Displays 12 monthly PUE values based on the selected climate zone's temperature profile. The fill area under the line visually represents the annual PUE variation envelope.</p>
+
+<div class="formula">
+<strong>Monthly Data Generation:</strong><br>
+for each month [Jan..Dec]:<br>
+&nbsp;&nbsp;tempFactor = 1 + (monthlyTemp[month] - 20) &times; 0.008<br>
+&nbsp;&nbsp;monthlyPUE = max(1.02, basePUE &times; tempFactor)
+</div>
+
+<h3>9.4 PUE Waterfall Chart (PRO)</h3>
+<p>Stacked bar chart showing how each power component builds up from the IT baseline (1.0) to the final PUE value. This visualization makes it immediately clear which subsystem contributes most to overhead.</p>
+
+<pre>
+<span class="cm">// Waterfall data construction</span>
+waterfallData = [
+    { label: <span class="st">'IT (Base)'</span>,    value: <span class="num">1.0</span> },
+    { label: <span class="st">'+ Cooling'</span>,    value: cooling_kW / itLoad },  <span class="cm">// e.g., 0.26</span>
+    { label: <span class="st">'+ UPS'</span>,        value: ups_kW / itLoad },      <span class="cm">// e.g., 0.096</span>
+    { label: <span class="st">'+ Transformer'</span>, value: tx_kW / itLoad },       <span class="cm">// e.g., 0.015</span>
+    { label: <span class="st">'+ PDU'</span>,        value: pdu_kW / itLoad },      <span class="cm">// e.g., 0.015</span>
+    { label: <span class="st">'+ Facility'</span>,   value: facility_kW / itLoad }, <span class="cm">// e.g., 0.078</span>
+];
+<span class="cm">// Cumulative = [1.0, 1.26, 1.356, 1.371, 1.386, 1.464]</span>
+<span class="cm">// Final bar top = PUE (1.464)</span>
+</pre>
+
+<div class="note"><strong>Chart Implementation Note:</strong> The waterfall effect is achieved using a stacked bar chart with two datasets: a transparent "base" dataset that provides the floating offset, and a colored "addition" dataset that renders the visible incremental bar. Each bar is labeled by subsystem and colored to match the doughnut chart segments.</div>
+
+<!-- ======================================= -->
+<!-- SECTION 10 -->
+<!-- ======================================= -->
+
+<h2 id="s10"><span class="section-tag pro-tag">PRO</span> 10. PDF Export &amp; Premium System</h2>
+
+<h3>10.1 Authentication System</h3>
+<p>The PRO tier is gated by a client-side authentication system using <code>localStorage</code>. The calculator checks two possible session sources at load time:</p>
+
+<pre>
+<span class="cm">// Session check on page load (IIFE)</span>
+(<span class="kw">function</span> <span class="fn">checkPremiumSession</span>() {
+    <span class="cm">// Check 1: rz_premium_session (calculator-specific login)</span>
+    <span class="kw">const</span> session = localStorage.getItem(<span class="st">'rz_premium_session'</span>);
+    <span class="kw">if</span> (session) {
+        <span class="kw">const</span> data = JSON.parse(session);
+        <span class="kw">if</span> (data.expires &gt; Date.now()) {
+            isPremiumUser = <span class="kw">true</span>;
+            <span class="fn">activatePremiumUI</span>();
+            <span class="kw">return</span>;
+        }
+    }
+
+    <span class="cm">// Check 2: dcmoc-auth (shared session with DC MOC app)</span>
+    <span class="kw">const</span> dcmocAuth = localStorage.getItem(<span class="st">'dcmoc-auth'</span>);
+    <span class="kw">if</span> (dcmocAuth &amp;&amp; JSON.parse(dcmocAuth).state?.user) {
+        isPremiumUser = <span class="kw">true</span>;
+        <span class="fn">activatePremiumUI</span>();
+    }
+})();
+</pre>
+
+<h3>10.2 Session Structure</h3>
+<table>
+<tr><th>Storage Key</th><th>Format</th><th>Fields</th><th>Expiry</th></tr>
+<tr><td><code>rz_premium_session</code></td><td>JSON</td><td>email, tier ("pro"), expires (ISO 8601)</td><td>30 days from login</td></tr>
+<tr><td><code>dcmoc-auth</code></td><td>JSON (Zustand persist)</td><td>state.user (object), state.role</td><td>Per DC MOC session</td></tr>
+</table>
+
+<h3>10.3 Valid Credentials</h3>
+<table>
+<tr><th>Email</th><th>Password</th><th>Tier</th><th>Access</th></tr>
+<tr><td>demo@resistancezero.com</td><td>demo2026</td><td>PRO</td><td>All PRO features, PDF export, PRO charts</td></tr>
+</table>
+
+<div class="note"><strong>Cross-Application SSO:</strong> Users who are logged into the DC MOC application (via Zustand <code>dcmoc-auth</code>) automatically receive PRO access in the PUE Calculator without needing to log in separately. This provides a seamless experience across the ResistanceZero tool suite.</div>
+
+<h3>10.4 PRO Feature Gating</h3>
+<p>PRO sections use a CSS-based locking mechanism with a JavaScript toggle:</p>
+
+<pre>
+<span class="cm">// HTML structure for a PRO section</span>
+&lt;div class=<span class="st">"input-section pro-section locked"</span>&gt;
+    &lt;div class=<span class="st">"pro-overlay"</span>&gt;
+        <span class="cm">&lt;!-- Lock icon, title, "Unlock PRO" button --&gt;</span>
+    &lt;/div&gt;
+    <span class="cm">&lt;!-- Actual PRO content (blurred when locked) --&gt;</span>
+&lt;/div&gt;
+
+<span class="cm">// CSS gating</span>
+.pro-section.locked &gt; *:not(.pro-overlay) {
+    filter: blur(<span class="num">6</span>px);
+    user-select: none;
+    pointer-events: none;
+}
+.pro-section.locked .pro-overlay { display: flex; }
+
+<span class="cm">// Unlock on login</span>
+<span class="kw">function</span> <span class="fn">activatePremiumUI</span>() {
+    document.querySelectorAll(<span class="st">'.pro-section'</span>).forEach(s =&gt; s.classList.remove(<span class="st">'locked'</span>));
+}
+</pre>
+
+<h3>10.5 PDF Export Structure</h3>
+<p>The PDF export generates a print-optimized HTML page using <code>window.open()</code>. The report includes:</p>
+<ol style="padding-left:20px;margin:10px 0;">
+<li><strong>Header:</strong> PUE value and rating as the headline metric</li>
+<li><strong>Key Metrics:</strong> DCiE, total power, annual energy, annual cost, cooling load, UPS loss</li>
+<li><strong>Configuration Summary:</strong> All input parameter values (IT load, cooling type, containment, UPS type, climate zone, etc.)</li>
+<li><strong>Industry Comparison:</strong> PUE relative to industry benchmarks</li>
+<li><strong>PRO Analytics:</strong> CO2/year, free cooling hours, percentile, Green Grid level, ASHRAE compliance</li>
+<li><strong>Recommendations:</strong> Top 3 actionable PUE improvement suggestions with estimated impact</li>
+<li><strong>Footer:</strong> Generation date, calculator version, disclaimer</li>
+</ol>
+
+<pre>
+<span class="cm">// PDF export flow</span>
+<span class="kw">function</span> <span class="fn">exportPDF</span>() {
+    <span class="kw">if</span> (!isPremiumUser) { <span class="fn">handlePremiumTab</span>(); <span class="kw">return</span>; }
+
+    <span class="cm">// 1. Collect all current values from DOM</span>
+    <span class="kw">const</span> pueVal = document.getElementById(<span class="st">'pueValue'</span>).textContent;
+    <span class="kw">const</span> ratingVal = document.getElementById(<span class="st">'ratingText'</span>).textContent;
+    <span class="cm">// ... (all other metrics)</span>
+
+    <span class="cm">// 2. Build inline HTML with print-optimized CSS</span>
+    <span class="kw">const</span> html = <span class="fn">buildPdfHtml</span>(pueVal, ratingVal, ...);
+
+    <span class="cm">// 3. Open in new window and trigger print dialog</span>
+    <span class="kw">const</span> win = window.open(<span class="st">''</span>, <span class="st">'_blank'</span>);
+    win.document.write(html);
+    win.document.close();
+    win.print();
+}
+</pre>
+
+<h3>10.6 Print CSS Considerations</h3>
+<table>
+<tr><th>Element</th><th>Print Behavior</th></tr>
+<tr><td>Navbar, Hero, Premium Controls, Footer</td><td>Hidden (<code>display: none</code>)</td></tr>
+<tr><td>Calculator Grid</td><td>Switched to single-column (<code>display: block</code>)</td></tr>
+<tr><td>PRO locked sections</td><td>Blur removed, interaction restored</td></tr>
+<tr><td>Results Panel</td><td>Static positioning (not sticky)</td></tr>
+<tr><td>Page Size</td><td>A4 with 1cm margins</td></tr>
+<tr><td>Tooltips, Presets, Login Modal</td><td>Hidden</td></tr>
+</table>
+
+<!-- ======================================= -->
+<!-- APPENDIX: TRANSFORMER + PDU -->
+<!-- ======================================= -->
+
+<h2 style="border-bottom-color:#10b981;">Appendix A: Transformer &amp; PDU Loss Models</h2>
+
+<p>These two components are often overlooked but contribute a combined 1.5-5% overhead to PUE.</p>
+
+<h3>A.1 Transformer Losses</h3>
+<div class="formula">
+Transformer_kW = IT_Load &times; transformerLoss%<br><br>
+<span style="color:#64748b">Default: 1.5% (typical dry-type, 95% loaded)</span><br>
+<span style="color:#64748b">Range: 0.5% (high-efficiency amorphous core) to 3.0% (legacy oil-filled, lightly loaded)</span>
+</div>
+
+<table>
+<tr><th>Transformer Type</th><th>Typical Loss</th><th>Application</th></tr>
+<tr><td>Amorphous Core</td><td>0.5 &ndash; 1.0%</td><td>New builds, high-efficiency specification</td></tr>
+<tr><td>Dry-Type (modern)</td><td>1.0 &ndash; 1.5%</td><td>Standard for indoor data centers</td></tr>
+<tr><td>Dry-Type (legacy)</td><td>1.5 &ndash; 2.5%</td><td>Older facilities, oversized transformers</td></tr>
+<tr><td>Oil-Filled</td><td>2.0 &ndash; 3.0%</td><td>Outdoor substations, high-capacity</td></tr>
+</table>
+
+<h3>A.2 PDU Efficiency</h3>
+<table>
+<tr><th>PDU Type</th><th>Efficiency</th><th>Loss per MW IT</th><th>Features</th></tr>
+<tr><td>Basic</td><td>98.0%</td><td>20.4 kW</td><td>Power distribution only, no monitoring</td></tr>
+<tr><td>Metered</td><td>98.5%</td><td>15.2 kW</td><td>Inlet/outlet current monitoring</td></tr>
+<tr><td>Monitored</td><td>99.0%</td><td>10.1 kW</td><td>Per-outlet monitoring, network-connected</td></tr>
+<tr><td>Switched</td><td>99.0%</td><td>10.1 kW</td><td>Per-outlet switching + monitoring (relay loss)</td></tr>
+</table>
+
+<div class="formula">
+PDU_Loss_kW = IT_Load &times; (1 - pduEfficiency[type])
+</div>
+
+<!-- ======================================= -->
+<!-- APPENDIX: RECOMMENDATIONS ENGINE -->
+<!-- ======================================= -->
+
+<h2 style="border-bottom-color:#10b981;">Appendix B: Recommendations Engine</h2>
+
+<p>The calculator generates contextual recommendations based on the current configuration. Each recommendation includes a title, description, and estimated PUE impact range.</p>
+
+<h3>B.1 Recommendation Triggers</h3>
+<table>
+<tr><th>Condition</th><th>Recommendation</th><th>Impact Range</th></tr>
+<tr><td>containment === "none"</td><td>Add Containment &mdash; hot or cold aisle containment</td><td>-0.10 to -0.15 PUE</td></tr>
+<tr><td>cooling in [crac, crah] AND PUE &gt; 1.4</td><td>Upgrade Cooling &mdash; in-row or RDHX</td><td>-0.10 to -0.20 PUE</td></tr>
+<tr><td>upsType === "double"</td><td>Consider Flywheel UPS &mdash; higher partial-load efficiency</td><td>-0.02 to -0.05 PUE</td></tr>
+<tr><td>PUE &gt; 1.5 AND economizer === "none"</td><td>Implement Economizer &mdash; air-side or water-side</td><td>-0.05 to -0.15 PUE</td></tr>
+<tr><td>PUE &gt; 1.3</td><td>Raise Supply Air Temp &mdash; ASHRAE allows up to 27&deg;C</td><td>-0.02 to -0.08 PUE</td></tr>
+<tr><td>containment in [hot, cold]</td><td>Upgrade to Chimney &mdash; best containment effectiveness</td><td>-0.03 to -0.05 PUE</td></tr>
+</table>
+
+<p>The engine selects the top 3 most applicable recommendations. If no recommendations trigger (i.e., PUE &le; 1.2 with optimal configuration), a congratulatory message is displayed instead.</p>
+
+<!-- ======================================= -->
+<!-- APPENDIX: VALIDATION -->
+<!-- ======================================= -->
+
+<h2 style="border-bottom-color:#10b981;">Appendix C: Validation &amp; Data Sources</h2>
+
+<h3>C.1 Primary Data Sources</h3>
+<table>
+<tr><th>Source</th><th>Used For</th><th>Year</th></tr>
+<tr><td>ASHRAE TC 9.9</td><td>Thermal guidelines, A1-A4 classes, supply air temperature ranges</td><td>2021</td></tr>
+<tr><td>The Green Grid</td><td>PUE/DCiE definitions, measurement levels (L1-L3)</td><td>2014 / updated 2023</td></tr>
+<tr><td>Uptime Institute Annual Survey</td><td>Industry average PUE (1.58), percentile distribution</td><td>2023</td></tr>
+<tr><td>Google Environmental Report</td><td>Hyperscale PUE benchmarks (1.10)</td><td>2024</td></tr>
+<tr><td>Equinix Sustainability Report</td><td>Colocation best-in-class PUE (1.20)</td><td>2024</td></tr>
+<tr><td>ASHRAE Fundamentals</td><td>COP ranges by cooling technology, psychrometric data</td><td>2021</td></tr>
+<tr><td>Schneider Electric WP#113</td><td>UPS efficiency curves by topology and load factor</td><td>2023</td></tr>
+<tr><td>IEA World Energy Outlook</td><td>Grid emission factors by region</td><td>2024</td></tr>
+<tr><td>Eureca Climate Data</td><td>Monthly average temperatures by climate zone</td><td>2020-2024</td></tr>
+</table>
+
+<h3>C.2 Model Limitations</h3>
+<ul style="padding-left:20px;margin:10px 0;">
+<li>Cooling overhead factors represent typical full-chain efficiency; actual values depend on chiller staging, water temperatures, and fan static pressure</li>
+<li>UPS efficiency curves are based on published manufacturer data at unity power factor; actual efficiency may be 1-2% lower with non-linear IT loads</li>
+<li>Climate multipliers use zone-level averages; micro-climate effects (urban heat island, altitude, proximity to water) are not modeled</li>
+<li>The seasonal model uses monthly averages and does not capture diurnal variation or extreme weather events</li>
+<li>Facility load calculations (security, fire) use per-rack factors that assume uniform distribution; actual loads may be concentrated at perimeter or control room</li>
+<li>CO2 calculation uses a single grid emission factor; actual carbon intensity varies hourly based on generation mix</li>
+<li>The calculator does not model part-load cooling efficiency (COP variation with load and ambient temperature)</li>
+</ul>
+
+<h3>C.3 Recommended Validation Approach</h3>
+<ol style="padding-left:20px;margin:10px 0;">
+<li>Compare calculated PUE against actual PUE measurements from existing facilities with similar configurations</li>
+<li>Validate cooling overhead against manufacturer performance data for the specific chiller plant design</li>
+<li>Cross-reference UPS losses with UPS vendor datasheets at the specific load factor being modeled</li>
+<li>For seasonal analysis, compare monthly PUE projections against 12-month BMS trend data if available</li>
+<li>Use Green Grid L2/L3 measurement methods for validation rather than L1 annual averages</li>
+<li>For financial analysis (cost per 0.1 PUE), validate against actual utility rate schedules including demand charges</li>
+</ol>
+
+<!-- FOOTER -->
+<div style="margin-top:40px;padding-top:20px;border-top:2px solid #e2e8f0;text-align:center;">
+<p style="font-size:10px;color:#94a3b8;margin:0;">ResistanceZero Engineering Tools | Version 1.0 | February 2026</p>
+<p style="font-size:10px;color:#94a3b8;margin:4px 0 0;">Author: Bagus Dwi Permana | Engineering Operations Manager & Ahli K3 Listrik</p>
+<p style="font-size:9px;color:#cbd5e1;margin:4px 0 0;">This document is auto-generated from the production calculator codebase. Print to PDF for distribution.</p>
+</div>
+
+</div>
+</body>
+</html>

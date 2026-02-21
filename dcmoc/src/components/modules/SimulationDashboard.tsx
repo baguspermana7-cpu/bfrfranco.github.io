@@ -84,8 +84,9 @@ export function SimulationDashboard() {
         const laborMultiplier = Math.pow(1 + laborEscalation, yearsElapsed);
         const partsMultiplier = Math.pow(1 + inflationRate, yearsElapsed);
 
-        // 1. Staffing Calculation
-        const eng = calculateStaffing('engineer', 4, inputs.shiftModel, selectedCountry);
+        // 1. Staffing Calculation — pass maintenance model + hybridRatio for proper correlation
+        const opModel = inputs.maintenanceModel === 'vendor' ? 'vendor' : inputs.maintenanceModel === 'hybrid' ? 'hybrid' : 'in-house';
+        const eng = calculateStaffing('engineer', 4, inputs.shiftModel, selectedCountry, true, undefined, undefined, opModel, inputs.hybridRatio ?? 0.5);
 
         // Turnover Calculation
         const coT = calculateTurnoverCost(

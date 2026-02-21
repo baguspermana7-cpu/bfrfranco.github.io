@@ -20,6 +20,13 @@ export interface AssetTemplate {
         baseLifeMonths: number;
         costPerUnit: number; // USD baseline
     }[];
+    criticalSpares?: {
+        name: string;
+        stockPercent: number;   // % of population to keep as spare (e.g. 0.05 = 5%)
+        minStock: number;       // Minimum units regardless of population
+        costPerUnit: number;    // USD per unit
+        leadTimeWeeks: number;  // Typical procurement lead time
+    }[];
 }
 
 export const ASSETS: AssetTemplate[] = [
@@ -38,7 +45,19 @@ export const ASSETS: AssetTemplate[] = [
         consumables: [
             { name: 'Fuel Filters', baseLifeMonths: 12, costPerUnit: 150 },
             { name: 'Air Filters', baseLifeMonths: 12, costPerUnit: 200 },
-            { name: 'Engine Oil (200L)', baseLifeMonths: 12, costPerUnit: 1200 }
+            { name: 'Engine Oil (200L)', baseLifeMonths: 12, costPerUnit: 1200 },
+            { name: 'Coolant (50L)', baseLifeMonths: 24, costPerUnit: 350 },
+            { name: 'Oil Filters', baseLifeMonths: 6, costPerUnit: 85 }
+        ],
+        criticalSpares: [
+            { name: 'AVR (Automatic Voltage Regulator)', stockPercent: 0.25, minStock: 1, costPerUnit: 8500, leadTimeWeeks: 12 },
+            { name: 'Fuel Injector Set', stockPercent: 0.10, minStock: 1, costPerUnit: 4200, leadTimeWeeks: 8 },
+            { name: 'Turbocharger Assembly', stockPercent: 0.10, minStock: 1, costPerUnit: 12000, leadTimeWeeks: 16 },
+            { name: 'Water Pump', stockPercent: 0.25, minStock: 1, costPerUnit: 2800, leadTimeWeeks: 6 },
+            { name: 'Starter Motor', stockPercent: 0.25, minStock: 1, costPerUnit: 3500, leadTimeWeeks: 8 },
+            { name: 'Gasket & Seal Kit', stockPercent: 0.50, minStock: 2, costPerUnit: 1200, leadTimeWeeks: 4 },
+            { name: 'Belt Kit (Alternator/Fan)', stockPercent: 0.50, minStock: 2, costPerUnit: 450, leadTimeWeeks: 2 },
+            { name: 'Radiator Core', stockPercent: 0.10, minStock: 1, costPerUnit: 6500, leadTimeWeeks: 12 },
         ]
     },
     {
@@ -55,6 +74,13 @@ export const ASSETS: AssetTemplate[] = [
         consumables: [
             { name: 'DC Capacitors', baseLifeMonths: 60, costPerUnit: 1200 },
             { name: 'Fans', baseLifeMonths: 48, costPerUnit: 300 }
+        ],
+        criticalSpares: [
+            { name: 'UPS Power Module (500kVA)', stockPercent: 0.05, minStock: 1, costPerUnit: 45000, leadTimeWeeks: 16 },
+            { name: 'Static Switch / SCR Module', stockPercent: 0.05, minStock: 1, costPerUnit: 18000, leadTimeWeeks: 12 },
+            { name: 'Control Board / Logic Card', stockPercent: 0.10, minStock: 1, costPerUnit: 8500, leadTimeWeeks: 8 },
+            { name: 'DC Bus Capacitor Bank', stockPercent: 0.10, minStock: 1, costPerUnit: 5200, leadTimeWeeks: 10 },
+            { name: 'Fan Tray Assembly', stockPercent: 0.15, minStock: 2, costPerUnit: 1800, leadTimeWeeks: 4 },
         ]
     },
     {
@@ -67,6 +93,15 @@ export const ASSETS: AssetTemplate[] = [
             { id: 'lvsb-a', name: 'Thermal Scanning (Terminations)', frequency: 'Annual', category: 'Electrical', criticality: 'Statutory', standardHours: 2, requiresShutdown: false },
             { id: 'lvsb-3y', name: 'Busbar Torque Check & Clean', frequency: 'Annual', category: 'Electrical', criticality: 'Optimal', standardHours: 8, requiresShutdown: true },
             { id: 'lvsb-pd', name: 'Partial Discharge Testing', frequency: 'Annual', category: 'Specialist', criticality: 'Optimal', standardHours: 4, requiresShutdown: false },
+        ],
+        criticalSpares: [
+            { name: 'ACB (Air Circuit Breaker) 3200A', stockPercent: 0.05, minStock: 1, costPerUnit: 28000, leadTimeWeeks: 16 },
+            { name: 'ACB (Air Circuit Breaker) 1600A', stockPercent: 0.05, minStock: 1, costPerUnit: 18000, leadTimeWeeks: 12 },
+            { name: 'MCCB 630A', stockPercent: 0.10, minStock: 2, costPerUnit: 2800, leadTimeWeeks: 4 },
+            { name: 'MCCB 250A', stockPercent: 0.10, minStock: 2, costPerUnit: 1200, leadTimeWeeks: 3 },
+            { name: 'Shunt Trip Coil', stockPercent: 0.15, minStock: 3, costPerUnit: 350, leadTimeWeeks: 2 },
+            { name: 'CT (Current Transformer) Set', stockPercent: 0.10, minStock: 2, costPerUnit: 800, leadTimeWeeks: 4 },
+            { name: 'Power Meter Module', stockPercent: 0.10, minStock: 2, costPerUnit: 1500, leadTimeWeeks: 6 },
         ]
     },
     {
@@ -96,6 +131,14 @@ export const ASSETS: AssetTemplate[] = [
         consumables: [
             { name: 'Compressor Oil', baseLifeMonths: 24, costPerUnit: 400 },
             { name: 'Biocide Chemicals', baseLifeMonths: 1, costPerUnit: 100 }
+        ],
+        criticalSpares: [
+            { name: 'Compressor Assembly', stockPercent: 0.10, minStock: 1, costPerUnit: 35000, leadTimeWeeks: 20 },
+            { name: 'VFD (Variable Frequency Drive)', stockPercent: 0.10, minStock: 1, costPerUnit: 12000, leadTimeWeeks: 12 },
+            { name: 'Expansion Valve', stockPercent: 0.15, minStock: 1, costPerUnit: 3200, leadTimeWeeks: 6 },
+            { name: 'Pressure Transducer Set', stockPercent: 0.20, minStock: 2, costPerUnit: 800, leadTimeWeeks: 4 },
+            { name: 'Temperature Sensor (PT1000)', stockPercent: 0.20, minStock: 4, costPerUnit: 250, leadTimeWeeks: 2 },
+            { name: 'Condenser Fan Motor', stockPercent: 0.10, minStock: 1, costPerUnit: 4500, leadTimeWeeks: 8 },
         ]
     },
     {
@@ -112,6 +155,12 @@ export const ASSETS: AssetTemplate[] = [
             { name: 'G4 Pre-Filters', baseLifeMonths: 3, costPerUnit: 45 },
             { name: 'Humidifier Bottle', baseLifeMonths: 12, costPerUnit: 180 },
             { name: 'Fan Belts', baseLifeMonths: 12, costPerUnit: 60 }
+        ],
+        criticalSpares: [
+            { name: 'EC Fan Motor Assembly', stockPercent: 0.10, minStock: 1, costPerUnit: 3800, leadTimeWeeks: 8 },
+            { name: 'Control Valve Actuator', stockPercent: 0.15, minStock: 1, costPerUnit: 1200, leadTimeWeeks: 4 },
+            { name: 'Humidity Sensor', stockPercent: 0.20, minStock: 2, costPerUnit: 450, leadTimeWeeks: 2 },
+            { name: 'Controller Board', stockPercent: 0.10, minStock: 1, costPerUnit: 2800, leadTimeWeeks: 8 },
         ]
     },
     {
@@ -171,7 +220,12 @@ export const ASSETS: AssetTemplate[] = [
             { id: 'fuel-bi', name: 'Filter Replacement', frequency: 'Bi-Annual', category: 'Mechanical', criticality: 'Optimal', standardHours: 2, requiresShutdown: true },
         ],
         consumables: [
-            { name: 'Coalescer Filters', baseLifeMonths: 6, costPerUnit: 350 }
+            { name: 'Coalescer Filters', baseLifeMonths: 6, costPerUnit: 350 },
+            { name: 'Separator Filters', baseLifeMonths: 6, costPerUnit: 280 }
+        ],
+        criticalSpares: [
+            { name: 'Transfer Pump', stockPercent: 0.25, minStock: 1, costPerUnit: 2200, leadTimeWeeks: 6 },
+            { name: 'Solenoid Valve', stockPercent: 0.20, minStock: 1, costPerUnit: 450, leadTimeWeeks: 3 },
         ]
     },
     {
@@ -216,6 +270,44 @@ export const ASSETS: AssetTemplate[] = [
         maintenanceTasks: [
             { id: 'bms-m', name: 'Database Backup & Health Check', frequency: 'Monthly', category: 'BMS & IT', criticality: 'Optimal', standardHours: 1, requiresShutdown: false },
             { id: 'bms-q', name: 'OS Patching & Security Audit', frequency: 'Quarterly', category: 'BMS & IT', criticality: 'Statutory', standardHours: 2, requiresShutdown: true },
+        ],
+        criticalSpares: [
+            { name: 'Server SSD (Hot-swap)', stockPercent: 0.20, minStock: 2, costPerUnit: 800, leadTimeWeeks: 2 },
+            { name: 'Server PSU Module', stockPercent: 0.15, minStock: 1, costPerUnit: 650, leadTimeWeeks: 3 },
+        ]
+    },
+    {
+        id: 'plc-hmi',
+        name: 'PLC / DDC Controller + HMI',
+        category: 'BMS & IT',
+        defaultRedundancy: 'N+1',
+        maintenanceTasks: [
+            { id: 'plc-q', name: 'Program Backup & Battery Check', frequency: 'Quarterly', category: 'BMS & IT', criticality: 'Statutory', standardHours: 1, requiresShutdown: false },
+            { id: 'plc-a', name: 'I/O Module Verification & Firmware', frequency: 'Annual', category: 'BMS & IT', criticality: 'Optimal', standardHours: 4, requiresShutdown: true },
+        ],
+        criticalSpares: [
+            { name: 'PLC CPU Module', stockPercent: 0.10, minStock: 1, costPerUnit: 5500, leadTimeWeeks: 10 },
+            { name: 'PLC I/O Module (DI/DO)', stockPercent: 0.15, minStock: 2, costPerUnit: 1800, leadTimeWeeks: 6 },
+            { name: 'PLC I/O Module (AI/AO)', stockPercent: 0.15, minStock: 2, costPerUnit: 2200, leadTimeWeeks: 6 },
+            { name: 'HMI Touch Panel 10"', stockPercent: 0.10, minStock: 1, costPerUnit: 3200, leadTimeWeeks: 8 },
+            { name: 'PLC Battery (Lithium)', stockPercent: 0.50, minStock: 4, costPerUnit: 35, leadTimeWeeks: 1 },
+            { name: 'Communication Module (Modbus/BACnet)', stockPercent: 0.15, minStock: 1, costPerUnit: 1500, leadTimeWeeks: 6 },
+        ]
+    },
+    {
+        id: 'field-sensor',
+        name: 'Field Sensors (Temp/Pressure/Flow)',
+        category: 'BMS & IT',
+        defaultRedundancy: 'N',
+        maintenanceTasks: [
+            { id: 'sens-a', name: 'Calibration Verification', frequency: 'Annual', category: 'BMS & IT', criticality: 'Statutory', standardHours: 0.5, requiresShutdown: false },
+        ],
+        criticalSpares: [
+            { name: 'Temperature Sensor (PT100/PT1000)', stockPercent: 0.05, minStock: 4, costPerUnit: 180, leadTimeWeeks: 2 },
+            { name: 'Pressure Transmitter (4-20mA)', stockPercent: 0.05, minStock: 2, costPerUnit: 650, leadTimeWeeks: 4 },
+            { name: 'Flow Meter (Electromagnetic)', stockPercent: 0.05, minStock: 1, costPerUnit: 3500, leadTimeWeeks: 8 },
+            { name: 'Differential Pressure Switch', stockPercent: 0.10, minStock: 2, costPerUnit: 320, leadTimeWeeks: 3 },
+            { name: 'Level Transmitter', stockPercent: 0.05, minStock: 1, costPerUnit: 850, leadTimeWeeks: 4 },
         ]
     },
     {
@@ -286,6 +378,16 @@ export const ASSETS: AssetTemplate[] = [
         maintenanceTasks: [
             { id: 'ro-m', name: 'Membrane Pressure Check', frequency: 'Monthly', category: 'Mechanical', criticality: 'Optimal', standardHours: 0.5, requiresShutdown: false },
             { id: 'ro-a', name: 'Membrane Cleaning / Replacement', frequency: 'Annual', category: 'Specialist', criticality: 'Optimal', standardHours: 6, requiresShutdown: true },
+        ],
+        consumables: [
+            { name: 'RO Membrane Element', baseLifeMonths: 36, costPerUnit: 2800 },
+            { name: 'Pre-Filter Cartridge (5μm)', baseLifeMonths: 3, costPerUnit: 45 },
+            { name: 'Antiscalant Chemical (25L)', baseLifeMonths: 3, costPerUnit: 180 },
+        ],
+        criticalSpares: [
+            { name: 'High Pressure Pump', stockPercent: 0.25, minStock: 1, costPerUnit: 4500, leadTimeWeeks: 10 },
+            { name: 'Pressure Vessel', stockPercent: 0.10, minStock: 1, costPerUnit: 1800, leadTimeWeeks: 8 },
+            { name: 'Conductivity Sensor', stockPercent: 0.20, minStock: 2, costPerUnit: 350, leadTimeWeeks: 2 },
         ]
     }
 ];
