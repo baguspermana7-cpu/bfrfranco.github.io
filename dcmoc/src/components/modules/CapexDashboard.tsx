@@ -145,7 +145,7 @@ const CapexDashboard = () => {
                         {/* ─── COOLING ─── */}
                         <div className="space-y-2">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Activity className="w-3 h-3 mr-1" /> Cooling Strategy
+                                <Activity className="w-3 h-3 mr-1" /> Cooling Strategy <Tooltip content="Determines cooling methodology and PUE target. Air-cooled is simplest. Direct Liquid Cooling achieves lowest PUE (~1.2)." />
                             </label>
                             <select className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white" value={inputs.coolingType}
                                 onChange={(e) => handleChange('coolingType', e.target.value)}>
@@ -159,7 +159,7 @@ const CapexDashboard = () => {
                         {/* ─── BUILDING ─── */}
                         <div className="space-y-2">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Building className="w-3 h-3 mr-1" /> Building Type
+                                <Building className="w-3 h-3 mr-1" /> Building Type <Tooltip content="Construction type affects cost/m². Purpose-built is standard. Modular/prefab can reduce timeline by 40%." />
                             </label>
                             <select className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white" value={inputs.buildingType}
                                 onChange={(e) => handleChange('buildingType', e.target.value)}>
@@ -173,7 +173,7 @@ const CapexDashboard = () => {
                         {/* ─── RACK TYPE ─── */}
                         <div className="space-y-2">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Server className="w-3 h-3 mr-1" /> Rack Density
+                                <Server className="w-3 h-3 mr-1" /> Rack Density <Tooltip content="Power per rack determines rack count and floor space. Ultra-high density (75kW) requires liquid cooling." />
                             </label>
                             <select className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white" value={inputs.rackType}
                                 onChange={(e) => handleChange('rackType', e.target.value)}>
@@ -187,7 +187,7 @@ const CapexDashboard = () => {
                         {/* ─── POWER BACKUP ─── */}
                         <div className="pt-3 border-t space-y-3">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Zap className="w-3 h-3 mr-1" /> Power Backup
+                                <Zap className="w-3 h-3 mr-1" /> Power Backup <Tooltip content="UPS provides instant battery backup. Generator provides extended runtime. Both are critical for Tier III+ facilities." />
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
@@ -224,7 +224,7 @@ const CapexDashboard = () => {
                         {/* ─── FIRE PROTECTION ─── */}
                         <div className="pt-3 border-t space-y-3">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Flame className="w-3 h-3 mr-1" /> Fire Protection
+                                <Flame className="w-3 h-3 mr-1" /> Fire Protection <Tooltip content="Novec 1230 and FM-200 are clean-agent systems safe for electronics. Inert gas is greener but requires larger storage." />
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
@@ -252,7 +252,7 @@ const CapexDashboard = () => {
                         {/* ─── SUSTAINABILITY ─── */}
                         <div className="pt-3 border-t space-y-3">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Leaf className="w-3 h-3 mr-1" /> Sustainability
+                                <Leaf className="w-3 h-3 mr-1" /> Sustainability <Tooltip content="Green certifications add 2-8% to build cost but reduce operating costs and improve ESG scores for investors." />
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
@@ -313,7 +313,7 @@ const CapexDashboard = () => {
                         {/* ─── SOFT COSTS ─── */}
                         <div className="pt-3 border-t space-y-3">
                             <label className="text-xs font-semibold text-slate-500 uppercase flex items-center">
-                                <Calculator className="w-3 h-3 mr-1" /> Soft Costs & Contingency
+                                <Calculator className="w-3 h-3 mr-1" /> Soft Costs & Contingency <Tooltip content="Design fee covers A&E firms. PM fee covers construction oversight. Contingency is a buffer for unforeseen costs (industry standard 10-15%)." />
                             </label>
                             <div className="grid grid-cols-3 gap-2">
                                 <div className="space-y-1">

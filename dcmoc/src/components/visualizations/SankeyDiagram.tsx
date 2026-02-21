@@ -56,7 +56,8 @@ const computeLayout = (
 
         let currentY = 0;
         colNodes.forEach(node => {
-            const nodeHeight = Math.max(8, (node.value / totalValue) * availableHeight);
+            // B6: Proportional heights with min 20px to prevent overlap
+            const nodeHeight = Math.max(20, (node.value / totalValue) * availableHeight);
             nodePositions.set(node.id, {
                 x,
                 y: currentY,
@@ -141,7 +142,8 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data, width = 700, height
                         <path
                             d={link.path}
                             fill={link.color}
-                            opacity={hoveredLink === null ? 0.35 : hoveredLink === i ? 0.7 : 0.12}
+                            // B6: Increased base opacity to 50%
+                            opacity={hoveredLink === null ? 0.50 : hoveredLink === i ? 0.8 : 0.15}
                             className="transition-opacity duration-200 cursor-pointer"
                             onMouseEnter={() => setHoveredLink(i)}
                             onMouseLeave={() => setHoveredLink(null)}

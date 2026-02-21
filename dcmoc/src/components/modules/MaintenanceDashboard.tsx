@@ -17,9 +17,13 @@ import {
 import {
     Wrench, Wind, AlertTriangle, CheckCircle2, Edit3, Save, RotateCcw,
     Calendar, List, TrendingUp, Shield, Package, Zap, DollarSign,
-    Clock, BarChart3, ArrowRight, Info, ChevronDown
+    Clock, BarChart3, ArrowRight, Info, ChevronDown, Flame
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Tooltip } from '@/components/ui/Tooltip';
+import {
+    ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Legend
+} from 'recharts';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import clsx from 'clsx';
 
@@ -265,17 +269,17 @@ export function MaintenanceDashboard() {
             {/* ═══ KPI ROW ═══ */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Annual Maint Budget', value: fmt(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
-                    { label: 'Maintenance Events', value: `${schedule.length}`, sub: `${totalMaintHours.toFixed(0)} total hours`, icon: Wrench, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-500/10' },
-                    { label: 'Active Assets', value: `${assetCounts.reduce((a, c) => a + c.count, 0)}`, sub: `${activeAssets.length} asset types`, icon: Zap, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10' },
-                    { label: '5-Year Savings', value: fmt(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10' },
+                    { label: 'Annual Maint Budget', value: fmt(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)' },
+                    { label: 'Maintenance Events', value: `${schedule.length}`, sub: `${totalMaintHours.toFixed(0)} total hours`, icon: Wrench, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-500/10', tip: 'Number of scheduled maintenance events per year based on SFG20 regimes' },
+                    { label: 'Active Assets', value: `${assetCounts.reduce((a, c) => a + c.count, 0)}`, sub: `${activeAssets.length} asset types`, icon: Zap, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', tip: 'Total physical assets requiring maintenance, auto-generated from CAPEX config' },
+                    { label: '5-Year Savings', value: fmt(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none">
                         <div className="flex items-center gap-2 mb-2">
                             <div className={clsx("p-1.5 rounded-lg", kpi.bg)}>
                                 <kpi.icon className={clsx('w-4 h-4', kpi.color)} />
                             </div>
-                            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{kpi.label}</span>
+                            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">{kpi.label} <Tooltip content={(kpi as any).tip} /></span>
                         </div>
                         <div className="text-xl font-bold text-slate-900 dark:text-white truncate" title={kpi.value.toString()}>{kpi.value}</div>
                         <div className="text-xs text-slate-500 mt-1">{kpi.sub}</div>
@@ -308,6 +312,184 @@ export function MaintenanceDashboard() {
             {activeTab === 'strategy' && strategyData && <StrategyTab data={strategyData} fmt={fmt} activeStrat={inputs.maintenanceStrategy || 'planned'} onSelect={(s) => actions.setInputs({ maintenanceStrategy: s as any })} />}
             {activeTab === 'sla' && slaData && <SLATab data={slaData} fmt={fmt} />}
             {activeTab === 'spares' && sparesData && <SparesTab data={sparesData} fmt={fmt} />}
+
+            {/* ═══ B17: MAINTENANCE EVENT TIMELINE (Monthly Heatmap) ═══ */}
+            {activeTab === 'schedule' && schedule.length > 0 && (
+                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
+                    <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <Flame className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+                            Monthly Maintenance Density Heatmap
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1">Event intensity by month — darker = more maintenance events</p>
+                    </div>
+                    <div className="p-6">
+                        {(() => {
+                            const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            // Count events per month (weekNumber -> month mapping)
+                            const monthCounts = new Array(12).fill(0);
+                            schedule.forEach(event => {
+                                const monthIdx = Math.min(11, Math.floor((event.weekNumber - 1) / 4.33));
+                                monthCounts[monthIdx]++;
+                            });
+                            const maxCount = Math.max(...monthCounts, 1);
+
+                            return (
+                                <div>
+                                    <div className="grid grid-cols-12 gap-2 mb-4">
+                                        {MONTHS.map((month, idx) => {
+                                            const count = monthCounts[idx];
+                                            const intensity = count / maxCount;
+                                            // Color from slate (low) through amber to red (high)
+                                            const bg = intensity === 0
+                                                ? 'bg-slate-100 dark:bg-slate-800'
+                                                : intensity < 0.25
+                                                    ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                                                    : intensity < 0.5
+                                                        ? 'bg-amber-100 dark:bg-amber-900/30'
+                                                        : intensity < 0.75
+                                                            ? 'bg-orange-200 dark:bg-orange-900/40'
+                                                            : 'bg-red-200 dark:bg-red-900/40';
+                                            const textColor = intensity === 0
+                                                ? 'text-slate-400 dark:text-slate-600'
+                                                : intensity < 0.5
+                                                    ? 'text-slate-700 dark:text-slate-300'
+                                                    : 'text-slate-900 dark:text-white';
+
+                                            return (
+                                                <div
+                                                    key={month}
+                                                    className={clsx(
+                                                        "flex flex-col items-center justify-center rounded-lg p-3 border transition-all hover:scale-105",
+                                                        bg,
+                                                        intensity > 0.5 ? 'border-orange-300 dark:border-orange-800/50' : 'border-slate-200 dark:border-slate-700/50'
+                                                    )}
+                                                >
+                                                    <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase">{month}</span>
+                                                    <span className={clsx("text-lg font-bold font-mono mt-1", textColor)}>{count}</span>
+                                                    <span className="text-[9px] text-slate-400 dark:text-slate-500">events</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500">
+                                        <span>Low</span>
+                                        <div className="flex gap-0.5">
+                                            <div className="w-4 h-2 rounded-sm bg-slate-100 dark:bg-slate-800" />
+                                            <div className="w-4 h-2 rounded-sm bg-emerald-100 dark:bg-emerald-900/30" />
+                                            <div className="w-4 h-2 rounded-sm bg-amber-100 dark:bg-amber-900/30" />
+                                            <div className="w-4 h-2 rounded-sm bg-orange-200 dark:bg-orange-900/40" />
+                                            <div className="w-4 h-2 rounded-sm bg-red-200 dark:bg-red-900/40" />
+                                        </div>
+                                        <span>High</span>
+                                        <span className="ml-4">Total: {schedule.length} events/year</span>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
+                </div>
+            )}
+
+            {/* ═══ B18: SPARE PARTS ABC PARETO CHART ═══ */}
+            {activeTab === 'spares' && sparesData && sparesData.items.length > 0 && (
+                <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4 text-violet-500 dark:text-violet-400" />
+                            Spare Parts ABC Pareto Analysis
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                        {(() => {
+                            // Sort items by cost descending, take top items representing ~80% of budget
+                            const sorted = [...sparesData.items]
+                                .sort((a, b) => (b.unitCost * b.quantity) - (a.unitCost * a.quantity));
+                            const totalCost = sorted.reduce((sum, item) => sum + item.unitCost * item.quantity, 0);
+
+                            // Build Pareto data
+                            let cumulative = 0;
+                            const paretoData = sorted.slice(0, 15).map((item, idx) => {
+                                const itemCost = item.unitCost * item.quantity;
+                                cumulative += itemCost;
+                                return {
+                                    name: item.partName.length > 18 ? item.partName.slice(0, 16) + '..' : item.partName,
+                                    cost: itemCost,
+                                    cumulativePct: totalCost > 0 ? (cumulative / totalCost) * 100 : 0,
+                                };
+                            });
+
+                            return (
+                                <div>
+                                    <ResponsiveContainer width="100%" height={320}>
+                                        <ComposedChart data={paretoData}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                                            <XAxis
+                                                dataKey="name"
+                                                stroke="#64748b"
+                                                fontSize={10}
+                                                angle={-35}
+                                                textAnchor="end"
+                                                height={70}
+                                            />
+                                            <YAxis
+                                                yAxisId="left"
+                                                stroke="#8b5cf6"
+                                                fontSize={11}
+                                                tickFormatter={(v: number) => fmt(v)}
+                                            />
+                                            <YAxis
+                                                yAxisId="right"
+                                                orientation="right"
+                                                stroke="#f59e0b"
+                                                fontSize={11}
+                                                domain={[0, 100]}
+                                                tickFormatter={(v: number) => `${v}%`}
+                                            />
+                                            <RTooltip
+                                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
+                                                labelStyle={{ color: '#e2e8f0' }}
+                                                formatter={((value: number, name: string) => [
+                                                    name === 'cost' ? fmt(value) : `${value.toFixed(1)}%`,
+                                                    name === 'cost' ? 'Item Cost' : 'Cumulative %'
+                                                ]) as any}
+                                            />
+                                            <Legend formatter={(value: string) => value === 'cost' ? 'Item Cost' : 'Cumulative %'} />
+                                            <Bar yAxisId="left" dataKey="cost" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={24} name="cost" />
+                                            <Line yAxisId="right" type="monotone" dataKey="cumulativePct" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b' }} name="cumulativePct" />
+                                        </ComposedChart>
+                                    </ResponsiveContainer>
+                                    <div className="mt-3 grid grid-cols-3 gap-3">
+                                        {(() => {
+                                            // ABC classification
+                                            let cumPct = 0;
+                                            let aCount = 0, bCount = 0, cCount = 0;
+                                            sorted.forEach(item => {
+                                                const itemCost = item.unitCost * item.quantity;
+                                                cumPct += totalCost > 0 ? (itemCost / totalCost) * 100 : 0;
+                                                if (cumPct <= 80) aCount++;
+                                                else if (cumPct <= 95) bCount++;
+                                                else cCount++;
+                                            });
+                                            return [
+                                                { label: 'Class A (0-80%)', count: aCount, color: 'text-red-500 dark:text-red-400', desc: 'High-value, critical' },
+                                                { label: 'Class B (80-95%)', count: bCount, color: 'text-amber-500 dark:text-amber-400', desc: 'Medium-value' },
+                                                { label: 'Class C (95-100%)', count: cCount, color: 'text-emerald-500 dark:text-emerald-400', desc: 'Low-value, bulk' },
+                                            ].map((cls, i) => (
+                                                <div key={i} className="text-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                                                    <div className="text-xs text-slate-500 mb-1">{cls.label}</div>
+                                                    <div className={clsx("text-xl font-bold font-mono", cls.color)}>{cls.count}</div>
+                                                    <div className="text-[10px] text-slate-400 mt-0.5">{cls.desc}</div>
+                                                </div>
+                                            ));
+                                        })()}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }
@@ -453,17 +635,17 @@ function ScheduleTab({ assetCounts, schedule, weeks }: {
         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-sm dark:shadow-none animate-in fade-in zoom-in-95 duration-300">
             <div className="p-4 border-b border-slate-200 dark:border-slate-800/50 flex justify-between items-center bg-slate-50/50 dark:bg-transparent">
                 <div className="text-sm font-medium text-slate-800 dark:text-slate-300">Annual Maintenance Calendar ({new Date().getFullYear()})</div>
-                <div className="flex gap-4 text-xs text-slate-600 dark:text-slate-400">
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500"></div>Statutory</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"></div>Optimal</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slate-500"></div>Discretionary</div>
+                <div className="flex gap-4 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500 border border-red-400"></div>Statutory</div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500 border border-blue-400"></div>Optimal</div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-slate-500 border border-slate-400"></div>Discretionary</div>
                 </div>
             </div>
             <div className="overflow-x-auto">
                 <div className="min-w-[1500px] p-4">
                     {/* Header Row */}
                     <div className="flex mb-2">
-                        <div className="w-48 flex-shrink-0 text-xs font-semibold text-slate-500 uppercase">Asset Name</div>
+                        <div className="w-48 flex-shrink-0 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Asset Name</div>
                         <div className="flex-1 grid grid-cols-[repeat(52,minmax(20px,1fr))] gap-px">
                             {weeks.map(w => (
                                 <div key={w} className="text-[10px] text-center text-slate-500 dark:text-slate-600 border-l border-slate-200 dark:border-slate-800/30">
@@ -484,23 +666,56 @@ function ScheduleTab({ assetCounts, schedule, weeks }: {
 
                             return (
                                 <div key={`${asset.assetId}-${idx}`} className="flex items-center hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors py-1 group border-b border-slate-100 dark:border-slate-800/30">
-                                    <div className="w-48 flex-shrink-0 pl-2 text-xs text-slate-600 dark:text-slate-400 font-medium truncate">{unitName}</div>
+                                    <div className="w-48 flex-shrink-0 pl-2 text-xs text-slate-700 dark:text-slate-300 font-semibold truncate">{unitName}</div>
                                     <div className="flex-1 grid grid-cols-[repeat(52,minmax(20px,1fr))] gap-px h-6 relative">
                                         {weeks.map(week => {
                                             const event = assetEvents.find(e => e.weekNumber === week);
                                             if (!event) return <div key={week} className="border-l border-slate-100 dark:border-slate-800/10"></div>;
 
+                                            // Calculate start/end dates for the week
+                                            const yearStart = new Date(new Date().getFullYear(), 0, 1);
+                                            const weekStart = new Date(yearStart.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000);
+                                            const weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
+                                            const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
                                             return (
                                                 <div
                                                     key={week}
                                                     className="rounded-sm mx-0.5 cursor-help relative group/event shadow-sm"
-                                                    style={{ backgroundColor: event.color }}
+                                                    style={{
+                                                        backgroundColor: event.color,
+                                                        minWidth: '4px',
+                                                    }}
                                                 >
-                                                    {/* Tooltip */}
-                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-2 rounded shadow-xl z-20 hidden group-hover/event:block">
-                                                        <div className="text-xs font-bold text-slate-900 dark:text-white mb-0.5">{event.task.name}</div>
-                                                        <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                                                            {event.durationHours} hrs • {event.techniciansRequired} Techs
+                                                    {/* Enhanced Hover Popover */}
+                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-lg shadow-xl z-20 hidden group-hover/event:block">
+                                                        <div className="text-xs font-bold text-slate-900 dark:text-white mb-1.5">{event.task.name}</div>
+                                                        <div className="space-y-1">
+                                                            <div className="flex items-center justify-between text-[10px]">
+                                                                <span className="text-slate-500 dark:text-slate-400">Asset:</span>
+                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{event.assetName}</span>
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-[10px]">
+                                                                <span className="text-slate-500 dark:text-slate-400">Duration:</span>
+                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{event.durationHours} hours</span>
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-[10px]">
+                                                                <span className="text-slate-500 dark:text-slate-400">Technicians:</span>
+                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{event.techniciansRequired}</span>
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-[10px]">
+                                                                <span className="text-slate-500 dark:text-slate-400">Week {week}:</span>
+                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{fmtDate(weekStart)} – {fmtDate(weekEnd)}</span>
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-[10px]">
+                                                                <span className="text-slate-500 dark:text-slate-400">Criticality:</span>
+                                                                <span className={clsx(
+                                                                    "font-medium px-1 py-0.5 rounded text-[9px]",
+                                                                    event.task.criticality === 'Statutory' ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400" :
+                                                                        event.task.criticality === 'Optimal' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" :
+                                                                            "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                                                                )}>{event.task.criticality}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

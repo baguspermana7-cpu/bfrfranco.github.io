@@ -264,8 +264,8 @@ export const drawKpiCard = (
     doc.setTextColor(...PDF_COLORS.slate900);
     doc.text(value, x + 5, y + 19);
 
-    // Subtext
-    doc.setFontSize(6.5);
+    // C15: Subtext min 7pt
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...PDF_COLORS.textLight);
     doc.text(subtext, x + 5, y + h - 5);
@@ -479,15 +479,16 @@ export const drawAreaChart = (
         doc.circle(p.x, p.y, 1.2, 'FD');
 
         // Value label
-        doc.setFontSize(5.5);
+        // C15: Min font size 7pt for value labels
+        doc.setFontSize(7);
         doc.setTextColor(...PDF_COLORS.slate600);
         doc.setFont('helvetica', 'normal');
         const valStr = data[i] >= 1000000 ? `$${(data[i] / 1e6).toFixed(1)}M` : `$${(data[i] / 1000).toFixed(0)}k`;
         doc.text(valStr, p.x, p.y - 3, { align: 'center' });
     });
 
-    // X-Axis Labels
-    doc.setFontSize(6.5);
+    // C15: X-Axis Labels min 7pt
+    doc.setFontSize(7);
     doc.setTextColor(...PDF_COLORS.slate600);
     labels.forEach((label, i) => {
         const lx = x + (i * (w / (labels.length - 1)));
@@ -602,14 +603,400 @@ export const drawInsightsSection = (doc: jsPDF, y: number, insights: { title: st
 
 // Legacy Compatibility
 export const drawHeader = (doc: jsPDF, c: string, t: string) => drawModernHeader(doc, t, `Region: ${c}`);
-export const drawRiskMatrix = (doc: jsPDF, x: number, y: number, w: number, risks: any[]) => {
-    doc.setFontSize(10);
-    doc.setTextColor(...PDF_COLORS.slate900);
-    doc.text('Risk Analysis', x, y);
-};
 export const drawBarChart = (doc: jsPDF, x: number, y: number, w: number, h: number, labels: string[], data: number[], title: string) => {
     doc.rect(x, y, w, h);
     doc.text(title, x, y - 2);
+};
+
+// ─── C7: RISK HEAT MAP (5×5 Matrix) ────────────────────────
+export const drawRiskHeatMap = (
+    doc: jsPDF, x: number, y: number,
+    risks: { title: string; probability: number; impact: number; score: number }[],
+    title: string = 'Risk Heat Map'
+): number => {
+    const gridSize = 5;
+    const cellW = 28;
+    const cellH = 16;
+    const labelW = 18;
+    const labelH = 10;
+
+    // Title
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...PDF_COLORS.slate900);
+    doc.text(title, x, y);
+    y += 8;
+
+    // Y-axis label
+    doc.setFontSize(7);
+    doc.setTextColor(...PDF_COLORS.slate500);
+    doc.text('IMPACT', x, y + (gridSize * cellH) / 2, { angle: 90 });
+
+    const startX = x + labelW;
+    const startY = y;
+
+    // Color mapping for risk levels (probability × impact)
+    const getCellColor = (p: number, i: number): [number, number, number] => {
+        const score = p * i;
+        if (score >= 15) return [220, 38, 38];    // Red - Critical
+        if (score >= 10) return [245, 158, 11];    // Amber - High
+        if (score >= 5) return [234, 179, 8];      // Yellow - Medium
+        return [34, 197, 94];                       // Green - Low
+    };
+
+    // Draw grid (bottom-up for impact, left-right for probability)
+    for (let impact = gridSize; impact >= 1; impact--) {
+        for (let prob = 1; prob <= gridSize; prob++) {
+            const cx = startX + (prob - 1) * cellW;
+            const cy = startY + (gridSize - impact) * cellH;
+            const color = getCellColor(prob, impact);
+
+            // Cell background with opacity
+            doc.setFillColor(color[0], color[1], color[2]);
+            (doc as any).setGlobalAlpha?.(0.3);
+            doc.rect(cx, cy, cellW, cellH, 'F');
+            (doc as any).setGlobalAlpha?.(1.0);
+
+            // Cell border
+            doc.setDrawColor(...PDF_COLORS.slate300);
+            doc.setLineWidth(0.2);
+            doc.rect(cx, cy, cellW, cellH, 'S');
+
+            // Check if any risks fall in this cell
+            const cellRisks = risks.filter(r => r.probability === prob && r.impact === impact);
+            if (cellRisks.length > 0) {
+                // Fill with stronger color
+                doc.setFillColor(...color);
+                doc.rect(cx, cy, cellW, cellH, 'F');
+
+                // Risk name(s)
+                doc.setFontSize(5.5);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(255, 255, 255);
+                const label = cellRisks.length === 1
+                    ? cellRisks[0].title.substring(0, 16)
+                    : `${cellRisks.length} risks`;
+                doc.text(label, cx + cellW / 2, cy + cellH / 2 + 1, { align: 'center' });
+            }
+        }
+
+        // Impact labels (right of Y axis)
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...PDF_COLORS.slate600);
+        const impactLabels = ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'];
+        doc.text(impactLabels[impact - 1]?.substring(0, 3) || `${impact}`, startX - 4, startY + (gridSize - impact) * cellH + cellH / 2 + 1, { align: 'right' });
+    }
+
+    // X-axis labels (probability)
+    const probLabels = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
+    for (let prob = 1; prob <= gridSize; prob++) {
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...PDF_COLORS.slate600);
+        doc.text(probLabels[prob - 1]?.substring(0, 6) || `${prob}`, startX + (prob - 1) * cellW + cellW / 2, startY + gridSize * cellH + 5, { align: 'center' });
+    }
+
+    // X-axis title
+    doc.setFontSize(7);
+    doc.setTextColor(...PDF_COLORS.slate500);
+    doc.text('PROBABILITY', startX + (gridSize * cellW) / 2, startY + gridSize * cellH + 12, { align: 'center' });
+
+    // Legend
+    const legendY = startY + gridSize * cellH + 18;
+    const legendItems = [
+        { label: 'Critical (15-25)', color: [220, 38, 38] as [number, number, number] },
+        { label: 'High (10-14)', color: [245, 158, 11] as [number, number, number] },
+        { label: 'Medium (5-9)', color: [234, 179, 8] as [number, number, number] },
+        { label: 'Low (1-4)', color: [34, 197, 94] as [number, number, number] },
+    ];
+    legendItems.forEach((item, i) => {
+        const lx = x + i * 45;
+        doc.setFillColor(...item.color);
+        doc.rect(lx, legendY, 4, 4, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(...PDF_COLORS.slate600);
+        doc.text(item.label, lx + 6, legendY + 3);
+    });
+
+    return legendY + 10;
+};
+
+// ─── C10: WATERMARK SUPPORT ─────────────────────────────────
+export const drawWatermark = (doc: jsPDF, text: string = 'DRAFT', opacity: number = 0.15) => {
+    const w = doc.internal.pageSize.width;
+    const h = doc.internal.pageSize.height;
+    const totalPages = doc.getNumberOfPages();
+
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.saveGraphicsState();
+        doc.setFontSize(60);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(150, 150, 150);
+
+        // jsPDF doesn't support native opacity on text easily,
+        // so we use a light gray that simulates ~15% opacity on white
+        const gray = Math.round(255 * (1 - opacity));
+        doc.setTextColor(gray, gray, gray);
+
+        // Draw diagonal watermark
+        doc.text(text, w / 2, h / 2, {
+            align: 'center',
+            angle: 45,
+        });
+        doc.restoreGraphicsState();
+    }
+};
+
+// ─── C4: SLA ANALYSIS TABLE ─────────────────────────────────
+export const drawSLAAnalysisTable = (
+    doc: jsPDF, y: number,
+    tierLevel: number,
+    downtimeMinutes: number,
+    costPerMinute: number,
+    slaBreachProb: number
+): number => {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...PDF_COLORS.slate900);
+    doc.text('SLA & Uptime Analysis', MARGIN, y);
+
+    const tiers = [
+        { tier: 2, uptime: 99.741, downtime: 1361, description: 'Basic Redundancy' },
+        { tier: 3, uptime: 99.982, downtime: 95, description: 'Concurrent Maintainable' },
+        { tier: 4, uptime: 99.995, downtime: 26, description: 'Fault Tolerant' },
+    ];
+
+    const bodyData = tiers.map(t => {
+        const isSelected = t.tier === tierLevel;
+        const annualPenalty = t.downtime * costPerMinute;
+        return [
+            { content: `Tier ${t.tier}`, styles: isSelected ? { fontStyle: 'bold' as const, fillColor: [219, 234, 254] as [number, number, number] } : {} },
+            { content: `${t.uptime}%`, styles: isSelected ? { fontStyle: 'bold' as const, fillColor: [219, 234, 254] as [number, number, number] } : {} },
+            { content: `${t.downtime} min`, styles: isSelected ? { fillColor: [219, 234, 254] as [number, number, number] } : {} },
+            { content: `$${annualPenalty.toLocaleString()}`, styles: isSelected ? { fillColor: [219, 234, 254] as [number, number, number] } : {} },
+            { content: t.description, styles: isSelected ? { fillColor: [219, 234, 254] as [number, number, number] } : {} },
+        ];
+    });
+
+    autoTable(doc, {
+        startY: y + 5,
+        head: [['Tier', 'Uptime Target', 'Max Downtime/yr', 'Penalty Exposure', 'Description']],
+        body: bodyData,
+        theme: 'grid',
+        headStyles: { fillColor: PDF_COLORS.slate800, textColor: 255, fontSize: 8, fontStyle: 'bold' },
+        bodyStyles: { textColor: PDF_COLORS.text, fontSize: 8 },
+        margin: { left: MARGIN, right: MARGIN }
+    });
+
+    let resultY = (doc as any).lastAutoTable.finalY + 5;
+
+    // Breach probability callout
+    doc.setFillColor(254, 243, 199); // amber-100
+    doc.roundedRect(MARGIN, resultY, CONTENT_WIDTH, 12, 2, 2, 'F');
+    doc.setFillColor(...PDF_COLORS.warning);
+    doc.rect(MARGIN, resultY, 3, 12, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...PDF_COLORS.warning);
+    doc.text(`SLA Breach Probability: ${(slaBreachProb * 100).toFixed(1)}%`, MARGIN + 6, resultY + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...PDF_COLORS.text);
+    doc.text(`Estimated annual financial exposure at $${costPerMinute.toLocaleString()}/min: $${(downtimeMinutes * costPerMinute).toLocaleString()}`, MARGIN + 6, resultY + 10);
+
+    return resultY + 16;
+};
+
+// ─── C8: COMPLIANCE MATRIX ──────────────────────────────────
+export const drawComplianceMatrix = (
+    doc: jsPDF, y: number,
+    country: { name: string; id: string; compliance?: { certifications?: string[] } },
+): number => {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...PDF_COLORS.slate900);
+    doc.text('Regulatory & Compliance Matrix', MARGIN, y);
+
+    // Country-specific compliance requirements
+    const complianceItems: { standard: string; scope: string; status: string; notes: string }[] = [];
+
+    // Universal standards
+    complianceItems.push(
+        { standard: 'ISO 27001', scope: 'Information Security', status: 'Required', notes: 'ISMS certification for enterprise clients' },
+        { standard: 'ISO 22301', scope: 'Business Continuity', status: 'Recommended', notes: 'BCM framework for Tier 3+' },
+        { standard: 'SOC 2 Type II', scope: 'Trust Services', status: 'Required', notes: 'Annual audit for US/EU clients' },
+        { standard: 'EN 50600', scope: 'DC Facility Design', status: 'Recommended', notes: 'European DC design standard' },
+    );
+
+    // Country-specific
+    if (country.id === 'ID') {
+        complianceItems.push(
+            { standard: 'PP 71/2019 (GR 71)', scope: 'Electronic Systems', status: 'Mandatory', notes: 'Data localization requirements' },
+            { standard: 'PP 35/2021', scope: 'Labor (Omnibus)', status: 'Mandatory', notes: 'Overtime, shift rules, severance' },
+        );
+    } else if (country.id === 'SG') {
+        complianceItems.push(
+            { standard: 'PDPA', scope: 'Data Protection', status: 'Mandatory', notes: 'Personal Data Protection Act' },
+            { standard: 'BCA Green Mark', scope: 'Sustainability', status: 'Incentivized', notes: 'Green building certification' },
+        );
+    } else if (country.id === 'US') {
+        complianceItems.push(
+            { standard: 'HIPAA', scope: 'Healthcare Data', status: 'Conditional', notes: 'If hosting healthcare workloads' },
+            { standard: 'FedRAMP', scope: 'Federal Systems', status: 'Conditional', notes: 'If serving US government agencies' },
+        );
+    } else if (['DE', 'GB', 'NL', 'IE', 'FR'].includes(country.id)) {
+        complianceItems.push(
+            { standard: 'GDPR', scope: 'Data Protection', status: 'Mandatory', notes: 'EU General Data Protection Regulation' },
+            { standard: 'EU Energy Efficiency', scope: 'Sustainability', status: 'Mandatory', notes: 'EU Energy Efficiency Directive (recast)' },
+        );
+    } else if (country.id === 'JP') {
+        complianceItems.push(
+            { standard: 'APPI', scope: 'Data Protection', status: 'Mandatory', notes: 'Act on Protection of Personal Information' },
+        );
+    }
+
+    // Add certifications from country profile if available
+    const certs = country.compliance?.certifications || [];
+    certs.forEach(cert => {
+        if (!complianceItems.find(c => c.standard === cert)) {
+            complianceItems.push({ standard: cert, scope: 'Local', status: 'Required', notes: `${country.name} requirement` });
+        }
+    });
+
+    const bodyData = complianceItems.map(item => {
+        const statusColor = item.status === 'Mandatory' ? [220, 38, 38]
+            : item.status === 'Required' ? [245, 158, 11]
+            : item.status === 'Conditional' ? [59, 130, 246]
+            : [34, 197, 94];
+        return [
+            item.standard,
+            item.scope,
+            { content: item.status, styles: { textColor: statusColor, fontStyle: 'bold' as const } },
+            item.notes,
+        ];
+    });
+
+    autoTable(doc, {
+        startY: y + 5,
+        head: [['Standard', 'Scope', 'Status', 'Notes']],
+        body: bodyData as any,
+        theme: 'grid',
+        headStyles: { fillColor: PDF_COLORS.slate800, textColor: 255, fontSize: 8, fontStyle: 'bold' },
+        bodyStyles: { textColor: PDF_COLORS.text, fontSize: 8 },
+        columnStyles: {
+            0: { cellWidth: 35, fontStyle: 'bold' },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 'auto' as any },
+        },
+        margin: { left: MARGIN, right: MARGIN },
+    });
+
+    return (doc as any).lastAutoTable.finalY + 10;
+};
+
+// ─── C5: SPARE PARTS DETAIL TABLE ───────────────────────────
+export const drawSparesDetailTable = (
+    doc: jsPDF, y: number,
+    spares: { items: any[]; totalInventoryValue: number; criticalSpares: number; totalAnnualSparesBudget: number }
+): number => {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...PDF_COLORS.slate900);
+    doc.text('Critical Spare Parts Inventory', MARGIN, y);
+
+    const formatMoney = (v: number) => `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+    // Top critical spares
+    const criticalItems = spares.items
+        .filter((item: any) => item.criticality === 'critical' || item.safetyStock > 0)
+        .slice(0, 15);
+
+    const bodyData = criticalItems.map((item: any) => [
+        item.name || item.asset || 'N/A',
+        `${item.quantity || item.safetyStock || 0}`,
+        item.leadTimeWeeks ? `${item.leadTimeWeeks} wks` : 'N/A',
+        formatMoney(item.unitCost || item.annualCost || 0),
+        formatMoney((item.quantity || item.safetyStock || 0) * (item.unitCost || item.annualCost || 0)),
+        item.criticality?.toUpperCase() || 'STD',
+    ]);
+
+    if (bodyData.length > 0) {
+        autoTable(doc, {
+            startY: y + 5,
+            head: [['SKU / Part', 'Qty', 'Lead Time', 'Unit Cost', 'Total Cost', 'Priority']],
+            body: bodyData,
+            theme: 'grid',
+            headStyles: { fillColor: PDF_COLORS.slate800, textColor: 255, fontSize: 8, fontStyle: 'bold' },
+            bodyStyles: { textColor: PDF_COLORS.text, fontSize: 7 },
+            columnStyles: {
+                0: { cellWidth: 50 },
+                4: { halign: 'right' },
+                5: { halign: 'center' },
+            },
+            margin: { left: MARGIN, right: MARGIN },
+        });
+
+        return (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Fallback if no itemized data
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...PDF_COLORS.text);
+    doc.text(`Total Inventory Value: ${formatMoney(spares.totalInventoryValue)} | Critical Items: ${spares.criticalSpares} | Annual Budget: ${formatMoney(spares.totalAnnualSparesBudget)}`, MARGIN, y + 8);
+    return y + 14;
+};
+
+// ─── C12: MULTI-YEAR STAFFING TABLE ─────────────────────────
+export const drawMultiYearStaffingTable = (
+    doc: jsPDF, y: number,
+    baseHeadcount: number,
+    baseMonthlyCost: number,
+    escalation: number,
+    turnoverRate: number,
+    years: number = 5
+): number => {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...PDF_COLORS.slate900);
+    doc.text(`${years}-Year Staffing Projection`, MARGIN, y);
+
+    const formatMoney = (v: number) => `$${(v / 1000).toFixed(0)}k`;
+
+    const headers = ['Metric', ...Array.from({ length: years }, (_, i) => `Year ${i + 1}`)];
+    const rowHeadcount: any[] = ['Headcount (FTE)'];
+    const rowMonthlyCost: any[] = ['Monthly OPEX'];
+    const rowAnnualCost: any[] = [{ content: 'Annual OPEX', styles: { fontStyle: 'bold' } }];
+    const rowTurnover: any[] = ['Est. Turnover'];
+    const rowRecruitment: any[] = ['Recruitment Cost'];
+
+    for (let yr = 0; yr < years; yr++) {
+        const escalatedCost = baseMonthlyCost * Math.pow(1 + escalation, yr);
+        const turnoverLoss = Math.round(baseHeadcount * turnoverRate);
+        const recruitCost = turnoverLoss * escalatedCost * 2; // ~2 months salary per hire
+
+        rowHeadcount.push(`${baseHeadcount}`);
+        rowMonthlyCost.push(formatMoney(escalatedCost));
+        rowAnnualCost.push({ content: formatMoney(escalatedCost * 12), styles: { fontStyle: 'bold' } });
+        rowTurnover.push(`${turnoverLoss} FTEs`);
+        rowRecruitment.push(formatMoney(recruitCost));
+    }
+
+    autoTable(doc, {
+        startY: y + 5,
+        head: [headers],
+        body: [rowHeadcount, rowMonthlyCost, rowAnnualCost, rowTurnover, rowRecruitment],
+        theme: 'grid',
+        headStyles: { fillColor: PDF_COLORS.slate800, textColor: 255, fontSize: 8, fontStyle: 'bold', halign: 'center' },
+        bodyStyles: { textColor: PDF_COLORS.text, fontSize: 8, halign: 'right' },
+        columnStyles: { 0: { cellWidth: 40, halign: 'left' } },
+        margin: { left: MARGIN, right: MARGIN },
+    });
+
+    return (doc as any).lastAutoTable.finalY + 10;
 };
 
 // ─── TABLE OF CONTENTS ──────────────────────────────────────
@@ -751,7 +1138,8 @@ export const draw5YearTCOTable = (doc: jsPDF, y: number, cashflows: any[], capex
         body: bodyData,
         theme: 'grid',
         headStyles: { fillColor: PDF_COLORS.slate800, textColor: 255, fontSize: 8, fontStyle: 'bold', halign: 'center' },
-        bodyStyles: { textColor: PDF_COLORS.text, fontSize: 7, halign: 'right' },
+        // C15: Min 8pt for table body text
+    bodyStyles: { textColor: PDF_COLORS.text, fontSize: 8, halign: 'right' },
         columnStyles: {
             0: { cellWidth: 45, halign: 'left' }
         },

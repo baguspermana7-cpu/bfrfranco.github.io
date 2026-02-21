@@ -3,8 +3,10 @@
 
 import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
-import { calculateStaffing, compareShiftModels, generate5YearProjection, StaffRole, StaffingResult, REFERENCE_STAFFING_10MW } from '@/modules/staffing/ShiftEngine';
-import { calculateTurnoverImpact, generateAnnualRoster } from '@/modules/staffing/RosterEngine';
+import { calculateStaffing, compareShiftModels, generate5YearProjection, StaffRole, StaffingResult, REFERENCE_STAFFING_10MW, ROLE_LABELS, calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { generateAnnualRoster } from '@/modules/staffing/RosterEngine';
+import { calculateTurnoverCost as calculateCostOfTurnover } from '@/modules/staffing/CostOfTurnover';
 import { Users, Clock, DollarSign, AlertTriangle, Calendar, Award, Briefcase, TrendingUp, ArrowRight, CheckCircle, XCircle, BarChart3, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -18,8 +20,21 @@ import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
 export function StaffingDashboard() {
     const { selectedCountry, inputs, actions } = useSimulationStore();
+    const effectiveInputs = useEffectiveInputs();
     const [activeTab, setActiveTab] = useState<'overview' | 'comparison' | 'org' | 'roster' | 'waterfall' | 'workorders'>('overview');
     const [isExporting, setIsExporting] = useState(false);
+
+    // Auto headcount calculation for rationale display
+    const autoResult = useMemo(() => {
+        return calculateAutoHeadcount(
+            inputs.itLoad,
+            inputs.tierLevel,
+            inputs.shiftModel,
+            inputs.staffingModel === 'outsourced' ? 'outsourced' : inputs.staffingModel,
+            inputs.maintenanceModel,
+            inputs.maintenanceStrategy
+        );
+    }, [inputs.itLoad, inputs.tierLevel, inputs.shiftModel, inputs.staffingModel, inputs.maintenanceModel, inputs.maintenanceStrategy]);
 
     // Memoized calculations
     const results = useMemo(() => {
@@ -34,7 +49,7 @@ export function StaffingDashboard() {
         ];
 
         const staffingResults: StaffingResult[] = roleConfigs.map(cfg => {
-            const qty = (inputs as any)[cfg.qtyKey] || 1;
+            const qty = (effectiveInputs as any)[cfg.qtyKey] || 1;
             const opModel = inputs.staffingModel === 'outsourced' ? 'vendor' : inputs.staffingModel;
             return calculateStaffing(cfg.role, qty, inputs.shiftModel, selectedCountry, cfg.is24x7, undefined, undefined, opModel);
         });
@@ -63,12 +78,18 @@ export function StaffingDashboard() {
         // Projections
         const projections = generate5YearProjection(staffingResults, selectedCountry.economy?.laborEscalation ?? 0.04);
 
-        // Turnover
+        // A10: Unified turnover cost model via CostOfTurnover
         const avgSalary = totalMonthlyCost / totalHeadcount;
-        const turnoverImpact = calculateTurnoverImpact(selectedCountry, avgSalary, inputs.turnoverRate || 0.15, totalHeadcount);
+        const turnoverImpact = calculateCostOfTurnover(
+            'Duty Engineer',
+            avgSalary,
+            selectedCountry,
+            inputs.turnoverRate || 0.15,
+            totalHeadcount
+        );
 
         // Roster Generation
-        const rosterPattern = inputs.shiftModel === '12h' ? '4on-4off' : '3shift-8h';
+        const rosterPattern = inputs.shiftModel === '12h' ? '4on-3off' : '3shift-8h';
         const roster = generateAnnualRoster(2025, rosterPattern);
 
         return {
@@ -77,7 +98,7 @@ export function StaffingDashboard() {
             shiftComparisons, total8hCost, total12hCost, totalSavings,
             roleConfigs,
         };
-    }, [selectedCountry, inputs]);
+    }, [selectedCountry, inputs, effectiveInputs]);
 
     if (!selectedCountry || !results) return <div>Loading...</div>;
 
@@ -205,36 +226,69 @@ export function StaffingDashboard() {
             </div>
 
             {/* Input Config Panel */}
-            <div className="grid grid-cols-5 gap-4 p-4 bg-slate-900/30 border border-slate-800 rounded-lg">
-                {results.roleConfigs.map((cfg) => (
-                    <div key={cfg.role} className="space-y-1">
-                        <label className="text-xs text-slate-500 uppercase">{cfg.label} (Direct HC)</label>
-                        <input type="number" min="1" max="50" className="w-full text-sm bg-slate-950 border border-slate-700 rounded p-1 text-white"
-                            value={(inputs as any)[cfg.qtyKey]}
-                            onChange={(e) => actions.setInputs({ [cfg.qtyKey]: Math.max(1, Number(e.target.value)) })} />
-                        <div className="text-[10px] text-slate-600">
-                            {cfg.is24x7 ? '24/7 Shift' : 'Day Shift (M-F)'}
-                        </div>
+            <div className="p-4 bg-slate-100 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-lg space-y-3">
+                {/* Auto/Manual Toggle */}
+                <div className="flex items-center justify-between">
+                    <div className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase tracking-wide">
+                        Headcount Composition
                     </div>
-                ))}
+                    <button
+                        onClick={() => {
+                            if (inputs.staffingAutoMode) {
+                                // Switching to manual: write auto values as baseline
+                                actions.setInputs({
+                                    headcount_ShiftLead: autoResult.headcounts['shift-lead'],
+                                    headcount_Engineer: autoResult.headcounts['engineer'],
+                                    headcount_Technician: autoResult.headcounts['technician'],
+                                    headcount_Admin: autoResult.headcounts['admin'],
+                                    headcount_Janitor: autoResult.headcounts['janitor'],
+                                });
+                            }
+                            actions.toggleStaffingAutoMode();
+                        }}
+                        className={clsx(
+                            "px-3 py-1 text-xs font-medium rounded-md border transition-all",
+                            inputs.staffingAutoMode
+                                ? "bg-cyan-50 dark:bg-cyan-950/30 border-cyan-300 dark:border-cyan-700 text-cyan-700 dark:text-cyan-400"
+                                : "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400"
+                        )}
+                    >
+                        {inputs.staffingAutoMode ? 'AUTO' : 'MANUAL'}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-5 gap-4">
+                    {results.roleConfigs.map((cfg) => {
+                        const autoKey = cfg.role === 'admin' ? 'admin' : cfg.role as keyof typeof autoResult.headcounts;
+                        return (
+                            <div key={cfg.role} className="space-y-1">
+                                <label className="text-xs text-slate-500 uppercase flex items-center gap-1">{cfg.label} (Direct HC) <Tooltip content={cfg.role === 'shift-lead' ? 'Team leaders managing shift operations and handovers' : cfg.role === 'engineer' ? 'Engineers handling critical infrastructure systems' : cfg.role === 'technician' ? 'Technicians for day-shift maintenance tasks' : cfg.role === 'admin' ? 'Supervisors overseeing daily operations' : 'Facility support staff (cleaning, logistics)'} /></label>
+                                {inputs.staffingAutoMode ? (
+                                    <div className="w-full text-sm bg-slate-200 dark:bg-slate-800 border border-cyan-300 dark:border-cyan-800 rounded p-1 text-slate-900 dark:text-white font-bold text-center cursor-not-allowed">
+                                        {(effectiveInputs as any)[cfg.qtyKey]}
+                                    </div>
+                                ) : (
+                                    <input type="number" min="1" max="50" className="w-full text-sm bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded p-1 text-slate-900 dark:text-white"
+                                        value={(inputs as any)[cfg.qtyKey]}
+                                        onChange={(e) => actions.setInputs({ [cfg.qtyKey]: Math.max(1, Number(e.target.value)) })} />
+                                )}
+                                <div className="text-[10px] text-slate-500 dark:text-slate-600">
+                                    {cfg.is24x7 ? '24/7 Shift' : 'Day Shift (M-F)'}
+                                </div>
+                                {inputs.staffingAutoMode && autoResult.rationale[autoKey] && (
+                                    <div className="text-[9px] text-cyan-600 dark:text-cyan-500 leading-tight">
+                                        {autoResult.rationale[autoKey]}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* ═══ OVERVIEW TAB ═══ */}
             {activeTab === 'overview' && (
                 <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                    {/* Role Cards Row */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                        {results.staffingResults.map((r, i) => (
-                            <div key={i} className="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none hover:border-cyan-500/30 transition-colors">
-                                <div className="text-[10px] text-slate-500 font-bold uppercase mb-1">{r.role.replace('-', ' ')} (Direct HC)</div>
-                                <div className="text-2xl font-bold text-slate-900 dark:text-white">{r.headcount}</div>
-                                <div className="text-[10px] text-slate-500 mt-1">
-                                    {r.is24x7 ? '24/7 Shift' : 'Day Shift (M-F)'}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
                     {/* KPI Cards */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none flex flex-col">
@@ -242,7 +296,7 @@ export function StaffingDashboard() {
                                 <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                                     <Users className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs text-slate-400">Total Headcount</span>
+                                <span className="text-xs text-slate-400 flex items-center gap-1">Total Headcount <Tooltip content="Total full-time equivalent employees across all roles and shifts" /></span>
                             </div>
                             <div className="mt-auto">
                                 <div className="text-3xl font-bold text-slate-900 dark:text-white">{results.totalHeadcount} <span className="text-sm font-normal text-slate-500">FTEs</span></div>
@@ -255,13 +309,13 @@ export function StaffingDashboard() {
                                 <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
                                     <DollarSign className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs text-slate-400">Monthly Payroll</span>
+                                <span className="text-xs text-slate-400 flex items-center gap-1">Monthly Payroll <Tooltip content="Total monthly cost including base salary, shift allowances, overtime, and benefits" /></span>
                             </div>
                             <div className="mt-auto">
                                 <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={formatMoney(results.totalMonthlyCost)}>
                                     {formatMoney(results.totalMonthlyCost)}
                                 </div>
-                                <div className="text-xs text-slate-500 mt-1">Year 1 Baseline ({inputs.shiftModel === '8h' ? 'Continental' : '4-on/4-off'})</div>
+                                <div className="text-xs text-slate-500 mt-1">Year 1 Baseline ({inputs.shiftModel === '8h' ? 'Continental' : '4-on/3-off'})</div>
                             </div>
                         </div>
 
@@ -270,7 +324,7 @@ export function StaffingDashboard() {
                                 <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
                                     <Clock className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs text-slate-400">Avg Weekly Hours</span>
+                                <span className="text-xs text-slate-400 flex items-center gap-1">Avg Weekly Hours <Tooltip content="Average scheduled hours per person per week including handover overlap" /></span>
                             </div>
                             <div className="mt-auto">
                                 <div className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -285,7 +339,7 @@ export function StaffingDashboard() {
                                 <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                                     <TrendingUp className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs text-slate-400">5-Year TCO</span>
+                                <span className="text-xs text-slate-400 flex items-center gap-1">5-Year TCO <Tooltip content="Total Cost of Ownership over 5 years with labor escalation factored in" /></span>
                             </div>
                             <div className="mt-auto">
                                 <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={formatMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}>
@@ -309,7 +363,7 @@ export function StaffingDashboard() {
                             </div>
                             <div>
                                 <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Cycle Length</dt>
-                                <dd className="text-slate-900 dark:text-white font-mono font-bold">8 days</dd>
+                                <dd className="text-slate-900 dark:text-white font-mono font-bold">{inputs.shiftModel === '8h' ? '8 days' : '7 days'}</dd>
                             </div>
                             <div>
                                 <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Work Days / Cycle</dt>
@@ -325,27 +379,40 @@ export function StaffingDashboard() {
                             </div>
                             <div>
                                 <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Teams Required</dt>
-                                <dd className="text-slate-900 dark:text-white font-mono font-bold">4</dd>
+                                <dd className="text-slate-900 dark:text-white font-mono font-bold">{inputs.shiftModel === '8h' ? '4' : '2'}</dd>
                             </div>
                         </div>
 
                         {/* Shift Visualization Bar */}
                         <div className="mt-6">
                             <div className="text-[10px] text-slate-500 uppercase font-bold mb-2">Shift Types</div>
-                            <div className="grid grid-cols-3 gap-1 h-12 rounded-lg overflow-hidden">
-                                <div className="bg-amber-500/10 border-l-4 border-amber-500 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-500">
-                                    ☀️ Morning
-                                    <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 14:00</span>
+                            {inputs.shiftModel === '8h' ? (
+                                <div className="grid grid-cols-3 gap-1 h-12 rounded-lg overflow-hidden">
+                                    <div className="bg-amber-500/10 border-l-4 border-amber-500 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-500">
+                                        ☀️ Morning
+                                        <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 14:00</span>
+                                    </div>
+                                    <div className="bg-orange-500/10 border-l-4 border-orange-500 flex items-center justify-center text-xs font-bold text-orange-600 dark:text-orange-500">
+                                        ☁️ Afternoon
+                                        <span className="block text-[9px] font-normal ml-2 opacity-70">14:00 — 22:00</span>
+                                    </div>
+                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500">
+                                        🌙 Night
+                                        <span className="block text-[9px] font-normal ml-2 opacity-70">22:00 — 06:00</span>
+                                    </div>
                                 </div>
-                                <div className="bg-orange-500/10 border-l-4 border-orange-500 flex items-center justify-center text-xs font-bold text-orange-600 dark:text-orange-500">
-                                    ☁️ Afternoon
-                                    <span className="block text-[9px] font-normal ml-2 opacity-70">14:00 — 22:00</span>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-1 h-12 rounded-lg overflow-hidden">
+                                    <div className="bg-cyan-500/10 border-l-4 border-cyan-500 flex items-center justify-center text-xs font-bold text-cyan-600 dark:text-cyan-500">
+                                        ☀️ Day
+                                        <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 18:00</span>
+                                    </div>
+                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500">
+                                        🌙 Night
+                                        <span className="block text-[9px] font-normal ml-2 opacity-70">18:00 — 06:00</span>
+                                    </div>
                                 </div>
-                                <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500">
-                                    🌙 Night
-                                    <span className="block text-[9px] font-normal ml-2 opacity-70">22:00 — 06:00</span>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
@@ -371,7 +438,7 @@ export function StaffingDashboard() {
                                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50">
                                     {results.staffingResults.map((r, i) => (
                                         <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/20 transition-colors">
-                                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{r.role.replace('shift-lead', 'Team Leaders').replace('engineer', 'Engineers').replace('technician', 'Technicians')}</td>
+                                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{ROLE_LABELS[r.role as StaffRole] || r.role}</td>
                                             <td className="px-4 py-3 text-center text-cyan-600 dark:text-cyan-400 font-bold">{r.headcount}</td>
                                             <td className="px-4 py-3 text-center text-slate-500">{r.onShiftCount}</td>
                                             <td className="px-4 py-3 text-slate-500">
@@ -625,7 +692,7 @@ export function StaffingDashboard() {
             )} {/* End Org Tab */}
 
             {activeTab === 'roster' && (
-                <RosterVisualizer roster={results.roster} year={2025} />
+                <RosterVisualizer roster={results.roster} year={2025} shiftModel={inputs.shiftModel as '8h' | '12h'} />
             )} {/* End Roster Tab */}
 
             {activeTab === 'waterfall' && (

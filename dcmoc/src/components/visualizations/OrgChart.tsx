@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { StaffingResult } from '@/modules/staffing/ShiftEngine';
-import { Users, User, ArrowDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { StaffingResult, ROLE_LABELS, StaffRole } from '@/modules/staffing/ShiftEngine';
+import { Users, User, ChevronDown, ChevronUp } from 'lucide-react';
 import clsx from 'clsx';
 
 interface OrgChartProps {
@@ -14,92 +14,125 @@ interface NodeProps {
     role: string;
     count: number;
     color: string;
+    salary?: number;
+    turnoverRate?: number;
+    utilization?: number;
     children?: React.ReactNode;
-    isLast?: boolean;
 }
 
-const OrgNode = ({ role, count, color, children, isLast }: NodeProps) => (
-    <div className="flex flex-col items-center relative">
-        {/* Connector Line Vertical (Top) */}
-        <div className="h-6 w-px bg-slate-700"></div>
+// B2: Interactive OrgNode with click-to-expand detail
+const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, children }: NodeProps) => {
+    const [expanded, setExpanded] = useState(false);
 
-        {/* Card */}
-        <div className={clsx("p-3 rounded-xl border w-48 transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-900/20 z-10",
-            `bg-${color}-950/30 border-${color}-800`
-        )}>
-            <div className="flex items-center gap-2 mb-1">
-                <div className={`p-1.5 rounded-lg bg-${color}-500/20 text-${color}-400`}>
-                    <User className="w-4 h-4" />
-                </div>
-                <div className="text-xs font-semibold text-slate-300 uppercase tracking-wide">
-                    {role}
-                </div>
-            </div>
-            <div className="text-xl font-bold text-white flex items-baseline gap-1">
-                {count} <span className="text-xs text-slate-500 font-normal">FTEs</span>
-            </div>
-        </div>
+    const formatMoney = (v: number) => v >= 1000 ? `$${(v / 1000).toFixed(1)}K` : `$${v.toFixed(0)}`;
 
-        {/* Children Container */}
-        {children && (
-            <>
-                <div className="h-6 w-px bg-slate-700"></div>
+    return (
+        <div className="flex flex-col items-center relative">
+            <div className="h-6 w-px bg-slate-300 dark:bg-slate-700"></div>
 
-                {/* Connector Branch (Horizontal) */}
-                <div className="flex gap-4 relative">
-                    {/* Top Horizontal Bar logic would be here for perfect trees, keeping simple for now */}
-                    <div className="flex gap-4 items-start">
-                        {children}
+            <div
+                className={clsx(
+                    "p-3 rounded-xl border w-52 transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-900/20 z-10 cursor-pointer",
+                    `bg-${color}-100 dark:bg-${color}-950/30 border-${color}-300 dark:border-${color}-800`
+                )}
+                onClick={() => setExpanded(!expanded)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setExpanded(!expanded)}
+            >
+                <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                        <div className={`p-1.5 rounded-lg bg-${color}-500/10 dark:bg-${color}-500/20 text-${color}-600 dark:text-${color}-400`}>
+                            <User className="w-4 h-4" />
+                        </div>
+                        <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                            {role}
+                        </div>
                     </div>
+                    {(salary || turnoverRate) && (
+                        expanded
+                            ? <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+                            : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                    )}
                 </div>
-            </>
-        )}
-    </div>
-);
+                <div className="text-xl font-bold text-slate-900 dark:text-white flex items-baseline gap-1">
+                    {count} <span className="text-xs text-slate-500 font-normal">FTEs</span>
+                </div>
+
+                {/* B2: Expanded detail panel */}
+                {expanded && (salary || turnoverRate || utilization) && (
+                    <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700/50 space-y-1 text-xs">
+                        {salary !== undefined && (
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">Avg Salary</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-mono">{formatMoney(salary)}/mo</span>
+                            </div>
+                        )}
+                        {turnoverRate !== undefined && (
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">Turnover</span>
+                                <span className={clsx("font-mono", turnoverRate > 0.20 ? "text-red-600 dark:text-red-400" : "text-slate-700 dark:text-slate-300")}>
+                                    {(turnoverRate * 100).toFixed(0)}%
+                                </span>
+                            </div>
+                        )}
+                        {utilization !== undefined && (
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">Utilization</span>
+                                <span className="text-cyan-600 dark:text-cyan-400 font-mono">{(utilization * 100).toFixed(0)}%</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {children && (
+                <>
+                    <div className="h-6 w-px bg-slate-300 dark:bg-slate-700"></div>
+                    <div className="flex gap-4 relative">
+                        <div className="flex gap-4 items-start">
+                            {children}
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
 
 export function OrgChart({ staffing, countryName }: OrgChartProps) {
-    // Helper to find count
     const getCount = (role: string) => staffing.find(r => r.role === role)?.headcount || 0;
+    const getSalary = (role: string) => staffing.find(r => r.role === role)?.monthlyCost
+        ? (staffing.find(r => r.role === role)!.monthlyCost / Math.max(1, staffing.find(r => r.role === role)!.headcount))
+        : undefined;
 
     const shiftLeads = getCount('shift-lead');
     const engineers = getCount('engineer');
     const technicians = getCount('technician');
     const admins = getCount('admin');
     const janitors = getCount('janitor');
-    const security = (inputs: any) => 0; // Placeholder if we add security later
 
     return (
-        <div className="p-8 bg-slate-900/50 border border-slate-800 rounded-xl overflow-x-auto">
-            <h3 className="text-lg font-bold text-white mb-8 flex items-center gap-2">
-                <Users className="w-5 h-5 text-cyan-400" />
-                Wait, who reports to whom? ({countryName})
+        <div className="p-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
+                <Users className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                Organization Structure ({countryName})
             </h3>
 
             <div className="flex flex-col items-center min-w-[800px]">
-                {/* Level 1: Site Manager (Implied/Single) or Admin */}
-                <OrgNode role="Facility Manager" count={1} color="purple">
-                    {/* Level 2: Shift Leads & Admin */}
-
-                    {/* Admin Branch */}
-                    <OrgNode role="Admin / Support" count={admins} color="slate" />
-
-                    {/* Technical Branch */}
-                    <OrgNode role="Shift Leads" count={shiftLeads} color="cyan">
-                        {/* Level 3: Engineers */}
-                        <OrgNode role="Duty Engineers" count={engineers} color="blue">
-                            {/* Level 4: Technicians */}
-                            <OrgNode role="Technicians" count={technicians} color="emerald">
-                                {/* Level 5: Janitors (Often report to FM but structurally here for balance) */}
-                                <OrgNode role="Caretakers" count={janitors} color="amber" />
-                            </OrgNode>
+                <OrgNode role="Facility Manager" count={1} color="purple" salary={getSalary('shift-lead') ? (getSalary('shift-lead')! * 1.5) : undefined} utilization={0.95}>
+                    <OrgNode role={ROLE_LABELS['admin']} count={admins} color="slate" salary={getSalary('admin')} utilization={0.80}>
+                        <OrgNode role={ROLE_LABELS['shift-lead']} count={shiftLeads} color="cyan" salary={getSalary('shift-lead')} turnoverRate={0.10} utilization={0.90}>
+                            <OrgNode role={ROLE_LABELS['engineer']} count={engineers} color="blue" salary={getSalary('engineer')} turnoverRate={0.15} utilization={0.85} />
                         </OrgNode>
+                        <OrgNode role={ROLE_LABELS['technician']} count={technicians} color="emerald" salary={getSalary('technician')} turnoverRate={0.20} utilization={0.80} />
+                        <OrgNode role={ROLE_LABELS['janitor']} count={janitors} color="amber" salary={getSalary('janitor')} turnoverRate={0.25} utilization={0.70} />
                     </OrgNode>
-
                 </OrgNode>
             </div>
 
             <p className="text-center text-xs text-slate-500 mt-8 max-w-2xl mx-auto">
-                * Visual hierarchy assumes standard Tier III operational structure where Shift Leads manage 24/7 technical teams, while Admin/Support reports directly to Facility Management.
+                Click any node to see detailed salary, turnover, and utilization data. Hierarchy assumes standard Tier III operational structure.
             </p>
         </div>
     );

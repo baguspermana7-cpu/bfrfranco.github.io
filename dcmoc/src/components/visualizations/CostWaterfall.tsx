@@ -103,42 +103,32 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
                 </div>
 
                 {/* Individual Waterfall Bars */}
+                {/* B14: Refactored to use flexbox instead of absolute positioning */}
                 {categories.map((cat, idx) => {
                     const prevCumulative = cumulative;
                     cumulative += cat.value;
+                    const barHeight = getPct(cat.value);
+                    const spacerHeight = getPct(prevCumulative);
                     return (
-                        <div key={idx} className="flex-1 flex flex-col justify-end h-full relative z-10 group">
-                            {/* Cumulative connector line */}
-                            {idx > 0 && (
-                                <div
-                                    className="absolute left-0 w-full border-t border-dashed border-slate-600/50 z-0"
-                                    style={{ bottom: `${getPct(prevCumulative)}%` }}
-                                />
-                            )}
-                            {/* Bar */}
+                        <div key={idx} className="flex-1 flex flex-col h-full z-10 group">
+                            {/* Spacer pushes bar down (flex-grow fills top) */}
+                            <div className="flex-1" />
+                            {/* B1: Permanent value label */}
+                            <div className="whitespace-nowrap text-[10px] font-bold w-full text-center text-white mb-1">
+                                {formatMoney(cat.value)}
+                            </div>
+                            {/* Bar raised by cumulative spacer */}
                             <div
                                 className={`w-full ${cat.color} rounded-t-sm relative`}
-                                style={{
-                                    height: `${getPct(cat.value)}%`,
-                                    marginBottom: idx > 0 ? `${(prevCumulative / total) * 100}%` : '0',
-                                    position: 'absolute',
-                                    bottom: `${getPct(prevCumulative)}%`,
-                                    left: 0,
-                                    right: 0,
-                                }}
-                            >
-                                <div className="absolute -top-5 whitespace-nowrap text-[10px] font-bold w-full text-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {formatMoney(cat.value)}
+                                style={{ height: `${barHeight}%` }}
+                            />
+                            {/* Cumulative spacer below bar */}
+                            {spacerHeight > 0 && (
+                                <div style={{ height: `${spacerHeight}%` }} className="relative">
+                                    {/* Connector line */}
+                                    <div className="absolute top-0 left-0 w-full border-t border-dashed border-slate-600/50" />
                                 </div>
-                            </div>
-                            {/* Cumulative annotation */}
-                            <div
-                                className="absolute right-0 text-[9px] text-slate-500 font-mono opacity-0 group-hover:opacity-100 transition-opacity"
-                                style={{ bottom: `${getPct(cumulative)}%`, transform: 'translateY(-50%)' }}
-                            >
-                                Σ {formatMoney(cumulative)}
-                            </div>
-                            <div className="h-px bg-slate-700 w-full mt-2 mb-1" style={{ position: 'relative', top: 0 }}></div>
+                            )}
                             <div className="text-[10px] text-center text-slate-400 h-10 flex items-center justify-center leading-tight px-0.5">
                                 {cat.label}
                             </div>

@@ -1,19 +1,21 @@
 
+// A7: Updated CAPEX base costs to 2025 market rates ($/kW)
+// Sources: Turner & Townsend 2025, C&W 2025, JLL Construction Benchmark
 export const costFactors = {
-    building: { base: 800, label: 'Building & Civil', icon: 'building', color: '#64748b' },
-    seismic: { base: 100, label: 'Seismic Protection', icon: 'mountain', color: '#78716c' },
-    electrical: { base: 1200, label: 'Electrical (MV/LV)', icon: 'zap', color: '#3b82f6' },
-    ups: { base: 600, label: 'UPS Systems', icon: 'battery-charging', color: '#8b5cf6' },
-    generator: { base: 400, label: 'Generator & Fuel', icon: 'fuel', color: '#f59e0b' },
-    cooling: { base: 700, label: 'Cooling Systems', icon: 'snowflake', color: '#06b6d4' },
-    fireSuppression: { base: 150, label: 'Fire Suppression', icon: 'fire-extinguisher', color: '#ef4444' },
-    fireAlarm: { base: 80, label: 'Fire Alarm System', icon: 'bell', color: '#f97316' },
-    bms: { base: 120, label: 'BMS / DCIM', icon: 'monitor', color: '#10b981' },
-    network: { base: 250, label: 'Network Infra', icon: 'network', color: '#a855f7' },
-    security: { base: 80, label: 'Security Systems', icon: 'shield', color: '#6366f1' },
-    commissioning: { base: 120, label: 'Cx Agent & Startup', icon: 'clipboard-check', color: '#14b8a6' },
-    testing: { base: 90, label: 'Testing & Compliance', icon: 'award', color: '#0ea5e9' },
-    permits: { base: 60, label: 'Permits & Approvals', icon: 'file-text', color: '#84cc16' }
+    building: { base: 1050, label: 'Building & Civil', icon: 'building', color: '#64748b' },
+    seismic: { base: 130, label: 'Seismic Protection', icon: 'mountain', color: '#78716c' },
+    electrical: { base: 1550, label: 'Electrical (MV/LV)', icon: 'zap', color: '#3b82f6' },
+    ups: { base: 780, label: 'UPS Systems', icon: 'battery-charging', color: '#8b5cf6' },
+    generator: { base: 520, label: 'Generator & Fuel', icon: 'fuel', color: '#f59e0b' },
+    cooling: { base: 900, label: 'Cooling Systems', icon: 'snowflake', color: '#06b6d4' },
+    fireSuppression: { base: 195, label: 'Fire Suppression', icon: 'fire-extinguisher', color: '#ef4444' },
+    fireAlarm: { base: 105, label: 'Fire Alarm System', icon: 'bell', color: '#f97316' },
+    bms: { base: 160, label: 'BMS / DCIM', icon: 'monitor', color: '#10b981' },
+    network: { base: 325, label: 'Network Infra', icon: 'network', color: '#a855f7' },
+    security: { base: 105, label: 'Security Systems', icon: 'shield', color: '#6366f1' },
+    commissioning: { base: 155, label: 'Cx Agent & Startup', icon: 'clipboard-check', color: '#14b8a6' },
+    testing: { base: 115, label: 'Testing & Compliance', icon: 'award', color: '#0ea5e9' },
+    permits: { base: 80, label: 'Permits & Approvals', icon: 'file-text', color: '#84cc16' }
 };
 
 export const redundancyMultipliers: Record<string, number> = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };

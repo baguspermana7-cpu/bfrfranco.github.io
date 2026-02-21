@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
-import { calculateStaffing, StaffingResult, ShiftPattern, SHIFT_PATTERNS } from '@/modules/staffing/ShiftEngine';
+import { calculateStaffing, StaffingResult, ShiftPattern, SHIFT_PATTERNS, ROLE_LABELS, StaffRole } from '@/modules/staffing/ShiftEngine';
 import { generateMaintenanceSchedule } from '@/modules/maintenance/ScheduleEngine';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
 import { assignWorkOrders, buildPersonProfiles, PersonProfile, PersonalWorkOrder, generateStaffList } from '@/modules/staffing/WorkOrderEngine';
@@ -82,8 +82,100 @@ export function WorkOrderView() {
 
     const maxTotalHours = Math.max(...loadDistribution.map(d => d.totalHours), 1);
 
+    // B19: Calculate consecutive weeks with >80% utilization for overload alerts
+    const overloadAlerts = useMemo(() => {
+        const alerts: { personName: string; personId: string; consecutiveWeeks: number; startWeek: number }[] = [];
+        for (const profile of profiles) {
+            const personAssignments = assignments.filter(a => a.personId === profile.personId);
+            // Build a map of week -> utilization
+            const weekUtils: Record<number, number> = {};
+            for (const a of personAssignments) {
+                weekUtils[a.weekNumber] = a.utilizationPercent;
+            }
+            // Find max consecutive run of >80% utilization
+            let maxRun = 0;
+            let maxRunStart = 0;
+            let currentRun = 0;
+            let currentRunStart = 0;
+            for (let w = 1; w <= 52; w++) {
+                if ((weekUtils[w] || 0) > 80) {
+                    if (currentRun === 0) currentRunStart = w;
+                    currentRun++;
+                    if (currentRun > maxRun) {
+                        maxRun = currentRun;
+                        maxRunStart = currentRunStart;
+                    }
+                } else {
+                    currentRun = 0;
+                }
+            }
+            if (maxRun >= 4) {
+                alerts.push({
+                    personName: profile.personName,
+                    personId: profile.personId,
+                    consecutiveWeeks: maxRun,
+                    startWeek: maxRunStart,
+                });
+            }
+        }
+        return alerts.sort((a, b) => b.consecutiveWeeks - a.consecutiveWeeks);
+    }, [profiles, assignments]);
+
     return (
         <div className="space-y-6">
+            {/* B19: Overload Alert Banner */}
+            {overloadAlerts.length > 0 && (
+                <div className={clsx(
+                    "border rounded-xl p-4",
+                    overloadAlerts.some(a => a.consecutiveWeeks >= 8)
+                        ? "bg-red-950/40 border-red-700/60"
+                        : "bg-amber-950/40 border-amber-700/60"
+                )}>
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className={clsx(
+                            "w-5 h-5 flex-shrink-0 mt-0.5",
+                            overloadAlerts.some(a => a.consecutiveWeeks >= 8) ? "text-red-400" : "text-amber-400"
+                        )} />
+                        <div className="flex-1">
+                            <h4 className={clsx(
+                                "text-sm font-bold uppercase tracking-wider mb-2",
+                                overloadAlerts.some(a => a.consecutiveWeeks >= 8) ? "text-red-400" : "text-amber-400"
+                            )}>
+                                Workload Overload Alert
+                            </h4>
+                            <div className="space-y-1.5">
+                                {overloadAlerts.map(alert => (
+                                    <div
+                                        key={alert.personId}
+                                        className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition-colors"
+                                        onClick={() => { setSelectedPerson(alert.personId); setViewMode('calendar'); }}
+                                    >
+                                        <span className={clsx(
+                                            "w-2 h-2 rounded-full flex-shrink-0",
+                                            alert.consecutiveWeeks >= 8 ? "bg-red-500" : "bg-amber-500"
+                                        )} />
+                                        <span className="text-slate-300">
+                                            <span className="text-white font-medium">{alert.personName}</span>
+                                            {' '}&mdash; Utilization has exceeded 80% for{' '}
+                                            <span className={clsx(
+                                                "font-bold",
+                                                alert.consecutiveWeeks >= 8 ? "text-red-400" : "text-amber-400"
+                                            )}>
+                                                {alert.consecutiveWeeks} consecutive weeks
+                                            </span>
+                                            {' '}(starting Week {alert.startWeek})
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="text-xs text-slate-500 mt-2">
+                                Sustained high utilization increases error risk and staff burnout. Consider redistributing workload or adding headcount.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Controls */}
             <div className="flex flex-wrap items-center gap-4 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
                 <div className="flex items-center gap-2">
@@ -192,7 +284,7 @@ export function WorkOrderView() {
                                         <tr key={profile.personId} className="border-t border-slate-800/50 hover:bg-slate-800/30 cursor-pointer"
                                             onClick={() => { setSelectedPerson(profile.personId); setViewMode('calendar'); }}>
                                             <td className="px-4 py-3 text-white font-medium">{profile.personName}</td>
-                                            <td className="px-4 py-3 text-slate-400 capitalize">{profile.role.replace('-', ' ')}</td>
+                                            <td className="px-4 py-3 text-slate-400 capitalize">{ROLE_LABELS[profile.role as StaffRole] || profile.role}</td>
                                             <td className="px-4 py-3">
                                                 <span className="px-2 py-1 rounded text-xs bg-slate-800 text-slate-300">{profile.team}</span>
                                             </td>
@@ -293,7 +385,7 @@ function PersonCalendar({
             <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-bold text-white">{profile.personName}</h3>
-                    <p className="text-sm text-slate-400">{profile.team} · {profile.role.replace('-', ' ')} </p>
+                    <p className="text-sm text-slate-400">{profile.team} · {ROLE_LABELS[profile.role as StaffRole] || profile.role} </p>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-center">
                     <div>

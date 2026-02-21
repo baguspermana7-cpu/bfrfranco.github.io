@@ -35,7 +35,7 @@ const TRAINING_PROGRAMS: TrainingProgram[] = [
 
 export const generateAnnualRoster = (
     year: number,
-    shiftPattern: '4on-4off' | '5on-2off' | '3shift-8h',
+    shiftPattern: '4on-4off' | '4on-3off' | '5on-2off' | '3shift-8h',
     startDate: Date = new Date(year, 0, 1)
 ): RosterShift[] => {
     const roster: RosterShift[] = [];
@@ -55,6 +55,22 @@ export const generateAnnualRoster = (
         if (shiftPattern === '4on-4off') {
             // 2 Day, 2 Night, 4 Off
             const cycleDay = cycleIndex % 8;
+            if (cycleDay < 2) {
+                dayType = 'Work';
+                shiftType = 'Day';
+                hours = 12;
+            } else if (cycleDay < 4) {
+                dayType = 'Work';
+                shiftType = 'Night';
+                hours = 12;
+            } else {
+                dayType = 'Off';
+                hours = 0;
+            }
+            cycleIndex++;
+        } else if (shiftPattern === '4on-3off') {
+            // 4-on/3-off: 2 Day, 2 Night, 3 Off (7-day cycle)
+            const cycleDay = cycleIndex % 7;
             if (cycleDay < 2) {
                 dayType = 'Work';
                 shiftType = 'Day';

@@ -9,26 +9,27 @@ interface SimulationState {
         shiftModel: '8h' | '12h';
         includeLongShiftPermit: boolean;
         aqiOverride: number | null;
-        turnoverRate: number | null; // Phase 5 Add
-        // Phase 12 Add
+        turnoverRate: number | null;
         itLoad: number; // kW
         buildingSize: number; // m2
-        coolingType: 'air' | 'inrow' | 'rdhx' | 'liquid'; // Aligned with Capex
+        coolingType: 'air' | 'inrow' | 'rdhx' | 'liquid';
         coolingTopology: 'in-row' | 'perimeter' | 'dlc';
         powerRedundancy: 'N+1' | '2N' | '2N+1';
 
         maintenanceStrategy: 'reactive' | 'planned' | 'predictive';
         maintenanceModel: 'in-house' | 'vendor' | 'hybrid';
-        hybridRatio: number; // 0.0 to 1.0 (In-house Portion)
-        // Phase 13 Add
+        hybridRatio: number;
         headcount_ShiftLead: number;
         headcount_Engineer: number;
         headcount_Technician: number;
         headcount_Admin: number;
         headcount_Janitor: number;
         baseYear: number;
+        // A12: Configurable occupancy ramp (year-by-year %)
+        occupancyRamp: number[];
+        staffingAutoMode: boolean;
     };
-    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance';
+    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq';
     isLoading: boolean;
     actions: {
         setLoading: (loading: boolean) => void;
@@ -38,8 +39,9 @@ interface SimulationState {
         toggleLongShiftPermit: () => void;
         setAqiOverride: (aqi: number) => void;
         setTurnoverRate: (rate: number) => void;
+        toggleStaffingAutoMode: () => void;
         setInputs: (inputs: Partial<SimulationState['inputs']>) => void; // Bulk update
-        setActiveTab: (tab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance') => void;
+        setActiveTab: (tab: SimulationState['activeTab']) => void;
     };
 }
 
@@ -67,8 +69,11 @@ export const useSimulationStore = create<SimulationState>((set) => ({
         headcount_Engineer: 5,  // 4 on shift + 1 floating/relief
         headcount_Technician: 2, // Day shift preventive maintenance
         headcount_Admin: 1,     // Supervisor (Day M-F)
-        headcount_Janitor: 2,   // Day/evening coverage
+        headcount_Janitor: 2,
         baseYear: 2025,
+        // A12: Default occupancy ramp (editable per-year)
+        occupancyRamp: [0.25, 0.50, 0.70, 0.85, 0.92, 0.95, 0.95, 0.95, 0.95, 0.95],
+        staffingAutoMode: true,
     },
     activeTab: 'sim', // Change default to SIM for "Super App" feel
     actions: {
@@ -100,10 +105,27 @@ export const useSimulationStore = create<SimulationState>((set) => ({
             set((state) => ({
                 inputs: { ...state.inputs, turnoverRate: rate },
             })),
-        setInputs: (newInputs) =>
+        toggleStaffingAutoMode: () =>
             set((state) => ({
-                inputs: { ...state.inputs, ...newInputs },
+                inputs: { ...state.inputs, staffingAutoMode: !state.inputs.staffingAutoMode },
             })),
+        // D1: Input validation with min/max clamping
+        setInputs: (newInputs) =>
+            set((state) => {
+                const validated = { ...newInputs };
+                if (validated.itLoad !== undefined) validated.itLoad = Math.max(100, Math.min(500000, validated.itLoad));
+                if (validated.buildingSize !== undefined) validated.buildingSize = Math.max(100, Math.min(100000, validated.buildingSize));
+                if (validated.headcount_ShiftLead !== undefined) validated.headcount_ShiftLead = Math.max(0, Math.min(50, validated.headcount_ShiftLead));
+                if (validated.headcount_Engineer !== undefined) validated.headcount_Engineer = Math.max(0, Math.min(100, validated.headcount_Engineer));
+                if (validated.headcount_Technician !== undefined) validated.headcount_Technician = Math.max(0, Math.min(100, validated.headcount_Technician));
+                if (validated.headcount_Admin !== undefined) validated.headcount_Admin = Math.max(0, Math.min(20, validated.headcount_Admin));
+                if (validated.headcount_Janitor !== undefined) validated.headcount_Janitor = Math.max(0, Math.min(20, validated.headcount_Janitor));
+                if (validated.hybridRatio !== undefined) validated.hybridRatio = Math.max(0, Math.min(1, validated.hybridRatio));
+                if (validated.turnoverRate !== undefined && validated.turnoverRate !== null) {
+                    validated.turnoverRate = Math.max(0, Math.min(1, validated.turnoverRate));
+                }
+                return { inputs: { ...state.inputs, ...validated } };
+            }),
         setActiveTab: (tab) =>
             set(() => ({ activeTab: tab })),
     },

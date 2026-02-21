@@ -9,10 +9,11 @@ import { Tooltip } from '@/components/ui/Tooltip';
 interface RosterVisualizerProps {
     roster: RosterShift[];
     year: number;
+    shiftModel: '8h' | '12h';
 }
 
-export function RosterVisualizer({ roster, year }: RosterVisualizerProps) {
-    const [selectedRole, setSelectedRole] = React.useState<'team-a' | 'team-b' | 'team-c' | 'team-d'>('team-a');
+export function RosterVisualizer({ roster, year, shiftModel }: RosterVisualizerProps) {
+    const [selectedRole, setSelectedRole] = React.useState<string>('team-a');
 
     const months = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -81,25 +82,40 @@ export function RosterVisualizer({ roster, year }: RosterVisualizerProps) {
                     >
                         <option value="team-a">Team A (Shift Lead)</option>
                         <option value="team-b">Team B (Engineer)</option>
-                        <option value="team-c">Team C (Tech 1)</option>
-                        <option value="team-d">Team D (Tech 2)</option>
+                        {shiftModel === '8h' && <option value="team-c">Team C (Tech 1)</option>}
+                        {shiftModel === '8h' && <option value="team-d">Team D (Tech 2)</option>}
                     </select>
                 </div>
             </div>
 
             <div className="flex gap-4 mb-4 text-sm">
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-cyan-500 rounded"></div>
-                    <span className="text-slate-300">Morning (06-14)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-600 rounded"></div>
-                    <span className="text-slate-300">Afternoon (14-22)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-indigo-600 rounded"></div>
-                    <span className="text-slate-300">Night (22-06)</span>
-                </div>
+                {shiftModel === '8h' ? (
+                    <>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-cyan-500 rounded"></div>
+                            <span className="text-slate-300">Morning (06-14)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-blue-600 rounded"></div>
+                            <span className="text-slate-300">Afternoon (14-22)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-indigo-600 rounded"></div>
+                            <span className="text-slate-300">Night (22-06)</span>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-cyan-500 rounded"></div>
+                            <span className="text-slate-300">Day (06-18)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-indigo-600 rounded"></div>
+                            <span className="text-slate-300">Night (18-06)</span>
+                        </div>
+                    </>
+                )}
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded"></div>
                     <span className="text-slate-500">Off Duty</span>
@@ -118,7 +134,8 @@ export function RosterVisualizer({ roster, year }: RosterVisualizerProps) {
                                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider text-right pr-2">
                                     {month}
                                 </div>
-                                <div className="flex gap-px h-8 bg-slate-950/50 rounded-md overflow-hidden border border-slate-800/50">
+                                {/* B8: Increased cell height from 8 to 12px min */}
+                                <div className="flex gap-px h-12 bg-slate-950/50 rounded-md overflow-hidden border border-slate-800/50">
                                     {daysInMonthBase.map((dayBase, dayIdx) => {
                                         const actualShift = getShiftForRole(dayBase.date, selectedRole);
 
@@ -150,7 +167,7 @@ export function RosterVisualizer({ roster, year }: RosterVisualizerProps) {
 
             <p className="text-xs text-slate-500 mt-2 text-center">
                 Visualizing schedule for <span className="text-white font-medium">{selectedRole.toUpperCase().replace('-', ' ')}</span>.
-                Pattern rotates every 28 days.
+                {shiftModel === '12h' ? '7' : '8'}-day cycle.
             </p>
         </div>
     );

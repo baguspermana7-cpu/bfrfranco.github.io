@@ -4,7 +4,9 @@ import React, { useMemo, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
+import { useScenarioStore } from '@/store/scenario';
 import { runSensitivityAnalysis } from '@/modules/analytics/SensitivityEngine';
+import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
 import TornadoChart from '@/components/visualizations/TornadoChart';
 import SankeyDiagram from '@/components/visualizations/SankeyDiagram';
 import type { SankeyNode, SankeyLink } from '@/components/visualizations/SankeyDiagram';
@@ -43,9 +45,14 @@ const REPORT_SECTIONS: { id: SectionId; label: string; icon: React.ReactNode }[]
 export function ReportDashboard() {
     const { selectedCountry, inputs } = useSimulationStore();
     const { inputs: capexInputs } = useCapexStore();
+    const { scenarios } = useScenarioStore();
     const [isGenerating, setIsGenerating] = useState<string | null>(null);
     const [simYear, setSimYear] = useState(2025);
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
+
+    // B9: Scenario Comparison state
+    const [scenarioA, setScenarioA] = useState<string>('');
+    const [scenarioB, setScenarioB] = useState<string>('');
 
     // Report Builder state
     const [visibleSections, setVisibleSections] = useState<Set<SectionId>>(
@@ -219,21 +226,28 @@ export function ReportDashboard() {
         // Risk (Fix: 'risks' on CountryProfile is actually 'risk' or distinct properties)
         const countryRisks = (selectedCountry as any).risks || { seismicActivity: 0, floodRisk: 0, gridInstability: 0 };
         const slaHours = inputs.maintenanceStrategy === 'reactive' ? 24 : 4;
-        const risk = calculateDowntimeRisk(inputs.tierLevel, 5000, slaHours);
+        const risk = calculateDowntimeRisk(inputs.tierLevel, undefined, slaHours, selectedCountry ?? undefined);
 
-        // Financials (Simplified mocking)
-        const revenueAnnual = inputs.itLoad * 150 * 12;
+        // A2: Use actual FinancialEngine instead of hardcoded IRR
         const stratCost = strategyData.strategies.find(s => s.id === inputs.maintenanceStrategy)?.totalAnnualCost || 0;
         const opexAnnual = totalMonthlyLabor * 12 + stratCost;
-        const ebitda = revenueAnnual - opexAnnual;
-        const npv = ebitda * 5 - capexResults.total;
+        const projectLifeYears = 10;
+        const taxRate = selectedCountry?.economy?.taxRate ?? 0.30;
+        const occupancyRamp = defaultOccupancyRamp(projectLifeYears);
 
-        const financialResult = {
-            npv,
-            irr: 18.5,
-            paybackPeriodYears: capexResults.total / (ebitda || 1),
-            roiPercent: (npv / (capexResults.total || 1)) * 100
-        };
+        const financialResult = calculateFinancials({
+            totalCapex: capexResults.total,
+            annualOpex: opexAnnual,
+            revenuePerKwMonth: 150,
+            itLoadKw: inputs.itLoad,
+            discountRate: 0.08,
+            projectLifeYears,
+            escalationRate: 0.03,
+            opexEscalation: selectedCountry?.economy?.inflationRate ?? 0.03,
+            occupancyRamp,
+            taxRate,
+            depreciationYears: 20,
+        });
 
         // Insights / Executive Summary
         const execSummary = generateExecutiveSummary(
@@ -473,6 +487,94 @@ export function ReportDashboard() {
                     ))}
                 </div>
             </div>
+
+            {/* ═══ B9: SCENARIO COMPARISON VIEW ═══ */}
+            {scenarios.length >= 2 && (
+                <div className="bg-white dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
+                    <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <BarChart3 className="w-5 h-5 text-violet-500 dark:text-violet-400" />
+                            Scenario Comparison
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1">Select two saved scenarios to compare side-by-side</p>
+                    </div>
+                    <div className="p-6">
+                        <div className="flex gap-4 mb-6">
+                            <div className="flex-1 space-y-1">
+                                <label className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">Scenario A</label>
+                                <select
+                                    value={scenarioA}
+                                    onChange={(e) => setScenarioA(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
+                                >
+                                    <option value="">Select scenario...</option>
+                                    {scenarios.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <label className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">Scenario B</label>
+                                <select
+                                    value={scenarioB}
+                                    onChange={(e) => setScenarioB(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
+                                >
+                                    <option value="">Select scenario...</option>
+                                    {scenarios.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        {(() => {
+                            const sA = scenarios.find(s => s.id === scenarioA);
+                            const sB = scenarios.find(s => s.id === scenarioB);
+                            if (!sA || !sB) return (
+                                <div className="text-center text-sm text-slate-400 py-6">Select two scenarios above to view comparison</div>
+                            );
+                            const deltaOpex = sB.summary.monthlyOpex - sA.summary.monthlyOpex;
+                            const deltaCapex = sB.summary.annualCapex - sA.summary.annualCapex;
+                            const deltaStaff = sB.summary.totalStaff - sA.summary.totalStaff;
+                            const deltaPue = sB.summary.pue - sA.summary.pue;
+                            const rows = [
+                                { label: 'Monthly OPEX', a: fmt(sA.summary.monthlyOpex), b: fmt(sB.summary.monthlyOpex), delta: deltaOpex, fmtDelta: fmt(Math.abs(deltaOpex)) },
+                                { label: 'Annual CAPEX', a: fmt(sA.summary.annualCapex), b: fmt(sB.summary.annualCapex), delta: deltaCapex, fmtDelta: fmt(Math.abs(deltaCapex)) },
+                                { label: 'Total Staff', a: `${sA.summary.totalStaff}`, b: `${sB.summary.totalStaff}`, delta: deltaStaff, fmtDelta: `${Math.abs(deltaStaff)}` },
+                                { label: 'PUE', a: sA.summary.pue.toFixed(2), b: sB.summary.pue.toFixed(2), delta: deltaPue, fmtDelta: Math.abs(deltaPue).toFixed(2) },
+                            ];
+                            return (
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="border-b border-slate-200 dark:border-slate-700">
+                                            <th className="py-2 text-left text-xs text-slate-500 font-medium">Metric</th>
+                                            <th className="py-2 text-right text-xs text-violet-600 dark:text-violet-400 font-medium">{sA.name}</th>
+                                            <th className="py-2 text-right text-xs text-cyan-600 dark:text-cyan-400 font-medium">{sB.name}</th>
+                                            <th className="py-2 text-right text-xs text-slate-500 font-medium">Delta (B-A)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rows.map((row, i) => (
+                                            <tr key={i} className="border-b border-slate-100 dark:border-slate-800/50">
+                                                <td className="py-3 text-slate-700 dark:text-slate-300">{row.label}</td>
+                                                <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{row.a}</td>
+                                                <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{row.b}</td>
+                                                <td className="py-3 text-right font-mono">
+                                                    <span className={clsx(
+                                                        row.delta > 0 ? 'text-red-500 dark:text-red-400' : row.delta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'
+                                                    )}>
+                                                        {row.delta > 0 ? '+' : row.delta < 0 ? '-' : ''}{row.fmtDelta}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            );
+                        })()}
+                    </div>
+                </div>
+            )}
 
             {/* Module-Specific Downloads */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -845,7 +947,9 @@ export function ReportDashboard() {
                         buildingSize: inputs.buildingSize,
                     },
                     selectedCountry.labor.baseSalary_Engineer,
-                    12000
+                    12000,
+                    0.20,
+                    selectedCountry
                 ) : [];
                 return sensitivityData.length > 0 ? (
                     <div id="tornado-chart-container" className="bg-white dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">

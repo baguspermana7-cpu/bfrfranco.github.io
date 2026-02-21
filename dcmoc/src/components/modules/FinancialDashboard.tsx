@@ -3,13 +3,15 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { calculateFinancials, defaultOccupancyRamp, FinancialResult } from '@/modules/analytics/FinancialEngine';
 import { calculateRevenue, defaultRevenueOccupancy, RevenueResult } from '@/modules/analytics/RevenueEngine';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { TrendingUp, DollarSign, Clock, Percent, BarChart3, ArrowUpRight, ArrowDownRight, Calculator, Receipt, Repeat, HandCoins, FileText } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, ReferenceLine,
-    ComposedChart, Bar, Line, Legend
+    ComposedChart, Bar, Line, Legend, LineChart, BarChart
 } from 'recharts';
 import { generateFinancialPDF } from '@/modules/reporting/PdfGenerator';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
@@ -74,6 +76,7 @@ const EditableCell = ({ value, onChange, className = '' }: {
 
 const FinancialDashboard = () => {
     const { selectedCountry, inputs } = useSimulationStore();
+    const effectiveInputs = useEffectiveInputs();
     const capexStore = useCapexStore();
     const capexResults = capexStore.results;
     const [isExporting, setIsExporting] = useState(false);
@@ -118,21 +121,21 @@ const FinancialDashboard = () => {
         }));
     }, []);
 
-    // Annual OPEX from sim inputs
+    // Annual OPEX from sim inputs (uses effective inputs for auto-calculated headcounts)
     const annualOpex = useMemo(() => {
         if (!selectedCountry) return 0;
         const labor = selectedCountry.labor;
         const staffCost = (
-            inputs.headcount_ShiftLead * labor.baseSalary_ShiftLead +
-            inputs.headcount_Engineer * labor.baseSalary_Engineer +
-            inputs.headcount_Technician * labor.baseSalary_Technician +
-            inputs.headcount_Admin * labor.baseSalary_Admin +
-            inputs.headcount_Janitor * labor.baseSalary_Janitor
+            effectiveInputs.headcount_ShiftLead * labor.baseSalary_ShiftLead +
+            effectiveInputs.headcount_Engineer * labor.baseSalary_Engineer +
+            effectiveInputs.headcount_Technician * labor.baseSalary_Technician +
+            effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
+            effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
         ) * 12;
-        const energyCost = inputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
-        const maintenanceCost = inputs.itLoad * 50;
+        const energyCost = effectiveInputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
+        const maintenanceCost = effectiveInputs.itLoad * 50;
         return staffCost + energyCost + maintenanceCost;
-    }, [selectedCountry, inputs]);
+    }, [selectedCountry, effectiveInputs]);
 
     // Financial projection
     const result: FinancialResult | null = useMemo(() => {
@@ -170,6 +173,54 @@ const FinancialDashboard = () => {
             occupancyRamp: defaultRevenueOccupancy(years),
         });
     }, [revInputs, inputs.itLoad, capexStore.inputs.itLoad]);
+
+    // B11: Occupancy impact data
+    const occupancyImpactData = useMemo(() => {
+        if (!capexResults) return [];
+        return Array.from({ length: 8 }, (_, i) => {
+            const occ = 0.30 + i * 0.10;
+            const annualRevenue = finInputs.revenuePerKwMonth * 12 * inputs.itLoad * occ;
+            const annualNetCashflow = annualRevenue - annualOpex;
+            const totalCapex = capexResults.total;
+            let npvCalc = -totalCapex;
+            for (let y = 1; y <= finInputs.projectLifeYears; y++) {
+                const escalatedRev = annualRevenue * Math.pow(1 + finInputs.escalationRate, y - 1);
+                const escalatedOpex = annualOpex * Math.pow(1 + finInputs.opexEscalation, y - 1);
+                const netCf = escalatedRev - escalatedOpex;
+                npvCalc += netCf / Math.pow(1 + finInputs.discountRate, y);
+            }
+            const irrApprox = totalCapex > 0 ? ((annualNetCashflow / totalCapex) * 100) : 0;
+            return {
+                occupancy: `${(occ * 100).toFixed(0)}%`,
+                occupancyPct: occ * 100,
+                npv: npvCalc,
+                irr: irrApprox,
+            };
+        });
+    }, [capexResults, finInputs, annualOpex, inputs.itLoad]);
+
+    // B16: Budget vs Forecast data
+    const budgetVsForecastData = useMemo(() => {
+        if (!selectedCountry) return [];
+        const labor = selectedCountry.labor;
+        const laborBudget = (
+            inputs.headcount_ShiftLead * labor.baseSalary_ShiftLead +
+            inputs.headcount_Engineer * labor.baseSalary_Engineer +
+            inputs.headcount_Technician * labor.baseSalary_Technician +
+            inputs.headcount_Admin * labor.baseSalary_Admin +
+            inputs.headcount_Janitor * labor.baseSalary_Janitor
+        ) * 12;
+        const maintenanceBudget = inputs.itLoad * 50;
+        const energyBudget = inputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
+        const vendorBudget = 50000;
+        const esc = 1 + (finInputs.opexEscalation || 0.035);
+        return [
+            { category: 'Labor', budget: laborBudget, forecast: laborBudget * esc },
+            { category: 'Maintenance', budget: maintenanceBudget, forecast: maintenanceBudget * (esc * 1.05) },
+            { category: 'Energy', budget: energyBudget, forecast: energyBudget * (esc * 0.98) },
+            { category: 'Vendor', budget: vendorBudget, forecast: vendorBudget * esc },
+        ];
+    }, [selectedCountry, inputs, finInputs.opexEscalation]);
 
     if (!result || !capexResults || !selectedCountry) {
         return <div className="p-8 text-center text-slate-500">Configure CAPEX Engine first to view financial analysis.</div>;
@@ -261,20 +312,20 @@ const FinancialDashboard = () => {
                             Financial Analysis
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Revenue per kW/month ($)</label>
+                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier." /></label>
                             <input type="number" className={inpCls}
                                 value={finInputs.revenuePerKwMonth}
                                 onChange={e => handleChange('revenuePerKwMonth', Number(e.target.value))} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Discount Rate (%)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Discount Rate (%) <Tooltip content="Weighted Average Cost of Capital (WACC). Used to discount future cashflows to present value. Typical DC range: 8-12%." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.discountRate * 100).toFixed(0)}
                                     onChange={e => handleChange('discountRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Project Life (yrs)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Project Life (yrs) <Tooltip content="Economic useful life of the facility for financial modeling. Typically 10-25 years for data centers." /></label>
                                 <input type="number" className={inpCls}
                                     value={finInputs.projectLifeYears}
                                     onChange={e => handleChange('projectLifeYears', Number(e.target.value))}
@@ -297,13 +348,13 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Tax Rate (%)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="Corporate income tax rate applied to taxable income after depreciation. Varies by jurisdiction." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.taxRate * 100).toFixed(0)}
                                     onChange={e => handleChange('taxRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Depreciation (yrs)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs." /></label>
                                 <input type="number" className={inpCls}
                                     value={finInputs.depreciationYears}
                                     onChange={e => handleChange('depreciationYears', Number(e.target.value))}
@@ -430,7 +481,7 @@ const FinancialDashboard = () => {
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">NPV</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">NPV</span><Tooltip content="Net Present Value — sum of all discounted future cashflows minus initial investment. Positive = value-creating project." />
                             </div>
                             <div className={`text-2xl font-bold ${result.npv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                                 {fmtMoney(result.npv)}
@@ -442,7 +493,7 @@ const FinancialDashboard = () => {
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <TrendingUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">IRR</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">IRR</span><Tooltip content="Internal Rate of Return — the discount rate at which NPV equals zero. Must exceed WACC (hurdle rate) for project approval." />
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-1">
                                 {result.irr.toFixed(1)}%
@@ -460,7 +511,7 @@ const FinancialDashboard = () => {
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Payback</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Payback</span><Tooltip content="Simple payback period — years until cumulative net cashflow turns positive. Discounted payback accounts for time value of money." />
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.paybackPeriodYears} <span className="text-sm text-slate-500 dark:text-slate-400">yrs</span></div>
                             <div className="text-xs text-slate-500 mt-1">Discounted: {result.discountedPaybackYears} yrs</div>
@@ -470,7 +521,7 @@ const FinancialDashboard = () => {
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Percent className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">ROI</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">ROI</span><Tooltip content="Return on Investment — total profit as percentage of initial CAPEX. PI (Profitability Index) = PV of cashflows / investment." />
                             </div>
                             <div className={`text-2xl font-bold ${result.roiPercent > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                                 {result.roiPercent.toFixed(0)}%
@@ -801,6 +852,106 @@ const FinancialDashboard = () => {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* ═══ B11: OCCUPANCY IMPACT CHART ═══ */}
+                {(() => {
+                    const breakEvenPct = occupancyImpactData.find(d => d.npv >= 0)?.occupancyPct ?? 100;
+
+                    return occupancyImpactData.length > 0 ? (
+                        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                                    Occupancy Impact — NPV &amp; IRR Sensitivity
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <LineChart data={occupancyImpactData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                                        <XAxis dataKey="occupancy" stroke="#64748b" fontSize={11} />
+                                        <YAxis
+                                            yAxisId="left"
+                                            stroke="#10b981"
+                                            fontSize={11}
+                                            tickFormatter={(v: number) => fmtMoney(v)}
+                                            label={{ value: 'NPV ($)', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 10 }}
+                                        />
+                                        <YAxis
+                                            yAxisId="right"
+                                            orientation="right"
+                                            stroke="#6366f1"
+                                            fontSize={11}
+                                            tickFormatter={(v: number) => `${v.toFixed(0)}%`}
+                                            label={{ value: 'IRR (%)', angle: 90, position: 'insideRight', fill: '#64748b', fontSize: 10 }}
+                                        />
+                                        <RTooltip
+                                            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
+                                            labelStyle={{ color: '#e2e8f0' }}
+                                            formatter={((value: number, name: string) => [
+                                                name === 'npv' ? fmtMoney(value) : `${value.toFixed(1)}%`,
+                                                name === 'npv' ? 'NPV' : 'IRR'
+                                            ]) as any}
+                                        />
+                                        <ReferenceLine yAxisId="left" y={0} stroke="#ef4444" strokeDasharray="6 3" label={{ value: 'Break-even', fill: '#ef4444', fontSize: 10, position: 'insideTopRight' }} />
+                                        <ReferenceLine x={`${breakEvenPct.toFixed(0)}%`} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: `BE: ${breakEvenPct.toFixed(0)}%`, fill: '#f59e0b', fontSize: 10, position: 'top' }} />
+                                        <Line yAxisId="left" type="monotone" dataKey="npv" stroke="#10b981" strokeWidth={2} dot={{ r: 4, fill: '#10b981' }} name="npv" />
+                                        <Line yAxisId="right" type="monotone" dataKey="irr" stroke="#6366f1" strokeWidth={2} dot={{ r: 4, fill: '#6366f1' }} strokeDasharray="5 5" name="irr" />
+                                        <Legend formatter={(value: string) => value === 'npv' ? 'NPV ($)' : 'IRR (%)'} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </CardContent>
+                        </Card>
+                    ) : null;
+                })()}
+
+                {/* ═══ B16: BUDGET VS FORECAST VARIANCE ═══ */}
+                {(() => {
+                    return budgetVsForecastData.length > 0 ? (
+                        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
+                                    <BarChart3 className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
+                                    Budget vs Forecast Variance
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <ResponsiveContainer width="100%" height={280}>
+                                    <BarChart data={budgetVsForecastData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                                        <XAxis dataKey="category" stroke="#64748b" fontSize={11} />
+                                        <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v: number) => fmtMoney(v)} />
+                                        <RTooltip
+                                            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
+                                            labelStyle={{ color: '#e2e8f0' }}
+                                            formatter={((value: number, name: string) => [
+                                                fmtMoney(value),
+                                                name === 'budget' ? 'Budget' : 'Forecast'
+                                            ]) as any}
+                                        />
+                                        <Legend formatter={(value: string) => value === 'budget' ? 'Budget' : 'Forecast'} />
+                                        <Bar dataKey="budget" fill="#06b6d4" radius={[4, 4, 0, 0]} name="budget" />
+                                        <Bar dataKey="forecast" fill="#f59e0b" radius={[4, 4, 0, 0]} name="forecast" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                                <div className="mt-3 grid grid-cols-4 gap-2">
+                                    {budgetVsForecastData.map((d, i) => {
+                                        const variance = d.forecast - d.budget;
+                                        const variancePct = d.budget > 0 ? ((variance / d.budget) * 100) : 0;
+                                        return (
+                                            <div key={i} className="text-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                                                <div className="text-xs text-slate-500 mb-1">{d.category}</div>
+                                                <div className={`text-sm font-mono font-bold ${variance > 0 ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                                    {variance > 0 ? '+' : ''}{variancePct.toFixed(1)}%
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ) : null;
+                })()}
 
             </div>
         </div>

@@ -45,7 +45,7 @@ export interface FinancialResult {
 }
 
 // ─── IRR CALCULATION (Newton-Raphson) ───────────────────────
-const calculateIRR = (cashflows: number[], guess: number = 0.10, maxIter: number = 200, tolerance: number = 1e-7): number => {
+export const calculateIRR = (cashflows: number[], guess: number = 0.10, maxIter: number = 200, tolerance: number = 1e-7): number => {
     let rate = guess;
 
     for (let i = 0; i < maxIter; i++) {

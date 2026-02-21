@@ -9,10 +9,22 @@ import CapexDashboard from '@/components/modules/CapexDashboard';
 import RiskDashboard from '@/components/modules/RiskDashboard';
 import CarbonDashboard from '@/components/modules/CarbonDashboard';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
+import InvestmentDashboard from '@/components/modules/InvestmentDashboard';
+import BenchmarkDashboard from '@/components/modules/BenchmarkDashboard';
+import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
+import PortfolioDashboard from '@/components/modules/PortfolioDashboard';
+import { FaqDashboard } from '@/components/modules/FaqDashboard';
+import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparisonPanel';
+import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
 
 export default function Home() {
   const { activeTab } = useSimulationStore();
+  const { isComparisonMode } = useScenarioStore();
+
+  if (isComparisonMode) {
+    return <ScenarioComparisonPanel />;
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -32,6 +44,16 @@ export default function Home() {
         return <CarbonDashboard />;
       case 'finance':
         return <FinancialDashboard />;
+      case 'invest':
+        return <InvestmentDashboard />;
+      case 'benchmark':
+        return <BenchmarkDashboard />;
+      case 'montecarlo':
+        return <MonteCarloDashboard />;
+      case 'portfolio':
+        return <PortfolioDashboard />;
+      case 'faq':
+        return <FaqDashboard />;
       default: // 'sim'
         return (
           <div className="text-center space-y-4 max-w-2xl mx-auto pt-20">

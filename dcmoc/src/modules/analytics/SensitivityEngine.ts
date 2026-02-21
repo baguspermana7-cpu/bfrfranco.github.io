@@ -1,6 +1,8 @@
 // ─── SENSITIVITY ANALYSIS ENGINE ────────────────────────────
 // Perturbs each input ±20% and measures TCO impact
 
+import { CountryProfile } from '@/constants/countries';
+
 export interface SensitivityResult {
     parameter: string;
     label: string;
@@ -30,9 +32,8 @@ interface SensitivityInputs {
     buildingSize: number;
 }
 
-// Simple linearized TCO model for sensitivity (avoids importing full engines)
-// Approximates annual TCO = OPEX + (CAPEX / projectLife)
-const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerKw: number): number => {
+// A4 + A14: Use country-specific energy rate and improved TCO model
+const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerKw: number, country?: CountryProfile): number => {
     const projectLife = 10;
 
     // Staffing OPEX (monthly × 12)
@@ -46,15 +47,21 @@ const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerK
     // Maintenance OPEX (simplified)
     const maintenanceOpex = inputs.itLoad * 50 * (1 - inputs.hybridRatio * 0.1); // $50/kW base
 
-    // Energy OPEX
-    const pue = inputs.tierLevel >= 4 ? 1.3 : inputs.tierLevel >= 3 ? 1.4 : 1.6;
-    const energyOpex = inputs.itLoad * pue * 8760 * 0.10 / 1000; // $0.10/kWh
+    // A4: Country-specific electricity rate (default $0.10/kWh for backward compat)
+    const electricityRate = country?.economy?.electricityRate ?? 0.10;
+    // A8: Updated PUE estimates per tier
+    const pue = inputs.tierLevel >= 4 ? 1.20 : inputs.tierLevel >= 3 ? 1.28 : 1.45;
+    const energyOpex = inputs.itLoad * pue * 8760 * electricityRate / 1000;
 
-    // CAPEX annualized
+    // A14: Improved annualized CAPEX with tax depreciation benefit
+    const taxRate = country?.economy?.taxRate ?? 0.30;
     const capex = inputs.itLoad * capexPerKw;
     const softCosts = capex * ((inputs.designFee + inputs.pmFee) / 100);
     const contingencyCost = capex * (inputs.contingency / 100);
-    const annualizedCapex = (capex + softCosts + contingencyCost) / projectLife;
+    const totalCapex = capex + softCosts + contingencyCost;
+    const annualDepreciation = totalCapex / 20; // 20-year straight-line
+    const depreciationTaxShield = annualDepreciation * taxRate;
+    const annualizedCapex = (totalCapex / projectLife) - depreciationTaxShield;
 
     return staffOpex + turnover + maintenanceOpex + energyOpex + annualizedCapex;
 };
@@ -63,9 +70,10 @@ export const runSensitivityAnalysis = (
     inputs: SensitivityInputs,
     baseSalaryAvg: number = 3000,
     capexPerKw: number = 12000,
-    perturbation: number = 0.20
+    perturbation: number = 0.20,
+    country?: CountryProfile
 ): SensitivityResult[] => {
-    const baseTCO = estimateTCO(inputs, baseSalaryAvg, capexPerKw);
+    const baseTCO = estimateTCO(inputs, baseSalaryAvg, capexPerKw, country);
 
     const parameters: { key: keyof SensitivityInputs; label: string; minClamp?: number }[] = [
         { key: 'itLoad', label: 'IT Load (kW)' },
@@ -92,8 +100,8 @@ export const runSensitivityAnalysis = (
         const lowInputs = { ...inputs, [param.key]: low };
         const highInputs = { ...inputs, [param.key]: high };
 
-        const lowTCO = estimateTCO(lowInputs, baseSalaryAvg, capexPerKw);
-        const highTCO = estimateTCO(highInputs, baseSalaryAvg, capexPerKw);
+        const lowTCO = estimateTCO(lowInputs, baseSalaryAvg, capexPerKw, country);
+        const highTCO = estimateTCO(highInputs, baseSalaryAvg, capexPerKw, country);
 
         results.push({
             parameter: param.key,

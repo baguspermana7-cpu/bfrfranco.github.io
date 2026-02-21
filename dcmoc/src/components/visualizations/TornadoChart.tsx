@@ -44,9 +44,9 @@ const TornadoChart: React.FC<TornadoChartProps> = ({ data, maxItems = 8 }) => {
 
                     return (
                         <div key={item.parameter} className="flex items-center group hover:bg-slate-100 dark:hover:bg-slate-800/30 rounded px-2 py-1 transition-colors">
-                            {/* Left bar (low / decrease) */}
+                            {/* Left bar (low / decrease) — B5: permanent labels */}
                             <div className="w-36 flex justify-end items-center">
-                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 mr-2">
                                     {fmtPct(item.deltaLow)}
                                 </span>
                                 <div
@@ -74,7 +74,7 @@ const TornadoChart: React.FC<TornadoChartProps> = ({ data, maxItems = 8 }) => {
                                         opacity: 0.8 + (i === 0 ? 0.2 : 0),
                                     }}
                                 />
-                                <span className="text-[10px] text-red-600 dark:text-red-400 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[10px] text-red-600 dark:text-red-400 ml-2">
                                     {fmtPct(item.deltaHigh)}
                                 </span>
                             </div>

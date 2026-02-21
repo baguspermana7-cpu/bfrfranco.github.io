@@ -3,12 +3,15 @@
  * Based on Uptime Institute Tier Standards & Business Criticiality.
  */
 
+import { CountryProfile } from '@/constants/countries';
+
 export interface DowntimeRisk {
     tier: 2 | 3 | 4;
     availability: number;
     expectedDowntimeMinutes: number;
     financialImpact: number;
     slaBreachProbability: 'Low' | 'Medium' | 'High';
+    costPerMinute: number; // Expose for transparency
 }
 
 const TIER_STATS = {
@@ -17,19 +20,22 @@ const TIER_STATS = {
     4: { name: 'Tier IV', availability: 99.995, downtimeMinutes: 26 }    // ~0.4 hours
 };
 
+// A5: Country-specific downtime cost with configurable override
 export const calculateDowntimeRisk = (
     tierLevel: 2 | 3 | 4,
-    costPerMinute: number = 5000, // Default $5k/min for enterprise
-    slaResponseTimeHours: number = 4
+    costPerMinute?: number,
+    slaResponseTimeHours: number = 4,
+    country?: CountryProfile
 ): DowntimeRisk => {
     const stats = TIER_STATS[tierLevel];
 
+    // Use provided cost, then country cost, then fallback to $5000 (US default)
+    const effectiveCostPerMin = costPerMinute ?? country?.risk?.downtimeCostPerMin ?? 5000;
+
     // Financial Impact
-    const financialImpact = stats.downtimeMinutes * costPerMinute;
+    const financialImpact = stats.downtimeMinutes * effectiveCostPerMin;
 
     // SLA Breach Probability
-    // If expected downtime events (MTTR) exceed SLA response, risk is high.
-    // Simplifying: Tier 2 has single paths, higher failure prob.
     let probability: 'Low' | 'Medium' | 'High' = 'Low';
 
     if (tierLevel === 2) probability = 'High';
@@ -41,6 +47,7 @@ export const calculateDowntimeRisk = (
         availability: stats.availability,
         expectedDowntimeMinutes: stats.downtimeMinutes,
         financialImpact,
-        slaBreachProbability: probability
+        slaBreachProbability: probability,
+        costPerMinute: effectiveCostPerMin,
     };
 };

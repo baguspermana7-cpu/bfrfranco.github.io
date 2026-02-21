@@ -198,7 +198,8 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     currentTotal += renewableCost * globalMult;
 
     // Metrics
-    const pue = coolingType === 'air' ? 1.45 : (coolingType === 'inrow' ? 1.35 : (coolingType === 'rdhx' ? 1.25 : 1.15));
+    // A8: Updated PUE to modern 2025 standards
+    const pue = coolingType === 'air' ? 1.35 : (coolingType === 'inrow' ? 1.28 : (coolingType === 'rdhx' ? 1.18 : 1.08));
     const annualEnergy = itLoad * pue * 8760 * 0.10; // $0.10/kWh default
     const floorSpace = Math.ceil(racks * 2.5); // 2.5 m2 per rack
 
@@ -264,6 +265,29 @@ export const computeTimeline = (redundancy: string, building: string, cooling: s
             { name: 'Commissioning', start: startComm, end: startComm + comm, color: '#ec4899' }
         ]
     };
+};
+
+// A13: Equipment Lifecycle Replacement Schedule
+export interface LifecycleItem {
+    component: string;
+    replacementYears: number;
+    costPerKw: number;
+    annualizedCostPerKw: number;
+}
+
+export const getLifecycleReplacements = (itLoadKw: number): { items: LifecycleItem[]; totalAnnualized: number; total20Year: number } => {
+    const items: LifecycleItem[] = [
+        { component: 'UPS Batteries (VRLA)', replacementYears: 5, costPerKw: 120, annualizedCostPerKw: 120 / 5 },
+        { component: 'UPS Batteries (Li-Ion)', replacementYears: 10, costPerKw: 180, annualizedCostPerKw: 180 / 10 },
+        { component: 'Diesel Generators', replacementYears: 15, costPerKw: 350, annualizedCostPerKw: 350 / 15 },
+        { component: 'CRAC/CRAH Units', replacementYears: 12, costPerKw: 200, annualizedCostPerKw: 200 / 12 },
+        { component: 'Fire Suppression Cylinders', replacementYears: 10, costPerKw: 30, annualizedCostPerKw: 30 / 10 },
+        { component: 'PDU/RPP', replacementYears: 15, costPerKw: 80, annualizedCostPerKw: 80 / 15 },
+        { component: 'BMS/DCIM Upgrade', replacementYears: 7, costPerKw: 40, annualizedCostPerKw: 40 / 7 },
+    ];
+    const totalAnnualized = items.reduce((sum, i) => sum + i.annualizedCostPerKw, 0) * itLoadKw;
+    const total20Year = items.reduce((sum, i) => sum + (Math.floor(20 / i.replacementYears) * i.costPerKw), 0) * itLoadKw;
+    return { items, totalAnnualized, total20Year };
 };
 
 export const generateCapexNarrative = (result: CapexResult): string => {

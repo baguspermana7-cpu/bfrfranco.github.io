@@ -796,6 +796,24 @@
             font-size: 1rem;
         }
 
+        /* Cost Card Hover Glow */
+        .cost-card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), 0 8px 32px rgba(0,0,0,0.3);
+        }
+        a.cost-card-hover[href*="capex"]:hover {
+            border-color: rgba(245, 158, 11, 0.7) !important;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.2), 0 8px 32px rgba(0,0,0,0.3);
+        }
+        a.cost-card-hover[href*="opex"]:hover {
+            border-color: rgba(16, 185, 129, 0.7) !important;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2), 0 8px 32px rgba(0,0,0,0.3);
+        }
+        a.cost-card-hover[href*="dcmoc"]:hover {
+            border-color: rgba(6, 182, 212, 0.7) !important;
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.25), 0 8px 32px rgba(0,0,0,0.3);
+        }
+
         /* Cost Simulator Section */
         .simulator-section {
             padding: 4rem 2rem;
@@ -1589,6 +1607,9 @@
                         <a href="opex-calculator.html" class="dropdown-item" style="color: var(--accent-emerald);">
                             <i class="fas fa-coins"></i> OPEX Calculator
                         </a>
+                        <a href="dcmoc/" class="dropdown-item" style="color: #22d3ee; border-top: 1px solid rgba(6,182,212,0.2); margin-top: 4px; padding-top: 10px;">
+                            <i class="fas fa-chart-line"></i> DC MOC <span style="font-size:0.65rem;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);padding:1px 5px;border-radius:4px;margin-left:4px;">PRO</span>
+                        </a>
                     </div>
                 </div>
                 <a href="index.html" class="nav-back">
@@ -1746,18 +1767,48 @@
                 <p>Professional-grade calculators for capital and operational expenditure analysis</p>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:900px;margin:0 auto;">
-                <a href="capex-calculator.html" style="text-decoration:none;background:linear-gradient(135deg,#1e3a5f,#2d5a87);border:2px solid rgba(245,158,11,0.3);border-radius:16px;padding:2.5rem;text-align:center;transition:all 0.3s;display:flex;flex-direction:column;align-items:center;gap:1rem;">
-                    <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;"><i class="fas fa-building" style="color:white;font-size:1.5rem;"></i></div>
-                    <h3 style="color:#f59e0b;font-size:1.15rem;font-weight:700;">CAPEX Calculator</h3>
-                    <p style="color:#94a3b8;font-size:0.85rem;line-height:1.5;">Construction cost estimation with 12+ configurable variables, detailed breakdown, PDF export, and scenario comparison.</p>
-                    <span style="color:#fbbf24;font-size:0.82rem;font-weight:600;margin-top:auto;">Open Calculator <i class="fas fa-arrow-right" style="margin-left:6px;"></i></span>
-                </a>
-                <a href="opex-calculator.html" style="text-decoration:none;background:linear-gradient(135deg,#0f3a2e,#1a5c47);border:2px solid rgba(16,185,129,0.3);border-radius:16px;padding:2.5rem;text-align:center;transition:all 0.3s;display:flex;flex-direction:column;align-items:center;gap:1rem;">
-                    <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;"><i class="fas fa-coins" style="color:white;font-size:1.5rem;"></i></div>
-                    <h3 style="color:#10b981;font-size:1.15rem;font-weight:700;">OPEX Calculator</h3>
-                    <p style="color:#94a3b8;font-size:0.85rem;line-height:1.5;">Operational cost analysis with energy modeling, staffing, maintenance, SLA-based pricing, and multi-year forecasting.</p>
-                    <span style="color:#34d399;font-size:0.82rem;font-weight:600;margin-top:auto;">Open Calculator <i class="fas fa-arrow-right" style="margin-left:6px;"></i></span>
+            <div style="max-width:900px;margin:0 auto;">
+                <!-- CAPEX + OPEX Row -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                    <a href="capex-calculator.html" class="cost-card-hover" style="text-decoration:none;background:linear-gradient(135deg,#1e3a5f,#2d5a87);border:2px solid rgba(245,158,11,0.3);border-radius:16px;padding:2.5rem;text-align:center;transition:all 0.4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;align-items:center;gap:1rem;">
+                        <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;"><i class="fas fa-building" style="color:white;font-size:1.5rem;"></i></div>
+                        <h3 style="color:#f59e0b;font-size:1.15rem;font-weight:700;">CAPEX Calculator</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;line-height:1.5;">Construction cost estimation with 12+ configurable variables, detailed breakdown, PDF export, and scenario comparison.</p>
+                        <span style="color:#fbbf24;font-size:0.82rem;font-weight:600;margin-top:auto;">Open Calculator <i class="fas fa-arrow-right" style="margin-left:6px;"></i></span>
+                    </a>
+                    <a href="opex-calculator.html" class="cost-card-hover" style="text-decoration:none;background:linear-gradient(135deg,#0f3a2e,#1a5c47);border:2px solid rgba(16,185,129,0.3);border-radius:16px;padding:2.5rem;text-align:center;transition:all 0.4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;align-items:center;gap:1rem;">
+                        <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;"><i class="fas fa-coins" style="color:white;font-size:1.5rem;"></i></div>
+                        <h3 style="color:#10b981;font-size:1.15rem;font-weight:700;">OPEX Calculator</h3>
+                        <p style="color:#94a3b8;font-size:0.85rem;line-height:1.5;">Operational cost analysis with energy modeling, staffing, maintenance, SLA-based pricing, and multi-year forecasting.</p>
+                        <span style="color:#34d399;font-size:0.82rem;font-weight:600;margin-top:auto;">Open Calculator <i class="fas fa-arrow-right" style="margin-left:6px;"></i></span>
+                    </a>
+                </div>
+
+                <!-- Connector -->
+                <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:1rem 0;">
+                    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.4),rgba(6,182,212,0.6));"></div>
+                    <div style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(6,182,212,0.5);display:flex;align-items:center;justify-content:center;background:rgba(6,182,212,0.1);"><i class="fas fa-chevron-down" style="color:#22d3ee;font-size:0.7rem;"></i></div>
+                    <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,0.6),rgba(16,185,129,0.4),transparent);"></div>
+                </div>
+
+                <!-- DC MOC Card -->
+                <a href="dcmoc/" class="cost-card-hover" style="text-decoration:none;display:flex;align-items:center;gap:2rem;background:linear-gradient(135deg,#0c1929,#122040,#0c1929);border:2px solid rgba(6,182,212,0.35);border-radius:20px;padding:2rem 2.5rem;transition:all 0.4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;">
+                    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(245,158,11,0.06),transparent 50%),radial-gradient(ellipse at 80% 50%,rgba(16,185,129,0.06),transparent 50%);pointer-events:none;"></div>
+                    <div style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#0891b2,#22d3ee);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 24px rgba(6,182,212,0.3);position:relative;z-index:1;">
+                        <i class="fas fa-chart-line" style="color:white;font-size:1.6rem;"></i>
+                    </div>
+                    <div style="flex:1;position:relative;z-index:1;">
+                        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.4rem;">
+                            <h3 style="color:#22d3ee;font-size:1.3rem;font-weight:800;margin:0;">DC MOC</h3>
+                            <span style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#67e8f9;padding:0.15rem 0.6rem;border-radius:6px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Pro</span>
+                        </div>
+                        <div style="color:#94a3b8;font-size:0.78rem;margin-bottom:0.6rem;font-weight:500;">Data Center Maintenance & Operations Calculator</div>
+                        <p style="color:#64748b;font-size:0.82rem;line-height:1.5;margin:0;">All-in-one simulation engine — combines CAPEX + OPEX with staffing models, shift optimization, risk analysis, Monte Carlo, financial projections, and executive reporting.</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;flex-shrink:0;position:relative;z-index:1;">
+                        <div style="width:40px;height:40px;border-radius:50%;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);display:flex;align-items:center;justify-content:center;"><i class="fas fa-arrow-right" style="color:#22d3ee;font-size:0.9rem;"></i></div>
+                        <span style="color:#67e8f9;font-size:0.7rem;font-weight:600;">Launch</span>
+                    </div>
                 </a>
             </div>
         </section>

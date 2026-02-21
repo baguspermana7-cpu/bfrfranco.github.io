@@ -3,6 +3,16 @@ import { CountryProfile } from '@/constants/countries';
 export type StaffRole = 'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor' | 'supervisor';
 export type ShiftPattern = '4on4off' | '4on3off' | 'continental-8h';
 
+// Centralized role display labels — single source of truth
+export const ROLE_LABELS: Record<StaffRole, string> = {
+    'shift-lead': 'Team Leaders',
+    'engineer': 'Engineers',
+    'technician': 'Technicians',
+    'admin': 'Supervisor',
+    'supervisor': 'Supervisor',
+    'janitor': 'Facility Staff',
+};
+
 // ─── SHIFT PATTERN CONFIGURATIONS ───────────────────────────
 export interface ShiftPatternConfig {
     id: ShiftPattern;
@@ -170,9 +180,9 @@ export const calculateStaffing = (
     // Vendor: 0.1 (only keep a skeleton oversight crew)
     const opModelMult = operatingModel === 'in-house' ? 1.0 : operatingModel === 'hybrid' ? 0.5 : 0.1;
 
-    // Resolve pattern
+    // Resolve pattern — 12H defaults to 4on3off (Day/Night only, 40h effective/week)
     const patternId: ShiftPattern = patternOverride
-        || (shiftModel === '12h' ? '4on4off' : 'continental-8h');
+        || (shiftModel === '12h' ? '4on3off' : 'continental-8h');
     const pattern = SHIFT_PATTERNS[patternId];
 
     // ─── NON-SHIFT STAFF (Admin, Janitor, Supervisor) ───
@@ -395,3 +405,83 @@ export const REFERENCE_STAFFING_10MW = {
     ],
     totalHeadcount: 14,
 };
+
+// ─── AUTO HEADCOUNT CALCULATION ────────────────────────────
+export interface AutoHeadcountResult {
+    headcounts: Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', number>;
+    rationale: Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', string>;
+    totalFTE: number;
+}
+
+export function calculateAutoHeadcount(
+    itLoadKw: number,
+    tierLevel: 2 | 3 | 4,
+    shiftModel: '8h' | '12h',
+    staffingModel: 'in-house' | 'outsourced' | 'hybrid',
+    maintenanceModel: 'in-house' | 'hybrid' | 'vendor',
+    maintenanceStrategy: 'reactive' | 'planned' | 'predictive'
+): AutoHeadcountResult {
+    const mw = itLoadKw / 1000;
+
+    // Base ratios per MW (from REFERENCE_STAFFING_10MW: 14 FTE / 10MW)
+    const baseRatios = {
+        'shift-lead': 0.4,
+        'engineer': 0.5,
+        'technician': 0.2,
+        'admin': 0.1,
+        'janitor': 0.2,
+    };
+
+    // Tier multiplier for shift roles
+    const tierMult = tierLevel === 4 ? 1.2 : tierLevel === 3 ? 1.0 : 0.85;
+
+    // Staffing model multiplier
+    const staffMult = staffingModel === 'in-house' ? 1.0 : staffingModel === 'hybrid' ? 0.6 : 0.3;
+
+    // Maintenance model affects technicians
+    const maintModelMult = maintenanceModel === 'in-house' ? 1.0 : maintenanceModel === 'hybrid' ? 0.5 : 0.2;
+
+    // Maintenance strategy affects engineers
+    const strategyMult = maintenanceStrategy === 'predictive' ? 1.15 : maintenanceStrategy === 'planned' ? 1.0 : 0.9;
+
+    // 8h shift needs more people (4 teams vs 2)
+    const shiftMult = shiftModel === '8h' ? 1.1 : 1.0;
+
+    const headcounts = {} as Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', number>;
+    const rationale = {} as Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', string>;
+
+    for (const [role, baseRatio] of Object.entries(baseRatios) as [keyof typeof baseRatios, number][]) {
+        let count = baseRatio * mw;
+        const parts: string[] = [`${baseRatio}/MW x ${mw.toFixed(1)}MW = ${count.toFixed(1)}`];
+
+        // Apply shift multiplier to shift roles
+        if (role === 'shift-lead' || role === 'engineer') {
+            count *= shiftMult;
+            if (shiftMult !== 1.0) parts.push(`x${shiftMult} (${shiftModel} shift)`);
+            count *= tierMult;
+            if (tierMult !== 1.0) parts.push(`x${tierMult} (T${tierLevel})`);
+        }
+
+        // Staffing model
+        count *= staffMult;
+        if (staffMult !== 1.0) parts.push(`x${staffMult} (${staffingModel})`);
+
+        // Maintenance model for technicians
+        if (role === 'technician') {
+            count *= maintModelMult;
+            if (maintModelMult !== 1.0) parts.push(`x${maintModelMult} (maint: ${maintenanceModel})`);
+        }
+
+        // Maintenance strategy for engineers
+        if (role === 'engineer') {
+            count *= strategyMult;
+            if (strategyMult !== 1.0) parts.push(`x${strategyMult} (${maintenanceStrategy})`);
+        }
+
+        headcounts[role] = Math.max(1, Math.round(count));
+        rationale[role] = parts.join(' → ') + ` → ${headcounts[role]}`;
+    }
+
+    const totalFTE = Object.values(headcounts).reduce((a, b) => a + b, 0);
+    return { headcounts, rationale, totalFTE };
+}

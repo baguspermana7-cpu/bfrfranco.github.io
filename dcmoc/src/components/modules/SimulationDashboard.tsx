@@ -44,6 +44,7 @@ export function SimulationDashboard() {
     const [scenarioTurnover, setScenarioTurnover] = useState(inputs.turnoverRate ?? 0.09);
     const [showWizard, setShowWizard] = useState(false);
     const [simYear, setSimYear] = useState(2025);
+    const [selectedRegion, setSelectedRegion] = useState(selectedCountry?.region || 'APAC');
 
     // Simulation Trigger Logic
     useEffect(() => {
@@ -64,6 +65,13 @@ export function SimulationDashboard() {
         }, 500);
         return () => clearTimeout(timer);
     }, [scenarioAQI, scenarioTurnover]);
+
+    // Sync region when country changes externally (e.g. scenario load)
+    useEffect(() => {
+        if (selectedCountry && selectedCountry.region !== selectedRegion) {
+            setSelectedRegion(selectedCountry.region);
+        }
+    }, [selectedCountry?.id]);
 
     const results = useMemo(() => {
         if (!selectedCountry) return null;
@@ -137,7 +145,7 @@ export function SimulationDashboard() {
         }
 
         // 3. Risk Calculation
-        const risk = calculateDowntimeRisk(inputs.tierLevel as 2 | 3 | 4);
+        const risk = calculateDowntimeRisk(inputs.tierLevel as 2 | 3 | 4, undefined, 4, selectedCountry ?? undefined);
 
         // 4. Total Monthly Staff Cost (Full Logic)
         const baseStaffCost = eng.monthlyCost;
@@ -216,13 +224,13 @@ export function SimulationDashboard() {
                                         insights
                                     });
                                 }}
-                                className="text-xs bg-cyan-900/50 text-cyan-400 border border-cyan-700 px-2 py-1 rounded hover:bg-cyan-800 transition-colors flex items-center gap-1"
+                                className="text-xs bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-700 px-2 py-1 rounded hover:bg-cyan-200 dark:hover:bg-cyan-800 transition-colors flex items-center gap-1"
                             >
                                 <Users className="w-3 h-3" /> Export PDF
                             </button>
                             <button
                                 onClick={() => setShowWizard(true)}
-                                className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded hover:bg-slate-700 hover:text-white transition-colors"
+                                className="text-xs bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded hover:bg-slate-300 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors"
                             >
                                 Wizard
                             </button>
@@ -230,24 +238,38 @@ export function SimulationDashboard() {
                     </h2>
 
                     {/* Region & Country Selector */}
-                    <div className="mb-8">
-                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <div className="mb-8 space-y-3">
+                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Globe2 className="w-3 h-3" /> Region & Country
                             <Tooltip content="Select datacenter location. Costs, regulations, and labor markets vary by country." />
                         </label>
                         <select
                             className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
-                            value={selectedCountry?.id || 'ID'}
+                            value={selectedRegion}
+                            onChange={(e) => {
+                                const newRegion = e.target.value as 'APAC' | 'EMEA' | 'AMER' | 'MENA' | 'AFR' | 'LATAM';
+                                setSelectedRegion(newRegion);
+                                const countriesInRegion = REGIONS[newRegion];
+                                if (countriesInRegion && countriesInRegion.length > 0) {
+                                    actions.selectCountry(countriesInRegion[0].id);
+                                }
+                            }}
+                        >
+                            {Object.keys(REGIONS).sort().map(region => (
+                                <option key={region} value={region}>
+                                    {REGION_LABELS[region] || region}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
+                            value={selectedCountry?.id || ''}
                             onChange={(e) => actions.selectCountry(e.target.value)}
                         >
-                            {Object.entries(REGIONS).sort().map(([region, countries]) => (
-                                <optgroup key={region} label={REGION_LABELS[region] || region}>
-                                    {countries.map(c => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.name} ({c.id})
-                                        </option>
-                                    ))}
-                                </optgroup>
+                            {(REGIONS[selectedRegion] || []).map(c => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name} ({c.id})
+                                </option>
                             ))}
                         </select>
                     </div>

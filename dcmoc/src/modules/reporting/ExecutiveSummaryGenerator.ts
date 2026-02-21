@@ -112,9 +112,18 @@ export const generateExecutiveSummary = (
     let riskNarrative = `The ${inputs.tierLevel === 4 ? 'Fault Tolerant' : 'Concurrent Maintainable'} design confirms a projected availability of ${availability}%, with an estimated annual downtime of ${downtime} minutes. `;
 
     if (pue < 1.4) {
-        riskNarrative += `Sustainability metrics are excellent with a design PUE of ${pue.toFixed(2)}, minimizing Scope 2 carbon footprint.`;
+        riskNarrative += `Sustainability metrics are excellent with a design PUE of ${pue.toFixed(2)}, minimizing Scope 2 carbon footprint. `;
     } else {
-        riskNarrative += `Design PUE is ${pue.toFixed(2)}, which may face scrutiny in strict regulatory markets. Consider liquid cooling options to improve efficiency.`;
+        riskNarrative += `Design PUE is ${pue.toFixed(2)}, which may face scrutiny in strict regulatory markets. Consider liquid cooling options to improve efficiency. `;
+    }
+
+    // C2: Add benchmark context
+    const industryAvgPUE = 1.58;
+    const pueDelta = ((industryAvgPUE - pue) / industryAvgPUE * 100).toFixed(0);
+    if (pue < industryAvgPUE) {
+        riskNarrative += `This represents a ${pueDelta}% improvement over the industry average PUE of ${industryAvgPUE}, translating to significant long-term energy savings.`;
+    } else {
+        riskNarrative += `The design PUE is above the industry average of ${industryAvgPUE}. Immediate efficiency interventions are recommended.`;
     }
 
     sections.push({
@@ -123,6 +132,35 @@ export const generateExecutiveSummary = (
         content: riskNarrative,
         keyMetric: `${pue.toFixed(2)} PUE`,
         status: pue < 1.5 ? 'positive' : 'neutral'
+    });
+
+    // C2: 5. MARKET CONTEXT & RECOMMENDATION (New section)
+    // ════════════════════════════════════════════════
+    const escalation = country.economy?.laborEscalation ?? 0.05;
+    let marketNarrative = `The ${country.name} market presents `;
+    if (escalation < 0.04) {
+        marketNarrative += `stable labor costs with annual escalation of ${(escalation * 100).toFixed(1)}%, favorable for long-term OPEX predictability. `;
+    } else if (escalation < 0.07) {
+        marketNarrative += `moderate labor cost pressure with ${(escalation * 100).toFixed(1)}% annual escalation, requiring careful headcount management. `;
+    } else {
+        marketNarrative += `aggressive labor cost inflation at ${(escalation * 100).toFixed(1)}% per annum, which will significantly impact 5-year TCO. `;
+    }
+
+    // C14: Industry benchmark comparison
+    const benchPerKw = safeCapex.metrics.perKw;
+    const industryAvgPerKw = 12000; // Industry average $/kW
+    const staffingRatio = headcount / (inputs.itLoad / 1000); // FTEs per MW
+    const industryStaffRatio = 8; // Industry benchmark
+
+    marketNarrative += `CAPEX efficiency is $${Math.round(benchPerKw).toLocaleString()}/kW (industry avg: $${industryAvgPerKw.toLocaleString()}/kW). `;
+    marketNarrative += `Staffing density of ${staffingRatio.toFixed(1)} FTEs/MW ${staffingRatio <= industryStaffRatio ? 'is within' : 'exceeds'} the industry benchmark of ${industryStaffRatio} FTEs/MW.`;
+
+    sections.push({
+        id: 'market',
+        title: 'Market Context & Benchmarks',
+        content: marketNarrative,
+        keyMetric: `$${Math.round(benchPerKw).toLocaleString()}/kW`,
+        status: benchPerKw <= industryAvgPerKw ? 'positive' : 'neutral'
     });
 
     return sections;

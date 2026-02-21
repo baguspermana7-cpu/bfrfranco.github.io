@@ -14,6 +14,12 @@ export interface SavedScenario {
         annualCapex: number;
         totalStaff: number;
         pue: number;
+        // Enriched metrics (populated at save time when financials are available)
+        irr?: number;
+        npv?: number;
+        paybackYears?: number;
+        annualCO2?: number;
+        riskScore?: number;
     };
 }
 
@@ -21,6 +27,10 @@ interface ScenarioStore {
     scenarios: SavedScenario[];
     isPanelOpen: boolean;
     comparisonId: string | null;
+
+    // Comparison mode
+    comparisonIds: string[];
+    isComparisonMode: boolean;
 
     // Actions
     openPanel: () => void;
@@ -31,6 +41,11 @@ interface ScenarioStore {
     renameScenario: (id: string, name: string) => void;
     setComparison: (id: string | null) => void;
     getScenario: (id: string) => SavedScenario | undefined;
+
+    // Comparison actions
+    toggleComparisonSelection: (id: string) => void;
+    enterComparisonMode: () => void;
+    exitComparisonMode: () => void;
 }
 
 // ─── PERSISTENCE ────────────────────────────────────────────
@@ -56,6 +71,8 @@ export const useScenarioStore = create<ScenarioStore>((set, get) => ({
     scenarios: loadFromStorage(),
     isPanelOpen: false,
     comparisonId: null,
+    comparisonIds: [],
+    isComparisonMode: false,
 
     openPanel: () => set({ isPanelOpen: true }),
     closePanel: () => set({ isPanelOpen: false }),
@@ -74,7 +91,12 @@ export const useScenarioStore = create<ScenarioStore>((set, get) => ({
 
     deleteScenario: (id) => {
         const updated = get().scenarios.filter(s => s.id !== id);
-        set({ scenarios: updated, comparisonId: get().comparisonId === id ? null : get().comparisonId });
+        const newComparisonIds = get().comparisonIds.filter(cid => cid !== id);
+        set({
+            scenarios: updated,
+            comparisonId: get().comparisonId === id ? null : get().comparisonId,
+            comparisonIds: newComparisonIds,
+        });
         saveToStorage(updated);
     },
 
@@ -87,4 +109,23 @@ export const useScenarioStore = create<ScenarioStore>((set, get) => ({
     setComparison: (id) => set({ comparisonId: id }),
 
     getScenario: (id) => get().scenarios.find(s => s.id === id),
+
+    toggleComparisonSelection: (id) => {
+        const current = get().comparisonIds;
+        if (current.includes(id)) {
+            set({ comparisonIds: current.filter(cid => cid !== id) });
+        } else if (current.length < 4) {
+            set({ comparisonIds: [...current, id] });
+        }
+    },
+
+    enterComparisonMode: () => {
+        if (get().comparisonIds.length >= 2) {
+            set({ isComparisonMode: true, isPanelOpen: false });
+        }
+    },
+
+    exitComparisonMode: () => {
+        set({ isComparisonMode: false, comparisonIds: [] });
+    },
 }));

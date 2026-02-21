@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import { calculateRiskProfile, calculateRiskScore, RiskScenario } from '@/modules/risk/RiskEngine';
@@ -11,19 +11,21 @@ import {
     Activity, TrendingUp, Clock, DollarSign, Thermometer,
     Droplets, Truck, FileCheck, Server
 } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 
 export default function RiskDashboard() {
     const { selectedCountry, inputs } = useSimulationStore();
     const tierLevel = (inputs.tierLevel === 4 ? 4 : 3) as 3 | 4;
     const [isExporting, setIsExporting] = useState(false);
+    const [selectedRiskCell, setSelectedRiskCell] = useState<{ row: number; col: number } | null>(null);
 
     const analysis = useMemo(() => {
         if (!selectedCountry) return null;
         const assets = generateAssetCounts(1000, tierLevel, 'air', 5000);
         const risks = calculateRiskProfile(selectedCountry, tierLevel, assets);
         const aggregation = calculateRiskScore(risks, tierLevel);
-        const downtime = calculateDowntimeRisk(tierLevel);
+        const downtime = calculateDowntimeRisk(tierLevel, undefined, 4, selectedCountry ?? undefined);
         return { risks, aggregation, downtime };
     }, [selectedCountry, tierLevel, inputs.headcount_Engineer]);
 
@@ -46,18 +48,25 @@ export default function RiskDashboard() {
 
     const getSeverityColor = (prob: string, impact: string) => {
         const score = ({ 'Low': 1, 'Medium': 2, 'High': 3, 'Critical': 4 }[prob] || 2) * ({ 'Low': 1, 'Medium': 2, 'High': 3, 'Catastrophic': 4 }[impact] || 2);
-        if (score >= 9) return 'border-red-500/50 bg-red-950/20';
-        if (score >= 6) return 'border-amber-500/50 bg-amber-950/20';
-        return 'border-emerald-500/50 bg-emerald-950/20';
+        if (score >= 9) return 'border-red-500/50 bg-red-100 dark:bg-red-950/20';
+        if (score >= 6) return 'border-amber-500/50 bg-amber-100 dark:bg-amber-950/20';
+        return 'border-emerald-500/50 bg-emerald-100 dark:bg-emerald-950/20';
     };
 
     const matrixColor = (score: number, hasRisks: boolean) => {
-        if (!hasRisks && score < 6) return 'bg-slate-900/50';
-        if (score >= 12) return 'bg-red-600/70';
-        if (score >= 8) return 'bg-orange-600/60';
-        if (score >= 4) return 'bg-amber-600/50';
-        return 'bg-emerald-600/40';
+        if (!hasRisks && score < 6) return 'bg-slate-200 dark:bg-slate-900/70';
+        if (score >= 12) return 'bg-red-500/80 dark:bg-red-600/80';
+        if (score >= 8) return 'bg-orange-500/75 dark:bg-orange-600/75';
+        if (score >= 4) return 'bg-amber-500/70 dark:bg-amber-600/70';
+        return 'bg-emerald-500/70 dark:bg-emerald-600/70';
     };
+
+    const handleCellClick = useCallback((row: number, col: number, hasRisks: boolean) => {
+        if (!hasRisks) return;
+        setSelectedRiskCell(prev =>
+            prev?.row === row && prev?.col === col ? null : { row, col }
+        );
+    }, []);
 
     return (
         <div className="p-6 space-y-6 overflow-y-auto h-[calc(100vh-140px)]">
@@ -84,7 +93,7 @@ export default function RiskDashboard() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <ShieldAlert className="w-3 h-3" /> Risk Score
+                        <ShieldAlert className="w-3 h-3" /> Risk Score <Tooltip content="Aggregated risk score across all categories. Higher = more risk. Normalized to % of maximum possible score." />
                     </div>
                     <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalScore}</div>
                     <div className={`text-xs mt-1 ${normalizedScore > 60 ? 'text-red-600 dark:text-red-400' : normalizedScore > 35 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
@@ -94,7 +103,7 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" /> Financial Exposure
+                        <DollarSign className="w-3 h-3" /> Financial Exposure <Tooltip content="Estimated annual cost of downtime events based on expected outage minutes x $5,000/min business impact." />
                     </div>
                     <div className="text-3xl font-bold text-red-600 dark:text-red-400">
                         ${(downtime.financialImpact / 1000).toFixed(0)}k
@@ -106,7 +115,7 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <Activity className="w-3 h-3" /> Availability
+                        <Activity className="w-3 h-3" /> Availability <Tooltip content="Expected annual uptime percentage based on tier redundancy level. Tier III >= 99.982%, Tier IV >= 99.995%." />
                     </div>
                     <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{downtime.availability}%</div>
                     <div className="text-xs text-slate-500 mt-1">
@@ -116,7 +125,7 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" /> SLA Breach Prob.
+                        <AlertTriangle className="w-3 h-3" /> SLA Breach Prob. <Tooltip content="Annual probability of exceeding the SLA downtime allowance. Factors in equipment age, maintenance strategy, and environmental conditions." />
                     </div>
                     <div className={`text-3xl font-bold ${slaBreachProbability > 0.1 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                         {(slaBreachProbability * 100).toFixed(1)}%
@@ -145,20 +154,57 @@ export default function RiskDashboard() {
                                         const actualRow = 4 - rowIdx;
                                         const cell = matrix[actualRow]?.[colIdx];
                                         const hasRisks = cell && cell.risks.length > 0;
+                                        const isSelected = selectedRiskCell?.row === actualRow && selectedRiskCell?.col === colIdx;
                                         return (
                                             <div
                                                 key={colIdx}
-                                                className={`flex-1 h-10 rounded-sm flex items-center justify-center relative group ${matrixColor((colIdx + 1) * (actualRow + 1), !!hasRisks)} 
-                                                    ${hasRisks ? 'ring-1 ring-white/30' : ''}`}
+                                                onClick={() => handleCellClick(actualRow, colIdx, !!hasRisks)}
+                                                className={`flex-1 min-h-[2.5rem] rounded-sm flex flex-col items-center justify-center relative group ${matrixColor((colIdx + 1) * (actualRow + 1), !!hasRisks)}
+                                                    ${hasRisks ? 'ring-1 ring-white/30 cursor-pointer hover:ring-2 hover:ring-white/60 transition-all' : ''}
+                                                    ${isSelected ? 'ring-2 ring-cyan-400 z-10' : ''}`}
                                             >
                                                 {hasRisks && (
                                                     <>
-                                                        <span className="text-xs font-bold text-white">{cell.risks.length}</span>
-                                                        <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-600 rounded p-2 hidden group-hover:block z-50 w-40">
-                                                            {cell.risks.map(r => (
-                                                                <div key={r.id} className="text-[10px] text-slate-300 mb-1">{r.title}</div>
-                                                            ))}
+                                                        <div className="flex flex-col items-center px-0.5 overflow-hidden w-full">
+                                                            {cell.risks.length === 1 ? (
+                                                                <span className="text-[8px] leading-tight font-semibold text-white text-center truncate w-full px-0.5">{cell.risks[0].title}</span>
+                                                            ) : (
+                                                                <>
+                                                                    <span className="text-[8px] leading-tight font-semibold text-white text-center truncate w-full px-0.5">{cell.risks[0].title}</span>
+                                                                    <span className="text-[7px] text-white/80">+{cell.risks.length - 1} more</span>
+                                                                </>
+                                                            )}
                                                         </div>
+                                                        {/* Hover tooltip */}
+                                                        <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-600 rounded p-2 hidden group-hover:block z-50 w-48">
+                                                            {cell.risks.map(r => (
+                                                                <div key={r.id} className="text-[10px] text-slate-300 mb-1 font-medium">{r.title}</div>
+                                                            ))}
+                                                            <div className="text-[9px] text-cyan-400 mt-1">Click for details</div>
+                                                        </div>
+                                                        {/* Click detail popup */}
+                                                        {isSelected && (
+                                                            <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-slate-900 border border-cyan-500/50 rounded-lg p-3 z-[60] w-64 shadow-xl shadow-black/30"
+                                                                onClick={(e) => e.stopPropagation()}>
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <span className="text-[10px] text-cyan-400 font-bold uppercase">Risk Details</span>
+                                                                    <button onClick={() => setSelectedRiskCell(null)} className="text-slate-500 hover:text-white text-xs">✕</button>
+                                                                </div>
+                                                                {cell.risks.map(r => (
+                                                                    <div key={r.id} className="mb-2 pb-2 border-b border-slate-700/50 last:border-0 last:mb-0 last:pb-0">
+                                                                        <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                                                                            {getIcon(r.category)}
+                                                                            {r.title}
+                                                                        </div>
+                                                                        <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">{r.description}</p>
+                                                                        <div className="flex gap-2 mt-1">
+                                                                            <span className="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-300">P: {r.probability}</span>
+                                                                            <span className="text-[9px] px-1 py-0.5 rounded bg-slate-800 text-slate-300">I: {r.impact}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </>
                                                 )}
                                             </div>
@@ -242,17 +288,17 @@ export default function RiskDashboard() {
                         </div>
                     </div>
                     {/* MTTR / MTBF estimates */}
-                    <div className="mt-4 pt-3 border-t border-slate-800 grid grid-cols-2 gap-4">
+                    <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-4">
                         <div>
                             <div className="text-[10px] text-slate-500 uppercase">Est. MTTR</div>
-                            <div className="text-sm font-bold text-amber-400">
+                            <div className="text-sm font-bold text-amber-600 dark:text-amber-400">
                                 {tierLevel === 4 ? '15 min' : '45 min'}
                             </div>
                             <div className="text-[10px] text-slate-500">Mean Time To Repair</div>
                         </div>
                         <div>
                             <div className="text-[10px] text-slate-500 uppercase">Est. MTBF</div>
-                            <div className="text-sm font-bold text-emerald-400">
+                            <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                                 {tierLevel === 4 ? '8,760 hrs' : '4,380 hrs'}
                             </div>
                             <div className="text-[10px] text-slate-500">Mean Time Between Failures</div>

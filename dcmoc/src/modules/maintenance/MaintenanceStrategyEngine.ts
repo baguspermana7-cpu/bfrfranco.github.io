@@ -39,9 +39,12 @@ export interface StrategyComparison {
     fiveYearSavings: number;         // Savings of recommended vs worst
 }
 
-const LABOR_RATE_INTERNAL = 45;   // $/hr in-house technician
-const LABOR_RATE_EMERGENCY = 300; // $/hr emergency callout (reactive)
-const COST_PER_MINUTE_DOWN = 5000; // $/min for critical DC downtime
+// A6: Country-specific labor rates (fallback to US defaults)
+const getLabor = (country?: CountryProfile) => ({
+    internal: country?.labor?.laborRatePerHour ?? 45,
+    emergency: (country?.labor?.laborRatePerHour ?? 45) * 6.5, // Emergency ~6.5x normal
+});
+const getDowntimeCost = (country?: CountryProfile) => country?.risk?.downtimeCostPerMin ?? 5000;
 
 export const calculateStrategyComparison = (
     assets: AssetCount[],
@@ -49,9 +52,12 @@ export const calculateStrategyComparison = (
     tierLevel: 3 | 4,
     country?: CountryProfile
 ): StrategyComparison => {
+    const labor = getLabor(country);
+    const COST_PER_MINUTE_DOWN = getDowntimeCost(country);
+
     // Planned Preventive (Baseline) — current SFG20 schedule
     const plannedTotalHours = schedule.reduce((a, e) => a + e.durationHours, 0);
-    const plannedLaborCost = plannedTotalHours * LABOR_RATE_INTERNAL;
+    const plannedLaborCost = plannedTotalHours * labor.internal;
     const plannedPartsCost = calculatePartsCost(assets);
     const plannedFailures = tierLevel === 4 ? 1.2 : 2.5; // Expected unplanned failures/year
     const plannedDowntimeCost = plannedFailures * 45 * COST_PER_MINUTE_DOWN * 0.01; // 45min avg, 1% probability each
@@ -61,7 +67,7 @@ export const calculateStrategyComparison = (
     const reactiveFailures = plannedFailures * 3.5;   // 3.5x more failures without PM
     const reactiveDowntimeMinutes = reactiveFailures * 90; // 90 min avg per failure (vs 45 planned)
     const reactiveDowntimeCost = reactiveDowntimeMinutes * COST_PER_MINUTE_DOWN * 0.03;
-    const reactiveLaborCost = reactiveFailures * 6 * LABOR_RATE_EMERGENCY; // 6hr avg emergency fix
+    const reactiveLaborCost = reactiveFailures * 6 * labor.emergency; // 6hr avg emergency fix
     const reactivePartsCost = plannedPartsCost * 0.6; // Less consumables but emergency parts cost 2x
     const reactiveEmergencyParts = reactiveFailures * 2500; // $2500 avg emergency part
     const reactiveTotal = reactiveLaborCost + reactivePartsCost + reactiveEmergencyParts + reactiveDowntimeCost;
@@ -234,9 +240,10 @@ export const calculateSLAComparison = (
     // NBD: avg 16hr response → 960 min downtime per incident
     // 4hr: avg 4hr → 240 min
     // 2hr: avg 2hr → 120 min
-    const nbdDowntime = baseFailures * 960 * COST_PER_MINUTE_DOWN * 0.01; // 1% probability weighting
-    const fourHrDowntime = baseFailures * 240 * COST_PER_MINUTE_DOWN * 0.01;
-    const twoHrDowntime = baseFailures * 120 * COST_PER_MINUTE_DOWN * 0.01;
+    const slaCostPerMin = getDowntimeCost(country);
+    const nbdDowntime = baseFailures * 960 * slaCostPerMin * 0.01; // 1% probability weighting
+    const fourHrDowntime = baseFailures * 240 * slaCostPerMin * 0.01;
+    const twoHrDowntime = baseFailures * 120 * slaCostPerMin * 0.01;
 
     const nbdBreakEven = 0; // Baseline
     const fourHrBreakEven = (fourHrBaseCost - nbdBaseCost) / (baseFailures * (960 - 240) * 0.01);
