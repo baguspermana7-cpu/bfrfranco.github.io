@@ -1162,7 +1162,40 @@
             .shi-kpi-grid { grid-template-columns: repeat(2, 1fr); }
             .shi-toolbar { flex-wrap: wrap; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1189,6 +1222,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -1983,20 +2018,20 @@
                     <div class="calc-results">
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resultScore">--</div>
-                            <div class="calc-result-label">Health Score</div>
+                            <div class="calc-result-label">Health Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Safety Health Score</div><div class="rtd">Composite safety culture score (0-100) based on Rasmussen's drift-to-failure model inputs.</div><span class="rtf">&gt;80 Strong &middot; 60-80 Developing &middot; &lt;60 At Risk</span></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resultDrift" style="color: #ef4444;">--</div>
-                            <div class="calc-result-label">Drift Probability</div>
+                            <div class="calc-result-label">Drift Probability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Drift-to-Failure Probability</div><div class="rtd">Estimated probability of operational drift toward failure boundary based on weak signal analysis.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resultCulture">--</div>
-                            <div class="calc-result-label">Culture Type</div>
+                            <div class="calc-result-label">Culture Type <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Safety Culture Type</div><div class="rtd">Classification per Westrum model: Pathological, Bureaucratic, or Generative safety culture.</div></span></span></div>
                             <div id="cultureBadge"></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resultTrajectory">--</div>
-                            <div class="calc-result-label">Trajectory</div>
+                            <div class="calc-result-label">Trajectory <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Safety Trajectory</div><div class="rtd">Direction of safety culture change: Improving, Stable, or Declining.</div></span></span></div>
                             <div id="trajectoryIndicator" class="trajectory-indicator"></div>
                         </div>
                     </div>

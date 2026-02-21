@@ -1307,7 +1307,40 @@
             .msf-pro-inputs .calc-grid { grid-template-columns: 1fr; }
             .msf-cta-block { padding: 1.25rem 1rem; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1328,6 +1361,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -2217,26 +2252,26 @@
 
                     <div class="calc-section-label cost">&#9660; Community Costs</div>
                     <div class="calc-results" id="costResults">
-                        <div class="calc-result-item"><div class="label">Bill Increase</div><div class="value" id="billIncrease">--</div><div class="subtext">$/month per household</div></div>
-                        <div class="calc-result-item"><div class="label">Water Use</div><div class="value" id="waterUse">--</div><div class="subtext">million litres/year</div></div>
-                        <div class="calc-result-item"><div class="label">Water Equiv.</div><div class="value" id="waterHouseholds">--</div><div class="subtext">households equivalent</div></div>
-                        <div class="calc-result-item"><div class="label">NOx Emissions</div><div class="value" id="dieselNox">--</div><div class="subtext">tons NOx/year</div></div>
-                        <div class="calc-result-item"><div class="label">Health Cost</div><div class="value" id="healthCost">--</div><div class="subtext">annual public health burden</div></div>
-                        <div class="calc-result-item"><div class="label">Noise at 400ft</div><div class="value" id="noiseLevel">--</div><div class="subtext">dB average</div></div>
-                        <div class="calc-result-item"><div class="label">Grid Load</div><div class="value" id="gridLoad">--</div><div class="subtext">% of regional capacity</div></div>
-                        <div class="calc-result-item"><div class="label">Tax Foregone</div><div class="value" id="taxForegone">--</div><div class="subtext">annual exemptions lost</div></div>
+                        <div class="calc-result-item"><div class="label">Bill Increase <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Electricity Bill Increase</div><div class="rtd">Estimated increase in local residential electricity bills from DC grid demand.</div></span></span></div><div class="value" id="billIncrease">--</div><div class="subtext">$/month per household</div></div>
+                        <div class="calc-result-item"><div class="label">Water Use <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Water Consumption</div><div class="rtd">Annual water use for DC cooling and operations.</div></span></span></div><div class="value" id="waterUse">--</div><div class="subtext">million litres/year</div></div>
+                        <div class="calc-result-item"><div class="label">Water Equiv. <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Water Equivalence</div><div class="rtd">Water usage expressed as household equivalents for community context.</div></span></span></div><div class="value" id="waterHouseholds">--</div><div class="subtext">households equivalent</div></div>
+                        <div class="calc-result-item"><div class="label">NOx Emissions <span class="res-tip">?<span class="res-tip-body"><div class="rtt">NOx Emissions</div><div class="rtd">Nitrogen oxide emissions from backup generators and grid electricity.</div></span></span></div><div class="value" id="dieselNox">--</div><div class="subtext">tons NOx/year</div></div>
+                        <div class="calc-result-item"><div class="label">Health Cost <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Health Impact Cost</div><div class="rtd">Estimated public health costs from DC air quality impacts.</div></span></span></div><div class="value" id="healthCost">--</div><div class="subtext">annual public health burden</div></div>
+                        <div class="calc-result-item"><div class="label">Noise at 400ft <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Noise Level</div><div class="rtd">Sound level at 400ft from facility — key community concern metric.</div></span></span></div><div class="value" id="noiseLevel">--</div><div class="subtext">dB average</div></div>
+                        <div class="calc-result-item"><div class="label">Grid Load <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Grid Load Impact</div><div class="rtd">DC demand as percentage of local grid capacity.</div></span></span></div><div class="value" id="gridLoad">--</div><div class="subtext">% of regional capacity</div></div>
+                        <div class="calc-result-item"><div class="label">Tax Foregone <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Tax Incentives Foregone</div><div class="rtd">Revenue lost by local government from tax incentives offered to attract the DC.</div></span></span></div><div class="value" id="taxForegone">--</div><div class="subtext">annual exemptions lost</div></div>
                     </div>
 
                     <div class="calc-section-label benefit">&#9650; Community Benefits</div>
                     <div class="calc-results" id="benefitResults">
-                        <div class="calc-result-item"><div class="label">Tax Revenue</div><div class="value green" id="taxRevenue">--</div><div class="subtext">annual property/equipment tax</div></div>
-                        <div class="calc-result-item"><div class="label">Construction Jobs</div><div class="value green" id="constJobs">--</div><div class="subtext">during build phase</div></div>
-                        <div class="calc-result-item"><div class="label">Permanent Jobs</div><div class="value green" id="permJobs">--</div><div class="subtext">direct operations</div></div>
-                        <div class="calc-result-item"><div class="label">Total Employment</div><div class="value green" id="totalJobs">--</div><div class="subtext">indirect + induced (2.5x)</div></div>
-                        <div class="calc-result-item"><div class="label">RE Capacity</div><div class="value green" id="reCapacity">--</div><div class="subtext">MW clean energy PPAs</div></div>
-                        <div class="calc-result-item"><div class="label">CO2 Avoided</div><div class="value green" id="co2Avoided">--</div><div class="subtext">tons/yr from renewables</div></div>
-                        <div class="calc-result-item"><div class="label">Waste Heat Value</div><div class="value green" id="wasteHeatValue">--</div><div class="subtext">annual heat recovery</div></div>
-                        <div class="calc-result-item"><div class="label">GDP Impact</div><div class="value green" id="gdpImpact">--</div><div class="subtext">annual economic contribution</div></div>
+                        <div class="calc-result-item"><div class="label">Tax Revenue <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Tax Revenue Generated</div><div class="rtd">Annual tax contribution from DC property, operations, and payroll.</div></span></span></div><div class="value green" id="taxRevenue">--</div><div class="subtext">annual property/equipment tax</div></div>
+                        <div class="calc-result-item"><div class="label">Construction Jobs <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Construction Jobs</div><div class="rtd">Employment created during DC construction phase.</div></span></span></div><div class="value green" id="constJobs">--</div><div class="subtext">during build phase</div></div>
+                        <div class="calc-result-item"><div class="label">Permanent Jobs <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Permanent Jobs</div><div class="rtd">Long-term operational positions at the DC.</div></span></span></div><div class="value green" id="permJobs">--</div><div class="subtext">direct operations</div></div>
+                        <div class="calc-result-item"><div class="label">Total Employment <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Total Employment</div><div class="rtd">Construction + permanent + indirect ecosystem jobs.</div></span></span></div><div class="value green" id="totalJobs">--</div><div class="subtext">indirect + induced (2.5x)</div></div>
+                        <div class="calc-result-item"><div class="label">RE Capacity <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Renewable Energy Capacity</div><div class="rtd">New renewable generation capacity driven by DC demand.</div></span></span></div><div class="value green" id="reCapacity">--</div><div class="subtext">MW clean energy PPAs</div></div>
+                        <div class="calc-result-item"><div class="label">CO2 Avoided <span class="res-tip">?<span class="res-tip-body"><div class="rtt">CO2 Avoided</div><div class="rtd">Carbon emissions prevented through DC renewable energy investments.</div></span></span></div><div class="value green" id="co2Avoided">--</div><div class="subtext">tons/yr from renewables</div></div>
+                        <div class="calc-result-item"><div class="label">Waste Heat Value <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Waste Heat Value</div><div class="rtd">Economic value of DC waste heat if recovered for district heating.</div></span></span></div><div class="value green" id="wasteHeatValue">--</div><div class="subtext">annual heat recovery</div></div>
+                        <div class="calc-result-item"><div class="label">GDP Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">GDP Impact</div><div class="rtd">Contribution to local/regional GDP from DC construction and operations.</div></span></span></div><div class="value green" id="gdpImpact">--</div><div class="subtext">annual economic contribution</div></div>
                     </div>
 
                     <div class="calc-section-label net">&#9670; Net Community Score</div>

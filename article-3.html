@@ -1118,7 +1118,40 @@
         .nav-user-dropdown.show{display:block}
         .tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:rgba(16,185,129,.2);color:#10b981;border-radius:50%;font-size:.65rem;font-weight:700;cursor:help;margin-left:4px;vertical-align:middle;position:relative}
         .tooltip-trigger .tooltip-content{display:none}
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
     <link rel="preload" as="image" href="assets/article-3-cover.jpg">
     <!-- Chart.js + D3.js for data visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1151,6 +1184,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -2020,19 +2055,19 @@
 
         <div class="mc-controls">
             <div class="mc-control">
-                <label>Monthly PM Tasks</label>
+                <label>Monthly PM Tasks <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monthly PM Tasks</div><div class="tooltip-desc">Total scheduled preventive maintenance work orders per month across all asset classes.</div><div class="tooltip-formula">Typical: 50-500 tasks/mo depending on facility size</div></span></span></label>
                 <input type="number" id="mc3Tasks" value="1200" min="50" max="50000">
             </div>
             <div class="mc-control">
-                <label>Technicians</label>
+                <label>Technicians <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Available Technicians</div><div class="tooltip-desc">Number of maintenance technicians available for PM execution. Does not include contractors or supervisors.</div></span></span></label>
                 <input type="number" id="mc3Techs" value="6" min="1" max="50">
             </div>
             <div class="mc-control">
-                <label>Avg Task Duration (hrs)</label>
+                <label>Avg Task Duration (hrs) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Task Duration</div><div class="tooltip-desc">Baseline average PM task duration for simulation. Varies around this mean using the selected uncertainty range.</div></span></span></label>
                 <input type="number" id="mc3Duration" value="1.5" min="0.25" max="8" step="0.25">
             </div>
             <div class="mc-control">
-                <label>Uncertainty Range</label>
+                <label>Uncertainty Range <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Uncertainty</div><div class="tooltip-desc">How much simulation inputs vary around their mean. Higher uncertainty = wider confidence intervals.</div><div class="tooltip-formula">&pm;10% verified data &middot; &pm;20% typical &middot; &pm;50% rough</div></span></span></label>
                 <select id="mc3Uncertainty">
                     <option value="0.1">&pm;10% (high confidence)</option>
                     <option value="0.2" selected>&pm;20% (typical)</option>
@@ -2159,8 +2194,8 @@
                     <!-- Mode Toggle + Action Buttons -->
                     <div class="maint-toolbar-row">
                         <div class="maint-mode-bar">
-                            <button class="maint-mode-btn active" id="maintModeFree" onclick="switchMaintMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
-                            <button class="maint-mode-btn" id="maintModePro" onclick="switchMaintMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maintProBadge">PRO</span></button>
+                            <button class="maint-mode-btn active" id="maintModeFree" data-mode="free" onclick="switchMaintMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
+                            <button class="maint-mode-btn" id="maintModePro" data-mode="pro" onclick="switchMaintMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maintProBadge">PRO</span></button>
                         </div>
                         <div class="maint-toolbar-actions">
                             <button class="maint-action-btn" onclick="maintResetDefaults()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-rotate-left"></i> Reset</button>
@@ -2175,11 +2210,11 @@
                             <input type="number" id="calcTasks" class="calc-input" value="400" min="1">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Available Technicians</label>
+                            <label class="calc-label">Available Technicians <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Available Technicians</div><div class="tooltip-desc">Number of qualified maintenance technicians available for task assignment.</div></span></span></label>
                             <input type="number" id="calcTechs" class="calc-input" value="6" min="1">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Current Backlog (tasks)</label>
+                            <label class="calc-label">Current Backlog (tasks) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Current Backlog</div><div class="tooltip-desc">Outstanding PM tasks that are overdue or deferred. Growing backlog indicates insufficient capacity.</div><div class="tooltip-formula">Healthy: &lt;10% of monthly tasks</div></span></span></label>
                             <input type="number" id="calcBacklog" class="calc-input" value="85" min="0">
                         </div>
                         <div class="calc-input-group">
@@ -2187,7 +2222,7 @@
                             <input type="number" id="calcDuration" class="calc-input" value="1.5" min="0.1" step="0.1">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Hours / Tech / Month</label>
+                            <label class="calc-label">Hours / Tech / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Hours per Tech per Month</div><div class="tooltip-desc">Available working hours per technician per month, before wrench time adjustments.</div><div class="tooltip-formula">Standard: 160-176 hrs/mo (40-44 hrs/wk)</div></span></span></label>
                             <input type="number" id="calcHours" class="calc-input" value="160" min="1">
                         </div>
                         <div class="calc-input-group">
@@ -2201,7 +2236,7 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Workflow Friction</label>
+                            <label class="calc-label">Workflow Friction <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Workflow Friction</div><div class="tooltip-desc">Level of administrative overhead and process inefficiency that reduces productive maintenance time.</div></span></span></label>
                             <select id="calcFriction" class="calc-select">
                                 <option value="High">High (55% efficiency)</option>
                                 <option value="Medium" selected>Medium (70% efficiency)</option>
@@ -2209,7 +2244,7 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Evidence Clarity</label>
+                            <label class="calc-label">Evidence Clarity <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Evidence Clarity</div><div class="tooltip-desc">Quality of maintenance records and documentation. Higher clarity improves audit readiness and compliance tracking.</div></span></span></label>
                             <select id="calcEvidence" class="calc-select">
                                 <option value="Unclear">Unclear (85% modifier)</option>
                                 <option value="Adequate" selected>Adequate (92% modifier)</option>
@@ -2223,15 +2258,15 @@
                         <div class="pro-input-section-title"><i class="fas fa-sliders"></i> Advanced Parameters</div>
                         <div class="calc-grid">
                             <div class="calc-input-group">
-                                <label class="calc-label">Wrench Time %</label>
+                                <label class="calc-label">Wrench Time % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Wrench Time Percentage</div><div class="tooltip-desc">Percentage of available time technicians spend doing actual maintenance work (vs travel, admin, waiting).</div><div class="tooltip-formula">Best practice: &gt;55% &middot; Industry avg: 25-35%</div></span></span></label>
                                 <input type="number" id="calcWrench" class="calc-input" value="35" min="10" max="80">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Travel & Admin Overhead %</label>
+                                <label class="calc-label">Travel & Admin Overhead % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Travel & Admin Overhead</div><div class="tooltip-desc">Percentage of time lost to travel between locations, paperwork, parts procurement, and administrative tasks.</div></span></span></label>
                                 <input type="number" id="calcOverhead" class="calc-input" value="25" min="0" max="60">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Task Duration Variability</label>
+                                <label class="calc-label">Task Duration Variability <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Task Duration Variability</div><div class="tooltip-desc">Coefficient of variation in task completion times. High variability makes scheduling less predictable.</div></span></span></label>
                                 <select id="calcVariability" class="calc-select">
                                     <option value="Low">Low (CV 0.15)</option>
                                     <option value="Medium" selected>Medium (CV 0.30)</option>
@@ -2239,15 +2274,15 @@
                                 </select>
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Critical Asset PM %</label>
+                                <label class="calc-label">Critical Asset PM % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Asset PM Coverage</div><div class="tooltip-desc">Percentage of PM tasks allocated to critical/high-priority assets. Should be prioritized.</div><div class="tooltip-formula">Target: &ge;95% completion for critical assets</div></span></span></label>
                                 <input type="number" id="calcCritical" class="calc-input" value="30" min="0" max="100">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">SLA Target %</label>
+                                <label class="calc-label">SLA Target % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">SLA Target</div><div class="tooltip-desc">Required PM completion rate specified in service level agreements.</div><div class="tooltip-formula">Typical: 85-95% compliance target</div></span></span></label>
                                 <input type="number" id="calcSLA" class="calc-input" value="95" min="80" max="100">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Backlog Age (avg weeks)</label>
+                                <label class="calc-label">Backlog Age (avg weeks) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Average Backlog Age</div><div class="tooltip-desc">Mean age of overdue tasks in weeks. Older backlog = higher risk of asset failure.</div></span></span></label>
                                 <input type="number" id="calcBacklogAge" class="calc-input" value="4" min="0" max="52">
                             </div>
                         </div>
@@ -2255,12 +2290,12 @@
 
                     <!-- Free Output Cards -->
                     <div class="calc-results" id="calcResults">
-                        <div class="calc-result-item"><div class="calc-result-value" id="resultCapacity">--</div><div class="calc-result-label">Effective Capacity (hrs)</div></div>
-                        <div class="calc-result-item"><div class="calc-result-value" id="resultCompliance">--</div><div class="calc-result-label">Predicted Compliance</div></div>
-                        <div class="calc-result-item"><div class="calc-result-value" id="resultBacklogBurn">--</div><div class="calc-result-label">Backlog Burn Rate (tasks/mo)</div></div>
-                        <div class="calc-result-item"><div class="calc-result-value" id="resultRisk">--</div><div class="calc-result-label">Risk Score (0-100)</div></div>
-                        <div class="calc-result-item"><div class="calc-result-value" id="resultStaffing">--</div><div class="calc-result-label">Recommended Techs (SLA)</div></div>
-                        <div class="calc-result-item"><div class="calc-result-value" id="resultMonths">--</div><div class="calc-result-label">Months to Target</div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultCapacity">--</div><div class="calc-result-label">Effective Capacity (hrs) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Effective Capacity</div><div class="rtd">Productive maintenance hours available per month after accounting for wrench time, travel, and admin overhead.</div><span class="rtf">Wrench time &times; available hours</span></span></span></div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultCompliance">--</div><div class="calc-result-label">Predicted Compliance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Predicted Compliance</div><div class="rtd">Forecasted PM completion rate based on capacity vs demand. The primary KPI for maintenance effectiveness.</div><span class="rtf">Target: &ge;90% for critical assets</span></span></span></div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultBacklogBurn">--</div><div class="calc-result-label">Backlog Burn Rate (tasks/mo) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Backlog Burn Rate</div><div class="rtd">Net rate of backlog reduction per month. Positive = clearing backlog, negative = backlog growing.</div></span></span></div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultRisk">--</div><div class="calc-result-label">Risk Score (0-100) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Maintenance Risk Score</div><div class="rtd">Composite risk score (0-100) combining compliance gap, backlog age, criticality exposure, and CMMS maturity.</div><span class="rtf">&lt;30 Good &middot; 30-60 Warning &middot; &gt;60 Critical</span></span></span></div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultStaffing">--</div><div class="calc-result-label">Recommended Techs (SLA) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Recommended Technicians</div><div class="rtd">Minimum technician count required to meet the SLA compliance target.</div></span></span></div></div>
+                        <div class="calc-result-item"><div class="calc-result-value" id="resultMonths">--</div><div class="calc-result-label">Months to Target <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Months to Target</div><div class="rtd">Estimated months to reach SLA compliance target given current staffing and backlog.</div></span></span></div></div>
                     </div>
 
                     <!-- Pro Output Panels -->
@@ -2269,11 +2304,11 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-gauge-high"></i> Capacity & Utilization</div>
                             <div class="calc-results" id="proCapGrid">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proRawCap">--</div><div class="calc-result-label">Raw Capacity (hrs/mo)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proWrenchCap">--</div><div class="calc-result-label">Wrench-Time Adjusted</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proTotalDemand">--</div><div class="calc-result-label">Total Demand (hrs/mo)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proUtilization">--</div><div class="calc-result-label">Utilization Rate</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proMargin">--</div><div class="calc-result-label">Capacity Margin</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proRawCap">--</div><div class="calc-result-label">Raw Capacity (hrs/mo) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Raw Capacity</div><div class="rtd">Total scheduled maintenance hours per month before efficiency adjustments.</div><span class="rtf">Techs &times; hours/month</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proWrenchCap">--</div><div class="calc-result-label">Wrench-Time Adjusted <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Wrench-Time Adjusted</div><div class="rtd">Capacity after wrench time factor — percentage of time actually spent on maintenance tasks.</div><span class="rtf">Industry avg wrench time: 25-35%</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proTotalDemand">--</div><div class="calc-result-label">Total Demand (hrs/mo) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Total Demand</div><div class="rtd">Monthly hours required to complete all scheduled PM tasks plus backlog reduction.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proUtilization">--</div><div class="calc-result-label">Utilization Rate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Utilization Rate</div><div class="rtd">Ratio of maintenance demand to available capacity. Over 100% means demand exceeds capacity.</div><span class="rtf">80-90% optimal &middot; &gt;100% understaffed</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMargin">--</div><div class="calc-result-label">Capacity Margin <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Capacity Margin</div><div class="rtd">Surplus or deficit of maintenance hours. Negative margin indicates understaffing.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Unlock 24 advanced KPIs + PDF export</div></div></div>
 
@@ -2281,11 +2316,11 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-clipboard-check"></i> Compliance Deep Dive</div>
                             <div class="calc-results" id="proCompGrid">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proCompPct">--</div><div class="calc-result-label">Predicted Compliance</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proConfBand">--</div><div class="calc-result-label">90% Confidence Band</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proCritComp">--</div><div class="calc-result-label">Critical Asset Compliance</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proGap">--</div><div class="calc-result-label">Gap to SLA Target</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proPercentile">--</div><div class="calc-result-label">Industry Percentile</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proCompPct">--</div><div class="calc-result-label">Predicted Compliance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Predicted Compliance</div><div class="rtd">Forecasted PM completion rate based on capacity vs demand. The primary KPI for maintenance effectiveness.</div><span class="rtf">Target: &ge;90% for critical assets</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proConfBand">--</div><div class="calc-result-label">90% Confidence Band <span class="res-tip">?<span class="res-tip-body"><div class="rtt">90% Confidence Band</div><div class="rtd">Monte Carlo simulation range — 90% of outcomes fall within this band.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proCritComp">--</div><div class="calc-result-label">Critical Asset Compliance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Critical Asset Compliance</div><div class="rtd">PM completion rate specifically for critical/high-priority assets.</div><span class="rtf">Target: &ge;95% for critical assets</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proGap">--</div><div class="calc-result-label">Gap to SLA Target <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Gap to SLA Target</div><div class="rtd">Percentage points between current predicted compliance and the SLA target.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proPercentile">--</div><div class="calc-result-label">Industry Percentile <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Industry Percentile</div><div class="rtd">Where this facility ranks compared to industry benchmarks for maintenance compliance.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo confidence intervals</div></div></div>
 
@@ -2293,11 +2328,11 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-triangle-exclamation"></i> Backlog & Risk</div>
                             <div class="calc-results" id="proRiskGrid">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proBurnRate">--</div><div class="calc-result-label">Burn Rate (tasks/mo)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proClearTime">--</div><div class="calc-result-label">Time-to-Clear Backlog</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proGrowthRisk">--</div><div class="calc-result-label">Backlog Growth Risk</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proWeightedRisk">--</div><div class="calc-result-label">Weighted Risk Score</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proSlaMiss">--</div><div class="calc-result-label">SLA Miss Probability</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBurnRate">--</div><div class="calc-result-label">Burn Rate (tasks/mo) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Backlog Burn Rate</div><div class="rtd">Net tasks cleared from backlog per month.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proClearTime">--</div><div class="calc-result-label">Time-to-Clear Backlog <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Backlog Clear Time</div><div class="rtd">Projected months to eliminate current maintenance backlog.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proGrowthRisk">--</div><div class="calc-result-label">Backlog Growth Risk <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Backlog Growth Risk</div><div class="rtd">Probability that backlog will grow rather than shrink under current conditions.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proWeightedRisk">--</div><div class="calc-result-label">Weighted Risk Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Weighted Risk Score</div><div class="rtd">Risk score weighted by asset criticality — critical asset failures weighted 3x.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proSlaMiss">--</div><div class="calc-result-label">SLA Miss Probability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">SLA Miss Probability</div><div class="rtd">Monte Carlo probability of failing to meet SLA target.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Backlog trajectory modeling</div></div></div>
 
@@ -2305,10 +2340,10 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-users-gear"></i> Workforce Optimization</div>
                             <div class="calc-results" id="proWorkGrid">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proReqTechs">--</div><div class="calc-result-label">Techs for SLA Target</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proOptUtil">--</div><div class="calc-result-label">Optimal Utilization</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proOvertime">--</div><div class="calc-result-label">Overtime Needed (hrs/mo)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proMarginal">--</div><div class="calc-result-label">Marginal Tech Impact</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proReqTechs">--</div><div class="calc-result-label">Techs for SLA Target <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Techs for SLA Target</div><div class="rtd">Optimal technician count to achieve SLA compliance with 90% confidence.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proOptUtil">--</div><div class="calc-result-label">Optimal Utilization <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Optimal Utilization</div><div class="rtd">Target utilization rate that balances efficiency with buffer capacity.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proOvertime">--</div><div class="calc-result-label">Overtime Needed (hrs/mo) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Overtime Required</div><div class="rtd">Monthly overtime hours needed if current staffing is insufficient.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMarginal">--</div><div class="calc-result-label">Marginal Tech Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Marginal Tech Impact</div><div class="rtd">Compliance improvement from adding one additional technician.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Staffing optimization model</div></div></div>
 
@@ -2316,11 +2351,11 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-arrow-trend-up"></i> Scenario Sensitivity</div>
                             <div class="calc-results" id="proScenGrid">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen1">--</div><div class="calc-result-label">+1 Technician</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen2">--</div><div class="calc-result-label">CMMS +1 Level</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen3">--</div><div class="calc-result-label">Friction → Low</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen4">--</div><div class="calc-result-label">Evidence → Excellent</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen5">--</div><div class="calc-result-label">-20% Task Duration</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen1">--</div><div class="calc-result-label">+1 Technician <span class="res-tip">?<span class="res-tip-body"><div class="rtt">+1 Technician</div><div class="rtd">Projected compliance if one more technician is added.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen2">--</div><div class="calc-result-label">CMMS +1 Level <span class="res-tip">?<span class="res-tip-body"><div class="rtt">CMMS Upgrade</div><div class="rtd">Projected improvement from upgrading CMMS maturity by one level.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen3">--</div><div class="calc-result-label">Friction → Low <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Friction Reduction</div><div class="rtd">Impact of reducing workflow friction to low level.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen4">--</div><div class="calc-result-label">Evidence → Excellent <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Evidence Improvement</div><div class="rtd">Impact of improving evidence clarity to excellent level.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen5">--</div><div class="calc-result-label">-20% Task Duration <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Duration Reduction</div><div class="rtd">Impact of 20% reduction in average task duration through process improvement.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div></div>
                     </div>
@@ -3014,8 +3049,16 @@
                 if(!content) return;
                 tc.innerHTML=content.innerHTML;
                 var r=t.getBoundingClientRect();
-                tc.style.top=(r.bottom+window.scrollY+8)+'px';
-                tc.style.left=Math.max(10,Math.min(window.innerWidth-340,r.left))+'px';
+                var left=r.right+12;
+                var top=r.top+r.height/2;
+                if(left+320>window.innerWidth-20) left=r.left-332;
+                if(left<20) left=20;
+                var th=tc.offsetHeight||150;
+                top=top-th/2;
+                if(top<20) top=20;
+                if(top+th>window.innerHeight-20) top=window.innerHeight-th-20;
+                tc.style.top=top+'px';
+                tc.style.left=left+'px';
                 tc.classList.add('visible');
             });
             t.addEventListener('mouseleave',function(){tc.classList.remove('visible');});

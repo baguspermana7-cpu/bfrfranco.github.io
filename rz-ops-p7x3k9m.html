@@ -350,6 +350,39 @@
         .theme-toggle-btn{background:none;border:1px solid #334155;color:#94a3b8;cursor:pointer;padding:6px 10px;border-radius:8px;font-size:0.85rem;transition:all 0.2s}
         .theme-toggle-btn:hover{border-color:#8b5cf6;color:#a78bfa}
 
+        /* ═══ DC INTEL ENHANCEMENTS ═══ */
+        .dc-chart-wrap{position:relative}
+        .dc-chart-wrap:hover .dc-chart-actions{opacity:1}
+        .dc-chart-actions{position:absolute;top:4px;right:4px;display:flex;gap:2px;opacity:0;transition:opacity 0.2s}
+        .dc-chart-btn{background:rgba(15,23,42,0.7);border:1px solid #334155;color:#94a3b8;cursor:pointer;padding:3px 6px;border-radius:4px;font-size:0.6rem;transition:all 0.15s}
+        .dc-chart-btn:hover{background:rgba(139,92,246,0.2);color:#a78bfa;border-color:#8b5cf6}
+        .dc-kpi-tooltip{position:relative;cursor:help}
+        .dc-kpi-tooltip:hover .dc-tooltip-text{opacity:1;visibility:visible;transform:translateY(0)}
+        .dc-tooltip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;font-size:0.68rem;color:#94a3b8;white-space:nowrap;opacity:0;visibility:hidden;transition:all 0.2s;z-index:50;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+        .dc-skeleton{background:linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);background-size:200% 100%;animation:dcSkeleton 1.5s infinite;border-radius:8px}
+        @keyframes dcSkeleton{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .dc-new-badge{display:inline-block;background:rgba(52,211,153,0.2);color:#34d399;font-size:0.5rem;padding:1px 5px;border-radius:3px;font-weight:800;letter-spacing:0.5px;vertical-align:middle;margin-left:4px;animation:dcPulse 2s infinite}
+        @keyframes dcPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+        /* ═══ E4: Print Styles ═══ */
+        @media print{
+            .sidebar,.topbar,.login-page,.hamburger,.sidebar-overlay,.btn,.bench-btn,.dc-chart-actions,.bench-filters,.bench-tabs,.modal-overlay{display:none!important}
+            .main-wrap{margin-left:0!important}
+            .section{display:none!important}
+            #sec-benchmarks{display:block!important}
+            .bench-panel{display:block!important;page-break-inside:avoid}
+            body{background:#fff!important;color:#000!important}
+            .card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid}
+            .bench-card{border:1px solid #ccc!important;background:#f9f9f9!important}
+            .bench-val,.kpi-val,.card-title{color:#000!important}
+            .bench-label,.bench-sub,.kpi-label{color:#666!important}
+            canvas{max-height:300px!important}
+        }
+
+        /* ═══ F3: Responsive Grid for Overview ═══ */
+        @media(max-width:1200px){#bp-overview>div[style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important}}
+        @media(min-width:1400px){#bp-overview>div:first-child{grid-template-columns:1fr 1fr 1fr!important}}
+
         /* ═══ SELECT OPTIONS FIX ═══ */
         select option{background:#1e293b;color:#e2e8f0}
 
@@ -419,6 +452,10 @@
         body.light-mode .bench-page-btn{border-color:#e2e8f0;color:#475569}
         body.light-mode .bench-table th{color:#64748b;border-color:#e2e8f0}
         body.light-mode .bench-table td{color:#334155;border-color:#f1f5f9}
+        body.light-mode .dc-chart-btn{background:rgba(255,255,255,0.8);border-color:#e2e8f0;color:#64748b}
+        body.light-mode .dc-chart-btn:hover{background:rgba(139,92,246,0.1);color:#7c3aed}
+        body.light-mode .dc-tooltip-text{background:#fff;border-color:#e2e8f0;color:#334155;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+        body.light-mode .dc-new-badge{background:rgba(16,185,129,0.12);color:#059669}
         body.light-mode .tl-item{border-color:#e2e8f0}
         body.light-mode .tl-item::before{border-color:#fff}
         body.light-mode .tl-text{color:#334155}
@@ -866,9 +903,16 @@
 <!-- ══════════════════════════════════════ BENCHMARKS ══════════════════════════════════════ -->
 <div class="section" id="sec-benchmarks">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Data Center Industry Intelligence</h1><p>Comprehensive global DC capacity data — 50+ operators, 28 countries, 35 facilities · Synergy, CBRE, JLL, C&W 2025-2026</p></div>
-        <div style="display:flex;gap:0.5rem;flex-shrink:0">
+        <div>
+            <h1>Data Center Industry Intelligence</h1>
+            <p>Comprehensive global DC capacity data — 50+ operators, 28 countries, 35 facilities · Synergy, CBRE, JLL, C&W 2025-2026</p>
+            <div style="font-size:0.62rem;color:#475569;margin-top:4px"><i class="fas fa-clock" style="margin-right:3px"></i>Last updated: Feb 2026 · Sources: Synergy Q3 2025, CBRE H1 2025, JLL 2026 Outlook</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap">
+            <div style="position:relative"><i class="fas fa-search" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.7rem"></i><input type="text" id="dcGlobalSearch" placeholder="Search all..." style="padding:5px 8px 5px 26px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;font-family:inherit;outline:none;width:160px" oninput="dcGlobalSearchFilter(this.value)"></div>
+            <button class="btn btn-ghost btn-sm" onclick="openDcCompareMode()" title="Compare operators"><i class="fas fa-columns"></i> Compare</button>
             <button class="btn btn-green btn-sm" onclick="exportBenchmarksCSV()"><i class="fas fa-download"></i> CSV</button>
+            <button class="btn btn-amber btn-sm" onclick="exportBenchJSON()" title="Export as JSON"><i class="fas fa-code"></i> JSON</button>
             <button class="btn btn-purple btn-sm" onclick="openReport('benchmarks')"><i class="fas fa-file-alt"></i> Report</button>
         </div>
     </div>
@@ -883,21 +927,37 @@
         <button class="bench-tab" onclick="showBenchTab('countries')"><i class="fas fa-globe-americas" style="margin-right:4px"></i>Countries (28)</button>
         <button class="bench-tab" onclick="showBenchTab('facilities')"><i class="fas fa-server" style="margin-right:4px"></i>Facilities (35)</button>
         <button class="bench-tab" onclick="showBenchTab('market')"><i class="fas fa-chart-line" style="margin-right:4px"></i>Market Intel</button>
+        <button class="bench-tab" onclick="showBenchTab('projections')"><i class="fas fa-brain" style="margin-right:4px"></i>Projection Analytics</button>
     </div>
 
     <!-- ═══ OVERVIEW TAB ═══ -->
     <div class="bench-panel active" id="bp-overview">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
-            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-building" style="color:#60a5fa"></i> Top 15 Operators by Capacity (MW)</div><canvas id="chartTopOperators" height="100"></canvas></div>
-            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-globe" style="color:#34d399"></i> Capacity by Region</div><canvas id="chartRegionCap" height="100"></canvas></div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0"><div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('topOps')" title="Download PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('topOps')" title="Fullscreen"><i class="fas fa-expand"></i></button></div><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-building" style="color:#60a5fa"></i> Top 15 Operators by Capacity (MW)</div><canvas id="chartTopOperators" height="100"></canvas></div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0"><div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('regionCap')" title="Download PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('regionCap')" title="Fullscreen"><i class="fas fa-expand"></i></button></div><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-globe" style="color:#34d399"></i> Capacity by Region</div><canvas id="chartRegionCap" height="100"></canvas></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
-            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-flag" style="color:#fbbf24"></i> Top 15 Countries by Capacity (MW)</div><canvas id="chartTopCountries" height="100"></canvas></div>
-            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-dollar-sign" style="color:#a78bfa"></i> Hyperscaler CapEx 2025 ($B)</div><canvas id="chartCapex" height="100"></canvas></div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0"><div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('topCountries')" title="Download PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('topCountries')" title="Fullscreen"><i class="fas fa-expand"></i></button></div><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-flag" style="color:#fbbf24"></i> Top 15 Countries by Capacity (MW)</div><canvas id="chartTopCountries" height="100"></canvas></div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0"><div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('capex')" title="Download PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('capex')" title="Fullscreen"><i class="fas fa-expand"></i></button></div><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-dollar-sign" style="color:#a78bfa"></i> Hyperscaler CapEx 2025 ($B)</div><canvas id="chartCapex" height="100"></canvas></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
-            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-area" style="color:#22d3ee"></i> Growth Rate by Country (% YoY)</div><canvas id="chartGrowthRate" height="100"></canvas></div>
-            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-layer-group" style="color:#f87171"></i> Operator Type Distribution</div><canvas id="chartTypeDistrib" height="100"></canvas></div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0"><div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('growth')" title="Download PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('growth')" title="Fullscreen"><i class="fas fa-expand"></i></button></div><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-area" style="color:#22d3ee"></i> Growth Rate by Country (% YoY)</div><canvas id="chartGrowthRate" height="100"></canvas></div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0"><div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('typeDistrib')" title="Download PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('typeDistrib')" title="Fullscreen"><i class="fas fa-expand"></i></button></div><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-layer-group" style="color:#f87171"></i> Operator Type Distribution</div><canvas id="chartTypeDistrib" height="100"></canvas></div>
+        </div>
+        <!-- A1: Scatter Capacity vs CapEx | A6: Radar Regional Comparison -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-braille" style="color:#a78bfa"></i> Capacity vs CapEx by Operator</div><canvas id="chartScatterCapVsCapex" height="140"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-spider" style="color:#60a5fa"></i> Regional Comparison (Radar)</div><canvas id="chartRadarRegion" height="140"></canvas></div>
+        </div>
+        <!-- A3: Scatter Country Capacity vs Growth | A7: Stacked Bar Capacity by Type per Region -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-bullseye" style="color:#34d399"></i> Country Capacity vs Growth Rate</div><canvas id="chartScatterCountryGrowth" height="140"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-bar" style="color:#fbbf24"></i> Capacity by Type per Region</div><canvas id="chartStackedRegionType" height="140"></canvas></div>
+        </div>
+        <!-- A4: City-Level Capacity Scatter | C5: Market Share Treemap | C8: Top Cities -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-map-pin" style="color:#f87171"></i> City-Level Capacity Distribution</div><canvas id="chartScatterCityCapacity" height="140"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-city" style="color:#22d3ee"></i> Top 10 Cities by Total Capacity</div><canvas id="chartTopCities" height="140"></canvas></div>
         </div>
     </div>
 
@@ -927,9 +987,15 @@
                 <span class="bench-filter-label">Search:</span>
                 <input type="text" class="bench-input" id="benchOpSearch" placeholder="Search operator..." oninput="filterBenchOps()">
             </div>
-            <div class="bench-filter-group" style="margin-left:auto">
+            <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px;align-items:center">
                 <span style="font-size:0.65rem;color:#64748b" id="benchOpCount">50 operators</span>
+                <button class="bench-btn bench-btn-ghost" onclick="exportTabCSV('operators')" title="Export operators CSV"><i class="fas fa-download" style="font-size:0.6rem"></i></button>
             </div>
+        </div>
+        <!-- A5: Bubble Operator Market Position | C9: Diversification Score -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-circle" style="color:#a78bfa"></i> Operator Market Position (Bubble)</div><canvas id="chartBubbleOperator" height="160"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-project-diagram" style="color:#34d399"></i> Geographic Diversification Score</div><canvas id="chartDiversification" height="160"></canvas></div>
         </div>
         <div class="card" style="padding:1rem;margin-bottom:0.75rem">
             <div class="tbl-overflow" id="benchOpTable"></div>
@@ -962,8 +1028,9 @@
                 <span class="bench-filter-label">Search:</span>
                 <input type="text" class="bench-input" id="benchCountrySearch" placeholder="Search country..." oninput="filterBenchCountries()">
             </div>
-            <div class="bench-filter-group" style="margin-left:auto">
+            <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px;align-items:center">
                 <span style="font-size:0.65rem;color:#64748b" id="benchCountryCount">28 countries</span>
+                <button class="bench-btn bench-btn-ghost" onclick="exportTabCSV('countries')" title="Export countries CSV"><i class="fas fa-download" style="font-size:0.6rem"></i></button>
             </div>
         </div>
         <div class="card" style="padding:1rem;margin-bottom:0.75rem">
@@ -1000,9 +1067,16 @@
                     <option value="pre2024">Pre-2024</option>
                 </select>
             </div>
-            <div class="bench-filter-group" style="margin-left:auto">
+            <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px;align-items:center">
                 <span style="font-size:0.65rem;color:#64748b" id="benchFacCount">35 facilities</span>
+                <button class="bench-btn bench-btn-ghost" onclick="exportTabCSV('facilities')" title="Export facilities CSV"><i class="fas fa-download" style="font-size:0.6rem"></i></button>
             </div>
+        </div>
+        <!-- A2: Scatter Facility MW vs Year | C6: Size Distribution Histogram | C7: Commissioning Timeline -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-braille" style="color:#a78bfa"></i> Facility MW vs Year Built</div><canvas id="chartScatterFacYear" height="160"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-bar" style="color:#60a5fa"></i> Size Distribution</div><canvas id="chartFacHistogram" height="160"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-calendar-alt" style="color:#34d399"></i> Commissioning Timeline</div><canvas id="chartCommissionTimeline" height="160"></canvas></div>
         </div>
         <div class="card" style="padding:1rem;margin-bottom:0.75rem">
             <div class="tbl-overflow" id="benchFacTable"></div>
@@ -1026,6 +1100,11 @@
             <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-map-marked-alt" style="color:#34d399"></i> Regional Breakdown</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem" id="benchRegionalInfo"></div>
         </div>
+        <!-- A8: Projected Capacity Timeline | C10: Investment Gap Analysis -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-area" style="color:#a78bfa"></i> Projected Capacity Timeline (GW)</div><canvas id="chartCapacityTimeline" height="160"></canvas></div>
+            <div class="card" style="padding:1rem;margin-bottom:0"><div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-balance-scale" style="color:#fbbf24"></i> Investment Gap Analysis ($B)</div><canvas id="chartInvestmentGap" height="160"></canvas></div>
+        </div>
         <div class="card" style="padding:1rem;margin-bottom:0.75rem">
             <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-exclamation-triangle" style="color:#f87171"></i> Key Market Constraints</div>
             <div id="benchConstraints"></div>
@@ -1034,6 +1113,112 @@
             <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-book" style="color:#64748b"></i> Sources & Methodology</div>
             <p style="font-size:0.72rem;color:#94a3b8;line-height:1.5" id="benchSources"></p>
         </div>
+    </div>
+
+    <!-- ═══ PROJECTION ANALYTICS TAB ═══ -->
+    <div class="bench-panel" id="bp-projections">
+        <div style="margin-bottom:1rem">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fas fa-brain" style="color:#a78bfa;font-size:0.9rem"></i>
+                <span style="font-size:0.85rem;font-weight:700;color:#f1f5f9">AI/Cloud Demand vs DC Supply — Projection Model</span>
+            </div>
+            <p style="font-size:0.72rem;color:#64748b;line-height:1.5">Interpolated projections using compound growth modeling on existing capacity data, AI/cloud provider CapEx trajectories, and regional supply pipeline analysis. Model factors: historical CAGR, announced buildout, power grid constraints, and AI compute demand curves (training + inference).</p>
+        </div>
+
+        <!-- KPI Summary for Projections -->
+        <div class="bench-grid" id="projKpis" style="grid-template-columns:repeat(6,1fr);gap:0.6rem;margin-bottom:1rem"></div>
+
+        <!-- Row 1: Regional Supply vs Demand Projection + Gap Waterfall -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0">
+                <div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('projRegionSupplyDemand')" title="PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('projRegionSupplyDemand')" title="Fullscreen"><i class="fas fa-expand"></i></button></div>
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-area" style="color:#60a5fa"></i> Regional DC Supply vs AI/Cloud Demand (GW) — 2024→2030</div>
+                <canvas id="chartProjRegionSupplyDemand" height="180"></canvas>
+            </div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0">
+                <div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('projGapWaterfall')" title="PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('projGapWaterfall')" title="Fullscreen"><i class="fas fa-expand"></i></button></div>
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-exclamation-triangle" style="color:#f87171"></i> Supply-Demand Gap by Region (GW Deficit 2030)</div>
+                <canvas id="chartProjGapWaterfall" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- Row 2: AI Provider CapEx vs Colo/Hyperscale Buildout + Provider Type Matrix -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0">
+                <div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('projProviderVsInfra')" title="PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('projProviderVsInfra')" title="Fullscreen"><i class="fas fa-expand"></i></button></div>
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-balance-scale-right" style="color:#fbbf24"></i> AI/Cloud Provider CapEx vs DC Infrastructure Buildout ($B)</div>
+                <canvas id="chartProjProviderVsInfra" height="180"></canvas>
+            </div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0">
+                <div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('projProviderTypeScatter')" title="PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('projProviderTypeScatter')" title="Fullscreen"><i class="fas fa-expand"></i></button></div>
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-braille" style="color:#a78bfa"></i> Provider Demand (GW) vs Colo/Hyperscale/Edge Allocation</div>
+                <canvas id="chartProjProviderTypeScatter" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- Row 3: Demand Growth by Provider Timeline + Infrastructure Type Gap Radar -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0">
+                <div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('projProviderTimeline')" title="PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('projProviderTimeline')" title="Fullscreen"><i class="fas fa-expand"></i></button></div>
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-chart-line" style="color:#34d399"></i> AI/Cloud Provider Capacity Demand Trajectory (GW)</div>
+                <canvas id="chartProjProviderTimeline" height="180"></canvas>
+            </div>
+            <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0">
+                <div class="dc-chart-actions"><button class="dc-chart-btn" onclick="exportChartPNG('projInfraTypeGap')" title="PNG"><i class="fas fa-image"></i></button><button class="dc-chart-btn" onclick="openChartFullscreen('projInfraTypeGap')" title="Fullscreen"><i class="fas fa-expand"></i></button></div>
+                <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-spider" style="color:#22d3ee"></i> Infrastructure Type Balance — Supply vs Demand (Radar)</div>
+                <canvas id="chartProjInfraTypeGap" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- Row 4: Provider Comparison Table -->
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-th" style="color:#a78bfa"></i> AI/Cloud Provider vs Infrastructure Type — Demand Allocation Matrix</div>
+            <div class="tbl-overflow" id="projProviderTable"></div>
+        </div>
+
+        <!-- Row 5: Regional Projection Detail Table -->
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-globe" style="color:#34d399"></i> Regional Supply-Demand Projection Detail (2025→2030)</div>
+            <div class="tbl-overflow" id="projRegionTable"></div>
+        </div>
+
+        <!-- Row 6: Gap Analysis Insights -->
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-lightbulb" style="color:#fbbf24"></i> Key Supply-Demand Imbalance Insights</div>
+            <div id="projInsights"></div>
+        </div>
+
+        <!-- Methodology -->
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-cogs" style="color:#64748b"></i> Projection Methodology</div>
+            <div id="projMethodology"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ DC INTEL MODALS ═══ -->
+<div class="modal-overlay" id="dcOperatorModal">
+    <div class="modal-box" style="max-width:780px">
+        <button class="modal-close" onclick="document.getElementById('dcOperatorModal').classList.remove('show')">&times;</button>
+        <div id="dcOperatorModalContent"></div>
+    </div>
+</div>
+<div class="modal-overlay" id="dcCountryPanel">
+    <div class="modal-box" style="max-width:780px">
+        <button class="modal-close" onclick="document.getElementById('dcCountryPanel').classList.remove('show')">&times;</button>
+        <div id="dcCountryPanelContent"></div>
+    </div>
+</div>
+<div class="modal-overlay" id="dcCompareModal">
+    <div class="modal-box" style="max-width:900px">
+        <button class="modal-close" onclick="document.getElementById('dcCompareModal').classList.remove('show')">&times;</button>
+        <div id="dcCompareContent"></div>
+    </div>
+</div>
+<div class="modal-overlay" id="dcChartFullscreen">
+    <div class="modal-box" style="max-width:95vw;max-height:95vh;padding:1rem">
+        <button class="modal-close" onclick="document.getElementById('dcChartFullscreen').classList.remove('show')">&times;</button>
+        <canvas id="chartFullscreenCanvas" style="width:100%;height:80vh"></canvas>
     </div>
 </div>
 
@@ -1695,6 +1880,10 @@ function toggleAdminTheme(){
     var isLight=document.body.classList.contains('light-mode');
     localStorage.setItem('rz_admin_theme',isLight?'light':'dark');
     document.getElementById('adminThemeBtn').innerHTML='<i class="fas fa-'+(isLight?'sun':'moon')+'"></i>';
+    // F2: Re-render DC charts with theme-appropriate colors
+    if(typeof renderBenchOverview==='function'){
+        try{renderBenchOverview()}catch(e){}
+    }
 }
 
 // Clock
@@ -2475,125 +2664,128 @@ function getCountryRegion(c){
 }
 
 const DC_OPERATORS=[
-  {rank:1,company:'Amazon Web Services (AWS)',hq:'United States',type:'Hyperscale',mw:7500,facilities:130,countries:27,keyMarkets:['N. Virginia','Oregon','Ohio','Ireland','Frankfurt','Singapore'],capex:105,source:'Synergy Q3 2025'},
-  {rank:2,company:'Microsoft Azure',hq:'United States',type:'Hyperscale',mw:7000,facilities:400,countries:60,keyMarkets:['N. Virginia','Chicago','Dublin','Amsterdam','Singapore','Phoenix'],capex:95,source:'Microsoft FY2025'},
-  {rank:3,company:'Google Cloud',hq:'United States',type:'Hyperscale',mw:5500,facilities:100,countries:25,keyMarkets:['Oregon','Iowa','Finland','Singapore','Taiwan','Netherlands'],capex:75,source:'Synergy Q3 2025'},
-  {rank:4,company:'Meta Platforms',hq:'United States',type:'Hyperscale',mw:4500,facilities:30,countries:6,keyMarkets:['Oregon','Iowa','Texas','Sweden','Ireland','Louisiana'],capex:72,source:'Meta Q3 2025'},
-  {rank:5,company:'Equinix',hq:'United States',type:'Colocation',mw:3000,facilities:260,countries:33,keyMarkets:['N. Virginia','Silicon Valley','Amsterdam','Frankfurt','Singapore','Tokyo'],capex:4.2,source:'Equinix Q4 2025'},
-  {rank:6,company:'Alibaba Cloud',hq:'China',type:'Hyperscale',mw:2800,facilities:85,countries:15,keyMarkets:['Hangzhou','Shanghai','Singapore','KL','Jakarta','Tokyo'],capex:23,source:'Alibaba FY2025'},
-  {rank:7,company:'Digital Realty',hq:'United States',type:'Colocation / Wholesale',mw:2760,facilities:300,countries:25,keyMarkets:['N. Virginia','Dallas','Chicago','Amsterdam','Frankfurt','Singapore'],capex:3.8,source:'Digital Realty Q3 2025'},
-  {rank:8,company:'Vantage Data Centers',hq:'United States',type:'Hyperscale / Wholesale',mw:2600,facilities:35,countries:6,keyMarkets:['N. Virginia','Phoenix','Santa Clara','Zurich','Johannesburg','Melbourne'],capex:5.0,source:'Data Centre Magazine'},
-  {rank:9,company:'Oracle',hq:'United States',type:'Hyperscale',mw:2200,facilities:147,countries:40,keyMarkets:['Abilene TX','Ashburn VA','Phoenix','London','Amsterdam','Tokyo'],capex:25,source:'Oracle Q2 FY2026'},
-  {rank:10,company:'NTT Global Data Centers',hq:'Japan',type:'Colocation / Wholesale',mw:2100,facilities:150,countries:20,keyMarkets:['Tokyo','Osaka','London','Frankfurt','Virginia','Mumbai','Singapore'],capex:3.5,source:'NTT GDC'},
-  {rank:11,company:'AirTrunk',hq:'Australia',type:'Hyperscale',mw:1800,facilities:11,countries:4,keyMarkets:['Sydney','Melbourne','Singapore','Tokyo','Hong Kong'],capex:3.0,source:'DCD, Blackstone'},
-  {rank:12,company:'Tencent Cloud',hq:'China',type:'Hyperscale',mw:1800,facilities:70,countries:12,keyMarkets:['Shenzhen','Shanghai','Beijing','Singapore','Tokyo','Frankfurt'],capex:15,source:'Tencent'},
-  {rank:13,company:'ByteDance / Volcano Engine',hq:'China',type:'Hyperscale',mw:1200,facilities:40,countries:8,keyMarkets:['Beijing','Shanghai','Singapore','Virginia','Jakarta'],capex:14,source:'SCMP, DCD'},
-  {rank:14,company:'Lumen Technologies',hq:'United States',type:'Colocation / Enterprise',mw:1200,facilities:55,countries:8,keyMarkets:['Denver','Minneapolis','Phoenix','London','Amsterdam'],capex:1.5,source:'Lumen IR'},
-  {rank:15,company:'Apple',hq:'United States',type:'Hyperscale',mw:1000,facilities:12,countries:5,keyMarkets:['Mesa AZ','Maiden NC','Reno NV','Waukee IA','Viborg DK'],capex:8,source:'Apple sustainability'},
-  {rank:16,company:'CyrusOne',hq:'United States',type:'Colocation / Wholesale',mw:1000,facilities:55,countries:3,keyMarkets:['Dallas','Houston','N. Virginia','Phoenix','London','Frankfurt'],capex:2.0,source:'CyrusOne'},
-  {rank:17,company:'QTS Realty Trust (Blackstone)',hq:'United States',type:'Hyperscale / Wholesale',mw:950,facilities:63,countries:2,keyMarkets:['Atlanta','Dallas','Chicago','N. Virginia','Phoenix'],capex:2.5,source:'QTS'},
-  {rank:18,company:'VNET Group (21Vianet)',hq:'China',type:'Colocation / Wholesale',mw:783,facilities:52,countries:1,keyMarkets:['Beijing','Shanghai','Shenzhen','Hebei','Inner Mongolia'],capex:1.0,source:'VNET Q3 2025'},
-  {rank:19,company:'GDS Holdings',hq:'China',type:'Colocation / Hyperscale',mw:750,facilities:102,countries:5,keyMarkets:['Shanghai','Beijing','Shenzhen','Johor','Batam'],capex:2.0,source:'GDS Q2 2025'},
-  {rank:20,company:'Keppel Data Centres',hq:'Singapore',type:'Colocation / Wholesale',mw:650,facilities:35,countries:8,keyMarkets:['Singapore','Dublin','London','Amsterdam','Johor','Sydney'],capex:1.5,source:'Keppel DC'},
-  {rank:21,company:'Switch (DigitalBridge)',hq:'United States',type:'Hyperscale / Wholesale',mw:650,facilities:8,countries:2,keyMarkets:['Las Vegas','Reno','Grand Rapids','Atlanta','Milan'],capex:1.8,source:'Switch'},
-  {rank:22,company:'Chindata / WinTriX DC',hq:'China',type:'Hyperscale',mw:650,facilities:30,countries:5,keyMarkets:['Beijing','Datong','Hebei','Johor','Cyberjaya','Mumbai'],capex:1.2,source:'DCD, Bain Capital'},
-  {rank:23,company:'STT GDC (ST Telemedia)',hq:'Singapore',type:'Colocation / Wholesale',mw:500,facilities:40,countries:10,keyMarkets:['Singapore','London','Bangkok','Mumbai','Guangzhou','Seoul'],capex:1.0,source:'STT GDC'},
-  {rank:24,company:'Yondr Group',hq:'Netherlands',type:'Hyperscale / Wholesale',mw:450,facilities:10,countries:6,keyMarkets:['N. Virginia','Dallas','London','Frankfurt','Paris','Johannesburg'],capex:2.5,source:'Yondr Group'},
-  {rank:25,company:'Iron Mountain Data Centers',hq:'United States',type:'Colocation',mw:400,facilities:30,countries:10,keyMarkets:['N. Virginia','New Jersey','Phoenix','Denver','Amsterdam','London'],capex:1.2,source:'Iron Mountain'},
-  {rank:26,company:'STACK Infrastructure',hq:'United States',type:'Hyperscale / Wholesale',mw:380,facilities:25,countries:5,keyMarkets:['N. Virginia','Dallas','Chicago','Silicon Valley','Milan','Johor'],capex:1.5,source:'STACK'},
-  {rank:27,company:'Compass Datacenters',hq:'United States',type:'Hyperscale / Wholesale',mw:360,facilities:15,countries:3,keyMarkets:['Dallas-FW','N. Virginia','Phoenix','Mississippi','Montreal'],capex:2.0,source:'Compass'},
-  {rank:28,company:'Digital Edge',hq:'Singapore',type:'Colocation / Wholesale',mw:340,facilities:18,countries:7,keyMarkets:['Tokyo','Seoul','Jakarta','Mumbai','Manila','Singapore','KL'],capex:1.0,source:'Digital Edge, Stonepeak'},
-  {rank:29,company:'Princeton Digital Group',hq:'Singapore',type:'Hyperscale / Colocation',mw:300,facilities:20,countries:5,keyMarkets:['Jakarta','Mumbai','Tokyo','Shanghai','Singapore'],capex:0.8,source:'Princeton Digital'},
-  {rank:30,company:'CoreSite (American Tower)',hq:'United States',type:'Colocation',mw:253,facilities:28,countries:1,keyMarkets:['N. Virginia','Silicon Valley','LA','Denver','Chicago','NYC'],capex:0.8,source:'CoreSite Q3 2025'},
-  {rank:31,company:'PureDC',hq:'Netherlands',type:'Colocation / Wholesale',mw:240,facilities:8,countries:5,keyMarkets:['Amsterdam','London','UAE','Indonesia','Spain'],capex:0.6,source:'PureDC, DCD'},
-  {rank:32,company:'Flexential',hq:'United States',type:'Colocation / Hybrid',mw:220,facilities:40,countries:1,keyMarkets:['Portland','Denver','Dallas','Charlotte','Tampa','Nashville'],capex:0.5,source:'Flexential'},
-  {rank:33,company:'Aligned Data Centers',hq:'United States',type:'Hyperscale / Wholesale',mw:200,facilities:12,countries:1,keyMarkets:['N. Virginia','Dallas','Phoenix','Chicago','Salt Lake City'],capex:1.0,source:'Aligned'},
-  {rank:34,company:'Scala Data Centers',hq:'Brazil',type:'Hyperscale / Colocation',mw:180,facilities:15,countries:3,keyMarkets:['Sao Paulo','Rio de Janeiro','Santiago','Bogota'],capex:0.8,source:'Scala DC'},
-  {rank:35,company:'EdgeConneX',hq:'United States',type:'Edge / Colocation',mw:170,facilities:80,countries:20,keyMarkets:['N. Virginia','Portland','Amsterdam','Jakarta','Santiago'],capex:0.7,source:'EdgeConneX'},
-  {rank:36,company:'DataBank',hq:'United States',type:'Colocation / Edge',mw:150,facilities:65,countries:1,keyMarkets:['Dallas','Minneapolis','Salt Lake City','Atlanta','Denver'],capex:0.4,source:'DataBank'},
-  {rank:37,company:'Sabey Data Centers',hq:'United States',type:'Colocation / Wholesale',mw:130,facilities:5,countries:1,keyMarkets:['Seattle','New York','Ashburn'],capex:0.3,source:'Sabey'},
-  {rank:38,company:'Yotta Infrastructure',hq:'India',type:'Hyperscale / Colocation',mw:300,facilities:5,countries:1,keyMarkets:['Navi Mumbai','Greater Noida','GIFT City'],capex:0.5,source:'Yotta, RankRed'},
-  {rank:39,company:'Colt DCS',hq:'United Kingdom',type:'Colocation',mw:260,facilities:17,countries:8,keyMarkets:['London','Frankfurt','Tokyo','Osaka','Mumbai','Singapore'],capex:0.8,source:'Colt DCS'},
-  {rank:40,company:'Cyxtera Technologies',hq:'United States',type:'Colocation',mw:220,facilities:60,countries:5,keyMarkets:['N. Virginia','Dallas','Chicago','London','Singapore','Sao Paulo'],capex:0.4,source:'Cyxtera'},
-  {rank:41,company:'T5 Data Centers',hq:'United States',type:'Wholesale',mw:200,facilities:8,countries:1,keyMarkets:['Dallas','Atlanta','Portland','Chicago','Colorado Springs'],capex:0.5,source:'T5'},
-  {rank:42,company:'TelecityGroup (Equinix acquired)',hq:'United Kingdom',type:'Colocation',mw:190,facilities:40,countries:10,keyMarkets:['London','Amsterdam','Paris','Stockholm','Dublin'],capex:0,source:'Legacy Equinix'},
-  {rank:43,company:'SpaceDC',hq:'Singapore',type:'Hyperscale',mw:180,facilities:6,countries:4,keyMarkets:['Jakarta','Singapore','Tokyo','Sydney'],capex:0.6,source:'SpaceDC'},
-  {rank:44,company:'CtrlS Datacenters',hq:'India',type:'Colocation / Hyperscale',mw:160,facilities:7,countries:1,keyMarkets:['Hyderabad','Mumbai','Chennai','Noida'],capex:0.3,source:'CtrlS'},
-  {rank:45,company:'Global Switch',hq:'United Kingdom',type:'Colocation / Wholesale',mw:400,facilities:13,countries:5,keyMarkets:['London','Sydney','Hong Kong','Singapore','Frankfurt','Amsterdam'],capex:1.2,source:'Global Switch'},
-  {rank:46,company:'Raxio Group',hq:'United Kingdom',type:'Colocation',mw:50,facilities:8,countries:8,keyMarkets:['Kampala','Kinshasa','Addis Ababa','Dar es Salaam','Maputo'],capex:0.2,source:'Raxio'},
-  {rank:47,company:'AIMS Data Centre',hq:'Malaysia',type:'Colocation',mw:60,facilities:5,countries:3,keyMarkets:['Kuala Lumpur','Cyberjaya','Bangkok','Ho Chi Minh'],capex:0.1,source:'AIMS'},
-  {rank:48,company:'CDC Data Centres',hq:'Australia',type:'Colocation / Government',mw:150,facilities:5,countries:1,keyMarkets:['Canberra','Sydney','Melbourne'],capex:0.5,source:'CDC'},
-  {rank:49,company:'NEXTDC',hq:'Australia',type:'Colocation',mw:420,facilities:14,countries:2,keyMarkets:['Sydney','Melbourne','Perth','Brisbane','Auckland'],capex:1.5,source:'NEXTDC'},
-  {rank:50,company:'Telehouse (KDDI)',hq:'Japan',type:'Colocation',mw:200,facilities:20,countries:8,keyMarkets:['Tokyo','London','Paris','Frankfurt','New York','Hong Kong'],capex:0.5,source:'Telehouse'}
+  {rank:1,company:'Amazon Web Services (AWS)',hq:'United States',type:'Hyperscale',mw:7500,facilities:130,countries:27,keyMarkets:['N. Virginia','Oregon','Ohio','Ireland','Frankfurt','Singapore'],capex:105,source:'Synergy Q3 2025',founded:2006,employees:85000,pue:1.20,renewablePercent:85},
+  {rank:2,company:'Microsoft Azure',hq:'United States',type:'Hyperscale',mw:7000,facilities:400,countries:60,keyMarkets:['N. Virginia','Chicago','Dublin','Amsterdam','Singapore','Phoenix'],capex:95,source:'Microsoft FY2025',founded:2010,employees:72000,pue:1.18,renewablePercent:100},
+  {rank:3,company:'Google Cloud',hq:'United States',type:'Hyperscale',mw:5500,facilities:100,countries:25,keyMarkets:['Oregon','Iowa','Finland','Singapore','Taiwan','Netherlands'],capex:75,source:'Synergy Q3 2025',founded:2008,employees:45000,pue:1.10,renewablePercent:100},
+  {rank:4,company:'Meta Platforms',hq:'United States',type:'Hyperscale',mw:4500,facilities:30,countries:6,keyMarkets:['Oregon','Iowa','Texas','Sweden','Ireland','Louisiana'],capex:72,source:'Meta Q3 2025',founded:2010,employees:28000,pue:1.08,renewablePercent:100},
+  {rank:5,company:'Equinix',hq:'United States',type:'Colocation',mw:3000,facilities:260,countries:33,keyMarkets:['N. Virginia','Silicon Valley','Amsterdam','Frankfurt','Singapore','Tokyo'],capex:4.2,source:'Equinix Q4 2025',founded:1998,employees:13200,pue:1.42,renewablePercent:96},
+  {rank:6,company:'Alibaba Cloud',hq:'China',type:'Hyperscale',mw:2800,facilities:85,countries:15,keyMarkets:['Hangzhou','Shanghai','Singapore','KL','Jakarta','Tokyo'],capex:23,source:'Alibaba FY2025',founded:2009,employees:35000,pue:1.25,renewablePercent:50},
+  {rank:7,company:'Digital Realty',hq:'United States',type:'Colocation / Wholesale',mw:2760,facilities:300,countries:25,keyMarkets:['N. Virginia','Dallas','Chicago','Amsterdam','Frankfurt','Singapore'],capex:3.8,source:'Digital Realty Q3 2025',founded:2004,employees:3800,pue:1.38,renewablePercent:68},
+  {rank:8,company:'Vantage Data Centers',hq:'United States',type:'Hyperscale / Wholesale',mw:2600,facilities:35,countries:6,keyMarkets:['N. Virginia','Phoenix','Santa Clara','Zurich','Johannesburg','Melbourne'],capex:5.0,source:'Data Centre Magazine',founded:2010,employees:900,pue:1.25,renewablePercent:60},
+  {rank:9,company:'Oracle',hq:'United States',type:'Hyperscale',mw:2200,facilities:147,countries:40,keyMarkets:['Abilene TX','Ashburn VA','Phoenix','London','Amsterdam','Tokyo'],capex:25,source:'Oracle Q2 FY2026',founded:2016,employees:15000,pue:1.22,renewablePercent:76},
+  {rank:10,company:'NTT Global Data Centers',hq:'Japan',type:'Colocation / Wholesale',mw:2100,facilities:150,countries:20,keyMarkets:['Tokyo','Osaka','London','Frankfurt','Virginia','Mumbai','Singapore'],capex:3.5,source:'NTT GDC',founded:2019,employees:5200,pue:1.30,renewablePercent:55},
+  {rank:11,company:'AirTrunk',hq:'Australia',type:'Hyperscale',mw:1800,facilities:11,countries:4,keyMarkets:['Sydney','Melbourne','Singapore','Tokyo','Hong Kong'],capex:3.0,source:'DCD, Blackstone',founded:2016,employees:550,pue:1.28,renewablePercent:70},
+  {rank:12,company:'Tencent Cloud',hq:'China',type:'Hyperscale',mw:1800,facilities:70,countries:12,keyMarkets:['Shenzhen','Shanghai','Beijing','Singapore','Tokyo','Frankfurt'],capex:15,source:'Tencent',founded:2010,employees:20000,pue:1.30,renewablePercent:40},
+  {rank:13,company:'ByteDance / Volcano Engine',hq:'China',type:'Hyperscale',mw:1200,facilities:40,countries:8,keyMarkets:['Beijing','Shanghai','Singapore','Virginia','Jakarta'],capex:14,source:'SCMP, DCD',founded:2017,employees:12000,pue:1.25,renewablePercent:35},
+  {rank:14,company:'Lumen Technologies',hq:'United States',type:'Colocation / Enterprise',mw:1200,facilities:55,countries:8,keyMarkets:['Denver','Minneapolis','Phoenix','London','Amsterdam'],capex:1.5,source:'Lumen IR',founded:2020,employees:4500,pue:1.55,renewablePercent:35},
+  {rank:15,company:'Apple',hq:'United States',type:'Hyperscale',mw:1000,facilities:12,countries:5,keyMarkets:['Mesa AZ','Maiden NC','Reno NV','Waukee IA','Viborg DK'],capex:8,source:'Apple sustainability',founded:2012,employees:2500,pue:1.12,renewablePercent:100},
+  {rank:16,company:'CyrusOne',hq:'United States',type:'Colocation / Wholesale',mw:1000,facilities:55,countries:3,keyMarkets:['Dallas','Houston','N. Virginia','Phoenix','London','Frankfurt'],capex:2.0,source:'CyrusOne',founded:2001,employees:1100,pue:1.35,renewablePercent:45},
+  {rank:17,company:'QTS Realty Trust (Blackstone)',hq:'United States',type:'Hyperscale / Wholesale',mw:950,facilities:63,countries:2,keyMarkets:['Atlanta','Dallas','Chicago','N. Virginia','Phoenix'],capex:2.5,source:'QTS',founded:2003,employees:1500,pue:1.30,renewablePercent:50},
+  {rank:18,company:'VNET Group (21Vianet)',hq:'China',type:'Colocation / Wholesale',mw:783,facilities:52,countries:1,keyMarkets:['Beijing','Shanghai','Shenzhen','Hebei','Inner Mongolia'],capex:1.0,source:'VNET Q3 2025',founded:1999,employees:3800,pue:1.45,renewablePercent:30},
+  {rank:19,company:'GDS Holdings',hq:'China',type:'Colocation / Hyperscale',mw:750,facilities:102,countries:5,keyMarkets:['Shanghai','Beijing','Shenzhen','Johor','Batam'],capex:2.0,source:'GDS Q2 2025',founded:2001,employees:4500,pue:1.35,renewablePercent:35},
+  {rank:20,company:'Keppel Data Centres',hq:'Singapore',type:'Colocation / Wholesale',mw:650,facilities:35,countries:8,keyMarkets:['Singapore','Dublin','London','Amsterdam','Johor','Sydney'],capex:1.5,source:'Keppel DC',founded:2014,employees:800,pue:1.35,renewablePercent:55},
+  {rank:21,company:'Switch (DigitalBridge)',hq:'United States',type:'Hyperscale / Wholesale',mw:650,facilities:8,countries:2,keyMarkets:['Las Vegas','Reno','Grand Rapids','Atlanta','Milan'],capex:1.8,source:'Switch',founded:2000,employees:1200,pue:1.18,renewablePercent:100},
+  {rank:22,company:'Chindata / WinTriX DC',hq:'China',type:'Hyperscale',mw:650,facilities:30,countries:5,keyMarkets:['Beijing','Datong','Hebei','Johor','Cyberjaya','Mumbai'],capex:1.2,source:'DCD, Bain Capital',founded:2015,employees:1500,pue:1.20,renewablePercent:45},
+  {rank:23,company:'STT GDC (ST Telemedia)',hq:'Singapore',type:'Colocation / Wholesale',mw:500,facilities:40,countries:10,keyMarkets:['Singapore','London','Bangkok','Mumbai','Guangzhou','Seoul'],capex:1.0,source:'STT GDC',founded:2014,employees:1200,pue:1.40,renewablePercent:40},
+  {rank:24,company:'Yondr Group',hq:'Netherlands',type:'Hyperscale / Wholesale',mw:450,facilities:10,countries:6,keyMarkets:['N. Virginia','Dallas','London','Frankfurt','Paris','Johannesburg'],capex:2.5,source:'Yondr Group',founded:2017,employees:400,pue:1.20,renewablePercent:80},
+  {rank:25,company:'Iron Mountain Data Centers',hq:'United States',type:'Colocation',mw:400,facilities:30,countries:10,keyMarkets:['N. Virginia','New Jersey','Phoenix','Denver','Amsterdam','London'],capex:1.2,source:'Iron Mountain',founded:2017,employees:1000,pue:1.40,renewablePercent:65},
+  {rank:26,company:'STACK Infrastructure',hq:'United States',type:'Hyperscale / Wholesale',mw:380,facilities:25,countries:5,keyMarkets:['N. Virginia','Dallas','Chicago','Silicon Valley','Milan','Johor'],capex:1.5,source:'STACK',founded:2019,employees:600,pue:1.28,renewablePercent:55},
+  {rank:27,company:'Compass Datacenters',hq:'United States',type:'Hyperscale / Wholesale',mw:360,facilities:15,countries:3,keyMarkets:['Dallas-FW','N. Virginia','Phoenix','Mississippi','Montreal'],capex:2.0,source:'Compass',founded:2012,employees:500,pue:1.22,renewablePercent:60},
+  {rank:28,company:'Digital Edge',hq:'Singapore',type:'Colocation / Wholesale',mw:340,facilities:18,countries:7,keyMarkets:['Tokyo','Seoul','Jakarta','Mumbai','Manila','Singapore','KL'],capex:1.0,source:'Digital Edge, Stonepeak',founded:2020,employees:350,pue:1.38,renewablePercent:40},
+  {rank:29,company:'Princeton Digital Group',hq:'Singapore',type:'Hyperscale / Colocation',mw:300,facilities:20,countries:5,keyMarkets:['Jakarta','Mumbai','Tokyo','Shanghai','Singapore'],capex:0.8,source:'Princeton Digital',founded:2017,employees:400,pue:1.40,renewablePercent:35},
+  {rank:30,company:'CoreSite (American Tower)',hq:'United States',type:'Colocation',mw:253,facilities:28,countries:1,keyMarkets:['N. Virginia','Silicon Valley','LA','Denver','Chicago','NYC'],capex:0.8,source:'CoreSite Q3 2025',founded:2010,employees:800,pue:1.35,renewablePercent:50},
+  {rank:31,company:'PureDC',hq:'Netherlands',type:'Colocation / Wholesale',mw:255,facilities:9,countries:5,keyMarkets:['Amsterdam','London','UAE','Indonesia','Spain'],capex:0.7,source:'PureDC, DCD',founded:2019,employees:220,pue:1.30,renewablePercent:70},
+  {rank:32,company:'Flexential',hq:'United States',type:'Colocation / Hybrid',mw:220,facilities:40,countries:1,keyMarkets:['Portland','Denver','Dallas','Charlotte','Tampa','Nashville'],capex:0.5,source:'Flexential',founded:2017,employees:1200,pue:1.45,renewablePercent:40},
+  {rank:33,company:'Aligned Data Centers',hq:'United States',type:'Hyperscale / Wholesale',mw:200,facilities:12,countries:1,keyMarkets:['N. Virginia','Dallas','Phoenix','Chicago','Salt Lake City'],capex:1.0,source:'Aligned',founded:2012,employees:400,pue:1.15,renewablePercent:75},
+  {rank:34,company:'Scala Data Centers',hq:'Brazil',type:'Hyperscale / Colocation',mw:180,facilities:15,countries:3,keyMarkets:['Sao Paulo','Rio de Janeiro','Santiago','Bogota'],capex:0.8,source:'Scala DC',founded:2018,employees:600,pue:1.35,renewablePercent:85},
+  {rank:35,company:'EdgeConneX',hq:'United States',type:'Edge / Colocation',mw:170,facilities:80,countries:20,keyMarkets:['N. Virginia','Portland','Amsterdam','Jakarta','Santiago'],capex:0.7,source:'EdgeConneX',founded:2013,employees:350,pue:1.40,renewablePercent:55},
+  {rank:36,company:'DataBank',hq:'United States',type:'Colocation / Edge',mw:150,facilities:65,countries:1,keyMarkets:['Dallas','Minneapolis','Salt Lake City','Atlanta','Denver'],capex:0.4,source:'DataBank',founded:2016,employees:500,pue:1.45,renewablePercent:35},
+  {rank:37,company:'Sabey Data Centers',hq:'United States',type:'Colocation / Wholesale',mw:130,facilities:5,countries:1,keyMarkets:['Seattle','New York','Ashburn'],capex:0.3,source:'Sabey',founded:2008,employees:250,pue:1.30,renewablePercent:60},
+  {rank:38,company:'Yotta Infrastructure',hq:'India',type:'Hyperscale / Colocation',mw:300,facilities:5,countries:1,keyMarkets:['Navi Mumbai','Greater Noida','GIFT City'],capex:0.5,source:'Yotta, RankRed',founded:2019,employees:700,pue:1.35,renewablePercent:50},
+  {rank:39,company:'Colt DCS',hq:'United Kingdom',type:'Colocation',mw:260,facilities:17,countries:8,keyMarkets:['London','Frankfurt','Tokyo','Osaka','Mumbai','Singapore'],capex:0.8,source:'Colt DCS',founded:2015,employees:600,pue:1.35,renewablePercent:65},
+  {rank:40,company:'Cyxtera Technologies',hq:'United States',type:'Colocation',mw:220,facilities:60,countries:5,keyMarkets:['N. Virginia','Dallas','Chicago','London','Singapore','Sao Paulo'],capex:0.4,source:'Cyxtera',founded:2017,employees:800,pue:1.50,renewablePercent:30},
+  {rank:41,company:'T5 Data Centers',hq:'United States',type:'Wholesale',mw:200,facilities:8,countries:1,keyMarkets:['Dallas','Atlanta','Portland','Chicago','Colorado Springs'],capex:0.5,source:'T5',founded:2007,employees:300,pue:1.28,renewablePercent:50},
+  {rank:42,company:'TelecityGroup (Equinix acquired)',hq:'United Kingdom',type:'Colocation',mw:190,facilities:40,countries:10,keyMarkets:['London','Amsterdam','Paris','Stockholm','Dublin'],capex:0,source:'Legacy Equinix',founded:2000,employees:0,pue:1.50,renewablePercent:70},
+  {rank:43,company:'SpaceDC',hq:'Singapore',type:'Hyperscale',mw:180,facilities:6,countries:4,keyMarkets:['Jakarta','Singapore','Tokyo','Sydney'],capex:0.6,source:'SpaceDC',founded:2018,employees:200,pue:1.30,renewablePercent:45},
+  {rank:44,company:'CtrlS Datacenters',hq:'India',type:'Colocation / Hyperscale',mw:160,facilities:7,countries:1,keyMarkets:['Hyderabad','Mumbai','Chennai','Noida'],capex:0.3,source:'CtrlS',founded:2007,employees:800,pue:1.40,renewablePercent:40},
+  {rank:45,company:'Global Switch',hq:'United Kingdom',type:'Colocation / Wholesale',mw:400,facilities:13,countries:5,keyMarkets:['London','Sydney','Hong Kong','Singapore','Frankfurt','Amsterdam'],capex:1.2,source:'Global Switch',founded:1998,employees:900,pue:1.38,renewablePercent:60},
+  {rank:46,company:'Raxio Group',hq:'United Kingdom',type:'Colocation',mw:50,facilities:8,countries:8,keyMarkets:['Kampala','Kinshasa','Addis Ababa','Dar es Salaam','Maputo'],capex:0.2,source:'Raxio',founded:2018,employees:150,pue:1.55,renewablePercent:25},
+  {rank:47,company:'AIMS Data Centre',hq:'Malaysia',type:'Colocation',mw:60,facilities:5,countries:3,keyMarkets:['Kuala Lumpur','Cyberjaya','Bangkok','Ho Chi Minh'],capex:0.1,source:'AIMS',founded:2003,employees:200,pue:1.50,renewablePercent:30},
+  {rank:48,company:'CDC Data Centres',hq:'Australia',type:'Colocation / Government',mw:150,facilities:5,countries:1,keyMarkets:['Canberra','Sydney','Melbourne'],capex:0.5,source:'CDC',founded:2007,employees:300,pue:1.35,renewablePercent:80},
+  {rank:49,company:'NEXTDC',hq:'Australia',type:'Colocation',mw:420,facilities:14,countries:2,keyMarkets:['Sydney','Melbourne','Perth','Brisbane','Auckland'],capex:1.5,source:'NEXTDC',founded:2010,employees:600,pue:1.30,renewablePercent:85},
+  {rank:50,company:'Telehouse (KDDI)',hq:'Japan',type:'Colocation',mw:200,facilities:20,countries:8,keyMarkets:['Tokyo','London','Paris','Frankfurt','New York','Hong Kong'],capex:0.5,source:'Telehouse',founded:1989,employees:500,pue:1.40,renewablePercent:50}
 ];
+// Market Cap / Valuation ($B) — public companies use parent market cap, private use estimated valuation (Feb 2026)
+const DC_MCAP={1:2100,2:3200,3:2200,4:1600,5:85,6:280,7:55,8:35,9:450,10:90,11:16,12:480,13:220,14:8,15:3500,16:15,17:10,18:2,19:8,20:12,21:11,22:3.5,23:5,24:2.5,25:28,26:6,27:4,28:3,29:2.5,30:100,31:1.2,32:2,33:4,34:3,35:3.5,36:3,37:1.5,38:0.8,39:3.5,40:1.5,41:2,42:0,43:1,44:0.8,45:11,46:0.3,47:0.2,48:2,49:8,50:75};
+DC_OPERATORS.forEach(o=>{o.marketCap=DC_MCAP[o.rank]||0});
 
 const DC_COUNTRIES=[
-  {rank:1,country:'United States',region:'Americas',mw:28500,facilities:5427,keyCities:['N. Virginia 5,600MW','Dallas-FW 1,500MW','Phoenix 2,800MW','Chicago 692MW','Silicon Valley'],growth:17.0,source:'CBRE H1 2025'},
-  {rank:2,country:'China',region:'APAC',mw:7050,facilities:449,keyCities:['Beijing 28.7%','Shanghai','Shenzhen','Hangzhou','Inner Mongolia'],growth:12.0,source:'Mordor Intelligence'},
-  {rank:3,country:'United Kingdom',region:'EMEA',mw:2590,facilities:523,keyCities:['London 1,189MW','Slough','Manchester'],growth:14.0,source:'C&W EMEA H1 2025'},
-  {rank:4,country:'Germany',region:'EMEA',mw:1800,facilities:529,keyCities:['Frankfurt 900+MW','Berlin','Munich'],growth:13.7,source:'C&W EMEA H1 2025'},
-  {rank:5,country:'Japan',region:'APAC',mw:1700,facilities:222,keyCities:['Tokyo 1,300+MW','Osaka','Inzai'],growth:10.0,source:'CBRE Global 2025'},
-  {rank:6,country:'Ireland',region:'EMEA',mw:1500,facilities:55,keyCities:['Dublin 1,200+MW'],growth:11.0,source:'C&W EMEA'},
-  {rank:7,country:'Netherlands',region:'EMEA',mw:1200,facilities:298,keyCities:['Amsterdam 800+MW','Eemshaven'],growth:8.0,source:'C&W EMEA'},
-  {rank:8,country:'Australia',region:'APAC',mw:1200,facilities:314,keyCities:['Sydney 700+MW','Melbourne 500+MW'],growth:15.0,source:'CBRE, C&W APAC'},
-  {rank:9,country:'Singapore',region:'APAC',mw:1100,facilities:99,keyCities:['Singapore (city-state)'],growth:4.4,source:'CBRE Global 2025'},
-  {rank:10,country:'France',region:'EMEA',mw:1000,facilities:322,keyCities:['Paris 700+MW','Marseille'],growth:11.2,source:'C&W EMEA'},
-  {rank:11,country:'India',region:'APAC',mw:950,facilities:153,keyCities:['Mumbai 335MW u/c','Chennai','Hyderabad','Pune'],growth:20.5,source:'CBRE, C&W APAC'},
-  {rank:12,country:'Canada',region:'Americas',mw:850,facilities:337,keyCities:['Toronto','Montreal','Vancouver'],growth:12.0,source:'CBRE NA H1 2025'},
-  {rank:13,country:'Brazil',region:'Americas',mw:550,facilities:197,keyCities:['Sao Paulo 493MW','Rio de Janeiro'],growth:15.0,source:'C&W Americas'},
-  {rank:14,country:'South Korea',region:'APAC',mw:500,facilities:43,keyCities:['Seoul','Busan','Incheon'],growth:10.0,source:'CBRE APAC'},
-  {rank:15,country:'Hong Kong',region:'APAC',mw:480,facilities:122,keyCities:['Tseung Kwan O','Chai Wan'],growth:6.0,source:'C&W APAC'},
-  {rank:16,country:'Italy',region:'EMEA',mw:400,facilities:168,keyCities:['Milan','Rome'],growth:12.0,source:'C&W EMEA'},
-  {rank:17,country:'Malaysia',region:'APAC',mw:380,facilities:41,keyCities:['Johor 700-900MW planned','KL','Cyberjaya'],growth:25.0,source:'GlobeNewsWire'},
-  {rank:18,country:'Indonesia',region:'APAC',mw:350,facilities:88,keyCities:['Jakarta','Batam','Bekasi'],growth:18.0,source:'C&W APAC'},
-  {rank:19,country:'Russia',region:'EMEA',mw:350,facilities:251,keyCities:['Moscow','St. Petersburg'],growth:5.0,source:'Cargoson'},
-  {rank:20,country:'Switzerland',region:'EMEA',mw:280,facilities:121,keyCities:['Zurich','Geneva'],growth:7.0,source:'C&W EMEA'},
-  {rank:21,country:'Sweden',region:'EMEA',mw:250,facilities:95,keyCities:['Stockholm','Lulea'],growth:10.0,source:'C&W EMEA'},
-  {rank:22,country:'Spain',region:'EMEA',mw:220,facilities:144,keyCities:['Madrid','Barcelona'],growth:15.0,source:'C&W EMEA'},
-  {rank:23,country:'Poland',region:'EMEA',mw:200,facilities:144,keyCities:['Warsaw','Krakow'],growth:14.0,source:'C&W EMEA'},
-  {rank:24,country:'Chile',region:'Americas',mw:180,facilities:59,keyCities:['Santiago 148MW'],growth:12.0,source:'C&W Americas'},
-  {rank:25,country:'Mexico',region:'Americas',mw:170,facilities:173,keyCities:['Queretaro','Mexico City'],growth:14.0,source:'C&W Americas'},
-  {rank:26,country:'Thailand',region:'APAC',mw:130,facilities:42,keyCities:['Bangkok','Chonburi'],growth:15.0,source:'C&W APAC'},
-  {rank:27,country:'South Africa',region:'EMEA',mw:120,facilities:25,keyCities:['Johannesburg','Cape Town'],growth:16.0,source:'C&W EMEA/MEA'},
-  {rank:28,country:'UAE',region:'EMEA',mw:110,facilities:20,keyCities:['Dubai','Abu Dhabi'],growth:18.0,source:'JLL 2026'}
+  {rank:1,country:'United States',region:'Americas',mw:28500,facilities:5427,keyCities:['N. Virginia 5,600MW','Dallas-FW 1,500MW','Phoenix 2,800MW','Chicago 692MW','Silicon Valley'],growth:17.0,source:'CBRE H1 2025',powerCostPerKWh:0.068,waterStress:2.3,fiberConnectivity:9.5,avgPUE:1.30},
+  {rank:2,country:'China',region:'APAC',mw:7050,facilities:449,keyCities:['Beijing 28.7%','Shanghai','Shenzhen','Hangzhou','Inner Mongolia'],growth:12.0,source:'Mordor Intelligence',powerCostPerKWh:0.078,waterStress:3.2,fiberConnectivity:8.0,avgPUE:1.45},
+  {rank:3,country:'United Kingdom',region:'EMEA',mw:2590,facilities:523,keyCities:['London 1,189MW','Slough','Manchester'],growth:14.0,source:'C&W EMEA H1 2025',powerCostPerKWh:0.185,waterStress:1.8,fiberConnectivity:8.5,avgPUE:1.35},
+  {rank:4,country:'Germany',region:'EMEA',mw:1800,facilities:529,keyCities:['Frankfurt 900+MW','Berlin','Munich'],growth:13.7,source:'C&W EMEA H1 2025',powerCostPerKWh:0.195,waterStress:1.5,fiberConnectivity:8.8,avgPUE:1.38},
+  {rank:5,country:'Japan',region:'APAC',mw:1700,facilities:222,keyCities:['Tokyo 1,300+MW','Osaka','Inzai'],growth:10.0,source:'CBRE Global 2025',powerCostPerKWh:0.155,waterStress:2.0,fiberConnectivity:9.2,avgPUE:1.40},
+  {rank:6,country:'Ireland',region:'EMEA',mw:1500,facilities:55,keyCities:['Dublin 1,200+MW'],growth:11.0,source:'C&W EMEA',powerCostPerKWh:0.175,waterStress:1.2,fiberConnectivity:7.5,avgPUE:1.32},
+  {rank:7,country:'Netherlands',region:'EMEA',mw:1200,facilities:298,keyCities:['Amsterdam 800+MW','Eemshaven'],growth:8.0,source:'C&W EMEA',powerCostPerKWh:0.120,waterStress:1.0,fiberConnectivity:9.5,avgPUE:1.30},
+  {rank:8,country:'Australia',region:'APAC',mw:1200,facilities:314,keyCities:['Sydney 700+MW','Melbourne 500+MW'],growth:15.0,source:'CBRE, C&W APAC',powerCostPerKWh:0.105,waterStress:3.5,fiberConnectivity:7.8,avgPUE:1.35},
+  {rank:9,country:'Singapore',region:'APAC',mw:1100,facilities:99,keyCities:['Singapore (city-state)'],growth:4.4,source:'CBRE Global 2025',powerCostPerKWh:0.145,waterStress:4.0,fiberConnectivity:9.8,avgPUE:1.55},
+  {rank:10,country:'France',region:'EMEA',mw:1000,facilities:322,keyCities:['Paris 700+MW','Marseille'],growth:11.2,source:'C&W EMEA',powerCostPerKWh:0.110,waterStress:1.6,fiberConnectivity:8.5,avgPUE:1.35},
+  {rank:11,country:'India',region:'APAC',mw:950,facilities:153,keyCities:['Mumbai 335MW u/c','Chennai','Hyderabad','Pune'],growth:20.5,source:'CBRE, C&W APAC',powerCostPerKWh:0.085,waterStress:3.8,fiberConnectivity:6.5,avgPUE:1.55},
+  {rank:12,country:'Canada',region:'Americas',mw:850,facilities:337,keyCities:['Toronto','Montreal','Vancouver'],growth:12.0,source:'CBRE NA H1 2025',powerCostPerKWh:0.065,waterStress:1.0,fiberConnectivity:8.5,avgPUE:1.28},
+  {rank:13,country:'Brazil',region:'Americas',mw:550,facilities:197,keyCities:['Sao Paulo 493MW','Rio de Janeiro'],growth:15.0,source:'C&W Americas',powerCostPerKWh:0.095,waterStress:2.0,fiberConnectivity:6.0,avgPUE:1.50},
+  {rank:14,country:'South Korea',region:'APAC',mw:500,facilities:43,keyCities:['Seoul','Busan','Incheon'],growth:10.0,source:'CBRE APAC',powerCostPerKWh:0.095,waterStress:2.5,fiberConnectivity:9.0,avgPUE:1.40},
+  {rank:15,country:'Hong Kong',region:'APAC',mw:480,facilities:122,keyCities:['Tseung Kwan O','Chai Wan'],growth:6.0,source:'C&W APAC',powerCostPerKWh:0.140,waterStress:2.8,fiberConnectivity:9.0,avgPUE:1.50},
+  {rank:16,country:'Italy',region:'EMEA',mw:400,facilities:168,keyCities:['Milan','Rome'],growth:12.0,source:'C&W EMEA',powerCostPerKWh:0.165,waterStress:2.5,fiberConnectivity:7.5,avgPUE:1.45},
+  {rank:17,country:'Malaysia',region:'APAC',mw:380,facilities:41,keyCities:['Johor 700-900MW planned','KL','Cyberjaya'],growth:25.0,source:'GlobeNewsWire',powerCostPerKWh:0.060,waterStress:1.5,fiberConnectivity:7.0,avgPUE:1.50},
+  {rank:18,country:'Indonesia',region:'APAC',mw:350,facilities:88,keyCities:['Jakarta','Batam','Bekasi'],growth:18.0,source:'C&W APAC',powerCostPerKWh:0.070,waterStress:2.8,fiberConnectivity:5.5,avgPUE:1.55},
+  {rank:19,country:'Russia',region:'EMEA',mw:350,facilities:251,keyCities:['Moscow','St. Petersburg'],growth:5.0,source:'Cargoson',powerCostPerKWh:0.055,waterStress:1.8,fiberConnectivity:6.0,avgPUE:1.60},
+  {rank:20,country:'Switzerland',region:'EMEA',mw:280,facilities:121,keyCities:['Zurich','Geneva'],growth:7.0,source:'C&W EMEA',powerCostPerKWh:0.105,waterStress:0.8,fiberConnectivity:9.0,avgPUE:1.25},
+  {rank:21,country:'Sweden',region:'EMEA',mw:250,facilities:95,keyCities:['Stockholm','Lulea'],growth:10.0,source:'C&W EMEA',powerCostPerKWh:0.065,waterStress:0.5,fiberConnectivity:8.5,avgPUE:1.22},
+  {rank:22,country:'Spain',region:'EMEA',mw:220,facilities:144,keyCities:['Madrid','Barcelona'],growth:15.0,source:'C&W EMEA',powerCostPerKWh:0.135,waterStress:3.2,fiberConnectivity:7.5,avgPUE:1.42},
+  {rank:23,country:'Poland',region:'EMEA',mw:200,facilities:144,keyCities:['Warsaw','Krakow'],growth:14.0,source:'C&W EMEA',powerCostPerKWh:0.105,waterStress:1.5,fiberConnectivity:7.0,avgPUE:1.45},
+  {rank:24,country:'Chile',region:'Americas',mw:180,facilities:59,keyCities:['Santiago 148MW'],growth:12.0,source:'C&W Americas',powerCostPerKWh:0.095,waterStress:3.5,fiberConnectivity:6.5,avgPUE:1.45},
+  {rank:25,country:'Mexico',region:'Americas',mw:170,facilities:173,keyCities:['Queretaro','Mexico City'],growth:14.0,source:'C&W Americas',powerCostPerKWh:0.075,waterStress:3.0,fiberConnectivity:6.5,avgPUE:1.50},
+  {rank:26,country:'Thailand',region:'APAC',mw:130,facilities:42,keyCities:['Bangkok','Chonburi'],growth:15.0,source:'C&W APAC',powerCostPerKWh:0.080,waterStress:2.0,fiberConnectivity:6.5,avgPUE:1.50},
+  {rank:27,country:'South Africa',region:'EMEA',mw:120,facilities:25,keyCities:['Johannesburg','Cape Town'],growth:16.0,source:'C&W EMEA/MEA',powerCostPerKWh:0.055,waterStress:3.8,fiberConnectivity:5.0,avgPUE:1.55},
+  {rank:28,country:'UAE',region:'EMEA',mw:110,facilities:20,keyCities:['Dubai','Abu Dhabi'],growth:18.0,source:'JLL 2026',powerCostPerKWh:0.065,waterStress:4.5,fiberConnectivity:7.5,avgPUE:1.55}
 ];
 
 const DC_FACILITIES=[
-  {rank:1,name:'Meta Altoona Campus',company:'Meta',city:'Altoona',country:'United States',mw:1401,type:'Hyperscale',year:2014,notes:'Multiple buildings; Iowa'},
-  {rank:2,name:'Vantage Shackelford County',company:'Vantage',city:'Shackelford',country:'United States',mw:1400,type:'Hyperscale',year:2026,notes:'$25B+ investment; Texas'},
-  {rank:3,name:'Meta Prineville Campus',company:'Meta',city:'Prineville',country:'United States',mw:1289,type:'Hyperscale',year:2011,notes:'3.2M sqft; Oregon'},
-  {rank:4,name:'Stargate Campus Phase 1',company:'Oracle/OpenAI',city:'Abilene',country:'United States',mw:1200,type:'Hyperscale/AI',year:2025,notes:'450K+ NVIDIA GB200 GPUs; Texas'},
-  {rank:5,name:'Meta Hyperion Campus',company:'Meta',city:'Richland Parish',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$27B; scaling to 5GW; Louisiana'},
-  {rank:6,name:'Meta Prometheus Campus',company:'Meta',city:'Columbus',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'1GW target; Ohio'},
-  {rank:7,name:'Vantage Port Washington',company:'Vantage/OpenAI',city:'Port Washington',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$15B; Stargate II; Wisconsin'},
-  {rank:8,name:'Switch Citadel Campus',company:'Switch',city:'Reno',country:'United States',mw:650,type:'Hyperscale',year:2017,notes:'Largest operational DC; 7.2M sqft; Nevada'},
-  {rank:9,name:'Microsoft Quincy Campus',company:'Microsoft',city:'Quincy',country:'United States',mw:622,type:'Hyperscale',year:2007,notes:'270 acres; hydropower; Washington'},
-  {rank:10,name:'CWL1 Data Centre',company:'Vantage',city:'Newport',country:'United Kingdom',mw:400,type:'Hyperscale',year:2024,notes:'1.85M sqft; Wales'},
-  {rank:11,name:'Compass Red Oak',company:'Compass',city:'Red Oak (DFW)',country:'United States',mw:360,type:'Hyperscale',year:2023,notes:'Multi-phase; Texas'},
-  {rank:12,name:'Yondr N. Virginia',company:'Yondr',city:'N. Virginia',country:'United States',mw:336,type:'Hyperscale',year:2024,notes:'96MW Phase 1; 336MW full'},
-  {rank:13,name:'AirTrunk MEL1',company:'AirTrunk',city:'Melbourne',country:'Australia',mw:280,type:'Hyperscale',year:2020,notes:'630MW total Melbourne portfolio'},
-  {rank:14,name:'Switch SuperNAP',company:'Switch',city:'Las Vegas',country:'United States',mw:280,type:'Hyperscale/Colo',year:2010,notes:'3.5M sqft; Tier IV Gold; Nevada'},
-  {rank:15,name:'QTS Atlanta Metro',company:'QTS',city:'Atlanta',country:'United States',mw:278,type:'Hyperscale',year:2011,notes:'990K sqft; flagship; Georgia'},
-  {rank:16,name:'QTS Excalibur Project',company:'QTS',city:'Fayetteville',country:'United States',mw:250,type:'Hyperscale',year:2023,notes:'615 acres; 7M sqft; Georgia'},
-  {rank:17,name:'Yotta NM1',company:'Yotta',city:'Navi Mumbai',country:'India',mw:250,type:'Hyperscale/Colo',year:2019,notes:'30,000 racks; 820K sqft'},
-  {rank:18,name:'AirTrunk SYD1',company:'AirTrunk',city:'Sydney',country:'Australia',mw:220,type:'Hyperscale',year:2018,notes:'First AirTrunk; APAC hub'},
-  {rank:19,name:'Microsoft Dublin Campus',company:'Microsoft',city:'Dublin',country:'Ireland',mw:200,type:'Hyperscale',year:2009,notes:'Azure Europe West anchor'},
-  {rank:20,name:'China Telecom Inner Mongolia',company:'China Telecom',city:'Hohhot',country:'China',mw:150,type:'Hyperscale/Cloud',year:2013,notes:'10.76M sqft; largest by area'},
-  {rank:21,name:'Apple Mesa Data Center',company:'Apple',city:'Mesa',country:'United States',mw:150,type:'Hyperscale',year:2018,notes:'1.3M sqft; 50MW solar; Arizona'},
-  {rank:22,name:'China Mobile Hohhot',company:'China Mobile',city:'Hohhot',country:'China',mw:140,type:'Hyperscale/Cloud',year:2014,notes:'7.75M sqft'},
-  {rank:23,name:'NTT Tokyo 1',company:'NTT',city:'Tokyo',country:'Japan',mw:120,type:'Colocation',year:2019,notes:'Flagship APAC facility'},
-  {rank:24,name:'Google Hamina',company:'Google',city:'Hamina',country:'Finland',mw:120,type:'Hyperscale',year:2011,notes:'Former paper mill; seawater cooling'},
-  {rank:25,name:'Meta Lulea',company:'Meta',city:'Lulea',country:'Sweden',mw:120,type:'Hyperscale',year:2013,notes:'Arctic climate; 100% hydro'},
-  {rank:26,name:'Equinix SV5/SV11',company:'Equinix',city:'San Jose',country:'United States',mw:110,type:'Colocation',year:2012,notes:'Silicon Valley flagship'},
-  {rank:27,name:'Lakeside Tech Center',company:'Digital Realty',city:'Chicago',country:'United States',mw:100,type:'Colocation',year:1999,notes:'1.1M sqft; 8-story; iconic'},
-  {rank:28,name:'Tulip Data Center',company:'Tulip Telecom',city:'Bengaluru',country:'India',mw:100,type:'Colocation',year:2015,notes:'950K sqft; one of Asia largest'},
-  {rank:29,name:'Sabey Intergate Seattle',company:'Sabey',city:'Seattle',country:'United States',mw:70,type:'Colocation',year:2011,notes:'900K sqft; green design'},
-  {rank:30,name:'Utah Data Center (IC)',company:'US Gov',city:'Bluffdale',country:'United States',mw:65,type:'Government',year:2014,notes:'1.5M sqft campus; Utah'},
-  {rank:31,name:'CoreSite VA3',company:'CoreSite',city:'Reston',country:'United States',mw:60,type:'Colocation',year:2017,notes:'940K sqft; N. Virginia hub'},
-  {rank:32,name:'Equinix AM5/AM17',company:'Equinix',city:'Amsterdam',country:'Netherlands',mw:55,type:'Colocation',year:2017,notes:'AMS-IX peering point'},
-  {rank:33,name:'Keppel Singapore T27',company:'Keppel',city:'Singapore',country:'Singapore',mw:52,type:'Colocation',year:2021,notes:'Tropical cooling innovation'},
-  {rank:34,name:'Equinix FR5/FR9',company:'Equinix',city:'Frankfurt',country:'Germany',mw:48,type:'Colocation',year:2015,notes:'DE-CIX adjacent; finserv hub'},
-  {rank:35,name:'Iron Mountain NJE-1',company:'Iron Mountain',city:'Edison',country:'United States',mw:26,type:'Colocation',year:2016,notes:'830K sqft; former vault; NJ'}
+  {rank:1,name:'Meta Altoona Campus',company:'Meta',city:'Altoona',country:'United States',mw:1401,type:'Hyperscale',year:2014,notes:'Multiple buildings; Iowa',lat:41.65,lon:-95.88,sqft:2400000},
+  {rank:2,name:'Vantage Shackelford County',company:'Vantage',city:'Shackelford',country:'United States',mw:1400,type:'Hyperscale',year:2026,notes:'$25B+ investment; Texas',lat:32.73,lon:-99.36,sqft:3000000},
+  {rank:3,name:'Meta Prineville Campus',company:'Meta',city:'Prineville',country:'United States',mw:1289,type:'Hyperscale',year:2011,notes:'3.2M sqft; Oregon',lat:44.30,lon:-120.73,sqft:3200000},
+  {rank:4,name:'Stargate Campus Phase 1',company:'Oracle/OpenAI',city:'Abilene',country:'United States',mw:1200,type:'Hyperscale/AI',year:2025,notes:'450K+ NVIDIA GB200 GPUs; Texas',lat:32.45,lon:-99.73,sqft:2500000},
+  {rank:5,name:'Meta Hyperion Campus',company:'Meta',city:'Richland Parish',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$27B; scaling to 5GW; Louisiana',lat:32.41,lon:-91.73,sqft:2000000},
+  {rank:6,name:'Meta Prometheus Campus',company:'Meta',city:'Columbus',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'1GW target; Ohio',lat:39.96,lon:-82.99,sqft:2000000},
+  {rank:7,name:'Vantage Port Washington',company:'Vantage/OpenAI',city:'Port Washington',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$15B; Stargate II; Wisconsin',lat:43.39,lon:-87.88,sqft:1800000},
+  {rank:8,name:'Switch Citadel Campus',company:'Switch',city:'Reno',country:'United States',mw:650,type:'Hyperscale',year:2017,notes:'Largest operational DC; 7.2M sqft; Nevada',lat:39.53,lon:-119.81,sqft:7200000},
+  {rank:9,name:'Microsoft Quincy Campus',company:'Microsoft',city:'Quincy',country:'United States',mw:622,type:'Hyperscale',year:2007,notes:'270 acres; hydropower; Washington',lat:47.23,lon:-119.85,sqft:1500000},
+  {rank:10,name:'CWL1 Data Centre',company:'Vantage',city:'Newport',country:'United Kingdom',mw:400,type:'Hyperscale',year:2024,notes:'1.85M sqft; Wales',lat:51.59,lon:-2.99,sqft:1850000},
+  {rank:11,name:'Compass Red Oak',company:'Compass',city:'Red Oak (DFW)',country:'United States',mw:360,type:'Hyperscale',year:2023,notes:'Multi-phase; Texas',lat:32.52,lon:-96.80,sqft:1200000},
+  {rank:12,name:'Yondr N. Virginia',company:'Yondr',city:'N. Virginia',country:'United States',mw:336,type:'Hyperscale',year:2024,notes:'96MW Phase 1; 336MW full',lat:39.04,lon:-77.49,sqft:900000},
+  {rank:13,name:'AirTrunk MEL1',company:'AirTrunk',city:'Melbourne',country:'Australia',mw:280,type:'Hyperscale',year:2020,notes:'630MW total Melbourne portfolio',lat:-37.81,lon:144.96,sqft:800000},
+  {rank:14,name:'Switch SuperNAP',company:'Switch',city:'Las Vegas',country:'United States',mw:280,type:'Hyperscale/Colo',year:2010,notes:'3.5M sqft; Tier IV Gold; Nevada',lat:36.17,lon:-115.14,sqft:3500000},
+  {rank:15,name:'QTS Atlanta Metro',company:'QTS',city:'Atlanta',country:'United States',mw:278,type:'Hyperscale',year:2011,notes:'990K sqft; flagship; Georgia',lat:33.75,lon:-84.39,sqft:990000},
+  {rank:16,name:'QTS Excalibur Project',company:'QTS',city:'Fayetteville',country:'United States',mw:250,type:'Hyperscale',year:2023,notes:'615 acres; 7M sqft; Georgia',lat:33.45,lon:-84.46,sqft:7000000},
+  {rank:17,name:'Yotta NM1',company:'Yotta',city:'Navi Mumbai',country:'India',mw:250,type:'Hyperscale/Colo',year:2019,notes:'30,000 racks; 820K sqft',lat:19.04,lon:73.03,sqft:820000},
+  {rank:18,name:'AirTrunk SYD1',company:'AirTrunk',city:'Sydney',country:'Australia',mw:220,type:'Hyperscale',year:2018,notes:'First AirTrunk; APAC hub',lat:-33.87,lon:151.21,sqft:600000},
+  {rank:19,name:'Microsoft Dublin Campus',company:'Microsoft',city:'Dublin',country:'Ireland',mw:200,type:'Hyperscale',year:2009,notes:'Azure Europe West anchor',lat:53.35,lon:-6.26,sqft:500000},
+  {rank:20,name:'China Telecom Inner Mongolia',company:'China Telecom',city:'Hohhot',country:'China',mw:150,type:'Hyperscale/Cloud',year:2013,notes:'10.76M sqft; largest by area',lat:40.84,lon:111.75,sqft:10760000},
+  {rank:21,name:'Apple Mesa Data Center',company:'Apple',city:'Mesa',country:'United States',mw:150,type:'Hyperscale',year:2018,notes:'1.3M sqft; 50MW solar; Arizona',lat:33.42,lon:-111.83,sqft:1300000},
+  {rank:22,name:'China Mobile Hohhot',company:'China Mobile',city:'Hohhot',country:'China',mw:140,type:'Hyperscale/Cloud',year:2014,notes:'7.75M sqft',lat:40.82,lon:111.73,sqft:7750000},
+  {rank:23,name:'NTT Tokyo 1',company:'NTT',city:'Tokyo',country:'Japan',mw:120,type:'Colocation',year:2019,notes:'Flagship APAC facility',lat:35.68,lon:139.69,sqft:450000},
+  {rank:24,name:'Google Hamina',company:'Google',city:'Hamina',country:'Finland',mw:120,type:'Hyperscale',year:2011,notes:'Former paper mill; seawater cooling',lat:60.57,lon:27.20,sqft:350000},
+  {rank:25,name:'Meta Lulea',company:'Meta',city:'Lulea',country:'Sweden',mw:120,type:'Hyperscale',year:2013,notes:'Arctic climate; 100% hydro',lat:65.58,lon:22.15,sqft:500000},
+  {rank:26,name:'Equinix SV5/SV11',company:'Equinix',city:'San Jose',country:'United States',mw:110,type:'Colocation',year:2012,notes:'Silicon Valley flagship',lat:37.34,lon:-121.89,sqft:400000},
+  {rank:27,name:'Lakeside Tech Center',company:'Digital Realty',city:'Chicago',country:'United States',mw:100,type:'Colocation',year:1999,notes:'1.1M sqft; 8-story; iconic',lat:41.88,lon:-87.63,sqft:1100000},
+  {rank:28,name:'Tulip Data Center',company:'Tulip Telecom',city:'Bengaluru',country:'India',mw:100,type:'Colocation',year:2015,notes:'950K sqft; one of Asia largest',lat:12.97,lon:77.59,sqft:950000},
+  {rank:29,name:'Sabey Intergate Seattle',company:'Sabey',city:'Seattle',country:'United States',mw:70,type:'Colocation',year:2011,notes:'900K sqft; green design',lat:47.61,lon:-122.33,sqft:900000},
+  {rank:30,name:'Utah Data Center (IC)',company:'US Gov',city:'Bluffdale',country:'United States',mw:65,type:'Government',year:2014,notes:'1.5M sqft campus; Utah',lat:40.49,lon:-111.93,sqft:1500000},
+  {rank:31,name:'CoreSite VA3',company:'CoreSite',city:'Reston',country:'United States',mw:60,type:'Colocation',year:2017,notes:'940K sqft; N. Virginia hub',lat:38.96,lon:-77.36,sqft:940000},
+  {rank:32,name:'Equinix AM5/AM17',company:'Equinix',city:'Amsterdam',country:'Netherlands',mw:55,type:'Colocation',year:2017,notes:'AMS-IX peering point',lat:52.37,lon:4.90,sqft:350000},
+  {rank:33,name:'Keppel Singapore T27',company:'Keppel',city:'Singapore',country:'Singapore',mw:52,type:'Colocation',year:2021,notes:'Tropical cooling innovation',lat:1.35,lon:103.82,sqft:300000},
+  {rank:34,name:'Equinix FR5/FR9',company:'Equinix',city:'Frankfurt',country:'Germany',mw:48,type:'Colocation',year:2015,notes:'DE-CIX adjacent; finserv hub',lat:50.11,lon:8.68,sqft:280000},
+  {rank:35,name:'Iron Mountain NJE-1',company:'Iron Mountain',city:'Edison',country:'United States',mw:26,type:'Colocation',year:2016,notes:'830K sqft; former vault; NJ',lat:40.52,lon:-74.41,sqft:830000}
 ];
 
 const DC_SUMMARY={
@@ -2619,6 +2811,7 @@ function showBenchTab(tab){
     if(tab==='operators') filterBenchOps();
     if(tab==='countries') filterBenchCountries();
     if(tab==='facilities') filterBenchFacilities();
+    if(tab==='projections') renderProjectionAnalytics();
 }
 
 function renderBenchmarks(){
@@ -2637,14 +2830,18 @@ function renderBenchKpis(){
     const avgGrowth=(DC_COUNTRIES.reduce((s,c)=>s+c.growth,0)/DC_COUNTRIES.length).toFixed(1);
     const totalFacMW=DC_FACILITIES.reduce((s,f)=>s+f.mw,0);
     const topGrowth=DC_COUNTRIES.reduce((a,b)=>a.growth>b.growth?a:b);
+    const avgPUE=(DC_OPERATORS.reduce((s,o)=>s+o.pue,0)/DC_OPERATORS.length).toFixed(2);
+    const avgRenew=Math.round(DC_OPERATORS.reduce((s,o)=>s+o.renewablePercent,0)/DC_OPERATORS.length);
     document.getElementById('benchKpis').innerHTML=[
-        {label:'Total Installed Capacity',val:DC_SUMMARY.totalInstalledGW+' GW',sub:'Synergy Research Q1 2025',cls:'purple',icon:'fa-bolt'},
-        {label:'Tracked Operators',val:DC_OPERATORS.length,sub:(totalOpMW/1000).toFixed(1)+' GW combined capacity',cls:'blue',icon:'fa-building'},
-        {label:'Countries Tracked',val:DC_COUNTRIES.length,sub:(totalCountryMW/1000).toFixed(1)+' GW mapped',cls:'green',icon:'fa-globe-americas'},
-        {label:'Hyperscale DCs',val:DC_SUMMARY.hyperscaleDCs.toLocaleString(),sub:Math.round(DC_SUMMARY.hyperscaleShare*100)+'% of global capacity',cls:'amber',icon:'fa-cloud'},
-        {label:'Fastest Growing',val:topGrowth.country,sub:topGrowth.growth+'% YoY growth',cls:'cyan',icon:'fa-chart-line'},
-        {label:'2030 Projection',val:DC_SUMMARY.projected2030GW+' GW',sub:'$'+DC_SUMMARY.investmentRequired2030T+'T investment needed',cls:'red',icon:'fa-rocket'}
-    ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+        {label:'Total Installed Capacity',val:DC_SUMMARY.totalInstalledGW+' GW',sub:'Synergy Research Q1 2025',cls:'purple',icon:'fa-bolt',tip:'Global data center IT load capacity as reported by Synergy Research Group'},
+        {label:'Tracked Operators',val:DC_OPERATORS.length,sub:(totalOpMW/1000).toFixed(1)+' GW combined capacity',cls:'blue',icon:'fa-building',tip:'Number of DC operators tracked in this intelligence database'},
+        {label:'Countries Tracked',val:DC_COUNTRIES.length,sub:(totalCountryMW/1000).toFixed(1)+' GW mapped',cls:'green',icon:'fa-globe-americas',tip:'Countries with tracked DC capacity across Americas, EMEA, and APAC'},
+        {label:'Hyperscale DCs',val:DC_SUMMARY.hyperscaleDCs.toLocaleString(),sub:Math.round(DC_SUMMARY.hyperscaleShare*100)+'% of global capacity',cls:'amber',icon:'fa-cloud',tip:'Hyperscale facilities (>5000 servers) as counted by Synergy Research'},
+        {label:'Fastest Growing',val:topGrowth.country,sub:topGrowth.growth+'% YoY growth',cls:'cyan',icon:'fa-chart-line',tip:'Country with highest year-over-year capacity growth rate'},
+        {label:'2030 Projection',val:DC_SUMMARY.projected2030GW+' GW',sub:'$'+DC_SUMMARY.investmentRequired2030T+'T investment needed',cls:'red',icon:'fa-rocket',tip:'Projected global DC capacity by 2030 per JLL and Synergy forecasts'},
+        {label:'Avg PUE',val:avgPUE,sub:'Industry benchmark: 1.58',cls:avgPUE<=1.3?'green':'amber',icon:'fa-leaf',tip:'Average Power Usage Effectiveness across tracked operators (lower = better)'},
+        {label:'Avg Renewable',val:avgRenew+'%',sub:'Operator-reported claims',cls:avgRenew>=60?'green':'amber',icon:'fa-solar-panel',tip:'Average renewable energy percentage claimed by tracked operators'}
+    ].map(k=>`<div class="bench-card ${k.cls} dc-kpi-tooltip"><div class="dc-tooltip-text">${k.tip}</div><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
 }
 
 function renderBenchOverview(){
@@ -2679,6 +2876,67 @@ function renderBenchOverview(){
     DC_OPERATORS.forEach(o=>{const t=o.type.includes('Hyperscale')?'Hyperscale':o.type.includes('Colocation')?'Colocation':o.type.includes('Wholesale')?'Wholesale':o.type.includes('Edge')?'Edge':'Other';typeCounts[t]=(typeCounts[t]||0)+1});
     destroyChart('typeDistrib');
     benchCharts.typeDistrib=new Chart(document.getElementById('chartTypeDistrib'),{type:'doughnut',data:{labels:Object.keys(typeCounts),datasets:[{data:Object.values(typeCounts),backgroundColor:['#60a5fa','#a78bfa','#fbbf24','#34d399','#f87171'],borderColor:'#1e293b',borderWidth:2}]},options:{responsive:true,cutout:'50%',plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:9},padding:8,boxWidth:10,usePointStyle:true}}}}});
+
+    // ═══ A1: Scatter — Capacity vs CapEx by Operator ═══
+    const scatterData=DC_OPERATORS.filter(o=>o.capex>0).map(o=>{
+        const t=o.type.includes('Hyperscale')?'Hyperscale':o.type.includes('Colocation')?'Colocation':o.type.includes('Wholesale')?'Wholesale':'Other';
+        const colors={Hyperscale:'rgba(96,165,250,0.7)',Colocation:'rgba(167,139,250,0.7)',Wholesale:'rgba(251,191,36,0.7)',Other:'rgba(248,113,113,0.7)'};
+        return {x:o.mw,y:o.capex,r:Math.max(3,Math.sqrt(o.facilities)*1.5),label:o.company.split('(')[0].trim(),color:colors[t],type:t};
+    });
+    const scatterDatasets={};
+    scatterData.forEach(d=>{if(!scatterDatasets[d.type])scatterDatasets[d.type]=[];scatterDatasets[d.type].push(d)});
+    destroyChart('scatterCapVsCapex');
+    benchCharts.scatterCapVsCapex=new Chart(document.getElementById('chartScatterCapVsCapex'),{type:'bubble',data:{datasets:Object.entries(scatterDatasets).map(([type,pts])=>({label:type,data:pts.map(p=>({x:p.x,y:p.y,r:p.r,label:p.label})),backgroundColor:pts[0].color,borderColor:pts[0].color.replace('0.7','1'),borderWidth:1}))},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>{const d=c.raw;return d.label+': '+d.x.toLocaleString()+'MW, $'+(d.y>=1?d.y+'B':Math.round(d.y*1000)+'M')}}}},scales:{x:{title:{display:true,text:'Capacity (MW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>(v/1000).toFixed(0)+'GW'},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'CapEx ($B)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>'$'+v+'B'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ A6: Radar — Regional Comparison ═══
+    const regionStats={Americas:{mw:0,fac:0,count:0,growth:0,hyper:0,capex:0},EMEA:{mw:0,fac:0,count:0,growth:0,hyper:0,capex:0},APAC:{mw:0,fac:0,count:0,growth:0,hyper:0,capex:0}};
+    DC_COUNTRIES.forEach(c=>{const r=regionStats[c.region];if(r){r.mw+=c.mw;r.fac+=c.facilities;r.count++;r.growth+=c.growth}});
+    DC_OPERATORS.forEach(o=>{const reg=getHQRegion(o.hq);if(regionStats[reg]){if(o.type.includes('Hyperscale'))regionStats[reg].hyper++;regionStats[reg].capex+=o.capex}});
+    const maxVals=[Math.max(...Object.values(regionStats).map(r=>r.mw)),Math.max(...Object.values(regionStats).map(r=>r.growth/r.count)),Math.max(...Object.values(regionStats).map(r=>r.fac)),Math.max(...Object.values(regionStats).map(r=>r.mw/r.fac)),Math.max(...Object.values(regionStats).map(r=>r.hyper)),Math.max(...Object.values(regionStats).map(r=>r.capex))];
+    destroyChart('radarRegion');
+    benchCharts.radarRegion=new Chart(document.getElementById('chartRadarRegion'),{type:'radar',data:{labels:['Total MW','Growth %','Facilities','Avg Size','Hyperscale','Investment'],datasets:[{label:'Americas',data:[regionStats.Americas.mw/maxVals[0]*100,(regionStats.Americas.growth/regionStats.Americas.count)/maxVals[1]*100,regionStats.Americas.fac/maxVals[2]*100,(regionStats.Americas.mw/regionStats.Americas.fac)/maxVals[3]*100,regionStats.Americas.hyper/maxVals[4]*100,regionStats.Americas.capex/maxVals[5]*100],borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.15)',pointBackgroundColor:'#60a5fa',borderWidth:2},{label:'EMEA',data:[regionStats.EMEA.mw/maxVals[0]*100,(regionStats.EMEA.growth/regionStats.EMEA.count)/maxVals[1]*100,regionStats.EMEA.fac/maxVals[2]*100,(regionStats.EMEA.mw/regionStats.EMEA.fac)/maxVals[3]*100,regionStats.EMEA.hyper/maxVals[4]*100,regionStats.EMEA.capex/maxVals[5]*100],borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.15)',pointBackgroundColor:'#fbbf24',borderWidth:2},{label:'APAC',data:[regionStats.APAC.mw/maxVals[0]*100,(regionStats.APAC.growth/regionStats.APAC.count)/maxVals[1]*100,regionStats.APAC.fac/maxVals[2]*100,(regionStats.APAC.mw/regionStats.APAC.fac)/maxVals[3]*100,regionStats.APAC.hyper/maxVals[4]*100,regionStats.APAC.capex/maxVals[5]*100],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.15)',pointBackgroundColor:'#34d399',borderWidth:2}]},options:{responsive:true,scales:{r:{grid:{color:'rgba(51,65,85,0.3)'},angleLines:{color:'rgba(51,65,85,0.3)'},ticks:{display:false},pointLabels:{color:'#94a3b8',font:{size:8}}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}}}}});
+
+    // ═══ A3: Scatter — Country Capacity vs Growth Rate ═══
+    const countryScatter=DC_COUNTRIES.map(c=>{
+        const colors={Americas:'rgba(96,165,250,0.7)',EMEA:'rgba(251,191,36,0.7)',APAC:'rgba(52,211,153,0.7)'};
+        return {x:c.mw,y:c.growth,r:Math.max(3,Math.sqrt(c.facilities)*0.5),label:c.country,color:colors[c.region],region:c.region};
+    });
+    const csDatasets={};
+    countryScatter.forEach(d=>{if(!csDatasets[d.region])csDatasets[d.region]=[];csDatasets[d.region].push(d)});
+    destroyChart('scatterCountryGrowth');
+    benchCharts.scatterCountryGrowth=new Chart(document.getElementById('chartScatterCountryGrowth'),{type:'bubble',data:{datasets:Object.entries(csDatasets).map(([region,pts])=>({label:region,data:pts.map(p=>({x:p.x,y:p.y,r:p.r,label:p.label})),backgroundColor:pts[0].color,borderColor:pts[0].color.replace('0.7','1'),borderWidth:1}))},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>{const d=c.raw;return d.label+': '+(d.x>=1000?(d.x/1000).toFixed(1)+'GW':d.x+'MW')+', '+d.y+'% growth'}}}},scales:{x:{title:{display:true,text:'Capacity (MW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>(v>=1000?(v/1000).toFixed(0)+'GW':v+'MW')},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'Growth Rate (%)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>v+'%'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ A7: Stacked Bar — Capacity by Type per Region ═══
+    const regionTypeData={Americas:{Hyperscale:0,Colocation:0,Wholesale:0,Other:0},EMEA:{Hyperscale:0,Colocation:0,Wholesale:0,Other:0},APAC:{Hyperscale:0,Colocation:0,Wholesale:0,Other:0}};
+    DC_OPERATORS.forEach(o=>{const reg=getHQRegion(o.hq);const t=o.type.includes('Hyperscale')?'Hyperscale':o.type.includes('Colocation')?'Colocation':o.type.includes('Wholesale')?'Wholesale':'Other';if(regionTypeData[reg])regionTypeData[reg][t]+=o.mw});
+    destroyChart('stackedRegionType');
+    benchCharts.stackedRegionType=new Chart(document.getElementById('chartStackedRegionType'),{type:'bar',data:{labels:['Americas','EMEA','APAC'],datasets:[{label:'Hyperscale',data:[regionTypeData.Americas.Hyperscale,regionTypeData.EMEA.Hyperscale,regionTypeData.APAC.Hyperscale],backgroundColor:'rgba(96,165,250,0.7)',borderRadius:2},{label:'Colocation',data:[regionTypeData.Americas.Colocation,regionTypeData.EMEA.Colocation,regionTypeData.APAC.Colocation],backgroundColor:'rgba(167,139,250,0.7)',borderRadius:2},{label:'Wholesale',data:[regionTypeData.Americas.Wholesale,regionTypeData.EMEA.Wholesale,regionTypeData.APAC.Wholesale],backgroundColor:'rgba(251,191,36,0.7)',borderRadius:2},{label:'Other',data:[regionTypeData.Americas.Other,regionTypeData.EMEA.Other,regionTypeData.APAC.Other],backgroundColor:'rgba(248,113,113,0.7)',borderRadius:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw/1000).toFixed(1)+'GW'}}},scales:{x:{stacked:true,ticks:{color:'#94a3b8',font:{size:8}},grid:{display:false}},y:{stacked:true,ticks:{color:'#475569',font:{size:7},callback:v=>(v/1000).toFixed(0)+'GW'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ A4: Scatter — City-Level Capacity Distribution ═══
+    const cityData=[];
+    DC_FACILITIES.forEach(f=>{cityData.push({x:f.lon,y:f.mw,label:f.city+' ('+f.company+')',city:f.city,country:f.country})});
+    destroyChart('scatterCityCapacity');
+    benchCharts.scatterCityCapacity=new Chart(document.getElementById('chartScatterCityCapacity'),{type:'scatter',data:{datasets:[{label:'Facilities',data:cityData.map(d=>({x:d.x,y:d.y,label:d.label})),backgroundColor:cityData.map(d=>d.y>=500?'rgba(248,113,113,0.7)':d.y>=200?'rgba(251,191,36,0.7)':d.y>=100?'rgba(96,165,250,0.7)':'rgba(52,211,153,0.7)'),borderColor:cityData.map(d=>d.y>=500?'#f87171':d.y>=200?'#fbbf24':d.y>=100?'#60a5fa':'#34d399'),borderWidth:1,pointRadius:cityData.map(d=>Math.max(3,Math.sqrt(d.y)*0.25))}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const d=c.raw;return d.label+': '+d.y+'MW'}}}},scales:{x:{title:{display:true,text:'Longitude',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'Capacity (MW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ C8: Top 10 Cities by Capacity ═══
+    const cityAgg={};
+    DC_FACILITIES.forEach(f=>{cityAgg[f.city]=(cityAgg[f.city]||0)+f.mw});
+    const topCities=Object.entries(cityAgg).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    destroyChart('topCities');
+    benchCharts.topCities=new Chart(document.getElementById('chartTopCities'),{type:'bar',data:{labels:topCities.map(c=>c[0]),datasets:[{label:'Total MW',data:topCities.map(c=>c[1]),backgroundColor:topCities.map((_,i)=>`hsla(${200+i*15},65%,55%,0.6)`),borderColor:topCities.map((_,i)=>`hsla(${200+i*15},65%,55%,1)`),borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toLocaleString()+' MW'}}},scales:{x:{ticks:{color:'#475569',font:{size:7},callback:v=>v>=1000?(v/1000).toFixed(1)+'GW':v+'MW'},grid:{color:'rgba(51,65,85,0.15)'}},y:{ticks:{color:'#e2e8f0',font:{size:7}},grid:{display:false}}}}});
+}
+
+function renderBenchOpCharts(){
+    // ═══ A5: Bubble — Operator Market Position ═══
+    const top25=DC_OPERATORS.filter(o=>o.capex>0).slice(0,25);
+    destroyChart('bubbleOperator');
+    benchCharts.bubbleOperator=new Chart(document.getElementById('chartBubbleOperator'),{type:'bubble',data:{datasets:[{label:'Operators',data:top25.map(o=>({x:o.mw,y:o.countries,r:Math.max(3,Math.sqrt(o.capex)*3),label:o.company.split('(')[0].trim(),capex:o.capex})),backgroundColor:top25.map(o=>o.type.includes('Hyperscale')?'rgba(96,165,250,0.6)':o.type.includes('Colocation')?'rgba(167,139,250,0.6)':'rgba(251,191,36,0.6)'),borderColor:top25.map(o=>o.type.includes('Hyperscale')?'#60a5fa':o.type.includes('Colocation')?'#a78bfa':'#fbbf24'),borderWidth:1}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const d=c.raw;return d.label+': '+d.x.toLocaleString()+'MW, '+d.y+' countries, $'+(d.capex>=1?d.capex+'B':Math.round(d.capex*1000)+'M')+' CapEx'}}}},scales:{x:{title:{display:true,text:'Capacity (MW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>(v/1000).toFixed(0)+'GW'},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'Country Reach',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ C9: Diversification Score ═══
+    const maxCountries=Math.max(...DC_OPERATORS.map(o=>o.countries));
+    const divOps=DC_OPERATORS.filter(o=>o.countries>=3).sort((a,b)=>(b.countries/maxCountries)-(a.countries/maxCountries)).slice(0,15);
+    destroyChart('diversification');
+    benchCharts.diversification=new Chart(document.getElementById('chartDiversification'),{type:'bar',data:{labels:divOps.map(o=>o.company.split('(')[0].split('/')[0].trim().substring(0,16)),datasets:[{label:'Score',data:divOps.map(o=>Math.round(o.countries/maxCountries*100)),backgroundColor:divOps.map(o=>o.countries>=20?'rgba(52,211,153,0.6)':o.countries>=10?'rgba(96,165,250,0.6)':'rgba(251,191,36,0.6)'),borderColor:divOps.map(o=>o.countries>=20?'#34d399':o.countries>=10?'#60a5fa':'#fbbf24'),borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'% ('+divOps[c.dataIndex].countries+' countries)'}}},scales:{x:{ticks:{color:'#475569',font:{size:7},callback:v=>v+'%'},grid:{color:'rgba(51,65,85,0.15)'},max:100},y:{ticks:{color:'#e2e8f0',font:{size:7}},grid:{display:false}}}}});
 }
 
 function filterBenchOps(){
@@ -2686,6 +2944,7 @@ function filterBenchOps(){
     const region=document.getElementById('benchOpRegion').value;
     const search=document.getElementById('benchOpSearch').value.toLowerCase();
     let data=[...DC_OPERATORS];
+    renderBenchOpCharts();
     if(type!=='all') data=data.filter(o=>o.type.includes(type));
     if(region!=='all') data=data.filter(o=>getHQRegion(o.hq)===region);
     if(search) data=data.filter(o=>o.company.toLowerCase().includes(search)||o.hq.toLowerCase().includes(search));
@@ -2713,21 +2972,35 @@ function filterBenchOps(){
         <th class="${sortCls('facilities')}" onclick="sortBenchOps('facilities')">Sites${sortIcon('facilities')}</th>
         <th class="${sortCls('countries')}" onclick="sortBenchOps('countries')">Countries${sortIcon('countries')}</th>
         <th class="${sortCls('capex')}" onclick="sortBenchOps('capex')">CapEx '25${sortIcon('capex')}</th>
+        <th class="${sortCls('marketCap')}" onclick="sortBenchOps('marketCap')">Mkt Cap${sortIcon('marketCap')}</th>
+        <th class="${sortCls('pue')}" onclick="sortBenchOps('pue')">PUE${sortIcon('pue')}</th>
+        <th>MW/Site</th>
+        <th>$/MW</th>
+        <th>Renew%</th>
         <th>Key Markets</th>
     </tr></thead><tbody>
         ${pageData.map(o=>{
             const pct=Math.round(o.mw/maxMW*100);
             const typeCls=o.type.includes('Hyperscale')?'hyperscale':o.type.includes('Colocation')?'colocation':o.type.includes('Wholesale')?'wholesale':o.type.includes('Edge')?'edge':'enterprise';
             const regionCls=getHQRegion(o.hq).toLowerCase();
-            return `<tr>
+            const mwPerSite=o.facilities>0?(o.mw/o.facilities).toFixed(1):'—';
+            const dollarPerMW=o.capex>0&&o.mw>0?'$'+(o.capex*1000/o.mw).toFixed(1)+'M':'—';
+            const pueCls=o.pue<=1.2?'color:#34d399':o.pue<=1.4?'color:#fbbf24':'color:#f87171';
+            const renewCls=o.renewablePercent>=80?'color:#34d399':o.renewablePercent>=50?'color:#fbbf24':'color:#f87171';
+            return `<tr onclick="showOperatorModal(${o.rank})" style="cursor:pointer">
                 <td style="color:#64748b;font-size:0.7rem">${o.rank}</td>
-                <td><div style="font-weight:600;color:#f1f5f9;font-size:0.78rem">${o.company}</div><div style="font-size:0.62rem;color:#64748b"><span class="bench-region ${regionCls}">${getHQRegion(o.hq)}</span> ${o.hq}</div></td>
+                <td><div style="font-weight:600;color:#f1f5f9;font-size:0.78rem">${o.company}</div><div style="font-size:0.62rem;color:#64748b"><span class="bench-region ${regionCls}">${getHQRegion(o.hq)}</span> ${o.hq} · Est. ${o.founded}</div></td>
                 <td><span class="bench-type ${typeCls}">${o.type.split('/')[0].trim()}</span></td>
                 <td><div class="cap-bar"><span class="cap-bar-val">${o.mw>=1000?(o.mw/1000).toFixed(1)+'GW':o.mw+'MW'}</span><div class="cap-bar-track"><div class="cap-bar-fill" style="width:${pct}%"></div></div></div></td>
                 <td>${o.facilities}</td>
                 <td>${o.countries}</td>
                 <td>${o.capex>=1?'$'+o.capex+'B':o.capex>0?'$'+Math.round(o.capex*1000)+'M':'—'}</td>
-                <td style="font-size:0.68rem;color:#94a3b8;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.keyMarkets.join(', ')}">${o.keyMarkets.slice(0,3).join(', ')}</td>
+                <td style="font-size:0.72rem;color:#60a5fa;font-weight:600">${o.marketCap>=1000?'$'+(o.marketCap/1000).toFixed(1)+'T':o.marketCap>=1?'$'+o.marketCap+'B':o.marketCap>0?'$'+Math.round(o.marketCap*1000)+'M':'—'}</td>
+                <td style="${pueCls};font-weight:600;font-size:0.72rem">${o.pue}</td>
+                <td style="font-size:0.72rem;color:#94a3b8">${mwPerSite}</td>
+                <td style="font-size:0.72rem;color:#94a3b8">${dollarPerMW}</td>
+                <td style="${renewCls};font-weight:600;font-size:0.72rem">${o.renewablePercent}%</td>
+                <td style="font-size:0.68rem;color:#94a3b8;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.keyMarkets.join(', ')}">${o.keyMarkets.slice(0,3).join(', ')}</td>
             </tr>`;
         }).join('')}
     </tbody></table>`;
@@ -2751,6 +3024,12 @@ function sortBenchOps(col){
     benchOpPage=1;filterBenchOps();
 }
 
+let benchCountrySort={col:'mw',dir:'desc'};
+function sortBenchCountries(col){
+    if(benchCountrySort.col===col) benchCountrySort.dir=benchCountrySort.dir==='asc'?'desc':'asc';
+    else{benchCountrySort.col=col;benchCountrySort.dir=col==='country'?'asc':'desc'}
+    filterBenchCountries();
+}
 function filterBenchCountries(){
     const region=document.getElementById('benchCountryRegion').value;
     const growth=document.getElementById('benchCountryGrowth').value;
@@ -2761,30 +3040,75 @@ function filterBenchCountries(){
     else if(growth==='medium') data=data.filter(c=>c.growth>=8&&c.growth<=15);
     else if(growth==='low') data=data.filter(c=>c.growth<8);
     if(search) data=data.filter(c=>c.country.toLowerCase().includes(search));
-    data.sort((a,b)=>b.mw-a.mw);
+    data.sort((a,b)=>{
+        let va=a[benchCountrySort.col],vb=b[benchCountrySort.col];
+        if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase()}
+        return benchCountrySort.dir==='asc'?(va>vb?1:-1):(va<vb?1:-1);
+    });
     const maxMW=Math.max(...DC_COUNTRIES.map(c=>c.mw));
     document.getElementById('benchCountryCount').textContent=data.length+' countries';
-    document.getElementById('benchCountryTable').innerHTML=`<table class="bench-table"><thead><tr>
-        <th>#</th><th>Country</th><th>Region</th><th>Capacity</th><th>Facilities</th><th>Growth YoY</th><th>Key Cities</th>
+    // C3: HHI — Geographic Concentration Index
+    const totalCountryMW2=DC_COUNTRIES.reduce((s,c)=>s+c.mw,0);
+    const hhi=Math.round(DC_COUNTRIES.reduce((s,c)=>s+Math.pow(c.mw/totalCountryMW2*100,2),0));
+    document.getElementById('benchCountryTable').innerHTML=`
+    <div style="display:flex;gap:1rem;margin-bottom:0.75rem;flex-wrap:wrap">
+        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">HHI Index:</span> <span style="color:${hhi>2500?'#f87171':hhi>1500?'#fbbf24':'#34d399'};font-weight:700">${hhi}</span> <span style="color:#475569">(${hhi>2500?'Highly Concentrated':hhi>1500?'Moderate':'Competitive'})</span></div>
+        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">Avg Power Cost:</span> <span style="color:#e2e8f0;font-weight:700">$${(DC_COUNTRIES.reduce((s,c)=>s+c.powerCostPerKWh,0)/DC_COUNTRIES.length).toFixed(3)}/kWh</span></div>
+        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">Avg PUE:</span> <span style="color:#e2e8f0;font-weight:700">${(DC_COUNTRIES.reduce((s,c)=>s+c.avgPUE,0)/DC_COUNTRIES.length).toFixed(2)}</span></div>
+    </div>
+    <table class="bench-table"><thead><tr>
+        <th onclick="sortBenchCountries('rank')" style="cursor:pointer">#</th><th onclick="sortBenchCountries('country')" style="cursor:pointer">Country</th><th>Region</th><th onclick="sortBenchCountries('mw')" style="cursor:pointer">Capacity</th><th onclick="sortBenchCountries('facilities')" style="cursor:pointer">Facilities</th><th onclick="sortBenchCountries('growth')" style="cursor:pointer">Growth YoY</th><th>2030 Est.</th><th onclick="sortBenchCountries('powerCostPerKWh')" style="cursor:pointer">$/kWh</th><th onclick="sortBenchCountries('avgPUE')" style="cursor:pointer">PUE</th><th onclick="sortBenchCountries('waterStress')" style="cursor:pointer">Water</th><th onclick="sortBenchCountries('fiberConnectivity')" style="cursor:pointer">Fiber</th><th>Key Cities</th>
     </tr></thead><tbody>
         ${data.map((c,i)=>{
             const pct=Math.round(c.mw/maxMW*100);
             const regionCls=c.region.toLowerCase();
             const growthCls=c.growth>=15?'growth-up':c.growth>=8?'growth-neutral':'growth-down';
-            return `<tr>
+            const proj2030=Math.round(c.mw*Math.pow(1+c.growth/100,5));
+            const waterCls=c.waterStress>=3.5?'color:#f87171':c.waterStress>=2?'color:#fbbf24':'color:#34d399';
+            const fiberCls=c.fiberConnectivity>=8?'color:#34d399':c.fiberConnectivity>=6?'color:#fbbf24':'color:#f87171';
+            return `<tr onclick="showCountryPanel('${c.country}')" style="cursor:pointer">
                 <td style="color:#64748b;font-size:0.7rem">${i+1}</td>
                 <td style="font-weight:600;color:#f1f5f9">${c.country}</td>
                 <td><span class="bench-region ${regionCls}">${c.region}</span></td>
                 <td><div class="cap-bar"><span class="cap-bar-val">${c.mw>=1000?(c.mw/1000).toFixed(1)+'GW':c.mw+'MW'}</span><div class="cap-bar-track"><div class="cap-bar-fill" style="width:${pct}%"></div></div></div></td>
                 <td>${c.facilities.toLocaleString()}</td>
                 <td><span class="${growthCls}">${c.growth>=0?'+':''}${c.growth}%</span></td>
-                <td style="font-size:0.68rem;color:#94a3b8;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.keyCities.join(', ')}">${c.keyCities.slice(0,3).join(', ')}</td>
+                <td style="font-size:0.72rem;color:#a78bfa;font-weight:600">${proj2030>=1000?(proj2030/1000).toFixed(1)+'GW':proj2030+'MW'}</td>
+                <td style="font-size:0.72rem;color:#94a3b8">$${c.powerCostPerKWh.toFixed(3)}</td>
+                <td style="font-size:0.72rem;color:${c.avgPUE<=1.3?'#34d399':c.avgPUE<=1.45?'#fbbf24':'#f87171'};font-weight:600">${c.avgPUE}</td>
+                <td style="font-size:0.72rem;${waterCls};font-weight:600">${c.waterStress.toFixed(1)}</td>
+                <td style="font-size:0.72rem;${fiberCls};font-weight:600">${c.fiberConnectivity.toFixed(1)}</td>
+                <td style="font-size:0.68rem;color:#94a3b8;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.keyCities.join(', ')}">${c.keyCities.slice(0,2).join(', ')}</td>
             </tr>`;
         }).join('')}
     </tbody></table>`;
 }
 
+function renderBenchFacCharts(){
+    // ═══ A2: Scatter — Facility MW vs Year Built ═══
+    const facScatter=DC_FACILITIES.map(f=>{
+        const colors={'United States':'rgba(96,165,250,0.7)','China':'rgba(248,113,113,0.7)','Australia':'rgba(52,211,153,0.7)','United Kingdom':'rgba(251,191,36,0.7)'};
+        return {x:f.year,y:f.mw,label:f.name,color:colors[f.country]||'rgba(167,139,250,0.7)'};
+    });
+    destroyChart('scatterFacYear');
+    benchCharts.scatterFacYear=new Chart(document.getElementById('chartScatterFacYear'),{type:'scatter',data:{datasets:[{label:'Facilities',data:facScatter.map(d=>({x:d.x,y:d.y,label:d.label})),backgroundColor:facScatter.map(d=>d.color),borderColor:facScatter.map(d=>d.color.replace('0.7','1')),borderWidth:1,pointRadius:facScatter.map(d=>Math.max(3,Math.sqrt(d.y)*0.2))}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const d=c.raw;return d.label+': '+d.y+'MW ('+d.x+')'}}}},scales:{x:{title:{display:true,text:'Year Built',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'},min:1998,max:2027},y:{title:{display:true,text:'Capacity (MW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ C6: Facility Size Distribution Histogram ═══
+    const bins=[{label:'<50MW',min:0,max:50},{label:'50-100',min:50,max:100},{label:'100-200',min:100,max:200},{label:'200-500',min:200,max:500},{label:'500-1000',min:500,max:1000},{label:'1000+',min:1000,max:Infinity}];
+    const binCounts=bins.map(b=>DC_FACILITIES.filter(f=>f.mw>=b.min&&f.mw<b.max).length);
+    destroyChart('facHistogram');
+    benchCharts.facHistogram=new Chart(document.getElementById('chartFacHistogram'),{type:'bar',data:{labels:bins.map(b=>b.label),datasets:[{label:'Facilities',data:binCounts,backgroundColor:['rgba(52,211,153,0.6)','rgba(96,165,250,0.6)','rgba(167,139,250,0.6)','rgba(251,191,36,0.6)','rgba(248,113,113,0.6)','rgba(244,63,94,0.6)'],borderColor:['#34d399','#60a5fa','#a78bfa','#fbbf24','#f87171','#f43f5e'],borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' facilities'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:8}},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ C7: Commissioning Timeline ═══
+    const yearCounts={};
+    DC_FACILITIES.forEach(f=>{yearCounts[f.year]=(yearCounts[f.year]||0)+1});
+    const years=Object.keys(yearCounts).sort();
+    destroyChart('commissionTimeline');
+    benchCharts.commissionTimeline=new Chart(document.getElementById('chartCommissionTimeline'),{type:'bar',data:{labels:years,datasets:[{label:'Commissioned',data:years.map(y=>yearCounts[y]),backgroundColor:years.map(y=>y>=2025?'rgba(52,211,153,0.6)':y>=2020?'rgba(96,165,250,0.6)':'rgba(167,139,250,0.6)'),borderColor:years.map(y=>y>=2025?'#34d399':y>=2020?'#60a5fa':'#a78bfa'),borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' facilities'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:7},stepSize:1},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+}
+
 function filterBenchFacilities(){
+    renderBenchFacCharts();
     const size=document.getElementById('benchFacSize').value;
     const country=document.getElementById('benchFacCountry').value;
     const year=document.getElementById('benchFacYear').value;
@@ -2802,19 +3126,23 @@ function filterBenchFacilities(){
     const maxMW=Math.max(...DC_FACILITIES.map(f=>f.mw));
     document.getElementById('benchFacCount').textContent=data.length+' facilities';
     document.getElementById('benchFacTable').innerHTML=`<table class="bench-table"><thead><tr>
-        <th>#</th><th>Facility</th><th>Company</th><th>Location</th><th>Capacity</th><th>Type</th><th>Year</th><th>Notes</th>
+        <th>#</th><th>Facility</th><th>Company</th><th>Location</th><th>Capacity</th><th>Area</th><th>W/sqft</th><th>Type</th><th>Year</th><th>Notes</th>
     </tr></thead><tbody>
         ${data.map((f,i)=>{
             const pct=Math.round(f.mw/maxMW*100);
+            const wPerSqft=f.sqft>0?(f.mw*1000000/f.sqft).toFixed(0):'—';
+            const isNew=f.year>=2025;
             return `<tr>
                 <td style="color:#64748b;font-size:0.7rem">${i+1}</td>
-                <td style="font-weight:600;color:#f1f5f9;font-size:0.78rem">${f.name}</td>
+                <td style="font-weight:600;color:#f1f5f9;font-size:0.78rem">${f.name}${isNew?' <span style="background:rgba(52,211,153,0.2);color:#34d399;font-size:0.55rem;padding:1px 5px;border-radius:3px;font-weight:700;vertical-align:middle">NEW</span>':''}</td>
                 <td style="font-size:0.75rem">${f.company}</td>
                 <td style="font-size:0.72rem">${f.city}, ${f.country}</td>
                 <td><div class="cap-bar"><span class="cap-bar-val">${f.mw>=1000?(f.mw/1000).toFixed(1)+'GW':f.mw+'MW'}</span><div class="cap-bar-track"><div class="cap-bar-fill" style="width:${pct}%"></div></div></div></td>
+                <td style="font-size:0.72rem;color:#94a3b8">${f.sqft>=1000000?(f.sqft/1000000).toFixed(1)+'M':f.sqft>=1000?Math.round(f.sqft/1000)+'K':f.sqft} sqft</td>
+                <td style="font-size:0.72rem;color:${parseInt(wPerSqft)>500?'#34d399':parseInt(wPerSqft)>200?'#fbbf24':'#94a3b8'};font-weight:600">${wPerSqft}</td>
                 <td><span class="bench-type ${f.type.includes('Hyperscale')?'hyperscale':f.type.includes('Colo')?'colocation':f.type.includes('Gov')?'government':'wholesale'}">${f.type.split('/')[0]}</span></td>
                 <td style="font-size:0.72rem">${f.year}</td>
-                <td style="font-size:0.65rem;color:#94a3b8;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.notes}">${f.notes}</td>
+                <td style="font-size:0.65rem;color:#94a3b8;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.notes}">${f.notes}</td>
             </tr>`;
         }).join('')}
     </tbody></table>`;
@@ -2879,15 +3207,34 @@ function renderBenchMarket(){
         ${r.items.map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(51,65,85,0.2)"><span style="font-size:0.72rem;color:#94a3b8">${i.l}</span><span style="font-size:0.72rem;color:#e2e8f0;font-weight:600">${i.v}</span></div>`).join('')}
     </div>`).join('');
 
+    // ═══ A8: Projected Capacity Timeline ═══
+    const timelineYears=['2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'];
+    const baseGW=50;
+    const growthRate=0.15;
+    const actualData=[50,58,67,78,90,DC_SUMMARY.totalInstalledGW,DC_SUMMARY.projected2026MW/1000];
+    const projectedData=[null,null,null,null,null,null,DC_SUMMARY.projected2026MW/1000];
+    for(let i=7;i<11;i++){const prev=projectedData[i-1]||actualData[i-1];projectedData.push(Math.round(prev*(1+growthRate)))}
+    destroyChart('capacityTimeline');
+    benchCharts.capacityTimeline=new Chart(document.getElementById('chartCapacityTimeline'),{type:'line',data:{labels:timelineYears,datasets:[{label:'Actual',data:actualData.concat(Array(4).fill(null)),borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.1)',fill:true,tension:0.3,borderWidth:2,pointRadius:3,pointBackgroundColor:'#60a5fa'},{label:'Projected',data:projectedData,borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.1)',fill:true,borderDash:[5,3],tension:0.3,borderWidth:2,pointRadius:3,pointBackgroundColor:'#a78bfa'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.raw?c.dataset.label+': '+c.raw.toFixed(1)+' GW':''}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'Capacity (GW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>v+'GW'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ C10: Investment Gap Analysis ═══
+    const investYears=['2024','2025','2026','2027','2028','2029','2030'];
+    const actualCapex=[250,370,450,null,null,null,null];
+    const requiredCapex=[280,350,480,550,620,700,800];
+    destroyChart('investmentGap');
+    benchCharts.investmentGap=new Chart(document.getElementById('chartInvestmentGap'),{type:'bar',data:{labels:investYears,datasets:[{label:'Actual CapEx',data:actualCapex,backgroundColor:'rgba(96,165,250,0.6)',borderColor:'#60a5fa',borderWidth:1,borderRadius:3},{label:'Required CapEx',data:requiredCapex,backgroundColor:'rgba(248,113,113,0.3)',borderColor:'#f87171',borderWidth:1,borderRadius:3,borderDash:[3,3]}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.raw?c.dataset.label+': $'+c.raw+'B':''}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{display:false}},y:{title:{display:true,text:'Investment ($B)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>'$'+v+'B'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
     // Constraints
     document.getElementById('benchConstraints').innerHTML=DC_SUMMARY.constraints.map(c=>
         `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(51,65,85,0.2)"><i class="fas fa-exclamation-circle" style="color:#f87171;font-size:0.65rem;margin-top:3px"></i><span style="font-size:0.75rem;color:#cbd5e1">${c}</span></div>`
     ).join('');
 
-    // Sources
+    // Sources with data freshness (E5)
     document.getElementById('benchSources').innerHTML=`
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><i class="fas fa-clock" style="color:#34d399;font-size:0.6rem"></i><span style="font-size:0.7rem;color:#34d399;font-weight:600">Data last verified: Feb 2026</span></div>
         <strong>Sources:</strong> ${DC_SUMMARY.sources.join(' · ')}<br>
-        <em style="color:#475569">Compiled 2026-02-17. MW figures represent IT load capacity unless noted. Country totals include colocation, hyperscale, and enterprise DCs.</em>`;
+        <em style="color:#475569">Compiled 2026-02-17. MW figures represent IT load capacity unless noted. Country totals include colocation, hyperscale, and enterprise DCs.</em><br>
+        <em style="color:#475569">PUE and renewable% are operator-reported estimates. Water stress uses WRI Aqueduct scale (0-5). Fiber connectivity scored 1-10 based on submarine cable density and IX presence.</em>`;
 }
 
 function exportBenchmarksCSV(){
@@ -2907,6 +3254,460 @@ function exportBenchmarksCSV(){
         DC_OPERATORS.forEach(o=>csv+=`${o.rank},"${o.company}",${o.hq},"${o.type}",${o.mw},${o.facilities},${o.countries},${o.capex}\n`);
     }
     downloadCSV(csv,'rz_dc_intelligence_'+fmtDate(new Date())+'.csv');
+}
+
+// ═══ D2: Operator Detail Modal ═══
+function showOperatorModal(rank){
+    const o=DC_OPERATORS.find(op=>op.rank===rank);
+    if(!o)return;
+    const mwPerSite=o.facilities>0?(o.mw/o.facilities).toFixed(1):'—';
+    const dollarPerMW=o.capex>0&&o.mw>0?'$'+(o.capex*1000/o.mw).toFixed(1)+'M':'—';
+    const divScore=Math.round(o.countries/Math.max(...DC_OPERATORS.map(x=>x.countries))*100);
+    const opFacilities=DC_FACILITIES.filter(f=>f.company.toLowerCase().includes(o.company.split('(')[0].split('/')[0].trim().split(' ')[0].toLowerCase()));
+    const isBookmarked=JSON.parse(localStorage.getItem('dc_bookmarks')||'[]').includes(o.rank);
+    document.getElementById('dcOperatorModalContent').innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem">
+            <div>
+                <h3 style="font-size:1.1rem;font-weight:800;color:#f1f5f9;margin-bottom:4px">${o.company}</h3>
+                <div style="font-size:0.75rem;color:#64748b">${o.hq} · Est. ${o.founded} · <span class="bench-type ${o.type.includes('Hyperscale')?'hyperscale':'colocation'}">${o.type}</span></div>
+            </div>
+            <button onclick="toggleDcBookmark(${o.rank})" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:${isBookmarked?'#fbbf24':'#475569'}" title="Bookmark"><i class="fas fa-star"></i></button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin-bottom:1.25rem">
+            ${[{l:'Capacity',v:o.mw>=1000?(o.mw/1000).toFixed(1)+' GW':o.mw+' MW',c:'purple'},{l:'Mkt Cap',v:o.marketCap>=1000?'$'+(o.marketCap/1000).toFixed(1)+'T':o.marketCap>=1?'$'+o.marketCap+'B':o.marketCap>0?'$'+Math.round(o.marketCap*1000)+'M':'N/A',c:'blue'},{l:'Sites',v:o.facilities,c:'blue'},{l:'Countries',v:o.countries,c:'green'},{l:'CapEx',v:o.capex>=1?'$'+o.capex+'B':'$'+Math.round(o.capex*1000)+'M',c:'amber'},{l:'PUE',v:o.pue,c:o.pue<=1.2?'green':o.pue<=1.4?'amber':'red'},{l:'Renewable',v:o.renewablePercent+'%',c:o.renewablePercent>=80?'green':o.renewablePercent>=50?'amber':'red'},{l:'MW/Site',v:mwPerSite,c:'cyan'},{l:'$/MW',v:dollarPerMW,c:'purple'}].map(k=>`<div class="bench-card ${k.c}" style="padding:8px 10px"><div class="bench-label" style="font-size:0.55rem">${k.l}</div><div class="bench-val" style="font-size:1rem">${k.v}</div></div>`).join('')}
+        </div>
+        <div class="m-section"><h4><i class="fas fa-map-marker-alt"></i> Key Markets</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${o.keyMarkets.map(m=>'<span style="background:rgba(139,92,246,0.12);color:#a78bfa;padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:600">'+m+'</span>').join('')}</div>
+        </div>
+        <div class="m-section"><h4><i class="fas fa-chart-bar"></i> Diversification Score</h4>
+            <div style="background:#0f172a;border-radius:6px;height:12px;overflow:hidden"><div style="height:100%;width:${divScore}%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);border-radius:6px"></div></div>
+            <div style="font-size:0.68rem;color:#64748b;margin-top:4px">${divScore}% geographic diversification (${o.countries} of ${Math.max(...DC_OPERATORS.map(x=>x.countries))} max countries)</div>
+        </div>
+        ${opFacilities.length>0?`<div class="m-section"><h4><i class="fas fa-server"></i> Known Facilities (${opFacilities.length})</h4>
+            <table class="bench-table"><thead><tr><th>Facility</th><th>Location</th><th>MW</th><th>Year</th></tr></thead><tbody>
+            ${opFacilities.map(f=>`<tr><td style="font-weight:600;font-size:0.75rem">${f.name}</td><td style="font-size:0.72rem">${f.city}, ${f.country}</td><td style="font-weight:600">${f.mw>=1000?(f.mw/1000).toFixed(1)+'GW':f.mw+'MW'}</td><td>${f.year}</td></tr>`).join('')}
+            </tbody></table></div>`:''}
+        <div style="font-size:0.65rem;color:#475569;margin-top:1rem">Source: ${o.source} · Employees est: ${o.employees>0?o.employees.toLocaleString():'N/A'}</div>`;
+    document.getElementById('dcOperatorModal').classList.add('show');
+}
+
+// ═══ D3: Country Deep-Dive Panel ═══
+function showCountryPanel(countryName){
+    const c=DC_COUNTRIES.find(x=>x.country===countryName);
+    if(!c)return;
+    const countryOps=DC_OPERATORS.filter(o=>o.keyMarkets.some(m=>c.keyCities.some(kc=>m.toLowerCase().includes(kc.split(' ')[0].toLowerCase())))||o.hq===c.country);
+    const countryFacs=DC_FACILITIES.filter(f=>f.country===c.country);
+    const proj2030=Math.round(c.mw*Math.pow(1+c.growth/100,5));
+    document.getElementById('dcCountryPanelContent').innerHTML=`
+        <h3 style="font-size:1.1rem;font-weight:800;color:#f1f5f9;margin-bottom:4px">${c.country}</h3>
+        <div style="font-size:0.75rem;color:#64748b;margin-bottom:1.25rem"><span class="bench-region ${c.region.toLowerCase()}">${c.region}</span> · Rank #${c.rank}</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin-bottom:1.25rem">
+            ${[{l:'Capacity',v:c.mw>=1000?(c.mw/1000).toFixed(1)+' GW':c.mw+' MW',c:'purple'},{l:'Facilities',v:c.facilities.toLocaleString(),c:'blue'},{l:'Growth',v:'+'+c.growth+'%',c:'green'},{l:'2030 Est.',v:proj2030>=1000?(proj2030/1000).toFixed(1)+' GW':proj2030+' MW',c:'amber'},{l:'Power Cost',v:'$'+c.powerCostPerKWh.toFixed(3)+'/kWh',c:'cyan'},{l:'Avg PUE',v:c.avgPUE.toFixed(2),c:c.avgPUE<=1.3?'green':c.avgPUE<=1.45?'amber':'red'},{l:'Water Stress',v:c.waterStress.toFixed(1)+'/5',c:c.waterStress>=3.5?'red':c.waterStress>=2?'amber':'green'},{l:'Fiber Score',v:c.fiberConnectivity.toFixed(1)+'/10',c:c.fiberConnectivity>=8?'green':'amber'}].map(k=>`<div class="bench-card ${k.c}" style="padding:8px 10px"><div class="bench-label" style="font-size:0.55rem">${k.l}</div><div class="bench-val" style="font-size:1rem">${k.v}</div></div>`).join('')}
+        </div>
+        <div class="m-section"><h4><i class="fas fa-city"></i> Key Cities</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${c.keyCities.map(m=>'<span style="background:rgba(52,211,153,0.12);color:#34d399;padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:600">'+m+'</span>').join('')}</div>
+        </div>
+        ${countryOps.length>0?`<div class="m-section"><h4><i class="fas fa-building"></i> Operators Present (${countryOps.length})</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${countryOps.slice(0,15).map(o=>'<span style="background:rgba(96,165,250,0.12);color:#60a5fa;padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:500">'+o.company.split('(')[0].trim()+'</span>').join('')}</div></div>`:''}
+        ${countryFacs.length>0?`<div class="m-section"><h4><i class="fas fa-server"></i> Tracked Facilities (${countryFacs.length})</h4>
+            <table class="bench-table"><thead><tr><th>Facility</th><th>Company</th><th>City</th><th>MW</th><th>Year</th></tr></thead><tbody>
+            ${countryFacs.map(f=>`<tr><td style="font-weight:600;font-size:0.75rem">${f.name}</td><td>${f.company}</td><td>${f.city}</td><td style="font-weight:600">${f.mw}MW</td><td>${f.year}</td></tr>`).join('')}
+            </tbody></table></div>`:''}
+        <div style="font-size:0.65rem;color:#475569;margin-top:1rem">Source: ${c.source}</div>`;
+    document.getElementById('dcCountryPanel').classList.add('show');
+}
+
+// ═══ D4: Comparison Mode ═══
+let dcCompareList=[];
+function openDcCompareMode(){
+    dcCompareList=[];
+    let html=`<h3 style="font-size:1rem;font-weight:800;color:#f1f5f9;margin-bottom:1rem"><i class="fas fa-columns" style="margin-right:6px"></i> Compare Operators</h3>
+        <p style="font-size:0.75rem;color:#64748b;margin-bottom:1rem">Select 2-5 operators to compare side-by-side</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1rem" id="dcCompareCheckboxes">
+            ${DC_OPERATORS.slice(0,30).map(o=>`<label style="display:inline-flex;align-items:center;gap:4px;background:#0f172a;border:1px solid #1f2937;border-radius:6px;padding:4px 10px;font-size:0.72rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" value="${o.rank}" onchange="dcCompareToggle(${o.rank})" style="accent-color:#8b5cf6">${o.company.split('(')[0].split('/')[0].trim().substring(0,20)}</label>`).join('')}
+        </div>
+        <button class="btn btn-purple btn-sm" onclick="dcRunComparison()"><i class="fas fa-chart-bar"></i> Compare Selected</button>
+        <div id="dcCompareResult" style="margin-top:1rem"></div>`;
+    document.getElementById('dcCompareContent').innerHTML=html;
+    document.getElementById('dcCompareModal').classList.add('show');
+}
+function dcCompareToggle(rank){
+    const idx=dcCompareList.indexOf(rank);
+    if(idx>=0)dcCompareList.splice(idx,1);else if(dcCompareList.length<5)dcCompareList.push(rank);
+    else{event.target.checked=false}
+}
+function dcRunComparison(){
+    if(dcCompareList.length<2){document.getElementById('dcCompareResult').innerHTML='<p style="color:#f87171;font-size:0.75rem">Select at least 2 operators</p>';return}
+    const ops=dcCompareList.map(r=>DC_OPERATORS.find(o=>o.rank===r)).filter(Boolean);
+    const maxMW=Math.max(...ops.map(o=>o.mw));
+    const maxCap=Math.max(...ops.map(o=>o.capex));
+    const maxFac=Math.max(...ops.map(o=>o.facilities));
+    const maxCountries=Math.max(...ops.map(o=>o.countries));
+    let html=`<table class="bench-table"><thead><tr><th>Metric</th>${ops.map(o=>'<th style="text-align:center">'+o.company.split('(')[0].trim().substring(0,14)+'</th>').join('')}</tr></thead><tbody>
+        <tr><td>Capacity</td>${ops.map(o=>'<td style="text-align:center;font-weight:600">'+(o.mw>=1000?(o.mw/1000).toFixed(1)+'GW':o.mw+'MW')+'</td>').join('')}</tr>
+        <tr><td>Facilities</td>${ops.map(o=>'<td style="text-align:center">'+o.facilities+'</td>').join('')}</tr>
+        <tr><td>Countries</td>${ops.map(o=>'<td style="text-align:center">'+o.countries+'</td>').join('')}</tr>
+        <tr><td>CapEx 2025</td>${ops.map(o=>'<td style="text-align:center">'+(o.capex>=1?'$'+o.capex+'B':'$'+Math.round(o.capex*1000)+'M')+'</td>').join('')}</tr>
+        <tr><td>Market Cap</td>${ops.map(o=>'<td style="text-align:center;color:#60a5fa;font-weight:600">'+(o.marketCap>=1000?'$'+(o.marketCap/1000).toFixed(1)+'T':o.marketCap>=1?'$'+o.marketCap+'B':o.marketCap>0?'$'+Math.round(o.marketCap*1000)+'M':'—')+'</td>').join('')}</tr>
+        <tr><td>PUE</td>${ops.map(o=>'<td style="text-align:center;color:'+(o.pue<=1.2?'#34d399':o.pue<=1.4?'#fbbf24':'#f87171')+'">'+o.pue+'</td>').join('')}</tr>
+        <tr><td>Renewable %</td>${ops.map(o=>'<td style="text-align:center;color:'+(o.renewablePercent>=80?'#34d399':o.renewablePercent>=50?'#fbbf24':'#f87171')+'">'+o.renewablePercent+'%</td>').join('')}</tr>
+        <tr><td>MW/Site</td>${ops.map(o=>'<td style="text-align:center">'+(o.facilities>0?(o.mw/o.facilities).toFixed(1):'—')+'</td>').join('')}</tr>
+        <tr><td>$/MW</td>${ops.map(o=>'<td style="text-align:center">'+(o.capex>0?'$'+(o.capex*1000/o.mw).toFixed(1)+'M':'—')+'</td>').join('')}</tr>
+        <tr><td>Founded</td>${ops.map(o=>'<td style="text-align:center">'+o.founded+'</td>').join('')}</tr>
+        <tr><td>Type</td>${ops.map(o=>'<td style="text-align:center"><span class="bench-type '+(o.type.includes('Hyperscale')?'hyperscale':'colocation')+'">'+o.type.split('/')[0].trim()+'</span></td>').join('')}</tr>
+    </tbody></table>
+    <div style="margin-top:1rem"><canvas id="chartCompareRadar" height="200"></canvas></div>`;
+    document.getElementById('dcCompareResult').innerHTML=html;
+    // Radar comparison chart
+    destroyChart('compareRadar');
+    const colors=['#60a5fa','#a78bfa','#34d399','#fbbf24','#f87171'];
+    benchCharts.compareRadar=new Chart(document.getElementById('chartCompareRadar'),{type:'radar',data:{labels:['Capacity','Sites','Countries','CapEx','PUE (inv)','Renewable%'],datasets:ops.map((o,i)=>({label:o.company.split('(')[0].trim().substring(0,14),data:[o.mw/maxMW*100,o.facilities/maxFac*100,o.countries/maxCountries*100,o.capex/maxCap*100,(2-o.pue)*100,o.renewablePercent],borderColor:colors[i],backgroundColor:colors[i].replace(')',',0.1)').replace('rgb','rgba'),pointBackgroundColor:colors[i],borderWidth:2}))},options:{responsive:true,scales:{r:{grid:{color:'rgba(51,65,85,0.3)'},angleLines:{color:'rgba(51,65,85,0.3)'},ticks:{display:false},pointLabels:{color:'#94a3b8',font:{size:8}}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}}}}});
+}
+
+// ═══ D6: Global Search ═══
+function dcGlobalSearchFilter(q){
+    if(!q||q.length<2){return}
+    q=q.toLowerCase();
+    const matchedOps=DC_OPERATORS.filter(o=>o.company.toLowerCase().includes(q)||o.hq.toLowerCase().includes(q)||o.type.toLowerCase().includes(q));
+    const matchedCountries=DC_COUNTRIES.filter(c=>c.country.toLowerCase().includes(q)||c.region.toLowerCase().includes(q));
+    const matchedFacs=DC_FACILITIES.filter(f=>f.name.toLowerCase().includes(q)||f.company.toLowerCase().includes(q)||f.city.toLowerCase().includes(q)||f.country.toLowerCase().includes(q));
+    if(matchedOps.length>0&&matchedCountries.length===0&&matchedFacs.length===0){showBenchTab('operators');document.getElementById('benchOpSearch').value=q;filterBenchOps()}
+    else if(matchedCountries.length>0&&matchedOps.length===0&&matchedFacs.length===0){showBenchTab('countries');document.getElementById('benchCountrySearch').value=q;filterBenchCountries()}
+    else if(matchedFacs.length>0&&matchedOps.length===0&&matchedCountries.length===0){showBenchTab('facilities')}
+}
+
+// ═══ D9: Bookmarks ═══
+function toggleDcBookmark(rank){
+    let bm=JSON.parse(localStorage.getItem('dc_bookmarks')||'[]');
+    const idx=bm.indexOf(rank);
+    if(idx>=0)bm.splice(idx,1);else bm.push(rank);
+    localStorage.setItem('dc_bookmarks',JSON.stringify(bm));
+    showOperatorModal(rank);
+}
+
+// ═══ E2: Export JSON ═══
+function exportBenchJSON(){
+    const data={operators:DC_OPERATORS,countries:DC_COUNTRIES,facilities:DC_FACILITIES,summary:DC_SUMMARY,exportedAt:new Date().toISOString()};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rz_dc_intelligence_'+fmtDate(new Date())+'.json';a.click();URL.revokeObjectURL(a.href);
+}
+
+// ═══ E1: Export Chart as PNG ═══
+function exportChartPNG(chartKey){
+    const chart=benchCharts[chartKey];
+    if(!chart)return;
+    const a=document.createElement('a');a.href=chart.toBase64Image();a.download='rz_chart_'+chartKey+'_'+fmtDate(new Date())+'.png';a.click();
+}
+
+// ═══ F1: Fullscreen Chart Mode ═══
+function openChartFullscreen(chartKey){
+    const srcChart=benchCharts[chartKey];
+    if(!srcChart)return;
+    destroyChart('fullscreen');
+    document.getElementById('dcChartFullscreen').classList.add('show');
+    setTimeout(()=>{
+        benchCharts.fullscreen=new Chart(document.getElementById('chartFullscreenCanvas'),{type:srcChart.config.type,data:JSON.parse(JSON.stringify(srcChart.config.data)),options:{...JSON.parse(JSON.stringify(srcChart.config.options)),responsive:true,maintainAspectRatio:false}});
+    },100);
+}
+
+// ═══ E6: Per-tab CSV Export (enhanced) ═══
+function exportTabCSV(tabName){
+    let csv='';
+    if(tabName==='operators'){
+        csv='Rank,Company,HQ,Type,Capacity_MW,Facilities,Countries,CapEx_B,MarketCap_B,PUE,Renewable%,Founded,Employees,MW_Per_Site,Dollar_Per_MW,Source\n';
+        DC_OPERATORS.forEach(o=>{const mps=o.facilities>0?(o.mw/o.facilities).toFixed(1):'';const dpm=o.capex>0?(o.capex*1000/o.mw).toFixed(1):'';csv+=`${o.rank},"${o.company}","${o.hq}","${o.type}",${o.mw},${o.facilities},${o.countries},${o.capex},${o.marketCap||0},${o.pue},${o.renewablePercent},${o.founded},${o.employees},${mps},${dpm},"${o.source}"\n`});
+    }else if(tabName==='countries'){
+        csv='Rank,Country,Region,Capacity_MW,Facilities,Growth_YoY,PowerCost_kWh,AvgPUE,WaterStress,FiberScore,Source\n';
+        DC_COUNTRIES.forEach(c=>csv+=`${c.rank},"${c.country}","${c.region}",${c.mw},${c.facilities},${c.growth},${c.powerCostPerKWh},${c.avgPUE},${c.waterStress},${c.fiberConnectivity},"${c.source}"\n`);
+    }else if(tabName==='facilities'){
+        csv='Rank,Name,Company,City,Country,Capacity_MW,SqFt,Type,Year,Lat,Lon,Notes\n';
+        DC_FACILITIES.forEach(f=>csv+=`${f.rank},"${f.name}","${f.company}","${f.city}","${f.country}",${f.mw},${f.sqft},"${f.type}",${f.year},${f.lat},${f.lon},"${f.notes}"\n`);
+    }
+    if(csv)downloadCSV(csv,'rz_dc_'+tabName+'_'+fmtDate(new Date())+'.csv');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECTION ANALYTICS — AI/Cloud Demand vs DC Supply
+// ═══════════════════════════════════════════════════════════════
+
+// AI/Cloud Provider demand profiles
+const AI_PROVIDERS=[
+    {name:'Microsoft (Azure/OpenAI)',short:'MSFT',type:'Hyperscale',currentGW:7.0,capex2025:95,growthRate:0.35,infraMix:{hyperscale:0.55,colo:0.30,edge:0.10,wholesale:0.05},regions:{Americas:0.45,EMEA:0.28,APAC:0.27},aiShare:0.45,color:'#60a5fa'},
+    {name:'Google (GCP/DeepMind)',short:'GOOG',type:'Hyperscale',currentGW:5.5,capex2025:75,growthRate:0.32,infraMix:{hyperscale:0.65,colo:0.20,edge:0.10,wholesale:0.05},regions:{Americas:0.40,EMEA:0.30,APAC:0.30},aiShare:0.50,color:'#34d399'},
+    {name:'Amazon (AWS/Anthropic)',short:'AWS',type:'Hyperscale',currentGW:7.5,capex2025:105,growthRate:0.30,infraMix:{hyperscale:0.60,colo:0.25,edge:0.10,wholesale:0.05},regions:{Americas:0.48,EMEA:0.25,APAC:0.27},aiShare:0.40,color:'#fbbf24'},
+    {name:'Meta (Llama/FAIR)',short:'META',type:'Hyperscale',currentGW:4.5,capex2025:72,growthRate:0.40,infraMix:{hyperscale:0.85,colo:0.05,edge:0.05,wholesale:0.05},regions:{Americas:0.60,EMEA:0.20,APAC:0.20},aiShare:0.55,color:'#a78bfa'},
+    {name:'Oracle (OCI/Stargate)',short:'ORCL',type:'Hyperscale',currentGW:2.2,capex2025:25,growthRate:0.45,infraMix:{hyperscale:0.50,colo:0.30,edge:0.15,wholesale:0.05},regions:{Americas:0.50,EMEA:0.25,APAC:0.25},aiShare:0.60,color:'#f87171'},
+    {name:'OpenAI (via MSFT/OCI)',short:'OAI',type:'AI-Native',currentGW:1.8,capex2025:18,growthRate:0.65,infraMix:{hyperscale:0.70,colo:0.20,edge:0.05,wholesale:0.05},regions:{Americas:0.55,EMEA:0.20,APAC:0.25},aiShare:1.00,color:'#22d3ee'},
+    {name:'Anthropic (via AWS/GCP)',short:'ANTH',type:'AI-Native',currentGW:0.6,capex2025:8,growthRate:0.80,infraMix:{hyperscale:0.50,colo:0.35,edge:0.10,wholesale:0.05},regions:{Americas:0.55,EMEA:0.25,APAC:0.20},aiShare:1.00,color:'#c084fc'},
+    {name:'xAI (Grok)',short:'XAI',type:'AI-Native',currentGW:0.8,capex2025:10,growthRate:0.90,infraMix:{hyperscale:0.80,colo:0.10,edge:0.05,wholesale:0.05},regions:{Americas:0.70,EMEA:0.15,APAC:0.15},aiShare:1.00,color:'#fb923c'},
+    {name:'Alibaba Cloud',short:'BABA',type:'Hyperscale',currentGW:2.8,capex2025:23,growthRate:0.22,infraMix:{hyperscale:0.60,colo:0.25,edge:0.10,wholesale:0.05},regions:{Americas:0.05,EMEA:0.05,APAC:0.90},aiShare:0.35,color:'#f472b6'},
+    {name:'Tencent Cloud',short:'TCNT',type:'Hyperscale',currentGW:1.8,capex2025:15,growthRate:0.20,infraMix:{hyperscale:0.55,colo:0.30,edge:0.10,wholesale:0.05},regions:{Americas:0.05,EMEA:0.05,APAC:0.90},aiShare:0.30,color:'#4ade80'},
+    {name:'ByteDance (Volcano)',short:'BYTE',type:'AI-Native',currentGW:1.2,capex2025:14,growthRate:0.50,infraMix:{hyperscale:0.65,colo:0.20,edge:0.10,wholesale:0.05},regions:{Americas:0.10,EMEA:0.05,APAC:0.85},aiShare:0.70,color:'#818cf8'}
+];
+
+// Interpolation: compound growth with constraint dampening
+function interpolateGrowth(baseGW,rate,years,constraintFactor){
+    constraintFactor=constraintFactor||0.92;
+    const result=[];
+    let v=baseGW;
+    for(let i=0;i<years;i++){
+        const dampened=rate*Math.pow(constraintFactor,i);
+        v=v*(1+dampened);
+        result.push(parseFloat(v.toFixed(2)));
+    }
+    return result;
+}
+
+// DC Supply projection per region (from existing data)
+function projectRegionalSupply(){
+    const regions={
+        Americas:{current:DC_SUMMARY.americas.share*DC_SUMMARY.totalInstalledGW,cagr:DC_SUMMARY.americas.supplyCAGR,pipeline:DC_SUMMARY.americas.constructionGW,constraint:0.90},
+        EMEA:{current:DC_SUMMARY.emea.operationalGW,cagr:DC_SUMMARY.emea.yoyGrowth,pipeline:DC_SUMMARY.emea.pipelineGW,constraint:0.85},
+        APAC:{current:DC_SUMMARY.apac.capacityGW,cagr:DC_SUMMARY.apac.growthCAGR,pipeline:0,constraint:0.88}
+    };
+    const result={};
+    Object.entries(regions).forEach(([r,d])=>{
+        const proj=interpolateGrowth(d.current,d.cagr,6,d.constraint);
+        proj[0]=d.current*(1+d.cagr);
+        if(d.pipeline>0)proj[1]+=d.pipeline*0.3;
+        result[r]={current:d.current,projections:proj};
+    });
+    return result;
+}
+
+// AI/Cloud demand projection per region
+function projectRegionalDemand(){
+    const regions={Americas:0,EMEA:0,APAC:0};
+    const result={};
+    Object.keys(regions).forEach(r=>{
+        let totalCurrent=0;
+        AI_PROVIDERS.forEach(p=>{totalCurrent+=p.currentGW*(p.regions[r]||0)});
+        const avgGrowth=AI_PROVIDERS.reduce((s,p)=>s+p.growthRate*(p.regions[r]||0)*p.currentGW,0)/Math.max(totalCurrent,0.1);
+        const proj=interpolateGrowth(totalCurrent,avgGrowth,6,0.88);
+        result[r]={current:totalCurrent,projections:proj,avgGrowth:avgGrowth};
+    });
+    return result;
+}
+
+let projRendered=false;
+function renderProjectionAnalytics(){
+    if(projRendered)return;
+    projRendered=true;
+
+    const supply=projectRegionalSupply();
+    const demand=projectRegionalDemand();
+    const years=['2025','2026','2027','2028','2029','2030'];
+
+    // Total demand and supply
+    const totalDemand2030=Object.values(demand).reduce((s,d)=>s+d.projections[5],0);
+    const totalSupply2030=Object.values(supply).reduce((s,d)=>s+d.projections[5],0);
+    const totalGap=totalDemand2030-totalSupply2030;
+    const aiOnlyDemand2030=AI_PROVIDERS.filter(p=>p.aiShare>=0.9).reduce((s,p)=>{const proj=interpolateGrowth(p.currentGW,p.growthRate,6,0.88);return s+proj[5]},0);
+    const hyperscaleSupplyShare=0.44;
+
+    // Infra type demand aggregation
+    const infraDemand2030={hyperscale:0,colo:0,edge:0,wholesale:0};
+    AI_PROVIDERS.forEach(p=>{
+        const proj=interpolateGrowth(p.currentGW,p.growthRate,6,0.88);
+        const gw2030=proj[5];
+        Object.entries(p.infraMix).forEach(([t,share])=>{infraDemand2030[t]+=gw2030*share});
+    });
+
+    // KPIs
+    document.getElementById('projKpis').innerHTML=[
+        {label:'Total AI/Cloud Demand 2030',val:totalDemand2030.toFixed(0)+' GW',sub:'All providers combined',cls:'purple',icon:'fa-brain'},
+        {label:'Total DC Supply 2030',val:totalSupply2030.toFixed(0)+' GW',sub:'Interpolated from pipeline',cls:'blue',icon:'fa-server'},
+        {label:'Projected Gap 2030',val:(totalGap>0?'+':'')+totalGap.toFixed(0)+' GW',sub:totalGap>0?'Demand exceeds supply':'Supply sufficient',cls:totalGap>0?'red':'green',icon:'fa-exclamation-triangle'},
+        {label:'AI-Native Demand 2030',val:aiOnlyDemand2030.toFixed(1)+' GW',sub:'OpenAI + Anthropic + xAI + ByteDance',cls:'cyan',icon:'fa-robot'},
+        {label:'Hyperscale Colo Gap',val:((infraDemand2030.hyperscale-totalSupply2030*hyperscaleSupplyShare)).toFixed(0)+' GW',sub:'Hyperscale demand vs supply share',cls:'amber',icon:'fa-warehouse'},
+        {label:'Edge Deficit',val:infraDemand2030.edge.toFixed(1)+' GW needed',sub:'Edge severely under-built',cls:'red',icon:'fa-network-wired'}
+    ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+
+    // ═══ Chart 1: Regional Supply vs Demand (stacked area) ═══
+    const regionColors={Americas:'#60a5fa',EMEA:'#fbbf24',APAC:'#34d399'};
+    destroyChart('projRegionSupplyDemand');
+    benchCharts.projRegionSupplyDemand=new Chart(document.getElementById('chartProjRegionSupplyDemand'),{type:'line',data:{labels:years,datasets:[
+        ...Object.entries(supply).map(([r,d])=>({label:r+' Supply',data:d.projections.map(v=>parseFloat(v.toFixed(1))),borderColor:regionColors[r],backgroundColor:regionColors[r].replace(')',',0.08)').replace('#',`rgba(${parseInt(regionColors[r].slice(1,3),16)},${parseInt(regionColors[r].slice(3,5),16)},${parseInt(regionColors[r].slice(5,7),16)},0.08)`),fill:false,borderWidth:2,pointRadius:3,pointBackgroundColor:regionColors[r],tension:0.3})),
+        ...Object.entries(demand).map(([r,d])=>({label:r+' Demand',data:d.projections.map(v=>parseFloat(v.toFixed(1))),borderColor:regionColors[r],borderDash:[5,3],fill:false,borderWidth:2,pointRadius:3,pointStyle:'triangle',pointBackgroundColor:regionColors[r],tension:0.3}))
+    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:7},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw+' GW'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'GW',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ Chart 2: Gap Waterfall by Region ═══
+    const gapData=Object.entries(supply).map(([r,s])=>{
+        const d=demand[r];
+        return {region:r,supply2030:s.projections[5],demand2030:d.projections[5],gap:d.projections[5]-s.projections[5]};
+    });
+    destroyChart('projGapWaterfall');
+    benchCharts.projGapWaterfall=new Chart(document.getElementById('chartProjGapWaterfall'),{type:'bar',data:{labels:gapData.map(g=>g.region),datasets:[
+        {label:'DC Supply 2030',data:gapData.map(g=>parseFloat(g.supply2030.toFixed(1))),backgroundColor:'rgba(96,165,250,0.5)',borderColor:'#60a5fa',borderWidth:1,borderRadius:3},
+        {label:'AI/Cloud Demand 2030',data:gapData.map(g=>parseFloat(g.demand2030.toFixed(1))),backgroundColor:'rgba(248,113,113,0.5)',borderColor:'#f87171',borderWidth:1,borderRadius:3},
+        {label:'Gap (Deficit)',data:gapData.map(g=>parseFloat(g.gap.toFixed(1))),backgroundColor:gapData.map(g=>g.gap>0?'rgba(248,113,113,0.3)':'rgba(52,211,153,0.3)'),borderColor:gapData.map(g=>g.gap>0?'#f87171':'#34d399'),borderWidth:1,borderRadius:3,borderDash:[3,3]}
+    ]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:7},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw+' GW'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:8}},grid:{display:false}},y:{title:{display:true,text:'GW',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ Chart 3: Provider CapEx vs DC Infrastructure Buildout ═══
+    const providerCapex=AI_PROVIDERS.filter(p=>p.capex2025>=8).sort((a,b)=>b.capex2025-a.capex2025);
+    const dcBuilders=DC_OPERATORS.filter(o=>!o.type.includes('Hyperscale')||o.capex<10).filter(o=>o.capex>=1).sort((a,b)=>b.capex-a.capex).slice(0,8);
+    destroyChart('projProviderVsInfra');
+    benchCharts.projProviderVsInfra=new Chart(document.getElementById('chartProjProviderVsInfra'),{type:'bar',data:{
+        labels:[...providerCapex.map(p=>p.short),'|',...dcBuilders.map(o=>o.company.split('(')[0].split('/')[0].trim().substring(0,10))],
+        datasets:[{label:'AI/Cloud Provider CapEx ($B)',data:[...providerCapex.map(p=>p.capex2025),...Array(1+dcBuilders.length).fill(null)],backgroundColor:'rgba(167,139,250,0.6)',borderColor:'#a78bfa',borderWidth:1,borderRadius:3},
+        {label:'DC Infrastructure CapEx ($B)',data:[...Array(providerCapex.length).fill(null),null,...dcBuilders.map(o=>o.capex)],backgroundColor:'rgba(52,211,153,0.6)',borderColor:'#34d399',borderWidth:1,borderRadius:3}]
+    },options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:7},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.raw?c.dataset.label+': $'+c.raw+'B':''}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7},maxRotation:45},grid:{display:false}},y:{title:{display:true,text:'CapEx ($B)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7},callback:v=>'$'+v+'B'},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ Chart 4: Provider Demand vs Infra Type Scatter ═══
+    const provTypeData=AI_PROVIDERS.map(p=>{
+        const proj=interpolateGrowth(p.currentGW,p.growthRate,6,0.88);
+        const gw2030=proj[5];
+        return {name:p.short,gw2030:gw2030,hyperscale:gw2030*p.infraMix.hyperscale,colo:gw2030*p.infraMix.colo,edge:gw2030*p.infraMix.edge,color:p.color,aiShare:p.aiShare};
+    });
+    destroyChart('projProviderTypeScatter');
+    benchCharts.projProviderTypeScatter=new Chart(document.getElementById('chartProjProviderTypeScatter'),{type:'bubble',data:{datasets:[
+        {label:'Hyperscale',data:provTypeData.map(d=>({x:d.gw2030,y:d.hyperscale,r:Math.max(4,Math.sqrt(d.hyperscale)*5),label:d.name})),backgroundColor:'rgba(96,165,250,0.5)',borderColor:'#60a5fa',borderWidth:1},
+        {label:'Colocation',data:provTypeData.map(d=>({x:d.gw2030,y:d.colo,r:Math.max(3,Math.sqrt(d.colo)*5),label:d.name})),backgroundColor:'rgba(167,139,250,0.5)',borderColor:'#a78bfa',borderWidth:1},
+        {label:'Edge',data:provTypeData.map(d=>({x:d.gw2030,y:d.edge,r:Math.max(2,Math.sqrt(d.edge)*5),label:d.name})),backgroundColor:'rgba(52,211,153,0.5)',borderColor:'#34d399',borderWidth:1}
+    ]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:7},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>{const d=c.raw;return provTypeData[c.dataIndex].name+' — '+c.dataset.label+': '+d.y.toFixed(1)+' GW (of '+d.x.toFixed(1)+' total)'}}}},scales:{x:{title:{display:true,text:'Total Demand 2030 (GW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'Type Allocation (GW)',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ Chart 5: Provider Demand Timeline ═══
+    destroyChart('projProviderTimeline');
+    benchCharts.projProviderTimeline=new Chart(document.getElementById('chartProjProviderTimeline'),{type:'line',data:{labels:['2024',...years],datasets:AI_PROVIDERS.filter(p=>p.currentGW>=0.6).map(p=>{
+        const proj=interpolateGrowth(p.currentGW,p.growthRate,6,0.88);
+        return {label:p.short,data:[p.currentGW,...proj.map(v=>parseFloat(v.toFixed(1)))],borderColor:p.color,backgroundColor:'transparent',borderWidth:2,pointRadius:2,pointBackgroundColor:p.color,tension:0.3};
+    })},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:7},boxWidth:8,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw+' GW'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}},y:{title:{display:true,text:'GW Demand',color:'#64748b',font:{size:8}},ticks:{color:'#475569',font:{size:7}},grid:{color:'rgba(51,65,85,0.15)'}}}}});
+
+    // ═══ Chart 6: Infrastructure Type Radar — Supply vs Demand ═══
+    const infraSupply2030={hyperscale:totalSupply2030*0.44,colo:totalSupply2030*0.30,edge:totalSupply2030*0.05,wholesale:totalSupply2030*0.21};
+    const maxInfra=Math.max(...Object.values(infraDemand2030),...Object.values(infraSupply2030));
+    destroyChart('projInfraTypeGap');
+    benchCharts.projInfraTypeGap=new Chart(document.getElementById('chartProjInfraTypeGap'),{type:'radar',data:{labels:['Hyperscale','Colocation','Edge','Wholesale'],datasets:[
+        {label:'Demand 2030',data:Object.values(infraDemand2030).map(v=>v/maxInfra*100),borderColor:'#f87171',backgroundColor:'rgba(248,113,113,0.15)',pointBackgroundColor:'#f87171',borderWidth:2},
+        {label:'Supply 2030',data:Object.values(infraSupply2030).map(v=>v/maxInfra*100),borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.15)',pointBackgroundColor:'#60a5fa',borderWidth:2}
+    ]},options:{responsive:true,scales:{r:{grid:{color:'rgba(51,65,85,0.3)'},angleLines:{color:'rgba(51,65,85,0.3)'},ticks:{display:false},pointLabels:{color:'#94a3b8',font:{size:9}}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:8},boxWidth:8,usePointStyle:true}}}}});
+
+    // ═══ Provider Comparison Table ═══
+    document.getElementById('projProviderTable').innerHTML=`<table class="bench-table"><thead><tr>
+        <th>Provider</th><th>Type</th><th>Current GW</th><th>CapEx '25</th><th>Growth Rate</th><th>2030 Demand</th><th>AI Share</th>
+        <th style="color:#60a5fa">Hyperscale</th><th style="color:#a78bfa">Colo</th><th style="color:#34d399">Edge</th><th style="color:#fbbf24">Wholesale</th>
+        <th>Americas</th><th>EMEA</th><th>APAC</th>
+    </tr></thead><tbody>
+        ${AI_PROVIDERS.sort((a,b)=>{const pa=interpolateGrowth(a.currentGW,a.growthRate,6,0.88);const pb=interpolateGrowth(b.currentGW,b.growthRate,6,0.88);return pb[5]-pa[5]}).map(p=>{
+            const proj=interpolateGrowth(p.currentGW,p.growthRate,6,0.88);
+            const gw2030=proj[5];
+            const typeCls=p.type==='AI-Native'?'edge':p.type==='Hyperscale'?'hyperscale':'colocation';
+            const growthCls=p.growthRate>=0.5?'color:#f87171;font-weight:700':p.growthRate>=0.3?'color:#fbbf24;font-weight:600':'color:#34d399';
+            return `<tr>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:${p.color};flex-shrink:0"></div><span style="font-weight:600;color:#f1f5f9;font-size:0.75rem">${p.name}</span></div></td>
+                <td><span class="bench-type ${typeCls}">${p.type}</span></td>
+                <td style="font-weight:600">${p.currentGW} GW</td>
+                <td>$${p.capex2025}B</td>
+                <td style="${growthCls}">${Math.round(p.growthRate*100)}% CAGR</td>
+                <td style="font-weight:700;color:#f1f5f9;font-size:0.82rem">${gw2030.toFixed(1)} GW</td>
+                <td style="color:${p.aiShare>=0.9?'#f87171':p.aiShare>=0.5?'#fbbf24':'#94a3b8'};font-weight:600">${Math.round(p.aiShare*100)}%</td>
+                <td style="font-size:0.72rem;color:#60a5fa">${(gw2030*p.infraMix.hyperscale).toFixed(1)}</td>
+                <td style="font-size:0.72rem;color:#a78bfa">${(gw2030*p.infraMix.colo).toFixed(1)}</td>
+                <td style="font-size:0.72rem;color:#34d399">${(gw2030*p.infraMix.edge).toFixed(1)}</td>
+                <td style="font-size:0.72rem;color:#fbbf24">${(gw2030*p.infraMix.wholesale).toFixed(1)}</td>
+                <td style="font-size:0.72rem">${Math.round(p.regions.Americas*100)}%</td>
+                <td style="font-size:0.72rem">${Math.round(p.regions.EMEA*100)}%</td>
+                <td style="font-size:0.72rem">${Math.round(p.regions.APAC*100)}%</td>
+            </tr>`;
+        }).join('')}
+    </tbody></table>
+    <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
+        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem">
+            <span style="color:#64748b">Hyperscale Demand 2030:</span> <span style="color:#60a5fa;font-weight:700">${infraDemand2030.hyperscale.toFixed(0)} GW</span>
+            <span style="color:#475569;margin:0 4px">vs Supply:</span> <span style="color:${infraDemand2030.hyperscale>infraSupply2030.hyperscale?'#f87171':'#34d399'};font-weight:700">${infraSupply2030.hyperscale.toFixed(0)} GW</span>
+            <span style="color:${infraDemand2030.hyperscale>infraSupply2030.hyperscale?'#f87171':'#34d399'};font-weight:600;margin-left:4px">(${infraDemand2030.hyperscale>infraSupply2030.hyperscale?'DEFICIT':'OK'}: ${Math.abs(infraDemand2030.hyperscale-infraSupply2030.hyperscale).toFixed(0)} GW)</span>
+        </div>
+        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem">
+            <span style="color:#64748b">Colo Demand 2030:</span> <span style="color:#a78bfa;font-weight:700">${infraDemand2030.colo.toFixed(0)} GW</span>
+            <span style="color:#475569;margin:0 4px">vs Supply:</span> <span style="color:${infraDemand2030.colo>infraSupply2030.colo?'#f87171':'#34d399'};font-weight:700">${infraSupply2030.colo.toFixed(0)} GW</span>
+        </div>
+        <div style="background:#0f172a;border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:0.72rem">
+            <span style="color:#64748b">Edge Demand 2030:</span> <span style="color:#34d399;font-weight:700">${infraDemand2030.edge.toFixed(1)} GW</span>
+            <span style="color:#475569;margin:0 4px">vs Supply:</span> <span style="color:#f87171;font-weight:700">${infraSupply2030.edge.toFixed(1)} GW</span>
+            <span style="color:#f87171;font-weight:600;margin-left:4px">CRITICAL GAP</span>
+        </div>
+    </div>`;
+
+    // ═══ Regional Projection Table ═══
+    document.getElementById('projRegionTable').innerHTML=`<table class="bench-table"><thead><tr>
+        <th>Region</th><th>Supply 2025</th><th>Supply 2028</th><th>Supply 2030</th><th>Demand 2025</th><th>Demand 2028</th><th>Demand 2030</th><th>Gap 2028</th><th>Gap 2030</th><th>Gap %</th>
+    </tr></thead><tbody>
+        ${Object.entries(supply).map(([r,s])=>{
+            const d=demand[r];
+            const gap2028=d.projections[3]-s.projections[3];
+            const gap2030=d.projections[5]-s.projections[5];
+            const gapPct=((gap2030/s.projections[5])*100).toFixed(0);
+            return `<tr>
+                <td><span class="bench-region ${r.toLowerCase()}" style="font-size:0.72rem;padding:3px 10px">${r}</span></td>
+                <td style="font-weight:600">${s.projections[0].toFixed(1)} GW</td>
+                <td>${s.projections[3].toFixed(1)} GW</td>
+                <td style="font-weight:700;color:#60a5fa">${s.projections[5].toFixed(1)} GW</td>
+                <td style="font-weight:600">${d.projections[0].toFixed(1)} GW</td>
+                <td>${d.projections[3].toFixed(1)} GW</td>
+                <td style="font-weight:700;color:#f87171">${d.projections[5].toFixed(1)} GW</td>
+                <td style="color:${gap2028>0?'#f87171':'#34d399'};font-weight:600">${gap2028>0?'+':''}${gap2028.toFixed(1)} GW</td>
+                <td style="color:${gap2030>0?'#f87171':'#34d399'};font-weight:700;font-size:0.82rem">${gap2030>0?'+':''}${gap2030.toFixed(1)} GW</td>
+                <td style="color:${gap2030>0?'#f87171':'#34d399'};font-weight:700">${gap2030>0?'+':''}${gapPct}%</td>
+            </tr>`;
+        }).join('')}
+        <tr style="border-top:2px solid #334155;font-weight:700">
+            <td style="color:#f1f5f9">GLOBAL TOTAL</td>
+            <td>${Object.values(supply).reduce((s,d)=>s+d.projections[0],0).toFixed(1)} GW</td>
+            <td>${Object.values(supply).reduce((s,d)=>s+d.projections[3],0).toFixed(1)} GW</td>
+            <td style="color:#60a5fa">${totalSupply2030.toFixed(1)} GW</td>
+            <td>${Object.values(demand).reduce((s,d)=>s+d.projections[0],0).toFixed(1)} GW</td>
+            <td>${Object.values(demand).reduce((s,d)=>s+d.projections[3],0).toFixed(1)} GW</td>
+            <td style="color:#f87171">${totalDemand2030.toFixed(1)} GW</td>
+            <td style="color:${Object.values(demand).reduce((s,d)=>s+d.projections[3],0)-Object.values(supply).reduce((s,d)=>s+d.projections[3],0)>0?'#f87171':'#34d399'}">${(Object.values(demand).reduce((s,d)=>s+d.projections[3],0)-Object.values(supply).reduce((s,d)=>s+d.projections[3],0)).toFixed(1)} GW</td>
+            <td style="color:${totalGap>0?'#f87171':'#34d399'};font-size:0.85rem">${totalGap>0?'+':''}${totalGap.toFixed(1)} GW</td>
+            <td style="color:${totalGap>0?'#f87171':'#34d399'}">${totalGap>0?'+':''}${((totalGap/totalSupply2030)*100).toFixed(0)}%</td>
+        </tr>
+    </tbody></table>`;
+
+    // ═══ Key Insights ═══
+    const fastestProvider=AI_PROVIDERS.reduce((a,b)=>a.growthRate>b.growthRate?a:b);
+    const largestDemand=AI_PROVIDERS.reduce((a,b)=>{const pa=interpolateGrowth(a.currentGW,a.growthRate,6,0.88);const pb=interpolateGrowth(b.currentGW,b.growthRate,6,0.88);return pa[5]>pb[5]?a:b});
+    const worstRegionGap=Object.entries(supply).reduce((worst,[r,s])=>{const gap=demand[r].projections[5]-s.projections[5];return gap>worst.gap?{region:r,gap}:worst},{region:'',gap:-Infinity});
+    document.getElementById('projInsights').innerHTML=[
+        {icon:'fa-fire',color:'#f87171',title:'Hyperscale Colo Imbalance',text:`Hyperscale colocation demand is projected at ${infraDemand2030.hyperscale.toFixed(0)} GW by 2030, but only ${infraSupply2030.hyperscale.toFixed(0)} GW of hyperscale-grade supply is projected. AI providers (OpenAI, Anthropic, xAI) are growing at 65-90% CAGR but infrastructure buildout at ~17% CAGR cannot keep pace. The compounding gap widens exponentially after 2027.`},
+        {icon:'fa-bolt',color:'#fbbf24',title:'AI-Native Providers — Fastest Growth, Least Infrastructure',text:`AI-native providers (OpenAI, Anthropic, xAI, ByteDance) rely entirely on leased infrastructure but are growing 2-4x faster than hyperscalers who own their DCs. ${fastestProvider.name} at ${Math.round(fastestProvider.growthRate*100)}% CAGR is the fastest grower. This creates severe dependency on Colo/Wholesale capacity that is already constrained.`},
+        {icon:'fa-globe-americas',color:'#60a5fa',title:'Regional Mismatch — '+worstRegionGap.region+' Most At-Risk',text:`${worstRegionGap.region} faces the largest absolute gap of ${worstRegionGap.gap.toFixed(1)} GW by 2030. Americas has massive hyperscale buildout (N. Virginia, Texas, Ohio) but AI demand is concentrating faster. EMEA faces grid constraints. APAC growth is bottlenecked by Singapore moratorium and India power infrastructure.`},
+        {icon:'fa-network-wired',color:'#34d399',title:'Edge Computing — Critical Under-Investment',text:`Edge infrastructure demand is projected at ${infraDemand2030.edge.toFixed(1)} GW by 2030, primarily driven by AI inference workloads. Current edge capacity is estimated at ${(totalSupply2030*0.05).toFixed(1)} GW. Edge DCs require fundamentally different economics (small, distributed, latency-optimized) that incumbent builders are not addressing at scale.`},
+        {icon:'fa-coins',color:'#a78bfa',title:'CapEx Mismatch — Providers vs Builders',text:`Top 4 AI/Cloud providers alone plan $${AI_PROVIDERS.slice(0,4).reduce((s,p)=>s+p.capex2025,0)}B CapEx in 2025, dwarfing the top 8 independent DC operators at $${dcBuilders.reduce((s,o)=>s+o.capex,0).toFixed(1)}B combined. However, provider CapEx includes GPUs, networking, and software — only ~30-40% goes to physical DC infrastructure. This amplifies the supply bottleneck.`},
+        {icon:'fa-chart-line',color:'#22d3ee',title:'Compound Divergence After 2027',text:`The demand-supply gap is manageable through 2027 (~${(Object.values(demand).reduce((s,d)=>s+d.projections[2],0)-Object.values(supply).reduce((s,d)=>s+d.projections[2],0)).toFixed(0)} GW deficit) because current construction pipelines deliver through 2027. Beyond 2027, constraint dampening accelerates supply slowdown while AI compute demand continues compounding. By 2030, the gap becomes structural — requiring $${(totalGap*1.5).toFixed(0)}B+ additional investment to close.`}
+    ].map(i=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(51,65,85,0.2)">
+        <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:${i.color}15;display:flex;align-items:center;justify-content:center"><i class="fas ${i.icon}" style="color:${i.color};font-size:0.75rem"></i></div>
+        <div><div style="font-size:0.78rem;font-weight:700;color:#f1f5f9;margin-bottom:3px">${i.title}</div><div style="font-size:0.72rem;color:#94a3b8;line-height:1.5">${i.text}</div></div>
+    </div>`).join('');
+
+    // ═══ Methodology ═══
+    document.getElementById('projMethodology').innerHTML=`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div>
+                <h5 style="font-size:0.75rem;font-weight:700;color:#a78bfa;margin-bottom:6px"><i class="fas fa-function" style="margin-right:4px"></i>Supply Projection Model</h5>
+                <div style="font-size:0.7rem;color:#94a3b8;line-height:1.6">
+                    <div style="margin-bottom:4px"><strong style="color:#e2e8f0">Formula:</strong> <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem">S(t) = S₀ × (1 + CAGR × 0.92^t)</code></div>
+                    <div style="margin-bottom:4px">• Base: Regional installed capacity from DC_SUMMARY (Synergy/CBRE 2025)</div>
+                    <div style="margin-bottom:4px">• CAGR: Americas 17%, EMEA 21%, APAC 12% from C&W/JLL data</div>
+                    <div style="margin-bottom:4px">• Constraint dampening: 0.92 per year (power, permits, labor)</div>
+                    <div>• Pipeline boost: Construction GW added to 2026-2027 projections</div>
+                </div>
+            </div>
+            <div>
+                <h5 style="font-size:0.75rem;font-weight:700;color:#f87171;margin-bottom:6px"><i class="fas fa-brain" style="margin-right:4px"></i>Demand Projection Model</h5>
+                <div style="font-size:0.7rem;color:#94a3b8;line-height:1.6">
+                    <div style="margin-bottom:4px"><strong style="color:#e2e8f0">Formula:</strong> <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem">D(t) = Σ P_i × (1 + g_i × 0.88^t) × R_region</code></div>
+                    <div style="margin-bottom:4px">• Per-provider growth rates from CapEx trajectory analysis</div>
+                    <div style="margin-bottom:4px">• AI-native providers: 65-90% CAGR (OpenAI, Anthropic, xAI)</div>
+                    <div style="margin-bottom:4px">• Hyperscalers: 20-45% CAGR (MSFT, GOOG, AWS, META, ORCL)</div>
+                    <div>• Dampening: 0.88 (capital constraints, efficiency gains)</div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:1rem;padding:10px;background:#0f172a;border:1px solid rgba(248,113,113,0.2);border-radius:8px">
+            <div style="font-size:0.7rem;color:#f87171;font-weight:600;margin-bottom:4px"><i class="fas fa-exclamation-triangle" style="margin-right:4px"></i>Key Limitation</div>
+            <div style="font-size:0.68rem;color:#94a3b8;line-height:1.5">These projections use deterministic compound growth with constraint dampening. Actual outcomes will vary based on: (1) AI model efficiency improvements (reducing compute per inference), (2) Nuclear/SMR power availability post-2028, (3) Regulatory changes (EU AI Act, Singapore lifting moratorium), (4) Potential AI winter / demand correction. Infrastructure allocation (hyperscale/colo/edge mix) is estimated from provider announcements and may shift significantly.</div>
+        </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════

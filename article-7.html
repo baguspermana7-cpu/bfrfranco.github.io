@@ -145,13 +145,14 @@
         [data-theme="dark"] .data-table thead { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         [data-theme="dark"] .data-table td { border-bottom-color: rgba(255,255,255,0.1); }
         [data-theme="dark"] .data-table tbody tr:hover { background: rgba(255,255,255,0.05); }
-        [data-theme="dark"] .info-box { background: rgba(16, 185, 129, 0.1); }
-        [data-theme="dark"] .info-box.warning { background: rgba(245, 158, 11, 0.1); }
-        [data-theme="dark"] .info-box.critical { background: rgba(239, 68, 68, 0.1); }
-        [data-theme="dark"] .key-insight { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); }
+        [data-theme="dark"] .info-box { background: transparent; }
+        [data-theme="dark"] .info-box.warning { background: transparent; }
+        [data-theme="dark"] .info-box.critical { background: transparent; }
+        [data-theme="dark"] .info-box-title { background: transparent; }
+        [data-theme="dark"] .key-insight { background: rgba(16, 185, 129, 0.03); border-color: rgba(16, 185, 129, 0.3); }
         [data-theme="dark"] .formula-box { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); }
         [data-theme="dark"] .references-section { background: rgba(255,255,255,0.03); }
-        [data-theme="dark"] .conclusion-box { background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.05) 100%); }
+        [data-theme="dark"] .conclusion-box { background: rgba(16,185,129,0.03); }
         [data-theme="dark"] .comparison-card { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
         [data-theme="dark"] .article-body blockquote { background: rgba(16, 185, 129, 0.08); color: #34d399; }
         [data-theme="dark"] .article-body h2 { color: #93c5fd; }
@@ -1106,7 +1107,40 @@
             .chart-container { padding: 1rem; }
             .calculator-section { padding: 1.5rem 1rem; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1125,6 +1159,8 @@
                         <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -2131,12 +2167,12 @@
                             <div class="res-pro-panel-header"><i class="fas fa-search-plus"></i> Resilience Gap Deep Dive</div>
                             <div class="res-pro-panel-body" id="resPanel1Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiGapSeverity">--</div><div class="res-kpi-label">Gap Severity</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiDesignOpsRatio">--</div><div class="res-kpi-label">Design vs Ops Ratio</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWeakest">--</div><div class="res-kpi-label">Weakest Dimension</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiStrongest">--</div><div class="res-kpi-label">Strongest Dimension</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiImprovePotential">--</div><div class="res-kpi-label">Improvement Potential</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiTierEquivGap">--</div><div class="res-kpi-label">Tier Equivalence Gap</div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiGapSeverity">--</div><div class="res-kpi-label">Gap Severity <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Gap Severity</div><div class="rtd">Overall severity of gaps between current resilience posture and target. Higher = more urgent.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiDesignOpsRatio">--</div><div class="res-kpi-label">Design vs Ops Ratio <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Design vs Ops Ratio</div><div class="rtd">Balance between engineering design and operational readiness investments.</div><span class="rtf">Optimal: 40-60% range</span></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWeakest">--</div><div class="res-kpi-label">Weakest Dimension <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Weakest Dimension</div><div class="rtd">The resilience dimension scoring lowest — priority area for improvement.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiStrongest">--</div><div class="res-kpi-label">Strongest Dimension <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Strongest Dimension</div><div class="rtd">Highest-scoring resilience dimension — leverage this strength.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiImprovePotential">--</div><div class="res-kpi-label">Improvement Potential <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Improvement Potential</div><div class="rtd">Maximum score improvement achievable by addressing identified gaps.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiTierEquivGap">--</div><div class="res-kpi-label">Tier Equivalence Gap <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Tier Equivalence Gap</div><div class="rtd">Gap between current resilience and the next Uptime Institute tier level.</div></span></span></div></div>
                                 </div>
                                 <canvas id="resRadarChart" width="400" height="300" style="width:100%;max-width:400px;margin:1rem auto;display:block;"></canvas>
                             </div>
@@ -2148,12 +2184,12 @@
                             <div class="res-pro-panel-header"><i class="fas fa-dollar-sign"></i> Cost of Downtime Analysis</div>
                             <div class="res-pro-panel-body" id="resPanel2Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiAnnualCost">--</div><div class="res-kpi-label">Est. Annual Downtime Cost</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiCostPerGap">--</div><div class="res-kpi-label">Cost per Gap Point</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRiskExposure">--</div><div class="res-kpi-label">Operational Risk Exposure</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiSlaPenalty">--</div><div class="res-kpi-label">SLA Penalty Estimate</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRecoveryRoi">--</div><div class="res-kpi-label">Recovery ROI</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiInsurance">--</div><div class="res-kpi-label">Insurance Impact</div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiAnnualCost">--</div><div class="res-kpi-label">Est. Annual Downtime Cost <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Downtime Cost</div><div class="rtd">Estimated yearly cost of unplanned downtime based on current resilience score.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiCostPerGap">--</div><div class="res-kpi-label">Cost per Gap Point <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Cost per Gap Point</div><div class="rtd">Incremental cost of each point of resilience gap — helps prioritize investments.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRiskExposure">--</div><div class="res-kpi-label">Operational Risk Exposure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Risk Exposure</div><div class="rtd">Total operational risk from identified resilience gaps, expressed as expected annual loss.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiSlaPenalty">--</div><div class="res-kpi-label">SLA Penalty Estimate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">SLA Penalty Risk</div><div class="rtd">Estimated SLA penalties from resilience shortfalls over the next 12 months.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRecoveryRoi">--</div><div class="res-kpi-label">Recovery ROI <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Recovery ROI</div><div class="rtd">Return on investment for resilience improvements based on avoided downtime costs.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiInsurance">--</div><div class="res-kpi-label">Insurance Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Insurance Impact</div><div class="rtd">Estimated insurance premium change based on current resilience posture.</div></span></span></div></div>
                                 </div>
                             </div>
                             <div class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
@@ -2164,10 +2200,10 @@
                             <div class="res-pro-panel-header"><i class="fas fa-chart-line"></i> Benchmarking &amp; Maturity</div>
                             <div class="res-pro-panel-body" id="resPanel3Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPercentile">--</div><div class="res-kpi-label">Industry Percentile</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiHollnagel">--</div><div class="res-kpi-label">Hollnagel Maturity Level</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWestrum">--</div><div class="res-kpi-label">Westrum Culture Type</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiProfile">--</div><div class="res-kpi-label">Comparable Facility Profile</div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPercentile">--</div><div class="res-kpi-label">Industry Percentile <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Industry Percentile</div><div class="rtd">How this facility ranks against industry peers for resilience.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiHollnagel">--</div><div class="res-kpi-label">Hollnagel Maturity Level <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Hollnagel Maturity</div><div class="rtd">Resilience maturity per Hollnagel's Four Cornerstones: Respond, Monitor, Learn, Anticipate.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWestrum">--</div><div class="res-kpi-label">Westrum Culture Type <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Westrum Culture Type</div><div class="rtd">Organizational culture classification: Pathological, Bureaucratic, or Generative.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiProfile">--</div><div class="res-kpi-label">Comparable Facility Profile <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Comparable Profile</div><div class="rtd">Benchmark comparison to facilities with similar size, tier, and geography.</div></span></span></div></div>
                                 </div>
                                 <div style="margin-top:1rem;">
                                     <h4 style="color:#94a3b8;font-size:0.85rem;margin-bottom:0.75rem;"><i class="fas fa-chart-bar" style="margin-right:6px;color:#10b981;"></i>Sensitivity Analysis — Dimension Impact</h4>
@@ -2182,20 +2218,20 @@
                             <div class="res-pro-panel-header"><i class="fas fa-road"></i> Improvement Roadmap</div>
                             <div class="res-pro-panel-body" id="resPanel4Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi30day">--</div><div class="res-kpi-label">30-Day Impact Projection</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi90day">--</div><div class="res-kpi-label">90-Day Target Score</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi1year">--</div><div class="res-kpi-label">1-Year Transformation</div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPriority">--</div><div class="res-kpi-label">Priority Investment Area</div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi30day">--</div><div class="res-kpi-label">30-Day Impact Projection <span class="res-tip">?<span class="res-tip-body"><div class="rtt">30-Day Projection</div><div class="rtd">Expected resilience improvement in 30 days if recommended actions are implemented.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi90day">--</div><div class="res-kpi-label">90-Day Target Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">90-Day Target</div><div class="rtd">Achievable resilience score in 90 days with focused investment.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi1year">--</div><div class="res-kpi-label">1-Year Transformation <span class="res-tip">?<span class="res-tip-body"><div class="rtt">1-Year Transformation</div><div class="rtd">Full resilience transformation target over 12 months.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPriority">--</div><div class="res-kpi-label">Priority Investment Area <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Priority Investment</div><div class="rtd">Highest-ROI area for resilience improvement spending.</div></span></span></div></div>
                                 </div>
                                 <div style="margin-top:1rem;">
                                     <h4 style="color:#94a3b8;font-size:0.85rem;margin-bottom:0.75rem;"><i class="fas fa-dice" style="margin-right:6px;color:#10b981;"></i>Monte Carlo Simulation (10,000 iterations)</h4>
                                     <div class="res-kpi-grid" style="margin-bottom:0.75rem;">
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcMean">--</div><div class="res-kpi-label">MC Mean</div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcStdDev">--</div><div class="res-kpi-label">Std Dev</div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP5">--</div><div class="res-kpi-label">P5 (Worst)</div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP50">--</div><div class="res-kpi-label">P50 (Median)</div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP95">--</div><div class="res-kpi-label">P95 (Best)</div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcRange">--</div><div class="res-kpi-label">Range</div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcMean">--</div><div class="res-kpi-label">MC Mean <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Monte Carlo Mean</div><div class="rtd">Average resilience score from Monte Carlo simulation across all scenarios.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcStdDev">--</div><div class="res-kpi-label">Std Dev <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Standard Deviation</div><div class="rtd">Spread of resilience outcomes — wider = more uncertainty.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP5">--</div><div class="res-kpi-label">P5 (Worst) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P5 — Worst Case</div><div class="rtd">5th percentile — 95% of scenarios score above this level.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP50">--</div><div class="res-kpi-label">P50 (Median) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P50 — Median</div><div class="rtd">Most likely resilience score outcome.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP95">--</div><div class="res-kpi-label">P95 (Best) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P95 — Best Case</div><div class="rtd">Top 5% optimistic scenario.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcRange">--</div><div class="res-kpi-label">Range <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Range</div><div class="rtd">Spread between worst-case and best-case scenarios.</div></span></span></div></div>
                                     </div>
                                     <canvas id="resHistChart" width="800" height="300" style="width:100%;margin:1rem auto;display:block;"></canvas>
                                 </div>

@@ -369,7 +369,7 @@
         }
 
         [data-theme="dark"] .article-body blockquote {
-            background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(239,68,68,0.05) 100%);
+            background: rgba(239,68,68,0.04);
             color: #fca5a5;
         }
 
@@ -430,7 +430,7 @@
         }
 
         [data-theme="dark"] .key-insight {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.04);
         }
 
         .key-insight strong {
@@ -487,16 +487,19 @@
         }
 
         [data-theme="dark"] .info-box {
-            background: linear-gradient(135deg, rgba(6,182,212,0.1) 0%, rgba(6,182,212,0.05) 100%);
+            background: transparent;
         }
         [data-theme="dark"] .info-box.warning {
-            background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(245,158,11,0.05) 100%);
+            background: transparent;
         }
         [data-theme="dark"] .info-box.critical {
-            background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(239,68,68,0.05) 100%);
+            background: transparent;
         }
         [data-theme="dark"] .info-box.success {
-            background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.05) 100%);
+            background: transparent;
+        }
+        [data-theme="dark"] .info-box-title {
+            background: transparent;
         }
 
         .info-box-title {
@@ -1004,7 +1007,40 @@
             .tip::after { left: 0; transform: none; max-width: 220px; }
             .article-nav { flex-direction: column; gap: 1rem; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
     <link rel="preload" as="image" href="assets/article-2-cover.jpg">
     <!-- Chart.js for data visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1037,6 +1073,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -1552,11 +1590,11 @@
                     <input type="number" id="criticalDaily" value="45" min="0" max="10000">
                 </div>
                 <div class="calc-group">
-                    <label for="warningDaily">Warning Alarms / Day</label>
+                    <label for="warningDaily">Warning Alarms / Day <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Warning Priority Alarms</div><div class="tooltip-desc">Medium-priority alarms requiring timely response. ISA-18.2 recommends Warning alarms be 15% or less of total.</div><div class="tooltip-formula">Warning target: &le;15% of total alarms</div></span></span></label>
                     <input type="number" id="warningDaily" value="280" min="0" max="10000">
                 </div>
                 <div class="calc-group">
-                    <label for="infoDaily">Information Alarms / Day</label>
+                    <label for="infoDaily">Information Alarms / Day <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Information/Advisory Alarms</div><div class="tooltip-desc">Low-priority notifications for operator awareness. Should make up the bulk of alarm traffic.</div><div class="tooltip-formula">Info target: &ge;80% of total alarms</div></span></span></label>
                     <input type="number" id="infoDaily" value="875" disabled style="opacity:0.7; cursor: not-allowed;">
                 </div>
                 <div class="calc-group">
@@ -1564,7 +1602,7 @@
                     <input type="number" id="avgResponse" value="180" min="1" max="3600">
                 </div>
                 <div class="calc-group">
-                    <label for="operatorsPerShift">Operators per Shift</label>
+                    <label for="operatorsPerShift">Operators per Shift <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Operators per Shift</div><div class="tooltip-desc">Number of operators simultaneously handling alarms during a shift. More operators reduce per-person alarm load.</div><div class="tooltip-formula">Rate per operator = total alarms / operators / time</div></span></span></label>
                     <select id="operatorsPerShift">
                         <option value="1">1</option>
                         <option value="2" selected>2</option>
@@ -1574,14 +1612,14 @@
                     </select>
                 </div>
                 <div class="calc-group">
-                    <label for="shiftDuration">Shift Duration (hours)</label>
+                    <label for="shiftDuration">Shift Duration (hours) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Shift Duration</div><div class="tooltip-desc">Length of each operator shift in hours. Longer shifts increase fatigue-related alarm miss risk.</div><div class="tooltip-formula">Standard: 8-12 hours</div></span></span></label>
                     <select id="shiftDuration">
                         <option value="8">8</option>
                         <option value="12" selected>12</option>
                     </select>
                 </div>
                 <div class="calc-group">
-                    <label for="shelvingPct">Current Shelving %: <span id="shelvingVal" class="range-value">10%</span></label>
+                    <label for="shelvingPct">Current Shelving %: <span id="shelvingVal" class="range-value">10%</span> <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Alarm Shelving Rate</div><div class="tooltip-desc">Percentage of alarms temporarily suppressed (shelved) by operators. Authorized shelving reduces noise but excessive shelving may mask real issues.</div><div class="tooltip-formula">ISA-18.2: Document all shelved alarms &middot; Review weekly</div></span></span></label>
                     <input type="range" id="shelvingPct" min="0" max="50" value="10">
                 </div>
             </div>
@@ -1603,7 +1641,7 @@
                         <input type="number" id="proStandingPct" value="0" min="0" max="100" placeholder="0 = auto-estimate">
                     </div>
                     <div class="calc-group">
-                        <label for="proFacilityType">Facility Type</label>
+                        <label for="proFacilityType">Facility Type <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Facility Type</div><div class="tooltip-desc">Type of data center operation. Affects alarm density baselines and ISA-18.2 applicability.</div></span></span></label>
                         <select id="proFacilityType">
                             <option value="dc" selected>Data Center (BMS)</option>
                             <option value="industrial">Industrial (DCS/SCADA)</option>
@@ -1612,7 +1650,7 @@
                         </select>
                     </div>
                     <div class="calc-group">
-                        <label for="proPriorityModel">Priority Model</label>
+                        <label for="proPriorityModel">Priority Model <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Priority Model</div><div class="tooltip-desc">Alarm priority classification scheme. ISA-18.2 recommends 3-4 priority levels with strict distribution targets.</div></span></span></label>
                         <select id="proPriorityModel">
                             <option value="3" selected>3-Level (Crit/Warn/Info)</option>
                             <option value="4">4-Level (Emer/High/Med/Low)</option>
@@ -1639,37 +1677,37 @@
             <!-- Free Output Cards -->
             <div class="calc-results-grid" id="calcResults">
                 <div class="result-card">
-                    <div class="result-card-label">Alarm Rate / Operator / 10 min</div>
+                    <div class="result-card-label">Alarm Rate / Operator / 10 min <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Alarm Rate</div><div class="rtd">Number of alarms per operator per 10-minute window. The primary ISA-18.2 metric for alarm system performance.</div><span class="rtf">ISA-18.2 target: &le; 1.0 per 10 min</span></span></span></div>
                     <div class="result-card-value" id="resRate">--</div>
                     <div class="result-card-sub">ISA-18.2 target: &le; 1.0</div>
                 </div>
                 <div class="result-card">
-                    <div class="result-card-label">Cognitive Load Index</div>
+                    <div class="result-card-label">Cognitive Load Index <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Cognitive Load</div><div class="rtd">Estimated operator cognitive utilization from alarm handling. Accounts for response time, alarm frequency, and multitasking overhead.</div><span class="rtf">Degradation onset at 70% utilization</span></span></span></div>
                     <div class="result-card-value" id="resCognitive">--</div>
                     <div class="result-card-sub" id="resCognitiveSub">Utilization of operator capacity</div>
                 </div>
                 <div class="result-card">
-                    <div class="result-card-label">Alarm Flood Probability / Shift</div>
+                    <div class="result-card-label">Alarm Flood Probability / Shift <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Flood Probability</div><div class="rtd">Statistical probability of at least one alarm flood event occurring during a shift.</div><span class="rtf">ISA-18.2 flood: &gt;10 alarms in 10 min</span></span></span></div>
                     <div class="result-card-value" id="resFlood">--</div>
                     <div class="result-card-sub">&gt;10 alarms in any 10-min window</div>
                 </div>
                 <div class="result-card">
-                    <div class="result-card-label">ISA-18.2 Compliance Score</div>
+                    <div class="result-card-label">ISA-18.2 Compliance Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">ISA-18.2 Compliance</div><div class="rtd">Composite compliance score across all ISA-18.2 alarm management KPIs.</div><span class="rtf">&gt;80% Good &middot; &gt;90% Excellent</span></span></span></div>
                     <div class="result-card-value" id="resISA">--</div>
                     <div class="result-card-sub" id="resISASub">Score out of 100</div>
                 </div>
                 <div class="result-card">
-                    <div class="result-card-label">Actionable Ratio</div>
+                    <div class="result-card-label">Actionable Ratio <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Actionable Ratio</div><div class="rtd">Percentage of alarms that require and receive operator action. Non-actionable alarms should be eliminated.</div><span class="rtf">Target: &gt;95% actionable</span></span></span></div>
                     <div class="result-card-value" id="resActionable">--</div>
                     <div class="result-card-sub">Target: &ge; 85%</div>
                 </div>
                 <div class="result-card">
-                    <div class="result-card-label">Recommended Daily Alarm Target</div>
+                    <div class="result-card-label">Recommended Daily Alarm Target <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Daily Alarm Target</div><div class="rtd">Maximum recommended daily alarm count based on ISA-18.2 and EEMUA 191 standards.</div><span class="rtf">EEMUA 191: &le;144/day/op = Acceptable</span></span></span></div>
                     <div class="result-card-value green" id="resTarget">--</div>
                     <div class="result-card-sub">Based on ISA-18.2 &le;1 per 10 min</div>
                 </div>
                 <div class="result-card">
-                    <div class="result-card-label">Priority Reduction Targets</div>
+                    <div class="result-card-label">Priority Reduction Targets <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Priority Reduction</div><div class="rtd">Number of alarms to eliminate per priority category to reach compliance targets.</div></span></span></div>
                     <div class="result-card-value" id="resPriority" style="font-size:0.9rem; line-height: 1.6;">--</div>
                     <div class="result-card-sub">Alarms to eliminate per category</div>
                 </div>
@@ -1682,14 +1720,14 @@
                     <div class="pro-panel-inner">
                         <div class="pro-panel-title"><i class="fas fa-gauge-high"></i> Burden & Capacity Analysis</div>
                         <div class="calc-results-grid" id="proBurdenGrid">
-                            <div class="result-card"><div class="result-card-label">Alarms / Op / Hour</div><div class="result-card-value" id="proAlmOpHr">--</div><div class="result-card-sub">Hourly operator burden</div></div>
-                            <div class="result-card"><div class="result-card-label">Alarms / Op / Shift</div><div class="result-card-value" id="proAlmOpShift">--</div><div class="result-card-sub">Total shift burden</div></div>
-                            <div class="result-card"><div class="result-card-label">Operator Busy Time</div><div class="result-card-value" id="proBusyTime">--</div><div class="result-card-sub">% of shift handling alarms</div></div>
-                            <div class="result-card"><div class="result-card-label">Remaining Capacity</div><div class="result-card-value" id="proCapacity">--</div><div class="result-card-sub">Available bandwidth</div></div>
-                            <div class="result-card"><div class="result-card-label">Utilization Band</div><div class="result-card-value" id="proUtilBand">--</div><div class="result-card-sub">EEMUA workload rating</div></div>
-                            <div class="result-card"><div class="result-card-label">Overload Margin</div><div class="result-card-value" id="proOverload">--</div><div class="result-card-sub">Alarms above safe capacity</div></div>
-                            <div class="result-card"><div class="result-card-label">Erlang-C Wait Prob.</div><div class="result-card-value" id="proErlangC">--</div><div class="result-card-sub">P(alarm must queue)</div></div>
-                            <div class="result-card"><div class="result-card-label">Avg Queue Wait</div><div class="result-card-value" id="proAvgWait">--</div><div class="result-card-sub">Seconds if queued</div></div>
+                            <div class="result-card"><div class="result-card-label">Alarms / Op / Hour <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Hourly Alarm Rate</div><div class="rtd">Average number of alarms per operator per hour. Key workload indicator.</div><span class="rtf">ISA-18.2: &le;6/hr is manageable</span></span></span></div><div class="result-card-value" id="proAlmOpHr">--</div><div class="result-card-sub">Hourly operator burden</div></div>
+                            <div class="result-card"><div class="result-card-label">Alarms / Op / Shift <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Shift Alarm Count</div><div class="rtd">Total alarms per operator over the shift duration.</div></span></span></div><div class="result-card-value" id="proAlmOpShift">--</div><div class="result-card-sub">Total shift burden</div></div>
+                            <div class="result-card"><div class="result-card-label">Operator Busy Time <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Operator Busy Time</div><div class="rtd">Percentage of shift time spent handling alarms (response + action).</div><span class="rtf">&gt;70% indicates overload risk</span></span></span></div><div class="result-card-value" id="proBusyTime">--</div><div class="result-card-sub">% of shift handling alarms</div></div>
+                            <div class="result-card"><div class="result-card-label">Remaining Capacity <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Remaining Capacity</div><div class="rtd">Available operator capacity for non-alarm tasks (monitoring, procedures, coordination).</div></span></span></div><div class="result-card-value" id="proCapacity">--</div><div class="result-card-sub">Available bandwidth</div></div>
+                            <div class="result-card"><div class="result-card-label">Utilization Band <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Utilization Band</div><div class="rtd">Operator workload classification: Green (manageable), Amber (heavy), Red (overloaded).</div></span></span></div><div class="result-card-value" id="proUtilBand">--</div><div class="result-card-sub">EEMUA workload rating</div></div>
+                            <div class="result-card"><div class="result-card-label">Overload Margin <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Overload Margin</div><div class="rtd">How close the operator is to cognitive overload. Negative values indicate current overload.</div></span></span></div><div class="result-card-value" id="proOverload">--</div><div class="result-card-sub">Alarms above safe capacity</div></div>
+                            <div class="result-card"><div class="result-card-label">Erlang-C Wait Prob. <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Erlang-C Wait Probability</div><div class="rtd">Probability that an incoming alarm must wait for operator attention, based on queuing theory.</div><span class="rtf">Target: &lt;20% wait probability</span></span></span></div><div class="result-card-value" id="proErlangC">--</div><div class="result-card-sub">P(alarm must queue)</div></div>
+                            <div class="result-card"><div class="result-card-label">Avg Queue Wait <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Avg Queue Wait</div><div class="rtd">Mean time an alarm waits in queue before operator acknowledgment.</div></span></span></div><div class="result-card-value" id="proAvgWait">--</div><div class="result-card-sub">Seconds if queued</div></div>
                         </div>
                     </div>
                     <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Login to unlock 28 advanced KPIs</div></div>
@@ -1700,12 +1738,12 @@
                     <div class="pro-panel-inner">
                         <div class="pro-panel-title"><i class="fas fa-water"></i> Flood Risk Deep Dive</div>
                         <div class="calc-results-grid" id="proFloodGrid">
-                            <div class="result-card"><div class="result-card-label">P(Flood per Window)</div><div class="result-card-value" id="proFloodWindow">--</div><div class="result-card-sub">Raw Poisson probability</div></div>
-                            <div class="result-card"><div class="result-card-label">Expected Flood Windows</div><div class="result-card-value" id="proFloodExpected">--</div><div class="result-card-sub">Per shift</div></div>
-                            <div class="result-card"><div class="result-card-label">95th %ile 10-min Count</div><div class="result-card-value" id="proPct95">--</div><div class="result-card-sub">Peak alarm burst</div></div>
-                            <div class="result-card"><div class="result-card-label">Est. Time-in-Flood</div><div class="result-card-value" id="proTimeFlood">--</div><div class="result-card-sub">% of shift in flood</div></div>
-                            <div class="result-card"><div class="result-card-label">Risk-of-Missing-Critical</div><div class="result-card-value" id="proMissCrit">--</div><div class="result-card-sub">During flood conditions</div></div>
-                            <div class="result-card"><div class="result-card-label">Flood Severity Index</div><div class="result-card-value" id="proFloodSeverity">--</div><div class="result-card-sub">Composite flood risk</div></div>
+                            <div class="result-card"><div class="result-card-label">P(Flood per Window) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Flood Probability per Window</div><div class="rtd">Probability of a flood event in any given 10-minute window.</div></span></span></div><div class="result-card-value" id="proFloodWindow">--</div><div class="result-card-sub">Raw Poisson probability</div></div>
+                            <div class="result-card"><div class="result-card-label">Expected Flood Windows <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Expected Flood Events</div><div class="rtd">Expected number of alarm flood windows per shift.</div></span></span></div><div class="result-card-value" id="proFloodExpected">--</div><div class="result-card-sub">Per shift</div></div>
+                            <div class="result-card"><div class="result-card-label">95th %ile 10-min Count <span class="res-tip">?<span class="res-tip-body"><div class="rtt">95th Percentile Count</div><div class="rtd">95th percentile of alarm count in any 10-minute window. Captures burst behavior.</div></span></span></div><div class="result-card-value" id="proPct95">--</div><div class="result-card-sub">Peak alarm burst</div></div>
+                            <div class="result-card"><div class="result-card-label">Est. Time-in-Flood <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Time in Flood State</div><div class="rtd">Estimated total time per shift spent in alarm flood conditions.</div></span></span></div><div class="result-card-value" id="proTimeFlood">--</div><div class="result-card-sub">% of shift in flood</div></div>
+                            <div class="result-card"><div class="result-card-label">Risk-of-Missing-Critical <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Risk of Missing Critical</div><div class="rtd">Probability that a critical alarm is missed or delayed during a flood event.</div><span class="rtf">Key safety metric</span></span></span></div><div class="result-card-value" id="proMissCrit">--</div><div class="result-card-sub">During flood conditions</div></div>
+                            <div class="result-card"><div class="result-card-label">Flood Severity Index <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Flood Severity Index</div><div class="rtd">Composite severity score of flood events considering duration, peak rate, and critical alarm exposure.</div></span></span></div><div class="result-card-value" id="proFloodSeverity">--</div><div class="result-card-sub">Composite flood risk</div></div>
                         </div>
                     </div>
                     <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Advanced flood modeling</div></div>
@@ -1716,12 +1754,12 @@
                     <div class="pro-panel-inner">
                         <div class="pro-panel-title"><i class="fas fa-ranking-star"></i> Priority & Quality Assessment</div>
                         <div class="calc-results-grid" id="proQualityGrid">
-                            <div class="result-card"><div class="result-card-label">Priority Distribution</div><div class="result-card-value" id="proPrioDist" style="font-size:0.85rem;line-height:1.5;">--</div><div class="result-card-sub">vs 80/15/5 benchmark</div></div>
-                            <div class="result-card"><div class="result-card-label">Standing Alarm %</div><div class="result-card-value" id="proStanding">--</div><div class="result-card-sub">ISA target: &le;10%</div></div>
-                            <div class="result-card"><div class="result-card-label">Chattering Impact</div><div class="result-card-value" id="proChattering">--</div><div class="result-card-sub">Nuisance alarm load</div></div>
-                            <div class="result-card"><div class="result-card-label">Suppression Exposure</div><div class="result-card-value" id="proSuppression">--</div><div class="result-card-sub">Unauthorized suppression risk</div></div>
-                            <div class="result-card"><div class="result-card-label">Net Actionable Ratio</div><div class="result-card-value" id="proNetActionable">--</div><div class="result-card-sub">After quality adjustment</div></div>
-                            <div class="result-card"><div class="result-card-label">Alarm Quality Score</div><div class="result-card-value" id="proQualityScore">--</div><div class="result-card-sub">Composite quality index</div></div>
+                            <div class="result-card"><div class="result-card-label">Priority Distribution <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Priority Distribution</div><div class="rtd">Breakdown of alarms by priority level. ISA-18.2 recommends Critical &le;5%, High &le;15%.</div></span></span></div><div class="result-card-value" id="proPrioDist" style="font-size:0.85rem;line-height:1.5;">--</div><div class="result-card-sub">vs 80/15/5 benchmark</div></div>
+                            <div class="result-card"><div class="result-card-label">Standing Alarm % <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Standing Alarms</div><div class="rtd">Percentage of alarms continuously active. High standing alarms mask new events.</div><span class="rtf">Target: &lt;5% standing</span></span></span></div><div class="result-card-value" id="proStanding">--</div><div class="result-card-sub">ISA target: &le;10%</div></div>
+                            <div class="result-card"><div class="result-card-label">Chattering Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Chattering Impact</div><div class="rtd">Alarm activations from chattering (rapid on/off cycling). Should be eliminated.</div></span></span></div><div class="result-card-value" id="proChattering">--</div><div class="result-card-sub">Nuisance alarm load</div></div>
+                            <div class="result-card"><div class="result-card-label">Suppression Exposure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Suppression Exposure</div><div class="rtd">Percentage of alarms currently suppressed/shelved. High suppression may mask real issues.</div></span></span></div><div class="result-card-value" id="proSuppression">--</div><div class="result-card-sub">Unauthorized suppression risk</div></div>
+                            <div class="result-card"><div class="result-card-label">Net Actionable Ratio <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Net Actionable Ratio</div><div class="rtd">Actionable alarms after removing standing, chattering, and nuisance alarms.</div></span></span></div><div class="result-card-value" id="proNetActionable">--</div><div class="result-card-sub">After quality adjustment</div></div>
+                            <div class="result-card"><div class="result-card-label">Alarm Quality Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Alarm Quality Score</div><div class="rtd">Overall alarm system quality combining actionability, priority accuracy, and nuisance rates.</div></span></span></div><div class="result-card-value" id="proQualityScore">--</div><div class="result-card-sub">Composite quality index</div></div>
                         </div>
                     </div>
                     <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Standards-aligned quality metrics</div></div>
@@ -1732,10 +1770,10 @@
                     <div class="pro-panel-inner">
                         <div class="pro-panel-title"><i class="fas fa-clipboard-check"></i> ISA-18.2 Compliance Drilldown</div>
                         <div class="calc-results-grid" id="proComplianceGrid">
-                            <div class="result-card"><div class="result-card-label">Rate Criterion</div><div class="result-card-value" id="proCompRate">--</div><div class="result-card-sub">Score out of 25</div></div>
-                            <div class="result-card"><div class="result-card-label">Actionable Criterion</div><div class="result-card-value" id="proCompAction">--</div><div class="result-card-sub">Score out of 25</div></div>
-                            <div class="result-card"><div class="result-card-label">Critical % Criterion</div><div class="result-card-value" id="proCompCrit">--</div><div class="result-card-sub">Score out of 25</div></div>
-                            <div class="result-card"><div class="result-card-label">Standing % Criterion</div><div class="result-card-value" id="proCompStand">--</div><div class="result-card-sub">Score out of 25</div></div>
+                            <div class="result-card"><div class="result-card-label">Rate Criterion <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Rate Criterion</div><div class="rtd">Pass/Fail assessment of alarm rate against ISA-18.2 maximum threshold.</div></span></span></div><div class="result-card-value" id="proCompRate">--</div><div class="result-card-sub">Score out of 25</div></div>
+                            <div class="result-card"><div class="result-card-label">Actionable Criterion <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Actionable Criterion</div><div class="rtd">Pass/Fail assessment of actionable alarm ratio against ISA-18.2 minimum.</div></span></span></div><div class="result-card-value" id="proCompAction">--</div><div class="result-card-sub">Score out of 25</div></div>
+                            <div class="result-card"><div class="result-card-label">Critical % Criterion <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Critical % Criterion</div><div class="rtd">Pass/Fail for critical alarm percentage against ISA-18.2 &le;5% target.</div></span></span></div><div class="result-card-value" id="proCompCrit">--</div><div class="result-card-sub">Score out of 25</div></div>
+                            <div class="result-card"><div class="result-card-label">Standing % Criterion <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Standing % Criterion</div><div class="rtd">Pass/Fail for standing alarm percentage against ISA-18.2 &lt;5% target.</div></span></span></div><div class="result-card-value" id="proCompStand">--</div><div class="result-card-sub">Score out of 25</div></div>
                         </div>
                     </div>
                     <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Compliance contribution breakdown</div></div>
@@ -1746,10 +1784,10 @@
                     <div class="pro-panel-inner">
                         <div class="pro-panel-title"><i class="fas fa-shuffle"></i> Scenario Sensitivity</div>
                         <div class="calc-results-grid" id="proScenarioGrid">
-                            <div class="result-card"><div class="result-card-label">+1 Operator Impact</div><div class="result-card-value" id="proScnOp">--</div><div class="result-card-sub">New rate if +1 operator</div></div>
-                            <div class="result-card"><div class="result-card-label">50% Faster Response</div><div class="result-card-value" id="proScnResp">--</div><div class="result-card-sub">New utilization</div></div>
-                            <div class="result-card"><div class="result-card-label">+10% Shelving</div><div class="result-card-value" id="proScnShelve">--</div><div class="result-card-sub">New flood probability</div></div>
-                            <div class="result-card"><div class="result-card-label">Priority Rebalance</div><div class="result-card-value" id="proScnPrio">--</div><div class="result-card-sub">If aligned to 80/15/5</div></div>
+                            <div class="result-card"><div class="result-card-label">+1 Operator Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">+1 Operator Impact</div><div class="rtd">Projected improvement in alarm rate if one additional operator is added per shift.</div></span></span></div><div class="result-card-value" id="proScnOp">--</div><div class="result-card-sub">New rate if +1 operator</div></div>
+                            <div class="result-card"><div class="result-card-label">50% Faster Response <span class="res-tip">?<span class="res-tip-body"><div class="rtt">50% Faster Response</div><div class="rtd">Impact of reducing average response time by 50% on cognitive load and queue metrics.</div></span></span></div><div class="result-card-value" id="proScnResp">--</div><div class="result-card-sub">New utilization</div></div>
+                            <div class="result-card"><div class="result-card-label">+10% Shelving <span class="res-tip">?<span class="res-tip-body"><div class="rtt">+10% Shelving Impact</div><div class="rtd">Effect of increasing authorized alarm shelving by 10 percentage points.</div></span></span></div><div class="result-card-value" id="proScnShelve">--</div><div class="result-card-sub">New flood probability</div></div>
+                            <div class="result-card"><div class="result-card-label">Priority Rebalance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Priority Rebalance</div><div class="rtd">Impact of rebalancing priority distribution to ISA-18.2 recommended ratios.</div></span></span></div><div class="result-card-value" id="proScnPrio">--</div><div class="result-card-sub">If aligned to 80/15/5</div></div>
                         </div>
                     </div>
                     <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div>
@@ -1781,11 +1819,11 @@
 
         <div class="mc-controls">
             <div class="mc-control">
-                <label>Mean Daily Alarms</label>
+                <label>Mean Daily Alarms <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Daily Alarms</div><div class="tooltip-desc">Baseline daily alarm count for Monte Carlo simulation. Varies around this mean using the selected uncertainty range.</div></span></span></label>
                 <input type="number" id="mcAlarms" value="1200" min="50" max="50000">
             </div>
             <div class="mc-control">
-                <label>Operators / Shift</label>
+                <label>Operators / Shift <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Operators</div><div class="tooltip-desc">Number of operators per shift for simulation. Affects per-operator alarm rate and cognitive load calculations.</div></span></span></label>
                 <select id="mcOps">
                     <option value="1">1 operator</option>
                     <option value="2" selected>2 operators</option>
@@ -1794,14 +1832,14 @@
                 </select>
             </div>
             <div class="mc-control">
-                <label>Shift Duration</label>
+                <label>Shift Duration <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Shift Duration</div><div class="tooltip-desc">Shift length in hours for simulation. Longer shifts increase total alarm exposure and fatigue effects.</div></span></span></label>
                 <select id="mcShift">
                     <option value="8">8 hours</option>
                     <option value="12" selected>12 hours</option>
                 </select>
             </div>
             <div class="mc-control">
-                <label>Uncertainty Range</label>
+                <label>Uncertainty Range <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Uncertainty</div><div class="tooltip-desc">How much the simulation inputs vary around their mean values. Higher uncertainty = wider confidence intervals in results.</div><div class="tooltip-formula">&pm;10% for verified data &middot; &pm;20% typical &middot; &pm;50% rough estimate</div></span></span></label>
                 <select id="mcUncertainty">
                     <option value="0.1">&pm;10% (high confidence data)</option>
                     <option value="0.2" selected>&pm;20% (typical field data)</option>
@@ -1818,7 +1856,7 @@
             <span style="font-size:0.78rem;color:#334155;" id="mcRunNote">Results update on each run</span>
         </div>
 
-        <div class="mc-progress" id="mcProgress">
+        <div class="mc-progress" id="mcProgress" style="display:none">
             <span id="mcProgressText">Running...</span>
             <div class="mc-progress-bar"><div class="mc-progress-fill" id="mcProgressFill" style="width:0%"></div></div>
         </div>
@@ -2625,7 +2663,7 @@
             var tooltipEl = document.createElement('div');
             tooltipEl.id = 'alarm-tooltip-container';
             document.body.appendChild(tooltipEl);
-            document.querySelectorAll('#sec10 .tooltip-trigger').forEach(function(trigger) {
+            document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
                 var content = trigger.querySelector('.tooltip-content');
                 if (!content) return;
                 trigger.addEventListener('mouseenter', function() {

@@ -972,8 +972,9 @@
         [data-theme="dark"] .article-body ul li::marker,
         [data-theme="dark"] .article-body ol li::marker { color: #94a3b8; }
         [data-theme="dark"] .article-body blockquote { background: rgba(16, 185, 129, 0.08); border-left-color: #10b981; color: #34d399; }
-        [data-theme="dark"] .info-box { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #e2e8f0; }
-        [data-theme="dark"] .key-insight { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); color: #e2e8f0; }
+        [data-theme="dark"] .info-box { background: transparent; border-color: rgba(16, 185, 129, 0.3); color: #e2e8f0; }
+        [data-theme="dark"] .info-box-title { background: transparent; }
+        [data-theme="dark"] .key-insight { background: rgba(16, 185, 129, 0.03); border-color: rgba(16, 185, 129, 0.3); color: #e2e8f0; }
         [data-theme="dark"] .highlight-box { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); color: #e2e8f0; }
         [data-theme="dark"] .warning-box { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); color: #e2e8f0; }
         [data-theme="dark"] .result-box { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #e2e8f0; }
@@ -1121,7 +1122,40 @@
         [data-theme="dark"] .sea-glass-panel{background:rgba(15,23,42,0.6)}
         [data-theme="dark"] .sea-control-deck{background:rgba(15,23,42,0.4)}
         @media(max-width:768px){.sea-exec-grid{grid-template-columns:1fr}.sea-scenario-btns{grid-template-columns:1fr}}
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1147,6 +1181,8 @@
                     <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                     <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                     <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                 </ul>
             </li>
             <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -2035,32 +2071,32 @@
                     <div style="font-size: 0.75rem; color: #6ee7b7; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem;">Demand Analysis</div>
                     <div class="results-grid">
                         <div class="result-item">
-                            <div class="label">Total Demand 2030 (MW)</div>
+                            <div class="label">Total Demand 2030 (MW) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Total 2030 Demand</div><div class="rtd">Projected total DC demand by 2030 combining cloud, AI inference, enterprise, and sovereign AI needs.</div></span></span></div>
                             <div class="value green" id="rTotalDemand">-</div>
                             <div class="subtext" id="rDemandNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Pipeline Utilization</div>
+                            <div class="label">Pipeline Utilization <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Pipeline Utilization</div><div class="rtd">How much of the current pipeline will be utilized by 2030 demand.</div><span class="rtf">&gt;90% = need more capacity</span></span></span></div>
                             <div class="value" id="rUtilization">-</div>
                             <div class="subtext">Total demand / pipeline</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Uncounted Demand</div>
+                            <div class="label">Uncounted Demand <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Uncounted Demand</div><div class="rtd">Demand from emerging workloads (edge AI, sovereign compute) not in traditional forecasts.</div></span></span></div>
                             <div class="value blue" id="rUncounted">-</div>
                             <div class="subtext">Sovereign + inference + enterprise</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Demand Gap (MW)</div>
+                            <div class="label">Demand Gap (MW) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Demand Gap</div><div class="rtd">Shortfall between projected demand and available/planned capacity.</div></span></span></div>
                             <div class="value" id="rDeficit">-</div>
                             <div class="subtext" id="rDeficitNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">MW per Capita</div>
+                            <div class="label">MW per Capita <span class="res-tip">?<span class="res-tip-body"><div class="rtt">MW per Capita</div><div class="rtd">DC capacity per million population — measures digital infrastructure maturity.</div></span></span></div>
                             <div class="value" id="rPerCapita">-</div>
                             <div class="subtext" id="rPerCapNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Years to Fill Pipeline</div>
+                            <div class="label">Years to Fill Pipeline <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Pipeline Fill Time</div><div class="rtd">Years for demand to fully absorb the current construction pipeline.</div></span></span></div>
                             <div class="value" id="rYearsFill">-</div>
                             <div class="subtext">At projected absorption</div>
                         </div>
@@ -2070,32 +2106,32 @@
                     <div style="font-size: 0.75rem; color: #6ee7b7; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 1.25rem 0 0.75rem;">Investment &amp; Financial Metrics</div>
                     <div class="results-grid">
                         <div class="result-item">
-                            <div class="label">Total Capex Required</div>
+                            <div class="label">Total Capex Required <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Total Capex Required</div><div class="rtd">Capital investment needed to build capacity for projected 2030 demand.</div></span></span></div>
                             <div class="value" id="rTotalCapex">-</div>
                             <div class="subtext">Pipeline build cost</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Annual Revenue (2030)</div>
+                            <div class="label">Annual Revenue (2030) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">2030 Annual Revenue</div><div class="rtd">Projected yearly revenue from DC operations in 2030.</div></span></span></div>
                             <div class="value green" id="rRevenue">-</div>
                             <div class="subtext" id="rRevNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Annual EBITDA (2030)</div>
+                            <div class="label">Annual EBITDA (2030) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">2030 EBITDA</div><div class="rtd">Projected earnings before interest, taxes, depreciation, and amortization in 2030.</div></span></span></div>
                             <div class="value green" id="rEBITDA">-</div>
                             <div class="subtext" id="rEBITDANote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">10-Year NPV</div>
+                            <div class="label">10-Year NPV <span class="res-tip">?<span class="res-tip-body"><div class="rtt">10-Year NPV</div><div class="rtd">Net Present Value of investment over 10 years at given discount rate.</div></span></span></div>
                             <div class="value green" id="rNPV">-</div>
                             <div class="subtext">At given WACC</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Projected IRR</div>
+                            <div class="label">Projected IRR <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Internal Rate of Return</div><div class="rtd">Annualized return on investment. Higher = more attractive.</div><span class="rtf">&gt;15% Good &middot; &gt;25% Excellent</span></span></span></div>
                             <div class="value" id="rIRR">-</div>
                             <div class="subtext" id="rIRRNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Payback Period</div>
+                            <div class="label">Payback Period <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Payback Period</div><div class="rtd">Years to recover capital investment from operating cash flows.</div></span></span></div>
                             <div class="value" id="rPayback">-</div>
                             <div class="subtext" id="rPayNote">-</div>
                         </div>
@@ -2105,22 +2141,22 @@
                     <div style="font-size: 0.75rem; color: #6ee7b7; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 1.25rem 0 0.75rem;">Socioeconomic Impact</div>
                     <div class="results-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
                         <div class="result-item">
-                            <div class="label">Construction Jobs</div>
+                            <div class="label">Construction Jobs <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Construction Jobs</div><div class="rtd">Employment during DC build phase.</div></span></span></div>
                             <div class="value green" id="rJobsConstruct">-</div>
                             <div class="subtext">During build phase</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Permanent DC Jobs</div>
+                            <div class="label">Permanent DC Jobs <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Permanent DC Jobs</div><div class="rtd">Long-term operational positions.</div></span></span></div>
                             <div class="value green" id="rJobsPerm">-</div>
                             <div class="subtext">Operations &amp; maintenance</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Ecosystem Jobs</div>
+                            <div class="label">Ecosystem Jobs <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Ecosystem Jobs</div><div class="rtd">Indirect and induced jobs in the supply chain and local economy.</div></span></span></div>
                             <div class="value green" id="rJobsEco">-</div>
                             <div class="subtext">3-5x multiplier effect</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Annual Tax Revenue</div>
+                            <div class="label">Annual Tax Revenue <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Tax Revenue</div><div class="rtd">Yearly tax contribution to local and national government.</div></span></span></div>
                             <div class="value green" id="rTax">-</div>
                             <div class="subtext">Property + corporate</div>
                         </div>

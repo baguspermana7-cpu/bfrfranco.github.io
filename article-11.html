@@ -953,6 +953,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -1367,7 +1369,7 @@
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label for="calcCountry">Select Country</label>
+                            <label for="calcCountry">Select Country <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Country Selection</div><div class="eeq-tooltip-desc">Choose the APAC country to model. Each country has unique electricity tariff structures, grid mix, and DC growth trajectories sourced from IEA, IRENA, and national energy regulators.</div><div class="eeq-tooltip-formula">Affects: base tariff, grid carbon intensity, subsidy structure</div></span></span></label>
                             <select id="calcCountry" onchange="calculateImpact()">
                                 <option value="indonesia">🇮🇩 Indonesia</option>
                                 <option value="malaysia">🇲🇾 Malaysia</option>
@@ -1378,7 +1380,7 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label for="calcYear">Projection Year</label>
+                            <label for="calcYear">Projection Year <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Projection Year</div><div class="eeq-tooltip-desc">Target year for the impact projection (2025-2035). Longer horizons compound DC capacity growth and tariff escalation effects.</div><div class="eeq-tooltip-formula">Tariff growth modeled at 2-5% CAGR depending on country</div></span></span></label>
                             <select id="calcYear" onchange="calculateImpact()">
                                 <option value="2026">2026 (Current)</option>
                                 <option value="2027">2027</option>
@@ -1388,11 +1390,11 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label for="calcHouseholdUsage">Monthly Household Usage (kWh)</label>
+                            <label for="calcHouseholdUsage">Monthly Household Usage (kWh) <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Monthly Household Usage</div><div class="eeq-tooltip-desc">Your household's average monthly electricity consumption in kWh. Used to calculate your personal cost impact from DC-driven grid load increases.</div><div class="eeq-tooltip-formula">APAC avg: 200-500 kWh/mo &middot; US avg: ~900 kWh/mo</div></span></span></label>
                             <input type="number" id="calcHouseholdUsage" value="200" min="50" max="2000">
                         </div>
                         <div class="calc-input-group">
-                            <label for="calcDCCapacity">New DC Capacity Added (MW)</label>
+                            <label for="calcDCCapacity">New DC Capacity Added (MW) <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">New DC Capacity Added</div><div class="eeq-tooltip-desc">Additional data center IT load capacity (MW) planned for the selected country. Each MW of IT load requires ~1.3-1.6 MW total power (depending on PUE).</div><div class="eeq-tooltip-formula">1 MW IT &asymp; 1.4 MW total &asymp; 12.3 GWh/yr at 1.4 PUE</div></span></span></label>
                             <input type="number" id="calcDCCapacity" value="500" min="100" max="10000">
                         </div>
                     </div>
@@ -1409,32 +1411,32 @@
 
                     <div class="calc-results">
                         <div class="calc-result-item">
-                            <div class="label">DC Annual Consumption</div>
+                            <div class="label">DC Annual Consumption <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">DC Annual Consumption</div><div class="eeq-tooltip-desc">Total annual electricity consumed by the new DC capacity, including cooling and infrastructure overhead (PUE-adjusted).</div><div class="eeq-tooltip-formula">MW &times; PUE &times; 8,760 hrs / 1,000 = GWh/yr</div></span></span></div>
                             <div class="value" id="dcConsumption">3,942</div>
                             <div class="subtext">GWh/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Households Equivalent</div>
+                            <div class="label">Households Equivalent <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Households Equivalent</div><div class="eeq-tooltip-desc">Number of average households that could be powered by the same amount of electricity the DC consumes annually.</div><div class="eeq-tooltip-formula">DC GWh / (household kWh/mo &times; 12 / 1,000,000)</div></span></span></div>
                             <div class="value" id="householdsEquiv">1,642,500</div>
                             <div class="subtext">homes powered</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Est. Tariff Increase</div>
+                            <div class="label">Est. Tariff Increase <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Estimated Tariff Increase</div><div class="eeq-tooltip-desc">Projected percentage increase in residential electricity tariffs due to DC-driven demand growth on the national grid.</div><div class="eeq-tooltip-formula">Based on marginal cost of new generation capacity</div></span></span></div>
                             <div class="value" id="tariffIncrease">2.3%</div>
                             <div class="subtext">by selected year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Your Monthly Impact</div>
+                            <div class="label">Your Monthly Impact <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Your Monthly Impact</div><div class="eeq-tooltip-desc">Estimated additional cost on YOUR monthly electricity bill from DC-induced tariff increases.</div><div class="eeq-tooltip-formula">Monthly kWh &times; current tariff &times; % increase</div></span></span></div>
                             <div class="value yellow" id="monthlyImpact">$1.84</div>
                             <div class="subtext">additional cost/month</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Your Annual Impact</div>
+                            <div class="label">Your Annual Impact <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Your Annual Impact</div><div class="eeq-tooltip-desc">Annualized additional electricity cost to your household from DC-driven tariff escalation.</div><div class="eeq-tooltip-formula">Monthly impact &times; 12</div></span></span></div>
                             <div class="value" id="annualImpact">$22.08</div>
                             <div class="subtext">additional cost/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">National Grid Load</div>
+                            <div class="label">National Grid Load <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">National Grid Load Increase</div><div class="eeq-tooltip-desc">Percentage increase in total national electricity demand caused by the new DC capacity.</div><div class="eeq-tooltip-formula">DC demand / national total demand &times; 100%</div></span></span></div>
                             <div class="value green" id="gridLoad">+1.2%</div>
                             <div class="subtext">increase in demand</div>
                         </div>

@@ -965,7 +965,40 @@
             .aig-tooltip-content { width: 220px; left: auto; right: -10px; transform: none; }
             .aig-tooltip-content::after { left: auto; right: 20px; transform: none; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -992,6 +1025,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -3258,19 +3293,19 @@ E = Cf × En × (t/0.2) × (610/D)^x
                     <div class="calc-results">
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-availability">99.992%</div>
-                            <div class="calc-result-label">System Availability</div>
+                            <div class="calc-result-label">System Availability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">System Availability</div><div class="rtd">Calculated availability percentage based on component MTBF, MTTR, and redundancy configuration.</div><span class="rtf">A = MTBF / (MTBF + MTTR) for series; 1-(1-A)^n for parallel</span></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-downtime">42 min</div>
-                            <div class="calc-result-label">Annual Downtime</div>
+                            <div class="calc-result-label">Annual Downtime <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Downtime</div><div class="rtd">Expected unplanned downtime hours per year based on the availability calculation.</div><span class="rtf">Tier III: &le;1.6 hrs &middot; Tier IV: &le;0.4 hrs</span></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-tier">Tier III</div>
-                            <div class="calc-result-label">Approximate Tier</div>
+                            <div class="calc-result-label">Approximate Tier <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Approximate Tier</div><div class="rtd">Uptime Institute tier equivalence based on calculated availability.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="result-nines">4</div>
-                            <div class="calc-result-label">Nines of Availability</div>
+                            <div class="calc-result-label">Nines of Availability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Nines of Availability</div><div class="rtd">Number of 9s in the availability percentage (e.g., 99.99% = four nines).</div></span></span></div>
                         </div>
                     </div>
 

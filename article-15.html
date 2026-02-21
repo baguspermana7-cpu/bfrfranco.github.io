@@ -1440,7 +1440,40 @@
         }
         body.print-quote .btn-close-modal,
         body.print-quote .btn-export-pdf { display: none !important; }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1467,6 +1500,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -2043,40 +2078,40 @@
                         <div class="mcl-kpi-grid">
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclEnergyCost">--</div>
-                                <div class="mcl-kpi-label">Annual Energy Cost</div>
+                                <div class="mcl-kpi-label">Annual Energy Cost <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Energy Cost</div><div class="rtd">Total yearly electricity expense including IT load, cooling, lighting, and UPS losses.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Load x PUE x rate x 8760</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclLaborBudget">--</div>
-                                <div class="mcl-kpi-label">Annual Labor Budget</div>
+                                <div class="mcl-kpi-label">Annual Labor Budget <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Labor Budget</div><div class="rtd">Total yearly staffing cost: salaries, benefits, overtime, and training.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Headcount x burdened rate</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMaintBudget">--</div>
-                                <div class="mcl-kpi-label">Maintenance Budget</div>
+                                <div class="mcl-kpi-label">Maintenance Budget <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Maintenance Budget</div><div class="rtd">Annual preventive + corrective maintenance spending.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">PM + CM + vendor</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclTotalOpex">--</div>
-                                <div class="mcl-kpi-label">Total Annual OPEX</div>
+                                <div class="mcl-kpi-label">Total Annual OPEX <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Total Annual OPEX</div><div class="rtd">Sum of all operating expenses: energy + labor + maintenance + overhead.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclOpexPerMW">--</div>
-                                <div class="mcl-kpi-label">OPEX per MW</div>
+                                <div class="mcl-kpi-label">OPEX per MW <span class="res-tip">?<span class="res-tip-body"><div class="rtt">OPEX per MW</div><div class="rtd">Operating cost normalized per MW of IT capacity — key benchmarking metric.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclCostPerKW">--</div>
-                                <div class="mcl-kpi-label">Cost per kW/month</div>
+                                <div class="mcl-kpi-label">Cost per kW/month <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Cost per kW/month</div><div class="rtd">Monthly operating cost per kW — comparable to colocation pricing.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Industry: $8-15/kW</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclCashVariance">--</div>
-                                <div class="mcl-kpi-label">Cash Flow Variance</div>
+                                <div class="mcl-kpi-label">Cash Flow Variance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Cash Flow Variance</div><div class="rtd">Volatility of monthly operating costs. Higher variance = harder to budget.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Target: &lt;2%</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclAFFO">--</div>
-                                <div class="mcl-kpi-label">AFFO Impact</div>
+                                <div class="mcl-kpi-label">AFFO Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">AFFO Impact</div><div class="rtd">Effect on Adjusted Funds From Operations — the REIT profitability metric.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">FFO - Maint CapEx</div>
                             </div>
                         </div>
@@ -2092,42 +2127,42 @@
                         <div class="mcl-kpi-grid">
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclHeadcount">--</div>
-                                <div class="mcl-kpi-label">Optimal Headcount</div>
+                                <div class="mcl-kpi-label">Optimal Headcount <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Optimal Headcount</div><div class="rtd">Recommended FTE count balancing cost, coverage, and burnout risk.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">SAP / Tech / FM</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclUtilization">--</div>
-                                <div class="mcl-kpi-label">Utilization Rate</div>
+                                <div class="mcl-kpi-label">Utilization Rate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Staff Utilization</div><div class="rtd">Percentage of available staff time spent on productive tasks.</div><span class="rtf">70-85% optimal &middot; &gt;90% burnout risk</span></span></span></div>
                                 <div class="mcl-kpi-sublabel">Target: 85%</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclBurnout">--</div>
-                                <div class="mcl-kpi-label">Burnout Probability</div>
+                                <div class="mcl-kpi-label">Burnout Probability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Burnout Probability</div><div class="rtd">Likelihood of staff burnout based on utilization, overtime, and turnover patterns.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Logistic model</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclBreakeven">--</div>
-                                <div class="mcl-kpi-label">In/Out Break-Even</div>
+                                <div class="mcl-kpi-label">In/Out Break-Even <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Insource/Outsource Break-Even</div><div class="rtd">Headcount at which in-house staffing becomes cheaper than outsourcing.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">FTE threshold</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclRetentionCost">--</div>
-                                <div class="mcl-kpi-label">Retention Premium</div>
+                                <div class="mcl-kpi-label">Retention Premium <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Retention Premium</div><div class="rtd">Additional compensation needed to maintain target retention rate.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Cost of turnover/yr</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclSkillGap">--</div>
-                                <div class="mcl-kpi-label">Single Points of Failure</div>
+                                <div class="mcl-kpi-label">Single Points of Failure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Single Points of Failure</div><div class="rtd">Number of critical roles with no backup coverage (bus factor = 1).</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Skill gap risk</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclResilienceIdx">--</div>
-                                <div class="mcl-kpi-label">Staffing Resilience Index</div>
+                                <div class="mcl-kpi-label">Staffing Resilience Index <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Staffing Resilience</div><div class="rtd">Measure of team robustness against turnover, illness, and skills gaps.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">0-100 score</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclHEP">--</div>
-                                <div class="mcl-kpi-label">HEP Modifier</div>
+                                <div class="mcl-kpi-label">HEP Modifier <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Human Error Probability</div><div class="rtd">Fatigue and workload adjustment to baseline human error rates.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Human Error Probability</div>
                             </div>
                         </div>
@@ -2143,36 +2178,36 @@
                         <div class="mcl-kpi-grid">
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclFinExposure">--</div>
-                                <div class="mcl-kpi-label">Financial Exposure</div>
+                                <div class="mcl-kpi-label">Financial Exposure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Financial Exposure</div><div class="rtd">Total financial risk from staffing gaps, expressed as potential annual loss.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Score 0-100</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclCOI">--</div>
-                                <div class="mcl-kpi-label">Cost of Inaction</div>
+                                <div class="mcl-kpi-label">Cost of Inaction <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Cost of Inaction</div><div class="rtd">Annual cost of maintaining current staffing levels without optimization.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Prevented losses x multiplier</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclOHS">--</div>
-                                <div class="mcl-kpi-label">Operational Health Score</div>
+                                <div class="mcl-kpi-label">Operational Health Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Operational Health</div><div class="rtd">Composite score of maintenance, alarm, and incident management effectiveness.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Grade A-F</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclPMCompliance">--</div>
-                                <div class="mcl-kpi-label">PM Compliance Rate</div>
+                                <div class="mcl-kpi-label">PM Compliance Rate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">PM Compliance</div><div class="rtd">Preventive maintenance task completion rate.</div><span class="rtf">Target: &ge;90%</span></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclAlarmEff">--</div>
-                                <div class="mcl-kpi-label">Alarm Efficiency</div>
+                                <div class="mcl-kpi-label">Alarm Efficiency <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Alarm Efficiency</div><div class="rtd">Ratio of actionable to total alarms — measures alarm system quality.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Signal-to-noise</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMaintDebt">--</div>
-                                <div class="mcl-kpi-label">5-Year Maint. Debt</div>
+                                <div class="mcl-kpi-label">5-Year Maint. Debt <span class="res-tip">?<span class="res-tip-body"><div class="rtt">5-Year Maintenance Debt</div><div class="rtd">Projected accumulation of deferred maintenance over 5 years.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Deferred projection</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclAFFOPotential">--</div>
-                                <div class="mcl-kpi-label">AFFO Optimization</div>
+                                <div class="mcl-kpi-label">AFFO Optimization <span class="res-tip">?<span class="res-tip-body"><div class="rtt">AFFO Optimization</div><div class="rtd">Achievable AFFO improvement through identified OPEX optimizations.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Annual savings potential</div>
                             </div>
                         </div>
@@ -2188,37 +2223,37 @@
                         <div class="mcl-kpi-grid">
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCP5">--</div>
-                                <div class="mcl-kpi-label">P5 (Best Case)</div>
+                                <div class="mcl-kpi-label">P5 (Best Case) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P5 — Best Case</div><div class="rtd">5th percentile OPEX — lowest cost scenario from Monte Carlo.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCP25">--</div>
-                                <div class="mcl-kpi-label">P25</div>
+                                <div class="mcl-kpi-label">P25 <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P25</div><div class="rtd">25th percentile OPEX outcome.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCP50">--</div>
-                                <div class="mcl-kpi-label">P50 (Median)</div>
+                                <div class="mcl-kpi-label">P50 (Median) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P50 — Median</div><div class="rtd">Most likely OPEX outcome.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCP75">--</div>
-                                <div class="mcl-kpi-label">P75</div>
+                                <div class="mcl-kpi-label">P75 <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P75</div><div class="rtd">75th percentile — higher cost scenario.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCP95">--</div>
-                                <div class="mcl-kpi-label">P95 (Worst Case)</div>
+                                <div class="mcl-kpi-label">P95 (Worst Case) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P95 — Worst Case</div><div class="rtd">95th percentile — near-worst cost scenario.</div></span></span></div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCCVaR">--</div>
-                                <div class="mcl-kpi-label">CVaR @ 95%</div>
+                                <div class="mcl-kpi-label">CVaR @ 95% <span class="res-tip">?<span class="res-tip-body"><div class="rtt">CVaR at 95%</div><div class="rtd">Average cost in the worst 5% of scenarios — tail risk measure.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">Expected Shortfall</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCExceed">--</div>
-                                <div class="mcl-kpi-label">Budget Exceedance</div>
+                                <div class="mcl-kpi-label">Budget Exceedance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Budget Exceedance Prob.</div><div class="rtd">Probability of exceeding the planned budget.</div></span></span></div>
                                 <div class="mcl-kpi-sublabel">P(cost > 120% budget)</div>
                             </div>
                             <div class="mcl-kpi-card">
                                 <div class="mcl-kpi-value" id="mclMCTopDriver">--</div>
-                                <div class="mcl-kpi-label">Highest Impact Factor</div>
+                                <div class="mcl-kpi-label">Highest Impact Factor <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Highest Impact Factor</div><div class="rtd">The single input variable with the largest effect on total OPEX.</div></span></span></div>
                             </div>
                         </div>
                         <div class="mcl-chart-container">

@@ -1070,7 +1070,40 @@
             a { color: inherit; text-decoration: none; }
             footer { display: none !important; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
     <link rel="preload" as="image" href="assets/article-5-cover.jpg">
 </head>
 <body>
@@ -1098,6 +1131,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -2041,7 +2076,7 @@
 
                     <!-- Criticality Sliders -->
                     <div style="margin-bottom: 2rem;">
-                        <label class="calc-label" style="margin-bottom: 0.75rem; display: block;">Criticality Distribution</label>
+                        <label class="calc-label" style="margin-bottom: 0.75rem; display: block;">Criticality Distribution <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Criticality Distribution</div><div class="tooltip-desc">Breakdown of deferred items by criticality: Critical (immediate risk), Major (degraded performance), Minor (cosmetic/low impact).</div><div class="tooltip-formula">Risk-weighted: Critical 5x &middot; Major 2x &middot; Minor 1x</div></span></span></label>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -2140,12 +2175,12 @@
                             <div class="pro-panel-inner">
                                 <div class="pro-panel-title"><i class="fas fa-dice"></i> Monte Carlo Risk Distribution</div>
                                 <div class="calc-results-grid" id="proMCGrid">
-                                    <div class="result-card"><div class="result-card-label">Risk Score p50</div><div class="result-card-value" id="proRiskP50">--</div><div class="result-card-sub">Median estimate</div></div>
-                                    <div class="result-card"><div class="result-card-label">Risk Score p80</div><div class="result-card-value" id="proRiskP80">--</div><div class="result-card-sub">Conservative estimate</div></div>
-                                    <div class="result-card"><div class="result-card-label">Risk Score p95</div><div class="result-card-value" id="proRiskP95">--</div><div class="result-card-sub">Worst-case plausible</div></div>
-                                    <div class="result-card"><div class="result-card-label">Confidence Band</div><div class="result-card-value" id="proConfBand">--</div><div class="result-card-sub">80% confidence width</div></div>
-                                    <div class="result-card"><div class="result-card-label">Simulation Runs</div><div class="result-card-value" id="proSimRuns">--</div><div class="result-card-sub">Monte Carlo iterations</div></div>
-                                    <div class="result-card"><div class="result-card-label">Distribution Shape</div><div class="result-card-value" id="proDistShape">--</div><div class="result-card-sub">Skewness indicator</div></div>
+                                    <div class="result-card"><div class="result-card-label">Risk Score p50 <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Median Risk Score</div><div class="rtd">50th percentile deferred maintenance risk score from Monte Carlo simulation.</div></span></span></div><div class="result-card-value" id="proRiskP50">--</div><div class="result-card-sub">Median estimate</div></div>
+                                    <div class="result-card"><div class="result-card-label">Risk Score p80 <span class="res-tip">?<span class="res-tip-body"><div class="rtt">p80 Risk Score</div><div class="rtd">80th percentile risk — 80% of scenarios are below this level.</div></span></span></div><div class="result-card-value" id="proRiskP80">--</div><div class="result-card-sub">Conservative estimate</div></div>
+                                    <div class="result-card"><div class="result-card-label">Risk Score p95 <span class="res-tip">?<span class="res-tip-body"><div class="rtt">p95 Risk Score</div><div class="rtd">95th percentile — captures tail risk from compounding deferral effects.</div></span></span></div><div class="result-card-value" id="proRiskP95">--</div><div class="result-card-sub">Worst-case plausible</div></div>
+                                    <div class="result-card"><div class="result-card-label">Confidence Band <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Confidence Band</div><div class="rtd">Width of the 90% confidence interval. Wider = more uncertainty.</div></span></span></div><div class="result-card-value" id="proConfBand">--</div><div class="result-card-sub">80% confidence width</div></div>
+                                    <div class="result-card"><div class="result-card-label">Simulation Runs <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Simulation Runs</div><div class="rtd">Number of Monte Carlo iterations used to estimate the risk distribution.</div></span></span></div><div class="result-card-value" id="proSimRuns">--</div><div class="result-card-sub">Monte Carlo iterations</div></div>
+                                    <div class="result-card"><div class="result-card-label">Distribution Shape <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Distribution Shape</div><div class="rtd">Statistical shape of the risk distribution (normal, right-skewed, bimodal).</div></span></span></div><div class="result-card-value" id="proDistShape">--</div><div class="result-card-sub">Skewness indicator</div></div>
                                 </div>
                                 <canvas id="debtMCHistogram" width="800" height="280" style="width:100%;margin:1rem 0;display:block;"></canvas>
                             </div>
@@ -2157,12 +2192,12 @@
                             <div class="pro-panel-inner">
                                 <div class="pro-panel-title"><i class="fas fa-coins"></i> Cost &amp; ROI Deep Dive</div>
                                 <div class="calc-results-grid" id="proCostGrid">
-                                    <div class="result-card"><div class="result-card-label">NPV of Deferral Cost</div><div class="result-card-value" id="proNPV">--</div><div class="result-card-sub">5-year net present value</div></div>
-                                    <div class="result-card"><div class="result-card-label">Cost of Inaction / Year</div><div class="result-card-value" id="proInactionCost">--</div><div class="result-card-sub">Annual risk-weighted exposure</div></div>
-                                    <div class="result-card"><div class="result-card-label">Break-Even Timeline</div><div class="result-card-value" id="proBreakEven">--</div><div class="result-card-sub">Remediation pays for itself</div></div>
-                                    <div class="result-card"><div class="result-card-label">ROI at 3 Years</div><div class="result-card-value" id="proROI3yr">--</div><div class="result-card-sub">Return on remediation invest</div></div>
-                                    <div class="result-card"><div class="result-card-label">SLA Penalty Exposure</div><div class="result-card-value" id="proSLAPenalty">--</div><div class="result-card-sub">Annual penalty risk estimate</div></div>
-                                    <div class="result-card"><div class="result-card-label">Insurance Premium Impact</div><div class="result-card-value" id="proInsurance">--</div><div class="result-card-sub">Est. premium delta</div></div>
+                                    <div class="result-card"><div class="result-card-label">NPV of Deferral Cost <span class="res-tip">?<span class="res-tip-body"><div class="rtt">NPV Deferral Cost</div><div class="rtd">Net Present Value of all costs caused by deferring maintenance over the analysis period.</div></span></span></div><div class="result-card-value" id="proNPV">--</div><div class="result-card-sub">5-year net present value</div></div>
+                                    <div class="result-card"><div class="result-card-label">Cost of Inaction / Year <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Inaction Cost</div><div class="rtd">Yearly cost of doing nothing — compound failure risk, SLA penalties, and emergency repairs.</div></span></span></div><div class="result-card-value" id="proInactionCost">--</div><div class="result-card-sub">Annual risk-weighted exposure</div></div>
+                                    <div class="result-card"><div class="result-card-label">Break-Even Timeline <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Break-Even Timeline</div><div class="rtd">When the cost of remediation equals the cost of continued deferral.</div></span></span></div><div class="result-card-value" id="proBreakEven">--</div><div class="result-card-sub">Remediation pays for itself</div></div>
+                                    <div class="result-card"><div class="result-card-label">ROI at 3 Years <span class="res-tip">?<span class="res-tip-body"><div class="rtt">3-Year ROI</div><div class="rtd">Return on investment if deferred items are remediated now, measured over 3 years.</div></span></span></div><div class="result-card-value" id="proROI3yr">--</div><div class="result-card-sub">Return on remediation invest</div></div>
+                                    <div class="result-card"><div class="result-card-label">SLA Penalty Exposure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">SLA Penalty Exposure</div><div class="rtd">Maximum potential SLA penalties from deferred maintenance failures.</div></span></span></div><div class="result-card-value" id="proSLAPenalty">--</div><div class="result-card-sub">Annual penalty risk estimate</div></div>
+                                    <div class="result-card"><div class="result-card-label">Insurance Premium Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Insurance Impact</div><div class="rtd">Estimated insurance premium increase due to deferred maintenance risk profile.</div></span></span></div><div class="result-card-value" id="proInsurance">--</div><div class="result-card-sub">Est. premium delta</div></div>
                                 </div>
                             </div>
                             <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">NPV, ROI &amp; financial exposure modeling</div></div>
@@ -2173,12 +2208,12 @@
                             <div class="pro-panel-inner">
                                 <div class="pro-panel-title"><i class="fas fa-chart-area"></i> Weibull Parameter Analysis</div>
                                 <div class="calc-results-grid" id="proWeibullGrid">
-                                    <div class="result-card"><div class="result-card-label">Effective &beta;</div><div class="result-card-value" id="proBeta">--</div><div class="result-card-sub">Shape (wear-out indicator)</div></div>
-                                    <div class="result-card"><div class="result-card-label">Effective &eta;</div><div class="result-card-value" id="proEta">--</div><div class="result-card-sub">Scale (characteristic life)</div></div>
-                                    <div class="result-card"><div class="result-card-label">MTTF Estimate</div><div class="result-card-value" id="proMTTF">--</div><div class="result-card-sub">Mean time to failure</div></div>
-                                    <div class="result-card"><div class="result-card-label">Reliability at Design Life</div><div class="result-card-value" id="proReliability">--</div><div class="result-card-sub">R(t) at current age</div></div>
-                                    <div class="result-card"><div class="result-card-label">Hazard Rate Trend</div><div class="result-card-value" id="proHazardTrend">--</div><div class="result-card-sub">Increasing / constant / decreasing</div></div>
-                                    <div class="result-card"><div class="result-card-label">B10 Life Estimate</div><div class="result-card-value" id="proB10">--</div><div class="result-card-sub">Age at 10% failure probability</div></div>
+                                    <div class="result-card"><div class="result-card-label">Effective &beta; <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Weibull Shape Parameter</div><div class="rtd">Effective beta (shape) parameter for the Weibull reliability model. &beta;&gt;1 means increasing failure rate.</div><span class="rtf">&beta;&lt;1: infant mortality &middot; &beta;=1: random &middot; &beta;&gt;1: wear-out</span></span></span></div><div class="result-card-value" id="proBeta">--</div><div class="result-card-sub">Shape (wear-out indicator)</div></div>
+                                    <div class="result-card"><div class="result-card-label">Effective &eta; <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Weibull Scale Parameter</div><div class="rtd">Characteristic life (eta) — age at which 63.2% of components have failed.</div></span></span></div><div class="result-card-value" id="proEta">--</div><div class="result-card-sub">Scale (characteristic life)</div></div>
+                                    <div class="result-card"><div class="result-card-label">MTTF Estimate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Mean Time To Failure</div><div class="rtd">Expected average operating time before failure based on Weibull parameters.</div></span></span></div><div class="result-card-value" id="proMTTF">--</div><div class="result-card-sub">Mean time to failure</div></div>
+                                    <div class="result-card"><div class="result-card-label">Reliability at Design Life <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Reliability at Design Life</div><div class="rtd">Probability of surviving to the designed operational life without failure.</div></span></span></div><div class="result-card-value" id="proReliability">--</div><div class="result-card-sub">R(t) at current age</div></div>
+                                    <div class="result-card"><div class="result-card-label">Hazard Rate Trend <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Hazard Rate Trend</div><div class="rtd">Direction of failure rate: increasing (wear-out), constant (random), or decreasing (burn-in).</div></span></span></div><div class="result-card-value" id="proHazardTrend">--</div><div class="result-card-sub">Increasing / constant / decreasing</div></div>
+                                    <div class="result-card"><div class="result-card-label">B10 Life Estimate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">B10 Life</div><div class="rtd">Age at which 10% of components are expected to have failed. Key for spare planning.</div></span></span></div><div class="result-card-value" id="proB10">--</div><div class="result-card-sub">Age at 10% failure probability</div></div>
                                 </div>
                             </div>
                             <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Weibull reliability parameters &amp; curves</div></div>
@@ -2189,10 +2224,10 @@
                             <div class="pro-panel-inner">
                                 <div class="pro-panel-title"><i class="fas fa-calendar-check"></i> Remediation Capacity Planner</div>
                                 <div class="calc-results-grid" id="proCapacityGrid">
-                                    <div class="result-card"><div class="result-card-label">Required Crew-Months</div><div class="result-card-value" id="proCrewMonths">--</div><div class="result-card-sub">Total remediation effort</div></div>
-                                    <div class="result-card"><div class="result-card-label">Optimal Phasing</div><div class="result-card-value" id="proPhasing">--</div><div class="result-card-sub">Recommended wave count</div></div>
-                                    <div class="result-card"><div class="result-card-label">Queue Wait Prob.</div><div class="result-card-value" id="proQueueProb">--</div><div class="result-card-sub">Erlang-C delay probability</div></div>
-                                    <div class="result-card"><div class="result-card-label">Throughput / Quarter</div><div class="result-card-value" id="proThroughput">--</div><div class="result-card-sub">Achievable items per quarter</div></div>
+                                    <div class="result-card"><div class="result-card-label">Required Crew-Months <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Required Crew-Months</div><div class="rtd">Total person-months of work needed to remediate all deferred items.</div></span></span></div><div class="result-card-value" id="proCrewMonths">--</div><div class="result-card-sub">Total remediation effort</div></div>
+                                    <div class="result-card"><div class="result-card-label">Optimal Phasing <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Optimal Phasing</div><div class="rtd">Recommended remediation phasing (quarters) to balance cost and risk reduction.</div></span></span></div><div class="result-card-value" id="proPhasing">--</div><div class="result-card-sub">Recommended wave count</div></div>
+                                    <div class="result-card"><div class="result-card-label">Queue Wait Prob. <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Queue Wait Probability</div><div class="rtd">Probability remediation work must wait due to resource constraints.</div></span></span></div><div class="result-card-value" id="proQueueProb">--</div><div class="result-card-sub">Erlang-C delay probability</div></div>
+                                    <div class="result-card"><div class="result-card-label">Throughput / Quarter <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Quarterly Throughput</div><div class="rtd">Number of deferred items that can be remediated per quarter.</div></span></span></div><div class="result-card-value" id="proThroughput">--</div><div class="result-card-sub">Achievable items per quarter</div></div>
                                 </div>
                             </div>
                             <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Erlang-C staffing &amp; phased remediation</div></div>
@@ -2203,10 +2238,10 @@
                             <div class="pro-panel-inner">
                                 <div class="pro-panel-title"><i class="fas fa-shuffle"></i> Scenario Sensitivity</div>
                                 <div class="calc-results-grid" id="proScenarioGrid">
-                                    <div class="result-card"><div class="result-card-label">Fix Top 20% Impact</div><div class="result-card-value" id="proFixTop20">--</div><div class="result-card-sub">Risk reduction from Pareto</div></div>
-                                    <div class="result-card"><div class="result-card-label">+50% Budget Impact</div><div class="result-card-value" id="proBudget50">--</div><div class="result-card-sub">Accelerated remediation</div></div>
-                                    <div class="result-card"><div class="result-card-label">Defer 2 More Years</div><div class="result-card-value" id="proDefer2yr">--</div><div class="result-card-sub">Cost of continued deferral</div></div>
-                                    <div class="result-card"><div class="result-card-label">Shift Criticality Mix</div><div class="result-card-value" id="proShiftMix">--</div><div class="result-card-sub">If 10% more items go critical</div></div>
+                                    <div class="result-card"><div class="result-card-label">Fix Top 20% Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Fix Top 20% Impact</div><div class="rtd">Risk reduction achieved by remediating only the top 20% highest-risk items.</div><span class="rtf">Pareto: 80% risk reduction from 20% effort</span></span></span></div><div class="result-card-value" id="proFixTop20">--</div><div class="result-card-sub">Risk reduction from Pareto</div></div>
+                                    <div class="result-card"><div class="result-card-label">+50% Budget Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">+50% Budget Impact</div><div class="rtd">Risk reduction from increasing the remediation budget by 50%.</div></span></span></div><div class="result-card-value" id="proBudget50">--</div><div class="result-card-sub">Accelerated remediation</div></div>
+                                    <div class="result-card"><div class="result-card-label">Defer 2 More Years <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Defer 2 More Years</div><div class="rtd">Risk score projection if maintenance is deferred 2 additional years.</div></span></span></div><div class="result-card-value" id="proDefer2yr">--</div><div class="result-card-sub">Cost of continued deferral</div></div>
+                                    <div class="result-card"><div class="result-card-label">Shift Criticality Mix <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Criticality Mix Shift</div><div class="rtd">Impact of reclassifying item criticality distribution on overall risk.</div></span></span></div><div class="result-card-value" id="proShiftMix">--</div><div class="result-card-sub">If 10% more items go critical</div></div>
                                 </div>
                                 <canvas id="debtTornadoChart" width="800" height="280" style="width:100%;margin:1rem 0;display:block;"></canvas>
                             </div>

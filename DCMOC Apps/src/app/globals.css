@@ -1,0 +1,88 @@
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-blue: #1e3a5f;
+  --color-brand-cyan: #06b6d4;
+  --color-brand-emerald: #10b981;
+  --color-brand-amber: #fbbf24;
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+:root {
+  /* Light Mode Defaults */
+  --background: #f8fafc;
+  /* Slate 50 */
+  --foreground: #0f172a;
+  /* Slate 900 */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  /* Slate 200 */
+  --muted: #f1f5f9;
+  /* Slate 100 */
+  --muted-fg: #64748b;
+  /* Slate 500 */
+}
+
+/* Force Dark Mode styles when .dark class is present */
+.dark {
+  --background: #0f172a;
+  /* Slate 900 */
+  --foreground: #f1f5f9;
+  /* Slate 100 */
+  --card-bg: #1e293b;
+  /* Slate 800 */
+  --card-border: #334155;
+  /* Slate 700 */
+  --muted: #1e293b;
+  /* Slate 800 */
+  --muted-fg: #94a3b8;
+  /* Slate 400 */
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light mode background pattern */
+body {
+  background-image:
+    radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(30, 58, 95, 0.05) 0px, transparent 50%);
+}
+
+/* Dark mode background pattern override */
+.dark body {
+  background-image:
+    radial-gradient(at 0% 0%, rgba(30, 58, 95, 0.3) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+}
+
+@media print {
+
+  aside,
+  header {
+    display: none !important;
+  }
+
+  main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Expand charts/tables for print */
+  .overflow-auto {
+    overflow: visible !important;
+  }
+}

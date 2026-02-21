@@ -338,7 +338,7 @@
         }
 
         [data-theme="dark"] .article-body blockquote {
-            background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%);
+            background: rgba(59,130,246,0.04);
             color: #93c5fd;
         }
 
@@ -402,7 +402,7 @@
         }
 
         [data-theme="dark"] .key-insight {
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(59, 130, 246, 0.04);
         }
 
         .key-insight strong {
@@ -459,16 +459,19 @@
         }
 
         [data-theme="dark"] .info-box {
-            background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%);
+            background: transparent;
         }
         [data-theme="dark"] .info-box.warning {
-            background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(245,158,11,0.05) 100%);
+            background: transparent;
         }
         [data-theme="dark"] .info-box.critical {
-            background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(239,68,68,0.05) 100%);
+            background: transparent;
         }
         [data-theme="dark"] .info-box.success {
-            background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.05) 100%);
+            background: transparent;
+        }
+        [data-theme="dark"] .info-box-title {
+            background: transparent;
         }
 
         .info-box-title {
@@ -1096,7 +1099,40 @@
             font-size: 0.6rem; font-weight: 800; padding: 2px 8px;
             border-radius: 4px; color: #fff; white-space: nowrap;
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
     <link rel="preload" as="image" href="assets/article-4-cover.jpg">
 </head>
 <body>
@@ -1124,6 +1160,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -1938,31 +1976,31 @@
                     <div class="calc-results" id="calcResults">
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resVendorMTTR">6.75</div>
-                            <div class="calc-result-label">Vendor MTTR (hrs)</div>
+                            <div class="calc-result-label">Vendor MTTR (hrs) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Vendor MTTR</div><div class="rtd">Mean Time To Repair using external vendor. Includes mobilization, travel, diagnosis, and repair phases.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value positive" id="resInhouseMTTR">3.35</div>
-                            <div class="calc-result-label">In-House MTTR (hrs)</div>
+                            <div class="calc-result-label">In-House MTTR (hrs) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">In-House MTTR</div><div class="rtd">Mean Time To Repair using internal team. Faster mobilization but may have skill limitations.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resVendorDowntime">243.0</div>
-                            <div class="calc-result-label">Vendor Annual Downtime (hrs)</div>
+                            <div class="calc-result-label">Vendor Annual Downtime (hrs) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Vendor Downtime</div><div class="rtd">Total annual downtime hours when relying on vendor for all incidents.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value positive" id="resInhouseDowntime">120.6</div>
-                            <div class="calc-result-label">In-House Annual Downtime (hrs)</div>
+                            <div class="calc-result-label">In-House Annual Downtime (hrs) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">In-House Downtime</div><div class="rtd">Total annual downtime hours with in-house response capability.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value positive" id="resNetSavings">$0</div>
-                            <div class="calc-result-label">Net Annual Savings</div>
+                            <div class="calc-result-label">Net Annual Savings <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Net Annual Savings</div><div class="rtd">Annual cost savings from in-house capability vs full vendor reliance, after training investment.</div></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resROI">0%</div>
-                            <div class="calc-result-label">Training ROI</div>
+                            <div class="calc-result-label">Training ROI <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Training ROI</div><div class="rtd">Return on training investment — savings divided by annual training cost.</div><span class="rtf">&gt;200% = strong case for in-house</span></span></span></div>
                         </div>
                         <div class="calc-result-item">
                             <div class="calc-result-value" id="resBreakeven">0</div>
-                            <div class="calc-result-label">Breakeven (months)</div>
+                            <div class="calc-result-label">Breakeven (months) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Breakeven Period</div><div class="rtd">Months until cumulative savings exceed cumulative training investment.</div></span></span></div>
                         </div>
                     </div>
 
@@ -1973,12 +2011,12 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-chart-bar"></i> MTTR Distribution & Phase Analysis</div>
                             <div class="calc-results">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proMeanMTTR">—</div><div class="calc-result-label">Mean In-House MTTR</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proMedianMTTR">—</div><div class="calc-result-label">Median MTTR (p50)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proP90MTTR">—</div><div class="calc-result-label">p90 MTTR (tail)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proMobPct">—</div><div class="calc-result-label">Mobilization % (Vendor)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proBottleneck">—</div><div class="calc-result-label">Phase Bottleneck</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proMTTRReduction">—</div><div class="calc-result-label">MTTR Reduction</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMeanMTTR">—</div><div class="calc-result-label">Mean In-House MTTR <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Mean In-House MTTR</div><div class="rtd">Average in-house repair time from Monte Carlo simulation across all scenarios.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMedianMTTR">—</div><div class="calc-result-label">Median MTTR (p50) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Median MTTR</div><div class="rtd">50th percentile repair time — half of incidents resolved faster than this.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proP90MTTR">—</div><div class="calc-result-label">p90 MTTR (tail) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">p90 MTTR</div><div class="rtd">90th percentile — 90% of incidents resolved within this time. Captures worst-case behavior.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proMobPct">—</div><div class="calc-result-label">Mobilization % (Vendor) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Vendor Mobilization %</div><div class="rtd">Percentage of total vendor MTTR spent on mobilization (dispatch, travel, site access).</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBottleneck">—</div><div class="calc-result-label">Phase Bottleneck <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Phase Bottleneck</div><div class="rtd">Which repair phase (mobilization, diagnosis, repair, test) is the longest contributor to MTTR.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proMTTRReduction">—</div><div class="calc-result-label">MTTR Reduction <span class="res-tip">?<span class="res-tip-body"><div class="rtt">MTTR Improvement</div><div class="rtd">Percentage reduction in MTTR achieved by in-house capability vs vendor.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" id="gate1" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo MTTR distributions</div></div></div>
 
@@ -1986,12 +2024,12 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-shield-halved"></i> Availability & Downtime Impact</div>
                             <div class="calc-results">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proAvailVendor">—</div><div class="calc-result-label">Vendor Availability</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proAvailInhouse">—</div><div class="calc-result-label">In-House Availability</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proAvailDelta">—</div><div class="calc-result-label">Availability Improvement</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proDownVendorP50">—</div><div class="calc-result-label">Vendor Downtime (p50)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proDownInhouseP50">—</div><div class="calc-result-label">In-House Downtime (p50)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proHoursSaved">—</div><div class="calc-result-label">Downtime Hours Saved</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proAvailVendor">—</div><div class="calc-result-label">Vendor Availability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Vendor Availability</div><div class="rtd">System availability when relying on vendor response. Based on MTBF and vendor MTTR.</div><span class="rtf">A = MTBF / (MTBF + MTTR)</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proAvailInhouse">—</div><div class="calc-result-label">In-House Availability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">In-House Availability</div><div class="rtd">System availability with in-house response capability.</div><span class="rtf">A = MTBF / (MTBF + MTTR)</span></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proAvailDelta">—</div><div class="calc-result-label">Availability Improvement <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Availability Gain</div><div class="rtd">Nines of availability gained by switching from vendor to in-house response.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proDownVendorP50">—</div><div class="calc-result-label">Vendor Downtime (p50) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Vendor Downtime p50</div><div class="rtd">Median annual vendor downtime from Monte Carlo simulation.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proDownInhouseP50">—</div><div class="calc-result-label">In-House Downtime (p50) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">In-House Downtime p50</div><div class="rtd">Median annual in-house downtime from Monte Carlo simulation.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proHoursSaved">—</div><div class="calc-result-label">Downtime Hours Saved <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Hours Saved</div><div class="rtd">Annual downtime hours saved by in-house capability.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" id="gate2" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">NASA/IEEE availability framework</div></div></div>
 
@@ -1999,12 +2037,12 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-coins"></i> Financial Deep Dive</div>
                             <div class="calc-results">
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proNPV3">—</div><div class="calc-result-label">3-Year NPV</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proCostVendor">—</div><div class="calc-result-label">Cost / Incident (Vendor)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proCostInhouse">—</div><div class="calc-result-label">Cost / Incident (In-House)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proBEp50">—</div><div class="calc-result-label">Breakeven (p50)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proBEp90">—</div><div class="calc-result-label">Breakeven (p90)</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="pro3YrSavings">—</div><div class="calc-result-label">3-Year Cumulative</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proNPV3">—</div><div class="calc-result-label">3-Year NPV <span class="res-tip">?<span class="res-tip-body"><div class="rtt">3-Year NPV</div><div class="rtd">Net Present Value of in-house capability investment over 3 years.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proCostVendor">—</div><div class="calc-result-label">Cost / Incident (Vendor) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Vendor Cost/Incident</div><div class="rtd">Total cost per incident with vendor response: callout fee + downtime cost.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proCostInhouse">—</div><div class="calc-result-label">Cost / Incident (In-House) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">In-House Cost/Incident</div><div class="rtd">Total cost per incident with in-house response: labor + downtime cost.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBEp50">—</div><div class="calc-result-label">Breakeven (p50) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Breakeven p50</div><div class="rtd">Median breakeven period from Monte Carlo simulation.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proBEp90">—</div><div class="calc-result-label">Breakeven (p90) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Breakeven p90</div><div class="rtd">90th percentile breakeven — conservative estimate.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="pro3YrSavings">—</div><div class="calc-result-label">3-Year Cumulative <span class="res-tip">?<span class="res-tip-body"><div class="rtt">3-Year Cumulative Savings</div><div class="rtd">Total cumulative savings over 3 years from in-house capability.</div></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" id="gate3" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">NPV & confidence-banded ROI</div></div></div>
 
@@ -2012,10 +2050,10 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-users-gear"></i> Staffing & Queueing (Erlang-C)</div>
                             <div class="calc-results">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proWaitProb">—</div><div class="calc-result-label">Wait Probability</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proQueueDelay">—</div><div class="calc-result-label">Avg Queue Delay</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value positive" id="proOptTeam">—</div><div class="calc-result-label">Optimal Team Size</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proUtilRate">—</div><div class="calc-result-label">Utilization Rate</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proWaitProb">—</div><div class="calc-result-label">Wait Probability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Queue Wait Probability</div><div class="rtd">Probability an incident must wait for a responder (all technicians busy).</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proQueueDelay">—</div><div class="calc-result-label">Avg Queue Delay <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Avg Queue Delay</div><div class="rtd">Average additional wait time when all responders are occupied.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value positive" id="proOptTeam">—</div><div class="calc-result-label">Optimal Team Size <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Optimal Team Size</div><div class="rtd">Recommended number of in-house responders to minimize queue delays.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proUtilRate">—</div><div class="calc-result-label">Utilization Rate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Team Utilization</div><div class="rtd">Percentage of time responders are engaged in incident response.</div><span class="rtf">70-85% optimal</span></span></span></div></div>
                             </div>
                         </div><div class="gated-overlay" id="gate4" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Erlang-C staffing optimization</div></div></div>
 
@@ -2023,9 +2061,9 @@
                         <div class="pro-panel"><div class="pro-panel-inner">
                             <div class="pro-panel-title"><i class="fas fa-arrow-trend-up"></i> Scenario Sensitivity</div>
                             <div class="calc-results">
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen1">—</div><div class="calc-result-label">+1 Technician</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen2">—</div><div class="calc-result-label">+1 Skill Level</div></div>
-                                <div class="calc-result-item"><div class="calc-result-value" id="proScen3">—</div><div class="calc-result-label">2x Incidents</div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen1">—</div><div class="calc-result-label">+1 Technician <span class="res-tip">?<span class="res-tip-body"><div class="rtt">+1 Technician</div><div class="rtd">Impact of adding one more in-house responder on queue delays.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen2">—</div><div class="calc-result-label">+1 Skill Level <span class="res-tip">?<span class="res-tip-body"><div class="rtt">+1 Skill Level</div><div class="rtd">Impact of improving team skill level by one tier on MTTR.</div></span></span></div></div>
+                                <div class="calc-result-item"><div class="calc-result-value" id="proScen3">—</div><div class="calc-result-label">2x Incidents <span class="res-tip">?<span class="res-tip-body"><div class="rtt">2x Incidents</div><div class="rtd">System performance if incident frequency doubles.</div></span></span></div></div>
                                 <div class="calc-result-item"><div class="calc-result-value" id="proScen4">—</div><div class="calc-result-label">−50% Vendor SLA</div></div>
                             </div>
                         </div><div class="gated-overlay" id="gate5" onclick="showLoginModal()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div></div>
@@ -3016,7 +3054,7 @@
         function initTooltips(){
             var tc=$('calc-tooltip-container');
             if(!tc) return;
-            document.querySelectorAll('.calculator-section .tooltip-trigger, .pro-drawer .tooltip-trigger').forEach(function(t){
+            document.querySelectorAll('.tooltip-trigger').forEach(function(t){
                 t.addEventListener('mouseenter',function(){
                     var content=t.querySelector('.tooltip-content');
                     if(!content) return;

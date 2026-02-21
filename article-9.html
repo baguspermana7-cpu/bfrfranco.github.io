@@ -1646,7 +1646,56 @@
             .hvac-toolbar { flex-wrap: wrap; }
             .hvac-region-select-row { flex-direction: column; align-items: flex-start; }
         }
-    </style>
+    
+        /* Result Card Tooltip System */
+        .kpi-label { position: relative; }
+        .kpi-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-left: 4px;
+            cursor: help;
+            position: relative;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+        .kpi-tooltip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .kpi-tooltip .kpi-tip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 400;
+            line-height: 1.5;
+            width: 260px;
+            z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        .kpi-tooltip:hover .kpi-tip { visibility: visible; opacity: 1; }
+        .kpi-tip .tt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .kpi-tip .td { color: #cbd5e1; }
+        .kpi-tip .tf { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px; color: #67e8f9; margin-top: 4px; display: block; }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1672,6 +1721,8 @@
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                         <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -2466,7 +2517,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
                     <!-- Region Select for Pro -->
                     <div class="hvac-region-select-row" style="margin-top:1rem;">
-                        <label for="hvacRegionSelect"><i class="fas fa-globe" style="margin-right:4px;"></i> Region:</label>
+                        <label for="hvacRegionSelect"><i class="fas fa-globe" style="margin-right:4px;"></i> Region: <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Deployment Region</div><div class="tooltip-desc">Select the geographic region for climate-adjusted cooling analysis. Affects ambient temperature, humidity, free cooling hours, and regulatory requirements.</div><div class="tooltip-formula">Tropical: PUE penalty +0.1-0.3 vs Nordic</div></span></span></label>
                         <select id="hvacRegionSelect" class="hvac-region-dropdown">
                             <option value="indonesia">Indonesia (Tropical)</option>
                             <option value="singapore">Singapore (Tropical)</option>
@@ -3861,22 +3912,22 @@ Where LMTD (Log Mean Temperature Difference) requires:
             if (tcoKPIs) {
                 var savingsColor = tco.savingsDLC10yr > 0 ? '#22c55e' : '#ef4444';
                 tcoKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.traditional.npv10yr) + '</div><div class="hvac-kpi-label">Traditional TCO (10yr NPV)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.hybrid.npv10yr) + '</div><div class="hvac-kpi-label">Hybrid TCO (10yr NPV)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.dlc.npv10yr) + '</div><div class="hvac-kpi-label">DLC TCO (10yr NPV)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + savingsColor + ';">' + fmt(tco.savingsDLC10yr) + '</div><div class="hvac-kpi-label">DLC Savings vs Traditional</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.paybackDLC.toFixed(1) + ' yrs</div><div class="hvac-kpi-label">DLC Payback Period</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + (tco.irrDLC * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Estimated IRR (DLC)</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.traditional.npv10yr) + '</div><div class="hvac-kpi-label">Traditional TCO (10yr NPV) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Traditional Cooling TCO</div><div class="td">Net Present Value of total ownership cost for conventional air-cooled CRAC/CRAH systems over 10 years.</div><span class="tf">Includes CAPEX, energy, maintenance, water, replacement</span></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.hybrid.npv10yr) + '</div><div class="hvac-kpi-label">Hybrid TCO (10yr NPV) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Hybrid Cooling TCO</div><div class="td">NPV of combined air + rear-door heat exchanger (RDHx) approach. Moderate CAPEX uplift with significant energy savings.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.dlc.npv10yr) + '</div><div class="hvac-kpi-label">DLC TCO (10yr NPV) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Total Cost of Ownership</div><div class="td">NPV of full direct-to-chip liquid cooling. Higher CAPEX but dramatically lower energy — essential for 40-100kW AI/GPU racks.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + savingsColor + ';">' + fmt(tco.savingsDLC10yr) + '</div><div class="hvac-kpi-label">DLC Savings vs Traditional <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC vs Traditional Savings</div><div class="td">Total cost advantage of DLC over traditional air cooling across the 10-year analysis period.</div><span class="tf">Typical: 25-45% of traditional TCO</span></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.paybackDLC.toFixed(1) + ' yrs</div><div class="hvac-kpi-label">DLC Payback Period <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Payback Period</div><div class="td">Years for DLC higher initial investment to be recovered through energy and operational savings.</div><span class="tf">Good: &lt;3yr &middot; Acceptable: 3-5yr</span></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + (tco.irrDLC * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Estimated IRR (DLC) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Internal Rate of Return</div><div class="td">Annualized return on DLC investment premium over traditional cooling.</div><span class="tf">Good: &gt;20% &middot; Excellent: &gt;35%</span></span></span></div></div>';
             }
 
             // Energy & Environmental KPIs
             var energyKPIs = document.getElementById('hvacTcoEnergyKPIs');
             if (energyKPIs) {
                 energyKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.annualEnergySavingsDLC) + '</div><div class="hvac-kpi-label">Annual Energy Savings (DLC)</div><div class="hvac-kpi-sublabel">' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/yr</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.annualEnergySavingsDLC) + '</div><div class="hvac-kpi-label">Annual Energy Savings (DLC) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Energy Savings</div><div class="td">Yearly electricity savings from DLC vs traditional air cooling.</div></span></span></div><div class="hvac-kpi-sublabel">' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/yr</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#10b981;">' + Math.round(tco.carbonOffsetDLC).toLocaleString() + '</div><div class="hvac-kpi-label">CO2 Offset (tons/yr)</div><div class="hvac-kpi-sublabel">Factor: ' + region.co2Factor.toFixed(2) + ' tCO2/MWh</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#06b6d4;">' + (tco.waterSavingsDLC / 1e6).toFixed(1) + 'M</div><div class="hvac-kpi-label">Water Savings (gal/yr)</div><div class="hvac-kpi-sublabel">DLC: ' + (tco.dlcWaterGal / 1e6).toFixed(1) + 'M vs Trad: ' + (tco.tradWaterGal / 1e6).toFixed(1) + 'M</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.annualEnergySavingsHybrid) + '</div><div class="hvac-kpi-label">Annual Energy Savings (Hybrid)</div><div class="hvac-kpi-sublabel">' + Math.round(tco.energySavingsHybrid_kWh).toLocaleString() + ' kWh/yr</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.annualEnergySavingsHybrid) + '</div><div class="hvac-kpi-label">Annual Energy Savings (Hybrid) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Hybrid Energy Savings</div><div class="td">Yearly electricity savings from hybrid cooling (RDHx) vs traditional air-only.</div></span></span></div><div class="hvac-kpi-sublabel">' + Math.round(tco.energySavingsHybrid_kWh).toLocaleString() + ' kWh/yr</div></div>';
             }
 
             // Lifecycle & Maintenance KPIs
@@ -3884,10 +3935,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
             if (lifecycleKPIs) {
                 var lcImprovement = ((1 - tco.lifecycleCostPerKW_dlc / tco.lifecycleCostPerKW_trad) * 100).toFixed(0);
                 lifecycleKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">$' + tco.lifecycleCostPerKW_trad.toFixed(0) + '</div><div class="hvac-kpi-label">Lifecycle $/kW (Traditional)</div><div class="hvac-kpi-sublabel">10yr NPV per cooling kW</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">$' + tco.lifecycleCostPerKW_dlc.toFixed(0) + '</div><div class="hvac-kpi-label">Lifecycle $/kW (DLC)</div><div class="hvac-kpi-sublabel">' + lcImprovement + '% improvement</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.tradMaint10yr) + '</div><div class="hvac-kpi-label">Trad Maintenance (10yr NPV)</div><div class="hvac-kpi-sublabel">$' + (COOLING_CONFIGS.traditional.maintenancePerMW / 1000).toFixed(0) + 'K/MW/yr</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlcMaint10yr) + '</div><div class="hvac-kpi-label">DLC Maintenance (10yr NPV)</div><div class="hvac-kpi-sublabel">$' + (COOLING_CONFIGS.dlc.maintenancePerMW / 1000).toFixed(0) + 'K/MW/yr (leak det., fluid)</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">$' + tco.lifecycleCostPerKW_trad.toFixed(0) + '</div><div class="hvac-kpi-label">Lifecycle $/kW (Traditional) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Traditional Lifecycle Cost/kW</div><div class="td">Total lifecycle cost per kW for conventional air-cooled systems.</div></span></span></div><div class="hvac-kpi-sublabel">10yr NPV per cooling kW</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">$' + tco.lifecycleCostPerKW_dlc.toFixed(0) + '</div><div class="hvac-kpi-label">Lifecycle $/kW (DLC) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Lifecycle Cost/kW</div><div class="td">Total lifecycle cost per kW for direct liquid cooling.</div></span></span></div><div class="hvac-kpi-sublabel">' + lcImprovement + '% improvement</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.tradMaint10yr) + '</div><div class="hvac-kpi-label">Trad Maintenance (10yr NPV) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Traditional Maintenance</div><div class="td">NPV of 10-year maintenance for air cooling: filters, fan replacements, refrigerant, etc.</div></span></span></div><div class="hvac-kpi-sublabel">$' + (COOLING_CONFIGS.traditional.maintenancePerMW / 1000).toFixed(0) + 'K/MW/yr</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlcMaint10yr) + '</div><div class="hvac-kpi-label">DLC Maintenance (10yr NPV) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Maintenance</div><div class="td">NPV of 10-year maintenance for liquid cooling: pump seals, coolant, leak detection.</div></span></span></div><div class="hvac-kpi-sublabel">$' + (COOLING_CONFIGS.dlc.maintenancePerMW / 1000).toFixed(0) + 'K/MW/yr (leak det., fluid)</div></div>';
             }
 
             drawTCOWaterfall(document.getElementById('hvacWaterfallChart'), tco);
@@ -3906,12 +3957,12 @@ Where LMTD (Log Mean Temperature Difference) requires:
             var adjustedPUE = (region.pueDLC * (1 + region.riskScore * 0.005)).toFixed(3);
             if (riskKPIs) {
                 riskKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.temp + '\u00B0C</div><div class="hvac-kpi-label">Avg Ambient Temperature</div><div class="hvac-kpi-sublabel">Peak: ' + region.peakTemp + '\u00B0C</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.humidity + '%</div><div class="hvac-kpi-label">Avg Relative Humidity</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.freeHours.toLocaleString() + '</div><div class="hvac-kpi-label">Free Cooling Hours/Year</div><div class="hvac-kpi-sublabel">' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (region.riskScore >= 6 ? '#ef4444' : region.riskScore >= 3 ? '#f59e0b' : '#22c55e') + ';">' + region.riskScore.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Risk Score</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + failProb + '%</div><div class="hvac-kpi-label">Failure Probability (High Heat)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + adjustedPUE + '</div><div class="hvac-kpi-label">Risk-Adjusted PUE (DLC)</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.temp + '\u00B0C</div><div class="hvac-kpi-label">Avg Ambient Temperature <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Avg Ambient Temperature</div><div class="td">Mean annual outdoor temperature. Higher temps reduce free cooling hours and increase energy costs.</div></span></span></div><div class="hvac-kpi-sublabel">Peak: ' + region.peakTemp + '\u00B0C</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.humidity + '%</div><div class="hvac-kpi-label">Avg Relative Humidity <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Avg Relative Humidity</div><div class="td">Mean annual humidity. High humidity limits economizer effectiveness and increases corrosion risk.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + region.freeHours.toLocaleString() + '</div><div class="hvac-kpi-label">Free Cooling Hours/Year <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Free Cooling Hours</div><div class="td">Annual hours where outdoor conditions allow mechanical cooling bypass (economizer mode).</div><span class="tf">Nordic: &gt;6,000h &middot; Tropical: &lt;500h</span></span></span></div><div class="hvac-kpi-sublabel">' + (region.freeHours / 87.6).toFixed(0) + '% of annual hours</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (region.riskScore >= 6 ? '#ef4444' : region.riskScore >= 3 ? '#f59e0b' : '#22c55e') + ';">' + region.riskScore.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Risk Score <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Climate Risk Score</div><div class="td">Composite risk index (0-100) combining temperature extremes, humidity, disaster probability, grid resilience.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + failProb + '%</div><div class="hvac-kpi-label">Failure Probability (High Heat) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">High-Heat Failure Probability</div><div class="td">Estimated probability of cooling system failure during extreme heat events.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + adjustedPUE + '</div><div class="hvac-kpi-label">Risk-Adjusted PUE (DLC) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Risk-Adjusted PUE</div><div class="td">DLC PUE adjusted for climate risk — accounts for degradation during extreme weather.</div></span></span></div></div>';
             }
 
             // Extended Risk Dimensions
@@ -3922,10 +3973,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
                 var scColor = region.supplyChain >= 7 ? '#22c55e' : region.supplyChain >= 5 ? '#f59e0b' : '#ef4444';
                 var cvColor = region.climateVolatility <= 3 ? '#22c55e' : region.climateVolatility <= 5 ? '#f59e0b' : '#ef4444';
                 riskExtKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + regCompColor + ';">' + region.regulatoryRisk.toFixed(1) + '/10</div><div class="hvac-kpi-label">Regulatory Compliance</div><div class="hvac-kpi-sublabel">' + (region.regulatoryRisk >= 7 ? 'Strong frameworks' : region.regulatoryRisk >= 5 ? 'Developing standards' : 'Limited regulation') + '</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + trlColor + ';">TRL ' + region.trl + '/9</div><div class="hvac-kpi-label">Technology Readiness</div><div class="hvac-kpi-sublabel">' + (region.trl >= 8 ? 'Proven at scale' : region.trl >= 6 ? 'Demo validated' : 'Early adoption') + '</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + scColor + ';">' + region.supplyChain.toFixed(1) + '/10</div><div class="hvac-kpi-label">Supply Chain Availability</div><div class="hvac-kpi-sublabel">' + (region.supplyChain >= 7 ? 'Multiple vendors' : region.supplyChain >= 5 ? 'Limited options' : 'Scarce supply') + '</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + cvColor + ';">' + region.climateVolatility.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Volatility Index</div><div class="hvac-kpi-sublabel">' + (region.climateVolatility <= 3 ? 'Stable climate' : region.climateVolatility <= 5 ? 'Moderate swings' : 'High variability') + '</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + regCompColor + ';">' + region.regulatoryRisk.toFixed(1) + '/10</div><div class="hvac-kpi-label">Regulatory Compliance <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Regulatory Compliance</div><div class="td">Assessment of DC cooling against local environmental regulations.</div></span></span></div><div class="hvac-kpi-sublabel">' + (region.regulatoryRisk >= 7 ? 'Strong frameworks' : region.regulatoryRisk >= 5 ? 'Developing standards' : 'Limited regulation') + '</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + trlColor + ';">TRL ' + region.trl + '/9</div><div class="hvac-kpi-label">Technology Readiness <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Technology Readiness</div><div class="td">Maturity assessment of selected cooling technology for the deployment scenario.</div></span></span></div><div class="hvac-kpi-sublabel">' + (region.trl >= 8 ? 'Proven at scale' : region.trl >= 6 ? 'Demo validated' : 'Early adoption') + '</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + scColor + ';">' + region.supplyChain.toFixed(1) + '/10</div><div class="hvac-kpi-label">Supply Chain Availability <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Supply Chain Availability</div><div class="td">Regional availability of cooling equipment, spare parts, and qualified technicians.</div></span></span></div><div class="hvac-kpi-sublabel">' + (region.supplyChain >= 7 ? 'Multiple vendors' : region.supplyChain >= 5 ? 'Limited options' : 'Scarce supply') + '</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + cvColor + ';">' + region.climateVolatility.toFixed(1) + '/10</div><div class="hvac-kpi-label">Climate Volatility Index <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Climate Volatility Index</div><div class="td">Year-to-year climate variation measure. Higher volatility = less predictable cooling performance.</div></span></span></div><div class="hvac-kpi-sublabel">' + (region.climateVolatility <= 3 ? 'Stable climate' : region.climateVolatility <= 5 ? 'Moderate swings' : 'High variability') + '</div></div>';
             }
 
             var riskNar = document.getElementById('hvacRiskNarrative');
@@ -3968,22 +4019,22 @@ Where LMTD (Log Mean Temperature Difference) requires:
             var totalTransition = tco.dlc.capex + trainingCost;
             if (transKPIs) {
                 transKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase1Capex) + '</div><div class="hvac-kpi-label">Phase 1 (Year 0-1): Foundation</div><div class="hvac-kpi-sublabel">CDU, piping, controls</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase2Capex) + '</div><div class="hvac-kpi-label">Phase 2 (Year 2-3): Expansion</div><div class="hvac-kpi-sublabel">High-density rack DLC</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase3Capex) + '</div><div class="hvac-kpi-label">Phase 3 (Year 4-5): Optimization</div><div class="hvac-kpi-sublabel">Full migration</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(trainingCost) + '</div><div class="hvac-kpi-label">Workforce Training</div><div class="hvac-kpi-sublabel">Certification & procedures</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(totalTransition) + '</div><div class="hvac-kpi-label">Total Transition Cost</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlc.annualOpex) + '/yr</div><div class="hvac-kpi-label">Steady-State Opex</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase1Capex) + '</div><div class="hvac-kpi-label">Phase 1 (Year 0-1): Foundation <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phase 1: Foundation</div><div class="td">Initial deployment — pilot installation, staff training, monitoring setup.</div></span></span></div><div class="hvac-kpi-sublabel">CDU, piping, controls</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase2Capex) + '</div><div class="hvac-kpi-label">Phase 2 (Year 2-3): Expansion <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phase 2: Expansion</div><div class="td">Scale-up — expand DLC to additional rows/halls based on Phase 1 learnings.</div></span></span></div><div class="hvac-kpi-sublabel">High-density rack DLC</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(phase3Capex) + '</div><div class="hvac-kpi-label">Phase 3 (Year 4-5): Optimization <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phase 3: Optimization</div><div class="td">Full deployment with performance tuning, predictive maintenance, operational maturity.</div></span></span></div><div class="hvac-kpi-sublabel">Full migration</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(trainingCost) + '</div><div class="hvac-kpi-label">Workforce Training <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Workforce Training</div><div class="td">Investment in retraining staff from air cooling to liquid cooling operations.</div></span></span></div><div class="hvac-kpi-sublabel">Certification & procedures</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(totalTransition) + '</div><div class="hvac-kpi-label">Total Transition Cost <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Total Transition Cost</div><div class="td">All-in migration cost: equipment, installation, training, and downtime.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.dlc.annualOpex) + '/yr</div><div class="hvac-kpi-label">Steady-State Opex <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Steady-State Opex</div><div class="td">Annual operating cost after full DLC deployment and optimization.</div></span></span></div></div>';
             }
 
             // Extended Transition KPIs
             var transExtKPIs = document.getElementById('hvacTransitionExtKPIs');
             if (transExtKPIs) {
                 transExtKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.downtimeHoursPhased + ' hrs</div><div class="hvac-kpi-label">Est. Downtime (Phased)</div><div class="hvac-kpi-sublabel">' + (tco.downtimeHoursPhased / 24).toFixed(1) + ' days over 5 years</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#f59e0b;">' + tco.downtimeHoursFull + ' hrs</div><div class="hvac-kpi-label">Est. Downtime (Full Cutover)</div><div class="hvac-kpi-sublabel">' + (tco.downtimeHoursFull / 24).toFixed(1) + ' days single event</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.phasedDeploymentCost) + '</div><div class="hvac-kpi-label">Phased Deployment Cost</div><div class="hvac-kpi-sublabel">+12% integration overhead</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.fullDeploymentCost) + '</div><div class="hvac-kpi-label">Full Deployment Cost</div><div class="hvac-kpi-sublabel">Higher risk, lower cost</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + tco.downtimeHoursPhased + ' hrs</div><div class="hvac-kpi-label">Est. Downtime (Phased) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phased Downtime</div><div class="td">Estimated downtime for phased DLC deployment.</div></span></span></div><div class="hvac-kpi-sublabel">' + (tco.downtimeHoursPhased / 24).toFixed(1) + ' days over 5 years</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#f59e0b;">' + tco.downtimeHoursFull + ' hrs</div><div class="hvac-kpi-label">Est. Downtime (Full Cutover) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Full Cutover Downtime</div><div class="td">Estimated downtime for complete DLC migration.</div></span></span></div><div class="hvac-kpi-sublabel">' + (tco.downtimeHoursFull / 24).toFixed(1) + ' days single event</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(tco.phasedDeploymentCost) + '</div><div class="hvac-kpi-label">Phased Deployment Cost <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phased Deployment Cost</div><div class="td">Total cost of phased DLC rollout.</div></span></span></div><div class="hvac-kpi-sublabel">+12% integration overhead</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(tco.fullDeploymentCost) + '</div><div class="hvac-kpi-label">Full Deployment Cost <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Full Deploy Cost</div><div class="td">Total cost of one-time full DLC deployment.</div></span></span></div><div class="hvac-kpi-sublabel">Higher risk, lower cost</div></div>';
             }
 
             // ROI Milestone Timeline
@@ -4037,10 +4088,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
                 monteKPIs.innerHTML =
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.mean) + '</div><div class="hvac-kpi-label">Mean Annual Savings</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#ef4444;">' + fmt(mc.p5) + '</div><div class="hvac-kpi-label">P5 (Conservative)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.p50) + '</div><div class="hvac-kpi-label">P50 (Median)</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.p50) + '</div><div class="hvac-kpi-label">P50 (Median) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">P50 — Median</div><div class="td">50th percentile — the most likely savings outcome from Monte Carlo simulation.</div></span></span></div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#22c55e;">' + fmt(mc.p95) + '</div><div class="hvac-kpi-label">P95 (Optimistic)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.stdDev) + '</div><div class="hvac-kpi-label">Std Deviation</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + ((mc.stdDev / mc.mean) * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Coefficient of Variation</div></div>';
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + fmt(mc.stdDev) + '</div><div class="hvac-kpi-label">Std Deviation <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Standard Deviation</div><div class="td">Spread of savings outcomes. Higher = more uncertainty in financial projections.</div></span></span></div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value">' + ((mc.stdDev / mc.mean) * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Coefficient of Variation <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Coefficient of Variation</div><div class="td">Std dev / mean ratio. Measures relative uncertainty.</div><span class="tf">CV &lt; 0.3: Low risk &middot; CV &gt; 0.5: High</span></span></span></div></div>';
             }
 
             // Tail Risk KPIs
@@ -4050,9 +4101,9 @@ Where LMTD (Log Mean Temperature Difference) requires:
                 var confClass = cv < 0.12 ? 'hvac-confidence-high' : cv < 0.20 ? 'hvac-confidence-med' : 'hvac-confidence-low';
                 var confLabel = cv < 0.12 ? 'HIGH' : cv < 0.20 ? 'MODERATE' : 'LOW';
                 monteTailKPIs.innerHTML =
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#f87171;">' + fmt(mc.p1) + '</div><div class="hvac-kpi-label">P1 (Worst-Case Tail)</div><div class="hvac-kpi-sublabel">1st percentile scenario</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#f87171;">' + fmt(mc.p1) + '</div><div class="hvac-kpi-label">P1 (Worst-Case Tail) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">P1 — Worst Case</div><div class="td">The worst 1% of simulated scenarios. Your downside risk floor.</div></span></span></div><div class="hvac-kpi-sublabel">1st percentile scenario</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:#fb923c;">' + fmt(mc.cvar95) + '</div><div class="hvac-kpi-label">CVaR at 95%</div><div class="hvac-kpi-sublabel">Expected shortfall (avg of worst 5%)</div></div>' +
-                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (mc.probNegativeROI > 0.05 ? '#ef4444' : mc.probNegativeROI > 0 ? '#f59e0b' : '#22c55e') + ';">' + (mc.probNegativeROI * 100).toFixed(2) + '%</div><div class="hvac-kpi-label">Prob. of Negative Savings</div><div class="hvac-kpi-sublabel">' + Math.round(mc.probNegativeROI * 10000) + ' of 10,000 scenarios</div></div>' +
+                    '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (mc.probNegativeROI > 0.05 ? '#ef4444' : mc.probNegativeROI > 0 ? '#f59e0b' : '#22c55e') + ';">' + (mc.probNegativeROI * 100).toFixed(2) + '%</div><div class="hvac-kpi-label">Prob. of Negative Savings <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Prob. Negative Savings</div><div class="td">Percentage of Monte Carlo runs where DLC costs MORE than traditional.</div><span class="tf">Good: &lt;5% &middot; Acceptable: &lt;15%</span></span></span></div><div class="hvac-kpi-sublabel">' + Math.round(mc.probNegativeROI * 10000) + ' of 10,000 scenarios</div></div>' +
                     '<div class="hvac-kpi-card"><div class="hvac-kpi-value" style="color:' + (mc.probBreakEven >= 0.9 ? '#22c55e' : mc.probBreakEven >= 0.7 ? '#f59e0b' : '#ef4444') + ';">' + (mc.probBreakEven * 100).toFixed(1) + '%</div><div class="hvac-kpi-label">Break-Even Probability</div><div class="hvac-kpi-sublabel">Savings exceed ' + fmt(mc.annualCapexRecovery) + '/yr<span class="' + confClass + ' hvac-confidence-badge">' + confLabel + '</span></div></div>';
             }
 
@@ -4391,10 +4442,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
             // Energy & Environmental
             html += '<h3>Energy & Environmental Impact</h3>';
             html += '<div class="kpi-grid-4">';
-            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.annualEnergySavingsDLC) + '</div><div class="kpi-label">Annual Energy Savings</div><div class="kpi-sub">' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/yr</div></div>';
-            html += '<div class="kpi-card"><div class="kpi-value badge-good">' + Math.round(tco.carbonOffsetDLC).toLocaleString() + '</div><div class="kpi-label">CO2 Offset (tons/yr)</div></div>';
-            html += '<div class="kpi-card"><div class="kpi-value">' + (tco.waterSavingsDLC / 1e6).toFixed(1) + 'M</div><div class="kpi-label">Water Savings (gal/yr)</div></div>';
-            html += '<div class="kpi-card"><div class="kpi-value">$' + tco.lifecycleCostPerKW_dlc.toFixed(0) + '</div><div class="kpi-label">DLC Lifecycle $/kW</div><div class="kpi-sub">vs $' + tco.lifecycleCostPerKW_trad.toFixed(0) + ' traditional</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.annualEnergySavingsDLC) + '</div><div class="kpi-label">Annual Energy Savings <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Annual Energy Savings</div><div class="td">Yearly electricity savings from DLC vs traditional air cooling, primarily from reduced fan power and improved heat transfer.</div></span></span></div><div class="kpi-sub">' + Math.round(tco.energySavingsDLC_kWh).toLocaleString() + ' kWh/yr</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value badge-good">' + Math.round(tco.carbonOffsetDLC).toLocaleString() + '</div><div class="kpi-label">CO2 Offset (tons/yr) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">CO2 Emissions Avoided</div><div class="td">Annual carbon dioxide reduction from DLC energy savings, based on regional grid carbon intensity.</div></span></span></div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + (tco.waterSavingsDLC / 1e6).toFixed(1) + 'M</div><div class="kpi-label">Water Savings (gal/yr) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Water Savings</div><div class="td">Annual water consumption reduction — DLC eliminates evaporative cooling tower water use.</div><span class="tf">Traditional: 1.8L/kWh &middot; DLC: near zero</span></span></span></div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">$' + tco.lifecycleCostPerKW_dlc.toFixed(0) + '</div><div class="kpi-label">DLC Lifecycle $/kW <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">DLC Lifecycle Cost/kW</div><div class="td">Total lifecycle cost per kW for direct liquid cooling. Higher initial but lower operating.</div></span></span></div><div class="kpi-sub">vs $' + tco.lifecycleCostPerKW_trad.toFixed(0) + ' traditional</div></div>';
             html += '</div>';
 
             html += waterfallSVG(tco);
@@ -4427,27 +4478,27 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
             html += '<h3>Operational Impact</h3>';
             html += '<div class="kpi-grid-4">';
-            html += '<div class="kpi-card"><div class="kpi-value">' + tco.downtimeHoursPhased + ' hrs</div><div class="kpi-label">Downtime (Phased)</div></div>';
-            html += '<div class="kpi-card"><div class="kpi-value badge-warn">' + tco.downtimeHoursFull + ' hrs</div><div class="kpi-label">Downtime (Full Cutover)</div></div>';
-            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.phasedDeploymentCost) + '</div><div class="kpi-label">Phased Cost (+12%)</div></div>';
-            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.fullDeploymentCost) + '</div><div class="kpi-label">Full Deploy Cost</div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + tco.downtimeHoursPhased + ' hrs</div><div class="kpi-label">Downtime (Phased) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phased Deployment Downtime</div><div class="td">Estimated downtime for hall-by-hall DLC rollout, minimizing disruption.</div></span></span></div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value badge-warn">' + tco.downtimeHoursFull + ' hrs</div><div class="kpi-label">Downtime (Full Cutover) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Full Cutover Downtime</div><div class="td">Estimated downtime for complete one-time DLC migration. Higher risk but faster.</div></span></span></div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.phasedDeploymentCost) + '</div><div class="kpi-label">Phased Cost (+12%) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Phased Deployment Cost</div><div class="td">Cost of phased DLC rollout — higher due to repeated mobilization but lower risk.</div></span></span></div></div>';
+            html += '<div class="kpi-card"><div class="kpi-value">' + fmt(tco.fullDeploymentCost) + '</div><div class="kpi-label">Full Deploy Cost <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Full Deployment Cost</div><div class="td">Cost of one-time full DLC deployment — lower total but higher risk and downtime.</div></span></span></div></div>';
             html += '</div>';
 
             if (proMode && mc) {
                 // Monte Carlo
                 html += '<h2>Monte Carlo Simulation (10,000 iterations)</h2>';
                 html += '<div class="kpi-grid">';
-                html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.mean) + '</div><div class="kpi-label">Mean Annual Savings</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p5) + '</div><div class="kpi-label">P5 (Conservative)</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + fmt(mc.p95) + '</div><div class="kpi-label">P95 (Optimistic)</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.mean) + '</div><div class="kpi-label">Mean Annual Savings <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Mean Annual Savings</div><div class="td">Average annual savings from Monte Carlo simulation across all scenarios (typically 10,000 runs).</div></span></span></div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p5) + '</div><div class="kpi-label">P5 (Conservative) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">P5 — Conservative Estimate</div><div class="td">5th percentile savings — 95% of simulated scenarios produce savings above this value.</div><span class="tf">Low-end estimate for conservative financial planning</span></span></span></div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + fmt(mc.p95) + '</div><div class="kpi-label">P95 (Optimistic) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">P95 — Optimistic Estimate</div><div class="td">95th percentile — only 5% of scenarios produce savings this high or above.</div></span></span></div></div>';
                 html += '</div>';
 
                 html += '<h3>Tail Risk & Break-Even</h3>';
                 html += '<div class="kpi-grid-4">';
-                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p1) + '</div><div class="kpi-label">P1 (Worst-Case)</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.cvar95) + '</div><div class="kpi-label">CVaR at 95%</div><div class="kpi-sub">Expected shortfall</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value">' + (mc.probNegativeROI * 100).toFixed(2) + '%</div><div class="kpi-label">Prob. Negative Savings</div></div>';
-                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + (mc.probBreakEven * 100).toFixed(1) + '%</div><div class="kpi-label">Break-Even Probability</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-bad">' + fmt(mc.p1) + '</div><div class="kpi-label">P1 (Worst-Case) <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">P1 — Worst Case</div><div class="td">The worst 1% of simulated scenarios. Your downside risk floor.</div></span></span></div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value">' + fmt(mc.cvar95) + '</div><div class="kpi-label">CVaR at 95% <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Conditional Value at Risk (95%)</div><div class="td">Average loss in the worst 5% of scenarios. Key metric for risk-adjusted investment decisions.</div></span></span></div><div class="kpi-sub">Expected shortfall</div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value">' + (mc.probNegativeROI * 100).toFixed(2) + '%</div><div class="kpi-label">Prob. Negative Savings <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Prob. Negative Savings</div><div class="td">Percentage of runs where DLC costs MORE than traditional cooling.</div><span class="tf">Good: &lt;5% &middot; Acceptable: &lt;15%</span></span></span></div></div>';
+                html += '<div class="kpi-card"><div class="kpi-value badge-good">' + (mc.probBreakEven * 100).toFixed(1) + '%</div><div class="kpi-label">Break-Even Probability <span class="kpi-tooltip">?<span class="kpi-tip"><div class="tt">Break-Even Probability</div><div class="td">Percentage of scenarios where DLC achieves positive NPV within the analysis period.</div><span class="tf">Target: >90% for investment approval</span></span></span></div></div>';
                 html += '</div>';
 
                 html += histogramSVG(mc);

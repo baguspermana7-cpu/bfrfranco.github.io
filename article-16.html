@@ -1089,7 +1089,40 @@
             .bub-scenario-grid{grid-template-columns:1fr}
         }
         @media (max-width:480px){.bub-evidence-grid{grid-template-columns:1fr}}
-    </style>
+    
+        /* Result Card Tooltip System */
+        .res-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+            color: #fbbf24; margin-left: 4px; cursor: help;
+            position: relative; flex-shrink: 0; vertical-align: middle;
+            line-height: 1;
+        }
+        .res-tip:hover { background: rgba(245,158,11,0.3); transform: scale(1.15); }
+        .res-tip .res-tip-body {
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; color: #e2e8f0;
+            padding: 0.7rem 0.9rem; border-radius: 8px;
+            font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+            width: 260px; z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245,158,11,0.2);
+            transition: opacity 0.2s ease; pointer-events: none;
+            text-transform: none; letter-spacing: normal;
+        }
+        .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
+        .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
+        .res-tip-body .rtd { color: #cbd5e1; }
+        .res-tip-body .rtf {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
+            color: #67e8f9; margin-top: 4px; display: block;
+        }
+</style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1115,6 +1148,8 @@
                     <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                     <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
                     <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                 </ul>
             </li>
             <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -1922,32 +1957,32 @@
                     <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem;">Supply-Demand Analysis</div>
                     <div class="results-grid">
                         <div class="result-item">
-                            <div class="label">Supply-to-Demand Ratio</div>
+                            <div class="label">Supply-to-Demand Ratio <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Supply-to-Demand Ratio</div><div class="rtd">Pipeline capacity divided by projected demand. Ratio &gt;2.0 indicates oversupply risk.</div><span class="rtf">&lt;1.5 Undersupplied &middot; 1.5-2.5 Balanced &middot; &gt;2.5 Oversupplied</span></span></span></div>
                             <div class="value" id="rSupplyDemand">-</div>
                             <div class="subtext" id="rSDNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Years to Absorb Pipeline</div>
+                            <div class="label">Years to Absorb Pipeline <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Pipeline Absorption</div><div class="rtd">Time for the market to fill current pipeline at the given absorption rate.</div><span class="rtf">&gt;5 years = high oversupply risk</span></span></span></div>
                             <div class="value" id="rYearsAbsorb">-</div>
                             <div class="subtext">At current absorption rate</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Projected 2028 Vacancy</div>
+                            <div class="label">Projected 2028 Vacancy <span class="res-tip">?<span class="res-tip-body"><div class="rtt">2028 Vacancy Rate</div><div class="rtd">Projected percentage of DC capacity sitting empty by 2028.</div><span class="rtf">&lt;10% healthy &middot; &gt;30% distressed</span></span></span></div>
                             <div class="value" id="rVacancy2028">-</div>
                             <div class="subtext" id="rVacNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Pipeline / Population</div>
+                            <div class="label">Pipeline / Population <span class="res-tip">?<span class="res-tip-body"><div class="rtt">MW per Million People</div><div class="rtd">DC capacity per million population — measures market maturity.</div></span></span></div>
                             <div class="value" id="rPipePerPop">-</div>
                             <div class="subtext" id="rPipePopNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Capital at Risk</div>
+                            <div class="label">Capital at Risk <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Capital at Risk</div><div class="rtd">Total investment capital exposed to oversupply risk (vacant capacity &times; build cost).</div></span></span></div>
                             <div class="value" id="rCapitalRisk">-</div>
                             <div class="subtext">Speculative builds only</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Total Pipeline Capex</div>
+                            <div class="label">Total Pipeline Capex <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Total Pipeline Capex</div><div class="rtd">Total capital expenditure for all pipeline capacity in the market.</div></span></span></div>
                             <div class="value" id="rTotalCapex">-</div>
                             <div class="subtext">Full pipeline build cost</div>
                         </div>
@@ -1957,32 +1992,32 @@
                     <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 1.25rem 0 0.75rem;">Financial Risk Metrics</div>
                     <div class="results-grid">
                         <div class="result-item">
-                            <div class="label">Break-Even Occupancy</div>
+                            <div class="label">Break-Even Occupancy <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Break-Even Occupancy</div><div class="rtd">Minimum occupancy rate needed to cover operating costs and debt service.</div></span></span></div>
                             <div class="value" id="rBreakeven">-</div>
                             <div class="subtext">OPEX coverage threshold</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Projected Avg Occupancy</div>
+                            <div class="label">Projected Avg Occupancy <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Projected Avg Occupancy</div><div class="rtd">Expected average occupancy rate across the market by analysis end.</div></span></span></div>
                             <div class="value" id="rProjOcc">-</div>
                             <div class="subtext" id="rOccNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Annual Revenue (Proj.)</div>
+                            <div class="label">Annual Revenue (Proj.) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Projected Annual Revenue</div><div class="rtd">Expected yearly revenue based on occupancy and revenue-per-MW assumptions.</div></span></span></div>
                             <div class="value" id="rRevenue">-</div>
                             <div class="subtext" id="rRevNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Annual EBITDA</div>
+                            <div class="label">Annual EBITDA <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual EBITDA</div><div class="rtd">Earnings before interest, taxes, depreciation, and amortization.</div></span></span></div>
                             <div class="value" id="rEBITDA">-</div>
                             <div class="subtext" id="rEBITDANote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">Payback Period</div>
+                            <div class="label">Payback Period <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Payback Period</div><div class="rtd">Years to recover total capital investment from operating cash flows.</div></span></span></div>
                             <div class="value" id="rPayback">-</div>
                             <div class="subtext" id="rPayNote">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="label">10-Year NPV</div>
+                            <div class="label">10-Year NPV <span class="res-tip">?<span class="res-tip-body"><div class="rtt">10-Year Net Present Value</div><div class="rtd">NPV of all cash flows over 10 years at the given discount rate.</div><span class="rtf">Positive NPV = value-creating investment</span></span></span></div>
                             <div class="value" id="rNPV">-</div>
                             <div class="subtext" id="rNPVNote">At given WACC</div>
                         </div>
