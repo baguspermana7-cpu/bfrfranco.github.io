@@ -14,17 +14,24 @@ import { calculateStaffing, compareAllShiftModels, generate5YearProjection, Staf
 import { calculateCapex, CapexResult } from '@/lib/CapexEngine';
 import { generateStaffingNarrative, ReportInsight } from '@/modules/reporting/NarrativeEngine';
 import { generateExecutiveSummary } from '@/modules/reporting/ExecutiveSummaryGenerator';
-import { generateMasterReportPDF, generateStaffingPDF, generateCapexPDF, generateMaintenancePDF } from '@/modules/reporting/PdfGenerator';
+import { generateMasterReportPDF, generateStaffingPDF, generateCapexPDF, generateMaintenancePDF, generateCountryIntelPDF, generateCapacityPlanPDF } from '@/modules/reporting/PdfGenerator';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
 import { generateMaintenanceSchedule, MaintenanceEvent } from '@/modules/maintenance/ScheduleEngine';
 import { generateAnnualRoster } from '@/modules/staffing/RosterEngine';
 import { calculateDowntimeRisk } from '@/modules/risk/DowntimeCalculator';
 import { calculateStrategyComparison, calculateSLAComparison, calculateSparesOptimization } from '@/modules/maintenance/MaintenanceStrategyEngine';
+import { calculateTaxIncentives } from '@/modules/analytics/TaxIncentiveEngine';
+import { calculateDisasterRisk } from '@/modules/risk/DisasterRiskEngine';
+import { calculateGridReliability } from '@/modules/infrastructure/GridReliabilityEngine';
+import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
+import { calculateCapacityPlan, CAPACITY_PRESETS } from '@/modules/capacity/CapacityPlanningEngine';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { calculateFuelGen } from '@/modules/infrastructure/FuelGenEngine';
 import {
     FileText, AlertTriangle, CheckCircle2, TrendingUp, Download, Loader2,
     DollarSign, Users, Clock, Zap, Building2, Shield, BarChart3,
     ChevronDown, Printer, ArrowDownRight, ArrowUpRight,
-    Settings2, StickyNote, Eye, EyeOff, Wrench
+    Settings2, StickyNote, Eye, EyeOff, Wrench, Globe, Layers
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -155,6 +162,33 @@ export function ReportDashboard() {
                         fullData.sparesData,
                         fullData.schedule,
                         analystNotes,
+                        branding
+                    );
+                    break;
+                case 'country-intel':
+                    await generateCountryIntelPDF(
+                        selectedCountry,
+                        {
+                            taxResult: fullData.taxResult,
+                            disasterResult: fullData.disasterResult,
+                            gridResult: fullData.gridResult,
+                            talentResult: fullData.talentResult,
+                            itLoadKw: inputs.itLoad,
+                            totalCapex: fullData.capex.total,
+                            totalFTE: fullData.totalHeadcount,
+                            annualStaffCost: fullData.annualStaffCostForTalent,
+                        },
+                        branding
+                    );
+                    break;
+                case 'capacity-plan':
+                    await generateCapacityPlanPDF(
+                        selectedCountry,
+                        {
+                            capPlan: fullData.capPlan,
+                            phases: inputs.capacityPhases,
+                            itLoadKw: inputs.itLoad,
+                        },
                         branding
                     );
                     break;
@@ -306,6 +340,57 @@ export function ReportDashboard() {
         const monthlyTasks = 120;
         const specialistTasks = 5;
 
+        // Country Intelligence calculations
+        const taxResult = selectedCountry.taxIncentives ? calculateTaxIncentives({
+            country: selectedCountry,
+            totalCapex: capexResults.total,
+            annualRevenue: inputs.itLoad * 150 * 12,
+            annualOpex: opexAnnual,
+            projectLifeYears: 10,
+            discountRate: 0.08,
+            equipmentCapexShare: 0.65,
+        }) : null;
+
+        const disasterResult = selectedCountry.naturalDisaster ? calculateDisasterRisk({
+            country: selectedCountry,
+            totalCapex: capexResults.total,
+            itLoadKw: inputs.itLoad,
+            annualRevenue: inputs.itLoad * 150 * 12,
+        }) : null;
+
+        const gridResult = selectedCountry.gridReliability ? calculateGridReliability({
+            country: selectedCountry,
+            itLoadKw: inputs.itLoad,
+            tierLevel: inputs.tierLevel,
+            coolingType: inputs.coolingType,
+        }) : null;
+
+        const annualStaffCostForTalent = totalMonthlyLabor * 12;
+        const talentResult = selectedCountry.talentPool ? calculateTalentAvailability({
+            country: selectedCountry,
+            totalFTE: totalHeadcount,
+            annualStaffCost: annualStaffCostForTalent,
+        }) : null;
+
+        // Capacity Planning
+        const capPlan = calculateCapacityPlan({
+            phases: inputs.capacityPhases,
+            country: selectedCountry,
+            coolingType: inputs.coolingType,
+            tierLevel: inputs.tierLevel,
+            shiftModel: inputs.shiftModel,
+            maintenanceModel: inputs.maintenanceModel,
+            hybridRatio: inputs.hybridRatio,
+        });
+
+        // Fuel & Generator data
+        const fuelGenResult = calculateFuelGen({
+            country: selectedCountry,
+            itLoadKw: inputs.itLoad,
+            tierLevel: inputs.tierLevel,
+            coolingType: inputs.coolingType,
+        });
+
         // Return flattened object for easier consumption, matching usage in component
         return {
             allStaff, tlResults, engResults, techResults, supResults, janResults,
@@ -320,7 +405,10 @@ export function ReportDashboard() {
             dailyTasks, weeklyTasks, monthlyTasks,
             specialistTasks, patternId,
             strategyData, slaData, sparesData,
-            execSummary, staffingNarrative
+            execSummary, staffingNarrative,
+            taxResult, disasterResult, gridResult, talentResult, capPlan,
+            annualStaffCostForTalent,
+            fuelGenResult,
         };
     }, [selectedCountry, inputs, capexInputs, simYear]);
 
@@ -577,17 +665,17 @@ export function ReportDashboard() {
             )}
 
             {/* Module-Specific Downloads */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 <button
                     onClick={() => handleExport('staffing')}
                     disabled={!!isGenerating}
-                    className="flex flex-col items-center justify-center gap-2 p-6 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
                 >
                     <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-cyan-100 dark:group-hover:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-700 dark:group-hover:text-cyan-300 transition-colors">
-                        <Users className="w-6 h-6" />
+                        <Users className="w-5 h-5" />
                     </div>
                     <div className="text-center">
-                        <div className="font-medium text-slate-900 dark:text-slate-200">Staffing Report</div>
+                        <div className="font-medium text-sm text-slate-900 dark:text-slate-200">Staffing Report</div>
                         <div className="text-xs text-slate-500 mt-1">Headcount, Roster, Shifts</div>
                     </div>
                 </button>
@@ -595,13 +683,13 @@ export function ReportDashboard() {
                 <button
                     onClick={() => handleExport('capex')}
                     disabled={!!isGenerating}
-                    className="flex flex-col items-center justify-center gap-2 p-6 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
                 >
                     <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
-                        <Building2 className="w-6 h-6" />
+                        <Building2 className="w-5 h-5" />
                     </div>
                     <div className="text-center">
-                        <div className="font-medium text-slate-900 dark:text-slate-200">CAPEX Report</div>
+                        <div className="font-medium text-sm text-slate-900 dark:text-slate-200">CAPEX Report</div>
                         <div className="text-xs text-slate-500 mt-1">Construction & Equipment</div>
                     </div>
                 </button>
@@ -609,14 +697,42 @@ export function ReportDashboard() {
                 <button
                     onClick={() => handleExport('maintenance')}
                     disabled={!!isGenerating}
-                    className="flex flex-col items-center justify-center gap-2 p-6 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
                 >
                     <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-amber-100 dark:group-hover:bg-amber-950/50 text-amber-600 dark:text-amber-400 group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
-                        <Wrench className="w-6 h-6" />
+                        <Wrench className="w-5 h-5" />
                     </div>
                     <div className="text-center">
-                        <div className="font-medium text-slate-900 dark:text-slate-200">Maintenance Plan</div>
+                        <div className="font-medium text-sm text-slate-900 dark:text-slate-200">Maintenance Plan</div>
                         <div className="text-xs text-slate-500 mt-1">Strategy, SLA, Spares</div>
+                    </div>
+                </button>
+
+                <button
+                    onClick={() => handleExport('country-intel')}
+                    disabled={!!isGenerating}
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-purple-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                >
+                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-purple-100 dark:group-hover:bg-purple-950/50 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
+                        <Globe className="w-5 h-5" />
+                    </div>
+                    <div className="text-center">
+                        <div className="font-medium text-sm text-slate-900 dark:text-slate-200">Country Intel</div>
+                        <div className="text-xs text-slate-500 mt-1">Tax, Disaster, Grid, Talent</div>
+                    </div>
+                </button>
+
+                <button
+                    onClick={() => handleExport('capacity-plan')}
+                    disabled={!!isGenerating}
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                >
+                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors">
+                        <Layers className="w-5 h-5" />
+                    </div>
+                    <div className="text-center">
+                        <div className="font-medium text-sm text-slate-900 dark:text-slate-200">Capacity Plan</div>
+                        <div className="text-xs text-slate-500 mt-1">Phases, Ramp, Finance</div>
                     </div>
                 </button>
             </div>
@@ -675,6 +791,7 @@ export function ReportDashboard() {
                                         { cat: 'Social Security / Benefits', monthly: fullData.allStaff.reduce((a, r) => a + r.breakdown.socialSecurity, 0) },
                                         { cat: 'Maintenance Parts & Consumables', monthly: fullData.annualConsumablesCost / 12 },
                                         { cat: 'Vendor / Specialist Services', monthly: fullData.annualVendorCost / 12 },
+                                        { cat: 'Fuel & Generator OPEX', monthly: fullData.fuelGenResult.cost.totalAnnualGenOpex / 12 },
                                         { cat: 'CAPEX Depreciation (20yr)', monthly: fullData.annualDepreciation / 12 },
                                     ].map((row, i) => {
                                         const annual = row.monthly * 12;
@@ -953,7 +1070,7 @@ export function ReportDashboard() {
                     selectedCountry
                 ) : [];
                 return sensitivityData.length > 0 ? (
-                    <div id="tornado-chart-container" className="bg-white dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
+                    <div id="tornado-chart-container" className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
                         <TornadoChart data={sensitivityData} />
                     </div>
                 ) : null;
@@ -997,8 +1114,8 @@ export function ReportDashboard() {
                     { source: 'energy', target: 'it_e', value: energyCost * 0.65 },
                 ];
                 return (
-                    <div id="sankey-diagram-container" className="bg-white dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-300 mb-4">Cost Flow Analysis — Sankey Diagram</h3>
+                    <div id="sankey-diagram-container" className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Cost Flow Analysis — Sankey Diagram</h3>
                         <SankeyDiagram data={{ nodes, links }} />
                     </div>
                 );
@@ -1016,17 +1133,19 @@ export function ReportDashboard() {
             )}
 
             {/* ═══ EXPORT BUTTONS ═══ */}
-            <div className="bg-gradient-to-r from-slate-50 to-white dark:from-slate-900/80 dark:to-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
+            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                     <Printer className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                     Export Reports
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[
                         { type: 'simulation', label: 'Full Simulation Report', desc: 'OPEX, projections, insights', color: 'from-cyan-600 to-blue-600' },
                         { type: 'staffing', label: 'Staffing Analysis PDF', desc: 'Roles, shifts, roster, 5yr projection', color: 'from-violet-600 to-purple-600' },
                         { type: 'capex', label: 'CAPEX Report PDF', desc: 'Cost breakdown, timeline, PUE', color: 'from-orange-600 to-red-600' },
                         { type: 'maintenance', label: 'Maintenance Report PDF', desc: 'Strategy, SLA, spares analysis', color: 'from-emerald-600 to-teal-600' },
+                        { type: 'country-intel', label: 'Country Intelligence PDF', desc: 'Tax, disaster, grid, talent index', color: 'from-purple-600 to-indigo-600' },
+                        { type: 'capacity-plan', label: 'Capacity Planning PDF', desc: 'Phased build, staffing ramp, finance', color: 'from-indigo-600 to-blue-600' },
                     ].map(btn => (
                         <button
                             key={btn.type}

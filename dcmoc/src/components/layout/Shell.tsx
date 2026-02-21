@@ -30,10 +30,19 @@ import {
     Target,
     Dices,
     Layers,
+    Layers as Layers3,
     GitCompare,
+    Receipt,
+    CloudLightning,
+    Zap,
+    GraduationCap,
     Check,
     LogOut,
     HelpCircle,
+    ClipboardCheck,
+    LineChart,
+    Activity,
+    Fuel,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '@/store/auth';
@@ -94,9 +103,19 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'Carbon / ESG', icon: Leaf, id: 'carbon' },
         { label: 'Financial', icon: TrendingUp, id: 'finance' },
         { label: 'Investment', icon: Landmark, id: 'invest' },
+        { label: 'Capacity Plan', icon: Layers3, id: 'capacity', section: 'planning' },
+        { label: 'Phased Finance', icon: Calculator, id: 'phased-finance', section: 'planning' },
         { label: 'Benchmarks', icon: Target, id: 'benchmark', section: 'analytics' },
         { label: 'Monte Carlo', icon: Dices, id: 'montecarlo', section: 'analytics' },
         { label: 'Portfolio', icon: Layers, id: 'portfolio', section: 'analytics' },
+        { label: 'Tax & Incentives', icon: Receipt, id: 'tax', section: 'country-intel' },
+        { label: 'Disaster Risk', icon: CloudLightning, id: 'disaster', section: 'country-intel' },
+        { label: 'Grid Reliability', icon: Zap, id: 'grid', section: 'country-intel' },
+        { label: 'Talent Index', icon: GraduationCap, id: 'talent', section: 'country-intel' },
+        { label: 'Compliance', icon: ClipboardCheck, id: 'compliance', section: 'country-intel' },
+        { label: 'Asset Lifecycle', icon: LineChart, id: 'asset-lifecycle', section: 'planning' },
+        { label: 'CBM / DCIM', icon: Activity, id: 'cbm', section: 'planning' },
+        { label: 'Fuel & Generator', icon: Fuel, id: 'fuel-gen' },
         { label: 'Report', icon: FileText, id: 'report' },
     ];
 
@@ -161,9 +180,19 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         </label>
                         {navItems.map((item, idx) => (
                             <React.Fragment key={item.id}>
+                                {item.section === 'planning' && navItems[idx - 1]?.section !== 'planning' && (
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2">
+                                        Capacity Planning
+                                    </label>
+                                )}
                                 {item.section === 'analytics' && navItems[idx - 1]?.section !== 'analytics' && (
                                     <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2">
                                         Advanced Analytics
+                                    </label>
+                                )}
+                                {item.section === 'country-intel' && navItems[idx - 1]?.section !== 'country-intel' && (
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2">
+                                        Country Intelligence
                                     </label>
                                 )}
                                 <button

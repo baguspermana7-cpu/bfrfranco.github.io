@@ -14,6 +14,16 @@ import BenchmarkDashboard from '@/components/modules/BenchmarkDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import PortfolioDashboard from '@/components/modules/PortfolioDashboard';
 import { FaqDashboard } from '@/components/modules/FaqDashboard';
+import CapacityDashboardMod from '@/components/modules/CapacityDashboard';
+import PhasedFinancialDashboard from '@/components/modules/PhasedFinancialDashboard';
+import TaxIncentiveDashboard from '@/components/modules/TaxIncentiveDashboard';
+import DisasterRiskDashboard from '@/components/modules/DisasterRiskDashboard';
+import GridReliabilityDashboard from '@/components/modules/GridReliabilityDashboard';
+import TalentDashboard from '@/components/modules/TalentDashboard';
+import ComplianceDashboard from '@/components/modules/ComplianceDashboard';
+import AssetLifecycleDashboard from '@/components/modules/AssetLifecycleDashboard';
+import CBMDashboard from '@/components/modules/CBMDashboard';
+import FuelGenDashboard from '@/components/modules/FuelGenDashboard';
 import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparisonPanel';
 import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
@@ -52,6 +62,26 @@ export default function Home() {
         return <MonteCarloDashboard />;
       case 'portfolio':
         return <PortfolioDashboard />;
+      case 'capacity':
+        return <CapacityDashboardMod />;
+      case 'phased-finance':
+        return <PhasedFinancialDashboard />;
+      case 'tax':
+        return <TaxIncentiveDashboard />;
+      case 'disaster':
+        return <DisasterRiskDashboard />;
+      case 'grid':
+        return <GridReliabilityDashboard />;
+      case 'talent':
+        return <TalentDashboard />;
+      case 'compliance':
+        return <ComplianceDashboard />;
+      case 'asset-lifecycle':
+        return <AssetLifecycleDashboard />;
+      case 'cbm':
+        return <CBMDashboard />;
+      case 'fuel-gen':
+        return <FuelGenDashboard />;
       case 'faq':
         return <FaqDashboard />;
       default: // 'sim'

@@ -8,6 +8,7 @@ import { calculateEnvironmentalDegradation } from '@/modules/maintenance/Environ
 import { calculateDowntimeRisk } from '@/modules/risk/DowntimeCalculator';
 import { ASSETS } from '@/constants/assets';
 import { COUNTRIES } from '@/constants/countries';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import {
     Users, Wrench, Activity, AlertTriangle, ShieldAlert,
     ArrowRight, TrendingUp, DollarSign, CloudFog, Globe2, Zap
@@ -37,6 +38,7 @@ const REGION_LABELS: Record<string, string> = {
 
 export function SimulationDashboard() {
     const { selectedCountry, inputs, actions, isLoading } = useSimulationStore();
+    const effectiveInputs = useEffectiveInputs();
     const [activeScenario, setActiveScenario] = useState<'standard' | 'stress'>('standard');
 
     // Scenario State (Local override for "What-If")
@@ -86,7 +88,8 @@ export function SimulationDashboard() {
 
         // 1. Staffing Calculation — pass maintenance model + hybridRatio for proper correlation
         const opModel = inputs.maintenanceModel === 'vendor' ? 'vendor' : inputs.maintenanceModel === 'hybrid' ? 'hybrid' : 'in-house';
-        const eng = calculateStaffing('engineer', 4, inputs.shiftModel, selectedCountry, true, undefined, undefined, opModel, inputs.hybridRatio ?? 0.5);
+        const engHeadcount = effectiveInputs.headcount_Engineer ?? 4;
+        const eng = calculateStaffing('engineer', engHeadcount, inputs.shiftModel, selectedCountry, true, undefined, undefined, opModel, inputs.hybridRatio ?? 0.5);
 
         // Turnover Calculation
         const coT = calculateTurnoverCost(

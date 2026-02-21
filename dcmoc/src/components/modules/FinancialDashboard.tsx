@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
@@ -103,14 +103,79 @@ const FinancialDashboard = () => {
         takeOrPayPct: 70,
     });
 
+    // Track whether user has manually edited (don't overwrite manual edits)
+    const userEditedFin = useRef(false);
+    const userEditedRev = useRef(false);
+
+    // Reset manual edit flags when country changes (re-enable auto-calc)
+    useEffect(() => {
+        userEditedFin.current = false;
+        userEditedRev.current = false;
+    }, [selectedCountry?.id]);
+
+    // Auto-derive financial parameters from country/tier/capex when they change
+    useEffect(() => {
+        if (!selectedCountry || userEditedFin.current) return;
+        const eco = selectedCountry.economy;
+        const tier = inputs.tierLevel ?? 3;
+
+        // Revenue per kW: tier 4 premium, tier 2 economy, adjusted by electricity cost
+        const tierRevMult = tier === 4 ? 1.4 : tier === 3 ? 1.0 : 0.75;
+        const baseRevPerKw = 120 + (eco.electricityRate * 500); // Higher electricity → higher colocation price
+        const autoRevPerKw = Math.round(baseRevPerKw * tierRevMult);
+
+        // Discount rate: risk-free proxy + country risk premium
+        const riskPremium = eco.inflationRate > 0.05 ? 0.04 : eco.inflationRate > 0.03 ? 0.02 : 0.01;
+        const autoDiscount = Math.round((0.06 + riskPremium + eco.inflationRate) * 100) / 100; // 6% base + risk + inflation
+
+        setFinInputs({
+            revenuePerKwMonth: autoRevPerKw,
+            discountRate: Math.min(0.18, autoDiscount),
+            projectLifeYears: 10,
+            escalationRate: Math.round(eco.inflationRate * 1000) / 1000,
+            opexEscalation: Math.round(eco.laborEscalation * 1000) / 1000,
+            taxRate: Math.round(eco.taxRate * 1000) / 1000,
+            depreciationYears: 15,
+        });
+    }, [selectedCountry?.id, inputs.tierLevel]);
+
+    useEffect(() => {
+        if (!selectedCountry || userEditedRev.current) return;
+        const eco = selectedCountry.economy;
+        const tier = inputs.tierLevel ?? 3;
+        const itLoad = inputs.itLoad ?? 1000;
+
+        // NRC per kW: derive from capex if available, otherwise estimate from tier
+        const capexPerKw = capexResults ? Math.round(capexResults.total / Math.max(1, itLoad)) : 0;
+        const autoNrcPerKw = capexPerKw > 0 ? Math.round(capexPerKw * 0.02) : (tier === 4 ? 350 : tier === 3 ? 250 : 150);
+
+        // MRC per kW: mirrors revenue logic
+        const tierMrcMult = tier === 4 ? 1.4 : tier === 3 ? 1.0 : 0.75;
+        const baseMrc = 120 + (eco.electricityRate * 500);
+        const autoMrcPerKw = Math.round(baseMrc * tierMrcMult);
+
+        setRevInputs({
+            nrcPerKw: Math.max(100, autoNrcPerKw),
+            nrcCustomFitout: Math.round(50000 * (tier === 4 ? 1.5 : tier === 3 ? 1.0 : 0.7)),
+            nrcCrossConnect: 15000,
+            mrcPerKwMonth: autoMrcPerKw,
+            mrcEscalation: Math.round(eco.inflationRate * 100),
+            mrcCrossConnectMonthly: 5000,
+            contractYears: 10,
+            takeOrPayPct: 70,
+        });
+    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total]);
+
     // Year-level overrides for the combined table
     const [yearOverrides, setYearOverrides] = useState<Record<number, Record<string, number>>>({});
 
     const handleChange = (key: string, value: number) => {
+        userEditedFin.current = true;
         setFinInputs(prev => ({ ...prev, [key]: value }));
     };
 
     const handleRevChange = (key: string, value: number) => {
+        userEditedRev.current = true;
         setRevInputs(prev => ({ ...prev, [key]: value }));
     };
 

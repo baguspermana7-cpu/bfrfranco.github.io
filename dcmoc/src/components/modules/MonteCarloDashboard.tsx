@@ -121,6 +121,35 @@ export default function MonteCarloDashboard() {
                 </div>
             </div>
 
+            {/* Brief Introduction */}
+            <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800/30 rounded-xl p-5">
+                <h3 className="text-sm font-bold text-orange-700 dark:text-orange-400 mb-2 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    What is Monte Carlo Simulation?
+                </h3>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                    Monte Carlo simulation is a quantitative risk analysis technique that runs thousands of scenarios
+                    by randomly varying key financial inputs (revenue, OPEX, occupancy, electricity cost, etc.)
+                    within their realistic ranges. Instead of a single deterministic forecast, it produces a
+                    <span className="font-semibold text-orange-700 dark:text-orange-300"> probability distribution </span>
+                    of outcomes — showing you not just the expected return, but the full range of possibilities.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0" />
+                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">NPV Distribution</span> — Probability of achieving positive net present value across all scenarios</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 shrink-0" />
+                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">IRR Risk</span> — Likelihood that internal rate of return falls below your hurdle rate (e.g., 10%)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">VaR (Value at Risk)</span> — Worst-case financial exposure at 5th percentile confidence level</span>
+                    </div>
+                </div>
+            </div>
+
             {/* Controls */}
             <div className="grid grid-cols-[300px_1fr] gap-6">
                 {/* Left: Controls */}

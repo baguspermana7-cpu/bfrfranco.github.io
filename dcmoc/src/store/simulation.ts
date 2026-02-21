@@ -28,8 +28,10 @@ interface SimulationState {
         // A12: Configurable occupancy ramp (year-by-year %)
         occupancyRamp: number[];
         staffingAutoMode: boolean;
+        // Capacity planning phases
+        capacityPhases: { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[];
     };
-    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq';
+    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen';
     isLoading: boolean;
     actions: {
         setLoading: (loading: boolean) => void;
@@ -74,6 +76,11 @@ export const useSimulationStore = create<SimulationState>((set) => ({
         // A12: Default occupancy ramp (editable per-year)
         occupancyRamp: [0.25, 0.50, 0.70, 0.85, 0.92, 0.95, 0.95, 0.95, 0.95, 0.95],
         staffingAutoMode: true,
+        capacityPhases: [
+            { id: 'p1', label: 'Phase 1', itLoadKw: 2000, startMonth: 0, buildMonths: 18, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
+            { id: 'p2', label: 'Phase 2', itLoadKw: 5000, startMonth: 18, buildMonths: 14, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
+            { id: 'p3', label: 'Phase 3', itLoadKw: 10000, startMonth: 36, buildMonths: 12, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
+        ],
     },
     activeTab: 'sim', // Change default to SIM for "Super App" feel
     actions: {

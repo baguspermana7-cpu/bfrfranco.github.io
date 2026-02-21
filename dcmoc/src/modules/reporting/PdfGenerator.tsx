@@ -1325,3 +1325,409 @@ export const generateMasterReportPDF = async (
     // End of Master Export
     savePdf(doc, `DCMOC_MasterReport_${country.name}_${new Date().toISOString().slice(0, 10)}.pdf`);
 };
+
+// ═══════════════════════════════════════════════════════════════
+// COUNTRY INTELLIGENCE PDF — Tax, Disaster, Grid, Talent (4-6 pages)
+// ═══════════════════════════════════════════════════════════════
+
+export const generateCountryIntelPDF = async (
+    country: CountryProfile,
+    data: {
+        taxResult: any;
+        disasterResult: any;
+        gridResult: any;
+        talentResult: any;
+        itLoadKw: number;
+        totalCapex: number;
+        totalFTE: number;
+        annualStaffCost: number;
+    },
+    branding?: BrandingConfig
+) => {
+    const { doc, autoTable } = await initDoc(branding);
+    let currentPage = 1;
+
+    // 1. Cover
+    drawCoverPage(doc, 'Country Intelligence\nReport', `Market Assessment for ${country.name}`, {
+        client: 'Site Selection Committee',
+        date: today(),
+        version: '1.0'
+    }, branding);
+
+    doc.addPage(); currentPage++;
+
+    // ── PAGE 2: Tax & Incentive Analysis ──
+    drawModernHeader(doc, 'Tax & Incentive Analysis', `${country.name} — Fiscal Environment`, branding);
+    let y = 35;
+
+    const tax = data.taxResult;
+    if (tax) {
+        drawKpiCard(doc, 14, y, 42, 24, 'Total Savings', fmt(tax.totalIncentiveValue), 'NPV of incentives');
+        drawKpiCard(doc, 60, y, 42, 24, 'Effective Tax Y1', `${(tax.effectiveTaxTimeline[0] * 100).toFixed(1)}%`, `vs ${(country.economy.taxRate * 100).toFixed(1)}% standard`);
+        drawKpiCard(doc, 106, y, 42, 24, 'NPV Uplift', fmt(tax.npvWithIncentives - tax.npvWithoutIncentives), 'With incentives');
+        drawKpiCard(doc, 152, y, 42, 24, 'IRR Uplift', `+${(tax.irrWithIncentives - tax.irrWithoutIncentives).toFixed(1)}%`, `${tax.irrWithIncentives.toFixed(1)}% with incentives`);
+        y += 35;
+
+        // Tax Holiday Timeline
+        y = drawSectionTitle(doc, y, 'Tax Holiday Timeline', '1.0', branding);
+        const taxRows = tax.effectiveTaxTimeline.slice(0, 10).map((rate: number, i: number) => [
+            `Year ${i + 1}`,
+            `${(country.economy.taxRate * 100).toFixed(1)}%`,
+            `${(rate * 100).toFixed(1)}%`,
+            fmt(tax.yearlyTaxSavings[i] || 0),
+        ]);
+        autoTable(doc, {
+            startY: y,
+            head: [['Period', 'Standard Rate', 'Effective Rate', 'Tax Savings']],
+            body: taxRows,
+            theme: 'striped',
+            headStyles: { fillColor: PDF_COLORS.slate900 },
+            styles: { fontSize: 8, cellPadding: 2 },
+            margin: { left: 14, right: 14 },
+            columnStyles: { 3: { halign: 'right', textColor: [5, 150, 105] } }
+        });
+        y = (doc as any).lastAutoTable.finalY + 10;
+
+        // Incentive Programs
+        if (tax.incentiveSummary && tax.incentiveSummary.length > 0) {
+            y = ensureSpace(doc, y, 40, { current: currentPage });
+            y = drawExecutiveBox(doc, y, 'Available Incentive Programs',
+                tax.incentiveSummary.join('\n'),
+                'success'
+            );
+        }
+
+        // FTZ
+        if (country.taxIncentives?.freeTradeZones && country.taxIncentives.freeTradeZones.length > 0) {
+            y = ensureSpace(doc, y, 20, { current: currentPage });
+            y = drawParagraph(doc, y, `Free Trade Zones: ${country.taxIncentives.freeTradeZones.join(', ')}. Import duty savings: ${fmt(tax.ftzBenefits)}.`);
+        }
+    }
+
+    drawFooter(doc, currentPage, branding);
+    doc.addPage(); currentPage++;
+
+    // ── PAGE 3: Natural Disaster Risk ──
+    drawModernHeader(doc, 'Natural Disaster Risk', `${country.name} — Hazard Profile`, branding);
+    y = 35;
+
+    const disaster = data.disasterResult;
+    if (disaster) {
+        drawKpiCard(doc, 14, y, 42, 24, 'Risk Score', `${disaster.compositeScore}/100`, disaster.riskCategory);
+        drawKpiCard(doc, 60, y, 42, 24, 'Insurance/Yr', fmt(disaster.annualInsuranceCost), 'Adjusted premium');
+        drawKpiCard(doc, 106, y, 42, 24, 'Structural +', fmt(disaster.structuralCostAdder), 'CAPEX hardening');
+        drawKpiCard(doc, 152, y, 42, 24, 'Revenue @ Risk', fmt(disaster.revenueAtRisk), `${disaster.businessInterruptionDays} days interruption`);
+        y += 35;
+
+        // Risk Breakdown Table
+        y = drawSectionTitle(doc, y, 'Risk Factor Breakdown', '2.0', branding);
+        const riskRows = disaster.riskBreakdown.map((r: any) => [
+            r.type, `${r.score}/100`, r.impact
+        ]);
+        autoTable(doc, {
+            startY: y,
+            head: [['Hazard Type', 'Score', 'Impact Assessment']],
+            body: riskRows,
+            theme: 'striped',
+            headStyles: { fillColor: PDF_COLORS.slate900 },
+            styles: { fontSize: 8, cellPadding: 2 },
+            margin: { left: 14, right: 14 }
+        });
+        y = (doc as any).lastAutoTable.finalY + 10;
+
+        // Mitigation Options
+        if (disaster.mitigationOptions && disaster.mitigationOptions.length > 0) {
+            y = ensureSpace(doc, y, 60, { current: currentPage });
+            y = drawSectionTitle(doc, y, 'Mitigation Recommendations', '2.1', branding);
+            const mitigRows = disaster.mitigationOptions.map((m: any) => [
+                m.name, fmt(m.cost), fmt(m.annualBenefit), `${m.roiPercent}%`
+            ]);
+            autoTable(doc, {
+                startY: y,
+                head: [['Measure', 'Cost', 'Annual Benefit', 'ROI']],
+                body: mitigRows,
+                theme: 'striped',
+                headStyles: { fillColor: PDF_COLORS.slate900 },
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { left: 14, right: 14 },
+                columnStyles: { 3: { halign: 'right', textColor: [5, 150, 105] } }
+            });
+            y = (doc as any).lastAutoTable.finalY + 10;
+        }
+    }
+
+    drawFooter(doc, currentPage, branding);
+    doc.addPage(); currentPage++;
+
+    // ── PAGE 4: Grid Reliability ──
+    drawModernHeader(doc, 'Grid Reliability Index', `${country.name} — Power Infrastructure`, branding);
+    y = 35;
+
+    const grid = data.gridResult;
+    if (grid) {
+        drawKpiCard(doc, 14, y, 35, 24, 'Grid Score', `${grid.reliabilityScore}`, `Grade ${grid.reliabilityGrade}`);
+        drawKpiCard(doc, 53, y, 35, 24, 'Outage Hrs/Yr', `${(grid.annualOutageMinutes / 60).toFixed(1)}`, `${grid.annualExpectedOutages} events`);
+        drawKpiCard(doc, 92, y, 35, 24, 'Gen Capacity', `${grid.requiredGenCapacity} kW`, `${grid.recommendedFuelHours}h fuel`);
+        drawKpiCard(doc, 131, y, 35, 24, 'Fuel Cost/Yr', fmt(grid.annualFuelCost), 'Backup operations');
+        drawKpiCard(doc, 170, y, 24, 24, 'Solar', `${grid.solarViabilityScore}`, '/100');
+        y += 35;
+
+        // Grid Cost Breakdown
+        y = drawSectionTitle(doc, y, 'Grid Risk Cost Breakdown', '3.0', branding);
+        if (grid.costBreakdown) {
+            const gridCostRows = grid.costBreakdown.map((item: any) => [item.label, fmtMoney(item.value)]);
+            gridCostRows.push(['Total Grid-Adjusted OPEX', fmtMoney(grid.gridRiskAdjustedOpex)]);
+            autoTable(doc, {
+                startY: y,
+                head: [['Cost Component', 'Annual Cost']],
+                body: gridCostRows,
+                theme: 'striped',
+                headStyles: { fillColor: PDF_COLORS.slate900 },
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { left: 14, right: 14 },
+                columnStyles: { 1: { halign: 'right' } }
+            });
+            y = (doc as any).lastAutoTable.finalY + 10;
+        }
+
+        // Backup Architecture
+        y = ensureSpace(doc, y, 40, { current: currentPage });
+        y = drawExecutiveBox(doc, y, 'Backup Power Architecture',
+            `Grid Feed ${grid.dualFeedRecommendation ? '(Dual A+B)' : '(Single)'} → ATS → UPS (${data.itLoadKw} kW)\n` +
+            `Generator: ${grid.requiredGenCapacity} kW (${grid.recommendedFuelHours}h fuel reserve)\n` +
+            `Availability with Backup: ${grid.availabilityWithBackup.toFixed(3)}%\n` +
+            `BESS ROI: ${grid.batteryStorageROI < 50 ? `${grid.batteryStorageROI} year payback` : 'Not recommended'}`,
+            'info'
+        );
+    }
+
+    drawFooter(doc, currentPage, branding);
+    doc.addPage(); currentPage++;
+
+    // ── PAGE 5: Talent Availability ──
+    drawModernHeader(doc, 'Talent Availability Index', `${country.name} — Workforce Assessment`, branding);
+    y = 35;
+
+    const talent = data.talentResult;
+    if (talent) {
+        drawKpiCard(doc, 14, y, 42, 24, 'Talent Score', `${talent.talentScore}/100`, talent.hiringDifficulty);
+        drawKpiCard(doc, 60, y, 42, 24, 'Salary Premium', `+${((talent.adjustedSalaryMultiplier - 1) * 100).toFixed(0)}%`, fmt(talent.adjustedAnnualStaffCost - data.annualStaffCost) + '/yr extra');
+        drawKpiCard(doc, 106, y, 42, 24, 'Time to Staff', `${talent.timeToFullStaff} mo`, 'Months to full team');
+        drawKpiCard(doc, 152, y, 42, 24, 'Turnover', `${(talent.adjustedTurnoverRate * 100).toFixed(0)}%`, fmt(talent.annualTurnoverCost) + '/yr');
+        y += 35;
+
+        // Talent Breakdown Table
+        y = drawSectionTitle(doc, y, 'Talent Factor Analysis', '4.0', branding);
+        if (talent.talentBreakdown) {
+            const talentRows = talent.talentBreakdown.map((item: any) => [item.metric, item.value, item.impact]);
+            autoTable(doc, {
+                startY: y,
+                head: [['Factor', 'Value', 'Impact']],
+                body: talentRows,
+                theme: 'striped',
+                headStyles: { fillColor: PDF_COLORS.slate900 },
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { left: 14, right: 14 }
+            });
+            y = (doc as any).lastAutoTable.finalY + 10;
+        }
+
+        // Cost Impact Summary
+        y = ensureSpace(doc, y, 50, { current: currentPage });
+        y = drawSectionTitle(doc, y, 'Annual Staff Cost Impact', '4.1', branding);
+        const costImpactRows = [
+            ['Base Annual Staff Cost', fmtMoney(data.annualStaffCost)],
+            [`+ Salary Premium (${((talent.adjustedSalaryMultiplier - 1) * 100).toFixed(0)}%)`, `+${fmtMoney(talent.adjustedAnnualStaffCost - data.annualStaffCost)}`],
+            ['+ Turnover Cost', `+${fmtMoney(talent.annualTurnoverCost)}`],
+            ['+ Training Cost', `+${fmtMoney(talent.annualTrainingCost)}`],
+            ['+ Recruitment Cost', `+${fmtMoney(talent.totalRecruitmentCost)}`],
+            ['Talent-Adjusted Total', fmtMoney(talent.adjustedAnnualStaffCost + talent.annualTurnoverCost + talent.annualTrainingCost)],
+        ];
+        autoTable(doc, {
+            startY: y,
+            head: [['Component', 'Amount']],
+            body: costImpactRows,
+            theme: 'striped',
+            headStyles: { fillColor: PDF_COLORS.slate900 },
+            styles: { fontSize: 8, cellPadding: 2 },
+            margin: { left: 14, right: 14 },
+            columnStyles: { 1: { halign: 'right' } }
+        });
+    }
+
+    drawFooter(doc, currentPage, branding);
+
+    savePdf(doc, `DCMOC_CountryIntel_${country.name}_${new Date().toISOString().slice(0, 10)}.pdf`);
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CAPACITY PLANNING PDF — Phased Build & Financial Analysis (3-5 pages)
+// ═══════════════════════════════════════════════════════════════
+
+export const generateCapacityPlanPDF = async (
+    country: CountryProfile,
+    data: {
+        capPlan: any; // CapacityPlanResult
+        phases: any[]; // input phases
+        phasedFinancials?: any; // phased finance data
+        itLoadKw: number;
+    },
+    branding?: BrandingConfig
+) => {
+    const { doc, autoTable } = await initDoc(branding);
+    let currentPage = 1;
+
+    // 1. Cover
+    drawCoverPage(doc, 'Capacity Planning\n& Phased Investment', `Multi-Phase Build Strategy for ${country.name}`, {
+        client: 'Infrastructure Planning',
+        date: today(),
+        version: '1.0'
+    }, branding);
+
+    doc.addPage(); currentPage++;
+
+    // ── PAGE 2: Capacity Overview ──
+    drawModernHeader(doc, 'Capacity Plan Overview', `${data.capPlan.phases.length} Phases — ${fmt(data.capPlan.totalItLoadKw)} kW Total`, branding);
+    let y = 35;
+
+    drawKpiCard(doc, 14, y, 42, 24, 'Total Capacity', `${(data.capPlan.totalItLoadKw / 1000).toFixed(1)} MW`, `${data.capPlan.phases.length} phases`);
+    drawKpiCard(doc, 60, y, 42, 24, 'Total CAPEX', fmt(data.capPlan.totalCapex), `$${Math.round(data.capPlan.totalCapex / data.capPlan.totalItLoadKw).toLocaleString()}/kW`);
+    drawKpiCard(doc, 106, y, 42, 24, 'Scalability', `${data.capPlan.scalabilityScore}/100`, 'Phase efficiency score');
+    drawKpiCard(doc, 152, y, 42, 24, 'Avg Utilization', `${(data.capPlan.phaseEfficiency * 100).toFixed(0)}%`, 'Across all phases');
+    y += 35;
+
+    // Phase Comparison Table
+    y = drawSectionTitle(doc, y, 'Phase-by-Phase Breakdown', '1.0', branding);
+    const phaseRows = data.capPlan.phases.map((p: any, i: number) => [
+        data.phases[i]?.label || `Phase ${i + 1}`,
+        `${p.itLoadKw.toLocaleString()} kW`,
+        fmt(p.capex),
+        `$${Math.round(p.capexPerKw).toLocaleString()}`,
+        `${p.headcount} FTE`,
+        p.pue.toFixed(2),
+        `M${data.phases[i]?.startMonth || 0}`,
+        `${data.phases[i]?.buildMonths || 0} mo`,
+    ]);
+
+    autoTable(doc, {
+        startY: y,
+        head: [['Phase', 'IT Load', 'CAPEX', '$/kW', 'Staff', 'PUE', 'Start', 'Build']],
+        body: phaseRows,
+        theme: 'striped',
+        headStyles: { fillColor: PDF_COLORS.slate900 },
+        styles: { fontSize: 8, cellPadding: 2 },
+        margin: { left: 14, right: 14 },
+        columnStyles: {
+            2: { halign: 'right' },
+            3: { halign: 'right' },
+            4: { halign: 'right' },
+        }
+    });
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // Build Timeline
+    y = ensureSpace(doc, y, 50, { current: currentPage });
+    y = drawSectionTitle(doc, y, 'Build Timeline', '1.1', branding);
+
+    data.capPlan.timeline.forEach((event: any, i: number) => {
+        y = ensureSpace(doc, y, 12, { current: currentPage });
+        const phaseColor = i % 2 === 0 ? PDF_COLORS.primary : PDF_COLORS.secondary;
+        doc.setFillColor(...phaseColor);
+        doc.circle(18, y + 2, 2, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(...PDF_COLORS.slate900);
+        doc.text(event.label, 24, y + 3);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...PDF_COLORS.slate500);
+        doc.text(`M${event.startMonth} → M${event.endMonth} (${event.type})`, 80, y + 3);
+        y += 8;
+    });
+
+    drawFooter(doc, currentPage, branding);
+    doc.addPage(); currentPage++;
+
+    // ── PAGE 3: Staffing Ramp ──
+    drawModernHeader(doc, 'Staffing & PUE Evolution', 'Resource Scaling Over Time', branding);
+    y = 35;
+
+    // Staffing Ramp Table (sample key months)
+    y = drawSectionTitle(doc, y, 'Staffing Ramp', '2.0', branding);
+    const staffSample = data.capPlan.staffingRamp.filter((_: any, i: number) => i % 6 === 0 || i === data.capPlan.staffingRamp.length - 1);
+    const staffRows = staffSample.map((s: any) => [`Month ${s.month}`, `${s.fte} FTE`]);
+    autoTable(doc, {
+        startY: y,
+        head: [['Month', 'Total FTE']],
+        body: staffRows,
+        theme: 'striped',
+        headStyles: { fillColor: PDF_COLORS.slate900 },
+        styles: { fontSize: 8, cellPadding: 2 },
+        margin: { left: 14, right: 100 }
+    });
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // PUE Evolution Table
+    y = ensureSpace(doc, y, 50, { current: currentPage });
+    y = drawSectionTitle(doc, y, 'PUE Evolution', '2.1', branding);
+    const pueSample = data.capPlan.pueEvolution.filter((_: any, i: number) => i % 6 === 0 || i === data.capPlan.pueEvolution.length - 1);
+    const pueRows = pueSample.map((p: any) => [`Month ${p.month}`, p.pue.toFixed(3)]);
+    autoTable(doc, {
+        startY: y,
+        head: [['Month', 'PUE']],
+        body: pueRows,
+        theme: 'striped',
+        headStyles: { fillColor: PDF_COLORS.slate900 },
+        styles: { fontSize: 8, cellPadding: 2 },
+        margin: { left: 14, right: 100 }
+    });
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // ── PAGE 4: Phased Financial (if available) ──
+    if (data.phasedFinancials) {
+        drawFooter(doc, currentPage, branding);
+        doc.addPage(); currentPage++;
+
+        drawModernHeader(doc, 'Phased Financial Analysis', 'Per-Phase & Blended Investment Returns', branding);
+        y = 35;
+
+        const pf = data.phasedFinancials;
+        drawKpiCard(doc, 14, y, 42, 24, 'Blended IRR', `${pf.blendedIRR?.toFixed(1) || 'N/A'}%`, 'Weighted by investment');
+        drawKpiCard(doc, 60, y, 42, 24, 'Total NPV', fmt(pf.totalNPV || 0), 'All phases combined');
+        drawKpiCard(doc, 106, y, 42, 24, 'Payback', `${pf.weightedPayback?.toFixed(1) || 'N/A'} yr`, 'Weighted average');
+        drawKpiCard(doc, 152, y, 42, 24, 'Investment', fmt(pf.totalInvestment || data.capPlan.totalCapex), 'Total capital deployed');
+        y += 35;
+
+        // Per-Phase Investment Decision Table
+        y = drawSectionTitle(doc, y, 'Investment Decision Matrix', '3.0', branding);
+        if (pf.phaseResults) {
+            const decisionRows = pf.phaseResults.map((pr: any) => [
+                pr.label,
+                fmt(pr.capex),
+                `${pr.irr?.toFixed(1) || 'N/A'}%`,
+                fmt(pr.npv || 0),
+                `${pr.payback?.toFixed(1) || 'N/A'} yr`,
+                pr.irr >= 12 ? 'GO' : pr.irr >= 8 ? 'CONDITIONAL' : 'NO-GO',
+            ]);
+            autoTable(doc, {
+                startY: y,
+                head: [['Phase', 'CAPEX', 'IRR', 'NPV', 'Payback', 'Decision']],
+                body: decisionRows,
+                theme: 'striped',
+                headStyles: { fillColor: PDF_COLORS.slate900 },
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { left: 14, right: 14 },
+                columnStyles: {
+                    1: { halign: 'right' },
+                    2: { halign: 'right' },
+                    3: { halign: 'right' },
+                    4: { halign: 'right' },
+                }
+            });
+        }
+    }
+
+    drawFooter(doc, currentPage, branding);
+
+    savePdf(doc, `DCMOC_CapacityPlan_${country.name}_${new Date().toISOString().slice(0, 10)}.pdf`);
+};
