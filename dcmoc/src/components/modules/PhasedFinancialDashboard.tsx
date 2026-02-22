@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { calculateCapacityPlan, CapacityPlanResult } from '@/modules/capacity/CapacityPlanningEngine';
 import { calculateFinancials, FinancialResult, calculateIRR } from '@/modules/analytics/FinancialEngine';
@@ -10,14 +10,13 @@ import { calculateGridReliability } from '@/modules/infrastructure/GridReliabili
 import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle } from 'lucide-react';
+import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
-    ComposedChart, Line, Area, Cell, ReferenceLine,
+    ComposedChart, Line, Area, Cell, ReferenceLine, LineChart,
 } from 'recharts';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
+import { fmt, fmtMoney, fmtPct } from '@/lib/format';
+import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
 interface PhaseFinancialResult {
     phaseLabel: string;
@@ -30,9 +29,10 @@ interface PhaseFinancialResult {
 
 const PhasedFinancialDashboard = () => {
     const { selectedCountry, inputs } = useSimulationStore();
+    const [isExporting, setIsExporting] = useState(false);
 
-    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments } = useMemo(() => {
-        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 } };
+    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative } = useMemo(() => {
+        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '' };
 
         // 1. Get capacity plan
         const capPlan = calculateCapacityPlan({
@@ -156,6 +156,62 @@ const PhasedFinancialDashboard = () => {
             cumulative: Math.round(cf.cumulativeCashflow / 1000),
         }));
 
+        // 6. Scenario comparison (conservative / base / aggressive)
+        const scenarios = (['conservative', 'base', 'aggressive'] as const).map(scenario => {
+            const revMult = scenario === 'conservative' ? 0.85 : scenario === 'aggressive' ? 1.15 : 1.0;
+            const occDelay = scenario === 'conservative' ? 1 : scenario === 'aggressive' ? -1 : 0;
+            const capexMult = scenario === 'conservative' ? 1.10 : scenario === 'aggressive' ? 0.95 : 1.0;
+
+            const scenFinancials = calculateFinancials({
+                totalCapex: totalCapex * capexMult,
+                annualOpex: capPlan.totalItLoadKw * 50 * 12 + gridOpexAdder + insuranceOpex + talentCostAdder,
+                revenuePerKwMonth: 150 * revMult,
+                itLoadKw: capPlan.totalItLoadKw,
+                discountRate: adjustedDiscount,
+                projectLifeYears: 20,
+                escalationRate: 0.03,
+                opexEscalation: selectedCountry.economy.inflationRate,
+                occupancyRamp: inputs.occupancyRamp.map((o, i) => {
+                    const shifted = Math.max(0, Math.min(0.95, i + occDelay < 0 ? 0.15 : o));
+                    return shifted;
+                }).concat(Array(10).fill(0.95)),
+                taxRate: effectiveTaxRate,
+                depreciationYears: 20,
+            });
+            return {
+                scenario,
+                irr: scenFinancials.irr,
+                npv: scenFinancials.npv,
+                payback: scenFinancials.paybackPeriodYears,
+                capex: Math.round(totalCapex * capexMult),
+            };
+        });
+
+        // 7. Construction financing (IDC = interest during construction)
+        const constructionMonths = capPlan.phases.reduce((max, p) => Math.max(max, p.startMonth + p.buildMonths), 0);
+        const drawSchedule = capPlan.phases.map(phase => {
+            const monthlyDraw = phase.capex / phase.buildMonths;
+            const avgOutstanding = phase.capex * 0.5; // Linear draw ~50% avg outstanding
+            const idc = avgOutstanding * (0.05 * phase.buildMonths / 12); // 5% construction loan rate
+            return {
+                label: phase.label,
+                capex: phase.capex,
+                drawMonths: phase.buildMonths,
+                monthlyDraw: Math.round(monthlyDraw),
+                idc: Math.round(idc),
+            };
+        });
+        const totalIDC = drawSchedule.reduce((s, d) => s + d.idc, 0);
+
+        // 8. Narrative
+        const goPhases = phaseResults.filter(p => p.goNoGo).length;
+        const narrative = `This ${phaseResults.length}-phase investment program requires ${fmtMoney(totalCapex)} in total capital across ${selectedCountry.name}. ` +
+            `After accounting for tax incentives (${fmtMoney(taxResult.totalIncentiveValue)}), disaster risk premiums, grid reliability costs, and talent market adjustments, ` +
+            `the blended IRR is ${weightedIrr.toFixed(1)}% against a 12% hurdle rate. ` +
+            `${goPhases === phaseResults.length ? 'All phases pass the GO threshold' : `${goPhases} of ${phaseResults.length} phases meet the hurdle`}. ` +
+            `Interest during construction adds ${fmtMoney(totalIDC)} to the effective cost base over ${constructionMonths} months of build activity. ` +
+            `The profitability index of ${pi.toFixed(2)}x indicates ${pi > 1.5 ? 'strong value creation' : pi > 1 ? 'positive but modest returns' : 'value destruction'}.`;
+
         return {
             capacityResult: capPlan,
             phaseFinancials: phaseResults,
@@ -171,6 +227,11 @@ const PhasedFinancialDashboard = () => {
                 grid: Math.round(gridOpexAdder),
                 talent: Math.round(talentCostAdder),
             },
+            scenarios,
+            drawSchedule,
+            totalIDC,
+            constructionMonths,
+            narrative,
         };
     }, [selectedCountry, inputs]);
 
@@ -181,14 +242,50 @@ const PhasedFinancialDashboard = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Calculator className="w-6 h-6 text-blue-500" />
-                    Phased Financial IRR/ROI
-                </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                    {selectedCountry.name} · {capacityResult.phases.length} Phases · Tax-adjusted · Risk-adjusted discount rate
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Calculator className="w-6 h-6 text-blue-500" />
+                        Phased Financial IRR/ROI
+                    </h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                        {selectedCountry.name} · {capacityResult.phases.length} Phases · Tax-adjusted · Risk-adjusted discount rate
+                    </p>
+                </div>
+                <ExportPDFButton
+                    isGenerating={isExporting}
+                    onExport={async () => {
+                        setIsExporting(true);
+                        try {
+                            const { generatePhasedFinancialPDF } = await import('@/modules/reporting/PdfGenerator');
+                            await generatePhasedFinancialPDF(selectedCountry!, {
+                                phaseResults: phaseFinancials.map(pf => ({
+                                    label: pf.phaseLabel,
+                                    capex: pf.capex,
+                                    irr: pf.irr,
+                                    npv: pf.npv,
+                                    payback: pf.payback,
+                                })),
+                                blendedIRR: blendedIrr,
+                                totalNPV: blendedNpv,
+                                weightedPayback: blendedPayback,
+                                totalInvestment,
+                                profitabilityIndex,
+                                scenarios,
+                                idcData: drawSchedule,
+                                totalIDC,
+                                blendedCashflows: cashflowData,
+                                narrative,
+                            });
+                        } catch (e) {
+                            console.error('Phased Financial PDF error:', e);
+                        } finally {
+                            setIsExporting(false);
+                        }
+                    }}
+                    label="PDF"
+                    className="px-2 py-1 text-[10px]"
+                />
             </div>
 
             {/* KPIs */}
@@ -249,6 +346,15 @@ const PhasedFinancialDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Narrative Summary */}
+            {narrative && (
+                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800/50">
+                    <CardContent className="pt-5 pb-4">
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{narrative}</p>
+                    </CardContent>
+                </Card>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Phase Decision Matrix */}
@@ -343,6 +449,95 @@ const PhasedFinancialDashboard = () => {
                                 <Line type="monotone" dataKey="cumulative" stroke="#06b6d4" strokeWidth={2} dot={false} />
                             </ComposedChart>
                         </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Scenario Comparison + Construction Financing */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Scenario Comparison */}
+                <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                    <CardContent className="pt-6">
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Scenario Comparison</h3>
+                        <p className="text-[11px] text-slate-400 mb-4">Conservative (-15% rev, +10% CAPEX), Base, Aggressive (+15% rev, -5% CAPEX)</p>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                                <thead>
+                                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                                        <th className="text-left py-2 px-2 text-slate-500">Scenario</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">CAPEX</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">IRR</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">NPV</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">Payback</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {scenarios.map((s, i) => (
+                                        <tr key={i} className={`border-b border-slate-100 dark:border-slate-800 ${s.scenario === 'base' ? 'bg-cyan-50 dark:bg-cyan-950/20' : ''}`}>
+                                            <td className="py-2 px-2 font-medium text-slate-900 dark:text-white capitalize flex items-center gap-1.5">
+                                                {s.scenario === 'conservative' && <AlertTriangle className="w-3 h-3 text-amber-500" />}
+                                                {s.scenario === 'base' && <Target className="w-3 h-3 text-cyan-500" />}
+                                                {s.scenario === 'aggressive' && <TrendingUp className="w-3 h-3 text-emerald-500" />}
+                                                {s.scenario}
+                                            </td>
+                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(s.capex)}</td>
+                                            <td className={`text-right py-2 px-2 font-semibold ${s.irr >= 12 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {s.irr.toFixed(1)}%
+                                            </td>
+                                            <td className={`text-right py-2 px-2 ${s.npv >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {fmtMoney(s.npv)}
+                                            </td>
+                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{s.payback} yr</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Construction Financing / IDC */}
+                <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                    <CardContent className="pt-6">
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Construction Financing &amp; IDC</h3>
+                        <p className="text-[11px] text-slate-400 mb-4">Interest during construction at 5% construction loan rate over {constructionMonths} months</p>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                                <thead>
+                                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                                        <th className="text-left py-2 px-2 text-slate-500">Phase</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">CAPEX</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">Draw Period</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">Monthly Draw</th>
+                                        <th className="text-right py-2 px-2 text-slate-500">IDC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {drawSchedule.map((d, i) => (
+                                        <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
+                                            <td className="py-2 px-2 font-medium text-slate-900 dark:text-white">{d.label}</td>
+                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(d.capex)}</td>
+                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{d.drawMonths} mo</td>
+                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(d.monthlyDraw)}</td>
+                                            <td className="text-right py-2 px-2 text-amber-600 dark:text-amber-400 font-medium">{fmtMoney(d.idc)}</td>
+                                        </tr>
+                                    ))}
+                                    <tr className="font-bold border-t-2 border-slate-200 dark:border-slate-600">
+                                        <td className="py-2 px-2 text-slate-900 dark:text-white">Total</td>
+                                        <td className="text-right py-2 px-2 text-slate-900 dark:text-white">{fmtMoney(drawSchedule.reduce((s, d) => s + d.capex, 0))}</td>
+                                        <td className="text-right py-2 px-2 text-slate-500">—</td>
+                                        <td className="text-right py-2 px-2 text-slate-500">—</td>
+                                        <td className="text-right py-2 px-2 text-amber-600 dark:text-amber-400">{fmtMoney(totalIDC)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800/40">
+                            <div className="text-xs text-slate-700 dark:text-slate-300">
+                                Effective CAPEX (incl. IDC): <span className="font-bold">{fmtMoney(totalInvestment + totalIDC)}</span>
+                                <span className="text-slate-500 ml-2">(+{((totalIDC / totalInvestment) * 100).toFixed(1)}% IDC premium)</span>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

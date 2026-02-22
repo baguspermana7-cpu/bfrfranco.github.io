@@ -242,8 +242,8 @@ export const calculateStaffing = (
 
     const shrinkageMult = patternId === '4on4off' ? 0.5 : patternId === '4on3off' ? 0.6 : 1.0;
     const shrinkageFactor = country.labor.shrinkageFactor * shrinkageMult;
-    const shrinkageHeads = Math.ceil(rawHeads * shrinkageFactor * opModelMult);
-    const totalHeads = Math.ceil(rawHeads * opModelMult) + shrinkageHeads;
+    const shrinkageHeads = Math.ceil(rawHeads * shrinkageFactor);
+    const totalHeads = rawHeads + shrinkageHeads;
 
     const weeklyScheduled = pattern.avgWeeklyScheduled;
     const weeklyEffective = pattern.avgWeeklyEffective;

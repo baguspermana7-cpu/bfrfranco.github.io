@@ -27,6 +27,7 @@ import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabili
 import { calculateCapacityPlan, CAPACITY_PRESETS } from '@/modules/capacity/CapacityPlanningEngine';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { calculateFuelGen } from '@/modules/infrastructure/FuelGenEngine';
+import { getPUE } from '@/constants/pue';
 import {
     FileText, AlertTriangle, CheckCircle2, TrendingUp, Download, Loader2,
     DollarSign, Users, Clock, Zap, Building2, Shield, BarChart3,
@@ -34,6 +35,7 @@ import {
     Settings2, StickyNote, Eye, EyeOff, Wrench, Globe, Layers
 } from 'lucide-react';
 import clsx from 'clsx';
+import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 
 type SectionId = 'kpis' | 'cost' | 'tco' | 'capex-shift' | 'risk' | 'insights' | 'maintStrategy' | 'sensitivity' | 'sankey';
 
@@ -161,6 +163,7 @@ export function ReportDashboard() {
                         fullData.slaData,
                         fullData.sparesData,
                         fullData.schedule,
+                        undefined,
                         analystNotes,
                         branding
                     );
@@ -240,12 +243,13 @@ export function ReportDashboard() {
         // CAPEX
         const capexResults = calculateCapex(capexInputs);
 
-        // Assets & Maintenance
-        const estBuildingArea = capexInputs.itLoad * 1.5;
+        // Assets & Maintenance — use simulation store for consistency with FuelGen/Maintenance
+        const reportCoolingMap: 'air' | 'pumped' = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx' ? 'pumped' : 'air';
+        const estBuildingArea = inputs.itLoad * 1.5;
         const assets = generateAssetCounts(
-            capexInputs.itLoad,
+            inputs.itLoad,
             inputs.tierLevel === 4 ? 4 : 3,
-            (capexInputs.coolingType as 'air' | 'pumped'),
+            reportCoolingMap,
             estBuildingArea,
             inputs.coolingTopology,
             inputs.powerRedundancy
@@ -389,6 +393,8 @@ export function ReportDashboard() {
             itLoadKw: inputs.itLoad,
             tierLevel: inputs.tierLevel,
             coolingType: inputs.coolingType,
+            coolingTopology: inputs.coolingTopology,
+            powerRedundancy: inputs.powerRedundancy,
         });
 
         // Return flattened object for easier consumption, matching usage in component
@@ -415,9 +421,6 @@ export function ReportDashboard() {
 
 
     if (!selectedCountry || !fullData) return <div className="p-10 text-center text-slate-400">Loading Report Engine...</div>;
-
-    const fmt = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1000 ? `$${(n / 1000).toFixed(0)}K` : `$${n.toFixed(0)}`;
-    const fmtFull = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 
     const pattern = SHIFT_PATTERNS[fullData.patternId];
 
@@ -626,8 +629,8 @@ export function ReportDashboard() {
                             const deltaStaff = sB.summary.totalStaff - sA.summary.totalStaff;
                             const deltaPue = sB.summary.pue - sA.summary.pue;
                             const rows = [
-                                { label: 'Monthly OPEX', a: fmt(sA.summary.monthlyOpex), b: fmt(sB.summary.monthlyOpex), delta: deltaOpex, fmtDelta: fmt(Math.abs(deltaOpex)) },
-                                { label: 'Annual CAPEX', a: fmt(sA.summary.annualCapex), b: fmt(sB.summary.annualCapex), delta: deltaCapex, fmtDelta: fmt(Math.abs(deltaCapex)) },
+                                { label: 'Monthly OPEX', a: fmtMoney(sA.summary.monthlyOpex), b: fmtMoney(sB.summary.monthlyOpex), delta: deltaOpex, fmtDelta: fmtMoney(Math.abs(deltaOpex)) },
+                                { label: 'Annual CAPEX', a: fmtMoney(sA.summary.annualCapex), b: fmtMoney(sB.summary.annualCapex), delta: deltaCapex, fmtDelta: fmtMoney(Math.abs(deltaCapex)) },
                                 { label: 'Total Staff', a: `${sA.summary.totalStaff}`, b: `${sB.summary.totalStaff}`, delta: deltaStaff, fmtDelta: `${Math.abs(deltaStaff)}` },
                                 { label: 'PUE', a: sA.summary.pue.toFixed(2), b: sB.summary.pue.toFixed(2), delta: deltaPue, fmtDelta: Math.abs(deltaPue).toFixed(2) },
                             ];
@@ -741,9 +744,9 @@ export function ReportDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {[
                         { label: 'Total Headcount', value: `${fullData.totalHeadcount}`, sub: 'FTE', icon: Users, color: 'text-cyan-600 dark:text-cyan-400' },
-                        { label: 'Monthly OPEX', value: fmt(fullData.totalMonthlyLabor), sub: 'Labor + Staff', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400' },
-                        { label: 'Annual TCO', value: fmt(fullData.annualTCO), sub: 'OPEX + Maint + Depr', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
-                        { label: '5-Year TCO', value: fmt(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-violet-600 dark:text-violet-400' },
+                        { label: 'Monthly OPEX', value: fmtMoney(fullData.totalMonthlyLabor), sub: 'Labor + Staff', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400' },
+                        { label: 'Annual TCO', value: fmtMoney(fullData.annualTCO), sub: 'OPEX + Maint + Depr', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
+                        { label: '5-Year TCO', value: fmtMoney(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-violet-600 dark:text-violet-400' },
                         { label: 'CAPEX $/kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || '0'}`, sub: `PUE ${fullData.capex.pue?.toFixed(2) || 'N/A'}`, icon: Zap, color: 'text-orange-600 dark:text-orange-400' },
                         { label: 'Availability', value: `${fullData.riskData?.availability?.toFixed(3) || '99.982'}%`, sub: `Tier ${inputs.tierLevel}`, icon: Shield, color: 'text-blue-600 dark:text-blue-400' },
                     ].map((kpi, i) => (
@@ -799,8 +802,8 @@ export function ReportDashboard() {
                                         return (
                                             <tr key={i} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20">
                                                 <td className="py-3 text-slate-700 dark:text-slate-300">{row.cat}</td>
-                                                <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{fmtFull(row.monthly)}</td>
-                                                <td className="py-3 text-right font-mono text-slate-900 dark:text-white">{fmtFull(annual)}</td>
+                                                <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{fmtMoneyFull(row.monthly)}</td>
+                                                <td className="py-3 text-right font-mono text-slate-900 dark:text-white">{fmtMoneyFull(annual)}</td>
                                                 <td className="py-3 text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <div className="w-16 bg-slate-200 dark:bg-slate-800 rounded-full h-1.5">
@@ -814,8 +817,8 @@ export function ReportDashboard() {
                                     })}
                                     <tr className="bg-slate-50 dark:bg-slate-950/50 font-bold">
                                         <td className="py-3 text-slate-900 dark:text-white">TOTAL ANNUAL TCO</td>
-                                        <td className="py-3 text-right font-mono text-cyan-600 dark:text-cyan-400">{fmtFull(fullData.annualTCO / 12)}</td>
-                                        <td className="py-3 text-right font-mono text-cyan-600 dark:text-cyan-400">{fmtFull(fullData.annualTCO)}</td>
+                                        <td className="py-3 text-right font-mono text-cyan-600 dark:text-cyan-400">{fmtMoneyFull(fullData.annualTCO / 12)}</td>
+                                        <td className="py-3 text-right font-mono text-cyan-600 dark:text-cyan-400">{fmtMoneyFull(fullData.annualTCO)}</td>
                                         <td className="py-3 text-right font-mono text-cyan-600 dark:text-cyan-400">100%</td>
                                     </tr>
                                 </tbody>
@@ -861,11 +864,11 @@ export function ReportDashboard() {
                                             <tr key={yr.year} className={clsx('border-b border-slate-100 dark:border-slate-800/50', i === 0 && 'bg-cyan-50 dark:bg-cyan-950/20')}>
                                                 <td className="py-3 text-slate-900 dark:text-white font-medium">{yr.year}{i === 0 && <span className="text-xs text-cyan-600 dark:text-cyan-400 ml-2">Current</span>}</td>
                                                 <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-300">{yr.totalHeadcount}</td>
-                                                <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-300">{fmtFull(yr.totalAnnualCost)}</td>
-                                                <td className="py-3 text-right font-mono text-slate-500 dark:text-slate-400">{fmtFull(maintCost)}</td>
-                                                <td className="py-3 text-right font-mono text-slate-500 dark:text-slate-400">{fmtFull(fullData.annualDepreciation)}</td>
-                                                <td className="py-3 text-right font-mono text-slate-900 dark:text-white">{fmtFull(yearTCO)}</td>
-                                                <td className="py-3 text-right font-mono text-amber-600 dark:text-amber-400">{fmt(cumulative)}</td>
+                                                <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-300">{fmtMoneyFull(yr.totalAnnualCost)}</td>
+                                                <td className="py-3 text-right font-mono text-slate-500 dark:text-slate-400">{fmtMoneyFull(maintCost)}</td>
+                                                <td className="py-3 text-right font-mono text-slate-500 dark:text-slate-400">{fmtMoneyFull(fullData.annualDepreciation)}</td>
+                                                <td className="py-3 text-right font-mono text-slate-900 dark:text-white">{fmtMoneyFull(yearTCO)}</td>
+                                                <td className="py-3 text-right font-mono text-amber-600 dark:text-amber-400">{fmtMoney(cumulative)}</td>
                                             </tr>
                                         );
                                     })}
@@ -887,11 +890,11 @@ export function ReportDashboard() {
                         </h3>
                         <div className="space-y-3">
                             {[
-                                { label: 'Total CAPEX', value: fmt(fullData.totalCAPEX), highlight: true },
+                                { label: 'Total CAPEX', value: fmtMoney(fullData.totalCAPEX), highlight: true },
                                 { label: 'Cost per kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || 'N/A'}` },
                                 { label: 'PUE', value: fullData.capex.pue?.toFixed(2) || 'N/A' },
                                 { label: 'Construction Timeline', value: `${fullData.capex.metrics?.timelineMonths || 'N/A'} months` },
-                                { label: 'Annual Depreciation', value: fmt(fullData.annualDepreciation) },
+                                { label: 'Annual Depreciation', value: fmtMoney(fullData.annualDepreciation) },
                             ].map((item, i) => (
                                 <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800/50">
                                     <span className="text-sm text-slate-500 dark:text-slate-400">{item.label}</span>
@@ -912,7 +915,7 @@ export function ReportDashboard() {
                                                 <div className="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
                                                     <div className="h-1.5 rounded-full bg-orange-500" style={{ width: `${pct}%` }} />
                                                 </div>
-                                                <span className="text-xs font-mono text-slate-500 dark:text-slate-400 w-14 text-right">{fmt(val as number)}</span>
+                                                <span className="text-xs font-mono text-slate-500 dark:text-slate-400 w-14 text-right">{fmtMoney(val as number)}</span>
                                             </div>
                                         );
                                     })}
@@ -1002,9 +1005,9 @@ export function ReportDashboard() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-y-1 text-xs">
                                     <span className="text-slate-500 dark:text-slate-500">Annual Cost:</span>
-                                    <span className="font-mono text-slate-900 dark:text-white text-right">{fmt(s.totalAnnualCost)}</span>
+                                    <span className="font-mono text-slate-900 dark:text-white text-right">{fmtMoney(s.totalAnnualCost)}</span>
                                     <span className="text-slate-500 dark:text-slate-500">5-Yr NPV:</span>
-                                    <span className="font-mono text-slate-600 dark:text-slate-300 text-right">{fmt(s.fiveYearNPV)}</span>
+                                    <span className="font-mono text-slate-600 dark:text-slate-300 text-right">{fmtMoney(s.fiveYearNPV)}</span>
                                     <span className="text-slate-500 dark:text-slate-500">Reliability:</span>
                                     <span className="font-mono text-slate-600 dark:text-slate-300 text-right">{s.reliabilityIndex}/100</span>
                                 </div>
@@ -1052,6 +1055,7 @@ export function ReportDashboard() {
                     {
                         itLoad: inputs.itLoad,
                         tierLevel: inputs.tierLevel,
+                        coolingType: inputs.coolingType,
                         headcount_Engineer: inputs.headcount_Engineer,
                         headcount_Technician: inputs.headcount_Technician,
                         headcount_ShiftLead: inputs.headcount_ShiftLead,
@@ -1085,7 +1089,8 @@ export function ReportDashboard() {
                     inputs.headcount_Admin * selectedCountry.labor.baseSalary_Admin +
                     inputs.headcount_Janitor * selectedCountry.labor.baseSalary_Janitor
                 ) * 12 : 0;
-                const energyCost = inputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
+                const elecRate = selectedCountry?.economy?.electricityRate ?? 0.10;
+                const energyCost = inputs.itLoad * getPUE(inputs.coolingType) * 8760 * elecRate;
                 const maintenanceCost = inputs.itLoad * 50;
                 const complianceCost = selectedCountry?.compliance.annualComplianceCost || 5000;
                 const total = staffCost + energyCost + maintenanceCost + complianceCost;

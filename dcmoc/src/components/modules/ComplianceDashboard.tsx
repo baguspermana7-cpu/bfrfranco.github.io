@@ -5,6 +5,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { calculateCompliance, ComplianceResult, ComplianceCategory } from '@/modules/compliance/ComplianceEngine';
 import { ClipboardCheck, Shield, DollarSign, AlertTriangle, CheckCircle2, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
+import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 
 const CATEGORY_COLORS: Record<ComplianceCategory, string> = {
     fire: 'bg-red-500',
@@ -35,9 +36,6 @@ export default function ComplianceDashboard() {
 
     if (!result) return <div className="text-slate-500 text-center py-20">Select a country to begin.</div>;
 
-    const fmtUsd = (n: number) => '$' + n.toLocaleString('en-US');
-    const fmtK = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
-
     const filteredItems = activeCategory === 'all' ? result.items : result.items.filter(i => i.category === activeCategory);
 
     return (
@@ -58,8 +56,8 @@ export default function ComplianceDashboard() {
                 {[
                     { label: 'Total Requirements', value: result.totalCount, icon: ClipboardCheck, color: 'cyan' },
                     { label: 'Mandatory', value: result.mandatoryCount, icon: AlertTriangle, color: 'amber' },
-                    { label: 'Initial Cost', value: fmtK(result.totalInitialCost), icon: DollarSign, color: 'blue' },
-                    { label: 'Annual Cost', value: fmtK(result.totalAnnualCost), icon: BarChart3, color: 'green' },
+                    { label: 'Initial Cost', value: fmtMoney(result.totalInitialCost), icon: DollarSign, color: 'blue' },
+                    { label: 'Annual Cost', value: fmtMoney(result.totalAnnualCost), icon: BarChart3, color: 'green' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                         <div className="flex items-center gap-2 mb-2">
@@ -104,7 +102,7 @@ export default function ComplianceDashboard() {
                             <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{cat.label}</span>
                         </div>
                         <div className="text-lg font-bold text-slate-900 dark:text-white">{cat.count} items</div>
-                        <div className="text-[10px] text-slate-500">{cat.mandatoryCount} mandatory • {fmtK(cat.annualCost)}/yr</div>
+                        <div className="text-[10px] text-slate-500">{cat.mandatoryCount} mandatory • {fmtMoney(cat.annualCost)}/yr</div>
                     </button>
                 ))}
             </div>
@@ -155,16 +153,16 @@ export default function ComplianceDashboard() {
                                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500">Optional</span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-2.5 text-right font-mono text-slate-800 dark:text-slate-200">{fmtK(item.initialCost)}</td>
-                                    <td className="px-4 py-2.5 text-right font-mono text-slate-800 dark:text-slate-200">{fmtK(item.annualCost)}</td>
+                                    <td className="px-4 py-2.5 text-right font-mono text-slate-800 dark:text-slate-200">{fmtMoney(item.initialCost)}</td>
+                                    <td className="px-4 py-2.5 text-right font-mono text-slate-800 dark:text-slate-200">{fmtMoney(item.annualCost)}</td>
                                 </tr>
                             ))}
                         </tbody>
                         <tfoot>
                             <tr className="border-t-2 border-slate-300 dark:border-slate-600 font-bold">
                                 <td colSpan={5} className="px-4 py-2.5 text-slate-900 dark:text-white">Total</td>
-                                <td className="px-4 py-2.5 text-right font-mono text-slate-900 dark:text-white">{fmtK(filteredItems.reduce((s, i) => s + i.initialCost, 0))}</td>
-                                <td className="px-4 py-2.5 text-right font-mono text-slate-900 dark:text-white">{fmtK(filteredItems.reduce((s, i) => s + i.annualCost, 0))}</td>
+                                <td className="px-4 py-2.5 text-right font-mono text-slate-900 dark:text-white">{fmtMoney(filteredItems.reduce((s, i) => s + i.initialCost, 0))}</td>
+                                <td className="px-4 py-2.5 text-right font-mono text-slate-900 dark:text-white">{fmtMoney(filteredItems.reduce((s, i) => s + i.annualCost, 0))}</td>
                             </tr>
                         </tfoot>
                     </table>

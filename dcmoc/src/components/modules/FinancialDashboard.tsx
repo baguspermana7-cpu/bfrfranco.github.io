@@ -11,18 +11,12 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import { TrendingUp, DollarSign, Clock, Percent, BarChart3, ArrowUpRight, ArrowDownRight, Calculator, Receipt, Repeat, HandCoins, FileText } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, ReferenceLine,
-    ComposedChart, Bar, Line, Legend, LineChart, BarChart
+    ComposedChart, Bar, Line, Legend, LineChart, BarChart, Cell
 } from 'recharts';
 import { generateFinancialPDF } from '@/modules/reporting/PdfGenerator';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import html2canvas from 'html2canvas';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => {
-    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-    return `$${n.toFixed(0)}`;
-};
+import { fmt, fmtMoney } from '@/lib/format';
 
 // ─── Editable Cell Component ─────────────────────────────────
 // Shows calculated value but allows user override. Yellow border = edited
@@ -399,13 +393,13 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Rev. Escalation (%)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Rev. Escalation (%) <Tooltip content="Monthly revenue per kW of IT capacity. Driven by market pricing and contract terms." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.escalationRate * 100).toFixed(0)}
                                     onChange={e => handleChange('escalationRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">OPEX Escalation (%)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">OPEX Escalation (%) <Tooltip content="Annual operating expenditure normalized per kilowatt. Includes energy, maintenance, staffing, and overhead." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.opexEscalation * 100).toFixed(1)}
                                     onChange={e => handleChange('opexEscalation', Number(e.target.value) / 100)} />
@@ -968,6 +962,146 @@ const FinancialDashboard = () => {
                             </CardContent>
                         </Card>
                     ) : null;
+                })()}
+
+                {/* ═══ OPEX BREAKDOWN ═══ */}
+                {(() => {
+                    const labor = selectedCountry.labor;
+                    const staffCost = (
+                        effectiveInputs.headcount_ShiftLead * labor.baseSalary_ShiftLead +
+                        effectiveInputs.headcount_Engineer * labor.baseSalary_Engineer +
+                        effectiveInputs.headcount_Technician * labor.baseSalary_Technician +
+                        effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
+                        effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
+                    ) * 12;
+                    const energyCost = effectiveInputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
+                    const maintenanceCost = effectiveInputs.itLoad * 50;
+                    const insuranceCost = capexResults.total * 0.003; // 0.3% of CAPEX
+                    const overheadCost = annualOpex * 0.05; // 5% overhead
+
+                    const opexBreakdown = [
+                        { category: 'Energy', value: energyCost, color: '#f59e0b' },
+                        { category: 'Staffing', value: staffCost, color: '#8b5cf6' },
+                        { category: 'Maintenance', value: maintenanceCost, color: '#06b6d4' },
+                        { category: 'Insurance', value: insuranceCost, color: '#ec4899' },
+                        { category: 'Overhead', value: overheadCost, color: '#64748b' },
+                    ];
+                    const totalOpex = opexBreakdown.reduce((s, d) => s + d.value, 0);
+
+                    return (
+                        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
+                                    <Receipt className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                                    OPEX Breakdown (Annual)
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <ResponsiveContainer width="100%" height={260}>
+                                    <BarChart data={opexBreakdown} layout="vertical">
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
+                                        <XAxis type="number" stroke="#64748b" fontSize={11} tickFormatter={(v: number) => fmtMoney(v)} />
+                                        <YAxis type="category" dataKey="category" stroke="#64748b" fontSize={11} width={90} />
+                                        <RTooltip
+                                            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
+                                            formatter={((value: number, name: string) => [fmtMoney(value), 'Annual Cost']) as any}
+                                        />
+                                        <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                            {opexBreakdown.map((entry, idx) => (
+                                                <Cell key={idx} fill={entry.color} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                                <div className="grid grid-cols-5 gap-2 mt-3">
+                                    {opexBreakdown.map((item, i) => (
+                                        <div key={i} className="text-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                                            <div className="text-[10px] text-slate-500 mb-0.5">{item.category}</div>
+                                            <div className="text-xs font-bold text-slate-900 dark:text-white">{fmtMoney(item.value)}</div>
+                                            <div className="text-[10px] text-slate-400">{((item.value / totalOpex) * 100).toFixed(0)}%</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    );
+                })()}
+
+                {/* ═══ SENSITIVITY ANALYSIS TABLE ═══ */}
+                {(() => {
+                    const baseCapex = capexResults.total;
+                    const baseOpex = annualOpex;
+                    const baseRevPerKw = finInputs.revenuePerKwMonth;
+                    const variations = [-20, -10, 0, 10, 20];
+
+                    const sensitivityRows = variations.map(capexVar => {
+                        return variations.map(revVar => {
+                            const adjCapex = baseCapex * (1 + capexVar / 100);
+                            const adjRev = baseRevPerKw * (1 + revVar / 100);
+                            const occupancyRamp = defaultOccupancyRamp(finInputs.projectLifeYears);
+                            const r = calculateFinancials({
+                                totalCapex: adjCapex,
+                                annualOpex: baseOpex,
+                                revenuePerKwMonth: adjRev,
+                                itLoadKw: inputs.itLoad,
+                                discountRate: finInputs.discountRate,
+                                projectLifeYears: finInputs.projectLifeYears,
+                                escalationRate: finInputs.escalationRate,
+                                opexEscalation: finInputs.opexEscalation,
+                                occupancyRamp,
+                                taxRate: finInputs.taxRate,
+                                depreciationYears: finInputs.depreciationYears,
+                            });
+                            return { capexVar, revVar, npv: r.npv, irr: r.irr };
+                        });
+                    });
+
+                    return (
+                        <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                                    Sensitivity Analysis — NPV &amp; IRR
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">CAPEX variation (rows) vs Revenue/kW variation (columns). Cell shows NPV / IRR.</p>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-xs">
+                                        <thead>
+                                            <tr>
+                                                <th className="px-2 py-2 text-left text-slate-500 font-medium">CAPEX \\ Rev</th>
+                                                {variations.map(v => (
+                                                    <th key={v} className="px-2 py-2 text-center text-slate-500 font-medium">{v >= 0 ? '+' : ''}{v}%</th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {sensitivityRows.map((row, ri) => (
+                                                <tr key={ri} className={variations[ri] === 0 ? 'bg-cyan-50 dark:bg-cyan-950/20' : ''}>
+                                                    <td className="px-2 py-2 font-mono text-slate-700 dark:text-slate-300 font-medium">{variations[ri] >= 0 ? '+' : ''}{variations[ri]}%</td>
+                                                    {row.map((cell, ci) => {
+                                                        const bg = cell.npv > 0 && cell.irr > finInputs.discountRate * 100
+                                                            ? 'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300'
+                                                            : cell.npv > 0
+                                                            ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300'
+                                                            : 'bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300';
+                                                        const isBase = variations[ri] === 0 && variations[ci] === 0;
+                                                        return (
+                                                            <td key={ci} className={`px-2 py-1.5 text-center font-mono text-[10px] rounded ${bg} ${isBase ? 'ring-2 ring-cyan-500' : ''}`}>
+                                                                <div className="font-bold">{fmtMoney(cell.npv)}</div>
+                                                                <div className="text-[9px] opacity-70">{cell.irr.toFixed(1)}%</div>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    );
                 })()}
 
                 {/* ═══ B16: BUDGET VS FORECAST VARIANCE ═══ */}

@@ -15,11 +15,13 @@ import {
     HistogramBin,
 } from '@/modules/analytics/MonteCarloEngine';
 import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+    BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
     LineChart, Line, ScatterChart, Scatter, Cell, ReferenceLine, CartesianGrid,
 } from 'recharts';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { Dices, Play, AlertTriangle, TrendingDown, Activity, Zap, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
+import { fmtMoney } from '@/lib/format';
 
 type MCTab = 'distributions' | 'statistics' | 'risk' | 'convergence' | 'scatter';
 
@@ -95,13 +97,12 @@ export default function MonteCarloDashboard() {
         );
     }
 
-    const fmtM = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n.toFixed(0)}`;
-    const tabs: { id: MCTab; label: string }[] = [
-        { id: 'distributions', label: 'Distributions' },
-        { id: 'statistics', label: 'Statistics' },
-        { id: 'risk', label: 'Risk Metrics' },
-        { id: 'convergence', label: 'Convergence' },
-        { id: 'scatter', label: 'Scatter' },
+    const tabs: { id: MCTab; label: string; tip: string }[] = [
+        { id: 'distributions', label: 'Distributions', tip: 'Histogram showing the frequency distribution of simulated outcomes. Shape reveals skew and tail risk.' },
+        { id: 'statistics', label: 'Statistics', tip: 'Summary statistics across all simulation runs including mean, median, std deviation, and percentile values.' },
+        { id: 'risk', label: 'Risk Metrics', tip: 'Probability-based risk metrics derived from the simulation results.' },
+        { id: 'convergence', label: 'Convergence', tip: 'Shows how simulation statistics stabilize as iteration count increases. Flat curves indicate sufficient runs.' },
+        { id: 'scatter', label: 'Scatter', tip: 'Two-dimensional plot of NPV vs IRR for each simulation run. Reveals correlation patterns and outlier clusters.' },
     ];
 
     return (
@@ -114,6 +115,7 @@ export default function MonteCarloDashboard() {
                             <Dices className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                         </div>
                         Monte Carlo Simulation
+                        <Tooltip content="Runs thousands of randomized scenarios to quantify financial uncertainty. Instead of a single forecast, produces a probability distribution of NPV, IRR, and payback outcomes." />
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Probabilistic risk analysis with {iterations.toLocaleString()} iterations
@@ -137,15 +139,15 @@ export default function MonteCarloDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                     <div className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0" />
-                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">NPV Distribution</span> — Probability of achieving positive net present value across all scenarios</span>
+                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">NPV Distribution</span> <Tooltip content="Net Present Value histogram across all simulation runs. Shows the full range of discounted cash flow outcomes and the probability of achieving positive returns." /> — Probability of achieving positive net present value across all scenarios</span>
                     </div>
                     <div className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 shrink-0" />
-                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">IRR Risk</span> — Likelihood that internal rate of return falls below your hurdle rate (e.g., 10%)</span>
+                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">IRR Risk</span> <Tooltip content="Internal Rate of Return distribution. Shows the probability that returns fall below the minimum acceptable rate (hurdle rate), typically 8-12% for data center investments." /> — Likelihood that internal rate of return falls below your hurdle rate (e.g., 10%)</span>
                     </div>
                     <div className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">VaR (Value at Risk)</span> — Worst-case financial exposure at 5th percentile confidence level</span>
+                        <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">VaR (Value at Risk)</span> <Tooltip content="Value at Risk quantifies downside exposure. The 5th percentile VaR means there is only a 5% probability of the outcome being worse than this threshold." /> — Worst-case financial exposure at 5th percentile confidence level</span>
                     </div>
                 </div>
             </div>
@@ -156,7 +158,7 @@ export default function MonteCarloDashboard() {
                 <div className="space-y-4">
                     {/* Iteration Count */}
                     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mb-2">Iterations</label>
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mb-2 flex items-center">Iterations <Tooltip content="Number of random iterations. Higher counts (10,000+) produce more stable confidence intervals but take longer." /></label>
                         <select
                             value={iterations}
                             onChange={e => setIterations(Number(e.target.value))}
@@ -169,7 +171,7 @@ export default function MonteCarloDashboard() {
                             <option value={50000}>50,000 (Detailed)</option>
                         </select>
 
-                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mt-3 mb-2">Seed</label>
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mt-3 mb-2 flex items-center">Seed <Tooltip content="Random number seed for reproducibility. Same seed + same inputs = identical results, enabling comparison across scenarios." /></label>
                         <input
                             type="number"
                             value={seed}
@@ -203,7 +205,7 @@ export default function MonteCarloDashboard() {
 
                     {/* Variable Toggles */}
                     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mb-3">Stochastic Variables</label>
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mb-3 flex items-center">Stochastic Variables <Tooltip content="Input parameters that are randomly varied each iteration. Enable/disable variables to see how each source of uncertainty affects outcomes. More variables = more realistic but wider result ranges." /></label>
                         <div className="space-y-2">
                             {variables.map(v => (
                                 <button
@@ -250,7 +252,7 @@ export default function MonteCarloDashboard() {
                                                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                                         )}
                                     >
-                                        {tab.label}
+                                        <span className="flex items-center justify-center">{tab.label} <Tooltip content={tab.tip} /></span>
                                     </button>
                                 ))}
                             </div>
@@ -271,21 +273,21 @@ export default function MonteCarloDashboard() {
 // ─── DISTRIBUTIONS TAB ──────────────────────────────────────
 
 function DistributionsTab({ result }: { result: MonteCarloResult }) {
-    const fmtM = (n: number) => `$${(n / 1_000_000).toFixed(1)}M`;
-
     return (
         <div className="space-y-4">
             <HistogramChart
                 title="NPV Distribution"
+                titleTip="Mean Net Present Value across all simulation runs. Represents the probability-weighted average outcome. Negative NPV indicates the project destroys value."
                 data={result.npvHistogram}
                 stats={result.npvStats}
                 color="#06b6d4"
-                formatValue={fmtM}
+                formatValue={fmtMoney}
                 varLine={result.varNpv5}
                 zeroLine
             />
             <HistogramChart
                 title="IRR Distribution (%)"
+                titleTip="Mean Internal Rate of Return across simulations. Compare against hurdle rate to assess project viability. IRR below discount rate implies negative NPV."
                 data={result.irrHistogram}
                 stats={result.irrStats}
                 color="#8b5cf6"
@@ -293,6 +295,7 @@ function DistributionsTab({ result }: { result: MonteCarloResult }) {
             />
             <HistogramChart
                 title="Payback Period Distribution (years)"
+                titleTip="Time required to recoup total CAPEX from net cash flows. Shorter payback = lower risk. Payback beyond project life means unrecovered investment."
                 data={result.paybackHistogram}
                 stats={result.paybackStats}
                 color="#f59e0b"
@@ -302,8 +305,9 @@ function DistributionsTab({ result }: { result: MonteCarloResult }) {
     );
 }
 
-function HistogramChart({ title, data, stats, color, formatValue, varLine, zeroLine }: {
+function HistogramChart({ title, titleTip, data, stats, color, formatValue, varLine, zeroLine }: {
     title: string;
+    titleTip?: string;
     data: HistogramBin[];
     stats: { mean: number; median: number; p5: number; p95: number };
     color: string;
@@ -321,18 +325,18 @@ function HistogramChart({ title, data, stats, color, formatValue, varLine, zeroL
     return (
         <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h4>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center">{title} {titleTip && <Tooltip content={titleTip} />}</h4>
                 <div className="flex gap-3 text-[10px] text-slate-500 dark:text-slate-400">
-                    <span>Mean: <span className="font-mono text-slate-700 dark:text-slate-300">{formatValue(stats.mean)}</span></span>
-                    <span>Median: <span className="font-mono text-slate-700 dark:text-slate-300">{formatValue(stats.median)}</span></span>
-                    <span>P5-P95: <span className="font-mono text-slate-700 dark:text-slate-300">{formatValue(stats.p5)} — {formatValue(stats.p95)}</span></span>
+                    <span className="flex items-center">Mean <Tooltip content="Arithmetic average across all simulation runs. Represents the expected (probability-weighted) outcome." />: <span className="font-mono text-slate-700 dark:text-slate-300 ml-0.5">{formatValue(stats.mean)}</span></span>
+                    <span className="flex items-center">Median <Tooltip content="Middle value (P50) when all results are sorted. Less sensitive to extreme outliers than the mean." />: <span className="font-mono text-slate-700 dark:text-slate-300 ml-0.5">{formatValue(stats.median)}</span></span>
+                    <span className="flex items-center">P5-P95 <Tooltip content="90% confidence interval. 90% of all simulated outcomes fall within this range. Wider range = higher uncertainty." />: <span className="font-mono text-slate-700 dark:text-slate-300 ml-0.5">{formatValue(stats.p5)} — {formatValue(stats.p95)}</span></span>
                 </div>
             </div>
             <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                     <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#94a3b8' }} interval="preserveStartEnd" />
                     <YAxis tick={{ fontSize: 9, fill: '#94a3b8' }} />
-                    <Tooltip
+                    <RechartsTooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }}
                         labelStyle={{ color: '#e2e8f0' }}
                         formatter={(value: any) => [value, 'Count']}
@@ -348,19 +352,18 @@ function HistogramChart({ title, data, stats, color, formatValue, varLine, zeroL
 // ─── STATISTICS TAB ─────────────────────────────────────────
 
 function StatisticsTab({ result }: { result: MonteCarloResult }) {
-    const fmtM = (n: number) => `$${(n / 1_000_000).toFixed(2)}M`;
     const rows = [
-        { label: 'Mean', npv: fmtM(result.npvStats.mean), irr: `${result.irrStats.mean.toFixed(2)}%`, payback: `${result.paybackStats.mean.toFixed(2)} yr` },
-        { label: 'Median', npv: fmtM(result.npvStats.median), irr: `${result.irrStats.median.toFixed(2)}%`, payback: `${result.paybackStats.median.toFixed(2)} yr` },
-        { label: 'Std Dev', npv: fmtM(result.npvStats.stdDev), irr: `${result.irrStats.stdDev.toFixed(2)}%`, payback: `${result.paybackStats.stdDev.toFixed(2)} yr` },
-        { label: 'Min', npv: fmtM(result.npvStats.min), irr: `${result.irrStats.min.toFixed(2)}%`, payback: `${result.paybackStats.min.toFixed(2)} yr` },
-        { label: 'P5', npv: fmtM(result.npvStats.p5), irr: `${result.irrStats.p5.toFixed(2)}%`, payback: `${result.paybackStats.p5.toFixed(2)} yr` },
-        { label: 'P10', npv: fmtM(result.npvStats.p10), irr: `${result.irrStats.p10.toFixed(2)}%`, payback: `${result.paybackStats.p10.toFixed(2)} yr` },
-        { label: 'P25', npv: fmtM(result.npvStats.p25), irr: `${result.irrStats.p25.toFixed(2)}%`, payback: `${result.paybackStats.p25.toFixed(2)} yr` },
-        { label: 'P75', npv: fmtM(result.npvStats.p75), irr: `${result.irrStats.p75.toFixed(2)}%`, payback: `${result.paybackStats.p75.toFixed(2)} yr` },
-        { label: 'P90', npv: fmtM(result.npvStats.p90), irr: `${result.irrStats.p90.toFixed(2)}%`, payback: `${result.paybackStats.p90.toFixed(2)} yr` },
-        { label: 'P95', npv: fmtM(result.npvStats.p95), irr: `${result.irrStats.p95.toFixed(2)}%`, payback: `${result.paybackStats.p95.toFixed(2)} yr` },
-        { label: 'Max', npv: fmtM(result.npvStats.max), irr: `${result.irrStats.max.toFixed(2)}%`, payback: `${result.paybackStats.max.toFixed(2)} yr` },
+        { label: 'Mean', tip: 'Arithmetic average across all simulation runs. Represents the expected (probability-weighted) outcome.', npv: fmtMoney(result.npvStats.mean), irr: `${result.irrStats.mean.toFixed(2)}%`, payback: `${result.paybackStats.mean.toFixed(2)} yr` },
+        { label: 'Median', tip: 'Middle value (P50) when all results are sorted. Less sensitive to extreme outliers than the mean.', npv: fmtMoney(result.npvStats.median), irr: `${result.irrStats.median.toFixed(2)}%`, payback: `${result.paybackStats.median.toFixed(2)} yr` },
+        { label: 'Std Dev', tip: 'Statistical measure of result spread. Larger std dev means higher uncertainty in outcomes.', npv: fmtMoney(result.npvStats.stdDev), irr: `${result.irrStats.stdDev.toFixed(2)}%`, payback: `${result.paybackStats.stdDev.toFixed(2)} yr` },
+        { label: 'Min', tip: 'Worst outcome observed across all simulation runs. Represents the absolute downside scenario.', npv: fmtMoney(result.npvStats.min), irr: `${result.irrStats.min.toFixed(2)}%`, payback: `${result.paybackStats.min.toFixed(2)} yr` },
+        { label: 'P5', tip: 'Pessimistic outcome: only 5% of simulations produced a worse result. Used for downside risk assessment.', npv: fmtMoney(result.npvStats.p5), irr: `${result.irrStats.p5.toFixed(2)}%`, payback: `${result.paybackStats.p5.toFixed(2)} yr` },
+        { label: 'P10', tip: 'Percentile outcome: 10% chance of being worse. P10 is a common pessimistic planning threshold.', npv: fmtMoney(result.npvStats.p10), irr: `${result.irrStats.p10.toFixed(2)}%`, payback: `${result.paybackStats.p10.toFixed(2)} yr` },
+        { label: 'P25', tip: 'Lower quartile: 25% of simulations fall below this value. Represents a conservative but not extreme scenario.', npv: fmtMoney(result.npvStats.p25), irr: `${result.irrStats.p25.toFixed(2)}%`, payback: `${result.paybackStats.p25.toFixed(2)} yr` },
+        { label: 'P75', tip: 'Upper quartile: 75% of simulations fall below this value. Represents a favorable scenario.', npv: fmtMoney(result.npvStats.p75), irr: `${result.irrStats.p75.toFixed(2)}%`, payback: `${result.paybackStats.p75.toFixed(2)} yr` },
+        { label: 'P90', tip: 'Optimistic outcome: 90% chance of being worse. P90 is a common upside planning threshold.', npv: fmtMoney(result.npvStats.p90), irr: `${result.irrStats.p90.toFixed(2)}%`, payback: `${result.paybackStats.p90.toFixed(2)} yr` },
+        { label: 'P95', tip: 'Very optimistic: only 5% of simulations exceeded this value. Used for upside opportunity sizing.', npv: fmtMoney(result.npvStats.p95), irr: `${result.irrStats.p95.toFixed(2)}%`, payback: `${result.paybackStats.p95.toFixed(2)} yr` },
+        { label: 'Max', tip: 'Best outcome observed across all simulation runs. Represents the absolute upside scenario.', npv: fmtMoney(result.npvStats.max), irr: `${result.irrStats.max.toFixed(2)}%`, payback: `${result.paybackStats.max.toFixed(2)} yr` },
     ];
 
     return (
@@ -368,16 +371,16 @@ function StatisticsTab({ result }: { result: MonteCarloResult }) {
             <table className="w-full text-xs">
                 <thead>
                     <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                        <th className="text-left px-4 py-3 font-semibold text-slate-900 dark:text-white">Percentile</th>
-                        <th className="text-center px-4 py-3 font-semibold text-cyan-600 dark:text-cyan-400">NPV</th>
-                        <th className="text-center px-4 py-3 font-semibold text-purple-600 dark:text-purple-400">IRR</th>
-                        <th className="text-center px-4 py-3 font-semibold text-amber-600 dark:text-amber-400">Payback</th>
+                        <th className="text-left px-4 py-3 font-semibold text-slate-900 dark:text-white"><span className="flex items-center">Percentile <Tooltip content="Statistical breakpoints showing how outcomes are distributed. P10/P50/P90 are the most commonly used for investment decisions." /></span></th>
+                        <th className="text-center px-4 py-3 font-semibold text-cyan-600 dark:text-cyan-400"><span className="flex items-center justify-center">NPV <Tooltip content="Net Present Value: total discounted cash flows minus initial investment. Positive NPV means the project creates value." /></span></th>
+                        <th className="text-center px-4 py-3 font-semibold text-purple-600 dark:text-purple-400"><span className="flex items-center justify-center">IRR <Tooltip content="Internal Rate of Return: the discount rate at which NPV equals zero. Compare against WACC/hurdle rate to evaluate viability." /></span></th>
+                        <th className="text-center px-4 py-3 font-semibold text-amber-600 dark:text-amber-400"><span className="flex items-center justify-center">Payback <Tooltip content="Simple payback period: years required to recover total CAPEX from cumulative net cash flows." /></span></th>
                     </tr>
                 </thead>
                 <tbody>
                     {rows.map((r, i) => (
                         <tr key={r.label} className={clsx('border-b border-slate-100 dark:border-slate-800', i % 2 === 0 ? '' : 'bg-slate-50/50 dark:bg-slate-800/20')}>
-                            <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300">{r.label}</td>
+                            <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300"><span className="flex items-center">{r.label} <Tooltip content={r.tip} /></span></td>
                             <td className="text-center px-4 py-2 font-mono text-slate-900 dark:text-white">{r.npv}</td>
                             <td className="text-center px-4 py-2 font-mono text-slate-900 dark:text-white">{r.irr}</td>
                             <td className="text-center px-4 py-2 font-mono text-slate-900 dark:text-white">{r.payback}</td>
@@ -392,8 +395,6 @@ function StatisticsTab({ result }: { result: MonteCarloResult }) {
 // ─── RISK METRICS TAB ───────────────────────────────────────
 
 function RiskTab({ result }: { result: MonteCarloResult }) {
-    const fmtM = (n: number) => `$${(n / 1_000_000).toFixed(1)}M`;
-
     return (
         <div className="space-y-4">
             {/* VaR Cards */}
@@ -401,13 +402,15 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
                 <RiskCard
                     icon={<TrendingDown className="w-5 h-5 text-red-500" />}
                     label="VaR (5%)"
-                    value={fmtM(result.varNpv5)}
+                    tip="Maximum expected loss at a given confidence level. VaR at 95% means there's only a 5% chance of losing more than this amount."
+                    value={fmtMoney(result.varNpv5)}
                     description="5th percentile NPV — worst case in 95% of scenarios"
                     severity={result.varNpv5 < 0 ? 'high' : 'low'}
                 />
                 <RiskCard
                     icon={<AlertTriangle className="w-5 h-5 text-amber-500" />}
                     label="P(NPV < 0)"
+                    tip="Percentage of simulation runs resulting in negative NPV. Key decision metric for risk-averse investors. Above 20% is generally considered high risk."
                     value={`${(result.probNpvNegative * 100).toFixed(1)}%`}
                     description="Probability of a negative net present value"
                     severity={result.probNpvNegative > 0.2 ? 'high' : result.probNpvNegative > 0.05 ? 'medium' : 'low'}
@@ -415,6 +418,7 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
                 <RiskCard
                     icon={<Activity className="w-5 h-5 text-purple-500" />}
                     label="P(IRR < 10%)"
+                    tip="Probability that the Internal Rate of Return falls below the 10% hurdle rate. Higher probability means the project is less likely to meet minimum return requirements."
                     value={`${(result.probIrrBelow10 * 100).toFixed(1)}%`}
                     description="Probability IRR falls below hurdle rate"
                     severity={result.probIrrBelow10 > 0.3 ? 'high' : result.probIrrBelow10 > 0.1 ? 'medium' : 'low'}
@@ -426,6 +430,7 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
                 <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                     <Zap className="w-4 h-4 text-amber-500" />
                     Sensitivity Analysis (Correlation with NPV)
+                    <Tooltip content="Tornado chart showing Pearson correlation between each stochastic variable and NPV. Bars extending right (green) increase NPV; bars extending left (red) decrease it. Longer bars = higher sensitivity." />
                 </h4>
                 <ResponsiveContainer width="100%" height={250}>
                     <BarChart
@@ -439,7 +444,7 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
                     >
                         <XAxis type="number" domain={[-1, 1]} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                         <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: '#94a3b8' }} width={90} />
-                        <Tooltip
+                        <RechartsTooltip
                             contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }}
                             formatter={(value: any) => [value.toFixed(3), 'Correlation']}
                         />
@@ -456,9 +461,10 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
     );
 }
 
-function RiskCard({ icon, label, value, description, severity }: {
+function RiskCard({ icon, label, tip, value, description, severity }: {
     icon: React.ReactNode;
     label: string;
+    tip?: string;
     value: string;
     description: string;
     severity: 'low' | 'medium' | 'high';
@@ -469,6 +475,7 @@ function RiskCard({ icon, label, value, description, severity }: {
             <div className="flex items-center gap-2 mb-2">
                 {icon}
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{label}</span>
+                {tip && <Tooltip content={tip} />}
             </div>
             <div className="text-2xl font-bold text-slate-900 dark:text-white">{value}</div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{description}</p>
@@ -479,12 +486,11 @@ function RiskCard({ icon, label, value, description, severity }: {
 // ─── CONVERGENCE TAB ────────────────────────────────────────
 
 function ConvergenceTab({ result }: { result: MonteCarloResult }) {
-    const fmtM = (n: number) => `$${(n / 1_000_000).toFixed(2)}M`;
-
     return (
         <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center">
                 Mean NPV Convergence Over Iterations
+                <Tooltip content="Shows how simulation statistics stabilize as iteration count increases. Flat curves indicate sufficient runs. If the line is still oscillating at the end, consider increasing iteration count for more reliable results." />
             </h4>
             <ResponsiveContainer width="100%" height={350}>
                 <LineChart data={result.convergenceHistory} margin={{ top: 10, right: 20, left: 20, bottom: 10 }}>
@@ -496,15 +502,15 @@ function ConvergenceTab({ result }: { result: MonteCarloResult }) {
                     />
                     <YAxis
                         tick={{ fontSize: 10, fill: '#94a3b8' }}
-                        tickFormatter={(v) => fmtM(v)}
+                        tickFormatter={(v) => fmtMoney(v)}
                     />
-                    <Tooltip
+                    <RechartsTooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }}
-                        formatter={(value: any) => [fmtM(value), 'Mean NPV']}
+                        formatter={(value: any) => [fmtMoney(value), 'Mean NPV']}
                         labelFormatter={(label) => `Iteration ${label.toLocaleString()}`}
                     />
                     <Line type="monotone" dataKey="meanNpv" stroke="#06b6d4" strokeWidth={2} dot={false} />
-                    <ReferenceLine y={result.npvStats.mean} stroke="#10b981" strokeDasharray="4 4" label={{ value: `Final: ${fmtM(result.npvStats.mean)}`, fill: '#10b981', fontSize: 10 }} />
+                    <ReferenceLine y={result.npvStats.mean} stroke="#10b981" strokeDasharray="4 4" label={{ value: `Final: ${fmtMoney(result.npvStats.mean)}`, fill: '#10b981', fontSize: 10 }} />
                 </LineChart>
             </ResponsiveContainer>
         </div>
@@ -532,7 +538,7 @@ function ScatterTab({ result }: { result: MonteCarloResult }) {
 
     return (
         <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">NPV vs IRR Scatter</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-1 flex items-center">NPV vs IRR Scatter <Tooltip content="Two-dimensional plot of NPV vs IRR for each simulation run. Points in the upper-right quadrant (positive NPV, high IRR) represent favorable outcomes. Red dashed line = NPV breakeven; amber dashed line = 10% IRR hurdle rate." /></h4>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-3">
                 Each point is one simulation run. Color indicates payback period.
             </p>
@@ -549,7 +555,7 @@ function ScatterTab({ result }: { result: MonteCarloResult }) {
                         tick={{ fontSize: 10, fill: '#94a3b8' }}
                         tickFormatter={(v) => `${v.toFixed(0)}%`}
                     />
-                    <Tooltip
+                    <RechartsTooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }}
                         formatter={(value: any, name: any) => {
                             if (name === 'NPV ($M)') return [`$${Number(value).toFixed(2)}M`, name];

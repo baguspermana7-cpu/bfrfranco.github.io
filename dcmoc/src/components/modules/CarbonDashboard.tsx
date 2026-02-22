@@ -8,13 +8,12 @@ import { calculateCarbonFootprint, CarbonResult } from '@/modules/analytics/Carb
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { Leaf, Zap, Globe2, TrendingDown, AlertTriangle, Award, Factory, DollarSign, Target } from 'lucide-react';
+import { getPUE } from '@/constants/pue';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
     AreaChart, Area, ReferenceLine
 } from 'recharts';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => `$${fmt(n)}`;
+import { fmt, fmtMoney } from '@/lib/format';
 
 const CarbonDashboard = () => {
     const { selectedCountry, inputs } = useSimulationStore();
@@ -28,7 +27,7 @@ const CarbonDashboard = () => {
         const effectiveItLoad = capexStore.inputs.itLoad || inputs.itLoad || 1000;
         // Use CAPEX store's cooling type for PUE
         const effectiveCooling = capexStore.inputs.coolingType || inputs.coolingType || 'air';
-        const pue = effectiveCooling === 'liquid' ? 1.2 : effectiveCooling === 'rdhx' ? 1.3 : effectiveCooling === 'inrow' ? 1.4 : 1.5;
+        const pue = getPUE(effectiveCooling);
 
         return calculateCarbonFootprint({
             itLoadKw: effectiveItLoad,

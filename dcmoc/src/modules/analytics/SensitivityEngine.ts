@@ -2,6 +2,7 @@
 // Perturbs each input ±20% and measures TCO impact
 
 import { CountryProfile } from '@/constants/countries';
+import { getPUE } from '@/constants/pue';
 
 export interface SensitivityResult {
     parameter: string;
@@ -20,6 +21,7 @@ export interface SensitivityResult {
 interface SensitivityInputs {
     itLoad: number;
     tierLevel: number;
+    coolingType?: string;
     headcount_Engineer: number;
     headcount_Technician: number;
     headcount_ShiftLead: number;
@@ -56,9 +58,9 @@ const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerK
 
     // A4: Country-specific electricity rate (default $0.10/kWh for backward compat)
     const electricityRate = country?.economy?.electricityRate ?? 0.10;
-    // A8: Updated PUE estimates per tier
-    const pue = inputs.tierLevel >= 4 ? 1.20 : inputs.tierLevel >= 3 ? 1.28 : 1.45;
-    const energyOpex = inputs.itLoad * pue * 8760 * electricityRate / 1000;
+    // A8: PUE from cooling type (canonical values from constants/pue.ts)
+    const pue = getPUE(inputs.coolingType ?? 'air');
+    const energyOpex = inputs.itLoad * pue * 8760 * electricityRate;
 
     // A14: Improved annualized CAPEX with tax depreciation benefit
     const taxRate = country?.economy?.taxRate ?? 0.30;

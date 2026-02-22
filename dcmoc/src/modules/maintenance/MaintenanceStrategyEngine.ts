@@ -50,14 +50,27 @@ export const calculateStrategyComparison = (
     assets: AssetCount[],
     schedule: MaintenanceEvent[],
     tierLevel: 3 | 4,
-    country?: CountryProfile
+    country?: CountryProfile,
+    maintenanceModel: 'in-house' | 'hybrid' | 'vendor' = 'in-house',
+    hybridRatio: number = 0.5
 ): StrategyComparison => {
     const labor = getLabor(country);
     const COST_PER_MINUTE_DOWN = getDowntimeCost(country);
 
+    // Maintenance model cost multiplier:
+    // In-house: 100% internal labor rate
+    // Hybrid: internal portion at 1.0x + vendor portion at 1.3x premium
+    // Vendor: 10% oversight at internal + 90% at vendor 1.35x premium
+    const internalPortion = maintenanceModel === 'in-house' ? 1.0
+        : maintenanceModel === 'hybrid' ? Math.max(0.1, hybridRatio)
+        : 0.10; // vendor = 10% oversight
+    const vendorPortion = 1.0 - internalPortion;
+    const vendorPremium = 1.35; // Vendor labor costs 35% more
+    const modelMult = internalPortion + (vendorPortion * vendorPremium);
+
     // Planned Preventive (Baseline) — current SFG20 schedule
     const plannedTotalHours = schedule.reduce((a, e) => a + e.durationHours, 0);
-    const plannedLaborCost = plannedTotalHours * labor.internal;
+    const plannedLaborCost = plannedTotalHours * labor.internal * modelMult;
     const plannedPartsCost = calculatePartsCost(assets);
     const plannedFailures = tierLevel === 4 ? 1.2 : 2.5; // Expected unplanned failures/year
     const plannedDowntimeCost = plannedFailures * 45 * COST_PER_MINUTE_DOWN * 0.01; // 45min avg, 1% probability each
@@ -67,7 +80,7 @@ export const calculateStrategyComparison = (
     const reactiveFailures = plannedFailures * 3.5;   // 3.5x more failures without PM
     const reactiveDowntimeMinutes = reactiveFailures * 90; // 90 min avg per failure (vs 45 planned)
     const reactiveDowntimeCost = reactiveDowntimeMinutes * COST_PER_MINUTE_DOWN * 0.03;
-    const reactiveLaborCost = reactiveFailures * 6 * labor.emergency; // 6hr avg emergency fix
+    const reactiveLaborCost = reactiveFailures * 6 * labor.emergency * modelMult; // 6hr avg emergency fix
     const reactivePartsCost = plannedPartsCost * 0.6; // Less consumables but emergency parts cost 2x
     const reactiveEmergencyParts = reactiveFailures * 2500; // $2500 avg emergency part
     const reactiveTotal = reactiveLaborCost + reactivePartsCost + reactiveEmergencyParts + reactiveDowntimeCost;

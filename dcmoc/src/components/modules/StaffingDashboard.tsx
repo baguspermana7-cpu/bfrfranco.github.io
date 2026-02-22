@@ -10,6 +10,7 @@ import { calculateTurnoverCost as calculateCostOfTurnover } from '@/modules/staf
 import { Users, Clock, DollarSign, AlertTriangle, Calendar, Award, Briefcase, TrendingUp, ArrowRight, CheckCircle, XCircle, BarChart3, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 import clsx from 'clsx';
 
 import { OrgChart } from '@/components/visualizations/OrgChart';
@@ -102,14 +103,6 @@ export function StaffingDashboard() {
     }, [selectedCountry, inputs, effectiveInputs]);
 
     if (!selectedCountry || !results) return <div>Loading...</div>;
-
-    const formatMoney = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0,
-        }).format(amount);
-    };
 
     return (
         <div className="space-y-6">
@@ -313,8 +306,8 @@ export function StaffingDashboard() {
                                 <span className="text-xs text-slate-400 flex items-center gap-1">Monthly Payroll <Tooltip content="Total monthly cost including base salary, shift allowances, overtime, and benefits" /></span>
                             </div>
                             <div className="mt-auto">
-                                <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={formatMoney(results.totalMonthlyCost)}>
-                                    {formatMoney(results.totalMonthlyCost)}
+                                <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.totalMonthlyCost)}>
+                                    {fmtMoney(results.totalMonthlyCost)}
                                 </div>
                                 <div className="text-xs text-slate-500 mt-1">Year 1 Baseline ({inputs.shiftModel === '8h' ? 'Continental' : '4-on/3-off'})</div>
                             </div>
@@ -343,8 +336,8 @@ export function StaffingDashboard() {
                                 <span className="text-xs text-slate-400 flex items-center gap-1">5-Year TCO <Tooltip content="Total Cost of Ownership over 5 years with labor escalation factored in" /></span>
                             </div>
                             <div className="mt-auto">
-                                <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={formatMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}>
-                                    {formatMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}
+                                <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}>
+                                    {fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}
                                 </div>
                                 <div className="text-xs text-slate-500 mt-1">2025-2030 Cumulative</div>
                             </div>
@@ -445,10 +438,10 @@ export function StaffingDashboard() {
                                             <td className="px-4 py-3 text-slate-500">
                                                 {r.is24x7 ? (inputs.shiftModel === '8h' ? 'Continental 3-Shift (8h)' : '4-Team 12h (4on/3off)') : 'Mon-Fri 08:00-17:00'}
                                             </td>
-                                            <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-400">{formatMoney(r.breakdown.baseSalaries)}</td>
-                                            <td className="px-4 py-3 text-right text-cyan-600 dark:text-cyan-400">{formatMoney(r.breakdown.shiftAllowance)}</td>
-                                            <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-500">{r.breakdown.overtime > 0 ? formatMoney(r.breakdown.overtime) : '–'}</td>
-                                            <td className="px-4 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400">{formatMoney(r.monthlyCost)}</td>
+                                            <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-400">{fmtMoney(r.breakdown.baseSalaries)}</td>
+                                            <td className="px-4 py-3 text-right text-cyan-600 dark:text-cyan-400">{fmtMoney(r.breakdown.shiftAllowance)}</td>
+                                            <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-500">{r.breakdown.overtime > 0 ? fmtMoney(r.breakdown.overtime) : '–'}</td>
+                                            <td className="px-4 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400">{fmtMoney(r.monthlyCost)}</td>
                                         </tr>
                                     ))}
                                     <tr className="bg-slate-100 dark:bg-slate-800/80 font-bold text-slate-900 dark:text-white border-t border-slate-300 dark:border-slate-600">
@@ -456,10 +449,10 @@ export function StaffingDashboard() {
                                         <td className="px-4 py-3 text-center text-cyan-700 dark:text-cyan-400">{results.totalHeadcount}</td>
                                         <td className="px-4 py-3 text-center">{results.totalOnShift}</td>
                                         <td className="px-4 py-3"></td>
-                                        <td className="px-4 py-3 text-right">{formatMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.baseSalaries, 0))}</td>
-                                        <td className="px-4 py-3 text-right">{formatMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.shiftAllowance, 0))}</td>
-                                        <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-500">{formatMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.overtime, 0))}</td>
-                                        <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400">{formatMoney(results.totalMonthlyCost)}</td>
+                                        <td className="px-4 py-3 text-right">{fmtMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.baseSalaries, 0))}</td>
+                                        <td className="px-4 py-3 text-right">{fmtMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.shiftAllowance, 0))}</td>
+                                        <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-500">{fmtMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.overtime, 0))}</td>
+                                        <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400">{fmtMoney(results.totalMonthlyCost)}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -484,7 +477,7 @@ export function StaffingDashboard() {
                                         <tr key={y.year}>
                                             <td className="py-2 font-mono text-cyan-600 dark:text-cyan-400">{y.year}</td>
                                             <td className="py-2 text-slate-600 dark:text-slate-400">{y.headcount} FTEs</td>
-                                            <td className="py-2 text-right font-bold text-slate-900 dark:text-white">{formatMoney(y.totalAnnualCost)}</td>
+                                            <td className="py-2 text-right font-bold text-slate-900 dark:text-white">{fmtMoney(y.totalAnnualCost)}</td>
                                             <td className="py-2 text-right text-slate-500">
                                                 {i === 0 ? '-' : `+${((y.totalAnnualCost / results.projections[i - 1].totalAnnualCost - 1) * 100).toFixed(1)}%`}
                                             </td>
@@ -510,25 +503,25 @@ export function StaffingDashboard() {
                                 return (
                                     <>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                                            <div className="text-[10px] text-slate-500 uppercase">Utilization Rate</div>
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Utilization Rate <Tooltip content="Net productive hours as a percentage of total scheduled hours, after accounting for shrinkage (breaks, training, admin)." /></div>
                                             <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{((1 - shrinkage) * 100).toFixed(0)}%</div>
                                             <div className="text-[10px] text-slate-500">Net productive hours</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                                            <div className="text-[10px] text-slate-500 uppercase">Cost per MW</div>
-                                            <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{formatMoney(totalCost / 1)}</div>
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Cost per MW <Tooltip content="Monthly staffing cost normalized per megawatt of IT load. Key benchmark for comparing staffing efficiency." /></div>
+                                            <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(totalCost / 1)}</div>
                                             <div className="text-[10px] text-slate-500">Staff cost / MW IT load</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                                            <div className="text-[10px] text-slate-500 uppercase">OT Ratio</div>
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">OT Ratio <Tooltip content="Overtime cost as a percentage of total payroll. Values above 15% indicate potential scheduling issues." /></div>
                                             <div className={`text-xl font-bold ${totalCost > 0 && (totalOT / totalCost) > 0.15 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                                                 {totalCost > 0 ? ((totalOT / totalCost) * 100).toFixed(1) : 0}%
                                             </div>
                                             <div className="text-[10px] text-slate-500">Overtime as % of total</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                                            <div className="text-[10px] text-slate-500 uppercase">Shrinkage Loss</div>
-                                            <div className="text-xl font-bold text-rose-600 dark:text-rose-400">{formatMoney(totalCost * shrinkage)}</div>
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Shrinkage Loss <Tooltip content="Monthly cost impact of non-productive time including breaks, training, sick leave, and admin duties." /></div>
+                                            <div className="text-xl font-bold text-rose-600 dark:text-rose-400">{fmtMoney(totalCost * shrinkage)}</div>
                                             <div className="text-[10px] text-slate-500">{(shrinkage * 100).toFixed(0)}% factor</div>
                                         </div>
                                     </>
@@ -542,6 +535,7 @@ export function StaffingDashboard() {
                         <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                             Headcount Sensitivity Analysis
+                            <Tooltip content="Impact analysis showing how percentage changes in headcount affect monthly staffing costs." />
                         </h3>
                         <div className="text-[10px] text-slate-500 mb-3">
                             Impact of headcount changes on monthly staffing costs
@@ -569,7 +563,7 @@ export function StaffingDashboard() {
                                                 />
                                             </div>
                                             <div className="w-20 text-xs font-mono text-right text-slate-900 dark:text-white">
-                                                {formatMoney(adjustedCost)}
+                                                {fmtMoney(adjustedCost)}
                                             </div>
                                             <div className="w-16 text-[10px] text-slate-500 text-right">
                                                 {adjustedHC} FTEs
@@ -600,8 +594,8 @@ export function StaffingDashboard() {
                             }
                             <h3 className="text-lg font-bold text-white">
                                 {results.totalSavings > 0
-                                    ? `12h (4on/4off) saves ${formatMoney(results.totalSavings)}/month vs 8h`
-                                    : `8h (Continental) is ${formatMoney(Math.abs(results.totalSavings))}/month cheaper`
+                                    ? `12h (4on/4off) saves ${fmtMoney(results.totalSavings)}/month vs 8h`
+                                    : `8h (Continental) is ${fmtMoney(Math.abs(results.totalSavings))}/month cheaper`
                                 }
                             </h3>
                         </div>
@@ -646,7 +640,7 @@ export function StaffingDashboard() {
                                         v12: results.shiftComparisons[0]?.comparison.model12h.metrics.overtimeHoursPerPerson || 0,
                                         fmt: (v: number) => v === 0 ? '✓ ZERO' : `${v}h`
                                     },
-                                    { label: 'Total Monthly Cost (Shift Staff)', v8: results.total8hCost, v12: results.total12hCost, fmt: (v: number) => formatMoney(v) },
+                                    { label: 'Total Monthly Cost (Shift Staff)', v8: results.total8hCost, v12: results.total12hCost, fmt: (v: number) => fmtMoney(v) },
                                 ].map(row => (
                                     <tr key={row.label} className="hover:bg-slate-800/30">
                                         <td className="px-6 py-3 text-slate-300 font-medium">{row.label}</td>
@@ -673,12 +667,12 @@ export function StaffingDashboard() {
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div className="p-3 bg-white dark:bg-slate-950/50 rounded-lg">
                                     <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1">8h Continental</div>
-                                    <div className="text-lg font-mono text-slate-900 dark:text-white">{formatMoney(comp.comparison.model8h.monthlyCost)}</div>
+                                    <div className="text-lg font-mono text-slate-900 dark:text-white">{fmtMoney(comp.comparison.model8h.monthlyCost)}</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400">{comp.comparison.model8h.headcount} FTEs, {comp.comparison.model8h.metrics.overtimeHoursPerPerson}h OT/wk</div>
                                 </div>
                                 <div className="p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg border border-cyan-200 dark:border-cyan-900/30">
                                     <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1">12h 4on/4off</div>
-                                    <div className="text-lg font-mono text-cyan-600 dark:text-cyan-400">{formatMoney(comp.comparison.model12h.monthlyCost)}</div>
+                                    <div className="text-lg font-mono text-cyan-600 dark:text-cyan-400">{fmtMoney(comp.comparison.model12h.monthlyCost)}</div>
                                     <div className="text-xs text-emerald-600 dark:text-emerald-400">{comp.comparison.model12h.headcount} FTEs, Zero OT</div>
                                 </div>
                             </div>

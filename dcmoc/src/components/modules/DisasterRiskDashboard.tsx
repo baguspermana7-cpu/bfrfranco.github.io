@@ -12,9 +12,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
+import { fmt, fmtMoney } from '@/lib/format';
 
 const riskColors: Record<string, string> = {
     'Low': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
@@ -95,6 +93,7 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Shield className="w-4 h-4 text-blue-500" />
                             <span className="text-xs text-slate-500 uppercase">Insurance/Yr</span>
+                            <Tooltip content="Estimated effect of disaster risk on annual property insurance premiums." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.annualInsuranceCost)}</div>
                         <div className="text-xs text-slate-500 mt-1">{selectedCountry.naturalDisaster?.insuranceMultiplier ?? 1.0}x multiplier</div>
@@ -106,6 +105,7 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Flame className="w-4 h-4 text-red-500" />
                             <span className="text-xs text-slate-500 uppercase">Structural Adder</span>
+                            <Tooltip content="Capital investment required to reduce disaster risk to acceptable levels (seismic bracing, flood barriers, etc)." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.structuralCostAdder)}</div>
                         <div className="text-xs text-slate-500 mt-1">{((selectedCountry.naturalDisaster?.structuralReinforcement ?? 0) * 100).toFixed(0)}% of CAPEX</div>
@@ -117,6 +117,7 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <DollarSign className="w-4 h-4 text-amber-500" />
                             <span className="text-xs text-slate-500 uppercase">Expected Loss/Yr</span>
+                            <Tooltip content="Annualized expected monetary loss from natural disaster events, factoring in probability and severity." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.expectedAnnualLoss)}</div>
                     </CardContent>
@@ -127,6 +128,7 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Wind className="w-4 h-4 text-cyan-500" />
                             <span className="text-xs text-slate-500 uppercase">Interruption</span>
+                            <Tooltip content="Expected business interruption days per year due to natural disaster events affecting facility operations." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.businessInterruptionDays}</div>
                         <div className="text-xs text-slate-500 mt-1">expected days/yr</div>
@@ -138,6 +140,7 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Waves className="w-4 h-4 text-blue-500" />
                             <span className="text-xs text-slate-500 uppercase">Revenue at Risk</span>
+                            <Tooltip content="Annual revenue exposed to loss from disaster-related downtime, based on expected interruption days and facility revenue." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.revenueAtRisk)}</div>
                     </CardContent>

@@ -32,19 +32,22 @@ export const generateAssetCounts = (
         switch (asset.id) {
             // --- CRITICAL POWER ---
             case 'gen-set':
-                // 2.5MW gensets. 
+                // 2.5MW gensets.
                 const requiredGenPower = itLoadKw * 1.5; // Safety factor + cooling + losses
                 const genCap = 2500;
                 const baseGen = Math.ceil(requiredGenPower / genCap);
-                count = applyRedundancy(baseGen, powerRedundancy === '2N+1' ? 'N+1' : 'N+1'); // Gen usually N+1 unless explicitly 2N
-                if (tierLevel === 4) count = applyRedundancy(baseGen, '2N'); // Tier 4 Gen usually 2N
+                // Respect user's powerRedundancy, but Tier 4 minimum is 2N
+                const genRedundancy = tierLevel === 4 && powerRedundancy === 'N+1' ? '2N' : powerRedundancy;
+                count = applyRedundancy(baseGen, genRedundancy);
                 break;
 
             case 'ups-module':
                 // 500kVA modules.
                 const upsCap = 450; // kW (pf 0.9)
                 const baseUps = Math.ceil(itLoadKw / upsCap);
-                count = applyRedundancy(baseUps, powerRedundancy);
+                // Tier 4 minimum is 2N for UPS
+                const upsRedundancy = tierLevel === 4 && powerRedundancy === 'N+1' ? '2N' : powerRedundancy;
+                count = applyRedundancy(baseUps, upsRedundancy);
                 break;
 
             case 'lv-switchgear':

@@ -30,6 +30,8 @@ export interface CBMInput {
     itLoadKw: number;
     tierLevel: 2 | 3 | 4;
     coolingType: string;
+    coolingTopology?: 'in-row' | 'perimeter' | 'dlc';
+    powerRedundancy?: 'N+1' | '2N' | '2N+1';
     enabledCategories?: SensorCategory[];
     dcimTier?: DCIMTier;
 }
@@ -75,7 +77,7 @@ const DCIM_PLATFORMS: DCIMPlatform[] = [
 ];
 
 export function calculateCBM(input: CBMInput): CBMResult {
-    const { country, itLoadKw, tierLevel, coolingType, enabledCategories, dcimTier } = input;
+    const { country, itLoadKw, tierLevel, coolingType, coolingTopology, powerRedundancy, enabledCategories, dcimTier } = input;
     const selectedTier = dcimTier ?? 'standard';
 
     // Estimate rack count
@@ -85,7 +87,9 @@ export function calculateCBM(input: CBMInput): CBMResult {
     // Estimate asset counts for sizing (AssetGenerator expects tier 3|4)
     const effectiveTier: 3 | 4 = tierLevel === 2 ? 3 : tierLevel as 3 | 4;
     const coolingMap: 'air' | 'pumped' = coolingType === 'liquid' || coolingType === 'rdhx' ? 'pumped' : 'air';
-    const assetCounts = generateAssetCounts(itLoadKw, effectiveTier, coolingMap, Math.ceil(itLoadKw * 0.6));
+    const effectiveCoolingTopology = coolingTopology ?? 'perimeter';
+    const effectivePowerRedundancy = powerRedundancy ?? '2N';
+    const assetCounts = generateAssetCounts(itLoadKw, effectiveTier, coolingMap, Math.ceil(itLoadKw * 0.6), effectiveCoolingTopology, effectivePowerRedundancy);
     const genCount = assetCounts.find(a => a.assetId === 'gen-set')?.count ?? 2;
     const upsCount = assetCounts.find(a => a.assetId === 'ups-module')?.count ?? 2;
     const cracCount = assetCounts.find(a => a.assetId === 'pac-unit')?.count ?? 4;

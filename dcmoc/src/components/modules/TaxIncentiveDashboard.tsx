@@ -12,9 +12,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
     AreaChart, Area, Line, ComposedChart,
 } from 'recharts';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
+import { fmt, fmtMoney } from '@/lib/format';
 
 const TaxIncentiveDashboard = () => {
     const { selectedCountry, inputs } = useSimulationStore();
@@ -101,6 +99,7 @@ const TaxIncentiveDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Calendar className="w-4 h-4 text-blue-500" />
                             <span className="text-xs text-slate-500 uppercase">Effective Rate Y1</span>
+                            <Tooltip content="Actual tax burden after all incentives, credits, and deductions are applied." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{(result.effectiveTaxTimeline[0] * 100).toFixed(1)}%</div>
                         <div className="text-xs text-slate-500 mt-1">vs {(selectedCountry.economy.taxRate * 100).toFixed(1)}% standard</div>
@@ -112,6 +111,7 @@ const TaxIncentiveDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <TrendingUp className="w-4 h-4 text-cyan-500" />
                             <span className="text-xs text-slate-500 uppercase">NPV Uplift</span>
+                            <Tooltip content="Net Present Value of all tax benefits over the project lifecycle. Key input for site selection." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.npvWithIncentives - result.npvWithoutIncentives)}</div>
                     </CardContent>
@@ -122,6 +122,7 @@ const TaxIncentiveDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <TrendingUp className="w-4 h-4 text-purple-500" />
                             <span className="text-xs text-slate-500 uppercase">IRR Uplift</span>
+                            <Tooltip content="Increase in Internal Rate of Return attributable to tax incentives. Higher uplift makes the jurisdiction more attractive." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">+{(result.irrWithIncentives - result.irrWithoutIncentives).toFixed(1)}%</div>
                         <div className="text-xs text-slate-500 mt-1">{result.irrWithIncentives.toFixed(1)}% vs {result.irrWithoutIncentives.toFixed(1)}%</div>
@@ -133,6 +134,7 @@ const TaxIncentiveDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Gift className="w-4 h-4 text-amber-500" />
                             <span className="text-xs text-slate-500 uppercase">FTZ Savings</span>
+                            <Tooltip content="Exemption or reduction on import duties for data center equipment and construction materials." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.ftzBenefits)}</div>
                         <div className="text-xs text-slate-500 mt-1">import duty saved</div>
@@ -144,6 +146,7 @@ const TaxIncentiveDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Award className="w-4 h-4 text-yellow-500" />
                             <span className="text-xs text-slate-500 uppercase">Ranking</span>
+                            <Tooltip content="Country's position in the incentive value ranking, normalized across all available jurisdictions." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">
                             #{countryIncentiveData.findIndex(c => c.code === selectedCountry.id) + 1}

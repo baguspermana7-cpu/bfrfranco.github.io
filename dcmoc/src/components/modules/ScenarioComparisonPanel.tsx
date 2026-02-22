@@ -9,6 +9,7 @@ import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { GitCompare, X, ArrowLeftRight } from 'lucide-react';
 import clsx from 'clsx';
+import { fmtMoney } from '@/lib/format';
 
 const SCENARIO_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444'];
 
@@ -116,7 +117,6 @@ export function ScenarioComparisonPanel() {
     }
 
     const baseline = metricsData[0];
-    const fmtM = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n.toFixed(0)}`;
     const fmtPct = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`;
     const delta = (val: number, base: number) => base !== 0 ? ((val - base) / Math.abs(base)) * 100 : 0;
 
@@ -181,8 +181,8 @@ export function ScenarioComparisonPanel() {
                             {i === 0 && <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-300">BASELINE</span>}
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-xs">
-                            <KpiCell label="CAPEX" value={fmtM(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} />
-                            <KpiCell label="OPEX/yr" value={fmtM(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} />
+                            <KpiCell label="CAPEX" value={fmtMoney(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} />
+                            <KpiCell label="OPEX/yr" value={fmtMoney(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} />
                             <KpiCell label="PUE" value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} />
                             <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} />
                             <KpiCell label="IRR" value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} />
@@ -235,14 +235,14 @@ export function ScenarioComparisonPanel() {
                     </thead>
                     <tbody>
                         {[
-                            { label: 'Total CAPEX', get: (m: ScenarioMetrics) => m.capex, fmt: fmtM },
+                            { label: 'Total CAPEX', get: (m: ScenarioMetrics) => m.capex, fmt: fmtMoney },
                             { label: 'CAPEX/kW', get: (m: ScenarioMetrics) => m.capexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
-                            { label: 'Annual OPEX', get: (m: ScenarioMetrics) => m.annualOpex, fmt: fmtM },
+                            { label: 'Annual OPEX', get: (m: ScenarioMetrics) => m.annualOpex, fmt: fmtMoney },
                             { label: 'OPEX/kW', get: (m: ScenarioMetrics) => m.opexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
                             { label: 'Total Staff', get: (m: ScenarioMetrics) => m.totalStaff, fmt: (n: number) => String(n) },
                             { label: 'PUE', get: (m: ScenarioMetrics) => m.pue, fmt: (n: number) => n.toFixed(2) },
                             { label: 'IRR', get: (m: ScenarioMetrics) => m.irr, fmt: (n: number) => `${n.toFixed(1)}%` },
-                            { label: 'NPV', get: (m: ScenarioMetrics) => m.npv, fmt: fmtM },
+                            { label: 'NPV', get: (m: ScenarioMetrics) => m.npv, fmt: fmtMoney },
                             { label: 'Payback', get: (m: ScenarioMetrics) => m.paybackYears, fmt: (n: number) => `${n.toFixed(1)} yr` },
                         ].map(row => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">

@@ -122,7 +122,7 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
     const carbonTaxExposure = netEmissions * CARBON_TAX_RATE_USD;
 
     // Benchmarks
-    const industryAvgEmissions = (itLoadKw * hoursPerYear * INDUSTRY_AVG_PUE * INDUSTRY_AVG_CARBON) / 1_000_000;
+    const industryAvgEmissions = (itLoadKw * hoursPerYear * INDUSTRY_AVG_PUE * INDUSTRY_AVG_CARBON) / 1_000;
     const carbonIntensityPerKw = (totalEmissions * 1000) / itLoadKw; // kgCO₂/kW
 
     // Efficiency rating

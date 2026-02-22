@@ -10,6 +10,7 @@ import {
     Grade,
     getBenchmarkForTier,
 } from '@/data/benchmarks';
+import { getPUE } from '@/constants/pue';
 
 export interface MetricScore {
     metric: BenchmarkMetric;
@@ -44,7 +45,7 @@ interface BenchmarkInputs {
     renewablePct: number;
 }
 
-const PUE_MAP: Record<string, number> = { air: 1.35, inrow: 1.28, rdhx: 1.18, liquid: 1.08 };
+// PUE_MAP replaced by getPUE() from shared constants
 
 export function calculateBenchmark(inputs: BenchmarkInputs): BenchmarkResult {
     const {
@@ -54,7 +55,7 @@ export function calculateBenchmark(inputs: BenchmarkInputs): BenchmarkResult {
     } = inputs;
 
     const mw = itLoadKw / 1000;
-    const effectivePue = pue || PUE_MAP[coolingType] || 1.35;
+    const effectivePue = pue || getPUE(coolingType);
     const annualEnergyKwh = itLoadKw * effectivePue * 8760;
     const energyCostPerKw = annualOpex > 0 ? (annualOpex * 0.6) / itLoadKw : 1500; // ~60% of OPEX is energy
 

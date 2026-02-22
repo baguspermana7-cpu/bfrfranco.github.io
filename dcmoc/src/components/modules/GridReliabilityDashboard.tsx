@@ -11,9 +11,7 @@ import { Zap, Activity, Fuel, Battery, Shield, Sun } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
 } from 'recharts';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
+import { fmt, fmtMoney } from '@/lib/format';
 
 const gradeColors: Record<string, string> = {
     A: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
@@ -86,6 +84,7 @@ const GridReliabilityDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Zap className="w-4 h-4 text-red-500" />
                             <span className="text-xs text-slate-500 uppercase">Outage Hrs/Yr</span>
+                            <Tooltip content="Expected hours of grid unavailability per year based on historical data for the selected country." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{(result.annualOutageMinutes / 60).toFixed(1)}</div>
                         <div className="text-xs text-slate-500 mt-1">{result.annualExpectedOutages} events</div>
@@ -97,6 +96,7 @@ const GridReliabilityDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Shield className="w-4 h-4 text-emerald-500" />
                             <span className="text-xs text-slate-500 uppercase">Gen Capacity</span>
+                            <Tooltip content="Seconds from power failure to generator reaching rated voltage and frequency. Typically 10-15s for diesel." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmt(result.requiredGenCapacity)}</div>
                         <div className="text-xs text-slate-500 mt-1">kW required</div>
@@ -108,6 +108,7 @@ const GridReliabilityDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Fuel className="w-4 h-4 text-amber-500" />
                             <span className="text-xs text-slate-500 uppercase">Fuel Cost/Yr</span>
+                            <Tooltip content="Annual diesel fuel expenditure for backup generators based on expected outage hours and required generator capacity." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.annualFuelCost)}</div>
                         <div className="text-xs text-slate-500 mt-1">{result.recommendedFuelHours}h fuel reserve</div>
@@ -130,6 +131,7 @@ const GridReliabilityDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Sun className="w-4 h-4 text-yellow-500" />
                             <span className="text-xs text-slate-500 uppercase">Solar Ready</span>
+                            <Tooltip content="Feasibility score for on-site solar based on irradiance, roof area, and local net metering policy." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.solarViabilityScore}</div>
                         <div className="text-xs text-slate-500 mt-1">/100 viability</div>

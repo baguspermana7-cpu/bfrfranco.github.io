@@ -2,6 +2,7 @@
 // Evaluates power grid quality and calculates backup infrastructure costs
 
 import { CountryProfile } from '@/constants/countries';
+import { getPUE } from '@/constants/pue';
 
 export interface GridReliabilityInput {
     country: CountryProfile;
@@ -67,7 +68,7 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     const annualOutageMinutes = annualExpectedOutages * avgOutageDuration;
 
     // --- Generator Sizing ---
-    const pue = coolingType === 'liquid' ? 1.08 : coolingType === 'rdhx' ? 1.18 : coolingType === 'inrow' ? 1.28 : 1.35;
+    const pue = getPUE(coolingType);
     const redundancyFactor = tierLevel === 4 ? 2.0 : tierLevel === 3 ? 1.5 : 1.25;
     const requiredGenCapacity = Math.ceil(itLoadKw * pue * redundancyFactor);
 
@@ -97,9 +98,12 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     // Total grid risk adjusted OPEX
     const gridRiskAdjustedOpex = annualFuelCost + annualUpsReplacementCost + dualFeedCost;
 
-    // Availability with backup
-    const backupAvailabilityBoost = tierLevel === 4 ? 0.0009 : tierLevel === 3 ? 0.005 : 0.01;
-    const availabilityWithBackup = Math.min(99.999, gridUptime + (100 - gridUptime) * (1 - backupAvailabilityBoost / (100 - gridUptime + 0.001)));
+    // Availability with backup: backup covers a fraction of unavailability
+    // Tier 4 backup covers 99.9% of outages, Tier 3 covers 99%, Tier 2 covers 95%
+    const backupCoverage = tierLevel === 4 ? 0.999 : tierLevel === 3 ? 0.99 : 0.95;
+    const unavailabilityPct = (100 - gridUptime) / 100;
+    const residualUnavailability = unavailabilityPct * (1 - backupCoverage);
+    const availabilityWithBackup = Math.min(99.999, (1 - residualUnavailability) * 100);
 
     // Solar viability
     const solarViabilityScore = renewableReadiness;

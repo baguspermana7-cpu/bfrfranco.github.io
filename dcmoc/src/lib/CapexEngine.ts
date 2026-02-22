@@ -18,6 +18,7 @@ import {
     testingRedundancyMult
 } from './capex-data';
 import { CountryProfile } from '@/constants/countries';
+import { getPUE } from '@/constants/pue';
 
 export interface CapexInput {
     itLoad: number; // kW
@@ -74,6 +75,7 @@ export interface CapexResult {
     };
     timeline: {
         phases: { name: string; start: number; end: number; color: string }[];
+        subPhases: { parent: string; name: string; start: number; end: number; color: string }[];
         totalMonths: number;
     };
 }
@@ -198,8 +200,8 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     currentTotal += renewableCost * globalMult;
 
     // Metrics
-    // A8: Updated PUE to modern 2025 standards
-    const pue = coolingType === 'air' ? 1.35 : (coolingType === 'inrow' ? 1.28 : (coolingType === 'rdhx' ? 1.18 : 1.08));
+    // A8: PUE from shared constants (modern 2025 standards)
+    const pue = getPUE(coolingType);
     const annualEnergy = itLoad * pue * 8760 * 0.10; // $0.10/kWh default
     const floorSpace = Math.ceil(racks * 2.5); // 2.5 m2 per rack
 
@@ -255,6 +257,37 @@ export const computeTimeline = (redundancy: string, building: string, cooling: s
     const endComm = startComm + comm;
     const totalMonths = endComm;
 
+    // L2 sub-phases for detailed Gantt chart
+    const subPhases = [
+        // Design & Engineering
+        { parent: 'Design & Engineering', name: 'Concept Design', start: startDesign, end: startDesign + Math.ceil(design * 0.3), color: '#10b981' },
+        { parent: 'Design & Engineering', name: 'Detailed Design', start: startDesign + Math.ceil(design * 0.25), end: startDesign + Math.ceil(design * 0.65), color: '#10b981' },
+        { parent: 'Design & Engineering', name: 'Equipment Specification', start: startDesign + Math.ceil(design * 0.5), end: startDesign + Math.ceil(design * 0.85), color: '#10b981' },
+        { parent: 'Design & Engineering', name: 'Vendor Selection', start: startDesign + Math.ceil(design * 0.7), end: startDesign + design, color: '#10b981' },
+        // Permitting
+        { parent: 'Permitting', name: 'Environmental Assessment', start: startPermit, end: startPermit + Math.ceil(permit * 0.5), color: '#f59e0b' },
+        { parent: 'Permitting', name: 'Building Permit', start: startPermit + Math.ceil(permit * 0.2), end: startPermit + Math.ceil(permit * 0.75), color: '#f59e0b' },
+        { parent: 'Permitting', name: 'Utility Connection', start: startPermit + Math.ceil(permit * 0.4), end: startPermit + Math.ceil(permit * 0.9), color: '#f59e0b' },
+        { parent: 'Permitting', name: 'Fire Safety Approval', start: startPermit + Math.ceil(permit * 0.5), end: startPermit + permit, color: '#f59e0b' },
+        // Civil Construction
+        { parent: 'Civil Construction', name: 'Site Prep & Excavation', start: startCivil, end: startCivil + Math.ceil(civil * 0.2), color: '#3b82f6' },
+        { parent: 'Civil Construction', name: 'Foundations & Structural', start: startCivil + Math.ceil(civil * 0.15), end: startCivil + Math.ceil(civil * 0.55), color: '#3b82f6' },
+        { parent: 'Civil Construction', name: 'Building Envelope', start: startCivil + Math.ceil(civil * 0.4), end: startCivil + Math.ceil(civil * 0.8), color: '#3b82f6' },
+        { parent: 'Civil Construction', name: 'Raised Floor & Containment', start: startCivil + Math.ceil(civil * 0.65), end: startCivil + civil, color: '#3b82f6' },
+        // MEP Installation
+        { parent: 'MEP Installation', name: 'HV/LV Electrical', start: startMep, end: startMep + Math.ceil(mep * 0.5), color: '#8b5cf6' },
+        { parent: 'MEP Installation', name: 'UPS & Battery', start: startMep + Math.ceil(mep * 0.2), end: startMep + Math.ceil(mep * 0.6), color: '#8b5cf6' },
+        { parent: 'MEP Installation', name: 'Cooling Plant', start: startMep + Math.ceil(mep * 0.15), end: startMep + Math.ceil(mep * 0.7), color: '#8b5cf6' },
+        { parent: 'MEP Installation', name: 'BMS / EPMS', start: startMep + Math.ceil(mep * 0.5), end: startMep + Math.ceil(mep * 0.85), color: '#8b5cf6' },
+        { parent: 'MEP Installation', name: 'Fire Suppression', start: startMep + Math.ceil(mep * 0.4), end: startMep + Math.ceil(mep * 0.75), color: '#8b5cf6' },
+        { parent: 'MEP Installation', name: 'Security Systems', start: startMep + Math.ceil(mep * 0.6), end: startMep + mep, color: '#8b5cf6' },
+        // Commissioning
+        { parent: 'Commissioning', name: 'IST (Individual System Test)', start: startComm, end: startComm + Math.ceil(comm * 0.35), color: '#ec4899' },
+        { parent: 'Commissioning', name: 'IFC (Integrated Functional)', start: startComm + Math.ceil(comm * 0.25), end: startComm + Math.ceil(comm * 0.65), color: '#ec4899' },
+        { parent: 'Commissioning', name: 'Load Testing', start: startComm + Math.ceil(comm * 0.5), end: startComm + Math.ceil(comm * 0.85), color: '#ec4899' },
+        { parent: 'Commissioning', name: 'Handover & Documentation', start: startComm + Math.ceil(comm * 0.7), end: startComm + comm, color: '#ec4899' },
+    ];
+
     return {
         totalMonths,
         phases: [
@@ -263,7 +296,8 @@ export const computeTimeline = (redundancy: string, building: string, cooling: s
             { name: 'Civil Construction', start: startCivil, end: startCivil + civil, color: '#3b82f6' },
             { name: 'MEP Installation', start: startMep, end: startMep + mep, color: '#8b5cf6' },
             { name: 'Commissioning', start: startComm, end: startComm + comm, color: '#ec4899' }
-        ]
+        ],
+        subPhases
     };
 };
 

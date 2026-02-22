@@ -12,6 +12,7 @@ import {
     Wrench, ArrowUpDown, Filter
 } from 'lucide-react';
 import clsx from 'clsx';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 export function WorkOrderView() {
     const { selectedCountry, inputs } = useSimulationStore();
@@ -33,13 +34,14 @@ export function WorkOrderView() {
             calculateStaffing('janitor', inputs.headcount_Janitor, inputs.shiftModel, selectedCountry, false),
         ];
 
-        // Generate maintenance events
-        const estBuildingArea = capexInputs.itLoad * 1.5;
+        // Generate maintenance events (use simulation store for consistency)
+        const estBuildingArea = inputs.itLoad * 0.6;
+        const coolingMap: 'air' | 'pumped' = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx' ? 'pumped' : 'air';
         const assets = generateAssetCounts(
-            capexInputs.itLoad,
+            inputs.itLoad,
             inputs.tierLevel === 4 ? 4 : 3,
-            (capexInputs.coolingType as 'air' | 'pumped'),
-            estBuildingArea,
+            coolingMap,
+            Math.ceil(estBuildingArea),
             inputs.coolingTopology,
             inputs.powerRedundancy
         );
@@ -141,7 +143,7 @@ export function WorkOrderView() {
                                 "text-sm font-bold uppercase tracking-wider mb-2",
                                 overloadAlerts.some(a => a.consecutiveWeeks >= 8) ? "text-red-400" : "text-amber-400"
                             )}>
-                                Workload Overload Alert
+                                Workload Overload Alert<Tooltip content="Staff members with utilization exceeding 80% for 4+ consecutive weeks. Sustained overload increases error risk, safety incidents, and staff burnout." />
                             </h4>
                             <div className="space-y-1.5">
                                 {overloadAlerts.map(alert => (
@@ -180,6 +182,7 @@ export function WorkOrderView() {
             <div className="flex flex-wrap items-center gap-4 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
                 <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-cyan-400" />
+                    <Tooltip content="Filter work orders by staff member. Select a person to view their individual workload, calendar, and assigned tasks." />
                     <select
                         value={selectedPerson}
                         onChange={(e) => setSelectedPerson(e.target.value)}
@@ -196,6 +199,7 @@ export function WorkOrderView() {
 
                 <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-cyan-400" />
+                    <Tooltip content="Filter by specific week number (1-52) to inspect work order distribution and utilization for that period." />
                     <select
                         value={selectedWeek}
                         onChange={(e) => setSelectedWeek(Number(e.target.value))}
@@ -229,19 +233,19 @@ export function WorkOrderView() {
             {/* KPI Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                    <div className="text-xs text-slate-500 uppercase mb-1">Total WOs/Year</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1">Total WOs/Year<Tooltip content="Total number of scheduled and reactive work orders generated annually based on your asset inventory and maintenance intervals." /></div>
                     <div className="text-2xl font-bold text-white">{schedule.length}</div>
                     <div className="text-xs text-slate-400">{(schedule.length / 52).toFixed(1)}/week avg</div>
                 </div>
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                    <div className="text-xs text-slate-500 uppercase mb-1">Total WO Hours</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1">Total WO Hours<Tooltip content="Cumulative labor hours required to complete all work orders in a year. Includes diagnosis, execution, and close-out time per task." /></div>
                     <div className="text-2xl font-bold text-white">
                         {profiles.reduce((a, p) => a + p.annualStats.totalWOHours, 0).toFixed(0)}h
                     </div>
                     <div className="text-xs text-slate-400">maintenance labor</div>
                 </div>
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                    <div className="text-xs text-slate-500 uppercase mb-1">Avg Load/Person</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1">Avg Load/Person<Tooltip content="Average weekly maintenance hours per staff member. Values above 20h/wk may indicate understaffing or uneven workload distribution." /></div>
                     <div className="text-2xl font-bold text-white">
                         {profiles.length > 0
                             ? (profiles.reduce((a, p) => a + p.annualStats.avgWeeklyWOHours, 0) / profiles.length).toFixed(1)
@@ -250,7 +254,7 @@ export function WorkOrderView() {
                     <div className="text-xs text-slate-400">maintenance work</div>
                 </div>
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-                    <div className="text-xs text-slate-500 uppercase mb-1">Staff Count</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1">Staff Count<Tooltip content="Total number of operations staff available for work order assignment across all roles and shift teams." /></div>
                     <div className="text-2xl font-bold text-white">{staffList.length}</div>
                     <div className="text-xs text-slate-400">{profiles.filter(p => p.annualStats.totalWOCount > 0).length} with WOs</div>
                 </div>
@@ -260,21 +264,21 @@ export function WorkOrderView() {
             {viewMode === 'summary' && (
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-800">
-                        <h3 className="text-lg font-bold text-white">Person-Level Annual Summary</h3>
+                        <h3 className="text-lg font-bold text-white">Person-Level Annual Summary<Tooltip content="Comprehensive breakdown of work order assignments per staff member for the full year. Click any row to drill into their weekly calendar." /></h3>
                         <p className="text-xs text-slate-400 mt-1">Work order load distribution per staff member</p>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="bg-slate-950/50">
-                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Person</th>
-                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Role</th>
-                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Team</th>
-                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">WOs/Year</th>
-                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">Total Hours</th>
-                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">Avg hrs/wk</th>
-                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">Busiest Week</th>
-                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Load</th>
+                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Person<Tooltip content="Staff member name. Click any row to view their detailed weekly calendar and work order breakdown." /></th>
+                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Role<Tooltip content="Operational role assigned to this staff member (e.g., Shift Lead, Engineer, Technician, Supervisor, Janitor)." /></th>
+                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Team<Tooltip content="Shift team assignment (e.g., Team A, Team B). Teams rotate based on the configured shift pattern." /></th>
+                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">WOs/Year<Tooltip content="Total number of work orders assigned to this person annually. Includes preventive, corrective, and statutory tasks." /></th>
+                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">Total Hours<Tooltip content="Cumulative maintenance labor hours for this person across the entire year. High values may indicate overloading." /></th>
+                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">Avg hrs/wk<Tooltip content="Average weekly maintenance hours. Calculated as total annual hours divided by working weeks. Sustained values above 20h suggest redistribution needed." /></th>
+                                    <th className="px-4 py-3 text-center text-xs text-slate-500 font-medium">Busiest Week<Tooltip content="The week number with the highest work order load for this person. Useful for identifying scheduling peaks and potential conflicts." /></th>
+                                    <th className="px-4 py-3 text-left text-xs text-slate-500 font-medium">Load<Tooltip content="Visual bar showing relative workload compared to the busiest staff member. Red indicates over 80% of max load, amber over 50%." /></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -315,7 +319,7 @@ export function WorkOrderView() {
             {/* ─── LOAD CHART VIEW ─────────────────────── */}
             {viewMode === 'load' && (
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-white mb-4">Annual WO Hours Distribution</h3>
+                    <h3 className="text-lg font-bold text-white mb-4">Annual WO Hours Distribution<Tooltip content="Horizontal bar chart ranking all staff by total annual maintenance hours. Red bars indicate over 80% of max load, amber over 50%. Helps identify uneven workload distribution." /></h3>
                     <div className="space-y-2">
                         {loadDistribution.map(person => {
                             const barWidth = maxTotalHours > 0 ? (person.totalHours / maxTotalHours) * 100 : 0;
@@ -390,15 +394,15 @@ function PersonCalendar({
                 <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
                         <div className="text-xl font-bold text-cyan-400">{profile.annualStats.totalWOCount}</div>
-                        <div className="text-xs text-slate-500">WOs/Year</div>
+                        <div className="text-xs text-slate-500">WOs/Year<Tooltip content="Total work orders assigned to this person for the year, including preventive, corrective, and statutory maintenance tasks." /></div>
                     </div>
                     <div>
                         <div className="text-xl font-bold text-white">{profile.annualStats.totalWOHours.toFixed(0)}h</div>
-                        <div className="text-xs text-slate-500">Total Hours</div>
+                        <div className="text-xs text-slate-500">Total Hours<Tooltip content="Cumulative maintenance labor hours across all 52 weeks. Includes task execution, documentation, and close-out time." /></div>
                     </div>
                     <div>
                         <div className="text-xl font-bold text-amber-400">{profile.annualStats.avgWeeklyWOHours.toFixed(1)}h</div>
-                        <div className="text-xs text-slate-500">Avg/Week</div>
+                        <div className="text-xs text-slate-500">Avg/Week<Tooltip content="Mean weekly maintenance hours for this person. Calculated as total hours divided by active working weeks in the shift pattern." /></div>
                     </div>
                 </div>
             </div>
@@ -466,7 +470,7 @@ function PersonCalendar({
                                         style={{ width: `${Math.min(100, Math.max(2, week.utilizationPercent))}%` }}
                                     />
                                 </div>
-                                <span className="text-xs text-slate-500">{week.utilizationPercent.toFixed(0)}% util</span>
+                                <span className="text-xs text-slate-500">{week.utilizationPercent.toFixed(0)}% util<Tooltip content="Weekly utilization: ratio of assigned WO hours to available shift hours. Above 90% is overloaded (red), 60-90% is moderate (amber)." /></span>
                             </div>
                         </div>
                     ))}

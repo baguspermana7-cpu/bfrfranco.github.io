@@ -5,11 +5,13 @@ import { usePortfolioStore, SiteConfig } from '@/store/portfolio';
 import { COUNTRIES } from '@/constants/countries';
 import { calculatePortfolio, SiteResult } from '@/modules/analytics/PortfolioEngine';
 import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell,
+    BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
 import { Layers, Plus, Copy, Trash2, Download, MapPin, Award } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import clsx from 'clsx';
+import { fmtMoney } from '@/lib/format';
 
 const SITE_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'];
 
@@ -28,7 +30,6 @@ export default function PortfolioDashboard() {
         }
     }, [store.sites]);
 
-    const fmtM = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n.toFixed(0)}`;
     const countryOptions = Object.values(COUNTRIES).map(c => ({ id: c.id, name: c.name }));
 
     const tabs: { id: PortfolioTab; label: string }[] = [
@@ -105,12 +106,12 @@ export default function PortfolioDashboard() {
                 <>
                     {/* Portfolio Summary */}
                     <div className="grid grid-cols-6 gap-3">
-                        <SummaryCard label="Total CAPEX" value={fmtM(result.totalCapex)} />
-                        <SummaryCard label="Annual OPEX" value={fmtM(result.totalAnnualOpex)} />
-                        <SummaryCard label="Total Staff" value={String(result.totalStaff)} />
-                        <SummaryCard label="Total IT Load" value={`${(result.totalItLoadKw / 1000).toFixed(1)} MW`} />
-                        <SummaryCard label="Wtd. PUE" value={result.weightedPue.toFixed(2)} />
-                        <SummaryCard label="Portfolio NPV" value={fmtM(result.portfolioNpv)} highlight={result.portfolioNpv > 0} />
+                        <SummaryCard label="Total CAPEX" value={fmtMoney(result.totalCapex)} tooltip="Combined capital expenditure across all data center sites in the portfolio." />
+                        <SummaryCard label="Annual OPEX" value={fmtMoney(result.totalAnnualOpex)} tooltip="Total annual operating expenditure across all portfolio sites including power, staffing, and maintenance." />
+                        <SummaryCard label="Total Staff" value={String(result.totalStaff)} tooltip="Combined headcount across all data center sites in the portfolio." />
+                        <SummaryCard label="Total IT Load" value={`${(result.totalItLoadKw / 1000).toFixed(1)} MW`} tooltip="Sum of IT power capacity across all portfolio sites in megawatts." />
+                        <SummaryCard label="Wtd. PUE" value={result.weightedPue.toFixed(2)} tooltip="Power Usage Effectiveness weighted by each site's IT load contribution. Accounts for site size variation." />
+                        <SummaryCard label="Portfolio NPV" value={fmtMoney(result.portfolioNpv)} highlight={result.portfolioNpv > 0} tooltip="Net Present Value of the combined portfolio, discounting future cash flows to present value. Positive means value creation." />
                     </div>
 
                     {/* Tab Nav */}
@@ -182,21 +183,21 @@ function SiteCard({ site, index, countryOptions, onUpdate, onDuplicate, onRemove
             </div>
 
             <div className="space-y-1.5 text-[10px]">
-                <SelectField label="Country" value={site.countryId} options={countryOptions.map(c => ({ value: c.id, label: c.name }))} onChange={v => onUpdate({ countryId: v })} />
-                <SelectField label="Tier" value={String(site.tierLevel)} options={[{ value: '2', label: 'Tier 2' }, { value: '3', label: 'Tier 3' }, { value: '4', label: 'Tier 4' }]} onChange={v => onUpdate({ tierLevel: Number(v) as 2 | 3 | 4 })} />
-                <NumberField label="IT Load (kW)" value={site.itLoad} onChange={v => onUpdate({ itLoad: v })} />
-                <SelectField label="Cooling" value={site.coolingType} options={[{ value: 'air', label: 'Air' }, { value: 'inrow', label: 'In-Row' }, { value: 'rdhx', label: 'RDHX' }, { value: 'liquid', label: 'Liquid' }]} onChange={v => onUpdate({ coolingType: v as SiteConfig['coolingType'] })} />
-                <SelectField label="Shift" value={site.shiftModel} options={[{ value: '8h', label: '8H Continental' }, { value: '12h', label: '12H 4on3off' }]} onChange={v => onUpdate({ shiftModel: v as '8h' | '12h' })} />
-                <SelectField label="Staffing" value={site.staffingModel} options={[{ value: 'in-house', label: 'In-House' }, { value: 'hybrid', label: 'Hybrid' }, { value: 'outsourced', label: 'Outsourced' }]} onChange={v => onUpdate({ staffingModel: v as SiteConfig['staffingModel'] })} />
+                <SelectField label="Country" value={site.countryId} options={countryOptions.map(c => ({ value: c.id, label: c.name }))} onChange={v => onUpdate({ countryId: v })} tooltip="Geographic location affects energy costs, labor rates, carbon grid intensity, and regulatory environment." />
+                <SelectField label="Tier" value={String(site.tierLevel)} options={[{ value: '2', label: 'Tier 2' }, { value: '3', label: 'Tier 3' }, { value: '4', label: 'Tier 4' }]} onChange={v => onUpdate({ tierLevel: Number(v) as 2 | 3 | 4 })} tooltip="Uptime Institute tier classification. Higher tiers provide greater redundancy and availability (Tier 2: 99.749%, Tier 3: 99.982%, Tier 4: 99.995%)." />
+                <NumberField label="IT Load (kW)" value={site.itLoad} onChange={v => onUpdate({ itLoad: v })} tooltip="Total IT power capacity for this site in kilowatts. Drives CAPEX, OPEX, staffing, and carbon calculations." />
+                <SelectField label="Cooling" value={site.coolingType} options={[{ value: 'air', label: 'Air' }, { value: 'inrow', label: 'In-Row' }, { value: 'rdhx', label: 'RDHX' }, { value: 'liquid', label: 'Liquid' }]} onChange={v => onUpdate({ coolingType: v as SiteConfig['coolingType'] })} tooltip="Cooling infrastructure type. Affects PUE, CAPEX, and energy efficiency. Liquid cooling offers lowest PUE but highest upfront cost." />
+                <SelectField label="Shift" value={site.shiftModel} options={[{ value: '8h', label: '8H Continental' }, { value: '12h', label: '12H 4on3off' }]} onChange={v => onUpdate({ shiftModel: v as '8h' | '12h' })} tooltip="Operator shift rotation model. 8H Continental uses 5 crews for 24/7 coverage; 12H 4on3off uses 4 crews with longer shifts." />
+                <SelectField label="Staffing" value={site.staffingModel} options={[{ value: 'in-house', label: 'In-House' }, { value: 'hybrid', label: 'Hybrid' }, { value: 'outsourced', label: 'Outsourced' }]} onChange={v => onUpdate({ staffingModel: v as SiteConfig['staffingModel'] })} tooltip="Staffing approach. In-house provides maximum control, outsourced reduces headcount, hybrid balances cost and oversight." />
             </div>
         </div>
     );
 }
 
-function SelectField({ label, value, options, onChange }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (v: string) => void }) {
+function SelectField({ label, value, options, onChange, tooltip }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (v: string) => void; tooltip?: string }) {
     return (
         <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400">{label}</span>
+            <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">{label}{tooltip && <Tooltip content={tooltip} />}</span>
             <select
                 value={value}
                 onChange={e => onChange(e.target.value)}
@@ -208,10 +209,10 @@ function SelectField({ label, value, options, onChange }: { label: string; value
     );
 }
 
-function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+function NumberField({ label, value, onChange, tooltip }: { label: string; value: number; onChange: (v: number) => void; tooltip?: string }) {
     return (
         <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400">{label}</span>
+            <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">{label}{tooltip && <Tooltip content={tooltip} />}</span>
             <input
                 type="number"
                 value={value}
@@ -222,10 +223,10 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
     );
 }
 
-function SummaryCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function SummaryCard({ label, value, highlight, tooltip }: { label: string; value: string; highlight?: boolean; tooltip?: string }) {
     return (
         <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-3 text-center">
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{label}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1">{label}{tooltip && <Tooltip content={tooltip} />}</div>
             <div className={clsx('text-lg font-bold mt-0.5', highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white')}>{value}</div>
         </div>
     );
@@ -255,7 +256,7 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
         <div className="space-y-4">
             {/* Radar Chart */}
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Site Comparison Radar</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-1">Site Comparison Radar<Tooltip content="Normalized radar chart comparing all sites across 6 key dimensions. Higher values (outer ring) indicate better performance relative to other sites." /></h3>
                 <ResponsiveContainer width="100%" height={350}>
                     <RadarChart data={radarData}>
                         <PolarGrid stroke="#475569" opacity={0.3} />
@@ -273,7 +274,7 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                             />
                         ))}
                         <Legend />
-                        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
                     </RadarChart>
                 </ResponsiveContainer>
             </div>
@@ -281,16 +282,16 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
             {/* Rankings */}
             <div className="grid grid-cols-4 gap-3">
                 {[
-                    { label: 'Best CAPEX/kW', siteId: result.bestCapexPerKw },
-                    { label: 'Best PUE', siteId: result.bestPue },
-                    { label: 'Best IRR', siteId: result.bestIrr },
-                    { label: 'Lowest Risk', siteId: result.lowestRisk },
+                    { label: 'Best CAPEX/kW', siteId: result.bestCapexPerKw, tooltip: 'Site with the lowest capital expenditure per kilowatt of IT capacity, indicating the most cost-efficient build.' },
+                    { label: 'Best PUE', siteId: result.bestPue, tooltip: 'Site with the lowest Power Usage Effectiveness, meaning the most energy-efficient facility. Closer to 1.0 is better.' },
+                    { label: 'Best IRR', siteId: result.bestIrr, tooltip: 'Site with the highest Internal Rate of Return, indicating the strongest projected investment performance.' },
+                    { label: 'Lowest Risk', siteId: result.lowestRisk, tooltip: 'Site with the lowest overall risk score based on tier level, redundancy, maintenance strategy, and geographic factors.' },
                 ].map(r => {
                     const site = result.sites.find(s => s.site.id === r.siteId);
                     const idx = result.sites.findIndex(s => s.site.id === r.siteId);
                     return (
                         <div key={r.label} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-3">
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{r.label}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">{r.label}<Tooltip content={r.tooltip} /></div>
                             <div className="flex items-center gap-2 mt-1">
                                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: SITE_COLORS[idx] || '#94a3b8' }} />
                                 <span className="text-sm font-semibold text-slate-900 dark:text-white">{site?.site.label || '—'}</span>
@@ -306,7 +307,6 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
 // ─── FINANCIAL TAB ──────────────────────────────────────────
 
 function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) {
-    const fmtM = (n: number) => `$${(n / 1_000_000).toFixed(1)}M`;
     const data = [
         { metric: 'CAPEX ($M)', ...Object.fromEntries(result.sites.map((s, i) => [`s${i}`, s.capex.total / 1_000_000])) },
         { metric: 'NPV ($M)', ...Object.fromEntries(result.sites.map((s, i) => [`s${i}`, s.financial.npv / 1_000_000])) },
@@ -316,12 +316,12 @@ function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio
     return (
         <div className="space-y-4">
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Financial Comparison</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-1">Financial Comparison<Tooltip content="Side-by-side comparison of capital expenditure, net present value, and annual operating costs across all portfolio sites." /></h3>
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
                         <XAxis dataKey="metric" tick={{ fontSize: 11, fill: '#94a3b8' }} />
                         <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={v => `$${v}M`} />
-                        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
                         <Legend formatter={(v: string) => result.sites[parseInt(v.replace('s', ''))]?.site.label || v} />
                         {result.sites.map((_, i) => (
                             <Bar key={i} dataKey={`s${i}`} fill={SITE_COLORS[i]} radius={[4, 4, 0, 0]} />
@@ -342,15 +342,15 @@ function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio
                     </thead>
                     <tbody>
                         {[
-                            { label: 'CAPEX/kW', get: (s: SiteResult) => `$${Math.round(s.capexPerKw).toLocaleString()}` },
-                            { label: 'OPEX/kW/yr', get: (s: SiteResult) => `$${Math.round(s.opexPerKw).toLocaleString()}` },
-                            { label: 'IRR', get: (s: SiteResult) => `${s.financial.irr.toFixed(1)}%` },
-                            { label: 'NPV', get: (s: SiteResult) => fmtM(s.financial.npv) },
-                            { label: 'Payback', get: (s: SiteResult) => `${s.financial.paybackPeriodYears.toFixed(1)} yr` },
-                            { label: 'ROI', get: (s: SiteResult) => `${s.financial.roiPercent.toFixed(1)}%` },
+                            { label: 'CAPEX/kW', get: (s: SiteResult) => `$${Math.round(s.capexPerKw).toLocaleString()}`, tooltip: 'Capital expenditure per kilowatt of IT capacity. Lower values indicate more cost-efficient construction.' },
+                            { label: 'OPEX/kW/yr', get: (s: SiteResult) => `$${Math.round(s.opexPerKw).toLocaleString()}`, tooltip: 'Annual operating cost per kilowatt of IT capacity. Includes energy, staffing, and maintenance.' },
+                            { label: 'IRR', get: (s: SiteResult) => `${s.financial.irr.toFixed(1)}%`, tooltip: 'Internal Rate of Return — the discount rate at which the project NPV equals zero. Higher is better.' },
+                            { label: 'NPV', get: (s: SiteResult) => fmtMoney(s.financial.npv), tooltip: 'Net Present Value — the present value of all future cash flows minus initial investment. Positive means value creation.' },
+                            { label: 'Payback', get: (s: SiteResult) => `${s.financial.paybackPeriodYears.toFixed(1)} yr`, tooltip: 'Time in years to recover the initial capital investment from operating cash flows.' },
+                            { label: 'ROI', get: (s: SiteResult) => `${s.financial.roiPercent.toFixed(1)}%`, tooltip: 'Return on Investment — total net profit as a percentage of initial capital expenditure over the project lifetime.' },
                         ].map(row => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
-                                <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300">{row.label}</td>
+                                <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300"><span className="flex items-center gap-1">{row.label}<Tooltip content={row.tooltip} /></span></td>
                                 {result.sites.map((s, i) => (
                                     <td key={i} className="text-center px-3 py-2 font-mono text-slate-900 dark:text-white">{row.get(s)}</td>
                                 ))}
@@ -374,12 +374,12 @@ function StaffingTab({ result }: { result: ReturnType<typeof calculatePortfolio>
     return (
         <div className="space-y-4">
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Staffing Comparison</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-1">Staffing Comparison<Tooltip content="Comparison of total headcount and staff density (per MW) across sites. Influenced by shift model, staffing approach, and local labor market." /></h3>
                 <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
                         <XAxis dataKey="metric" tick={{ fontSize: 11, fill: '#94a3b8' }} />
                         <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
                         <Legend formatter={(v: string) => result.sites[parseInt(v.replace('s', ''))]?.site.label || v} />
                         {result.sites.map((_, i) => (
                             <Bar key={i} dataKey={`s${i}`} fill={SITE_COLORS[i]} radius={[4, 4, 0, 0]} />
@@ -399,13 +399,13 @@ function StaffingTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                     </thead>
                     <tbody>
                         {[
-                            { label: 'Total Staff', get: (s: SiteResult) => String(s.totalStaff) },
-                            { label: 'Staff/MW', get: (s: SiteResult) => s.staffPerMw.toFixed(1) },
-                            { label: 'Annual Staff Cost', get: (s: SiteResult) => `$${Math.round(s.annualStaffCost).toLocaleString()}` },
-                            { label: 'Country', get: (s: SiteResult) => s.countryName },
+                            { label: 'Total Staff', get: (s: SiteResult) => String(s.totalStaff), tooltip: 'Total headcount required for 24/7 operations at this site, based on shift model and staffing approach.' },
+                            { label: 'Staff/MW', get: (s: SiteResult) => s.staffPerMw.toFixed(1), tooltip: 'Staff density per megawatt of IT load. Lower values indicate more efficient operations staffing.' },
+                            { label: 'Annual Staff Cost', get: (s: SiteResult) => `$${Math.round(s.annualStaffCost).toLocaleString()}`, tooltip: 'Total annual labor cost including salaries adjusted for country-specific labor rates.' },
+                            { label: 'Country', get: (s: SiteResult) => s.countryName, tooltip: 'Site location which determines local labor rates, energy costs, and regulatory requirements.' },
                         ].map(row => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
-                                <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300">{row.label}</td>
+                                <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300"><span className="flex items-center gap-1">{row.label}<Tooltip content={row.tooltip} /></span></td>
                                 {result.sites.map((s, i) => (
                                     <td key={i} className="text-center px-3 py-2 font-mono text-slate-900 dark:text-white">{row.get(s)}</td>
                                 ))}
@@ -424,7 +424,7 @@ function RiskTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) 
     return (
         <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Risk Profile Comparison</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1">Risk Profile Comparison<Tooltip content="Comparison of risk-related design choices across sites including tier level, redundancy configuration, and maintenance strategy." /></h3>
             </div>
             <table className="w-full text-xs">
                 <thead>
@@ -437,14 +437,14 @@ function RiskTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) 
                 </thead>
                 <tbody>
                     {[
-                        { label: 'Tier Level', get: (s: SiteResult) => `Tier ${s.site.tierLevel}` },
-                        { label: 'Power Redundancy', get: (s: SiteResult) => s.site.powerRedundancy },
-                        { label: 'Maint. Strategy', get: (s: SiteResult) => s.site.maintenanceStrategy },
-                        { label: 'Cooling Type', get: (s: SiteResult) => s.site.coolingType },
-                        { label: 'Expected Uptime', get: (s: SiteResult) => s.site.tierLevel === 4 ? '99.995%' : s.site.tierLevel === 3 ? '99.982%' : '99.749%' },
+                        { label: 'Tier Level', get: (s: SiteResult) => `Tier ${s.site.tierLevel}`, tooltip: 'Uptime Institute tier classification defining redundancy and fault tolerance (Tier 2: N+1, Tier 3: Concurrently Maintainable, Tier 4: Fault Tolerant).' },
+                        { label: 'Power Redundancy', get: (s: SiteResult) => s.site.powerRedundancy, tooltip: 'Power distribution redundancy configuration (e.g., N+1, 2N). Higher redundancy reduces single-point-of-failure risk.' },
+                        { label: 'Maint. Strategy', get: (s: SiteResult) => s.site.maintenanceStrategy, tooltip: 'Maintenance approach — reactive (break-fix), preventive (scheduled), or predictive (condition-based monitoring).' },
+                        { label: 'Cooling Type', get: (s: SiteResult) => s.site.coolingType, tooltip: 'Cooling infrastructure design. Affects energy efficiency, water usage, and maximum rack density support.' },
+                        { label: 'Expected Uptime', get: (s: SiteResult) => s.site.tierLevel === 4 ? '99.995%' : s.site.tierLevel === 3 ? '99.982%' : '99.749%', tooltip: 'Target availability based on tier level. Tier 4: 26 min/yr downtime, Tier 3: 1.6 hr/yr, Tier 2: 22 hr/yr.' },
                     ].map(row => (
                         <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
-                            <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300">{row.label}</td>
+                            <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300"><span className="flex items-center gap-1">{row.label}<Tooltip content={row.tooltip} /></span></td>
                             {result.sites.map((s, i) => (
                                 <td key={i} className="text-center px-3 py-2 font-mono text-slate-900 dark:text-white">{row.get(s)}</td>
                             ))}
@@ -467,12 +467,12 @@ function CarbonTab({ result }: { result: ReturnType<typeof calculatePortfolio> }
     return (
         <div className="space-y-4">
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Carbon & Energy Comparison</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-1">Carbon & Energy Comparison<Tooltip content="Comparison of annual CO2 emissions and PUE across sites. Lower values indicate more environmentally efficient operations." /></h3>
                 <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
                         <XAxis dataKey="metric" tick={{ fontSize: 11, fill: '#94a3b8' }} />
                         <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
                         <Legend formatter={(v: string) => result.sites[parseInt(v.replace('s', ''))]?.site.label || v} />
                         {result.sites.map((_, i) => (
                             <Bar key={i} dataKey={`s${i}`} fill={SITE_COLORS[i]} radius={[4, 4, 0, 0]} />
@@ -492,14 +492,14 @@ function CarbonTab({ result }: { result: ReturnType<typeof calculatePortfolio> }
                     </thead>
                     <tbody>
                         {[
-                            { label: 'Annual CO₂', get: (s: SiteResult) => `${Math.round(s.carbon.annualEmissionsTonCO2).toLocaleString()} tCO₂` },
-                            { label: 'PUE', get: (s: SiteResult) => s.pue.toFixed(2) },
-                            { label: 'Annual Energy', get: (s: SiteResult) => `${Math.round(s.carbon.annualEnergyMWh).toLocaleString()} MWh` },
-                            { label: 'Grid Intensity', get: (s: SiteResult) => `${s.carbon.pueEfficiency.toFixed(2)} PUE` },
-                            { label: 'Carbon Offset Cost', get: (s: SiteResult) => `$${Math.round(s.carbon.carbonOffsetCostUSD).toLocaleString()}` },
+                            { label: 'Annual CO₂', get: (s: SiteResult) => `${Math.round(s.carbon.annualEmissionsTonCO2).toLocaleString()} tCO₂`, tooltip: 'Total annual carbon dioxide emissions in metric tons, based on energy consumption and local grid carbon intensity.' },
+                            { label: 'PUE', get: (s: SiteResult) => s.pue.toFixed(2), tooltip: 'Power Usage Effectiveness — ratio of total facility power to IT equipment power. 1.0 is perfect; typical range is 1.2-1.8.' },
+                            { label: 'Annual Energy', get: (s: SiteResult) => `${Math.round(s.carbon.annualEnergyMWh).toLocaleString()} MWh`, tooltip: 'Total annual energy consumption including IT load and all overhead (cooling, lighting, losses) in megawatt-hours.' },
+                            { label: 'Grid Intensity', get: (s: SiteResult) => `${s.carbon.pueEfficiency.toFixed(2)} PUE`, tooltip: 'PUE efficiency factor reflecting how the local electricity grid carbon intensity affects overall emissions.' },
+                            { label: 'Carbon Offset Cost', get: (s: SiteResult) => `$${Math.round(s.carbon.carbonOffsetCostUSD).toLocaleString()}`, tooltip: 'Estimated annual cost to offset carbon emissions through verified carbon credits at current market rates.' },
                         ].map(row => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
-                                <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300">{row.label}</td>
+                                <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300"><span className="flex items-center gap-1">{row.label}<Tooltip content={row.tooltip} /></span></td>
                                 {result.sites.map((s, i) => (
                                     <td key={i} className="text-center px-3 py-2 font-mono text-slate-900 dark:text-white">{row.get(s)}</td>
                                 ))}

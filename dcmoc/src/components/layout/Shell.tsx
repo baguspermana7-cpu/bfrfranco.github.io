@@ -45,6 +45,7 @@ import {
     Fuel,
 } from 'lucide-react';
 import clsx from 'clsx';
+import { getPUE } from '@/constants/pue';
 import { useAuthStore } from '@/store/auth';
 import { LoginScreen } from '@/components/ui/LoginScreen';
 
@@ -133,7 +134,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                 monthlyOpex: 0,
                 annualCapex: capexStore.results?.total || 0,
                 totalStaff,
-                pue: inputs.coolingType === 'liquid' ? 1.2 : 1.4,
+                pue: getPUE(inputs.coolingType),
             },
         });
         setScenarioName('');

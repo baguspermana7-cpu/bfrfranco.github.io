@@ -10,11 +10,81 @@ import { calculateCapex } from '@/lib/CapexEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { calculateCarbonFootprint } from '@/modules/analytics/CarbonEngine';
 import { BENCHMARK_CATEGORIES, BenchmarkCategory, GRADE_COLORS, Grade, getBenchmarkForTier } from '@/data/benchmarks';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import { Target, Trophy, AlertTriangle, TrendingUp, Info, ChevronRight } from 'lucide-react';
+import { Tooltip as InfoTooltip } from '@/components/ui/Tooltip';
 import clsx from 'clsx';
 
 type BenchmarkTab = 'scorecard' | 'detailed' | 'strengths' | 'comparison';
+
+// ─── TOOLTIP CONTENT MAP ────────────────────────────────────
+const TOOLTIP_TEXTS = {
+    // Main dashboard
+    industryBenchmarks: 'Compare your data center configuration against industry-standard benchmarks from Uptime Institute, ASHRAE, and Green Grid surveys for same-tier facilities.',
+    configBadge: 'Active configuration parameters used for benchmark scoring. Tier level, country, and IT load directly affect which peer group your facility is compared against.',
+
+    // Overall score & grade
+    overallGrade: 'Composite grade (A\u2013F) based on weighted scoring across all benchmark categories. A = top 10%, F = bottom 20%.',
+    overallScore: 'Weighted aggregate of all category scores (0\u2013100), reflecting overall operational maturity relative to industry peers.',
+
+    // Category labels
+    energyEfficiency: 'Power Usage Effectiveness benchmark. Scores facility energy efficiency against Tier-matched peers using PUE, WUE, and energy cost per kW.',
+    staffing: 'Staff-to-MW ratio compared to industry norms. Accounts for shift model, labor cost as % of OPEX, and annual turnover rate.',
+    financial: 'OPEX per kW and CAPEX per kW benchmarked against regional and tier-appropriate comparables. Includes IRR and payback period.',
+    availability: 'Uptime achievement vs SLA targets. Based on annual uptime percentage and mean time to repair (MTTR) for the selected tier.',
+    carbonEsg: 'Carbon intensity, renewable energy percentage, and Scope 2 emissions per MW benchmarked against industry leaders and GHG Protocol standards.',
+
+    // Scorecard summary sections
+    topStrengths: 'The top 3 metrics where your facility outperforms industry peers. Based on lowest percentile rank (closest to best-in-class).',
+    improvementAreas: 'The 3 metrics with the most room for improvement. Each includes an actionable recommendation based on industry best practices.',
+
+    // Detailed metrics
+    categoryScore: 'Performance score (0\u2013100) for a specific operational domain relative to industry averages.',
+    percentileRank: "Facility's position relative to industry peers. Lower percentile = better performance. 10th percentile means top 10%.",
+    metricGrade: 'Letter grade (A\u2013F) derived from percentile rank. A = top 25%, B = 25\u201350%, C = 50\u201375%, D = 75\u201390%, F = bottom 10%.',
+    bulletChart: 'Visual benchmark range. Blue zone = interquartile range (P25\u2013P75). Cyan marker = your value. Vertical line = industry median.',
+    improvementGap: 'Difference between current performance and best-in-class benchmark. Represents optimization opportunity.',
+
+    // Individual metric tooltips
+    metrics: {
+        pue: 'Power Usage Effectiveness \u2014 ratio of total facility power to IT equipment power. Lower is better. Industry median ~1.35 (Uptime Institute 2024).',
+        wue: 'Water Usage Effectiveness \u2014 liters of water consumed per kWh of IT energy. Estimated from cooling type. Lower is better.',
+        energy_cost_per_kw: 'Annual electricity cost per kW of IT load, estimated at ~60% of total OPEX. Varies significantly by region.',
+        staff_per_mw: 'Full-time equivalent staff per MW of IT load. Tier 4 facilities typically require 5\u201318 FTE/MW; Tier 2 requires 2.5\u201310.',
+        labor_cost_pct_opex: 'Labor costs as a percentage of total operating expenditure. High ratios may indicate overstaffing or under-automation.',
+        turnover_rate: 'Annual staff turnover percentage. High turnover increases training costs and operational risk. Industry median ~15%.',
+        capex_per_kw: 'Total capital expenditure per kW of IT capacity. Tier level is the strongest driver. Includes M&E, structure, and site costs.',
+        opex_per_kw: 'Annual operating expenditure per kW of IT load. Encompasses energy, staffing, maintenance, and compliance costs.',
+        irr: 'Internal Rate of Return \u2014 expected annualized return on investment. Higher is better. Industry median ~13% for new builds.',
+        payback_years: 'Years to recover initial capital investment through net cash flows. Lower is better. Affected by occupancy ramp and pricing.',
+        uptime_pct: 'Annual uptime as a percentage. Derived from tier level SLA targets. Tier 3 targets 99.982%, Tier 4 targets 99.995%.',
+        mttr_hours: 'Mean Time to Repair \u2014 average hours to restore service after an incident. Lower is better. Driven by spares, staffing, and procedures.',
+        cue: 'Carbon Usage Effectiveness \u2014 kgCO2 emitted per kWh of IT energy. Derived from grid carbon intensity. Lower is better.',
+        renewable_pct: 'Percentage of energy sourced from renewables (PPAs, on-site, RECs). Higher is better. Industry leaders target 100%.',
+        scope2_per_mw: 'Annual Scope 2 greenhouse gas emissions (tCO2) per MW of IT load. Driven by grid carbon intensity and PUE.',
+    } as Record<string, string>,
+
+    // Comparison table headers
+    compMetric: 'Benchmark metric name and unit of measurement.',
+    compYourValue: 'Your facility\'s calculated value for this metric based on current configuration inputs.',
+    compPercentiles: 'Industry distribution from top performers (P10) to bottom performers (P90). Based on Uptime Institute and Green Grid surveys.',
+    compRank: "Percentile rank indicating where your facility falls in the industry distribution. Lower percentile = better performance.",
+    compGrade: 'Letter grade (A\u2013F) derived from percentile position. A = top quartile, F = bottom decile.',
+    compSource: 'Data source for the benchmark values (e.g., Uptime Institute, ASHRAE, Green Grid, IEA).',
+
+    // Strengths & Gaps tab
+    strengthsHeading: 'Metrics where your configuration excels relative to industry peers. Sorted by percentile rank (best first).',
+    gapsHeading: 'Metrics with the largest gap between your performance and industry best-in-class. Each includes an actionable recommendation.',
+} as const;
+
+// Map benchmark category IDs to tooltip keys
+const CATEGORY_TOOLTIP_MAP: Record<BenchmarkCategory, string> = {
+    energy: TOOLTIP_TEXTS.energyEfficiency,
+    staffing: TOOLTIP_TEXTS.staffing,
+    financial: TOOLTIP_TEXTS.financial,
+    availability: TOOLTIP_TEXTS.availability,
+    carbon: TOOLTIP_TEXTS.carbonEsg,
+};
 
 export default function BenchmarkDashboard() {
     const { selectedCountry, inputs } = useSimulationStore();
@@ -116,6 +186,7 @@ export default function BenchmarkDashboard() {
                             <Target className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                         </div>
                         Industry Benchmarks
+                        <InfoTooltip content={TOOLTIP_TEXTS.industryBenchmarks} />
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Compare your configuration against industry standards
@@ -124,6 +195,7 @@ export default function BenchmarkDashboard() {
                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
                     <Info className="w-3.5 h-3.5" />
                     Tier {inputs.tierLevel} | {selectedCountry.name} | {inputs.itLoad.toLocaleString()} kW
+                    <InfoTooltip content={TOOLTIP_TEXTS.configBadge} />
                 </div>
             </div>
 
@@ -177,10 +249,13 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <span className={clsx('text-4xl font-bold', gradeColor.text, gradeColor.darkText)}>{result.overallGrade}</span>
-                            <span className="text-sm text-slate-500 dark:text-slate-400">{result.overallScore}/100</span>
+                            <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-0.5">{result.overallScore}/100 <InfoTooltip content={TOOLTIP_TEXTS.overallScore} /></span>
                         </div>
                     </div>
-                    <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">Overall Benchmark Score</p>
+                    <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 flex items-center justify-center gap-1">
+                        Overall Benchmark Score
+                        <InfoTooltip content={TOOLTIP_TEXTS.overallGrade} />
+                    </p>
                 </div>
             </div>
 
@@ -191,9 +266,9 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
                     const gc = GRADE_COLORS[catScore.grade];
                     return (
                         <div key={catId} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4 text-center">
-                            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">{cat.label}</div>
-                            <div className={clsx('text-2xl font-bold', gc.text, gc.darkText)}>{catScore.grade}</div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">{catScore.score}/100</div>
+                            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center justify-center gap-0.5">{cat.label} <InfoTooltip content={CATEGORY_TOOLTIP_MAP[catId]} /></div>
+                            <div className={clsx('text-2xl font-bold flex items-center justify-center gap-1', gc.text, gc.darkText)}>{catScore.grade} <InfoTooltip content={TOOLTIP_TEXTS.metricGrade} /></div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-1 flex items-center justify-center gap-0.5">{catScore.score}/100 <InfoTooltip content={TOOLTIP_TEXTS.categoryScore} /></div>
                             <div className="mt-2 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div
                                     className={clsx('h-full rounded-full transition-all', catScore.grade === 'A' ? 'bg-emerald-500' : catScore.grade === 'B' ? 'bg-blue-500' : catScore.grade === 'C' ? 'bg-yellow-500' : catScore.grade === 'D' ? 'bg-orange-500' : 'bg-red-500')}
@@ -211,6 +286,7 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
                     <div className="flex items-center gap-2 mb-3">
                         <Trophy className="w-4 h-4 text-emerald-500" />
                         <span className="text-sm font-semibold text-slate-900 dark:text-white">Top Strengths</span>
+                        <InfoTooltip content={TOOLTIP_TEXTS.topStrengths} />
                     </div>
                     <div className="space-y-2">
                         {result.strengths.map((s, i) => (
@@ -225,6 +301,7 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
                     <div className="flex items-center gap-2 mb-3">
                         <AlertTriangle className="w-4 h-4 text-amber-500" />
                         <span className="text-sm font-semibold text-slate-900 dark:text-white">Improvement Areas</span>
+                        <InfoTooltip content={TOOLTIP_TEXTS.improvementAreas} />
                     </div>
                     <div className="space-y-2">
                         {result.improvements.map((s, i) => (
@@ -254,7 +331,7 @@ function DetailedTab({ metrics, tier }: { metrics: MetricScore[]; tier: 2 | 3 | 
             {(Object.entries(grouped) as [BenchmarkCategory, MetricScore[]][]).map(([catId, catMetrics]) => (
                 <div key={catId} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{BENCHMARK_CATEGORIES[catId].label}</h3>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1">{BENCHMARK_CATEGORIES[catId].label} <InfoTooltip content={CATEGORY_TOOLTIP_MAP[catId]} /></h3>
                     </div>
                     <div className="p-5 space-y-5">
                         {catMetrics.map(m => (
@@ -282,9 +359,10 @@ function BulletChart({ score, tier }: { score: MetricScore; tier: 2 | 3 | 4 }) {
     return (
         <div>
             <div className="flex items-center justify-between mb-1.5">
-                <div>
+                <div className="flex items-center gap-1">
                     <span className="text-sm font-medium text-slate-900 dark:text-white">{metric.name}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">({metric.unit})</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">({metric.unit})</span>
+                    <InfoTooltip content={TOOLTIP_TEXTS.metrics[metric.id] || metric.description} />
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-mono font-medium text-slate-700 dark:text-slate-300">
@@ -293,6 +371,7 @@ function BulletChart({ score, tier }: { score: MetricScore; tier: 2 | 3 | 4 }) {
                     <span className={clsx('text-xs font-bold px-1.5 py-0.5 rounded', gc.bg, gc.text, gc.darkBg, gc.darkText)}>
                         {grade}
                     </span>
+                    <InfoTooltip content={TOOLTIP_TEXTS.percentileRank} />
                 </div>
             </div>
             {/* Bullet bar */}
@@ -309,9 +388,9 @@ function BulletChart({ score, tier }: { score: MetricScore; tier: 2 | 3 | 4 }) {
                 />
             </div>
             <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                <span>P10: {formatMetricValue(b.p10, metric.unit)}</span>
-                <span>Median: {formatMetricValue(b.median, metric.unit)}</span>
-                <span>P90: {formatMetricValue(b.p90, metric.unit)}</span>
+                <span className="flex items-center gap-0.5">P10: {formatMetricValue(b.p10, metric.unit)}</span>
+                <span className="flex items-center gap-0.5">Median: {formatMetricValue(b.median, metric.unit)} <InfoTooltip content={TOOLTIP_TEXTS.bulletChart} /></span>
+                <span className="flex items-center gap-0.5">P90: {formatMetricValue(b.p90, metric.unit)}</span>
             </div>
         </div>
     );
@@ -327,6 +406,7 @@ function StrengthsTab({ result }: { result: ReturnType<typeof calculateBenchmark
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                     <Trophy className="w-4 h-4 text-emerald-500" />
                     Top 3 Strengths
+                    <InfoTooltip content={TOOLTIP_TEXTS.strengthsHeading} />
                 </h3>
                 {result.strengths.map((s, i) => {
                     const gc = GRADE_COLORS[s.grade];
@@ -347,6 +427,7 @@ function StrengthsTab({ result }: { result: ReturnType<typeof calculateBenchmark
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-amber-500" />
                     Top 3 Improvement Areas
+                    <InfoTooltip content={TOOLTIP_TEXTS.gapsHeading} />
                 </h3>
                 {result.improvements.map((s, i) => {
                     const gc = GRADE_COLORS[s.grade];
@@ -378,16 +459,16 @@ function ComparisonTab({ metrics }: { metrics: MetricScore[] }) {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                            <th className="text-left px-4 py-3 font-semibold text-slate-900 dark:text-white">Metric</th>
-                            <th className="text-center px-3 py-3 font-semibold text-slate-900 dark:text-white">Your Value</th>
-                            <th className="text-center px-3 py-3 font-semibold text-slate-500 dark:text-slate-400">P10</th>
+                            <th className="text-left px-4 py-3 font-semibold text-slate-900 dark:text-white"><span className="flex items-center gap-1">Metric <InfoTooltip content={TOOLTIP_TEXTS.compMetric} /></span></th>
+                            <th className="text-center px-3 py-3 font-semibold text-slate-900 dark:text-white"><span className="flex items-center justify-center gap-1">Your Value <InfoTooltip content={TOOLTIP_TEXTS.compYourValue} /></span></th>
+                            <th className="text-center px-3 py-3 font-semibold text-slate-500 dark:text-slate-400"><span className="flex items-center justify-center gap-0.5">P10 <InfoTooltip content={TOOLTIP_TEXTS.compPercentiles} /></span></th>
                             <th className="text-center px-3 py-3 font-semibold text-slate-500 dark:text-slate-400">P25</th>
                             <th className="text-center px-3 py-3 font-semibold text-slate-500 dark:text-slate-400">Median</th>
                             <th className="text-center px-3 py-3 font-semibold text-slate-500 dark:text-slate-400">P75</th>
                             <th className="text-center px-3 py-3 font-semibold text-slate-500 dark:text-slate-400">P90</th>
-                            <th className="text-center px-3 py-3 font-semibold text-slate-900 dark:text-white">Rank</th>
-                            <th className="text-center px-3 py-3 font-semibold text-slate-900 dark:text-white">Grade</th>
-                            <th className="text-left px-3 py-3 font-semibold text-slate-500 dark:text-slate-400">Source</th>
+                            <th className="text-center px-3 py-3 font-semibold text-slate-900 dark:text-white"><span className="flex items-center justify-center gap-1">Rank <InfoTooltip content={TOOLTIP_TEXTS.compRank} /></span></th>
+                            <th className="text-center px-3 py-3 font-semibold text-slate-900 dark:text-white"><span className="flex items-center justify-center gap-1">Grade <InfoTooltip content={TOOLTIP_TEXTS.compGrade} /></span></th>
+                            <th className="text-left px-3 py-3 font-semibold text-slate-500 dark:text-slate-400"><span className="flex items-center gap-1">Source <InfoTooltip content={TOOLTIP_TEXTS.compSource} /></span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -397,7 +478,7 @@ function ComparisonTab({ metrics }: { metrics: MetricScore[] }) {
                             return (
                                 <tr key={m.metric.id} className={clsx('border-b border-slate-100 dark:border-slate-800', i % 2 === 0 ? 'bg-white dark:bg-transparent' : 'bg-slate-50/50 dark:bg-slate-800/20')}>
                                     <td className="px-4 py-2.5">
-                                        <div className="font-medium text-slate-900 dark:text-white text-xs">{m.metric.name}</div>
+                                        <div className="font-medium text-slate-900 dark:text-white text-xs flex items-center gap-0.5">{m.metric.name} <InfoTooltip content={TOOLTIP_TEXTS.metrics[m.metric.id] || m.metric.description} /></div>
                                         <div className="text-[10px] text-slate-500 dark:text-slate-400">{m.metric.unit}</div>
                                     </td>
                                     <td className="text-center px-3 py-2.5 font-mono font-semibold text-cyan-700 dark:text-cyan-400 text-xs">{formatMetricValue(m.userValue, m.metric.unit)}</td>

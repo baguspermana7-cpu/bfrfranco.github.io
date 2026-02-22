@@ -1148,3 +1148,75 @@ export const draw5YearTCOTable = (doc: jsPDF, y: number, cashflows: any[], capex
 
     return (doc as any).lastAutoTable.finalY + 15;
 };
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED PDF HELPERS — Used by all pdf/ generators
+// ═══════════════════════════════════════════════════════════════
+
+export const initDoc = async (branding?: BrandingConfig) => {
+    const jsPDFModule = await import('jspdf');
+    let JsPDFConstructor: any = null;
+
+    if (jsPDFModule.default && typeof jsPDFModule.default === 'function') {
+        JsPDFConstructor = jsPDFModule.default;
+    } else if ((jsPDFModule as any).jsPDF) {
+        JsPDFConstructor = (jsPDFModule as any).jsPDF;
+    } else {
+        JsPDFConstructor = jsPDFModule.default || jsPDFModule;
+    }
+
+    const autoTableModule = await import('jspdf-autotable');
+    const autoTableFn = autoTableModule.default || autoTableModule;
+
+    if (!JsPDFConstructor) {
+        throw new Error("Failed to load jsPDF constructor");
+    }
+
+    const doc = new JsPDFConstructor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const runAutoTable = (d: any, o: any) => {
+        if (typeof autoTableFn === 'function') {
+            return (autoTableFn as any)(d, o);
+        }
+        if (typeof (d as any).autoTable === 'function') {
+            return (d as any).autoTable(o);
+        }
+        console.error('autoTable plugin not found');
+    };
+
+    return { doc, autoTable: runAutoTable };
+};
+
+export const savePdf = (doc: any, filename: string) => {
+    try {
+        const blob = doc.output('blob');
+        if (blob.size < 100) {
+            throw new Error(`Generated PDF is empty (${blob.size} bytes)`);
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e: any) {
+        console.error('PDF save error:', e);
+        if (typeof window !== 'undefined') {
+            window.alert(`PDF Generation Failed: ${e.message || 'Unknown error'}`);
+        }
+    }
+};
+
+export const fmt = (n: number): string => {
+    if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+    if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}k`;
+    return `$${n.toFixed(0)}`;
+};
+
+export const fmtMoney = (n: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+};
+
+export const today = () => new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });

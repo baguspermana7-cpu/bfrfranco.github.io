@@ -22,12 +22,13 @@ export default function RiskDashboard() {
 
     const analysis = useMemo(() => {
         if (!selectedCountry) return null;
-        const assets = generateAssetCounts(1000, tierLevel, 'air', 5000);
+        const coolingMap: 'air' | 'pumped' = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx' ? 'pumped' : 'air';
+        const assets = generateAssetCounts(inputs.itLoad, tierLevel, coolingMap, Math.ceil(inputs.itLoad * 0.6), inputs.coolingTopology, inputs.powerRedundancy);
         const risks = calculateRiskProfile(selectedCountry, tierLevel, assets);
         const aggregation = calculateRiskScore(risks, tierLevel);
         const downtime = calculateDowntimeRisk(tierLevel, undefined, 4, selectedCountry ?? undefined);
         return { risks, aggregation, downtime };
-    }, [selectedCountry, tierLevel, inputs.headcount_Engineer]);
+    }, [selectedCountry, tierLevel, inputs.itLoad, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, inputs.headcount_Engineer]);
 
     if (!selectedCountry || !analysis) {
         return <div className="p-8 text-center text-slate-500">Select a country to view risk analysis.</div>;

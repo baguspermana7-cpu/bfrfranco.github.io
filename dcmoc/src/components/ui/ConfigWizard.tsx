@@ -37,7 +37,12 @@ export function ConfigWizard({ onComplete }: { onComplete: () => void }) {
             coolingTopology: cooling,
             powerRedundancy: power
         });
-        setCapexInputs({ coolingType: cooling === 'perimeter' ? 'air' : cooling === 'in-row' ? 'inrow' : 'liquid' }); // Sync Cooling
+        // Sync both cooling AND redundancy to capex store
+        const capexRedundancy = power === '2N+1' ? '2n1' : power === '2N' ? '2n' : 'n1';
+        setCapexInputs({
+            coolingType: cooling === 'perimeter' ? 'air' : cooling === 'in-row' ? 'inrow' : 'liquid',
+            redundancy: capexRedundancy,
+        });
         setStep('strategy');
     };
 

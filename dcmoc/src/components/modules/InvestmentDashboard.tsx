@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { getPUE } from '@/constants/pue';
 import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
 import { calculateInvestment, InvestmentResult } from '@/modules/analytics/InvestmentEngine';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -17,15 +18,8 @@ import {
     BarChart, Bar, Legend, ComposedChart, Area
 } from 'recharts';
 import clsx from 'clsx';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => {
-    if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`;
-    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-    return `$${n.toFixed(0)}`;
-};
-const fmtPct = (n: number, dec = 1) => `${n.toFixed(dec)}%`;
+import { fmt, fmtMoney, fmtPct } from '@/lib/format';
+import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
 type InvestTab = 'cap' | 'returns' | 'valuation' | 'ipo' | 'readiness' | 'sensitivity';
 
@@ -36,6 +30,7 @@ const InvestmentDashboard = () => {
     const capexResults = capexStore.results;
 
     const [activeTab, setActiveTab] = useState<InvestTab>('cap');
+    const [isExporting, setIsExporting] = useState(false);
 
     // Local configurable inputs
     const [investInputs, setInvestInputs] = useState({
@@ -70,7 +65,8 @@ const InvestmentDashboard = () => {
             effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
             effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
         ) * 12;
-        const energyCost = effectiveInputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
+        const elecRate = selectedCountry.economy?.electricityRate ?? 0.10;
+        const energyCost = effectiveInputs.itLoad * getPUE(effectiveInputs.coolingType ?? 'air') * 8760 * elecRate;
         const maintenanceCost = effectiveInputs.itLoad * 50;
         return staffCost + energyCost + maintenanceCost;
     }, [selectedCountry, effectiveInputs]);
@@ -129,6 +125,37 @@ const InvestmentDashboard = () => {
     ];
 
     return (
+        <div className="space-y-4">
+            {/* Header with Export */}
+            <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Landmark className="w-6 h-6 text-indigo-500" />
+                    Investment Analysis
+                </h2>
+                <ExportPDFButton
+                    isGenerating={isExporting}
+                    onExport={async () => {
+                        setIsExporting(true);
+                        try {
+                            const { generateInvestmentPDF } = await import('@/modules/reporting/PdfGenerator');
+                            await generateInvestmentPDF(
+                                selectedCountry,
+                                result,
+                                investInputs,
+                                finResult,
+                                capexResults.total,
+                                effectiveInputs.itLoad
+                            );
+                        } catch (e) {
+                            console.error('Investment PDF error:', e);
+                        } finally {
+                            setIsExporting(false);
+                        }
+                    }}
+                    label="PDF"
+                    className="px-2 py-1 text-[10px]"
+                />
+            </div>
         <div className="flex gap-6">
             {/* ═══ LEFT SIDEBAR ═══ */}
             <div className="w-[340px] flex-shrink-0 space-y-4 overflow-y-auto max-h-[calc(100vh-6rem)] pb-6">
@@ -195,7 +222,7 @@ const InvestmentDashboard = () => {
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Terminal Cap Rate (%)</label>
+                        <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Terminal Cap Rate (%) <Tooltip content="Estimated value of the business beyond the explicit forecast period. Often the largest component of total valuation." /></label>
                         <input type="number" className={inpCls} step={0.25}
                             value={(investInputs.terminalCapRate * 100).toFixed(1)}
                             onChange={e => handleChange('terminalCapRate', Number(e.target.value) / 100)} />
@@ -265,7 +292,7 @@ const InvestmentDashboard = () => {
                             <KPICard label="Total CAPEX" value={fmtMoney(capexResults.total)} icon={<Building className="w-4 h-4" />} color="slate" />
                             <KPICard label="Debt Amount" value={fmtMoney(result.totalDebt)} sub={`${(investInputs.debtRatio * 100).toFixed(0)}% leverage`} icon={<DollarSign className="w-4 h-4" />} color="red" />
                             <KPICard label="Equity Required" value={fmtMoney(result.totalEquity)} sub={`${((1 - investInputs.debtRatio) * 100).toFixed(0)}% equity`} icon={<DollarSign className="w-4 h-4" />} color="emerald" />
-                            <KPICard label="WACC" value={fmtPct(result.wacc * 100)} sub="Weighted avg cost" icon={<TrendingUp className="w-4 h-4" />} color="indigo" />
+                            <KPICard label="WACC" value={fmtPct(result.wacc * 100)} sub="Weighted avg cost" icon={<TrendingUp className="w-4 h-4" />} color="indigo" tooltip="Weighted Average Cost of Capital — blended cost of debt and equity financing. Used as discount rate for DCF analysis." />
                         </div>
 
                         {/* Donut Chart */}
@@ -346,7 +373,7 @@ const InvestmentDashboard = () => {
                     <div className="space-y-4 animate-in fade-in duration-300">
                         <div className="grid grid-cols-4 gap-3">
                             <KPICard label="Equity IRR" value={fmtPct(result.equityIRR)} sub={result.equityIRR > 15 ? 'Above 15% target' : 'Below 15% target'} icon={<TrendingUp className="w-4 h-4" />} color={result.equityIRR >= 15 ? 'emerald' : 'red'} />
-                            <KPICard label="MOIC" value={`${result.moic.toFixed(2)}x`} sub="Multiple on invested capital" icon={<ArrowUpRight className="w-4 h-4" />} color={result.moic >= 2 ? 'emerald' : 'amber'} />
+                            <KPICard label="MOIC" value={`${result.moic.toFixed(2)}x`} sub="Multiple on invested capital" icon={<ArrowUpRight className="w-4 h-4" />} color={result.moic >= 2 ? 'emerald' : 'amber'} tooltip="Multiple on Invested Capital — total value returned divided by total capital invested. Target is 2-3x for PE." />
                             <KPICard label="Min DSCR" value={`${result.minDSCR.toFixed(2)}x`} sub={result.minDSCR >= 1.25 ? 'Above 1.25x threshold' : 'Below 1.25x threshold'} icon={<Shield className="w-4 h-4" />} color={result.minDSCR >= 1.25 ? 'emerald' : 'red'} />
                             <KPICard label="Y1 Cash-on-Cash" value={fmtPct(result.year1CashOnCash)} sub="Year 1 levered yield" icon={<DollarSign className="w-4 h-4" />} color={result.year1CashOnCash >= 8 ? 'emerald' : 'amber'} />
                         </div>
@@ -411,20 +438,64 @@ const InvestmentDashboard = () => {
                     </div>
                 )}
 
+                {/* ═══ GP/LP RETURN WATERFALL ═══ */}
+                {activeTab === 'returns' && (() => {
+                    // GP/LP waterfall: 8% hurdle, 20% carry above hurdle
+                    const hurdleRate = 0.08;
+                    const carryRate = 0.20;
+                    const equityInvested = result.totalEquity;
+                    const totalDistributed = result.exitEquityValue + result.leveredFCFTable.reduce((s, r) => s + Math.max(0, r.leveredFCF), 0);
+                    const totalProfit = totalDistributed - equityInvested;
+                    const hurdleReturn = equityInvested * hurdleRate * investInputs.exitYear;
+                    const profitAboveHurdle = Math.max(0, totalProfit - hurdleReturn);
+                    const gpCarry = profitAboveHurdle * carryRate;
+                    const lpReturn = totalDistributed - gpCarry;
+                    const gpTotal = gpCarry;
+                    const lpMoic = lpReturn / equityInvested;
+
+                    const waterfallItems = [
+                        { label: 'LP Capital Return', value: equityInvested, color: '#64748b' },
+                        { label: `LP Pref (${(hurdleRate * 100).toFixed(0)}% hurdle)`, value: Math.min(hurdleReturn, totalProfit), color: '#06b6d4' },
+                        { label: 'GP Carry (20%)', value: gpCarry, color: '#f59e0b' },
+                        { label: 'LP Excess Return', value: Math.max(0, totalProfit - hurdleReturn - gpCarry), color: '#10b981' },
+                    ];
+
+                    return (
+                        <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
+                            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-1">GP/LP Return Waterfall</h3>
+                            <p className="text-[11px] text-slate-400 mb-4">{(hurdleRate * 100).toFixed(0)}% preferred return hurdle, {(carryRate * 100).toFixed(0)}% GP carry on profits above hurdle</p>
+                            <div className="grid grid-cols-4 gap-3 mb-4">
+                                {waterfallItems.map((item, i) => (
+                                    <div key={i} className="text-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                                        <div className="w-2 h-2 rounded-full mx-auto mb-1" style={{ backgroundColor: item.color }} />
+                                        <div className="text-[10px] text-slate-500 mb-0.5">{item.label}</div>
+                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{fmtMoney(item.value)}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <div className="text-xs text-slate-500">LP Total Return: <span className="font-bold text-emerald-600 dark:text-emerald-400">{fmtMoney(lpReturn)}</span> ({lpMoic.toFixed(2)}x MOIC)</div>
+                                <div className="text-xs text-slate-500">GP Total Return: <span className="font-bold text-amber-600 dark:text-amber-400">{fmtMoney(gpTotal)}</span></div>
+                                <div className="text-xs text-slate-500">Total Distributed: <span className="font-bold text-slate-900 dark:text-white">{fmtMoney(totalDistributed)}</span></div>
+                            </div>
+                        </div>
+                    );
+                })()}
+
                 {/* ═══ TAB 3: VALUATION DASHBOARD ═══ */}
                 {activeTab === 'valuation' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
                         {/* 3 Valuation Cards */}
                         <div className="grid grid-cols-3 gap-4">
                             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm dark:shadow-none">
-                                <div className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase font-semibold mb-2">EV/EBITDA Method</div>
+                                <div className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase font-semibold mb-2 flex items-center gap-1">EV/EBITDA Method <Tooltip content="Enterprise Value — total value of the company including debt minus cash. Used for EV/EBITDA and other valuation multiples." /></div>
                                 <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.valuation.evEbitda)}</div>
                                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                     {fmtMoney(result.stabilizedEBITDA)} x {investInputs.exitEbitdaMultiple}x
                                 </div>
                             </div>
                             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm dark:shadow-none">
-                                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-semibold mb-2">Cap Rate Method</div>
+                                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-semibold mb-2 flex items-center gap-1">Cap Rate Method <Tooltip content="Discounted Cash Flow — valuation method summing present values of projected future free cash flows." /></div>
                                 <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.valuation.capRateVal)}</div>
                                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                     NOI {fmtMoney(result.stabilizedNOI)} / {fmtPct(investInputs.terminalCapRate * 100)}
@@ -487,6 +558,53 @@ const InvestmentDashboard = () => {
                     </div>
                 )}
 
+                {/* Terminal Value Sensitivity by Cap Rate */}
+                {activeTab === 'valuation' && (() => {
+                    const capRates = [0.050, 0.055, 0.060, 0.065, 0.070, 0.075, 0.080];
+                    const noi = result.stabilizedNOI;
+                    const terminalData = capRates.map(cr => ({
+                        capRate: `${(cr * 100).toFixed(1)}%`,
+                        terminalValue: noi / cr,
+                        impliedDollarPerKw: Math.round((noi / cr) / effectiveInputs.itLoad),
+                        isActive: Math.abs(cr - investInputs.terminalCapRate) < 0.001,
+                    }));
+
+                    return (
+                        <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
+                            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-1">Terminal Value Sensitivity</h3>
+                            <p className="text-[11px] text-slate-400 mb-4">Stabilized NOI of {fmtMoney(noi)} capitalized across a range of cap rates</p>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-semibold">
+                                            <th className="px-4 py-2 text-left">Cap Rate</th>
+                                            <th className="px-4 py-2 text-right">Terminal Value</th>
+                                            <th className="px-4 py-2 text-right">Implied $/kW</th>
+                                            <th className="px-4 py-2 text-right">vs Current</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50">
+                                        {terminalData.map((row, i) => {
+                                            const baseVal = noi / investInputs.terminalCapRate;
+                                            const diff = ((row.terminalValue - baseVal) / baseVal) * 100;
+                                            return (
+                                                <tr key={i} className={clsx("hover:bg-slate-50 dark:hover:bg-slate-700/20 transition-colors", row.isActive && "bg-cyan-50 dark:bg-cyan-950/20")}>
+                                                    <td className="px-4 py-2 text-slate-800 dark:text-slate-300 font-mono">{row.capRate}</td>
+                                                    <td className="px-4 py-2 text-right text-slate-900 dark:text-white font-medium">{fmtMoney(row.terminalValue)}</td>
+                                                    <td className="px-4 py-2 text-right text-cyan-600 dark:text-cyan-400">${fmt(row.impliedDollarPerKw)}/kW</td>
+                                                    <td className={clsx("px-4 py-2 text-right font-mono", diff > 0 ? 'text-emerald-600 dark:text-emerald-400' : diff < 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-500')}>
+                                                        {row.isActive ? '—' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}%`}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    );
+                })()}
+
                 {/* ═══ TAB 4: IPO / ACQUISITION PRICING ═══ */}
                 {activeTab === 'ipo' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
@@ -523,7 +641,7 @@ const InvestmentDashboard = () => {
                                         <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-semibold">
                                             <th className="px-4 py-2 text-left">Multiple</th>
                                             <th className="px-4 py-2 text-right">Enterprise Value</th>
-                                            <th className="px-4 py-2 text-right">Equity Value</th>
+                                            <th className="px-4 py-2 text-right"><span className="flex items-center justify-end gap-1">Equity Value <Tooltip content="Enterprise value minus net debt. Represents the value attributable to equity holders." /></span></th>
                                             <th className="px-4 py-2 text-right">Implied $/kW</th>
                                         </tr>
                                     </thead>
@@ -668,18 +786,20 @@ const InvestmentDashboard = () => {
                 )}
             </div>
         </div>
+        </div>
     );
 };
 
 // ─── KPI Card Component ─────────────────────────────────────
-function KPICard({ label, value, sub, icon, color }: {
-    label: string; value: string; sub?: string; icon: React.ReactNode; color: string;
+function KPICard({ label, value, sub, icon, color, tooltip }: {
+    label: string; value: string; sub?: string; icon: React.ReactNode; color: string; tooltip?: string;
 }) {
     return (
         <div className={`bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm dark:shadow-none`}>
             <div className="flex items-center gap-1.5 mb-1">
                 <div className={`text-${color}-600 dark:text-${color}-400`}>{icon}</div>
                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">{label}</span>
+                {tooltip && <Tooltip content={tooltip} />}
             </div>
             <div className="text-2xl font-bold text-slate-900 dark:text-white">{value}</div>
             {sub && <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{sub}</div>}

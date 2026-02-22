@@ -8,12 +8,14 @@ import { calculateEnvironmentalDegradation } from '@/modules/maintenance/Environ
 import { calculateDowntimeRisk } from '@/modules/risk/DowntimeCalculator';
 import { ASSETS } from '@/constants/assets';
 import { COUNTRIES } from '@/constants/countries';
+import { getPUE } from '@/constants/pue';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import {
     Users, Wrench, Activity, AlertTriangle, ShieldAlert,
     ArrowRight, TrendingUp, DollarSign, CloudFog, Globe2, Zap
 } from 'lucide-react';
 import clsx from 'clsx';
+import { fmtMoney, fmtMoneyFull, fmtCompact, fmtUnit } from '@/lib/format';
 import { ConfigWizard } from '@/components/ui/ConfigWizard';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -352,7 +354,7 @@ export function SimulationDashboard() {
                         {aqiLaborPunishment > 0 && (
                             <div className="mt-2 text-xs text-red-400 bg-red-950/20 p-2 rounded flex items-center gap-2">
                                 <TrendingUp className="w-3 h-3" />
-                                +{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(aqiLaborPunishment)} (Hazard Pay & Freq. Maint.)
+                                +{fmtMoneyFull(aqiLaborPunishment)} (Hazard Pay & Freq. Maint.)
                             </div>
                         )}
                     </div>
@@ -377,7 +379,7 @@ export function SimulationDashboard() {
                         </div>
                         <div className="mt-2 text-xs text-amber-400 bg-amber-950/20 p-2 rounded flex items-center gap-2">
                             <DollarSign className="w-3 h-3" />
-                            +{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(turnoverAmortizedMonthly)} Monthly Hidden Loss
+                            +{fmtMoneyFull(turnoverAmortizedMonthly)} Monthly Hidden Loss
                         </div>
                     </div>
 
@@ -396,8 +398,8 @@ export function SimulationDashboard() {
                                     <Tooltip content="Monthly base salary + allowances for FTEs" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white truncate" title={results.monthlyInternalCost.toLocaleString()}>
-                                ${results.monthlyInternalCost.toLocaleString()}
+                            <div className="text-2xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoneyFull(results.monthlyInternalCost)}>
+                                {fmtMoney(results.monthlyInternalCost)}
                             </div>
                             <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
                                 <Users className="w-3 h-3" />
@@ -413,8 +415,8 @@ export function SimulationDashboard() {
                                     <Tooltip content="Outsourced specialist services (Security, Cleaning, MEP)" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-amber-500 dark:text-amber-400 truncate" title={results.monthlyVendorCost.toLocaleString()}>
-                                ${results.monthlyVendorCost.toLocaleString()}
+                            <div className="text-2xl font-bold text-amber-500 dark:text-amber-400 truncate" title={fmtMoneyFull(results.monthlyVendorCost)}>
+                                {fmtMoney(results.monthlyVendorCost)}
                             </div>
                             <div className="text-[10px] text-slate-500 mt-1">
                                 Includes 35% Vendor Premium
@@ -429,8 +431,8 @@ export function SimulationDashboard() {
                                     <Tooltip content="Monthly maintenance consumables based on AQI impact" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-cyan-500 dark:text-cyan-400 truncate" title={results.totalMonthlyConsumables.toLocaleString()}>
-                                ${results.totalMonthlyConsumables.toLocaleString()}
+                            <div className="text-2xl font-bold text-cyan-500 dark:text-cyan-400 truncate" title={fmtMoneyFull(results.totalMonthlyConsumables)}>
+                                {fmtMoney(results.totalMonthlyConsumables)}
                             </div>
                             <div className="text-[10px] text-slate-500 mt-1">
                                 AQI Impact: {results.aqiImpact > 1 ? 'High' : 'None'}
@@ -445,8 +447,8 @@ export function SimulationDashboard() {
                                     <Tooltip content="Recruitment + Training + Lost Productivity" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate" title={Math.round(results.turnoverCost).toLocaleString()}>
-                                ${Math.round(results.turnoverCost).toLocaleString()}
+                            <div className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate" title={fmtMoneyFull(results.turnoverCost)}>
+                                {fmtMoney(results.turnoverCost)}
                             </div>
                             <div className="text-[10px] text-slate-500 mt-1">
                                 Rate: {(scenarioTurnover * 100).toFixed(0)}% / Year
@@ -517,14 +519,14 @@ export function SimulationDashboard() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Expected Availability</div>
+                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Expected Availability <Tooltip content="Percentage of time the facility is operational. Determined by tier level and redundancy design." /></div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">{results.availability.toFixed(3)}%</div>
                                     <div className="text-[10px] text-slate-500">~{results.downtimeMinutes} mins downtime / year</div>
                                 </div>
                                 <div>
-                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Financial Exposure</div>
-                                    <div className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate" title={Math.round(results.financialRisk).toLocaleString()}>
-                                        ${Math.round(results.financialRisk).toLocaleString()}
+                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Financial Exposure <Tooltip content="Maximum estimated financial loss from downtime events over a year, calculated at $5K per minute." /></div>
+                                    <div className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate" title={fmtMoneyFull(results.financialRisk)}>
+                                        {fmtMoney(results.financialRisk)}
                                     </div>
                                     <div className="text-[10px] text-slate-500">@ $5k/min business impact</div>
                                 </div>
@@ -539,26 +541,40 @@ export function SimulationDashboard() {
                             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Power & Cooling Analytics</h3>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                            <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">PUE</div>
-                                <div className="text-lg font-bold text-orange-600 dark:text-amber-400">1.45</div>
-                                <div className="text-[9px] text-slate-500">Good</div>
-                            </div>
-                            <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">Cooling Load</div>
-                                <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400">450 kW</div>
-                                <div className="text-[9px] text-slate-500">31% overhead</div>
-                            </div>
-                            <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">Total Facility</div>
-                                <div className="text-lg font-bold text-slate-900 dark:text-white">1450 KW</div>
-                                <div className="text-[9px] text-slate-500">IT + Cooling + Losses</div>
-                            </div>
-                            <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">Annual Energy</div>
-                                <div className="text-lg font-bold text-violet-600 dark:text-purple-400 truncate">12702 MWh</div>
-                                <div className="text-[9px] text-slate-500">$1,270,200 @ $0.10</div>
-                            </div>
+                            {(() => {
+                                const pue = getPUE(inputs.coolingType);
+                                const coolingLoadKw = Math.round(inputs.itLoad * (pue - 1));
+                                const coolingPct = Math.round((pue - 1) * 100);
+                                const totalFacilityKw = Math.round(inputs.itLoad * pue);
+                                const annualEnergyMWh = Math.round(totalFacilityKw * 8760 / 1000);
+                                const elecRate = selectedCountry?.economy?.electricityRate ?? 0.10;
+                                const annualCost = Math.round(totalFacilityKw * 8760 * elecRate);
+                                const pueLabel = pue <= 1.15 ? 'Excellent' : pue <= 1.25 ? 'Very Good' : pue <= 1.35 ? 'Good' : 'Average';
+                                return (
+                                    <>
+                                        <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
+                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">PUE <Tooltip content="Power Usage Effectiveness — ratio of total facility power to IT equipment power. Lower is better (1.0 = perfect)." /></div>
+                                            <div className="text-lg font-bold text-orange-600 dark:text-amber-400">{pue.toFixed(2)}</div>
+                                            <div className="text-[9px] text-slate-500">{pueLabel}</div>
+                                        </div>
+                                        <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
+                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Cooling Load <Tooltip content="Power consumed by cooling systems in kW. Derived from IT load multiplied by (PUE - 1)." /></div>
+                                            <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{fmtUnit(coolingLoadKw, 'kW')}</div>
+                                            <div className="text-[9px] text-slate-500">{coolingPct}% overhead</div>
+                                        </div>
+                                        <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
+                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Total Facility <Tooltip content="Combined power draw including IT load, cooling, lighting, and distribution losses." /></div>
+                                            <div className="text-lg font-bold text-slate-900 dark:text-white">{fmtUnit(totalFacilityKw, 'kW')}</div>
+                                            <div className="text-[9px] text-slate-500">IT + Cooling + Losses</div>
+                                        </div>
+                                        <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
+                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Annual Energy <Tooltip content="Total facility energy consumption over a year in megawatt-hours." /></div>
+                                            <div className="text-lg font-bold text-violet-600 dark:text-purple-400 truncate">{fmtUnit(annualEnergyMWh, 'MWh')}</div>
+                                            <div className="text-[9px] text-slate-500">{fmtMoney(annualCost)} @ ${elecRate.toFixed(2)}</div>
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </div>
 
                         <div className="mt-4">
@@ -585,22 +601,23 @@ export function SimulationDashboard() {
                 <div className="grid grid-cols-3 gap-4">
                     {(() => {
                         const gridCarbonIntensity = selectedCountry!.environment?.gridCarbonIntensity ?? 0.50;
-                        const annualMWh = ((inputs.tierLevel === 4 ? 1250 : 1450) * 8760) / 1000;
+                        const envPue = getPUE(inputs.coolingType);
+                        const annualMWh = (inputs.itLoad * envPue * 8760) / 1000;
                         const annualCO2Tonnes = annualMWh * gridCarbonIntensity;
                         return (
                             <>
                                 <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
-                                    <div className="text-[10px] text-slate-500 uppercase">Grid Carbon</div>
+                                    <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Grid Carbon <Tooltip content="Carbon intensity of the local electricity grid in kgCO2 per kWh consumed." /></div>
                                     <div className="text-xl font-bold text-amber-500 dark:text-amber-400">{gridCarbonIntensity.toFixed(2)}</div>
                                     <div className="text-[10px] text-slate-500">kgCO₂/kWh</div>
                                 </div>
                                 <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
-                                    <div className="text-[10px] text-slate-500 uppercase">Annual CO₂</div>
+                                    <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Annual CO₂ <Tooltip content="Total Scope 2 carbon emissions from grid electricity consumption." /></div>
                                     <div className="text-xl font-bold text-orange-500 dark:text-orange-400">{(annualCO2Tonnes / 1000).toFixed(1)}k</div>
                                     <div className="text-[10px] text-slate-500">tonnes/year</div>
                                 </div>
                                 <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
-                                    <div className="text-[10px] text-slate-500 uppercase">WUE (est.)</div>
+                                    <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">WUE (est.) <Tooltip content="Water Usage Effectiveness — liters of water consumed per kWh of IT energy. Lower is better." /></div>
                                     <div className="text-xl font-bold text-blue-500 dark:text-blue-400">{(selectedCountry!.environment?.baselineAQI ?? 50) > 80 ? '1.8' : '1.2'}</div>
                                     <div className="text-[10px] text-slate-500">L/kWh</div>
                                 </div>

@@ -12,9 +12,7 @@ import { GraduationCap, Users, DollarSign, Clock, TrendingUp, Award } from 'luci
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
 } from 'recharts';
-
-const fmt = (n: number, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
-const fmtMoney = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
+import { fmt, fmtMoney } from '@/lib/format';
 
 const difficultyColors: Record<string, string> = {
     'Easy': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
@@ -101,6 +99,7 @@ const TalentDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <DollarSign className="w-4 h-4 text-amber-500" />
                             <span className="text-xs text-slate-500 uppercase">Salary Premium</span>
+                            <Tooltip content="How facility pay compares to local market rates. Below 90% increases attrition risk." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">+{((result.adjustedSalaryMultiplier - 1) * 100).toFixed(0)}%</div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.adjustedAnnualStaffCost - annualStaffCost)}/yr extra</div>
@@ -112,6 +111,7 @@ const TalentDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Clock className="w-4 h-4 text-blue-500" />
                             <span className="text-xs text-slate-500 uppercase">Time to Staff</span>
+                            <Tooltip content="Estimated months to recruit and onboard the full operations team based on local talent pool depth and competition." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.timeToFullStaff}</div>
                         <div className="text-xs text-slate-500 mt-1">months to full team</div>
@@ -123,6 +123,7 @@ const TalentDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Users className="w-4 h-4 text-red-500" />
                             <span className="text-xs text-slate-500 uppercase">Turnover</span>
+                            <Tooltip content="Annual percentage of staff departing. Data center industry average is 10-15%. Higher rates increase recruitment costs." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{(result.adjustedTurnoverRate * 100).toFixed(0)}%</div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.annualTurnoverCost)}/yr cost</div>
@@ -134,6 +135,7 @@ const TalentDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <GraduationCap className="w-4 h-4 text-emerald-500" />
                             <span className="text-xs text-slate-500 uppercase">Training/Yr</span>
+                            <Tooltip content="Annual training hours per employee. Critical for maintaining certifications and operational competency." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.annualTrainingCost)}</div>
                     </CardContent>
@@ -144,6 +146,7 @@ const TalentDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <TrendingUp className="w-4 h-4 text-orange-500" />
                             <span className="text-xs text-slate-500 uppercase">Recruit Cost</span>
+                            <Tooltip content="Total one-time recruitment expenditure for staffing the facility. Includes agency fees, relocation, and onboarding costs." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.totalRecruitmentCost)}</div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.recruitmentCostPerHire)}/hire</div>

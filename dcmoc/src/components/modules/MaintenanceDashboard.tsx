@@ -26,6 +26,7 @@ import {
 } from 'recharts';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import clsx from 'clsx';
+import { fmtMoney } from '@/lib/format';
 
 type TabId = 'assets' | 'schedule' | 'strategy' | 'sla' | 'spares';
 
@@ -48,9 +49,11 @@ export function MaintenanceDashboard() {
         return calculateStrategyComparison(
             assetCounts, schedule,
             inputs.tierLevel === 4 ? 4 : 3,
-            selectedCountry
+            selectedCountry,
+            inputs.maintenanceModel as 'in-house' | 'hybrid' | 'vendor',
+            inputs.hybridRatio ?? 0.5
         );
-    }, [assetCounts, schedule, inputs.tierLevel, selectedCountry]);
+    }, [assetCounts, schedule, inputs.tierLevel, selectedCountry, inputs.maintenanceModel, inputs.hybridRatio]);
 
     const slaData = useMemo(() => {
         if (!selectedCountry || assetCounts.length === 0) return null;
@@ -70,21 +73,22 @@ export function MaintenanceDashboard() {
         );
     }, [assetCounts, inputs.tierLevel, selectedCountry]);
 
-    // Initial Generation Effect
+    // Initial Generation Effect — use simulation store for consistency with FuelGen/CBM
+    const coolingMap: 'air' | 'pumped' = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx' ? 'pumped' : 'air';
     useEffect(() => {
         if (!isPencilMode) {
-            const estBuildingArea = capexInputs.itLoad * 1.5;
+            const estBuildingArea = inputs.itLoad * 1.5;
             const counts = generateAssetCounts(
-                capexInputs.itLoad,
+                inputs.itLoad,
                 inputs.tierLevel === 4 ? 4 : 3,
-                (capexInputs.coolingType as 'air' | 'pumped'),
+                coolingMap,
                 estBuildingArea,
                 inputs.coolingTopology,
                 inputs.powerRedundancy
             );
             setAssetCounts(counts);
         }
-    }, [capexInputs.itLoad, inputs.tierLevel, capexInputs.coolingType, isPencilMode, inputs.coolingTopology, inputs.powerRedundancy]);
+    }, [inputs.itLoad, inputs.tierLevel, inputs.coolingType, isPencilMode, inputs.coolingTopology, inputs.powerRedundancy]);
 
     const handleCountChange = (assetId: string, newCount: number) => {
         setAssetCounts(prev => prev.map(a =>
@@ -108,7 +112,6 @@ export function MaintenanceDashboard() {
 
     const weeks = Array.from({ length: 52 }, (_, i) => i + 1);
 
-    const fmt = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1000 ? `$${(n / 1000).toFixed(0)}K` : `$${n.toFixed(0)}`;
 
     // KPI calculations
     const totalMaintHours = schedule.reduce((a, e) => a + e.durationHours, 0);
@@ -156,6 +159,7 @@ export function MaintenanceDashboard() {
                                     slaData,
                                     sparesData,
                                     schedule,
+                                    undefined,
                                     narrative
                                 );
                             } finally {
@@ -269,10 +273,10 @@ export function MaintenanceDashboard() {
             {/* ═══ KPI ROW ═══ */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Annual Maint Budget', value: fmt(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)' },
+                    { label: 'Annual Maint Budget', value: fmtMoney(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)' },
                     { label: 'Maintenance Events', value: `${schedule.length}`, sub: `${totalMaintHours.toFixed(0)} total hours`, icon: Wrench, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-500/10', tip: 'Number of scheduled maintenance events per year based on SFG20 regimes' },
                     { label: 'Active Assets', value: `${assetCounts.reduce((a, c) => a + c.count, 0)}`, sub: `${activeAssets.length} asset types`, icon: Zap, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', tip: 'Total physical assets requiring maintenance, auto-generated from CAPEX config' },
-                    { label: '5-Year Savings', value: fmt(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy' },
+                    { label: '5-Year Savings', value: fmtMoney(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none">
                         <div className="flex items-center gap-2 mb-2">
@@ -309,9 +313,9 @@ export function MaintenanceDashboard() {
             {/* ═══ TAB CONTENT ═══ */}
             {activeTab === 'assets' && <AssetsTab assets={activeAssets} assetCounts={assetCounts} isPencilMode={isPencilMode} handleCountChange={handleCountChange} selectedCountry={selectedCountry} currentAQI={currentAQI} />}
             {activeTab === 'schedule' && <ScheduleTab assetCounts={assetCounts} schedule={schedule} weeks={weeks} />}
-            {activeTab === 'strategy' && strategyData && <StrategyTab data={strategyData} fmt={fmt} activeStrat={inputs.maintenanceStrategy || 'planned'} onSelect={(s) => actions.setInputs({ maintenanceStrategy: s as any })} />}
-            {activeTab === 'sla' && slaData && <SLATab data={slaData} fmt={fmt} />}
-            {activeTab === 'spares' && sparesData && <SparesTab data={sparesData} fmt={fmt} />}
+            {activeTab === 'strategy' && strategyData && <StrategyTab data={strategyData} fmt={fmtMoney} activeStrat={inputs.maintenanceStrategy || 'planned'} onSelect={(s) => actions.setInputs({ maintenanceStrategy: s as any })} />}
+            {activeTab === 'sla' && slaData && <SLATab data={slaData} fmt={fmtMoney} />}
+            {activeTab === 'spares' && sparesData && <SparesTab data={sparesData} fmt={fmtMoney} />}
 
             {/* ═══ B17: MAINTENANCE EVENT TIMELINE (Monthly Heatmap) ═══ */}
             {activeTab === 'schedule' && schedule.length > 0 && (
@@ -436,7 +440,7 @@ export function MaintenanceDashboard() {
                                                 yAxisId="left"
                                                 stroke="#8b5cf6"
                                                 fontSize={11}
-                                                tickFormatter={(v: number) => fmt(v)}
+                                                tickFormatter={(v: number) => fmtMoney(v)}
                                             />
                                             <YAxis
                                                 yAxisId="right"
@@ -450,7 +454,7 @@ export function MaintenanceDashboard() {
                                                 contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
                                                 labelStyle={{ color: '#e2e8f0' }}
                                                 formatter={((value: number, name: string) => [
-                                                    name === 'cost' ? fmt(value) : `${value.toFixed(1)}%`,
+                                                    name === 'cost' ? fmtMoney(value) : `${value.toFixed(1)}%`,
                                                     name === 'cost' ? 'Item Cost' : 'Cumulative %'
                                                 ]) as any}
                                             />

@@ -4,6 +4,7 @@
 import { CountryProfile } from '@/constants/countries';
 import { COUNTRIES } from '@/constants/countries';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
+import { getPUE } from '@/constants/pue';
 
 export type TestingRegime = 'minimal' | 'complete';
 
@@ -12,6 +13,8 @@ export interface FuelGenInput {
     itLoadKw: number;
     tierLevel: 2 | 3 | 4;
     coolingType: string;
+    coolingTopology?: 'in-row' | 'perimeter' | 'dlc';
+    powerRedundancy?: 'N+1' | '2N' | '2N+1';
     testingRegime?: TestingRegime;
     overrides?: {
         dieselPricePerLiter?: number;
@@ -92,7 +95,7 @@ export interface FuelGenResult {
 }
 
 export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
-    const { country, itLoadKw, tierLevel, coolingType, overrides, testingRegime: regime } = input;
+    const { country, itLoadKw, tierLevel, coolingType, coolingTopology, powerRedundancy, overrides, testingRegime: regime } = input;
     const testingRegime: TestingRegime = regime ?? 'minimal';
     const fuel = country.fuelDiesel;
     const grid = country.gridReliability;
@@ -110,18 +113,20 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     const monthlyTestHours = overrides?.monthlyTestHours ?? 2;
     const annualFullLoadTestHours = overrides?.annualFullLoadTestHours ?? 4;
 
-    // PUE factor
-    const pueFactor = coolingType === 'liquid' ? 1.2 : coolingType === 'rdhx' ? 1.25 : coolingType === 'inrow' ? 1.3 : 1.4;
+    // PUE from shared constants
+    const pueFactor = getPUE(coolingType);
     const totalFacilityLoadKw = itLoadKw * pueFactor;
 
     // Generator sizing — sync with AssetGenerator for consistency with Maintenance module
     const genUnitCapacity = 2500; // kW per generator
     const effectiveTier: 3 | 4 = tierLevel === 2 ? 3 : tierLevel as 3 | 4;
     const coolingMap: 'air' | 'pumped' = coolingType === 'liquid' || coolingType === 'rdhx' ? 'pumped' : 'air';
-    const assetCounts = generateAssetCounts(itLoadKw, effectiveTier, coolingMap, Math.ceil(itLoadKw * 0.6));
+    const effectiveCoolingTopology = coolingTopology ?? 'perimeter';
+    const effectivePowerRedundancy = powerRedundancy ?? '2N';
+    const assetCounts = generateAssetCounts(itLoadKw, effectiveTier, coolingMap, Math.ceil(itLoadKw * 0.6), effectiveCoolingTopology, effectivePowerRedundancy);
     const genFromAssets = assetCounts.find(a => a.assetId === 'gen-set');
     const genCount = genFromAssets?.count ?? Math.ceil(totalFacilityLoadKw / genUnitCapacity);
-    const redundancy = tierLevel === 4 ? '2N' : tierLevel === 3 ? 'N+1' : 'N';
+    const redundancy = effectivePowerRedundancy;
     const totalGenCapacity = genCount * genUnitCapacity;
 
     const generator: GeneratorSpec = {

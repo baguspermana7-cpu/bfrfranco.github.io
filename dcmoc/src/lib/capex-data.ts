@@ -44,7 +44,7 @@ export const cityData: Record<string, { perW: number; region: string; label: str
     tokyo: { perW: 15.20, region: 'japan', label: 'Tokyo', source: 'T&T 2025' },
     singapore: { perW: 14.53, region: 'sea', label: 'Singapore', source: 'T&T 2025' },
     hong_kong: { perW: 13.80, region: 'china', label: 'Hong Kong', source: 'Est. T&T' },
-    seoul: { perW: 9.50, region: 'japan', label: 'Seoul', source: 'C&W APAC' },
+    seoul: { perW: 9.50, region: 'south_korea', label: 'Seoul', source: 'C&W APAC' },
     sydney: { perW: 12.30, region: 'australia', label: 'Sydney', source: 'Est. T&T' },
     malaysia: { perW: 11.37, region: 'sea', label: 'Malaysia/Johor', source: 'T&T 2025' },
     jakarta: { perW: 11.21, region: 'sea', label: 'Jakarta', source: 'T&T 2025' },

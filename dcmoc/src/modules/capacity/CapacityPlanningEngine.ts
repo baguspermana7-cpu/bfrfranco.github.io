@@ -2,7 +2,9 @@
 // Multi-phase data center build-out planning with interconnections
 
 import { CountryProfile } from '@/constants/countries';
+import { getPUE } from '@/constants/pue';
 import { calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
+import { fmtMoney, fmtKw } from '@/lib/format';
 
 export interface CapacityPhase {
     id: string;
@@ -26,6 +28,30 @@ export interface PhaseResult {
     pue: number;
 }
 
+export interface PhaseDetail {
+    id: string;
+    label: string;
+    description: string;
+    infrastructureScope: string[];
+    riskFactors: string[];
+    revenueEstimate: number;
+    roiYears: number;
+    riskScore: number; // 0-100
+}
+
+export interface AssumptionItem {
+    category: string;
+    assumption: string;
+    value: string;
+}
+
+export interface UtilizationPoint {
+    month: number;
+    capacityKw: number;
+    demandKw: number;
+    utilization: number;
+}
+
 export interface TimelineEvent {
     phaseId: string;
     label: string;
@@ -46,6 +72,10 @@ export interface CapacityPlanResult {
     staffingRamp: { month: number; fte: number }[];
     pueEvolution: { month: number; pue: number }[];
     totalMonths: number;
+    narrative: string;
+    phaseDetails: PhaseDetail[];
+    assumptions: AssumptionItem[];
+    utilizationCurve: UtilizationPoint[];
 }
 
 export interface CapacityPlanInput {
@@ -88,8 +118,8 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
     const baseCpkw = baseCapexPerKw ?? 10000;
     const effectiveCpkw = baseCpkw * tierMult * coolMult * constructionIndex;
 
-    // Base PUE
-    const basePue = coolingType === 'liquid' ? 1.08 : coolingType === 'rdhx' ? 1.18 : coolingType === 'inrow' ? 1.28 : 1.35;
+    // Base PUE from shared constants
+    const basePue = getPUE(coolingType);
 
     // Calculate total timeline span
     const lastPhaseEnd = Math.max(...phases.map(p => p.startMonth + p.buildMonths + 48));
@@ -218,6 +248,100 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         phaseResults.reduce((s, p) => s + (p.itLoadKw / totalItLoadKw), 0) / phaseResults.length * 100
     );
 
+    // ─── Utilization curve (monthly capacity vs simulated demand) ───
+    const utilizationCurve: UtilizationPoint[] = [];
+    for (let m = 0; m < totalMonths; m += 3) {
+        const capacityKw = cumulativeItLoad[m] ?? 0;
+        // Demand ramps up using occupancy ramp per phase
+        let demandKw = 0;
+        for (const phase of phases) {
+            const opMonth = phase.startMonth + phase.buildMonths;
+            if (m >= opMonth) {
+                const monthsSinceOp = m - opMonth;
+                const quarterIndex = Math.min(Math.floor(monthsSinceOp / 12), phase.occupancyRamp.length - 1);
+                demandKw += phase.itLoadKw * (phase.occupancyRamp[quarterIndex] ?? 0.95);
+            }
+        }
+        utilizationCurve.push({
+            month: m,
+            capacityKw,
+            demandKw: Math.round(demandKw),
+            utilization: capacityKw > 0 ? Math.round((demandKw / capacityKw) * 100) : 0,
+        });
+    }
+
+    // ─── Phase details (per-phase context) ───
+    const phaseDetails: PhaseDetail[] = phaseResults.map((pr, idx) => {
+        const phase = phases[idx];
+        const rackCount = Math.ceil(pr.itLoadKw / 8); // ~8 kW per rack avg
+        const coolingLabel = coolingType === 'liquid' ? 'Liquid cooling' : coolingType === 'rdhx' ? 'Rear-door heat exchangers' : coolingType === 'inrow' ? 'In-row cooling' : 'Raised-floor air cooling';
+        const monthlyRevenue = pr.itLoadKw * 0.95 * 120; // ~$120/kW/mo at 95% occupancy
+        const annualRevenue = monthlyRevenue * 12;
+        const roiYears = Math.round((pr.capex / annualRevenue) * 10) / 10;
+
+        // Risk factors based on phase characteristics
+        const risks: string[] = [];
+        if (pr.itLoadKw >= 20000) risks.push('Large-scale commissioning complexity');
+        if (pr.buildMonths > 18) risks.push('Extended construction timeline');
+        if (idx > 0 && phase.startMonth < phases[idx - 1].startMonth + phases[idx - 1].buildMonths)
+            risks.push('Overlapping construction with prior phase');
+        if (coolingType === 'liquid') risks.push('Liquid cooling supply chain lead times');
+        if (tierLevel === 4) risks.push('Tier IV concurrent maintainability requirements');
+        if (risks.length === 0) risks.push('Standard construction risk profile');
+
+        const riskScore = Math.min(100, Math.round(
+            (pr.itLoadKw >= 20000 ? 25 : 10) +
+            (pr.buildMonths > 18 ? 20 : 5) +
+            (idx > 0 ? 15 : 0) +
+            (coolingType === 'liquid' ? 15 : 0) +
+            (tierLevel === 4 ? 15 : 5)
+        ));
+
+        return {
+            id: pr.id,
+            label: pr.label,
+            description: `${pr.label} deploys ${fmtKw(pr.itLoadKw)} IT capacity over ${pr.buildMonths} months with ${coolingLabel.toLowerCase()}, becoming operational at month ${pr.operationalMonth}.`,
+            infrastructureScope: [
+                `${rackCount} racks (~8 kW avg density)`,
+                `${coolingLabel}`,
+                `Tier ${tierLevel} redundancy`,
+                `${Math.ceil(pr.itLoadKw / 1000)} × 1 MW power modules`,
+                `${pr.fte} operations FTE at full capacity`,
+            ],
+            riskFactors: risks,
+            revenueEstimate: Math.round(annualRevenue),
+            roiYears,
+            riskScore,
+        };
+    });
+
+    // ─── Key assumptions ───
+    const assumptions: AssumptionItem[] = [
+        { category: 'CAPEX', assumption: 'Base cost per kW', value: `$${baseCpkw.toLocaleString()}/kW` },
+        { category: 'CAPEX', assumption: 'Tier multiplier', value: `${tierMult}x (Tier ${tierLevel})` },
+        { category: 'CAPEX', assumption: 'Cooling multiplier', value: `${coolMult}x (${coolingType})` },
+        { category: 'CAPEX', assumption: 'Construction index', value: `${constructionIndex}x (${country.name})` },
+        { category: 'CAPEX', assumption: 'Scale discount', value: `${Math.round(scaleDiscount * 100)}% of base at ${fmtKw(totalPlannedKw)} total` },
+        { category: 'Operations', assumption: 'Shift model', value: shiftModel === '12h' ? '12-hour shifts (2 crew)' : '8-hour shifts (3 crew)' },
+        { category: 'Operations', assumption: 'Maintenance model', value: `${maintenanceModel}${maintenanceModel === 'hybrid' ? ` (${Math.round(hybridRatio * 100)}% in-house)` : ''}` },
+        { category: 'Operations', assumption: 'Base PUE', value: `${basePue} (${coolingType} cooling)` },
+        { category: 'Revenue', assumption: 'Avg revenue per kW', value: '$120/kW/month at 95% occupancy' },
+        { category: 'Revenue', assumption: 'Occupancy ramp', value: '30% → 60% → 85% → 95% (annual steps)' },
+    ];
+
+    // ─── Narrative summary ───
+    const avgCpkw = Math.round(totalCapex / totalItLoadKw);
+    const lastPhase = phaseResults[phaseResults.length - 1];
+    const peakFte = lastPhase?.fte ?? 0;
+    const finalPue = pueEvolution[pueEvolution.length - 1]?.pue ?? basePue;
+    const narrative = `This ${phases.length}-phase capacity plan deploys ${fmtKw(totalItLoadKw)} of IT load across ${country.name} ` +
+        `over ${totalMonths} months with a total CAPEX of ${fmtMoney(totalCapex)} (avg $${avgCpkw.toLocaleString()}/kW). ` +
+        `Phase 1 (${fmtKw(phaseResults[0].itLoadKw)}) establishes the initial footprint at month ${phaseResults[0].operationalMonth}, ` +
+        `while ${phases.length > 2 ? 'subsequent phases scale' : 'Phase 2 scales'} capacity through economies of scale, ` +
+        `reducing per-kW costs by ${Math.round((1 - (lastPhase.capexPerKw / phaseResults[0].capexPerKw)) * 100)}% by the final phase. ` +
+        `The Tier ${tierLevel} design with ${coolingType} cooling achieves a PUE of ${finalPue} at full scale. ` +
+        `Peak staffing reaches ${peakFte} FTE under the ${maintenanceModel} maintenance model.`;
+
     return {
         phases: phaseResults,
         timeline,
@@ -230,5 +354,9 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         staffingRamp,
         pueEvolution,
         totalMonths,
+        narrative,
+        phaseDetails,
+        assumptions,
+        utilizationCurve,
     };
 };

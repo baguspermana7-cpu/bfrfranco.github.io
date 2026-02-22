@@ -186,10 +186,10 @@ export function calculatePortfolio(sites: SiteConfig[]): PortfolioResult {
 
 function getLocationFromCountry(countryId: string): string {
     const map: Record<string, string> = {
-        US: 'usa', GB: 'uk', DE: 'europe', NL: 'europe', IE: 'europe', FR: 'europe', SE: 'nordics',
-        PL: 'europe', SG: 'singapore', JP: 'japan', AU: 'australia', IN: 'india', CN: 'china',
-        KR: 'japan', AE: 'middle_east', SA: 'middle_east', QA: 'middle_east',
-        BR: 'latam', CL: 'latam', MX: 'latam', CO: 'latam',
+        US: 'usa', GB: 'europe', DE: 'europe', NL: 'europe', IE: 'europe', FR: 'europe', SE: 'europe',
+        PL: 'europe', SG: 'sea', JP: 'japan', AU: 'australia', IN: 'india', CN: 'china',
+        KR: 'south_korea', AE: 'mena', SA: 'mena', QA: 'mena',
+        BR: 'south_america', CL: 'south_america', MX: 'south_america', CO: 'south_america',
         ZA: 'africa', NG: 'africa', KE: 'africa',
     };
     return map[countryId] || 'sea';
