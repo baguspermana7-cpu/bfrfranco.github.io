@@ -58,6 +58,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="preload" as="image" href="assets/article-18-cover.png">
 
@@ -1198,6 +1199,50 @@
 </head>
 <body>
 
+<!-- Navigation (shared) -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">
+            <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+        </a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown">
+                <a href="datacenter-solutions.html" class="nav-link">
+                    DC Solutions
+                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                    <li><a href="dc-conventional.html">DC Conventional</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                    <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+            <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </div>
+</nav>
+
+<main id="main-content">
 <!-- Article Hero -->
 <header class="article-hero">
     <div class="container">
@@ -2005,53 +2050,127 @@ function aifGetInputs() {
 }
 
 // ==================== CORE CALC ====================
+// AI Factory Infrastructure Readiness — benchmarked against AI-native requirements
+// Weights: Cooling 35%, Structural 25%, Power Density 20%, PUE 10%, Age 10%
 function aifComputeReadiness(inp) {
     var itLoadKW = inp.density * inp.racks;
     var itLoadMW = itLoadKW / 1000;
     var facPowerMW = itLoadMW * inp.pue;
-    var annualEnergy = facPowerMW * 8760 * inp.elecRate * 1000000; // $/yr
+    var annualEnergy = facPowerMW * 8760 * inp.elecRate * 1000000;
 
-    // Cooling readiness score
-    var coolingCap = inp.cooling === 'immersion' ? 400 : inp.cooling === 'dtc' ? 200 : 30;
-    var coolScore = Math.min(100, (coolingCap / Math.max(inp.density, 1)) * 100);
-    // LC infrastructure bonus
-    if (inp.lcInfra === 'full') coolScore = Math.min(100, coolScore * 1.2);
-    else if (inp.lcInfra === 'partial') coolScore = Math.min(100, coolScore * 1.1);
-    // Penalize air cooling for high density
-    if (inp.cooling === 'air' && inp.density > 30) coolScore *= 0.5;
+    // === 1. COOLING READINESS (35%) ===
+    // Benchmark: AI racks need 40kW minimum, 130kW state-of-art (GB300 NVL72)
+    var coolingMaxKW = inp.cooling === 'immersion' ? 400 : inp.cooling === 'dtc' ? 200 : 30;
+    var coolScore;
+    if (inp.cooling === 'air') {
+        // Air cooling: hard limit ~30kW. Cannot serve AI racks above that.
+        if (inp.density <= 10) coolScore = 18;
+        else if (inp.density <= 20) coolScore = 14;
+        else if (inp.density <= 30) coolScore = 10;
+        else coolScore = 3; // physically impossible above 30kW
+        // Partial/full LC infrastructure shows transition readiness
+        if (inp.lcInfra === 'full') coolScore += 8;
+        else if (inp.lcInfra === 'partial') coolScore += 4;
+    } else if (inp.cooling === 'dtc') {
+        // DTC: up to ~200kW. The 2025-2026 standard for AI deployments.
+        if (inp.density <= coolingMaxKW) {
+            var headroom = 1 - (inp.density / coolingMaxKW);
+            coolScore = 62 + headroom * 20; // 62-82 based on headroom
+        } else {
+            coolScore = 30; // over-capacity
+        }
+        if (inp.lcInfra === 'full') coolScore = Math.min(100, coolScore + 12);
+        else if (inp.lcInfra === 'partial') coolScore = Math.min(100, coolScore + 6);
+        else coolScore = Math.max(0, coolScore - 18); // DTC without LC infrastructure
+    } else { // immersion
+        if (inp.density <= coolingMaxKW) {
+            coolScore = 78 + Math.min(17, ((coolingMaxKW - inp.density) / coolingMaxKW) * 17);
+        } else {
+            coolScore = 40;
+        }
+        if (inp.lcInfra === 'full') coolScore = Math.min(100, coolScore + 8);
+        else if (inp.lcInfra === 'partial') coolScore = Math.min(100, coolScore + 4);
+        else coolScore = Math.max(0, coolScore - 22);
+    }
     coolScore = Math.round(Math.max(0, Math.min(100, coolScore)));
 
-    // Structural readiness
-    var rackWeight = inp.density <= 15 ? 1000 : inp.density <= 50 ? 1500 : inp.density <= 130 ? 2500 : 3500;
-    var structScore = Math.round(Math.min(100, (inp.floorLoad / rackWeight) * 100));
+    // === 2. STRUCTURAL READINESS (25%) ===
+    // AI racks: 40kW class = ~1500 kg/m², 130kW class = ~2500 kg/m², 300kW+ = ~3500 kg/m²
+    var structScore;
+    var aiMinFloor = 1500, aiTargetFloor = 2500;
+    if (inp.floorLoad >= aiTargetFloor) {
+        structScore = 82 + Math.min(18, ((inp.floorLoad - aiTargetFloor) / 2500) * 18);
+    } else if (inp.floorLoad >= aiMinFloor) {
+        structScore = 38 + ((inp.floorLoad - aiMinFloor) / (aiTargetFloor - aiMinFloor)) * 44;
+    } else if (inp.floorLoad >= 800) {
+        structScore = 8 + ((inp.floorLoad - 800) / (aiMinFloor - 800)) * 30;
+    } else {
+        structScore = (inp.floorLoad / 800) * 8;
+    }
+    structScore = Math.round(Math.max(0, Math.min(100, structScore)));
 
-    // Power readiness (PUE efficiency)
-    var pueScore = Math.round(Math.min(100, ((2.0 - inp.pue) / 1.0) * 100));
-    pueScore = Math.max(0, pueScore);
+    // === 3. POWER DENSITY READINESS (20%) ===
+    // Below 15kW = traditional. 15-40kW = transition. 40-130kW = AI-capable. 130+ = cutting edge.
+    var densityScore;
+    if (inp.density >= 130) {
+        densityScore = 88 + Math.min(12, (inp.density - 130) / 470 * 12);
+    } else if (inp.density >= 40) {
+        densityScore = 42 + ((inp.density - 40) / 90) * 46;
+    } else if (inp.density >= 15) {
+        densityScore = 8 + ((inp.density - 15) / 25) * 34;
+    } else {
+        densityScore = (inp.density / 15) * 8;
+    }
+    densityScore = Math.round(Math.max(0, Math.min(100, densityScore)));
 
-    // Age penalty
-    var agePenalty = Math.min(30, inp.age * 1.5);
+    // === 4. PUE EFFICIENCY (10%) ===
+    // AI-native target: PUE 1.10-1.25. Industry avg 1.58. Air-cooled legacy: 1.6-2.0
+    var pueScore;
+    if (inp.pue <= 1.08) pueScore = 100;
+    else if (inp.pue <= 1.15) pueScore = 82 + ((1.15 - inp.pue) / 0.07) * 18;
+    else if (inp.pue <= 1.30) pueScore = 55 + ((1.30 - inp.pue) / 0.15) * 27;
+    else if (inp.pue <= 1.50) pueScore = 22 + ((1.50 - inp.pue) / 0.20) * 33;
+    else if (inp.pue <= 1.80) pueScore = 5 + ((1.80 - inp.pue) / 0.30) * 17;
+    else pueScore = Math.max(0, 5 - (inp.pue - 1.80) * 8);
+    pueScore = Math.round(Math.max(0, Math.min(100, pueScore)));
 
-    // Overall score
-    var overall = (coolScore * 0.35 + structScore * 0.25 + pueScore * 0.20 + (100 - agePenalty) * 0.20);
-    overall = Math.round(Math.max(0, Math.min(100, overall)));
+    // === 5. AGE & ADAPTABILITY (10%) ===
+    var ageScore;
+    if (inp.age <= 1) ageScore = 95;
+    else if (inp.age <= 3) ageScore = 78 + ((3 - inp.age) / 2) * 17;
+    else if (inp.age <= 7) ageScore = 45 + ((7 - inp.age) / 4) * 33;
+    else if (inp.age <= 15) ageScore = 12 + ((15 - inp.age) / 8) * 33;
+    else if (inp.age <= 25) ageScore = ((25 - inp.age) / 10) * 12;
+    else ageScore = 0;
+    ageScore = Math.round(Math.max(0, Math.min(100, ageScore)));
 
-    // Grade
+    // === WEIGHTED COMPOSITE ===
+    var overall = Math.round(coolScore * 0.35 + structScore * 0.25 + densityScore * 0.20 + pueScore * 0.10 + ageScore * 0.10);
+    overall = Math.max(0, Math.min(100, overall));
+
     var grade = overall >= 85 ? 'A' : overall >= 70 ? 'B' : overall >= 50 ? 'C' : overall >= 30 ? 'D' : 'F';
 
-    // OPEX estimate (energy + cooling maint + staffing)
-    var coolMaint = itLoadMW * (inp.cooling === 'air' ? 200000 : inp.cooling === 'dtc' ? 350000 : 500000);
-    var staffing = itLoadMW * 800000;
-    var totalOPEX = annualEnergy + coolMaint + staffing;
+    // OPEX estimate (annual)
+    var coolMaint = itLoadMW * (inp.cooling === 'air' ? 120000 : inp.cooling === 'dtc' ? 320000 : 480000);
+    var staffing = Math.max(350000, itLoadMW * 450000);
+    var networkMaint = itLoadMW * 160000;
+    var insurance = itLoadMW * 70000;
+    var totalOPEX = annualEnergy + coolMaint + staffing + networkMaint + insurance;
 
     // Recommendation
     var recommend;
     if (overall >= 80) recommend = 'AI-Ready';
-    else if (inp.age > 15 || (coolScore < 30 && structScore < 30)) recommend = 'New Build';
-    else if (inp.age > 10 || coolScore < 50) recommend = 'Major Retrofit';
-    else recommend = 'Minor Upgrade';
+    else if (overall >= 62) recommend = 'Targeted Retrofit';
+    else if (overall >= 42) recommend = 'Major Retrofit';
+    else if (overall >= 22 && inp.age <= 15) recommend = 'Extensive Retrofit or New Build';
+    else recommend = 'New Build Required';
 
-    return { itLoadMW: itLoadMW, facPowerMW: facPowerMW, annualEnergy: annualEnergy, coolScore: coolScore, structScore: structScore, pueScore: pueScore, overall: overall, grade: grade, totalOPEX: totalOPEX, recommend: recommend };
+    return {
+        itLoadMW: itLoadMW, facPowerMW: facPowerMW, annualEnergy: annualEnergy,
+        coolScore: coolScore, structScore: structScore, densityScore: densityScore,
+        pueScore: pueScore, ageScore: ageScore, overall: overall, grade: grade,
+        totalOPEX: totalOPEX, recommend: recommend
+    };
 }
 
 function fmtMoney(n) {
@@ -2076,15 +2195,15 @@ function aifCalculate() {
 
     var csEl = document.getElementById('resCoolScore');
     csEl.textContent = r.coolScore + '/100';
-    csEl.className = 'value ' + (r.coolScore >= 70 ? 'green' : r.coolScore >= 40 ? 'amber' : 'red');
+    csEl.className = 'value ' + (r.coolScore >= 65 ? 'green' : r.coolScore >= 35 ? 'amber' : 'red');
 
     var ssEl = document.getElementById('resStructScore');
     ssEl.textContent = r.structScore + '/100';
-    ssEl.className = 'value ' + (r.structScore >= 70 ? 'green' : r.structScore >= 40 ? 'amber' : 'red');
+    ssEl.className = 'value ' + (r.structScore >= 65 ? 'green' : r.structScore >= 35 ? 'amber' : 'red');
 
     var grEl = document.getElementById('resGrade');
     grEl.textContent = r.grade;
-    grEl.className = 'value ' + (r.grade === 'A' ? 'green' : r.grade === 'B' ? 'green' : r.grade === 'C' ? 'amber' : 'red');
+    grEl.className = 'value ' + (r.grade === 'A' || r.grade === 'B' ? 'green' : r.grade === 'C' ? 'amber' : 'red');
 
     document.getElementById('resRecommend').textContent = r.recommend;
 
@@ -2092,7 +2211,7 @@ function aifCalculate() {
     var needle = document.getElementById('gaugeNeedle');
     needle.style.left = Math.max(2, Math.min(98, r.overall)) + '%';
     var verdict = document.getElementById('aifVerdict');
-    verdict.textContent = r.grade === 'A' ? 'AI-Native Ready' : r.grade === 'B' ? 'Capable with Minor Upgrades' : r.grade === 'C' ? 'Partial Readiness - Significant Investment Needed' : r.grade === 'D' ? 'Major Infrastructure Gaps' : 'Not Viable for AI Workloads';
+    verdict.textContent = r.grade === 'A' ? 'AI-Native Ready' : r.grade === 'B' ? 'Capable with Targeted Upgrades' : r.grade === 'C' ? 'Partial Readiness — Significant Investment Needed' : r.grade === 'D' ? 'Major Infrastructure Gaps' : 'Not Viable for AI Workloads';
     verdict.className = 'aif-verdict grade-' + r.grade.toLowerCase();
 
     if (aifPremium && aifMode === 'pro') aifUpdateProPanels();
@@ -2101,11 +2220,14 @@ function aifCalculate() {
 // ==================== PRO PANELS ====================
 function aifUpdateProPanels() {
     var inp = aifGetInputs();
-    aifRunMonteCarlo(inp);
-    aifRunTCO(inp);
-    aifRunTornado(inp);
-    aifRunStrandedAsset(inp);
+    try { aifRunMonteCarlo(inp); } catch(e) { console.error('MC error:', e); }
+    try { aifRunTCO(inp); } catch(e) { console.error('TCO error:', e); }
+    try { aifRunTornado(inp); } catch(e) { console.error('Tornado error:', e); }
+    try { aifRunStrandedAsset(inp); } catch(e) { console.error('SA error:', e); }
 }
+
+// Store last MC/TCO/Tornado/SA data for PDF export
+var aifLastMC = null, aifLastTCO = null, aifLastTornado = null, aifLastSA = null;
 
 // --- Monte Carlo ---
 function aifRunMonteCarlo(inp) {
@@ -2115,16 +2237,21 @@ function aifRunMonteCarlo(inp) {
             density: inp.density * (0.85 + Math.random() * 0.30),
             racks: inp.racks,
             cooling: inp.cooling,
-            pue: inp.pue * (0.90 + Math.random() * 0.20),
+            pue: Math.max(1.02, inp.pue * (0.92 + Math.random() * 0.16)),
             elecRate: inp.elecRate * (0.80 + Math.random() * 0.40),
-            age: Math.round(inp.age * (0.75 + Math.random() * 0.50)),
-            floorLoad: inp.floorLoad,
+            age: Math.max(0, Math.round(inp.age + (Math.random() - 0.5) * inp.age * 0.5)),
+            floorLoad: Math.round(inp.floorLoad * (0.90 + Math.random() * 0.20)),
             lcInfra: inp.lcInfra
         };
         scores.push(aifComputeReadiness(sim).overall);
     }
     scores.sort(function(a,b){return a-b;});
     var mean = scores.reduce(function(s,v){return s+v;},0) / scores.length;
+    var variance = scores.reduce(function(s,v){return s+(v-mean)*(v-mean);},0) / scores.length;
+    var stdDev = Math.sqrt(variance);
+
+    aifLastMC = { scores: scores, mean: mean, stdDev: stdDev, min: scores[0], max: scores[9999],
+        p5: scores[499], p25: scores[2499], p50: scores[4999], p75: scores[7499], p95: scores[9499] };
 
     document.getElementById('mcMean').textContent = mean.toFixed(1);
     document.getElementById('mcP5').textContent = scores[499].toFixed(1);
@@ -2133,7 +2260,7 @@ function aifRunMonteCarlo(inp) {
     document.getElementById('mcP75').textContent = scores[7499].toFixed(1);
     document.getElementById('mcP95').textContent = scores[9499].toFixed(1);
 
-    // Histogram
+    // Histogram via Chart.js
     var bins = new Array(20).fill(0);
     scores.forEach(function(s) { var b = Math.min(19, Math.floor(s / 5)); bins[b]++; });
     var labels = bins.map(function(_,i) { return (i*5) + '-' + (i*5+4); });
@@ -2141,8 +2268,12 @@ function aifRunMonteCarlo(inp) {
     if (mcChartInstance) mcChartInstance.destroy();
     mcChartInstance = new Chart(document.getElementById('mcChart'), {
         type: 'bar',
-        data: { labels: labels, datasets: [{ label: 'Frequency', data: bins, backgroundColor: 'rgba(59,130,246,0.6)', borderColor: '#3b82f6', borderWidth: 1 }] },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+        data: { labels: labels, datasets: [{ label: 'Frequency', data: bins,
+            backgroundColor: bins.map(function(_,i){var mid=i*5+2.5;return mid>=70?'rgba(34,197,94,0.65)':mid>=40?'rgba(251,191,36,0.65)':'rgba(239,68,68,0.65)';}),
+            borderColor: bins.map(function(_,i){var mid=i*5+2.5;return mid>=70?'#22c55e':mid>=40?'#f59e0b':'#ef4444';}), borderWidth: 1 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 8 }, maxRotation: 45 }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
     });
 }
 
@@ -2151,29 +2282,36 @@ function aifRunTCO(inp) {
     var itMW = inp.density * inp.racks / 1000;
     var rows = [];
     var totals = [0, 0, 0];
+    var esc = 1.03; // 3% annual escalation
 
     for (var yr = 1; yr <= 5; yr++) {
-        // Traditional (air, PUE 1.5)
-        var tradEnergy = itMW * 1.5 * 8760 * inp.elecRate * 1e6;
-        var tradCapex = yr === 1 ? itMW * 8e6 : 0;
-        var tradOPEX = itMW * 1e6;
+        var e = Math.pow(esc, yr - 1);
+
+        // Traditional (air-cooled, PUE ~1.55, limited capability)
+        var tradPUE = Math.max(1.55, inp.pue);
+        var tradEnergy = itMW * tradPUE * 8760 * inp.elecRate * 1e6 * e;
+        var tradCapex = yr === 1 ? itMW * 6e6 : 0;
+        var tradOPEX = itMW * 750000 * e;
+        if (inp.density > 30) tradEnergy *= 1.25; // efficiency penalty for impossible air cooling
         var tradTotal = tradCapex + tradEnergy + tradOPEX;
 
-        // Retrofit (DTC, PUE 1.2)
-        var retroEnergy = itMW * 1.2 * 8760 * inp.elecRate * 1e6;
-        var retroCapex = yr === 1 ? itMW * 12e6 : yr === 2 ? itMW * 3e6 : 0;
-        var retroOPEX = itMW * 1.3e6;
+        // Retrofit (DTC upgrade, PUE 1.25)
+        var retroEnergy = itMW * 1.25 * 8760 * inp.elecRate * 1e6 * e;
+        var retroCapex = yr === 1 ? itMW * 10e6 : yr === 2 ? itMW * 2.5e6 : 0;
+        var retroOPEX = itMW * 1.1e6 * e;
         var retroTotal = retroCapex + retroEnergy + retroOPEX;
 
-        // Greenfield (full LC, PUE 1.10)
-        var greenEnergy = itMW * 1.10 * 8760 * inp.elecRate * 1e6;
-        var greenCapex = yr === 1 ? itMW * 18e6 : yr === 2 ? itMW * 5e6 : 0;
-        var greenOPEX = itMW * 1.5e6;
+        // Greenfield AI-Native (full LC, PUE 1.12)
+        var greenEnergy = itMW * 1.12 * 8760 * inp.elecRate * 1e6 * e;
+        var greenCapex = yr === 1 ? itMW * 15e6 : yr === 2 ? itMW * 4e6 : 0;
+        var greenOPEX = itMW * 1.3e6 * e;
         var greenTotal = greenCapex + greenEnergy + greenOPEX;
 
         totals[0] += tradTotal; totals[1] += retroTotal; totals[2] += greenTotal;
         rows.push([yr, tradTotal, retroTotal, greenTotal]);
     }
+
+    aifLastTCO = { rows: rows, totals: totals };
 
     document.getElementById('tcoTrad').textContent = fmtMoney(totals[0]);
     document.getElementById('tcoRetro').textContent = fmtMoney(totals[1]);
@@ -2190,22 +2328,24 @@ function aifRunTCO(inp) {
     });
     var trT = document.createElement('tr');
     trT.style.fontWeight = '700';
-    trT.innerHTML = '<td>Total</td><td>' + fmtMoney(totals[0]) + '</td><td>' + fmtMoney(totals[1]) + '</td><td>' + fmtMoney(totals[2]) + '</td>';
+    trT.innerHTML = '<td>5-Year Total</td><td>' + fmtMoney(totals[0]) + '</td><td>' + fmtMoney(totals[1]) + '</td><td>' + fmtMoney(totals[2]) + '</td>';
     tbody.appendChild(trT);
 
-    // Chart
+    // Chart.js grouped bar
     if (tcoChartInstance) tcoChartInstance.destroy();
     tcoChartInstance = new Chart(document.getElementById('tcoChart'), {
         type: 'bar',
         data: {
             labels: rows.map(function(r){return 'Year '+r[0];}),
             datasets: [
-                { label: 'Traditional', data: rows.map(function(r){return r[1];}), backgroundColor: 'rgba(148,163,184,0.6)' },
-                { label: 'Retrofit', data: rows.map(function(r){return r[2];}), backgroundColor: 'rgba(59,130,246,0.6)' },
-                { label: 'Greenfield', data: rows.map(function(r){return r[3];}), backgroundColor: 'rgba(6,182,212,0.6)' }
+                { label: 'Traditional', data: rows.map(function(r){return r[1];}), backgroundColor: 'rgba(148,163,184,0.65)', borderColor: '#94a3b8', borderWidth: 1 },
+                { label: 'Retrofit', data: rows.map(function(r){return r[2];}), backgroundColor: 'rgba(59,130,246,0.65)', borderColor: '#3b82f6', borderWidth: 1 },
+                { label: 'Greenfield', data: rows.map(function(r){return r[3];}), backgroundColor: 'rgba(6,182,212,0.65)', borderColor: '#06b6d4', borderWidth: 1 }
             ]
         },
-        options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: { x: { stacked: false, ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8', callback: function(v){return fmtMoney(v);} }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+        options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8', callback: function(v){return fmtMoney(v);} }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
     });
 }
 
@@ -2225,9 +2365,11 @@ function aifRunTornado(inp) {
         var hi = Object.assign({}, inp); hi[p.key] = inp[p.key] * 1.2;
         var scoreLo = aifComputeReadiness(lo).overall;
         var scoreHi = aifComputeReadiness(hi).overall;
-        return { name: p.name, low: scoreLo - base, high: scoreHi - base, range: Math.abs(scoreHi - scoreLo) };
+        return { name: p.name, low: scoreLo - base, high: scoreHi - base, scoreLo: scoreLo, scoreHi: scoreHi, base: base, range: Math.abs(scoreHi - scoreLo) };
     });
     results.sort(function(a,b){return b.range - a.range;});
+
+    aifLastTornado = { results: results, base: base };
 
     if (tornadoChartInstance) tornadoChartInstance.destroy();
     tornadoChartInstance = new Chart(document.getElementById('tornadoChart'), {
@@ -2235,11 +2377,13 @@ function aifRunTornado(inp) {
         data: {
             labels: results.map(function(r){return r.name;}),
             datasets: [
-                { label: '-20%', data: results.map(function(r){return r.low;}), backgroundColor: 'rgba(239,68,68,0.6)' },
-                { label: '+20%', data: results.map(function(r){return r.high;}), backgroundColor: 'rgba(34,197,94,0.6)' }
+                { label: '-20%', data: results.map(function(r){return r.low;}), backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#ef4444', borderWidth: 1 },
+                { label: '+20%', data: results.map(function(r){return r.high;}), backgroundColor: 'rgba(34,197,94,0.6)', borderColor: '#22c55e', borderWidth: 1 }
             ]
         },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } } } }
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } } } }
     });
 }
 
@@ -2247,66 +2391,117 @@ function aifRunTornado(inp) {
 function aifRunStrandedAsset(inp) {
     var r = aifComputeReadiness(inp);
 
-    // Stranded probability
-    var prob = Math.round(Math.max(0, Math.min(100, 100 - r.overall + (inp.age > 10 ? 15 : 0) + (inp.cooling === 'air' && inp.density > 30 ? 20 : 0))));
+    // Stranded probability — multi-factor model
+    var baseRisk = Math.max(0, 100 - r.overall);
+    var agePenalty = inp.age > 15 ? 18 : inp.age > 10 ? 12 : inp.age > 5 ? 5 : 0;
+    var coolingPenalty = (inp.cooling === 'air' && inp.density > 30) ? 22 : (inp.cooling === 'air' ? 10 : 0);
+    var structPenalty = inp.floorLoad < 1500 && inp.density > 40 ? 12 : 0;
+    var lcPenalty = inp.lcInfra === 'none' && inp.cooling !== 'air' ? 8 : 0;
+    var prob = Math.round(Math.max(0, Math.min(100, baseRisk * 0.6 + agePenalty + coolingPenalty + structPenalty + lcPenalty)));
+
     var itMW = inp.density * inp.racks / 1000;
-    var facilityValue = itMW * 12e6; // rough facility value
-    var writedown = facilityValue * (prob / 100) * 0.6;
-    var yearsObs = r.overall >= 80 ? '7+' : r.overall >= 60 ? '4-6' : r.overall >= 40 ? '2-3' : '<2';
-    var action = r.overall >= 80 ? 'Maintain & Monitor' : r.overall >= 60 ? 'Plan Retrofit' : r.overall >= 40 ? 'Urgent Retrofit' : 'Divest or Rebuild';
+    var facilityValue = itMW * (inp.cooling === 'air' ? 8e6 : inp.cooling === 'dtc' ? 12e6 : 15e6);
+    var writedown = facilityValue * (prob / 100) * 0.55;
+    var yearsObs = r.overall >= 80 ? '7+' : r.overall >= 65 ? '5-7' : r.overall >= 45 ? '3-5' : r.overall >= 25 ? '1-3' : '<1';
+    var action = r.overall >= 80 ? 'Maintain & Monitor' : r.overall >= 62 ? 'Plan Targeted Retrofit' : r.overall >= 42 ? 'Urgent Retrofit Required' : r.overall >= 22 ? 'Major Rebuild or Divest' : 'Immediate Divestment';
+
+    aifLastSA = { prob: prob, writedown: writedown, yearsObs: yearsObs, action: action, facilityValue: facilityValue, r: r };
 
     document.getElementById('saProb').textContent = prob + '%';
-    document.getElementById('saProb').style.color = prob > 60 ? '#f87171' : prob > 30 ? '#fbbf24' : '#34d399';
+    document.getElementById('saProb').style.color = prob > 60 ? '#f87171' : prob > 35 ? '#fbbf24' : '#34d399';
     document.getElementById('saWritedown').textContent = fmtMoney(writedown);
     document.getElementById('saYears').textContent = yearsObs;
     document.getElementById('saAction').textContent = action;
 
-    // Radar chart
-    var powerScore = Math.min(100, (inp.density / 130) * 100);
-    var networkScore = inp.density > 40 ? 80 : 50;
-    var flexScore = Math.max(0, 100 - inp.age * 4);
+    // Radar chart — use actual computed sub-scores
+    var lcScore = inp.lcInfra === 'full' ? 92 : inp.lcInfra === 'partial' ? 52 : 10;
+    var networkScore = inp.density >= 80 ? 85 : inp.density >= 40 ? 65 : inp.density >= 15 ? 40 : 20;
 
     if (radarChartInstance) radarChartInstance.destroy();
     radarChartInstance = new Chart(document.getElementById('radarChart'), {
         type: 'radar',
         data: {
-            labels: ['Power Density', 'Cooling', 'Structure', 'Network', 'Age/Flex', 'LC Infrastructure'],
+            labels: ['Power Density', 'Cooling', 'Structure', 'PUE Efficiency', 'Age/Flexibility', 'LC Infra'],
             datasets: [{
                 label: 'Your Facility',
-                data: [powerScore, r.coolScore, r.structScore, networkScore, flexScore, inp.lcInfra === 'full' ? 95 : inp.lcInfra === 'partial' ? 55 : 15],
+                data: [r.densityScore, r.coolScore, r.structScore, r.pueScore, r.ageScore, lcScore],
                 backgroundColor: 'rgba(59,130,246,0.2)',
                 borderColor: '#3b82f6',
                 borderWidth: 2,
                 pointBackgroundColor: '#3b82f6'
             }, {
                 label: 'AI-Native Target',
-                data: [85, 90, 85, 85, 80, 95],
-                backgroundColor: 'rgba(34,197,94,0.1)',
+                data: [88, 85, 82, 85, 78, 92],
+                backgroundColor: 'rgba(34,197,94,0.08)',
                 borderColor: '#22c55e',
-                borderWidth: 1,
+                borderWidth: 1.5,
                 borderDash: [5, 5],
                 pointBackgroundColor: '#22c55e'
             }]
         },
-        options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: { r: { ticks: { color: '#64748b', backdropColor: 'transparent', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, min: 0, max: 100 } } }
+        options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+            scales: { r: { ticks: { color: '#64748b', backdropColor: 'transparent', font: { size: 9 } },
+            grid: { color: 'rgba(255,255,255,0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, min: 0, max: 100 } } }
     });
 
-    // Narrative
-    var narr = '<h4>Executive Assessment</h4>';
-    if (prob > 60) {
-        narr += '<p>This facility presents <strong>high stranded asset risk</strong>. With a readiness score of ' + r.overall + '/100 and an estimated ' + prob + '% probability of functional obsolescence for AI workloads, the current infrastructure configuration cannot competitively serve the GPU-dense computing market that will dominate demand growth through 2030.</p>';
-        narr += '<p>The primary gaps are in ' + (r.coolScore < 50 ? 'cooling infrastructure' : 'structural capacity') + ' and ' + (r.coolScore < 50 ? 'structural reinforcement' : 'cooling modernization') + '. At current rack density targets of ' + inp.density + ' kW, the facility requires ' + (inp.cooling === 'air' ? 'a complete transition from air to liquid cooling' : 'significant cooling capacity expansion') + ' to achieve AI-native readiness.</p>';
-        narr += '<p><strong>Recommended action:</strong> Commission a detailed engineering assessment within 90 days. If retrofit costs exceed 60% of greenfield equivalent, consider divestment and purpose-built replacement. The estimated write-down exposure is ' + fmtMoney(writedown) + '.</p>';
-    } else if (prob > 30) {
-        narr += '<p>This facility shows <strong>moderate stranded asset risk</strong> with a readiness score of ' + r.overall + '/100. The infrastructure has foundational capabilities but requires targeted investment to remain competitive for AI workloads.</p>';
-        narr += '<p>Key strengths include ' + (r.coolScore >= 60 ? 'adequate cooling infrastructure' : 'structural capacity') + '. Priority investments should focus on ' + (r.coolScore < 60 ? 'liquid cooling deployment' : 'power density upgrades') + ' to close the gap with purpose-built AI facilities entering the market.</p>';
-        narr += '<p><strong>Recommended action:</strong> Develop a phased retrofit plan targeting AI-readiness within 18-24 months. Estimated investment: ' + fmtMoney(facilityValue * 0.3) + ' to ' + fmtMoney(facilityValue * 0.5) + '.</p>';
-    } else {
-        narr += '<p>This facility demonstrates <strong>low stranded asset risk</strong> with a readiness score of ' + r.overall + '/100. The infrastructure is well-positioned to support current and near-term AI workload requirements.</p>';
-        narr += '<p>The facility scores well across power density, cooling, and structural dimensions. To maintain competitiveness as rack densities continue to increase toward 200+ kW, ongoing investment in cooling capacity and power distribution should be planned on a 24-36 month cycle.</p>';
-        narr += '<p><strong>Recommended action:</strong> Maintain current infrastructure with planned capacity expansions. Monitor technology transitions (Vera Rubin, Rubin Ultra) for facility impact assessment.</p>';
-    }
+    // Dynamic narrative
+    var narr = aifGenerateNarrative(inp, r, prob, writedown, facilityValue, yearsObs, action);
     document.getElementById('saNarrative').innerHTML = narr;
+}
+
+// --- Narrative Generator ---
+function aifGenerateNarrative(inp, r, prob, writedown, facilityValue, yearsObs, action) {
+    var narr = '<h4>Executive Assessment</h4>';
+    var coolingLabel = inp.cooling === 'air' ? 'air-cooled' : inp.cooling === 'dtc' ? 'direct-to-chip liquid cooled' : 'immersion cooled';
+    var densityClass = inp.density >= 130 ? 'cutting-edge AI-native' : inp.density >= 40 ? 'AI-capable' : inp.density >= 15 ? 'transition-density' : 'traditional enterprise';
+
+    // Paragraph 1: Overall assessment
+    if (prob > 60) {
+        narr += '<p>This ' + inp.age + '-year-old ' + coolingLabel + ' facility operating at ' + inp.density + ' kW/rack (' + densityClass + ' class) presents <strong>high stranded asset risk</strong>. With an AI readiness score of ' + r.overall + '/100 (Grade ' + r.grade + ') and ' + prob + '% estimated probability of functional obsolescence, the infrastructure cannot competitively serve GPU-dense workloads. The estimated write-down exposure is ' + fmtMoney(writedown) + ' against a facility value of ' + fmtMoney(facilityValue) + '.</p>';
+    } else if (prob > 35) {
+        narr += '<p>This ' + inp.age + '-year-old ' + coolingLabel + ' facility at ' + inp.density + ' kW/rack shows <strong>moderate stranded asset risk</strong>. The readiness score of ' + r.overall + '/100 (Grade ' + r.grade + ') indicates foundational capabilities requiring targeted investment. Estimated obsolescence timeline: ' + yearsObs + ' years without intervention.</p>';
+    } else {
+        narr += '<p>This ' + coolingLabel + ' facility at ' + inp.density + ' kW/rack demonstrates <strong>low stranded asset risk</strong> with a readiness score of ' + r.overall + '/100 (Grade ' + r.grade + '). The infrastructure supports current AI workload requirements with ' + prob + '% probability of near-term obsolescence.</p>';
+    }
+
+    // Paragraph 2: Dimensional analysis
+    var weakest = [{n:'Cooling',s:r.coolScore},{n:'Structural',s:r.structScore},{n:'Density',s:r.densityScore},{n:'PUE',s:r.pueScore},{n:'Age',s:r.ageScore}];
+    weakest.sort(function(a,b){return a.s-b.s;});
+    var strongest = [{n:'Cooling',s:r.coolScore},{n:'Structural',s:r.structScore},{n:'Density',s:r.densityScore},{n:'PUE',s:r.pueScore},{n:'Age',s:r.ageScore}];
+    strongest.sort(function(a,b){return b.s-a.s;});
+
+    narr += '<p><strong>Key gaps:</strong> ' + weakest[0].n + ' readiness scores lowest at ' + weakest[0].s + '/100';
+    if (weakest[1].s < 50) narr += ', followed by ' + weakest[1].n + ' at ' + weakest[1].s + '/100';
+    narr += '. ';
+
+    if (inp.cooling === 'air' && inp.density > 30) {
+        narr += 'Air cooling cannot physically remove heat at ' + inp.density + ' kW/rack — thermal runaway risk is immediate. ';
+    } else if (inp.cooling === 'air') {
+        narr += 'Air cooling limits maximum rack density to approximately 30 kW, blocking any deployment of current-generation GPU accelerators (NVIDIA GB300 at 132 kW/rack). ';
+    }
+
+    if (inp.floorLoad < 1500 && inp.density >= 40) {
+        narr += 'Floor load capacity of ' + inp.floorLoad + ' kg/m&sup2; is insufficient for AI-class racks weighing 1,500-3,500 kg — structural reinforcement is mandatory. ';
+    }
+
+    narr += 'Strongest dimension: ' + strongest[0].n + ' at ' + strongest[0].s + '/100.</p>';
+
+    // Paragraph 3: Actionable recommendation
+    narr += '<p><strong>Recommended action: ' + action + '.</strong> ';
+    if (r.overall >= 80) {
+        narr += 'Maintain current infrastructure with planned capacity expansions aligned to NVIDIA roadmap milestones (Vera Rubin 2026-2027, Rubin Ultra 2027+). Budget 15-20% of facility value annually for technology refresh to preserve competitive position.</p>';
+    } else if (r.overall >= 62) {
+        narr += 'Develop a phased retrofit plan targeting completion within 12-18 months. Priority investments: ' + (r.coolScore < r.structScore ? 'liquid cooling deployment (DTC recommended for brownfield)' : 'structural reinforcement and power distribution upgrade') + '. Estimated retrofit investment: ' + fmtMoney(facilityValue * 0.25) + ' to ' + fmtMoney(facilityValue * 0.40) + '.</p>';
+    } else if (r.overall >= 42) {
+        narr += 'Commission an engineering assessment within 60 days. The facility requires substantial upgrades across ' + weakest.filter(function(w){return w.s<50}).length + ' dimensions. If total retrofit costs exceed 55% of greenfield equivalent (' + fmtMoney(facilityValue * 0.55) + '), greenfield replacement delivers better long-term ROI.</p>';
+    } else {
+        narr += 'The gap between current capability and AI-native requirements is too large for economical retrofit. At current scores, investment in a purpose-built facility costing approximately ' + fmtMoney(facilityValue * 1.8) + ' to ' + fmtMoney(facilityValue * 2.5) + ' will deliver 7-10 year competitive viability versus a retrofit that risks further stranding within 2-3 years.</p>';
+    }
+
+    // Paragraph 4: Industry context
+    narr += '<p><strong>Industry benchmark:</strong> As of 2026, hyperscaler AI facilities target 100-140 kW/rack density with DTC cooling at PUE 1.10-1.20. Combined hyperscaler CAPEX exceeds $600B annually. Facilities unable to support 40+ kW racks with liquid cooling face accelerating revenue displacement as AI workloads shift to purpose-built infrastructure. The NVIDIA GB300 NVL72 at 132 kW/rack represents the current deployment standard; Vera Rubin and Rubin Ultra will push toward 600 kW/rack within 18-24 months.</p>';
+
+    return narr;
 }
 
 // ==================== INPUT LISTENERS ====================
@@ -2325,6 +2520,12 @@ function aifExportPDF() {
     var isPro = aifPremium && aifMode === 'pro';
     var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+    // Run fresh calculations for PDF
+    var mc = null, tcoData = null, tornadoData = null, saData = null;
+    if (isPro) {
+        mc = aifLastMC; tcoData = aifLastTCO; tornadoData = aifLastTornado; saData = aifLastSA;
+    }
+
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI Factory Readiness Report</title>';
     html += '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,-apple-system,sans-serif;color:#1f2937;padding:30px;max-width:900px;margin:0 auto;font-size:11px;line-height:1.6}';
     html += 'h1{font-size:22px;color:#1e3a5f;margin-bottom:4px}h2{font-size:14px;color:#1e3a5f;border-bottom:2px solid #3b82f6;padding-bottom:4px;margin:20px 0 10px}';
@@ -2332,79 +2533,221 @@ function aifExportPDF() {
     html += 'td{padding:8px;border:1px solid #e5e7eb;font-size:11px}.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-weight:700;font-size:10px}';
     html += '.score-big{font-size:48px;font-weight:800;text-align:center;margin:15px 0}.kpi-row{display:flex;gap:12px;margin:10px 0}';
     html += '.kpi-box{flex:1;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;text-align:center}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase}.kpi-val{font-size:16px;font-weight:700;color:#1e3a5f}';
-    html += '.narr{background:#f8fafc;border-left:3px solid #3b82f6;padding:12px;margin:10px 0;font-size:10px;line-height:1.6}';
+    html += '.narr{background:#f8fafc;border-left:3px solid #3b82f6;padding:12px;margin:10px 0;font-size:10px;line-height:1.6}.narr h4{font-size:12px;color:#1e3a5f;margin-bottom:6px}';
+    html += '.narr p{margin-bottom:8px}.narr strong{color:#1e40af}';
+    html += '.chart-row{display:flex;gap:16px;margin:12px 0}.chart-row>div{flex:1;min-width:0}';
     html += '@media print{@page{margin:15mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>';
 
     // Header
     html += '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #3b82f6;padding-bottom:10px;margin-bottom:15px">';
-    html += '<div><h1>AI Factory Infrastructure Readiness Report</h1><div style="color:#64748b;font-size:10px">Generated ' + now + ' | ResistanceZero.com</div></div>';
-    html += '<div style="font-size:10px;color:#64748b;text-align:right">resistancezero.com<br>AI Infrastructure Analysis</div></div>';
+    html += '<div><h1>AI Factory Infrastructure Readiness Report</h1><div style="color:#64748b;font-size:10px">Generated ' + now + ' | ' + (isPro ? 'Pro Intelligence Report' : 'Free Assessment') + '</div></div>';
+    html += '<div style="text-align:right"><div style="font-weight:800;color:#3b82f6;font-size:14px">ResistanceZero</div><div style="font-size:9px;color:#94a3b8">resistancezero.com</div></div></div>';
 
     // Grade
     var gradeColor = r.grade === 'A' ? '#059669' : r.grade === 'B' ? '#10b981' : r.grade === 'C' ? '#d97706' : '#dc2626';
-    html += '<div style="text-align:center;margin:15px 0"><div class="score-big" style="color:' + gradeColor + '">Grade ' + r.grade + '</div>';
-    html += '<div style="font-size:14px;color:#64748b">Overall Readiness Score: ' + r.overall + '/100</div></div>';
+    html += '<div style="text-align:center;padding:15px;background:#f8fafc;border-radius:10px;margin:10px 0">';
+    html += '<div style="font-size:11px;color:#64748b;text-transform:uppercase">AI Infrastructure Readiness</div>';
+    html += '<div class="score-big" style="color:' + gradeColor + '">Grade ' + r.grade + '</div>';
+    html += '<div style="font-size:14px;color:#64748b">Overall Score: ' + r.overall + '/100</div>';
+    html += '<div style="margin-top:6px"><span class="badge" style="background:' + (r.overall >= 70 ? '#ecfdf5;color:#059669' : r.overall >= 40 ? '#fffbeb;color:#d97706' : '#fef2f2;color:#dc2626') + '">' + r.recommend + '</span></div></div>';
 
     // KPI row
     html += '<div class="kpi-row">';
     html += '<div class="kpi-box"><div class="kpi-label">IT Load</div><div class="kpi-val">' + r.itLoadMW.toFixed(1) + ' MW</div></div>';
     html += '<div class="kpi-box"><div class="kpi-label">Facility Power</div><div class="kpi-val">' + r.facPowerMW.toFixed(1) + ' MW</div></div>';
     html += '<div class="kpi-box"><div class="kpi-label">Annual Energy</div><div class="kpi-val">' + fmtMoney(r.annualEnergy) + '</div></div>';
-    html += '<div class="kpi-box"><div class="kpi-label">Cooling Score</div><div class="kpi-val">' + r.coolScore + '/100</div></div>';
-    html += '<div class="kpi-box"><div class="kpi-label">Structural</div><div class="kpi-val">' + r.structScore + '/100</div></div>';
-    html += '<div class="kpi-box"><div class="kpi-label">Recommendation</div><div class="kpi-val" style="font-size:12px">' + r.recommend + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Annual OPEX</div><div class="kpi-val">' + fmtMoney(r.totalOPEX) + '</div></div>';
+    html += '</div>';
+
+    // Sub-score breakdown
+    html += '<div class="kpi-row">';
+    html += '<div class="kpi-box"><div class="kpi-label">Cooling</div><div class="kpi-val" style="color:' + (r.coolScore >= 65 ? '#059669' : r.coolScore >= 35 ? '#d97706' : '#dc2626') + '">' + r.coolScore + '/100</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Structure</div><div class="kpi-val" style="color:' + (r.structScore >= 65 ? '#059669' : r.structScore >= 35 ? '#d97706' : '#dc2626') + '">' + r.structScore + '/100</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Density</div><div class="kpi-val" style="color:' + (r.densityScore >= 65 ? '#059669' : r.densityScore >= 35 ? '#d97706' : '#dc2626') + '">' + r.densityScore + '/100</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">PUE</div><div class="kpi-val" style="color:' + (r.pueScore >= 65 ? '#059669' : r.pueScore >= 35 ? '#d97706' : '#dc2626') + '">' + r.pueScore + '/100</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Age</div><div class="kpi-val" style="color:' + (r.ageScore >= 65 ? '#059669' : r.ageScore >= 35 ? '#d97706' : '#dc2626') + '">' + r.ageScore + '/100</div></div>';
     html += '</div>';
 
     // Input params
     html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
-    html += '<tr><td>Rack Density</td><td>' + inp.density + ' kW</td><td>Cooling Type</td><td>' + inp.cooling.toUpperCase() + '</td></tr>';
+    html += '<tr><td>Rack Density</td><td>' + inp.density + ' kW</td><td>Cooling Type</td><td>' + (inp.cooling === 'dtc' ? 'Direct-to-Chip' : inp.cooling === 'immersion' ? 'Immersion' : 'Air') + '</td></tr>';
     html += '<tr><td>Number of Racks</td><td>' + inp.racks + '</td><td>PUE</td><td>' + inp.pue + '</td></tr>';
     html += '<tr><td>Electricity Rate</td><td>$' + inp.elecRate + '/kWh</td><td>Facility Age</td><td>' + inp.age + ' years</td></tr>';
-    html += '<tr><td>Floor Load</td><td>' + inp.floorLoad + ' kg/m&sup2;</td><td>LC Infrastructure</td><td>' + inp.lcInfra + '</td></tr></table>';
+    html += '<tr><td>Floor Load</td><td>' + inp.floorLoad + ' kg/m&sup2;</td><td>LC Infrastructure</td><td>' + (inp.lcInfra === 'full' ? 'Full' : inp.lcInfra === 'partial' ? 'Partial' : 'None') + '</td></tr></table>';
 
-    // Results
-    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr>';
-    html += '<tr><td>Total IT Load</td><td>' + r.itLoadMW.toFixed(1) + ' MW</td><td>Annual Energy Cost</td><td>' + fmtMoney(r.annualEnergy) + '</td></tr>';
-    html += '<tr><td>Total Facility Power</td><td>' + r.facPowerMW.toFixed(1) + ' MW</td><td>Estimated Annual OPEX</td><td>' + fmtMoney(r.totalOPEX) + '</td></tr>';
-    html += '<tr><td>Cooling Readiness</td><td>' + r.coolScore + '/100</td><td>Structural Readiness</td><td>' + r.structScore + '/100</td></tr>';
-    html += '<tr><td>AI Readiness Grade</td><td style="font-weight:700;color:' + gradeColor + '">' + r.grade + ' (' + r.overall + '/100)</td><td>Recommendation</td><td>' + r.recommend + '</td></tr></table>';
+    // Results table
+    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>';
+    html += '<tr><td>Total IT Load</td><td><strong>' + r.itLoadMW.toFixed(1) + ' MW</strong></td><td>' + (r.itLoadMW >= 10 ? 'Hyperscale class' : r.itLoadMW >= 1 ? 'Enterprise class' : 'Small deployment') + '</td></tr>';
+    html += '<tr><td>Total Facility Power</td><td>' + r.facPowerMW.toFixed(1) + ' MW</td><td>PUE overhead: ' + ((r.facPowerMW/r.itLoadMW - 1) * 100).toFixed(0) + '%</td></tr>';
+    html += '<tr><td>Annual Energy Cost</td><td>' + fmtMoney(r.annualEnergy) + '</td><td>' + fmtMoney(r.annualEnergy / 12) + '/month</td></tr>';
+    html += '<tr><td>Estimated Annual OPEX</td><td>' + fmtMoney(r.totalOPEX) + '</td><td>Energy + cooling + staff + network</td></tr>';
+    html += '<tr><td>AI Readiness Grade</td><td style="font-weight:700;color:' + gradeColor + '">Grade ' + r.grade + ' (' + r.overall + '/100)</td><td>' + r.recommend + '</td></tr></table>';
 
+    // === PRO SECTIONS WITH SVG CHARTS ===
     if (isPro) {
-        // Narrative
+        // Executive Assessment narrative
         html += '<h2>Executive Assessment</h2>';
-        html += '<div class="narr">' + document.getElementById('saNarrative').innerHTML + '</div>';
+        html += '<div class="narr">' + (document.getElementById('saNarrative').innerHTML || '') + '</div>';
 
-        // MC stats
-        html += '<h2>Monte Carlo Analysis (10K Iterations)</h2>';
-        html += '<div class="kpi-row">';
-        html += '<div class="kpi-box"><div class="kpi-label">Mean</div><div class="kpi-val">' + document.getElementById('mcMean').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">P5</div><div class="kpi-val">' + document.getElementById('mcP5').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">P50</div><div class="kpi-val">' + document.getElementById('mcP50').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">P95</div><div class="kpi-val">' + document.getElementById('mcP95').textContent + '</div></div></div>';
+        // Monte Carlo SVG Histogram + percentile table
+        if (mc && mc.scores) {
+            html += '<h2>Monte Carlo Simulation (10,000 Iterations)</h2><div class="chart-row">';
+            var bins = 25, bMin = mc.min, bMax = mc.max, bRange = bMax - bMin || 1;
+            var binW = bRange / bins, counts = new Array(bins).fill(0), maxCt = 0;
+            mc.scores.forEach(function(v) { var bi = Math.min(bins - 1, Math.floor((v - bMin) / binW)); counts[bi]++; if (counts[bi] > maxCt) maxCt = counts[bi]; });
+            var svgW = 400, svgH = 200, pad = {t: 18, r: 15, b: 35, l: 42}, cW = svgW - pad.l - pad.r, cH = svgH - pad.t - pad.b;
 
-        // TCO
-        html += '<h2>5-Year TCO Comparison</h2>';
-        html += '<div class="kpi-row">';
-        html += '<div class="kpi-box"><div class="kpi-label">Traditional</div><div class="kpi-val">' + document.getElementById('tcoTrad').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">Retrofit</div><div class="kpi-val">' + document.getElementById('tcoRetro').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">Greenfield</div><div class="kpi-val">' + document.getElementById('tcoGreen').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">Best Value</div><div class="kpi-val">' + document.getElementById('tcoBest').textContent + '</div></div></div>';
+            html += '<div><svg viewBox="0 0 ' + svgW + ' ' + svgH + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#fff">';
+            // Grid lines
+            for (var g = 0; g <= 4; g++) { var gy = pad.t + cH - cH * (g / 4); html += '<line x1="' + pad.l + '" y1="' + gy + '" x2="' + (svgW - pad.r) + '" y2="' + gy + '" stroke="#e5e7eb" stroke-width="0.5"/>'; html += '<text x="' + (pad.l - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-size="8" fill="#94a3b8">' + Math.round(maxCt * g / 4) + '</text>'; }
+            // Bars
+            var barW = cW / bins;
+            for (var i = 0; i < bins; i++) {
+                var bx = pad.l + i * barW, bh = (counts[i] / maxCt) * cH, by = pad.t + cH - bh;
+                var midVal = bMin + (i + 0.5) * binW;
+                var bCol = midVal >= 70 ? '#059669' : midVal >= 40 ? '#f59e0b' : '#ef4444';
+                html += '<rect x="' + bx + '" y="' + by + '" width="' + (barW - 1) + '" height="' + bh + '" fill="' + bCol + '" rx="1"/>';
+                if (i % 5 === 0) html += '<text x="' + (bx + barW / 2) + '" y="' + (svgH - pad.b + 12) + '" text-anchor="middle" font-size="7" fill="#6b7280">' + Math.round(bMin + i * binW) + '</text>';
+            }
+            // P5/P50/P95 lines
+            var pLines = [{v: mc.p5, l: 'P5', c: '#ef4444'}, {v: mc.p50, l: 'P50', c: '#3b82f6'}, {v: mc.p95, l: 'P95', c: '#059669'}];
+            pLines.forEach(function(pl) {
+                var px = pad.l + ((pl.v - bMin) / bRange) * cW;
+                if (px >= pad.l && px <= svgW - pad.r) {
+                    html += '<line x1="' + px + '" y1="' + pad.t + '" x2="' + px + '" y2="' + (pad.t + cH) + '" stroke="' + pl.c + '" stroke-width="1.5" stroke-dasharray="4,3"/>';
+                    html += '<text x="' + px + '" y="' + (pad.t - 4) + '" text-anchor="middle" font-size="8" font-weight="700" fill="' + pl.c + '">' + pl.l + ': ' + pl.v.toFixed(1) + '</text>';
+                }
+            });
+            html += '<text x="' + (svgW / 2) + '" y="' + (svgH - 2) + '" text-anchor="middle" font-size="8" fill="#6b7280">AI Readiness Score Distribution</text>';
+            html += '</svg></div>';
 
-        // Stranded Asset
-        html += '<h2>Stranded Asset Risk</h2>';
-        html += '<div class="kpi-row">';
-        html += '<div class="kpi-box"><div class="kpi-label">Risk Probability</div><div class="kpi-val">' + document.getElementById('saProb').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">Est. Write-down</div><div class="kpi-val">' + document.getElementById('saWritedown').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">Years to Obsolescence</div><div class="kpi-val">' + document.getElementById('saYears').textContent + '</div></div>';
-        html += '<div class="kpi-box"><div class="kpi-label">Action</div><div class="kpi-val" style="font-size:11px">' + document.getElementById('saAction').textContent + '</div></div></div>';
+            // Percentile table
+            html += '<div><table style="margin-top:0"><tr><th>Percentile</th><th>Score</th><th>Assessment</th></tr>';
+            html += '<tr><td style="color:#ef4444;font-weight:600">P5 (Worst Case)</td><td>' + mc.p5.toFixed(1) + '</td><td>' + (mc.p5 >= 50 ? 'Viable' : 'At risk') + '</td></tr>';
+            html += '<tr><td>P25</td><td>' + mc.p25.toFixed(1) + '</td><td>' + (mc.p25 >= 50 ? 'Adequate' : 'Below threshold') + '</td></tr>';
+            html += '<tr><td style="color:#3b82f6;font-weight:600">P50 (Median)</td><td><strong>' + mc.p50.toFixed(1) + '</strong></td><td>Most likely outcome</td></tr>';
+            html += '<tr><td>P75</td><td>' + mc.p75.toFixed(1) + '</td><td>Upside scenario</td></tr>';
+            html += '<tr><td style="color:#059669;font-weight:600">P95 (Best Case)</td><td>' + mc.p95.toFixed(1) + '</td><td>Optimistic bound</td></tr>';
+            html += '<tr style="background:#f0f9ff"><td>Mean &plusmn; StdDev</td><td>' + mc.mean.toFixed(1) + '</td><td>&sigma; = ' + mc.stdDev.toFixed(1) + ' points</td></tr></table></div></div>';
+        }
+
+        // TCO comparison: SVG stacked bar + table
+        if (tcoData && tcoData.rows) {
+            html += '<h2>5-Year TCO Comparison</h2><div class="chart-row">';
+            var tRows = tcoData.rows, tTotals = tcoData.totals;
+            var maxTCO = 0; tRows.forEach(function(row) { maxTCO = Math.max(maxTCO, row[1], row[2], row[3]); });
+
+            var tW = 400, tH = 200, tPad = {t: 15, r: 15, b: 30, l: 50}, tCW = tW - tPad.l - tPad.r, tCH = tH - tPad.t - tPad.b;
+            html += '<div><svg viewBox="0 0 ' + tW + ' ' + tH + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#fff">';
+            // Grid
+            for (var g = 0; g <= 4; g++) { var gy = tPad.t + tCH - tCH * (g / 4); html += '<line x1="' + tPad.l + '" y1="' + gy + '" x2="' + (tW - tPad.r) + '" y2="' + gy + '" stroke="#e5e7eb" stroke-width="0.5"/>'; html += '<text x="' + (tPad.l - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-size="7" fill="#94a3b8">' + fmtMoney(maxTCO * g / 4) + '</text>'; }
+            // Bars — grouped by year
+            var groupW = tCW / 5, barPad = 6, singleBarW = (groupW - barPad * 2) / 3;
+            var colors = ['#94a3b8', '#3b82f6', '#06b6d4'];
+            tRows.forEach(function(row, yi) {
+                for (var bi = 0; bi < 3; bi++) {
+                    var bx = tPad.l + yi * groupW + barPad + bi * singleBarW;
+                    var bh = (row[bi + 1] / maxTCO) * tCH;
+                    var by = tPad.t + tCH - bh;
+                    html += '<rect x="' + bx + '" y="' + by + '" width="' + (singleBarW - 1) + '" height="' + bh + '" fill="' + colors[bi] + '" rx="1"/>';
+                }
+                html += '<text x="' + (tPad.l + yi * groupW + groupW / 2) + '" y="' + (tH - tPad.b + 12) + '" text-anchor="middle" font-size="8" fill="#6b7280">Y' + row[0] + '</text>';
+            });
+            // Legend
+            html += '<rect x="' + (tPad.l + 5) + '" y="' + (tPad.t + 2) + '" width="8" height="8" fill="#94a3b8" rx="1"/><text x="' + (tPad.l + 16) + '" y="' + (tPad.t + 9) + '" font-size="7" fill="#64748b">Traditional</text>';
+            html += '<rect x="' + (tPad.l + 75) + '" y="' + (tPad.t + 2) + '" width="8" height="8" fill="#3b82f6" rx="1"/><text x="' + (tPad.l + 86) + '" y="' + (tPad.t + 9) + '" font-size="7" fill="#64748b">Retrofit</text>';
+            html += '<rect x="' + (tPad.l + 135) + '" y="' + (tPad.t + 2) + '" width="8" height="8" fill="#06b6d4" rx="1"/><text x="' + (tPad.l + 146) + '" y="' + (tPad.t + 9) + '" font-size="7" fill="#64748b">Greenfield</text>';
+            html += '</svg></div>';
+
+            // TCO table
+            html += '<div><table style="margin-top:0"><tr><th>Year</th><th>Traditional</th><th>Retrofit</th><th>Greenfield</th></tr>';
+            tRows.forEach(function(row) { html += '<tr><td>Year ' + row[0] + '</td><td>' + fmtMoney(row[1]) + '</td><td>' + fmtMoney(row[2]) + '</td><td>' + fmtMoney(row[3]) + '</td></tr>'; });
+            html += '<tr style="background:#f0f9ff;font-weight:700"><td>5-Yr Total</td><td>' + fmtMoney(tTotals[0]) + '</td><td>' + fmtMoney(tTotals[1]) + '</td><td>' + fmtMoney(tTotals[2]) + '</td></tr></table></div></div>';
+        }
+
+        // Sensitivity Tornado: SVG + table
+        if (tornadoData && tornadoData.results) {
+            html += '<h2>Sensitivity Analysis</h2><div class="chart-row">';
+            var top6 = tornadoData.results.slice(0, 6), baseScore = tornadoData.base;
+            var tW = 400, tH = 28 * top6.length + 50, tPad = {t: 22, r: 40, b: 15, l: 120}, tCW = tW - tPad.l - tPad.r;
+            var maxRange = 0; top6.forEach(function(s) { var absMax = Math.max(Math.abs(s.low), Math.abs(s.high)); if (absMax > maxRange) maxRange = absMax; });
+            maxRange = maxRange || 1;
+
+            html += '<div><svg viewBox="0 0 ' + tW + ' ' + tH + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#fff">';
+            var baseLine = tPad.l + tCW / 2;
+            html += '<line x1="' + baseLine + '" y1="' + tPad.t + '" x2="' + baseLine + '" y2="' + (tH - tPad.b) + '" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3"/>';
+            html += '<text x="' + baseLine + '" y="' + (tPad.t - 6) + '" text-anchor="middle" font-size="8" font-weight="700" fill="#1e3a5f">Base: ' + baseScore + '</text>';
+            top6.forEach(function(s, i) {
+                var y = tPad.t + i * 28 + 4, bH = 22;
+                var loX = baseLine + (s.low / maxRange) * (tCW / 2);
+                var hiX = baseLine + (s.high / maxRange) * (tCW / 2);
+                html += '<rect x="' + Math.min(loX, baseLine) + '" y="' + y + '" width="' + Math.abs(loX - baseLine) + '" height="' + bH + '" fill="#fca5a5" rx="2"/>';
+                html += '<rect x="' + Math.min(hiX, baseLine) + '" y="' + y + '" width="' + Math.abs(hiX - baseLine) + '" height="' + bH + '" fill="#86efac" rx="2"/>';
+                html += '<text x="' + (tPad.l - 4) + '" y="' + (y + bH / 2 + 4) + '" text-anchor="end" font-size="8" fill="#374151">' + s.name + '</text>';
+            });
+            html += '</svg></div>';
+
+            // Data table
+            html += '<div><table style="margin-top:0"><tr><th>Parameter</th><th>-20%</th><th>Base</th><th>+20%</th><th>Range</th></tr>';
+            top6.forEach(function(s) { html += '<tr><td>' + s.name + '</td><td style="color:#dc2626">' + s.scoreLo + '</td><td>' + s.base + '</td><td style="color:#059669">' + s.scoreHi + '</td><td><strong>' + s.range + '</strong></td></tr>'; });
+            html += '</table></div></div>';
+        }
+
+        // Stranded Asset SVG Radar + summary
+        if (saData) {
+            html += '<h2>Stranded Asset Risk Assessment</h2>';
+            html += '<div class="kpi-row">';
+            html += '<div class="kpi-box"><div class="kpi-label">Risk Probability</div><div class="kpi-val" style="color:' + (saData.prob > 60 ? '#dc2626' : saData.prob > 35 ? '#d97706' : '#059669') + '">' + saData.prob + '%</div></div>';
+            html += '<div class="kpi-box"><div class="kpi-label">Est. Write-down</div><div class="kpi-val">' + fmtMoney(saData.writedown) + '</div></div>';
+            html += '<div class="kpi-box"><div class="kpi-label">Years to Obsolescence</div><div class="kpi-val">' + saData.yearsObs + '</div></div>';
+            html += '<div class="kpi-box"><div class="kpi-label">Action</div><div class="kpi-val" style="font-size:11px">' + saData.action + '</div></div></div>';
+
+            // SVG Radar chart
+            var dims = [
+                {n: 'Density', v: r.densityScore, t: 88},
+                {n: 'Cooling', v: r.coolScore, t: 85},
+                {n: 'Structure', v: r.structScore, t: 82},
+                {n: 'PUE', v: r.pueScore, t: 85},
+                {n: 'Age', v: r.ageScore, t: 78},
+                {n: 'LC Infra', v: inp.lcInfra === 'full' ? 92 : inp.lcInfra === 'partial' ? 52 : 10, t: 92}
+            ];
+            var rW = 300, rH = 280, cx = rW / 2, cy = rH / 2 + 5, maxR = 105;
+            html += '<div style="text-align:center;margin:10px 0"><svg viewBox="0 0 ' + rW + ' ' + rH + '" xmlns="http://www.w3.org/2000/svg" style="width:300px;height:auto;background:#fff">';
+            // Grid rings
+            [20, 40, 60, 80, 100].forEach(function(ring) {
+                var pts = [];
+                for (var d = 0; d < 6; d++) { var a = (d * 60 - 90) * Math.PI / 180; pts.push((cx + maxR * (ring / 100) * Math.cos(a)).toFixed(1) + ',' + (cy + maxR * (ring / 100) * Math.sin(a)).toFixed(1)); }
+                html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>';
+                if (ring % 40 === 0) html += '<text x="' + (cx + 3) + '" y="' + (cy - maxR * ring / 100 + 3) + '" font-size="7" fill="#94a3b8">' + ring + '</text>';
+            });
+            // Axis lines + labels
+            dims.forEach(function(dim, d) {
+                var a = (d * 60 - 90) * Math.PI / 180;
+                var lx = cx + (maxR + 18) * Math.cos(a), ly = cy + (maxR + 18) * Math.sin(a);
+                html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + maxR * Math.cos(a)).toFixed(1) + '" y2="' + (cy + maxR * Math.sin(a)).toFixed(1) + '" stroke="#e5e7eb" stroke-width="0.5"/>';
+                html += '<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="middle" font-size="7" fill="#374151">' + dim.n + '</text>';
+            });
+            // Target polygon (dashed green)
+            var tPts = []; dims.forEach(function(dim, d) { var a = (d * 60 - 90) * Math.PI / 180; tPts.push((cx + maxR * (dim.t / 100) * Math.cos(a)).toFixed(1) + ',' + (cy + maxR * (dim.t / 100) * Math.sin(a)).toFixed(1)); });
+            html += '<polygon points="' + tPts.join(' ') + '" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>';
+            // Facility polygon (blue)
+            var fPts = []; dims.forEach(function(dim, d) { var a = (d * 60 - 90) * Math.PI / 180; fPts.push((cx + maxR * (dim.v / 100) * Math.cos(a)).toFixed(1) + ',' + (cy + maxR * (dim.v / 100) * Math.sin(a)).toFixed(1)); });
+            html += '<polygon points="' + fPts.join(' ') + '" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="2"/>';
+            dims.forEach(function(dim, d) { var a = (d * 60 - 90) * Math.PI / 180; html += '<circle cx="' + (cx + maxR * (dim.v / 100) * Math.cos(a)).toFixed(1) + '" cy="' + (cy + maxR * (dim.v / 100) * Math.sin(a)).toFixed(1) + '" r="3" fill="#3b82f6"/>'; });
+            // Legend
+            html += '<rect x="10" y="' + (rH - 18) + '" width="10" height="10" fill="rgba(59,130,246,0.3)" stroke="#3b82f6" stroke-width="1"/><text x="24" y="' + (rH - 10) + '" font-size="7" fill="#374151">Your Facility</text>';
+            html += '<rect x="100" y="' + (rH - 18) + '" width="10" height="10" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1" stroke-dasharray="2,1"/><text x="114" y="' + (rH - 10) + '" font-size="7" fill="#374151">AI-Native Target</text>';
+            html += '</svg></div>';
+        }
     }
 
     // Methodology
-    html += '<h2>Methodology Note</h2><div style="font-size:9px;color:#64748b;line-height:1.5">';
-    html += 'This assessment uses a weighted scoring model: Cooling Readiness (35%), Structural Readiness (25%), PUE Efficiency (20%), and Facility Age (20%). ';
-    html += 'Monte Carlo simulation varies rack density (&plusmn;15%), PUE (&plusmn;10%), electricity rate (&plusmn;20%), and facility age (&plusmn;25%) across 10,000 iterations. ';
-    html += 'TCO comparison uses industry-standard cost assumptions for traditional air-cooled, retrofitted DTC, and greenfield AI-native facilities. ';
-    html += 'All calculations are performed client-side. No data is transmitted or stored. This report is for informational purposes only and should not replace professional engineering assessment.</div>';
+    html += '<h2>Methodology</h2><div style="font-size:9px;color:#64748b;line-height:1.5">';
+    html += 'Weighted scoring: Cooling Readiness (35%), Structural Readiness (25%), Power Density (20%), PUE Efficiency (10%), Age/Adaptability (10%). ';
+    html += 'Cooling scores benchmark against AI-native requirements: air cooling caps at ~30 kW/rack, DTC supports up to 200 kW, immersion up to 400 kW. ';
+    html += 'Structural scores measure floor load against AI-rack weights (1,500-3,500 kg/m&sup2;). Power density scores evaluate proximity to the 40-130 kW AI-capable range. ';
+    html += 'Monte Carlo: 10,000 iterations varying density (&plusmn;15%), PUE (&plusmn;8%), electricity (&plusmn;20%), age (&plusmn;25%), floor load (&plusmn;10%). ';
+    html += 'TCO uses 3% annual cost escalation. All calculations client-side; no data transmitted.</div>';
 
     html += '<div style="text-align:center;margin-top:20px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:8px;color:#94a3b8">';
     html += 'Generated by ResistanceZero AI Factory Readiness Calculator | resistancezero.com | &copy; 2026 Bagus Dwi Permana</div>';
