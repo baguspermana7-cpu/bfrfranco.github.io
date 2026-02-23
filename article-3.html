@@ -1158,8 +1158,51 @@
     <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
 </head>
 <body>
+    <!-- Reading Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Search Overlay & Modal -->
+    <div class="search-overlay" id="searchOverlay"></div>
+    <div class="search-modal" id="searchModal">
+        <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <kbd class="search-kbd">ESC</kbd>
+        </div>
+        <div class="search-results" id="searchResults">
+            <div class="search-empty">Type to search across all content</div>
+        </div>
+        <div class="search-footer">
+            <span><kbd class="search-kbd">&uarr;&darr;</kbd> Navigate</span>
+            <span><kbd class="search-kbd">Enter</kbd> Open</span>
+        </div>
+    </div>
+
+    <!-- TOC Sidebar (desktop, wide screens) -->
+    <nav class="toc-sidebar" id="tocSidebar" aria-label="Table of Contents">
+        <div class="toc-sidebar-label">On this page</div>
+        <ul class="toc-sidebar-list" id="tocSidebarList"></ul>
+    </nav>
+
+    <!-- TOC Mobile Toggle -->
+    <button class="toc-mobile-toggle" id="tocMobileToggle" aria-label="Table of contents">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </button>
+    <div class="toc-mobile-backdrop" id="tocMobileBackdrop"></div>
+    <div class="toc-mobile-drawer" id="tocMobileDrawer">
+        <div class="toc-drawer-header">
+            <span class="toc-drawer-title">Table of Contents</span>
+            <button class="toc-drawer-close" id="tocDrawerClose" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <ul class="toc-mobile-list" id="tocMobileList"></ul>
+    </div>
+
+
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Navigation -->
     <nav class="navbar">
@@ -1204,6 +1247,9 @@
                 </li>
                 <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
+                        <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
                 <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -1291,6 +1337,19 @@
             </div>
         </div>
     </section>
+    <!-- Series Navigation -->
+    <div class="series-nav" style="margin-top: 1rem;">
+        <div class="series-badge">
+            <span class="series-badge-icon">03</span>
+            Engineering Journal &mdash; Article 3 of 18
+        </div>
+        <span class="series-title"></span>
+        <div class="series-links">
+            <a href="article-2.html" class="series-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
+            <a href="article-4.html" class="series-link">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+        </div>
+    </div>
+
 
     <!-- Featured Image -->
     <figure style="margin: 2rem 0; text-align: center;">
@@ -3040,7 +3099,269 @@
         }
         html+='</div></div>';
 
-        html+='</body></html>';
+        html+='
+<!-- ═══ Feature 22: Reading Progress Bar ═══ -->
+<script>
+(function() {
+    var bar = document.getElementById('scrollProgress');
+    if (!bar) return;
+    var ticking = false;
+    function updateProgress() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width = Math.min(pct, 100) + '%';
+        ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+        if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
+    }, { passive: true });
+    updateProgress();
+})();
+</script>
+
+<!-- ═══ Feature 23: TOC Sidebar ═══ -->
+<script>
+(function() {
+    // Find H2s with IDs first, then fallback to auto-generating IDs
+    var sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
+    if (!sections.length) {
+        var allH2s = document.querySelectorAll('.article-body h2, .article-content h2');
+        allH2s.forEach(function(h2, i) {
+            if (!h2.id) h2.id = 'toc-section-' + (i + 1);
+        });
+        sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
+    }
+    if (!sections.length) return;
+
+    var sidebarList = document.getElementById('tocSidebarList');
+    var mobileList = document.getElementById('tocMobileList');
+    var sidebar = document.getElementById('tocSidebar');
+    var tocToggle = document.getElementById('tocMobileToggle');
+    var tocDrawer = document.getElementById('tocMobileDrawer');
+    var tocBackdrop = document.getElementById('tocMobileBackdrop');
+    var tocClose = document.getElementById('tocDrawerClose');
+
+    var tocData = [];
+    sections.forEach(function(h2, i) {
+        var id = h2.getAttribute('id');
+        var numMatch = id.match(/\d+/);
+        var num = numMatch ? numMatch[0] : String(i + 1);
+        var text = h2.textContent.replace(/^\s*\d+[\.\s]*/, '').trim();
+        tocData.push({ id: id, num: num, text: text });
+    });
+
+    function buildList(container, isMobile) {
+        tocData.forEach(function(item) {
+            var li = document.createElement('li');
+            if (!isMobile) li.className = 'toc-sidebar-item';
+            var a = document.createElement('a');
+            a.href = '#' + item.id;
+            a.setAttribute('data-section', item.id);
+            if (isMobile) {
+                a.textContent = item.num + '. ' + item.text;
+            } else {
+                a.className = 'toc-sidebar-link';
+                a.innerHTML = '<span class="toc-sidebar-num">' + item.num + '</span>' + item.text;
+            }
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.getElementById(item.id);
+                if (target) window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+                if (isMobile) closeMobileDrawer();
+            });
+            li.appendChild(a);
+            container.appendChild(li);
+        });
+    }
+
+    buildList(sidebarList, false);
+    buildList(mobileList, true);
+
+    var currentSection = null;
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                currentSection = entry.target.getAttribute('id');
+                highlightActive(currentSection);
+            }
+        });
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(function(s) { observer.observe(s); });
+
+    function highlightActive(sectionId) {
+        sidebarList.querySelectorAll('.toc-sidebar-link').forEach(function(a) {
+            a.classList.toggle('active', a.getAttribute('data-section') === sectionId);
+        });
+        mobileList.querySelectorAll('a').forEach(function(a) {
+            a.classList.toggle('active', a.getAttribute('data-section') === sectionId);
+        });
+    }
+
+    var articleContent = document.querySelector('.article-content');
+    if (articleContent && sidebar) {
+        var sidebarObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                sidebar.classList.toggle('visible', entry.isIntersecting);
+            });
+        }, { rootMargin: '0px', threshold: 0.01 });
+        sidebarObserver.observe(articleContent);
+    }
+
+    function openMobileDrawer() {
+        tocDrawer.classList.add('active');
+        tocBackdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeMobileDrawer() {
+        tocDrawer.classList.remove('active');
+        tocBackdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (tocToggle) tocToggle.addEventListener('click', openMobileDrawer);
+    if (tocClose) tocClose.addEventListener('click', closeMobileDrawer);
+    if (tocBackdrop) tocBackdrop.addEventListener('click', closeMobileDrawer);
+})();
+</script>
+
+<!-- ═══ Feature 21: Global Search ═══ -->
+<script>
+(function() {
+    var searchBtn = document.getElementById('navSearchBtn');
+    var overlay = document.getElementById('searchOverlay');
+    var modal = document.getElementById('searchModal');
+    var input = document.getElementById('searchInput');
+    var resultsEl = document.getElementById('searchResults');
+    var fuse = null;
+    var searchData = null;
+    var focusedIdx = -1;
+
+    function openSearch() {
+        overlay.classList.add('active');
+        modal.classList.add('active');
+        input.value = '';
+        input.focus();
+        focusedIdx = -1;
+        resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>';
+        if (!searchData) {
+            fetch('search-index.json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    searchData = data;
+                    fuse = new Fuse(data, {
+                        keys: [
+                            { name: 'title', weight: 0.4 },
+                            { name: 'description', weight: 0.25 },
+                            { name: 'keywords', weight: 0.25 },
+                            { name: 'category', weight: 0.1 }
+                        ],
+                        threshold: 0.35,
+                        includeScore: true,
+                        minMatchCharLength: 2
+                    });
+                })
+                .catch(function() {});
+        }
+    }
+
+    function closeSearch() {
+        overlay.classList.remove('active');
+        modal.classList.remove('active');
+        input.blur();
+    }
+
+    function getIconClass(cat) {
+        cat = (cat || '').toLowerCase();
+        if (cat === 'calculator') return 'calc';
+        if (cat === 'tool') return 'tool';
+        return '';
+    }
+
+    function getIconLabel(item) {
+        if (item.url && item.url.indexOf('article-') === 0) {
+            return item.url.replace('article-', '').replace('.html', '').padStart(2, '0');
+        }
+        var cat = (item.category || '').toLowerCase();
+        if (cat === 'calculator') return '&#9889;';
+        if (cat === 'tool') return '&#9881;';
+        return '&#9733;';
+    }
+
+    function renderResults(results) {
+        if (!results.length) {
+            resultsEl.innerHTML = '<div class="search-empty">No results found</div>';
+            focusedIdx = -1;
+            return;
+        }
+        var html = '';
+        results.slice(0, 8).forEach(function(r, i) {
+            var item = r.item;
+            var iconCls = getIconClass(item.category);
+            html += '<a href="' + item.url + '" class="search-result-item" data-idx="' + i + '">'
+                + '<div class="search-result-icon ' + iconCls + '">' + getIconLabel(item) + '</div>'
+                + '<div class="search-result-info">'
+                + '<div class="search-result-category">' + (item.category || '') + '</div>'
+                + '<div class="search-result-title">' + item.title + '</div>'
+                + '<div class="search-result-desc">' + item.description + '</div>'
+                + '</div></a>';
+        });
+        resultsEl.innerHTML = html;
+        focusedIdx = -1;
+    }
+
+    function updateFocus() {
+        var items = resultsEl.querySelectorAll('.search-result-item');
+        items.forEach(function(el, i) {
+            el.classList.toggle('focused', i === focusedIdx);
+            if (i === focusedIdx) el.scrollIntoView({ block: 'nearest' });
+        });
+    }
+
+    if (searchBtn) searchBtn.addEventListener('click', openSearch);
+    if (overlay) overlay.addEventListener('click', closeSearch);
+
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            if (modal.classList.contains('active')) closeSearch();
+            else openSearch();
+            return;
+        }
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') { closeSearch(); return; }
+        var items = resultsEl.querySelectorAll('.search-result-item');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            focusedIdx = Math.min(focusedIdx + 1, items.length - 1);
+            updateFocus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            focusedIdx = Math.max(focusedIdx - 1, 0);
+            updateFocus();
+        } else if (e.key === 'Enter' && focusedIdx >= 0 && items[focusedIdx]) {
+            e.preventDefault();
+            items[focusedIdx].click();
+        }
+    });
+
+    if (input) {
+        input.addEventListener('input', function() {
+            var query = input.value.trim();
+            if (query.length < 2 || !fuse) {
+                resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>';
+                focusedIdx = -1;
+                return;
+            }
+            var results = fuse.search(query);
+            renderResults(results);
+        });
+    }
+})();
+</script>
+
+</body></html>';
 
         var w=window.open('','_blank');
         if(w){w.document.write(html);w.document.close();setTimeout(function(){w.print();},500);}
