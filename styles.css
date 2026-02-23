@@ -156,6 +156,14 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Lock background scroll when mobile menu is open */
+body.menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
 /* Theme transition - targeted elements only */
 body, .navbar, .card, .article-content, .article-hero, .footer,
 .nav-menu, .dropdown-menu, .info-box, .comparison-card, .data-table,
@@ -3414,6 +3422,7 @@ section {
         width: 100%;
         height: calc(100vh - 70px);
         background: var(--white);
+        display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
@@ -3421,9 +3430,10 @@ section {
         padding-bottom: 1rem;
         gap: 0;
         transition: left var(--transition-normal);
-        overflow-y: auto;
+        overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
+        touch-action: pan-y;
     }
 
     .nav-menu.active {
@@ -3467,8 +3477,9 @@ section {
     }
 
     .nav-dropdown.active .dropdown-menu {
-        max-height: 500px;
+        max-height: 80vh;
         padding: 0.5rem 0;
+        overflow: visible;
     }
 
     .nav-dropdown.active .dropdown-arrow {
