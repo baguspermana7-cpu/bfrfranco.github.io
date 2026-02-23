@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>The $64 Billion Rebellion: Communities vs Data Centers | ResistanceZero</title>
-    <meta name="description" content="$64B blocked across 24 states. 142 activist groups. Malaysia's first DC protest. Interactive calculator to assess your community's impact.">
+    <meta name="description" content="$64B in data center projects contested globally. Multi-perspective community impact analysis with interactive scorecard calculator.">
     <meta name="keywords" content="Data Center Opposition, Community Backlash, Electricity Bills, Data Center Water, Diesel Generators, Johor Malaysia, Northern Virginia, Data Center Moratorium, PJM Capacity, Community Impact, Southeast Asia">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#dc2626">
     <link rel="canonical" href="https://resistancezero.com/article-14.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-14.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-14.html">
@@ -1647,7 +1654,7 @@
 
                 <span class="perspective-tab community">Community Perspective</span>
 
-                <p>The single most politically explosive issue is electricity costs. When your neighbor's power bill rises while the data center next door negotiates below-market rates, the math becomes personal.</p>
+                <p>The single most politically explosive issue is electricity costs — a dynamic we quantified in <a href="article-11.html">our analysis of AI data centers versus citizen electricity bills</a>. When your neighbor's power bill rises while the data center next door negotiates below-market rates, the math becomes personal.</p>
 
                 <h3>2.1 The Carnegie Mellon Projection</h3>
 
@@ -1899,7 +1906,7 @@
 
                 <h3>7.1 The Investment Scale</h3>
 
-                <p>The SEA data center market is projected to grow from <strong>$13.71 billion (2024)</strong> to <strong>$30.47 billion by 2030</strong>. Hyperscaler commitments are staggering:</p>
+                <p>The SEA data center market is projected to grow from <strong>$13.71 billion (2024)</strong> to <strong>$30.47 billion by 2030</strong> — expansion that our analysis of <a href="article-16.html">the Southeast Asian data center bubble risk</a> suggests may be outpacing infrastructure capacity. Hyperscaler commitments are staggering:</p>
 
                 <div class="data-table-container">
                     <table class="data-table">
@@ -1944,7 +1951,7 @@
                     <li><strong>Public dashboards</strong> with real-time energy, water, and economic impact metrics</li>
                 </ul>
 
-                <p>By rejecting tax breaks and pledging to cover full electricity costs, Microsoft removes the two most politically toxic elements. Whether Amazon, Google, and Meta match these commitments is <strong>the critical question for 2026</strong>.</p>
+                <p>By rejecting tax breaks and pledging to cover full electricity costs, Microsoft removes the two most politically toxic elements — addressing the <a href="article-12.html">grid value equation</a> that determines whether data centers are net contributors or net burdens. Whether Amazon, Google, and Meta match these commitments is <strong>the critical question for 2026</strong>.</p>
 
                 <h3>8.2 The Nordic Waste Heat Model</h3>
 
@@ -4630,5 +4637,65 @@
     </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

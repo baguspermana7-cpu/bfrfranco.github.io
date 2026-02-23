@@ -12,13 +12,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUE Calculator | Data Center Power Usage Effectiveness</title>
-    <meta name="description" content="Calculate Power Usage Effectiveness (PUE) for data centers. Analyze cooling efficiency, UPS losses, and facility overhead based on ASHRAE TC 9.9 and Green Grid standards.">
+    <meta name="description" content="Calculate Power Usage Effectiveness for your data center. Interactive PUE calculator with cooling, UPS, and lighting efficiency inputs.">
     <meta name="keywords" content="PUE Calculator, Power Usage Effectiveness, Data Center Efficiency, DCiE, ASHRAE TC 9.9, Green Grid, Cooling Efficiency">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#06b6d4">
     <link rel="canonical" href="https://resistancezero.com/pue-calculator.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/pue-calculator.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://resistancezero.com/pue-calculator.html">
@@ -27,11 +34,14 @@
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
 
+    <meta property="og:image" content="https://resistancezero.com/assets/pue-calculator-hero.jpg">
+    <meta property="og:image:alt" content="Pue Calculator">
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="PUE Calculator — Data Center Power Efficiency">
     <meta name="twitter:description" content="Calculate PUE for data centers with cooling, UPS, and facility analysis.">
 
+    <meta name="twitter:image" content="https://resistancezero.com/assets/pue-calculator-hero.jpg">
     <!-- Schema -->
     <script type="application/ld+json">
     {
@@ -1881,5 +1891,65 @@
     });
     </script>
     <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

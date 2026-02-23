@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>Data Center Power Distribution | Hyperscaler Design | ResistanceZero</title>
-    <meta name="description" content="Ultra-comprehensive technical analysis of modern data center power distribution systems. Covers AWS, Google, Microsoft, xAI Colossus architectures. 48V/380V/800V DC distribution, failure scenarios, arc flash calculations, protection coordination, and reliability engineering.">
+    <meta name="description" content="Hyperscaler power distribution: AWS, Google, Microsoft, xAI architectures analyzed. 48V/380V/800V DC, failure scenarios, reliability engineering.">
     <meta name="keywords" content="Data Center Power Distribution, Hyperscaler Architecture, AWS UPS, Google 48V DC, Microsoft Azure Power, xAI Colossus, NVIDIA GB200, Arc Flash, Selective Coordination, UPS Design, Generator Systems, Lithium-ion Battery, Thermal Runaway, TIA-942, Uptime Institute Tier">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#1e3a5f">
     <link rel="canonical" href="https://resistancezero.com/article-13.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-13.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-13.html">
@@ -1312,7 +1319,7 @@
                 </h2>
 
                 <p>
-                    The data center industry is undergoing a fundamental transformation in power distribution architecture, driven by the unprecedented power demands of AI workloads. Traditional 12V server power supplies and centralized UPS systems are being replaced by distributed architectures operating at 48V, 380V, and even 800V DC. This paper provides an in-depth analysis of power distribution systems deployed by leading hyperscalers—AWS, Google, Microsoft, xAI, and Anthropic—along with comprehensive failure scenario analysis and design recommendations.
+                    The data center industry is undergoing a fundamental transformation in power distribution architecture, driven by the unprecedented power demands of AI workloads — demands that are reshaping facilities into what our analysis of <a href="article-18.html">the AI factory paradigm</a> describes as purpose-built intelligence manufacturing plants. Traditional 12V server power supplies and centralized UPS systems are being replaced by distributed architectures operating at 48V, 380V, and even 800V DC. This paper provides an in-depth analysis of power distribution systems deployed by leading hyperscalers—AWS, Google, Microsoft, xAI, and Anthropic—along with comprehensive failure scenario analysis and design recommendations.
                 </p>
 
                 <div class="info-box success">
@@ -1494,7 +1501,7 @@
                             </div>
                         </div>
                         <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
-                            New power shelf design enables 130+ kW per rack for GB200 workloads, with 3x more planned.
+                            New power shelf design enables 130+ kW per rack for GB200 workloads, with 3x more planned — densities that demand the kind of <a href="article-9.html">advanced cooling architectures</a> no traditional HVAC system can support.
                         </p>
                     </div>
                 </div>
@@ -2270,7 +2277,7 @@ Where:
                 <h4>2.5.10 Cascading Failure Analysis</h4>
 
                 <p>
-                    Multi-cloud architectures introduce <strong>complex failure propagation paths</strong> that differ fundamentally from single-site deployments. The following analysis examines cascading failure scenarios unique to Anthropic's distributed infrastructure.
+                    Multi-cloud architectures introduce <strong>complex failure propagation paths</strong> that differ fundamentally from single-site deployments, where <a href="article-7.html">infrastructure resilience engineering</a> becomes the critical differentiator between managed recovery and catastrophic loss. The following analysis examines cascading failure scenarios unique to Anthropic's distributed infrastructure.
                 </p>
 
                 <div class="data-table-wrapper">
@@ -5535,5 +5542,65 @@ function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelec
 </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

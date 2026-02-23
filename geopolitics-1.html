@@ -22,6 +22,13 @@
     <meta name="theme-color" content="#059669">
     <link rel="canonical" href="https://resistancezero.com/geopolitics-1.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/geopolitics-1.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/geopolitics-1.html">
@@ -1930,7 +1937,7 @@
 
                 <h3>6.3 Digital Dependency</h3>
 
-                <p>Critical infrastructure — power, water, communications, financial systems — depends on interconnected digital systems vulnerable to cyber attack or physical disruption.</p>
+                <p>Critical infrastructure — power, water, communications, financial systems — depends on interconnected digital systems vulnerable to cyber attack or physical disruption. In Southeast Asia, the <a href="article-16.html">rapid data center expansion</a> is simultaneously creating new digital infrastructure and new vulnerabilities.</p>
 
                 <h3>6.4 Reduced Surge Capacity</h3>
 
@@ -1941,7 +1948,7 @@
                 <p>While this analysis has focused on European and East Asian preparedness efforts, the implications for Southeast Asia, including Indonesia, merit consideration:</p>
 
                 <div class="positive-box">
-                    <p><strong>Opportunity for Proactive Planning:</strong> Rather than waiting for crisis to drive policy, Southeast Asian nations can learn from the Nordic and East Asian models to develop appropriate preparedness frameworks tailored to regional risks — whether from natural disasters, regional tensions, or infrastructure vulnerabilities.</p>
+                    <p><strong>Opportunity for Proactive Planning:</strong> Rather than waiting for crisis to drive policy, Southeast Asian nations can learn from the Nordic and East Asian models to develop appropriate preparedness frameworks tailored to regional risks — whether from natural disasters, regional tensions, or infrastructure vulnerabilities. The <a href="article-17.html">$37 billion data center investment wave</a> sweeping the region makes infrastructure resilience planning more urgent than ever.</p>
                 </div>
 
                 <p>Key considerations for the region:</p>
@@ -1960,6 +1967,8 @@
                     "If you are prepared, you will be able to help not only yourself but also your neighbors and community. Preparedness is not about panic — it is about responsibility."
                     <br><span style="font-size: 0.9rem; color: #64748b;">— Swedish Civil Contingencies Agency (MSB)</span>
                 </blockquote>
+
+                <p>This community-first mindset is already manifesting in the data center industry, where <a href="article-14.html">organized community opposition</a> has blocked $64 billion in projects globally — demonstrating that local resilience and collective action remain powerful forces even in the age of digital infrastructure.</p>
 
                 <p>The key takeaways:</p>
                 <ol>
@@ -2900,5 +2909,65 @@
     function shareWhatsApp(){const d=getShareData();window.open(`https://wa.me/?text=${encodeURIComponent(d.title+'\n\n'+d.url)}`,'_blank')}
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

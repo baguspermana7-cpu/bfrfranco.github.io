@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>AI Data Centers vs Citizen Bills | Southeast Asia | ResistanceZero</title>
-    <meta name="description" content="Comprehensive analysis of AI data center electricity consumption impact on citizen bills in Southeast Asia. Interactive calculator, country comparison, subsidy analysis. Why are citizens asked to save electricity while AI consumes megawatts?">
+    <meta name="description" content="One AI data center equals 100,000 households in power demand. Interactive impact calculator for Southeast Asian electricity bill analysis.">
     <meta name="keywords" content="AI Data Center, Electricity Consumption, Southeast Asia, Indonesia PLN, Malaysia TNB, Singapore, Electricity Subsidy, Power Grid, NVIDIA GPU, Citizen Bills, Energy Crisis">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#dc2626">
     <link rel="canonical" href="https://resistancezero.com/article-11.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-11.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-11.html">
@@ -101,6 +108,40 @@
                 "@type": "ListItem",
                 "position": 3,
                 "name": "AI Data Centers vs Citizen Electricity Bills"
+            }
+        ]
+    }
+    </script>
+
+    <!-- Structured Data - FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How much electricity does an AI data center use?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A single 100MW AI data center consumes approximately 876 GWh annually — equivalent to the electricity demand of 100,000 average Southeast Asian households."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do data centers raise household electricity bills?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Large-scale data center deployment can increase electricity demand by 5-15% in host regions. Whether this raises household bills depends on grid capacity, energy policy, subsidy structures, and how infrastructure investment costs are distributed."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do you calculate data center impact on regional electricity?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "By comparing facility power demand against regional grid capacity, modeling demand growth scenarios, and analyzing electricity pricing mechanisms to determine cost pass-through to existing consumers."
+                }
             }
         ]
     }
@@ -1265,7 +1306,7 @@
                     </div>
                 </div>
 
-                <p>A single AI training rack with 8 NVIDIA B200 GPUs can consume <strong>80-100 kW</strong> — equivalent to powering <strong>80-100 typical Indonesian homes simultaneously</strong>.</p>
+                <p>A single AI training rack with 8 NVIDIA B200 GPUs can consume <strong>80-100 kW</strong> — equivalent to powering <strong>80-100 typical Indonesian homes simultaneously</strong>. The counter-argument, explored in <a href="article-12.html">our analysis of how data centers fund grid modernization</a>, is that this demand also drives renewable investment.</p>
 
                 <h3>1.2 The ChatGPT Comparison</h3>
 
@@ -1342,7 +1383,7 @@
 
                 <h2 id="section-4">4. The Uncomfortable Truth: Who Really Pays?</h2>
 
-                <p>This is where the controversy gets real. When data centers consume massive amounts of electricity, the costs don't stay isolated — they ripple through the entire grid system.</p>
+                <p>This is where the controversy gets real. When data centers consume massive amounts of electricity, the costs don't stay isolated — they ripple through the entire grid system. And electricity is only part of the resource equation: the <a href="article-10.html">water stress crisis facing AI data centers</a> adds another layer of environmental and social impact.</p>
 
                 <h3>3.1 The US Warning: A Preview for Southeast Asia</h3>
 
@@ -2008,7 +2049,7 @@
                 <ul>
                     <li>AI data centers consume electricity at unprecedented scales</li>
                     <li>Infrastructure costs are being passed to residential consumers</li>
-                    <li>SEA countries are at the beginning of a massive DC buildout</li>
+                    <li>SEA countries are at the beginning of a massive DC buildout — one where <a href="article-16.html">the risk of a Southeast Asian data center bubble</a> compounds the pressure on consumers</li>
                     <li>Without intervention, the US pattern will repeat in Southeast Asia</li>
                 </ul>
 
@@ -3519,5 +3560,65 @@ function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelec
 </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

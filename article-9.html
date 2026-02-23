@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>The HVAC Shock | Chiller-Free Cooling | ResistanceZero</title>
-    <meta name="description" content="Deep technical analysis of chiller-free cooling for data centers. Nvidia's warm-water DLC announcement, tropical climate implementation, fault scenarios, and comprehensive pros/cons analysis.">
+    <meta name="description" content="Nvidia Rubin's direct-to-chip cooling doesn't eliminate HVAC. Tropical climate analysis, hybrid cooling, and fault scenario implementation guide.">
     <meta name="keywords" content="Data Center Cooling, Chiller-Free, Direct Liquid Cooling, DLC, Warm Water Cooling, Tropical Data Center, Nvidia Rubin, CDU, Dry Cooler, PUE Optimization, HVAC">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0066cc">
     <link rel="canonical" href="https://resistancezero.com/article-9.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-9.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-9.html">
@@ -2050,7 +2057,7 @@
 
                 <h2 id="section-2">2. What Nvidia Actually Announced</h2>
 
-                <p>Rubin is not a single chip but a rack-scale platform co-designed across compute, networking, power, and cooling. It combines GPUs, CPUs, and networking into one rack with sixth-generation NVLink interconnects and an MGX architecture for serviceability.</p>
+                <p>Rubin is not a single chip but a rack-scale platform co-designed across compute, networking, power, and cooling. It combines GPUs, CPUs, and networking into one rack with sixth-generation NVLink interconnects and an MGX architecture for serviceability &mdash; part of the broader shift toward <a href="article-18.html">AI factory infrastructure and GPU-dense computing</a> that is reshaping facility design.</p>
 
                 <div class="key-insight">
                     <h4>The Interesting Bit for Facility Operators</h4>
@@ -2723,7 +2730,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
                         <ul>
                             <li><strong>Immediate OPEX reduction:</strong> 30-60% cooling energy savings</li>
                             <li><strong>Carbon credits:</strong> ESG compliance and reporting benefits</li>
-                            <li><strong>Water conservation:</strong> 30-40% reduction with dry coolers</li>
+                            <li><strong>Water conservation:</strong> 30-40% reduction with dry coolers &mdash; critical given the growing <a href="article-10.html">water stress challenges facing data centers</a></li>
                             <li><strong>Simplified maintenance:</strong> Fewer mechanical components</li>
                             <li><strong>No refrigerant compliance:</strong> Avoid HFC phase-out regulations</li>
                         </ul>
@@ -2751,7 +2758,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             PROS
                         </h4>
                         <ul>
-                            <li><strong>Future-proof architecture:</strong> Ready for 100+ kW/rack AI densities</li>
+                            <li><strong>Future-proof architecture:</strong> Ready for 100+ kW/rack AI densities, complementing modern <a href="article-13.html">hyperscaler power distribution architectures</a></li>
                             <li><strong>Regulatory compliance:</strong> Ahead of environmental regulations</li>
                             <li><strong>Heat reuse potential:</strong> District heating revenue ($20-50/MWh)</li>
                             <li><strong>Market differentiation:</strong> Green credentials for premium pricing</li>
@@ -4982,5 +4989,65 @@ Where LMTD (Log Mean Temperature Difference) requires:
     </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>When Nothing Happens, Engineering Is Working | Operations Journal #1</title>
-    <meta name="description" content="In critical infrastructure, success is defined by the absence of events. A comprehensive exploration of proactive engineering, Safety-II theory, operational maturity, and the invisible work that prevents data center incidents. 9,000-word flagship article with interactive maturity calculator.">
+    <meta name="description" content="Proactive engineering and Safety-II theory applied to data center operations. Interactive maturity calculator. 9,000-word flagship journal entry.">
     <meta name="keywords" content="Data Center Operations, Proactive Engineering, Safety-II, Hollnagel, Operational Maturity, Resilience Engineering, Incident Prevention, MTBF, MTTR, PUE, Critical Infrastructure, Condition Monitoring, Predictive Maintenance, CMMS, DCIM, BMS, Operations Journal">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#1e3a5f">
     <link rel="canonical" href="https://resistancezero.com/article-1.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-1.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-1.html">
@@ -1707,7 +1714,7 @@
                 </p>
 
                 <p>
-                    This is the paradox at the heart of critical infrastructure engineering: <strong>the better the work, the less visible it becomes</strong>. When an operations team does its job perfectly, the outcome is indistinguishable from a facility that requires no management at all. The signals of excellence are, by definition, the absence of signals. No incidents to report. No near-misses to investigate. No emergency maintenance windows to justify. Just continuous, silent, reliable operation.
+                    This is the paradox at the heart of critical infrastructure engineering: <strong>the better the work, the less visible it becomes</strong>. When an operations team does its job perfectly, the outcome is indistinguishable from a facility that requires no management at all. The signals of excellence are, by definition, the absence of signals. No incidents to report. No near-misses to investigate. No emergency maintenance windows to justify. Just continuous, silent, reliable operation — a condition that depends on recognizing <a href="article-8.html">weak signals and safety indicators</a> before they escalate.
                 </p>
 
                 <blockquote>
@@ -1824,7 +1831,7 @@
                 <h3>2.2 Safety-II: The Proactive Paradigm</h3>
 
                 <p>
-                    <span class="tooltip" data-tip="Safety-II: Modern paradigm focused on understanding why things go right most of the time">Safety-II</span> inverts the perspective. Rather than defining safety as the absence of adverse outcomes, Safety-II defines it as <strong>the presence of adaptive capacity</strong>. The operating assumption is that systems are inherently variable, and successful outcomes occur not because everything follows plan, but because people continuously adjust their performance to match conditions <a href="#ref-1" class="cite">[1]</a>.
+                    <span class="tooltip" data-tip="Safety-II: Modern paradigm focused on understanding why things go right most of the time">Safety-II</span> inverts the perspective. Rather than defining safety as the absence of adverse outcomes, Safety-II defines it as <strong>the presence of adaptive capacity</strong> — a concept we explore further in our analysis of <a href="article-7.html">resilience beyond traditional tier ratings</a>. The operating assumption is that systems are inherently variable, and successful outcomes occur not because everything follows plan, but because people continuously adjust their performance to match conditions <a href="#ref-1" class="cite">[1]</a>.
                 </p>
 
                 <p>
@@ -2260,7 +2267,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Deferred Maintenance</strong></td>
-                                <td>Reactive events consume resources meant for preventive work</td>
+                                <td>Reactive events consume resources meant for preventive work, accelerating <a href="article-5.html" style="color: inherit; text-decoration: underline;">technical debt accumulation</a></td>
                                 <td>Compounding reliability decline</td>
                             </tr>
                             <tr>
@@ -4857,5 +4864,65 @@ function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelec
     }
 })();
 </script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

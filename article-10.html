@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>Water Stress and AI Data Centers | Southeast Asia | ResistanceZero</title>
-    <meta name="description" content="Comprehensive analysis of water stress in Southeast Asian data centers. Covers Jakarta/Bekasi crisis, emerging low-stress opportunities (Johor Bahru, Hanoi, Da Nang), regional comparison, and mitigation strategies. Interactive calculator included.">
+    <meta name="description" content="58% of data centers in water-stressed regions. Interactive water stress calculator, WUE benchmarks, and sustainable cooling strategies for SEA.">
     <meta name="keywords" content="Water Stress, Data Center Water Consumption, AI Cooling, Southeast Asia Data Centers, Indonesia, Jakarta, Bekasi, Johor Bahru, Hanoi, Da Nang, Vietnam, Malaysia, WRI Aqueduct, Liquid Cooling, Sustainability, Emerging Markets">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0066cc">
     <link rel="canonical" href="https://resistancezero.com/article-10.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-10.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-10.html">
@@ -1544,14 +1551,14 @@
 
                 <h2 id="section-3">3. AI's Insatiable Thirst: The Cooling Challenge</h2>
 
-                <p>The rise of AI workloads has fundamentally changed data center cooling requirements. Traditional air-cooled facilities operated at rack densities of 8-12 kW. Modern AI facilities require 25-40 kW per rack—and often much more for GPU-dense configurations.</p>
+                <p>The rise of AI workloads has fundamentally changed data center cooling requirements, as explored in depth in <a href="article-9.html">our HVAC shock analysis of AI-era cooling demands</a>. Traditional air-cooled facilities operated at rack densities of 8-12 kW. Modern AI facilities require 25-40 kW per rack—and often much more for GPU-dense configurations.</p>
 
                 <h3>2.1 Why AI Uses More Water</h3>
                 <ul>
                     <li><strong>Higher heat density:</strong> A single NVIDIA H100 GPU generates 700W of heat.<a href="#ref9" class="cite">[9]</a> A rack of 8 GPUs produces 5.6 kW from GPUs alone</li>
                     <li><strong>Continuous operation:</strong> AI training workloads run 24/7 at maximum utilization, unlike burst compute patterns</li>
                     <li><strong>Liquid cooling adoption:</strong> Above 25 kW per rack, liquid or hybrid cooling becomes essential—and evaporative cooling systems consume significant water</li>
-                    <li><strong>Scale effects:</strong> A 100MW AI data center can consume 1-2 billion liters of water annually</li>
+                    <li><strong>Scale effects:</strong> A 100MW AI data center can consume 1-2 billion liters of water annually — and the <a href="article-11.html">electricity bills to power that consumption</a> add another dimension to the resource challenge</li>
                 </ul>
 
                 <h3>2.2 Water Usage Effectiveness (WUE)</h3>
@@ -2166,7 +2173,7 @@
 
                 <div class="result-box">
                     <h4>Strategic Insight</h4>
-                    <p>A diversified SEA data center portfolio balancing high-demand markets (Jakarta, Singapore) with emerging low-stress locations (Johor Bahru, Hanoi, Da Nang) can achieve both performance requirements and sustainability goals. The optimal strategy considers:</p>
+                    <p>A diversified SEA data center portfolio balancing high-demand markets (Jakarta, Singapore) with emerging low-stress locations (Johor Bahru, Hanoi, Da Nang) can achieve both performance requirements and sustainability goals — particularly when considering the <a href="article-12.html">grid modernization value that data centers bring to host regions</a>. The optimal strategy considers:</p>
                     <p><strong>1. Latency tiers:</strong> Primary workloads in established hubs, disaster recovery in emerging markets</p>
                     <p><strong>2. Water portfolio:</strong> Balance water-intensive cooling in low-stress regions, advanced cooling tech in stressed areas</p>
                     <p><strong>3. Risk distribution:</strong> Regulatory, climate, and infrastructure diversification across ASEAN</p>
@@ -3821,5 +3828,65 @@
     </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

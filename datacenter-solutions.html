@@ -15,13 +15,20 @@
 
     <!-- SEO Meta Tags -->
     <title>Data Center Engineering & Telemetry Solutions | Bagus Dwi Permana</title>
-    <meta name="description" content="Comprehensive data center solutions: Conventional DC, AI/HPC Datahall, Cost Simulator, and Technical Research. Expert in electrical safety (Ahli K3 Listrik) and critical infrastructure.">
+    <meta name="description" content="Enterprise data center solutions: DCIM, BMS integration, predictive maintenance, and operational optimization services by Bagus Dwi Permana.">
     <meta name="keywords" content="Data Center, Telemetry, DCIM, BMS, Cost Calculator, AI Datacenter, Liquid Cooling, PUE, Ahli K3 Listrik, Critical Infrastructure">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#1e3a5f">
     <link rel="canonical" href="https://resistancezero.com/datacenter-solutions.html">
 
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/datacenter-solutions.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
@@ -1983,16 +1990,15 @@
                     <p class="tool-desc">Calculate Power Usage Effectiveness based on cooling type, climate zone, and IT load distribution.</p>
                 </a>
 
-                <div class="tool-card coming-soon-card">
-                    <span class="coming-soon-badge">Coming Soon</span>
+                <a href="tier-advisor.html" class="tool-card" style="text-decoration:none;color:inherit;">
                     <div class="tool-header">
                         <div class="tool-icon" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">
                             <i class="fas fa-layer-group"></i>
                         </div>
                         <span class="tool-title">Tier Advisor</span>
                     </div>
-                    <p class="tool-desc">Determine Uptime Institute Tier classification based on your redundancy and infrastructure configuration.</p>
-                </div>
+                    <p class="tool-desc">Map your infrastructure to Uptime Institute Tier I-IV, TIA-942, and EN 50600 with regional compliance overlays for 12+ jurisdictions.</p>
+                </a>
 
                 <a href="tia-942-checklist.html" class="tool-card" style="text-decoration:none;color:inherit;">
                     <div class="tool-header">
@@ -2192,5 +2198,65 @@
     </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+    // Cookie Banner
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        cb.classList.add('hidden');
+        // Disable GA
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+
+    // Scroll to Top
+    var sBtn = document.getElementById('scrollTopBtn');
+    if (sBtn) {
+        var ticking = false;
+        window.addEventListener('scroll', function(){
+            if (!ticking) {
+                window.requestAnimationFrame(function(){
+                    if (window.scrollY > 500) {
+                        sBtn.classList.add('visible');
+                    } else {
+                        sBtn.classList.remove('visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        sBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
 </body>
 </html>

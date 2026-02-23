@@ -3904,6 +3904,12 @@ section {
     visibility: visible;
 }
 
+/* Fix tooltip contrast in dark mode — var(--gray-800) flips to light color */
+[data-theme="dark"] .share-btn::after {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
 /* Mobile: Bottom bar */
 @media (max-width: 1024px) {
     .share-buttons {
@@ -4578,6 +4584,13 @@ section {
 [data-theme="dark"] .article-body [class*="evidence-block"] [class*="-card"] {
     background: rgba(255,255,255,0.04);
     border-color: rgba(255,255,255,0.08);
+}
+/* Fix evidence-card child elements getting unwanted background from [class*="card-"] wildcard */
+[data-theme="dark"] .article-body .evidence-card .evidence-card-value,
+[data-theme="dark"] .article-body .evidence-card .evidence-card-label,
+[data-theme="dark"] .article-body .evidence-card .evidence-card-sub {
+    background: transparent;
+    border-color: transparent;
 }
 /* Preserve pro-panel/login/CTA blocks (already dark-themed) */
 [data-theme="dark"] .article-body [class*="pro-panel"] [class*="-card"],
@@ -5945,3 +5958,107 @@ section {
     .series-title { display: none; }
     .series-links { align-self: flex-end; }
 }
+
+/* ===== Cookie Consent Banner ===== */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 -2px 16px rgba(0,0,0,0.06);
+    font-size: 0.85rem;
+    color: #374151;
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.cookie-banner.hidden {
+    transform: translateY(100%);
+    pointer-events: none;
+}
+.cookie-banner p { margin: 0; line-height: 1.5; }
+.cookie-banner a { color: var(--primary-blue, #2563eb); text-decoration: underline; }
+.cookie-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+.cookie-accept {
+    padding: 0.45rem 1.2rem;
+    background: var(--primary-blue, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.cookie-accept:hover { background: #1d4ed8; }
+.cookie-decline {
+    padding: 0.45rem 1.2rem;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.cookie-decline:hover { background: #f3f4f6; color: #374151; }
+[data-theme="dark"] .cookie-banner {
+    background: rgba(30,41,59,0.92);
+    border-top-color: rgba(255,255,255,0.06);
+    color: #cbd5e1;
+}
+[data-theme="dark"] .cookie-decline { border-color: #475569; color: #94a3b8; }
+[data-theme="dark"] .cookie-decline:hover { background: #334155; color: #e2e8f0; }
+@media (max-width: 768px) {
+    .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+}
+@media print { .cookie-banner { display: none; } }
+
+/* ===== Scroll to Top Button ===== */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary-blue, #2563eb);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background 0.2s;
+}
+.scroll-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.scroll-top-btn:hover { background: #1d4ed8; box-shadow: 0 4px 16px rgba(37,99,235,0.45); }
+[data-theme="dark"] .scroll-top-btn { background: #3b82f6; box-shadow: 0 2px 12px rgba(59,130,246,0.35); }
+[data-theme="dark"] .scroll-top-btn:hover { background: #60a5fa; }
+@media (max-width: 1024px) {
+    .scroll-top-btn { bottom: 90px; right: 16px; }
+}
+@media print { .scroll-top-btn { display: none; } }
