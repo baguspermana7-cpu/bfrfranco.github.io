@@ -13,6 +13,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#0b1120;color:#e2e8f0;min-height:100vh;display:flex}
@@ -593,6 +598,32 @@
         body.light-mode .ua-event-row:hover{background:rgba(139,92,246,0.04)}
         body.light-mode .ua-event-detail{color:#334155}
         body.light-mode .ua-event-page{color:#64748b}
+
+        /* ═══ GLOBAL MAP ═══ */
+        #dcGlobalMap{background:#0b1120;border-radius:14px}
+        .leaflet-popup-content-wrapper{background:#1e293b!important;color:#e2e8f0!important;border:1px solid #334155!important;border-radius:10px!important;box-shadow:0 8px 24px rgba(0,0,0,0.4)!important}
+        .leaflet-popup-tip{background:#1e293b!important;border:1px solid #334155!important}
+        .leaflet-popup-content{margin:8px 12px!important;font-family:'Inter',sans-serif!important;font-size:0.78rem!important}
+        .leaflet-popup-close-button{color:#64748b!important;font-size:1.2rem!important}
+        .leaflet-popup-close-button:hover{color:#f1f5f9!important}
+        .leaflet-control-zoom a{background:#1e293b!important;color:#94a3b8!important;border-color:#334155!important}
+        .leaflet-control-zoom a:hover{background:#334155!important;color:#f1f5f9!important}
+        .leaflet-control-attribution{background:rgba(17,24,39,0.8)!important;color:#475569!important;font-size:0.55rem!important}
+        .leaflet-control-attribution a{color:#8b5cf6!important}
+        .map-popup-title{font-size:0.82rem;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+        .map-popup-sub{font-size:0.68rem;color:#64748b;margin-bottom:6px}
+        .map-popup-row{display:flex;justify-content:space-between;padding:2px 0;font-size:0.72rem}
+        .map-popup-row .lbl{color:#64748b}.map-popup-row .val{color:#e2e8f0;font-weight:600}
+        .map-popup-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:600}
+        body.light-mode .leaflet-popup-content-wrapper{background:#fff!important;color:#1e293b!important;border-color:#e2e8f0!important}
+        body.light-mode .leaflet-popup-tip{background:#fff!important;border-color:#e2e8f0!important}
+        body.light-mode .leaflet-popup-close-button{color:#94a3b8!important}
+        body.light-mode .leaflet-control-zoom a{background:#fff!important;color:#1e293b!important;border-color:#e2e8f0!important}
+        body.light-mode .leaflet-control-attribution{background:rgba(255,255,255,0.8)!important;color:#94a3b8!important}
+        body.light-mode .map-popup-title{color:#1e293b}
+        body.light-mode .map-popup-row .lbl{color:#94a3b8}
+        body.light-mode .map-popup-row .val{color:#1e293b}
+        body.light-mode #dcGlobalMap{background:#f8fafc}
     </style>
 </head>
 <body>
@@ -906,7 +937,7 @@
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
             <h1>Data Center Industry Intelligence</h1>
-            <p>Comprehensive global DC capacity data — 50+ operators, 28 countries, 35 facilities · Synergy, CBRE, JLL, C&W 2025-2026</p>
+            <p>Comprehensive global DC capacity data — 53 operators, 35 countries, 91 facilities · Synergy, CBRE, JLL, C&W 2025-2026</p>
             <div style="font-size:0.62rem;color:#475569;margin-top:4px"><i class="fas fa-clock" style="margin-right:3px"></i>Last updated: Feb 2026 · Sources: Synergy Q3 2025, CBRE H1 2025, JLL 2026 Outlook</div>
         </div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap">
@@ -924,11 +955,13 @@
     <!-- Sub-tabs -->
     <div class="bench-tabs">
         <button class="bench-tab active" onclick="showBenchTab('overview')"><i class="fas fa-chart-pie" style="margin-right:4px"></i>Overview</button>
-        <button class="bench-tab" onclick="showBenchTab('operators')"><i class="fas fa-building" style="margin-right:4px"></i>Operators (50+)</button>
-        <button class="bench-tab" onclick="showBenchTab('countries')"><i class="fas fa-globe-americas" style="margin-right:4px"></i>Countries (28)</button>
-        <button class="bench-tab" onclick="showBenchTab('facilities')"><i class="fas fa-server" style="margin-right:4px"></i>Facilities (35)</button>
+        <button class="bench-tab" onclick="showBenchTab('operators')"><i class="fas fa-building" style="margin-right:4px"></i>Operators (53)</button>
+        <button class="bench-tab" onclick="showBenchTab('countries')"><i class="fas fa-globe-americas" style="margin-right:4px"></i>Countries (35)</button>
+        <button class="bench-tab" onclick="showBenchTab('facilities')"><i class="fas fa-server" style="margin-right:4px"></i>Facilities (91)</button>
         <button class="bench-tab" onclick="showBenchTab('market')"><i class="fas fa-chart-line" style="margin-right:4px"></i>Market Intel</button>
         <button class="bench-tab" onclick="showBenchTab('projections')"><i class="fas fa-brain" style="margin-right:4px"></i>Projection Analytics</button>
+        <button class="bench-tab" onclick="showBenchTab('globalmap')"><i class="fas fa-map-marked-alt" style="margin-right:4px"></i>Global Map</button>
+        <button class="bench-tab" onclick="showBenchTab('energymix')"><i class="fas fa-bolt" style="margin-right:4px"></i>Energy Mix</button>
     </div>
 
     <!-- ═══ OVERVIEW TAB ═══ -->
@@ -1030,7 +1063,7 @@
                 <input type="text" class="bench-input" id="benchCountrySearch" placeholder="Search country..." oninput="filterBenchCountries()">
             </div>
             <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px;align-items:center">
-                <span style="font-size:0.65rem;color:#64748b" id="benchCountryCount">28 countries</span>
+                <span style="font-size:0.65rem;color:#64748b" id="benchCountryCount">35 countries</span>
                 <button class="bench-btn bench-btn-ghost" onclick="exportTabCSV('countries')" title="Export countries CSV"><i class="fas fa-download" style="font-size:0.6rem"></i></button>
             </div>
         </div>
@@ -1194,6 +1227,104 @@
             <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-cogs" style="color:#64748b"></i> Projection Methodology</div>
             <div id="projMethodology"></div>
         </div>
+    </div>
+
+    <!-- ═══ GLOBAL MAP TAB ═══ -->
+    <div class="bench-panel" id="bp-globalmap">
+        <div style="margin-bottom:1rem">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fas fa-map-marked-alt" style="color:#34d399;font-size:0.9rem"></i>
+                <span style="font-size:0.85rem;font-weight:700;color:#f1f5f9">Global Data Center Footprint</span>
+            </div>
+            <p style="font-size:0.72rem;color:#64748b;line-height:1.5">Interactive map showing 91 major facilities, 53 operator HQs, and 35 country capacity footprints. Click markers for details. Use filters to isolate layers, types, or regions.</p>
+        </div>
+        <div class="bench-filters" style="margin-bottom:0.75rem">
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Layer:</span>
+                <select class="bench-select" id="mapLayerSelect" onchange="toggleMapLayer()">
+                    <option value="all">All Layers</option>
+                    <option value="facilities">Facilities (91)</option>
+                    <option value="operators">Operator HQs (53)</option>
+                    <option value="countries">Country Capacity (35)</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Type:</span>
+                <select class="bench-select" id="mapTypeFilter" onchange="filterMapMarkers()">
+                    <option value="all">All Types</option>
+                    <option value="Hyperscale">Hyperscale</option>
+                    <option value="Colocation">Colocation</option>
+                    <option value="Wholesale">Wholesale</option>
+                    <option value="Edge">Edge</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Region:</span>
+                <select class="bench-select" id="mapRegionFilter" onchange="filterMapMarkers()">
+                    <option value="all">All Regions</option>
+                    <option value="Americas">Americas</option>
+                    <option value="EMEA">EMEA</option>
+                    <option value="APAC">APAC</option>
+                </select>
+            </div>
+            <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px">
+                <button class="bench-btn bench-btn-ghost" onclick="resetMapView()" title="Reset view"><i class="fas fa-undo" style="font-size:0.6rem"></i> Reset</button>
+                <button class="bench-btn bench-btn-ghost" onclick="toggleMapFullscreen()" title="Fullscreen"><i class="fas fa-expand" style="font-size:0.6rem"></i></button>
+            </div>
+        </div>
+        <div class="bench-grid" id="mapKpis" style="grid-template-columns:repeat(5,1fr);gap:0.6rem;margin-bottom:0.75rem"></div>
+        <div class="card" style="padding:0;margin-bottom:0.75rem;overflow:hidden;border-radius:14px">
+            <div id="dcGlobalMap" style="height:560px;width:100%"></div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-list" style="color:#64748b"></i> Map Legend</div>
+            <div id="mapLegend" style="display:flex;gap:2rem;flex-wrap:wrap;font-size:0.72rem;color:#94a3b8"></div>
+        </div>
+    </div>
+
+    <!-- ═══ ENERGY MIX TAB ═══ -->
+    <div class="bench-panel" id="bp-energymix">
+        <div style="margin-bottom:1rem">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fas fa-bolt" style="color:#eab308;font-size:0.9rem"></i>
+                <span style="font-size:0.85rem;font-weight:700;color:#f1f5f9">Electricity Generation Mix by Country</span>
+            </div>
+            <p style="font-size:0.72rem;color:#64748b;line-height:1.5">2024 electricity generation mix for all 35 DC countries. Shows coal, gas, oil, nuclear, hydro, wind, solar, and other renewables as percentage of total generation. Sources: Ember Climate, Low Carbon Power, IEA, EIA, national agencies.</p>
+        </div>
+        <div class="bench-filters" style="margin-bottom:0.75rem">
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Sort:</span>
+                <select class="bench-select" id="energySortSelect" onchange="sortEnergyMix()">
+                    <option value="fossil-desc">Highest Fossil %</option>
+                    <option value="renewable-desc">Highest Renewable %</option>
+                    <option value="alpha">Alphabetical</option>
+                    <option value="capacity">By DC Capacity</option>
+                </select>
+            </div>
+            <div class="bench-filter-group">
+                <span class="bench-filter-label">Region:</span>
+                <select class="bench-select" id="energyRegionFilter" onchange="renderEnergyMix()">
+                    <option value="all">All Regions</option>
+                    <option value="Americas">Americas</option>
+                    <option value="EMEA">EMEA</option>
+                    <option value="APAC">APAC</option>
+                </select>
+            </div>
+        </div>
+        <div id="energyKpis" class="bench-kpis" style="margin-bottom:0.75rem"></div>
+        <div class="card dc-chart-wrap" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="dc-chart-actions">
+                <button class="dc-chart-btn" onclick="exportChartPNG('energyMix')" title="Download PNG"><i class="fas fa-image"></i></button>
+                <button class="dc-chart-btn" onclick="openChartFullscreen('energyMix')" title="Fullscreen"><i class="fas fa-expand"></i></button>
+            </div>
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-bolt" style="color:#eab308"></i> Electricity Generation Mix — All 29 DC Countries</div>
+            <div style="position:relative;height:680px"><canvas id="chartEnergyMix"></canvas></div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+            <div class="card-title" style="font-size:0.78rem;margin-bottom:0.5rem"><i class="fas fa-lightbulb" style="color:#f59e0b"></i> Notable Insights</div>
+            <div id="energyInsights" style="font-size:0.72rem;color:#94a3b8;line-height:1.7"></div>
+        </div>
+        <div style="font-size:0.65rem;color:#475569;text-align:center;padding:0.5rem 0">Data: 2024 electricity generation mix. Sources: Ember Global Electricity Review 2025, Low Carbon Power, IEA, EIA, national energy agencies.</div>
     </div>
 </div>
 
@@ -1884,6 +2015,13 @@ function toggleAdminTheme(){
     // F2: Re-render DC charts with theme-appropriate colors
     if(typeof renderBenchOverview==='function'){
         try{renderBenchOverview()}catch(e){}
+    }
+    // Swap map tiles on theme change
+    if(typeof dcMap!=='undefined' && dcMap){
+        try{
+            if(isLight){dcMap.removeLayer(mapDarkTiles);mapLightTiles.addTo(dcMap)}
+            else{dcMap.removeLayer(mapLightTiles);mapDarkTiles.addTo(dcMap)}
+        }catch(e){}
     }
 }
 
@@ -2714,10 +2852,13 @@ const DC_OPERATORS=[
   {rank:47,company:'AIMS Data Centre',hq:'Malaysia',type:'Colocation',mw:60,facilities:5,countries:3,keyMarkets:['Kuala Lumpur','Cyberjaya','Bangkok','Ho Chi Minh'],capex:0.1,source:'AIMS',founded:2003,employees:200,pue:1.50,renewablePercent:30},
   {rank:48,company:'CDC Data Centres',hq:'Australia',type:'Colocation / Government',mw:150,facilities:5,countries:1,keyMarkets:['Canberra','Sydney','Melbourne'],capex:0.5,source:'CDC',founded:2007,employees:300,pue:1.35,renewablePercent:80},
   {rank:49,company:'NEXTDC',hq:'Australia',type:'Colocation',mw:420,facilities:14,countries:2,keyMarkets:['Sydney','Melbourne','Perth','Brisbane','Auckland'],capex:1.5,source:'NEXTDC',founded:2010,employees:600,pue:1.30,renewablePercent:85},
-  {rank:50,company:'Telehouse (KDDI)',hq:'Japan',type:'Colocation',mw:200,facilities:20,countries:8,keyMarkets:['Tokyo','London','Paris','Frankfurt','New York','Hong Kong'],capex:0.5,source:'Telehouse',founded:1989,employees:500,pue:1.40,renewablePercent:50}
+  {rank:50,company:'Telehouse (KDDI)',hq:'Japan',type:'Colocation',mw:200,facilities:20,countries:8,keyMarkets:['Tokyo','London','Paris','Frankfurt','New York','Hong Kong'],capex:0.5,source:'Telehouse',founded:1989,employees:500,pue:1.40,renewablePercent:50},
+  {rank:51,company:'xAI',hq:'United States',type:'Hyperscale/AI',mw:422,facilities:1,countries:1,keyMarkets:['Memphis TN'],capex:10,source:'SemiAnalysis 2025',founded:2023,employees:500,pue:1.30,renewablePercent:15},
+  {rank:52,company:'Huawei Cloud',hq:'China',type:'Hyperscale/Cloud',mw:1500,facilities:50,countries:15,keyMarkets:["Gui'an",'Ulanqab','Shanghai','Singapore'],capex:12,source:'Huawei 2025',founded:2017,employees:20000,pue:1.20,renewablePercent:30},
+  {rank:53,company:'CoreWeave',hq:'United States',type:'Hyperscale/AI',mw:500,facilities:15,countries:3,keyMarkets:['New Jersey','Virginia','London','Chicago'],capex:8,source:'CoreWeave IPO 2025',founded:2017,employees:1500,pue:1.25,renewablePercent:50}
 ];
 // Market Cap / Valuation ($B) — public companies use parent market cap, private use estimated valuation (Feb 2026)
-const DC_MCAP={1:2100,2:3200,3:2200,4:1600,5:85,6:280,7:55,8:35,9:450,10:90,11:16,12:480,13:220,14:8,15:3500,16:15,17:10,18:2,19:8,20:12,21:11,22:3.5,23:5,24:2.5,25:28,26:6,27:4,28:3,29:2.5,30:100,31:1.2,32:2,33:4,34:3,35:3.5,36:3,37:1.5,38:0.8,39:3.5,40:1.5,41:2,42:0,43:1,44:0.8,45:11,46:0.3,47:0.2,48:2,49:8,50:75};
+const DC_MCAP={1:2100,2:3200,3:2200,4:1600,5:85,6:280,7:55,8:35,9:450,10:90,11:16,12:480,13:220,14:8,15:3500,16:15,17:10,18:2,19:8,20:12,21:11,22:3.5,23:5,24:2.5,25:28,26:6,27:4,28:3,29:2.5,30:100,31:1.2,32:2,33:4,34:3,35:3.5,36:3,37:1.5,38:0.8,39:3.5,40:1.5,41:2,42:0,43:1,44:0.8,45:11,46:0.3,47:0.2,48:2,49:8,50:75,51:45,52:20,53:35};
 DC_OPERATORS.forEach(o=>{o.marketCap=DC_MCAP[o.rank]||0});
 
 const DC_COUNTRIES=[
@@ -2748,45 +2889,147 @@ const DC_COUNTRIES=[
   {rank:25,country:'Mexico',region:'Americas',mw:170,facilities:173,keyCities:['Queretaro','Mexico City'],growth:14.0,source:'C&W Americas',powerCostPerKWh:0.075,waterStress:3.0,fiberConnectivity:6.5,avgPUE:1.50},
   {rank:26,country:'Thailand',region:'APAC',mw:130,facilities:42,keyCities:['Bangkok','Chonburi'],growth:15.0,source:'C&W APAC',powerCostPerKWh:0.080,waterStress:2.0,fiberConnectivity:6.5,avgPUE:1.50},
   {rank:27,country:'South Africa',region:'EMEA',mw:120,facilities:25,keyCities:['Johannesburg','Cape Town'],growth:16.0,source:'C&W EMEA/MEA',powerCostPerKWh:0.055,waterStress:3.8,fiberConnectivity:5.0,avgPUE:1.55},
-  {rank:28,country:'UAE',region:'EMEA',mw:110,facilities:20,keyCities:['Dubai','Abu Dhabi'],growth:18.0,source:'JLL 2026',powerCostPerKWh:0.065,waterStress:4.5,fiberConnectivity:7.5,avgPUE:1.55}
+  {rank:28,country:'UAE',region:'EMEA',mw:110,facilities:20,keyCities:['Dubai','Abu Dhabi'],growth:18.0,source:'JLL 2026',powerCostPerKWh:0.065,waterStress:4.5,fiberConnectivity:7.5,avgPUE:1.55},
+  {rank:29,country:'Finland',region:'EMEA',mw:120,facilities:1,keyCities:['Hamina'],growth:8.0,source:'Google sustainability',powerCostPerKWh:0.075,waterStress:0.5,fiberConnectivity:8.0,avgPUE:1.20},
+  {rank:30,country:'Taiwan',region:'APAC',mw:350,facilities:30,keyCities:['Changhua','Taipei','Taoyuan'],growth:15.0,source:'CBRE APAC 2025',powerCostPerKWh:0.085,waterStress:2.5,fiberConnectivity:8.5,avgPUE:1.40},
+  {rank:31,country:'Belgium',region:'EMEA',mw:250,facilities:62,keyCities:['Brussels','St Ghislain','Antwerp'],growth:12.0,source:'C&W EMEA',powerCostPerKWh:0.145,waterStress:1.2,fiberConnectivity:8.0,avgPUE:1.35},
+  {rank:32,country:'Norway',region:'EMEA',mw:180,facilities:45,keyCities:['Oslo','Stavanger'],growth:14.0,source:'C&W EMEA',powerCostPerKWh:0.055,waterStress:0.5,fiberConnectivity:8.0,avgPUE:1.18},
+  {rank:33,country:'Denmark',region:'EMEA',mw:200,facilities:35,keyCities:['Copenhagen','Odense','Viborg'],growth:10.0,source:'C&W EMEA',powerCostPerKWh:0.120,waterStress:0.8,fiberConnectivity:8.5,avgPUE:1.25},
+  {rank:34,country:'Saudi Arabia',region:'EMEA',mw:150,facilities:15,keyCities:['Riyadh','Jeddah','NEOM'],growth:22.0,source:'JLL 2026',powerCostPerKWh:0.048,waterStress:4.8,fiberConnectivity:6.5,avgPUE:1.55},
+  {rank:35,country:'Bahrain',region:'EMEA',mw:100,facilities:8,keyCities:['Manama'],growth:18.0,source:'JLL 2026',powerCostPerKWh:0.035,waterStress:5.0,fiberConnectivity:7.0,avgPUE:1.50}
+];
+
+// ═══ ENERGY MIX DATA (2024) — Sources: Ember Climate, Low Carbon Power, IEA, EIA, national agencies ═══
+const ENERGY_MIX=[
+  {country:'United States',coal:15.0,gas:43.0,oil:0.4,nuclear:18.0,hydro:5.5,wind:10.3,solar:6.9,other:0.9},
+  {country:'China',coal:55.0,gas:3.0,oil:0.1,nuclear:5.0,hydro:14.0,wind:10.5,solar:9.0,other:3.4},
+  {country:'United Kingdom',coal:1.6,gas:28.9,oil:0.1,nuclear:13.0,hydro:2.3,wind:26.2,solar:5.1,other:12.2},
+  {country:'Germany',coal:20.0,gas:10.5,oil:0.5,nuclear:0.0,hydro:4.5,wind:28.5,solar:15.0,other:21.0},
+  {country:'Japan',coal:28.0,gas:31.0,oil:2.0,nuclear:9.0,hydro:9.0,wind:1.0,solar:11.0,other:9.0},
+  {country:'Ireland',coal:2.7,gas:38.5,oil:1.3,nuclear:0.0,hydro:2.6,wind:31.8,solar:4.0,other:4.1},
+  {country:'Netherlands',coal:10.0,gas:35.0,oil:1.0,nuclear:3.0,hydro:0.0,wind:23.0,solar:19.0,other:6.0},
+  {country:'Australia',coal:43.0,gas:16.0,oil:1.5,nuclear:0.0,hydro:5.0,wind:14.0,solar:20.0,other:0.5},
+  {country:'Singapore',coal:0.0,gas:92.0,oil:2.0,nuclear:0.0,hydro:0.0,wind:0.0,solar:2.1,other:2.8},
+  {country:'France',coal:0.5,gas:3.1,oil:0.2,nuclear:69.6,hydro:11.2,wind:9.1,solar:5.7,other:1.1},
+  {country:'India',coal:70.0,gas:3.0,oil:0.5,nuclear:3.0,hydro:8.0,wind:5.0,solar:7.0,other:3.5},
+  {country:'Canada',coal:3.8,gas:15.4,oil:0.5,nuclear:13.6,hydro:55.6,wind:7.9,solar:1.7,other:1.5},
+  {country:'Brazil',coal:2.0,gas:6.0,oil:1.5,nuclear:2.0,hydro:54.0,wind:15.0,solar:10.0,other:9.5},
+  {country:'South Korea',coal:27.0,gas:27.0,oil:0.9,nuclear:32.2,hydro:1.4,wind:0.6,solar:6.4,other:2.2},
+  {country:'Hong Kong',coal:27.0,gas:48.0,oil:0.5,nuclear:24.0,hydro:0.0,wind:0.0,solar:0.4,other:0.1},
+  {country:'Italy',coal:2.0,gas:44.0,oil:3.0,nuclear:0.0,hydro:20.0,wind:8.0,solar:13.0,other:9.0},
+  {country:'Malaysia',coal:43.8,gas:32.9,oil:0.5,nuclear:0.0,hydro:18.2,wind:0.0,solar:1.6,other:2.5},
+  {country:'Indonesia',coal:62.0,gas:17.4,oil:1.9,nuclear:0.0,hydro:7.0,wind:0.1,solar:0.2,other:11.2},
+  {country:'Russia',coal:17.7,gas:44.9,oil:0.7,nuclear:18.5,hydro:17.6,wind:0.6,solar:0.4,other:0.1},
+  {country:'Switzerland',coal:0.0,gas:1.5,oil:0.5,nuclear:28.4,hydro:59.6,wind:0.2,solar:7.4,other:2.4},
+  {country:'Sweden',coal:0.3,gas:0.5,oil:0.3,nuclear:26.9,hydro:43.4,wind:24.6,solar:1.4,other:2.6},
+  {country:'Spain',coal:2.1,gas:20.1,oil:0.8,nuclear:20.0,hydro:15.2,wind:21.5,solar:20.3,other:2.1},
+  {country:'Poland',coal:57.0,gas:13.0,oil:0.5,nuclear:0.0,hydro:1.2,wind:14.9,solar:11.0,other:1.5},
+  {country:'Chile',coal:14.0,gas:14.0,oil:1.0,nuclear:0.0,hydro:28.0,wind:13.0,solar:24.0,other:6.8},
+  {country:'Mexico',coal:5.0,gas:60.0,oil:5.0,nuclear:3.4,hydro:6.5,wind:5.8,solar:7.7,other:2.0},
+  {country:'Thailand',coal:14.0,gas:51.0,oil:0.5,nuclear:0.0,hydro:3.0,wind:2.0,solar:3.0,other:6.0},
+  {country:'South Africa',coal:82.0,gas:0.3,oil:0.5,nuclear:3.3,hydro:0.8,wind:4.7,solar:8.5,other:0.1},
+  {country:'UAE',coal:0.0,gas:72.0,oil:0.0,nuclear:19.6,hydro:0.0,wind:0.0,solar:8.3,other:0.0},
+  {country:'Finland',coal:2.0,gas:3.0,oil:0.5,nuclear:38.0,hydro:17.0,wind:24.0,solar:1.5,other:12.0},
+  {country:'Taiwan',coal:32.0,gas:41.0,oil:1.0,nuclear:8.0,hydro:2.0,wind:4.0,solar:8.0,other:4.0},
+  {country:'Belgium',coal:1.5,gas:24.0,oil:0.5,nuclear:41.0,hydro:0.5,wind:16.0,solar:8.5,other:8.0},
+  {country:'Norway',coal:0.1,gas:0.5,oil:0.1,nuclear:0.0,hydro:88.0,wind:10.0,solar:0.1,other:1.2},
+  {country:'Denmark',coal:3.0,gas:4.0,oil:0.5,nuclear:0.0,hydro:0.0,wind:55.0,solar:8.0,other:29.5},
+  {country:'Saudi Arabia',coal:0.0,gas:60.0,oil:38.0,nuclear:0.0,hydro:0.0,wind:0.5,solar:1.0,other:0.5},
+  {country:'Bahrain',coal:0.0,gas:99.0,oil:0.5,nuclear:0.0,hydro:0.0,wind:0.0,solar:0.5,other:0.0}
 ];
 
 const DC_FACILITIES=[
-  {rank:1,name:'Meta Altoona Campus',company:'Meta',city:'Altoona',country:'United States',mw:1401,type:'Hyperscale',year:2014,notes:'Multiple buildings; Iowa',lat:41.65,lon:-95.88,sqft:2400000},
+  {rank:1,name:'Meta Altoona Campus',company:'Meta',city:'Altoona',country:'United States',mw:1401,type:'Hyperscale',year:2014,notes:'Multiple buildings; Iowa',lat:41.65,lon:-93.46,sqft:2400000},
   {rank:2,name:'Vantage Shackelford County',company:'Vantage',city:'Shackelford',country:'United States',mw:1400,type:'Hyperscale',year:2026,notes:'$25B+ investment; Texas',lat:32.73,lon:-99.36,sqft:3000000},
   {rank:3,name:'Meta Prineville Campus',company:'Meta',city:'Prineville',country:'United States',mw:1289,type:'Hyperscale',year:2011,notes:'3.2M sqft; Oregon',lat:44.30,lon:-120.73,sqft:3200000},
   {rank:4,name:'Stargate Campus Phase 1',company:'Oracle/OpenAI',city:'Abilene',country:'United States',mw:1200,type:'Hyperscale/AI',year:2025,notes:'450K+ NVIDIA GB200 GPUs; Texas',lat:32.45,lon:-99.73,sqft:2500000},
-  {rank:5,name:'Meta Hyperion Campus',company:'Meta',city:'Richland Parish',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$27B; scaling to 5GW; Louisiana',lat:32.41,lon:-91.73,sqft:2000000},
-  {rank:6,name:'Meta Prometheus Campus',company:'Meta',city:'Columbus',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'1GW target; Ohio',lat:39.96,lon:-82.99,sqft:2000000},
-  {rank:7,name:'Vantage Port Washington',company:'Vantage/OpenAI',city:'Port Washington',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$15B; Stargate II; Wisconsin',lat:43.39,lon:-87.88,sqft:1800000},
-  {rank:8,name:'Switch Citadel Campus',company:'Switch',city:'Reno',country:'United States',mw:650,type:'Hyperscale',year:2017,notes:'Largest operational DC; 7.2M sqft; Nevada',lat:39.53,lon:-119.81,sqft:7200000},
-  {rank:9,name:'Microsoft Quincy Campus',company:'Microsoft',city:'Quincy',country:'United States',mw:622,type:'Hyperscale',year:2007,notes:'270 acres; hydropower; Washington',lat:47.23,lon:-119.85,sqft:1500000},
-  {rank:10,name:'CWL1 Data Centre',company:'Vantage',city:'Newport',country:'United Kingdom',mw:400,type:'Hyperscale',year:2024,notes:'1.85M sqft; Wales',lat:51.59,lon:-2.99,sqft:1850000},
-  {rank:11,name:'Compass Red Oak',company:'Compass',city:'Red Oak (DFW)',country:'United States',mw:360,type:'Hyperscale',year:2023,notes:'Multi-phase; Texas',lat:32.52,lon:-96.80,sqft:1200000},
-  {rank:12,name:'Yondr N. Virginia',company:'Yondr',city:'N. Virginia',country:'United States',mw:336,type:'Hyperscale',year:2024,notes:'96MW Phase 1; 336MW full',lat:39.04,lon:-77.49,sqft:900000},
-  {rank:13,name:'AirTrunk MEL1',company:'AirTrunk',city:'Melbourne',country:'Australia',mw:280,type:'Hyperscale',year:2020,notes:'630MW total Melbourne portfolio',lat:-37.81,lon:144.96,sqft:800000},
-  {rank:14,name:'Switch SuperNAP',company:'Switch',city:'Las Vegas',country:'United States',mw:280,type:'Hyperscale/Colo',year:2010,notes:'3.5M sqft; Tier IV Gold; Nevada',lat:36.17,lon:-115.14,sqft:3500000},
-  {rank:15,name:'QTS Atlanta Metro',company:'QTS',city:'Atlanta',country:'United States',mw:278,type:'Hyperscale',year:2011,notes:'990K sqft; flagship; Georgia',lat:33.75,lon:-84.39,sqft:990000},
-  {rank:16,name:'QTS Excalibur Project',company:'QTS',city:'Fayetteville',country:'United States',mw:250,type:'Hyperscale',year:2023,notes:'615 acres; 7M sqft; Georgia',lat:33.45,lon:-84.46,sqft:7000000},
-  {rank:17,name:'Yotta NM1',company:'Yotta',city:'Navi Mumbai',country:'India',mw:250,type:'Hyperscale/Colo',year:2019,notes:'30,000 racks; 820K sqft',lat:19.04,lon:73.03,sqft:820000},
-  {rank:18,name:'AirTrunk SYD1',company:'AirTrunk',city:'Sydney',country:'Australia',mw:220,type:'Hyperscale',year:2018,notes:'First AirTrunk; APAC hub',lat:-33.87,lon:151.21,sqft:600000},
-  {rank:19,name:'Microsoft Dublin Campus',company:'Microsoft',city:'Dublin',country:'Ireland',mw:200,type:'Hyperscale',year:2009,notes:'Azure Europe West anchor',lat:53.35,lon:-6.26,sqft:500000},
-  {rank:20,name:'China Telecom Inner Mongolia',company:'China Telecom',city:'Hohhot',country:'China',mw:150,type:'Hyperscale/Cloud',year:2013,notes:'10.76M sqft; largest by area',lat:40.84,lon:111.75,sqft:10760000},
-  {rank:21,name:'Apple Mesa Data Center',company:'Apple',city:'Mesa',country:'United States',mw:150,type:'Hyperscale',year:2018,notes:'1.3M sqft; 50MW solar; Arizona',lat:33.42,lon:-111.83,sqft:1300000},
-  {rank:22,name:'China Mobile Hohhot',company:'China Mobile',city:'Hohhot',country:'China',mw:140,type:'Hyperscale/Cloud',year:2014,notes:'7.75M sqft',lat:40.82,lon:111.73,sqft:7750000},
-  {rank:23,name:'NTT Tokyo 1',company:'NTT',city:'Tokyo',country:'Japan',mw:120,type:'Colocation',year:2019,notes:'Flagship APAC facility',lat:35.68,lon:139.69,sqft:450000},
-  {rank:24,name:'Google Hamina',company:'Google',city:'Hamina',country:'Finland',mw:120,type:'Hyperscale',year:2011,notes:'Former paper mill; seawater cooling',lat:60.57,lon:27.20,sqft:350000},
-  {rank:25,name:'Meta Lulea',company:'Meta',city:'Lulea',country:'Sweden',mw:120,type:'Hyperscale',year:2013,notes:'Arctic climate; 100% hydro',lat:65.58,lon:22.15,sqft:500000},
-  {rank:26,name:'Equinix SV5/SV11',company:'Equinix',city:'San Jose',country:'United States',mw:110,type:'Colocation',year:2012,notes:'Silicon Valley flagship',lat:37.34,lon:-121.89,sqft:400000},
-  {rank:27,name:'Lakeside Tech Center',company:'Digital Realty',city:'Chicago',country:'United States',mw:100,type:'Colocation',year:1999,notes:'1.1M sqft; 8-story; iconic',lat:41.88,lon:-87.63,sqft:1100000},
-  {rank:28,name:'Tulip Data Center',company:'Tulip Telecom',city:'Bengaluru',country:'India',mw:100,type:'Colocation',year:2015,notes:'950K sqft; one of Asia largest',lat:12.97,lon:77.59,sqft:950000},
-  {rank:29,name:'Sabey Intergate Seattle',company:'Sabey',city:'Seattle',country:'United States',mw:70,type:'Colocation',year:2011,notes:'900K sqft; green design',lat:47.61,lon:-122.33,sqft:900000},
-  {rank:30,name:'Utah Data Center (IC)',company:'US Gov',city:'Bluffdale',country:'United States',mw:65,type:'Government',year:2014,notes:'1.5M sqft campus; Utah',lat:40.49,lon:-111.93,sqft:1500000},
-  {rank:31,name:'CoreSite VA3',company:'CoreSite',city:'Reston',country:'United States',mw:60,type:'Colocation',year:2017,notes:'940K sqft; N. Virginia hub',lat:38.96,lon:-77.36,sqft:940000},
-  {rank:32,name:'Equinix AM5/AM17',company:'Equinix',city:'Amsterdam',country:'Netherlands',mw:55,type:'Colocation',year:2017,notes:'AMS-IX peering point',lat:52.37,lon:4.90,sqft:350000},
-  {rank:33,name:'Keppel Singapore T27',company:'Keppel',city:'Singapore',country:'Singapore',mw:52,type:'Colocation',year:2021,notes:'Tropical cooling innovation',lat:1.35,lon:103.82,sqft:300000},
-  {rank:34,name:'Equinix FR5/FR9',company:'Equinix',city:'Frankfurt',country:'Germany',mw:48,type:'Colocation',year:2015,notes:'DE-CIX adjacent; finserv hub',lat:50.11,lon:8.68,sqft:280000},
-  {rank:35,name:'Iron Mountain NJE-1',company:'Iron Mountain',city:'Edison',country:'United States',mw:26,type:'Colocation',year:2016,notes:'830K sqft; former vault; NJ',lat:40.52,lon:-74.41,sqft:830000}
+  {rank:5,name:'AWS N. Virginia Cluster',company:'AWS',city:'Ashburn',country:'United States',mw:1060,type:'Hyperscale',year:2006,notes:'us-east-1; largest cloud region',lat:39.04,lon:-77.49,sqft:2000000},
+  {rank:6,name:'Meta Hyperion Campus',company:'Meta',city:'Richland Parish',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$27B; scaling to 5GW; Louisiana',lat:32.41,lon:-91.73,sqft:2000000},
+  {rank:7,name:'Meta Prometheus Campus',company:'Meta',city:'Columbus',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'1GW target; Ohio',lat:39.96,lon:-82.99,sqft:2000000},
+  {rank:8,name:'Vantage Port Washington',company:'Vantage/OpenAI',city:'Port Washington',country:'United States',mw:1000,type:'Hyperscale/AI',year:2026,notes:'$15B; Stargate II; Wisconsin',lat:43.39,lon:-87.88,sqft:1800000},
+  {rank:9,name:'Meta Fort Worth Campus',company:'Meta',city:'Fort Worth',country:'United States',mw:800,type:'Hyperscale',year:2016,notes:'2.4M sqft; 7 buildings; Texas',lat:32.75,lon:-97.33,sqft:2400000},
+  {rank:10,name:'Switch Citadel Campus',company:'Switch',city:'Reno',country:'United States',mw:650,type:'Hyperscale',year:2017,notes:'Largest operational DC; 7.2M sqft; Nevada',lat:39.53,lon:-119.81,sqft:7200000},
+  {rank:11,name:'Microsoft Quincy Campus',company:'Microsoft',city:'Quincy',country:'United States',mw:622,type:'Hyperscale',year:2007,notes:'270 acres; hydropower; Washington',lat:47.23,lon:-119.85,sqft:1500000},
+  {rank:12,name:'AWS Oregon Cluster',company:'AWS',city:'Boardman',country:'United States',mw:600,type:'Hyperscale',year:2011,notes:'us-west-2; 20+ DCs; Oregon',lat:45.84,lon:-119.70,sqft:1500000},
+  {rank:13,name:'Google Council Bluffs Campus',company:'Google',city:'Council Bluffs',country:'United States',mw:500,type:'Hyperscale',year:2009,notes:'2 campuses; $7B+ expansion; Iowa',lat:41.26,lon:-95.86,sqft:1200000},
+  {rank:14,name:'Meta DeKalb Campus',company:'Meta',city:'DeKalb',country:'United States',mw:500,type:'Hyperscale',year:2022,notes:'2.4M sqft; 100% renewable; Illinois',lat:41.93,lon:-88.75,sqft:2400000},
+  {rank:15,name:'xAI Colossus Supercomputer',company:'xAI',city:'Memphis',country:'United States',mw:422,type:'Hyperscale/AI',year:2024,notes:'150K H100 + 50K H200 + 30K GB200; scaling to 2GW; Tennessee',lat:35.15,lon:-90.05,sqft:800000},
+  {rank:16,name:'Google The Dalles Campus',company:'Google',city:'The Dalles',country:'United States',mw:400,type:'Hyperscale',year:2006,notes:'First custom DC; 6+ buildings; hydropower; Oregon',lat:45.60,lon:-121.18,sqft:1000000},
+  {rank:17,name:'CWL1 Data Centre',company:'Vantage',city:'Newport',country:'United Kingdom',mw:400,type:'Hyperscale',year:2024,notes:'1.85M sqft; Wales',lat:51.59,lon:-2.99,sqft:1850000},
+  {rank:18,name:'Microsoft Des Moines Campus',company:'Microsoft',city:'West Des Moines',country:'United States',mw:400,type:'Hyperscale',year:2014,notes:'6 DCs; Ginger East/West; Iowa',lat:41.58,lon:-93.71,sqft:1200000},
+  {rank:19,name:'Compass Red Oak',company:'Compass',city:'Red Oak (DFW)',country:'United States',mw:360,type:'Hyperscale',year:2023,notes:'Multi-phase; Texas',lat:32.52,lon:-96.80,sqft:1200000},
+  {rank:20,name:'AWS Dublin Cluster',company:'AWS',city:'Dublin',country:'Ireland',mw:350,type:'Hyperscale',year:2007,notes:'eu-west-1; major European region',lat:53.42,lon:-6.28,sqft:900000},
+  {rank:21,name:'Microsoft Phoenix Campus',company:'Microsoft',city:'Goodyear',country:'United States',mw:350,type:'Hyperscale',year:2019,notes:'279 acres; 5 buildings; Arizona',lat:33.44,lon:-112.36,sqft:1100000},
+  {rank:22,name:'Yondr N. Virginia',company:'Yondr',city:'N. Virginia',country:'United States',mw:336,type:'Hyperscale',year:2024,notes:'96MW Phase 1; 336MW full',lat:39.06,lon:-77.47,sqft:900000},
+  {rank:23,name:'Meta Gallatin Campus',company:'Meta',city:'Gallatin',country:'United States',mw:300,type:'Hyperscale',year:2020,notes:'970K sqft; Tennessee',lat:36.39,lon:-86.45,sqft:970000},
+  {rank:24,name:'Google Midlothian Campus',company:'Google',city:'Midlothian',country:'United States',mw:300,type:'Hyperscale',year:2019,notes:'375-acre RailPort campus; Texas',lat:32.48,lon:-96.99,sqft:900000},
+  {rank:25,name:'AWS Ohio Campus',company:'AWS',city:'Columbus',country:'United States',mw:300,type:'Hyperscale',year:2016,notes:'us-east-2; New Albany; Ohio',lat:40.08,lon:-82.81,sqft:800000},
+  {rank:26,name:'Microsoft Chicago Campus',company:'Microsoft',city:'Chicago',country:'United States',mw:300,type:'Hyperscale',year:2010,notes:'North Central US; Illinois',lat:41.85,lon:-87.68,sqft:900000},
+  {rank:27,name:'CyrusOne Carrollton Campus',company:'CyrusOne',city:'Carrollton',country:'United States',mw:300,type:'Colocation',year:2004,notes:'1.2M sqft; Dallas flagship; Texas',lat:32.97,lon:-96.89,sqft:1200000},
+  {rank:28,name:'AirTrunk MEL1',company:'AirTrunk',city:'Melbourne',country:'Australia',mw:280,type:'Hyperscale',year:2020,notes:'630MW total Melbourne portfolio',lat:-37.81,lon:144.96,sqft:800000},
+  {rank:29,name:'Switch SuperNAP',company:'Switch',city:'Las Vegas',country:'United States',mw:280,type:'Hyperscale/Colo',year:2010,notes:'3.5M sqft; Tier IV Gold; Nevada',lat:36.17,lon:-115.14,sqft:3500000},
+  {rank:30,name:'QTS Atlanta Metro',company:'QTS',city:'Atlanta',country:'United States',mw:278,type:'Hyperscale',year:2011,notes:'990K sqft; flagship; Georgia',lat:33.75,lon:-84.39,sqft:990000},
+  {rank:31,name:'Alibaba Zhangbei DC',company:'Alibaba',city:'Zhangbei',country:'China',mw:250,type:'Hyperscale',year:2016,notes:'Hebei; AliCloud backbone',lat:41.16,lon:114.72,sqft:800000},
+  {rank:32,name:'QTS Excalibur Project',company:'QTS',city:'Fayetteville',country:'United States',mw:250,type:'Hyperscale',year:2023,notes:'615 acres; 7M sqft; Georgia',lat:33.45,lon:-84.46,sqft:7000000},
+  {rank:33,name:'Yotta NM1',company:'Yotta',city:'Navi Mumbai',country:'India',mw:250,type:'Hyperscale/Colo',year:2019,notes:'30,000 racks; 820K sqft',lat:19.04,lon:73.03,sqft:820000},
+  {rank:34,name:'Equinix DC1-DC15 (Ashburn)',company:'Equinix',city:'Ashburn',country:'United States',mw:250,type:'Colocation',year:2000,notes:'15+ IBX DCs; N. Virginia',lat:39.05,lon:-77.46,sqft:1000000},
+  {rank:35,name:'AWS Frankfurt Cluster',company:'AWS',city:'Frankfurt',country:'Germany',mw:250,type:'Hyperscale',year:2014,notes:'eu-central-1; Germany',lat:50.12,lon:8.63,sqft:700000},
+  {rank:36,name:'Microsoft San Antonio Campus',company:'Microsoft',city:'San Antonio',country:'United States',mw:250,type:'Hyperscale',year:2016,notes:'South Central US; Texas',lat:29.42,lon:-98.49,sqft:800000},
+  {rank:37,name:'Microsoft Boydton Campus',company:'Microsoft',city:'Boydton',country:'United States',mw:250,type:'Hyperscale',year:2010,notes:'US East; Mecklenburg County; Virginia',lat:36.67,lon:-78.39,sqft:900000},
+  {rank:38,name:'AirTrunk SYD1',company:'AirTrunk',city:'Sydney',country:'Australia',mw:220,type:'Hyperscale',year:2018,notes:'First AirTrunk; APAC hub',lat:-33.87,lon:151.21,sqft:600000},
+  {rank:39,name:'Microsoft Dublin Campus',company:'Microsoft',city:'Dublin',country:'Ireland',mw:200,type:'Hyperscale',year:2009,notes:'Azure Europe West anchor',lat:53.35,lon:-6.26,sqft:500000},
+  {rank:40,name:'Google Mayes County Campus',company:'Google',city:'Pryor Creek',country:'United States',mw:200,type:'Hyperscale',year:2007,notes:'$5.7B+ investment; Oklahoma',lat:36.31,lon:-95.32,sqft:700000},
+  {rank:41,name:'Google Papillion Campus',company:'Google',city:'Papillion',country:'United States',mw:200,type:'Hyperscale',year:2012,notes:'275-acre campus; Nebraska',lat:41.15,lon:-96.04,sqft:600000},
+  {rank:42,name:'Google Henderson Campus',company:'Google',city:'Henderson',country:'United States',mw:200,type:'Hyperscale',year:2020,notes:'64 acres; $1.2B; Nevada',lat:36.04,lon:-115.00,sqft:500000},
+  {rank:43,name:'Google Eemshaven',company:'Google',city:'Eemshaven',country:'Netherlands',mw:200,type:'Hyperscale',year:2018,notes:'europe-west4; wind-powered',lat:53.44,lon:6.83,sqft:600000},
+  {rank:44,name:'Google Cedar Rapids',company:'Google',city:'Cedar Rapids',country:'United States',mw:200,type:'Hyperscale',year:2025,notes:'Part of $7B Iowa expansion',lat:41.98,lon:-91.67,sqft:500000},
+  {rank:45,name:'AWS Sydney Cluster',company:'AWS',city:'Sydney',country:'Australia',mw:200,type:'Hyperscale',year:2012,notes:'ap-southeast-2',lat:-33.82,lon:151.16,sqft:600000},
+  {rank:46,name:'AWS Tokyo Cluster',company:'AWS',city:'Tokyo',country:'Japan',mw:200,type:'Hyperscale',year:2011,notes:'ap-northeast-1; 4 AZs',lat:35.65,lon:139.74,sqft:500000},
+  {rank:47,name:'Digital Realty Ashburn Campus',company:'Digital Realty',city:'Ashburn',country:'United States',mw:200,type:'Colocation',year:2005,notes:'ACC campus; 5 buildings; Virginia',lat:39.02,lon:-77.50,sqft:800000},
+  {rank:48,name:'CoreWeave NJ Campus',company:'CoreWeave',city:'Edison',country:'United States',mw:200,type:'Hyperscale/AI',year:2024,notes:'GPU cloud; NVIDIA partnership; New Jersey',lat:40.53,lon:-74.38,sqft:500000},
+  {rank:49,name:'Tencent Qingyuan DC',company:'Tencent',city:'Qingyuan',country:'China',mw:200,type:'Hyperscale',year:2020,notes:'One of China\'s largest',lat:23.68,lon:113.06,sqft:700000},
+  {rank:50,name:'Huawei Cloud Gui\'an DC',company:'Huawei Cloud',city:"Gui'an",country:'China',mw:200,type:'Hyperscale/Cloud',year:2018,notes:'1M+ servers; Guizhou',lat:26.42,lon:106.64,sqft:800000},
+  {rank:51,name:'China Telecom Inner Mongolia',company:'China Telecom',city:'Hohhot',country:'China',mw:150,type:'Hyperscale/Cloud',year:2013,notes:'10.76M sqft; largest by area',lat:40.84,lon:111.75,sqft:10760000},
+  {rank:52,name:'Apple Mesa Data Center',company:'Apple',city:'Mesa',country:'United States',mw:150,type:'Hyperscale',year:2018,notes:'1.3M sqft; 50MW solar; Arizona',lat:33.42,lon:-111.83,sqft:1300000},
+  {rank:53,name:'Google Lenoir Campus',company:'Google',city:'Lenoir',country:'United States',mw:150,type:'Hyperscale',year:2007,notes:'Multi-building; North Carolina',lat:35.91,lon:-81.54,sqft:400000},
+  {rank:54,name:'Google St Ghislain',company:'Google',city:'St Ghislain',country:'Belgium',mw:150,type:'Hyperscale',year:2010,notes:'Industrial canal cooling',lat:50.45,lon:3.82,sqft:400000},
+  {rank:55,name:'Oracle Ashburn Campus',company:'Oracle',city:'Ashburn',country:'United States',mw:150,type:'Hyperscale',year:2018,notes:'us-ashburn-1; flagship; Virginia',lat:39.04,lon:-77.48,sqft:500000},
+  {rank:56,name:'AWS Singapore Cluster',company:'AWS',city:'Singapore',country:'Singapore',mw:150,type:'Hyperscale',year:2010,notes:'ap-southeast-1',lat:1.33,lon:103.74,sqft:400000},
+  {rank:57,name:'Microsoft Amsterdam Campus',company:'Microsoft',city:'Amsterdam',country:'Netherlands',mw:150,type:'Hyperscale',year:2014,notes:'West Europe; wind-powered',lat:52.34,lon:4.85,sqft:450000},
+  {rank:58,name:'Microsoft London Campus',company:'Microsoft',city:'London',country:'United Kingdom',mw:150,type:'Hyperscale',year:2016,notes:'UK South; $4B UK investment',lat:51.48,lon:-0.10,sqft:400000},
+  {rank:59,name:'Digital Realty Dallas Campus',company:'Digital Realty',city:'Dallas',country:'United States',mw:150,type:'Colocation',year:2006,notes:'Richardson/Garland; Texas',lat:32.95,lon:-96.73,sqft:600000},
+  {rank:60,name:'ByteDance Virginia Campus',company:'ByteDance',city:'Ashburn',country:'United States',mw:150,type:'Hyperscale',year:2022,notes:'TikTok US data residency; Virginia',lat:39.01,lon:-77.52,sqft:500000},
+  {rank:61,name:'China Mobile Hohhot',company:'China Mobile',city:'Hohhot',country:'China',mw:140,type:'Hyperscale/Cloud',year:2014,notes:'7.75M sqft',lat:40.82,lon:111.73,sqft:7750000},
+  {rank:62,name:'AWS Mumbai Cluster',company:'AWS',city:'Mumbai',country:'India',mw:120,type:'Hyperscale',year:2016,notes:'ap-south-1',lat:19.12,lon:72.93,sqft:350000},
+  {rank:63,name:'NTT Tokyo 1',company:'NTT',city:'Tokyo',country:'Japan',mw:120,type:'Colocation',year:2019,notes:'Flagship APAC facility',lat:35.68,lon:139.69,sqft:450000},
+  {rank:64,name:'Google Hamina',company:'Google',city:'Hamina',country:'Finland',mw:120,type:'Hyperscale',year:2011,notes:'Former paper mill; seawater cooling',lat:60.57,lon:27.20,sqft:350000},
+  {rank:65,name:'Meta Lulea',company:'Meta',city:'Lulea',country:'Sweden',mw:120,type:'Hyperscale',year:2013,notes:'Arctic climate; 100% hydro',lat:65.58,lon:22.15,sqft:500000},
+  {rank:66,name:'Samsung SDS Chuncheon HPC',company:'Samsung SDS',city:'Chuncheon',country:'South Korea',mw:114,type:'Hyperscale',year:2023,notes:'114MW; 116K servers',lat:37.88,lon:127.73,sqft:400000},
+  {rank:67,name:'Equinix SV5/SV11',company:'Equinix',city:'San Jose',country:'United States',mw:110,type:'Colocation',year:2012,notes:'Silicon Valley flagship',lat:37.34,lon:-121.89,sqft:400000},
+  {rank:68,name:'Lakeside Tech Center',company:'Digital Realty',city:'Chicago',country:'United States',mw:100,type:'Colocation',year:1999,notes:'1.1M sqft; 8-story; iconic',lat:41.88,lon:-87.63,sqft:1100000},
+  {rank:69,name:'Tulip Data Center',company:'Tulip Telecom',city:'Bengaluru',country:'India',mw:100,type:'Colocation',year:2015,notes:'950K sqft; one of Asia largest',lat:12.97,lon:77.59,sqft:950000},
+  {rank:70,name:'Apple Maiden Data Center',company:'Apple',city:'Maiden',country:'United States',mw:100,type:'Hyperscale',year:2010,notes:'4 buildings; 1M sqft; iCloud backbone; North Carolina',lat:35.57,lon:-81.38,sqft:1000000},
+  {rank:71,name:'Google Changhua County',company:'Google',city:'Changhua',country:'Taiwan',mw:100,type:'Hyperscale',year:2013,notes:'asia-east1 region',lat:24.08,lon:120.54,sqft:300000},
+  {rank:72,name:'Oracle Phoenix Campus',company:'Oracle',city:'Phoenix',country:'United States',mw:100,type:'Hyperscale',year:2019,notes:'us-phoenix-1; AI workloads; Arizona',lat:33.45,lon:-112.07,sqft:350000},
+  {rank:73,name:'AWS Sao Paulo Cluster',company:'AWS',city:'Sao Paulo',country:'Brazil',mw:100,type:'Hyperscale',year:2011,notes:'sa-east-1',lat:-23.53,lon:-46.68,sqft:300000},
+  {rank:74,name:'AWS Seoul Cluster',company:'AWS',city:'Seoul',country:'South Korea',mw:100,type:'Hyperscale',year:2016,notes:'ap-northeast-2',lat:37.52,lon:127.02,sqft:300000},
+  {rank:75,name:'Microsoft Singapore Campus',company:'Microsoft',city:'Singapore',country:'Singapore',mw:100,type:'Hyperscale',year:2014,notes:'Southeast Asia',lat:1.44,lon:103.79,sqft:300000},
+  {rank:76,name:'Equinix TY1-TY12 (Tokyo)',company:'Equinix',city:'Tokyo',country:'Japan',mw:100,type:'Colocation',year:2002,notes:'12 IBX DCs',lat:35.63,lon:139.73,sqft:400000},
+  {rank:77,name:'Huawei Cloud Ulanqab DC',company:'Huawei Cloud',city:'Ulanqab',country:'China',mw:100,type:'Hyperscale/Cloud',year:2019,notes:'300K servers; PUE 1.15',lat:40.99,lon:113.13,sqft:500000},
+  {rank:78,name:'Oracle Austin HQ Campus',company:'Oracle',city:'Austin',country:'United States',mw:80,type:'Hyperscale',year:2016,notes:'OCI us-austin-1; Texas',lat:30.39,lon:-97.72,sqft:250000},
+  {rank:79,name:'Apple Reno Data Center',company:'Apple',city:'Reno',country:'United States',mw:80,type:'Hyperscale',year:2012,notes:'3 buildings; Nevada',lat:39.54,lon:-119.78,sqft:400000},
+  {rank:80,name:'Apple Waukee Data Center',company:'Apple',city:'Waukee',country:'United States',mw:80,type:'Hyperscale',year:2020,notes:'$1.3B investment; Iowa',lat:41.61,lon:-93.87,sqft:400000},
+  {rank:81,name:'AWS Bahrain Cluster',company:'AWS',city:'Manama',country:'Bahrain',mw:80,type:'Hyperscale',year:2019,notes:'me-south-1',lat:26.10,lon:50.52,sqft:250000},
+  {rank:82,name:'Sabey Intergate Seattle',company:'Sabey',city:'Seattle',country:'United States',mw:70,type:'Colocation',year:2011,notes:'900K sqft; green design',lat:47.61,lon:-122.33,sqft:900000},
+  {rank:83,name:'Utah Data Center (IC)',company:'US Gov',city:'Bluffdale',country:'United States',mw:65,type:'Government',year:2014,notes:'1.5M sqft campus; Utah',lat:40.49,lon:-111.93,sqft:1500000},
+  {rank:84,name:'Oracle London Campus',company:'Oracle',city:'London',country:'United Kingdom',mw:60,type:'Hyperscale',year:2020,notes:'uk-london-1',lat:51.52,lon:-0.08,sqft:200000},
+  {rank:85,name:'CoreSite VA3',company:'CoreSite',city:'Reston',country:'United States',mw:60,type:'Colocation',year:2017,notes:'940K sqft; N. Virginia hub',lat:38.96,lon:-77.36,sqft:940000},
+  {rank:86,name:'AWS Cape Town Cluster',company:'AWS',city:'Cape Town',country:'South Africa',mw:60,type:'Hyperscale',year:2020,notes:'af-south-1',lat:-33.93,lon:18.42,sqft:200000},
+  {rank:87,name:'Equinix AM5/AM17',company:'Equinix',city:'Amsterdam',country:'Netherlands',mw:55,type:'Colocation',year:2017,notes:'AMS-IX peering point',lat:52.37,lon:4.90,sqft:350000},
+  {rank:88,name:'Keppel Singapore T27',company:'Keppel',city:'Singapore',country:'Singapore',mw:52,type:'Colocation',year:2021,notes:'Tropical cooling innovation',lat:1.35,lon:103.82,sqft:300000},
+  {rank:89,name:'Oracle Osaka Campus',company:'Oracle',city:'Osaka',country:'Japan',mw:50,type:'Hyperscale',year:2020,notes:'ap-osaka-1',lat:34.69,lon:135.50,sqft:180000},
+  {rank:90,name:'Equinix FR5/FR9',company:'Equinix',city:'Frankfurt',country:'Germany',mw:48,type:'Colocation',year:2015,notes:'DE-CIX adjacent; finserv hub',lat:50.11,lon:8.68,sqft:280000},
+  {rank:91,name:'Iron Mountain NJE-1',company:'Iron Mountain',city:'Edison',country:'United States',mw:26,type:'Colocation',year:2016,notes:'830K sqft; former vault; NJ',lat:40.52,lon:-74.41,sqft:830000}
 ];
 
 const DC_SUMMARY={
@@ -2813,6 +3056,8 @@ function showBenchTab(tab){
     if(tab==='countries') filterBenchCountries();
     if(tab==='facilities') filterBenchFacilities();
     if(tab==='projections') renderProjectionAnalytics();
+    if(tab==='globalmap') initDCMap();
+    if(tab==='energymix') renderEnergyMix();
 }
 
 function renderBenchmarks(){
@@ -4923,6 +5168,364 @@ if(checkAccess()){
     renderSettings();
     renderMayar();
     renderActivity();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL MAP — Leaflet.js Implementation
+// ═══════════════════════════════════════════════════════════════
+const COUNTRY_COORDS={
+    'United States':[38.90,-77.04],'China':[39.91,116.39],'Japan':[35.68,139.69],
+    'Australia':[-33.87,151.21],'Singapore':[1.35,103.82],'Netherlands':[52.37,4.90],
+    'United Kingdom':[51.51,-0.13],'India':[19.08,72.88],'Brazil':[-23.55,-46.63],
+    'Malaysia':[3.14,101.69],'South Korea':[37.55,126.97],'Hong Kong':[22.32,114.17],
+    'France':[48.86,2.35],'Germany':[50.11,8.68],'Ireland':[53.35,-6.26],
+    'Italy':[45.46,9.19],'Indonesia':[-6.21,106.85],'Russia':[55.76,37.62],
+    'Switzerland':[47.37,8.54],'Sweden':[59.33,18.07],'Spain':[40.42,-3.70],
+    'Poland':[52.23,21.01],'Chile':[-33.45,-70.67],'Mexico':[19.43,-99.13],
+    'Thailand':[13.76,100.50],'South Africa':[-26.20,28.04],'UAE':[25.20,55.27],
+    'Canada':[43.65,-79.38],'Taiwan':[25.03,121.57],'Saudi Arabia':[24.71,46.67],
+    'Kenya':[-1.29,36.82],'Nigeria':[6.52,3.38],'Vietnam':[21.03,105.85],
+    'Philippines':[14.60,120.98],'New Zealand':[-36.85,174.76],
+    'Finland':[60.57,27.20],
+    'Belgium':[50.85,4.35],'Norway':[59.91,10.75],'Denmark':[55.68,12.57],
+    'Bahrain':[26.07,50.55]
+};
+
+// ═══ ENERGY MIX CHART ═══
+const ENERGY_SOURCES=['coal','gas','oil','nuclear','hydro','wind','solar','other'];
+const ENERGY_COLORS={coal:'#374151',gas:'#6366f1',oil:'#78716c',nuclear:'#f59e0b',hydro:'#3b82f6',wind:'#06b6d4',solar:'#eab308',other:'#8b5cf6'};
+const ENERGY_LABELS={coal:'Coal',gas:'Natural Gas',oil:'Oil',nuclear:'Nuclear',hydro:'Hydro',wind:'Wind',solar:'Solar',other:'Other Renewables'};
+
+function getCountryRegion(countryName){
+    const c=DC_COUNTRIES.find(x=>x.country===countryName);
+    return c?c.region:'EMEA';
+}
+
+function sortEnergyMix(){renderEnergyMix()}
+
+function renderEnergyMix(){
+    const sortVal=document.getElementById('energySortSelect').value;
+    const regionVal=document.getElementById('energyRegionFilter').value;
+
+    // Build sorted data
+    let data=ENERGY_MIX.map(e=>{
+        const fossil=e.coal+e.gas+e.oil;
+        const renewable=e.hydro+e.wind+e.solar+e.other;
+        const region=getCountryRegion(e.country);
+        const dcCap=(DC_COUNTRIES.find(c=>c.country===e.country)||{mw:0}).mw;
+        return {...e,fossil,renewable,region,dcCap};
+    });
+
+    if(sortVal==='fossil-desc') data.sort((a,b)=>b.fossil-a.fossil);
+    else if(sortVal==='renewable-desc') data.sort((a,b)=>b.renewable-a.renewable);
+    else if(sortVal==='alpha') data.sort((a,b)=>a.country.localeCompare(b.country));
+    else if(sortVal==='capacity') data.sort((a,b)=>b.dcCap-a.dcCap);
+
+    // KPIs
+    const avgRenew=(data.reduce((s,d)=>s+d.renewable,0)/data.length).toFixed(1);
+    const cleanest=data.reduce((a,b)=>a.renewable>b.renewable?a:b);
+    const dirtiest=data.reduce((a,b)=>a.fossil>b.fossil?a:b);
+    const over50renew=data.filter(d=>d.renewable>50).length;
+    const avgFossil=(data.reduce((s,d)=>s+d.fossil,0)/data.length).toFixed(1);
+
+    document.getElementById('energyKpis').innerHTML=[
+        {label:'Avg Renewable',val:avgRenew+'%',sub:'Hydro+Wind+Solar+Other',cls:parseFloat(avgRenew)>=40?'green':'amber',icon:'fa-leaf'},
+        {label:'Cleanest Grid',val:cleanest.country,sub:cleanest.renewable.toFixed(1)+'% renewable',cls:'green',icon:'fa-solar-panel'},
+        {label:'Most Fossil-Heavy',val:dirtiest.country,sub:dirtiest.fossil.toFixed(1)+'% fossil',cls:'red',icon:'fa-smog'},
+        {label:'Avg Fossil',val:avgFossil+'%',sub:'Coal+Gas+Oil average',cls:parseFloat(avgFossil)>=50?'red':'amber',icon:'fa-industry'},
+        {label:'>50% Renewable',val:over50renew+' countries',sub:'Out of '+data.length+' tracked',cls:over50renew>=10?'green':'amber',icon:'fa-globe-americas'}
+    ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+
+    // Chart
+    const labels=data.map(d=>d.country);
+    const datasets=ENERGY_SOURCES.map(src=>({
+        label:ENERGY_LABELS[src],
+        data:data.map(d=>d[src]),
+        backgroundColor:data.map(d=>{
+            const base=ENERGY_COLORS[src];
+            if(regionVal!=='all'&&d.region!==regionVal) return base+'40';
+            return base+'cc';
+        }),
+        borderColor:data.map(d=>{
+            const base=ENERGY_COLORS[src];
+            if(regionVal!=='all'&&d.region!==regionVal) return base+'30';
+            return base;
+        }),
+        borderWidth:0.5,
+        borderSkipped:false,
+        barThickness:16
+    }));
+
+    destroyChart('energyMix');
+    benchCharts.energyMix=new Chart(document.getElementById('chartEnergyMix'),{
+        type:'bar',
+        data:{labels,datasets},
+        options:{
+            indexAxis:'y',
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+                legend:{
+                    position:'top',
+                    labels:{color:'#94a3b8',font:{size:8},boxWidth:10,usePointStyle:true,pointStyle:'rect',padding:8}
+                },
+                tooltip:{
+                    callbacks:{
+                        title:ctx=>ctx[0].label,
+                        label:ctx=>ENERGY_LABELS[ENERGY_SOURCES[ctx.datasetIndex]]+': '+ctx.raw.toFixed(1)+'%',
+                        afterBody:function(ctx){
+                            const idx=ctx[0].dataIndex;
+                            const d=data[idx];
+                            return ['','Fossil: '+d.fossil.toFixed(1)+'% | Renewable: '+d.renewable.toFixed(1)+'%'];
+                        }
+                    }
+                }
+            },
+            scales:{
+                x:{
+                    stacked:true,
+                    max:100,
+                    ticks:{color:'#475569',font:{size:7},callback:v=>v+'%'},
+                    grid:{color:'rgba(51,65,85,0.15)'},
+                    title:{display:true,text:'% of Total Electricity Generation',color:'#64748b',font:{size:8}}
+                },
+                y:{
+                    stacked:true,
+                    ticks:{color:'#e2e8f0',font:{size:7.5}},
+                    grid:{display:false}
+                }
+            }
+        }
+    });
+
+    // Insights
+    const nuclearTop=data.reduce((a,b)=>a.nuclear>b.nuclear?a:b);
+    const hydroTop=data.reduce((a,b)=>a.hydro>b.hydro?a:b);
+    const windTop=data.reduce((a,b)=>a.wind>b.wind?a:b);
+    const solarTop=data.reduce((a,b)=>a.solar>b.solar?a:b);
+    const coalTop=data.reduce((a,b)=>a.coal>b.coal?a:b);
+    const gasTop=data.reduce((a,b)=>a.gas>b.gas?a:b);
+    const zeroNuclear=data.filter(d=>d.nuclear===0);
+
+    const bullets=[
+        `<b>${nuclearTop.country}</b>: ${nuclearTop.nuclear}% nuclear — highest nuclear share among DC countries`,
+        `<b>${hydroTop.country}</b>: ${hydroTop.hydro}% hydro — largest hydroelectric generation`,
+        `<b>${coalTop.country}</b>: ${coalTop.coal}% coal — most coal-dependent grid`,
+        `<b>${gasTop.country}</b>: ${gasTop.gas}% natural gas — highest gas reliance`,
+        `<b>${windTop.country}</b>: ${windTop.wind}% wind — leading wind power share`,
+        `<b>${solarTop.country}</b>: ${solarTop.solar}% solar — highest solar penetration`,
+        `<b>${zeroNuclear.length} countries</b> have zero nuclear generation: ${zeroNuclear.map(d=>d.country).join(', ')}`,
+        `<b>${over50renew} of ${data.length}</b> DC countries generate over 50% of electricity from renewables`
+    ];
+    document.getElementById('energyInsights').innerHTML=bullets.map(b=>`<div style="padding:3px 0;border-bottom:1px solid rgba(51,65,85,0.2)">• ${b}</div>`).join('');
+}
+
+let dcMap=null,mapDarkTiles=null,mapLightTiles=null;
+let mapLayers={facilities:null,operators:null,countries:null};
+
+function initDCMap(){
+    if(dcMap){dcMap.invalidateSize();return}
+    if(typeof L==='undefined'){setTimeout(initDCMap,200);return}
+
+    dcMap=L.map('dcGlobalMap',{center:[25,10],zoom:2,minZoom:2,maxZoom:16,zoomControl:true,worldCopyJump:true});
+
+    mapDarkTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+        attribution:'&copy; <a href="https://osm.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',subdomains:'abcd',maxZoom:20
+    });
+    mapLightTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+        attribution:'&copy; <a href="https://osm.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',subdomains:'abcd',maxZoom:20
+    });
+
+    const isLight=document.body.classList.contains('light-mode');
+    (isLight?mapLightTiles:mapDarkTiles).addTo(dcMap);
+
+    // Create layer groups
+    if(typeof L.markerClusterGroup==='function'){
+        mapLayers.facilities=L.markerClusterGroup({
+            maxClusterRadius:40,
+            iconCreateFunction:function(cluster){
+                const n=cluster.getChildCount();
+                return L.divIcon({
+                    html:'<div style="background:rgba(96,165,250,0.85);border:2px solid #60a5fa;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.7rem;font-weight:700;font-family:Inter,sans-serif">'+n+'</div>',
+                    className:'',iconSize:[36,36]
+                });
+            }
+        });
+    } else {
+        mapLayers.facilities=L.layerGroup();
+    }
+    mapLayers.operators=L.layerGroup();
+    mapLayers.countries=L.layerGroup();
+
+    addFacilityMarkers();
+    addOperatorMarkers();
+    addCountryCircles();
+
+    Object.values(mapLayers).forEach(lg=>lg.addTo(dcMap));
+    renderMapKpis();
+    renderMapLegend();
+}
+
+function addFacilityMarkers(){
+    DC_FACILITIES.forEach(f=>{
+        const sz=Math.max(6,Math.min(20,Math.sqrt(f.mw/8)));
+        const m=L.circleMarker([f.lat,f.lon],{
+            radius:sz,fillColor:'#60a5fa',fillOpacity:0.7,color:'#3b82f6',weight:2
+        });
+        m.bindPopup(
+            '<div class="map-popup-title">'+f.name+'</div>'+
+            '<div class="map-popup-sub">'+f.company+' &middot; '+f.city+', '+f.country+
+            ' <span class="map-popup-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa">'+f.type+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Capacity</span><span class="val">'+f.mw.toLocaleString()+' MW</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Floor Space</span><span class="val">'+(f.sqft/1e6).toFixed(1)+'M sqft</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Year</span><span class="val">'+f.year+'</span></div>'+
+            '<div style="font-size:0.65rem;color:#64748b;margin-top:6px;border-top:1px solid #334155;padding-top:4px">'+f.notes+'</div>',
+            {maxWidth:300}
+        );
+        m.bindTooltip(f.name+' ('+f.mw+' MW)',{direction:'top',offset:[0,-sz]});
+        m._mapMeta={type:f.type,region:getCountryRegion(f.country),layer:'facilities'};
+        mapLayers.facilities.addLayer(m);
+    });
+}
+
+function addOperatorMarkers(){
+    const hqCount={};
+    DC_OPERATORS.forEach(o=>{
+        const coords=COUNTRY_COORDS[o.hq];
+        if(!coords) return;
+        hqCount[o.hq]=(hqCount[o.hq]||0)+1;
+        const n=hqCount[o.hq]-1;
+        var jx=0,jy=0;
+        if(n>0){
+            var angle=n*2.399963;
+            var r=Math.min(1.5,0.3*Math.sqrt(n));
+            jx=r*Math.cos(angle);
+            jy=r*Math.sin(angle);
+        }
+        const sz=Math.max(5,Math.min(16,Math.sqrt(o.mw/25)));
+        const m=L.circleMarker([coords[0]+jy,coords[1]+jx],{
+            radius:sz,fillColor:'#a78bfa',fillOpacity:0.6,color:'#8b5cf6',weight:2
+        });
+        const shortName=o.company.split('(')[0].trim();
+        const region=getHQRegion(o.hq);
+        m.bindPopup(
+            '<div class="map-popup-title">'+o.company+'</div>'+
+            '<div class="map-popup-sub">HQ: '+o.hq+' &middot; <span class="bench-region '+region.toLowerCase()+'">'+region+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Capacity</span><span class="val">'+o.mw.toLocaleString()+' MW</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Facilities</span><span class="val">'+o.facilities+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Countries</span><span class="val">'+o.countries+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">CapEx</span><span class="val">'+(o.capex>=1?'$'+o.capex+'B':'$'+Math.round(o.capex*1000)+'M')+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">PUE</span><span class="val">'+o.pue+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Renewable</span><span class="val">'+o.renewablePercent+'%</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Key Markets</span><span class="val" style="font-size:0.65rem">'+o.keyMarkets.slice(0,4).join(', ')+'</span></div>'+
+            '<div style="margin-top:6px;text-align:center"><button class="bench-btn bench-btn-primary" onclick="showOperatorModal('+o.rank+')" style="font-size:0.65rem"><i class="fas fa-external-link-alt"></i> Full Profile</button></div>',
+            {maxWidth:320}
+        );
+        m.bindTooltip(shortName+' ('+o.mw.toLocaleString()+' MW)',{direction:'top',offset:[0,-sz]});
+        m._mapMeta={type:o.type,region:region,layer:'operators'};
+        mapLayers.operators.addLayer(m);
+    });
+}
+
+function addCountryCircles(){
+    const maxMW=Math.max(...DC_COUNTRIES.map(c=>c.mw));
+    DC_COUNTRIES.forEach(c=>{
+        const coords=COUNTRY_COORDS[c.country];
+        if(!coords) return;
+        const radius=Math.max(25000,Math.sqrt(c.mw/maxMW)*300000);
+        const circle=L.circle(coords,{
+            radius:radius,fillColor:'#34d399',fillOpacity:0.20,color:'#34d399',weight:2,dashArray:'4 2'
+        });
+        circle.bindPopup(
+            '<div class="map-popup-title">'+c.country+'</div>'+
+            '<div class="map-popup-sub"><span class="bench-region '+c.region.toLowerCase()+'">'+c.region+'</span> &middot; Rank #'+c.rank+'</div>'+
+            '<div class="map-popup-row"><span class="lbl">Capacity</span><span class="val">'+c.mw.toLocaleString()+' MW</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Facilities</span><span class="val">'+c.facilities.toLocaleString()+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Growth</span><span class="val" style="color:'+(c.growth>=12?'#34d399':'#fbbf24')+'">'+c.growth+'% YoY</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Power Cost</span><span class="val">$'+c.powerCostPerKWh+'/kWh</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Avg PUE</span><span class="val">'+c.avgPUE+'</span></div>'+
+            '<div class="map-popup-row"><span class="lbl">Key Cities</span><span class="val" style="font-size:0.65rem">'+c.keyCities.slice(0,3).join(', ')+'</span></div>'+
+            '<div style="margin-top:6px;text-align:center"><button class="bench-btn bench-btn-primary" onclick="showCountryPanel(\''+c.country.replace(/'/g,"\\'")+'\')" style="font-size:0.65rem"><i class="fas fa-external-link-alt"></i> Country Profile</button></div>',
+            {maxWidth:320}
+        );
+        circle.bindTooltip(c.country+': '+c.mw.toLocaleString()+' MW',{direction:'top',sticky:true});
+        circle._mapMeta={region:c.region,layer:'countries'};
+        mapLayers.countries.addLayer(circle);
+    });
+}
+
+function toggleMapLayer(){
+    const val=document.getElementById('mapLayerSelect').value;
+    ['facilities','operators','countries'].forEach(layer=>{
+        if(val==='all'||val===layer) dcMap.addLayer(mapLayers[layer]);
+        else dcMap.removeLayer(mapLayers[layer]);
+    });
+}
+
+function filterMapMarkers(){
+    const typeF=document.getElementById('mapTypeFilter').value;
+    const regionF=document.getElementById('mapRegionFilter').value;
+    ['facilities','operators'].forEach(lk=>{
+        mapLayers[lk].eachLayer(m=>{
+            if(!m._mapMeta) return;
+            const p=m._mapMeta;
+            const tMatch=typeF==='all'||(p.type&&p.type.includes(typeF));
+            const rMatch=regionF==='all'||p.region===regionF;
+            const show=tMatch&&rMatch;
+            m.setStyle({opacity:show?1:0.08,fillOpacity:show?0.7:0.05});
+        });
+    });
+    mapLayers.countries.eachLayer(c=>{
+        if(!c._mapMeta) return;
+        const match=regionF==='all'||c._mapMeta.region===regionF;
+        c.setStyle({opacity:match?1:0.08,fillOpacity:match?0.20:0.02});
+    });
+}
+
+function resetMapView(){
+    dcMap.setView([25,10],2);
+    document.getElementById('mapLayerSelect').value='all';
+    document.getElementById('mapTypeFilter').value='all';
+    document.getElementById('mapRegionFilter').value='all';
+    ['facilities','operators','countries'].forEach(l=>{
+        if(!dcMap.hasLayer(mapLayers[l])) dcMap.addLayer(mapLayers[l]);
+    });
+    // Reset opacity for all layers
+    ['facilities','operators'].forEach(lk=>{
+        mapLayers[lk].eachLayer(m=>{if(m.setStyle)m.setStyle({opacity:1,fillOpacity:0.7})});
+    });
+    mapLayers.countries.eachLayer(c=>{if(c.setStyle)c.setStyle({opacity:1,fillOpacity:0.20})});
+}
+
+function toggleMapFullscreen(){
+    const el=document.getElementById('dcGlobalMap');
+    if(el.style.height==='560px'||!el.style.height){el.style.height='85vh'}
+    else{el.style.height='560px'}
+    dcMap.invalidateSize();
+}
+
+function renderMapKpis(){
+    const totalFacMW=DC_FACILITIES.reduce((s,f)=>s+f.mw,0);
+    const totalOpMW=DC_OPERATORS.reduce((s,o)=>s+o.mw,0);
+    const totalFacs=DC_OPERATORS.reduce((s,o)=>s+o.facilities,0);
+    const avgRenew=Math.round(DC_OPERATORS.reduce((s,o)=>s+o.renewablePercent,0)/DC_OPERATORS.length);
+    const kpis=[
+        {label:'Mapped Facilities',val:DC_FACILITIES.length,sub:totalFacMW.toLocaleString()+' MW total',cls:'blue',icon:'fa-map-marker-alt'},
+        {label:'Operators Tracked',val:DC_OPERATORS.length,sub:(totalOpMW/1000).toFixed(1)+' GW combined',cls:'purple',icon:'fa-building'},
+        {label:'Countries Covered',val:DC_COUNTRIES.length,sub:'3 regions',cls:'green',icon:'fa-globe'},
+        {label:'Total Facilities',val:totalFacs.toLocaleString(),sub:'Global DC footprint',cls:'amber',icon:'fa-server'},
+        {label:'Avg Renewable',val:avgRenew+'%',sub:'Operator-reported',cls:avgRenew>=60?'green':'amber',icon:'fa-solar-panel'}
+    ];
+    document.getElementById('mapKpis').innerHTML=kpis.map(k=>
+        '<div class="bench-card '+k.cls+'"><div class="bench-label"><i class="fas '+k.icon+'" style="margin-right:4px"></i>'+k.label+'</div><div class="bench-val">'+k.val+'</div><div class="bench-sub">'+k.sub+'</div></div>'
+    ).join('');
+}
+
+function renderMapLegend(){
+    document.getElementById('mapLegend').innerHTML=
+        '<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#60a5fa;border:2px solid #3b82f6"></div> Facility (sized by MW)</div>'+
+        '<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#a78bfa;border:2px solid #8b5cf6"></div> Operator HQ (sized by MW)</div>'+
+        '<div style="display:flex;align-items:center;gap:6px"><div style="width:18px;height:18px;border-radius:50%;background:rgba(52,211,153,0.15);border:1.5px dashed #34d399"></div> Country Capacity (sized by MW)</div>';
 }
 </script>
 </body>

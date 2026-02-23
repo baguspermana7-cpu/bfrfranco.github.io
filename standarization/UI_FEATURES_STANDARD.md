@@ -8,7 +8,7 @@
 
 ## Overview
 
-Four UI features are implemented across all articles:
+Seven UI features are implemented across all articles:
 
 | # | Feature | Purpose | Effort |
 |---|---------|---------|--------|
@@ -16,6 +16,9 @@ Four UI features are implemented across all articles:
 | 22 | Reading Progress Bar | Scroll progress indicator at top | Small |
 | 23 | TOC Sidebar | Sticky table of contents with section highlighting | Medium |
 | 24 | Series Navigation | Article series badge with prev/next links | Small |
+| 28 | Cookie Consent Banner | GDPR-style cookie consent with GA toggle | Small |
+| 29 | Reading Time Badge | Estimated reading time on article cards | Small |
+| 30 | Scroll to Top Button | Fixed button to smooth-scroll to page top | Small |
 
 ---
 
@@ -236,6 +239,100 @@ When creating a new article (e.g., article-19.html):
 
 ---
 
+---
+
+## Feature 28: Cookie Consent Banner
+
+### How It Works
+- Fixed banner at `bottom: 0`, full width, `z-index: 10002` (above everything)
+- Glass-morphic background (`backdrop-filter: blur(12px)`)
+- Starts hidden (`.hidden` class); shown if `localStorage.getItem('rz_cookie_consent')` is null
+- **Accept**: Sets `rz_cookie_consent = 'accepted'`, hides banner
+- **Decline**: Sets `rz_cookie_consent = 'declined'`, hides banner, disables GA (`window['ga-disable-G-GED7FX8RTV'] = true`)
+- Slide animation via `transform: translateY(100%)`
+
+### CSS Classes
+| Class | Purpose |
+|-------|---------|
+| `.cookie-banner` | Fixed banner container |
+| `.cookie-banner.hidden` | Hidden state (translateY 100%) |
+| `.cookie-actions` | Button group (flex row) |
+| `.cookie-accept` | Primary blue accept button |
+| `.cookie-decline` | Secondary decline button |
+
+### localStorage Key
+- **Key**: `rz_cookie_consent`
+- **Values**: `'accepted'` or `'declined'`
+
+### Deployed On
+All 29 HTML pages (19 articles + index + articles + geopolitics + insights + datacenter-solutions + 5 calculators)
+
+---
+
+## Feature 29: Reading Time Badge
+
+### How It Works
+- Clock icon + "X min" text shown in article card meta row on `articles.html`
+- Positioned between the date span and "Read →" link
+- Reading time calculated at 200 words/minute from article content word counts
+
+### CSS Classes (defined inline in `articles.html`)
+| Class | Purpose |
+|-------|---------|
+| `.article-card-readtime` | Badge container (flex, 0.72rem) |
+
+### Reading Times
+| Article | Time |
+|---------|------|
+| 1 | 34 min |
+| 2 | 16 min |
+| 3 | 32 min |
+| 4 | 34 min |
+| 5 | 33 min |
+| 6 | 30 min |
+| 7 | 35 min |
+| 8 | 30 min |
+| 9 | 10 min |
+| 10 | 16 min |
+| 11 | 15 min |
+| 12 | 24 min |
+| 13 | 31 min |
+| 14 | 26 min |
+| 15 | 35 min |
+| 16 | 20 min |
+| 17 | 32 min |
+| 18 | 17 min |
+
+### When Adding New Articles
+Add a `<span class="article-card-readtime">` with clock SVG between the date and "Read →" spans.
+
+---
+
+## Feature 30: Scroll to Top Button
+
+### How It Works
+- Fixed 44px circle button at bottom-right corner
+- Hidden by default (`opacity: 0, visibility: hidden`)
+- Shows (`.visible` class) after scrolling 500px, via `requestAnimationFrame`-throttled scroll listener
+- Click triggers `window.scrollTo({ top: 0, behavior: 'smooth' })`
+
+### CSS Classes
+| Class | Purpose |
+|-------|---------|
+| `.scroll-top-btn` | Button container |
+| `.scroll-top-btn.visible` | Shown state |
+
+### Position Coordination
+| Viewport | Position | Notes |
+|----------|----------|-------|
+| Desktop (>1024px) | `bottom: 24px; right: 24px` | Clear of all other elements |
+| Mobile (≤1024px) | `bottom: 90px; right: 16px` | Above share bottom bar; TOC toggle is on LEFT |
+
+### Deployed On
+Same 29 files as cookie banner.
+
+---
+
 ## Dark Mode Support
 
 All features support dark mode via `[data-theme="dark"]` selectors:
@@ -243,12 +340,17 @@ All features support dark mode via `[data-theme="dark"]` selectors:
 - TOC sidebar links: `var(--light-blue)` active color
 - Series nav: Blue-tinted glassmorphic background
 - Progress bar: Blue → gold → orange gradient
+- Cookie banner: `rgba(30,41,59,0.92)` background
+- Scroll-to-top: `#3b82f6` background, `#60a5fa` on hover
 
 ## Files Modified
 
 | File | What Changed |
 |------|-------------|
-| `styles.css` | +520 lines: search, TOC sidebar, series nav CSS |
+| `styles.css` | +520 lines: search, TOC sidebar, series nav CSS; +90 lines: cookie, scroll-top, readtime |
 | `search-index.json` | Created: 27-entry search index |
-| `article-1.html` through `article-18.html` | +321 lines each: HTML elements + JS |
-| `geopolitics-1.html` | +321 lines: same features |
+| `article-1.html` through `article-18.html` | +321 lines each: HTML elements + JS; +cookie/scroll-top snippet |
+| `geopolitics-1.html` | +321 lines: same features; +cookie/scroll-top snippet |
+| `articles.html` | Reading time badges in all 18 article cards; +cookie/scroll-top snippet |
+| `index.html`, `insights.html`, `geopolitics.html`, etc. | +cookie/scroll-top snippet |
+| Calculator pages (5 files) | +cookie/scroll-top snippet |
