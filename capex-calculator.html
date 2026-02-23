@@ -1482,123 +1482,93 @@
                         </div>
                     </div>
 
-                    <div class="input-group">
-                        <label class="input-label">
-                            <i class="fas fa-map-marker-alt"></i> Location Factor
-                            <span class="tooltip-trigger">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-map-marker-alt"></i> Location Factor</div>
-                                    <div class="tooltip-desc">Regional cost multiplier based on labor rates, materials, and logistics costs.</div>
-                                    <table class="tooltip-table">
-                                        <tr><th>Region</th><th>Multiplier</th></tr>
-                                        <tr><td>India</td><td>0.55x (lowest)</td></tr>
-                                        <tr><td>SE Asia (Indonesia)</td><td>0.65x</td></tr>
-                                        <tr><td>China</td><td>0.70x</td></tr>
-                                        <tr><td>USA (baseline)</td><td>1.00x</td></tr>
-                                        <tr><td>Europe</td><td>1.15x (highest)</td></tr>
-                                    </table>
-                                </div>
-                            </span>
-                        </label>
-                        <select class="input-field" id="locationFactor">
-                            <option value="sea">Southeast Asia - Indonesia, Malaysia (0.65x)</option>
-                            <option value="india">India (0.55x)</option>
-                            <option value="china">China (0.70x)</option>
-                            <option value="japan">Japan / Korea (1.10x)</option>
-                            <option value="australia">Australia (1.05x)</option>
-                            <option value="europe">Europe (1.15x)</option>
-                            <option value="usa" selected>USA (1.00x)</option>
-                        </select>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-globe"></i> Region
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-globe"></i> Region</div>
+                                        <div class="tooltip-desc">Geographic region sets the base cost multiplier. Select a city below for precise market-level pricing from T&amp;T DCCI 2025 and C&amp;W 2025.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>Region</th><th>Default Mult.</th></tr>
+                                            <tr><td>Americas</td><td>1.00x (baseline)</td></tr>
+                                            <tr><td>EMEA - Europe</td><td>1.15x</td></tr>
+                                            <tr><td>Middle East</td><td>0.90x</td></tr>
+                                            <tr><td>APAC</td><td>0.85x (varies widely)</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact">Select a specific city for precise $/W pricing</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="locationFactor">
+                                <option value="americas" selected>Americas (1.00x)</option>
+                                <option value="emea">EMEA - Europe (1.15x)</option>
+                                <option value="middle_east">Middle East (0.90x)</option>
+                                <option value="apac">APAC - Asia Pacific (0.85x)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">
+                                <i class="fas fa-city"></i> City / Market
+                                <span class="tooltip-trigger">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-city"></i> City-Specific $/W Cost</div>
+                                        <div class="tooltip-desc">Metro-level construction cost per watt. Overrides the generic region multiplier with precise market data from industry reports.</div>
+                                        <table class="tooltip-table">
+                                            <tr><th>City</th><th>$/W (2025)</th></tr>
+                                            <tr><td>Tokyo</td><td>$15.20</td></tr>
+                                            <tr><td>Zurich</td><td>$14.50</td></tr>
+                                            <tr><td>Dallas, TX</td><td>$14.30</td></tr>
+                                            <tr><td>Warsaw</td><td>$9.00</td></tr>
+                                            <tr><td>Chennai</td><td>$6.20</td></tr>
+                                        </table>
+                                        <div class="tooltip-impact">Sources: Turner &amp; Townsend DCCI 2025, Cushman &amp; Wakefield 2025</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="cityMarket">
+                                <option value="none">-- Select City (optional) --</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- ═══ ADVANCED MODE SECTIONS (hidden by default) ═══ -->
                     <div id="advancedInputs" style="display:none;flex-direction:column;gap:1.5rem;">
 
-                        <!-- A. Year & City/Market -->
+                        <!-- A. Year & Escalation -->
                         <div style="border-top:1px solid rgba(245,158,11,0.2);padding-top:1.5rem;margin-top:0.5rem;">
                             <div style="font-size:0.8rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-calendar-alt"></i> Year & Market Location
+                                <i class="fas fa-calendar-alt"></i> Year & Escalation
                             </div>
-                            <div class="input-row">
-                                <div class="input-group">
-                                    <label class="input-label">
-                                        <i class="fas fa-calendar"></i> Projection Year
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-calendar"></i> Year Escalation</div>
-                                                <div class="tooltip-desc">Cost escalation based on industry trends. 7% CAGR 2020-2025 (T&T), decelerating as supply chains normalize.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th>Year</th><th>Multiplier</th></tr>
-                                                    <tr><td>2025 (baseline)</td><td>1.000x</td></tr>
-                                                    <tr><td>2026</td><td>1.060x (+6.0%)</td></tr>
-                                                    <tr><td>2027</td><td>1.115x (+5.5%)</td></tr>
-                                                    <tr><td>2028</td><td>1.165x (+4.5%)</td></tr>
-                                                    <tr><td>2029</td><td>1.210x (+3.8%)</td></tr>
-                                                    <tr><td>2030</td><td>1.250x (+3.3%)</td></tr>
-                                                </table>
-                                                <div class="tooltip-impact">Sources: JLL 2026 Outlook, Turner & Townsend DCCI 2025, Avid Solutions 2026-2030 projections</div>
-                                            </div>
-                                        </span>
-                                    </label>
-                                    <select class="input-field" id="projYear">
-                                        <option value="2025" selected>2025 (Baseline)</option>
-                                        <option value="2026">2026 (+6.0%)</option>
-                                        <option value="2027">2027 (+5.2%)</option>
-                                        <option value="2028">2028 (+4.5%)</option>
-                                        <option value="2029">2029 (+3.9%)</option>
-                                        <option value="2030">2030 (+3.3%)</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">
-                                        <i class="fas fa-city"></i> City / Market
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-city"></i> City-Specific $/W Cost</div>
-                                                <div class="tooltip-desc">Construction cost per watt based on specific metro area. Replaces generic Location Factor when selected.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th>City</th><th>$/W (2025)</th></tr>
-                                                    <tr><td>Tokyo</td><td>$15.20</td></tr>
-                                                    <tr><td>Singapore</td><td>$14.53</td></tr>
-                                                    <tr><td>Silicon Valley</td><td>$13.30</td></tr>
-                                                    <tr><td>Dallas, TX</td><td>$14.30</td></tr>
-                                                    <tr><td>Mumbai</td><td>$6.64</td></tr>
-                                                </table>
-                                                <div class="tooltip-impact">Sources: Turner & Townsend DCCI 2025, Cushman & Wakefield Cost Guide 2025</div>
-                                            </div>
-                                        </span>
-                                    </label>
-                                    <select class="input-field" id="cityMarket">
-                                        <option value="none">-- Use Location Factor above --</option>
-                                        <optgroup label="Americas">
-                                            <option value="silicon_valley">Silicon Valley — $13.30/W</option>
-                                            <option value="new_jersey">New Jersey / NYC — $12.90/W</option>
-                                            <option value="virginia">Virginia / NOVA — $13.40/W</option>
-                                            <option value="dallas">Dallas, TX — $14.30/W</option>
-                                            <option value="phoenix">Phoenix, AZ — $13.40/W</option>
-                                            <option value="chicago">Chicago, IL — $13.20/W</option>
-                                            <option value="san_antonio">San Antonio, TX — $9.30/W</option>
-                                        </optgroup>
-                                        <optgroup label="Europe">
-                                            <option value="london">London — $12.00/W</option>
-                                            <option value="frankfurt">Frankfurt — $11.60/W</option>
-                                            <option value="amsterdam">Amsterdam — $11.80/W</option>
-                                            <option value="stockholm">Stockholm — $10.50/W</option>
-                                            <option value="lisbon">Lisbon — $10.80/W</option>
-                                        </optgroup>
-                                        <optgroup label="Asia Pacific">
-                                            <option value="tokyo">Tokyo — $15.20/W</option>
-                                            <option value="singapore">Singapore — $14.53/W</option>
-                                            <option value="hong_kong">Hong Kong — $13.80/W</option>
-                                            <option value="seoul">Seoul — $9.50/W</option>
-                                            <option value="sydney">Sydney — $12.30/W</option>
-                                            <option value="malaysia">Malaysia / Johor — $11.37/W</option>
-                                            <option value="jakarta">Jakarta — $11.21/W</option>
-                                            <option value="mumbai">Mumbai — $6.64/W</option>
-                                            <option value="bangkok">Bangkok — $8.50/W</option>
-                                        </optgroup>
-                                    </select>
-                                </div>
+                            <div class="input-group">
+                                <label class="input-label">
+                                    <i class="fas fa-calendar"></i> Projection Year
+                                    <span class="tooltip-trigger">?
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title"><i class="fas fa-calendar"></i> Year Escalation</div>
+                                            <div class="tooltip-desc">Cost escalation based on industry trends. 7% CAGR 2020-2025 (T&T), decelerating as supply chains normalize.</div>
+                                            <table class="tooltip-table">
+                                                <tr><th>Year</th><th>Multiplier</th></tr>
+                                                <tr><td>2025 (baseline)</td><td>1.000x</td></tr>
+                                                <tr><td>2026</td><td>1.060x (+6.0%)</td></tr>
+                                                <tr><td>2027</td><td>1.115x (+5.5%)</td></tr>
+                                                <tr><td>2028</td><td>1.165x (+4.5%)</td></tr>
+                                                <tr><td>2029</td><td>1.210x (+3.8%)</td></tr>
+                                                <tr><td>2030</td><td>1.250x (+3.3%)</td></tr>
+                                            </table>
+                                            <div class="tooltip-impact">Sources: JLL 2026 Outlook, Turner & Townsend DCCI 2025, Avid Solutions 2026-2030 projections</div>
+                                        </div>
+                                    </span>
+                                </label>
+                                <select class="input-field" id="projYear">
+                                    <option value="2025" selected>2025 (Baseline)</option>
+                                    <option value="2026">2026 (+6.0%)</option>
+                                    <option value="2027">2027 (+5.2%)</option>
+                                    <option value="2028">2028 (+4.5%)</option>
+                                    <option value="2029">2029 (+3.9%)</option>
+                                    <option value="2030">2030 (+3.3%)</option>
+                                </select>
                             </div>
                         </div>
 
@@ -2240,33 +2210,61 @@
         const fireAlarmMultipliers = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 };
         const upsMultipliers = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
         const genMultipliers = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
-        const locationMultipliers = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0 };
+        const locationMultipliers = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.90 };
+
+        // Display region → internal region mapping + default multiplier
+        const regionGroupDefaults = {
+            americas:    { internalRegion: 'usa',    multiplier: 1.00 },
+            emea:        { internalRegion: 'europe', multiplier: 1.15 },
+            apac:        { internalRegion: 'sea',    multiplier: 0.85 },
+            middle_east: { internalRegion: 'mena',   multiplier: 0.90 }
+        };
 
         // ═══ ADVANCED MODE DATA ═══
         // City-specific cost per Watt ($/W, 2025 baseline)
         // Sources: Turner & Townsend DCCI 2025, Cushman & Wakefield Cost Guide 2025
         const cityData = {
-            silicon_valley: { perW: 13.30, region: 'usa', label: 'Silicon Valley', source: 'T&T 2025' },
-            new_jersey:     { perW: 12.90, region: 'usa', label: 'New Jersey/NYC', source: 'C&W 2025' },
-            virginia:       { perW: 13.40, region: 'usa', label: 'Virginia/NOVA', source: 'C&W 2025' },
-            dallas:         { perW: 14.30, region: 'usa', label: 'Dallas, TX', source: 'C&W 2025' },
-            phoenix:        { perW: 13.40, region: 'usa', label: 'Phoenix, AZ', source: 'C&W 2025' },
-            chicago:        { perW: 13.20, region: 'usa', label: 'Chicago, IL', source: 'C&W 2025' },
-            san_antonio:    { perW:  9.30, region: 'usa', label: 'San Antonio, TX', source: 'C&W 2025' },
-            london:         { perW: 12.00, region: 'europe', label: 'London', source: 'T&T 2025' },
-            frankfurt:      { perW: 11.60, region: 'europe', label: 'Frankfurt', source: 'T&T 2025' },
-            amsterdam:      { perW: 11.80, region: 'europe', label: 'Amsterdam', source: 'Est. T&T' },
-            stockholm:      { perW: 10.50, region: 'europe', label: 'Stockholm', source: 'Est. T&T' },
-            lisbon:         { perW: 10.80, region: 'europe', label: 'Lisbon', source: 'Est. T&T' },
-            tokyo:          { perW: 15.20, region: 'japan', label: 'Tokyo', source: 'T&T 2025' },
-            singapore:      { perW: 14.53, region: 'sea', label: 'Singapore', source: 'T&T 2025' },
-            hong_kong:      { perW: 13.80, region: 'china', label: 'Hong Kong', source: 'Est. T&T' },
-            seoul:          { perW:  9.50, region: 'japan', label: 'Seoul', source: 'C&W APAC' },
-            sydney:         { perW: 12.30, region: 'australia', label: 'Sydney', source: 'Est. T&T' },
-            malaysia:       { perW: 11.37, region: 'sea', label: 'Malaysia/Johor', source: 'T&T 2025' },
-            jakarta:        { perW: 11.21, region: 'sea', label: 'Jakarta', source: 'T&T 2025' },
-            mumbai:         { perW:  6.64, region: 'india', label: 'Mumbai', source: 'T&T 2025' },
-            bangkok:        { perW:  8.50, region: 'sea', label: 'Bangkok', source: 'Est. APAC' }
+            // ── Americas (10) ──
+            silicon_valley: { perW: 13.30, region: 'usa', label: 'Silicon Valley', source: 'T&T 2025', displayRegion: 'americas' },
+            new_jersey:     { perW: 12.90, region: 'usa', label: 'New Jersey / NYC', source: 'C&W 2025', displayRegion: 'americas' },
+            virginia:       { perW: 13.40, region: 'usa', label: 'Virginia / NOVA', source: 'C&W 2025', displayRegion: 'americas' },
+            dallas:         { perW: 14.30, region: 'usa', label: 'Dallas, TX', source: 'C&W 2025', displayRegion: 'americas' },
+            phoenix:        { perW: 13.40, region: 'usa', label: 'Phoenix, AZ', source: 'C&W 2025', displayRegion: 'americas' },
+            chicago:        { perW: 13.20, region: 'usa', label: 'Chicago, IL', source: 'C&W 2025', displayRegion: 'americas' },
+            san_antonio:    { perW:  9.30, region: 'usa', label: 'San Antonio, TX', source: 'C&W 2025', displayRegion: 'americas' },
+            toronto:        { perW: 11.80, region: 'usa', label: 'Toronto, Canada', source: 'Est. T&T', displayRegion: 'americas' },
+            sao_paulo:      { perW:  8.50, region: 'usa', label: 'São Paulo, Brazil', source: 'Est. C&W', displayRegion: 'americas' },
+            queretaro:      { perW:  8.00, region: 'usa', label: 'Querétaro, Mexico', source: 'Est. C&W', displayRegion: 'americas' },
+            // ── EMEA — Europe (13) ──
+            london:         { perW: 12.00, region: 'europe', label: 'London, UK', source: 'T&T 2025', displayRegion: 'emea' },
+            frankfurt:      { perW: 11.60, region: 'europe', label: 'Frankfurt, Germany', source: 'T&T 2025', displayRegion: 'emea' },
+            amsterdam:      { perW: 11.80, region: 'europe', label: 'Amsterdam, Netherlands', source: 'Est. T&T', displayRegion: 'emea' },
+            stockholm:      { perW: 10.50, region: 'europe', label: 'Stockholm, Sweden', source: 'Est. T&T', displayRegion: 'emea' },
+            lisbon:         { perW: 10.80, region: 'europe', label: 'Lisbon, Portugal', source: 'Est. T&T', displayRegion: 'emea' },
+            dublin:         { perW: 11.50, region: 'europe', label: 'Dublin, Ireland', source: 'Est. T&T', displayRegion: 'emea' },
+            paris:          { perW: 12.20, region: 'europe', label: 'Paris, France', source: 'Est. T&T', displayRegion: 'emea' },
+            madrid:         { perW: 10.20, region: 'europe', label: 'Madrid, Spain', source: 'Est. T&T', displayRegion: 'emea' },
+            milan:          { perW: 11.00, region: 'europe', label: 'Milan, Italy', source: 'Est. T&T', displayRegion: 'emea' },
+            warsaw:         { perW:  9.00, region: 'europe', label: 'Warsaw, Poland', source: 'Est. C&W', displayRegion: 'emea' },
+            zurich:         { perW: 14.50, region: 'europe', label: 'Zurich, Switzerland', source: 'Est. T&T', displayRegion: 'emea' },
+            oslo:           { perW: 11.50, region: 'europe', label: 'Oslo, Norway', source: 'Est. T&T', displayRegion: 'emea' },
+            brussels:       { perW: 11.20, region: 'europe', label: 'Brussels, Belgium', source: 'Est. T&T', displayRegion: 'emea' },
+            // ── Middle East (3) ──
+            dubai:          { perW: 10.50, region: 'mena', label: 'Dubai, UAE', source: 'Est. C&W', displayRegion: 'middle_east' },
+            riyadh:         { perW:  9.80, region: 'mena', label: 'Riyadh, Saudi Arabia', source: 'Est. C&W', displayRegion: 'middle_east' },
+            doha:           { perW: 11.00, region: 'mena', label: 'Doha, Qatar', source: 'Est. C&W', displayRegion: 'middle_east' },
+            // ── Asia Pacific (9) ──
+            tokyo:          { perW: 15.20, region: 'japan', label: 'Tokyo, Japan', source: 'T&T 2025', displayRegion: 'apac' },
+            singapore:      { perW: 14.53, region: 'sea', label: 'Singapore', source: 'T&T 2025', displayRegion: 'apac' },
+            hong_kong:      { perW: 13.80, region: 'china', label: 'Hong Kong', source: 'Est. T&T', displayRegion: 'apac' },
+            seoul:          { perW:  9.50, region: 'japan', label: 'Seoul, South Korea', source: 'C&W APAC', displayRegion: 'apac' },
+            sydney:         { perW: 12.30, region: 'australia', label: 'Sydney, Australia', source: 'Est. T&T', displayRegion: 'apac' },
+            malaysia:       { perW: 11.37, region: 'sea', label: 'Malaysia / Johor', source: 'T&T 2025', displayRegion: 'apac' },
+            jakarta:        { perW: 11.21, region: 'sea', label: 'Jakarta, Indonesia', source: 'T&T 2025', displayRegion: 'apac' },
+            mumbai:         { perW:  6.64, region: 'india', label: 'Mumbai, India', source: 'T&T 2025', displayRegion: 'apac' },
+            chennai:        { perW:  6.20, region: 'india', label: 'Chennai, India', source: 'Est. T&T', displayRegion: 'apac' },
+            taipei:         { perW: 10.00, region: 'china', label: 'Taipei, Taiwan', source: 'Est. C&W APAC', displayRegion: 'apac' },
+            bangkok:        { perW:  8.50, region: 'sea', label: 'Bangkok, Thailand', source: 'Est. APAC', displayRegion: 'apac' }
         };
 
         // Year escalation multipliers (CAPEX)
@@ -2320,7 +2318,8 @@
             japan: { permits: 1.8, testing: 1.5, label: 'Building Standards Act, fire prevention, seismic cert' },
             australia: { permits: 1.6, testing: 1.3, label: 'DA/CC approval, NCC compliance, fire safety' },
             europe: { permits: 1.7, testing: 1.4, label: 'EIA, energy efficiency directive, CE marking' },
-            usa: { permits: 1.0, testing: 1.0, label: 'AHJ permits, NFPA 75/76, UL/ETL listing' }
+            usa: { permits: 1.0, testing: 1.0, label: 'AHJ permits, NFPA 75/76, UL/ETL listing' },
+            mena: { permits: 1.2, testing: 0.9, label: 'Municipality permit, civil defense, DEWA/SEC/Kahramaa approval' }
         };
         // Testing standards by redundancy (more redundancy = more IST/ISST testing)
         const testingRedundancyMult = { n: 0.7, n1: 1.0, '2n': 1.5, '2n1': 1.8 };
@@ -2417,7 +2416,7 @@
         // Timeline adjustment multipliers
         const buildingTimeMult = { warehouse: 0.7, modular: 0.6, purpose: 1.0, highrise: 1.4 };
         const coolingTimeMult = { air: 1.0, inrow: 1.05, rdhx: 1.15, liquid: 1.3 }; // DLC needs more MEP time
-        const permitTimeMult = { sea: 1.2, india: 1.4, china: 1.3, japan: 1.5, australia: 1.3, europe: 1.4, usa: 1.0 };
+        const permitTimeMult = { sea: 1.2, india: 1.4, china: 1.3, japan: 1.5, australia: 1.3, europe: 1.4, usa: 1.0, mena: 1.1 };
         // IT load scale: >10MW = +20%, >50MW = +40%
         function loadScaleMult(itLoad) {
             if (itLoad <= 1000) return 0.55;   // micro/edge DC
@@ -2433,7 +2432,7 @@
         // Grid emission factors (tCO₂/MWh) — IEA 2024 estimates
         const gridEmissionFactor = {
             sea: 0.72, india: 0.71, china: 0.56, japan: 0.47,
-            australia: 0.65, europe: 0.23, usa: 0.39
+            australia: 0.65, europe: 0.23, usa: 0.39, mena: 0.55
         };
         // WUE by cooling type (L/kWh IT load)
         const wueByCooling = {
@@ -2552,7 +2551,7 @@
         });
 
         // Advanced mode event listeners
-        ['projYear','cityMarket','substationType','transformerLead','marketCondition','deliveryMethod','contractorAvail',
+        ['projYear','substationType','transformerLead','marketCondition','deliveryMethod','contractorAvail',
          'powerDistribution','transformerType','pduType','cablingType','floorType','siteCondition','securityLevel','fiberEntry','greenCert','renewableOption'].forEach(id => {
             document.getElementById(id).addEventListener('change', calculateCosts);
         });
@@ -2610,13 +2609,24 @@
             const alarmMult = fireAlarmMultipliers[alarmType];
             const upsMult = upsMultipliers[upsType];
             const genMult = genMultipliers[genType];
-            let locMult = locationMultipliers[location];
-            let effectiveRegion = location; // for permit/compliance lookup
+            const regionDefault = regionGroupDefaults[location] || regionGroupDefaults.americas;
+            let locMult = regionDefault.multiplier;
+            let effectiveRegion = regionDefault.internalRegion;
             const fuelMult = 1 + (fuelHours - 24) * 0.008;
+
+            // City-specific override (works in both Simple and Advanced modes)
+            let cityLabel = '';
+            const cityVal = document.getElementById('cityMarket').value;
+            if (cityVal !== 'none' && cityData[cityVal]) {
+                const city = cityData[cityVal];
+                cityLabel = city.label;
+                effectiveRegion = city.region;
+                locMult = city.perW / 13.0;
+            }
 
             // Advanced mode adjustments
             const isAdv = capexMode === 'advanced';
-            let yearMult = 1.0, cityLabel = '', yearLabel = '2025';
+            let yearMult = 1.0, yearLabel = '2025';
             let marketMult = 1.0, deliveryMult = 1.0, contractorMult = 1.0;
             let designPct = 0, pmPct = 0, contingencyPct = 5;
             let fomTotal = 0, fomIncluded = false;
@@ -2628,16 +2638,6 @@
                 // Year escalation
                 yearLabel = document.getElementById('projYear').value;
                 yearMult = yearEscalation[yearLabel].mult;
-
-                // City-specific override
-                const cityVal = document.getElementById('cityMarket').value;
-                if (cityVal !== 'none' && cityData[cityVal]) {
-                    const city = cityData[cityVal];
-                    cityLabel = city.label;
-                    effectiveRegion = city.region;
-                    // City $/W -> derive location multiplier relative to US baseline ~$13/W
-                    locMult = city.perW / 13.0;
-                }
 
                 // Market factors
                 marketMult = marketConditionMult[document.getElementById('marketCondition').value];
@@ -2866,7 +2866,7 @@
 
             // Build config metadata for PDF comparison
             const buildingLabels = { warehouse: 'Warehouse Conversion', modular: 'Modular / Prefab', purpose: 'Purpose-Built', highrise: 'High-Rise Multi-Story' };
-            const locationLabels = { sea: 'Southeast Asia', india: 'India', china: 'China', japan: 'Japan / Korea', australia: 'Australia', europe: 'Europe', usa: 'USA' };
+            const locationLabels = { americas: 'Americas', emea: 'EMEA (Europe)', apac: 'Asia Pacific', middle_east: 'Middle East' };
             const coolingLabels = { air: 'Raised Floor / CRAC', inrow: 'In-Row Cooling', rdhx: 'Rear-Door HX', liquid: 'Direct Liquid' };
             const rackLabels = { standard: 'Standard (5-8 kW)', medium: 'Medium (8-15 kW)', high: 'High (15-30 kW)', ai: 'AI/HPC (30-100 kW)' };
             const redundancyLabels = { n: 'N (No Redundancy)', n1: 'N+1', '2n': '2N', '2n1': '2N+1' };
@@ -2956,31 +2956,43 @@
         document.getElementById('upsType').addEventListener('change', calculateCosts);
         document.getElementById('genType').addEventListener('change', calculateCosts);
         document.getElementById('locationFactor').addEventListener('change', function() {
-            filterCityByLocation();
-            calculateCosts();
+            populateCityDropdown();
         });
+        document.getElementById('cityMarket').addEventListener('change', calculateCosts);
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', calculateCosts);
         });
 
-        // Filter city dropdown to only show cities matching the selected location/region
-        function filterCityByLocation() {
-            const loc = document.getElementById('locationFactor').value;
+        // Dynamically populate city dropdown based on selected display region
+        function populateCityDropdown() {
+            const displayRegion = document.getElementById('locationFactor').value;
             const citySelect = document.getElementById('cityMarket');
             if (!citySelect) return;
-            const prev = citySelect.value;
-            citySelect.querySelectorAll('option').forEach(opt => {
-                if (opt.value === 'none') { opt.style.display = ''; return; }
-                const cd = cityData[opt.value];
-                opt.style.display = (cd && cd.region === loc) ? '' : 'none';
+            const prevVal = citySelect.value;
+
+            citySelect.innerHTML = '<option value="none">-- Select City (optional) --</option>';
+
+            const matches = [];
+            for (const [key, city] of Object.entries(cityData)) {
+                if (city.displayRegion === displayRegion) {
+                    matches.push({ key, ...city });
+                }
+            }
+            matches.sort((a, b) => a.label.localeCompare(b.label));
+
+            matches.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.key;
+                opt.textContent = c.label + ' \u2014 $' + c.perW.toFixed(2) + '/W';
+                citySelect.appendChild(opt);
             });
-            citySelect.querySelectorAll('optgroup').forEach(og => {
-                const visible = Array.from(og.querySelectorAll('option')).some(o => o.style.display !== 'none');
-                og.style.display = visible ? '' : 'none';
-            });
-            // Reset to "none" if current selection is now hidden
-            const selOpt = citySelect.querySelector('option[value="' + prev + '"]');
-            if (selOpt && selOpt.style.display === 'none') citySelect.value = 'none';
+
+            if (prevVal && citySelect.querySelector('option[value="' + prevVal + '"]')) {
+                citySelect.value = prevVal;
+            } else {
+                citySelect.value = 'none';
+            }
+            calculateCosts();
         }
 
         // Last computed result (avoids recalculation in comparison)
@@ -2991,7 +3003,7 @@
         var userTier = 'free'; // 'free' | 'pro'
 
         // Initial calculation
-        filterCityByLocation();
+        populateCityDropdown();
         calculateCosts();
         initTooltipSystem();
 
@@ -3167,7 +3179,7 @@
             const buildingType = document.getElementById('buildingType').value;
             const locVal = document.getElementById('locationFactor').value;
             const cityVal2 = document.getElementById('cityMarket') ? document.getElementById('cityMarket').value : 'none';
-            const effReg = (cityVal2 !== 'none' && cityData[cityVal2]) ? cityData[cityVal2].region : locVal;
+            const effReg = (cityVal2 !== 'none' && cityData[cityVal2]) ? cityData[cityVal2].region : (regionGroupDefaults[locVal] || regionGroupDefaults.americas).internalRegion;
 
             const racks = Math.ceil(result.itLoad / rackKw[rackType]);
             const floorM2 = Math.ceil(racks * rackFootprint);
@@ -3989,7 +4001,7 @@
             const buildingType = document.getElementById('buildingType').value;
             const location = document.getElementById('locationFactor').value;
             const cityVal = document.getElementById('cityMarket') ? document.getElementById('cityMarket').value : 'none';
-            const effRegion = (cityVal !== 'none' && cityData[cityVal]) ? cityData[cityVal].region : location;
+            const effRegion = (cityVal !== 'none' && cityData[cityVal]) ? cityData[cityVal].region : (regionGroupDefaults[location] || regionGroupDefaults.americas).internalRegion;
             const phases = r._timeline || computeTimeline(redundancy, buildingType, coolingType, effRegion, itLoad);
             const totalMonths = phases.totalMonths;
 
