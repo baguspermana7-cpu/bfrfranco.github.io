@@ -1308,7 +1308,7 @@
                 </svg>
             </button>
             <div class="nav-auth-wrap" id="maintNavAuthWrap">
-                <button class="nav-login-btn" id="maintNavLoginBtn" onclick="maintShowLogin()"><i class="fas fa-user-circle"></i> <span>Login</span></button>
+                <button class="nav-login-btn" id="maintNavLoginBtn" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()"><i class="fas fa-user-circle"></i> <span>Login</span></button>
                 <button class="nav-user-btn" id="maintNavUserBtn" onclick="maintToggleDropdown()"><span class="nav-user-avatar" id="maintNavAvatar">U</span><span class="nav-user-email" id="maintNavEmail">user</span><i class="fas fa-chevron-down" style="font-size:0.6rem;color:#64748b;"></i></button>
                 <div class="nav-user-dropdown" id="maintNavDropdown">
                     <div style="padding:14px 16px;border-bottom:1px solid #334155;">
@@ -2299,7 +2299,7 @@
                         </div>
                         <div class="maint-toolbar-actions">
                             <button class="maint-action-btn" onclick="maintResetDefaults()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-rotate-left"></i> Reset</button>
-                            <button class="maint-action-btn primary" id="maintBtnPdf" onclick="maintShowLogin()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                            <button class="maint-action-btn primary" id="maintBtnPdf" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-file-pdf"></i> Export PDF</button>
                         </div>
                     </div>
 
@@ -2410,7 +2410,7 @@
                                 <div class="calc-result-item"><div class="calc-result-value" id="proUtilization">--</div><div class="calc-result-label">Utilization Rate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Utilization Rate</div><div class="rtd">Ratio of maintenance demand to available capacity. Over 100% means demand exceeds capacity.</div><span class="rtf">80-90% optimal &middot; &gt;100% understaffed</span></span></span></div></div>
                                 <div class="calc-result-item"><div class="calc-result-value" id="proMargin">--</div><div class="calc-result-label">Capacity Margin <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Capacity Margin</div><div class="rtd">Surplus or deficit of maintenance hours. Negative margin indicates understaffing.</div></span></span></div></div>
                             </div>
-                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Unlock 24 advanced KPIs + PDF export</div></div></div>
+                        </div><div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Unlock 24 advanced KPIs + PDF export</div></div></div>
 
                         <!-- Panel 2: Compliance Deep Dive -->
                         <div class="pro-panel"><div class="pro-panel-inner">
@@ -2422,7 +2422,7 @@
                                 <div class="calc-result-item"><div class="calc-result-value" id="proGap">--</div><div class="calc-result-label">Gap to SLA Target <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Gap to SLA Target</div><div class="rtd">Percentage points between current predicted compliance and the SLA target.</div></span></span></div></div>
                                 <div class="calc-result-item"><div class="calc-result-value" id="proPercentile">--</div><div class="calc-result-label">Industry Percentile <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Industry Percentile</div><div class="rtd">Where this facility ranks compared to industry benchmarks for maintenance compliance.</div></span></span></div></div>
                             </div>
-                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo confidence intervals</div></div></div>
+                        </div><div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo confidence intervals</div></div></div>
 
                         <!-- Panel 3: Backlog & Risk -->
                         <div class="pro-panel"><div class="pro-panel-inner">
@@ -2434,7 +2434,7 @@
                                 <div class="calc-result-item"><div class="calc-result-value" id="proWeightedRisk">--</div><div class="calc-result-label">Weighted Risk Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Weighted Risk Score</div><div class="rtd">Risk score weighted by asset criticality — critical asset failures weighted 3x.</div></span></span></div></div>
                                 <div class="calc-result-item"><div class="calc-result-value" id="proSlaMiss">--</div><div class="calc-result-label">SLA Miss Probability <span class="res-tip">?<span class="res-tip-body"><div class="rtt">SLA Miss Probability</div><div class="rtd">Monte Carlo probability of failing to meet SLA target.</div></span></span></div></div>
                             </div>
-                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Backlog trajectory modeling</div></div></div>
+                        </div><div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Backlog trajectory modeling</div></div></div>
 
                         <!-- Panel 4: Workforce Optimization -->
                         <div class="pro-panel"><div class="pro-panel-inner">
@@ -2445,7 +2445,7 @@
                                 <div class="calc-result-item"><div class="calc-result-value" id="proOvertime">--</div><div class="calc-result-label">Overtime Needed (hrs/mo) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Overtime Required</div><div class="rtd">Monthly overtime hours needed if current staffing is insufficient.</div></span></span></div></div>
                                 <div class="calc-result-item"><div class="calc-result-value" id="proMarginal">--</div><div class="calc-result-label">Marginal Tech Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Marginal Tech Impact</div><div class="rtd">Compliance improvement from adding one additional technician.</div></span></span></div></div>
                             </div>
-                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Staffing optimization model</div></div></div>
+                        </div><div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Staffing optimization model</div></div></div>
 
                         <!-- Panel 5: Scenario Sensitivity -->
                         <div class="pro-panel"><div class="pro-panel-inner">
@@ -2457,7 +2457,7 @@
                                 <div class="calc-result-item"><div class="calc-result-value" id="proScen4">--</div><div class="calc-result-label">Evidence → Excellent <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Evidence Improvement</div><div class="rtd">Impact of improving evidence clarity to excellent level.</div></span></span></div></div>
                                 <div class="calc-result-item"><div class="calc-result-value" id="proScen5">--</div><div class="calc-result-label">-20% Task Duration <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Duration Reduction</div><div class="rtd">Impact of 20% reduction in average task duration through process improvement.</div></span></span></div></div>
                             </div>
-                        </div><div class="gated-overlay" onclick="maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div></div>
+                        </div><div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else maintShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div></div>
                     </div>
 
                     <div class="privacy-badge" style="margin-top:0.5rem;">
@@ -2918,7 +2918,11 @@
         var proPanels=document.getElementById('maintProPanels');
         var proInputs=document.getElementById('maintProInputs');
         if(mode==='pro'){
-            if(!maintIsPremium){maintShowLogin();return;}
+            if(!maintIsPremium){
+                if(window._rzAuth&&typeof window._rzAuth.showModal==='function') window._rzAuth.showModal();
+                else maintShowLogin();
+                return;
+            }
             if(proPanels)proPanels.style.display='block';
             if(proInputs)proInputs.style.display='block';
         }else{
@@ -2934,7 +2938,7 @@
         var pdf=document.getElementById('maintBtnPdf');
         if(pdf){
             if(maintIsPremium){pdf.onclick=function(){exportMaintPDF();};pdf.style.opacity='1';}
-            else{pdf.onclick=function(){maintShowLogin();};pdf.style.opacity='0.7';}
+            else{pdf.onclick=function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();else maintShowLogin();};pdf.style.opacity='0.7';}
         }
     }
 
@@ -3464,6 +3468,27 @@
             applyMaintGating();
         }
     }catch(ex){}
+
+    // Listen for global auth changes (login/logout via navbar auth.js)
+    window.addEventListener('rz-auth-change', function(e) {
+        if (e.detail && e.detail.action === 'login') {
+            maintIsPremium = true;
+            applyMaintGating();
+            maintMode = 'pro';
+            document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='pro');});
+            var pp=document.getElementById('maintProPanels');if(pp)pp.style.display='block';
+            var pi=document.getElementById('maintProInputs');if(pi)pi.style.display='block';
+            updateMaintCalculator();
+        } else if (e.detail && e.detail.action === 'logout') {
+            maintIsPremium = false;
+            maintMode = 'free';
+            document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='free');});
+            var pp=document.getElementById('maintProPanels');if(pp)pp.style.display='none';
+            var pi=document.getElementById('maintProInputs');if(pi)pi.style.display='none';
+            applyMaintGating();
+            updateMaintCalculator();
+        }
+    });
 
     initMaintTooltips();
     updateMaintCalculator();

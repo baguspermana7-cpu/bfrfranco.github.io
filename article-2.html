@@ -1591,7 +1591,7 @@
                 </svg>
             </button>
             <div class="nav-auth-wrap" id="alarmNavAuthWrap">
-                <button class="nav-login-btn" id="alarmNavLoginBtn" onclick="alarmShowLogin()"><i class="fas fa-user-circle"></i> <span>Login</span></button>
+                <button class="nav-login-btn" id="alarmNavLoginBtn" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()"><i class="fas fa-user-circle"></i> <span>Login</span></button>
                 <button class="nav-user-btn" id="alarmNavUserBtn" onclick="alarmToggleDropdown()">
                     <span class="nav-user-avatar" id="alarmNavAvatar">U</span>
                     <span class="nav-user-email" id="alarmNavEmail">user@email.com</span>
@@ -2079,7 +2079,7 @@
                 </div>
                 <div class="alarm-toolbar-actions">
                     <button class="alarm-action-btn" id="alarmBtnReset2" onclick="alarmResetDefaults()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-rotate-left"></i> Reset</button>
-                    <button class="alarm-action-btn primary" id="alarmBtnPdf" onclick="alarmShowLogin()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                    <button class="alarm-action-btn primary" id="alarmBtnPdf" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 </div>
             </div>
 
@@ -2234,7 +2234,7 @@
                             <div class="result-card"><div class="result-card-label">Avg Queue Wait <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Avg Queue Wait</div><div class="rtd">Mean time an alarm waits in queue before operator acknowledgment.</div></span></span></div><div class="result-card-value" id="proAvgWait">--</div><div class="result-card-sub">Seconds if queued</div></div>
                         </div>
                     </div>
-                    <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Login to unlock 28 advanced KPIs</div></div>
+                    <div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Login to unlock 28 advanced KPIs</div></div>
                 </div>
 
                 <!-- Panel 2: Flood Risk Deep Dive -->
@@ -2250,7 +2250,7 @@
                             <div class="result-card"><div class="result-card-label">Flood Severity Index <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Flood Severity Index</div><div class="rtd">Composite severity score of flood events considering duration, peak rate, and critical alarm exposure.</div></span></span></div><div class="result-card-value" id="proFloodSeverity">--</div><div class="result-card-sub">Composite flood risk</div></div>
                         </div>
                     </div>
-                    <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Advanced flood modeling</div></div>
+                    <div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Advanced flood modeling</div></div>
                 </div>
 
                 <!-- Panel 3: Priority & Quality -->
@@ -2266,7 +2266,7 @@
                             <div class="result-card"><div class="result-card-label">Alarm Quality Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Alarm Quality Score</div><div class="rtd">Overall alarm system quality combining actionability, priority accuracy, and nuisance rates.</div></span></span></div><div class="result-card-value" id="proQualityScore">--</div><div class="result-card-sub">Composite quality index</div></div>
                         </div>
                     </div>
-                    <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Standards-aligned quality metrics</div></div>
+                    <div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Standards-aligned quality metrics</div></div>
                 </div>
 
                 <!-- Panel 4: Compliance Drilldown -->
@@ -2280,7 +2280,7 @@
                             <div class="result-card"><div class="result-card-label">Standing % Criterion <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Standing % Criterion</div><div class="rtd">Pass/Fail for standing alarm percentage against ISA-18.2 &lt;5% target.</div></span></span></div><div class="result-card-value" id="proCompStand">--</div><div class="result-card-sub">Score out of 25</div></div>
                         </div>
                     </div>
-                    <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Compliance contribution breakdown</div></div>
+                    <div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Compliance contribution breakdown</div></div>
                 </div>
 
                 <!-- Panel 5: Scenario Sensitivity -->
@@ -2294,7 +2294,7 @@
                             <div class="result-card"><div class="result-card-label">Priority Rebalance <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Priority Rebalance</div><div class="rtd">Impact of rebalancing priority distribution to ISA-18.2 recommended ratios.</div></span></span></div><div class="result-card-value" id="proScnPrio">--</div><div class="result-card-sub">If aligned to 80/15/5</div></div>
                         </div>
                     </div>
-                    <div class="gated-overlay" onclick="alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div>
+                    <div class="gated-overlay" onclick="if(window._rzAuth)window._rzAuth.showModal();else alarmShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div>
                 </div>
             </div>
 
@@ -2949,7 +2949,11 @@
 
         // ═══ MODE SWITCHING & GATING ═══
         window.switchAlarmMode = function(mode) {
-            if (mode === 'pro' && !alarmIsPremium) { alarmShowLogin(); return; }
+            if (mode === 'pro' && !alarmIsPremium) {
+                if(window._rzAuth&&typeof window._rzAuth.showModal==='function') window._rzAuth.showModal();
+                else alarmShowLogin();
+                return;
+            }
             alarmMode = mode;
             document.getElementById('alarmModeFree').classList.toggle('active', mode === 'free');
             document.getElementById('alarmModePro').classList.toggle('active', mode === 'pro');
@@ -2969,7 +2973,7 @@
                 if (pdfBtn) { pdfBtn.onclick = function() { exportAlarmPDF(); }; pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Export PDF Report'; }
             } else {
                 if (badge) badge.style.display = 'inline-block';
-                if (pdfBtn) { pdfBtn.onclick = function() { alarmShowLogin(); }; }
+                if (pdfBtn) { pdfBtn.onclick = function() { if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();else alarmShowLogin(); }; }
             }
         }
 
@@ -3582,6 +3586,21 @@
                 else localStorage.removeItem('rz_premium_session');
             } catch(e) { localStorage.removeItem('rz_premium_session'); }
         }
+
+        // Listen for global auth changes (login/logout via navbar auth.js)
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.action === 'login') {
+                alarmIsPremium = true;
+                applyAlarmGating();
+                alarmUpdateNavAuth();
+                switchAlarmMode('pro');
+            } else if (e.detail && e.detail.action === 'logout') {
+                alarmIsPremium = false;
+                switchAlarmMode('free');
+                applyAlarmGating();
+                alarmUpdateNavAuth();
+            }
+        });
 
         setTimeout(function() { applyAlarmGating(); alarmUpdateNavAuth(); initAlarmTooltips(); }, 150);
     })();
