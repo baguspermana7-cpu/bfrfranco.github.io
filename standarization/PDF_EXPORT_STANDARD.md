@@ -1,6 +1,6 @@
 # PDF Export Quality Standard — ResistanceZero
 
-> **Version**: 1.1 | **Updated**: 2026-02-16
+> **Version**: 1.2 | **Updated**: 2026-02-23
 
 ---
 
@@ -111,6 +111,33 @@
 - Baseline vertical dashed line with label
 - $ values or % shown at bar ends
 - Bar height: 24-28px, gap: 4px
+
+### Horizontal Bar Chart (Criteria Breakdown)
+- Used for: ISA-18.2 compliance breakdown, multi-criteria scores
+- Background: full-width `#f3f4f6` bar behind colored bar
+- Fill color: green (`#059669`) if passing, amber (`#f59e0b`) if marginal, red (`#ef4444`) if failing
+- Labels left-aligned, values right of bar end (e.g., `18/25`)
+- Summary line below (e.g., "ISA Score: 75/100 (Grade C)")
+- viewBox: `320×180` typical for side-by-side, `700×180` for full-width
+
+### Semicircular Gauge (Utilization/Load)
+- Used for: cognitive load, capacity utilization, risk meters
+- SVG arc paths with 3 color zones (green 0-50%, yellow 50-70%, red 70-100%)
+- Zone arcs: `stroke-width:18`, `opacity:0.3` for background zones
+- Active arc: full opacity, `stroke-linecap:round`
+- Needle: `<line>` from center to arc edge, `stroke-width:2.5`
+- Center dot: `<circle r="5">`
+- Large value text at center, zone labels at 0% and 100% endpoints
+- viewBox: `320×180` typical
+
+### Stacked Horizontal Bar (Distribution Comparison)
+- Used for: priority distribution (Critical/Warning/Info) vs benchmark
+- Two rows: "Your System" and "Benchmark" (e.g., ISA-18.2)
+- Each row: stacked segments with different colors
+- Segment colors: `#ef4444` (Critical), `#f59e0b` (Warning), `#3b82f6` (Info)
+- Percentage labels inside segments if width > 25px
+- Legend row below with color swatches
+- viewBox: `700×100` typical for full-width layout
 
 ---
 
@@ -269,6 +296,7 @@ function exportPDF() {
 - [ ] Header has title, date, and RESISTANCEZERO branding
 - [ ] Footer has resistancezero.com, generation date, client-side disclaimer
 - [ ] SVG charts render correctly in print preview
+- [ ] New chart types (gauge, stacked bar, horizontal bar) render with correct color zones
 - [ ] Narrative text is data-aligned (references actual calculated values)
 - [ ] Compact spacing: no margins > 16px between sections
 

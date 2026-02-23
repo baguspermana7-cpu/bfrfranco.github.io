@@ -1,6 +1,6 @@
 # ResistanceZero Pro Enhancement Mode — Standardization Guide
 
-> **Version**: 2.0 | **Last Updated**: 2026-02-16 | **Status**: Active
+> **Version**: 2.1 | **Last Updated**: 2026-02-23 | **Status**: Active
 > **Applies to**: All article pages with interactive calculators (articles 1–15)
 
 ---
@@ -40,7 +40,7 @@ Every article with an interactive calculator follows a **unified Pro Enhancement
 | Article | Topic | CSS Prefix | Theme Color | Theme Accent | Pro Status |
 |---------|-------|-----------|-------------|--------------|------------|
 | 1 | CAPEX/OPEX Benchmarking | (generic) | `#3b82f6` blue | `#60a5fa` | GOLD STANDARD |
-| 2 | Power Risk Assessment | (generic) | `#ef4444` red | `#f87171` | Strong |
+| 2 | Alarm Rationalization | (generic) | `#ef4444` red | `#f87171` | Full (3 SVG charts in PDF, Feb 2026) |
 | 3 | Monitoring Maturity | (generic) | `#10b981` emerald | `#34d399` | Strong |
 | 4 | In-House Capability / MTTR | (generic) | `#3b82f6` blue | `#60a5fa` | Strong (5 panels) |
 | 5 | Technical Debt Risk | (generic) | `#f59e0b` gold | `#fbbf24` | Full (upgraded Feb 2026) |
@@ -544,6 +544,10 @@ Sandbox/
 13. **Free/Pro mode buttons MUST be separate** — use a mode-bar with two buttons (Free Assessment + Pro Analysis), not a single toggle. Active button gets distinct styling (gradient background + shadow). Include a mode indicator badge showing current mode.
 14. **PDF export MUST include executive summary KPI cards** — never just tables. Use `pdf-kpi-grid` with 4 columns, `pdf-score-card` for the hero metric, and side-by-side SVG charts (`pdf-chart-row`).
 15. **PDF narrative section is MANDATORY** — generate dynamic assessment paragraphs referencing actual calculated values, industry benchmarks, and financial impact. Use `pdf-narrative` with left border accent.
+16. **Chart.js annotation plugin MUST be loaded separately** — If any chart config uses `plugins.annotation.annotations`, the CDN `chartjs-plugin-annotation@3.0.1` must be included AFTER `chart.umd.min.js`. Base Chart.js 4.x does NOT include annotation. Without it, annotation configs may silently fail or cause blank charts.
+17. **Inline styles on dark-themed elements cause light-mode readability issues** — NEVER hardcode light text colors (`color:#cbd5e1`, `color:#64748b`) directly on HTML elements inside `.article-body`. Instead, define CSS classes with both light and dark mode variants using `[data-theme="dark"]`. Use `!important` on the class rule to override global `.article-body p`/`.article-body blockquote` rules.
+18. **Self-contained dark elements MUST have dedicated CSS classes** — Components like `.operator-story`, `.aif-quote`, calculator panels that have their own dark background need CSS rules with boosted specificity (`.article-body .operator-story blockquote`) and `!important` to prevent generic `styles.css` rules from overriding their colors in either theme mode.
+19. **New SVG chart types for PDF exports** — Beyond radar/histogram/tornado, these patterns are now proven: (a) **Horizontal bar chart** for criteria breakdown (e.g., ISA-18.2 score per criterion), (b) **Semicircular gauge** for utilization/load metrics with color-coded zones, (c) **Stacked horizontal bar** for distribution comparison (e.g., user's system vs benchmark split). All use inline SVG with `viewBox` for responsive sizing.
 
 ---
 
