@@ -85,7 +85,10 @@ function initNavigation() {
     hamburger?.addEventListener('click', function() {
         hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
-        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        const isOpen = navMenu.classList.contains('active');
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+        hamburger.setAttribute('aria-expanded', isOpen);
+        hamburger.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
     });
 
     // Handle dropdown toggle on mobile

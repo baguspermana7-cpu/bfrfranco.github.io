@@ -25,6 +25,19 @@
     color: #0f172a;
 }
 
+/* Screen-reader only (visually hidden) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* CSS Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
@@ -411,6 +424,9 @@ a {
     flex-direction: column;
     cursor: pointer;
     gap: 5px;
+    background: none;
+    border: none;
+    padding: 0;
 }
 
 .bar {
@@ -1139,7 +1155,7 @@ a {
 }
 
 [data-theme="dark"] .bento-tag {
-    color: #64748b;
+    color: #94a3b8;
     border-color: rgba(255, 255, 255, 0.05);
 }
 
@@ -2550,7 +2566,7 @@ section {
     stroke: var(--medium-blue);
 }
 
-.contact-text h4 {
+.contact-text h3 {
     font-size: 1rem;
     font-weight: 600;
     color: var(--gray-800);
@@ -3402,11 +3418,12 @@ section {
         align-items: center;
         justify-content: flex-start;
         padding-top: 2rem;
-        padding-bottom: 3rem;
+        padding-bottom: 1rem;
         gap: 0;
         transition: left var(--transition-normal);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 
     .nav-menu.active {
@@ -3450,7 +3467,7 @@ section {
     }
 
     .nav-dropdown.active .dropdown-menu {
-        max-height: 300px;
+        max-height: 500px;
         padding: 0.5rem 0;
     }
 
