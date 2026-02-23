@@ -14,7 +14,7 @@ const FAQ_DATA: FaqItem[] = [
     // ── General ──────────────────────────────────────────────────
     { category: 'General', q: 'What is DC MOC?', a: 'Data Center Maintenance & Operations Calculator — a simulation engine for modeling staffing, shift patterns, CAPEX, OPEX, risk analysis, carbon/ESG, and financial projections for data center operations across 30+ countries.' },
     { category: 'General', q: 'Who is DC MOC for?', a: 'Data center operations managers, facility engineers, C-level executives, and consultants who need to plan staffing, estimate costs, and compare operational scenarios for new or existing data center facilities.' },
-    { category: 'General', q: 'Is there a demo account?', a: 'Yes — use demo@resistancezero.com / demo2026 to explore all Pro features including scenario modeling, PDF reports, and advanced analytics.' },
+    { category: 'General', q: 'How do I get access?', a: 'DC MOC is available to authorized users only. Contact us at admin@resistancezero.com to request access credentials and discuss your data center operations needs.' },
     { category: 'General', q: 'How do I export a PDF report?', a: 'Each module has an "Export Full Report (PDF)" button in the top toolbar. Click it to generate a comprehensive multi-page PDF covering all KPIs, charts, tables, and recommendations for the active module. Reports are branded and print-ready.' },
     { category: 'General', q: 'Can I save and compare scenarios?', a: 'Yes — the Simulation module lets you save configurations as named scenarios. The Scenario Comparison tab displays saved scenarios side-by-side, comparing cost, headcount, PUE, and risk metrics across different countries and shift models.' },
 

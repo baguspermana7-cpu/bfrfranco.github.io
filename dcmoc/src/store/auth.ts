@@ -17,7 +17,6 @@ interface AuthState {
 const ACCOUNTS: { email: string; password: string; role: UserRole }[] = [
     { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', role: 'root' },
     { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', role: 'root' },
-    { email: 'demo@resistancezero.com', password: 'demo2026', role: 'user' },
 ];
 
 export const useAuthStore = create<AuthState>()(
