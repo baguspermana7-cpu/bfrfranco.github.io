@@ -140,7 +140,7 @@ export default function RiskDashboard() {
                 {/* 5×5 Risk Matrix */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <ShieldAlert className="w-4 h-4 text-cyan-400" /> Risk Matrix (Likelihood × Impact)
+                        <ShieldAlert className="w-4 h-4 text-cyan-400" /> Risk Matrix (Likelihood × Impact) <Tooltip content="5×5 risk assessment matrix mapping likelihood (Rare to Certain) against impact (Negligible to Catastrophic). Red zones require immediate mitigation." />
                     </h3>
                     <div className="relative">
                         <div className="text-[10px] text-slate-500 -rotate-90 absolute -left-7 top-1/2 -translate-y-1/2 whitespace-nowrap">
@@ -148,9 +148,20 @@ export default function RiskDashboard() {
                         </div>
                         <div className="ml-6">
                             {/* Y-axis labels */}
-                            {['Catastrophic', 'High', 'Medium', 'Low', 'Negligible'].map((label, rowIdx) => (
+                            {(['Catastrophic', 'High', 'Medium', 'Low', 'Negligible'] as const).map((label, rowIdx) => {
+                                const yTooltips: Record<string, string> = {
+                                    'Catastrophic': 'Business-critical, >$10M loss',
+                                    'High': 'Major disruption, $1M-$10M',
+                                    'Medium': 'Significant impact, $100k-$1M',
+                                    'Low': 'Minor disruption, $10k-$100k',
+                                    'Negligible': 'Minimal impact, <$10k loss',
+                                };
+                                return (
                                 <div key={label} className="flex items-center gap-1 mb-1">
-                                    <div className="w-16 text-[10px] text-slate-500 text-right pr-2">{label}</div>
+                                    <div className="w-16 text-[10px] text-slate-500 text-right pr-2 flex items-center justify-end gap-0.5">
+                                        <span>{label}</span>
+                                        <Tooltip content={yTooltips[label]} />
+                                    </div>
                                     {[0, 1, 2, 3, 4].map(colIdx => {
                                         const actualRow = 4 - rowIdx;
                                         const cell = matrix[actualRow]?.[colIdx];
@@ -212,13 +223,25 @@ export default function RiskDashboard() {
                                         );
                                     })}
                                 </div>
-                            ))}
+                            );
+                            })}
                             {/* X-axis labels */}
                             <div className="flex items-center gap-1 mt-1">
                                 <div className="w-16"></div>
-                                {['Rare', 'Unlikely', 'Possible', 'Likely', 'Certain'].map(l => (
-                                    <div key={l} className="flex-1 text-[10px] text-slate-500 text-center">{l}</div>
-                                ))}
+                                {(['Rare', 'Unlikely', 'Possible', 'Likely', 'Certain'] as const).map(l => {
+                                    const xTooltips: Record<string, string> = {
+                                        'Rare': 'Less than 1% probability per year',
+                                        'Unlikely': '1-10% probability',
+                                        'Possible': '10-50% probability',
+                                        'Likely': '50-90% probability',
+                                        'Certain': 'Over 90% probability',
+                                    };
+                                    return (
+                                        <div key={l} className="flex-1 text-[10px] text-slate-500 text-center flex flex-col items-center">
+                                            <span className="flex items-center gap-0.5">{l}<Tooltip content={xTooltips[l]} /></span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                             <div className="text-center text-[10px] text-slate-500 mt-1">LIKELIHOOD →</div>
                         </div>
@@ -291,14 +314,14 @@ export default function RiskDashboard() {
                     {/* MTTR / MTBF estimates */}
                     <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-4">
                         <div>
-                            <div className="text-[10px] text-slate-500 uppercase">Est. MTTR</div>
+                            <div className="text-[10px] text-slate-500 uppercase flex items-center">Est. MTTR <Tooltip content="Mean Time To Repair: average duration to restore equipment after failure." /></div>
                             <div className="text-sm font-bold text-amber-600 dark:text-amber-400">
                                 {tierLevel === 4 ? '15 min' : '45 min'}
                             </div>
                             <div className="text-[10px] text-slate-500">Mean Time To Repair</div>
                         </div>
                         <div>
-                            <div className="text-[10px] text-slate-500 uppercase">Est. MTBF</div>
+                            <div className="text-[10px] text-slate-500 uppercase flex items-center">Est. MTBF <Tooltip content="Mean Time Between Failures: average operating time between equipment failures." /></div>
                             <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                                 {tierLevel === 4 ? '8,760 hrs' : '4,380 hrs'}
                             </div>
@@ -351,7 +374,7 @@ export default function RiskDashboard() {
                     </h3>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">AQI Impact</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">AQI Impact <Tooltip content="Air Quality Index effect on equipment: high AQI accelerates filter clogging, increases cooling load, and may require facility shutdown above AQI 300." /></span>
                             <span className={`font-bold ${(selectedCountry.environment?.baselineAQI ?? 50) > 100 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                                 AQI {selectedCountry.environment?.baselineAQI ?? 50}
                             </span>
@@ -385,7 +408,7 @@ export default function RiskDashboard() {
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Critical Spares Lead</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Critical Spares Lead <Tooltip content="Lead time for procuring critical replacement parts. Longer lead times increase downtime risk during equipment failures." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">
                                 {selectedCountry.id === 'US' || selectedCountry.id === 'JP' ? '2-4 weeks' : '6-12 weeks'}
                             </span>
@@ -409,13 +432,13 @@ export default function RiskDashboard() {
                     </h3>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Data Sovereignty</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Data Sovereignty <Tooltip content="Legal requirements for data residency within national borders. References local regulations (e.g., Indonesia PP 71/2019, EU GDPR, Japan APPI)." /></span>
                             <span className={`font-bold ${selectedCountry.id === 'ID' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>
                                 {selectedCountry.id === 'ID' ? 'PP 71/2019' : selectedCountry.id === 'DE' ? 'GDPR' : selectedCountry.id === 'JP' ? 'APPI' : 'Standard'}
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Labor Regulations</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Labor Regulations <Tooltip content="Local employment laws affecting shift patterns, overtime limits, and worker protections (e.g., Indonesia PP 35/2021)." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">
                                 {selectedCountry.id === 'ID' ? 'PP 35/2021' : selectedCountry.id === 'JP' ? 'LSA' : 'Standard'}
                             </span>

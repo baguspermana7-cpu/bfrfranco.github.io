@@ -6,6 +6,7 @@ import { calculateCompliance, ComplianceResult, ComplianceCategory } from '@/mod
 import { ClipboardCheck, Shield, DollarSign, AlertTriangle, CheckCircle2, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtMoney, fmtMoneyFull } from '@/lib/format';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 const CATEGORY_COLORS: Record<ComplianceCategory, string> = {
     fire: 'bg-red-500',
@@ -54,15 +55,16 @@ export default function ComplianceDashboard() {
             {/* KPIs */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                    { label: 'Total Requirements', value: result.totalCount, icon: ClipboardCheck, color: 'cyan' },
-                    { label: 'Mandatory', value: result.mandatoryCount, icon: AlertTriangle, color: 'amber' },
-                    { label: 'Initial Cost', value: fmtMoney(result.totalInitialCost), icon: DollarSign, color: 'blue' },
-                    { label: 'Annual Cost', value: fmtMoney(result.totalAnnualCost), icon: BarChart3, color: 'green' },
+                    { label: 'Total Requirements', value: result.totalCount, icon: ClipboardCheck, color: 'cyan', tip: 'Total number of regulatory and certification requirements applicable to this country, including fire, electrical, environmental, building, data-protection, and telecom categories.' },
+                    { label: 'Mandatory', value: result.mandatoryCount, icon: AlertTriangle, color: 'amber', tip: 'Requirements that are legally mandatory — non-compliance may result in fines, operational shutdowns, or license revocations.' },
+                    { label: 'Initial Cost', value: fmtMoney(result.totalInitialCost), icon: DollarSign, color: 'blue', tip: 'One-time compliance cost for certifications, inspections, equipment upgrades, and initial filing fees.' },
+                    { label: 'Annual Cost', value: fmtMoney(result.totalAnnualCost), icon: BarChart3, color: 'green', tip: 'Recurring annual cost for license renewals, periodic inspections, audits, and ongoing compliance monitoring.' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                         <div className="flex items-center gap-2 mb-2">
                             <kpi.icon className={`w-4 h-4 text-${kpi.color}-500`} />
                             <span className="text-xs text-slate-500">{kpi.label}</span>
+                            <Tooltip content={kpi.tip} />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{kpi.value}</div>
                     </div>
@@ -72,7 +74,7 @@ export default function ComplianceDashboard() {
             {/* Compliance Score */}
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Compliance Coverage Score</h3>
+                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">Compliance Coverage Score <Tooltip content="Weighted score (0-100) based on percentage of mandatory requirements met. Score ≥80 is good, 60-79 needs attention, <60 is critical risk." /></h3>
                     <span className={clsx("text-2xl font-bold", result.complianceScore >= 80 ? "text-emerald-500" : result.complianceScore >= 60 ? "text-amber-500" : "text-red-500")}>
                         {result.complianceScore}/100
                     </span>
@@ -122,13 +124,13 @@ export default function ComplianceDashboard() {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/80">
-                                <th className="text-left px-4 py-2 text-slate-500 font-medium">Requirement</th>
-                                <th className="text-left px-4 py-2 text-slate-500 font-medium">Authority</th>
-                                <th className="text-left px-4 py-2 text-slate-500 font-medium">Standard</th>
-                                <th className="text-center px-4 py-2 text-slate-500 font-medium">Freq.</th>
-                                <th className="text-center px-4 py-2 text-slate-500 font-medium">Status</th>
-                                <th className="text-right px-4 py-2 text-slate-500 font-medium">Initial</th>
-                                <th className="text-right px-4 py-2 text-slate-500 font-medium">Annual</th>
+                                <th className="text-left px-4 py-2 text-slate-500 font-medium"><span className="flex items-center gap-1">Requirement <Tooltip content="Specific regulatory or certification requirement that applies to data center operations in this jurisdiction." /></span></th>
+                                <th className="text-left px-4 py-2 text-slate-500 font-medium"><span className="flex items-center gap-1">Authority <Tooltip content="Government body, regulatory agency, or standards organization that enforces this requirement." /></span></th>
+                                <th className="text-left px-4 py-2 text-slate-500 font-medium"><span className="flex items-center gap-1">Standard <Tooltip content="Reference standard code (e.g., IEC, NFPA, ISO) that defines the technical specification." /></span></th>
+                                <th className="text-center px-4 py-2 text-slate-500 font-medium"><span className="flex items-center justify-center gap-1">Freq. <Tooltip content="Inspection or renewal frequency — how often compliance must be verified (annual, biennial, one-time)." /></span></th>
+                                <th className="text-center px-4 py-2 text-slate-500 font-medium"><span className="flex items-center justify-center gap-1">Status <Tooltip content="Mandatory requirements are legally required. Optional requirements are best-practice recommendations." /></span></th>
+                                <th className="text-right px-4 py-2 text-slate-500 font-medium"><span className="flex items-center justify-end gap-1">Initial <Tooltip content="One-time cost for initial certification, inspection, or equipment purchase." /></span></th>
+                                <th className="text-right px-4 py-2 text-slate-500 font-medium"><span className="flex items-center justify-end gap-1">Annual <Tooltip content="Recurring annual cost for renewals, periodic inspections, and ongoing compliance." /></span></th>
                             </tr>
                         </thead>
                         <tbody>

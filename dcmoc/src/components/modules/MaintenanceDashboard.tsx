@@ -212,7 +212,7 @@ export function MaintenanceDashboard() {
                     {/* Hybrid Slider */}
                     {inputs.maintenanceModel === 'hybrid' && (
                         <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
-                            <span className="text-xs text-slate-500 dark:text-slate-400">In-House:</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">In-House: <Tooltip content="Percentage of maintenance work performed by in-house staff vs outsourced contractors. Higher in-house ratio reduces response time but increases fixed payroll cost." /></span>
                             <div className="flex items-center gap-2">
                                 <input
                                     type="range"
@@ -255,7 +255,7 @@ export function MaintenanceDashboard() {
                     <div className="flex items-center gap-4 bg-slate-100 dark:bg-slate-950 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <Wind className={clsx("w-4 h-4", isHighAQI ? "text-amber-500" : "text-emerald-500")} />
-                            AQI:
+                            AQI: <Tooltip content="Air Quality Index (0-300) at the facility location. Higher AQI accelerates filter degradation, increases HVAC maintenance frequency, and reduces equipment lifespan." />
                         </div>
                         <input
                             type="range"
@@ -323,7 +323,7 @@ export function MaintenanceDashboard() {
                     <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <Flame className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-                            Monthly Maintenance Density Heatmap
+                            Monthly Maintenance Density Heatmap <Tooltip content="Visual heatmap showing maintenance task concentration across months. Darker cells indicate higher maintenance workload — helps identify peak periods for resource planning." />
                         </h3>
                         <p className="text-xs text-slate-500 mt-1">Event intensity by month — darker = more maintenance events</p>
                     </div>
@@ -401,7 +401,7 @@ export function MaintenanceDashboard() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                             <BarChart3 className="w-4 h-4 text-violet-500 dark:text-violet-400" />
-                            Spare Parts ABC Pareto Analysis
+                            Spare Parts ABC Pareto Analysis <Tooltip content="ABC classification of spare parts by value: A-items (top 20% by cost, ~80% of value), B-items (next 30%), C-items (remaining 50%). Drives inventory investment strategy." />
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4">
@@ -638,11 +638,11 @@ function ScheduleTab({ assetCounts, schedule, weeks }: {
     return (
         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-sm dark:shadow-none animate-in fade-in zoom-in-95 duration-300">
             <div className="p-4 border-b border-slate-200 dark:border-slate-800/50 flex justify-between items-center bg-slate-50/50 dark:bg-transparent">
-                <div className="text-sm font-medium text-slate-800 dark:text-slate-300">Annual Maintenance Calendar ({new Date().getFullYear()})</div>
+                <div className="text-sm font-medium text-slate-800 dark:text-slate-300">Annual Maintenance Calendar ({new Date().getFullYear()}) <Tooltip content="12-month schedule grid showing all planned maintenance events. Color-coded: statutory (legally required), optimal (manufacturer-recommended), discretionary (condition-based)." /></div>
                 <div className="flex gap-4 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500 border border-red-400"></div>Statutory</div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500 border border-blue-400"></div>Optimal</div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-slate-500 border border-slate-400"></div>Discretionary</div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500 border border-red-400"></div>Statutory <Tooltip content="Legally required inspections and certifications — non-negotiable." /></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500 border border-blue-400"></div>Optimal <Tooltip content="Manufacturer-recommended maintenance intervals for optimal performance and warranty compliance." /></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-slate-500 border border-slate-400"></div>Discretionary <Tooltip content="Condition-based maintenance triggered by sensor data, inspections, or degradation thresholds." /></div>
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -765,7 +765,7 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
                         <div className="p-5 border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-transparent">
                             <div className="flex items-center gap-2 mb-1">
                                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white capitalize">{s.label}</h3>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white capitalize">{s.label} <Tooltip content={s.id === 'reactive' ? "Run-to-Failure: No scheduled maintenance — repair only when equipment fails. Lowest upfront cost but highest downtime risk." : s.id === 'planned' ? "Planned Preventive: Time-based scheduled maintenance at fixed intervals regardless of condition." : "Predictive (CBM): Condition-based maintenance using sensor data and analytics to predict failures before they occur."} /></h3>
                             </div>
                             <p className="text-xs text-slate-500 mt-1 leading-relaxed">{s.description}</p>
                         </div>
@@ -773,22 +773,22 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
                         {/* Metrics */}
                         <div className="p-5 space-y-3">
                             {[
-                                { label: 'Annual Cost', value: fmt(s.totalAnnualCost), highlight: true },
-                                { label: 'Labor', value: fmt(s.annualLaborCost) },
-                                { label: 'Parts & Materials', value: fmt(s.annualPartsCost) },
-                                { label: 'Downtime Risk', value: fmt(s.annualDowntimeCost) },
-                                { label: 'Unplanned Failures', value: `${s.unplannedFailures.toFixed(1)}/yr` },
-                                { label: '5-Year NPV', value: fmt(s.fiveYearNPV), highlight: true },
+                                { label: 'Annual Cost', value: fmt(s.totalAnnualCost), highlight: true, tip: 'Total annual maintenance cost including labor, parts, and estimated downtime losses for this strategy.' },
+                                { label: 'Labor', value: fmt(s.annualLaborCost), tip: 'Annual cost of maintenance technicians, engineers, and overtime hours required by this strategy.' },
+                                { label: 'Parts & Materials', value: fmt(s.annualPartsCost), tip: 'Annual spend on replacement parts, consumables, lubricants, and materials for scheduled and unscheduled repairs.' },
+                                { label: 'Downtime Risk', value: fmt(s.annualDowntimeCost), tip: 'Estimated annual cost of unplanned downtime based on failure probability and revenue-at-risk per hour of outage.' },
+                                { label: 'Unplanned Failures', value: `${s.unplannedFailures.toFixed(1)}/yr`, tip: 'Expected number of unplanned equipment failures per year. Lower values indicate better maintenance effectiveness.' },
+                                { label: '5-Year NPV', value: fmt(s.fiveYearNPV), highlight: true, tip: 'Net Present Value of all maintenance costs over 5 years, discounted at WACC. Lower NPV = more cost-effective strategy.' },
                             ].map((row, i) => (
                                 <div key={i} className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/30 last:border-0">
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">{row.label}</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">{row.label} <Tooltip content={row.tip} /></span>
                                     <span className={clsx('text-sm font-mono', row.highlight ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-slate-300')}>{row.value}</span>
                                 </div>
                             ))}
 
                             {s.sensorCapex > 0 && (
                                 <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/30">
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">Sensor CAPEX (one-time)</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">Sensor CAPEX (one-time) <Tooltip content="One-time capital cost for IoT sensors, vibration monitors, thermal cameras, and DCIM integration required for predictive maintenance." /></span>
                                     <span className="text-sm font-mono text-orange-600 dark:text-orange-400">{fmt(s.sensorCapex)}</span>
                                 </div>
                             )}
@@ -796,7 +796,7 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
                             {/* Reliability Bar */}
                             <div className="mt-3 pt-2">
                                 <div className="flex justify-between text-xs mb-1">
-                                    <span className="text-slate-500">Reliability Index</span>
+                                    <span className="text-slate-500">Reliability Index <Tooltip content="Overall equipment reliability score (0-100) based on MTBF, failure rates, and maintenance effectiveness. Higher is better." /></span>
                                     <span className="font-mono text-slate-900 dark:text-white">{s.reliabilityIndex}/100</span>
                                 </div>
                                 <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -816,10 +816,10 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
                 <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
                     <div>
-                        <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">Strategy Recommendation</h3>
+                        <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">Strategy Recommendation <Tooltip content="AI-recommended maintenance strategy based on cost-benefit analysis, considering your facility size, equipment mix, and risk tolerance." /></h3>
                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{data.recommendationReason}</p>
                         <div className="mt-3 px-3 py-2 bg-white dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-800 w-fit">
-                            <span className="text-xs text-slate-500">5-Year Savings (Optimal vs Worst):</span>
+                            <span className="text-xs text-slate-500">5-Year Savings (Optimal vs Worst): <Tooltip content="Projected cost savings over 5 years by adopting the optimal strategy compared to the most expensive alternative." /></span>
                             <span className="ml-2 font-mono font-bold text-emerald-600 dark:text-emerald-400">{fmt(data.fiveYearSavings)}</span>
                         </div>
                     </div>
@@ -843,13 +843,13 @@ function SLATab({ data, fmt }: { data: ReturnType<typeof calculateSLAComparison>
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
-                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase min-w-[120px]">SLA Tier</th>
-                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase min-w-[120px]">Response Time</th>
-                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[100px]">Annual Cost</th>
-                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[100px]">Risk Exposure</th>
-                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[120px]">Net Annual Cost</th>
-                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[120px]">Break-Even</th>
-                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase">Coverage</th>
+                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase min-w-[120px]"><span className="flex items-center gap-1">SLA Tier <Tooltip content="Service Level Agreement tier defining response time guarantees and coverage scope from the maintenance vendor." /></span></th>
+                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase min-w-[120px]"><span className="flex items-center gap-1">Response Time <Tooltip content="Maximum guaranteed time from fault report to on-site technician arrival. Shorter response = higher SLA cost." /></span></th>
+                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[100px]"><span className="flex items-center justify-end gap-1">Annual Cost <Tooltip content="Annual fee paid to the vendor for this SLA tier, based on asset count and criticality." /></span></th>
+                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[100px]"><span className="flex items-center justify-end gap-1">Risk Exposure <Tooltip content="Estimated annual financial risk from downtime during the response window. Longer response = higher risk." /></span></th>
+                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[120px]"><span className="flex items-center justify-end gap-1">Net Annual Cost <Tooltip content="Total cost of the SLA tier: annual fee + estimated risk exposure. The true cost of each option." /></span></th>
+                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase min-w-[120px]"><span className="flex items-center justify-end gap-1">Break-Even <Tooltip content="Downtime cost per minute at which upgrading to this SLA tier becomes financially justified over the cheaper option." /></span></th>
+                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase"><span className="flex items-center gap-1">Coverage <Tooltip content="Scope of equipment and services included in this SLA tier — what is covered and what requires additional contracts." /></span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -957,12 +957,12 @@ function SparesTab({ data, fmt }: { data: ReturnType<typeof calculateSparesOptim
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
-                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase">Critical Spare Part</th>
-                                <th className="py-3 px-4 text-center text-xs text-slate-500 font-medium uppercase">Criticality</th>
-                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase">Unit Cost</th>
-                                <th className="py-3 px-4 text-center text-xs text-slate-500 font-medium uppercase">Lead Time</th>
-                                <th className="py-3 px-4 text-center text-xs text-slate-500 font-medium uppercase">Reorder / Max</th>
-                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase">Holding Cost</th>
+                                <th className="py-3 px-4 text-left text-xs text-slate-500 font-medium uppercase"><span className="flex items-center gap-1">Critical Spare Part <Tooltip content="Name and associated asset for each spare part held in inventory. Critical spares prevent extended downtime during failures." /></span></th>
+                                <th className="py-3 px-4 text-center text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-center gap-1">Criticality <Tooltip content="Impact level if this part is unavailable: Critical (immediate outage risk), Major (degraded operation), Standard (convenience)." /></span></th>
+                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-end gap-1">Unit Cost <Tooltip content="Purchase price per unit from the supplier, used to calculate total inventory investment and holding costs." /></span></th>
+                                <th className="py-3 px-4 text-center text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-center gap-1">Lead Time <Tooltip content="Number of days from order placement to delivery. Longer lead times require higher safety stock levels." /></span></th>
+                                <th className="py-3 px-4 text-center text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-center gap-1">Reorder / Max <Tooltip content="Reorder point (minimum stock triggering a new order) / Maximum quantity to hold. Based on lead time and consumption rate." /></span></th>
+                                <th className="py-3 px-4 text-right text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-end gap-1">Holding Cost <Tooltip content="Annual cost to store this spare: includes warehousing, insurance, depreciation, and opportunity cost of tied-up capital (~15-25% of unit cost)." /></span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -994,12 +994,12 @@ function SparesTab({ data, fmt }: { data: ReturnType<typeof calculateSparesOptim
             {/* Inventory KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { label: 'Total Inventory Value', value: fmt(data.totalInventoryValue), desc: 'Capital tied up in spares', color: 'text-blue-600 dark:text-blue-400' },
-                    { label: 'Annual Holding Cost', value: fmt(data.totalHoldingCost), desc: 'Storage & depreciation', color: 'text-purple-600 dark:text-purple-400' },
-                    { label: 'Annual Spares Budget', value: fmt(data.totalAnnualSparesBudget), desc: 'Consumption + Holding', color: 'text-emerald-600 dark:text-emerald-400' },
+                    { label: 'Total Inventory Value', value: fmt(data.totalInventoryValue), desc: 'Capital tied up in spares', color: 'text-blue-600 dark:text-blue-400', tip: 'Total capital investment tied up in spare parts inventory. Higher values increase working capital requirements but reduce downtime risk.' },
+                    { label: 'Annual Holding Cost', value: fmt(data.totalHoldingCost), desc: 'Storage & depreciation', color: 'text-purple-600 dark:text-purple-400', tip: 'Annual cost of maintaining spare parts inventory: warehousing, insurance, depreciation, and opportunity cost of capital.' },
+                    { label: 'Annual Spares Budget', value: fmt(data.totalAnnualSparesBudget), desc: 'Consumption + Holding', color: 'text-emerald-600 dark:text-emerald-400', tip: 'Total annual budget for spare parts: consumption (parts used in maintenance) plus holding costs (storage and depreciation).' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm dark:shadow-none">
-                        <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">{kpi.label}</div>
+                        <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">{kpi.label} <Tooltip content={kpi.tip} /></div>
                         <div className={clsx("text-2xl font-bold mb-1", kpi.color)}>{kpi.value}</div>
                         <div className="text-xs text-slate-500 dark:text-slate-400">{kpi.desc}</div>
                     </div>

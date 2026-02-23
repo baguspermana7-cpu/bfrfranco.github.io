@@ -210,7 +210,7 @@ const CapexDashboard = () => {
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">UPS System</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">UPS System <Tooltip content="Standalone: traditional double-conversion online UPS. Modular: scalable hot-swap frames (Vertiv/Eaton). Distributed: rack-level lithium-ion units. Rotary/DRUPS: diesel rotary flywheel — no battery needed." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.upsType}
                                         onChange={(e) => handleChange('upsType', e.target.value)}>
                                         <option value="standalone">Standalone UPS</option>
@@ -220,7 +220,7 @@ const CapexDashboard = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Generator</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Generator <Tooltip content="Diesel: most common, fast start, high energy density. Gas Engine: lower emissions, requires gas supply. HVO/Renewable: hydrotreated vegetable oil — drop-in diesel replacement with 90% lower CO2." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.genType}
                                         onChange={(e) => handleChange('genType', e.target.value)}>
                                         <option value="diesel">Diesel Gen</option>
@@ -230,7 +230,7 @@ const CapexDashboard = () => {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fuel Storage: {inputs.fuelHours}h</div>
+                                <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fuel Storage: {inputs.fuelHours}h <Tooltip content="On-site fuel reserve in hours of full-load runtime. 48h is typical for Tier III. 72-168h for remote or hurricane-prone sites." /></div>
                                 <input type="range" min={12} max={168} step={12} value={inputs.fuelHours}
                                     onChange={(e) => handleChange('fuelHours', Number(e.target.value))}
                                     className="w-full accent-indigo-500" />
@@ -247,7 +247,7 @@ const CapexDashboard = () => {
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Suppression</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Suppression <Tooltip content="Novec 1230: clean agent, zero ODP, safe for occupied spaces. FM-200: proven clean agent (being phased out in EU). Inert Gas (IG-541): nitrogen/argon blend, zero GWP, larger cylinder storage. Wet Pipe: cheapest but risks water damage to equipment." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.fireType}
                                         onChange={(e) => handleChange('fireType', e.target.value)}>
                                         <option value="novec">Novec 1230</option>
@@ -257,7 +257,7 @@ const CapexDashboard = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fire Alarm</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fire Alarm <Tooltip content="Addressable: point-type detectors with exact zone identification. VESDA (Aspirating): air-sampling system that detects smoke at earliest stages — gold standard for data centers. Beam Detection: infrared beam across large open spaces." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.alarmType}
                                         onChange={(e) => handleChange('alarmType', e.target.value)}>
                                         <option value="addressable">Addressable</option>
@@ -275,7 +275,7 @@ const CapexDashboard = () => {
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Green Certification</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Green Certification <Tooltip content="LEED Silver: basic sustainable design (+2% cost). LEED Gold: high-performance building (+4%). LEED Platinum: maximum sustainability standard (+8%). Certification adds upfront cost but improves ESG scores and may unlock tax incentives." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.greenCert}
                                         onChange={(e) => handleChange('greenCert', e.target.value)}>
                                         <option value="none">None</option>
@@ -285,7 +285,7 @@ const CapexDashboard = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Renewable Energy</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Renewable Energy <Tooltip content="Solar PV: rooftop or carport panels to offset grid consumption. Solar + BESS: solar with Battery Energy Storage System for peak shaving and grid independence. Adds CAPEX but reduces long-term OPEX." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.renewableOption}
                                         onChange={(e) => handleChange('renewableOption', e.target.value)}>
                                         <option value="none">None</option>
@@ -299,16 +299,16 @@ const CapexDashboard = () => {
                         {/* ─── SUBSTATION & GRID ─── */}
                         <div className="pt-3 border-t dark:border-slate-700 space-y-3">
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Zap className="w-3 h-3 mr-1" /> Substation & Grid
+                                <Zap className="w-3 h-3 mr-1" /> Substation & Grid <Tooltip content="Front-of-meter infrastructure includes HV/MV substation, grid connection, and utility metering. Required for builds >5MW or greenfield sites without existing power feed." />
                             </label>
                             <div className="flex items-center gap-2 mb-2">
                                 <input type="checkbox" checked={inputs.includeFOM} onChange={() => handleChange('includeFOM', !inputs.includeFOM)} className="accent-indigo-500" />
-                                <span className="text-xs text-slate-600 dark:text-slate-400">Include Front-of-Meter Infrastructure</span>
+                                <span className="text-xs text-slate-600 dark:text-slate-400">Include Front-of-Meter Infrastructure <Tooltip content="Toggle to include substation, HV switchgear, transformers, and grid connection costs. Typically $2-8M+ depending on voltage and capacity." /></span>
                             </div>
                             {inputs.includeFOM && (
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="space-y-1">
-                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Substation</div>
+                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Substation <Tooltip content="Pad Mount 11kV: compact, low-cost, suits <5MW loads. Dedicated 33kV: standard for 5-20MW campuses. 66kV/132kV: transmission-level for hyperscale 50MW+ sites with direct grid tap." /></div>
                                         <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.substationType}
                                             onChange={(e) => handleChange('substationType', e.target.value)}>
                                             <option value="pad_mounted_11kv">Pad Mount 11kV</option>
@@ -318,7 +318,7 @@ const CapexDashboard = () => {
                                         </select>
                                     </div>
                                     <div className="space-y-1">
-                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Utility Rate</div>
+                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Utility Rate <Tooltip content="Local electricity tariff in $/kWh. Affects OPEX projections and payback calculations. Typical range: $0.05-$0.20/kWh depending on market." /></div>
                                         <div className="flex items-center gap-1">
                                             <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.utilityRate}
                                                 onChange={(e) => handleChange('utilityRate', Number(e.target.value))} />
@@ -365,11 +365,11 @@ const CapexDashboard = () => {
                         {/* ─── PROJECT TIMELINE ─── */}
                         <div className="pt-3 border-t dark:border-slate-700 space-y-3">
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Calendar className="w-3 h-3 mr-1" /> Project Year & Market
+                                <Calendar className="w-3 h-3 mr-1" /> Project Year & Market <Tooltip content="Construction year affects material pricing via inflation indices. City market applies local labor and supply-chain cost multipliers." />
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Project Year</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Project Year <Tooltip content="Construction start year. Applies inflation/deflation adjustment to all cost estimates based on construction cost indices." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.projYear}
                                         onChange={(e) => handleChange('projYear', e.target.value)}>
                                         <option value="2024">2024</option>
@@ -379,7 +379,7 @@ const CapexDashboard = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">City Market</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">City Market <Tooltip content="City-level cost multiplier based on local labor rates, material costs, and market conditions. Silicon Valley and London are premium; Generic uses the country baseline." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.cityMarket}
                                         onChange={(e) => handleChange('cityMarket', e.target.value)}>
                                         <option value="none">Generic</option>
@@ -407,10 +407,10 @@ const CapexDashboard = () => {
                             <div className="space-y-3 animate-in slide-in-from-top-2">
                                 {/* Power Distribution */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Power Distribution</label>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Power Distribution <Tooltip content="Method of delivering power from UPS output to server racks. Busway is modern and flexible. Underfloor routing works with raised floors." /></label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Distribution</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Distribution <Tooltip content="Busway/Busbar: tap-off units for flexible rack feeds. Cable Tray: traditional copper/aluminum runs. Overhead: ceiling-mounted runs for slab floors. Underfloor: routed beneath raised floor tiles." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.powerDistribution || 'busway'}
                                                 onChange={(e) => handleChange('powerDistribution', e.target.value)}>
                                                 <option value="busway">Busway / Busbar</option>
@@ -420,7 +420,7 @@ const CapexDashboard = () => {
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">PDU Type</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">PDU Type <Tooltip content="Basic: simple power strip, no monitoring. Monitored: per-outlet power metering for capacity planning. Switched: remote on/off per outlet. Intelligent/Managed: full SNMP/API control with environmental sensors." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.pduType || 'monitored'}
                                                 onChange={(e) => handleChange('pduType', e.target.value)}>
                                                 <option value="basic">Basic</option>
@@ -434,10 +434,10 @@ const CapexDashboard = () => {
 
                                 {/* Cabling & Floor */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Cabling & Floor</label>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Cabling & Floor <Tooltip content="Structured cabling and raised floor choices affect airflow management, cable routing capacity, and long-term scalability." /></label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Cabling</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Cabling <Tooltip content="Cat 6A: supports 10GbE up to 100m, most common. Cat 8: 25/40GbE for short runs (<30m). Fiber OM4: multimode for 10-100GbE up to 150m. Fiber Single-Mode: long-distance inter-building and campus backbone." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.cablingType || 'cat6a'}
                                                 onChange={(e) => handleChange('cablingType', e.target.value)}>
                                                 <option value="cat6a">Cat 6A Copper</option>
@@ -447,7 +447,7 @@ const CapexDashboard = () => {
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Floor Type</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Floor Type <Tooltip content="Raised Floor: standard 300mm plenum for underfloor air distribution. Slab: no raised floor, requires overhead cooling. 600mm: deeper plenum for higher airflow. 1000mm: maximum plenum for high-density or underfloor busway routing." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.floorType || 'raised'}
                                                 onChange={(e) => handleChange('floorType', e.target.value)}>
                                                 <option value="raised">Raised Floor</option>
@@ -461,10 +461,10 @@ const CapexDashboard = () => {
 
                                 {/* Security & Connectivity */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Security & Connectivity</label>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Security & Connectivity <Tooltip content="Physical security layers and network connectivity infrastructure. Higher security tiers add mantraps, vehicle barriers, and 24/7 guard staff." /></label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Security Level</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Security Level <Tooltip content="Basic: CCTV and card access. Standard: adds biometric readers (fingerprint/iris). Enhanced: mantraps, IR perimeter detection, vehicle bollards. Military Grade: SCIF-level with Tempest shielding, armed guards, blast-resistant walls." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.securityLevel || 'standard'}
                                                 onChange={(e) => handleChange('securityLevel', e.target.value)}>
                                                 <option value="basic">Basic (CCTV + Access)</option>
@@ -474,7 +474,7 @@ const CapexDashboard = () => {
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fiber Entry</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fiber Entry <Tooltip content="Single Entrance: one fiber path into building. Dual Diverse: two physically separate fiber paths from different carriers for redundancy. MMR (Meet-Me Room): carrier-neutral room for cross-connects between multiple providers." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.fiberEntry || 'single'}
                                                 onChange={(e) => handleChange('fiberEntry', e.target.value)}>
                                                 <option value="single">Single Entrance</option>
@@ -487,10 +487,10 @@ const CapexDashboard = () => {
 
                                 {/* Site & Market */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Site & Market Conditions</label>
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Site & Market Conditions <Tooltip content="Site preparation and labor market conditions that affect construction cost and timeline. Brownfield and overheated markets can add 10-20% to baseline costs." /></label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Site Condition</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Site Condition <Tooltip content="Greenfield: undeveloped land, clean build but needs full site works. Brownfield: previously developed land, may require demolition or remediation. Retrofit: converting an existing building — saves on shell but limits design flexibility." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.siteCondition || 'greenfield'}
                                                 onChange={(e) => handleChange('siteCondition', e.target.value)}>
                                                 <option value="greenfield">Greenfield</option>
@@ -499,7 +499,7 @@ const CapexDashboard = () => {
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Market Condition</div>
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Market Condition <Tooltip content="Favorable: low labor demand, competitive bidding — cost savings. Normal: standard market pricing. Tight: skilled labor shortage, longer lead times. Overheated: extreme demand (e.g., NoVA 2024), adds ~15% premium with extended schedules." /></div>
                                             <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.marketCondition || 'normal'}
                                                 onChange={(e) => handleChange('marketCondition', e.target.value)}>
                                                 <option value="favorable">Favorable (Low Labor)</option>

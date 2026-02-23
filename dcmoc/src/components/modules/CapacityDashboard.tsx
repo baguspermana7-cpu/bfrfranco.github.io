@@ -144,7 +144,7 @@ const CapacityDashboardMod = () => {
                 <Card className="lg:col-span-1 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phase Configuration</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phase Configuration <Tooltip content="Define build phases for your data center expansion. Each phase specifies IT load capacity, construction start month, and build duration." /></h3>
                             <button onClick={addPhase} className="p-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors">
                                 <Plus className="w-4 h-4" />
                             </button>
@@ -166,7 +166,7 @@ const CapacityDashboardMod = () => {
                                     </div>
                                     <div className="grid grid-cols-3 gap-2 text-xs">
                                         <div>
-                                            <label className="text-slate-500 block mb-0.5">IT Load (kW)</label>
+                                            <label className="text-slate-500 mb-0.5 flex items-center gap-1">IT Load (kW) <Tooltip content="IT power capacity in kilowatts for this phase. Determines rack density, cooling requirements, and staffing levels." /></label>
                                             <input
                                                 type="number"
                                                 className="w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded text-slate-900 dark:text-white text-xs"
@@ -175,7 +175,7 @@ const CapacityDashboardMod = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-slate-500 block mb-0.5">Start (Mo)</label>
+                                            <label className="text-slate-500 mb-0.5 flex items-center gap-1">Start (Mo) <Tooltip content="Construction start month (from project inception). Phase 1 typically starts at month 0; subsequent phases are staggered." /></label>
                                             <input
                                                 type="number"
                                                 className="w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded text-slate-900 dark:text-white text-xs"
@@ -184,7 +184,7 @@ const CapacityDashboardMod = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-slate-500 block mb-0.5">Build (Mo)</label>
+                                            <label className="text-slate-500 mb-0.5 flex items-center gap-1">Build (Mo) <Tooltip content="Construction duration in months. Typical ranges: 12-18 months for shell+core, 6-9 months for fit-out." /></label>
                                             <input
                                                 type="number"
                                                 className="w-full px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded text-slate-900 dark:text-white text-xs"
@@ -250,7 +250,7 @@ const CapacityDashboardMod = () => {
                             {/* Gantt Chart */}
                             <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                                 <CardContent className="pt-6">
-                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Build Timeline (Gantt)</h3>
+                                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Build Timeline (Gantt) <Tooltip content="Gantt chart visualization showing construction timelines for each phase. Overlapping bars indicate concurrent build activities." /></h3>
                                     <div className="space-y-2">
                                         {result.phases.map((phase, idx) => {
                                             const maxMonth = result.totalMonths;
@@ -330,7 +330,7 @@ const CapacityDashboardMod = () => {
                     {/* Cumulative Capacity + CAPEX */}
                     <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                         <CardContent className="pt-6">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Cumulative Capacity & Investment</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Cumulative Capacity & Investment <Tooltip content="Stacked area chart showing how total IT capacity and cumulative CAPEX investment grow over the project timeline." /></h3>
                             <ResponsiveContainer width="100%" height={280}>
                                 <ComposedChart data={cumulativeChartData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
@@ -351,7 +351,7 @@ const CapacityDashboardMod = () => {
                     {/* Utilization Curve */}
                     <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                         <CardContent className="pt-6">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Capacity vs Demand Utilization</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Capacity vs Demand Utilization <Tooltip content="Shows how deployed capacity compares to projected demand over time. The gap between capacity and demand represents available headroom." /></h3>
                             <p className="text-[11px] text-slate-400 mb-4">Deployed capacity versus projected demand based on occupancy ramp assumptions</p>
                             <ResponsiveContainer width="100%" height={280}>
                                 <ComposedChart data={result.utilizationCurve}>
@@ -382,20 +382,20 @@ const CapacityDashboardMod = () => {
                     {/* Enhanced Phase Comparison Table */}
                     <Card className="lg:col-span-2 bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                         <CardContent className="pt-6">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Phase Comparison</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Phase Comparison <Tooltip content="Side-by-side comparison of all phases showing IT load, CAPEX, cost per kW, staffing, PUE, revenue, and ROI for each phase." /></h3>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-xs">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700">
-                                            <th className="text-left py-2 px-2 text-slate-500">Phase</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">IT Load</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">CAPEX</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">$/kW</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">FTE</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">PUE</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">Revenue/yr</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">ROI</th>
-                                            <th className="text-right py-2 px-2 text-slate-500">Risk</th>
+                                            <th className="text-left py-2 px-2 text-slate-500"><span className="flex items-center gap-1">Phase <Tooltip content="Build phase identifier. Each phase represents a discrete capacity expansion." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">IT Load <Tooltip content="IT power capacity in kilowatts provisioned for this phase." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">CAPEX <Tooltip content="Capital expenditure for this phase including construction, MEP, and equipment." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">$/kW <Tooltip content="Cost per kilowatt for this phase. Should decrease in later phases due to economies of scale." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">FTE <Tooltip content="Full-time equivalent headcount required to operate this phase at steady state." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">PUE <Tooltip content="Power Usage Effectiveness for this phase. Lower is better; 1.0 = perfect efficiency." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">Revenue/yr <Tooltip content="Estimated annual revenue at full occupancy based on regional colocation rates." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">ROI <Tooltip content="Return on investment period in years — time to recoup CAPEX from operating margin." /></span></th>
+                                            <th className="text-right py-2 px-2 text-slate-500"><span className="flex items-center justify-end gap-1">Risk <Tooltip content="Composite risk score (0-100) factoring supply chain, permitting, demand uncertainty, and construction complexity." /></span></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -444,7 +444,7 @@ const CapacityDashboardMod = () => {
                             </div>
 
                             {/* Staffing Ramp */}
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-6 mb-3">Staffing Ramp</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-6 mb-3">Staffing Ramp <Tooltip content="Projected headcount growth across phases, showing when new staff must be hired to support each capacity expansion." /></h3>
                             <ResponsiveContainer width="100%" height={150}>
                                 <AreaChart data={result.staffingRamp}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
@@ -492,7 +492,7 @@ const CapacityDashboardMod = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                     {/* Infrastructure Scope */}
                                     <div>
-                                        <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Infrastructure Scope</h4>
+                                        <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Infrastructure Scope <Tooltip content="Summary of physical infrastructure components required across all phases — generators, UPS units, cooling systems, PDUs." /></h4>
                                         <ul className="space-y-1">
                                             {detail.infrastructureScope.map((item, i) => (
                                                 <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
@@ -505,7 +505,7 @@ const CapacityDashboardMod = () => {
 
                                     {/* Risk Factors */}
                                     <div>
-                                        <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Risk Factors</h4>
+                                        <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Risk Factors <Tooltip content="Identified risks for the capacity plan including supply chain delays, permitting issues, and demand uncertainty." /></h4>
                                         <ul className="space-y-1">
                                             {detail.riskFactors.map((risk, i) => (
                                                 <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
@@ -526,7 +526,7 @@ const CapacityDashboardMod = () => {
             {result && activeTab === 'assumptions' && (
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Key Assumptions</h3>
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Key Assumptions <Tooltip content="Baseline assumptions used in capacity calculations including PUE targets, utilization rates, and cost escalation factors." /></h3>
                         <p className="text-[11px] text-slate-400 mb-4">These assumptions drive the capacity plan calculations. Adjust phase configuration or global inputs to see how changes propagate.</p>
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs">

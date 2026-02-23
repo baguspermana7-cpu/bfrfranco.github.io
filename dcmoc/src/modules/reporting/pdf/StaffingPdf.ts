@@ -173,12 +173,13 @@ export const generateStaffingPDF = async (
     y = drawSectionTitle(doc, y, 'Efficiency Metrics', '4', branding);
 
     const utilizationRate = efficiencyMetrics?.utilizationRate || 0.82;
-    const costPerMW = totalCost / (staffingResults.reduce((acc, r) => acc + r.headcount, 0) > 0 ? 1 : 1); // Simplified
+    const totalHeadsForCost = staffingResults.reduce((acc, r) => acc + r.headcount, 0) || 1;
+    const costPerMW = totalCost / totalHeadsForCost;
     const otRatio = efficiencyMetrics?.otRatio || 0.05;
     const shrinkageLoss = efficiencyMetrics?.shrinkageLoss || 0.08;
 
     drawKpiCard(doc, 14, y, 42, 24, 'Utilization Rate', `${(utilizationRate * 100).toFixed(0)}%`, 'Productive vs total hours');
-    drawKpiCard(doc, 60, y, 42, 24, 'Cost / MW', fmt(totalCost * 12), 'Annual staff cost');
+    drawKpiCard(doc, 60, y, 42, 24, 'Cost / Head', fmt(costPerMW * 12), 'Annual per-head cost');
     drawKpiCard(doc, 106, y, 42, 24, 'OT Ratio', `${(otRatio * 100).toFixed(1)}%`, 'Overtime vs regular');
     drawKpiCard(doc, 152, y, 42, 24, 'Shrinkage', `${(shrinkageLoss * 100).toFixed(1)}%`, 'Leave + absence');
     y += 35;

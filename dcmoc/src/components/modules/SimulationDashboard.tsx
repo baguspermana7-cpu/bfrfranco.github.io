@@ -310,7 +310,7 @@ export function SimulationDashboard() {
                                         : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600"
                                 )}
                             >
-                                8-Hour (3 Shift)
+                                8-Hour (3 Shift) <Tooltip content="8-Hour Continental: 3 shifts × 8 hours, 4 teams. Provides 24/7 coverage with standard shift lengths." />
                             </button>
                             <button
                                 onClick={() => actions.setInputs({ shiftModel: '12h' })}
@@ -321,7 +321,7 @@ export function SimulationDashboard() {
                                         : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600"
                                 )}
                             >
-                                12-Hour (2 Shift)
+                                12-Hour (2 Shift) <Tooltip content="12-Hour 4on/3off: 2 shifts × 12 hours, 2 teams. Fewer handovers but longer shifts — may require regulatory permits." />
                             </button>
                         </div>
                         {inputs.shiftModel === '12h' && selectedCountry.id === 'ID' && (
@@ -347,9 +347,9 @@ export function SimulationDashboard() {
                             className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                         />
                         <div className="flex justify-between mt-2 text-sm">
-                            <span className="text-slate-500 dark:text-slate-400">Low (10)</span>
+                            <span className="text-slate-500 dark:text-slate-400 flex items-center">Low (10) <Tooltip content="AQI 0-50: Good air quality, minimal equipment impact. AQI 150-300: Hazardous — accelerated filter degradation, increased cooling load, potential facility shutdown." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">{scenarioAQI} AQI</span>
-                            <span className="text-slate-500 dark:text-slate-400">Hazardous (300)</span>
+                            <span className="text-slate-500 dark:text-slate-400 flex items-center">Hazardous (300) <Tooltip content="AQI 0-50: Good air quality, minimal equipment impact. AQI 150-300: Hazardous — accelerated filter degradation, increased cooling load, potential facility shutdown." /></span>
                         </div>
                         {aqiLaborPunishment > 0 && (
                             <div className="mt-2 text-xs text-red-400 bg-red-950/20 p-2 rounded flex items-center gap-2">
@@ -374,8 +374,10 @@ export function SimulationDashboard() {
                             onChange={(e) => setScenarioTurnover(Number(e.target.value))}
                             className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                         />
-                        <div className="flex justify-end mt-2 text-sm">
+                        <div className="flex justify-between mt-2 text-sm items-center">
+                            <span className="text-slate-500 dark:text-slate-400 flex items-center text-xs">0% <Tooltip content="Annual employee turnover rate. Industry average 10-15%. Higher turnover increases recruitment costs and reduces operational continuity." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">{(scenarioTurnover * 100).toFixed(0)}%</span>
+                            <span className="text-slate-500 dark:text-slate-400 text-xs">50%</span>
                         </div>
                         <div className="mt-2 text-xs text-amber-400 bg-amber-950/20 p-2 rounded flex items-center gap-2">
                             <DollarSign className="w-3 h-3" />
@@ -460,12 +462,12 @@ export function SimulationDashboard() {
                     <div className="bg-slate-200 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-300 dark:border-slate-600 mb-6">
                         <div className="flex items-center gap-2 mb-4">
                             <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Overtime & Regulatory Analysis (PP 35/2021)</h3>
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">Overtime & Regulatory Analysis (PP 35/2021) <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <div className="flex justify-between text-xs mb-1">
-                                    <span className="text-slate-600 dark:text-slate-400">Weekly OT Hours/Person</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">Weekly OT Hours/Person <Tooltip content="Maximum overtime hours per person per week. Subject to local labor law limits (e.g., Indonesia max 14hrs/week, EU max 8hrs/week)." /></span>
                                     <span className="text-slate-900 dark:text-white font-mono font-bold">{results.overtimeHours.toFixed(1)} hrs</span>
                                 </div>
                                 <div className="h-2 bg-slate-300 dark:bg-slate-600 rounded-full overflow-hidden">
@@ -480,11 +482,11 @@ export function SimulationDashboard() {
                             </div>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-xs border-b border-slate-300 dark:border-slate-600/50 pb-1">
-                                    <span className="text-slate-600 dark:text-slate-400">Base Salary</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">Base Salary <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></span>
                                     <span className="text-slate-900 dark:text-white font-mono">${(20000).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-xs font-bold text-amber-600 dark:text-amber-400">
-                                    <span>Overtime Penalty</span>
+                                    <span className="flex items-center">Overtime Penalty <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></span>
                                     <span className="font-mono">${(1126.30).toFixed(2)}</span>
                                 </div>
                             </div>
@@ -496,7 +498,7 @@ export function SimulationDashboard() {
                         <div className="bg-slate-200 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-300 dark:border-slate-600">
                             <div className="flex items-center gap-2 mb-4">
                                 <CloudFog className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Environmental Physics (Power Law)</h3>
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">Environmental Physics (Power Law) <Tooltip content="Mathematical model of environmental impact on equipment: temperature derating, humidity corrosion factor, and particulate accumulation rates." /></h3>
                             </div>
                             <div className="flex items-start gap-4">
                                 <div className="flex-1 bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg font-mono text-[10px] text-emerald-700 dark:text-emerald-400 border border-slate-400 dark:border-slate-700/50">
@@ -563,7 +565,7 @@ export function SimulationDashboard() {
                                             <div className="text-[9px] text-slate-500">{coolingPct}% overhead</div>
                                         </div>
                                         <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Total Facility <Tooltip content="Combined power draw including IT load, cooling, lighting, and distribution losses." /></div>
+                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Total Facility <Tooltip content="Total facility power consumption including IT load, cooling, lighting, UPS losses, and mechanical systems. Total = IT Load × PUE." /></div>
                                             <div className="text-lg font-bold text-slate-900 dark:text-white">{fmtUnit(totalFacilityKw, 'kW')}</div>
                                             <div className="text-[9px] text-slate-500">IT + Cooling + Losses</div>
                                         </div>

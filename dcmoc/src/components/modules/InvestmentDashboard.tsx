@@ -181,13 +181,13 @@ const InvestmentDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Interest Rate (%)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Interest Rate (%) <Tooltip content="Annual interest rate on debt financing. Typical range 4-8% for data center project finance." /></label>
                                 <input type="number" className={inpCls} step={0.5}
                                     value={(investInputs.debtCostAnnual * 100).toFixed(1)}
                                     onChange={e => handleChange('debtCostAnnual', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Debt Term (yrs)</label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Debt Term (yrs) <Tooltip content="Loan repayment period in years. Longer terms reduce annual payments but increase total interest cost. Typical: 7-15 years." /></label>
                                 <input type="number" className={inpCls} min={5} max={25}
                                     value={investInputs.debtTermYears}
                                     onChange={e => handleChange('debtTermYears', Number(e.target.value))} />
@@ -209,13 +209,13 @@ const InvestmentDashboard = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Exit Year</label>
+                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Exit Year <Tooltip content="Target year for investment exit (sale, IPO, or recapitalization). Typical PE holding period: 5-7 years." /></label>
                             <input type="number" className={inpCls} min={3} max={10}
                                 value={investInputs.exitYear}
                                 onChange={e => handleChange('exitYear', Number(e.target.value))} />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Exit EV/EBITDA</label>
+                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Exit EV/EBITDA <Tooltip content="Enterprise Value to EBITDA multiple at exit. Data center multiples typically range 15-25x depending on market conditions and contract quality." /></label>
                             <input type="number" className={inpCls} min={10} max={30} step={0.5}
                                 value={investInputs.exitEbitdaMultiple}
                                 onChange={e => handleChange('exitEbitdaMultiple', Number(e.target.value))} />
@@ -289,9 +289,9 @@ const InvestmentDashboard = () => {
                     <div className="space-y-4 animate-in fade-in duration-300">
                         {/* KPI Cards */}
                         <div className="grid grid-cols-4 gap-3">
-                            <KPICard label="Total CAPEX" value={fmtMoney(capexResults.total)} icon={<Building className="w-4 h-4" />} color="slate" />
-                            <KPICard label="Debt Amount" value={fmtMoney(result.totalDebt)} sub={`${(investInputs.debtRatio * 100).toFixed(0)}% leverage`} icon={<DollarSign className="w-4 h-4" />} color="red" />
-                            <KPICard label="Equity Required" value={fmtMoney(result.totalEquity)} sub={`${((1 - investInputs.debtRatio) * 100).toFixed(0)}% equity`} icon={<DollarSign className="w-4 h-4" />} color="emerald" />
+                            <KPICard label="Total CAPEX" value={fmtMoney(capexResults.total)} icon={<Building className="w-4 h-4" />} color="slate" tooltip="Total capital expenditure including land, building, MEP, and IT infrastructure. This is the total investment amount to be financed." />
+                            <KPICard label="Debt Amount" value={fmtMoney(result.totalDebt)} sub={`${(investInputs.debtRatio * 100).toFixed(0)}% leverage`} icon={<DollarSign className="w-4 h-4" />} color="red" tooltip="Total debt financing amount based on CAPEX and debt ratio. This is the principal amount to be repaid over the debt term." />
+                            <KPICard label="Equity Required" value={fmtMoney(result.totalEquity)} sub={`${((1 - investInputs.debtRatio) * 100).toFixed(0)}% equity`} icon={<DollarSign className="w-4 h-4" />} color="emerald" tooltip="Equity capital required from sponsors/investors. This is the portion of CAPEX not covered by debt financing." />
                             <KPICard label="WACC" value={fmtPct(result.wacc * 100)} sub="Weighted avg cost" icon={<TrendingUp className="w-4 h-4" />} color="indigo" tooltip="Weighted Average Cost of Capital — blended cost of debt and equity financing. Used as discount rate for DCF analysis." />
                         </div>
 
@@ -372,15 +372,15 @@ const InvestmentDashboard = () => {
                 {activeTab === 'returns' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
                         <div className="grid grid-cols-4 gap-3">
-                            <KPICard label="Equity IRR" value={fmtPct(result.equityIRR)} sub={result.equityIRR > 15 ? 'Above 15% target' : 'Below 15% target'} icon={<TrendingUp className="w-4 h-4" />} color={result.equityIRR >= 15 ? 'emerald' : 'red'} />
+                            <KPICard label="Equity IRR" value={fmtPct(result.equityIRR)} sub={result.equityIRR > 15 ? 'Above 15% target' : 'Below 15% target'} icon={<TrendingUp className="w-4 h-4" />} color={result.equityIRR >= 15 ? 'emerald' : 'red'} tooltip="Levered Internal Rate of Return on equity invested. Target is 15%+ for institutional data center PE investments." />
                             <KPICard label="MOIC" value={`${result.moic.toFixed(2)}x`} sub="Multiple on invested capital" icon={<ArrowUpRight className="w-4 h-4" />} color={result.moic >= 2 ? 'emerald' : 'amber'} tooltip="Multiple on Invested Capital — total value returned divided by total capital invested. Target is 2-3x for PE." />
-                            <KPICard label="Min DSCR" value={`${result.minDSCR.toFixed(2)}x`} sub={result.minDSCR >= 1.25 ? 'Above 1.25x threshold' : 'Below 1.25x threshold'} icon={<Shield className="w-4 h-4" />} color={result.minDSCR >= 1.25 ? 'emerald' : 'red'} />
-                            <KPICard label="Y1 Cash-on-Cash" value={fmtPct(result.year1CashOnCash)} sub="Year 1 levered yield" icon={<DollarSign className="w-4 h-4" />} color={result.year1CashOnCash >= 8 ? 'emerald' : 'amber'} />
+                            <KPICard label="Min DSCR" value={`${result.minDSCR.toFixed(2)}x`} sub={result.minDSCR >= 1.25 ? 'Above 1.25x threshold' : 'Below 1.25x threshold'} icon={<Shield className="w-4 h-4" />} color={result.minDSCR >= 1.25 ? 'emerald' : 'red'} tooltip="Minimum Debt Service Coverage Ratio across all years. Lenders typically require 1.25x+ DSCR as a covenant threshold." />
+                            <KPICard label="Y1 Cash-on-Cash" value={fmtPct(result.year1CashOnCash)} sub="Year 1 levered yield" icon={<DollarSign className="w-4 h-4" />} color={result.year1CashOnCash >= 8 ? 'emerald' : 'amber'} tooltip="Year 1 levered free cashflow divided by total equity invested. Measures the immediate cash yield on equity. Target: 8%+ for stabilized assets." />
                         </div>
 
                         {/* DSCR Chart */}
                         <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
-                            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-4">Debt Service Coverage Ratio (DSCR)</h3>
+                            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-4 flex items-center gap-1">Debt Service Coverage Ratio (DSCR) <Tooltip content="Ratio of net operating income to total debt service payments. A DSCR below 1.0x means cashflow cannot cover debt payments. Lenders typically require 1.25x minimum." /></h3>
                             <ResponsiveContainer width="100%" height={260}>
                                 <LineChart data={result.leveredFCFTable.filter(r => r.dscr < 99).map(r => ({
                                     year: `Y${r.year}`,
@@ -462,7 +462,7 @@ const InvestmentDashboard = () => {
 
                     return (
                         <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
-                            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-1">GP/LP Return Waterfall</h3>
+                            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-1 flex items-center gap-1">GP/LP Return Waterfall <Tooltip content="Distribution waterfall showing how profits are split between General Partner (GP) and Limited Partners (LP). LP receives preferred return first, then GP takes carried interest on excess profits." /></h3>
                             <p className="text-[11px] text-slate-400 mb-4">{(hurdleRate * 100).toFixed(0)}% preferred return hurdle, {(carryRate * 100).toFixed(0)}% GP carry on profits above hurdle</p>
                             <div className="grid grid-cols-4 gap-3 mb-4">
                                 {waterfallItems.map((item, i) => (
@@ -502,7 +502,7 @@ const InvestmentDashboard = () => {
                                 </div>
                             </div>
                             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm dark:shadow-none">
-                                <div className="text-[10px] text-cyan-600 dark:text-cyan-400 uppercase font-semibold mb-2">$/kW Implied</div>
+                                <div className="text-[10px] text-cyan-600 dark:text-cyan-400 uppercase font-semibold mb-2 flex items-center gap-1">$/kW Implied <Tooltip content="Implied valuation per kilowatt of IT capacity. Benchmark: $8,000-$15,000/kW for stabilized assets in Tier 1 markets." /></div>
                                 <div className="text-2xl font-bold text-slate-900 dark:text-white">${fmt(result.valuation.dollarPerKw)}/kW</div>
                                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                     EV {fmtMoney(result.valuation.evEbitda)} / {fmt(effectiveInputs.itLoad)} kW
@@ -613,17 +613,17 @@ const InvestmentDashboard = () => {
                             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-4">IPO / Acquisition Pricing</h3>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="bg-slate-100 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                                    <div className="text-[10px] text-slate-500 uppercase mb-1">Pre-Money (EV)</div>
+                                    <div className="text-[10px] text-slate-500 uppercase mb-1 flex items-center gap-1">Pre-Money (EV) <Tooltip content="Enterprise Value before any acquisition premium. Based on EV/EBITDA multiple applied to stabilized EBITDA." /></div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.valuation.evEbitda)}</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400">Fair value before premium</div>
                                 </div>
                                 <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
-                                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase mb-1">Control Premium</div>
+                                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase mb-1 flex items-center gap-1">Control Premium <Tooltip content="Additional premium paid above market value for acquiring a controlling stake. Typically 20-40% for data center acquisitions." /></div>
                                     <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">+{(investInputs.controlPremiumPct * 100).toFixed(0)}%</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400">{fmtMoney(result.valuation.evEbitda * investInputs.controlPremiumPct)}</div>
                                 </div>
                                 <div className="bg-indigo-50 dark:bg-indigo-950/30 rounded-lg p-4 border border-indigo-200 dark:border-indigo-800">
-                                    <div className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-1">IPO / Acquisition Price</div>
+                                    <div className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-1 flex items-center gap-1">IPO / Acquisition Price <Tooltip content="Final transaction price including control premium. This is the total amount a buyer would pay or the implied IPO market cap." /></div>
                                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{fmtMoney(result.ipoPrice)}</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400">Implied $/kW: ${fmt(result.ipoPrice / effectiveInputs.itLoad)}</div>
                                 </div>
@@ -675,7 +675,7 @@ const InvestmentDashboard = () => {
                             "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-700"
                         )}>
                             <div className="text-5xl font-bold text-slate-900 dark:text-white">{result.readinessScore}</div>
-                            <div className="text-sm text-slate-600 dark:text-slate-400">/ 100</div>
+                            <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center justify-center gap-1">/ 100 <Tooltip content="Composite investment readiness score based on weighted checks across IRR, DSCR, MOIC, leverage, and payback metrics. 80+ = Ready, 50-79 = Conditional, below 50 = Not Ready." /></div>
                             <div className={clsx(
                                 "text-lg font-bold mt-2",
                                 result.readinessLabel === 'Ready' ? "text-emerald-600 dark:text-emerald-400" :

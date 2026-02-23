@@ -32,12 +32,12 @@ export default function PortfolioDashboard() {
 
     const countryOptions = Object.values(COUNTRIES).map(c => ({ id: c.id, name: c.name }));
 
-    const tabs: { id: PortfolioTab; label: string }[] = [
-        { id: 'overview', label: 'Overview' },
-        { id: 'financial', label: 'Financial' },
-        { id: 'staffing', label: 'Staffing' },
-        { id: 'risk', label: 'Risk' },
-        { id: 'carbon', label: 'Carbon' },
+    const tabs: { id: PortfolioTab; label: string; tooltip: string }[] = [
+        { id: 'overview', label: 'Overview', tooltip: 'Radar chart and rankings comparing all sites across key performance dimensions.' },
+        { id: 'financial', label: 'Financial', tooltip: 'CAPEX, OPEX, NPV, IRR, payback, and ROI comparison across all sites.' },
+        { id: 'staffing', label: 'Staffing', tooltip: 'Headcount, staff density per MW, and labor cost comparison across all sites.' },
+        { id: 'risk', label: 'Risk', tooltip: 'Tier level, redundancy, maintenance strategy, and uptime comparison across all sites.' },
+        { id: 'carbon', label: 'Carbon', tooltip: 'CO2 emissions, PUE, energy consumption, and carbon offset cost comparison.' },
     ];
 
     return (
@@ -50,6 +50,7 @@ export default function PortfolioDashboard() {
                             <Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                         </div>
                         Multi-Site Portfolio
+                        <Tooltip content="Analyze and compare up to 5 data center sites across financial, staffing, risk, and carbon dimensions to optimize portfolio allocation." />
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Compare 2-5 data center locations side-by-side
@@ -60,6 +61,7 @@ export default function PortfolioDashboard() {
                         onClick={store.importFromCurrentConfig}
                         disabled={store.sites.length >= 5}
                         className="px-3 py-2 text-xs font-medium bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-400 text-white rounded-lg transition-colors flex items-center gap-1.5"
+                        title="Import settings from the currently active single-site configuration into the portfolio"
                     >
                         <Download className="w-3.5 h-3.5" />
                         Import Current
@@ -68,6 +70,7 @@ export default function PortfolioDashboard() {
                         onClick={store.addSite}
                         disabled={store.sites.length >= 5}
                         className="px-3 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-400 text-white rounded-lg transition-colors flex items-center gap-1.5"
+                        title="Add a new blank site to the portfolio (max 5 sites)"
                     >
                         <Plus className="w-3.5 h-3.5" />
                         Add Site
@@ -120,6 +123,7 @@ export default function PortfolioDashboard() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
+                                title={tab.tooltip}
                                 className={clsx(
                                     'flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all',
                                     activeTab === tab.id
@@ -166,7 +170,7 @@ function SiteCard({ site, index, countryOptions, onUpdate, onDuplicate, onRemove
                         value={site.label}
                         onChange={e => onUpdate({ label: e.target.value })}
                     />
-                    {isBest && <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+                    {isBest && <span title="Top-ranked site in IRR or PUE"><Award className="w-3.5 h-3.5 text-amber-500 shrink-0" /></span>}
                 </div>
                 <div className="flex gap-1">
                     {canDuplicate && (
@@ -277,6 +281,21 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                         <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
                     </RadarChart>
                 </ResponsiveContainer>
+                <div className="grid grid-cols-3 gap-x-4 gap-y-1 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                    {[
+                        { axis: 'CAPEX Efficiency', desc: 'Lower CAPEX per kW scores higher — measures construction cost efficiency.' },
+                        { axis: 'OPEX Efficiency', desc: 'Lower annual OPEX per kW scores higher — measures operational cost efficiency.' },
+                        { axis: 'Staff Efficiency', desc: 'Lower staff per MW scores higher — measures workforce productivity.' },
+                        { axis: 'PUE', desc: 'Lower PUE scores higher — measures energy efficiency (1.0 is perfect).' },
+                        { axis: 'IRR', desc: 'Higher Internal Rate of Return scores higher — measures investment performance.' },
+                        { axis: 'Carbon', desc: 'Lower annual CO2 emissions score higher — measures environmental efficiency.' },
+                    ].map(item => (
+                        <div key={item.axis} className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
+                            <span className="font-medium text-slate-600 dark:text-slate-300">{item.axis}</span>
+                            <Tooltip content={item.desc} />
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Rankings */}

@@ -256,19 +256,19 @@ export const drawKpiCard = (
     doc.setFontSize(7);
     doc.setTextColor(...PDF_COLORS.textLight);
     doc.setFont('helvetica', 'normal');
-    doc.text(title.toUpperCase(), x + 5, y + 9);
+    doc.text(title.toUpperCase(), x + 5, y + 8);
 
     // Value
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...PDF_COLORS.slate900);
-    doc.text(value, x + 5, y + 19);
+    doc.text(value, x + 5, y + 17);
 
     // C15: Subtext min 7pt
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...PDF_COLORS.textLight);
-    doc.text(subtext, x + 5, y + h - 5);
+    doc.text(subtext, x + 5, y + h - 3);
 };
 
 // ─── EXECUTIVE BOX (Highlighted Recommendation) ─────────────
@@ -1181,7 +1181,7 @@ export const initDoc = async (branding?: BrandingConfig) => {
         if (typeof (d as any).autoTable === 'function') {
             return (d as any).autoTable(o);
         }
-        console.error('autoTable plugin not found');
+        throw new Error('autoTable plugin not found — jspdf-autotable failed to load');
     };
 
     return { doc, autoTable: runAutoTable };

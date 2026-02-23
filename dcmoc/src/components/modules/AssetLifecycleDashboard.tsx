@@ -109,18 +109,18 @@ export default function AssetLifecycleDashboard() {
                 <span className="text-xs font-medium text-slate-500 flex items-center gap-1">Depreciation Method: <Tooltip content="Annual accounting depreciation based on asset useful life. Straight-line spreads cost evenly; declining balance front-loads; sum-of-years accelerates early depreciation." /></span>
                 <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                     {[
-                        { id: 'straight-line' as DepreciationMethod, label: 'Straight-Line' },
-                        { id: 'declining-balance' as DepreciationMethod, label: 'Declining Balance' },
-                        { id: 'sum-of-years' as DepreciationMethod, label: 'Sum-of-Years' },
+                        { id: 'straight-line' as DepreciationMethod, label: 'Straight-Line', tooltip: 'Equal annual depreciation over asset life. Simplest method, spreads cost evenly.' },
+                        { id: 'declining-balance' as DepreciationMethod, label: 'Declining Balance', tooltip: 'Accelerated depreciation — higher expense in early years, decreasing over time. Matches faster initial value loss.' },
+                        { id: 'sum-of-years' as DepreciationMethod, label: 'Sum-of-Years', tooltip: 'Accelerated method using remaining life fraction. Front-loads depreciation more aggressively than declining balance.' },
                     ].map(m => (
                         <button
                             key={m.id}
                             onClick={() => setDepMethod(m.id)}
                             className={clsx(
-                                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1",
                                 depMethod === m.id ? "bg-white dark:bg-slate-700 text-cyan-700 dark:text-cyan-400 shadow-sm" : "text-slate-500 hover:text-slate-700"
                             )}
-                        >{m.label}</button>
+                        >{m.label} <Tooltip content={m.tooltip} /></button>
                     ))}
                 </div>
             </div>
@@ -150,7 +150,7 @@ export default function AssetLifecycleDashboard() {
                         <Activity className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
                     </div>
                     <div>
-                        <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1">Portfolio Assessment</h4>
+                        <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1 flex items-center gap-1">Portfolio Assessment <Tooltip content="AI-generated narrative summarizing the facility's asset portfolio status, upcoming replacement events, and overall lifecycle cost outlook." /></h4>
                         <p className="text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed">
                             This facility manages {result.assets.length} asset types with a total portfolio value of {fmtMoney(result.totalAcquisitionCost)}.
                             {' '}The average asset age is {ps.avgAssetAge} years, with {ps.oldestAsset} being the closest to end-of-life.
@@ -167,19 +167,19 @@ export default function AssetLifecycleDashboard() {
             {/* View Tabs */}
             <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                 {[
-                    { id: 'depreciation' as const, label: 'Depreciation Schedule' },
-                    { id: 'replacement' as const, label: 'Replacement Timeline' },
-                    { id: 'health' as const, label: 'Health & Risk' },
-                    { id: 'assets' as const, label: 'Asset Detail' },
+                    { id: 'depreciation' as const, label: 'Depreciation Schedule', tooltip: 'Annual depreciation expense by category with book value and cumulative replacement cost curves.' },
+                    { id: 'replacement' as const, label: 'Replacement Timeline', tooltip: 'Year-by-year CAPEX replacement forecast showing when major equipment refresh events occur.' },
+                    { id: 'health' as const, label: 'Health & Risk', tooltip: 'Current condition assessment and failure probability for each asset type, with projected risk events.' },
+                    { id: 'assets' as const, label: 'Asset Detail', tooltip: 'Full inventory table with per-unit cost, useful life, depreciation, and replacement year for every tracked asset.' },
                 ].map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveView(tab.id)}
                         className={clsx(
-                            "flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors",
+                            "flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1",
                             activeView === tab.id ? "bg-white dark:bg-slate-700 text-cyan-700 dark:text-cyan-400 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
-                    >{tab.label}</button>
+                    >{tab.label} <Tooltip content={tab.tooltip} /></button>
                 ))}
             </div>
 
@@ -242,8 +242,8 @@ export default function AssetLifecycleDashboard() {
                                 </ComposedChart>
                             </ResponsiveContainer>
                             <div className="flex items-center justify-center gap-6 mt-2 text-xs text-slate-500">
-                                <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-cyan-500 rounded" /><span>Book Value</span></div>
-                                <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-amber-500 rounded" /><span>Cumulative Replacement Cost</span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-cyan-500 rounded" /><span className="flex items-center gap-0.5">Book Value <Tooltip content="Net book value of all assets after accumulated depreciation. Declines over time as assets age toward end-of-life." /></span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-amber-500 rounded" /><span className="flex items-center gap-0.5">Cumulative Replacement Cost <Tooltip content="Running total of all replacement expenditures over the projection period. Step increases correspond to asset refresh events." /></span></div>
                             </div>
                         </div>
                     </div>
@@ -317,10 +317,10 @@ export default function AssetLifecycleDashboard() {
                                     </div>
                                     <div className="flex justify-between text-[10px]">
                                         <span className="text-slate-600 dark:text-slate-400">{h.healthPct}% health</span>
-                                        <span className="text-slate-600 dark:text-slate-400">{h.remainingLife}yr left</span>
+                                        <span className="text-slate-600 dark:text-slate-400 flex items-center gap-0.5">{h.remainingLife}yr left <Tooltip content="Estimated years of useful life remaining based on age, condition, and maintenance history." /></span>
                                     </div>
-                                    <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-1">
-                                        Failure prob: {(h.failureProbability * 100).toFixed(1)}%
+                                    <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-0.5">
+                                        Failure prob: {(h.failureProbability * 100).toFixed(1)}% <Tooltip content="Annual probability of catastrophic failure based on the Weibull distribution and current asset age." />
                                     </div>
                                 </div>
                             ))}
@@ -353,14 +353,14 @@ export default function AssetLifecycleDashboard() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="bg-slate-50 dark:bg-slate-800/80">
-                                        <th className="text-left px-3 py-2 text-slate-500 font-medium">Asset</th>
-                                        <th className="text-center px-3 py-2 text-slate-500 font-medium">Qty</th>
-                                        <th className="text-center px-3 py-2 text-slate-500 font-medium">Life (yr)</th>
-                                        <th className="text-right px-3 py-2 text-slate-500 font-medium">Unit Cost</th>
-                                        <th className="text-right px-3 py-2 text-slate-500 font-medium">Total Cost</th>
-                                        <th className="text-right px-3 py-2 text-slate-500 font-medium">Annual Dep.</th>
-                                        <th className="text-center px-3 py-2 text-slate-500 font-medium">Health</th>
-                                        <th className="text-right px-3 py-2 text-slate-500 font-medium">Replace</th>
+                                        <th className="text-left px-3 py-2 text-slate-500 font-medium"><span className="flex items-center gap-0.5">Asset <Tooltip content="Equipment name and category. Color dot indicates the asset category grouping." /></span></th>
+                                        <th className="text-center px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-center gap-0.5">Qty <Tooltip content="Number of units of this asset type deployed in the facility." /></span></th>
+                                        <th className="text-center px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-center gap-0.5">Life (yr) <Tooltip content="Expected useful life in years before the asset requires replacement." /></span></th>
+                                        <th className="text-right px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-end gap-0.5">Unit Cost <Tooltip content="Replacement cost per unit for this asset category." /></span></th>
+                                        <th className="text-right px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-end gap-0.5">Total Cost <Tooltip content="Aggregate acquisition cost (unit cost multiplied by quantity deployed)." /></span></th>
+                                        <th className="text-right px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-end gap-0.5">Annual Dep. <Tooltip content="Yearly depreciation expense for this asset under the selected depreciation method." /></span></th>
+                                        <th className="text-center px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-center gap-0.5">Health <Tooltip content="Current asset health score (0-100%) based on age, maintenance history, and environmental factors." /></span></th>
+                                        <th className="text-right px-3 py-2 text-slate-500 font-medium"><span className="flex items-center justify-end gap-0.5">Replace <Tooltip content="Projected replacement year based on useful life and current age of the asset." /></span></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -422,28 +422,28 @@ export default function AssetLifecycleDashboard() {
                     <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
                         <div className="flex items-center gap-1.5 mb-1">
                             <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-semibold">Early (−2yr)</span>
+                            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-semibold flex items-center gap-0.5">Early (−2yr) <Tooltip content="NPV of replacing all assets 2 years before scheduled end-of-life. Higher upfront cost but avoids failure risk and unplanned downtime." /></span>
                         </div>
                         <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{fmtMoney(fi.earlyReplacementNpv)}</div>
                     </div>
                     <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
                         <div className="flex items-center gap-1.5 mb-1">
                             <Calendar className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                            <span className="text-[10px] text-blue-700 dark:text-blue-400 uppercase font-semibold">On-Time</span>
+                            <span className="text-[10px] text-blue-700 dark:text-blue-400 uppercase font-semibold flex items-center gap-0.5">On-Time <Tooltip content="NPV of replacing assets exactly at their scheduled end-of-life. Baseline strategy with no early or deferred cost adjustments." /></span>
                         </div>
                         <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{fmtMoney(result.npvOfReplacements)}</div>
                     </div>
                     <div className="bg-red-50 dark:bg-red-950/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
                         <div className="flex items-center gap-1.5 mb-1">
                             <ArrowDownRight className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-                            <span className="text-[10px] text-red-700 dark:text-red-400 uppercase font-semibold">Deferred (+2yr)</span>
+                            <span className="text-[10px] text-red-700 dark:text-red-400 uppercase font-semibold flex items-center gap-0.5">Deferred (+2yr) <Tooltip content="NPV of deferring replacements by 2 years beyond end-of-life. Incurs a 15% annual failure cost penalty for each deferred year." /></span>
                         </div>
                         <div className="text-lg font-bold text-red-600 dark:text-red-400">{fmtMoney(fi.deferredReplacementNpv)}</div>
                     </div>
                     <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
                         <div className="flex items-center gap-1.5 mb-1">
                             <DollarSign className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                            <span className="text-[10px] text-amber-700 dark:text-amber-400 uppercase font-semibold">Aging Maint Cost</span>
+                            <span className="text-[10px] text-amber-700 dark:text-amber-400 uppercase font-semibold flex items-center gap-0.5">Aging Maint Cost <Tooltip content="Estimated annual maintenance cost increase due to aging assets operating beyond optimal life. Reflects higher repair frequency and parts scarcity." /></span>
                         </div>
                         <div className="text-lg font-bold text-amber-600 dark:text-amber-400">{fmtMoney(fi.maintenanceCostOfAging)}/yr</div>
                     </div>

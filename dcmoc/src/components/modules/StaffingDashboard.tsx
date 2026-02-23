@@ -211,6 +211,9 @@ export function StaffingDashboard() {
                                     insights as any[],
                                     results.shiftComparisons
                                 );
+                            } catch (e: any) {
+                                console.error('Staffing PDF export failed:', e);
+                                alert(`PDF export failed: ${e?.message || 'Unknown error'}`);
                             } finally {
                                 setIsExporting(false);
                             }
@@ -226,29 +229,32 @@ export function StaffingDashboard() {
                     <div className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase tracking-wide">
                         Headcount Composition
                     </div>
-                    <button
-                        onClick={() => {
-                            if (inputs.staffingAutoMode) {
-                                // Switching to manual: write auto values as baseline
-                                actions.setInputs({
-                                    headcount_ShiftLead: autoResult.headcounts['shift-lead'],
-                                    headcount_Engineer: autoResult.headcounts['engineer'],
-                                    headcount_Technician: autoResult.headcounts['technician'],
-                                    headcount_Admin: autoResult.headcounts['admin'],
-                                    headcount_Janitor: autoResult.headcounts['janitor'],
-                                });
-                            }
-                            actions.toggleStaffingAutoMode();
-                        }}
-                        className={clsx(
-                            "px-3 py-1 text-xs font-medium rounded-md border transition-all",
-                            inputs.staffingAutoMode
-                                ? "bg-cyan-50 dark:bg-cyan-950/30 border-cyan-300 dark:border-cyan-700 text-cyan-700 dark:text-cyan-400"
-                                : "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400"
-                        )}
-                    >
-                        {inputs.staffingAutoMode ? 'AUTO' : 'MANUAL'}
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={() => {
+                                if (inputs.staffingAutoMode) {
+                                    // Switching to manual: write auto values as baseline
+                                    actions.setInputs({
+                                        headcount_ShiftLead: autoResult.headcounts['shift-lead'],
+                                        headcount_Engineer: autoResult.headcounts['engineer'],
+                                        headcount_Technician: autoResult.headcounts['technician'],
+                                        headcount_Admin: autoResult.headcounts['admin'],
+                                        headcount_Janitor: autoResult.headcounts['janitor'],
+                                    });
+                                }
+                                actions.toggleStaffingAutoMode();
+                            }}
+                            className={clsx(
+                                "px-3 py-1 text-xs font-medium rounded-md border transition-all",
+                                inputs.staffingAutoMode
+                                    ? "bg-cyan-50 dark:bg-cyan-950/30 border-cyan-300 dark:border-cyan-700 text-cyan-700 dark:text-cyan-400"
+                                    : "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400"
+                            )}
+                        >
+                            {inputs.staffingAutoMode ? 'AUTO' : 'MANUAL'}
+                        </button>
+                        <Tooltip content="Auto mode calculates optimal headcount based on IT load and shift model. Manual mode lets you override individual role counts." />
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-5 gap-4">
@@ -352,27 +358,27 @@ export function StaffingDashboard() {
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                             <div>
-                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Pattern</dt>
+                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase flex items-center gap-1">Pattern <Tooltip content="The shift rotation pattern defining work/rest sequences. Determines coverage, fatigue risk, and overtime exposure." /></dt>
                                 <dd className="text-slate-900 dark:text-white font-mono font-bold">{results.staffingResults[0]?.schedule.pattern}</dd>
                             </div>
                             <div>
-                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Cycle Length</dt>
+                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase flex items-center gap-1">Cycle Length <Tooltip content="Total days in one complete shift rotation cycle. 4-on/3-off = 7 days, Continental 3-shift = 8 days." /></dt>
                                 <dd className="text-slate-900 dark:text-white font-mono font-bold">{inputs.shiftModel === '8h' ? '8 days' : '7 days'}</dd>
                             </div>
                             <div>
-                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Work Days / Cycle</dt>
+                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase flex items-center gap-1">Work Days / Cycle <Tooltip content="Number of working days within one rotation cycle. Fewer work days per cycle generally improves work-life balance." /></dt>
                                 <dd className="text-slate-900 dark:text-white font-mono font-bold">
                                     {inputs.shiftModel === '8h' ? '6 days' : '4 days'}
                                 </dd>
                             </div>
                             <div>
-                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Shift Duration</dt>
+                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase flex items-center gap-1">Shift Duration <Tooltip content="Length of each individual shift. 8h shifts require 3 rotations per day; 12h shifts require 2 rotations per day." /></dt>
                                 <dd className="text-slate-900 dark:text-white font-mono font-bold">
                                     {inputs.shiftModel === '8h' ? '8h' : '12h'}
                                 </dd>
                             </div>
                             <div>
-                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase">Teams Required</dt>
+                                <dt className="text-slate-600 dark:text-slate-500 text-xs uppercase flex items-center gap-1">Teams Required <Tooltip content="Minimum number of independent teams needed to provide continuous 24/7 coverage under this shift pattern." /></dt>
                                 <dd className="text-slate-900 dark:text-white font-mono font-bold">4</dd>
                             </div>
                         </div>
@@ -382,26 +388,26 @@ export function StaffingDashboard() {
                             <div className="text-[10px] text-slate-500 uppercase font-bold mb-2">Shift Types</div>
                             {inputs.shiftModel === '8h' ? (
                                 <div className="grid grid-cols-3 gap-1 h-12 rounded-lg overflow-hidden">
-                                    <div className="bg-amber-500/10 border-l-4 border-amber-500 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-500">
+                                    <div className="bg-amber-500/10 border-l-4 border-amber-500 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-500" title="Morning shift: 06:00-14:00. Highest staffing density for planned maintenance windows.">
                                         ☀️ Morning
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 14:00</span>
                                     </div>
-                                    <div className="bg-orange-500/10 border-l-4 border-orange-500 flex items-center justify-center text-xs font-bold text-orange-600 dark:text-orange-500">
+                                    <div className="bg-orange-500/10 border-l-4 border-orange-500 flex items-center justify-center text-xs font-bold text-orange-600 dark:text-orange-500" title="Afternoon shift: 14:00-22:00. Overlap with morning shift enables handover briefings.">
                                         ☁️ Afternoon
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">14:00 — 22:00</span>
                                     </div>
-                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500">
+                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500" title="Night shift: 22:00-06:00. Skeleton crew for monitoring; attracts night-shift allowance.">
                                         🌙 Night
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">22:00 — 06:00</span>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-2 gap-1 h-12 rounded-lg overflow-hidden">
-                                    <div className="bg-cyan-500/10 border-l-4 border-cyan-500 flex items-center justify-center text-xs font-bold text-cyan-600 dark:text-cyan-500">
+                                    <div className="bg-cyan-500/10 border-l-4 border-cyan-500 flex items-center justify-center text-xs font-bold text-cyan-600 dark:text-cyan-500" title="Day shift: 06:00-18:00. 12-hour compressed shift covering all daytime operations and maintenance.">
                                         ☀️ Day
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 18:00</span>
                                     </div>
-                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500">
+                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500" title="Night shift: 18:00-06:00. 12-hour overnight monitoring; attracts night-shift allowance.">
                                         🌙 Night
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">18:00 — 06:00</span>
                                     </div>
@@ -419,14 +425,14 @@ export function StaffingDashboard() {
                             <table className="w-full text-xs">
                                 <thead>
                                     <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-bold">
-                                        <th className="px-4 py-3 text-left">Role</th>
-                                        <th className="px-4 py-3 text-center">Employed</th>
-                                        <th className="px-4 py-3 text-center">On-Shift</th>
-                                        <th className="px-4 py-3 text-left">Schedule</th>
-                                        <th className="px-4 py-3 text-right">Base</th>
-                                        <th className="px-4 py-3 text-right">Shift Allow.</th>
-                                        <th className="px-4 py-3 text-right">OT</th>
-                                        <th className="px-4 py-3 text-right">Total</th>
+                                        <th className="px-4 py-3 text-left"><span className="flex items-center gap-1">Role <Tooltip content="Job function category (Engineers, Technicians, Security, Facilities, Management)." /></span></th>
+                                        <th className="px-4 py-3 text-center"><span className="flex items-center justify-center gap-1">Employed <Tooltip content="Total headcount employed for this role across all shifts." /></span></th>
+                                        <th className="px-4 py-3 text-center"><span className="flex items-center justify-center gap-1">On-Shift <Tooltip content="Number of staff on duty per shift after accounting for rotation and shrinkage." /></span></th>
+                                        <th className="px-4 py-3 text-left"><span className="flex items-center gap-1">Schedule <Tooltip content="Shift rotation pattern assigned to this role." /></span></th>
+                                        <th className="px-4 py-3 text-right"><span className="flex items-center justify-end gap-1">Base <Tooltip content="Base monthly salary before shift allowances and overtime." /></span></th>
+                                        <th className="px-4 py-3 text-right"><span className="flex items-center justify-end gap-1">Shift Allow. <Tooltip content="Additional pay for night shifts, weekends, and holiday coverage. Varies by country labor law." /></span></th>
+                                        <th className="px-4 py-3 text-right"><span className="flex items-center justify-end gap-1">OT <Tooltip content="Estimated monthly overtime cost based on average overtime hours and local overtime multiplier." /></span></th>
+                                        <th className="px-4 py-3 text-right"><span className="flex items-center justify-end gap-1">Total <Tooltip content="Total monthly cost per employee: base salary + shift allowance + overtime." /></span></th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50">
@@ -466,10 +472,10 @@ export function StaffingDashboard() {
                             <table className="w-full text-xs">
                                 <thead>
                                     <tr className="text-slate-500 font-bold uppercase border-b border-slate-300 dark:border-slate-700">
-                                        <th className="py-2 text-left">Year</th>
-                                        <th className="py-2 text-left">Headcount</th>
-                                        <th className="py-2 text-right">Annual Cost</th>
-                                        <th className="py-2 text-right">Escalation</th>
+                                        <th className="py-2 text-left"><span className="flex items-center gap-1">Year <Tooltip content="Calendar year of the projection period." /></span></th>
+                                        <th className="py-2 text-left"><span className="flex items-center gap-1">Headcount <Tooltip content="Projected total full-time equivalents for each year." /></span></th>
+                                        <th className="py-2 text-right"><span className="flex items-center justify-end gap-1">Annual Cost <Tooltip content="Total projected annual staffing cost including all allowances and overtime." /></span></th>
+                                        <th className="py-2 text-right"><span className="flex items-center justify-end gap-1">Escalation <Tooltip content="Year-over-year percentage increase driven by labor cost escalation rates for the selected country." /></span></th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-300 dark:divide-slate-700/50">
@@ -508,7 +514,7 @@ export function StaffingDashboard() {
                                             <div className="text-[10px] text-slate-500">Net productive hours</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Cost per MW <Tooltip content="Monthly staffing cost normalized per megawatt of IT load. Key benchmark for comparing staffing efficiency." /></div>
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Cost per MW <Tooltip content="Total monthly staffing cost divided by IT load in MW. Benchmark for comparing staffing efficiency across facilities." /></div>
                                             <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(totalCost / 1)}</div>
                                             <div className="text-[10px] text-slate-500">Staff cost / MW IT load</div>
                                         </div>
@@ -618,10 +624,10 @@ export function StaffingDashboard() {
                         <table className="w-full text-sm">
                             <thead className="bg-slate-950/50 text-slate-400 uppercase text-xs">
                                 <tr>
-                                    <th className="px-6 py-3 text-left">Metric</th>
-                                    <th className="px-6 py-3 text-center">8h (Continental)</th>
-                                    <th className="px-6 py-3 text-center">12h (4on/4off)</th>
-                                    <th className="px-6 py-3 text-center">Difference</th>
+                                    <th className="px-6 py-3 text-left"><span className="flex items-center gap-1">Metric <Tooltip content="Key performance indicator being compared across shift models." /></span></th>
+                                    <th className="px-6 py-3 text-center"><span className="flex items-center justify-center gap-1">8h (Continental) <Tooltip content="Traditional 3-shift Continental pattern: Morning/Afternoon/Night with 4 teams rotating across 8-day cycles." /></span></th>
+                                    <th className="px-6 py-3 text-center"><span className="flex items-center justify-center gap-1">12h (4on/4off) <Tooltip content="Compressed 12-hour schedule: 4 days on, 4 days off. Two shifts (Day/Night) with 2 teams each." /></span></th>
+                                    <th className="px-6 py-3 text-center"><span className="flex items-center justify-center gap-1">Difference <Tooltip content="Delta between 8h and 12h models. Green indicates the 12h model is more favorable." /></span></th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800">

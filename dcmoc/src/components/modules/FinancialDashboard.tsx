@@ -432,18 +432,18 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500">Setup Fee ($/kW)</label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Setup Fee ($/kW) <Tooltip content="Non-Recurring Charge per kW of contracted IT power. Covers initial provisioning, rack setup, and commissioning. Typically 2-5% of CAPEX per kW." /></label>
                                 <input type="number" className={inpCls}
                                     value={revInputs.nrcPerKw} onChange={e => handleRevChange('nrcPerKw', Number(e.target.value))} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500">X-Connect Setup ($)</label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">X-Connect Setup ($) <Tooltip content="One-time cross-connect installation fee. Covers physical cabling between customer cage and meet-me room or carrier demarcation point." /></label>
                                 <input type="number" className={inpCls}
                                     value={revInputs.nrcCrossConnect} onChange={e => handleRevChange('nrcCrossConnect', Number(e.target.value))} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-600 dark:text-slate-500">Custom Fit-out ($)</label>
+                            <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Custom Fit-out ($) <Tooltip content="Non-recurring charge for bespoke cage or suite buildout. Includes custom power distribution, containment, security cages, and tenant-specific infrastructure." /></label>
                             <input type="number" className={inpCls}
                                 value={revInputs.nrcCustomFitout} onChange={e => handleRevChange('nrcCustomFitout', Number(e.target.value))} />
                         </div>
@@ -454,18 +454,18 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500">MRC $/kW/mo</label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">MRC $/kW/mo <Tooltip content="Monthly Recurring Charge per kW of IT power. The core colocation fee covering power delivery, cooling, and facility access. Typically the largest revenue component." /></label>
                                 <input type="number" className={inpCls}
                                     value={revInputs.mrcPerKwMonth} onChange={e => handleRevChange('mrcPerKwMonth', Number(e.target.value))} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500">Escalation (%/yr)</label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Escalation (%/yr) <Tooltip content="Annual MRC price escalation rate written into the contract. Typically tied to CPI or a fixed percentage (2-5%/yr) to offset rising energy and labor costs." /></label>
                                 <input type="number" className={inpCls}
                                     value={revInputs.mrcEscalation} onChange={e => handleRevChange('mrcEscalation', Number(e.target.value))} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-600 dark:text-slate-500">X-Connect MRC ($/mo)</label>
+                            <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">X-Connect MRC ($/mo) <Tooltip content="Monthly recurring fee for cross-connect port maintenance. Covers fiber/copper patching, monitoring, and meet-me room access. Charged per active cross-connect." /></label>
                             <input type="number" className={inpCls}
                                 value={revInputs.mrcCrossConnectMonthly} onChange={e => handleRevChange('mrcCrossConnectMonthly', Number(e.target.value))} />
                         </div>
@@ -476,12 +476,12 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500">Lease Term (yrs)</label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Lease Term (yrs) <Tooltip content="Duration of the colocation lease agreement in years. Longer terms typically offer better rates and provide revenue predictability for the operator." /></label>
                                 <input type="number" className={inpCls}
                                     value={revInputs.contractYears} onChange={e => handleRevChange('contractYears', Number(e.target.value))} min={3} max={25} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500">Take-or-Pay (%)</label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Take-or-Pay (%) <Tooltip content="Minimum committed power/space usage regardless of actual consumption. Protects the provider's revenue baseline. Typically 70-100% of contracted capacity." /></label>
                                 <input type="number" className={inpCls}
                                     value={revInputs.takeOrPayPct} onChange={e => handleRevChange('takeOrPayPct', Number(e.target.value))} min={0} max={100} />
                             </div>
@@ -597,7 +597,7 @@ const FinancialDashboard = () => {
                             <CardContent className="pt-4">
                                 <div className="flex items-center gap-1.5 mb-1">
                                     <Receipt className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Total NRC</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Total NRC</span><Tooltip content="Total Non-Recurring Charges — all one-time fees including setup, cross-connect installation, and custom fit-out. Collected at contract signing or deployment." />
                                 </div>
                                 <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(revResult.totalNRC)}</div>
                                 <div className="text-xs text-slate-500 mt-1">One-time setup fees</div>
@@ -607,7 +607,7 @@ const FinancialDashboard = () => {
                             <CardContent className="pt-4">
                                 <div className="flex items-center gap-1.5 mb-1">
                                     <Repeat className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Lifetime MRC</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Lifetime MRC</span><Tooltip content="Total Monthly Recurring Charges summed over the full contract period. Includes power, cooling, and cross-connect fees with annual escalation applied." />
                                 </div>
                                 <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{fmtMoney(revResult.totalMRC_lifetime)}</div>
                                 <div className="text-xs text-slate-500 mt-1">Over {revInputs.contractYears} years</div>
@@ -617,7 +617,7 @@ const FinancialDashboard = () => {
                             <CardContent className="pt-4">
                                 <div className="flex items-center gap-1.5 mb-1">
                                     <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">TCV</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">TCV</span><Tooltip content="Total Contract Value — the sum of all NRC and lifetime MRC over the full lease term. Key metric for deal sizing and sales pipeline valuation." />
                                 </div>
                                 <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{fmtMoney(revResult.contractValue)}</div>
                                 <div className="text-xs text-slate-500 mt-1">Total Contract Value</div>
@@ -627,7 +627,7 @@ const FinancialDashboard = () => {
                             <CardContent className="pt-4">
                                 <div className="flex items-center gap-1.5 mb-1">
                                     <DollarSign className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Effective $/kW/mo</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Effective $/kW/mo</span><Tooltip content="Blended effective rate per kW per month. Amortizes NRC over the contract term and adds to average MRC, giving the true all-in cost per kW." />
                                 </div>
                                 <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">${revResult.effectiveRate.toFixed(0)}</div>
                                 <div className="text-xs text-slate-500 mt-1">Blended rate (NRC+MRC)</div>
@@ -641,7 +641,7 @@ const FinancialDashboard = () => {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                             <BarChart3 className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-                            Cumulative Free Cashflow
+                            Cumulative Free Cashflow <Tooltip content="Running total of net cashflows (revenue minus OPEX) over the project life. The point where the curve crosses zero marks payback. Dashed line shows time-value-adjusted (discounted) cashflow." />
                         </CardTitle>
                     </CardHeader>
                     <CardContent id="financial-cashflow-chart" className="p-4 bg-white dark:bg-slate-800" style={isExporting ? { width: '800px', height: '320px' } : undefined}>
@@ -683,7 +683,7 @@ const FinancialDashboard = () => {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                                 <BarChart3 className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
-                                Revenue Waterfall — NRC + MRC Breakdown
+                                Revenue Waterfall — NRC + MRC Breakdown <Tooltip content="Stacked bar chart showing annual revenue composition: one-time NRC (Year 1 only), recurring MRC from power, and cross-connect fees. The line tracks cumulative revenue over the contract." />
                             </CardTitle>
                         </CardHeader>
                         <CardContent id="financial-waterfall-chart" className="p-4 bg-white dark:bg-slate-800" style={isExporting ? { width: '800px', height: '340px' } : undefined}>
@@ -732,7 +732,7 @@ const FinancialDashboard = () => {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                                MRC Growth Trajectory with Take-or-Pay Floor
+                                MRC Growth Trajectory with Take-or-Pay Floor <Tooltip content="Monthly MRC progression over contract term showing the effect of annual escalation and occupancy ramp. The dashed line marks the minimum billable amount guaranteed by the take-or-pay clause." />
                             </CardTitle>
                         </CardHeader>
                         <CardContent id="financial-mrc-chart" className="p-4 bg-white dark:bg-slate-800" style={isExporting ? { width: '800px', height: '300px' } : undefined}>
@@ -778,7 +778,7 @@ const FinancialDashboard = () => {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                             <Receipt className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
-                            Year-by-Year Projection &amp; Revenue
+                            Year-by-Year Projection &amp; Revenue <Tooltip content="Combined financial projection and revenue model table. Shows escalated revenue, OPEX, EBITDA, net income alongside NRC/MRC revenue streams. Click any numeric cell to manually override calculated values." />
                             <span className="ml-auto text-[9px] text-slate-500 font-normal">Click any value to override</span>
                         </CardTitle>
                     </CardHeader>
@@ -921,7 +921,7 @@ const FinancialDashboard = () => {
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                                     <TrendingUp className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-                                    Occupancy Impact — NPV &amp; IRR Sensitivity
+                                    Occupancy Impact — NPV &amp; IRR Sensitivity <Tooltip content="Shows how facility occupancy rate affects project viability. The break-even point marks the minimum occupancy needed for NPV to turn positive. Critical for go/no-go decisions." />
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -993,7 +993,7 @@ const FinancialDashboard = () => {
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                                     <Receipt className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-                                    OPEX Breakdown (Annual)
+                                    OPEX Breakdown (Annual) <Tooltip content="Annual operating expenditure breakdown by category. Energy is typically the largest cost (40-60%), followed by staffing. Understanding the mix helps identify cost optimization opportunities." />
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -1061,7 +1061,7 @@ const FinancialDashboard = () => {
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                                     <TrendingUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-                                    Sensitivity Analysis — NPV &amp; IRR
+                                    Sensitivity Analysis — NPV &amp; IRR <Tooltip content="Two-way sensitivity matrix showing NPV and IRR under varying CAPEX and revenue assumptions. Green = viable (NPV>0, IRR>WACC), amber = marginal, red = unviable. The cyan-ringed cell is the base case." />
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -1111,7 +1111,7 @@ const FinancialDashboard = () => {
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
                                     <BarChart3 className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
-                                    Budget vs Forecast Variance
+                                    Budget vs Forecast Variance <Tooltip content="Compares budgeted OPEX against forecasted actuals by category. Positive variance (red) = over budget. Helps identify cost overruns early and adjust operational planning." />
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">

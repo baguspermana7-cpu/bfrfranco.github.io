@@ -65,13 +65,13 @@ const CarbonDashboard = () => {
                         <Leaf className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                         Carbon & ESG Dashboard
                     </h2>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                        {selectedCountry.name} · {fmt(capexStore.inputs.itLoad || inputs.itLoad || 1000)} kW IT Load · Grid: {selectedCountry.environment.gridCarbonIntensity} kgCO₂/kWh
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 flex items-center">
+                        {selectedCountry.name} · {fmt(capexStore.inputs.itLoad || inputs.itLoad || 1000)} kW IT Load · Grid: {selectedCountry.environment.gridCarbonIntensity} kgCO₂/kWh<Tooltip content="Carbon intensity of the local electricity grid in kgCO2 per kWh. Varies by country based on energy mix (coal, gas, nuclear, renewables)." />
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className={`px-4 py-2 rounded-xl border text-xl font-bold ${ratingColors[result.efficiencyRating]}`}>
-                        Rating: {result.efficiencyRating}
+                    <div className={`px-4 py-2 rounded-xl border text-xl font-bold ${ratingColors[result.efficiencyRating]} flex items-center gap-1`}>
+                        Rating: {result.efficiencyRating}<Tooltip content="Efficiency rating from A (best) to F (worst) based on PUE, carbon intensity, and renewable energy adoption. A = hyperscale-class efficiency, F = legacy facility with high emissions." />
                     </div>
                     <ExportPDFButton
                         isGenerating={isExporting}
@@ -140,17 +140,17 @@ const CarbonDashboard = () => {
                 {/* Scope Breakdown */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-700 dark:text-slate-300">GHG Protocol Scope Breakdown</CardTitle>
+                        <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center">GHG Protocol Scope Breakdown<Tooltip content="Greenhouse Gas Protocol framework: Scope 1 (direct emissions from owned generators), Scope 2 (indirect emissions from purchased electricity), Scope 3 (value chain emissions from construction, commuting, waste)." /></CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {[
-                            { label: 'Scope 1 — Direct', value: result.scope1, color: '#ef4444', desc: 'Generators, fuel combustion' },
-                            { label: 'Scope 2 — Grid', value: result.scope2, color: '#f59e0b', desc: 'Purchased electricity' },
-                            { label: 'Scope 3 — Supply Chain', value: result.scope3, color: '#8b5cf6', desc: 'Estimated upstream/downstream' },
+                            { label: 'Scope 1 — Direct', value: result.scope1, color: '#ef4444', desc: 'Generators, fuel combustion', tip: 'Scope 1: Direct GHG emissions from sources owned or controlled by the facility, such as diesel/gas generators and on-site fuel combustion.' },
+                            { label: 'Scope 2 — Grid', value: result.scope2, color: '#f59e0b', desc: 'Purchased electricity', tip: 'Scope 2: Indirect emissions from purchased electricity consumed by the data center. Driven by grid carbon intensity and total energy demand.' },
+                            { label: 'Scope 3 — Supply Chain', value: result.scope3, color: '#8b5cf6', desc: 'Estimated upstream/downstream', tip: 'Scope 3: All other indirect emissions in the value chain — embodied carbon in construction materials, employee commuting, waste disposal, and upstream fuel production.' },
                         ].map(scope => (
                             <div key={scope.label}>
                                 <div className="flex justify-between items-baseline mb-1">
-                                    <span className="text-xs text-slate-600 dark:text-slate-400">{scope.label}</span>
+                                    <span className="text-xs text-slate-600 dark:text-slate-400 flex items-center">{scope.label}<Tooltip content={scope.tip} /></span>
                                     <span className="text-sm font-semibold text-slate-900 dark:text-white">{fmt(scope.value, 1)} tCO₂</span>
                                 </div>
                                 <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -166,7 +166,7 @@ const CarbonDashboard = () => {
                             </div>
                         ))}
                         <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Total GHG Emissions</span>
+                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center">Total GHG Emissions<Tooltip content="Sum of all three scopes (Scope 1 + 2 + 3) before any renewable energy offsets are applied. This is your gross annual carbon footprint." /></span>
                             <span className="text-sm font-bold text-slate-900 dark:text-white">{fmt(result.annualEmissionsTonCO2, 1)} tCO₂/yr</span>
                         </div>
                     </CardContent>
@@ -175,17 +175,17 @@ const CarbonDashboard = () => {
                 {/* Energy Breakdown */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-700 dark:text-slate-300">Energy Consumption Breakdown</CardTitle>
+                        <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center">Energy Consumption Breakdown<Tooltip content="Breakdown of total facility energy: IT load, cooling, lighting, UPS losses, and other mechanical systems. PUE determines the ratio of total to IT power." /></CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {[
-                            { label: 'IT Equipment', value: result.itEnergyMWh, color: '#3b82f6', pct: (result.itEnergyMWh / result.annualEnergyMWh * 100) },
-                            { label: 'Cooling Systems', value: result.coolingEnergyMWh, color: '#06b6d4', pct: (result.coolingEnergyMWh / result.annualEnergyMWh * 100) },
-                            { label: 'Distribution Losses', value: result.lossEnergyMWh, color: '#64748b', pct: (result.lossEnergyMWh / result.annualEnergyMWh * 100) },
+                            { label: 'IT Equipment', value: result.itEnergyMWh, color: '#3b82f6', pct: (result.itEnergyMWh / result.annualEnergyMWh * 100), tip: 'Energy consumed by servers, storage, and networking equipment. This is the useful compute load that PUE efficiency is measured against.' },
+                            { label: 'Cooling Systems', value: result.coolingEnergyMWh, color: '#06b6d4', pct: (result.coolingEnergyMWh / result.annualEnergyMWh * 100), tip: 'Energy used by CRAC/CRAH units, chillers, cooling towers, and pumps. Varies significantly by cooling type (air, DX, chilled water, liquid).' },
+                            { label: 'Distribution Losses', value: result.lossEnergyMWh, color: '#64748b', pct: (result.lossEnergyMWh / result.annualEnergyMWh * 100), tip: 'Energy lost in power distribution: UPS conversion losses, PDU transformer losses, switchgear, and cable resistance. Typically 5-12% of total load.' },
                         ].map(item => (
                             <div key={item.label}>
                                 <div className="flex justify-between items-baseline mb-1">
-                                    <span className="text-xs text-slate-600 dark:text-slate-400">{item.label}</span>
+                                    <span className="text-xs text-slate-600 dark:text-slate-400 flex items-center">{item.label}<Tooltip content={item.tip} /></span>
                                     <span className="text-sm font-semibold text-slate-900 dark:text-white">{fmt(item.value)} MWh ({item.pct.toFixed(1)}%)</span>
                                 </div>
                                 <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -198,7 +198,7 @@ const CarbonDashboard = () => {
                         ))}
                         <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">vs Industry Average</span>
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center">vs Industry Average<Tooltip content="Comparison against industry benchmarks: average PUE ~1.58 (Uptime Institute 2024), best-in-class <1.2 for hyperscale facilities." /></span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{fmt(result.industryAvgEmissions, 1)} tCO₂/yr</span>
                             </div>
                             <div className="text-xs text-slate-500">
@@ -217,7 +217,7 @@ const CarbonDashboard = () => {
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
                         <TrendingDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        Carbon Reduction Investment Scenarios
+                        Carbon Reduction Investment Scenarios<Tooltip content="Modeled investment pathways to reduce carbon emissions. Each scenario shows upfront cost, annual CO2 savings, financial savings, and payback period based on current facility parameters." />
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -231,20 +231,20 @@ const CarbonDashboard = () => {
                                 <p className="text-[10px] text-slate-600 dark:text-slate-500 mb-3 leading-relaxed">{scenario.description}</p>
                                 <div className="space-y-1.5">
                                     <div className="flex justify-between text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">Investment</span>
+                                        <span className="text-slate-600 dark:text-slate-400 flex items-center">Investment<Tooltip content="Estimated upfront capital expenditure required to implement this carbon reduction scenario." /></span>
                                         <span className="text-slate-900 dark:text-white font-medium">{fmtMoney(scenario.investmentUSD)}</span>
                                     </div>
                                     <div className="flex justify-between text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">CO₂ Saved/yr</span>
+                                        <span className="text-slate-600 dark:text-slate-400 flex items-center">CO₂ Saved/yr<Tooltip content="Projected annual reduction in CO2 emissions (tonnes) if this scenario is fully implemented." /></span>
                                         <span className="text-emerald-600 dark:text-emerald-400 font-medium">{fmt(scenario.annualSavingsTonCO2, 1)} t</span>
                                     </div>
                                     <div className="flex justify-between text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">Savings/yr</span>
+                                        <span className="text-slate-600 dark:text-slate-400 flex items-center">Savings/yr<Tooltip content="Annual financial savings from reduced energy costs and avoided carbon tax/offset expenses." /></span>
                                         <span className="text-emerald-600 dark:text-emerald-400 font-medium">{fmtMoney(scenario.annualSavingsUSD)}</span>
                                     </div>
                                     {scenario.paybackYears > 0 && (
                                         <div className="flex justify-between text-xs pt-1 border-t border-slate-200 dark:border-slate-700">
-                                            <span className="text-slate-600 dark:text-slate-400">Payback</span>
+                                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Payback<Tooltip content="Simple payback period: years to recover initial investment from annual savings. Does not account for discount rate or escalation." /></span>
                                             <span className="text-amber-600 dark:text-amber-400 font-medium">{scenario.paybackYears} yrs</span>
                                         </div>
                                     )}
@@ -259,16 +259,16 @@ const CarbonDashboard = () => {
             {(() => {
                 const designPue = result.pueEfficiency;
                 const pueData = [
-                    { name: 'Design PUE', value: designPue, color: '#10b981' },
-                    { name: 'Industry Avg', value: 1.58, color: '#f59e0b' },
-                    { name: 'Best-in-Class', value: 1.10, color: '#06b6d4' },
+                    { name: 'Design PUE', value: designPue, color: '#10b981', tip: 'Your facility\'s design PUE based on selected cooling type. This is the theoretical efficiency under normal operating conditions.' },
+                    { name: 'Industry Avg', value: 1.58, color: '#f59e0b', tip: 'Global industry average PUE of 1.58 per Uptime Institute 2024 Annual Survey. Includes all data center types and sizes.' },
+                    { name: 'Best-in-Class', value: 1.10, color: '#06b6d4', tip: 'Best-in-class PUE achieved by leading hyperscale operators (Google, Meta) using advanced liquid cooling and free-air economization.' },
                 ];
                 return (
                     <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <Zap className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                                PUE Benchmark Comparison
+                                PUE Benchmark Comparison<Tooltip content="Power Usage Effectiveness (PUE) = Total Facility Power / IT Equipment Power. A PUE of 1.0 means all power goes to IT. Lower is better. Industry average is ~1.58 (Uptime Institute 2024)." />
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-4">
@@ -299,7 +299,7 @@ const CarbonDashboard = () => {
                                 {pueData.map((d, i) => (
                                     <div key={i} className="flex items-center gap-1.5">
                                         <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: d.color }} />
-                                        <span>{d.name}: {d.value.toFixed(2)}</span>
+                                        <span>{d.name}: {d.value.toFixed(2)}</span><Tooltip content={d.tip} />
                                     </div>
                                 ))}
                             </div>
@@ -346,7 +346,7 @@ const CarbonDashboard = () => {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <Target className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                                Carbon Net-Zero Trajectory ({currentYear} - 2050)
+                                Carbon Net-Zero Trajectory ({currentYear} - 2050)<Tooltip content="Projected emissions reduction pathway assuming accelerating renewable energy adoption over time. Uses a logistic curve model from current renewable offset to full net-zero by 2050, aligned with Paris Agreement targets." />
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-4">
@@ -390,12 +390,12 @@ const CarbonDashboard = () => {
                             </ResponsiveContainer>
                             <div className="mt-3 grid grid-cols-3 gap-3">
                                 {[
-                                    { year: currentYear, label: 'Current', value: currentEmissions, color: 'text-red-500 dark:text-red-400' },
-                                    { year: 2030, label: '2030 Target', value: trajectoryData.find(d => d.year === 2030)?.emissions ?? 0, color: 'text-amber-500 dark:text-amber-400' },
-                                    { year: 2050, label: 'Net-Zero Target', value: 0, color: 'text-emerald-500 dark:text-emerald-400' },
+                                    { year: currentYear, label: 'Current', value: currentEmissions, color: 'text-red-500 dark:text-red-400', tip: 'Current annual net emissions after applying any existing renewable energy offsets from your selected configuration.' },
+                                    { year: 2030, label: '2030 Target', value: trajectoryData.find(d => d.year === 2030)?.emissions ?? 0, color: 'text-amber-500 dark:text-amber-400', tip: '2030 interim target aligned with EU Green Deal and corporate ESG commitments. Typically aims for 40-55% reduction from baseline.' },
+                                    { year: 2050, label: 'Net-Zero Target', value: 0, color: 'text-emerald-500 dark:text-emerald-400', tip: 'Paris Agreement net-zero target year. Requires eliminating or fully offsetting all greenhouse gas emissions by 2050.' },
                                 ].map((m, i) => (
                                     <div key={i} className="text-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                                        <div className="text-xs text-slate-500">{m.label} ({m.year})</div>
+                                        <div className="text-xs text-slate-500 flex items-center justify-center">{m.label} ({m.year})<Tooltip content={m.tip} /></div>
                                         <div className={`text-lg font-bold font-mono ${m.color}`}>{fmt(m.value)} <span className="text-xs text-slate-400">tCO2</span></div>
                                     </div>
                                 ))}
