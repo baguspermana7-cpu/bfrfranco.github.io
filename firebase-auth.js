@@ -205,8 +205,8 @@
       '<div class="rz-modal">' +
         '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()">&times;</button>' +
         '<div id="rzModalForm">' +
-          '<h3><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Premium Access</h3>' +
-          '<p class="rz-modal-sub">Sign in to unlock advanced features and full calculator access.</p>' +
+          '<h3><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Sign In</h3>' +
+          '<p class="rz-modal-sub">Access calculators, tools, and analytical content.</p>' +
           '<div class="rz-error" id="rzModalError"></div>' +
           googleSection +
           '<label>Email</label>' +

@@ -176,16 +176,16 @@
             '<div class="rz-modal">' +
                 '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()" aria-label="Close login dialog">&times;</button>' +
                 '<div id="rzModalForm">' +
-                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Premium Access</h3>' +
-                    '<p class="rz-modal-sub">Sign in to unlock advanced features and full calculator access.</p>' +
+                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Sign In</h3>' +
+                    '<p class="rz-modal-sub">Access calculators, tools, and analytical content.</p>' +
                     '<div class="rz-error" id="rzModalError">Invalid email or password.</div>' +
                     '<label>Email</label>' +
                     '<input type="email" id="rzModalEmail" placeholder="your@email.com" autocomplete="email">' +
                     '<label>Password</label>' +
                     '<input type="password" id="rzModalPassword" placeholder="Enter password" autocomplete="current-password">' +
                     '<button class="rz-submit-btn" id="rzModalSubmit" onclick="window._rzAuth.doLogin()">Sign In</button>' +
-                    '<div style="text-align:center;margin-top:8px;">' +
-                        '<a href="https://bagus-dwi-permana.myr.id/membership/resistancezero-pro" target="_blank" rel="noopener" class="rz-pro-link" style="font-size:0.68rem;color:#64748b;text-decoration:none;transition:color 0.2s;">Unlock Pro Mode &rarr;</a>' +
+                    '<div style="text-align:center;margin-top:12px;font-size:0.68rem;color:#475569;line-height:1.5;">' +
+                        'By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>' +
                     '</div>' +
                     '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
                         '<span class="rz-demo-label" style="color:#a78bfa;font-weight:600;">Demo Account:</span><br>' +
@@ -195,7 +195,7 @@
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +
                     '<i class="fas fa-check-circle"></i>' +
-                    '<p id="rzSuccessTier">PRO Access Activated</p>' +
+                    '<p id="rzSuccessTier">Access Activated</p>' +
                     '<small>Page will refresh in a moment...</small>' +
                 '</div>' +
             '</div>' +

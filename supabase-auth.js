@@ -191,9 +191,6 @@
                     '<div class="rz-dd-badge" id="rzDdBadge">FREE</div>' +
                     '<div class="rz-dd-email" id="rzDdEmail"></div>' +
                 '</div>' +
-                '<button class="rz-dd-upgrade" id="rzDdUpgrade" style="display:none;" onclick="window._rzAuth.upgrade()">' +
-                    '<i class="fas fa-crown"></i> Upgrade to PRO' +
-                '</button>' +
                 '<button class="rz-dd-logout" onclick="window._rzAuth.logout()">' +
                     '<i class="fas fa-sign-out-alt"></i> Logout' +
                 '</button>' +
@@ -215,7 +212,7 @@
                 /* Login form */
                 '<div id="rzModalForm">' +
                     '<h3><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Sign In</h3>' +
-                    '<p class="rz-modal-sub">Access premium calculators, articles, and technical analysis.</p>' +
+                    '<p class="rz-modal-sub">Access calculators, tools, and analytical content.</p>' +
                     '<div class="rz-error" id="rzModalError"></div>' +
                     '<label>Email</label>' +
                     '<input type="email" id="rzModalEmail" placeholder="your@email.com" autocomplete="email">' +
@@ -229,11 +226,14 @@
                     '<div class="rz-signup-link" id="rzSignupLink">' +
                         'No account? <a onclick="window._rzAuth.showSignup()">Create one</a>' +
                     '</div>' +
+                    '<div style="text-align:center;margin-top:12px;font-size:0.68rem;color:#475569;line-height:1.5;">' +
+                        'By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>' +
+                    '</div>' +
                 '</div>' +
                 /* Signup form */
                 '<div id="rzSignupForm" style="display:none;">' +
                     '<h3><i class="fas fa-user-plus" style="color:#8b5cf6;margin-right:8px;"></i>Create Account</h3>' +
-                    '<p class="rz-modal-sub">Start with free access. Upgrade to PRO anytime.</p>' +
+                    '<p class="rz-modal-sub">Create a free account to access all features.</p>' +
                     '<div class="rz-error" id="rzSignupError"></div>' +
                     '<label>Full Name</label>' +
                     '<input type="text" id="rzSignupName" placeholder="Your full name" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.9rem;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;">' +
@@ -461,7 +461,7 @@
             document.getElementById('rzSuccessTier').textContent =
                 tier === 'pro' ? 'PRO Access Active' : 'Welcome!';
             document.getElementById('rzSuccessSub').textContent =
-                tier === 'free' ? 'Free tier active. Upgrade anytime!' : 'Page will refresh in a moment...';
+                tier === 'free' ? 'Free access active.' : 'Page will refresh in a moment...';
             document.getElementById('rzModalSuccess').classList.add('show');
             updateAuthUI({ email: data.user.email, tier: tier });
 
@@ -557,8 +557,7 @@
         },
 
         upgrade: function () {
-            // Redirect to Mayar checkout
-            window.open('https://bagus-dwi-permana.myr.id/membership/resistancezero-pro', '_blank');
+            window.location.href = 'mailto:bagus@resistancezero.com';
         },
 
         toggleDropdown: function () {
