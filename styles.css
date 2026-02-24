@@ -527,6 +527,7 @@ a {
     height: 100%;
     animation: ticker-scroll 30s linear infinite;
     white-space: nowrap;
+    will-change: transform;
 }
 
 .ticker-content:hover {
@@ -670,6 +671,7 @@ a {
     background-position: center center;
     z-index: -2;
     animation: gridPulse 4s ease-in-out infinite;
+    will-change: opacity;
 }
 
 .hero-background::before {
@@ -698,11 +700,9 @@ a {
 
 @keyframes gridPulse {
     0%, 100% {
-        background-size: 60px 60px;
         opacity: 0.6;
     }
     50% {
-        background-size: 62px 62px;
         opacity: 1;
     }
 }
@@ -3209,15 +3209,15 @@ section {
    Typewriter Effect
    ========================================== */
 .typewriter {
-    overflow: hidden;
     border-right: 3px solid var(--accent-gold);
     white-space: nowrap;
-    animation: typing 3.5s steps(50, end), blink-caret 0.75s step-end infinite;
+    clip-path: inset(0 100% 0 0);
+    animation: typing 3.5s steps(50, end) forwards, blink-caret 0.75s step-end infinite;
 }
 
 @keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
 }
 
 @keyframes blink-caret {

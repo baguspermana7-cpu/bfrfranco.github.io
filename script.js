@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScroll();
     initContactForm();
     initNavbarScroll();
-    initParticles();
     initScrollProgress();
     initCursorSpotlight();
     initCardTilt();
@@ -151,9 +150,9 @@ function initNavigation() {
         }
     });
     
-    // Update active nav link based on scroll position
+    // Update active nav link based on scroll position (throttled)
     updateActiveNavLink();
-    window.addEventListener('scroll', updateActiveNavLink);
+    window.addEventListener('scroll', throttle(updateActiveNavLink, 100));
 }
 
 function updateActiveNavLink() {
@@ -543,175 +542,6 @@ function throttle(func, limit) {
 }
 
 /* ==========================================
-   Floating Particles System
-   ========================================== */
-function initParticles() {
-    const canvas = document.getElementById('particles-canvas');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let mouse = { x: null, y: null, radius: 150 };
-    let animationId;
-
-    // Set canvas size
-    function resizeCanvas() {
-        const hero = document.querySelector('.hero');
-        if (hero) {
-            canvas.width = hero.offsetWidth;
-            canvas.height = hero.offsetHeight;
-        }
-    }
-
-    // Particle class
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 4 + 2;
-            this.baseX = this.x;
-            this.baseY = this.y;
-            this.density = (Math.random() * 30) + 1;
-            this.speedX = (Math.random() - 0.5) * 0.5;
-            this.speedY = (Math.random() - 0.5) * 0.5;
-            this.opacity = Math.random() * 0.6 + 0.3;
-            // Assign color once at creation - warm palette
-            const colorIndex = Math.floor(Math.random() * 3);
-            this.color = colorIndex === 0 ? [245, 158, 11] :
-                         colorIndex === 1 ? [251, 191, 36] : [255, 107, 53];
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.opacity})`;
-            ctx.fill();
-
-            // Warm glow effect
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, 0.5)`;
-        }
-
-        update() {
-            // Mouse interaction
-            if (mouse.x !== null && mouse.y !== null) {
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < mouse.radius) {
-                    let forceDirectionX = dx / distance;
-                    let forceDirectionY = dy / distance;
-                    let maxDistance = mouse.radius;
-                    let force = (maxDistance - distance) / maxDistance;
-                    let directionX = forceDirectionX * force * this.density * 0.5;
-                    let directionY = forceDirectionY * force * this.density * 0.5;
-
-                    this.x -= directionX;
-                    this.y -= directionY;
-                }
-            }
-
-            // Floating movement
-            this.x += this.speedX;
-            this.y += this.speedY;
-
-            // Boundary check with smooth wrap
-            if (this.x < 0) this.x = canvas.width;
-            if (this.x > canvas.width) this.x = 0;
-            if (this.y < 0) this.y = canvas.height;
-            if (this.y > canvas.height) this.y = 0;
-
-            this.draw();
-        }
-    }
-
-    // Initialize particles
-    function initParticleArray() {
-        particles = [];
-        const numberOfParticles = Math.min(30, Math.floor((canvas.width * canvas.height) / 20000));
-        for (let i = 0; i < numberOfParticles; i++) {
-            particles.push(new Particle());
-        }
-    }
-
-    // Connect particles with lines
-    function connectParticles() {
-        for (let a = 0; a < particles.length; a++) {
-            for (let b = a + 1; b < particles.length; b++) {
-                let dx = particles[a].x - particles[b].x;
-                let dy = particles[a].y - particles[b].y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < 150) {
-                    let opacity = 1 - (distance / 150);
-                    // Warm gold connection lines
-                    ctx.strokeStyle = `rgba(245, 158, 11, ${opacity * 0.3})`;
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    ctx.moveTo(particles[a].x, particles[a].y);
-                    ctx.lineTo(particles[b].x, particles[b].y);
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-
-    // Animation loop
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.shadowBlur = 0;
-
-        for (let particle of particles) {
-            particle.update();
-        }
-
-        connectParticles();
-        animationId = requestAnimationFrame(animate);
-    }
-
-    // Event listeners
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        hero.addEventListener('mousemove', function(e) {
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
-        });
-
-        hero.addEventListener('mouseleave', function() {
-            mouse.x = null;
-            mouse.y = null;
-        });
-    }
-
-    window.addEventListener('resize', debounce(function() {
-        resizeCanvas();
-        initParticleArray();
-    }, 200));
-
-    // Reduce particles on mobile for performance
-    function checkMobile() {
-        if (window.innerWidth <= 768) {
-            cancelAnimationFrame(animationId);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        } else {
-            if (!animationId) {
-                animate();
-            }
-        }
-    }
-
-    // Initialize
-    resizeCanvas();
-    initParticleArray();
-    animate();
-
-    // Check on resize
-    window.addEventListener('resize', debounce(checkMobile, 300));
-}
-
-/* ==========================================
    Scroll Progress Bar
    ========================================== */
 function initScrollProgress() {
@@ -723,7 +553,7 @@ function initScrollProgress() {
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrollPercent = (scrollTop / docHeight) * 100;
         progressBar.style.width = scrollPercent + '%';
-    }, 10));
+    }, 50));
 }
 
 /* ==========================================
@@ -733,32 +563,44 @@ function initCursorSpotlight() {
     const spotlight = document.getElementById('cursorSpotlight');
     if (!spotlight) return;
 
-    // Only enable on desktop
-    if (window.innerWidth <= 768) return;
+    // Skip on touch devices (no cursor)
+    if (!window.matchMedia('(pointer: fine)').matches) return;
 
     let mouseX = 0, mouseY = 0;
     let spotX = 0, spotY = 0;
+    let dirty = false;
+    let rafId = null;
 
     document.addEventListener('mousemove', function(e) {
         mouseX = e.clientX;
         mouseY = e.clientY;
         spotlight.classList.add('active');
+        if (!dirty) {
+            dirty = true;
+            if (!rafId) rafId = requestAnimationFrame(animateSpotlight);
+        }
     });
 
     document.addEventListener('mouseleave', function() {
         spotlight.classList.remove('active');
+        dirty = false;
     });
 
-    // Smooth follow animation
+    // Smooth follow animation — only runs when mouse is moving
     function animateSpotlight() {
         spotX += (mouseX - spotX) * 0.1;
         spotY += (mouseY - spotY) * 0.1;
         spotlight.style.left = spotX + 'px';
         spotlight.style.top = spotY + 'px';
-        requestAnimationFrame(animateSpotlight);
-    }
 
-    animateSpotlight();
+        // Stop animating once we've caught up (within 0.5px)
+        if (Math.abs(mouseX - spotX) > 0.5 || Math.abs(mouseY - spotY) > 0.5) {
+            rafId = requestAnimationFrame(animateSpotlight);
+        } else {
+            rafId = null;
+            dirty = false;
+        }
+    }
 }
 
 /* ==========================================
