@@ -428,6 +428,138 @@ Same 29 files as cookie banner.
 
 ---
 
+## CRITICAL: Script Placement Rules
+
+> **Lesson learned 2026-02-25**: A batch insertion of Feature 22/23/21 scripts broke Pro mode, PDF export, and calculator JS across 17 articles because scripts were inserted INSIDE calculator IIFEs instead of AFTER them.
+
+### Rule 1: Feature scripts MUST be in separate `<script>` blocks
+```
+WRONG:
+<script>
+  (function(){ /* calculator IIFE */
+    ...
+    <!-- Feature 22 -->     <-- BREAKS EVERYTHING
+    <script>...</script>
+    ...
+  })();
+</script>
+
+CORRECT:
+<script>
+  (function(){ /* calculator IIFE */ })();
+</script>
+<!-- Feature 22 -->
+<script>(function(){ /* reading progress */ })();</script>
+<!-- Feature 23 -->
+<script>(function(){ /* TOC sidebar */ })();</script>
+<!-- Feature 21 -->
+<script>(function(){ /* global search */ })();</script>
+```
+
+### Rule 2: Never place `</script>` inside JS string literals
+The HTML parser terminates `<script>` blocks at the FIRST `</script>` it encounters, regardless of JS string context. Use `<\/script>` or string concatenation instead.
+
+### Rule 3: Multi-line strings in JS must use backticks or concatenation
+Single-quoted strings (`'...'`) cannot contain raw newlines. If a batch script splits a string across lines, it creates "Invalid or unexpected token" errors.
+
+### Rule 4: PDF export functions write to new windows
+Calculator PDF export functions use `w.document.write(html)` where `html` is a string built via concatenation. Never insert code between the string building and `w.document.write()` call.
+
+### Rule 5: Validate after batch edits
+After any batch modification across articles, run this Node.js check:
+```js
+// Extracts all <script> blocks and parses them
+const scriptRegex = /<script>([\s\S]*?)<\/script>/g;
+let match;
+while ((match = scriptRegex.exec(html)) !== null) {
+    try { new Function(match[1]); }
+    catch(e) { console.error("Syntax error at line " + lineNum); }
+}
+```
+
+### Script Order in Articles
+1. `<script src="script.min.js">` — Shared utilities
+2. `<script>` — Free calculator IIFE
+3. `<script>` — Pro Mode calculator IIFE (exports `window.switchXxxMode`, `window.exportXxxPDF`)
+4. `<!-- Feature 22 -->` `<script>` — Reading Progress Bar
+5. `<!-- Feature 23 -->` `<script>` — TOC Sidebar
+6. `<!-- Feature 21 -->` `<script>` — Global Search
+7. `<script>` — Tooltip positioning
+8. `<script>` — Newsletter subscription
+9. `<script src="auth.js">` — Authentication module
+10. `<script src="rz-tracker.js">` — Analytics tracker
+11. `<script>` — Cookie consent + scroll-to-top
+
+---
+
+## Calculator Disclaimer Standard
+
+### Requirement
+ALL pages with calculators MUST have a disclaimer block. This includes:
+- 9 standalone calculator pages (pue, capex, opex, roi, carbon-footprint, datahallAI, dc-conventional, tia-942-checklist, tier-advisor)
+- Article-embedded calculators (articles 1-7, 9, 12, 13, 17, 18)
+
+### Placement
+- **Standalone pages**: Before the `<!-- Footer -->` section
+- **Article-embedded**: After the benchmark-meta/privacy-badge div, before the calculator container's closing `</div>` or before the next `<h2>` section
+
+### HTML Template
+```html
+<div style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
+    <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+        <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;">
+            <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div>
+            <div style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">
+                Disclaimer &amp; Data Sources
+            </div>
+            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">
+                This calculator is provided for <strong style="color:#cbd5e1;">educational and
+                estimation purposes only</strong>. Results are approximations based on industry
+                benchmarks and publicly available data.
+            </p>
+            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">
+                <strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong>
+                [SPECIFIC SOURCES FOR THIS CALCULATOR]
+            </p>
+            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">
+                All calculations are performed entirely in your browser. No data is transmitted
+                to any server. See our <a href="privacy.html" style="color:#60a5fa;">Privacy Policy</a>.
+            </p>
+            <p style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">
+                By using this tool you agree to our
+                <a href="terms.html" style="color:#60a5fa;">Terms of Service</a>.
+                All content on ResistanceZero is independent personal research.
+            </p>
+        </div>
+    </div>
+</div>
+```
+
+### Per-Calculator Sources
+| Calculator | Algorithm Sources |
+|-----------|-----------------|
+| PUE (standalone + article-9) | ASHRAE TC 9.9, Green Grid, ISO/IEC 30134-2, Uptime Institute 2024 |
+| CAPEX | Turner & Townsend, JLL, Uptime Institute Tier Standards, CBRE |
+| OPEX | Uptime Institute, US EIA, BLS, JLL, CBRE, IEC 62040 |
+| ROI | NPV DCF, IRR Newton-Raphson, Uptime Institute, JLL, CBRE |
+| Carbon Footprint | GHG Protocol Scope 1/2/3, IEA, EPA eGRID, SBTi |
+| AI Data Hall | ASHRAE TC 9.9, OCP, NVIDIA DGX, Uptime Institute, Green Grid |
+| DC Conventional | ASHRAE TC 9.9, Uptime Institute Tier I-IV, IEC 62040, TIA-942 |
+| TIA-942 Checklist | TIA-942-B, Uptime Institute, BICSI 002-2019 |
+| Tier Advisor | Uptime Institute Tier Classification, TIA-942, IEEE 493 |
+| Maturity (article-1) | Uptime Institute 2023-2024, EN 50600, ISO 55001 |
+| Alarm (article-2) | ISA-18.2-2022, EEMUA 191, IEC 62682, Poisson/Erlang-C |
+| Maintenance (article-3) | Palmer (2006), Smith & Hinchcliffe (2004), RCM III |
+| MTTR (article-4) | 5-phase MTTR decomposition, IEEE 493, vendor mobilization |
+| Tech Debt (article-5) | NIST Weibull, ISO 55001, Uptime Institute 2023 |
+| RCA (article-6) | DOE-HDBK-1208, Leveson STAMP 2011, ISO 45001 |
+| Resilience (article-7) | Hollnagel 2014, EN 50600, Uptime Institute 2023 |
+| Availability (article-13) | Uptime Institute Tier I-IV, IEEE 1584-2018, EU AI Act Art 13 |
+
+---
+
 ## Dark Mode Support
 
 All features support dark mode via `[data-theme="dark"]` selectors:
