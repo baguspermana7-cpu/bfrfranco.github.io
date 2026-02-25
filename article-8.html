@@ -3503,6 +3503,59 @@
         '</div>' +
         '<div class="footer">resistancezero.com | Generated ' + today + ' | All calculations performed client-side | SHI Model v2.0</div>' +
         '
+</body></html>';
+
+        var w = window.open('', '_blank');
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 500);
+    };
+
+    // --- Tooltip Positioning ---
+    document.addEventListener('mouseover', function(e) {
+        var trigger = e.target.closest('.tooltip-trigger');
+        if (!trigger) return;
+        var content = trigger.querySelector('.tooltip-content');
+        if (!content) return;
+        content.classList.add('visible');
+        var rect = trigger.getBoundingClientRect();
+        content.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+        content.style.top = (rect.bottom + 8) + 'px';
+    });
+    document.addEventListener('mouseout', function(e) {
+        var trigger = e.target.closest('.tooltip-trigger');
+        if (!trigger) return;
+        var content = trigger.querySelector('.tooltip-content');
+        if (content) content.classList.remove('visible');
+    });
+
+    // --- Hook to Calculator Inputs ---
+    ['calcNearMiss','calcWeakSignals','calcAudit','calcTraining','calcDays','calcWalks','calcHazard','calcMeeting'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', updateProPanels);
+            el.addEventListener('change', updateProPanels);
+        }
+    });
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAuth();
+        if (isAuthenticated) {
+            var proBtn = document.querySelector('.shi-btn-pro');
+            if (proBtn) proBtn.classList.add('active');
+        }
+    });
+    window.addEventListener('rz-auth-change', function() {
+        checkAuth();
+        if (isAuthenticated && proMode) { unlockPanels(); updateProPanels(); }
+    });
+
+    // Run initial auth check
+    checkAuth();
+})();
+</script>
+
 <!-- ═══ Feature 22: Reading Progress Bar ═══ -->
 <script>
 (function() {
@@ -3931,59 +3984,6 @@
             renderResults(results);
         });
     }
-})();
-</script>
-
-</body></html>';
-
-        var w = window.open('', '_blank');
-        w.document.write(html);
-        w.document.close();
-        setTimeout(function() { w.print(); }, 500);
-    };
-
-    // --- Tooltip Positioning ---
-    document.addEventListener('mouseover', function(e) {
-        var trigger = e.target.closest('.tooltip-trigger');
-        if (!trigger) return;
-        var content = trigger.querySelector('.tooltip-content');
-        if (!content) return;
-        content.classList.add('visible');
-        var rect = trigger.getBoundingClientRect();
-        content.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
-        content.style.top = (rect.bottom + 8) + 'px';
-    });
-    document.addEventListener('mouseout', function(e) {
-        var trigger = e.target.closest('.tooltip-trigger');
-        if (!trigger) return;
-        var content = trigger.querySelector('.tooltip-content');
-        if (content) content.classList.remove('visible');
-    });
-
-    // --- Hook to Calculator Inputs ---
-    ['calcNearMiss','calcWeakSignals','calcAudit','calcTraining','calcDays','calcWalks','calcHazard','calcMeeting'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', updateProPanels);
-            el.addEventListener('change', updateProPanels);
-        }
-    });
-
-    // --- Init ---
-    document.addEventListener('DOMContentLoaded', function() {
-        checkAuth();
-        if (isAuthenticated) {
-            var proBtn = document.querySelector('.shi-btn-pro');
-            if (proBtn) proBtn.classList.add('active');
-        }
-    });
-    window.addEventListener('rz-auth-change', function() {
-        checkAuth();
-        if (isAuthenticated && proMode) { unlockPanels(); updateProPanels(); }
-    });
-
-    // Run initial auth check
-    checkAuth();
 })();
 </script>
 <script>

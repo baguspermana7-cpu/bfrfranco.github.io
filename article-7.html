@@ -2361,6 +2361,20 @@
                     <!-- Benchmark Meta -->
                     <div class="benchmark-meta">Model v1.0 · Feb 2026 · Based on Uptime Institute 2023, Hollnagel Resilience Engineering 2014, EN 50600 · 7-dimension weighted model</div>
 
+                    <!-- Calculator Disclaimer -->
+                    <div style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
+                        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+                            <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
+                            <div>
+                                <div style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
+                                <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
+                                <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> Uptime Institute 2023 resilience benchmarks, Hollnagel Resilience Engineering (2014) four cornerstones framework, EN 50600 data center facility standards, 7-dimension weighted resilience model with Tier I-IV classification.</p>
+                                <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
+                                <p style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Login Modal -->
                     <div class="res-login-overlay" id="resLoginOverlay">
                         <div class="res-login-box">
@@ -3662,6 +3676,134 @@
                 '<p>resistancezero.com | Generated ' + new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) + ' | Client-side calculations</p>' +
                 '<p>No data was transmitted to any server. All computations performed in your browser.</p></div>' +
         '
+</body></html>';
+
+            var w2 = window.open('', '_blank');
+            if (w2) { w2.document.write(html); w2.document.close(); setTimeout(function() { w2.print(); }, 600); }
+        };
+
+        // --- Update Pro Panels (Enhanced) ---
+        function updateProPanels() {
+            if (!resProUnlocked) return;
+
+            var relScore = parseInt(document.getElementById('relScoreVal')?.textContent) || 0;
+            var resScore = parseInt(document.getElementById('resScoreVal')?.textContent) || 0;
+            var gap = Math.abs(relScore - resScore);
+
+            var dimScores = getDimScores();
+
+            var minIdx = dimScores.indexOf(Math.min.apply(null, dimScores));
+            var maxIdx = dimScores.indexOf(Math.max.apply(null, dimScores));
+            var avgDim = dimScores.reduce(function(a,b) { return a+b; }, 0) / (dimScores.length || 1);
+
+            // Panel 1: Gap Deep Dive
+            var gapSeverity = gap > 30 ? 'Critical' : gap >= 15 ? 'Moderate' : 'Low';
+            document.getElementById('resKpiGapSeverity').textContent = gapSeverity;
+            document.getElementById('resKpiDesignOpsRatio').textContent = relScore > 0 ? (resScore / relScore).toFixed(2) : '--';
+            document.getElementById('resKpiWeakest').textContent = dimNames[minIdx] || '--';
+            document.getElementById('resKpiStrongest').textContent = dimNames[maxIdx] || '--';
+            document.getElementById('resKpiImprovePotential').textContent = '+' + Math.round(100 - avgDim) + ' pts';
+            var relTierNum = relScore < 45 ? 1 : relScore < 65 ? 2 : relScore < 85 ? 3 : 4;
+            var resTierNum = resScore < 20 ? 1 : resScore < 40 ? 2 : resScore < 65 ? 3 : resScore < 85 ? 4 : 5;
+            document.getElementById('resKpiTierEquivGap').textContent = Math.abs(relTierNum - resTierNum) + ' levels';
+
+            // Panel 2: Cost of Downtime
+            var baseCost = 9000;
+            var annualMinutes = gap > 30 ? 180 : gap >= 15 ? 60 : 15;
+            var annualCost = baseCost * annualMinutes;
+            document.getElementById('resKpiAnnualCost').textContent = '$' + (annualCost >= 1000000 ? (annualCost/1000000).toFixed(1) + 'M' : (annualCost/1000).toFixed(0) + 'K');
+            document.getElementById('resKpiCostPerGap').textContent = gap > 0 ? '$' + Math.round(annualCost / gap).toLocaleString() : '--';
+            var riskLevel = gap > 30 ? 'High' : gap >= 15 ? 'Medium' : 'Low';
+            document.getElementById('resKpiRiskExposure').textContent = riskLevel;
+            document.getElementById('resKpiSlaPenalty').textContent = '$' + Math.round(annualCost * 0.15).toLocaleString();
+            document.getElementById('resKpiRecoveryRoi').textContent = (annualCost > 0 ? ((annualCost * 0.6) / (annualCost * 0.2)).toFixed(1) : '--') + 'x';
+            var insImpact = gap > 30 ? '+25-40%' : gap >= 15 ? '+10-20%' : 'Favorable';
+            document.getElementById('resKpiInsurance').textContent = insImpact;
+
+            // Panel 3: Benchmarking
+            var percentile = Math.min(99, Math.max(1, Math.round(resScore * 0.95 + 5)));
+            document.getElementById('resKpiPercentile').textContent = 'P' + percentile;
+            var hollLevel = resScore < 20 ? 'Pathological' : resScore < 40 ? 'Reactive' : resScore < 65 ? 'Calculative' : resScore < 85 ? 'Proactive' : 'Generative';
+            document.getElementById('resKpiHollnagel').textContent = hollLevel;
+            var westrum = resScore < 30 ? 'Pathological' : resScore < 60 ? 'Bureaucratic' : 'Generative';
+            document.getElementById('resKpiWestrum').textContent = westrum;
+            var profile = relScore >= 75 && resScore < 40 ? 'Over-designed / Under-operated' : relScore < 45 && resScore >= 65 ? 'Lean & Resilient' : gap <= 15 ? 'Balanced Facility' : 'Design-Heavy';
+            document.getElementById('resKpiProfile').textContent = profile;
+
+            // Panel 4: Improvement Roadmap
+            var quick30 = Math.min(100, resScore + Math.round((100 - resScore) * 0.15));
+            var target90 = Math.min(100, resScore + Math.round((100 - resScore) * 0.35));
+            var year1 = Math.min(100, resScore + Math.round((100 - resScore) * 0.65));
+            document.getElementById('resKpi30day').textContent = quick30 + '/100';
+            document.getElementById('resKpi90day').textContent = target90 + '/100';
+            document.getElementById('resKpi1year').textContent = year1 + '/100';
+            document.getElementById('resKpiPriority').textContent = dimNames[minIdx] || '--';
+
+            // === Run Monte Carlo ===
+            var mcResult = runResMonteCarlo(dimScores);
+            document.getElementById('resMcMean').textContent = mcResult.mean;
+            document.getElementById('resMcStdDev').textContent = mcResult.stdDev;
+            document.getElementById('resMcP5').textContent = mcResult.p5;
+            document.getElementById('resMcP50').textContent = mcResult.p50;
+            document.getElementById('resMcP95').textContent = mcResult.p95;
+            document.getElementById('resMcRange').textContent = mcResult.min + '-' + mcResult.max;
+
+            // === Run Sensitivity ===
+            var sensitivities = runResSensitivity(dimScores);
+            renderTornadoBars(sensitivities);
+
+            // === Generate Narrative ===
+            var narrativeBox = document.getElementById('resNarrativeBox');
+            if (narrativeBox) {
+                narrativeBox.innerHTML = generateResNarrative(relScore, resScore, gap, dimScores, mcResult);
+                narrativeBox.style.display = 'block';
+            }
+
+            // === Draw Canvas Charts ===
+            drawResRadarChart(dimScores);
+            drawResHistChart(mcResult);
+        }
+
+        // Hook into existing calculate function
+        var origCalc = window._resCalc;
+        if (origCalc) {
+            window._resCalc = function() {
+                origCalc();
+                if (resProUnlocked) updateProPanels();
+            };
+        }
+
+        // Override all input listeners to use hooked version
+        var inputIds = ['calcRedundancy','calcDrillFreq','calcRecovery','calcDocCurrency','calcCommPlan','calcLessons'];
+        var sliderIds = ['calcResponseTime','calcCrossTrain'];
+        inputIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('change', function() { if (resProUnlocked) updateProPanels(); });
+        });
+        sliderIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('input', function() { if (resProUnlocked) updateProPanels(); });
+        });
+
+        // Session check on load
+        try {
+            var sess = JSON.parse(localStorage.getItem('rz_premium_session'));
+            if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
+                unlockPro();
+                switchResMode('pro');
+            }
+        } catch(e) {}
+
+        // Cross-article auth sync
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.tier === 'pro') {
+                unlockPro();
+                switchResMode('pro');
+            }
+        });
+    })();
+    </script>
+
 <!-- ═══ Feature 22: Reading Progress Bar ═══ -->
 <script>
 (function() {
@@ -4092,134 +4234,6 @@
     }
 })();
 </script>
-
-</body></html>';
-
-            var w2 = window.open('', '_blank');
-            if (w2) { w2.document.write(html); w2.document.close(); setTimeout(function() { w2.print(); }, 600); }
-        };
-
-        // --- Update Pro Panels (Enhanced) ---
-        function updateProPanels() {
-            if (!resProUnlocked) return;
-
-            var relScore = parseInt(document.getElementById('relScoreVal')?.textContent) || 0;
-            var resScore = parseInt(document.getElementById('resScoreVal')?.textContent) || 0;
-            var gap = Math.abs(relScore - resScore);
-
-            var dimScores = getDimScores();
-
-            var minIdx = dimScores.indexOf(Math.min.apply(null, dimScores));
-            var maxIdx = dimScores.indexOf(Math.max.apply(null, dimScores));
-            var avgDim = dimScores.reduce(function(a,b) { return a+b; }, 0) / (dimScores.length || 1);
-
-            // Panel 1: Gap Deep Dive
-            var gapSeverity = gap > 30 ? 'Critical' : gap >= 15 ? 'Moderate' : 'Low';
-            document.getElementById('resKpiGapSeverity').textContent = gapSeverity;
-            document.getElementById('resKpiDesignOpsRatio').textContent = relScore > 0 ? (resScore / relScore).toFixed(2) : '--';
-            document.getElementById('resKpiWeakest').textContent = dimNames[minIdx] || '--';
-            document.getElementById('resKpiStrongest').textContent = dimNames[maxIdx] || '--';
-            document.getElementById('resKpiImprovePotential').textContent = '+' + Math.round(100 - avgDim) + ' pts';
-            var relTierNum = relScore < 45 ? 1 : relScore < 65 ? 2 : relScore < 85 ? 3 : 4;
-            var resTierNum = resScore < 20 ? 1 : resScore < 40 ? 2 : resScore < 65 ? 3 : resScore < 85 ? 4 : 5;
-            document.getElementById('resKpiTierEquivGap').textContent = Math.abs(relTierNum - resTierNum) + ' levels';
-
-            // Panel 2: Cost of Downtime
-            var baseCost = 9000;
-            var annualMinutes = gap > 30 ? 180 : gap >= 15 ? 60 : 15;
-            var annualCost = baseCost * annualMinutes;
-            document.getElementById('resKpiAnnualCost').textContent = '$' + (annualCost >= 1000000 ? (annualCost/1000000).toFixed(1) + 'M' : (annualCost/1000).toFixed(0) + 'K');
-            document.getElementById('resKpiCostPerGap').textContent = gap > 0 ? '$' + Math.round(annualCost / gap).toLocaleString() : '--';
-            var riskLevel = gap > 30 ? 'High' : gap >= 15 ? 'Medium' : 'Low';
-            document.getElementById('resKpiRiskExposure').textContent = riskLevel;
-            document.getElementById('resKpiSlaPenalty').textContent = '$' + Math.round(annualCost * 0.15).toLocaleString();
-            document.getElementById('resKpiRecoveryRoi').textContent = (annualCost > 0 ? ((annualCost * 0.6) / (annualCost * 0.2)).toFixed(1) : '--') + 'x';
-            var insImpact = gap > 30 ? '+25-40%' : gap >= 15 ? '+10-20%' : 'Favorable';
-            document.getElementById('resKpiInsurance').textContent = insImpact;
-
-            // Panel 3: Benchmarking
-            var percentile = Math.min(99, Math.max(1, Math.round(resScore * 0.95 + 5)));
-            document.getElementById('resKpiPercentile').textContent = 'P' + percentile;
-            var hollLevel = resScore < 20 ? 'Pathological' : resScore < 40 ? 'Reactive' : resScore < 65 ? 'Calculative' : resScore < 85 ? 'Proactive' : 'Generative';
-            document.getElementById('resKpiHollnagel').textContent = hollLevel;
-            var westrum = resScore < 30 ? 'Pathological' : resScore < 60 ? 'Bureaucratic' : 'Generative';
-            document.getElementById('resKpiWestrum').textContent = westrum;
-            var profile = relScore >= 75 && resScore < 40 ? 'Over-designed / Under-operated' : relScore < 45 && resScore >= 65 ? 'Lean & Resilient' : gap <= 15 ? 'Balanced Facility' : 'Design-Heavy';
-            document.getElementById('resKpiProfile').textContent = profile;
-
-            // Panel 4: Improvement Roadmap
-            var quick30 = Math.min(100, resScore + Math.round((100 - resScore) * 0.15));
-            var target90 = Math.min(100, resScore + Math.round((100 - resScore) * 0.35));
-            var year1 = Math.min(100, resScore + Math.round((100 - resScore) * 0.65));
-            document.getElementById('resKpi30day').textContent = quick30 + '/100';
-            document.getElementById('resKpi90day').textContent = target90 + '/100';
-            document.getElementById('resKpi1year').textContent = year1 + '/100';
-            document.getElementById('resKpiPriority').textContent = dimNames[minIdx] || '--';
-
-            // === Run Monte Carlo ===
-            var mcResult = runResMonteCarlo(dimScores);
-            document.getElementById('resMcMean').textContent = mcResult.mean;
-            document.getElementById('resMcStdDev').textContent = mcResult.stdDev;
-            document.getElementById('resMcP5').textContent = mcResult.p5;
-            document.getElementById('resMcP50').textContent = mcResult.p50;
-            document.getElementById('resMcP95').textContent = mcResult.p95;
-            document.getElementById('resMcRange').textContent = mcResult.min + '-' + mcResult.max;
-
-            // === Run Sensitivity ===
-            var sensitivities = runResSensitivity(dimScores);
-            renderTornadoBars(sensitivities);
-
-            // === Generate Narrative ===
-            var narrativeBox = document.getElementById('resNarrativeBox');
-            if (narrativeBox) {
-                narrativeBox.innerHTML = generateResNarrative(relScore, resScore, gap, dimScores, mcResult);
-                narrativeBox.style.display = 'block';
-            }
-
-            // === Draw Canvas Charts ===
-            drawResRadarChart(dimScores);
-            drawResHistChart(mcResult);
-        }
-
-        // Hook into existing calculate function
-        var origCalc = window._resCalc;
-        if (origCalc) {
-            window._resCalc = function() {
-                origCalc();
-                if (resProUnlocked) updateProPanels();
-            };
-        }
-
-        // Override all input listeners to use hooked version
-        var inputIds = ['calcRedundancy','calcDrillFreq','calcRecovery','calcDocCurrency','calcCommPlan','calcLessons'];
-        var sliderIds = ['calcResponseTime','calcCrossTrain'];
-        inputIds.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.addEventListener('change', function() { if (resProUnlocked) updateProPanels(); });
-        });
-        sliderIds.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.addEventListener('input', function() { if (resProUnlocked) updateProPanels(); });
-        });
-
-        // Session check on load
-        try {
-            var sess = JSON.parse(localStorage.getItem('rz_premium_session'));
-            if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
-                unlockPro();
-                switchResMode('pro');
-            }
-        } catch(e) {}
-
-        // Cross-article auth sync
-        window.addEventListener('rz-auth-change', function(e) {
-            if (e.detail && e.detail.tier === 'pro') {
-                unlockPro();
-                switchResMode('pro');
-            }
-        });
-    })();
-    </script>
 
     <!-- Tooltip Positioning JS -->
     <script>

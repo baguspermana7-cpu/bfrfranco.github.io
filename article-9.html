@@ -4668,6 +4668,93 @@ Where LMTD (Log Mean Temperature Difference) requires:
             html += '</div>';
 
         html+='
+</body></html>';
+
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+            setTimeout(function() { w.print(); }, 600);
+        };
+
+        // === TOOLTIP POSITIONING ===
+        function initTooltips() {
+            document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
+                var content = trigger.querySelector('.tooltip-content');
+                if (!content) return;
+
+                trigger.addEventListener('mouseenter', function(e) {
+                    var rect = trigger.getBoundingClientRect();
+                    content.style.top = (rect.bottom + 8) + 'px';
+                    content.style.left = Math.max(10, Math.min(rect.left - 120, window.innerWidth - 280)) + 'px';
+                    content.classList.add('visible');
+                });
+                trigger.addEventListener('mouseleave', function() {
+                    content.classList.remove('visible');
+                });
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    content.classList.toggle('visible');
+                });
+            });
+
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.tooltip-content.visible').forEach(function(tc) {
+                    tc.classList.remove('visible');
+                });
+            });
+        }
+
+        // === HOOK EVENTS ===
+        function init() {
+            checkAuth();
+            initTooltips();
+
+            var loadSlider = document.getElementById('loadSlider');
+            var rateSlider = document.getElementById('rateSlider');
+            var regionSelect = document.getElementById('hvacRegionSelect');
+
+            if (loadSlider) {
+                loadSlider.addEventListener('input', function() {
+                    if (proMode) updateHvacProPanels();
+                });
+            }
+            if (rateSlider) {
+                rateSlider.addEventListener('input', function() {
+                    if (proMode) updateHvacProPanels();
+                });
+            }
+            if (regionSelect) {
+                regionSelect.addEventListener('change', function() {
+                    if (proMode) updateHvacProPanels();
+                });
+            }
+
+            // Listen for auth changes from other tabs/articles
+            window.addEventListener('rz-auth-change', function() {
+                checkAuth();
+                if (isAuthenticated && proMode) updateHvacProPanels();
+            });
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'rz_premium_session') {
+                    checkAuth();
+                    if (isAuthenticated && proMode) updateHvacProPanels();
+                }
+            });
+
+            // Resize handler for pro charts
+            window.addEventListener('resize', function() {
+                if (proMode) updateHvacProPanels();
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+
 <!-- ═══ Feature 22: Reading Progress Bar ═══ -->
 <script>
 (function() {
@@ -5098,93 +5185,6 @@ Where LMTD (Log Mean Temperature Difference) requires:
     }
 })();
 </script>
-
-</body></html>';
-
-            w.document.open();
-            w.document.write(html);
-            w.document.close();
-            setTimeout(function() { w.print(); }, 600);
-        };
-
-        // === TOOLTIP POSITIONING ===
-        function initTooltips() {
-            document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
-                var content = trigger.querySelector('.tooltip-content');
-                if (!content) return;
-
-                trigger.addEventListener('mouseenter', function(e) {
-                    var rect = trigger.getBoundingClientRect();
-                    content.style.top = (rect.bottom + 8) + 'px';
-                    content.style.left = Math.max(10, Math.min(rect.left - 120, window.innerWidth - 280)) + 'px';
-                    content.classList.add('visible');
-                });
-                trigger.addEventListener('mouseleave', function() {
-                    content.classList.remove('visible');
-                });
-                trigger.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    content.classList.toggle('visible');
-                });
-            });
-
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.tooltip-content.visible').forEach(function(tc) {
-                    tc.classList.remove('visible');
-                });
-            });
-        }
-
-        // === HOOK EVENTS ===
-        function init() {
-            checkAuth();
-            initTooltips();
-
-            var loadSlider = document.getElementById('loadSlider');
-            var rateSlider = document.getElementById('rateSlider');
-            var regionSelect = document.getElementById('hvacRegionSelect');
-
-            if (loadSlider) {
-                loadSlider.addEventListener('input', function() {
-                    if (proMode) updateHvacProPanels();
-                });
-            }
-            if (rateSlider) {
-                rateSlider.addEventListener('input', function() {
-                    if (proMode) updateHvacProPanels();
-                });
-            }
-            if (regionSelect) {
-                regionSelect.addEventListener('change', function() {
-                    if (proMode) updateHvacProPanels();
-                });
-            }
-
-            // Listen for auth changes from other tabs/articles
-            window.addEventListener('rz-auth-change', function() {
-                checkAuth();
-                if (isAuthenticated && proMode) updateHvacProPanels();
-            });
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'rz_premium_session') {
-                    checkAuth();
-                    if (isAuthenticated && proMode) updateHvacProPanels();
-                }
-            });
-
-            // Resize handler for pro charts
-            window.addEventListener('resize', function() {
-                if (proMode) updateHvacProPanels();
-            });
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
-    })();
-    </script>
 <script src="auth.js"></script>
 <script src="rz-tracker.js"></script>
 

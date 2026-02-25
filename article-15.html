@@ -4360,6 +4360,53 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
             '</div>' +
 
         html+='
+</body></html>';
+
+        win.document.write(html);
+        win.document.close();
+        setTimeout(function() { win.print(); }, 600);
+    };
+
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+
+    // Enter key in login
+    document.getElementById('mclLoginPass').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') mclDoLogin();
+    });
+    document.getElementById('mclLoginEmail').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') document.getElementById('mclLoginPass').focus();
+    });
+
+    // Close on overlay click
+    document.getElementById('mclLoginOverlay').addEventListener('click', function(e) {
+        if (e.target === this) mclHideLogin();
+    });
+
+    // Pro input change listeners
+    ['mclCountry', 'mclLoad', 'mclPUE', 'mclStaffModel', 'mclRetention', 'mclPMRatio'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', function() { if (mclProMode) updateAllPanels(); });
+            el.addEventListener('input', function() { if (mclProMode) updateAllPanels(); });
+        }
+    });
+
+    // Listen for auth changes (from auth.js or other articles)
+    window.addEventListener('rz-auth-change', function() {
+        if (mclCheckAuth()) mclUnlockPanels();
+        else mclLockPanels();
+    });
+
+    // Auto-unlock on load if already authenticated
+    if (mclCheckAuth()) {
+        mclUnlockPanels();
+    }
+
+})();
+</script>
+
 <!-- ═══ Feature 22: Reading Progress Bar ═══ -->
 <script>
 (function() {
@@ -4788,53 +4835,6 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
             renderResults(results);
         });
     }
-})();
-</script>
-
-</body></html>';
-
-        win.document.write(html);
-        win.document.close();
-        setTimeout(function() { win.print(); }, 600);
-    };
-
-    // ============================================================
-    // EVENT LISTENERS
-    // ============================================================
-
-    // Enter key in login
-    document.getElementById('mclLoginPass').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') mclDoLogin();
-    });
-    document.getElementById('mclLoginEmail').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') document.getElementById('mclLoginPass').focus();
-    });
-
-    // Close on overlay click
-    document.getElementById('mclLoginOverlay').addEventListener('click', function(e) {
-        if (e.target === this) mclHideLogin();
-    });
-
-    // Pro input change listeners
-    ['mclCountry', 'mclLoad', 'mclPUE', 'mclStaffModel', 'mclRetention', 'mclPMRatio'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('change', function() { if (mclProMode) updateAllPanels(); });
-            el.addEventListener('input', function() { if (mclProMode) updateAllPanels(); });
-        }
-    });
-
-    // Listen for auth changes (from auth.js or other articles)
-    window.addEventListener('rz-auth-change', function() {
-        if (mclCheckAuth()) mclUnlockPanels();
-        else mclLockPanels();
-    });
-
-    // Auto-unlock on load if already authenticated
-    if (mclCheckAuth()) {
-        mclUnlockPanels();
-    }
-
 })();
 </script>
 <script src="auth.js"></script>

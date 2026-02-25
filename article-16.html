@@ -3188,6 +3188,20 @@ function bubExportPDF(){
     html+='<h2>Methodology</h2><p style="font-size:10px;color:#64748b">5-factor weighted risk model: S/D ratio (30pts), speculative exposure (25pts), pre-commitment gap (20pts), absorption timeline (15pts), extended payback (10pts). Monte Carlo: 10,000 iterations with ±15% uniform random variation across all inputs. NPV: 10-year DCF with 3-year ramp-up. Sources: Cushman &amp; Wakefield H1 2025, Arizton 2025-2030, CBRE SEA Data Center Report 2025.</p>';
     html+='<div class="footer">resistancezero.com &middot; Generated '+date+' &middot; All calculations performed client-side — no data sent to any server</div>';
         html+='
+</body></html>';
+    w.document.open();w.document.write(html);w.document.close();
+    setTimeout(function(){w.print()},600);
+}
+
+// ═══ INPUT HOOKS ═══
+document.querySelectorAll('.bubble-calculator input, .bubble-calculator select').forEach(function(el){
+    el.addEventListener('input',function(){if(bubPremium&&bubMode==='pro')bubUpdateProPanels()});
+    el.addEventListener('change',function(){if(bubPremium&&bubMode==='pro')bubUpdateProPanels()});
+});
+// Unlock panels if already logged in
+if(bubPremium){bubUnlockPanels()}
+</script>
+
 <!-- ═══ Feature 22: Reading Progress Bar ═══ -->
 <script>
 (function() {
@@ -3617,20 +3631,6 @@ function bubExportPDF(){
         });
     }
 })();
-</script>
-
-</body></html>';
-    w.document.open();w.document.write(html);w.document.close();
-    setTimeout(function(){w.print()},600);
-}
-
-// ═══ INPUT HOOKS ═══
-document.querySelectorAll('.bubble-calculator input, .bubble-calculator select').forEach(function(el){
-    el.addEventListener('input',function(){if(bubPremium&&bubMode==='pro')bubUpdateProPanels()});
-    el.addEventListener('change',function(){if(bubPremium&&bubMode==='pro')bubUpdateProPanels()});
-});
-// Unlock panels if already logged in
-if(bubPremium){bubUnlockPanels()}
 </script>
 
 <script src="auth.js"></script>
