@@ -1238,6 +1238,12 @@
             <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
             <kbd class="search-kbd">ESC</kbd>
         </div>
+        <div class="search-chips" id="searchChips">
+            <button class="search-chip active" data-filter="all">All</button>
+            <button class="search-chip" data-filter="articles">Articles</button>
+            <button class="search-chip" data-filter="calculators">Calculators</button>
+            <button class="search-chip" data-filter="tools">Tools</button>
+        </div>
         <div class="search-results" id="searchResults">
             <div class="search-empty">Type to search across all content</div>
         </div>
@@ -1246,6 +1252,7 @@
             <span><kbd class="search-kbd">Enter</kbd> Open</span>
         </div>
     </div>
+    <div class="search-preview" id="searchPreview"></div>
 
     <!-- TOC Sidebar (desktop, wide screens) -->
     <nav class="toc-sidebar" id="tocSidebar" aria-label="Table of Contents">
@@ -2981,9 +2988,55 @@ function aifExportPDF() {
     var modal = document.getElementById('searchModal');
     var input = document.getElementById('searchInput');
     var resultsEl = document.getElementById('searchResults');
+    var previewEl = document.getElementById('searchPreview');
+    var chipsEl = document.getElementById('searchChips');
     var fuse = null;
     var searchData = null;
     var focusedIdx = -1;
+    var activeFilter = 'all';
+    var lastResults = [];
+    var RECENT_KEY = 'rz-search-recent';
+
+    function getRecent() {
+        try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; }
+        catch(e) { return []; }
+    }
+    function saveRecent(query) {
+        if (!query || query.length < 2) return;
+        var arr = getRecent().filter(function(q) { return q !== query; });
+        arr.unshift(query);
+        if (arr.length > 3) arr = arr.slice(0, 3);
+        try { localStorage.setItem(RECENT_KEY, JSON.stringify(arr)); } catch(e) {}
+    }
+    function clearRecent() {
+        try { localStorage.removeItem(RECENT_KEY); } catch(e) {}
+    }
+
+    function renderRecent() {
+        var recent = getRecent();
+        if (!recent.length) {
+            resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>';
+            return;
+        }
+        var html = '<div class="search-recent"><div class="search-recent-header">'
+            + '<span class="search-recent-label">Recent</span>'
+            + '<button class="search-recent-clear" id="clearRecent">Clear</button></div>';
+        recent.forEach(function(q) {
+            html += '<div class="search-recent-item" data-query="' + q.replace(/"/g, '&quot;') + '">'
+                + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+                + '<span>' + q + '</span></div>';
+        });
+        html += '</div>';
+        resultsEl.innerHTML = html;
+        var clearBtn = document.getElementById('clearRecent');
+        if (clearBtn) clearBtn.addEventListener('click', function() { clearRecent(); renderRecent(); });
+        resultsEl.querySelectorAll('.search-recent-item').forEach(function(el) {
+            el.addEventListener('click', function() {
+                input.value = el.getAttribute('data-query');
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+    }
 
     function openSearch() {
         overlay.classList.add('active');
@@ -2991,7 +3044,11 @@ function aifExportPDF() {
         input.value = '';
         input.focus();
         focusedIdx = -1;
-        resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>';
+        activeFilter = 'all';
+        lastResults = [];
+        updateChips();
+        hidePreview();
+        renderRecent();
         if (!searchData) {
             fetch('search-index.json')
                 .then(function(r) { return r.json(); })
@@ -3006,6 +3063,7 @@ function aifExportPDF() {
                         ],
                         threshold: 0.35,
                         includeScore: true,
+                        includeMatches: true,
                         minMatchCharLength: 2
                     });
                 })
@@ -3017,12 +3075,19 @@ function aifExportPDF() {
         overlay.classList.remove('active');
         modal.classList.remove('active');
         input.blur();
+        hidePreview();
     }
 
     function getIconClass(cat) {
         cat = (cat || '').toLowerCase();
         if (cat === 'calculator') return 'calc';
         if (cat === 'tool') return 'tool';
+        if (cat === 'policy') return 'policy';
+        if (cat === 'sustainability') return 'sustainability';
+        if (cat === 'geopolitics') return 'geopolitics';
+        if (cat === 'analysis') return 'analysis';
+        if (cat === 'leadership') return 'leadership';
+        if (cat === 'business') return 'business';
         return '';
     }
 
@@ -3033,36 +3098,143 @@ function aifExportPDF() {
         var cat = (item.category || '').toLowerCase();
         if (cat === 'calculator') return '&#9889;';
         if (cat === 'tool') return '&#9881;';
+        if (cat === 'geopolitics') return '&#9733;';
         return '&#9733;';
     }
 
+    function getCatFilter(cat) {
+        cat = (cat || '').toLowerCase();
+        if (cat === 'calculator') return 'calculators';
+        if (cat === 'tool') return 'tools';
+        return 'articles';
+    }
+
+    function highlightText(text, matches, key) {
+        if (!matches || !matches.length) return text;
+        var found = null;
+        for (var i = 0; i < matches.length; i++) {
+            if (matches[i].key === key) { found = matches[i]; break; }
+        }
+        if (!found || !found.indices || !found.indices.length) return text;
+        var indices = found.indices.sort(function(a, b) { return a[0] - b[0]; });
+        var result = '';
+        var last = 0;
+        indices.forEach(function(pair) {
+            var start = pair[0], end = pair[1];
+            if (start > last) result += text.substring(last, start);
+            result += '<mark class="search-highlight">' + text.substring(start, end + 1) + '</mark>';
+            last = end + 1;
+        });
+        if (last < text.length) result += text.substring(last);
+        return result;
+    }
+
+    function filterResults(results) {
+        if (activeFilter === 'all') return results;
+        return results.filter(function(r) {
+            return getCatFilter(r.item.category) === activeFilter;
+        });
+    }
+
     function renderResults(results) {
-        if (!results.length) {
+        var filtered = filterResults(results);
+        if (!filtered.length) {
             resultsEl.innerHTML = '<div class="search-empty">No results found</div>';
             focusedIdx = -1;
+            hidePreview();
             return;
         }
         var html = '';
-        results.slice(0, 8).forEach(function(r, i) {
+        filtered.slice(0, 8).forEach(function(r, i) {
             var item = r.item;
             var iconCls = getIconClass(item.category);
+            var titleHtml = highlightText(item.title, r.matches, 'title');
+            var descHtml = highlightText(item.description, r.matches, 'description');
             html += '<a href="' + item.url + '" class="search-result-item" data-idx="' + i + '">'
                 + '<div class="search-result-icon ' + iconCls + '">' + getIconLabel(item) + '</div>'
                 + '<div class="search-result-info">'
                 + '<div class="search-result-category">' + (item.category || '') + '</div>'
-                + '<div class="search-result-title">' + item.title + '</div>'
-                + '<div class="search-result-desc">' + item.description + '</div>'
+                + '<div class="search-result-title">' + titleHtml + '</div>'
+                + '<div class="search-result-desc">' + descHtml + '</div>'
                 + '</div></a>';
         });
         resultsEl.innerHTML = html;
         focusedIdx = -1;
+        attachHoverListeners(filtered);
+    }
+
+    function attachHoverListeners(filtered) {
+        resultsEl.querySelectorAll('.search-result-item').forEach(function(el) {
+            var idx = parseInt(el.getAttribute('data-idx'), 10);
+            el.addEventListener('mouseenter', function() { showPreview(filtered[idx], el); });
+            el.addEventListener('mouseleave', function() { hidePreview(); });
+            el.addEventListener('click', function() { saveRecent(input.value.trim()); });
+        });
+    }
+
+    function showPreview(r, anchorEl) {
+        if (!previewEl || !r) return;
+        var item = r.item;
+        var imgHtml = item.image ? '<img class="search-preview-img" src="' + item.image + '" alt="">' : '';
+        var timeHtml = item.readingTime ? '<div class="search-preview-badge"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' + item.readingTime + ' min</div>' : '';
+        previewEl.innerHTML = imgHtml
+            + '<div class="search-preview-text">'
+            + '<div class="search-preview-cat">' + (item.category || '') + '</div>'
+            + '<div class="search-preview-title">' + item.title + '</div>'
+            + '<div class="search-preview-desc">' + item.description + '</div>'
+            + timeHtml
+            + '</div>';
+        // Position tooltip to the right of the modal
+        var modalRect = modal.getBoundingClientRect();
+        var itemRect = anchorEl.getBoundingClientRect();
+        var tipLeft = modalRect.right + 10;
+        var tipTop = itemRect.top;
+        // If no space on right, show on left
+        if (tipLeft + 270 > window.innerWidth) {
+            tipLeft = modalRect.left - 270;
+        }
+        // Keep within viewport vertically
+        if (tipTop + 100 > window.innerHeight) {
+            tipTop = window.innerHeight - 110;
+        }
+        previewEl.style.left = tipLeft + 'px';
+        previewEl.style.top = tipTop + 'px';
+        previewEl.classList.add('visible');
+    }
+
+    function hidePreview() {
+        if (!previewEl) return;
+        previewEl.innerHTML = '';
+        previewEl.classList.remove('visible');
+    }
+
+    function updateChips() {
+        if (!chipsEl) return;
+        chipsEl.querySelectorAll('.search-chip').forEach(function(chip) {
+            chip.classList.toggle('active', chip.getAttribute('data-filter') === activeFilter);
+        });
+    }
+
+    if (chipsEl) {
+        chipsEl.addEventListener('click', function(e) {
+            var chip = e.target.closest('.search-chip');
+            if (!chip) return;
+            activeFilter = chip.getAttribute('data-filter');
+            updateChips();
+            if (lastResults.length) renderResults(lastResults);
+        });
     }
 
     function updateFocus() {
         var items = resultsEl.querySelectorAll('.search-result-item');
         items.forEach(function(el, i) {
             el.classList.toggle('focused', i === focusedIdx);
-            if (i === focusedIdx) el.scrollIntoView({ block: 'nearest' });
+            if (i === focusedIdx) {
+                el.scrollIntoView({ block: 'nearest' });
+                var idx = parseInt(el.getAttribute('data-idx'), 10);
+                var filtered = filterResults(lastResults);
+                if (filtered[idx]) showPreview(filtered[idx], el);
+            }
         });
     }
 
@@ -3089,6 +3261,7 @@ function aifExportPDF() {
             updateFocus();
         } else if (e.key === 'Enter' && focusedIdx >= 0 && items[focusedIdx]) {
             e.preventDefault();
+            saveRecent(input.value.trim());
             items[focusedIdx].click();
         }
     });
@@ -3097,11 +3270,15 @@ function aifExportPDF() {
         input.addEventListener('input', function() {
             var query = input.value.trim();
             if (query.length < 2 || !fuse) {
-                resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>';
+                lastResults = [];
                 focusedIdx = -1;
+                hidePreview();
+                if (query.length === 0) { renderRecent(); }
+                else { resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>'; }
                 return;
             }
             var results = fuse.search(query);
+            lastResults = results;
             renderResults(results);
         });
     }

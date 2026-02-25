@@ -27,19 +27,51 @@ Seven UI features are implemented across all articles:
 ### How It Works
 - **Trigger**: Click search icon in navbar OR press `Ctrl+K` / `Cmd+K`
 - **Engine**: Fuse.js v7.0.0 (CDN, loaded with `defer`)
-- **Index**: `search-index.json` — 27 entries (18 articles + 5 calculators + 3 tools + geopolitics-1)
+- **Index**: `search-index.json` — 29 entries (18 articles + 7 calculators + 3 tools + geopolitics-1)
 - **Matching**: Fuzzy search across title (0.4), description (0.25), keywords (0.25), category (0.1)
+- **Threshold**: 0.35 fuzzy tolerance, minimum 2 character match length
 - **Navigation**: Arrow keys to navigate, Enter to open, ESC to close
 - **Results**: Max 8 shown, with icon (article number / category icon), title, description
+
+### Enhanced Features (added 2026-02-25)
+
+#### Hover Preview Panel
+- **Width**: Modal expanded to 780px (from 600px); right-side preview pane is 220px
+- **Content**: Hero image thumbnail, category, title, description, reading time badge
+- **Trigger**: Hover on result item or keyboard-focus (arrow keys)
+- **Mobile**: Hidden below 768px; modal reverts to 92vw
+
+#### Match Highlighting
+- **Config**: `includeMatches: true` in Fuse.js options
+- **Rendering**: Match indices wrapped in `<mark class="search-highlight">`
+- **Applied to**: title and description fields
+- **Styling**: Yellow/amber in light mode, blue tint in dark mode
+
+#### Category Filter Chips
+- **Chips**: All | Articles | Calculators | Tools
+- **Position**: Between search input and results area
+- **Behavior**: Filter results by category; "All" shows everything
+- **Active chip**: Accent color fill
+- **Scrollable**: Horizontal scroll on mobile
+
+#### Recent Searches
+- **Storage**: `localStorage` key `rz-search-recent`, stores last 3 queries as JSON array
+- **Display**: On empty modal open (no query), shows recent searches with clock icons
+- **Save trigger**: When user clicks a result or presses Enter on focused result
+- **Clear**: "Clear" button removes all recent searches
 
 ### CSS Classes
 | Class | Purpose |
 |-------|---------|
 | `.nav-search-btn` | Search icon button in navbar |
 | `.search-overlay` | Dark backdrop behind modal |
-| `.search-modal` | Modal container |
+| `.search-modal` | Modal container (780px desktop, 92vw mobile) |
 | `.search-input-wrap` | Input row with icon + kbd hint |
 | `.search-input` | The text input |
+| `.search-chips` | Category filter chip row |
+| `.search-chip` | Individual filter chip button |
+| `.search-chip.active` | Currently active filter |
+| `.search-body` | Flex container for results + preview |
 | `.search-results` | Scrollable results container |
 | `.search-result-item` | Individual result link |
 | `.search-result-icon` | Left icon (article number or category) |
@@ -48,6 +80,20 @@ Seven UI features are implemented across all articles:
 | `.search-result-title` | Result title |
 | `.search-result-desc` | Result description |
 | `.search-result-category` | Category label above title |
+| `.search-highlight` | `<mark>` tag for fuzzy match highlighting |
+| `.search-preview` | Right-side preview pane |
+| `.search-preview.visible` | Preview pane shown state |
+| `.search-preview-img` | Hero image thumbnail (16:9 aspect) |
+| `.search-preview-cat` | Category label in preview |
+| `.search-preview-title` | Title in preview |
+| `.search-preview-desc` | Description in preview |
+| `.search-preview-badge` | Reading time badge in preview |
+| `.search-preview-empty` | Placeholder when no item hovered |
+| `.search-recent` | Recent searches container |
+| `.search-recent-header` | Header row (label + clear button) |
+| `.search-recent-label` | "Recent" label |
+| `.search-recent-clear` | Clear button |
+| `.search-recent-item` | Individual recent search row |
 | `.search-empty` | "No results" placeholder |
 | `.search-footer` | Bottom bar with keyboard hints |
 | `.search-kbd` | Keyboard shortcut badge styling |
@@ -56,9 +102,29 @@ Seven UI features are implemented across all articles:
 ```html
 <div class="search-overlay" id="searchOverlay"></div>
 <div class="search-modal" id="searchModal">
-    <div class="search-input-wrap">...</div>
-    <div class="search-results" id="searchResults">...</div>
-    <div class="search-footer">...</div>
+    <div class="search-input-wrap">
+        <svg>...</svg>
+        <input class="search-input" id="searchInput" ...>
+        <kbd class="search-kbd">ESC</kbd>
+    </div>
+    <div class="search-chips" id="searchChips">
+        <button class="search-chip active" data-filter="all">All</button>
+        <button class="search-chip" data-filter="articles">Articles</button>
+        <button class="search-chip" data-filter="calculators">Calculators</button>
+        <button class="search-chip" data-filter="tools">Tools</button>
+    </div>
+    <div class="search-body">
+        <div class="search-results" id="searchResults">
+            <div class="search-empty">Type to search across all content</div>
+        </div>
+        <div class="search-preview" id="searchPreview">
+            <div class="search-preview-empty">Hover a result to preview</div>
+        </div>
+    </div>
+    <div class="search-footer">
+        <span><kbd>&uarr;&darr;</kbd> Navigate</span>
+        <span><kbd>Enter</kbd> Open</span>
+    </div>
 </div>
 ```
 
@@ -78,15 +144,44 @@ Seven UI features are implemented across all articles:
     "url": "article-1.html",
     "description": "Short description",
     "category": "Operations",
-    "keywords": ["keyword1", "keyword2"]
+    "keywords": ["keyword1", "keyword2"],
+    "image": "assets/article-1-cover.webp",
+    "readingTime": 6
   }
 ]
 ```
 
+**Fields**:
+- `id`: Sequential integer
+- `title`: Display title
+- `url`: Relative URL
+- `description`: Short summary (shown in results + preview)
+- `category`: One of: Operations, Engineering, Policy, Analysis, Sustainability, Leadership, Business, Geopolitics, Calculator, Tool
+- `keywords`: Array of 5-8 relevant terms
+- `image`: Relative path to cover image (webp preferred), or `null` for tools/calculators without covers
+- `readingTime`: Estimated reading time in minutes (integer)
+
+### Category Filter Mapping
+| Category value | Filter chip |
+|----------------|-------------|
+| Operations, Engineering, Policy, Analysis, Sustainability, Leadership, Business, Geopolitics | Articles |
+| Calculator | Calculators |
+| Tool | Tools |
+
+### localStorage Keys
+| Key | Purpose | Format |
+|-----|---------|--------|
+| `rz-search-recent` | Recent search queries | JSON array of up to 3 strings |
+
+### Pages with Search (24 total)
+article-1 through article-18, geopolitics-1, index.html, articles.html, geopolitics.html, insights.html, datacenter-solutions.html
+
 ### When Adding New Articles
-1. Add entry to `search-index.json` with next sequential ID
+1. Add entry to `search-index.json` with next sequential ID (include `image` and `readingTime`)
 2. Include 5-8 relevant keywords
-3. Category options: Operations, Engineering, Policy, Analysis, Sustainability, Leadership, Business, Geopolitics, Calculator, Tool
+3. Copy the search modal HTML block (overlay + modal with chips + preview) from any existing article
+4. Copy the search IIFE `<script>` block from any existing article
+5. Category options: Operations, Engineering, Policy, Analysis, Sustainability, Leadership, Business, Geopolitics, Calculator, Tool
 
 ---
 
@@ -229,7 +324,7 @@ When creating a new article (e.g., article-19.html):
 3. **In navbar**: Add search button before theme-toggle
 4. **After hero section**: Add series nav with correct numbering
 5. **Before `</body>`**: Add the 3 JS script blocks (progress, TOC, search)
-6. **Update `search-index.json`**: Add new entry with ID 28+
+6. **Update `search-index.json`**: Add new entry with ID 30+
 7. **Update article-18.html**: Change series nav "Next" from disabled to linking to article-19
 
 ### JS Script Order (before `</body>`)
@@ -348,7 +443,7 @@ All features support dark mode via `[data-theme="dark"]` selectors:
 | File | What Changed |
 |------|-------------|
 | `styles.css` | +520 lines: search, TOC sidebar, series nav CSS; +90 lines: cookie, scroll-top, readtime |
-| `search-index.json` | Created: 27-entry search index |
+| `search-index.json` | 29-entry search index with image + readingTime fields |
 | `article-1.html` through `article-18.html` | +321 lines each: HTML elements + JS; +cookie/scroll-top snippet |
 | `geopolitics-1.html` | +321 lines: same features; +cookie/scroll-top snippet |
 | `articles.html` | Reading time badges in all 18 article cards; +cookie/scroll-top snippet |

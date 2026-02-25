@@ -64,7 +64,7 @@
 **Monetization**: Free map with basic project data; Pro adds risk scoring, investment flow analysis, and quarterly intelligence briefings. Licensing to think tanks and government advisory firms.
 **Effort**: Very Large
 
-### 110. National DC Carbon Budget Allocator
+### 110. National DC Carbon Budget Allocator-Done
 **Description**: Tool that models how a country should allocate its carbon budget across DC workloads to meet Paris Agreement / NDC commitments. Input a country's total allowed emissions and DC sector share; the tool distributes across workload types (AI training, cloud, enterprise, government) based on economic value per ton of CO2. Outputs optimal energy mix, renewable procurement targets, and carbon credit requirements per MW of DC capacity.
 **Why it's elite**: Carbon budgeting for DCs is discussed abstractly in policy circles but never quantified at this level. RZ makes it concrete and actionable — exactly the kind of tool sustainability officers need.
 **Monetization**: Free basic allocation; Pro adds scenario modeling, SEC/CSRD reporting templates, and carbon credit marketplace referral links. ESG consulting firm partnerships.

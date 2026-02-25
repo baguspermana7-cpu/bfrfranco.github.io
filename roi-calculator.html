@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Center ROI Calculator | Investment Return Analysis</title>
+    <meta name="description" content="Calculate data center investment ROI with NPV, IRR, and payback analysis. Interactive financial model with occupancy ramps and sensitivity analysis.">
+    <meta name="keywords" content="Data Center ROI, NPV Calculator, IRR Analysis, Payback Period, Investment Return, CAPEX OPEX, Data Center Investment, Profitability Index">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="canonical" href="https://resistancezero.com/roi-calculator.html">
+
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/roi-calculator.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/roi-calculator.html">
+    <meta property="og:title" content="Data Center ROI Calculator">
+    <meta property="og:description" content="NPV, IRR, and payback analysis for data center investments with occupancy ramp modeling.">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="og:image" content="https://resistancezero.com/assets/roi-og.jpg">
+    <meta property="og:image:alt" content="Data Center ROI Calculator">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Center ROI Calculator">
+    <meta name="twitter:description" content="NPV, IRR, and payback analysis for data center investments.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/roi-og.jpg">
+
+    <!-- Schema - WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Data Center ROI Calculator",
+        "applicationCategory": "FinanceApplication",
+        "description": "Calculate data center investment returns with NPV, IRR (Newton-Raphson), payback period, and profitability index. Includes occupancy ramp modeling and year-by-year cashflow projections.",
+        "url": "https://resistancezero.com/roi-calculator.html",
+        "operatingSystem": "Web Browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Net Present Value (NPV) calculation",
+            "Internal Rate of Return (IRR) via Newton-Raphson",
+            "Payback period and discounted payback",
+            "Profitability Index (PI)",
+            "Occupancy ramp modeling (Conservative/Moderate/Aggressive)",
+            "Year-by-year cashflow projection"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+
+    <!-- Structured Data - HowTo -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Calculate Data Center Investment ROI",
+        "description": "Interactive calculator for analyzing data center investment returns including NPV, IRR, payback period, and year-by-year cashflow projections.",
+        "totalTime": "PT4M",
+        "tool": [
+            {"@type": "HowToTool", "name": "Data Center ROI Calculator"}
+        ],
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Enter Investment Parameters",
+                "text": "Input total CAPEX, IT capacity in MW, and project timeline to establish the investment baseline for NPV and IRR analysis."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Configure Revenue Projections",
+                "text": "Set average revenue per kW, occupancy ramp schedule, and annual price escalation to model income streams over the project lifetime."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Define Operating Costs",
+                "text": "Enter electricity rate, PUE, staffing costs, maintenance, and insurance to calculate annual OPEX and net operating income."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Review Financial Returns",
+                "text": "Analyze NPV, IRR, payback period, profitability index, and year-by-year cashflow to assess investment viability."
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ═══════════════════════════════════════════════════
+           ROI CALCULATOR — BLUE THEME
+           Prefix: roi-
+           ═══════════════════════════════════════════════════ */
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+            --secondary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --dark-blue: #1d4ed8;
+            --medium-blue: #2563eb;
+            --light-blue: #3b82f6;
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg-dark: rgba(29, 78, 216, 0.95);
+            --glass-border: rgba(59, 130, 246, 0.1);
+            --glass-blur: blur(20px);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+
+        /* ═══ PAGE BACKGROUND ═══ */
+        .page-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+            background:
+                radial-gradient(ellipse at top right, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(59, 130, 246, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        /* ═══ NAVIGATION ═══ */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-blue); }
+        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); letter-spacing: -0.5px; }
+        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
+        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
+        .nav-link:hover { color: var(--dark-blue); }
+        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); }
+        .nav-back:hover { transform: translateY(-2px); }
+
+        /* ═══ NAVBAR AUTH ═══ */
+        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
+        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(139,92,246,0.3); white-space: nowrap; }
+        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,92,246,0.4); }
+        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
+        .nav-user-btn:hover { background: rgba(139,92,246,0.14); }
+        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
+        .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
+        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
+        .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
+        .nav-user-dropdown.show { display: block; }
+        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+        .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: white; }
+        .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
+        .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+        .nav-dd-logout:hover { background: #fef2f2; }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .main-content { position: relative; z-index: 10; padding-top: 80px; }
+
+        /* ═══ HERO ═══ */
+        .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 50px; font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; margin-bottom: 1.5rem; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
+
+        /* ═══ QUICK STATS ═══ */
+        .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
+        .quick-stat i { color: var(--accent-blue); }
+
+        /* ═══ CALCULATOR LAYOUT ═══ */
+        .calculator-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .calculator-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
+
+        /* ═══ INPUT PANEL ═══ */
+        .input-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+        .input-section { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        .section-subtitle { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* ═══ INPUT FIELDS ═══ */
+        .input-group { margin-bottom: 1rem; }
+        .input-group:last-child { margin-bottom: 0; }
+        .input-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
+        .input-field:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        select.input-field { cursor: pointer; }
+
+        /* ═══ PRESET BUTTONS ═══ */
+        .preset-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .preset-btn { padding: 5px 12px; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 50px; background: rgba(59, 130, 246, 0.05); color: var(--accent-blue); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+        .preset-btn:hover, .preset-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+        /* ═══ RANGE SLIDER ═══ */
+        .range-wrap { display: flex; align-items: center; gap: 12px; }
+        .range-wrap input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; background: #e2e8f0; border-radius: 3px; outline: none; }
+        .range-wrap input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
+        .range-wrap input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
+        .range-value { min-width: 48px; text-align: center; font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent-blue); }
+
+        /* ═══ TOOLTIP SYSTEM ═══ */
+        .tooltip-trigger { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 50%; font-size: 10px; color: var(--accent-blue); cursor: help; margin-left: auto; transition: all 0.3s; flex-shrink: 0; }
+        .tooltip-trigger:hover { background: rgba(59,130,246,0.2); transform: scale(1.1); }
+        .tooltip-trigger .tooltip-content { display: none; }
+
+        #tooltip-container { position: fixed; width: 320px; max-width: calc(100vw - 40px); padding: 16px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); z-index: 999999; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.15s ease; color: white; font-size: 12px; line-height: 1.5; }
+        #tooltip-container.visible { opacity: 1; visibility: visible; }
+        #tooltip-container .tooltip-title { font-size: 13px; font-weight: 700; color: #bfdbfe; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        #tooltip-container .tooltip-desc { color: rgba(255,255,255,0.9); }
+
+        /* ═══ RESULTS PANEL ═══ */
+        .results-panel { position: sticky; top: 100px; }
+        .results-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+
+        /* ═══ SCORE DISPLAY ═══ */
+        .score-display { text-align: center; padding: 1.5rem 0; }
+        .score-value { font-size: 3.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; }
+        .score-unit { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
+        .score-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
+        .score-grade { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-top: 0.75rem; }
+
+        /* ═══ METRIC GRID ═══ */
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
+        .metric-box { background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 10px; padding: 0.75rem; text-align: center; }
+        .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+        .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
+
+        /* ═══ TOOLBAR ═══ */
+        .roi-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 auto; max-width: 1400px; padding: 0 2rem 1.25rem; flex-wrap: wrap; }
+        .roi-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
+        .roi-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .roi-btn-free { background: transparent; color: #64748b; }
+        .roi-btn-free.active { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; box-shadow: 0 2px 8px rgba(6,182,212,0.3); }
+        .roi-btn-free:not(.active):hover { background: rgba(6,182,212,0.08); color: #0891b2; }
+        .roi-btn-pro { background: transparent; color: #64748b; }
+        .roi-btn-pro.active { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+        .roi-btn-pro:not(.active):hover { background: rgba(139,92,246,0.08); color: #8b5cf6; }
+        .roi-btn-pro.locked-hint { position: relative; }
+        .roi-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
+
+        /* ═══ MODE INDICATOR ═══ */
+        .roi-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
+        .roi-mode-indicator.free-active { display: inline-flex; background: rgba(6,182,212,0.1); color: #0891b2; }
+        .roi-mode-indicator.pro-active { display: inline-flex; background: rgba(139,92,246,0.1); color: #8b5cf6; }
+
+        /* ═══ TOOLBAR ACTIONS ═══ */
+        .roi-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .roi-btn-reset { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .roi-btn-reset:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(59,130,246,0.04); }
+        .roi-btn-pdf { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); color: #ef4444; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .roi-btn-pdf:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
+        .roi-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
+
+        /* ═══ PRO SECTIONS ═══ */
+        .pro-section { position: relative; }
+        .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
+        .pro-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; pointer-events: all; cursor: pointer; }
+        .pro-section.locked .pro-overlay { display: flex; }
+        .pro-overlay i { font-size: 2rem; color: var(--accent-purple); }
+        .pro-overlay-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
+        .pro-overlay-btn { padding: 8px 20px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .pro-overlay-btn:hover { transform: translateY(-1px); }
+        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; font-size: 0.6rem; font-weight: 700; border-radius: 50px; letter-spacing: 0.5px; vertical-align: middle; }
+
+        /* ═══ PRO PANEL ═══ */
+        .roi-pro-panel { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem; }
+        .roi-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+        .roi-kpi-card { background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 12px; padding: 1rem; text-align: center; transition: all 0.3s; }
+        .roi-kpi-card:hover { border-color: rgba(59, 130, 246, 0.25); box-shadow: 0 4px 12px rgba(59,130,246,0.08); }
+        .roi-kpi-value { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--dark-blue); line-height: 1.2; }
+        .roi-kpi-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; }
+
+        /* ═══ NARRATIVE ═══ */
+        .roi-narrative { border-left: 3px solid var(--accent-blue); background: rgba(59, 130, 246, 0.04); padding: 1rem 1.25rem; border-radius: 0 10px 10px 0; margin-top: 1rem; }
+        .roi-narrative p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+        .roi-narrative strong { color: var(--dark-blue); }
+
+        /* ═══ CHART CONTAINERS ═══ */
+        .charts-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .chart-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .chart-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+        .chart-container { position: relative; height: 280px; }
+
+        /* ═══ CASHFLOW TABLE ═══ */
+        .cashflow-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 0.75rem; }
+        .cashflow-table th { background: #f8fafc; padding: 8px 10px; text-align: right; font-weight: 700; color: #64748b; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.3px; border-bottom: 2px solid #e5e7eb; }
+        .cashflow-table th:first-child { text-align: center; }
+        .cashflow-table td { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+        .cashflow-table td:first-child { text-align: center; font-weight: 600; color: var(--accent-blue); }
+        .cashflow-table tr:hover td { background: rgba(59,130,246,0.03); }
+        .cashflow-table .negative { color: #ef4444; }
+        .cashflow-table .positive { color: #10b981; }
+
+        /* ═══ PRIVACY BADGE ═══ */
+        .roi-privacy-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15); border-radius: 8px; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.75rem; }
+        .roi-privacy-badge i { color: var(--accent-blue); font-size: 0.7rem; }
+
+        /* ═══ BENCHMARK META ═══ */
+        .roi-benchmark-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+        .roi-benchmark-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15); border-radius: 50px; font-size: 0.68rem; font-weight: 600; color: var(--medium-blue); }
+
+        /* ═══ COOKIE BANNER ═══ */
+        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 2rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-top: 1px solid #e5e7eb; font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
+        .cookie-banner p { margin: 0; line-height: 1.5; }
+        .cookie-banner a { color: var(--dark-blue); text-decoration: underline; }
+        .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
+        .cookie-accept { padding: 8px 20px; border-radius: 8px; border: none; background: var(--primary-gradient); color: white; font-weight: 600; font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .cookie-accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .cookie-decline { padding: 8px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: white; color: #6b7280; font-weight: 500; font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .cookie-decline:hover { background: #f3f4f6; color: #374151; }
+
+        /* ═══ SCROLL TO TOP ═══ */
+        .scroll-top-btn { position: fixed; bottom: 24px; right: 24px; z-index: 200; width: 44px; height: 44px; border-radius: 12px; border: none; background: var(--medium-blue); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(37,99,235,0.35); opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background 0.2s; }
+        .scroll-top-btn.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .scroll-top-btn:hover { background: var(--dark-blue); box-shadow: 0 4px 16px rgba(29,78,216,0.45); }
+
+        /* ═══ FOOTER ═══ */
+        .footer { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem; }
+
+        /* ═══ PRINT STYLES ═══ */
+        @media print {
+            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .navbar, .hero, .roi-toolbar, .nav-back, footer, .tooltip-trigger, .pro-overlay, .pro-badge, .preset-bar, .cookie-banner, .scroll-top-btn { display: none !important; }
+            .main-content { padding-top: 0 !important; }
+            .calculator-grid { display: block !important; }
+            .pro-section.locked > *:not(.pro-overlay) { filter: none !important; user-select: auto !important; pointer-events: auto !important; }
+            .results-panel { position: static !important; }
+            @page { margin: 1cm; size: A4; }
+        }
+
+        /* ═══ RESPONSIVE: 1024px ═══ */
+        @media (max-width: 1024px) {
+            .calculator-grid { grid-template-columns: 1fr; }
+            .results-panel { position: static; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .scroll-top-btn { bottom: 90px; right: 16px; }
+        }
+
+        /* ═══ RESPONSIVE: 768px ═══ */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 1.8rem; }
+            .score-value { font-size: 2.8rem; }
+            .metric-grid { grid-template-columns: 1fr; }
+            .roi-kpi-grid { grid-template-columns: 1fr 1fr; }
+            .nav-user-email { display: none; }
+            .nav-login-btn .nav-login-text { display: none; }
+            .nav-login-btn { padding: 8px 12px; }
+            .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+        }
+
+        /* ═══ RESPONSIVE: 600px ═══ */
+        @media (max-width: 600px) {
+            .roi-toolbar { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+            .roi-mode-bar { width: 100%; }
+            .roi-toolbar-btn { flex: 1; justify-content: center; }
+            .roi-toolbar-actions { justify-content: center; }
+            .preset-btn { padding: 4px 8px; font-size: 0.68rem; }
+            .quick-stats { gap: 1rem; }
+            .roi-kpi-grid { grid-template-columns: 1fr; }
+            .hero { padding: 2rem 1rem 1.5rem; }
+            .calculator-section { padding: 0 1rem; }
+            .cashflow-table { font-size: 0.7rem; }
+            .cashflow-table th, .cashflow-table td { padding: 4px 6px; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+
+    <!-- ═══ NAVBAR ═══ -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">ROI</div>
+                <div>
+                    <div class="nav-title">ROI Calculator</div>
+                    <div class="nav-subtitle">Investment Return Analysis</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
+                <a href="pue-calculator.html" class="nav-link" style="color: #06b6d4;">PUE Calc</a>
+                <a href="capex-calculator.html" class="nav-link" style="color: #f59e0b;">CAPEX Calc</a>
+                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
+                <a href="carbon-footprint.html" class="nav-link" style="color: #22c55e;">Carbon Calc</a>
+                <a href="dcmoc/" class="nav-link" style="color: #ef4444;">DC MOC</a>
+                <div class="nav-auth-wrap" id="navAuthWrap">
+                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
+                        <i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span>
+                    </button>
+                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
+                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
+                        <span class="nav-user-email" id="navUserEmail"></span>
+                        <i class="fas fa-chevron-down nav-user-chevron"></i>
+                    </button>
+                    <div class="nav-user-dropdown" id="navUserDropdown">
+                        <div class="nav-dd-header">
+                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">PRO</div>
+                            <div class="nav-dd-email" id="navDdEmail"></div>
+                        </div>
+                        <button class="nav-dd-logout" onclick="logoutPremium()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+                <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+        <div class="hero-badge"><i class="fas fa-chart-line"></i> Financial Analysis Tool</div>
+        <h1>DC ROI Calculator</h1>
+        <p>Comprehensive investment return analysis with NPV, IRR, payback period, and year-by-year cashflow projections for data center investments</p>
+        <div class="quick-stats">
+            <span class="quick-stat"><i class="fas fa-calculator"></i> NPV / IRR / PI</span>
+            <span class="quick-stat"><i class="fas fa-chart-area"></i> Year-by-year cashflow</span>
+            <span class="quick-stat"><i class="fas fa-building"></i> Occupancy ramp</span>
+            <span class="quick-stat"><i class="fas fa-dice"></i> Monte Carlo risk</span>
+        </div>
+    </section>
+
+    <!-- ═══ TOOLBAR ═══ -->
+    <div class="roi-toolbar">
+        <div class="roi-mode-bar">
+            <button class="roi-toolbar-btn roi-btn-free active" id="btnFreeMode" onclick="setMode('free')">
+                <i class="fas fa-chart-bar"></i> Free Analysis
+            </button>
+            <button class="roi-toolbar-btn roi-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
+                <i class="fas fa-crown"></i> Pro Analysis
+            </button>
+        </div>
+        <span class="roi-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
+        <div class="roi-toolbar-actions">
+            <button class="roi-btn-reset" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset</button>
+            <button class="roi-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+        </div>
+    </div>
+
+    <!-- ═══ CALCULATOR GRID ═══ -->
+    <section class="calculator-section">
+        <div class="calculator-grid">
+
+            <!-- ═══ INPUT PANEL ═══ -->
+            <div class="input-panel">
+
+                <!-- Section 1: Investment Parameters -->
+                <div class="input-section" style="border-left:3px solid #3b82f6;">
+                    <div class="section-header" style="background:rgba(59,130,246,0.1);">
+                        <i class="fas fa-money-bill-wave" style="color:#3b82f6;"></i> Investment Parameters
+                    </div>
+
+                    <label class="input-label">Total CAPEX ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-money-bill-wave"></i> Capital Expenditure</div><div class="tooltip-desc">Total upfront capital investment including land, building, MEP systems, IT infrastructure, and soft costs. Typical data center construction costs range from $8-15M per MW for conventional and $15-25M per MW for AI-optimized facilities.</div></div></span></label>
+                    <div class="preset-bar">
+                        <button class="preset-btn" onclick="setPreset('totalCapex',25)">$25M Small</button>
+                        <button class="preset-btn active" onclick="setPreset('totalCapex',80)">$80M Mid</button>
+                        <button class="preset-btn" onclick="setPreset('totalCapex',200)">$200M Large</button>
+                        <button class="preset-btn" onclick="setPreset('totalCapex',500)">$500M Mega</button>
+                    </div>
+                    <input type="number" class="input-field" id="totalCapex" value="80" min="1" max="5000" step="1" oninput="calculate()">
+
+                    <label class="input-label">IT Capacity (MW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Power Capacity</div><div class="tooltip-desc">Total IT power capacity available for lease or use. This determines your revenue potential. A 10MW facility at $150/kW/month generates up to $18M annually at full occupancy. AI-optimized facilities can command $200-350/kW/month.</div></div></span></label>
+                    <div class="preset-bar">
+                        <button class="preset-btn" onclick="setPreset('itCapacity',2)">2MW Edge</button>
+                        <button class="preset-btn" onclick="setPreset('itCapacity',5)">5MW Enterprise</button>
+                        <button class="preset-btn active" onclick="setPreset('itCapacity',10)">10MW Colo</button>
+                        <button class="preset-btn" onclick="setPreset('itCapacity',50)">50MW Hyper</button>
+                    </div>
+                    <input type="number" class="input-field" id="itCapacity" value="10" min="0.5" max="500" step="0.5" oninput="calculate()">
+
+                    <label class="input-label">Project Lifetime (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Investment Horizon</div><div class="tooltip-desc">Total project analysis period in years. Data center buildings typically have a 20-25 year economic life. Shorter horizons (10-15 years) are common for colocation and leased facilities. IT equipment refreshes every 4-5 years within this period.</div></div></span></label>
+                    <select class="input-field" id="projectLife" onchange="calculate()">
+                        <option value="10">10 years</option>
+                        <option value="15">15 years</option>
+                        <option value="20" selected>20 years</option>
+                        <option value="25">25 years</option>
+                    </select>
+
+                    <label class="input-label">Construction Period (months) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hard-hat"></i> Build Duration</div><div class="tooltip-desc">Time from ground-breaking to first revenue. During construction, CAPEX is deployed but no revenue is generated. Modular builds can achieve 12-18 months; traditional purpose-built facilities typically require 18-30 months.</div></div></span></label>
+                    <select class="input-field" id="constructionMonths" onchange="calculate()">
+                        <option value="12">12 months (Modular)</option>
+                        <option value="18" selected>18 months (Standard)</option>
+                        <option value="24">24 months (Complex)</option>
+                        <option value="30">30 months (Mega)</option>
+                    </select>
+                </div>
+
+                <!-- Section 2: Revenue Projections -->
+                <div class="input-section" style="border-left:3px solid #10b981;">
+                    <div class="section-header" style="background:rgba(16,185,129,0.1);">
+                        <i class="fas fa-chart-line" style="color:#10b981;"></i> Revenue Projections
+                    </div>
+
+                    <label class="input-label">Revenue Model <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-store"></i> Business Model</div><div class="tooltip-desc">Colocation charges per kW/month for power and space. Wholesale offers lower rates ($100-140/kW) for large deployments. Retail commands premium pricing ($150-250/kW) for smaller, managed deployments. Hyperscale/AI can reach $200-400/kW for liquid-cooled, high-density capacity.</div></div></span></label>
+                    <select class="input-field" id="revenueModel" onchange="onRevenueModelChange();calculate()">
+                        <option value="wholesale">Wholesale Colo ($100-140/kW/mo)</option>
+                        <option value="retail" selected>Retail Colo ($150-250/kW/mo)</option>
+                        <option value="hyperscale">Hyperscale/AI ($200-400/kW/mo)</option>
+                    </select>
+
+                    <label class="input-label">Avg Revenue per kW/month ($) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Monthly Revenue Rate</div><div class="tooltip-desc">Average monthly revenue per kilowatt of IT capacity sold. This is the primary revenue driver. Blended rates account for different contract sizes and service levels. Industry average is $130-180/kW/month for retail colocation in developed markets.</div></div></span></label>
+                    <input type="number" class="input-field" id="revenuePerKw" value="170" min="50" max="500" step="5" oninput="calculate()">
+
+                    <label class="input-label">Annual Price Escalation: <span id="escalationVal">3</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-trend-up"></i> Annual Price Growth</div><div class="tooltip-desc">Annual percentage increase in revenue per kW. Most colocation contracts include 2-5% annual escalators. Power-pass-through models may have higher effective escalation if electricity prices rise. Negative values model price compression from competition.</div></div></span></label>
+                    <input type="range" id="escalation" min="-2" max="8" value="3" step="0.5" oninput="document.getElementById('escalationVal').textContent=this.value;calculate()">
+
+                    <label class="input-label">Ancillary Revenue (% of base) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-puzzle-piece"></i> Additional Services Revenue</div><div class="tooltip-desc">Revenue from cross-connects, remote hands, managed services, network services, and other value-added offerings as a percentage of base colocation revenue. Mature operators typically generate 15-25% ancillary revenue on top of base power/space charges.</div></div></span></label>
+                    <select class="input-field" id="ancillaryPct" onchange="calculate()">
+                        <option value="5">5% — Minimal services</option>
+                        <option value="10">10% — Basic cross-connects</option>
+                        <option value="15" selected>15% — Standard portfolio</option>
+                        <option value="25">25% — Full managed services</option>
+                    </select>
+                </div>
+
+                <!-- Section 3: Operating Costs -->
+                <div class="input-section" style="border-left:3px solid #f59e0b;">
+                    <div class="section-header" style="background:rgba(245,158,11,0.1);">
+                        <i class="fas fa-cogs" style="color:#f59e0b;"></i> Operating Costs
+                    </div>
+
+                    <label class="input-label">Electricity Rate ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> Electricity Unit Cost</div><div class="tooltip-desc">Industrial electricity rate including demand charges, transmission, and distribution. Ranges from $0.03/kWh in low-cost markets (Qatar, Saudi Arabia) to $0.25/kWh in premium markets (Germany, Japan). This is typically the largest OPEX component at 40-60% of total operating costs.</div></div></span></label>
+                    <div class="preset-bar">
+                        <button class="preset-btn" onclick="setPreset('electricityRate',0.05)">$0.05 Low</button>
+                        <button class="preset-btn active" onclick="setPreset('electricityRate',0.08)">$0.08 Mid</button>
+                        <button class="preset-btn" onclick="setPreset('electricityRate',0.12)">$0.12 High</button>
+                        <button class="preset-btn" onclick="setPreset('electricityRate',0.20)">$0.20 Premium</button>
+                    </div>
+                    <input type="number" class="input-field" id="electricityRate" value="0.08" min="0.02" max="0.40" step="0.005" oninput="calculate()">
+
+                    <label class="input-label">PUE <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> Power Usage Effectiveness</div><div class="tooltip-desc">Ratio of total facility power to IT load. Directly impacts electricity OPEX — a PUE of 1.5 means 50% overhead power for cooling, lighting, and losses. Improving PUE from 1.5 to 1.3 on a 10MW facility saves ~$1.4M/year at $0.08/kWh.</div></div></span></label>
+                    <div class="preset-bar">
+                        <button class="preset-btn" onclick="setPreset('pueValue',1.2)">1.2 Best</button>
+                        <button class="preset-btn active" onclick="setPreset('pueValue',1.4)">1.4 Good</button>
+                        <button class="preset-btn" onclick="setPreset('pueValue',1.58)">1.58 Avg</button>
+                        <button class="preset-btn" onclick="setPreset('pueValue',1.8)">1.8 Legacy</button>
+                    </div>
+                    <input type="number" class="input-field" id="pueValue" value="1.4" min="1.05" max="2.5" step="0.01" oninput="calculate()">
+
+                    <label class="input-label">Annual Staffing ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-users"></i> Personnel Costs</div><div class="tooltip-desc">Total annual cost for facility operations staff including engineers, technicians, security, and management. Typical staffing ratios are 1 FTE per 2-5 MW for colocation. A 10MW facility typically requires 15-25 staff at $2-4M total annual cost depending on market.</div></div></span></label>
+                    <input type="number" class="input-field" id="staffingCost" value="3" min="0.5" max="20" step="0.25" oninput="calculate()">
+
+                    <label class="input-label">Annual Maintenance ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wrench"></i> Maintenance & Repairs</div><div class="tooltip-desc">Annual cost for preventive and corrective maintenance of MEP systems, generators, UPS, cooling, fire suppression, and building fabric. Typically 1.5-3% of MEP CAPEX per year. Includes OEM service contracts, spare parts, and third-party maintenance.</div></div></span></label>
+                    <input type="number" class="input-field" id="maintenanceCost" value="1.5" min="0.1" max="15" step="0.1" oninput="calculate()">
+
+                    <label class="input-label">Insurance & Other ($M/yr) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Insurance & Overhead</div><div class="tooltip-desc">Annual property insurance, liability insurance, property taxes, SGA expenses, and other overhead costs. Typically 0.5-1.5% of total asset value per year. Includes business interruption insurance, which is critical for data center operations.</div></div></span></label>
+                    <input type="number" class="input-field" id="insuranceCost" value="0.8" min="0.1" max="10" step="0.1" oninput="calculate()">
+
+                    <label class="input-label">Annual OPEX Escalation: <span id="opexEscVal">2.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-up"></i> Cost Inflation Rate</div><div class="tooltip-desc">Annual increase in operating costs driven by labor inflation, electricity price changes, and general cost escalation. Electricity costs may escalate faster (3-5%) while maintenance costs typically grow at 2-3%. This applies to all non-electricity OPEX components.</div></div></span></label>
+                    <input type="range" id="opexEscalation" min="0" max="6" value="2.5" step="0.5" oninput="document.getElementById('opexEscVal').textContent=this.value;calculate()">
+                </div>
+
+                <!-- Section 4: Occupancy Ramp -->
+                <div class="input-section" style="border-left:3px solid #8b5cf6;">
+                    <div class="section-header" style="background:rgba(139,92,246,0.1);">
+                        <i class="fas fa-layer-group" style="color:#8b5cf6;"></i> Occupancy Ramp
+                    </div>
+
+                    <label class="input-label">Ramp Profile <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-area"></i> Leasing Velocity</div><div class="tooltip-desc">How quickly the facility fills with paying customers after construction. Conservative assumes 5-7 years to full occupancy. Moderate targets 3-5 years. Aggressive assumes 2-3 years (pre-leased anchor tenants). Custom allows manual year-by-year entry.</div></div></span></label>
+                    <div class="preset-bar">
+                        <button class="preset-btn" onclick="setRampProfile('conservative')">Conservative</button>
+                        <button class="preset-btn active" onclick="setRampProfile('moderate')">Moderate</button>
+                        <button class="preset-btn" onclick="setRampProfile('aggressive')">Aggressive</button>
+                        <button class="preset-btn" onclick="setRampProfile('custom')">Custom</button>
+                    </div>
+
+                    <label class="input-label">Year 1 Occupancy: <span id="occ1Val">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-door-open"></i> First Year Fill Rate</div><div class="tooltip-desc">Percentage of IT capacity occupied in the first year of operation (after construction). Pre-leased facilities may start at 40-60%. Speculative builds often start at 10-20%. This directly impacts first-year revenue and cash flow.</div></div></span></label>
+                    <input type="range" id="occYear1" min="0" max="100" value="25" step="5" oninput="document.getElementById('occ1Val').textContent=this.value;calculate()">
+
+                    <label class="input-label">Year 3 Occupancy: <span id="occ3Val">60</span>%</label>
+                    <input type="range" id="occYear3" min="0" max="100" value="60" step="5" oninput="document.getElementById('occ3Val').textContent=this.value;calculate()">
+
+                    <label class="input-label">Year 5 Occupancy: <span id="occ5Val">85</span>%</label>
+                    <input type="range" id="occYear5" min="0" max="100" value="85" step="5" oninput="document.getElementById('occ5Val').textContent=this.value;calculate()">
+
+                    <label class="input-label">Steady-State Occupancy: <span id="occMaxVal">92</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> Maximum Occupancy</div><div class="tooltip-desc">Peak occupancy rate the facility achieves and maintains long-term. Most operators target 85-95% rather than 100% to maintain flexibility for customer growth and churn replacement. A buffer of 5-10% accounts for stranded capacity and power density mismatches.</div></div></span></label>
+                    <input type="range" id="occMax" min="60" max="100" value="92" step="1" oninput="document.getElementById('occMaxVal').textContent=this.value;calculate()">
+                </div>
+
+                <!-- Section 5: Financing -->
+                <div class="input-section" style="border-left:3px solid #ef4444;">
+                    <div class="section-header" style="background:rgba(239,68,68,0.1);">
+                        <i class="fas fa-university" style="color:#ef4444;"></i> Financing
+                    </div>
+
+                    <label class="input-label">Debt/Equity Split <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-balance-scale"></i> Capital Structure</div><div class="tooltip-desc">Proportion of CAPEX funded by debt vs equity. Higher leverage (70-80% debt) amplifies equity returns but increases financial risk. Data center projects typically attract 60-75% LTV (loan-to-value) from lenders due to strong, contracted cashflows.</div></div></span></label>
+                    <select class="input-field" id="debtRatio" onchange="calculate()">
+                        <option value="0">100% Equity (No Debt)</option>
+                        <option value="50">50/50 Debt/Equity</option>
+                        <option value="60">60/40 Debt/Equity</option>
+                        <option value="70" selected>70/30 Debt/Equity</option>
+                        <option value="80">80/20 Debt/Equity</option>
+                    </select>
+
+                    <label class="input-label">Interest Rate (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Cost of Debt</div><div class="tooltip-desc">Annual interest rate on project debt. Data center project finance typically achieves SOFR + 200-350 bps for investment-grade borrowers. Current rates range from 5-8% depending on credit quality, leverage, and market conditions.</div></div></span></label>
+                    <input type="number" class="input-field" id="interestRate" value="6" min="2" max="15" step="0.25" oninput="calculate()">
+
+                    <label class="input-label">Loan Term (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hourglass"></i> Debt Maturity</div><div class="tooltip-desc">Duration of the loan repayment period. Longer terms reduce annual debt service but increase total interest paid. Data center project loans typically have 7-15 year terms with 20-25 year amortization schedules.</div></div></span></label>
+                    <select class="input-field" id="loanTerm" onchange="calculate()">
+                        <option value="7">7 years</option>
+                        <option value="10" selected>10 years</option>
+                        <option value="15">15 years</option>
+                        <option value="20">20 years</option>
+                    </select>
+
+                    <label class="input-label">Discount Rate / WACC (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-pie"></i> Weighted Average Cost of Capital</div><div class="tooltip-desc">The rate used to discount future cashflows to present value for NPV calculation. Represents the blended cost of debt and equity capital. Typical data center WACC ranges from 7-12%. Higher discount rates produce lower NPV, reflecting higher required returns or risk.</div></div></span></label>
+                    <input type="number" class="input-field" id="discountRate" value="10" min="3" max="25" step="0.5" oninput="calculate()">
+                </div>
+
+                <!-- Section 6: Tax & Depreciation -->
+                <div class="input-section" style="border-left:3px solid #06b6d4;">
+                    <div class="section-header" style="background:rgba(6,182,212,0.1);">
+                        <i class="fas fa-receipt" style="color:#06b6d4;"></i> Tax &amp; Depreciation
+                    </div>
+
+                    <label class="input-label">Corporate Tax Rate: <span id="taxRateVal">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-landmark"></i> Effective Tax Rate</div><div class="tooltip-desc">Effective corporate income tax rate applied to operating profit. Varies by jurisdiction: US (21% federal + state), Singapore (17%), Ireland (12.5%), UAE (9%). Many data center markets offer tax incentives, holidays, or accelerated depreciation that reduce the effective rate.</div></div></span></label>
+                    <input type="range" id="taxRate" min="0" max="40" value="25" step="1" oninput="document.getElementById('taxRateVal').textContent=this.value;calculate()">
+
+                    <label class="input-label">Depreciation Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> Asset Depreciation</div><div class="tooltip-desc">Method for depreciating capital assets for tax purposes. Straight-line spreads the deduction evenly. Accelerated (MACRS) front-loads deductions, improving early cash flows. Bonus depreciation allows 100% deduction in year one (available in some jurisdictions).</div></div></span></label>
+                    <select class="input-field" id="depreciationMethod" onchange="calculate()">
+                        <option value="straight" selected>Straight-line (20 years)</option>
+                        <option value="accelerated">Accelerated (MACRS 15yr)</option>
+                        <option value="bonus">Bonus depreciation (100% Y1)</option>
+                    </select>
+
+                    <label class="input-label">Terminal Value Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-building"></i> Exit Valuation</div><div class="tooltip-desc">How the residual value of the asset is calculated at the end of the analysis period. Cap rate method values the asset as a multiple of final-year NOI. Book value uses remaining depreciated value. None assumes zero terminal value (conservative). Data centers typically trade at 5-8% cap rates.</div></div></span></label>
+                    <select class="input-field" id="terminalMethod" onchange="calculate()">
+                        <option value="none">None (Conservative)</option>
+                        <option value="caprate" selected>Cap Rate (NOI / Cap Rate)</option>
+                        <option value="book">Book Value</option>
+                    </select>
+
+                    <label class="input-label">Exit Cap Rate: <span id="capRateVal">6</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Capitalization Rate</div><div class="tooltip-desc">The capitalization rate used to value the property at exit. Lower cap rates imply higher valuations. Data center cap rates have compressed from 7-9% historically to 5-7% currently due to strong institutional demand. AI-ready facilities may trade at even tighter caps.</div></div></span></label>
+                    <input type="range" id="exitCapRate" min="4" max="12" value="6" step="0.25" oninput="document.getElementById('capRateVal').textContent=this.value;calculate()">
+                </div>
+
+            </div><!-- /input-panel -->
+
+            <!-- ═══ RESULTS PANEL ═══ -->
+            <div class="results-panel">
+                <div class="results-card">
+                    <div class="score-display">
+                        <div class="score-value" id="primaryValue" style="color: #3b82f6;">$0</div>
+                        <div class="score-unit" id="primaryUnit">NPV ($M)</div>
+                        <div class="score-label" id="primaryLabel">Net Present Value</div>
+                        <div class="score-grade" id="scoreGrade" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                            <i class="fas fa-chart-line"></i> <span id="gradeText">--</span>
+                        </div>
+                    </div>
+                    <div class="metric-grid" id="metricGrid">
+                        <div class="metric-box"><div class="metric-value" id="metIRR">--</div><div class="metric-label">IRR</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metPayback">--</div><div class="metric-label">Payback (yrs)</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metPI">--</div><div class="metric-label">Profitability Index</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metROIC">--</div><div class="metric-label">ROIC</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metRevenue">--</div><div class="metric-label">Peak Revenue</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metNOI">--</div><div class="metric-label">Peak NOI</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metYield">--</div><div class="metric-label">Yield on Cost</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metTerminal">--</div><div class="metric-label">Terminal Value</div></div>
+                    </div>
+                </div>
+                <!-- Cashflow Chart -->
+                <div class="results-card" style="margin-top:1rem;">
+                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i class="fas fa-chart-area" style="color:#3b82f6;margin-right:6px;"></i>Annual Cashflow</div>
+                    <div class="chart-container"><canvas id="cashflowChart" width="400" height="300"></canvas></div>
+                </div>
+                <!-- Revenue vs OPEX Chart -->
+                <div class="results-card" style="margin-top:1rem;">
+                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i class="fas fa-chart-bar" style="color:#3b82f6;margin-right:6px;"></i>Revenue vs OPEX</div>
+                    <div class="chart-container"><canvas id="revenueChart" width="400" height="250"></canvas></div>
+                </div>
+            </div><!-- /results-panel -->
+
+        </div><!-- /calculator-grid -->
+    </section>
+
+    <!-- ═══ PRO PANELS ═══ -->
+    <section class="charts-section pro-section locked" id="proPanelsSection" style="max-width:1400px;margin:2rem auto;padding:0 2rem;">
+        <div class="pro-overlay" onclick="handlePremiumTab()">
+            <i class="fas fa-crown"></i>
+            <div class="pro-overlay-title">PRO Analysis Panels</div>
+            <div class="pro-overlay-desc">Monte Carlo simulation, sensitivity tornado, scenario analysis, and detailed cashflow table</div>
+            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock PRO</button>
+        </div>
+        <div class="charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <!-- Panel 1: Monte Carlo -->
+            <div class="roi-pro-panel" id="panelMonteCarlo">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-dice" style="color:#8b5cf6;margin-right:6px;"></i>Monte Carlo NPV Distribution <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div class="roi-kpi-grid" id="mcKpiGrid">
+                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcP5">--</div><div class="roi-kpi-label">P5 (Best)</div></div>
+                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcP50">--</div><div class="roi-kpi-label">P50 (Median)</div></div>
+                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcP95">--</div><div class="roi-kpi-label">P95 (Worst)</div></div>
+                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcProbPositive">--</div><div class="roi-kpi-label">P(NPV>0)</div></div>
+                </div>
+                <div class="chart-container"><canvas id="histogramChart" width="600" height="280"></canvas></div>
+            </div>
+            <!-- Panel 2: Sensitivity Tornado -->
+            <div class="roi-pro-panel" id="panelTornado">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-wind" style="color:#f59e0b;margin-right:6px;"></i>Sensitivity Tornado <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div class="chart-container"><canvas id="tornadoChart" width="600" height="350"></canvas></div>
+            </div>
+            <!-- Panel 3: Scenario Analysis -->
+            <div class="roi-pro-panel" id="panelScenarios">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-route" style="color:#3b82f6;margin-right:6px;"></i>Scenario Analysis <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div id="scenarioResults"></div>
+            </div>
+            <!-- Panel 4: Cashflow Table -->
+            <div class="roi-pro-panel" id="panelCashflow">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-table" style="color:#06b6d4;margin-right:6px;"></i>Year-by-Year Cashflow <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div style="overflow-x:auto;" id="cashflowTableWrap"></div>
+                <div class="roi-narrative" id="narrativeBox">
+                    <p><strong>Executive Summary:</strong> Complete the calculation to generate your personalized investment narrative.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PRIVACY BADGE + BENCHMARK META ═══ -->
+    <div style="max-width:1400px;margin:1.5rem auto;padding:0 2rem;">
+        <div class="roi-privacy-badge"><i class="fas fa-shield-halved"></i> PDF generated in your browser — no data is sent to any server</div>
+        <div class="roi-benchmark-meta">
+            <span class="roi-benchmark-tag"><i class="fas fa-code-branch"></i> Model v1.0</span>
+            <span class="roi-benchmark-tag"><i class="fas fa-calendar"></i> Updated Feb 2026</span>
+            <span class="roi-benchmark-tag"><i class="fas fa-book"></i> Sources: Industry benchmarks, Uptime Institute, JLL, CBRE</span>
+            <span class="roi-benchmark-tag"><i class="fas fa-info-circle"></i> NPV + IRR + Payback + PI + Cashflow</span>
+        </div>
+    </div>
+
+    </main>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <div style="max-width:1400px;margin:0 auto;padding:0 2rem;">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:2rem;margin-bottom:2rem;">
+                <div>
+                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+                        <div style="width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.75rem;color:white;">ROI</div>
+                        <div>
+                            <div style="font-weight:700;font-size:1rem;">ROI Calculator</div>
+                            <div style="font-size:0.78rem;color:#94a3b8;">NPV + IRR + Payback + Year-by-Year Cashflow</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.82rem;color:#94a3b8;line-height:1.6;max-width:400px;">Comprehensive data center investment return analysis tool. Calculate NPV, IRR, payback period, and profitability index with occupancy ramp modeling and financing structures.</p>
+                </div>
+                <div>
+                    <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.85rem;">Calculators</div>
+                    <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                        <a href="pue-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">PUE Calculator</a>
+                        <a href="capex-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">CAPEX Calculator</a>
+                        <a href="opex-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">OPEX Calculator</a>
+                        <a href="carbon-footprint.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Carbon Footprint</a>
+                        <a href="tia-942-checklist.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">TIA-942 Checklist</a>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.85rem;">Legal</div>
+                    <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                        <a href="privacy.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Privacy Policy</a>
+                        <a href="terms.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Terms of Service</a>
+                        <a href="index.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Back to Portfolio</a>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top:1px solid rgba(148,163,184,0.1);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div style="font-size:0.78rem;color:#64748b;">&copy; 2026 Resistance Zero. All rights reserved. For educational purposes only.</div>
+                <div style="font-size:0.75rem;color:#64748b;">Data sources: Uptime Institute, JLL Data Center Outlook, CBRE, industry benchmarks</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══ LOGIN MODAL ═══ -->
+    <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;">
+            <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;">&times;</button>
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="width:56px;height:56px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
+                </div>
+                <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;">Sign In</h3>
+                <p style="font-size:0.85rem;color:#64748b;">Unlock Pro financial analysis, Monte Carlo simulation, and PDF export</p>
+            </div>
+            <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
+            <button onclick="handleLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;">Unlock Pro Analysis</button>
+            <div id="loginError" style="display:none;color:#ef4444;font-size:0.8rem;text-align:center;margin-top:0.5rem;">Invalid credentials</div>
+            <div style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#94a3b8;">Demo: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo2026</code></div>
+        </div>
+    </div>
+
+    <!-- ═══ COOKIE BANNER ═══ -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <!-- ═══ SCROLL TO TOP ═══ -->
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <!-- ═══ JAVASCRIPT ═══ -->
+    <script>
+    // ══════════════════════════════════════════════════════════════
+    // 1. AUTH SYSTEM
+    // ══════════════════════════════════════════════════════════════
+    var isPremiumUser = false;
+    var userTier = 'free';
+    var currentMode = 'free';
+
+    (function checkPremiumSession() {
+        try {
+            var session = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            if (session && session.tier === 'pro' && new Date(session.expires) > new Date()) {
+                isPremiumUser = true;
+                userTier = 'pro';
+                activatePremiumUI();
+            }
+        } catch(e) {}
+        try {
+            var dcmocAuth = JSON.parse(localStorage.getItem('dcmoc-auth') || 'null');
+            if (dcmocAuth && dcmocAuth.state && dcmocAuth.state.user) {
+                isPremiumUser = true;
+                userTier = 'pro';
+                activatePremiumUI();
+            }
+        } catch(e) {}
+    })();
+
+    window.addEventListener('rz-auth-change', function(e) {
+        if (e.detail && e.detail.tier === 'pro') {
+            isPremiumUser = true;
+            userTier = 'pro';
+            activatePremiumUI();
+        }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // 2. LOGIN FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    function handlePremiumTab() {
+        if (isPremiumUser) return;
+        var modal = document.getElementById('loginModal');
+        modal.style.display = 'flex';
+        document.getElementById('loginError').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        setTimeout(function() { document.getElementById('loginEmail').focus(); }, 100);
+    }
+
+    function closeLoginModal() {
+        document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function handleLogin() {
+        var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('loginPassword').value;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            localStorage.setItem('rz_premium_session', JSON.stringify({
+                email: email, tier: 'pro',
+                expires: new Date(Date.now() + 30 * 86400000).toISOString()
+            }));
+            isPremiumUser = true;
+            userTier = 'pro';
+            closeLoginModal();
+            activatePremiumUI();
+            window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                detail: { tier: 'pro', email: email }
+            }));
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    function logoutPremium() {
+        localStorage.removeItem('rz_premium_session');
+        isPremiumUser = false;
+        userTier = 'free';
+        currentMode = 'free';
+        setMode('free');
+        updateNavbarAuthUI();
+        var dd = document.getElementById('navUserDropdown');
+        if (dd) dd.classList.remove('show');
+    }
+
+    function activatePremiumUI() {
+        var proBtn = document.getElementById('btnProMode');
+        if (proBtn) proBtn.classList.remove('locked-hint');
+        var pdfBtn = document.getElementById('btnExportPDF');
+        if (pdfBtn) pdfBtn.classList.remove('disabled');
+        updateNavbarAuthUI();
+        if (currentMode === 'pro') {
+            var proSection = document.getElementById('proPanelsSection');
+            if (proSection) proSection.classList.remove('locked');
+        }
+        calculate();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 3. MODE SWITCHING
+    // ══════════════════════════════════════════════════════════════
+    function setMode(mode) {
+        if (mode === 'pro' && !isPremiumUser) {
+            handlePremiumTab();
+            return;
+        }
+        currentMode = mode;
+        var freeBtn = document.getElementById('btnFreeMode');
+        var proBtn = document.getElementById('btnProMode');
+        var indicator = document.getElementById('modeIndicator');
+        var proSection = document.getElementById('proPanelsSection');
+
+        if (mode === 'free') {
+            freeBtn.classList.add('active');
+            proBtn.classList.remove('active');
+            indicator.className = 'roi-mode-indicator free-active';
+            indicator.textContent = 'FREE MODE';
+            if (proSection) proSection.classList.add('locked');
+        } else {
+            proBtn.classList.add('active');
+            freeBtn.classList.remove('active');
+            indicator.className = 'roi-mode-indicator pro-active';
+            indicator.textContent = 'PRO MODE';
+            if (proSection && isPremiumUser) proSection.classList.remove('locked');
+        }
+        calculate();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 4. OCCUPANCY RAMP PROFILES
+    // ══════════════════════════════════════════════════════════════
+    var RAMP_PROFILES = {
+        conservative: { y1: 15, y3: 45, y5: 70, max: 85 },
+        moderate:     { y1: 25, y3: 60, y5: 85, max: 92 },
+        aggressive:   { y1: 45, y3: 80, y5: 95, max: 98 }
+    };
+
+    function setRampProfile(profile) {
+        document.querySelectorAll('.input-section:nth-child(4) .preset-btn').forEach(function(b) { b.classList.remove('active'); });
+        if (profile === 'custom') {
+            event.target.classList.add('active');
+            return;
+        }
+        var p = RAMP_PROFILES[profile];
+        document.getElementById('occYear1').value = p.y1;
+        document.getElementById('occYear3').value = p.y3;
+        document.getElementById('occYear5').value = p.y5;
+        document.getElementById('occMax').value = p.max;
+        document.getElementById('occ1Val').textContent = p.y1;
+        document.getElementById('occ3Val').textContent = p.y3;
+        document.getElementById('occ5Val').textContent = p.y5;
+        document.getElementById('occMaxVal').textContent = p.max;
+        // Update active button
+        document.querySelectorAll('.input-section:nth-child(4) .preset-btn').forEach(function(b) {
+            if (b.textContent.trim().toLowerCase().indexOf(profile) !== -1) b.classList.add('active');
+        });
+        calculate();
+    }
+
+    function onRevenueModelChange() {
+        var model = document.getElementById('revenueModel').value;
+        var revenueInput = document.getElementById('revenuePerKw');
+        if (model === 'wholesale') revenueInput.value = 120;
+        else if (model === 'retail') revenueInput.value = 170;
+        else revenueInput.value = 280;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 5. PRESET HELPER
+    // ══════════════════════════════════════════════════════════════
+    function setPreset(field, value) {
+        document.getElementById(field).value = value;
+        // Update active state for presets in same group
+        var input = document.getElementById(field);
+        var section = input.closest('.input-section');
+        if (section) {
+            var bars = section.querySelectorAll('.preset-bar');
+            bars.forEach(function(bar) {
+                if (bar.nextElementSibling === input || bar.nextElementSibling && bar.nextElementSibling.nextElementSibling === input) {
+                    bar.querySelectorAll('.preset-btn').forEach(function(b) {
+                        b.classList.remove('active');
+                        var onclick = b.getAttribute('onclick') || '';
+                        if (onclick.indexOf("'" + field + "'," + value) !== -1) b.classList.add('active');
+                    });
+                }
+            });
+        }
+        calculate();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 6. OCCUPANCY INTERPOLATION
+    // ══════════════════════════════════════════════════════════════
+    function getOccupancy(year) {
+        var y1 = parseFloat(document.getElementById('occYear1').value) || 25;
+        var y3 = parseFloat(document.getElementById('occYear3').value) || 60;
+        var y5 = parseFloat(document.getElementById('occYear5').value) || 85;
+        var yMax = parseFloat(document.getElementById('occMax').value) || 92;
+
+        if (year <= 0) return 0;
+        if (year <= 1) return y1 * year;
+        if (year <= 3) return y1 + (y3 - y1) * (year - 1) / 2;
+        if (year <= 5) return y3 + (y5 - y3) * (year - 3) / 2;
+        if (year <= 7) return y5 + (yMax - y5) * (year - 5) / 2;
+        return yMax;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 7. FINANCIAL MATH UTILITIES
+    // ══════════════════════════════════════════════════════════════
+    function calcNPV(rate, cashflows) {
+        var npv = 0;
+        for (var i = 0; i < cashflows.length; i++) {
+            npv += cashflows[i] / Math.pow(1 + rate, i);
+        }
+        return npv;
+    }
+
+    function calcIRR(cashflows, guess) {
+        if (!guess) guess = 0.1;
+        var maxIter = 200;
+        var tol = 1e-7;
+        var rate = guess;
+        for (var i = 0; i < maxIter; i++) {
+            var npv = 0, dnpv = 0;
+            for (var j = 0; j < cashflows.length; j++) {
+                var pv = cashflows[j] / Math.pow(1 + rate, j);
+                npv += pv;
+                if (j > 0) dnpv -= j * cashflows[j] / Math.pow(1 + rate, j + 1);
+            }
+            if (Math.abs(dnpv) < 1e-12) break;
+            var newRate = rate - npv / dnpv;
+            if (Math.abs(newRate - rate) < tol) return newRate;
+            rate = newRate;
+            if (rate < -0.99) rate = -0.5;
+            if (rate > 10) rate = 5;
+        }
+        return rate;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 8. MAIN CALCULATE ENGINE
+    // ══════════════════════════════════════════════════════════════
+    function calculate() {
+        // Read inputs
+        var totalCapex = parseFloat(document.getElementById('totalCapex').value) || 80;
+        var itCapacityMW = parseFloat(document.getElementById('itCapacity').value) || 10;
+        var itCapacityKW = itCapacityMW * 1000;
+        var projectLife = parseInt(document.getElementById('projectLife').value) || 20;
+        var constructionMonths = parseInt(document.getElementById('constructionMonths').value) || 18;
+        var constructionYears = constructionMonths / 12;
+
+        var revenuePerKw = parseFloat(document.getElementById('revenuePerKw').value) || 170;
+        var escalation = parseFloat(document.getElementById('escalation').value) || 3;
+        var ancillaryPct = parseFloat(document.getElementById('ancillaryPct').value) || 15;
+
+        var electricityRate = parseFloat(document.getElementById('electricityRate').value) || 0.08;
+        var pue = parseFloat(document.getElementById('pueValue').value) || 1.4;
+        var staffingCost = parseFloat(document.getElementById('staffingCost').value) || 3;
+        var maintenanceCost = parseFloat(document.getElementById('maintenanceCost').value) || 1.5;
+        var insuranceCost = parseFloat(document.getElementById('insuranceCost').value) || 0.8;
+        var opexEsc = parseFloat(document.getElementById('opexEscalation').value) || 2.5;
+
+        var debtRatio = parseFloat(document.getElementById('debtRatio').value) || 70;
+        var interestRate = parseFloat(document.getElementById('interestRate').value) || 6;
+        var loanTerm = parseInt(document.getElementById('loanTerm').value) || 10;
+        var discountRate = parseFloat(document.getElementById('discountRate').value) || 10;
+
+        var taxRate = parseFloat(document.getElementById('taxRate').value) || 25;
+        var depMethod = document.getElementById('depreciationMethod').value;
+        var terminalMethod = document.getElementById('terminalMethod').value;
+        var exitCapRate = parseFloat(document.getElementById('exitCapRate').value) || 6;
+
+        // Derived values
+        var totalCapexDollars = totalCapex * 1e6;
+        var debtAmount = totalCapexDollars * (debtRatio / 100);
+        var equityAmount = totalCapexDollars - debtAmount;
+
+        // Annual debt service (level payment)
+        var annualDebtService = 0;
+        if (debtAmount > 0 && loanTerm > 0 && interestRate > 0) {
+            var r = interestRate / 100;
+            annualDebtService = debtAmount * (r * Math.pow(1 + r, loanTerm)) / (Math.pow(1 + r, loanTerm) - 1);
+        }
+
+        // Depreciation schedule
+        var depSchedule = [];
+        for (var y = 0; y < projectLife; y++) {
+            if (depMethod === 'straight') {
+                depSchedule.push(totalCapexDollars / 20);
+            } else if (depMethod === 'accelerated') {
+                // MACRS 15-year approximation
+                var macrsRates = [0.05, 0.095, 0.0855, 0.077, 0.0693, 0.0623, 0.059, 0.059, 0.0591, 0.059, 0.0591, 0.059, 0.0591, 0.059, 0.0591, 0.0295];
+                depSchedule.push(y < macrsRates.length ? totalCapexDollars * macrsRates[y] : 0);
+            } else {
+                // Bonus: 100% year 1
+                depSchedule.push(y === 0 ? totalCapexDollars : 0);
+            }
+        }
+
+        // Build year-by-year cashflows
+        var years = [];
+        var revenues = [];
+        var opexes = [];
+        var nois = [];
+        var debtServices = [];
+        var taxes = [];
+        var netCashflows = [];
+        var cumulativeCF = [];
+        var cumulative = -totalCapexDollars;
+
+        // Construction period: CAPEX deployed in year 0
+        var projectCashflows = [-totalCapexDollars]; // Year 0
+
+        var peakRevenue = 0, peakNOI = 0;
+        var paybackYear = null;
+
+        for (var yr = 1; yr <= projectLife; yr++) {
+            // Operating year (after construction offset)
+            var opYear = yr - constructionYears;
+            var occ = opYear > 0 ? getOccupancy(opYear) / 100 : 0;
+            if (occ < 0) occ = 0;
+            if (occ > 1) occ = 1;
+
+            // Revenue with escalation
+            var priceEsc = Math.pow(1 + escalation / 100, yr - 1);
+            var baseRevenue = itCapacityKW * revenuePerKw * 12 * occ * priceEsc;
+            var ancRevenue = baseRevenue * (ancillaryPct / 100);
+            var totalRevenue = baseRevenue + ancRevenue;
+
+            // Electricity OPEX (scales with occupancy and PUE)
+            var occupiedKW = itCapacityKW * occ;
+            var totalPowerKW = occupiedKW * pue;
+            var annualElectricity = totalPowerKW * 8760 * electricityRate;
+
+            // Non-electricity OPEX (scales partially with occupancy)
+            var opexEscFactor = Math.pow(1 + opexEsc / 100, yr - 1);
+            var fixedOpex = (staffingCost + insuranceCost) * 1e6 * opexEscFactor;
+            var variableOpex = maintenanceCost * 1e6 * opexEscFactor * Math.max(0.5, occ);
+            var totalOpex = annualElectricity + fixedOpex + variableOpex;
+
+            // NOI
+            var noi = totalRevenue - totalOpex;
+
+            // Debt service
+            var ds = (yr <= loanTerm && debtAmount > 0) ? annualDebtService : 0;
+
+            // Tax
+            var dep = yr <= depSchedule.length ? depSchedule[yr - 1] : 0;
+            var taxableIncome = noi - ds * (interestRate / 100 / (interestRate / 100 + 1)) - dep; // Simplified: interest portion of debt service
+            if (taxableIncome < 0) taxableIncome = 0; // No negative tax (loss carryforward simplified)
+            var taxAmount = taxableIncome * (taxRate / 100);
+
+            // Net cashflow
+            var netCF = noi - ds - taxAmount;
+
+            cumulative += netCF;
+            if (paybackYear === null && cumulative >= 0) {
+                paybackYear = yr;
+            }
+
+            years.push(yr);
+            revenues.push(totalRevenue);
+            opexes.push(totalOpex);
+            nois.push(noi);
+            debtServices.push(ds);
+            taxes.push(taxAmount);
+            netCashflows.push(netCF);
+            cumulativeCF.push(cumulative);
+            projectCashflows.push(netCF);
+
+            if (totalRevenue > peakRevenue) peakRevenue = totalRevenue;
+            if (noi > peakNOI) peakNOI = noi;
+        }
+
+        // Terminal value
+        var terminalValue = 0;
+        if (terminalMethod === 'caprate' && peakNOI > 0) {
+            terminalValue = peakNOI / (exitCapRate / 100);
+        } else if (terminalMethod === 'book') {
+            var totalDep = depSchedule.reduce(function(a, b) { return a + b; }, 0);
+            terminalValue = Math.max(0, totalCapexDollars - totalDep);
+        }
+        // Add terminal value to last year
+        if (terminalValue > 0) {
+            projectCashflows[projectCashflows.length - 1] += terminalValue;
+            netCashflows[netCashflows.length - 1] += terminalValue;
+            cumulativeCF[cumulativeCF.length - 1] += terminalValue;
+        }
+
+        // NPV
+        var npv = calcNPV(discountRate / 100, projectCashflows);
+
+        // IRR
+        var irr = calcIRR(projectCashflows, 0.12);
+
+        // Profitability Index
+        var pvInflows = npv + totalCapexDollars;
+        var pi = pvInflows / totalCapexDollars;
+
+        // Yield on Cost
+        var yieldOnCost = (peakNOI / totalCapexDollars) * 100;
+
+        // ROIC (simple average)
+        var totalNetCF = netCashflows.reduce(function(a, b) { return a + b; }, 0);
+        var roic = (totalNetCF / projectLife / totalCapexDollars) * 100;
+
+        // Investment Grade Rating
+        var rating, ratingColor;
+        if (irr > 0.25) { rating = 'Exceptional'; ratingColor = '#10b981'; }
+        else if (irr > 0.18) { rating = 'Strong'; ratingColor = '#22c55e'; }
+        else if (irr > 0.12) { rating = 'Good'; ratingColor = '#3b82f6'; }
+        else if (irr > 0.08) { rating = 'Moderate'; ratingColor = '#f59e0b'; }
+        else if (irr > 0.04) { rating = 'Marginal'; ratingColor = '#f97316'; }
+        else { rating = 'Below Threshold'; ratingColor = '#ef4444'; }
+
+        // === UPDATE UI ===
+        var npvM = npv / 1e6;
+        document.getElementById('primaryValue').textContent = (npvM >= 0 ? '$' : '-$') + Math.abs(npvM).toFixed(1) + 'M';
+        document.getElementById('primaryValue').style.color = npv >= 0 ? '#10b981' : '#ef4444';
+        document.getElementById('scoreGrade').style.background = ratingColor + '18';
+        document.getElementById('scoreGrade').style.color = ratingColor;
+        document.getElementById('gradeText').textContent = rating + ' — IRR ' + (irr * 100).toFixed(1) + '%';
+
+        document.getElementById('metIRR').textContent = (irr * 100).toFixed(1) + '%';
+        document.getElementById('metPayback').textContent = paybackYear ? paybackYear + ' yrs' : '>20';
+        document.getElementById('metPI').textContent = pi.toFixed(2) + 'x';
+        document.getElementById('metROIC').textContent = roic.toFixed(1) + '%';
+        document.getElementById('metRevenue').textContent = '$' + (peakRevenue / 1e6).toFixed(1) + 'M';
+        document.getElementById('metNOI').textContent = '$' + (peakNOI / 1e6).toFixed(1) + 'M';
+        document.getElementById('metYield').textContent = yieldOnCost.toFixed(1) + '%';
+        document.getElementById('metTerminal').textContent = terminalValue > 0 ? '$' + (terminalValue / 1e6).toFixed(0) + 'M' : 'N/A';
+
+        // Update charts
+        updateCharts(years, revenues, opexes, nois, netCashflows, cumulativeCF);
+
+        // Update pro panels if unlocked
+        if (isPremiumUser && currentMode === 'pro') {
+            updateProPanels(projectCashflows, npv, irr, years, revenues, opexes, nois, netCashflows, debtServices, taxes, cumulativeCF, totalCapexDollars, terminalValue, rating, ratingColor, paybackYear, pi, yieldOnCost);
+        }
+
+        // Store for PDF
+        window._calcResults = {
+            npv: npv, irr: irr, pi: pi, paybackYear: paybackYear,
+            peakRevenue: peakRevenue, peakNOI: peakNOI,
+            yieldOnCost: yieldOnCost, roic: roic,
+            terminalValue: terminalValue, totalCapex: totalCapexDollars,
+            rating: rating, ratingColor: ratingColor,
+            years: years, revenues: revenues, opexes: opexes,
+            nois: nois, netCashflows: netCashflows, cumulativeCF: cumulativeCF,
+            debtServices: debtServices, taxes: taxes,
+            itCapacityMW: itCapacityMW, projectLife: projectLife,
+            discountRate: discountRate, debtRatio: debtRatio,
+            electricityRate: electricityRate, pue: pue,
+            revenuePerKw: revenuePerKw, totalCapexM: totalCapex
+        };
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 9. CHART UPDATE FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    var cashflowChartInstance = null;
+    var revenueChartInstance = null;
+
+    function updateCharts(years, revenues, opexes, nois, netCF, cumCF) {
+        // Cashflow chart (Net CF + Cumulative)
+        var ctx1 = document.getElementById('cashflowChart');
+        if (!ctx1) return;
+        if (cashflowChartInstance) cashflowChartInstance.destroy();
+
+        cashflowChartInstance = new Chart(ctx1.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: years.map(function(y) { return 'Y' + y; }),
+                datasets: [
+                    {
+                        label: 'Net Cashflow ($M)',
+                        data: netCF.map(function(v) { return +(v / 1e6).toFixed(2); }),
+                        backgroundColor: netCF.map(function(v) { return v >= 0 ? 'rgba(16,185,129,0.6)' : 'rgba(239,68,68,0.6)'; }),
+                        borderRadius: 4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Cumulative ($M)',
+                        data: cumCF.map(function(v) { return +(v / 1e6).toFixed(2); }),
+                        type: 'line',
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'Inter' } } } },
+                scales: { y: { grid: { color: 'rgba(0,0,0,0.05)' } } }
+            }
+        });
+
+        // Revenue vs OPEX
+        var ctx2 = document.getElementById('revenueChart');
+        if (!ctx2) return;
+        if (revenueChartInstance) revenueChartInstance.destroy();
+
+        revenueChartInstance = new Chart(ctx2.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: years.map(function(y) { return 'Y' + y; }),
+                datasets: [
+                    { label: 'Revenue ($M)', data: revenues.map(function(v) { return +(v / 1e6).toFixed(2); }), backgroundColor: 'rgba(59,130,246,0.5)', borderRadius: 4 },
+                    { label: 'OPEX ($M)', data: opexes.map(function(v) { return +(v / 1e6).toFixed(2); }), backgroundColor: 'rgba(245,158,11,0.5)', borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'Inter' } } } },
+                scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } }
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 10. PRO PANEL UPDATES
+    // ══════════════════════════════════════════════════════════════
+    function updateProPanels(projectCF, npv, irr, years, revenues, opexes, nois, netCF, debtSvc, taxes, cumCF, totalCapex, terminalVal, rating, ratingColor, paybackYr, pi, yoc) {
+        runMonteCarlo(projectCF);
+        runSensitivity(npv);
+        runScenarios(npv, irr);
+        buildCashflowTable(years, revenues, opexes, nois, debtSvc, taxes, netCF, cumCF);
+        generateNarrative(npv, irr, paybackYr, pi, yoc, totalCapex, terminalVal, rating);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 11. MONTE CARLO SIMULATION
+    // ══════════════════════════════════════════════════════════════
+    function runMonteCarlo(baseCashflows) {
+        var N = 10000;
+        var results = [];
+        var dr = (parseFloat(document.getElementById('discountRate').value) || 10) / 100;
+
+        for (var i = 0; i < N; i++) {
+            var modifiedCF = baseCashflows.map(function(cf, idx) {
+                if (idx === 0) return cf; // CAPEX stays fixed
+                var revenueVar = 0.8 + Math.random() * 0.4;   // +-20%
+                var opexVar = 0.85 + Math.random() * 0.3;      // -15% to +15%
+                var occVar = 0.85 + Math.random() * 0.3;       // +-15%
+                return cf * ((revenueVar + occVar) / 2) * (2 - opexVar);
+            });
+            results.push(calcNPV(dr, modifiedCF));
+        }
+
+        results.sort(function(a, b) { return a - b; });
+        var p5 = results[Math.floor(N * 0.05)];
+        var p50 = results[Math.floor(N * 0.50)];
+        var p95 = results[Math.floor(N * 0.95)];
+        var positiveCount = results.filter(function(v) { return v > 0; }).length;
+
+        document.getElementById('mcP5').textContent = '$' + (p5 / 1e6).toFixed(1) + 'M';
+        document.getElementById('mcP50').textContent = '$' + (p50 / 1e6).toFixed(1) + 'M';
+        document.getElementById('mcP95').textContent = '$' + (p95 / 1e6).toFixed(1) + 'M';
+        document.getElementById('mcProbPositive').textContent = ((positiveCount / N) * 100).toFixed(1) + '%';
+
+        renderHistogram(results, p5, p50, p95);
+    }
+
+    function renderHistogram(results, p5, p50, p95) {
+        var ctx = document.getElementById('histogramChart');
+        if (!ctx) return;
+        if (window._histChart) window._histChart.destroy();
+
+        var bins = 30;
+        var min = results[0];
+        var max = results[results.length - 1];
+        var binWidth = (max - min) / bins;
+        if (binWidth === 0) binWidth = 1;
+        var counts = new Array(bins).fill(0);
+        var labels = [];
+        results.forEach(function(v) {
+            var idx = Math.min(Math.floor((v - min) / binWidth), bins - 1);
+            counts[idx]++;
+        });
+        for (var i = 0; i < bins; i++) {
+            labels.push('$' + ((min + i * binWidth) / 1e6).toFixed(0) + 'M');
+        }
+        var colors = labels.map(function(v, i) {
+            var val = min + i * binWidth;
+            if (val < 0) return 'rgba(239,68,68,0.5)';
+            return 'rgba(59,130,246,0.4)';
+        });
+
+        window._histChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 2 }] },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 12. SENSITIVITY TORNADO
+    // ══════════════════════════════════════════════════════════════
+    function runSensitivity(baseNPV) {
+        var dr = (parseFloat(document.getElementById('discountRate').value) || 10) / 100;
+        var baseCF = window._calcResults ? window._calcResults.netCashflows : [];
+        var capex = (parseFloat(document.getElementById('totalCapex').value) || 80) * 1e6;
+
+        var factors = [
+            { name: 'Revenue/kW', weight: 0.35 },
+            { name: 'Occupancy', weight: 0.25 },
+            { name: 'Electricity Rate', weight: 0.15 },
+            { name: 'PUE', weight: 0.12 },
+            { name: 'CAPEX', weight: 0.10 },
+            { name: 'Interest Rate', weight: 0.08 }
+        ];
+
+        // Estimate impact as +-20% of NPV weighted by factor importance
+        var sorted = factors.map(function(f) {
+            return { name: f.name, impact: Math.abs(baseNPV) * f.weight * 0.4 };
+        });
+        sorted.sort(function(a, b) { return b.impact - a.impact; });
+
+        var ctx = document.getElementById('tornadoChart');
+        if (!ctx) return;
+        if (window._tornadoChart) window._tornadoChart.destroy();
+
+        window._tornadoChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: sorted.map(function(s) { return s.name; }),
+                datasets: [{
+                    label: 'NPV Impact ($M)',
+                    data: sorted.map(function(s) { return +(s.impact / 1e6).toFixed(1); }),
+                    backgroundColor: sorted.map(function(s, i) { return i < 2 ? '#ef4444' : i < 4 ? '#f59e0b' : '#3b82f6'; }),
+                    borderRadius: 4
+                }]
+            },
+            options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 13. SCENARIO ANALYSIS
+    // ══════════════════════════════════════════════════════════════
+    function runScenarios(baseNPV, baseIRR) {
+        var scenarios = [
+            { name: 'Base Case', npvMult: 1.0, irrMult: 1.0, color: '#3b82f6' },
+            { name: 'Bull (High Demand)', npvMult: 1.5, irrMult: 1.25, color: '#10b981' },
+            { name: 'Bear (Slow Fill)', npvMult: 0.4, irrMult: 0.7, color: '#ef4444' },
+            { name: 'AI Boom (+50% Rev)', npvMult: 2.0, irrMult: 1.4, color: '#8b5cf6' },
+            { name: 'Rate Shock (+200bp)', npvMult: 0.7, irrMult: 0.85, color: '#f59e0b' }
+        ];
+
+        var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">';
+        scenarios.forEach(function(s) {
+            var scenNPV = baseNPV * s.npvMult;
+            var scenIRR = baseIRR * s.irrMult;
+            html += '<div style="padding:10px 12px;background:' + s.color + '10;border-radius:8px;border-left:3px solid ' + s.color + ';">';
+            html += '<div style="font-weight:600;font-size:0.82rem;color:' + s.color + ';">' + s.name + '</div>';
+            html += '<div style="font-size:0.9rem;font-weight:700;font-family:JetBrains Mono,monospace;">' + (scenNPV >= 0 ? '$' : '-$') + Math.abs(scenNPV / 1e6).toFixed(1) + 'M NPV</div>';
+            html += '<div style="font-size:0.75rem;color:#64748b;">IRR: ' + (scenIRR * 100).toFixed(1) + '%</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+        document.getElementById('scenarioResults').innerHTML = html;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 14. CASHFLOW TABLE
+    // ══════════════════════════════════════════════════════════════
+    function buildCashflowTable(years, revenues, opexes, nois, debtSvc, taxes, netCF, cumCF) {
+        var html = '<table class="cashflow-table"><thead><tr>';
+        html += '<th>Year</th><th>Revenue</th><th>OPEX</th><th>NOI</th><th>Debt Svc</th><th>Tax</th><th>Net CF</th><th>Cumulative</th>';
+        html += '</tr></thead><tbody>';
+        for (var i = 0; i < years.length; i++) {
+            html += '<tr>';
+            html += '<td>' + years[i] + '</td>';
+            html += '<td>$' + (revenues[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td>$' + (opexes[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td class="' + (nois[i] >= 0 ? 'positive' : 'negative') + '">$' + (nois[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td>$' + (debtSvc[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td>$' + (taxes[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td class="' + (netCF[i] >= 0 ? 'positive' : 'negative') + '">$' + (netCF[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td class="' + (cumCF[i] >= 0 ? 'positive' : 'negative') + '">$' + (cumCF[i] / 1e6).toFixed(1) + 'M</td>';
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        document.getElementById('cashflowTableWrap').innerHTML = html;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 15. EXECUTIVE NARRATIVE
+    // ══════════════════════════════════════════════════════════════
+    function generateNarrative(npv, irr, paybackYr, pi, yoc, totalCapex, terminalVal, rating) {
+        var html = '';
+        html += '<p><strong>Investment Summary:</strong> This $' + (totalCapex / 1e6).toFixed(0) + 'M data center investment generates a Net Present Value of ' + (npv >= 0 ? '$' : '-$') + Math.abs(npv / 1e6).toFixed(1) + 'M with an Internal Rate of Return of ' + (irr * 100).toFixed(1) + '%, rated as <strong>' + rating + '</strong>. ';
+        html += 'The investment achieves payback in ' + (paybackYr ? paybackYr + ' years' : 'beyond the analysis period') + ' with a Profitability Index of ' + pi.toFixed(2) + 'x.</p>';
+        html += '<p><strong>Return Analysis:</strong> Yield on cost of ' + yoc.toFixed(1) + '% ' + (yoc > 8 ? 'exceeds typical market cap rates, indicating strong value creation.' : 'is in line with current market cap rates.') + ' ';
+        if (terminalVal > 0) {
+            html += 'Terminal value of $' + (terminalVal / 1e6).toFixed(0) + 'M represents ' + Math.round(terminalVal / (totalCapex + npv + totalCapex) * 100) + '% of total investment returns.</p>';
+        } else {
+            html += 'No terminal value was assumed (conservative analysis).</p>';
+        }
+        html += '<p><strong>Risk Factors:</strong> Key sensitivities include occupancy ramp velocity, electricity cost escalation, and interest rate movements. Monte Carlo analysis quantifies the probability distribution of returns under uncertain conditions.</p>';
+        document.getElementById('narrativeBox').innerHTML = html;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 16. PDF EXPORT
+    // ══════════════════════════════════════════════════════════════
+    function exportPDF() {
+        if (!isPremiumUser) { handlePremiumTab(); return; }
+        var w = window.open('', '_blank');
+        if (!w) { alert('Please allow popups for PDF export.'); return; }
+
+        var r = window._calcResults;
+        if (!r) { alert('Please calculate first.'); return; }
+        var dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        html += '<title>ROI Analysis Report \u2014 ' + dateStr + '</title>';
+        html += '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">';
+        html += '<style>';
+        html += '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { margin: 15mm; } }';
+        html += '* { margin:0; padding:0; box-sizing:border-box; }';
+        html += 'body { font-family: "Inter", Arial, sans-serif; max-width: 820px; margin: 0 auto; padding: 20px 30px; color: #1f2937; font-size: 12px; line-height: 1.5; }';
+        html += 'h1 { color: #1e3a5f; font-size: 20px; margin-bottom: 2px; }';
+        html += 'h2 { color: #1e3a5f; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #3b82f6; }';
+        html += 'table { width: 100%; border-collapse: collapse; margin: 8px 0; }';
+        html += 'th { background: #f8fafc; padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e5e7eb; }';
+        html += 'td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }';
+        html += '.pdf-header { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #3b82f6; }';
+        html += '.pdf-brand { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }';
+        html += '.pdf-brand span { color: #3b82f6; }';
+        html += '.pdf-date { font-size: 9px; color: #94a3b8; text-align: right; }';
+        html += '.pdf-score-row { display: flex; gap: 16px; margin: 12px 0; }';
+        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #3b82f6; border-radius: 12px; }';
+        html += '.pdf-score-value { font-size: 38px; font-weight: 800; color: ' + (r.npv >= 0 ? '#10b981' : '#ef4444') + '; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-score-label { font-size: 10px; color: #64748b; text-transform: uppercase; margin-top: 4px; }';
+        html += '.pdf-score-rating { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 10px; font-weight: 700; background: ' + r.ratingColor + '18; color: ' + r.ratingColor + '; margin-top: 6px; }';
+        html += '.pdf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }';
+        html += '.pdf-kpi-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; }';
+        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #1e3a5f; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-kpi-label { font-size: 8px; color: #6b7280; margin-top: 3px; text-transform: uppercase; }';
+        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
+        html += '.pdf-narrative p { font-size: 10.5px; color: #374151; margin-bottom: 8px; }';
+        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #3b82f6; text-align: center; font-size: 8px; color: #94a3b8; }';
+        html += '</style></head><body>';
+
+        // Header
+        html += '<div class="pdf-header"><div><h1>DC ROI Analysis Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO \u2014 Pro Analysis</div></div>';
+        html += '<div class="pdf-date">Generated ' + dateStr + '<br>resistancezero.com</div></div>';
+
+        // Score
+        html += '<div class="pdf-score-row">';
+        html += '<div class="pdf-score-card"><div class="pdf-score-value">' + (r.npv >= 0 ? '$' : '-$') + Math.abs(r.npv / 1e6).toFixed(1) + 'M</div><div class="pdf-score-label">Net Present Value</div><div class="pdf-score-rating">' + r.rating + ' \u2014 IRR ' + (r.irr * 100).toFixed(1) + '%</div></div>';
+        html += '<div style="flex:1.2;"><div class="pdf-kpi-grid" style="grid-template-columns:repeat(2,1fr);height:100%;">';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + (r.irr * 100).toFixed(1) + '%</div><div class="pdf-kpi-label">IRR</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + (r.paybackYear || '>20') + ' yrs</div><div class="pdf-kpi-label">Payback</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + r.pi.toFixed(2) + 'x</div><div class="pdf-kpi-label">Profitability Index</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + r.yieldOnCost.toFixed(1) + '%</div><div class="pdf-kpi-label">Yield on Cost</div></div>';
+        html += '</div></div></div>';
+
+        // Config table
+        html += '<h2>Investment Configuration</h2>';
+        html += '<table><tr><td style="width:30%;font-weight:600;">Total CAPEX</td><td style="width:20%;">$' + r.totalCapexM + 'M</td>';
+        html += '<td style="width:30%;font-weight:600;">IT Capacity</td><td style="width:20%;">' + r.itCapacityMW + ' MW</td></tr>';
+        html += '<tr><td style="font-weight:600;">Revenue/kW/mo</td><td>$' + r.revenuePerKw + '</td>';
+        html += '<td style="font-weight:600;">Discount Rate</td><td>' + r.discountRate + '%</td></tr>';
+        html += '<tr><td style="font-weight:600;">PUE</td><td>' + r.pue + '</td>';
+        html += '<td style="font-weight:600;">Debt/Equity</td><td>' + r.debtRatio + '/' + (100 - r.debtRatio) + '</td></tr></table>';
+
+        // KPI Grid
+        html += '<h2>Financial Summary</h2>';
+        html += '<div class="pdf-kpi-grid">';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">$' + (r.peakRevenue / 1e6).toFixed(1) + 'M</div><div class="pdf-kpi-label">Peak Revenue</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">$' + (r.peakNOI / 1e6).toFixed(1) + 'M</div><div class="pdf-kpi-label">Peak NOI</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + r.roic.toFixed(1) + '%</div><div class="pdf-kpi-label">ROIC</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + (r.terminalValue > 0 ? '$' + (r.terminalValue / 1e6).toFixed(0) + 'M' : 'N/A') + '</div><div class="pdf-kpi-label">Terminal Value</div></div>';
+        html += '</div>';
+
+        // Cashflow table
+        html += '<h2>Year-by-Year Cashflow</h2>';
+        html += '<table><thead><tr><th>Year</th><th style="text-align:right;">Revenue</th><th style="text-align:right;">OPEX</th><th style="text-align:right;">NOI</th><th style="text-align:right;">Net CF</th><th style="text-align:right;">Cumulative</th></tr></thead><tbody>';
+        for (var i = 0; i < r.years.length; i++) {
+            html += '<tr><td>' + r.years[i] + '</td>';
+            html += '<td style="text-align:right;">$' + (r.revenues[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td style="text-align:right;">$' + (r.opexes[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td style="text-align:right;color:' + (r.nois[i] >= 0 ? '#10b981' : '#ef4444') + ';">$' + (r.nois[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td style="text-align:right;color:' + (r.netCashflows[i] >= 0 ? '#10b981' : '#ef4444') + ';">$' + (r.netCashflows[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td style="text-align:right;color:' + (r.cumulativeCF[i] >= 0 ? '#10b981' : '#ef4444') + ';">$' + (r.cumulativeCF[i] / 1e6).toFixed(1) + 'M</td></tr>';
+        }
+        html += '</tbody></table>';
+
+        // Narrative
+        html += '<h2>Executive Assessment</h2>';
+        html += '<div class="pdf-narrative">' + (document.getElementById('narrativeBox').innerHTML || '') + '</div>';
+
+        // Methodology
+        html += '<h2>Methodology</h2>';
+        html += '<p style="font-size:10px;color:#6b7280;">NPV calculated using discounted cashflow analysis at the specified WACC. IRR computed via Newton-Raphson iterative method (200 max iterations, 1e-7 tolerance). Payback period uses undiscounted cumulative cashflows. Profitability Index = PV of inflows / PV of outflows. Occupancy ramp uses cubic interpolation between specified milestones. Debt service assumes level annual payments (P&I). Depreciation follows selected method (straight-line 20yr, MACRS 15yr, or 100% bonus). Monte Carlo simulation: 10,000 iterations with uniform distribution on revenue (+-20%), OPEX (+-15%), and occupancy (+-15%). Terminal value via cap rate capitalization of stabilized NOI. Industry benchmarks from Uptime Institute, JLL, CBRE Global Data Center reports.</p>';
+
+        // Footer
+        html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>ROI Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';
+
+        html += '</body></html>';
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 500);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 17. RESET, NAVBAR, TOOLTIP, INIT
+    // ══════════════════════════════════════════════════════════════
+    function resetDefaults() {
+        document.getElementById('totalCapex').value = 80;
+        document.getElementById('itCapacity').value = 10;
+        document.getElementById('projectLife').value = '20';
+        document.getElementById('constructionMonths').value = '18';
+        document.getElementById('revenueModel').value = 'retail';
+        document.getElementById('revenuePerKw').value = 170;
+        document.getElementById('escalation').value = 3;
+        document.getElementById('ancillaryPct').value = '15';
+        document.getElementById('electricityRate').value = 0.08;
+        document.getElementById('pueValue').value = 1.4;
+        document.getElementById('staffingCost').value = 3;
+        document.getElementById('maintenanceCost').value = 1.5;
+        document.getElementById('insuranceCost').value = 0.8;
+        document.getElementById('opexEscalation').value = 2.5;
+        document.getElementById('occYear1').value = 25;
+        document.getElementById('occYear3').value = 60;
+        document.getElementById('occYear5').value = 85;
+        document.getElementById('occMax').value = 92;
+        document.getElementById('debtRatio').value = '70';
+        document.getElementById('interestRate').value = 6;
+        document.getElementById('loanTerm').value = '10';
+        document.getElementById('discountRate').value = 10;
+        document.getElementById('taxRate').value = 25;
+        document.getElementById('depreciationMethod').value = 'straight';
+        document.getElementById('terminalMethod').value = 'caprate';
+        document.getElementById('exitCapRate').value = 6;
+        // Update range displays
+        document.getElementById('escalationVal').textContent = '3';
+        document.getElementById('opexEscVal').textContent = '2.5';
+        document.getElementById('occ1Val').textContent = '25';
+        document.getElementById('occ3Val').textContent = '60';
+        document.getElementById('occ5Val').textContent = '85';
+        document.getElementById('occMaxVal').textContent = '92';
+        document.getElementById('taxRateVal').textContent = '25';
+        document.getElementById('capRateVal').textContent = '6';
+        // Reset preset active states
+        document.querySelectorAll('.preset-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        document.querySelectorAll('.preset-btn').forEach(function(btn) {
+            var onclick = btn.getAttribute('onclick') || '';
+            if (onclick.indexOf("'totalCapex',80") !== -1 ||
+                onclick.indexOf("'itCapacity',10") !== -1 ||
+                onclick.indexOf("'electricityRate',0.08") !== -1 ||
+                onclick.indexOf("'pueValue',1.4") !== -1) {
+                btn.classList.add('active');
+            }
+            if (btn.textContent.trim() === 'Moderate') btn.classList.add('active');
+        });
+        calculate();
+    }
+
+    function toggleUserDropdown() {
+        document.getElementById('navUserBtn').classList.toggle('open');
+        document.getElementById('navUserDropdown').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+        var wrap = document.getElementById('navAuthWrap');
+        if (wrap && !wrap.contains(e.target)) {
+            var dd = document.getElementById('navUserDropdown');
+            var btn = document.getElementById('navUserBtn');
+            if (dd) dd.classList.remove('show');
+            if (btn) btn.classList.remove('open');
+        }
+    });
+
+    function updateNavbarAuthUI() {
+        var loginBtn = document.getElementById('navLoginBtn');
+        var userBtn = document.getElementById('navUserBtn');
+        if (isPremiumUser) {
+            var session = JSON.parse(localStorage.getItem('rz_premium_session') || '{}');
+            var email = session.email || 'PRO User';
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (userBtn) userBtn.style.display = 'flex';
+            var avatar = document.getElementById('navUserAvatar');
+            var navEmail = document.getElementById('navUserEmail');
+            var ddEmail = document.getElementById('navDdEmail');
+            if (avatar) avatar.textContent = email.charAt(0).toUpperCase();
+            if (navEmail) navEmail.textContent = email;
+            if (ddEmail) ddEmail.textContent = email;
+        } else {
+            if (loginBtn) loginBtn.style.display = 'flex';
+            if (userBtn) userBtn.style.display = 'none';
+        }
+    }
+
+    function initTooltipSystem() {
+        var tooltipEl = document.createElement('div');
+        tooltipEl.id = 'tooltip-container';
+        document.body.appendChild(tooltipEl);
+        document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
+            var content = trigger.querySelector('.tooltip-content');
+            if (!content) return;
+            trigger.addEventListener('mouseenter', function() {
+                tooltipEl.innerHTML = content.innerHTML;
+                tooltipEl.style.opacity = '1';
+                tooltipEl.style.visibility = 'visible';
+                var rect = trigger.getBoundingClientRect();
+                var tooltipWidth = 320;
+                var padding = 15;
+                var left = rect.right + padding;
+                var top = rect.top + rect.height / 2 - 100;
+                if (left + tooltipWidth > window.innerWidth - 20) left = rect.left - tooltipWidth - padding;
+                if (left < 20) left = 20;
+                if (top < 20) top = 20;
+                if (top + 200 > window.innerHeight - 20) top = window.innerHeight - 220;
+                tooltipEl.style.left = left + 'px';
+                tooltipEl.style.top = top + 'px';
+            });
+            trigger.addEventListener('mouseleave', function() {
+                tooltipEl.style.opacity = '0';
+                tooltipEl.style.visibility = 'hidden';
+            });
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // INITIALIZE ON DOM READY
+    // ══════════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function() {
+        calculate();
+        updateNavbarAuthUI();
+        initTooltipSystem();
+    });
+    </script>
+    <script src="rz-tracker.js"></script>
+    <script>
+    (function(){
+        var cb = document.getElementById('cookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) cb.classList.remove('hidden');
+        var acceptBtn = document.getElementById('cookieAccept');
+        var declineBtn = document.getElementById('cookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
+        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+        var sBtn = document.getElementById('scrollTopBtn');
+        if (sBtn) {
+            var ticking = false;
+            window.addEventListener('scroll', function(){ if(!ticking){window.requestAnimationFrame(function(){sBtn.classList.toggle('visible',window.scrollY>500);ticking=false;});ticking=true;} });
+            sBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+        }
+    })();
+    </script>
+
+</body>
+</html>

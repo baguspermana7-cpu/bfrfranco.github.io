@@ -16,7 +16,7 @@
     <!-- SEO Meta Tags -->
     <title>Data Center Engineering & Telemetry Solutions | Bagus Dwi Permana</title>
     <meta name="description" content="Enterprise data center solutions: DCIM, BMS integration, predictive maintenance, and operational optimization services by Bagus Dwi Permana.">
-    <meta name="keywords" content="Data Center, Telemetry, DCIM, BMS, Cost Calculator, AI Datacenter, Liquid Cooling, PUE, Ahli K3 Listrik, Critical Infrastructure">
+    <meta name="keywords" content="Data Center, Telemetry, DCIM, BMS, Cost Calculator, AI Datacenter, Liquid Cooling, PUE, Critical Infrastructure, Data Center Design">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#1e3a5f">
@@ -1550,6 +1550,243 @@
                 display: block;
             }
         }
+
+        /* Feature 21: Global Search */
+        .nav-search-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            transition: background 0.2s ease, color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-search-btn:hover {
+            background: rgba(0,0,0,0.06);
+            color: var(--medium-blue);
+        }
+        [data-theme="dark"] .nav-search-btn {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .nav-search-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--light-blue);
+        }
+        .search-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .search-modal {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            width: min(600px, 92vw);
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+            overflow: hidden;
+        }
+        .search-overlay.active + .search-modal,
+        .search-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        [data-theme="dark"] .search-modal {
+            background: #1e293b;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+        .search-input-wrap {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+            gap: 0.75rem;
+        }
+        [data-theme="dark"] .search-input-wrap {
+            border-color: rgba(255,255,255,0.1);
+        }
+        .search-input-wrap svg {
+            width: 20px;
+            height: 20px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] .search-input {
+            color: #e2e8f0;
+        }
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+        .search-kbd {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            color: #6b7280;
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+        }
+        [data-theme="dark"] .search-kbd {
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+        }
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        .search-results::-webkit-scrollbar { width: 4px; }
+        .search-results::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .search-result-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.15s ease;
+            cursor: pointer;
+        }
+        .search-result-item:hover,
+        .search-result-item.focused {
+            background: rgba(59,130,246,0.08);
+        }
+        [data-theme="dark"] .search-result-item:hover,
+        [data-theme="dark"] .search-result-item.focused {
+            background: rgba(96,165,250,0.12);
+        }
+        .search-result-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+            background: var(--medium-blue);
+        }
+        .search-result-icon.calc { background: #f59e0b; }
+        .search-result-icon.tool { background: #10b981; }
+        .search-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .search-result-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        [data-theme="dark"] .search-result-title { color: #e2e8f0; }
+        .search-result-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        [data-theme="dark"] .search-result-desc { color: #94a3b8; }
+        .search-result-category {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-blue);
+            margin-bottom: 2px;
+        }
+        .search-empty {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .search-footer {
+            padding: 0.6rem 1.25rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .search-footer { border-color: rgba(255,255,255,0.1); }
+        .search-preview { position: fixed; z-index: 10003; width: 260px; background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); padding: 0.6rem; display: none; gap: 0.4rem; pointer-events: none; }
+        .search-preview.visible { display: flex; align-items: flex-start; }
+        [data-theme="dark"] .search-preview { background: #1e293b; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        .search-preview-img { width: 80px; height: 52px; object-fit: cover; border-radius: 6px; background: #f1f5f9; flex-shrink: 0; }
+        [data-theme="dark"] .search-preview-img { background: #334155; }
+        .search-preview-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .search-preview-cat { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-blue); }
+        .search-preview-title { font-size: 0.72rem; font-weight: 600; color: var(--text-primary); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        [data-theme="dark"] .search-preview-title { color: #e2e8f0; }
+        .search-preview-desc { font-size: 0.62rem; color: #64748b; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        [data-theme="dark"] .search-preview-desc { color: #94a3b8; }
+        .search-preview-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.58rem; color: #64748b; }
+        [data-theme="dark"] .search-preview-badge { color: #94a3b8; }
+        @media (max-width: 900px) { .search-preview { display: none !important; } }
+        .search-result-icon.policy { background: #8b5cf6; }
+        .search-result-icon.sustainability { background: #059669; }
+        .search-result-icon.geopolitics { background: #ef4444; }
+        .search-result-icon.analysis { background: #f97316; }
+        .search-result-icon.leadership { background: #14b8a6; }
+        .search-result-icon.business { background: #6366f1; }
+        .search-highlight { background: rgba(250, 204, 21, 0.35); color: inherit; border-radius: 2px; padding: 0 1px; }
+        [data-theme="dark"] .search-highlight { background: rgba(96, 165, 250, 0.25); }
+        .search-chips { display: flex; gap: 6px; padding: 0.5rem 1.25rem; border-bottom: 1px solid #e2e8f0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .search-chips::-webkit-scrollbar { display: none; }
+        [data-theme="dark"] .search-chips { border-color: rgba(255,255,255,0.1); }
+        .search-chip { padding: 4px 12px; font-size: 0.72rem; font-weight: 600; border-radius: 20px; border: 1px solid #d1d5db; background: transparent; color: #6b7280; cursor: pointer; white-space: nowrap; transition: all 0.15s ease; font-family: 'Inter', sans-serif; }
+        .search-chip:hover { border-color: var(--medium-blue); color: var(--medium-blue); }
+        .search-chip.active { background: var(--medium-blue); border-color: var(--medium-blue); color: #fff; }
+        [data-theme="dark"] .search-chip { border-color: rgba(255,255,255,0.15); color: #94a3b8; }
+        [data-theme="dark"] .search-chip:hover { border-color: var(--light-blue); color: var(--light-blue); }
+        [data-theme="dark"] .search-chip.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+        .search-recent { padding: 0.75rem 1.25rem; }
+        .search-recent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .search-recent-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; }
+        .search-recent-clear { font-size: 0.7rem; color: #94a3b8; cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; padding: 0; }
+        .search-recent-clear:hover { color: var(--medium-blue); }
+        .search-recent-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.5rem; border-radius: 8px; cursor: pointer; color: #64748b; font-size: 0.85rem; transition: background 0.15s ease; }
+        .search-recent-item:hover { background: rgba(59,130,246,0.06); }
+        [data-theme="dark"] .search-recent-item { color: #94a3b8; }
+        [data-theme="dark"] .search-recent-item:hover { background: rgba(96,165,250,0.1); }
+        .search-recent-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.5; }
     </style>
 
     <!-- Structured Data - BreadcrumbList -->
@@ -1572,8 +1809,33 @@
         ]
     }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
 </head>
 <body>
+    <!-- Search Overlay & Modal -->
+    <div class="search-overlay" id="searchOverlay"></div>
+    <div class="search-modal" id="searchModal">
+        <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <kbd class="search-kbd">ESC</kbd>
+        </div>
+        <div class="search-chips" id="searchChips">
+            <button class="search-chip active" data-filter="all">All</button>
+            <button class="search-chip" data-filter="articles">Articles</button>
+            <button class="search-chip" data-filter="calculators">Calculators</button>
+            <button class="search-chip" data-filter="tools">Tools</button>
+        </div>
+        <div class="search-results" id="searchResults">
+            <div class="search-empty">Type to search across all content</div>
+        </div>
+        <div class="search-footer">
+            <span><kbd class="search-kbd">&uarr;&darr;</kbd> Navigate</span>
+            <span><kbd class="search-kbd">Enter</kbd> Open</span>
+        </div>
+    </div>
+    <div class="search-preview" id="searchPreview"></div>
+
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Background -->
     <div class="page-background"></div>
@@ -1650,6 +1912,9 @@
                     <i class="fas fa-arrow-left"></i>
                     Portfolio
                 </a>
+                <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -1666,29 +1931,28 @@
         <section class="hero fade-in">
             <div class="hero-badge">
                 <i class="fas fa-circle"></i>
-                Enterprise Data Center Engineering
+                Data Center Engineering Hub
             </div>
             <h1>Data Center Engineering & Telemetry Solutions</h1>
-            <p>Comprehensive solutions for conventional and AI-powered data centers.
-               Interactive cost simulation, real-time telemetry dashboards, and technical research
-               from an Ahli K3 Listrik certified engineer.</p>
+            <p>Explore interactive tools, cost simulators, and telemetry dashboards
+               for conventional and AI-powered data centers.</p>
 
             <div class="hero-stats">
                 <div class="stat-item fade-in delay-1">
-                    <div class="stat-value">50+</div>
-                    <div class="stat-label">MW Managed</div>
+                    <div class="stat-value">1.2–1.4</div>
+                    <div class="stat-label">Industry Best PUE</div>
                 </div>
                 <div class="stat-item fade-in delay-2">
-                    <div class="stat-value">99.99%</div>
-                    <div class="stat-label">Uptime Target</div>
+                    <div class="stat-value">99.995%</div>
+                    <div class="stat-label">Tier IV Uptime</div>
                 </div>
                 <div class="stat-item fade-in delay-3">
-                    <div class="stat-value">&lt;1.4</div>
-                    <div class="stat-label">PUE Achieved</div>
+                    <div class="stat-value">30–100kW</div>
+                    <div class="stat-label">AI Rack Density</div>
                 </div>
                 <div class="stat-item fade-in delay-4">
-                    <div class="stat-value">Tier III+</div>
-                    <div class="stat-label">Design Standard</div>
+                    <div class="stat-value">Tier I–IV</div>
+                    <div class="stat-label">Design Standards</div>
                 </div>
             </div>
         </section>
@@ -2010,16 +2274,15 @@
                     <p class="tool-desc">Assess TIA-942-B compliance with 56 items, 4 tier levels, weighted scoring, and gap analysis.</p>
                 </a>
 
-                <div class="tool-card coming-soon-card">
-                    <span class="coming-soon-badge">Coming Soon</span>
+                <a href="carbon-footprint.html" class="tool-card" style="text-decoration:none;color:inherit;">
                     <div class="tool-header">
                         <div class="tool-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">
                             <i class="fas fa-leaf"></i>
                         </div>
                         <span class="tool-title">Carbon Footprint</span>
                     </div>
-                    <p class="tool-desc">Estimate CO2 emissions based on power consumption and regional grid energy mix.</p>
-                </div>
+                    <p class="tool-desc">GHG Protocol Scope 1/2/3 emissions, life-cycle assessment, and Paris Agreement carbon budget analysis for 33 countries.</p>
+                </a>
 
                 <div class="tool-card coming-soon-card">
                     <span class="coming-soon-badge">Coming Soon</span>
@@ -2032,16 +2295,15 @@
                     <p class="tool-desc">Side-by-side comparison of different configurations: Air vs Liquid, N+1 vs 2N, and more.</p>
                 </div>
 
-                <div class="tool-card coming-soon-card">
-                    <span class="coming-soon-badge">Coming Soon</span>
+                <a href="roi-calculator.html" class="tool-card" style="text-decoration:none;color:inherit;">
                     <div class="tool-header">
                         <div class="tool-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <span class="tool-title">ROI Calculator</span>
                     </div>
-                    <p class="tool-desc">Calculate return on investment timeline based on operational costs and revenue projections.</p>
-                </div>
+                    <p class="tool-desc">NPV, IRR, payback period, and year-by-year cashflow analysis with occupancy ramp modeling and Monte Carlo simulation.</p>
+                </a>
             </div>
         </section>
 
@@ -2253,6 +2515,311 @@
         });
         sBtn.addEventListener('click', function(){
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+
+<!-- ═══ Feature 21: Global Search ═══ -->
+<script>
+(function() {
+    var searchBtn = document.getElementById('navSearchBtn');
+    var overlay = document.getElementById('searchOverlay');
+    var modal = document.getElementById('searchModal');
+    var input = document.getElementById('searchInput');
+    var resultsEl = document.getElementById('searchResults');
+    var previewEl = document.getElementById('searchPreview');
+    var chipsEl = document.getElementById('searchChips');
+    var fuse = null;
+    var searchData = null;
+    var focusedIdx = -1;
+    var activeFilter = 'all';
+    var lastResults = [];
+    var RECENT_KEY = 'rz-search-recent';
+
+    function getRecent() {
+        try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; }
+        catch(e) { return []; }
+    }
+    function saveRecent(query) {
+        if (!query || query.length < 2) return;
+        var arr = getRecent().filter(function(q) { return q !== query; });
+        arr.unshift(query);
+        if (arr.length > 3) arr = arr.slice(0, 3);
+        try { localStorage.setItem(RECENT_KEY, JSON.stringify(arr)); } catch(e) {}
+    }
+    function clearRecent() {
+        try { localStorage.removeItem(RECENT_KEY); } catch(e) {}
+    }
+
+    function renderRecent() {
+        var recent = getRecent();
+        if (!recent.length) {
+            resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>';
+            return;
+        }
+        var html = '<div class="search-recent"><div class="search-recent-header">'
+            + '<span class="search-recent-label">Recent</span>'
+            + '<button class="search-recent-clear" id="clearRecent">Clear</button></div>';
+        recent.forEach(function(q) {
+            html += '<div class="search-recent-item" data-query="' + q.replace(/"/g, '&quot;') + '">'
+                + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+                + '<span>' + q + '</span></div>';
+        });
+        html += '</div>';
+        resultsEl.innerHTML = html;
+        var clearBtn = document.getElementById('clearRecent');
+        if (clearBtn) clearBtn.addEventListener('click', function() { clearRecent(); renderRecent(); });
+        resultsEl.querySelectorAll('.search-recent-item').forEach(function(el) {
+            el.addEventListener('click', function() {
+                input.value = el.getAttribute('data-query');
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+    }
+
+    function openSearch() {
+        overlay.classList.add('active');
+        modal.classList.add('active');
+        input.value = '';
+        input.focus();
+        focusedIdx = -1;
+        activeFilter = 'all';
+        lastResults = [];
+        updateChips();
+        hidePreview();
+        renderRecent();
+        if (!searchData) {
+            fetch('search-index.json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    searchData = data;
+                    fuse = new Fuse(data, {
+                        keys: [
+                            { name: 'title', weight: 0.4 },
+                            { name: 'description', weight: 0.25 },
+                            { name: 'keywords', weight: 0.25 },
+                            { name: 'category', weight: 0.1 }
+                        ],
+                        threshold: 0.35,
+                        includeScore: true,
+                        includeMatches: true,
+                        minMatchCharLength: 2
+                    });
+                })
+                .catch(function() {});
+        }
+    }
+
+    function closeSearch() {
+        overlay.classList.remove('active');
+        modal.classList.remove('active');
+        input.blur();
+        hidePreview();
+    }
+
+    function getIconClass(cat) {
+        cat = (cat || '').toLowerCase();
+        if (cat === 'calculator') return 'calc';
+        if (cat === 'tool') return 'tool';
+        if (cat === 'policy') return 'policy';
+        if (cat === 'sustainability') return 'sustainability';
+        if (cat === 'geopolitics') return 'geopolitics';
+        if (cat === 'analysis') return 'analysis';
+        if (cat === 'leadership') return 'leadership';
+        if (cat === 'business') return 'business';
+        return '';
+    }
+
+    function getIconLabel(item) {
+        if (item.url && item.url.indexOf('article-') === 0) {
+            return item.url.replace('article-', '').replace('.html', '').padStart(2, '0');
+        }
+        var cat = (item.category || '').toLowerCase();
+        if (cat === 'calculator') return '&#9889;';
+        if (cat === 'tool') return '&#9881;';
+        if (cat === 'geopolitics') return '&#9733;';
+        return '&#9733;';
+    }
+
+    function getCatFilter(cat) {
+        cat = (cat || '').toLowerCase();
+        if (cat === 'calculator') return 'calculators';
+        if (cat === 'tool') return 'tools';
+        return 'articles';
+    }
+
+    function highlightText(text, matches, key) {
+        if (!matches || !matches.length) return text;
+        var found = null;
+        for (var i = 0; i < matches.length; i++) {
+            if (matches[i].key === key) { found = matches[i]; break; }
+        }
+        if (!found || !found.indices || !found.indices.length) return text;
+        var indices = found.indices.sort(function(a, b) { return a[0] - b[0]; });
+        var result = '';
+        var last = 0;
+        indices.forEach(function(pair) {
+            var start = pair[0], end = pair[1];
+            if (start > last) result += text.substring(last, start);
+            result += '<mark class="search-highlight">' + text.substring(start, end + 1) + '</mark>';
+            last = end + 1;
+        });
+        if (last < text.length) result += text.substring(last);
+        return result;
+    }
+
+    function filterResults(results) {
+        if (activeFilter === 'all') return results;
+        return results.filter(function(r) {
+            return getCatFilter(r.item.category) === activeFilter;
+        });
+    }
+
+    function renderResults(results) {
+        var filtered = filterResults(results);
+        if (!filtered.length) {
+            resultsEl.innerHTML = '<div class="search-empty">No results found</div>';
+            focusedIdx = -1;
+            hidePreview();
+            return;
+        }
+        var html = '';
+        filtered.slice(0, 8).forEach(function(r, i) {
+            var item = r.item;
+            var iconCls = getIconClass(item.category);
+            var titleHtml = highlightText(item.title, r.matches, 'title');
+            var descHtml = highlightText(item.description, r.matches, 'description');
+            html += '<a href="' + item.url + '" class="search-result-item" data-idx="' + i + '">'
+                + '<div class="search-result-icon ' + iconCls + '">' + getIconLabel(item) + '</div>'
+                + '<div class="search-result-info">'
+                + '<div class="search-result-category">' + (item.category || '') + '</div>'
+                + '<div class="search-result-title">' + titleHtml + '</div>'
+                + '<div class="search-result-desc">' + descHtml + '</div>'
+                + '</div></a>';
+        });
+        resultsEl.innerHTML = html;
+        focusedIdx = -1;
+        attachHoverListeners(filtered);
+    }
+
+    function attachHoverListeners(filtered) {
+        resultsEl.querySelectorAll('.search-result-item').forEach(function(el) {
+            var idx = parseInt(el.getAttribute('data-idx'), 10);
+            el.addEventListener('mouseenter', function() { showPreview(filtered[idx], el); });
+            el.addEventListener('mouseleave', function() { hidePreview(); });
+            el.addEventListener('click', function() { saveRecent(input.value.trim()); });
+        });
+    }
+
+    function showPreview(r, anchorEl) {
+        if (!previewEl || !r) return;
+        var item = r.item;
+        var imgHtml = item.image ? '<img class="search-preview-img" src="' + item.image + '" alt="">' : '';
+        var timeHtml = item.readingTime ? '<div class="search-preview-badge"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' + item.readingTime + ' min</div>' : '';
+        previewEl.innerHTML = imgHtml
+            + '<div class="search-preview-text">'
+            + '<div class="search-preview-cat">' + (item.category || '') + '</div>'
+            + '<div class="search-preview-title">' + item.title + '</div>'
+            + '<div class="search-preview-desc">' + item.description + '</div>'
+            + timeHtml
+            + '</div>';
+        // Position tooltip to the right of the modal
+        var modalRect = modal.getBoundingClientRect();
+        var itemRect = anchorEl.getBoundingClientRect();
+        var tipLeft = modalRect.right + 10;
+        var tipTop = itemRect.top;
+        // If no space on right, show on left
+        if (tipLeft + 270 > window.innerWidth) {
+            tipLeft = modalRect.left - 270;
+        }
+        // Keep within viewport vertically
+        if (tipTop + 100 > window.innerHeight) {
+            tipTop = window.innerHeight - 110;
+        }
+        previewEl.style.left = tipLeft + 'px';
+        previewEl.style.top = tipTop + 'px';
+        previewEl.classList.add('visible');
+    }
+
+    function hidePreview() {
+        if (!previewEl) return;
+        previewEl.innerHTML = '';
+        previewEl.classList.remove('visible');
+    }
+
+    function updateChips() {
+        if (!chipsEl) return;
+        chipsEl.querySelectorAll('.search-chip').forEach(function(chip) {
+            chip.classList.toggle('active', chip.getAttribute('data-filter') === activeFilter);
+        });
+    }
+
+    if (chipsEl) {
+        chipsEl.addEventListener('click', function(e) {
+            var chip = e.target.closest('.search-chip');
+            if (!chip) return;
+            activeFilter = chip.getAttribute('data-filter');
+            updateChips();
+            if (lastResults.length) renderResults(lastResults);
+        });
+    }
+
+    function updateFocus() {
+        var items = resultsEl.querySelectorAll('.search-result-item');
+        items.forEach(function(el, i) {
+            el.classList.toggle('focused', i === focusedIdx);
+            if (i === focusedIdx) {
+                el.scrollIntoView({ block: 'nearest' });
+                var idx = parseInt(el.getAttribute('data-idx'), 10);
+                var filtered = filterResults(lastResults);
+                if (filtered[idx]) showPreview(filtered[idx], el);
+            }
+        });
+    }
+
+    if (searchBtn) searchBtn.addEventListener('click', openSearch);
+    if (overlay) overlay.addEventListener('click', closeSearch);
+
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            if (modal.classList.contains('active')) closeSearch();
+            else openSearch();
+            return;
+        }
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') { closeSearch(); return; }
+        var items = resultsEl.querySelectorAll('.search-result-item');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            focusedIdx = Math.min(focusedIdx + 1, items.length - 1);
+            updateFocus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            focusedIdx = Math.max(focusedIdx - 1, 0);
+            updateFocus();
+        } else if (e.key === 'Enter' && focusedIdx >= 0 && items[focusedIdx]) {
+            e.preventDefault();
+            saveRecent(input.value.trim());
+            items[focusedIdx].click();
+        }
+    });
+
+    if (input) {
+        input.addEventListener('input', function() {
+            var query = input.value.trim();
+            if (query.length < 2 || !fuse) {
+                lastResults = [];
+                focusedIdx = -1;
+                hidePreview();
+                if (query.length === 0) { renderRecent(); }
+                else { resultsEl.innerHTML = '<div class="search-empty">Type to search across all content</div>'; }
+                return;
+            }
+            var results = fuse.search(query);
+            lastResults = results;
+            renderResults(results);
         });
     }
 })();

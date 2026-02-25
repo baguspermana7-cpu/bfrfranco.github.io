@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Center Carbon Footprint Calculator | CO₂ Emissions Estimator</title>
+    <meta name="description" content="Calculate data center carbon footprint and CO₂ emissions. Interactive calculator with grid emission factors, renewable energy offsets, and Scope 1-3 analysis.">
+    <meta name="keywords" content="Carbon Footprint Calculator, Data Center CO2 Emissions, Scope 1 2 3 Emissions, Carbon Intensity, Renewable Energy Credits, PPA, GHG Protocol, Net Zero Data Center">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#22c55e">
+    <link rel="canonical" href="https://resistancezero.com/carbon-footprint.html">
+
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/carbon-footprint.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/carbon-footprint.html">
+    <meta property="og:title" content="Data Center Carbon Footprint Calculator">
+    <meta property="og:description" content="Calculate CO₂ emissions from data center operations with grid factors, renewable offsets, and Scope 1-3 GHG Protocol analysis.">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="og:image" content="https://resistancezero.com/assets/carbon-footprint-og.jpg">
+    <meta property="og:image:alt" content="Data Center Carbon Footprint Calculator">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Center Carbon Footprint Calculator">
+    <meta name="twitter:description" content="Calculate CO₂ emissions with grid factors, renewables, and Scope 1-3 analysis.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/carbon-footprint-og.jpg">
+
+    <!-- Schema - WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Data Center Carbon Footprint Calculator",
+        "applicationCategory": "UtilityApplication",
+        "description": "Calculate data center carbon footprint and CO₂ emissions based on power consumption, grid emission factors, renewable energy mix, and GHG Protocol Scope 1-3 methodology.",
+        "url": "https://resistancezero.com/carbon-footprint.html",
+        "operatingSystem": "Web Browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Grid emission factor by country/region",
+            "Scope 1, 2, and 3 emissions breakdown",
+            "Renewable energy credit (REC) and PPA offsets",
+            "Carbon intensity benchmarking (kgCO₂/kWh IT)",
+            "Diesel generator emissions modeling",
+            "Annual and lifecycle carbon projections"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+
+    <!-- Structured Data - HowTo -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Calculate Data Center Carbon Footprint",
+        "description": "Estimate your data center's total carbon emissions using grid emission factors, on-site generation, renewable energy procurement, and GHG Protocol Scope 1-3 methodology.",
+        "totalTime": "PT4M",
+        "tool": [
+            {"@type": "HowToTool", "name": "Data Center Carbon Footprint Calculator"}
+        ],
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Enter Facility Power Profile",
+                "text": "Input your data center's IT load in MW and Power Usage Effectiveness (PUE) to calculate total facility energy consumption and baseline carbon footprint."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Select Grid Region and Emission Factor",
+                "text": "Choose your grid region to apply the correct carbon intensity factor (kgCO₂/kWh). Factors vary from 0.02 in Nordic hydro grids to 0.9+ in coal-heavy regions."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Configure Renewable Energy and Offsets",
+                "text": "Set your renewable energy procurement percentage via on-site generation, Power Purchase Agreements (PPAs), or Renewable Energy Credits (RECs) to calculate net emissions."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Review Scope 1-3 Emissions Breakdown",
+                "text": "Analyze your total carbon footprint across GHG Protocol scopes: Scope 1 (diesel generators, refrigerants), Scope 2 (purchased electricity), and Scope 3 (supply chain, embodied carbon)."
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ═══════════════════════════════════════════════════
+           CARBON FOOTPRINT CALCULATOR — GREEN THEME
+           Prefix: cf-
+           ═══════════════════════════════════════════════════ */
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+            --secondary-gradient: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            --dark-green: #15803d;
+            --medium-green: #16a34a;
+            --light-green: #22c55e;
+            --accent-green: #22c55e;
+            --accent-gold: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg-dark: rgba(21, 128, 61, 0.95);
+            --glass-border: rgba(34, 197, 94, 0.1);
+            --glass-blur: blur(20px);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+
+        /* ═══ PAGE BACKGROUND ═══ */
+        .page-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+            background:
+                radial-gradient(ellipse at top right, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(22, 163, 74, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(34, 197, 94, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        /* ═══ NAVIGATION ═══ */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-green); }
+        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); letter-spacing: -0.5px; }
+        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-green); }
+        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
+        .nav-link:hover { color: var(--dark-green); }
+        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25); }
+        .nav-back:hover { transform: translateY(-2px); }
+
+        /* ═══ NAVBAR AUTH ═══ */
+        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
+        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(139,92,246,0.3); white-space: nowrap; }
+        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,92,246,0.4); }
+        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
+        .nav-user-btn:hover { background: rgba(139,92,246,0.14); }
+        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
+        .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
+        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
+        .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
+        .nav-user-dropdown.show { display: block; }
+        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+        .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: white; }
+        .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
+        .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+        .nav-dd-logout:hover { background: #fef2f2; }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .main-content { position: relative; z-index: 10; padding-top: 80px; }
+
+        /* ═══ HERO ═══ */
+        .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 50px; font-size: 0.8rem; color: var(--accent-green); font-weight: 600; margin-bottom: 1.5rem; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
+
+        /* ═══ QUICK STATS ═══ */
+        .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
+        .quick-stat i { color: var(--accent-green); }
+
+        /* ═══ CALCULATOR LAYOUT ═══ */
+        .calculator-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .calculator-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
+
+        /* ═══ INPUT PANEL ═══ */
+        .input-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+        .input-section { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; cursor: pointer; }
+        .section-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        .section-subtitle { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* ═══ INPUT FIELDS ═══ */
+        .input-group { margin-bottom: 1rem; }
+        .input-group:last-child { margin-bottom: 0; }
+        .input-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
+        .input-field:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1); }
+        select.input-field { cursor: pointer; }
+
+        /* ═══ PRESET BUTTONS ═══ */
+        .preset-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .preset-btn { padding: 5px 12px; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 50px; background: rgba(34, 197, 94, 0.05); color: var(--accent-green); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+        .preset-btn:hover, .preset-btn.active { background: var(--accent-green); color: white; border-color: var(--accent-green); }
+
+        /* ═══ RANGE SLIDER ═══ */
+        .range-wrap { display: flex; align-items: center; gap: 12px; }
+        .range-wrap input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; background: #e2e8f0; border-radius: 3px; outline: none; }
+        .range-wrap input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-green); cursor: pointer; box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3); }
+        .range-wrap input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-green); cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3); }
+        .range-value { min-width: 48px; text-align: center; font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent-green); }
+
+        /* ═══ TOOLTIP SYSTEM ═══ */
+        .tooltip-trigger { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 50%; font-size: 10px; color: var(--accent-green); cursor: help; margin-left: auto; transition: all 0.3s; flex-shrink: 0; }
+        .tooltip-trigger:hover { background: rgba(34,197,94,0.2); transform: scale(1.1); }
+        .tooltip-trigger .tooltip-content { display: none; }
+
+        #tooltip-container { position: fixed; width: 320px; max-width: calc(100vw - 40px); padding: 16px; background: linear-gradient(135deg, #15803d, #16a34a); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); z-index: 999999; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.15s ease; color: white; font-size: 12px; line-height: 1.5; }
+        #tooltip-container.visible { opacity: 1; visibility: visible; }
+        #tooltip-container .tooltip-title { font-size: 13px; font-weight: 700; color: #bbf7d0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        #tooltip-container .tooltip-desc { color: rgba(255,255,255,0.9); }
+        #tooltip-container .tooltip-table { width: 100%; font-size: 11px; border-collapse: collapse; }
+        #tooltip-container .tooltip-table th { text-align: left; color: rgba(255,255,255,0.6); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        #tooltip-container .tooltip-table td { padding: 4px 0; }
+        #tooltip-container .tooltip-table td:last-child { text-align: right; color: #bbf7d0; }
+
+        /* ═══ RESULTS PANEL ═══ */
+        .results-panel { position: sticky; top: 100px; }
+        .results-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+
+        /* ═══ SCORE DISPLAY ═══ */
+        .score-display { text-align: center; padding: 1.5rem 0; }
+        .score-value { font-size: 3.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; }
+        .score-unit { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
+        .score-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
+        .score-grade { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-top: 0.75rem; }
+
+        /* ═══ METRIC GRID ═══ */
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
+        .metric-box { background: rgba(34, 197, 94, 0.04); border: 1px solid rgba(34, 197, 94, 0.1); border-radius: 10px; padding: 0.75rem; text-align: center; }
+        .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+        .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
+
+        /* ═══ TAB BAR ═══ */
+        .cf-tab-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        .cf-tab-btn { flex: 1; padding: 0.6rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; background: transparent; color: #64748b; }
+        .cf-tab-btn:hover { background: rgba(34,197,94,0.06); color: var(--medium-green); }
+        .cf-tab-btn.active { background: var(--primary-gradient); color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.3); }
+
+        /* ═══ TAB CONTENT ═══ */
+        .cf-tab-content { display: none; }
+        .cf-tab-content.active { display: block; }
+
+        /* ═══ TOOLBAR ═══ */
+        .cf-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 auto; max-width: 1400px; padding: 0 2rem 1.25rem; flex-wrap: wrap; }
+        .cf-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
+        .cf-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .cf-btn-free { background: transparent; color: #64748b; }
+        .cf-btn-free.active { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; box-shadow: 0 2px 8px rgba(6,182,212,0.3); }
+        .cf-btn-free:not(.active):hover { background: rgba(6,182,212,0.08); color: #0891b2; }
+        .cf-btn-pro { background: transparent; color: #64748b; }
+        .cf-btn-pro.active { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+        .cf-btn-pro:not(.active):hover { background: rgba(139,92,246,0.08); color: #8b5cf6; }
+        .cf-btn-pro.locked-hint { position: relative; }
+        .cf-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
+
+        /* ═══ MODE INDICATOR ═══ */
+        .cf-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
+        .cf-mode-indicator.free-active { display: inline-flex; background: rgba(6,182,212,0.1); color: #0891b2; }
+        .cf-mode-indicator.pro-active { display: inline-flex; background: rgba(139,92,246,0.1); color: #8b5cf6; }
+
+        /* ═══ TOOLBAR ACTIONS ═══ */
+        .cf-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .cf-btn-reset { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .cf-btn-reset:hover { border-color: var(--accent-green); color: var(--accent-green); background: rgba(34,197,94,0.04); }
+        .cf-btn-pdf { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); color: #ef4444; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .cf-btn-pdf:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
+        .cf-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
+
+        /* ═══ PRO SECTIONS ═══ */
+        .pro-section { position: relative; }
+        .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
+        .pro-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; pointer-events: all; cursor: pointer; }
+        .pro-section.locked .pro-overlay { display: flex; }
+        .pro-overlay i { font-size: 2rem; color: var(--accent-purple); }
+        .pro-overlay-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
+        .pro-overlay-btn { padding: 8px 20px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .pro-overlay-btn:hover { transform: translateY(-1px); }
+        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; font-size: 0.6rem; font-weight: 700; border-radius: 50px; letter-spacing: 0.5px; vertical-align: middle; }
+
+        /* ═══ PRO PANEL ═══ */
+        .cf-pro-panel { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem; }
+        .cf-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+        .cf-kpi-card { background: rgba(34, 197, 94, 0.04); border: 1px solid rgba(34, 197, 94, 0.1); border-radius: 12px; padding: 1rem; text-align: center; transition: all 0.3s; }
+        .cf-kpi-card:hover { border-color: rgba(34, 197, 94, 0.25); box-shadow: 0 4px 12px rgba(34,197,94,0.08); }
+        .cf-kpi-value { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--dark-green); line-height: 1.2; }
+        .cf-kpi-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; }
+
+        /* ═══ NARRATIVE ═══ */
+        .cf-narrative { border-left: 3px solid var(--accent-green); background: rgba(34, 197, 94, 0.04); padding: 1rem 1.25rem; border-radius: 0 10px 10px 0; margin-top: 1rem; }
+        .cf-narrative p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+        .cf-narrative strong { color: var(--dark-green); }
+
+        /* ═══ CHART CONTAINERS ═══ */
+        .charts-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .chart-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .chart-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+        .chart-container { position: relative; height: 280px; }
+
+        /* ═══ RECOMMENDATIONS ═══ */
+        .rec-section { margin-top: 1.25rem; }
+        .rec-title { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
+        .rec-card { display: flex; gap: 10px; padding: 0.75rem; background: rgba(34, 197, 94, 0.04); border: 1px solid rgba(34, 197, 94, 0.1); border-radius: 10px; margin-bottom: 0.5rem; }
+        .rec-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(34, 197, 94, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 0.8rem; flex-shrink: 0; }
+        .rec-text h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
+        .rec-text p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+        .rec-impact { font-size: 0.65rem; font-weight: 700; color: var(--accent-emerald); background: rgba(16, 185, 129, 0.08); padding: 2px 8px; border-radius: 50px; margin-top: 4px; display: inline-block; }
+
+        /* ═══ COMPARISON BAR ═══ */
+        .comparison-bar { height: 8px; border-radius: 4px; background: #e2e8f0; position: relative; margin: 8px 0 4px; }
+        .comparison-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .comparison-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
+
+        /* ═══ LOGIN MODAL ═══ */
+        @keyframes cfLoginIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .cf-login-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; }
+        .cf-login-overlay.show { display: flex; }
+        .cf-login-box { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(139,92,246,0.3); border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 400px; position: relative; animation: cfLoginIn 0.3s ease; }
+        .cf-login-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: #64748b; font-size: 1.4rem; cursor: pointer; padding: 4px; }
+        .cf-login-close:hover { color: #e2e8f0; }
+        .cf-login-box h3 { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.25rem; text-align: center; }
+        .cf-login-box .login-subtitle { font-size: 0.85rem; color: #64748b; text-align: center; margin-bottom: 1.5rem; }
+        .cf-login-box input[type="email"],
+        .cf-login-box input[type="password"] { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #f1f5f9; font-size: 0.9rem; font-family: inherit; margin-bottom: 12px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .cf-login-box input[type="email"]:focus,
+        .cf-login-box input[type="password"]:focus { border-color: rgba(139,92,246,0.6); }
+        .cf-login-submit { width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+        .cf-login-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.3); }
+        .cf-login-error { display: none; padding: 10px 14px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #ef4444; font-size: 0.82rem; margin-bottom: 12px; text-align: center; }
+        .cf-login-error.show { display: block; }
+        .cf-login-demo { margin-top: 1rem; padding: 12px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 10px; text-align: center; }
+        .cf-login-demo p { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
+        .cf-login-demo code { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #a78bfa; background: rgba(139,92,246,0.1); padding: 2px 6px; border-radius: 4px; }
+
+        /* ═══ PRIVACY BADGE ═══ */
+        .cf-privacy-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: 8px; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.75rem; }
+        .cf-privacy-badge i { color: var(--accent-green); font-size: 0.7rem; }
+
+        /* ═══ BENCHMARK META ═══ */
+        .cf-benchmark-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+        .cf-benchmark-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: 50px; font-size: 0.68rem; font-weight: 600; color: var(--medium-green); }
+
+        /* ═══ COOKIE BANNER ═══ */
+        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 2rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-top: 1px solid #e5e7eb; font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
+        .cookie-banner p { margin: 0; line-height: 1.5; }
+        .cookie-banner a { color: var(--dark-green); text-decoration: underline; }
+        .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
+        .cookie-accept { padding: 8px 20px; border-radius: 8px; border: none; background: var(--primary-gradient); color: white; font-weight: 600; font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .cookie-accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .cookie-decline { padding: 8px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: white; color: #6b7280; font-weight: 500; font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .cookie-decline:hover { background: #f3f4f6; color: #374151; }
+        @media (max-width: 768px) {
+            .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+        }
+
+        /* ═══ SCROLL TO TOP ═══ */
+        .scroll-top-btn { position: fixed; bottom: 24px; right: 24px; z-index: 200; width: 44px; height: 44px; border-radius: 12px; border: none; background: var(--medium-green); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(22,163,74,0.35); opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background 0.2s; }
+        .scroll-top-btn.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .scroll-top-btn:hover { background: var(--dark-green); box-shadow: 0 4px 16px rgba(21,128,61,0.45); }
+
+        /* ═══ FOOTER ═══ */
+        .footer { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem; }
+        .footer-container { max-width: 1200px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start; }
+        .footer-brand { font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.5rem; }
+        .footer-desc { font-size: 0.82rem; color: #64748b; line-height: 1.6; }
+        .footer-links-title { font-size: 0.78rem; font-weight: 700; color: #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+        .footer-link { display: block; font-size: 0.82rem; color: #64748b; text-decoration: none; padding: 4px 0; transition: color 0.2s; }
+        .footer-link:hover { color: var(--accent-green); }
+        .footer-bottom { text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: #475569; }
+
+        /* ═══ PRINT STYLES ═══ */
+        @media print {
+            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .navbar, .hero, .cf-toolbar, .cf-login-overlay, .nav-back, footer, .tooltip-trigger, .pro-overlay, .pro-badge, .preset-bar, .cookie-banner, .scroll-top-btn { display: none !important; }
+            .main-content { padding-top: 0 !important; }
+            .calculator-section { padding: 0 !important; }
+            .calculator-grid { display: block !important; }
+            .pro-section.locked > *:not(.pro-overlay) { filter: none !important; user-select: auto !important; pointer-events: auto !important; }
+            .results-panel { position: static !important; }
+            @page { margin: 1cm; size: A4; }
+        }
+
+        /* ═══ RESPONSIVE: 1024px ═══ */
+        @media (max-width: 1024px) {
+            .calculator-grid { grid-template-columns: 1fr; }
+            .results-panel { position: static; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .scroll-top-btn { bottom: 90px; right: 16px; }
+        }
+
+        /* ═══ RESPONSIVE: 768px ═══ */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 1.8rem; }
+            .score-value { font-size: 2.8rem; }
+            .metric-grid { grid-template-columns: 1fr; }
+            .cf-kpi-grid { grid-template-columns: 1fr 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .nav-user-email { display: none; }
+            .nav-login-btn .nav-login-text { display: none; }
+            .nav-login-btn { padding: 8px 12px; }
+            .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+        }
+
+        /* ═══ RESPONSIVE: 600px ═══ */
+        @media (max-width: 600px) {
+            .cf-toolbar { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+            .cf-mode-bar { width: 100%; }
+            .cf-toolbar-btn { flex: 1; justify-content: center; }
+            .cf-toolbar-actions { justify-content: center; }
+            .cf-tab-bar { flex-direction: column; }
+            .cf-tab-btn { justify-content: center; }
+            .preset-btn { padding: 4px 8px; font-size: 0.68rem; }
+            .quick-stats { gap: 1rem; }
+            .cf-kpi-grid { grid-template-columns: 1fr; }
+            .hero { padding: 2rem 1rem 1.5rem; }
+            .calculator-section { padding: 0 1rem; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+
+    <!-- ═══ NAVBAR ═══ -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">CO&#8322;</div>
+                <div>
+                    <div class="nav-title">Carbon Footprint</div>
+                    <div class="nav-subtitle">Life-Cycle Assessment</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
+                <a href="pue-calculator.html" class="nav-link" style="color: #06b6d4;">PUE Calc</a>
+                <a href="capex-calculator.html" class="nav-link" style="color: #f59e0b;">CAPEX Calc</a>
+                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
+                <a href="roi-calculator.html" class="nav-link" style="color: #3b82f6;">ROI Calc</a>
+                <a href="dcmoc/" class="nav-link" style="color: #ef4444;">DC MOC</a>
+                <div class="nav-auth-wrap" id="navAuthWrap">
+                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
+                        <i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span>
+                    </button>
+                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
+                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
+                        <span class="nav-user-email" id="navUserEmail"></span>
+                        <i class="fas fa-chevron-down nav-user-chevron"></i>
+                    </button>
+                    <div class="nav-user-dropdown" id="navUserDropdown">
+                        <div class="nav-dd-header">
+                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">PRO</div>
+                            <div class="nav-dd-email" id="navDdEmail"></div>
+                        </div>
+                        <button class="nav-dd-logout" onclick="logoutPremium()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+                <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+        <div class="hero-badge"><i class="fas fa-leaf"></i> Carbon Emissions Assessment</div>
+        <h1>DC Carbon Footprint Calculator</h1>
+        <p>Comprehensive GHG Protocol Scope 1/2/3 emissions analysis with life-cycle assessment and national carbon budget allocation for data centers</p>
+        <div class="quick-stats">
+            <span class="quick-stat"><i class="fas fa-globe"></i> 33 countries</span>
+            <span class="quick-stat"><i class="fas fa-chart-pie"></i> Scope 1/2/3 breakdown</span>
+            <span class="quick-stat"><i class="fas fa-recycle"></i> Cradle-to-grave LCA</span>
+            <span class="quick-stat"><i class="fas fa-flag"></i> Paris Agreement aligned</span>
+        </div>
+    </section>
+
+    <!-- ═══ TAB BAR ═══ -->
+    <div style="max-width:1400px;margin:0 auto 1rem;padding:0 2rem;">
+        <div class="cf-tab-bar">
+            <button class="cf-tab-btn active" data-tab="operational" onclick="switchTab('operational')">
+                <i class="fas fa-bolt"></i> Operational
+            </button>
+            <button class="cf-tab-btn" data-tab="lifecycle" onclick="switchTab('lifecycle')">
+                <i class="fas fa-recycle"></i> Life-Cycle
+            </button>
+            <button class="cf-tab-btn" data-tab="budget" onclick="switchTab('budget')">
+                <i class="fas fa-flag"></i> Carbon Budget
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ TOOLBAR ═══ -->
+    <div class="cf-toolbar" style="max-width:1400px;margin:0 auto 1.5rem;padding:0 2rem;">
+        <div class="cf-mode-bar">
+            <button class="cf-toolbar-btn cf-btn-free active" id="btnFreeMode" onclick="setMode('free')">
+                <i class="fas fa-chart-bar"></i> Free Assessment
+            </button>
+            <button class="cf-toolbar-btn cf-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
+                <i class="fas fa-crown"></i> Pro Analysis
+            </button>
+        </div>
+        <span class="cf-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
+        <div class="cf-toolbar-actions">
+            <button class="cf-btn-reset" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset</button>
+            <button class="cf-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+        </div>
+    </div>
+
+    <!-- ═══ CALCULATOR GRID ═══ -->
+    <section class="calculator-section">
+        <div class="calculator-grid">
+
+            <!-- ═══ INPUT PANEL ═══ -->
+            <div class="input-panel">
+
+                <!-- ══════════════════════════════════════════════ -->
+                <!-- TAB 1: OPERATIONAL                            -->
+                <!-- ══════════════════════════════════════════════ -->
+                <div class="cf-tab-content active" id="tabOperational">
+
+                    <!-- Section 1 - Facility Profile -->
+                    <div class="input-section" style="border-left:3px solid #22c55e;">
+                        <div class="section-header" style="background:rgba(34,197,94,0.1);">
+                            <i class="fas fa-server" style="color:#22c55e;"></i> Facility Profile
+                        </div>
+
+                        <label class="input-label">IT Load (kW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Electrical Load</div><div class="tooltip-desc">Total IT power draw at the rack level in kilowatts. This includes servers, storage, and networking equipment. Typical edge sites are 50-500 kW; enterprise 500 kW-5 MW; hyperscale 5-100 MW.</div></div></span></label>
+                        <div class="preset-group">
+                            <button class="preset-btn" onclick="setPreset('itLoad',100)">100kW Edge</button>
+                            <button class="preset-btn" onclick="setPreset('itLoad',500)">500kW Enterprise</button>
+                            <button class="preset-btn active" onclick="setPreset('itLoad',1000)">1MW Colo</button>
+                            <button class="preset-btn" onclick="setPreset('itLoad',5000)">5MW Hyperscale</button>
+                            <button class="preset-btn" onclick="setPreset('itLoad',10000)">10MW Mega</button>
+                        </div>
+                        <input type="number" class="input-field" id="itLoad" value="1000" min="50" max="100000" step="10" oninput="calculate()">
+
+                        <label class="input-label">Power Usage Effectiveness (PUE) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> PUE Rating</div><div class="tooltip-desc">Ratio of total facility power to IT equipment power. A PUE of 1.0 means all energy goes to IT; 2.0 means 50% is overhead. Global average is ~1.58. Best-in-class hyperscalers achieve 1.1-1.2.</div></div></span></label>
+                        <div class="preset-group">
+                            <button class="preset-btn" onclick="setPreset('pueValue',1.2)">1.2 Best</button>
+                            <button class="preset-btn" onclick="setPreset('pueValue',1.4)">1.4 Good</button>
+                            <button class="preset-btn active" onclick="setPreset('pueValue',1.58)">1.58 Average</button>
+                            <button class="preset-btn" onclick="setPreset('pueValue',1.8)">1.8 Legacy</button>
+                            <button class="preset-btn" onclick="setPreset('pueValue',2.0)">2.0 Poor</button>
+                        </div>
+                        <input type="number" class="input-field" id="pueValue" value="1.58" min="1.1" max="2.5" step="0.01" oninput="calculate()">
+                    </div>
+
+                    <!-- Section 2 - Location & Grid -->
+                    <div class="input-section" style="border-left:3px solid #3b82f6;">
+                        <div class="section-header" style="background:rgba(59,130,246,0.1);">
+                            <i class="fas fa-globe" style="color:#3b82f6;"></i> Location &amp; Grid
+                        </div>
+
+                        <label class="input-label">Country <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-map-marker-alt"></i> Data Center Location</div><div class="tooltip-desc">Select the country where your data center is located. This determines grid carbon intensity, electricity rates, and applicable carbon regulations. Each country has unique emission factors based on its energy mix.</div></div></span></label>
+                        <select class="input-field" id="countrySelect" onchange="calculate()">
+                            <optgroup label="APAC">
+                                <option value="ID">Indonesia</option>
+                                <option value="SG">Singapore</option>
+                                <option value="MY">Malaysia</option>
+                                <option value="TH">Thailand</option>
+                                <option value="VN">Vietnam</option>
+                                <option value="PH">Philippines</option>
+                                <option value="IN">India</option>
+                                <option value="CN">China</option>
+                                <option value="JP">Japan</option>
+                                <option value="KR">South Korea</option>
+                                <option value="AU">Australia</option>
+                                <option value="NZ">New Zealand</option>
+                                <option value="TW">Taiwan</option>
+                            </optgroup>
+                            <optgroup label="EMEA">
+                                <option value="GB">United Kingdom</option>
+                                <option value="DE">Germany</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="IE">Ireland</option>
+                                <option value="FR">France</option>
+                                <option value="SE">Sweden</option>
+                                <option value="PL">Poland</option>
+                                <option value="PT">Portugal</option>
+                            </optgroup>
+                            <optgroup label="Americas">
+                                <option value="US" selected>United States</option>
+                            </optgroup>
+                            <optgroup label="MENA">
+                                <option value="AE">UAE</option>
+                                <option value="SA">Saudi Arabia</option>
+                                <option value="QA">Qatar</option>
+                            </optgroup>
+                            <optgroup label="Africa">
+                                <option value="ZA">South Africa</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="KE">Kenya</option>
+                            </optgroup>
+                            <optgroup label="LATAM">
+                                <option value="BR">Brazil</option>
+                                <option value="CL">Chile</option>
+                                <option value="MX">Mexico</option>
+                                <option value="CO">Colombia</option>
+                            </optgroup>
+                        </select>
+
+                        <label class="input-label">Grid Carbon Intensity (kgCO&#8322;/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> Grid Emission Factor</div><div class="tooltip-desc">Carbon dioxide equivalent emitted per kilowatt-hour of grid electricity. Auto-populated based on selected country. Reflects the national energy generation mix including coal, gas, nuclear, and renewables.</div></div></span></label>
+                        <input type="number" class="input-field" id="gridIntensity" value="0.39" step="0.001" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">Electricity Rate ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Industrial Electricity Price</div><div class="tooltip-desc">Average industrial electricity rate in USD per kWh for the selected country. Used to estimate operational costs and carbon tax impact. Auto-populated from IEA and regional utility data.</div></div></span></label>
+                        <input type="number" class="input-field" id="electricityRate" value="0.07" step="0.001" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                    </div>
+
+                    <!-- Section 3 - Cooling System -->
+                    <div class="input-section" style="border-left:3px solid #06b6d4;">
+                        <div class="section-header" style="background:rgba(6,182,212,0.1);">
+                            <i class="fas fa-snowflake" style="color:#06b6d4;"></i> Cooling System
+                        </div>
+
+                        <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Technology</div><div class="tooltip-desc">Primary cooling method used in the facility. Different cooling types use different refrigerants with varying Global Warming Potential. Direct liquid cooling systems use low-GWP refrigerants like R-1234ze (GWP=7) vs traditional R-410A (GWP=2088).</div></div></span></label>
+                        <select class="input-field" id="coolingType" onchange="calculate()">
+                            <option value="air_crac">Air / CRAC (R-410A)</option>
+                            <option value="inrow">In-Row (R-410A)</option>
+                            <option value="rdhx">RDHX (R-134a)</option>
+                            <option value="dlc">Direct Liquid (R-1234ze)</option>
+                        </select>
+
+                        <label class="input-label">Refrigerant GWP <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-thermometer-half"></i> Global Warming Potential</div><div class="tooltip-desc">Global Warming Potential of the refrigerant relative to CO2. R-410A has a GWP of 2088, meaning 1 kg leaked equals 2088 kg CO2 equivalent. Low-GWP alternatives like R-1234ze (GWP=7) dramatically reduce Scope 1 fugitive emissions.</div></div></span></label>
+                        <input type="number" class="input-field" id="gwpValue" value="2088" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">Refrigerant Charge (kg/kW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-weight-hanging"></i> Refrigerant Charge Rate</div><div class="tooltip-desc">Amount of refrigerant per kilowatt of cooling capacity. Traditional CRAC units require more refrigerant per kW than modern in-row or direct liquid systems. This factor is auto-populated based on your selected cooling type.</div></div></span></label>
+                        <input type="number" class="input-field" id="chargePerKw" value="0.35" step="0.01" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">Annual Leak Rate (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wind"></i> Refrigerant Leak Rate</div><div class="tooltip-desc">Percentage of total refrigerant charge that leaks annually. Industry average is 5-10% for older DX systems. Well-maintained chilled water systems can achieve 2-3%. Fugitive refrigerant leaks are a major Scope 1 emission source.</div></div></span></label>
+                        <input type="number" class="input-field" id="leakRate" value="5" min="1" max="15" step="0.5" oninput="calculate()">
+                    </div>
+
+                    <!-- Section 4 - Backup Power -->
+                    <div class="input-section" style="border-left:3px solid #f59e0b;">
+                        <div class="section-header" style="background:rgba(245,158,11,0.1);">
+                            <i class="fas fa-gas-pump" style="color:#f59e0b;"></i> Backup Power
+                        </div>
+
+                        <label class="input-label">Generator Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-gas-pump"></i> Backup Generator Fuel</div><div class="tooltip-desc">Type of fuel used in backup generators. Standard diesel emits 2.68 kgCO2 per liter. HVO (Hydrotreated Vegetable Oil) biodiesel is a drop-in replacement that reduces emissions by ~80% with a factor of 0.54 kgCO2/L.</div></div></span></label>
+                        <select class="input-field" id="genType" onchange="calculate()">
+                            <option value="diesel">Diesel (2.68 kgCO&#8322;/L)</option>
+                            <option value="hvo">HVO Biodiesel (0.54 kgCO&#8322;/L)</option>
+                        </select>
+
+                        <label class="input-label">Annual Generator Test Hours: <span id="genHoursVal">200</span>h <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-clock"></i> Generator Run Hours</div><div class="tooltip-desc">Total annual hours that backup generators operate, including monthly testing (typically 1-2h/month), load bank tests, and unplanned outages. More testing hours improve reliability but increase Scope 1 direct emissions from fuel combustion.</div></div></span></label>
+                        <input type="range" class="range-slider" id="genHours" min="50" max="500" value="200" step="10" oninput="document.getElementById('genHoursVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>50h</span><span>500h</span></div>
+                    </div>
+
+                    <!-- Section 5 - Renewable Energy -->
+                    <div class="input-section" style="border-left:3px solid #eab308;">
+                        <div class="section-header" style="background:rgba(234,179,8,0.1);">
+                            <i class="fas fa-sun" style="color:#eab308;"></i> Renewable Energy
+                        </div>
+
+                        <label class="input-label">Renewable Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-solar-panel"></i> Renewable Energy Approach</div><div class="tooltip-desc">Method of procuring renewable energy. On-site solar PV provides direct generation. Solar + BESS adds battery storage for 24/7 matching. 100% PPA (Power Purchase Agreement) or Green Tariff procures certified renewable electricity from off-site wind/solar farms.</div></div></span></label>
+                        <select class="input-field" id="renewableType" onchange="calculate()">
+                            <option value="none">None</option>
+                            <option value="solar">On-site Solar PV</option>
+                            <option value="solar_bess">Solar + BESS</option>
+                            <option value="ppa">100% PPA (Green Tariff)</option>
+                        </select>
+
+                        <label class="input-label">Renewable Coverage: <span id="renewablePctVal">0</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Renewable Energy Coverage</div><div class="tooltip-desc">Percentage of total facility electricity consumption offset by renewable energy sources. At 100%, all grid electricity is matched with renewable generation or certificates. This directly reduces Scope 2 market-based emissions.</div></div></span></label>
+                        <input type="range" class="range-slider" id="renewablePct" min="0" max="100" value="0" step="5" oninput="document.getElementById('renewablePctVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+                    </div>
+
+                </div><!-- /tabOperational -->
+
+                <!-- ══════════════════════════════════════════════ -->
+                <!-- TAB 2: LIFE-CYCLE                             -->
+                <!-- ══════════════════════════════════════════════ -->
+                <div class="cf-tab-content" id="tabLifecycle">
+
+                    <!-- Section 6 - Building & Construction -->
+                    <div class="input-section" style="border-left:3px solid #64748b;">
+                        <div class="section-header" style="background:rgba(100,116,139,0.1);">
+                            <i class="fas fa-building" style="color:#64748b;"></i> Building &amp; Construction
+                        </div>
+
+                        <label class="input-label">Facility Size (MW IT) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ruler-combined"></i> Facility IT Capacity</div><div class="tooltip-desc">Total IT power capacity in megawatts. This is linked to the IT Load value from the Operational tab and determines the building footprint, structural steel, and concrete quantities for embodied carbon calculations per EN 15978 LCA stages A1-A5.</div></div></span></label>
+                        <input type="number" class="input-field" id="facilityMW" value="1" min="0.1" max="200" step="0.1" oninput="calculate()">
+
+                        <label class="input-label">Building Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-warehouse"></i> Construction Type</div><div class="tooltip-desc">The type of building construction affects embodied carbon significantly. Purpose-built data centers use optimized designs. Converted warehouses reuse existing structures (lower embodied carbon). Modular/prefab facilities are manufactured off-site with standardized components.</div></div></span></label>
+                        <select class="input-field" id="buildingType" onchange="calculate()">
+                            <option value="purpose_built">Purpose-built</option>
+                            <option value="converted">Converted warehouse</option>
+                            <option value="modular">Modular / prefab</option>
+                        </select>
+
+                        <label class="input-label">Concrete Grade <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-cubes"></i> Concrete Specification</div><div class="tooltip-desc">Concrete grade determines embodied carbon intensity. Standard C30 emits ~150 kgCO2e per ton. High-strength C40 emits ~250 kgCO2e/ton but uses less volume. Low-carbon mixes with 50% GGBS (Ground Granulated Blast-furnace Slag) can reduce embodied carbon to ~100 kgCO2e/ton.</div></div></span></label>
+                        <select class="input-field" id="concreteGrade" onchange="calculate()">
+                            <option value="c30">C30 standard (150 kgCO&#8322;e/ton)</option>
+                            <option value="c40">C40 high-strength (250 kgCO&#8322;e/ton)</option>
+                            <option value="lowcarbon">Low-carbon 50% GGBS (100 kgCO&#8322;e/ton)</option>
+                        </select>
+
+                        <label class="input-label">Steel Sourcing <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-industry"></i> Structural Steel Source</div><div class="tooltip-desc">Steel production method significantly impacts embodied carbon. World average (30% recycled) emits 1850 kgCO2e/ton. Electric Arc Furnace (EAF) with 90%+ recycled content emits only 500 kgCO2e/ton. Virgin Basic Oxygen Furnace (BOF) steel emits 2200 kgCO2e/ton. Data from ICE Database v4.1.</div></div></span></label>
+                        <select class="input-field" id="steelSource" onchange="calculate()">
+                            <option value="world_avg">World average 30% recycled (1850 kgCO&#8322;e/ton)</option>
+                            <option value="eaf">EAF recycled 90%+ (500 kgCO&#8322;e/ton)</option>
+                            <option value="bof">Virgin BOF (2200 kgCO&#8322;e/ton)</option>
+                        </select>
+
+                        <label class="input-label">Seismic Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-mountain"></i> Seismic Design Category</div><div class="tooltip-desc">Higher seismic zones require more structural reinforcement, increasing steel and concrete quantities by 10-40%. Zone 0 has no seismic requirements. Zone 4 (very high) requires base isolation, moment frames, and additional structural mass, significantly increasing embodied carbon.</div></div></span></label>
+                        <select class="input-field" id="seismicZone" onchange="calculate()">
+                            <option value="0">0 - None</option>
+                            <option value="1">1 - Low</option>
+                            <option value="2">2 - Moderate</option>
+                            <option value="3">3 - High</option>
+                            <option value="4">4 - Very High</option>
+                        </select>
+                    </div>
+
+                    <!-- Section 7 - MEP Equipment -->
+                    <div class="input-section" style="border-left:3px solid #8b5cf6;">
+                        <div class="section-header" style="background:rgba(139,92,246,0.1);">
+                            <i class="fas fa-plug" style="color:#8b5cf6;"></i> MEP Equipment
+                        </div>
+
+                        <label class="input-label">UPS Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-full"></i> UPS Topology</div><div class="tooltip-desc">Uninterruptible Power Supply type affects both embodied carbon (manufacturing) and operational efficiency. Modular UPS systems are lighter and can be right-sized. Standalone double-conversion UPS units are heavier with more copper and steel per kW.</div></div></span></label>
+                        <select class="input-field" id="upsTypeLCA" onchange="calculate()">
+                            <option value="modular">Modular</option>
+                            <option value="standalone">Standalone double-conversion</option>
+                        </select>
+
+                        <label class="input-label">Battery Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-car-battery"></i> Battery Chemistry</div><div class="tooltip-desc">Battery chemistry determines embodied carbon per kWh of storage. VRLA Lead-Acid emits 68 kgCO2e/kWh with a 5-year life. Li-ion LFP emits 62 kgCO2e/kWh with a 10-year life. Li-ion NMC emits 74 kgCO2e/kWh but offers higher energy density.</div></div></span></label>
+                        <select class="input-field" id="batteryType" onchange="calculate()">
+                            <option value="vrla">VRLA Lead-Acid (68 kgCO&#8322;e/kWh)</option>
+                            <option value="lfp">Li-ion LFP (62 kgCO&#8322;e/kWh)</option>
+                            <option value="nmc">Li-ion NMC (74 kgCO&#8322;e/kWh)</option>
+                        </select>
+
+                        <label class="input-label">Battery Runtime <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hourglass-half"></i> UPS Runtime Duration</div><div class="tooltip-desc">Duration the UPS battery system can support the full IT load during a power outage. Longer runtime requires more battery capacity, increasing embodied carbon. 5 minutes is typical for generator-backed sites; 15-30 minutes for sites without generators.</div></div></span></label>
+                        <select class="input-field" id="batteryRuntime" onchange="calculate()">
+                            <option value="5">5 minutes</option>
+                            <option value="10">10 minutes</option>
+                            <option value="15">15 minutes</option>
+                            <option value="30">30 minutes</option>
+                        </select>
+
+                        <label class="input-label">Redundancy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Power Redundancy Level</div><div class="tooltip-desc">Infrastructure redundancy level per Uptime Institute tiers. N = no redundancy. N+1 = one extra unit. 2N = fully duplicated. 2N+1 = duplicated plus one extra. Higher redundancy multiplies equipment quantities and embodied carbon proportionally.</div></div></span></label>
+                        <select class="input-field" id="redundancyLCA" onchange="calculate()">
+                            <option value="N">N</option>
+                            <option value="N1">N+1</option>
+                            <option value="2N">2N</option>
+                            <option value="2N1">2N+1</option>
+                        </select>
+                    </div>
+
+                    <!-- Section 8 - IT Equipment -->
+                    <div class="input-section" style="border-left:3px solid #6366f1;">
+                        <div class="section-header" style="background:rgba(99,102,241,0.1);">
+                            <i class="fas fa-microchip" style="color:#6366f1;"></i> IT Equipment
+                        </div>
+
+                        <label class="input-label">Workload Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Workload Profile</div><div class="tooltip-desc">Determines the embodied carbon per server. Traditional enterprise servers emit ~1200 kgCO2e each. AI/GPU servers (e.g., NVIDIA H100) have higher embodied carbon at ~4000 kgCO2e due to complex GPU manufacturing. Newer B200+ GPUs improve to ~3500 kgCO2e per server.</div></div></span></label>
+                        <select class="input-field" id="workloadType" onchange="calculate()">
+                            <option value="traditional">Traditional Enterprise (1200 kgCO&#8322;e/server)</option>
+                            <option value="cloud">Cloud / Hyperscale (1200 kgCO&#8322;e/server)</option>
+                            <option value="ai_h100">AI / GPU H100 (4000 kgCO&#8322;e/server)</option>
+                            <option value="ai_b200">AI / GPU B200+ (3500 kgCO&#8322;e/server)</option>
+                        </select>
+
+                        <label class="input-label">Servers per MW <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Server Density</div><div class="tooltip-desc">Number of servers that fit in 1 MW of IT load, auto-calculated based on workload type. Traditional servers average ~5 kW each (~200/MW). AI GPU servers average ~10 kW each (~100/MW). This determines total embodied carbon from IT equipment manufacturing.</div></div></span></label>
+                        <input type="number" class="input-field" id="serversPerMW" value="200" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">Server Refresh Cycle: <span id="serverRefreshVal">4</span> years <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-sync"></i> Server Replacement Cycle</div><div class="tooltip-desc">How often servers are replaced with new hardware. Shorter cycles increase total embodied carbon over the project lifetime. Industry standard is 3-5 years. Extending to 6-7 years reduces embodied carbon but may increase operational energy use from less efficient hardware.</div></div></span></label>
+                        <input type="range" class="range-slider" id="serverRefresh" min="3" max="7" value="4" step="1" oninput="document.getElementById('serverRefreshVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>3 yr</span><span>7 yr</span></div>
+
+                        <label class="input-label">Network Refresh Cycle: <span id="networkRefreshVal">5</span> years <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-network-wired"></i> Network Equipment Cycle</div><div class="tooltip-desc">Replacement cycle for switches, routers, and network infrastructure. Network gear typically has a longer useful life than servers. Embodied carbon per network device is lower than servers but the total count can be significant in large deployments.</div></div></span></label>
+                        <input type="range" class="range-slider" id="networkRefresh" min="4" max="8" value="5" step="1" oninput="document.getElementById('networkRefreshVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>4 yr</span><span>8 yr</span></div>
+
+                        <label class="input-label">Project Lifetime: <span id="projectLifetimeVal">20</span> years <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Facility Operational Lifetime</div><div class="tooltip-desc">Total expected operational life of the data center facility. Determines how many IT refresh cycles occur and amortizes building embodied carbon. Typical range is 15-25 years for purpose-built facilities, though some operate 30+ years with major refurbishments.</div></div></span></label>
+                        <input type="range" class="range-slider" id="projectLifetime" min="15" max="30" value="20" step="1" oninput="document.getElementById('projectLifetimeVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>15 yr</span><span>30 yr</span></div>
+                    </div>
+
+                    <!-- Section 9 - Transport & Construction -->
+                    <div class="input-section" style="border-left:3px solid #6b7280;">
+                        <div class="section-header" style="background:rgba(107,114,128,0.1);">
+                            <i class="fas fa-truck" style="color:#6b7280;"></i> Transport &amp; Construction
+                        </div>
+
+                        <label class="input-label">Equipment Origin <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-map-signs"></i> Supply Chain Distance</div><div class="tooltip-desc">Average distance that major equipment (UPS, generators, cooling units, switchgear) travels from manufacturer to site. Local sourcing under 500 km has minimal transport emissions. International shipments over 5000 km can add 2-5% to total embodied carbon.</div></div></span></label>
+                        <select class="input-field" id="equipOrigin" onchange="calculate()">
+                            <option value="local">Local &lt;500km</option>
+                            <option value="regional">Regional 500-2000km</option>
+                            <option value="international">International &gt;5000km</option>
+                        </select>
+
+                        <label class="input-label">Transport Mode <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shipping-fast"></i> Primary Transport Method</div><div class="tooltip-desc">Mode of transport for heavy equipment delivery. Truck-only is typical for local. Truck+Ship is standard for international heavy cargo (lowest per-ton-km emissions). Truck+Air is used for urgent or specialized components but has ~50x higher emissions than sea freight.</div></div></span></label>
+                        <select class="input-field" id="transportMode" onchange="calculate()">
+                            <option value="truck">Truck only</option>
+                            <option value="truck_ship">Truck + Ship</option>
+                            <option value="truck_air">Truck + Air</option>
+                        </select>
+
+                        <label class="input-label">Construction Duration <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hard-hat"></i> Build Timeline</div><div class="tooltip-desc">Total construction duration from ground-breaking to commissioning. Longer construction periods mean more on-site diesel consumption (cranes, excavators, generators), worker transport emissions, and temporary facility energy use. Modular builds typically complete faster.</div></div></span></label>
+                        <select class="input-field" id="constructDuration" onchange="calculate()">
+                            <option value="12">12 months</option>
+                            <option value="18">18 months</option>
+                            <option value="24">24 months</option>
+                            <option value="36">36 months</option>
+                        </select>
+                    </div>
+
+                    <!-- Section 10 - End-of-Life -->
+                    <div class="input-section" style="border-left:3px solid #10b981;">
+                        <div class="section-header" style="background:rgba(16,185,129,0.1);">
+                            <i class="fas fa-recycle" style="color:#10b981;"></i> End-of-Life
+                        </div>
+
+                        <label class="input-label">Decommission Plan <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wrench"></i> End-of-Life Strategy</div><div class="tooltip-desc">Approach to facility decommissioning at end of operational life. Full demolition has the highest end-of-life carbon. Partial refit preserves the shell structure. Building reuse retains the entire structure for a new purpose, earning carbon credits under LCA stage D.</div></div></span></label>
+                        <select class="input-field" id="decommPlan" onchange="calculate()">
+                            <option value="demolition">Full demolition</option>
+                            <option value="refit">Partial refit</option>
+                            <option value="reuse">Building reuse</option>
+                        </select>
+
+                        <label class="input-label">E-waste Program <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-trash-restore"></i> IT Equipment Recycling</div><div class="tooltip-desc">E-waste recycling and recovery program for decommissioned IT equipment. Standard recycling recovers ~80% of materials. Advanced recovery reaches 90% with precious metal extraction. Circular programs achieve 95% through refurbishment, component reuse, and certified recycling partners.</div></div></span></label>
+                        <select class="input-field" id="ewaste" onchange="calculate()">
+                            <option value="standard">Standard recycling 80%</option>
+                            <option value="advanced">Advanced recovery 90%</option>
+                            <option value="circular">Circular program 95%</option>
+                        </select>
+
+                        <label class="input-label">Steel Recycling Rate: <span id="steelRecycleVal">92</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dumpster"></i> Structural Steel Recovery</div><div class="tooltip-desc">Percentage of structural steel recovered and recycled at end of life. Steel is highly recyclable with typical recovery rates of 85-98%. Higher rates reduce the net embodied carbon through avoided virgin production credits in LCA stage D (benefits beyond system boundary).</div></div></span></label>
+                        <input type="range" class="range-slider" id="steelRecycle" min="80" max="98" value="92" step="1" oninput="document.getElementById('steelRecycleVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>80%</span><span>98%</span></div>
+
+                        <label class="input-label">Copper Recycling Rate: <span id="copperRecycleVal">85</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ring"></i> Copper Cable Recovery</div><div class="tooltip-desc">Percentage of copper from cabling, busbars, and transformers recovered at end of life. Copper recycling saves ~4 kgCO2e per kg compared to virgin production. Rates of 85-95% are achievable with dedicated cable stripping and separation processes.</div></div></span></label>
+                        <input type="range" class="range-slider" id="copperRecycle" min="80" max="95" value="85" step="1" oninput="document.getElementById('copperRecycleVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>80%</span><span>95%</span></div>
+                    </div>
+
+                </div><!-- /tabLifecycle -->
+
+                <!-- ══════════════════════════════════════════════ -->
+                <!-- TAB 3: CARBON BUDGET                          -->
+                <!-- ══════════════════════════════════════════════ -->
+                <div class="cf-tab-content" id="tabBudget">
+
+                    <!-- Section 11 - Country NDC Profile -->
+                    <div class="input-section" style="border-left:3px solid #ef4444;">
+                        <div class="section-header" style="background:rgba(239,68,68,0.1);">
+                            <i class="fas fa-flag" style="color:#ef4444;"></i> Country NDC Profile
+                        </div>
+
+                        <label class="input-label">Country <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-flag"></i> NDC Country Reference</div><div class="tooltip-desc">This mirrors the country selected in the Location &amp; Grid tab. Each country has Nationally Determined Contributions (NDCs) under the Paris Agreement with specific reduction targets and timelines. The NDC data auto-populates based on your selected location.</div></div></span></label>
+                        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.75rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;font-size:0.85rem;">
+                            <i class="fas fa-sync-alt" style="color:#3b82f6;"></i> Same as Location &amp; Grid tab &mdash; <strong id="budgetCountryName">United States</strong>
+                        </div>
+
+                        <label class="input-label">NDC Target Year <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> NDC Commitment Year</div><div class="tooltip-desc">The year by which the country pledges to achieve its Nationally Determined Contribution target under the Paris Agreement. Most countries have targets for 2030, with some extending to 2035 or 2050 for net-zero commitments.</div></div></span></label>
+                        <input type="text" class="input-field" id="ndcYear" value="2030" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">NDC Reduction Target <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> Emissions Reduction Pledge</div><div class="tooltip-desc">The country's pledged percentage reduction in greenhouse gas emissions compared to a baseline year (varies by country). For example, the US targets 50-52% below 2005 levels by 2030. The EU targets 55% below 1990 levels by 2030.</div></div></span></label>
+                        <input type="text" class="input-field" id="ndcTarget" value="50-52% below 2005 levels" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">Current Total Emissions (MtCO&#8322;) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-smog"></i> National GHG Emissions</div><div class="tooltip-desc">The country's total annual greenhouse gas emissions in megatons of CO2 equivalent. This provides context for the data center sector's proportional share of national emissions and helps assess sector-level carbon budget allocation.</div></div></span></label>
+                        <input type="number" class="input-field" id="totalEmissions" value="5222" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">DC Sector Share: <span id="dcShareVal">3.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Data Center Energy Share</div><div class="tooltip-desc">Estimated percentage of national electricity consumption attributed to data centers. Globally this ranges from 1-4%, but in data center hubs like Ireland (18%), Singapore (7%), or Virginia (25%+ of local grid), the share is much higher. This determines the DC sector's fair share of the national carbon budget.</div></div></span></label>
+                        <input type="range" class="range-slider" id="dcShare" min="0.5" max="10" value="3.5" step="0.1" oninput="document.getElementById('dcShareVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>0.5%</span><span>10%</span></div>
+
+                        <label class="input-label">DC Sector Growth Rate: <span id="dcGrowthVal">15</span>%/yr <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-bar"></i> Annual DC Growth Rate</div><div class="tooltip-desc">Projected annual growth rate of data center capacity in the selected country. AI-driven demand is pushing growth rates to 15-30% in major markets. Higher growth means the sector's share of the carbon budget must be split among more facilities, reducing per-MW allocation.</div></div></span></label>
+                        <input type="range" class="range-slider" id="dcGrowth" min="5" max="30" value="15" step="1" oninput="document.getElementById('dcGrowthVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>5%/yr</span><span>30%/yr</span></div>
+                    </div>
+
+                    <!-- Section 12 - Carbon Budget Parameters -->
+                    <div class="input-section" style="border-left:3px solid #8b5cf6;">
+                        <div class="section-header" style="background:rgba(139,92,246,0.1);">
+                            <i class="fas fa-chart-pie" style="color:#8b5cf6;"></i> Carbon Budget Parameters
+                        </div>
+
+                        <label class="input-label">Budget Period <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-check"></i> Assessment Timeframe</div><div class="tooltip-desc">The time period over which the cumulative carbon budget is calculated. Shorter periods (2025-2030) align with near-term NDC targets. Longer periods (2025-2050) align with net-zero commitments. The budget methodology determines how emissions are distributed across this period.</div></div></span></label>
+                        <select class="input-field" id="budgetPeriod" onchange="calculate()">
+                            <option value="2030">2025-2030</option>
+                            <option value="2035">2025-2035</option>
+                            <option value="2040">2025-2040</option>
+                            <option value="2050">2025-2050</option>
+                        </select>
+
+                        <label class="input-label">Budget Methodology <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-sliders-h"></i> Reduction Pathway Shape</div><div class="tooltip-desc">How the carbon budget is distributed over the budget period. Linear decline reduces emissions evenly each year. Front-loaded requires steeper initial cuts (more ambitious). Back-loaded allows higher near-term emissions but requires rapid reduction later (higher cumulative risk).</div></div></span></label>
+                        <select class="input-field" id="budgetMethod" onchange="calculate()">
+                            <option value="linear">Linear decline</option>
+                            <option value="front">Front-loaded reduction</option>
+                            <option value="back">Back-loaded</option>
+                        </select>
+
+                        <label class="input-label">Cumulative DC Budget (MtCO&#8322;) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-database"></i> Sector Carbon Budget</div><div class="tooltip-desc">Total cumulative CO2 emissions allowed for the data center sector in this country over the budget period. Calculated from the national carbon budget, DC sector share, and growth projections. This is the "carbon pie" that all data centers in the country must share.</div></div></span></label>
+                        <input type="number" class="input-field" id="cumulBudget" value="--" readonly style="background:#f1f5f9;cursor:not-allowed;">
+
+                        <label class="input-label">Annual Budget per MW (tCO&#8322;/MW/yr) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> Per-MW Carbon Allocation</div><div class="tooltip-desc">Your facility's fair share of the national DC sector carbon budget, expressed as tons of CO2 per MW of IT load per year. If your actual emissions exceed this budget, you are consuming more than your fair share of the national carbon budget. Values below 1000 tCO2/MW/yr typically require significant renewable energy procurement.</div></div></span></label>
+                        <input type="number" class="input-field" id="annualBudgetPerMW" value="--" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                    </div>
+
+                    <!-- Section 13 - Workload Allocation -->
+                    <div class="input-section" style="border-left:3px solid #6366f1;">
+                        <div class="section-header" style="background:rgba(99,102,241,0.1);">
+                            <i class="fas fa-layer-group" style="color:#6366f1;"></i> Workload Allocation
+                        </div>
+
+                        <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.75rem;padding:0.5rem 0.75rem;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
+                            <i class="fas fa-info-circle" style="color:#6366f1;margin-right:4px;"></i> Sliders must sum to 100%. Different workloads have different carbon intensity and economic value per MWh.
+                        </div>
+
+                        <label class="input-label">AI Training: <span id="wlTrainingVal">15</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-brain"></i> AI Model Training</div><div class="tooltip-desc">Percentage of IT load dedicated to AI/ML model training workloads. Training is the most energy-intensive workload per unit of economic output but is typically a transient burst workload. Carbon allocation per MWh for training is debated due to its high societal value potential.</div></div></span></label>
+                        <input type="range" class="range-slider" id="wlTraining" min="0" max="100" value="15" step="5" oninput="document.getElementById('wlTrainingVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+
+                        <label class="input-label">AI Inference: <span id="wlInferenceVal">20</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-robot"></i> AI Inference Serving</div><div class="tooltip-desc">Percentage of IT load for AI inference (serving predictions/responses). Inference typically uses 60-90% of AI compute but at lower per-request energy than training. Rapidly growing workload segment driven by LLM adoption, autonomous systems, and real-time AI applications.</div></div></span></label>
+                        <input type="range" class="range-slider" id="wlInference" min="0" max="100" value="20" step="5" oninput="document.getElementById('wlInferenceVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+
+                        <label class="input-label">Cloud SaaS/IaaS: <span id="wlCloudVal">30</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-cloud"></i> Cloud Computing</div><div class="tooltip-desc">Percentage of IT load running cloud services including SaaS applications and IaaS virtual machines. Cloud workloads benefit from high utilization rates and elastic scaling, typically achieving better carbon efficiency per unit of compute than on-premises enterprise IT.</div></div></span></label>
+                        <input type="range" class="range-slider" id="wlCloud" min="0" max="100" value="30" step="5" oninput="document.getElementById('wlCloudVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+
+                        <label class="input-label">Enterprise IT: <span id="wlEnterpriseVal">20</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-briefcase"></i> Enterprise Applications</div><div class="tooltip-desc">Percentage of IT load for traditional enterprise workloads such as ERP, databases, email, file storage, and internal applications. These workloads often have lower server utilization rates (15-30%) compared to cloud-native applications, resulting in higher carbon per useful compute unit.</div></div></span></label>
+                        <input type="range" class="range-slider" id="wlEnterprise" min="0" max="100" value="20" step="5" oninput="document.getElementById('wlEnterpriseVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+
+                        <label class="input-label">Government / Critical: <span id="wlGovtVal">15</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-landmark"></i> Critical Infrastructure</div><div class="tooltip-desc">Percentage of IT load serving government, healthcare, defense, financial, and other critical national infrastructure. These workloads may receive preferential carbon budget allocation due to their essential nature, but they also face stricter regulatory reporting requirements.</div></div></span></label>
+                        <input type="range" class="range-slider" id="wlGovt" min="0" max="100" value="15" step="5" oninput="document.getElementById('wlGovtVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.75rem;border-radius:8px;font-size:0.85rem;font-weight:600;margin-top:0.5rem;" id="workloadTotalBar">
+                            <span>Total Allocation</span>
+                            <span id="workloadTotalValue" style="font-size:1rem;">100%</span>
+                        </div>
+                    </div>
+
+                    <!-- Section 14 - Procurement Targets -->
+                    <div class="input-section" style="border-left:3px solid #f59e0b;">
+                        <div class="section-header" style="background:rgba(245,158,11,0.1);">
+                            <i class="fas fa-solar-panel" style="color:#f59e0b;"></i> Procurement Targets
+                        </div>
+
+                        <label class="input-label">Current Renewable %: <span id="currentRenewableVal">40</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-leaf"></i> Current Renewable Procurement</div><div class="tooltip-desc">Your facility's current percentage of electricity from renewable sources (PPAs, RECs, on-site generation). This baseline is used to model the pathway to your net-zero target year and calculate the required annual increase in renewable procurement.</div></div></span></label>
+                        <input type="range" class="range-slider" id="currentRenewable" min="0" max="100" value="40" step="5" oninput="document.getElementById('currentRenewableVal').textContent=this.value;calculate()">
+                        <div class="range-labels"><span>0%</span><span>100%</span></div>
+
+                        <label class="input-label">Target Year Net-Zero <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-crosshairs"></i> Net-Zero Target Year</div><div class="tooltip-desc">The year by which your facility aims to achieve net-zero carbon emissions. Earlier targets (2030) require aggressive renewable procurement and efficiency measures. This is compared against the national NDC timeline to assess Paris Agreement alignment.</div></div></span></label>
+                        <select class="input-field" id="netZeroYear" onchange="calculate()">
+                            <option value="2030">2030</option>
+                            <option value="2035">2035</option>
+                            <option value="2040">2040</option>
+                            <option value="2050">2050</option>
+                        </select>
+
+                        <label class="input-label">Carbon Credit Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-certificate"></i> Offsetting Approach</div><div class="tooltip-desc">Strategy for addressing residual emissions that cannot be eliminated through efficiency and renewables. Voluntary offsets (e.g., Verra VCS) are purchased on voluntary markets. Compliance credits (e.g., EU ETS allowances) are mandatory in regulated markets. Using "Both" provides regulatory coverage and voluntary leadership positioning.</div></div></span></label>
+                        <select class="input-field" id="creditStrategy" onchange="calculate()">
+                            <option value="none">None</option>
+                            <option value="voluntary">Voluntary offsets</option>
+                            <option value="compliance">Compliance credits</option>
+                            <option value="both">Both</option>
+                        </select>
+                    </div>
+
+                </div><!-- /tabBudget -->
+
+            </div><!-- /input-panel -->
+
+            <!-- ═══ RESULTS PANEL ═══ -->
+            <div class="results-panel">
+                <div class="results-card">
+                    <div class="score-display" id="resultsDisplay">
+                        <div class="score-value" id="primaryValue" style="color: #22c55e;">0</div>
+                        <div class="score-unit" id="primaryUnit">tCO&#8322;e/yr</div>
+                        <div class="score-label" id="primaryLabel">Annual Carbon Emissions</div>
+                        <div class="score-grade" id="scoreGrade" style="background:rgba(34,197,94,0.1);color:#22c55e;">
+                            <i class="fas fa-leaf"></i> <span id="gradeText">--</span>
+                        </div>
+                    </div>
+                    <div class="metric-grid" id="metricGrid">
+                        <div class="metric-box"><div class="metric-value" id="metScope1">--</div><div class="metric-label">Scope 1</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metScope2">--</div><div class="metric-label">Scope 2</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metScope3">--</div><div class="metric-label">Scope 3</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metIntensity">--</div><div class="metric-label">kgCO&#8322;/kWh IT</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metOffset">--</div><div class="metric-label">Offset Cost</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metTax">--</div><div class="metric-label">Carbon Tax</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metEnergy">--</div><div class="metric-label">Annual MWh</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metRating">--</div><div class="metric-label">Efficiency</div></div>
+                    </div>
+                </div>
+                <!-- Scope Breakdown Chart -->
+                <div class="results-card" style="margin-top:1rem;">
+                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i class="fas fa-chart-pie" style="color:#22c55e;margin-right:6px;"></i>Emissions Breakdown</div>
+                    <div class="chart-container"><canvas id="scopeChart" width="400" height="300"></canvas></div>
+                </div>
+                <!-- Industry Comparison Chart -->
+                <div class="results-card" style="margin-top:1rem;">
+                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i class="fas fa-chart-bar" style="color:#22c55e;margin-right:6px;"></i>Industry Comparison</div>
+                    <div class="chart-container"><canvas id="comparisonChart" width="400" height="250"></canvas></div>
+                </div>
+            </div><!-- /results-panel -->
+
+        </div><!-- /calculator-grid -->
+    </section>
+
+    <!-- ═══ PRO PANELS ═══ -->
+    <section class="charts-section pro-section locked" id="proPanelsSection" style="max-width:1400px;margin:2rem auto;padding:0 2rem;">
+        <div class="pro-overlay" onclick="handlePremiumTab()">
+            <i class="fas fa-crown"></i>
+            <div class="pro-overlay-title">PRO Analysis Panels</div>
+            <div class="pro-overlay-desc">Monte Carlo simulation, sensitivity tornado, reduction scenarios, and compliance assessment</div>
+            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock PRO</button>
+        </div>
+        <div class="charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <!-- Panel 1: Monte Carlo -->
+            <div class="cf-pro-panel" id="panelMonteCarlo">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-dice" style="color:#8b5cf6;margin-right:6px;"></i>Monte Carlo Risk Distribution <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div class="cf-kpi-grid" id="mcKpiGrid">
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="mcP5">--</div><div class="cf-kpi-label">P5 (Best)</div></div>
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="mcP50">--</div><div class="cf-kpi-label">P50 (Median)</div></div>
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="mcP95">--</div><div class="cf-kpi-label">P95 (Worst)</div></div>
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="mcStdDev">--</div><div class="cf-kpi-label">Std Dev</div></div>
+                </div>
+                <div class="chart-container"><canvas id="histogramChart" width="600" height="280"></canvas></div>
+            </div>
+            <!-- Panel 2: Sensitivity Tornado -->
+            <div class="cf-pro-panel" id="panelTornado">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-wind" style="color:#f59e0b;margin-right:6px;"></i>Sensitivity Tornado <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div class="chart-container"><canvas id="tornadoChart" width="600" height="350"></canvas></div>
+            </div>
+            <!-- Panel 3: Reduction Scenarios -->
+            <div class="cf-pro-panel" id="panelScenarios">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-route" style="color:#22c55e;margin-right:6px;"></i>Reduction Scenarios <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div id="scenarioResults"></div>
+                <div class="chart-container"><canvas id="scenarioChart" width="600" height="280"></canvas></div>
+            </div>
+            <!-- Panel 4: Financial & Compliance -->
+            <div class="cf-pro-panel" id="panelCompliance">
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-balance-scale" style="color:#ef4444;margin-right:6px;"></i>Financial Impact &amp; Compliance <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div class="cf-kpi-grid" id="complianceKpiGrid">
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="compOffset">--</div><div class="cf-kpi-label">Offset Cost/yr</div></div>
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="compTax">--</div><div class="cf-kpi-label">EU ETS Exposure</div></div>
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="compCBAM">--</div><div class="cf-kpi-label">CBAM Risk</div></div>
+                    <div class="cf-kpi-card"><div class="cf-kpi-value" id="compSEC">--</div><div class="cf-kpi-label">SEC/CSRD Gap</div></div>
+                </div>
+                <div class="cf-narrative" id="narrativeBox">
+                    <p><strong>Executive Assessment:</strong> Complete the calculation to generate your personalized carbon footprint narrative.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PRIVACY BADGE + BENCHMARK META ═══ -->
+    <div style="max-width:1400px;margin:1.5rem auto;padding:0 2rem;">
+        <div class="cf-privacy-badge"><i class="fas fa-shield-halved"></i> PDF generated in your browser — no data is sent to any server</div>
+        <div class="cf-benchmark-meta">
+            <span class="cf-benchmark-tag"><i class="fas fa-code-branch"></i> Model v1.0</span>
+            <span class="cf-benchmark-tag"><i class="fas fa-calendar"></i> Updated Feb 2026</span>
+            <span class="cf-benchmark-tag"><i class="fas fa-book"></i> Sources: GHG Protocol, EN 15978, ICE v4.1, Paris Agreement NDCs</span>
+            <span class="cf-benchmark-tag"><i class="fas fa-info-circle"></i> Scope 1/2/3 + LCA A1-D + National Carbon Budget</span>
+        </div>
+    </div>
+
+    </main>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <div style="max-width:1400px;margin:0 auto;padding:0 2rem;">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:2rem;margin-bottom:2rem;">
+                <div>
+                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+                        <div style="width:40px;height:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:white;">CO&#8322;</div>
+                        <div>
+                            <div style="font-weight:700;font-size:1rem;">Carbon Footprint Calculator</div>
+                            <div style="font-size:0.78rem;color:#94a3b8;">GHG Protocol Scope 1/2/3 + LCA + Carbon Budget</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.82rem;color:#94a3b8;line-height:1.6;max-width:400px;">Comprehensive carbon emissions assessment tool for data centers. Combines operational GHG Protocol analysis with cradle-to-grave life-cycle assessment and Paris Agreement-aligned national carbon budget allocation.</p>
+                </div>
+                <div>
+                    <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.85rem;">Calculators</div>
+                    <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                        <a href="pue-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">PUE Calculator</a>
+                        <a href="capex-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">CAPEX Calculator</a>
+                        <a href="opex-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">OPEX Calculator</a>
+                        <a href="roi-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">ROI Calculator</a>
+                        <a href="tia-942-compliance.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">TIA-942 Compliance</a>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.85rem;">Legal</div>
+                    <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                        <a href="privacy.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">Privacy Policy</a>
+                        <a href="terms.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">Terms of Service</a>
+                        <a href="index.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;transition:color 0.2s;">Back to Portfolio</a>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top:1px solid rgba(148,163,184,0.1);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div style="font-size:0.78rem;color:#64748b;">&copy; 2026 Resistance Zero. All rights reserved. For educational purposes only.</div>
+                <div style="font-size:0.75rem;color:#64748b;">Data sources: IEA, GHG Protocol, EN 15978, ICE Database v4.1, UNFCCC NDC Registry</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══ LOGIN MODAL ═══ -->
+    <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;">
+            <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;">&times;</button>
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="width:56px;height:56px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
+                </div>
+                <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;">Sign In</h3>
+                <p style="font-size:0.85rem;color:#64748b;">Unlock Pro carbon analysis, Monte Carlo simulation, and PDF export</p>
+            </div>
+            <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
+            <button onclick="handleLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;">Unlock Pro Analysis</button>
+            <div id="loginError" style="display:none;color:#ef4444;font-size:0.8rem;text-align:center;margin-top:0.5rem;">Invalid credentials</div>
+            <div style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#94a3b8;">Demo: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo2026</code></div>
+        </div>
+    </div>
+
+    <!-- ═══ COOKIE BANNER ═══ -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <!-- ═══ SCROLL TO TOP ═══ -->
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <!-- ═══ JAVASCRIPT ═══ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // ══════════════════════════════════════════════════════════════
+    // 1. COUNTRY DATA (33 countries)
+    // ══════════════════════════════════════════════════════════════
+    var COUNTRIES = {
+        ID: { name: 'Indonesia', grid: 0.70, rate: 0.08, region: 'APAC' },
+        SG: { name: 'Singapore', grid: 0.40, rate: 0.15, region: 'APAC' },
+        MY: { name: 'Malaysia', grid: 0.60, rate: 0.07, region: 'APAC' },
+        TH: { name: 'Thailand', grid: 0.50, rate: 0.09, region: 'APAC' },
+        VN: { name: 'Vietnam', grid: 0.55, rate: 0.06, region: 'APAC' },
+        PH: { name: 'Philippines', grid: 0.60, rate: 0.12, region: 'APAC' },
+        IN: { name: 'India', grid: 0.72, rate: 0.07, region: 'APAC' },
+        CN: { name: 'China', grid: 0.58, rate: 0.08, region: 'APAC' },
+        JP: { name: 'Japan', grid: 0.50, rate: 0.18, region: 'APAC' },
+        KR: { name: 'South Korea', grid: 0.42, rate: 0.10, region: 'APAC' },
+        AU: { name: 'Australia', grid: 0.60, rate: 0.14, region: 'APAC' },
+        NZ: { name: 'New Zealand', grid: 0.10, rate: 0.12, region: 'APAC' },
+        TW: { name: 'Taiwan', grid: 0.50, rate: 0.09, region: 'APAC' },
+        US: { name: 'United States', grid: 0.40, rate: 0.10, region: 'AMER' },
+        GB: { name: 'United Kingdom', grid: 0.23, rate: 0.20, region: 'EMEA' },
+        DE: { name: 'Germany', grid: 0.35, rate: 0.25, region: 'EMEA' },
+        NL: { name: 'Netherlands', grid: 0.33, rate: 0.18, region: 'EMEA' },
+        IE: { name: 'Ireland', grid: 0.30, rate: 0.16, region: 'EMEA' },
+        FR: { name: 'France', grid: 0.06, rate: 0.15, region: 'EMEA' },
+        SE: { name: 'Sweden', grid: 0.04, rate: 0.08, region: 'EMEA' },
+        PL: { name: 'Poland', grid: 0.65, rate: 0.12, region: 'EMEA' },
+        PT: { name: 'Portugal', grid: 0.08, rate: 0.14, region: 'EMEA' },
+        AE: { name: 'UAE', grid: 0.45, rate: 0.06, region: 'MENA' },
+        SA: { name: 'Saudi Arabia', grid: 0.55, rate: 0.04, region: 'MENA' },
+        QA: { name: 'Qatar', grid: 0.48, rate: 0.03, region: 'MENA' },
+        ZA: { name: 'South Africa', grid: 0.90, rate: 0.08, region: 'AFR' },
+        NG: { name: 'Nigeria', grid: 0.45, rate: 0.10, region: 'AFR' },
+        KE: { name: 'Kenya', grid: 0.30, rate: 0.12, region: 'AFR' },
+        BR: { name: 'Brazil', grid: 0.15, rate: 0.09, region: 'LATAM' },
+        CL: { name: 'Chile', grid: 0.35, rate: 0.10, region: 'LATAM' },
+        MX: { name: 'Mexico', grid: 0.45, rate: 0.08, region: 'LATAM' },
+        CO: { name: 'Colombia', grid: 0.20, rate: 0.07, region: 'LATAM' }
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // 2. NDC DATA (33 countries)
+    // ══════════════════════════════════════════════════════════════
+    var NDC_DATA = {
+        ID: { total: 692, target: -31.89, year: 2030, dcShare: 1.2, renewable: 55 },
+        SG: { total: 52, target: -36, year: 2030, dcShare: 5.0, renewable: 25 },
+        MY: { total: 256, target: -45, year: 2030, dcShare: 1.5, renewable: 40 },
+        TH: { total: 273, target: -30, year: 2030, dcShare: 1.3, renewable: 35 },
+        VN: { total: 290, target: -27, year: 2030, dcShare: 1.0, renewable: 30 },
+        PH: { total: 151, target: -75, year: 2030, dcShare: 1.0, renewable: 25 },
+        IN: { total: 2710, target: -45, year: 2030, dcShare: 1.5, renewable: 30 },
+        CN: { total: 11477, target: -65, year: 2030, dcShare: 2.0, renewable: 35 },
+        JP: { total: 1066, target: -46, year: 2030, dcShare: 2.5, renewable: 45 },
+        KR: { total: 616, target: -40, year: 2030, dcShare: 2.0, renewable: 35 },
+        AU: { total: 393, target: -43, year: 2030, dcShare: 2.5, renewable: 50 },
+        NZ: { total: 35, target: -50, year: 2030, dcShare: 2.0, renewable: 70 },
+        TW: { total: 275, target: -23.8, year: 2030, dcShare: 2.0, renewable: 30 },
+        US: { total: 5057, target: -50, year: 2030, dcShare: 3.5, renewable: 40 },
+        GB: { total: 332, target: -68, year: 2030, dcShare: 2.8, renewable: 45 },
+        DE: { total: 674, target: -65, year: 2030, dcShare: 3.0, renewable: 60 },
+        NL: { total: 149, target: -55, year: 2030, dcShare: 4.0, renewable: 55 },
+        IE: { total: 58, target: -51, year: 2030, dcShare: 4.5, renewable: 50 },
+        FR: { total: 302, target: -40, year: 2030, dcShare: 2.5, renewable: 70 },
+        SE: { total: 45, target: -59, year: 2045, dcShare: 4.0, renewable: 80 },
+        PL: { total: 326, target: -55, year: 2030, dcShare: 1.5, renewable: 25 },
+        PT: { total: 45, target: -55, year: 2030, dcShare: 2.0, renewable: 65 },
+        AE: { total: 190, target: -31, year: 2030, dcShare: 3.0, renewable: 20 },
+        SA: { total: 672, target: -19, year: 2030, dcShare: 2.0, renewable: 15 },
+        QA: { total: 103, target: -25, year: 2030, dcShare: 2.5, renewable: 10 },
+        ZA: { total: 435, target: -28, year: 2030, dcShare: 1.5, renewable: 20 },
+        NG: { total: 250, target: -20, year: 2030, dcShare: 0.8, renewable: 15 },
+        KE: { total: 73, target: -32, year: 2030, dcShare: 1.0, renewable: 75 },
+        BR: { total: 1070, target: -50, year: 2030, dcShare: 1.5, renewable: 80 },
+        CL: { total: 95, target: -45, year: 2030, dcShare: 1.5, renewable: 60 },
+        MX: { total: 490, target: -35, year: 2030, dcShare: 1.5, renewable: 30 },
+        CO: { total: 97, target: -51, year: 2030, dcShare: 1.0, renewable: 70 }
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // 3. LCA CONSTANTS
+    // ══════════════════════════════════════════════════════════════
+    var LCA = {
+        // Material carbon factors (kgCO2e/ton)
+        CONCRETE_C30: 150, CONCRETE_C40: 250, CONCRETE_LOW: 100,
+        STEEL_WORLD_AVG: 1850, STEEL_EAF: 500, STEEL_BOF: 2200,
+        COPPER_PRIMARY: 4100, COPPER_RECYCLED: 800,
+        ALUMINUM_PRIMARY: 10000, ALUMINUM_RECYCLED: 600,
+        PVC_CABLE: 2800,
+        // Quantities per MW IT (tons)
+        CONCRETE_PER_MW: 1000, STEEL_PER_MW: 200, COPPER_PER_MW: 20,
+        ALUMINUM_PER_MW: 10, PVC_PER_MW: 7,
+        // Server embodied (kgCO2e per unit)
+        SERVER_STANDARD: 1200, SERVER_BLADE: 1750,
+        GPU_SERVER_H100: 4000, GPU_SERVER_B200: 3500,
+        NETWORK_SWITCH: 450, STORAGE_ARRAY: 2000,
+        // Battery (kgCO2e/kWh)
+        BATTERY_VRLA: 68, BATTERY_LFP: 62, BATTERY_NMC: 74,
+        // Construction (kgCO2e/m2)
+        CONSTRUCTION_ACTIVITY: 40, DEMOLITION: 15,
+        // Recycling credits (kgCO2e saved per ton)
+        RECYCLE_STEEL: 1500, RECYCLE_COPPER: 3000, RECYCLE_ALUMINUM: 9000,
+        // Building type multipliers
+        BUILDING_PURPOSE: 1.0, BUILDING_CONVERTED: 0.7, BUILDING_MODULAR: 0.85,
+        // Seismic multipliers for structural steel/concrete
+        SEISMIC: [1.0, 1.05, 1.12, 1.25, 1.40]
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // 4. OPERATIONAL CONSTANTS
+    // ══════════════════════════════════════════════════════════════
+    var CARBON_OFFSET_PRICE = 25; // $/tCO2
+    var CARBON_TAX_RATE = 50; // $/tCO2 (EU ETS)
+    var DIESEL_EMISSION_FACTOR = 2.68; // kgCO2/L
+    var HVO_EMISSION_FACTOR = 0.54; // kgCO2/L
+    var DIESEL_CONSUMPTION_RATE = 0.3; // L/kW/hr
+    var INDUSTRY_AVG_PUE = 1.58;
+    var INDUSTRY_AVG_CARBON = 0.475; // kgCO2/kWh
+
+    var COOLING_DATA = {
+        air_crac: { gwp: 2088, charge: 0.3, defaultLeak: 5, name: 'R-410A' },
+        inrow: { gwp: 2088, charge: 0.2, defaultLeak: 4, name: 'R-410A' },
+        rdhx: { gwp: 1430, charge: 0.15, defaultLeak: 3, name: 'R-134a' },
+        dlc: { gwp: 675, charge: 0.05, defaultLeak: 2, name: 'R-1234ze' }
+    };
+
+    var WORKLOAD_DATA = {
+        traditional: { embodied: 1200, serversPerMW: 1250, name: 'Traditional Enterprise' },
+        cloud: { embodied: 1200, serversPerMW: 1000, name: 'Cloud/Hyperscale' },
+        gpu_h100: { embodied: 4000, serversPerMW: 140, name: 'AI/GPU H100' },
+        gpu_b200: { embodied: 3500, serversPerMW: 200, name: 'AI/GPU B200+' }
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // 5. AUTH SYSTEM
+    // ══════════════════════════════════════════════════════════════
+    var isPremiumUser = false;
+    var userTier = 'free';
+    var currentMode = 'free';
+    var currentTab = 'operational';
+
+    // Check session on load
+    (function checkPremiumSession() {
+        try {
+            var session = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            if (session && session.tier === 'pro' && new Date(session.expires) > new Date()) {
+                isPremiumUser = true;
+                userTier = 'pro';
+                activatePremiumUI();
+            }
+        } catch(e) {}
+        try {
+            var dcmocAuth = JSON.parse(localStorage.getItem('dcmoc-auth') || 'null');
+            if (dcmocAuth && dcmocAuth.state && dcmocAuth.state.user) {
+                isPremiumUser = true;
+                userTier = 'pro';
+                activatePremiumUI();
+            }
+        } catch(e) {}
+    })();
+
+    window.addEventListener('rz-auth-change', function(e) {
+        if (e.detail && e.detail.tier === 'pro') {
+            isPremiumUser = true;
+            userTier = 'pro';
+            activatePremiumUI();
+        }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // 6. LOGIN FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    function handlePremiumTab() {
+        if (isPremiumUser) return;
+        var modal = document.getElementById('loginModal');
+        modal.style.display = 'flex';
+        document.getElementById('loginError').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        setTimeout(function() { document.getElementById('loginEmail').focus(); }, 100);
+    }
+
+    function closeLoginModal() {
+        document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function handleLogin() {
+        var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('loginPassword').value;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            localStorage.setItem('rz_premium_session', JSON.stringify({
+                email: email, tier: 'pro',
+                expires: new Date(Date.now() + 30 * 86400000).toISOString()
+            }));
+            isPremiumUser = true;
+            userTier = 'pro';
+            closeLoginModal();
+            activatePremiumUI();
+            window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                detail: { email: email, tier: 'pro', action: 'login' }
+            }));
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    function logoutPremium() {
+        localStorage.removeItem('rz_premium_session');
+        isPremiumUser = false;
+        userTier = 'free';
+        setMode('free');
+        updateNavbarAuthUI();
+        window.dispatchEvent(new CustomEvent('rz-auth-change', {
+            detail: { tier: 'free', action: 'logout' }
+        }));
+    }
+
+    function activatePremiumUI() {
+        var btnPro = document.getElementById('btnProMode');
+        if (btnPro) btnPro.classList.remove('locked-hint');
+        setMode('pro');
+        updateNavbarAuthUI();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 7. MODE / TAB SWITCHING
+    // ══════════════════════════════════════════════════════════════
+    function setMode(mode) {
+        if (mode === 'pro' && !isPremiumUser) { handlePremiumTab(); return; }
+        currentMode = mode;
+        var btnFree = document.getElementById('btnFreeMode');
+        var btnPro = document.getElementById('btnProMode');
+        var indicator = document.getElementById('modeIndicator');
+        var btnPdf = document.getElementById('btnExportPDF');
+        if (mode === 'free') {
+            btnFree.classList.add('active');
+            btnPro.classList.remove('active');
+            indicator.className = 'cf-mode-indicator free-active';
+            indicator.textContent = 'FREE MODE';
+            document.querySelectorAll('.pro-section').forEach(function(s) { s.classList.add('locked'); });
+            if (btnPdf) btnPdf.classList.add('disabled');
+        } else {
+            btnPro.classList.add('active');
+            btnFree.classList.remove('active');
+            indicator.className = 'cf-mode-indicator pro-active';
+            indicator.textContent = 'PRO MODE';
+            document.querySelectorAll('.pro-section').forEach(function(s) { s.classList.remove('locked'); });
+            if (btnPdf) btnPdf.classList.remove('disabled');
+        }
+        calculate();
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.cf-tab-btn').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+        });
+        document.querySelectorAll('.cf-tab-content').forEach(function(content) {
+            content.classList.remove('active');
+        });
+        var tabMap = { operational: 'tabOperational', lifecycle: 'tabLifecycle', budget: 'tabBudget' };
+        document.getElementById(tabMap[tab]).classList.add('active');
+        // Reset metric labels when switching tabs
+        resetMetricLabels(tab);
+        calculate();
+    }
+
+    function resetMetricLabels(tab) {
+        if (tab === 'operational') {
+            document.getElementById('metScope1').parentElement.querySelector('.metric-label').textContent = 'Scope 1';
+            document.getElementById('metScope2').parentElement.querySelector('.metric-label').textContent = 'Scope 2';
+            document.getElementById('metScope3').parentElement.querySelector('.metric-label').textContent = 'Scope 3';
+            document.getElementById('metIntensity').parentElement.querySelector('.metric-label').textContent = 'kgCO\u2082/kWh IT';
+            document.getElementById('metOffset').parentElement.querySelector('.metric-label').textContent = 'Offset Cost';
+            document.getElementById('metTax').parentElement.querySelector('.metric-label').textContent = 'Carbon Tax';
+            document.getElementById('metEnergy').parentElement.querySelector('.metric-label').textContent = 'Annual MWh';
+            document.getElementById('metRating').parentElement.querySelector('.metric-label').textContent = 'Efficiency';
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 8. COUNTRY SELECTION HANDLER
+    // ══════════════════════════════════════════════════════════════
+    function onCountryChange() {
+        var code = document.getElementById('countrySelect').value;
+        var c = COUNTRIES[code];
+        if (!c) return;
+        document.getElementById('gridIntensity').value = c.grid;
+        document.getElementById('electricityRate').value = c.rate;
+        // Update budget tab country name display
+        var budgetName = document.getElementById('budgetCountryName');
+        if (budgetName) budgetName.textContent = c.name;
+        // Update NDC fields
+        var ndc = NDC_DATA[code];
+        if (ndc) {
+            document.getElementById('ndcYear').value = ndc.year;
+            document.getElementById('ndcTarget').value = ndc.target + '%';
+            document.getElementById('totalEmissions').value = ndc.total;
+            document.getElementById('dcShare').value = ndc.dcShare;
+            document.getElementById('dcGrowth').value = 15;
+            document.getElementById('currentRenewable').value = ndc.renewable;
+            updateRangeDisplays();
+        }
+        calculate();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 9. COOLING DATA HANDLER
+    // ══════════════════════════════════════════════════════════════
+    function onCoolingChange() {
+        var type = document.getElementById('coolingType').value;
+        var data = COOLING_DATA[type];
+        if (data) {
+            document.getElementById('gwpValue').value = data.gwp;
+            document.getElementById('chargePerKw').value = data.charge;
+            document.getElementById('leakRate').value = data.defaultLeak;
+        }
+        calculate();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 10. WORKLOAD HANDLER
+    // ══════════════════════════════════════════════════════════════
+    function onWorkloadChange() {
+        var type = document.getElementById('workloadType').value;
+        var data = WORKLOAD_DATA[type];
+        if (data) {
+            document.getElementById('serversPerMW').value = data.serversPerMW;
+        }
+        calculate();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 11. PRESET + RANGE DISPLAY UPDATERS
+    // ══════════════════════════════════════════════════════════════
+    function setPreset(fieldId, value) {
+        document.getElementById(fieldId).value = value;
+        // Update active state on preset buttons
+        var input = document.getElementById(fieldId);
+        var container = input.closest('.input-section');
+        if (container) {
+            container.querySelectorAll('.preset-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+                var onclickStr = btn.getAttribute('onclick') || '';
+                if (onclickStr.indexOf("'" + fieldId + "'") !== -1 && onclickStr.indexOf(value) !== -1) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        calculate();
+    }
+
+    function updateWorkloadTotal() {
+        var wlT = parseFloat(document.getElementById('wlTraining').value) || 0;
+        var wlI = parseFloat(document.getElementById('wlInference').value) || 0;
+        var wlC = parseFloat(document.getElementById('wlCloud').value) || 0;
+        var wlE = parseFloat(document.getElementById('wlEnterprise').value) || 0;
+        var wlG = parseFloat(document.getElementById('wlGovt').value) || 0;
+        var total = wlT + wlI + wlC + wlE + wlG;
+        var bar = document.getElementById('workloadTotalBar');
+        var val = document.getElementById('workloadTotalValue');
+        if (val) val.textContent = total + '%';
+        if (bar) {
+            if (total === 100) {
+                bar.style.background = 'rgba(34,197,94,0.1)';
+                bar.style.color = '#22c55e';
+            } else {
+                bar.style.background = 'rgba(239,68,68,0.1)';
+                bar.style.color = '#ef4444';
+            }
+        }
+    }
+
+    function updateRangeDisplays() {
+        var ranges = {
+            genHours: { el: 'genHoursVal' },
+            renewablePct: { el: 'renewablePctVal' },
+            serverRefresh: { el: 'serverRefreshVal' },
+            networkRefresh: { el: 'networkRefreshVal' },
+            projectLifetime: { el: 'projectLifetimeVal' },
+            steelRecycle: { el: 'steelRecycleVal' },
+            copperRecycle: { el: 'copperRecycleVal' },
+            dcShare: { el: 'dcShareVal' },
+            dcGrowth: { el: 'dcGrowthVal' },
+            wlTraining: { el: 'wlTrainingVal' },
+            wlInference: { el: 'wlInferenceVal' },
+            wlCloud: { el: 'wlCloudVal' },
+            wlEnterprise: { el: 'wlEnterpriseVal' },
+            wlGovt: { el: 'wlGovtVal' },
+            currentRenewable: { el: 'currentRenewableVal' }
+        };
+        Object.keys(ranges).forEach(function(id) {
+            var input = document.getElementById(id);
+            var display = document.getElementById(ranges[id].el);
+            if (input && display) display.textContent = input.value;
+        });
+        updateWorkloadTotal();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 12. MAIN CALCULATE FUNCTION
+    // ══════════════════════════════════════════════════════════════
+    function calculate() {
+        // === Common inputs ===
+        var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+        var pue = parseFloat(document.getElementById('pueValue').value) || 1.58;
+        var country = document.getElementById('countrySelect').value;
+        var gridIntensity = parseFloat(document.getElementById('gridIntensity').value) || COUNTRIES[country].grid;
+        var renewablePct = parseFloat(document.getElementById('renewablePct').value) || 0;
+
+        // === TAB 1: OPERATIONAL EMISSIONS ===
+        var totalPowerKW = itLoad * pue;
+        var annualMWh = totalPowerKW * 8760 / 1000;
+        var effectiveGrid = gridIntensity * (1 - renewablePct / 100);
+
+        // Scope 2: Grid electricity
+        var scope2 = annualMWh * effectiveGrid; // tCO2
+
+        // Scope 1: Generator emissions + Refrigerant leakage
+        var genType = document.getElementById('genType').value;
+        var genHours = parseFloat(document.getElementById('genHours').value) || 200;
+        var genEF = genType === 'diesel' ? DIESEL_EMISSION_FACTOR : HVO_EMISSION_FACTOR;
+        var genEmissions = itLoad * DIESEL_CONSUMPTION_RATE * genHours * genEF / 1000; // tCO2
+
+        var coolingType = document.getElementById('coolingType').value;
+        var cData = COOLING_DATA[coolingType];
+        if (!cData) cData = COOLING_DATA['air_crac'];
+        var leakRate = parseFloat(document.getElementById('leakRate').value) || 5;
+        var refrigCharge = itLoad * cData.charge; // total kg
+        var refrigEmissions = refrigCharge * (leakRate / 100) * cData.gwp / 1000; // tCO2e
+
+        var scope1 = genEmissions + refrigEmissions;
+
+        // Scope 3: Embodied IT (simplified for operational tab)
+        var scope3 = itLoad * 0.15; // Rough estimate: 0.15 tCO2e per kW IT (upstream)
+
+        var totalEmissions = scope1 + scope2 + scope3;
+
+        // Efficiency rating
+        var intensityPerKWh = totalEmissions * 1000 / (itLoad * 8760); // kgCO2/kWh IT
+        var rating, ratingColor;
+        if (intensityPerKWh < 0.1) { rating = 'A+ \u2014 Exceptional'; ratingColor = '#22c55e'; }
+        else if (intensityPerKWh < 0.2) { rating = 'A \u2014 Excellent'; ratingColor = '#22c55e'; }
+        else if (intensityPerKWh < 0.4) { rating = 'B \u2014 Good'; ratingColor = '#16a34a'; }
+        else if (intensityPerKWh < 0.6) { rating = 'C \u2014 Average'; ratingColor = '#eab308'; }
+        else if (intensityPerKWh < 0.8) { rating = 'D \u2014 Below Avg'; ratingColor = '#f59e0b'; }
+        else if (intensityPerKWh < 1.0) { rating = 'E \u2014 Poor'; ratingColor = '#ef4444'; }
+        else { rating = 'F \u2014 Critical'; ratingColor = '#dc2626'; }
+
+        var offsetCost = totalEmissions * CARBON_OFFSET_PRICE;
+        var taxExposure = totalEmissions * CARBON_TAX_RATE;
+
+        // === TAB 2: LIFE-CYCLE ASSESSMENT ===
+        var facilityMW = parseFloat(document.getElementById('facilityMW').value) || (itLoad / 1000);
+        var buildType = document.getElementById('buildingType').value;
+        var buildMult = buildType === 'purpose' ? LCA.BUILDING_PURPOSE : buildType === 'converted' ? LCA.BUILDING_CONVERTED : LCA.BUILDING_MODULAR;
+        var seismic = parseInt(document.getElementById('seismicZone').value) || 0;
+        var seismicMult = LCA.SEISMIC[seismic] || 1.0;
+
+        // A1-A3: Materials
+        var concreteGrade = document.getElementById('concreteGrade').value;
+        var concreteFactor = concreteGrade === 'c30' ? LCA.CONCRETE_C30 : concreteGrade === 'c40' ? LCA.CONCRETE_C40 : LCA.CONCRETE_LOW;
+        var steelSource = document.getElementById('steelSource').value;
+        var steelFactor = steelSource === 'world' ? LCA.STEEL_WORLD_AVG : steelSource === 'eaf' ? LCA.STEEL_EAF : LCA.STEEL_BOF;
+
+        var concreteCarbon = facilityMW * LCA.CONCRETE_PER_MW * concreteFactor * buildMult * seismicMult / 1000; // tCO2e
+        var steelCarbon = facilityMW * LCA.STEEL_PER_MW * steelFactor * buildMult * seismicMult / 1000;
+        var copperCarbon = facilityMW * LCA.COPPER_PER_MW * LCA.COPPER_PRIMARY / 1000;
+        var aluminumCarbon = facilityMW * LCA.ALUMINUM_PER_MW * LCA.ALUMINUM_PRIMARY / 1000;
+        var pvcCarbon = facilityMW * LCA.PVC_PER_MW * LCA.PVC_CABLE / 1000;
+        var materialsTotal = concreteCarbon + steelCarbon + copperCarbon + aluminumCarbon + pvcCarbon; // A1-A3
+
+        // IT Equipment embodied
+        var workloadType = document.getElementById('workloadType').value;
+        var wData = WORKLOAD_DATA[workloadType];
+        if (!wData) wData = WORKLOAD_DATA['traditional'];
+        var serversPerMW = wData.serversPerMW;
+        var serverRefresh = parseInt(document.getElementById('serverRefresh').value) || 4;
+        var networkRefresh = parseInt(document.getElementById('networkRefresh').value) || 5;
+        var projectLife = parseInt(document.getElementById('projectLifetime').value) || 20;
+        var serverCycles = Math.ceil(projectLife / serverRefresh);
+        var networkCycles = Math.ceil(projectLife / networkRefresh);
+        var totalServers = facilityMW * serversPerMW;
+        var networkUnits = totalServers * 0.05; // ~5% network switches
+        var storageUnits = totalServers * 0.02; // ~2% storage arrays
+        var itEmbodied = (totalServers * wData.embodied * serverCycles + networkUnits * LCA.NETWORK_SWITCH * networkCycles + storageUnits * LCA.STORAGE_ARRAY * serverCycles) / 1000; // tCO2e
+
+        // Battery embodied
+        var batteryType = document.getElementById('batteryType').value;
+        var batteryFactor = batteryType === 'vrla' ? LCA.BATTERY_VRLA : batteryType === 'lfp' ? LCA.BATTERY_LFP : LCA.BATTERY_NMC;
+        var batteryRuntime = parseInt(document.getElementById('batteryRuntime').value) || 10;
+        var redundancyLCA = document.getElementById('redundancyLCA').value;
+        var redMult = redundancyLCA === 'n' ? 1 : redundancyLCA === 'n1' ? 1.25 : redundancyLCA === '2n' ? 2 : 2.25;
+        var batteryKWh = facilityMW * 1000 * (batteryRuntime / 60) * redMult;
+        var batteryCarbon = batteryKWh * batteryFactor / 1000; // tCO2e
+        var batteryReplacements = Math.ceil(projectLife / 8); // replace every 8 years
+        var totalBatteryCarbon = batteryCarbon * batteryReplacements;
+
+        // MEP equipment embodied (UPS, cooling, generators)
+        var mepCarbon = facilityMW * 150; // ~150 tCO2e/MW for MEP equipment
+
+        // A4-A5: Transport + Construction
+        var origin = document.getElementById('equipOrigin').value;
+        var transportMult = origin === 'local' ? 0.8 : origin === 'regional' ? 1.0 : 1.5;
+        var constructDuration = parseInt(document.getElementById('constructDuration').value) || 18;
+        var floorArea = facilityMW * 500; // ~500 m2 per MW IT
+        var constructionCarbon = floorArea * LCA.CONSTRUCTION_ACTIVITY * transportMult * (constructDuration / 18) / 1000; // tCO2e (A4+A5)
+
+        // C1-C4: End of Life
+        var decommPlan = document.getElementById('decommPlan').value;
+        var decommMult = decommPlan === 'demolition' ? 1.0 : decommPlan === 'refit' ? 0.5 : 0.2;
+        var endOfLifeCarbon = floorArea * LCA.DEMOLITION * decommMult / 1000;
+
+        // Module D: Recycling credits (negative)
+        var steelRecyclePct = parseFloat(document.getElementById('steelRecycle').value) || 92;
+        var copperRecyclePct = parseFloat(document.getElementById('copperRecycle').value) || 85;
+        var ewaste = document.getElementById('ewaste').value;
+        var ewastePct = ewaste === 'standard' ? 0.80 : ewaste === 'advanced' ? 0.90 : 0.95;
+        var steelRecycleCredit = facilityMW * LCA.STEEL_PER_MW * (steelRecyclePct / 100) * LCA.RECYCLE_STEEL / 1000;
+        var copperRecycleCredit = facilityMW * LCA.COPPER_PER_MW * (copperRecyclePct / 100) * LCA.RECYCLE_COPPER / 1000;
+        var aluminumRecycleCredit = facilityMW * LCA.ALUMINUM_PER_MW * 0.85 * LCA.RECYCLE_ALUMINUM / 1000;
+        var moduleDCredit = -(steelRecycleCredit + copperRecycleCredit + aluminumRecycleCredit);
+
+        // Operational carbon over lifetime
+        var lifetimeOperational = totalEmissions * projectLife;
+
+        var totalLifecycle = materialsTotal + itEmbodied + totalBatteryCarbon + mepCarbon + constructionCarbon + endOfLifeCarbon + moduleDCredit;
+        var totalLifecyclePlusOps = totalLifecycle + lifetimeOperational;
+        var annualAmortized = totalLifecycle / projectLife;
+
+        // === TAB 3: CARBON BUDGET ===
+        var ndc = NDC_DATA[country];
+        var dcSharePct = parseFloat(document.getElementById('dcShare').value) || (ndc ? ndc.dcShare : 3.5);
+        var dcGrowthRate = parseFloat(document.getElementById('dcGrowth').value) || 15;
+        var budgetPeriodVal = document.getElementById('budgetPeriod').value;
+        var budgetYears = parseInt(budgetPeriodVal) - 2025;
+        if (budgetYears <= 0) budgetYears = 5;
+        var budgetMethod = document.getElementById('budgetMethod').value;
+
+        var nationalTotal = ndc ? ndc.total : 5057;
+        var ndcReduction = ndc ? Math.abs(ndc.target) / 100 : 0.5;
+        var dcSectorEmissions = nationalTotal * (dcSharePct / 100);
+        var targetDcEmissions = dcSectorEmissions * (1 - ndcReduction);
+
+        // Budget calculation based on methodology
+        var cumulativeBudget;
+        if (budgetMethod === 'linear') {
+            cumulativeBudget = (dcSectorEmissions + targetDcEmissions) / 2 * budgetYears;
+        } else if (budgetMethod === 'front') {
+            cumulativeBudget = (dcSectorEmissions + targetDcEmissions) / 2 * budgetYears * 0.85;
+        } else {
+            cumulativeBudget = (dcSectorEmissions + targetDcEmissions) / 2 * budgetYears * 1.15;
+        }
+
+        // Estimate national MW capacity
+        var nationalMW = dcSectorEmissions / (INDUSTRY_AVG_CARBON * 8.76 * INDUSTRY_AVG_PUE); // rough MW estimate
+        if (nationalMW < 10) nationalMW = 10;
+        var annualBudgetPerMW = cumulativeBudget / budgetYears / nationalMW * 1000; // tCO2/MW/yr
+
+        // Workload allocation
+        var wlT = parseFloat(document.getElementById('wlTraining').value) || 15;
+        var wlI = parseFloat(document.getElementById('wlInference').value) || 20;
+        var wlC = parseFloat(document.getElementById('wlCloud').value) || 30;
+        var wlE = parseFloat(document.getElementById('wlEnterprise').value) || 20;
+        var wlG = parseFloat(document.getElementById('wlGovt').value) || 15;
+        var wlTotal = wlT + wlI + wlC + wlE + wlG;
+        // Economic value weighting
+        var econWeights = { training: 3.0, inference: 2.5, cloud: 1.5, enterprise: 1.0, govt: 2.0 };
+        var weightedSum = wlT * econWeights.training + wlI * econWeights.inference + wlC * econWeights.cloud + wlE * econWeights.enterprise + wlG * econWeights.govt;
+
+        // Renewable procurement targets
+        var currentRenewablePct = parseFloat(document.getElementById('currentRenewable').value) || 40;
+        var netZeroYear = parseInt(document.getElementById('netZeroYear').value) || 2050;
+        var yearsToNetZero = netZeroYear - 2025;
+        if (yearsToNetZero <= 0) yearsToNetZero = 5;
+        var renewableGapPerYear = (100 - currentRenewablePct) / yearsToNetZero;
+
+        // Credit strategy
+        var creditStrategy = document.getElementById('creditStrategy').value;
+        var creditMultiplier = creditStrategy === 'none' ? 0 : creditStrategy === 'voluntary' ? 0.5 : creditStrategy === 'compliance' ? 0.8 : 1.0;
+
+        // === UPDATE UI ===
+        if (currentTab === 'operational') {
+            document.getElementById('primaryValue').textContent = Math.round(totalEmissions).toLocaleString();
+            document.getElementById('primaryUnit').textContent = 'tCO\u2082e/yr';
+            document.getElementById('primaryLabel').textContent = 'Annual Carbon Emissions';
+            document.getElementById('primaryValue').style.color = ratingColor;
+            document.getElementById('scoreGrade').style.background = ratingColor + '18';
+            document.getElementById('scoreGrade').style.color = ratingColor;
+            document.getElementById('gradeText').textContent = rating;
+            // Update metric boxes
+            document.getElementById('metScope1').textContent = Math.round(scope1).toLocaleString() + ' t';
+            document.getElementById('metScope2').textContent = Math.round(scope2).toLocaleString() + ' t';
+            document.getElementById('metScope3').textContent = Math.round(scope3).toLocaleString() + ' t';
+            document.getElementById('metIntensity').textContent = intensityPerKWh.toFixed(3);
+            document.getElementById('metOffset').textContent = '$' + Math.round(offsetCost).toLocaleString();
+            document.getElementById('metTax').textContent = '$' + Math.round(taxExposure).toLocaleString();
+            document.getElementById('metEnergy').textContent = Math.round(annualMWh).toLocaleString();
+            document.getElementById('metRating').textContent = rating.split(' \u2014 ')[0];
+        } else if (currentTab === 'lifecycle') {
+            document.getElementById('primaryValue').textContent = Math.round(totalLifecycle).toLocaleString();
+            document.getElementById('primaryUnit').textContent = 'tCO\u2082e total';
+            document.getElementById('primaryLabel').textContent = 'Life-Cycle Embodied Carbon';
+            document.getElementById('primaryValue').style.color = '#22c55e';
+            document.getElementById('gradeText').textContent = facilityMW.toFixed(1) + ' MW over ' + projectLife + ' years';
+            // Update metric boxes for LCA
+            document.getElementById('metScope1').textContent = Math.round(materialsTotal) + ' t';
+            document.getElementById('metScope1').parentElement.querySelector('.metric-label').textContent = 'Materials (A1-A3)';
+            document.getElementById('metScope2').textContent = Math.round(itEmbodied) + ' t';
+            document.getElementById('metScope2').parentElement.querySelector('.metric-label').textContent = 'IT Equipment';
+            document.getElementById('metScope3').textContent = Math.round(constructionCarbon) + ' t';
+            document.getElementById('metScope3').parentElement.querySelector('.metric-label').textContent = 'Construction (A4-A5)';
+            document.getElementById('metIntensity').textContent = Math.round(totalLifecycle / facilityMW);
+            document.getElementById('metIntensity').parentElement.querySelector('.metric-label').textContent = 'tCO\u2082e/MW';
+            document.getElementById('metOffset').textContent = Math.round(moduleDCredit) + ' t';
+            document.getElementById('metOffset').parentElement.querySelector('.metric-label').textContent = 'Module D Credit';
+            document.getElementById('metTax').textContent = Math.round(annualAmortized) + ' t/yr';
+            document.getElementById('metTax').parentElement.querySelector('.metric-label').textContent = 'Amortized/yr';
+            document.getElementById('metEnergy').textContent = Math.round(lifetimeOperational).toLocaleString();
+            document.getElementById('metEnergy').parentElement.querySelector('.metric-label').textContent = 'Lifetime Ops (tCO\u2082)';
+            document.getElementById('metRating').textContent = Math.round(totalLifecycle / totalLifecyclePlusOps * 100) + '%';
+            document.getElementById('metRating').parentElement.querySelector('.metric-label').textContent = 'Embodied Share';
+        } else if (currentTab === 'budget') {
+            document.getElementById('primaryValue').textContent = Math.round(annualBudgetPerMW).toLocaleString();
+            document.getElementById('primaryUnit').textContent = 'tCO\u2082/MW/yr';
+            document.getElementById('primaryLabel').textContent = 'Allocated Carbon Budget';
+            document.getElementById('primaryValue').style.color = '#22c55e';
+            document.getElementById('gradeText').textContent = country + ' \u2014 2025-' + budgetPeriodVal;
+            // Update readonly fields
+            document.getElementById('cumulBudget').value = cumulativeBudget.toFixed(1);
+            document.getElementById('annualBudgetPerMW').value = annualBudgetPerMW.toFixed(1);
+            // Update metric boxes for budget tab
+            document.getElementById('metScope1').textContent = cumulativeBudget.toFixed(0) + ' Mt';
+            document.getElementById('metScope1').parentElement.querySelector('.metric-label').textContent = 'Cumulative Budget';
+            document.getElementById('metScope2').textContent = annualBudgetPerMW.toFixed(0) + ' t';
+            document.getElementById('metScope2').parentElement.querySelector('.metric-label').textContent = 'Budget/MW/yr';
+            document.getElementById('metScope3').textContent = Math.round(renewableGapPerYear * 10) / 10 + '%/yr';
+            document.getElementById('metScope3').parentElement.querySelector('.metric-label').textContent = 'Renewable Ramp';
+            document.getElementById('metIntensity').textContent = netZeroYear;
+            document.getElementById('metIntensity').parentElement.querySelector('.metric-label').textContent = 'Net-Zero Target';
+            document.getElementById('metOffset').textContent = (wlTotal === 100 ? '\u2713' : '\u2717') + ' ' + wlTotal + '%';
+            document.getElementById('metOffset').parentElement.querySelector('.metric-label').textContent = 'Workload Sum';
+            document.getElementById('metTax').textContent = creditStrategy;
+            document.getElementById('metTax').parentElement.querySelector('.metric-label').textContent = 'Credit Strategy';
+            document.getElementById('metEnergy').textContent = Math.round(nationalMW);
+            document.getElementById('metEnergy').parentElement.querySelector('.metric-label').textContent = 'Est. National MW';
+            document.getElementById('metRating').textContent = ndcReduction * 100 + '%';
+            document.getElementById('metRating').parentElement.querySelector('.metric-label').textContent = 'NDC Target';
+        }
+
+        // Update charts
+        updateCharts(scope1, scope2, scope3, totalEmissions, materialsTotal, itEmbodied, constructionCarbon, endOfLifeCarbon, moduleDCredit, totalBatteryCarbon, mepCarbon);
+
+        // Update pro panels if unlocked
+        if (isPremiumUser && currentMode === 'pro') {
+            updateProPanels(totalEmissions, scope1, scope2, scope3, totalLifecycle, annualBudgetPerMW, rating, intensityPerKWh, offsetCost, taxExposure);
+        }
+
+        // Store calc results for PDF export
+        window._calcResults = {
+            totalEmissions: totalEmissions, scope1: scope1, scope2: scope2, scope3: scope3,
+            rating: rating, ratingColor: ratingColor, intensityPerKWh: intensityPerKWh,
+            annualMWh: annualMWh, offsetCost: offsetCost, taxExposure: taxExposure,
+            totalLifecycle: totalLifecycle, materialsTotal: materialsTotal, itEmbodied: itEmbodied,
+            constructionCarbon: constructionCarbon, endOfLifeCarbon: endOfLifeCarbon,
+            moduleDCredit: moduleDCredit, totalBatteryCarbon: totalBatteryCarbon, mepCarbon: mepCarbon,
+            lifetimeOperational: lifetimeOperational, annualAmortized: annualAmortized,
+            facilityMW: facilityMW, projectLife: projectLife,
+            annualBudgetPerMW: annualBudgetPerMW, cumulativeBudget: cumulativeBudget,
+            country: country, pue: pue, itLoad: itLoad, renewablePct: renewablePct
+        };
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 13. CHART UPDATE FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    var scopeChartInstance = null;
+    var comparisonChartInstance = null;
+
+    function updateCharts(scope1, scope2, scope3, total, materials, itEmb, construction, eol, moduleD, battery, mep) {
+        // Scope/LCA Donut Chart
+        var ctx1 = document.getElementById('scopeChart');
+        if (!ctx1) return;
+        if (scopeChartInstance) scopeChartInstance.destroy();
+
+        var chartData, chartLabels, chartColors;
+        if (currentTab === 'operational') {
+            chartLabels = ['Scope 1 (Direct)', 'Scope 2 (Grid)', 'Scope 3 (Upstream)'];
+            chartData = [scope1, scope2, scope3];
+            chartColors = ['#ef4444', '#3b82f6', '#f59e0b'];
+        } else if (currentTab === 'lifecycle') {
+            chartLabels = ['Materials (A1-A3)', 'IT Equipment', 'Battery', 'MEP', 'Construction (A4-A5)', 'End-of-Life (C1-C4)', 'Module D (Credit)'];
+            chartData = [materials, itEmb, battery, mep, construction, eol, Math.abs(moduleD)];
+            chartColors = ['#64748b', '#6366f1', '#8b5cf6', '#a855f7', '#6b7280', '#ef4444', '#22c55e'];
+        } else {
+            // Budget tab: show workload allocation
+            var wlT = parseFloat(document.getElementById('wlTraining').value) || 15;
+            var wlI = parseFloat(document.getElementById('wlInference').value) || 20;
+            var wlC = parseFloat(document.getElementById('wlCloud').value) || 30;
+            var wlE = parseFloat(document.getElementById('wlEnterprise').value) || 20;
+            var wlG = parseFloat(document.getElementById('wlGovt').value) || 15;
+            chartLabels = ['AI Training', 'AI Inference', 'Cloud SaaS/IaaS', 'Enterprise IT', 'Govt/Critical'];
+            chartData = [wlT, wlI, wlC, wlE, wlG];
+            chartColors = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#8b5cf6'];
+        }
+
+        scopeChartInstance = new Chart(ctx1.getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: chartLabels, datasets: [{ data: chartData, backgroundColor: chartColors, borderWidth: 2, borderColor: '#ffffff' }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 12 } } } }
+        });
+
+        // Comparison Bar Chart
+        var ctx2 = document.getElementById('comparisonChart');
+        if (!ctx2) return;
+        if (comparisonChartInstance) comparisonChartInstance.destroy();
+
+        if (currentTab === 'operational') {
+            var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+            var industryAvg = INDUSTRY_AVG_CARBON * itLoad * 8760 * INDUSTRY_AVG_PUE / 1000;
+            comparisonChartInstance = new Chart(ctx2.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Your Facility', 'Industry Average', 'Best Practice'],
+                    datasets: [{ label: 'tCO\u2082e/yr', data: [total, industryAvg, industryAvg * 0.3], backgroundColor: ['#22c55e', '#94a3b8', '#06b6d4'], borderRadius: 6 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+            });
+        } else if (currentTab === 'lifecycle') {
+            var phases = [materials, itEmb + battery + mep, construction, eol, Math.abs(moduleD)];
+            comparisonChartInstance = new Chart(ctx2.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['A1-A3\nMaterials', 'B1-B7\nEquipment', 'A4-A5\nConstruction', 'C1-C4\nEnd-of-Life', 'D\nRecycling'],
+                    datasets: [{ label: 'tCO\u2082e', data: phases, backgroundColor: ['#64748b', '#6366f1', '#6b7280', '#ef4444', '#22c55e'], borderRadius: 6 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        } else {
+            // Budget: renewable procurement timeline
+            var years = [];
+            var renewables = [];
+            var currentR = parseFloat(document.getElementById('currentRenewable').value) || 40;
+            var nzYear = parseInt(document.getElementById('netZeroYear').value) || 2050;
+            for (var y = 2025; y <= nzYear; y += 5) {
+                years.push(y);
+                var pct = Math.min(100, currentR + ((100 - currentR) * (y - 2025) / (nzYear - 2025)));
+                renewables.push(Math.round(pct));
+            }
+            comparisonChartInstance = new Chart(ctx2.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{ label: 'Renewable %', data: renewables, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.3, pointRadius: 4 }]
+                },
+                options: { responsive: true, scales: { y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }, plugins: { legend: { display: false } } }
+            });
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 14. PRO PANEL UPDATES
+    // ══════════════════════════════════════════════════════════════
+    function updateProPanels(totalEmissions, scope1, scope2, scope3, totalLifecycle, annualBudgetPerMW, rating, intensity, offsetCost, taxExposure) {
+        runMonteCarlo(totalEmissions);
+        runSensitivity(totalEmissions);
+        runScenarios(totalEmissions, scope2);
+        generateNarrative(totalEmissions, rating, intensity, offsetCost, taxExposure, totalLifecycle);
+    }
+
+    function runMonteCarlo(baseEmissions) {
+        var N = 10000;
+        var results = [];
+        for (var i = 0; i < N; i++) {
+            var pueVar = 0.9 + Math.random() * 0.2;
+            var gridVar = 0.85 + Math.random() * 0.3;
+            var genVar = 0.7 + Math.random() * 0.6;
+            results.push(baseEmissions * ((pueVar + gridVar + genVar) / 3));
+        }
+        results.sort(function(a, b) { return a - b; });
+        var mean = results.reduce(function(a, b) { return a + b; }, 0) / N;
+        var p5 = results[Math.floor(N * 0.05)];
+        var p50 = results[Math.floor(N * 0.50)];
+        var p95 = results[Math.floor(N * 0.95)];
+        var variance = results.reduce(function(sum, x) { return sum + Math.pow(x - mean, 2); }, 0) / N;
+        var stdDev = Math.sqrt(variance);
+
+        document.getElementById('mcP5').textContent = Math.round(p5).toLocaleString();
+        document.getElementById('mcP50').textContent = Math.round(p50).toLocaleString();
+        document.getElementById('mcP95').textContent = Math.round(p95).toLocaleString();
+        document.getElementById('mcStdDev').textContent = Math.round(stdDev).toLocaleString();
+
+        renderHistogram(results, p5, p50, p95);
+    }
+
+    function renderHistogram(results, p5, p50, p95) {
+        var ctx = document.getElementById('histogramChart');
+        if (!ctx) return;
+        if (window._histChart) window._histChart.destroy();
+
+        var bins = 30;
+        var min = results[0];
+        var max = results[results.length - 1];
+        var binWidth = (max - min) / bins;
+        var counts = new Array(bins).fill(0);
+        var labels = [];
+        results.forEach(function(v) {
+            var idx = Math.min(Math.floor((v - min) / binWidth), bins - 1);
+            counts[idx]++;
+        });
+        for (var i = 0; i < bins; i++) {
+            labels.push(Math.round(min + i * binWidth));
+        }
+        var colors = labels.map(function(v) {
+            if (v < p5) return 'rgba(34,197,94,0.6)';
+            if (v > p95) return 'rgba(239,68,68,0.6)';
+            return 'rgba(34,197,94,0.3)';
+        });
+
+        window._histChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 2 }] },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+
+    function runSensitivity(baseEmissions) {
+        var inputs = {
+            'PUE': { vary: 0.2, impact: 0 },
+            'Grid Intensity': { vary: 0.2, impact: 0 },
+            'IT Load': { vary: 0.2, impact: 0 },
+            'Gen Hours': { vary: 0.2, impact: 0 },
+            'Renewable %': { vary: 0.2, impact: 0 },
+            'Leak Rate': { vary: 0.2, impact: 0 }
+        };
+        var pue = parseFloat(document.getElementById('pueValue').value) || 1.58;
+        var grid = parseFloat(document.getElementById('gridIntensity').value) || 0.40;
+        var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
+        var genHours = parseFloat(document.getElementById('genHours').value) || 200;
+        var renew = parseFloat(document.getElementById('renewablePct').value) || 0;
+        var leak = parseFloat(document.getElementById('leakRate').value) || 5;
+
+        // Vary each +-20% and compute impact
+        inputs['PUE'].impact = Math.abs(itLoad * (pue * 1.2) * 8.76 * grid * (1 - renew / 100) - itLoad * (pue * 0.8) * 8.76 * grid * (1 - renew / 100));
+        inputs['Grid Intensity'].impact = Math.abs(itLoad * pue * 8.76 * (grid * 1.2) * (1 - renew / 100) - itLoad * pue * 8.76 * (grid * 0.8) * (1 - renew / 100));
+        inputs['IT Load'].impact = Math.abs((itLoad * 1.2) * pue * 8.76 * grid * (1 - renew / 100) - (itLoad * 0.8) * pue * 8.76 * grid * (1 - renew / 100));
+        inputs['Gen Hours'].impact = Math.abs(itLoad * 0.3 * (genHours * 1.2) * 2.68 / 1000 - itLoad * 0.3 * (genHours * 0.8) * 2.68 / 1000);
+        inputs['Renewable %'].impact = Math.abs(itLoad * pue * 8.76 * grid * (1 - Math.min(100, renew * 1.2) / 100) - itLoad * pue * 8.76 * grid * (1 - Math.max(0, renew * 0.8) / 100));
+        inputs['Leak Rate'].impact = Math.abs(leak * 1.2 - leak * 0.8) / 100 * itLoad * 0.3 * 2088 / 1000;
+
+        // Sort by impact
+        var sorted = Object.keys(inputs).map(function(k) { return { name: k, impact: inputs[k].impact }; });
+        sorted.sort(function(a, b) { return b.impact - a.impact; });
+
+        // Render tornado as horizontal bar chart
+        var ctx = document.getElementById('tornadoChart');
+        if (!ctx) return;
+        if (window._tornadoChart) window._tornadoChart.destroy();
+
+        window._tornadoChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: sorted.map(function(s) { return s.name; }),
+                datasets: [{
+                    label: 'Impact (tCO\u2082e)',
+                    data: sorted.map(function(s) { return Math.round(s.impact); }),
+                    backgroundColor: sorted.map(function(s, i) { return i < 2 ? '#ef4444' : i < 4 ? '#f59e0b' : '#22c55e'; }),
+                    borderRadius: 4
+                }]
+            },
+            options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+        });
+    }
+
+    function runScenarios(baseEmissions, scope2) {
+        var scenarios = [
+            { name: 'Current State', reduction: 0, color: '#94a3b8' },
+            { name: '+ Solar PV (30%)', reduction: scope2 * 0.30, color: '#eab308' },
+            { name: '+ Liquid Cooling', reduction: baseEmissions * 0.08, color: '#06b6d4' },
+            { name: '+ 100% PPA', reduction: scope2 * 0.95, color: '#22c55e' },
+            { name: '+ Low-carbon Materials', reduction: baseEmissions * 0.05, color: '#8b5cf6' }
+        ];
+
+        var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">';
+        var cumReduction = 0;
+        scenarios.forEach(function(s) {
+            cumReduction += s.reduction;
+            var remaining = Math.max(0, baseEmissions - cumReduction);
+            html += '<div style="padding:8px 12px;background:' + s.color + '15;border-radius:8px;border-left:3px solid ' + s.color + ';">';
+            html += '<div style="font-weight:600;font-size:0.82rem;">' + s.name + '</div>';
+            html += '<div style="font-size:0.9rem;font-weight:700;color:' + s.color + ';">' + Math.round(remaining).toLocaleString() + ' tCO\u2082e</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+        document.getElementById('scenarioResults').innerHTML = html;
+
+        // Scenario chart
+        var ctx = document.getElementById('scenarioChart');
+        if (!ctx) return;
+        if (window._scenarioChart) window._scenarioChart.destroy();
+
+        cumReduction = 0;
+        var values = scenarios.map(function(s) { cumReduction += s.reduction; return Math.max(0, baseEmissions - cumReduction); });
+
+        window._scenarioChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: scenarios.map(function(s) { return s.name; }),
+                datasets: [{ data: values, backgroundColor: scenarios.map(function(s) { return s.color; }), borderRadius: 6 }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    function generateNarrative(total, rating, intensity, offset, tax, lifecycle) {
+        var country = COUNTRIES[document.getElementById('countrySelect').value];
+        var countryName = country ? country.name : 'Selected Country';
+        var html = '';
+        html += '<p><strong>Current Assessment:</strong> Your data center in ' + countryName + ' produces approximately ' + Math.round(total).toLocaleString() + ' tCO\u2082e annually, achieving an efficiency rating of ' + rating + '. ';
+        html += 'The carbon intensity of ' + intensity.toFixed(3) + ' kgCO\u2082/kWh IT ' + (intensity < 0.4 ? 'is below the industry average of 0.475 kgCO\u2082/kWh, indicating relatively clean operations.' : 'exceeds the industry average of 0.475 kgCO\u2082/kWh, suggesting significant improvement potential.') + '</p>';
+        html += '<p><strong>Financial Exposure:</strong> At current carbon offset prices ($' + CARBON_OFFSET_PRICE + '/tCO\u2082), annual offsetting would cost $' + Math.round(offset).toLocaleString() + '. ';
+        html += 'Under EU ETS pricing ($' + CARBON_TAX_RATE + '/tCO\u2082), carbon tax exposure reaches $' + Math.round(tax).toLocaleString() + '/year. ';
+        html += 'SEC Climate Disclosure Rule and EU CSRD will require reporting of these emissions across all three scopes.</p>';
+        if (lifecycle > 0) {
+            html += '<p><strong>Life-Cycle Context:</strong> Embodied carbon from construction and equipment totals approximately ' + Math.round(lifecycle).toLocaleString() + ' tCO\u2082e over the project lifetime. ';
+            html += 'This represents ' + Math.round(lifecycle / (lifecycle + total * 20) * 100) + '% of total cradle-to-grave emissions, highlighting the importance of material selection and circular economy strategies.</p>';
+        }
+        html += '<p><strong>Recommendations:</strong> Priority actions include: (1) increasing renewable energy procurement to reduce Scope 2, (2) transitioning to low-GWP refrigerants for Scope 1 reduction, and (3) implementing Science Based Targets initiative (SBTi) aligned reduction pathways for long-term decarbonization.</p>';
+        document.getElementById('narrativeBox').innerHTML = html;
+
+        // Update compliance KPIs
+        document.getElementById('compOffset').textContent = '$' + Math.round(offset).toLocaleString();
+        document.getElementById('compTax').textContent = '$' + Math.round(tax).toLocaleString();
+        document.getElementById('compCBAM').textContent = intensity > 0.6 ? 'High' : intensity > 0.3 ? 'Medium' : 'Low';
+        document.getElementById('compSEC').textContent = '3 gaps';
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 15. PDF EXPORT FUNCTION
+    // ══════════════════════════════════════════════════════════════
+    function exportPDF() {
+        if (!isPremiumUser) { handlePremiumTab(); return; }
+        var w = window.open('', '_blank');
+        if (!w) { alert('Please allow popups for PDF export.'); return; }
+
+        var r = window._calcResults;
+        if (!r) { alert('Please calculate first.'); return; }
+        var dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        var rColor = r.ratingColor || '#22c55e';
+
+        // Build SVG scope chart
+        var svgScope = buildSVGDonut(r.scope1, r.scope2, r.scope3);
+        // Build SVG comparison bar
+        var svgComp = buildSVGBar(r);
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        html += '<title>Carbon Footprint Report \u2014 ' + dateStr + '</title>';
+        html += '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">';
+        html += '<style>';
+        html += '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { margin: 15mm; } }';
+        html += '* { margin:0; padding:0; box-sizing:border-box; }';
+        html += 'body { font-family: "Inter", Arial, sans-serif; max-width: 820px; margin: 0 auto; padding: 20px 30px; color: #1f2937; font-size: 12px; line-height: 1.5; }';
+        html += 'h1 { color: #1e3a5f; font-size: 20px; margin-bottom: 2px; }';
+        html += 'h2 { color: #1e3a5f; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #22c55e; }';
+        html += 'table { width: 100%; border-collapse: collapse; margin: 8px 0; }';
+        html += 'th { background: #f8fafc; padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e5e7eb; }';
+        html += 'td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }';
+        html += '.pdf-header { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #22c55e; }';
+        html += '.pdf-brand { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }';
+        html += '.pdf-brand span { color: #22c55e; }';
+        html += '.pdf-date { font-size: 9px; color: #94a3b8; text-align: right; }';
+        html += '.pdf-score-row { display: flex; gap: 16px; margin: 12px 0; }';
+        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 2px solid ' + rColor + '; border-radius: 12px; }';
+        html += '.pdf-score-value { font-size: 38px; font-weight: 800; color: ' + rColor + '; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-score-label { font-size: 10px; color: #64748b; text-transform: uppercase; margin-top: 4px; }';
+        html += '.pdf-score-rating { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 10px; font-weight: 700; background: ' + rColor + '18; color: ' + rColor + '; margin-top: 6px; }';
+        html += '.pdf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }';
+        html += '.pdf-kpi-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; }';
+        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #1e3a5f; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-kpi-label { font-size: 8px; color: #6b7280; margin-top: 3px; text-transform: uppercase; }';
+        html += '.pdf-chart-row { display: flex; gap: 16px; margin: 12px 0; }';
+        html += '.pdf-chart-row > div { flex: 1; background: #fafbfc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; }';
+        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #22c55e; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
+        html += '.pdf-narrative p { font-size: 10.5px; color: #374151; margin-bottom: 8px; }';
+        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #22c55e; text-align: center; font-size: 8px; color: #94a3b8; }';
+        html += '</style></head><body>';
+
+        // Header
+        html += '<div class="pdf-header"><div><h1>DC Carbon Footprint Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO \u2014 Pro Analysis</div></div>';
+        html += '<div class="pdf-date">Generated ' + dateStr + '<br>resistancezero.com</div></div>';
+
+        // Score
+        html += '<div class="pdf-score-row">';
+        html += '<div class="pdf-score-card"><div class="pdf-score-value">' + Math.round(r.totalEmissions).toLocaleString() + '</div><div class="pdf-score-label">tCO\u2082e per year</div><div class="pdf-score-rating">' + r.rating + '</div></div>';
+        html += '<div style="flex:1.2;"><div class="pdf-kpi-grid" style="grid-template-columns:repeat(2,1fr);height:100%;">';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.scope1) + '</div><div class="pdf-kpi-label">Scope 1 (tCO\u2082)</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.scope2) + '</div><div class="pdf-kpi-label">Scope 2 (tCO\u2082)</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.scope3) + '</div><div class="pdf-kpi-label">Scope 3 (tCO\u2082)</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + r.intensityPerKWh.toFixed(3) + '</div><div class="pdf-kpi-label">kgCO\u2082/kWh IT</div></div>';
+        html += '</div></div></div>';
+
+        // KPI Grid
+        html += '<div class="pdf-kpi-grid">';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.annualMWh).toLocaleString() + '</div><div class="pdf-kpi-label">Annual MWh</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">$' + Math.round(r.offsetCost).toLocaleString() + '</div><div class="pdf-kpi-label">Offset Cost</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">$' + Math.round(r.taxExposure).toLocaleString() + '</div><div class="pdf-kpi-label">EU ETS Exposure</div></div>';
+        html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + r.pue + '</div><div class="pdf-kpi-label">PUE</div></div>';
+        html += '</div>';
+
+        // Config table
+        html += '<h2>Configuration</h2>';
+        html += '<table><tr><td style="width:30%;font-weight:600;">IT Load</td><td style="width:20%;">' + r.itLoad + ' kW</td>';
+        html += '<td style="width:30%;font-weight:600;">Country</td><td style="width:20%;">' + r.country + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">PUE</td><td>' + r.pue + '</td>';
+        html += '<td style="font-weight:600;">Renewable %</td><td>' + r.renewablePct + '%</td></tr></table>';
+
+        // Charts (SVG)
+        html += '<h2>Emissions Analysis</h2>';
+        html += '<div class="pdf-chart-row"><div>' + svgScope + '</div><div>' + svgComp + '</div></div>';
+
+        // Life-cycle summary
+        if (r.totalLifecycle > 0) {
+            html += '<h2>Life-Cycle Assessment</h2>';
+            html += '<div class="pdf-kpi-grid">';
+            html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.totalLifecycle).toLocaleString() + '</div><div class="pdf-kpi-label">Total Embodied (tCO\u2082e)</div></div>';
+            html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.materialsTotal) + '</div><div class="pdf-kpi-label">Materials (A1-A3)</div></div>';
+            html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.itEmbodied) + '</div><div class="pdf-kpi-label">IT Equipment</div></div>';
+            html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">' + Math.round(r.moduleDCredit) + '</div><div class="pdf-kpi-label">Module D Credit</div></div>';
+            html += '</div>';
+        }
+
+        // Narrative
+        html += '<h2>Executive Assessment</h2>';
+        html += '<div class="pdf-narrative">' + (document.getElementById('narrativeBox').innerHTML || '') + '</div>';
+
+        // Methodology
+        html += '<h2>Methodology</h2>';
+        html += '<p style="font-size:10px;color:#6b7280;">Operational emissions calculated per GHG Protocol Corporate Standard (Scope 1/2/3). Grid emission factors from IEA World Energy Outlook 2024. Refrigerant GWP values from IPCC AR6. Life-cycle assessment follows ISO 14040/14044 and EN 15978 (modules A1-D). Material carbon factors from ICE Database v4.1 (University of Bath). Server embodied carbon from manufacturer PCF reports (Dell, HPE, NVIDIA). National carbon budgets derived from UNFCCC NDC Registry targets. Monte Carlo simulation: 10,000 iterations with uniform distribution. Industry benchmarks from Uptime Institute 2024 Global Survey.</p>';
+
+        // Footer
+        html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>Carbon Footprint Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';
+
+        html += '</body></html>';
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 500);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 16. SVG CHART BUILDERS FOR PDF
+    // ══════════════════════════════════════════════════════════════
+    function buildSVGDonut(scope1, scope2, scope3) {
+        var total = scope1 + scope2 + scope3;
+        if (total === 0) return '<svg viewBox="0 0 200 200"><text x="100" y="100" text-anchor="middle" fill="#94a3b8">No data</text></svg>';
+        var data = [
+            { value: scope1, color: '#ef4444', label: 'Scope 1' },
+            { value: scope2, color: '#3b82f6', label: 'Scope 2' },
+            { value: scope3, color: '#f59e0b', label: 'Scope 3' }
+        ];
+        var cx = 100, cy = 90, r = 70, ir = 40;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" style="width:100%;max-width:300px;">';
+        var startAngle = -90;
+        data.forEach(function(d) {
+            if (d.value <= 0) return;
+            var angle = (d.value / total) * 360;
+            var endAngle = startAngle + angle;
+            var largeArc = angle > 180 ? 1 : 0;
+            var x1 = cx + r * Math.cos(startAngle * Math.PI / 180);
+            var y1 = cy + r * Math.sin(startAngle * Math.PI / 180);
+            var x2 = cx + r * Math.cos(endAngle * Math.PI / 180);
+            var y2 = cy + r * Math.sin(endAngle * Math.PI / 180);
+            var ix1 = cx + ir * Math.cos(endAngle * Math.PI / 180);
+            var iy1 = cy + ir * Math.sin(endAngle * Math.PI / 180);
+            var ix2 = cx + ir * Math.cos(startAngle * Math.PI / 180);
+            var iy2 = cy + ir * Math.sin(startAngle * Math.PI / 180);
+            svg += '<path d="M' + x1 + ',' + y1 + ' A' + r + ',' + r + ' 0 ' + largeArc + ',1 ' + x2 + ',' + y2 + ' L' + ix1 + ',' + iy1 + ' A' + ir + ',' + ir + ' 0 ' + largeArc + ',0 ' + ix2 + ',' + iy2 + ' Z" fill="' + d.color + '"/>';
+            startAngle = endAngle;
+        });
+        // Center text
+        svg += '<text x="' + cx + '" y="' + (cy - 5) + '" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">' + Math.round(total) + '</text>';
+        svg += '<text x="' + cx + '" y="' + (cy + 10) + '" text-anchor="middle" font-size="8" fill="#6b7280">tCO\u2082e/yr</text>';
+        // Legend
+        var ly = 175;
+        data.forEach(function(d, i) {
+            var lx = 10 + i * 65;
+            svg += '<rect x="' + lx + '" y="' + ly + '" width="8" height="8" rx="2" fill="' + d.color + '"/>';
+            svg += '<text x="' + (lx + 12) + '" y="' + (ly + 7) + '" font-size="8" fill="#6b7280">' + d.label + ' (' + Math.round(d.value / total * 100) + '%)</text>';
+        });
+        svg += '</svg>';
+        return svg;
+    }
+
+    function buildSVGBar(r) {
+        var industryAvg = INDUSTRY_AVG_CARBON * r.itLoad * 8760 * INDUSTRY_AVG_PUE / 1000;
+        var bestPractice = industryAvg * 0.3;
+        var data = [
+            { value: r.totalEmissions, label: 'Your DC', color: '#22c55e' },
+            { value: industryAvg, label: 'Industry Avg', color: '#94a3b8' },
+            { value: bestPractice, label: 'Best Practice', color: '#06b6d4' }
+        ];
+        var maxVal = Math.max.apply(null, data.map(function(d) { return d.value; })) * 1.1;
+        if (maxVal === 0) maxVal = 1;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" style="width:100%;max-width:300px;">';
+        data.forEach(function(d, i) {
+            var x = 30 + i * 90;
+            var h = (d.value / maxVal) * 140;
+            var y = 160 - h;
+            svg += '<rect x="' + x + '" y="' + y + '" width="60" height="' + h + '" rx="4" fill="' + d.color + '"/>';
+            svg += '<text x="' + (x + 30) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="10" font-weight="600" fill="#1f2937">' + Math.round(d.value).toLocaleString() + '</text>';
+            svg += '<text x="' + (x + 30) + '" y="175" text-anchor="middle" font-size="8" fill="#6b7280">' + d.label + '</text>';
+        });
+        svg += '</svg>';
+        return svg;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 17. RESET, NAVBAR, TOOLTIP, INIT FUNCTIONS
+    // ══════════════════════════════════════════════════════════════
+    function resetDefaults() {
+        document.getElementById('itLoad').value = 1000;
+        document.getElementById('pueValue').value = 1.58;
+        document.getElementById('countrySelect').value = 'US';
+        document.getElementById('coolingType').value = 'air_crac';
+        document.getElementById('genType').value = 'diesel';
+        document.getElementById('genHours').value = 200;
+        document.getElementById('renewableType').value = 'none';
+        document.getElementById('renewablePct').value = 0;
+        document.getElementById('leakRate').value = 5;
+        // LCA defaults
+        document.getElementById('facilityMW').value = 1;
+        document.getElementById('buildingType').value = 'purpose';
+        document.getElementById('concreteGrade').value = 'c30';
+        document.getElementById('steelSource').value = 'world';
+        document.getElementById('seismicZone').value = '0';
+        document.getElementById('upsTypeLCA').value = 'modular';
+        document.getElementById('batteryType').value = 'lfp';
+        document.getElementById('batteryRuntime').value = '10';
+        document.getElementById('redundancyLCA').value = 'n1';
+        document.getElementById('workloadType').value = 'traditional';
+        document.getElementById('serverRefresh').value = 4;
+        document.getElementById('networkRefresh').value = 5;
+        document.getElementById('projectLifetime').value = 20;
+        document.getElementById('equipOrigin').value = 'regional';
+        document.getElementById('transportMode').value = 'truck_ship';
+        document.getElementById('constructDuration').value = '18';
+        document.getElementById('decommPlan').value = 'demolition';
+        document.getElementById('ewaste').value = 'standard';
+        document.getElementById('steelRecycle').value = 92;
+        document.getElementById('copperRecycle').value = 85;
+        // Budget defaults
+        document.getElementById('dcShare').value = 3.5;
+        document.getElementById('dcGrowth').value = 15;
+        document.getElementById('budgetPeriod').value = '2030';
+        document.getElementById('budgetMethod').value = 'linear';
+        document.getElementById('wlTraining').value = 15;
+        document.getElementById('wlInference').value = 20;
+        document.getElementById('wlCloud').value = 30;
+        document.getElementById('wlEnterprise').value = 20;
+        document.getElementById('wlGovt').value = 15;
+        document.getElementById('currentRenewable').value = 40;
+        document.getElementById('netZeroYear').value = '2050';
+        document.getElementById('creditStrategy').value = 'none';
+        // Reset preset button active states
+        document.querySelectorAll('.preset-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        document.querySelectorAll('.preset-btn').forEach(function(btn) {
+            var onclick = btn.getAttribute('onclick') || '';
+            if (onclick.indexOf("'itLoad',1000") !== -1 || onclick.indexOf("'pueValue',1.58") !== -1) {
+                btn.classList.add('active');
+            }
+        });
+        onCountryChange();
+        onCoolingChange();
+        onWorkloadChange();
+        updateRangeDisplays();
+        calculate();
+    }
+
+    function toggleUserDropdown() {
+        document.getElementById('navUserBtn').classList.toggle('open');
+        document.getElementById('navUserDropdown').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+        var wrap = document.getElementById('navAuthWrap');
+        if (wrap && !wrap.contains(e.target)) {
+            var dd = document.getElementById('navUserDropdown');
+            var btn = document.getElementById('navUserBtn');
+            if (dd) dd.classList.remove('show');
+            if (btn) btn.classList.remove('open');
+        }
+    });
+
+    function updateNavbarAuthUI() {
+        var loginBtn = document.getElementById('navLoginBtn');
+        var userBtn = document.getElementById('navUserBtn');
+        if (isPremiumUser) {
+            var session = JSON.parse(localStorage.getItem('rz_premium_session') || '{}');
+            var email = session.email || 'PRO User';
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (userBtn) userBtn.style.display = 'flex';
+            var avatar = document.getElementById('navUserAvatar');
+            var navEmail = document.getElementById('navUserEmail');
+            var ddEmail = document.getElementById('navDdEmail');
+            if (avatar) avatar.textContent = email.charAt(0).toUpperCase();
+            if (navEmail) navEmail.textContent = email;
+            if (ddEmail) ddEmail.textContent = email;
+        } else {
+            if (loginBtn) loginBtn.style.display = 'flex';
+            if (userBtn) userBtn.style.display = 'none';
+        }
+    }
+
+    function initTooltipSystem() {
+        var tooltipEl = document.createElement('div');
+        tooltipEl.id = 'tooltip-container';
+        tooltipEl.style.cssText = 'position:fixed;z-index:99999;max-width:320px;padding:16px;background:white;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.15);border:1px solid #e2e8f0;pointer-events:none;opacity:0;transition:opacity 0.2s;font-size:0.82rem;color:#374151;line-height:1.6;';
+        document.body.appendChild(tooltipEl);
+        document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
+            var content = trigger.querySelector('.tooltip-content');
+            if (!content) return;
+            trigger.addEventListener('mouseenter', function() {
+                tooltipEl.innerHTML = content.innerHTML;
+                tooltipEl.style.opacity = '1';
+                var rect = trigger.getBoundingClientRect();
+                var tooltipWidth = 320;
+                var padding = 15;
+                var left = rect.right + padding;
+                var top = rect.top + rect.height / 2 - 100;
+                if (left + tooltipWidth > window.innerWidth - 20) left = rect.left - tooltipWidth - padding;
+                if (left < 20) left = 20;
+                if (top < 20) top = 20;
+                if (top + 200 > window.innerHeight - 20) top = window.innerHeight - 220;
+                tooltipEl.style.left = left + 'px';
+                tooltipEl.style.top = top + 'px';
+            });
+            trigger.addEventListener('mouseleave', function() {
+                tooltipEl.style.opacity = '0';
+            });
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // INITIALIZE ON DOM READY
+    // ══════════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function() {
+        // Override country select onchange to call onCountryChange
+        var countrySelect = document.getElementById('countrySelect');
+        if (countrySelect) {
+            countrySelect.removeAttribute('onchange');
+            countrySelect.addEventListener('change', onCountryChange);
+        }
+        // Override cooling select onchange
+        var coolingSelect = document.getElementById('coolingType');
+        if (coolingSelect) {
+            coolingSelect.removeAttribute('onchange');
+            coolingSelect.addEventListener('change', onCoolingChange);
+        }
+        // Override workload select onchange
+        var workloadSelect = document.getElementById('workloadType');
+        if (workloadSelect) {
+            workloadSelect.removeAttribute('onchange');
+            workloadSelect.addEventListener('change', onWorkloadChange);
+        }
+        // Initialize
+        onCountryChange();
+        onCoolingChange();
+        onWorkloadChange();
+        updateRangeDisplays();
+        calculate();
+        updateNavbarAuthUI();
+        initTooltipSystem();
+    });
+    </script>
+    <script src="rz-tracker.js"></script>
+    <script>
+    (function(){
+        var cb = document.getElementById('cookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) cb.classList.remove('hidden');
+        var acceptBtn = document.getElementById('cookieAccept');
+        var declineBtn = document.getElementById('cookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
+        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+        var sBtn = document.getElementById('scrollTopBtn');
+        if (sBtn) {
+            var ticking = false;
+            window.addEventListener('scroll', function(){ if(!ticking){window.requestAnimationFrame(function(){sBtn.classList.toggle('visible',window.scrollY>500);ticking=false;});ticking=true;} });
+            sBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+        }
+    })();
+    </script>
+</body>
+</html>

@@ -75,7 +75,7 @@ Select a DC topology (Tier II/III/IV). Then trigger failure events (utility outa
 - **Viral potential:** Very high — interactive failure simulation is unprecedented for a free tool
 - **Effort:** Very large (animation engine + topology logic)
 
-### 64. DC Carbon Footprint Life-Cycle Calculator
+### 64. DC Carbon Footprint Life-Cycle Calculator-Done
 Goes beyond operational emissions. Includes embodied carbon (concrete, steel, copper), server manufacturing emissions, and end-of-life recycling. Full cradle-to-grave analysis per MW of capacity.
 - **Viral potential:** High — life-cycle carbon is the next frontier beyond PUE
 - **Effort:** Large (LCA data + calculation engine)
