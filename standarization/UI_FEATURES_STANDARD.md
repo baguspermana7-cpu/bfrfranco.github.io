@@ -360,7 +360,7 @@ When creating a new article (e.g., article-19.html):
 - **Values**: `'accepted'` or `'declined'`
 
 ### Deployed On
-All 29 HTML pages (19 articles + index + articles + geopolitics + insights + datacenter-solutions + 5 calculators)
+All HTML pages including standalone calculators. Standalone calculator pages that don't load `styles.css` have cookie CSS inlined in their `<style>` block (added 2026-02-26). Pages tier-advisor.html and tia-942-checklist.html had cookie HTML+JS+CSS added (were previously missing entirely).
 
 ---
 
@@ -497,40 +497,54 @@ while ((match = scriptRegex.exec(html)) !== null) {
 ### Requirement
 ALL pages with calculators MUST have a disclaimer block. This includes:
 - 9 standalone calculator pages (pue, capex, opex, roi, carbon-footprint, datahallAI, dc-conventional, tia-942-checklist, tier-advisor)
-- Article-embedded calculators (articles 1-7, 9, 12, 13, 17, 18)
+- ALL 18 article-embedded calculators (articles 1-18)
 
 ### Placement
 - **Standalone pages**: Before the `<!-- Footer -->` section
 - **Article-embedded**: After the benchmark-meta/privacy-badge div, before the calculator container's closing `</div>` or before the next `<h2>` section
 
+### Light/Dark Mode Contrast (added 2026-02-26)
+
+Disclaimers use the `.calc-disclaimer` CSS class (defined in `styles.css`) with semantic sub-classes:
+- `.disc-title` — heading text
+- `.disc-text` — body paragraphs
+- `.disc-fine` — fine print paragraph
+
+**Light mode** (default): `#f1f5f9` bg, `#475569` text, `#1e293b` strong — high contrast on white.
+**Dark mode** (`[data-theme="dark"]`): `rgba(30,41,59,0.6)` bg, `#94a3b8` text, `#cbd5e1` strong.
+
+CSS uses `!important` to override legacy inline color styles on older disclaimers. Standalone calculator pages (which don't load `styles.css`) have the light-mode CSS inlined in their `<style>` block.
+
 ### HTML Template
 ```html
-<div style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
+<div class="calc-disclaimer" style="border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
     <div style="display:flex;align-items:flex-start;gap:0.75rem;">
         <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;">
             <i class="fas fa-triangle-exclamation"></i>
         </div>
         <div>
-            <div style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">
+            <div class="disc-title" style="font-weight:700;font-size:0.8rem;margin-bottom:0.5rem;">
                 Disclaimer &amp; Data Sources
             </div>
-            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">
-                This calculator is provided for <strong style="color:#cbd5e1;">educational and
+            <p class="disc-text" style="font-size:0.72rem;line-height:1.65;margin:0 0 0.5rem 0;">
+                This calculator is provided for <strong>educational and
                 estimation purposes only</strong>. Results are approximations based on industry
-                benchmarks and publicly available data.
+                benchmarks and publicly available data. They should not be used as the sole basis for investment,
+                procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.
             </p>
-            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">
-                <strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong>
+            <p class="disc-text" style="font-size:0.72rem;line-height:1.65;margin:0 0 0.5rem 0;">
+                <strong>Algorithm &amp; methodology sources:</strong>
                 [SPECIFIC SOURCES FOR THIS CALCULATOR]
             </p>
-            <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">
+            <p class="disc-text" style="font-size:0.72rem;line-height:1.65;margin:0 0 0.5rem 0;">
                 All calculations are performed entirely in your browser. No data is transmitted
-                to any server. See our <a href="privacy.html" style="color:#60a5fa;">Privacy Policy</a>.
+                to any server. See our <a href="privacy.html" style="text-decoration:underline;">Privacy Policy</a> for details.
             </p>
-            <p style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">
+            <p class="disc-fine" style="font-size:0.68rem;line-height:1.5;margin:0;">
                 By using this tool you agree to our
-                <a href="terms.html" style="color:#60a5fa;">Terms of Service</a>.
+                <a href="terms.html" style="text-decoration:underline;">Terms of Service</a>.
                 All content on ResistanceZero is independent personal research.
+                This site does not represent any current or former employer.
             </p>
         </div>
     </div>
@@ -556,7 +570,15 @@ ALL pages with calculators MUST have a disclaimer block. This includes:
 | Tech Debt (article-5) | NIST Weibull, ISO 55001, Uptime Institute 2023 |
 | RCA (article-6) | DOE-HDBK-1208, Leveson STAMP 2011, ISO 45001 |
 | Resilience (article-7) | Hollnagel 2014, EN 50600, Uptime Institute 2023 |
+| Safety Culture (article-8) | Hudson Safety Maturity Model 2007, Westrum 2004, Reason 1997, Uptime Institute 2023-2024 |
+| Water Consumption (article-10) | WRI Aqueduct 4.0, ASHRAE TC 9.9, WUE/PUE industry metrics, IEA 2025 |
+| Electricity Impact (article-11) | IEA Energy & AI 2025, Monte Carlo 10K, NPV 10-year @ 8%, 6 SEA country grid data |
 | Availability (article-13) | Uptime Institute Tier I-IV, IEEE 1584-2018, EU AI Act Art 13 |
+| Community Impact (article-14) | IEA 2025, McKinsey DC economy model, multi-factor community impact scoring |
+| Service Revenue (article-15) | Uptime Institute 2024, CBRE, JLL, Schneider Electric WP37, regional labor indices |
+| Bubble Risk (article-16) | Synergy Research M&A data, JLL vacancy metrics, Monte Carlo 10K, pricing models |
+| Opportunity Stack (article-17) | McKinsey DC economy, Uptime Institute staffing forecast, JLL, NPV/IRR analysis |
+| AI Factory Readiness (article-18) | NVIDIA DGX specs, OCP cooling standards, ASHRAE TC 9.9, Uptime Institute Tier I-IV |
 
 ---
 
