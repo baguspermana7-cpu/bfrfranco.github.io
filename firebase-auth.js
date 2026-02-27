@@ -47,17 +47,24 @@
   var apiBase = window.API_BASE || '';
   var firebaseReady = false;
   var firebaseAuth = null;
+  var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+  function detectRole(email) {
+    var e = String(email || '').toLowerCase().trim();
+    return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+  }
 
   /* ─── Demo fallback (when Firebase not configured) ─── */
   var DEMO_USERS = [
-    { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' }
+    { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro', role: 'pro' }
   ];
 
   function findDemoUser(email, password) {
     var e = email.toLowerCase().trim();
     var match = null;
     DEMO_USERS.forEach(function (u) {
-      if (u.email === e && u.password === password) match = u;
+      if (u.email === e && u.password === password) {
+        match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
+      }
     });
     return match;
   }
@@ -72,6 +79,10 @@
         localStorage.removeItem('rz_premium_session');
         return null;
       }
+      if (!data.role) {
+        data.role = detectRole(data.email);
+        localStorage.setItem('rz_premium_session', JSON.stringify(data));
+      }
       return data;
     } catch (e) { return null; }
   }
@@ -82,7 +93,8 @@
     localStorage.setItem('rz_premium_session', JSON.stringify({
       email: data.email,
       tier: data.tier || 'pro',
-      expires: expires.toISOString(),
+      role: data.role || detectRole(data.email),
+     expires: expires.toISOString(),
       firebase_uid: data.firebase_uid || null,
       display_name: data.display_name || null
     }));
@@ -214,8 +226,11 @@
           '<label>Password</label>' +
           '<input type="password" id="rzModalPassword" placeholder="Enter password" autocomplete="current-password">' +
           '<button class="rz-submit-btn" id="rzModalSubmit" onclick="window._rzAuth.doLogin()">Sign In</button>' +
+          '<div style="text-align:center;margin-top:12px;font-size:0.68rem;color:#475569;line-height:1.5;">' +
+            'By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>' +
+          '</div>' +
           '<div style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
-            '<span style="color:#a78bfa;font-weight:600;">Demo:</span> ' +
+            '<span style="color:#a78bfa;font-weight:600;">Demo Account:</span> ' +
             '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo@resistancezero.com</code> / ' +
             '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo2026</code>' +
           '</div>' +
@@ -226,7 +241,7 @@
         '</div>' +
         '<div class="rz-success" id="rzModalSuccess">' +
           '<i class="fas fa-check-circle"></i>' +
-          '<p id="rzSuccessTier">PRO Access Activated</p>' +
+          '<p id="rzSuccessTier">Access Activated</p>' +
           '<small>Page will refresh in a moment...</small>' +
         '</div>' +
       '</div>' +
@@ -345,17 +360,18 @@
       setSession({
         email: user.email,
         tier: tier,
+        role: detectRole(user.email),
         firebase_uid: user.uid,
         display_name: user.displayName || ''
       });
 
       if (loadingEl) loadingEl.classList.remove('show');
-      if (tierLabel) tierLabel.textContent = (tier === 'pro' ? 'PRO' : 'FREE') + ' Access Activated';
+      if (tierLabel) tierLabel.textContent = 'Access Activated';
       if (successEl) successEl.classList.add('show');
       updateAuthUI();
 
       window.dispatchEvent(new CustomEvent('rz-auth-change', {
-        detail: { email: user.email, tier: tier, action: 'login', firebase_uid: user.uid }
+        detail: { email: user.email, tier: tier, role: detectRole(user.email), action: 'login', firebase_uid: user.uid }
       }));
 
       setTimeout(function () { window._rzAuth.hideModal(); }, 1500);
@@ -471,12 +487,12 @@
     var successEl = document.getElementById('rzModalSuccess');
     var tierLabel = document.getElementById('rzSuccessTier');
 
-    setSession({ email: user.email, tier: user.tier });
+    setSession({ email: user.email, tier: user.tier, role: user.role || detectRole(user.email) });
     if (formEl) formEl.style.display = 'none';
-    if (tierLabel) tierLabel.textContent = (user.tier === 'pro' ? 'PRO' : 'DEMO') + ' Access Activated';
+    if (tierLabel) tierLabel.textContent = 'Access Activated';
     if (successEl) successEl.classList.add('show');
     updateAuthUI();
-    window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: user.email, tier: user.tier, action: 'login' } }));
+    window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: user.email, tier: user.tier, role: user.role || detectRole(user.email), action: 'login' } }));
     setTimeout(function () { window._rzAuth.hideModal(); }, 1500);
   }
 

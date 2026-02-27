@@ -675,7 +675,7 @@
                         <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Website</a>
                         <div class="login-secure"><i class="fas fa-shield-alt"></i> Authorized only</div>
                     </div>
-                    <p style="text-align:center;font-size:0.68rem;color:#475569;margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+                    <p style="text-align:center;font-size:0.68rem;color:#475569;margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
                 </form>
             </div>
             <div class="login-ext-footer">&copy; 2026 ResistanceZero. All rights reserved.</div>
@@ -1896,7 +1896,8 @@ function checkAccess(){
     try{
         const d=JSON.parse(s);
         var expMs=typeof d.expires==='string'?new Date(d.expires).getTime():d.expires;
-        if(expMs<Date.now()||!ADMIN_EMAILS.includes(d.email)){showLogin();return false}
+        var role=d.role||'pro';
+        if(expMs<Date.now()||!ADMIN_EMAILS.includes(d.email)||role!=='root'){showLogin();return false}
         adminEmail=d.email;
         document.getElementById('sidebarAvatar').textContent=d.email.charAt(0).toUpperCase();
         document.getElementById('sidebarName').textContent=d.email.split('@')[0];
@@ -1962,10 +1963,10 @@ function handleAdminLogin(e){
     var remember=document.getElementById('loginRemember').checked;
     var expiry=remember ? 30*86400000 : 86400000;
     localStorage.setItem('rz_premium_session',JSON.stringify({
-        email:email,tier:'pro',
-        expires:new Date(Date.now()+expiry).toISOString()
+        email:email,tier:'pro',role:'root',
+       expires:new Date(Date.now()+expiry).toISOString()
     }));
-    window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',action:'login'}}));
+    window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'root',action:'login'}}));
 
     // Show dashboard
     errEl.style.display='none';

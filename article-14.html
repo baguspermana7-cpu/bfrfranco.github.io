@@ -2766,15 +2766,14 @@
                     <div class="msf-login-overlay" id="msfLoginOverlay">
                         <div class="msf-login-box">
                             <button class="msf-login-close" onclick="msfHideLogin()">&times;</button>
-                            <h3><i class="fas fa-lock" style="color:#f97316;margin-right:6px;"></i> Unlock Pro Analysis</h3>
+                            <h3><i class="fas fa-lock" style="color:#f97316;margin-right:6px;"></i> Sign In</h3>
                             <p>Access Stochastic Reliability, Financial Engineering, Human Factors, Monte Carlo Simulation, and AI Executive Dossier.</p>
                             <input type="email" id="msfLoginEmail" placeholder="Email address" autocomplete="email">
                             <input type="password" id="msfLoginPass" placeholder="Password" autocomplete="current-password">
                             <div class="msf-login-error" id="msfLoginError">Invalid credentials. Please try again.</div>
                             <button class="msf-login-submit" onclick="msfDoLogin()">Sign In</button>
-                            <div class="demo-hint">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
-                            <div style="text-align:center;margin-top:6px;"><a href="mailto:bagus@resistancezero.com" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Want full access? Get in touch &rarr;</a></div>
-                <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+                            <div class="demo-hint">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
                         </div>
                     </div>
 
@@ -2806,7 +2805,7 @@
                             </p>
                             <p class="disc-fine" style="font-size:0.68rem;line-height:1.5;margin:0;">
                                 By using this tool you agree to our
-                                <a href="terms.html" style="text-decoration:underline;">Terms of Service</a>.
+                                <a href="terms.html" style="text-decoration:underline;">Terms</a>.
                                 All content on ResistanceZero is independent personal research.
                                 This site does not represent any current or former employer.
                             </p>
@@ -4031,8 +4030,8 @@
             if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
                 var session = {
                     email: email,
-                    tier: 'pro',
-                    expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                    tier: 'pro', role: 'pro',
+                   expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
                 };
                 localStorage.setItem('rz_premium_session', JSON.stringify(session));
                 window.dispatchEvent(new Event('rz-auth-change'));

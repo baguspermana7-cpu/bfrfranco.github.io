@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Center Carbon Footprint Calculator | CO₂ Emissions Estimator</title>
-    <meta name="description" content="Calculate data center carbon footprint and CO₂ emissions. Interactive calculator with grid emission factors, renewable energy offsets, and Scope 1-3 analysis.">
+    <meta name="description" content="Calculate data center carbon footprint and CO2 emissions with grid factors, renewable offsets, and Scope 1-3 analysis.">
     <meta name="keywords" content="Carbon Footprint Calculator, Data Center CO2 Emissions, Scope 1 2 3 Emissions, Carbon Intensity, Renewable Energy Credits, PPA, GHG Protocol, Net Zero Data Center">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
@@ -1190,13 +1190,14 @@
                     <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
                 </div>
                 <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;">Sign In</h3>
-                <p style="font-size:0.85rem;color:#64748b;">Unlock Pro carbon analysis, Monte Carlo simulation, and PDF export</p>
+                <p style="font-size:0.85rem;color:#64748b;">Access calculators, tools, and analytical content.</p>
             </div>
             <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
             <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
-            <button onclick="handleLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;">Unlock Pro Analysis</button>
+            <button onclick="handleLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;">Sign In</button>
             <div id="loginError" style="display:none;color:#ef4444;font-size:0.8rem;text-align:center;margin-top:0.5rem;">Invalid credentials</div>
-            <div style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#94a3b8;">Demo: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo2026</code></div>
+            <div style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#94a3b8;">Demo Account: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo2026</code></div>
+            <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:10px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
         </div>
     </div>
 
@@ -1405,15 +1406,15 @@
         var pass = document.getElementById('loginPassword').value;
         if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
             localStorage.setItem('rz_premium_session', JSON.stringify({
-                email: email, tier: 'pro',
-                expires: new Date(Date.now() + 30 * 86400000).toISOString()
+                email: email, tier: 'pro', role: 'pro',
+               expires: new Date(Date.now() + 30 * 86400000).toISOString()
             }));
             isPremiumUser = true;
             userTier = 'pro';
             closeLoginModal();
             activatePremiumUI();
             window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                detail: { email: email, tier: 'pro', action: 'login' }
+                detail: { email: email, tier: 'pro', role: 'pro', action: 'login' }
             }));
         } else {
             document.getElementById('loginError').style.display = 'block';
@@ -1421,13 +1422,14 @@
     }
 
     function logoutPremium() {
+        var prevSession = JSON.parse(localStorage.getItem('rz_premium_session') || '{}');
         localStorage.removeItem('rz_premium_session');
         isPremiumUser = false;
         userTier = 'free';
         setMode('free');
         updateNavbarAuthUI();
         window.dispatchEvent(new CustomEvent('rz-auth-change', {
-            detail: { tier: 'free', action: 'logout' }
+            detail: { tier: 'free', role: prevSession.role || 'pro', action: 'logout' }
         }));
     }
 

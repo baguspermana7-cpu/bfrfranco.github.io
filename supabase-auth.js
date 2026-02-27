@@ -27,6 +27,11 @@
     var SUPABASE_URL  = cfg.SUPABASE_URL  || '';
     var SUPABASE_ANON = cfg.SUPABASE_ANON || '';
     var API_BASE      = cfg.API_BASE      || '';
+    var ROOT_EMAILS   = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+    function detectRole(email) {
+        var e = String(email || '').toLowerCase().trim();
+        return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+    }
 
     /* ───────── Supabase client ───────── */
     var supabase = null;
@@ -56,7 +61,8 @@
             localStorage.setItem('rz_premium_session', JSON.stringify({
                 email: session.email,
                 tier: _entitlements ? _entitlements.tier : 'free',
-                expires: expires.toISOString()
+                role: session.role || detectRole(session.email),
+               expires: expires.toISOString()
             }));
         } else {
             localStorage.removeItem('rz_premium_session');
@@ -78,6 +84,10 @@
             if (data.expires && new Date(data.expires) < new Date()) {
                 localStorage.removeItem('rz_premium_session');
                 return null;
+            }
+            if (!data.role) {
+                data.role = detectRole(data.email);
+                localStorage.setItem('rz_premium_session', JSON.stringify(data));
             }
             return data;
         } catch (e) { return null; }
@@ -228,6 +238,11 @@
                     '</div>' +
                     '<div style="text-align:center;margin-top:12px;font-size:0.68rem;color:#475569;line-height:1.5;">' +
                         'By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>' +
+                    '</div>' +
+                    '<div style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
+                        '<span style="color:#a78bfa;font-weight:600;">Demo Account:</span> ' +
+                        '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.75rem;">demo2026</code>' +
                     '</div>' +
                 '</div>' +
                 /* Signup form */
@@ -454,19 +469,18 @@
             }
 
             // Sync to localStorage for backward compat
-            syncLocalStorage({ email: data.user.email, tier: tier });
+            syncLocalStorage({ email: data.user.email, tier: tier, role: detectRole(data.user.email) });
 
             // Show success
             document.getElementById('rzModalForm').style.display = 'none';
-            document.getElementById('rzSuccessTier').textContent =
-                tier === 'pro' ? 'PRO Access Active' : 'Welcome!';
+            document.getElementById('rzSuccessTier').textContent = 'Access Activated';
             document.getElementById('rzSuccessSub').textContent =
-                tier === 'free' ? 'Free access active.' : 'Page will refresh in a moment...';
+                'Page will refresh in a moment...';
             document.getElementById('rzModalSuccess').classList.add('show');
-            updateAuthUI({ email: data.user.email, tier: tier });
+            updateAuthUI({ email: data.user.email, tier: tier, role: detectRole(data.user.email) });
 
             window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                detail: { email: data.user.email, tier: tier, action: 'login', entitlements: _entitlements }
+                detail: { email: data.user.email, tier: tier, role: detectRole(data.user.email), action: 'login', entitlements: _entitlements }
             }));
 
             setTimeout(function () {
@@ -592,11 +606,11 @@
             if (session) {
                 var meData = await fetchEntitlements(session.access_token);
                 var tier = meData?.entitlements?.tier || 'free';
-                syncLocalStorage({ email: session.user.email, tier: tier });
-                updateAuthUI({ email: session.user.email, tier: tier });
+                syncLocalStorage({ email: session.user.email, tier: tier, role: detectRole(session.user.email) });
+                updateAuthUI({ email: session.user.email, tier: tier, role: detectRole(session.user.email) });
 
                 window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                    detail: { email: session.user.email, tier: tier, action: 'session_restored', entitlements: _entitlements }
+                    detail: { email: session.user.email, tier: tier, role: detectRole(session.user.email), action: 'session_restored', entitlements: _entitlements }
                 }));
             } else {
                 updateAuthUI(null);
@@ -607,11 +621,11 @@
                 if (event === 'SIGNED_IN' && session) {
                     var meData = await fetchEntitlements(session.access_token);
                     var tier = meData?.entitlements?.tier || 'free';
-                    syncLocalStorage({ email: session.user.email, tier: tier });
-                    updateAuthUI({ email: session.user.email, tier: tier });
+                    syncLocalStorage({ email: session.user.email, tier: tier, role: detectRole(session.user.email) });
+                    updateAuthUI({ email: session.user.email, tier: tier, role: detectRole(session.user.email) });
 
                     window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                        detail: { email: session.user.email, tier: tier, action: 'login', entitlements: _entitlements }
+                        detail: { email: session.user.email, tier: tier, role: detectRole(session.user.email), action: 'login', entitlements: _entitlements }
                     }));
                 } else if (event === 'SIGNED_OUT') {
                     _entitlements = null;

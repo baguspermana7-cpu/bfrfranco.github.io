@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Root Engineering Lab | Standards + Liquid-to-Chip | ResistanceZero</title>
+    <meta name="description" content="Root-only engineering lab for deep standards analysis and high-fidelity liquid-to-chip sizing, energy, and compliance estimation.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0f172a">
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.88);
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: rgba(30, 58, 95, 0.16);
+            --shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+            --accent-gold: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #0f172a;
+            --bg-card: rgba(15, 23, 42, 0.82);
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.2);
+            --shadow: 0 12px 30px rgba(2, 6, 23, 0.45);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .page-background {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at top right, rgba(74, 144, 184, 0.14), transparent 48%),
+                radial-gradient(ellipse at bottom left, rgba(245, 158, 11, 0.1), transparent 55%);
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(10, 15, 29, 0.84);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0.95rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: var(--primary-gradient);
+            box-shadow: 0 8px 18px rgba(30, 58, 95, 0.35);
+        }
+
+        .brand-title {
+            font-size: 0.96rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .brand-subtitle {
+            display: block;
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.52rem 0.9rem;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+            background: var(--primary-gradient);
+            box-shadow: 0 6px 16px rgba(30, 58, 95, 0.28);
+        }
+
+        .theme-toggle {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            cursor: pointer;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.55);
+            transition: transform 0.18s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: rgba(15, 23, 42, 0.7);
+            color: #f8fafc;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        .hero {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.06), rgba(6, 182, 212, 0.06));
+            box-shadow: var(--shadow);
+        }
+
+        [data-theme="dark"] .hero {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.35), rgba(15, 23, 42, 0.75));
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.38rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #fff;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            line-height: 1.2;
+            margin-bottom: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .hero p {
+            max-width: 860px;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            font-size: 1rem;
+        }
+
+        .hero-kpis {
+            margin-top: 1.45rem;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .hero-kpi {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.8rem 0.9rem;
+            background: var(--bg-card);
+        }
+
+        .hero-kpi .kpi-label {
+            font-size: 0.67rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+        }
+
+        .hero-kpi .kpi-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .legal-disclaimer-wrap {
+            margin-top: 1rem;
+        }
+
+        .legal-disclaimer {
+            border-radius: 14px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-left: 4px solid var(--accent-gold);
+            background: var(--bg-card);
+            padding: 1rem 1.15rem;
+            box-shadow: var(--shadow);
+        }
+
+        .legal-disclaimer-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin: 0 0 0.45rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .legal-disclaimer p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .legal-disclaimer p + p {
+            margin-top: 0.35rem;
+        }
+
+        .legal-disclaimer a {
+            color: #2563eb;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-top: 1.35rem;
+        }
+
+        .section-header {
+            margin-bottom: 0.85rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.35rem;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+
+        .section-header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .standards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .standard-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 0.95rem;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+        }
+
+        .standard-card-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+            border-color: rgba(245, 158, 11, 0.35);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(30, 58, 95, 0.08));
+        }
+
+        .standard-card-link:hover {
+            transform: translateY(-3px);
+            border-color: rgba(245, 158, 11, 0.55);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+        }
+
+        [data-theme="dark"] .standard-card-link {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(30, 58, 95, 0.25));
+        }
+
+        .standard-card-link .open-link {
+            margin-top: 0.55rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #b45309;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        [data-theme="dark"] .standard-card-link .open-link {
+            color: #fbbf24;
+        }
+
+        .standard-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.55rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .standard-card h3 i {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.76rem;
+        }
+
+        .standard-card ul {
+            list-style: none;
+            display: grid;
+            gap: 0.38rem;
+        }
+
+        .standard-card li {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            padding-left: 0.95rem;
+            position: relative;
+        }
+
+        .standard-card li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 0.45rem;
+            background: #60a5fa;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .detail-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.85rem 0.9rem;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+        }
+
+        .detail-card .route-id {
+            display: inline-block;
+            margin-bottom: 0.45rem;
+            font-size: 0.66rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.02em;
+            color: var(--text-muted);
+            background: rgba(148, 163, 184, 0.14);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 999px;
+            padding: 0.16rem 0.46rem;
+        }
+
+        .detail-card h4 {
+            font-size: 0.88rem;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+
+        .detail-card p {
+            margin: 0;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .architecture-layout {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .panel {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+        }
+
+        .panel h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel p {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.6rem;
+        }
+
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+        }
+
+        .step {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.65rem 0.55rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.42);
+        }
+
+        [data-theme="dark"] .step {
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        .step .num {
+            display: inline-flex;
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            align-items: center;
+            justify-content: center;
+            background: #1e3a5f;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .step h4 {
+            font-size: 0.73rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .step p {
+            font-size: 0.69rem;
+            line-height: 1.35;
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .calculator-layout {
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .calc-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+        }
+
+        .calc-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.58rem;
+        }
+
+        .input-group {
+            display: grid;
+            gap: 0.25rem;
+        }
+
+        .input-group label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 0.56rem 0.62rem;
+            font-size: 0.84rem;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.7);
+            font-family: 'Inter', sans-serif;
+        }
+
+        [data-theme="dark"] .input-group input,
+        [data-theme="dark"] .input-group select {
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .check-wrap {
+            margin-top: 0.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .form-actions {
+            margin-top: 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-accent {
+            border: none;
+            border-radius: 10px;
+            padding: 0.62rem 0.9rem;
+            font-size: 0.83rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            flex: 1;
+        }
+
+        .btn-secondary {
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-accent {
+            color: #fff;
+            background: linear-gradient(135deg, #0ea5e9, #0369a1);
+        }
+
+        [data-theme="dark"] .btn-secondary {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover,
+        .btn-accent:hover {
+            transform: translateY(-1px);
+        }
+
+        .calc-footnote {
+            margin-top: 0.65rem;
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .result-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.58rem 0.65rem;
+            background: rgba(255, 255, 255, 0.44);
+        }
+
+        [data-theme="dark"] .result-card {
+            background: rgba(30, 41, 59, 0.58);
+        }
+
+        .result-card .label {
+            display: block;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-bottom: 0.18rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+        }
+
+        .result-card .value {
+            font-size: 0.95rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .scoreboard {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem 0.8rem;
+            margin-bottom: 0.65rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(37, 99, 235, 0.1));
+        }
+
+        .score-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.6rem;
+        }
+
+        .score-title {
+            font-size: 0.76rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .score-value {
+            font-size: 1.1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .score-grade {
+            margin-top: 0.2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .compliance-grid {
+            display: grid;
+            gap: 0.4rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .compliance-item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.5rem 0.58rem;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        [data-theme="dark"] .compliance-item {
+            background: rgba(30, 41, 59, 0.58);
+        }
+
+        .compliance-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.55rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .compliance-name {
+            font-size: 0.77rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .compliance-score {
+            font-size: 0.74rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .progress {
+            height: 7px;
+            border-radius: 99px;
+            overflow: hidden;
+            background: rgba(148, 163, 184, 0.3);
+        }
+
+        .progress > i {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+            transition: width 0.4s ease;
+        }
+
+        .method-block {
+            border: 1px dashed rgba(148, 163, 184, 0.5);
+            border-radius: 10px;
+            padding: 0.65rem;
+        }
+
+        .method-block h4 {
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
+        }
+
+        .method-block ul {
+            list-style: none;
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        .method-block li {
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            padding-left: 0.95rem;
+            position: relative;
+        }
+
+        .method-block li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 0.45rem;
+            background: var(--accent-cyan);
+        }
+
+        .model-block {
+            margin-bottom: 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.72rem 0.76rem;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(16, 185, 129, 0.08));
+        }
+
+        [data-theme="dark"] .model-block {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.45), rgba(15, 23, 42, 0.75));
+        }
+
+        .model-head {
+            margin-bottom: 0.45rem;
+        }
+
+        .model-head h4 {
+            font-size: 0.82rem;
+            margin-bottom: 0.2rem;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .model-head p {
+            margin: 0;
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        .model-track {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .model-arrow {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .model-node {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.46rem 0.5rem;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        [data-theme="dark"] .model-node {
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .model-node .tag {
+            display: block;
+            font-size: 0.64rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.18rem;
+            font-weight: 700;
+        }
+
+        .model-node .val {
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .model-impact-grid {
+            margin-top: 0.52rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.45rem;
+        }
+
+        .model-impact {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.46rem;
+            background: rgba(255, 255, 255, 0.52);
+        }
+
+        [data-theme="dark"] .model-impact {
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .model-impact .k {
+            display: block;
+            font-size: 0.61rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.1rem;
+            font-weight: 700;
+        }
+
+        .model-impact .v {
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .flow-block {
+            margin-top: 0.68rem;
+            margin-bottom: 0.68rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.68rem 0.72rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(245, 158, 11, 0.08));
+        }
+
+        [data-theme="dark"] .flow-block {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.4), rgba(15, 23, 42, 0.78));
+        }
+
+        .flow-head {
+            margin-bottom: 0.42rem;
+        }
+
+        .flow-head h4 {
+            font-size: 0.81rem;
+            color: var(--text-primary);
+            margin-bottom: 0.16rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.34rem;
+        }
+
+        .flow-head p {
+            margin: 0;
+            font-size: 0.73rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .flow-row {
+            display: grid;
+            grid-template-columns: 130px 1fr auto;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.32rem;
+        }
+
+        .flow-row span:first-child {
+            font-size: 0.69rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .flow-row span:last-child {
+            font-size: 0.68rem;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-align: right;
+            min-width: 58px;
+        }
+
+        .flow-bar {
+            height: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(148, 163, 184, 0.24);
+        }
+
+        .flow-bar > i {
+            display: block;
+            width: 0%;
+            height: 100%;
+            transition: width 0.35s ease;
+            background: linear-gradient(90deg, #0ea5e9, #22c55e);
+        }
+
+        #barFlowIt { background: linear-gradient(90deg, #38bdf8, #3b82f6); }
+        #barFlowLiquid { background: linear-gradient(90deg, #06b6d4, #10b981); }
+        #barFlowAir { background: linear-gradient(90deg, #f59e0b, #f97316); }
+        #barFlowPump { background: linear-gradient(90deg, #8b5cf6, #6366f1); }
+        #barFlowElecLoss { background: linear-gradient(90deg, #ef4444, #f97316); }
+        #barFlowAux { background: linear-gradient(90deg, #64748b, #475569); }
+
+        .target-block {
+            margin-top: 0.65rem;
+            border: 1px dashed rgba(148, 163, 184, 0.55);
+            border-radius: 10px;
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.42);
+        }
+
+        [data-theme="dark"] .target-block {
+            background: rgba(30, 41, 59, 0.55);
+        }
+
+        .target-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .target-head h4 {
+            font-size: 0.8rem;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .target-badge {
+            font-size: 0.68rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 0.16rem 0.42rem;
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        [data-theme="dark"] .target-badge {
+            background: rgba(15, 23, 42, 0.72);
+        }
+
+        .target-list {
+            list-style: none;
+            display: grid;
+            gap: 0.3rem;
+            margin: 0 0 0.45rem;
+            padding: 0;
+        }
+
+        .target-list li {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .target-list li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 0.43rem;
+            background: var(--accent-emerald);
+        }
+
+        .scenario-table-wrap {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.42);
+        }
+
+        [data-theme="dark"] .scenario-table-wrap {
+            background: rgba(15, 23, 42, 0.65);
+        }
+
+        .scenario-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.72rem;
+        }
+
+        .scenario-table th {
+            text-align: left;
+            padding: 0.45rem 0.5rem;
+            background: rgba(30, 58, 95, 0.12);
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.62rem;
+        }
+
+        .scenario-table td {
+            padding: 0.42rem 0.5rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+            color: var(--text-primary);
+        }
+
+        .scenario-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .footer {
+            margin-top: 1rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .footer a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .root-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+            background: rgba(2, 6, 23, 0.72);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        body.locked .root-gate {
+            display: flex;
+        }
+
+        body.locked .navbar,
+        body.locked .main-content,
+        body.locked .page-background {
+            filter: blur(4px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .root-gate-card {
+            width: 100%;
+            max-width: 460px;
+            border-radius: 16px;
+            background: #0f172a;
+            border: 1px solid rgba(245, 158, 11, 0.32);
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: 0 20px 45px rgba(2, 6, 23, 0.5);
+        }
+
+        .root-gate-card .lock {
+            width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            margin-bottom: 0.65rem;
+        }
+
+        .root-gate-card h2 {
+            font-size: 1.2rem;
+            color: #f8fafc;
+            margin-bottom: 0.45rem;
+        }
+
+        .root-gate-card p {
+            font-size: 0.84rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .root-gate-actions {
+            margin-top: 0.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .root-gate-actions button,
+        .root-gate-actions a {
+            border: none;
+            border-radius: 10px;
+            padding: 0.56rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .root-gate-actions .login {
+            color: #fff;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .root-gate-actions .back {
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            background: transparent;
+            color: #e2e8f0;
+        }
+
+        .root-gate-note {
+            margin-top: 0.55rem;
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.9rem 1.2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 -2px 18px rgba(0, 0, 0, 0.08);
+            font-size: 0.83rem;
+            color: #334155;
+            transition: transform 0.35s ease;
+        }
+
+        [data-theme="dark"] .cookie-banner {
+            background: rgba(10, 15, 29, 0.95);
+            color: #cbd5e1;
+            border-top-color: rgba(148, 163, 184, 0.2);
+        }
+
+        .cookie-banner.hidden {
+            transform: translateY(120%);
+            pointer-events: none;
+        }
+
+        .cookie-banner a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .cookie-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+
+        .cookie-accept,
+        .cookie-decline {
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            padding: 0.42rem 0.8rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .cookie-accept {
+            border-color: #2563eb;
+            background: #2563eb;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1180px) {
+            .standards-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .calculator-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .architecture-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .hero-kpis {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .standards-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .pipeline {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-container {
+                padding: 0.75rem 0.9rem;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+            .main-content {
+                padding: 1rem 0.9rem 2.5rem;
+            }
+
+            .hero {
+                padding: 1.2rem;
+            }
+
+            .hero-kpis,
+            .standards-grid,
+            .input-grid,
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-row {
+                grid-template-columns: 1fr;
+                gap: 0.2rem;
+            }
+
+            .flow-row span:last-child {
+                text-align: left;
+            }
+
+            .cookie-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.55rem;
+            }
+        }
+    </style>
+</head>
+<body class="locked">
+    <div class="page-background" aria-hidden="true"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="datacenter-solutions.html" class="nav-brand">
+                <span class="brand-icon"><i class="fas fa-microchip"></i></span>
+                <span>
+                    <span class="brand-title">Root Engineering Lab</span>
+                    <span class="brand-subtitle">Standards + Liquid-to-Chip Intelligence</span>
+                </span>
+            </a>
+
+            <div class="nav-links">
+                <a href="datacenter-solutions.html" class="nav-back"><i class="fas fa-arrow-left"></i> DC Solutions</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle dark/light mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content" id="main-content">
+        <section class="hero">
+            <span class="hero-badge"><i class="fas fa-lock"></i> Root Only Module</span>
+            <h1>Standards + Liquid-to-Chip Engineering Lab</h1>
+            <p>
+                This landing page is designed for deep engineering review across ASHRAE, ANSI, ISO, NFPA, and Uptime Institute frameworks,
+                combined with a high-fidelity liquid-to-chip model for thermal, hydraulic, energy, cost, and compliance estimation.
+            </p>
+
+            <div class="hero-kpis">
+                <div class="hero-kpi">
+                    <div class="kpi-label">Standards Engines</div>
+                    <div class="kpi-value">5</div>
+                </div>
+                <div class="hero-kpi">
+                    <div class="kpi-label">Model Scope</div>
+                    <div class="kpi-value">Thermal + Cost</div>
+                </div>
+                <div class="hero-kpi">
+                    <div class="kpi-label">Calculator Mode</div>
+                    <div class="kpi-value">High Fidelity</div>
+                </div>
+                <div class="hero-kpi">
+                    <div class="kpi-label">Access Level</div>
+                    <div class="kpi-value">Root</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="legal-disclaimer-wrap" aria-label="Legal Disclaimer">
+            <div class="legal-disclaimer">
+                <p class="legal-disclaimer-title"><span aria-hidden="true">&#9888;</span> Legal Notice</p>
+                <p>All dashboards, calculators, and technical materials are independent personal research based on public standards and references. They do not represent any current or former employer.</p>
+                <p>Outputs are for educational and planning context only, not legal, financial, investment, procurement, safety, or engineering advice. Always validate final decisions with licensed professionals and applicable regulations.</p>
+                <p>Use of this website is subject to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+            </div>
+        </section>
+
+        <section class="section" id="standards">
+            <div class="section-header">
+                <h2>Standards Deep-Dive Coverage</h2>
+                <p>Coverage is structured as engineering controls, acceptance criteria, and evidence checkpoints for design and operations.</p>
+            </div>
+            <div class="standards-grid">
+                <a href="ltc-ashrae-thermal-control.html" class="standard-card standard-card-link" aria-label="Open ASHRAE deep-dive module">
+                    <h3><i class="fas fa-temperature-half" style="background:#06b6d4"></i>ASHRAE</h3>
+                    <ul>
+                        <li>Thermal envelopes and allowable inlet bands.</li>
+                        <li>Supply/return delta-T and liquid loop stability.</li>
+                        <li>Air-liquid interaction at mixed cooling ratios.</li>
+                    </ul>
+                    <span class="open-link">Open Deep-Dive <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="ltc-ansi-tia-topology-readiness.html" class="standard-card standard-card-link" aria-label="Open ANSI and TIA deep-dive module">
+                    <h3><i class="fas fa-scale-balanced" style="background:#8b5cf6"></i>ANSI / TIA</h3>
+                    <ul>
+                        <li>Topology readiness and redundancy mapping.</li>
+                        <li>Structured compliance checkpoints by subsystem.</li>
+                        <li>Operational resilience for planned maintenance.</li>
+                    </ul>
+                    <span class="open-link">Open Deep-Dive <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="ltc-iso-energy-governance.html" class="standard-card standard-card-link" aria-label="Open ISO deep-dive module">
+                    <h3><i class="fas fa-certificate" style="background:#10b981"></i>ISO</h3>
+                    <ul>
+                        <li>Energy management and KPI governance logic.</li>
+                        <li>Measurement coverage and audit traceability.</li>
+                        <li>Continuous improvement scoring framework.</li>
+                    </ul>
+                    <span class="open-link">Open Deep-Dive <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="ltc-nfpa-fire-risk.html" class="standard-card standard-card-link" aria-label="Open NFPA deep-dive module">
+                    <h3><i class="fas fa-shield-halved" style="background:#ef4444"></i>NFPA</h3>
+                    <ul>
+                        <li>Fire detection and suppression path assumptions.</li>
+                        <li>Risk weighting by suppression strategy.</li>
+                        <li>Safety integrity and emergency response posture.</li>
+                    </ul>
+                    <span class="open-link">Open Deep-Dive <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="ltc-uptime-tier-alignment.html" class="standard-card standard-card-link" aria-label="Open Uptime Institute deep-dive module">
+                    <h3><i class="fas fa-layer-group" style="background:#f59e0b"></i>Uptime Institute</h3>
+                    <ul>
+                        <li>Tier-aligned redundancy interpretation.</li>
+                        <li>Concurrent maintainability influence scoring.</li>
+                        <li>Failure containment and service continuity focus.</li>
+                    </ul>
+                    <span class="open-link">Open Deep-Dive <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="ltc-system-modelling-lab.html" class="standard-card standard-card-link" aria-label="Open Interconnected Deep-Dive Modules">
+                    <h3><i class="fas fa-diagram-project" style="background:#d97706"></i>Liquid-to-Chip Engineering Lab</h3>
+                    <ul>
+                        <li>Gateway to cross-domain deep-dive modules.</li>
+                        <li>Not limited to one topic or isolated subsystem.</li>
+                        <li>Structured to link standards, cooling, power, safety, and operations.</li>
+                    </ul>
+                    <span class="open-link">Open Module Map <i class="fas fa-arrow-right"></i></span>
+                </a>
+            </div>
+        </section>
+
+        <section class="section" id="detail-pages-plan">
+            <div class="section-header">
+                <h2>Interconnected Deep-Dive Modules</h2>
+                <p>This lab is a module index. Each domain will have its own dedicated page for detailed engineering explanation.</p>
+            </div>
+            <div class="detail-grid">
+                <article class="detail-card">
+                    <span class="route-id">ltc-ashrae-thermal-control.html</span>
+                    <h4>ASHRAE Thermal Control Module</h4>
+                    <p>Environmental envelopes, intake conditions, and cross-check with liquid/air mixed operation constraints.</p>
+                    <p style="margin-top:0.4rem;"><a href="ltc-ashrae-thermal-control.html" style="font-size:0.75rem;font-weight:700;color:#2563eb;text-decoration:underline;">Open detail page</a></p>
+                </article>
+                <article class="detail-card">
+                    <span class="route-id">ltc-ansi-tia-topology-readiness.html</span>
+                    <h4>ANSI/TIA Topology Readiness Module</h4>
+                    <p>Redundancy interpretation, maintainability path checks, and infrastructure readiness scoring.</p>
+                    <p style="margin-top:0.4rem;"><a href="ltc-ansi-tia-topology-readiness.html" style="font-size:0.75rem;font-weight:700;color:#2563eb;text-decoration:underline;">Open detail page</a></p>
+                </article>
+                <article class="detail-card">
+                    <span class="route-id">ltc-iso-energy-governance.html</span>
+                    <h4>ISO Energy Governance Module</h4>
+                    <p>KPI governance, measurement quality, and continuous improvement compliance evidence mapping.</p>
+                    <p style="margin-top:0.4rem;"><a href="ltc-iso-energy-governance.html" style="font-size:0.75rem;font-weight:700;color:#2563eb;text-decoration:underline;">Open detail page</a></p>
+                </article>
+                <article class="detail-card">
+                    <span class="route-id">ltc-nfpa-fire-risk.html</span>
+                    <h4>NFPA Fire & Safety Module</h4>
+                    <p>Suppression strategy selection, risk weighting, and response posture assumptions for data halls.</p>
+                    <p style="margin-top:0.4rem;"><a href="ltc-nfpa-fire-risk.html" style="font-size:0.75rem;font-weight:700;color:#2563eb;text-decoration:underline;">Open detail page</a></p>
+                </article>
+                <article class="detail-card">
+                    <span class="route-id">ltc-uptime-tier-alignment.html</span>
+                    <h4>Uptime Tier Alignment Module</h4>
+                    <p>Tier-oriented resilience logic, fault containment analysis, and continuity assurance checks.</p>
+                    <p style="margin-top:0.4rem;"><a href="ltc-uptime-tier-alignment.html" style="font-size:0.75rem;font-weight:700;color:#2563eb;text-decoration:underline;">Open detail page</a></p>
+                </article>
+                <article class="detail-card">
+                    <span class="route-id">ltc-system-modelling-lab.html</span>
+                    <h4>Liquid-to-Chip Engineering Module</h4>
+                    <p>Thermal-hydraulic design, CDU network sizing, pump duty, and integrated operating economics.</p>
+                    <p style="margin-top:0.4rem;"><a href="ltc-system-modelling-lab.html" style="font-size:0.75rem;font-weight:700;color:#2563eb;text-decoration:underline;">Open detail page</a></p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="architecture">
+            <div class="section-header">
+                <h2>Integrated Engineering Architecture Focus</h2>
+                <p>The model treats liquid cooling as one subsystem in a broader standards-driven engineering chain.</p>
+            </div>
+            <div class="architecture-layout">
+                <div class="panel">
+                    <h3>Thermal-Hydraulic Engineering Chain</h3>
+                    <p>
+                        The sizing model follows end-to-end heat transport: chip load capture, coolant transport, pumping duty,
+                        CDU losses, and rejection path energy. This prevents underestimating total cooling parasitics.
+                    </p>
+                    <div class="pipeline">
+                        <div class="step">
+                            <div class="num">1</div>
+                            <h4>Chip Heat</h4>
+                            <p>GPU/CPU thermal load</p>
+                        </div>
+                        <div class="step">
+                            <div class="num">2</div>
+                            <h4>Cold Plate</h4>
+                            <p>Capture ratio tuning</p>
+                        </div>
+                        <div class="step">
+                            <div class="num">3</div>
+                            <h4>CDU Loop</h4>
+                            <p>Flow, head, pump duty</p>
+                        </div>
+                        <div class="step">
+                            <div class="num">4</div>
+                            <h4>Heat Rejection</h4>
+                            <p>COP and climate effects</p>
+                        </div>
+                        <div class="step">
+                            <div class="num">5</div>
+                            <h4>Compliance</h4>
+                            <p>Standards score fusion</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Advanced Modeling Dimensions</h3>
+                    <p>Calculator outputs include:</p>
+                    <ul class="method-list" style="list-style:none;display:grid;gap:0.35rem;">
+                        <li style="font-size:0.8rem;color:var(--text-secondary);">Thermal capture, coolant flow, and pumping power.</li>
+                        <li style="font-size:0.8rem;color:var(--text-secondary);">CDU sizing under N, N+1, and 2N configurations.</li>
+                        <li style="font-size:0.8rem;color:var(--text-secondary);">Composite PUE, WUE, annual energy, and OPEX.</li>
+                        <li style="font-size:0.8rem;color:var(--text-secondary);">Cross-standard alignment score with weighted grading.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="calculator">
+            <div class="section-header">
+                <h2>High-Fidelity Engineering Calculator</h2>
+                <p>Use this model for detailed scenario comparison before final validation with licensed engineering teams.</p>
+            </div>
+
+            <div class="calculator-layout">
+                <div class="calc-card">
+                    <h3>Design Inputs</h3>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="inItLoad">IT Load (MW)</label>
+                            <input id="inItLoad" type="number" min="0.5" step="0.1" value="12">
+                        </div>
+                        <div class="input-group">
+                            <label for="inRackCount">Rack Count</label>
+                            <input id="inRackCount" type="number" min="20" step="1" value="360">
+                        </div>
+                        <div class="input-group">
+                            <label for="inCountryProfile">Country Profile</label>
+                            <select id="inCountryProfile">
+                                <option value="custom">Custom Manual</option>
+                                <option value="sg">Singapore</option>
+                                <option value="us_va">USA - Virginia</option>
+                                <option value="nl">Netherlands</option>
+                                <option value="id_jkt">Indonesia - Jakarta</option>
+                                <option value="in_mum">India - Mumbai</option>
+                                <option value="ie">Ireland</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="inClimate">Climate Profile</label>
+                            <select id="inClimate">
+                                <option value="tropical">Tropical</option>
+                                <option value="temperate">Temperate</option>
+                                <option value="dry">Dry</option>
+                                <option value="continental">Continental</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="inLiquidCapture">Liquid Capture (%)</label>
+                            <input id="inLiquidCapture" type="number" min="0" max="100" step="1" value="85">
+                        </div>
+                        <div class="input-group">
+                            <label for="inCoolant">Coolant Type</label>
+                            <select id="inCoolant">
+                                <option value="water">Water</option>
+                                <option value="pg20">20% Propylene Glycol</option>
+                                <option value="pg30">30% Propylene Glycol</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="inSupplyTemp">Supply Temp (C)</label>
+                            <input id="inSupplyTemp" type="number" step="0.1" value="30">
+                        </div>
+                        <div class="input-group">
+                            <label for="inReturnTemp">Return Temp (C)</label>
+                            <input id="inReturnTemp" type="number" step="0.1" value="38.5">
+                        </div>
+                        <div class="input-group">
+                            <label for="inPumpHead">Pump Head (m)</label>
+                            <input id="inPumpHead" type="number" min="5" step="0.5" value="28">
+                        </div>
+                        <div class="input-group">
+                            <label for="inPumpEff">Pump Efficiency (%)</label>
+                            <input id="inPumpEff" type="number" min="35" max="95" step="1" value="78">
+                        </div>
+                        <div class="input-group">
+                            <label for="inHydraulicMargin">Hydraulic Margin (%)</label>
+                            <input id="inHydraulicMargin" type="number" min="0" max="45" step="1" value="12">
+                        </div>
+                        <div class="input-group">
+                            <label for="inCduUnit">CDU Unit Capacity (kW)</label>
+                            <input id="inCduUnit" type="number" min="300" step="50" value="1200">
+                        </div>
+                        <div class="input-group">
+                            <label for="inRedundancy">Redundancy Topology</label>
+                            <select id="inRedundancy">
+                                <option value="N">N</option>
+                                <option value="N1">N+1</option>
+                                <option value="2N">2N</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="inAirCop">Air Path COP</label>
+                            <input id="inAirCop" type="number" min="1.5" step="0.1" value="4.2">
+                        </div>
+                        <div class="input-group">
+                            <label for="inEconomizerHours">Economizer Availability (%)</label>
+                            <input id="inEconomizerHours" type="number" min="0" max="95" step="1" value="28">
+                        </div>
+                        <div class="input-group">
+                            <label for="inFanPower">Fan Power (% IT)</label>
+                            <input id="inFanPower" type="number" min="0.5" max="12" step="0.1" value="3.2">
+                        </div>
+                        <div class="input-group">
+                            <label for="inUpsEff">UPS Efficiency (%)</label>
+                            <input id="inUpsEff" type="number" min="90" max="99.5" step="0.1" value="96.5">
+                        </div>
+                        <div class="input-group">
+                            <label for="inDistLoss">Power Distribution Loss (% Input)</label>
+                            <input id="inDistLoss" type="number" min="0.5" max="8" step="0.1" value="2.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="inHeatReuse">Heat Reuse Rate (% Liquid Path)</label>
+                            <input id="inHeatReuse" type="number" min="0" max="80" step="1" value="18">
+                        </div>
+                        <div class="input-group">
+                            <label for="inElecPrice">Electricity Price (USD/kWh)</label>
+                            <input id="inElecPrice" type="number" min="0.02" step="0.005" value="0.11">
+                        </div>
+                        <div class="input-group">
+                            <label for="inWaterTariff">Water Tariff (USD/m3)</label>
+                            <input id="inWaterTariff" type="number" min="0.1" step="0.1" value="1.6">
+                        </div>
+                        <div class="input-group">
+                            <label for="inCarbonIntensity">Grid Carbon Intensity (kgCO2e/kWh)</label>
+                            <input id="inCarbonIntensity" type="number" min="0.05" max="1.1" step="0.01" value="0.42">
+                        </div>
+                        <div class="input-group">
+                            <label for="inMonitoring">Monitoring Coverage (%)</label>
+                            <input id="inMonitoring" type="number" min="0" max="100" step="1" value="92">
+                        </div>
+                        <div class="input-group">
+                            <label for="inFireType">Fire Suppression Strategy</label>
+                            <select id="inFireType">
+                                <option value="clean_agent">Clean Agent</option>
+                                <option value="water_mist">Water Mist</option>
+                                <option value="double_interlock">Double-Interlock Pre-Action</option>
+                                <option value="dry_pipe">Dry Pipe</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="inTargetPue">Target PUE</label>
+                            <input id="inTargetPue" type="number" min="1.05" step="0.01" value="1.20">
+                        </div>
+                        <div class="input-group">
+                            <label for="inTargetCop">Target System COP</label>
+                            <input id="inTargetCop" type="number" min="3" step="0.1" value="8.2">
+                        </div>
+                    </div>
+
+                    <label class="check-wrap" for="inConcurrent">
+                        <input id="inConcurrent" type="checkbox" checked>
+                        Concurrent maintainability verified.
+                    </label>
+
+                    <div class="form-actions">
+                        <button class="btn-primary" id="runCalc" type="button">Run High-Fidelity Model</button>
+                        <button class="btn-accent" id="optimizeTarget" type="button">Optimize To Target</button>
+                        <button class="btn-secondary" id="resetCalc" type="button">Reset</button>
+                    </div>
+
+                    <p class="calc-footnote">
+                        The model estimates thermodynamic and economic behavior using engineering assumptions for early-stage design screening.
+                    </p>
+                </div>
+
+                <div class="calc-card">
+                    <h3>Engineering Output</h3>
+                    <div class="result-grid">
+                        <div class="result-card"><span class="label">Country Profile</span><span class="value" id="outCountry">-</span></div>
+                        <div class="result-card"><span class="label">Liquid Heat Captured</span><span class="value" id="outLiquidLoad">-</span></div>
+                        <div class="result-card"><span class="label">Residual Air Heat</span><span class="value" id="outAirLoad">-</span></div>
+                        <div class="result-card"><span class="label">Coolant Flow (Design)</span><span class="value" id="outFlow">-</span></div>
+                        <div class="result-card"><span class="label">Pump Power</span><span class="value" id="outPump">-</span></div>
+                        <div class="result-card"><span class="label">CDU Count</span><span class="value" id="outCdu">-</span></div>
+                        <div class="result-card"><span class="label">Projected PUE</span><span class="value" id="outPue">-</span></div>
+                        <div class="result-card"><span class="label">Projected System COP</span><span class="value" id="outCop">-</span></div>
+                        <div class="result-card"><span class="label">Projected WUE</span><span class="value" id="outWue">-</span></div>
+                        <div class="result-card"><span class="label">Annual Energy</span><span class="value" id="outEnergy">-</span></div>
+                        <div class="result-card"><span class="label">Gross Annual OPEX</span><span class="value" id="outOpex">-</span></div>
+                        <div class="result-card"><span class="label">Heat-Reuse Credit</span><span class="value" id="outHeatCredit">-</span></div>
+                        <div class="result-card"><span class="label">Net Annual OPEX</span><span class="value" id="outNetOpex">-</span></div>
+                        <div class="result-card"><span class="label">Annual Carbon</span><span class="value" id="outCarbon">-</span></div>
+                        <div class="result-card"><span class="label">Carbon Avoided</span><span class="value" id="outCarbonAvoided">-</span></div>
+                        <div class="result-card"><span class="label">Rack Density</span><span class="value" id="outRackDensity">-</span></div>
+                        <div class="result-card"><span class="label">Risk Index</span><span class="value" id="outRisk">-</span></div>
+                        <div class="result-card"><span class="label">Data Confidence</span><span class="value" id="outConfidence">-</span></div>
+                    </div>
+
+                    <div class="model-block">
+                        <div class="model-head">
+                            <h4><i class="fas fa-diagram-project"></i> Advanced Modelling Block Diagram</h4>
+                            <p>Input profiles flow through thermal-hydraulic engine and produce quantified impact to efficiency, cost, and compliance.</p>
+                        </div>
+                        <div class="model-track">
+                            <div class="model-node">
+                                <span class="tag">Input Profile</span>
+                                <span class="val" id="modelInputNode">-</span>
+                            </div>
+                            <div class="model-arrow">&#8594;</div>
+                            <div class="model-node">
+                                <span class="tag">Thermal Engine</span>
+                                <span class="val" id="modelEngineNode">-</span>
+                            </div>
+                            <div class="model-arrow">&#8594;</div>
+                            <div class="model-node">
+                                <span class="tag">Impact Layer</span>
+                                <span class="val" id="modelImpactNode">-</span>
+                            </div>
+                        </div>
+                        <div class="model-impact-grid">
+                            <div class="model-impact">
+                                <span class="k">PUE Gap to Target</span>
+                                <span class="v" id="impactPueGap">-</span>
+                            </div>
+                            <div class="model-impact">
+                                <span class="k">COP Gap to Target</span>
+                                <span class="v" id="impactCopGap">-</span>
+                            </div>
+                            <div class="model-impact">
+                                <span class="k">OPEX Delta vs Target Mode</span>
+                                <span class="v" id="impactOpexDelta">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flow-block">
+                        <div class="flow-head">
+                            <h4><i class="fas fa-sitemap"></i> Dynamic Energy + Loss Breakdown</h4>
+                            <p>Live share of major loads from IT input to final facility demand.</p>
+                        </div>
+                        <div class="flow-row">
+                            <span>IT Core Load</span>
+                            <div class="flow-bar"><i id="barFlowIt"></i></div>
+                            <span id="flowIt">-</span>
+                        </div>
+                        <div class="flow-row">
+                            <span>Liquid Cooling</span>
+                            <div class="flow-bar"><i id="barFlowLiquid"></i></div>
+                            <span id="flowLiquid">-</span>
+                        </div>
+                        <div class="flow-row">
+                            <span>Air Path Cooling</span>
+                            <div class="flow-bar"><i id="barFlowAir"></i></div>
+                            <span id="flowAir">-</span>
+                        </div>
+                        <div class="flow-row">
+                            <span>Pump + Hydraulics</span>
+                            <div class="flow-bar"><i id="barFlowPump"></i></div>
+                            <span id="flowPump">-</span>
+                        </div>
+                        <div class="flow-row">
+                            <span>Electrical Losses</span>
+                            <div class="flow-bar"><i id="barFlowElecLoss"></i></div>
+                            <span id="flowElecLoss">-</span>
+                        </div>
+                        <div class="flow-row">
+                            <span>Other Aux + Fan</span>
+                            <div class="flow-bar"><i id="barFlowAux"></i></div>
+                            <span id="flowAux">-</span>
+                        </div>
+                    </div>
+
+                    <div class="target-block">
+                        <div class="target-head">
+                            <h4>Target Guidance Engine</h4>
+                            <span class="target-badge" id="targetGapBadge">Gap: -</span>
+                        </div>
+                        <ul class="target-list" id="targetActions">
+                            <li>Run model to generate optimization actions.</li>
+                        </ul>
+                        <div class="scenario-table-wrap">
+                            <table class="scenario-table">
+                                <thead>
+                                    <tr>
+                                        <th>Scenario</th>
+                                        <th>PUE</th>
+                                <th>System COP</th>
+                                <th>Annual OPEX</th>
+                                <th>Annual Carbon</th>
+                                <th>WUE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                    <tr>
+                                        <td>Baseline</td>
+                                        <td id="basePue">-</td>
+                                        <td id="baseCop">-</td>
+                                        <td id="baseNetOpex">-</td>
+                                        <td id="baseCarbon">-</td>
+                                        <td id="baseWue">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Optimized</td>
+                                        <td id="optPue">-</td>
+                                        <td id="optCop">-</td>
+                                        <td id="optNetOpex">-</td>
+                                        <td id="optCarbon">-</td>
+                                        <td id="optWue">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Delta</td>
+                                        <td id="deltaPue">-</td>
+                                        <td id="deltaCop">-</td>
+                                        <td id="deltaNetOpex">-</td>
+                                        <td id="deltaCarbon">-</td>
+                                        <td id="deltaWue">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="scoreboard">
+                        <div class="score-row">
+                            <span class="score-title">Composite Standards Alignment</span>
+                            <span class="score-value" id="outScore">-</span>
+                        </div>
+                        <p class="score-grade" id="outGrade">Grade: -</p>
+                    </div>
+
+                    <div class="compliance-grid">
+                        <div class="compliance-item">
+                            <div class="compliance-head"><span class="compliance-name">ASHRAE Thermal Envelope</span><span class="compliance-score" id="scoreAshrae">-</span></div>
+                            <div class="progress"><i id="barAshrae"></i></div>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-head"><span class="compliance-name">ANSI/TIA Infrastructure Readiness</span><span class="compliance-score" id="scoreAnsi">-</span></div>
+                            <div class="progress"><i id="barAnsi"></i></div>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-head"><span class="compliance-name">ISO Energy Governance</span><span class="compliance-score" id="scoreIso">-</span></div>
+                            <div class="progress"><i id="barIso"></i></div>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-head"><span class="compliance-name">NFPA Safety Posture</span><span class="compliance-score" id="scoreNfpa">-</span></div>
+                            <div class="progress"><i id="barNfpa"></i></div>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-head"><span class="compliance-name">Uptime Tier Alignment</span><span class="compliance-score" id="scoreUptime">-</span></div>
+                            <div class="progress"><i id="barUptime"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="method-block">
+                        <h4>Methodology Snapshot</h4>
+                        <ul>
+                            <li>Mass flow uses Q = m * Cp * deltaT with coolant-specific properties.</li>
+                            <li>Pump duty includes redundancy factor, hydraulic margin, and efficiency correction.</li>
+                            <li>Cooling energy blends liquid + air path with economizer and part-load corrections.</li>
+                            <li>PUE includes UPS and distribution losses, fan load, and auxiliary systems.</li>
+                            <li>Net OPEX and carbon include heat reuse credit and displacement benefit.</li>
+                            <li>Composite score uses weighted standard-specific criteria plus risk modifiers.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Root Engineering Lab - ResistanceZero - 2026</p>
+            <p><a href="terms.html">Terms</a> - <a href="privacy.html">Privacy</a> - <a href="datacenter-solutions.html">Back to DC Solutions</a></p>
+        </footer>
+    </main>
+
+    <div class="root-gate" id="rootGate" aria-live="polite">
+        <div class="root-gate-card">
+            <div class="lock"><i class="fas fa-lock"></i></div>
+            <h2>Root Access Required</h2>
+            <p>This page is restricted. Sign in with a root account to open the standards and liquid-to-chip lab.</p>
+            <div class="root-gate-actions">
+                <button class="login" id="rootLoginBtn" type="button">Sign In as Root</button>
+                <a class="back" href="datacenter-solutions.html">Back</a>
+            </div>
+            <p class="root-gate-note">Allowed root emails: admin@resistancezero.com, bagus@resistancezero.com</p>
+        </div>
+    </div>
+
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <script>
+        (function initTheme() {
+            var themeToggle = document.getElementById('themeToggle');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+            function preferredTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) return saved;
+                return prefersDark.matches ? 'dark' : 'light';
+            }
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                var icon = themeToggle.querySelector('i');
+                if (icon) {
+                    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                }
+                var metaTheme = document.querySelector('meta[name="theme-color"]');
+                if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#0a0f1d' : '#ffffff');
+            }
+
+            applyTheme(preferredTheme());
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    var current = document.documentElement.getAttribute('data-theme');
+                    applyTheme(current === 'dark' ? 'light' : 'dark');
+                });
+            }
+        })();
+
+        (function initCalculator() {
+            var COUNTRY_PROFILES = {
+                custom: { label: 'Custom Manual' },
+                sg: { label: 'Singapore', climate: 'tropical', elecPrice: 0.22, waterTariff: 2.7, airCop: 4.0, targetPue: 1.23, targetCop: 7.8, economizerHours: 22, carbonIntensity: 0.41, upsEff: 96.8, distLoss: 2.2 },
+                us_va: { label: 'USA - Virginia', climate: 'temperate', elecPrice: 0.11, waterTariff: 1.3, airCop: 4.9, targetPue: 1.18, targetCop: 8.8, economizerHours: 48, carbonIntensity: 0.31, upsEff: 97.2, distLoss: 1.9 },
+                nl: { label: 'Netherlands', climate: 'temperate', elecPrice: 0.17, waterTariff: 1.9, airCop: 5.1, targetPue: 1.16, targetCop: 9.1, economizerHours: 52, carbonIntensity: 0.27, upsEff: 97.4, distLoss: 1.8 },
+                id_jkt: { label: 'Indonesia - Jakarta', climate: 'tropical', elecPrice: 0.1, waterTariff: 1.6, airCop: 4.1, targetPue: 1.26, targetCop: 7.5, economizerHours: 18, carbonIntensity: 0.73, upsEff: 96.1, distLoss: 2.4 },
+                in_mum: { label: 'India - Mumbai', climate: 'tropical', elecPrice: 0.12, waterTariff: 1.4, airCop: 4.2, targetPue: 1.24, targetCop: 7.7, economizerHours: 20, carbonIntensity: 0.69, upsEff: 96.0, distLoss: 2.5 },
+                ie: { label: 'Ireland', climate: 'temperate', elecPrice: 0.18, waterTariff: 2.2, airCop: 5.0, targetPue: 1.15, targetCop: 9.3, economizerHours: 58, carbonIntensity: 0.29, upsEff: 97.5, distLoss: 1.7 }
+            };
+
+            var CLIMATE_FACTORS = {
+                tropical: { wetBulb: 26, baseWue: 0.62, climateCopBias: -0.45 },
+                temperate: { wetBulb: 17, baseWue: 0.22, climateCopBias: 0.38 },
+                dry: { wetBulb: 16, baseWue: 0.30, climateCopBias: 0.55 },
+                continental: { wetBulb: 19, baseWue: 0.38, climateCopBias: 0.22 }
+            };
+
+            var COOLANTS = {
+                water: { cp: 4.186, rho: 997 },
+                pg20: { cp: 3.92, rho: 1025 },
+                pg30: { cp: 3.75, rho: 1038 }
+            };
+
+            var DEFAULTS = {
+                inItLoad: 12,
+                inRackCount: 360,
+                inLiquidCapture: 85,
+                inCoolant: 'water',
+                inSupplyTemp: 30,
+                inReturnTemp: 38.5,
+                inPumpHead: 28,
+                inPumpEff: 78,
+                inHydraulicMargin: 12,
+                inCduUnit: 1200,
+                inRedundancy: 'N1',
+                inClimate: 'tropical',
+                inCountryProfile: 'custom',
+                inAirCop: 4.2,
+                inEconomizerHours: 28,
+                inFanPower: 3.2,
+                inUpsEff: 96.5,
+                inDistLoss: 2.1,
+                inHeatReuse: 18,
+                inElecPrice: 0.11,
+                inWaterTariff: 1.6,
+                inCarbonIntensity: 0.42,
+                inMonitoring: 92,
+                inFireType: 'clean_agent',
+                inTargetPue: 1.2,
+                inTargetCop: 8.2,
+                inConcurrent: true
+            };
+
+            var baselineModel = null;
+            var optimizedModel = null;
+
+            function n(id) {
+                var el = document.getElementById(id);
+                if (!el) return 0;
+                return parseFloat(el.value || '0');
+            }
+
+            function clamp(v, min, max) {
+                return Math.max(min, Math.min(max, v));
+            }
+
+            function setText(id, value) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = value;
+            }
+
+            function setBar(id, value) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.style.width = clamp(value, 0, 100) + '%';
+            }
+
+            function fmtNum(value, digits) {
+                return Number(value).toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: digits });
+            }
+
+            function fmtUsd(value) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 0
+                }).format(value);
+            }
+
+            function signed(value, digits, suffix) {
+                var sign = value > 0 ? '+' : '';
+                return sign + fmtNum(value, digits) + (suffix || '');
+            }
+
+            function selectedCountryLabel() {
+                var sel = document.getElementById('inCountryProfile');
+                if (!sel) return 'Custom Manual';
+                var key = sel.value;
+                return (COUNTRY_PROFILES[key] && COUNTRY_PROFILES[key].label) ? COUNTRY_PROFILES[key].label : 'Custom Manual';
+            }
+
+            function gatherInputs() {
+                return {
+                    itLoadMw: Math.max(n('inItLoad'), 0.5),
+                    rackCount: Math.max(n('inRackCount'), 10),
+                    liquidCapture: clamp(n('inLiquidCapture'), 0, 100),
+                    coolantKey: document.getElementById('inCoolant').value,
+                    supplyTemp: n('inSupplyTemp'),
+                    returnTemp: n('inReturnTemp'),
+                    pumpHead: Math.max(n('inPumpHead'), 5),
+                    pumpEff: clamp(n('inPumpEff'), 35, 95),
+                    hydraulicMargin: clamp(n('inHydraulicMargin'), 0, 45),
+                    cduUnit: Math.max(n('inCduUnit'), 300),
+                    redundancy: document.getElementById('inRedundancy').value,
+                    climate: document.getElementById('inClimate').value,
+                    countryKey: document.getElementById('inCountryProfile').value,
+                    airCop: Math.max(n('inAirCop'), 1.5),
+                    economizerHours: clamp(n('inEconomizerHours'), 0, 95),
+                    fanPower: clamp(n('inFanPower'), 0.5, 12),
+                    upsEff: clamp(n('inUpsEff'), 90, 99.5),
+                    distLoss: clamp(n('inDistLoss'), 0.5, 8),
+                    heatReuse: clamp(n('inHeatReuse'), 0, 80),
+                    elecPrice: Math.max(n('inElecPrice'), 0.01),
+                    waterTariff: Math.max(n('inWaterTariff'), 0.1),
+                    carbonIntensity: clamp(n('inCarbonIntensity'), 0.05, 1.1),
+                    monitoring: clamp(n('inMonitoring'), 0, 100),
+                    fireType: document.getElementById('inFireType').value,
+                    targetPue: Math.max(n('inTargetPue'), 1.05),
+                    targetCop: Math.max(n('inTargetCop'), 3),
+                    concurrent: document.getElementById('inConcurrent').checked
+                };
+            }
+
+            function ashraeScore(supplyTemp, returnTemp, deltaT, liquidCapture) {
+                var score = 100;
+                if (supplyTemp < 18 || supplyTemp > 40) score -= 35;
+                if (returnTemp > 50) score -= 20;
+                if (deltaT < 6) score -= 15;
+                if (deltaT > 14) score -= 8;
+                if (liquidCapture < 65) score -= 12;
+                return clamp(score, 0, 100);
+            }
+
+            function ansiScore(redundancy, monitoring, rackDensity, hydraulicMargin) {
+                var base = redundancy === '2N' ? 88 : (redundancy === 'N1' ? 78 : 62);
+                base += monitoring * 0.1;
+                if (rackDensity > 80) base -= 6;
+                if (hydraulicMargin > 25) base -= 4;
+                return clamp(base, 0, 100);
+            }
+
+            function isoScore(monitoring, pue, netCarbonTons, annualGwh) {
+                var score = 35 + monitoring * 0.42;
+                if (pue <= 1.2) score += 21;
+                else if (pue <= 1.3) score += 15;
+                else if (pue <= 1.4) score += 9;
+                else if (pue <= 1.5) score += 4;
+                var intensity = annualGwh > 0 ? netCarbonTons / annualGwh : 0;
+                if (intensity <= 250) score += 8;
+                else if (intensity <= 350) score += 4;
+                return clamp(score, 0, 100);
+            }
+
+            function nfpaScore(fireType, concurrent) {
+                var map = {
+                    clean_agent: 94,
+                    water_mist: 88,
+                    double_interlock: 81,
+                    dry_pipe: 72
+                };
+                var score = map[fireType] || 70;
+                if (concurrent) score += 4;
+                return clamp(score, 0, 100);
+            }
+
+            function uptimeScore(redundancy, monitoring, concurrent, upsEff) {
+                var score = redundancy === '2N' ? 92 : (redundancy === 'N1' ? 80 : 58);
+                score += monitoring * 0.1;
+                score += (upsEff - 95) * 3.2;
+                if (concurrent) score += 6;
+                return clamp(score, 0, 100);
+            }
+
+            function grade(score) {
+                if (score >= 90) return 'Grade A';
+                if (score >= 80) return 'Grade B';
+                if (score >= 70) return 'Grade C';
+                if (score >= 60) return 'Grade D';
+                return 'Grade E';
+            }
+
+            function computeModel(input) {
+                var climateData = CLIMATE_FACTORS[input.climate] || CLIMATE_FACTORS.tropical;
+                var coolant = COOLANTS[input.coolantKey] || COOLANTS.water;
+
+                var itKw = Math.max(input.itLoadMw * 1000, 100);
+                var liquidKw = itKw * (input.liquidCapture / 100);
+                var airKw = itKw - liquidKw;
+                var deltaT = Math.max(input.returnTemp - input.supplyTemp, 3);
+
+                var massFlowKgS = liquidKw / (coolant.cp * deltaT);
+                var baseFlowM3s = massFlowKgS / coolant.rho;
+                var redundancyFactor = input.redundancy === '2N' ? 2 : (input.redundancy === 'N1' ? 1.15 : 1);
+                var designFlowM3s = baseFlowM3s * redundancyFactor * (1 + (input.hydraulicMargin / 100));
+                var flowLpm = designFlowM3s * 60000;
+
+                var hydraulicPowerKw = (coolant.rho * 9.81 * input.pumpHead * designFlowM3s) / 1000;
+                var pumpPowerKw = hydraulicPowerKw / Math.max(input.pumpEff / 100, 0.35);
+
+                var cduLossKw = liquidKw * 0.018;
+                var economizerFraction = input.economizerHours / 100;
+                var supplyBonus = clamp((input.supplyTemp - 28) * 0.12, -0.4, 1.4);
+                var econBonus = economizerFraction * 1.1;
+                var liquidCop = clamp(6.4 + climateData.climateCopBias + supplyBonus + econBonus, 3.5, 13);
+                var airCopEff = clamp(input.airCop * (1 + economizerFraction * 0.62), 1.8, 14);
+
+                var liquidCoolingKw = ((liquidKw + cduLossKw) / liquidCop) + pumpPowerKw;
+                var airCoolingKw = airKw / airCopEff;
+                var fanKw = itKw * (input.fanPower / 100) * (1 - (input.liquidCapture / 100) * 0.48);
+                var totalCoolingKw = liquidCoolingKw + airCoolingKw + fanKw;
+                var systemCop = itKw / Math.max(totalCoolingKw, 1);
+
+                var upsInputKw = itKw / Math.max(input.upsEff / 100, 0.9);
+                var upsLossKw = upsInputKw - itKw;
+                var distLossKw = upsInputKw * (input.distLoss / 100);
+
+                var auxKw = itKw * 0.03;
+                var totalFacilityKw = itKw + totalCoolingKw + upsLossKw + distLossKw + auxKw;
+                var pue = totalFacilityKw / itKw;
+
+                var annualKwh = totalFacilityKw * 8760;
+                var annualGwh = annualKwh / 1000000;
+                var annualEnergyCost = annualKwh * input.elecPrice;
+
+                var wue = climateData.baseWue * (1 - economizerFraction * 0.45) * (1 - (input.liquidCapture / 100) * 0.33);
+                wue = Math.max(wue, 0.05);
+                var annualWaterM3 = (annualKwh * wue) / 1000;
+                var annualWaterCost = annualWaterM3 * input.waterTariff;
+                var grossOpex = annualEnergyCost + annualWaterCost;
+
+                var heatReuseKwAvg = liquidKw * (input.heatReuse / 100) * 0.52;
+                var heatReuseKwh = heatReuseKwAvg * 8760;
+                var heatReuseCredit = heatReuseKwh * input.elecPrice * 0.62;
+                var netOpex = Math.max(grossOpex - heatReuseCredit, 0);
+
+                var annualCarbonTons = (annualKwh * input.carbonIntensity) / 1000;
+                var avoidedCarbonTons = (heatReuseKwh * input.carbonIntensity * 0.65) / 1000;
+                var netCarbonTons = Math.max(annualCarbonTons - avoidedCarbonTons, 0);
+
+                var cduBase = Math.max(1, Math.ceil(liquidKw / input.cduUnit));
+                var cduCount = input.redundancy === '2N' ? cduBase * 2 : (input.redundancy === 'N1' ? cduBase + 1 : cduBase);
+                var rackDensity = itKw / Math.max(input.rackCount, 1);
+
+                var scoreA = ashraeScore(input.supplyTemp, input.returnTemp, deltaT, input.liquidCapture);
+                var scoreB = ansiScore(input.redundancy, input.monitoring, rackDensity, input.hydraulicMargin);
+                var scoreC = isoScore(input.monitoring, pue, netCarbonTons, annualGwh);
+                var scoreD = nfpaScore(input.fireType, input.concurrent);
+                var scoreE = uptimeScore(input.redundancy, input.monitoring, input.concurrent, input.upsEff);
+                var totalScore = (scoreA * 0.24) + (scoreB * 0.16) + (scoreC * 0.16) + (scoreD * 0.2) + (scoreE * 0.24);
+
+                var riskIndex = 18;
+                if (input.redundancy === 'N') riskIndex += 12;
+                if (!input.concurrent) riskIndex += 8;
+                if (rackDensity > 80) riskIndex += 10;
+                if (input.fireType === 'dry_pipe') riskIndex += 6;
+                riskIndex += Math.max(0, (80 - input.monitoring) * 0.2);
+                riskIndex += Math.max(0, (input.upsEff < 96 ? (96 - input.upsEff) * 3 : 0));
+                riskIndex = clamp(riskIndex, 5, 95);
+
+                var confidence = clamp(
+                    48 +
+                    (input.monitoring * 0.35) +
+                    (input.concurrent ? 6 : 0) +
+                    (input.countryKey !== 'custom' ? 8 : 0) +
+                    ((deltaT >= 6 && deltaT <= 14) ? 6 : 0) +
+                    ((input.hydraulicMargin <= 20) ? 3 : 0),
+                    0,
+                    99
+                );
+
+                var pueGap = pue - input.targetPue;
+                var copGap = systemCop - input.targetCop;
+
+                return {
+                    input: input,
+                    itKw: itKw,
+                    liquidKw: liquidKw,
+                    airKw: airKw,
+                    deltaT: deltaT,
+                    flowLpm: flowLpm,
+                    pumpPowerKw: pumpPowerKw,
+                    cduCount: cduCount,
+                    pue: pue,
+                    systemCop: systemCop,
+                    wue: wue,
+                    annualGwh: annualGwh,
+                    annualEnergyCost: annualEnergyCost,
+                    annualWaterCost: annualWaterCost,
+                    annualOpex: grossOpex,
+                    heatReuseCredit: heatReuseCredit,
+                    netOpex: netOpex,
+                    annualCarbonTons: annualCarbonTons,
+                    avoidedCarbonTons: avoidedCarbonTons,
+                    netCarbonTons: netCarbonTons,
+                    rackDensity: rackDensity,
+                    confidence: confidence,
+                    riskIndex: riskIndex,
+                    scores: { ashrae: scoreA, ansi: scoreB, iso: scoreC, nfpa: scoreD, uptime: scoreE, total: totalScore },
+                    pueGap: pueGap,
+                    copGap: copGap,
+                    totalFacilityKw: totalFacilityKw,
+                    breakdown: {
+                        it: itKw,
+                        liquidCooling: liquidCoolingKw,
+                        airCooling: airCoolingKw,
+                        pump: pumpPowerKw,
+                        elecLoss: upsLossKw + distLossKw,
+                        aux: auxKw + fanKw
+                    }
+                };
+            }
+
+            function renderTargetActions(base, opt) {
+                var list = document.getElementById('targetActions');
+                if (!list) return;
+                var items = [];
+
+                if (!base) {
+                    items.push('Run model to generate optimization actions.');
+                } else if (!opt) {
+                    items.push('Set target PUE/COP then click Optimize To Target for best-fit multi-factor parameters.');
+                    items.push('Model considers thermal capture, hydraulic margin, economizer, power losses, and heat reuse tradeoff.');
+                } else {
+                    var dCapture = opt.input.liquidCapture - base.input.liquidCapture;
+                    var dSupply = opt.input.supplyTemp - base.input.supplyTemp;
+                    var dAirCop = opt.input.airCop - base.input.airCop;
+                    var dPumpEff = opt.input.pumpEff - base.input.pumpEff;
+                    var dEco = opt.input.economizerHours - base.input.economizerHours;
+                    var dHeat = opt.input.heatReuse - base.input.heatReuse;
+                    var dPue = base.pue - opt.pue;
+                    var dCop = opt.systemCop - base.systemCop;
+                    var dRisk = base.riskIndex - opt.riskIndex;
+
+                    if (Math.abs(dCapture) > 0.4) items.push('Set liquid capture to ' + fmtNum(opt.input.liquidCapture, 0) + '% (' + signed(dCapture, 0, ' pts') + ') to reduce residual air-path cooling.');
+                    if (Math.abs(dSupply) > 0.2) items.push('Tune supply temperature to ' + fmtNum(opt.input.supplyTemp, 1) + 'C (' + signed(dSupply, 1, 'C') + ') while keeping delta-T stable.');
+                    if (Math.abs(dAirCop) > 0.05) items.push('Increase equivalent air-path COP to ' + fmtNum(opt.input.airCop, 2) + ' (' + signed(dAirCop, 2, '') + ') via control sequencing and plant tuning.');
+                    if (Math.abs(dPumpEff) > 0.5) items.push('Raise pump efficiency to ' + fmtNum(opt.input.pumpEff, 0) + '% (' + signed(dPumpEff, 0, ' pts') + ') to suppress parasitic loads.');
+                    if (Math.abs(dEco) > 1) items.push('Target economizer availability around ' + fmtNum(opt.input.economizerHours, 0) + '% (' + signed(dEco, 0, ' pts') + ') with operating envelope controls.');
+                    if (Math.abs(dHeat) > 1) items.push('Shift heat reuse to ' + fmtNum(opt.input.heatReuse, 0) + '% (' + signed(dHeat, 0, ' pts') + ') for net OPEX and carbon relief.');
+                    items.push('Projected impact: PUE ' + signed(dPue, 3, '') + ' better, COP ' + signed(dCop, 2, '') + ', net OPEX ' + signed(base.netOpex - opt.netOpex, 0, ' USD/yr') + ', risk index ' + signed(dRisk, 1, '') + ' better.');
+                }
+
+                list.innerHTML = items.map(function(text) { return '<li>' + text + '</li>'; }).join('');
+            }
+
+            function renderScenarioTable(base, opt) {
+                if (!base) return;
+                setText('basePue', fmtNum(base.pue, 3));
+                setText('baseCop', fmtNum(base.systemCop, 2));
+                setText('baseNetOpex', fmtUsd(base.netOpex));
+                setText('baseCarbon', fmtNum(base.netCarbonTons, 0) + ' tCO2e');
+                setText('baseWue', fmtNum(base.wue, 3));
+
+                if (!opt) {
+                    setText('optPue', '-');
+                    setText('optCop', '-');
+                    setText('optNetOpex', '-');
+                    setText('optCarbon', '-');
+                    setText('optWue', '-');
+                    setText('deltaPue', '-');
+                    setText('deltaCop', '-');
+                    setText('deltaNetOpex', '-');
+                    setText('deltaCarbon', '-');
+                    setText('deltaWue', '-');
+                    return;
+                }
+
+                setText('optPue', fmtNum(opt.pue, 3));
+                setText('optCop', fmtNum(opt.systemCop, 2));
+                setText('optNetOpex', fmtUsd(opt.netOpex));
+                setText('optCarbon', fmtNum(opt.netCarbonTons, 0) + ' tCO2e');
+                setText('optWue', fmtNum(opt.wue, 3));
+
+                setText('deltaPue', signed(opt.pue - base.pue, 3, ''));
+                setText('deltaCop', signed(opt.systemCop - base.systemCop, 2, ''));
+                setText('deltaNetOpex', signed(opt.netOpex - base.netOpex, 0, ' USD'));
+                setText('deltaCarbon', signed(opt.netCarbonTons - base.netCarbonTons, 0, ' tCO2e'));
+                setText('deltaWue', signed(opt.wue - base.wue, 3, ''));
+            }
+
+            function renderBreakdown(model) {
+                if (!model) return;
+                var total = Math.max(model.totalFacilityKw, 1);
+                var keys = [
+                    ['It', model.breakdown.it, 'barFlowIt', 'flowIt'],
+                    ['Liquid', model.breakdown.liquidCooling, 'barFlowLiquid', 'flowLiquid'],
+                    ['Air', model.breakdown.airCooling, 'barFlowAir', 'flowAir'],
+                    ['Pump', model.breakdown.pump, 'barFlowPump', 'flowPump'],
+                    ['ElecLoss', model.breakdown.elecLoss, 'barFlowElecLoss', 'flowElecLoss'],
+                    ['Aux', model.breakdown.aux, 'barFlowAux', 'flowAux']
+                ];
+
+                keys.forEach(function(item) {
+                    var value = item[1];
+                    var width = clamp((value / total) * 100, 0, 100);
+                    setBar(item[2], width);
+                    setText(item[3], fmtNum(value, 0) + ' kW (' + fmtNum(width, 1) + '%)');
+                });
+            }
+
+            function applyModelToUI(model) {
+                setText('outCountry', selectedCountryLabel());
+                setText('outLiquidLoad', fmtNum(model.liquidKw, 0) + ' kW');
+                setText('outAirLoad', fmtNum(model.airKw, 0) + ' kW');
+                setText('outFlow', fmtNum(model.flowLpm, 0) + ' LPM');
+                setText('outPump', fmtNum(model.pumpPowerKw, 1) + ' kW');
+                setText('outCdu', model.cduCount + ' units');
+                setText('outPue', fmtNum(model.pue, 3));
+                setText('outCop', fmtNum(model.systemCop, 2));
+                setText('outWue', fmtNum(model.wue, 3) + ' L/kWh');
+                setText('outEnergy', fmtNum(model.annualGwh, 2) + ' GWh/yr');
+                setText('outOpex', fmtUsd(model.annualOpex));
+                setText('outHeatCredit', fmtUsd(model.heatReuseCredit));
+                setText('outNetOpex', fmtUsd(model.netOpex));
+                setText('outCarbon', fmtNum(model.netCarbonTons, 0) + ' tCO2e/yr');
+                setText('outCarbonAvoided', fmtNum(model.avoidedCarbonTons, 0) + ' tCO2e/yr');
+                setText('outRackDensity', fmtNum(model.rackDensity, 1) + ' kW/rack');
+                setText('outRisk', fmtNum(model.riskIndex, 1) + '/100');
+                setText('outConfidence', fmtNum(model.confidence, 0) + '%');
+
+                setText('modelInputNode', fmtNum(model.input.itLoadMw, 1) + 'MW | ' + fmtNum(model.input.liquidCapture, 0) + '% liquid | eco ' + fmtNum(model.input.economizerHours, 0) + '%');
+                setText('modelEngineNode', 'dT ' + fmtNum(model.deltaT, 1) + 'C | ' + fmtNum(model.flowLpm, 0) + ' LPM | UPS ' + fmtNum(model.input.upsEff, 1) + '%');
+                setText('modelImpactNode', 'PUE ' + fmtNum(model.pue, 3) + ' | COP ' + fmtNum(model.systemCop, 2) + ' | risk ' + fmtNum(model.riskIndex, 1));
+
+                setText('impactPueGap', signed(model.pueGap, 3, ''));
+                setText('impactCopGap', signed(model.copGap, 2, ''));
+                if (baselineModel && optimizedModel) setText('impactOpexDelta', signed(optimizedModel.netOpex - baselineModel.netOpex, 0, ' USD/yr'));
+                else setText('impactOpexDelta', 'N/A');
+                setText('targetGapBadge', 'Gap PUE ' + signed(model.pueGap, 3, '') + ' | COP ' + signed(model.copGap, 2, ''));
+
+                setText('outScore', fmtNum(model.scores.total, 1) + '/100');
+                setText('outGrade', grade(model.scores.total));
+                setText('scoreAshrae', fmtNum(model.scores.ashrae, 0) + '/100');
+                setText('scoreAnsi', fmtNum(model.scores.ansi, 0) + '/100');
+                setText('scoreIso', fmtNum(model.scores.iso, 0) + '/100');
+                setText('scoreNfpa', fmtNum(model.scores.nfpa, 0) + '/100');
+                setText('scoreUptime', fmtNum(model.scores.uptime, 0) + '/100');
+                setBar('barAshrae', model.scores.ashrae);
+                setBar('barAnsi', model.scores.ansi);
+                setBar('barIso', model.scores.iso);
+                setBar('barNfpa', model.scores.nfpa);
+                setBar('barUptime', model.scores.uptime);
+
+                renderBreakdown(model);
+            }
+
+            function runModel(resetOptimization) {
+                if (resetOptimization === void 0) resetOptimization = true;
+                var input = gatherInputs();
+                baselineModel = computeModel(input);
+                if (resetOptimization) optimizedModel = null;
+                applyModelToUI(baselineModel);
+                renderScenarioTable(baselineModel, optimizedModel);
+                renderTargetActions(baselineModel, optimizedModel);
+            }
+
+            function applyCountryProfile() {
+                var key = document.getElementById('inCountryProfile').value;
+                var profile = COUNTRY_PROFILES[key];
+                if (!profile || key === 'custom') {
+                    runModel(true);
+                    return;
+                }
+                document.getElementById('inClimate').value = profile.climate;
+                document.getElementById('inElecPrice').value = profile.elecPrice;
+                document.getElementById('inWaterTariff').value = profile.waterTariff;
+                document.getElementById('inAirCop').value = profile.airCop;
+                document.getElementById('inTargetPue').value = profile.targetPue;
+                document.getElementById('inTargetCop').value = profile.targetCop;
+                document.getElementById('inEconomizerHours').value = profile.economizerHours;
+                document.getElementById('inCarbonIntensity').value = profile.carbonIntensity;
+                document.getElementById('inUpsEff').value = profile.upsEff;
+                document.getElementById('inDistLoss').value = profile.distLoss;
+                runModel(true);
+            }
+
+            function optimizeObjective(model, input) {
+                var pueErr = Math.abs(model.pue - input.targetPue);
+                var copErr = Math.abs(model.systemCop - input.targetCop);
+                var score = 0;
+                score += pueErr * 240;
+                score += copErr * 45;
+                score += model.riskIndex * 0.8;
+                score += (model.netOpex / 1000000) * 0.06;
+                score += (model.netCarbonTons / 1000) * 0.08;
+                if (model.pue > input.targetPue + 0.02) score += 8;
+                if (model.systemCop < input.targetCop - 0.2) score += 6;
+                return score;
+            }
+
+            function randomInRange(min, max, step) {
+                var raw = min + (Math.random() * (max - min));
+                if (step > 0) raw = Math.round(raw / step) * step;
+                return clamp(raw, min, max);
+            }
+
+            function optimizeToTarget() {
+                var input = gatherInputs();
+                var base = computeModel(input);
+                baselineModel = base;
+
+                var best = base;
+                var bestInput = Object.assign({}, input);
+                var bestScore = optimizeObjective(base, input);
+                var baseDeltaT = Math.max(input.returnTemp - input.supplyTemp, 6);
+
+                for (var i = 0; i < 2600; i++) {
+                    var candidate = Object.assign({}, input, {
+                        liquidCapture: randomInRange(Math.max(55, input.liquidCapture - 25), Math.min(98, input.liquidCapture + 20), 1),
+                        supplyTemp: randomInRange(Math.max(22, input.supplyTemp - 5), Math.min(38, input.supplyTemp + 6), 0.5),
+                        airCop: randomInRange(Math.max(2.5, input.airCop - 1.8), Math.min(10, input.airCop + 2.4), 0.1),
+                        pumpEff: randomInRange(Math.max(62, input.pumpEff - 12), Math.min(92, input.pumpEff + 12), 1),
+                        economizerHours: randomInRange(Math.max(0, input.economizerHours - 28), Math.min(90, input.economizerHours + 28), 1),
+                        heatReuse: randomInRange(Math.max(0, input.heatReuse - 30), Math.min(80, input.heatReuse + 35), 1),
+                        hydraulicMargin: randomInRange(Math.max(2, input.hydraulicMargin - 12), Math.min(35, input.hydraulicMargin + 10), 1)
+                    });
+                    candidate.returnTemp = candidate.supplyTemp + baseDeltaT;
+
+                    var model = computeModel(candidate);
+                    var score = optimizeObjective(model, input);
+                    if (score < bestScore) {
+                        bestScore = score;
+                        best = model;
+                        bestInput = candidate;
+                    }
+                }
+
+                document.getElementById('inLiquidCapture').value = fmtNum(bestInput.liquidCapture, 0);
+                document.getElementById('inSupplyTemp').value = fmtNum(bestInput.supplyTemp, 1);
+                document.getElementById('inReturnTemp').value = fmtNum(bestInput.returnTemp, 1);
+                document.getElementById('inAirCop').value = fmtNum(bestInput.airCop, 1);
+                document.getElementById('inPumpEff').value = fmtNum(bestInput.pumpEff, 0);
+                document.getElementById('inEconomizerHours').value = fmtNum(bestInput.economizerHours, 0);
+                document.getElementById('inHeatReuse').value = fmtNum(bestInput.heatReuse, 0);
+                document.getElementById('inHydraulicMargin').value = fmtNum(bestInput.hydraulicMargin, 0);
+
+                optimizedModel = best;
+                applyModelToUI(optimizedModel);
+                renderScenarioTable(baselineModel, optimizedModel);
+                renderTargetActions(baselineModel, optimizedModel);
+            }
+
+            function resetForm() {
+                Object.keys(DEFAULTS).forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (!el) return;
+                    if (el.type === 'checkbox') el.checked = DEFAULTS[id];
+                    else el.value = DEFAULTS[id];
+                });
+                baselineModel = null;
+                optimizedModel = null;
+                runModel(true);
+            }
+
+            document.getElementById('runCalc').addEventListener('click', function() { runModel(true); });
+            document.getElementById('optimizeTarget').addEventListener('click', optimizeToTarget);
+            document.getElementById('resetCalc').addEventListener('click', resetForm);
+            document.getElementById('inCountryProfile').addEventListener('change', applyCountryProfile);
+
+            runModel(true);
+        })();
+    </script>
+
+    <script src="auth.js?v=20260225"></script>
+    <script src="rz-tracker.js"></script>
+
+    <script>
+        (function rootAccessGate() {
+            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+
+            function detectRole(email) {
+                var e = String(email || '').toLowerCase().trim();
+                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+            }
+
+            function getSession() {
+                try {
+                    var raw = localStorage.getItem('rz_premium_session');
+                    if (!raw) return null;
+                    var data = JSON.parse(raw);
+                    if (data.expires && new Date(data.expires) < new Date()) {
+                        localStorage.removeItem('rz_premium_session');
+                        return null;
+                    }
+                    if (!data.role) data.role = detectRole(data.email);
+                    return data;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function isRoot(session) {
+                return !!(session && String(session.role || '').toLowerCase() === 'root');
+            }
+
+            function applyGate() {
+                var session = getSession();
+                document.body.classList.toggle('locked', !isRoot(session));
+            }
+
+            var loginBtn = document.getElementById('rootLoginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
+                        window._rzAuth.showModal();
+                    } else {
+                        alert('Login module is not ready yet.');
+                    }
+                });
+            }
+
+            window.addEventListener('rz-auth-change', function() {
+                applyGate();
+            });
+
+            setTimeout(applyGate, 60);
+            setTimeout(applyGate, 550);
+        })();
+
+        (function cookieBanner() {
+            var banner = document.getElementById('cookieBanner');
+            var accepted = localStorage.getItem('rz_cookie_consent');
+            if (!accepted && banner) banner.classList.remove('hidden');
+
+            var accept = document.getElementById('cookieAccept');
+            var decline = document.getElementById('cookieDecline');
+
+            if (accept) {
+                accept.addEventListener('click', function() {
+                    localStorage.setItem('rz_cookie_consent', 'accepted');
+                    banner.classList.add('hidden');
+                });
+            }
+
+            if (decline) {
+                decline.addEventListener('click', function() {
+                    localStorage.setItem('rz_cookie_consent', 'declined');
+                    banner.classList.add('hidden');
+                    window['ga-disable-G-GED7FX8RTV'] = true;
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -2170,7 +2170,7 @@
                         <div class="shi-pro-panel gated" id="shiPanel1">
                             <div class="shi-gate-overlay" onclick="shiShowLogin()">
                                 <i class="fas fa-lock"></i>
-                                <span>Unlock Pro Analysis</span>
+                                <span>Sign In</span>
                             </div>
                             <div class="shi-panel-content">
                                 <div class="shi-panel-title"><i class="fas fa-layer-group"></i> Safety Maturity Classification (Westrum Typology)</div>
@@ -2184,7 +2184,7 @@
                         <div class="shi-pro-panel gated" id="shiPanel2">
                             <div class="shi-gate-overlay" onclick="shiShowLogin()">
                                 <i class="fas fa-lock"></i>
-                                <span>Unlock Pro Analysis</span>
+                                <span>Sign In</span>
                             </div>
                             <div class="shi-panel-content">
                                 <div class="shi-panel-title"><i class="fas fa-dollar-sign"></i> Cost of Complacency Model</div>
@@ -2197,7 +2197,7 @@
                         <div class="shi-pro-panel gated" id="shiPanel3">
                             <div class="shi-gate-overlay" onclick="shiShowLogin()">
                                 <i class="fas fa-lock"></i>
-                                <span>Unlock Pro Analysis</span>
+                                <span>Sign In</span>
                             </div>
                             <div class="shi-panel-content">
                                 <div class="shi-panel-title"><i class="fas fa-chart-bar"></i> Sensitivity Analysis (Tornado)</div>
@@ -2210,7 +2210,7 @@
                         <div class="shi-pro-panel gated" id="shiPanel4">
                             <div class="shi-gate-overlay" onclick="shiShowLogin()">
                                 <i class="fas fa-lock"></i>
-                                <span>Unlock Pro Analysis</span>
+                                <span>Sign In</span>
                             </div>
                             <div class="shi-panel-content">
                                 <div class="shi-panel-title"><i class="fas fa-brain"></i> Monte Carlo Risk Simulation (10,000 iterations)</div>
@@ -2262,7 +2262,7 @@
                             </p>
                             <p class="disc-fine" style="font-size:0.68rem;line-height:1.5;margin:0;">
                                 By using this tool you agree to our
-                                <a href="terms.html" style="text-decoration:underline;">Terms of Service</a>.
+                                <a href="terms.html" style="text-decoration:underline;">Terms</a>.
                                 All content on ResistanceZero is independent personal research.
                                 This site does not represent any current or former employer.
                             </p>
@@ -2274,15 +2274,14 @@
                 <div class="shi-login-overlay" id="shiLoginOverlay">
                     <div class="shi-login-box">
                         <button class="shi-login-close" onclick="shiHideLogin()">&times;</button>
-                        <div class="shi-login-title">Unlock Pro Analysis</div>
+                        <div class="shi-login-title">Sign In</div>
                         <div class="shi-login-subtitle">Access Monte Carlo simulation, sensitivity analysis, cost modeling, and comprehensive PDF reports</div>
                         <input type="email" class="shi-login-input" id="shiLoginEmail" placeholder="Email address">
                         <input type="password" class="shi-login-input" id="shiLoginPass" placeholder="Password">
                         <div class="shi-login-error" id="shiLoginError">Invalid credentials</div>
                         <button class="shi-login-submit" onclick="shiDoLogin()">Sign In</button>
-                        <div class="shi-login-demo">Demo: demo@resistancezero.com / demo2026</div>
-                        <div style="text-align:center;margin-top:6px;"><a href="mailto:bagus@resistancezero.com" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Want full access? Get in touch &rarr;</a></div>
-                <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+                        <div class="shi-login-demo">Demo Account: demo@resistancezero.com / demo2026</div>
+<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
                     </div>
                 </div>
 
@@ -3337,7 +3336,7 @@
         var email = document.getElementById('shiLoginEmail').value.trim();
         var pass = document.getElementById('shiLoginPass').value;
         if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
-            var session = { email: email, tier: 'pro', expires: new Date(Date.now() + 30*24*60*60*1000).toISOString() };
+            var session = { email: email, tier: 'pro', role: 'pro', expires: new Date(Date.now() + 30*24*60*60*1000).toISOString() };
             localStorage.setItem('rz_premium_session', JSON.stringify(session));
             isAuthenticated = true;
             unlockPanels();

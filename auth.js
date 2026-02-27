@@ -15,9 +15,15 @@
         document.head.appendChild(fa);
     }
 
+    var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+    function detectRole(email) {
+        var e = String(email || '').toLowerCase().trim();
+        return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+    }
+
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
-        { email: 'demo@resistancezero.com',  password: 'demo2026',        tier: 'pro' }
+        { email: 'demo@resistancezero.com',  password: 'demo2026',        tier: 'pro', role: 'pro' }
     ];
 
     /* Also check manually-created accounts stored in localStorage by admin */
@@ -32,13 +38,17 @@
         var e = email.toLowerCase().trim();
         var match = null;
         VALID_USERS.forEach(function (u) {
-            if (u.email === e && u.password === password) match = u;
+            if (u.email === e && u.password === password) {
+                match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
+            }
         });
         if (match) return match;
         /* Check manual accounts */
         var manuals = getManualAccounts();
         manuals.forEach(function (u) {
-            if (u.email.toLowerCase() === e && u.password === password) match = u;
+            if (u.email.toLowerCase() === e && u.password === password) {
+                match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
+            }
         });
         return match;
     }
@@ -53,17 +63,22 @@
                 localStorage.removeItem('rz_premium_session');
                 return null;
             }
+            if (!data.role) {
+                data.role = detectRole(data.email);
+                localStorage.setItem('rz_premium_session', JSON.stringify(data));
+            }
             return data;
         } catch (e) { return null; }
     }
 
-    function setSession(email, tier) {
+    function setSession(email, tier, role) {
         var expires = new Date();
         expires.setDate(expires.getDate() + 30);
         localStorage.setItem('rz_premium_session', JSON.stringify({
             email: email,
             tier: tier,
-            expires: expires.toISOString()
+            role: role || detectRole(email),
+           expires: expires.toISOString()
         }));
     }
 
@@ -383,14 +398,14 @@
             }
 
             /* Success */
-            setSession(user.email, user.tier);
+            setSession(user.email, user.tier, user.role);
             if (formEl) formEl.style.display = 'none';
-            if (tierLabel) tierLabel.textContent = (user.tier === 'pro' ? 'PRO' : 'DEMO') + ' Access Activated';
+            if (tierLabel) tierLabel.textContent = 'Access Activated';
             if (successEl) successEl.classList.add('show');
             updateAuthUI();
 
             /* Dispatch custom event for page-specific handlers */
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: user.email, tier: user.tier, action: 'login' } }));
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: user.email, tier: user.tier, role: user.role || detectRole(user.email), action: 'login' } }));
 
             /* Auto-close modal after delay */
             setTimeout(function () {

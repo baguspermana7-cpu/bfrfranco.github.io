@@ -2152,7 +2152,7 @@
                                 </div>
                                 <canvas id="bubMcChart" width="800" height="260" style="width:100%;display:block;margin:0.5rem 0"></canvas>
                             </div>
-                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Risk Intelligence</span></div>
+                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 2: Sensitivity Tornado -->
@@ -2161,7 +2161,7 @@
                                 <div class="bub-panel-title"><i class="fas fa-tornado"></i> Sensitivity Tornado — Risk Score Impact</div>
                                 <canvas id="bubTornadoChart" width="800" height="300" style="width:100%;display:block;margin:0.5rem 0"></canvas>
                             </div>
-                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Risk Intelligence</span></div>
+                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 3: Market Scenario Comparison -->
@@ -2170,7 +2170,7 @@
                                 <div class="bub-panel-title"><i class="fas fa-layer-group"></i> Scenario Intelligence Engine</div>
                                 <div class="bub-scenario-grid" id="bubScenarioGrid"></div>
                             </div>
-                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Risk Intelligence</span></div>
+                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 4: Risk Radar + Grade -->
@@ -2191,7 +2191,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Risk Intelligence</span></div>
+                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 5: Executive Narrative -->
@@ -2200,7 +2200,7 @@
                                 <div class="bub-panel-title"><i class="fas fa-file-lines"></i> Executive Risk Assessment</div>
                                 <div class="bub-narrative" id="bubNarrative"></div>
                             </div>
-                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Risk Intelligence</span></div>
+                            <div class="bub-gate-overlay" onclick="bubShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                     </div>
@@ -2637,7 +2637,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </p>
             <p class="disc-fine" style="font-size:0.68rem;line-height:1.5;margin:0;">
                 By using this tool you agree to our
-                <a href="terms.html" style="text-decoration:underline;">Terms of Service</a>.
+                <a href="terms.html" style="text-decoration:underline;">Terms</a>.
                 All content on ResistanceZero is independent personal research.
                 This site does not represent any current or former employer.
             </p>
@@ -2653,10 +2653,10 @@ window.addEventListener('DOMContentLoaded', function() {
         <p>Unlock Monte Carlo simulation (10K runs), sensitivity tornado, multi-dimensional risk radar, scenario engine, and executive narrative assessment.</p>
         <input type="email" id="bubLoginEmail" placeholder="Email address">
         <input type="password" id="bubLoginPass" placeholder="Password">
-        <button class="bub-login-submit" onclick="bubHandleLogin()">Unlock Pro Analysis</button>
+        <button class="bub-login-submit" onclick="bubHandleLogin()">Sign In</button>
         <div class="bub-login-error" id="bubLoginError">Invalid credentials.</div>
-        <div class="bub-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
-        <p style="font-size:0.68rem;color:#78716c;margin-top:8px;line-height:1.5;">By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#d97706;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#d97706;text-decoration:underline;">Privacy Policy</a>.</p>
+        <div class="bub-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+        <p style="font-size:0.68rem;color:#78716c;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#d97706;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#d97706;text-decoration:underline;">Privacy Policy</a>.</p>
     </div>
 </div>
 
@@ -2674,8 +2674,8 @@ function bubHandleLogin(){
     var email=document.getElementById('bubLoginEmail').value.trim();
     var pass=document.getElementById('bubLoginPass').value;
     if(email==='demo@resistancezero.com'&&pass==='demo2026'){
-        localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',expires:new Date(Date.now()+30*86400000).toISOString()}));
-        window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',action:'login'}}));
+        localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',role: 'pro', expires:new Date(Date.now()+30*86400000).toISOString()}));
+        window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'pro',action:'login'}}));
         bubPremium=true;
         bubHideLogin();
         bubUnlockPanels();

@@ -634,13 +634,43 @@ a { color: inherit; text-decoration: none; }
 .theme-toggle:hover { background: rgba(6, 182, 212, 0.2); transform: scale(1.05); }
 [data-theme="light"] .theme-toggle { background: #ffffff; border-color: var(--border); color: #475569; }
 [data-theme="light"] .theme-toggle:hover { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
-        /* Calculator Disclaimer */
-        .calc-disclaimer { background: #f1f5f9 !important; border: 1px solid #cbd5e1 !important; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; }
-        .calc-disclaimer .disc-title { color: #1e293b !important; }
-        .calc-disclaimer .disc-text { color: #475569 !important; }
-        .calc-disclaimer .disc-text strong { color: #1e293b !important; }
-        .calc-disclaimer .disc-text a { color: #2563eb !important; }
-        .calc-disclaimer .disc-fine { color: #64748b !important; }
+        /* Top Legal Disclaimer */
+        .legal-disclaimer-wrap { flex-shrink: 0; }
+        .calc-disclaimer {
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .calc-disclaimer .disc-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 0 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+        .calc-disclaimer .disc-text {
+            font-size: 10px;
+            line-height: 1.55;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .calc-disclaimer .disc-text + .disc-text { margin-top: 4px; }
+        .calc-disclaimer strong { color: #cbd5e1; }
+        .calc-disclaimer a { color: var(--accent-cyan); text-decoration: underline; }
+        [data-theme="light"] .calc-disclaimer {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(148, 163, 184, 0.45);
+        }
+        [data-theme="light"] .calc-disclaimer .disc-title { color: #0f172a; }
+        [data-theme="light"] .calc-disclaimer .disc-text { color: #334155; }
+        [data-theme="light"] .calc-disclaimer strong { color: #0f172a; }
+        [data-theme="light"] .calc-disclaimer a { color: #1d4ed8; }
         /* Cookie Banner */
         .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1rem 2rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -2px 16px rgba(0,0,0,0.06); font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
         .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
@@ -727,6 +757,15 @@ a { color: inherit; text-decoration: none; }
 
     <!-- Main Content -->
     <main class="content-area">
+        <div class="legal-disclaimer-wrap" aria-label="Legal Disclaimer">
+            <div class="calc-disclaimer">
+                <p class="disc-title"><span aria-hidden="true">&#9888;</span> Legal Notice</p>
+                <p class="disc-text">This conventional data center dashboard is independent personal research using publicly available standards and reference datasets. It does not represent any current or former employer.</p>
+                <p class="disc-text">All metrics and calculations are for educational and estimation purposes only, not legal, financial, investment, procurement, safety, or engineering advice. Validate final decisions with qualified professionals and local regulations.</p>
+                <p class="disc-text">Use of this website is subject to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>. All rendering runs in-browser.</p>
+            </div>
+        </div>
+
         <!-- KPI Strip -->
         <div class="kpi-strip">
             <div class="kpi-card">
@@ -853,22 +892,6 @@ a { color: inherit; text-decoration: none; }
                 <div class="callout-value" id="cRh">48%</div>
             </div>
         </div>
-    
-    <!-- Calculator Disclaimer -->
-    <div style="max-width:1400px;margin:2rem auto 0;padding:0 2rem;">
-        <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;">
-            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
-                <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
-                <div>
-                    <div class="disc-title" style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> ASHRAE TC 9.9 recommended thermal guidelines, Uptime Institute Tier I-IV standards, IEC 62040 UPS efficiency, TIA-942 infrastructure design, Green Grid PUE methodology.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                    <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     </main>
 

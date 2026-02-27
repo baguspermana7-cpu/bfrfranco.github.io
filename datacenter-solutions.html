@@ -566,6 +566,68 @@
             line-height: 1.8;
         }
 
+        .legal-disclaimer-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem 1.25rem;
+        }
+
+        .legal-disclaimer {
+            background: var(--glass-bg);
+            border: 1px solid rgba(74, 144, 184, 0.28);
+            border-left: 4px solid var(--accent-gold);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .legal-disclaimer-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin: 0 0 0.45rem;
+            font-size: 0.77rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+
+        .legal-disclaimer p {
+            margin: 0;
+            font-size: 0.79rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .legal-disclaimer p + p {
+            margin-top: 0.4rem;
+        }
+
+        .legal-disclaimer a {
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        [data-theme="dark"] .legal-disclaimer {
+            background: rgba(15, 23, 42, 0.75);
+            border-color: rgba(148, 163, 184, 0.26);
+            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.4);
+        }
+
+        [data-theme="dark"] .legal-disclaimer-title {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .legal-disclaimer p {
+            color: #cbd5e1;
+        }
+
+        [data-theme="dark"] .legal-disclaimer a {
+            color: #93c5fd;
+        }
+
         .hero-stats {
             display: flex;
             justify-content: center;
@@ -1411,6 +1473,65 @@
             box-shadow: var(--shadow-md);
         }
 
+        .tool-card.root-only-card {
+            position: relative;
+            border-color: rgba(245, 158, 11, 0.35);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(30, 58, 95, 0.08));
+            cursor: pointer;
+        }
+
+        .tool-card.root-only-card:hover {
+            border-color: rgba(245, 158, 11, 0.55);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(245, 158, 11, 0.25);
+        }
+
+        .root-lock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 0.64rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #fff;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+        }
+
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.9rem;
+        }
+
+        .tool-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        [data-theme="dark"] .tool-card.root-only-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(15, 23, 42, 0.5));
+        }
+
+        [data-theme="dark"] .tool-tag {
+            background: rgba(30, 41, 59, 0.65);
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.28);
+        }
+
         .tool-header {
             display: flex;
             align-items: center;
@@ -1476,6 +1597,14 @@
 
             .hero {
                 padding: 3rem 1.5rem 2rem;
+            }
+
+            .legal-disclaimer-wrap {
+                padding: 0 1rem 1rem;
+            }
+
+            .legal-disclaimer {
+                padding: 0.9rem 1rem;
             }
 
             .hero h1 {
@@ -1969,6 +2098,15 @@
             </div>
         </section>
 
+        <section class="legal-disclaimer-wrap fade-in delay-1" aria-label="Legal Disclaimer">
+            <div class="legal-disclaimer">
+                <p class="legal-disclaimer-title"><span aria-hidden="true">&#9888;</span> Legal Notice</p>
+                <p>All dashboards, calculators, and technical materials are independent personal research based on public standards and references. They do not represent any current or former employer.</p>
+                <p>Outputs are for educational and planning context only, not legal, financial, investment, procurement, safety, or engineering advice. Always validate final decisions with licensed professionals and applicable regulations.</p>
+                <p>Use of this website is subject to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+            </div>
+        </section>
+
         <!-- Solutions Grid -->
         <section id="solutions" class="solutions-section">
             <div class="section-header">
@@ -2266,6 +2404,25 @@
                     <p class="tool-desc">Calculate Power Usage Effectiveness based on cooling type, climate zone, and IT load distribution.</p>
                 </a>
 
+                <a href="standards-ltc-lab.html" id="rootStandardsCard" class="tool-card root-only-card" style="text-decoration:none;color:inherit;" aria-label="Root only standards and liquid-to-chip module">
+                    <span class="root-lock-badge"><i class="fas fa-lock"></i> Root Only</span>
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <span class="tool-title">Standards + Liquid-to-Chip Lab</span>
+                    </div>
+                    <p class="tool-desc">Framework module for ASHRAE, ANSI, ISO, NFPA, and Uptime Institute alignment with advanced liquid-to-chip engineering reference blocks. Concept stage, root access gated.</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">ASHRAE</span>
+                        <span class="tool-tag">ANSI</span>
+                        <span class="tool-tag">ISO</span>
+                        <span class="tool-tag">NFPA</span>
+                        <span class="tool-tag">Uptime</span>
+                        <span class="tool-tag">Liquid-to-Chip</span>
+                    </div>
+                </a>
+
                 <a href="tier-advisor.html" class="tool-card" style="text-decoration:none;color:inherit;">
                     <div class="tool-header">
                         <div class="tool-icon" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">
@@ -2469,8 +2626,63 @@
                 }
             });
         })();
-    </script>
+</script>
 <script src="auth.js?v=20260225"></script>
+<script>
+(function () {
+    function fallbackSession() {
+        try {
+            var raw = localStorage.getItem('rz_premium_session');
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function getSession() {
+        try {
+            if (window._rzAuth && typeof window._rzAuth.getSession === 'function') {
+                return window._rzAuth.getSession();
+            }
+        } catch (e) {}
+        return fallbackSession();
+    }
+
+    function openLogin() {
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
+            window._rzAuth.showModal();
+        } else {
+            alert('Please sign in first.');
+        }
+    }
+
+    function handleRootCardClick(event) {
+        var session = getSession();
+        var isRoot = session && String(session.role || '').toLowerCase() === 'root';
+
+        if (isRoot) {
+            return;
+        }
+
+        if (!session) {
+            event.preventDefault();
+            openLogin();
+            return;
+        }
+
+        if (!isRoot) {
+            event.preventDefault();
+            alert('This module is root-only. Please sign in with a root account.');
+            openLogin();
+        }
+    }
+
+    var rootCard = document.getElementById('rootStandardsCard');
+    if (rootCard) {
+        rootCard.addEventListener('click', handleRootCardClick);
+    }
+})();
+</script>
 <script src="rz-tracker.js"></script>
 
 <!-- Cookie Consent Banner -->

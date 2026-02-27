@@ -1843,7 +1843,7 @@
                             </div>
                             <div class="aif-chart-container"><canvas id="mcChart"></canvas></div>
                         </div>
-                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Intelligence</span></div>
+                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                     </div>
 
                     <!-- Panel 2: TCO Comparison -->
@@ -1863,7 +1863,7 @@
                             <p class="table-source" style="font-size:0.72rem;color:#64748b;font-style:italic;margin:0.4rem 0 1.2rem;">Source: Publicly available industry data and published standards. For educational and research purposes only.</p>
                             <div class="aif-chart-container"><canvas id="tcoChart"></canvas></div>
                         </div>
-                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Intelligence</span></div>
+                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                     </div>
 
                     <!-- Panel 3: Sensitivity Tornado -->
@@ -1873,7 +1873,7 @@
                             <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.5rem;">Impact of &plusmn;20% variation in each input on AI Readiness Score, sorted by magnitude.</p>
                             <div class="aif-chart-container"><canvas id="tornadoChart"></canvas></div>
                         </div>
-                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Intelligence</span></div>
+                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                     </div>
 
                     <!-- Panel 4: Stranded Asset Risk -->
@@ -1892,7 +1892,7 @@
                                 <p>Run the calculator to generate your facility assessment.</p>
                             </div>
                         </div>
-                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Unlock Pro Intelligence</span></div>
+                        <div class="aif-gate-overlay" onclick="aifShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                     </div>
                 </div>
 
@@ -2048,7 +2048,7 @@
             </p>
             <p class="disc-fine" style="font-size:0.68rem;line-height:1.5;margin:0;">
                 By using this tool you agree to our
-                <a href="terms.html" style="text-decoration:underline;">Terms of Service</a>.
+                <a href="terms.html" style="text-decoration:underline;">Terms</a>.
                 All content on ResistanceZero is independent personal research.
                 This site does not represent any current or former employer.
             </p>
@@ -2064,11 +2064,11 @@
         <p>Unlock Monte Carlo simulation (10K runs), 5-Year TCO comparison, sensitivity tornado analysis, and stranded asset risk assessment with dynamic narrative.</p>
         <input type="email" id="aifLoginEmail" placeholder="Email address">
         <input type="password" id="aifLoginPass" placeholder="Password">
-        <button class="aif-login-submit" onclick="aifHandleLogin()">Unlock Pro Intelligence</button>
+        <button class="aif-login-submit" onclick="aifHandleLogin()">Sign In</button>
         <div class="aif-login-error" id="aifLoginError">Invalid credentials.</div>
-        <div class="aif-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+        <div class="aif-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
         <p style="font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">
-            By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a>.
+            By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#60a5fa;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a>.
         </p>
     </div>
 </div>
@@ -2119,8 +2119,8 @@ function aifHandleLogin() {
     var email = document.getElementById('aifLoginEmail').value.trim();
     var pass = document.getElementById('aifLoginPass').value;
     if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
-        localStorage.setItem('rz_premium_session', JSON.stringify({ email: email, tier: 'pro', expires: new Date(Date.now() + 30*86400000).toISOString() }));
-        window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', action: 'login' } }));
+        localStorage.setItem('rz_premium_session', JSON.stringify({ email: email, tier: 'pro', role: 'pro', expires: new Date(Date.now() + 30*86400000).toISOString() }));
+        window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', role: 'pro', action: 'login' } }));
         aifPremium = true;
         aifHideLogin();
         aifUnlockPanels();

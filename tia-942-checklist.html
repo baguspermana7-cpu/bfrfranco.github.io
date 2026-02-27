@@ -536,7 +536,7 @@
             <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;padding:4px;">&times;</button>
             <div style="text-align:center;margin-bottom:1.5rem;">
                 <div style="width:56px;height:56px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;"><i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i></div>
-                <h3 style="font-size:1.2rem;font-weight:700;color:#1e293b;">Unlock Pro Analysis</h3>
+                <h3 style="font-size:1.2rem;font-weight:700;color:#1e293b;">Sign In</h3>
                 <p style="font-size:0.82rem;color:#64748b;margin-top:0.5rem;">Gap analysis, Monte Carlo, tier comparison, roadmap, sensitivity, and PDF export.</p>
             </div>
             <div style="margin-bottom:1rem;">
@@ -550,10 +550,10 @@
             <div id="loginError" style="display:none;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#ef4444;font-size:0.78rem;margin-bottom:1rem;"></div>
             <button onclick="attemptLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;">Sign In</button>
             <div style="text-align:center;margin-top:1rem;padding:8px;background:#f8fafc;border-radius:8px;">
-                <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;"><i class="fas fa-shield-alt" style="margin-right:4px;"></i> Demo: demo@resistancezero.com / demo2026</p>
+                <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;"><i class="fas fa-shield-alt" style="margin-right:4px;"></i> Demo Account: demo@resistancezero.com / demo2026</p>
             </div>
             <div style="text-align:center;margin-top:0.75rem;"><p style="font-size:0.68rem;color:#cbd5e1;"><i class="fas fa-lock" style="margin-right:3px;"></i> All calculations run locally. No data transmitted.</p></div>
-            <p class="disc-fine" style="font-size:0.68rem;color:#64748b;margin-top:12px;line-height:1.5;text-align:center;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+            <p class="disc-fine" style="font-size:0.68rem;color:#64748b;margin-top:12px;line-height:1.5;text-align:center;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
         </div>
     </div>
 
@@ -1157,10 +1157,10 @@
         var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
         if (match) {
             var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
-            localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, expires: expDate.toISOString() }));
+            localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires: expDate.toISOString() }));
             isPremiumUser = true; userTier = match.tier;
             closeLoginModal(); activatePremiumUI();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, action: 'login' } }));
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', action: 'login' } }));
         } else { errorEl.textContent = 'Invalid credentials'; errorEl.style.display = 'block'; }
     }
 

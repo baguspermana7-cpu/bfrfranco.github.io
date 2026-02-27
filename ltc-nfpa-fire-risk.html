@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>NFPA Fire and Life-Safety Risk | ResistanceZero</title>
+    <meta name="description" content="Root-only standards deep-dive module for ResistanceZero engineering lab.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b1324;
+            --card: rgba(15, 23, 42, 0.84);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --line: rgba(148, 163, 184, 0.24);
+            --accent: #f59e0b;
+            --accent2: #06b6d4;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(ellipse at top right, rgba(6,182,212,0.13), transparent 45%),
+                radial-gradient(ellipse at bottom left, rgba(245,158,11,0.11), transparent 52%),
+                var(--bg);
+            color: var(--text);
+        }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.9rem;
+        }
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 0.8rem;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.34rem 0.72rem;
+            border-radius: 999px;
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            background: rgba(245, 158, 11, 0.16);
+            color: #fde68a;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--card);
+            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.45);
+            padding: 1.1rem;
+        }
+        h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); margin: 0.45rem 0 0.3rem; }
+        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
+        .summary {
+            margin-top: 0.9rem;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            background: rgba(6, 182, 212, 0.1);
+            font-size: 0.85rem;
+            line-height: 1.65;
+            color: #c7d2fe;
+        }
+        .grid {
+            margin-top: 0.85rem;
+            display: grid;
+            grid-template-columns: 1.2fr 0.95fr;
+            gap: 0.75rem;
+        }
+        .card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.62);
+            padding: 0.8rem;
+        }
+        .card h3 {
+            font-size: 0.86rem;
+            color: #f8fafc;
+            margin-bottom: 0.45rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        ul { list-style: none; display: grid; gap: 0.35rem; }
+        li {
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            line-height: 1.55;
+            padding-left: 0.9rem;
+            position: relative;
+        }
+        li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent2);
+            position: absolute;
+            left: 0;
+            top: 0.45rem;
+        }
+        .cta {
+            margin-top: 0.85rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.42rem;
+            text-decoration: none;
+            border-radius: 10px;
+            padding: 0.58rem 0.82rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .btn-main { background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; }
+        .btn-sub { border: 1px solid var(--line); color: var(--text); }
+        .next {
+            margin-top: 0.8rem;
+            font-size: 0.8rem;
+            color: #f1f5f9;
+            border-top: 1px dashed var(--line);
+            padding-top: 0.7rem;
+            line-height: 1.55;
+        }
+        .legal {
+            margin-top: 0.9rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        .root-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 6, 23, 0.74);
+            padding: 1rem;
+            backdrop-filter: blur(6px);
+        }
+        body.locked .root-gate { display: flex; }
+        body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
+        .root-card {
+            max-width: 430px;
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid rgba(245, 158, 11, 0.38);
+            border-radius: 14px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 18px 36px rgba(2, 6, 23, 0.5);
+        }
+        .root-card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
+        .root-card p { font-size: 0.83rem; color: #cbd5e1; line-height: 1.55; }
+        .root-actions { margin-top: 0.7rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+        .root-actions button, .root-actions a {
+            border-radius: 9px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid rgba(148,163,184,0.35);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .root-actions button { background: #8b5cf6; color: #fff; border: none; }
+        .root-actions a { color: #e2e8f0; }
+        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+
+        .cookie-banner {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+            padding: 0.8rem 1rem;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(148, 163, 184, 0.28);
+            color: #cbd5e1;
+            font-size: 0.8rem;
+        }
+        .cookie-banner.hidden {
+            transform: translateY(120%);
+            pointer-events: none;
+        }
+        .cookie-banner a { color: #93c5fd; text-decoration: underline; }
+        .cookie-actions { display: flex; gap: 0.5rem; }
+        .cookie-accept, .cookie-decline {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 7px;
+            padding: 0.4rem 0.72rem;
+            font-size: 0.74rem;
+            cursor: pointer;
+            background: transparent;
+            color: #e2e8f0;
+        }
+        .cookie-accept { background: #2563eb; border-color: #2563eb; }
+        @media (max-width: 760px) {
+            .cookie-banner { flex-direction: column; text-align: center; }
+        }
+
+    </style>
+</head>
+<body class="locked">
+    <div class="wrap">
+        <div class="topbar">
+            <a class="back" href="standards-ltc-lab.html"><i class="fas fa-arrow-left"></i> Back to Lab</a>
+            <span class="pill"><i class="fas fa-lock"></i> Root Module</span>
+        </div>
+        <section class="panel">
+            <span class="pill">NFPA / Safety Posture</span>
+            <h1>NFPA Fire and Life-Safety Risk</h1>
+            <p class="subtitle">Suppression strategy, response pathways, and integrated safety posture.</p>
+            <p class="summary">This module compares suppression architectures and response readiness to reduce high-impact failure scenarios in mission-critical halls.</p>
+
+            <div class="grid">
+                <article class="card">
+                    <h3>Coverage</h3>
+                    <ul>
+                        <li>Suppression mode comparison: clean agent, water mist, pre-action.</li>
+                        <li>Detection-to-response latency assumptions and blind spots.</li>
+                        <li>Cross-impact of fire controls to uptime and recovery path.</li>
+                        <li>Emergency drills and response-role maturity scoring.</li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <h3>Focus Blocks</h3>
+                    <ul>
+                        <li>Hazard profile map</li>
+                        <li>Response timeline</li>
+                        <li>Suppression tradeoffs</li>
+                        <li>Recovery readiness</li>
+                    </ul>
+                </article>
+            </div>
+
+            <div class="cta">
+                <a class="btn btn-main" href="standards-ltc-lab.html#calculator"><i class="fas fa-chart-line"></i> Open Live Simulation</a>
+                <a class="btn btn-sub" href="datacenter-solutions.html#tools"><i class="fas fa-grid"></i> Back to Tools</a>
+            </div>
+
+            <p class="next">Next step: build tabletop scenario set (detection miss, delayed discharge, failover under alarm).</p>
+            <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review.</p>
+        </section>
+    </div>
+
+    <div class="root-gate" id="rootGate">
+        <div class="root-card">
+            <h2>Root Access Required</h2>
+            <p>This deep-dive module is restricted to root accounts.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In as Root</button>
+                <a href="datacenter-solutions.html">Back</a>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <script src="auth.js?v=20260225"></script>
+    <script>
+        (function rootAccessGate() {
+            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+
+            function detectRole(email) {
+                var e = String(email || '').toLowerCase().trim();
+                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+            }
+
+            function getSession() {
+                try {
+                    var raw = localStorage.getItem('rz_premium_session');
+                    if (!raw) return null;
+                    var data = JSON.parse(raw);
+                    if (data.expires && new Date(data.expires) < new Date()) {
+                        localStorage.removeItem('rz_premium_session');
+                        return null;
+                    }
+                    if (!data.role) data.role = detectRole(data.email);
+                    return data;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function isRoot(session) {
+                return !!(session && String(session.role || '').toLowerCase() === 'root');
+            }
+
+            function applyGate() {
+                document.body.classList.toggle('locked', !isRoot(getSession()));
+            }
+
+            var loginBtn = document.getElementById('rootLoginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
+                        window._rzAuth.showModal();
+                    }
+                });
+            }
+
+            window.addEventListener('rz-auth-change', applyGate);
+            setTimeout(applyGate, 60);
+            setTimeout(applyGate, 550);
+        })();
+
+
+        (function cookieBanner() {
+            var banner = document.getElementById('cookieBanner');
+            var accepted = localStorage.getItem('rz_cookie_consent');
+            if (!accepted && banner) banner.classList.remove('hidden');
+
+            var accept = document.getElementById('cookieAccept');
+            var decline = document.getElementById('cookieDecline');
+
+            if (accept) {
+                accept.addEventListener('click', function() {
+                    localStorage.setItem('rz_cookie_consent', 'accepted');
+                    banner.classList.add('hidden');
+                });
+            }
+
+            if (decline) {
+                decline.addEventListener('click', function() {
+                    localStorage.setItem('rz_cookie_consent', 'declined');
+                    banner.classList.add('hidden');
+                    window['ga-disable-G-GED7FX8RTV'] = true;
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

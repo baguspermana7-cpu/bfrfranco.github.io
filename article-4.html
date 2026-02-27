@@ -2226,7 +2226,7 @@
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> 5-phase MTTR decomposition model (Detection, Diagnosis, Mobilization, Repair, Verification), incident frequency distribution (80/20 rule), vendor mobilization analysis, industry MTTR benchmarks.</p>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+                                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
                             </div>
                         </div>
                     </div>
@@ -2241,13 +2241,12 @@
                         <p class="login-sub">Unlock 26 advanced KPIs, Monte Carlo simulation & executive PDF export</p>
                         <input type="email" class="login-input" id="loginEmail" placeholder="Email address">
                         <input type="password" class="login-input" id="loginPass" placeholder="Password">
-                        <button class="login-submit" id="loginSubmit" onclick="handleLogin()">Unlock Pro Analysis</button>
+                        <button class="login-submit" id="loginSubmit" onclick="handleLogin()">Sign In</button>
                         <div class="login-error" id="loginError">Invalid credentials. Please try again.</div>
                         <div class="login-hint">
-                            <span>Demo access:</span> <code>demo@resistancezero.com</code> / <code>demo2026</code>
+                            <span>Demo Account:</span> <code>demo@resistancezero.com</code> / <code>demo2026</code>
                         </div>
-                        <div style="text-align:center;margin-top:6px;"><a href="mailto:bagus@resistancezero.com" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Want full access? Get in touch &rarr;</a></div>
-                <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
                     </div>
                 </div>
 
@@ -3209,10 +3208,10 @@
             if(email==='demo@resistancezero.com' && pass==='demo2026'){
                 isPremium=true;
                 var exp=new Date(); exp.setDate(exp.getDate()+30);
-                localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',expires:exp.toISOString()}));
+                localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',role: 'pro', expires:exp.toISOString()}));
                 hideLoginModal();
                 // Notify auth.js to update navbar
-                window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',action:'login'}}));
+                window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'pro',action:'login'}}));
                 var badge=$('proBadge'); if(badge){badge.textContent='ACTIVE';badge.style.background='linear-gradient(135deg,#10b981,#059669)';}
                 switchCalcMode('pro');
             } else {

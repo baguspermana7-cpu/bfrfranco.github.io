@@ -2492,7 +2492,7 @@
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> Palmer (2006) maintenance planning principles, Smith &amp; Hinchcliffe (2004) RCM methodology, Reliability-Centered Maintenance III, capacity model with friction coefficients, CMMS maturity &amp; evidence quality modifiers.</p>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+                                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
                             </div>
                         </div>
                     </div>
@@ -2719,10 +2719,9 @@
             <button onclick="maintDoLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Sign In</button>
             <div id="maintLoginError" style="display:none;margin-top:.75rem;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#dc2626;font-size:.8rem;text-align:center;"></div>
             <div style="margin-top:1rem;padding:12px;background:#f0fdf4;border-radius:10px;text-align:center;">
-                <p style="margin:0;font-size:.78rem;color:#166534;"><i class="fas fa-flask" style="margin-right:4px;"></i> <strong>Demo access:</strong> demo@resistancezero.com / demo2026</p>
+                <p style="margin:0;font-size:.78rem;color:#166534;"><i class="fas fa-flask" style="margin-right:4px;"></i> <strong>Demo Account:</strong> demo@resistancezero.com / demo2026</p>
             </div>
-            <div style="text-align:center;margin-top:6px;"><a href="mailto:bagus@resistancezero.com" style="font-size:0.62rem;color:#64748b;text-decoration:none;">Want full access? Get in touch &rarr;</a></div>
-                <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By clicking Login, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
         </div>
     </div>
 
@@ -2984,7 +2983,7 @@
         var user=MAINT_USERS[email];
         if(user&&user.pw===pass){
             maintIsPremium=true;
-            var exp=new Date();exp.setDate(exp.getDate()+30);localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:user.tier,expires:exp.toISOString()}));
+            var exp=new Date();exp.setDate(exp.getDate()+30);localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:user.tier, role: (email === 'admin@resistancezero.com' || email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires:exp.toISOString()}));
             maintCloseLogin();
             maintMode='pro';
             document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='pro');});
