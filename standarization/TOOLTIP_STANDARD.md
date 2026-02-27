@@ -1,6 +1,6 @@
 # Calculator Tooltip Standard — ResistanceZero
 
-> **Version**: 1.2 | **Updated**: 2026-02-16
+> **Version**: 1.3 | **Updated**: 2026-02-28
 
 ---
 
@@ -16,7 +16,16 @@
 Used for calculator inputs. JS-powered positioning with floating content panel.
 
 ### System 2: Term Tooltips (`.term-tooltip` + `data-tooltip`)
-Used for inline technical terms in article body text. CSS-only `::after` hover.
+Used for inline technical terms in article body text.
+
+**Two sub-variants:**
+
+| Variant | Mechanism | Use When |
+|---------|-----------|----------|
+| **2a: CSS `::after`** | Pure CSS pseudo-element | Simple pages without `overflow: hidden` containers |
+| **2b: JS Floating** | `position: fixed` div + JS positioning | Pages with accordions, collapsible panels, or any `overflow: hidden` parent (**preferred**) |
+
+> **CRITICAL (lesson 2026-02-28):** CSS `::after` tooltips get **clipped** by parent containers with `overflow: hidden` (e.g., accordion bodies, collapsed panels). If the page uses accordions or any collapsible UI, **always use variant 2b (JS Floating)**. See BUG-005 below.
 
 ---
 
@@ -110,7 +119,9 @@ Replace `THEME_COLOR` and `THEME_RGB` with article's accent color:
 }
 ```
 
-## CSS — Term Tooltips
+## CSS — Term Tooltips (Variant 2a: CSS-only)
+
+> Only use on pages WITHOUT `overflow: hidden` containers. For accordion pages, use Variant 2b below.
 
 ```css
 .term-tooltip {
@@ -148,6 +159,142 @@ Replace `THEME_COLOR` and `THEME_RGB` with article's accent color:
   visibility: visible;
 }
 ```
+
+## CSS + JS — Term Tooltips (Variant 2b: JS Floating — PREFERRED)
+
+> Use this for ANY page with accordions, collapsible panels, or `overflow: hidden` containers.
+> The tooltip is a separate `<div>` at the document root level, positioned with `position: fixed` via JS.
+> **Reference implementation**: `ltc-ashrae-thermal-control.html` (71 tooltips, 2026-02-28)
+
+### HTML (add at document root level, outside all containers)
+```html
+<div class="tooltip-float" id="tooltipFloat"></div>
+```
+
+### CSS
+```css
+.term-tooltip {
+    border-bottom: 1px dotted var(--accent2);
+    cursor: help;
+    color: inherit;
+}
+
+.tooltip-float {
+    position: fixed;
+    z-index: 100000;
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    max-width: 340px;
+    min-width: 200px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    border: 1px solid rgba(THEME_RGB, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s, visibility 0.15s;
+    pointer-events: none;
+    white-space: normal;
+    font-weight: 400;
+    word-wrap: break-word;
+}
+.tooltip-float.visible { opacity: 1; visibility: visible; }
+
+/* Arrow */
+.tooltip-float::before {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px;
+    background: inherit;
+    border: inherit;
+    border-right: none; border-top: none;
+    transform: rotate(-45deg);
+}
+.tooltip-float.above::before { bottom: -6px; left: var(--arrow, 50%); margin-left: -5px; }
+.tooltip-float.below::before { top: -6px; left: var(--arrow, 50%); margin-left: -5px; transform: rotate(135deg); }
+
+/* Light mode */
+[data-theme="light"] .tooltip-float {
+    background: #fff;
+    color: #1e293b;
+    border-color: rgba(THEME_RGB, 0.25);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+```
+
+### JS (positioning + viewport edge detection + mobile touch)
+```js
+(function(){
+    var tip = document.getElementById('tooltipFloat');
+    if (!tip) return;
+    var hideTimer = null;
+
+    function show(el) {
+        clearTimeout(hideTimer);
+        var text = el.getAttribute('data-tooltip');
+        if (!text) return;
+        tip.textContent = text;
+        tip.className = 'tooltip-float';
+        tip.style.opacity = '0';
+        tip.style.visibility = 'visible';
+
+        var r = el.getBoundingClientRect();
+        var tw = tip.offsetWidth;
+        var th = tip.offsetHeight;
+        var gap = 8;
+
+        // Horizontal: center on element, clamp to viewport
+        var left = r.left + r.width / 2 - tw / 2;
+        if (left < 8) left = 8;
+        if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+
+        // Vertical: prefer above, fallback below
+        var top;
+        if (r.top - th - gap > 8) {
+            top = r.top - th - gap;
+            tip.classList.add('above');
+        } else {
+            top = r.bottom + gap;
+            tip.classList.add('below');
+        }
+
+        // Arrow position
+        var arrowLeft = r.left + r.width / 2 - left;
+        arrowLeft = Math.max(12, Math.min(arrowLeft, tw - 12));
+        tip.style.setProperty('--arrow', arrowLeft + 'px');
+
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+        tip.classList.add('visible');
+    }
+
+    function hide() {
+        hideTimer = setTimeout(function(){
+            tip.classList.remove('visible');
+            tip.style.visibility = 'hidden';
+        }, 80);
+    }
+
+    document.querySelectorAll('.term-tooltip').forEach(function(el) {
+        el.addEventListener('mouseenter', function(){ show(el); });
+        el.addEventListener('mouseleave', hide);
+        el.addEventListener('touchstart', function(e){
+            e.preventDefault();
+            show(el);
+            setTimeout(hide, 3000);
+        }, {passive: false});
+    });
+})();
+```
+
+### Key advantages over CSS `::after`
+- **No clipping**: `position: fixed` escapes all `overflow: hidden` ancestors
+- **Viewport-aware**: Automatically flips above/below and clamps horizontally
+- **Arrow tracks element**: CSS variable `--arrow` positions the arrow pointer accurately
+- **Touch support**: 3-second auto-dismiss for mobile users
+- **Wider tooltip**: `max-width: 340px` (vs 260px for CSS-only) — fits longer definitions without truncation
 
 ---
 
@@ -263,6 +410,12 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 **Fix**: Broaden the selector to target all tooltip triggers on the page.
 **Prevention**: Unless tooltips are truly scoped to one section, always use the global `.tooltip-trigger` selector.
 
+### BUG-005: CSS `::after` Tooltip Clipped by `overflow: hidden` (ASHRAE page, 2026-02-28)
+**Symptom**: Term tooltips appear truncated/cut off. Tooltip content visible but half-hidden behind the accordion boundary.
+**Root cause**: `.accordion { overflow: hidden }` and `.accordion-body { overflow: hidden }` clip CSS `::after` pseudo-elements which use `position: absolute` (relative to their parent, trapped inside the overflow container).
+**Fix**: Replaced CSS `::after` tooltips with a JS-powered floating `<div id="tooltipFloat">` positioned with `position: fixed` (relative to viewport, outside all overflow containers). Added viewport edge detection, arrow positioning, and mobile touch support.
+**Prevention**: **NEVER use CSS `::after` tooltips inside `overflow: hidden` containers.** If the page has accordions, collapsible panels, or any container with `overflow: hidden`, ALWAYS use Variant 2b (JS Floating tooltips). Check for `overflow: hidden` in CSS before choosing tooltip implementation.
+
 ### BUG-004: Missing Term Tooltips for Key Terms
 **Symptom**: Domain-specific terms (e.g., "wrench time") appear as plain text with no explanation.
 **Root cause**: Terms were used in article body without `.term-tooltip` wrapping.
@@ -279,6 +432,9 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 - [ ] If using container-based tooltips: container `<div>` exists in the DOM
 - [ ] If using opacity-based CSS: JS uses `classList` not `style.display`
 - [ ] Domain-specific terms in article body have `.term-tooltip` with `data-tooltip`
+- [ ] If page has abbreviation glossary: ALL glossary terms have inline tooltips at first prose occurrence
+- [ ] If page has `overflow: hidden` containers (accordions, collapsible panels): use Variant 2b (JS Floating), NOT CSS `::after`
+- [ ] If using Variant 2b: `<div id="tooltipFloat">` exists at document root level (outside all containers)
 - [ ] Tooltip colors match the article's theme color (see Per-Article table)
-- [ ] Hover test: every "?" shows tooltip content, not just the badge
-- [ ] Mobile: tooltips don't overflow viewport (JS viewport bounds check)
+- [ ] Hover test: every tooltip shows FULL content without clipping or truncation
+- [ ] Mobile: tooltips don't overflow viewport (JS viewport bounds check / touch support)

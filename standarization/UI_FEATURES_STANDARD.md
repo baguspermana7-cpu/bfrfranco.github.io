@@ -428,6 +428,21 @@ Same 29 files as cookie banner.
 
 ---
 
+## CRITICAL: Section Tag Balance When Adding Content (lesson 2026-02-28)
+
+When inserting new accordion items or content blocks into existing `<section>` containers:
+
+1. **Insert BEFORE the closing `</section>` tag**, not after it
+2. If the insertion replaces a comment marker (e.g., `<!-- SECTION 4 -->`), ensure the replacement does NOT include extra `</section>` tags that create mismatches
+3. **Always validate section balance** after insertion:
+   ```bash
+   grep -c '<section' file.html    # count opens
+   grep -c '</section>' file.html  # count closes — must match
+   ```
+4. **Real-world bug (2026-02-28)**: Adding altitude calculator + quiz to TC 9.9 section placed them AFTER `</section>` instead of BEFORE. Same happened with GPU specs in Cooling section. Result: 16 opens vs 18 closes — orphaned content outside any section.
+
+---
+
 ## CRITICAL: Script Placement Rules
 
 > **Lesson learned 2026-02-25**: A batch insertion of Feature 22/23/21 scripts broke Pro mode, PDF export, and calculator JS across 17 articles because scripts were inserted INSIDE calculator IIFEs instead of AFTER them.
