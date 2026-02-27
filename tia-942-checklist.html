@@ -6,8 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TIA-942 Compliance Checklist | Data Center Infrastructure Standard</title>
-    <meta name="description" content="TIA-942 data center compliance checklist. Interactive audit tool covering site, architecture, electrical, mechanical, and telecom domains.">
-    <meta name="keywords" content="TIA-942, Data Center Compliance, Tier Classification, Infrastructure Standard, ANSI/TIA-942-B, Compliance Checklist">
+    <meta name="description" content="TIA-942 compliance checklist for 5 DC types. 80+ items across 6 domains with facility-type filtering for enterprise, colo, hyperscale, edge, modular.">
+    <meta name="keywords" content="TIA-942, Data Center Compliance, Tier Classification, Infrastructure Standard, ANSI/TIA-942-B, Compliance Checklist, Enterprise, Colocation, Hyperscale, Edge, Modular">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#10b981">
@@ -22,16 +22,16 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://resistancezero.com/tia-942-checklist.html">
     <meta property="og:title" content="TIA-942 Compliance Checklist — Data Center Standard">
-    <meta property="og:description" content="Assess data center compliance with TIA-942-B across 56 checklist items, 6 categories, and 4 tier levels.">
+    <meta property="og:description" content="TIA-942-B compliance for 5 DC types — 80+ items across 6 categories with facility-type and tier filtering.">
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta property="og:image" content="https://resistancezero.com/assets/tia-942-hero.jpg">
     <meta property="og:image:alt" content="Tia 942 Checklist">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="TIA-942 Compliance Checklist">
-    <meta name="twitter:description" content="Assess data center TIA-942-B compliance with real-time scoring and tier filtering.">
+    <meta name="twitter:description" content="TIA-942-B compliance for 5 DC types with real-time scoring, tier and facility-type filtering.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/tia-942-hero.jpg">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"TIA-942 Compliance Checklist","applicationCategory":"UtilityApplication","description":"TIA-942-B compliance assessment for data centers with 56 items across 6 categories and 4 tier levels.","url":"https://resistancezero.com/tia-942-checklist.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"TIA-942 Compliance Checklist","applicationCategory":"UtilityApplication","description":"TIA-942-B compliance assessment for 5 data center types with 80+ items across 6 categories and 4 tier levels.","url":"https://resistancezero.com/tia-942-checklist.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana"}}</script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -141,6 +141,16 @@
         .tier-btn:not(.active):hover{background:rgba(16,185,129,0.06);color:#059669}
         .tier-num{font-weight:800;margin-right:4px}
 
+        /* DC Type Selector */
+        .dctype-selector{max-width:1400px;margin:0 auto;padding:0 2rem 1.5rem}
+        .dctype-label{font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px}
+        .dctype-label i{color:var(--accent-emerald);font-size:0.8rem}
+        .dctype-bar{display:flex;gap:0;background:#f1f5f9;border-radius:12px;padding:4px;border:1px solid #e2e8f0;flex-wrap:wrap}
+        .dctype-btn{flex:1;padding:0.5rem 0.75rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.78rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#64748b;background:transparent;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-width:0}
+        .dctype-btn.active{background:white;color:#1e293b;box-shadow:var(--shadow-sm);border:1px solid rgba(16,185,129,0.2)}
+        .dctype-btn:not(.active):hover{background:rgba(16,185,129,0.06);color:#059669}
+        .dctype-btn i{font-size:0.72rem}
+
         /* Calculator Grid */
         .calculator-section{max-width:1400px;margin:2rem auto;padding:0 2rem}
         .calculator-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:2rem}
@@ -161,7 +171,7 @@
         .cat-chevron{font-size:0.75rem;color:var(--text-muted);transition:transform 0.3s}
         .cat-header.open .cat-chevron{transform:rotate(180deg)}
         .cat-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
-        .cat-body.open{max-height:2000px}
+        .cat-body.open{max-height:3000px}
         .cat-items{padding:0 1.25rem 1rem}
         .check-item{display:flex;align-items:center;gap:10px;padding:0.6rem 0;border-bottom:1px solid rgba(0,0,0,0.04)}
         .check-item:last-child{border-bottom:none}
@@ -249,7 +259,7 @@
         /* Print */
         @media print{
             body{background:white !important;color:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-            .navbar,.hero,.tia-toolbar,.tier-selector,#loginModal,.nav-back,footer,.pro-overlay,.pro-badge{display:none !important}
+            .navbar,.hero,.tia-toolbar,.tier-selector,.dctype-selector,#loginModal,.nav-back,footer,.pro-overlay,.pro-badge{display:none !important}
             .main-content{padding-top:0 !important}
             .calculator-section{padding:0 !important}
             .calculator-grid{display:block !important}
@@ -269,6 +279,8 @@
             .metric-grid{grid-template-columns:1fr}
             .tier-bar{flex-wrap:wrap}
             .tier-btn{flex:none;width:calc(50% - 2px)}
+            .dctype-bar{flex-wrap:wrap}
+            .dctype-btn{flex:none;width:calc(50% - 2px)}
         }
         /* Calculator Disclaimer */
         .calc-disclaimer { background: #f1f5f9 !important; border: 1px solid #cbd5e1 !important; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; }
@@ -341,7 +353,7 @@
         <section class="hero">
             <div class="hero-badge"><i class="fas fa-certificate"></i> TIA-942-B Compliance</div>
             <h1>TIA-942 Compliance Checklist</h1>
-            <p>Assess your data center infrastructure against TIA-942-B standard requirements. Evaluate 56 items across 6 categories with tier-specific filtering and real-time weighted scoring.</p>
+            <p>Assess your data center infrastructure against TIA-942-B standard requirements. Evaluate 80+ items across 6 categories with tier-specific and facility-type filtering for enterprise, colocation, hyperscale, edge, and modular data centers.</p>
             <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(16,185,129,0.15);">
                 <img src="assets/tia-942-hero.jpg" alt="TIA-942 Data Center Infrastructure Standard" style="width:100%;height:auto;display:block;" loading="lazy">
             </div>
@@ -352,10 +364,10 @@
                 </p>
             </div>
             <div class="quick-stats">
-                <span class="quick-stat"><i class="fas fa-clipboard-check"></i> 56 checklist items</span>
+                <span class="quick-stat"><i class="fas fa-clipboard-check"></i> <span id="statItemCount">56</span> checklist items</span>
                 <span class="quick-stat"><i class="fas fa-layer-group"></i> 4 tier levels</span>
                 <span class="quick-stat"><i class="fas fa-th-large"></i> 6 categories</span>
-                <span class="quick-stat"><i class="fas fa-chart-bar"></i> Real-time scoring</span>
+                <span class="quick-stat"><i class="fas fa-server"></i> <span id="statDcType">Enterprise</span></span>
             </div>
         </section>
 
@@ -382,11 +394,24 @@
 
         <!-- Tier Selector -->
         <div class="tier-selector">
+            <div class="dctype-label"><i class="fas fa-layer-group"></i> Tier Level</div>
             <div class="tier-bar">
                 <button class="tier-btn" onclick="setTier(1)"><span class="tier-num">1</span> Basic</button>
                 <button class="tier-btn" onclick="setTier(2)"><span class="tier-num">2</span> Redundant</button>
                 <button class="tier-btn active" onclick="setTier(3)"><span class="tier-num">3</span> Concurrently Maintainable</button>
                 <button class="tier-btn" onclick="setTier(4)"><span class="tier-num">4</span> Fault Tolerant</button>
+            </div>
+        </div>
+
+        <!-- DC Type Selector -->
+        <div class="dctype-selector">
+            <div class="dctype-label"><i class="fas fa-server"></i> Facility Type</div>
+            <div class="dctype-bar">
+                <button class="dctype-btn active" onclick="setDcType('ent')" data-dc="ent"><i class="fas fa-building"></i> Enterprise</button>
+                <button class="dctype-btn" onclick="setDcType('colo')" data-dc="colo"><i class="fas fa-city"></i> Colocation</button>
+                <button class="dctype-btn" onclick="setDcType('hyper')" data-dc="hyper"><i class="fas fa-cloud"></i> Hyperscale</button>
+                <button class="dctype-btn" onclick="setDcType('edge')" data-dc="edge"><i class="fas fa-microchip"></i> Edge</button>
+                <button class="dctype-btn" onclick="setDcType('mod')" data-dc="mod"><i class="fas fa-cube"></i> Modular</button>
             </div>
         </div>
 
@@ -408,6 +433,7 @@
                             <div class="metric-box"><div class="metric-label">Tier Level</div><div class="metric-value" id="metricTier">3</div></div>
                             <div class="metric-box"><div class="metric-label">Weakest Cat.</div><div class="metric-value" id="metricWeakest">0%</div></div>
                             <div class="metric-box"><div class="metric-label">Maturity</div><div class="metric-value" id="metricMaturity" style="font-size:0.85rem;">L1</div></div>
+                            <div class="metric-box" style="grid-column:span 2;"><div class="metric-label">Facility Type</div><div class="metric-value" id="metricDcType" style="font-size:0.85rem;">Enterprise</div></div>
                         </div>
                         <div class="cat-bars" id="catBars">
                             <div class="cat-bars-title"><i class="fas fa-chart-bar" style="color:var(--accent-emerald);"></i> Category Scores</div>
@@ -567,141 +593,229 @@
         { id:'fire', label:'Fire Protection', icon:'fa-fire-extinguisher', color:'#ef4444', weight:1.1 },
         { id:'sec', label:'Physical Security', icon:'fa-shield-alt', color:'#8b5cf6', weight:0.9 }
     ];
+    const DC_TYPES = [
+        {id:'ent', label:'Enterprise', icon:'fa-building', color:'#3b82f6'},
+        {id:'colo', label:'Colocation', icon:'fa-city', color:'#8b5cf6'},
+        {id:'hyper', label:'Hyperscale/Cloud', icon:'fa-cloud', color:'#06b6d4'},
+        {id:'edge', label:'Edge/Micro', icon:'fa-microchip', color:'#f59e0b'},
+        {id:'mod', label:'Modular/Prefab', icon:'fa-cube', color:'#10b981'}
+    ];
+    const DC_ALL = ['ent','colo','hyper','edge','mod'];
     const ITEMS = [
         // ── Site & Architecture ──
-        {id:'site_location',cat:'site',label:'Site risk assessment completed',tiers:[1,2,3,4],w:3,ref:'§5.1',
+        {id:'site_location',cat:'site',label:'Site risk assessment completed',tiers:[1,2,3,4],w:3,ref:'§5.1',dcTypes:DC_ALL,
          tip:'Comprehensive site risk assessment evaluating natural disasters (seismic, flood, wind), environmental hazards, proximity to airports/highways, EMI sources, and utility reliability. Must document all identified risks with mitigation strategies.'},
-        {id:'site_floor_load',cat:'site',label:'Floor load ≥12 kPa (250 psf)',tiers:[1,2,3,4],w:3,ref:'§5.2.2',
+        {id:'site_floor_load',cat:'site',label:'Floor load ≥12 kPa (250 psf)',tiers:[1,2,3,4],w:3,ref:'§5.2.2',dcTypes:DC_ALL,
          tip:'Structural floor load capacity must support ≥12 kPa (250 psf) for heavy IT equipment, UPS batteries, and cooling units. Standard office floors (~2.5 kPa) are insufficient. Requires structural engineer certification.'},
-        {id:'site_ceiling',cat:'site',label:'Ceiling ≥3.0m clear',tiers:[1,2,3,4],w:2,ref:'§5.2.3',
+        {id:'site_ceiling',cat:'site',label:'Ceiling ≥3.0m clear',tiers:[1,2,3,4],w:2,ref:'§5.2.3',dcTypes:['ent','colo','hyper'],
          tip:'Minimum 3.0m (10ft) clear height above finished floor for adequate airflow, overhead cable routing, and cooling distribution. Higher ceilings improve hot-air stratification and reduce recirculation.'},
-        {id:'site_raised_floor',cat:'site',label:'Raised floor ≥450mm',tiers:[2,3,4],w:2,ref:'§5.2.4',
+        {id:'site_raised_floor',cat:'site',label:'Raised floor ≥450mm',tiers:[2,3,4],w:2,ref:'§5.2.4',dcTypes:['ent','colo'],
          tip:'Raised access floor ≥450mm (18in) enables underfloor air distribution, cable routing, and leak detection. Required for Tier 2+ to separate power/data cabling from cooling airflow paths.'},
-        {id:'site_cable_pathway',cat:'site',label:'Dedicated cable pathways',tiers:[1,2,3,4],w:2,ref:'§5.3.1',
+        {id:'site_cable_pathway',cat:'site',label:'Dedicated cable pathways',tiers:[1,2,3,4],w:2,ref:'§5.3.1',dcTypes:DC_ALL,
          tip:'Dedicated cable pathways separate power and telecommunications cables to prevent electromagnetic interference. Requires physical separation between high-voltage and low-voltage systems per NEC/TIA standards.'},
-        {id:'site_entrance_room',cat:'site',label:'Dedicated entrance room(s)',tiers:[2,3,4],w:2,ref:'§5.3.2',
+        {id:'site_entrance_room',cat:'site',label:'Dedicated entrance room(s)',tiers:[2,3,4],w:2,ref:'§5.3.2',dcTypes:['ent','colo','hyper'],
          tip:'Dedicated entrance room(s) house carrier demarcation points, main distribution frames, and incoming service connections. Must be physically separate from computer room with fire-rated walls.'},
-        {id:'site_loading_dock',cat:'site',label:'Loading dock/staging area',tiers:[2,3,4],w:1,ref:'§5.2.5',
+        {id:'site_loading_dock',cat:'site',label:'Loading dock/staging area',tiers:[2,3,4],w:1,ref:'§5.2.5',dcTypes:['ent','colo','hyper'],
          tip:'Loading dock or staging area for equipment delivery, unpacking, and acclimation. Prevents contamination from cardboard/debris entering white space. Recommended minimum 30 m² staging area.'},
-        {id:'site_separate_entry',cat:'site',label:'Separate delivery & personnel entry',tiers:[3,4],w:1,ref:'§5.2.6',
+        {id:'site_separate_entry',cat:'site',label:'Separate delivery & personnel entry',tiers:[3,4],w:1,ref:'§5.2.6',dcTypes:['ent','colo','hyper'],
          tip:'Separate delivery entrance and personnel entry prevents security conflicts and contamination. Delivery path should not cross secure computer room areas. Critical for Tier 3/4 security requirements.'},
-        {id:'site_dual_entrance',cat:'site',label:'Dual entrance rooms (diverse carriers)',tiers:[3,4],w:3,ref:'§5.3.3',
+        {id:'site_dual_entrance',cat:'site',label:'Dual entrance rooms (diverse carriers)',tiers:[3,4],w:3,ref:'§5.3.3',dcTypes:['ent','colo','hyper'],
          tip:'Dual entrance rooms with diverse carrier entry paths eliminate single points of failure for telecommunications. Each room should serve independent carrier feeds entering from different building sides.'},
-        {id:'site_vapor_barrier',cat:'site',label:'Vapor barrier below floor',tiers:[2,3,4],w:1,ref:'§5.2.7',
+        {id:'site_vapor_barrier',cat:'site',label:'Vapor barrier below floor',tiers:[2,3,4],w:1,ref:'§5.2.7',dcTypes:['ent','colo'],
          tip:'Vapor barrier (6-mil polyethylene minimum) below raised floor prevents moisture migration from concrete slab. Critical in humid climates. Requires continuous barrier with sealed seams and penetration boots.'},
         // ── Electrical ──
-        {id:'elec_utility_feed',cat:'elec',label:'Dedicated utility power feed',tiers:[1,2,3,4],w:3,ref:'§6.1.1',
+        {id:'elec_utility_feed',cat:'elec',label:'Dedicated utility power feed',tiers:[1,2,3,4],w:3,ref:'§6.1.1',dcTypes:DC_ALL,
          tip:'Dedicated utility power feed from local distribution company sized for full facility load plus growth. Must have dedicated transformer(s) not shared with other buildings. Voltage typically 12-35kV medium voltage.'},
-        {id:'elec_dual_feed',cat:'elec',label:'Dual feeds from independent substations',tiers:[3,4],w:3,ref:'§6.1.2',
+        {id:'elec_dual_feed',cat:'elec',label:'Dual feeds from independent substations',tiers:[3,4],w:3,ref:'§6.1.2',dcTypes:['ent','colo','hyper'],
          tip:'Two independent utility feeds from separate substations via diverse physical paths. Eliminates single utility source as point of failure. Required for Tier 3/4 concurrent maintainability. Each feed must handle full load.'},
-        {id:'elec_ups',cat:'elec',label:'UPS system for critical loads',tiers:[1,2,3,4],w:3,ref:'§6.2.1',
+        {id:'elec_ups',cat:'elec',label:'UPS system for critical loads',tiers:[1,2,3,4],w:3,ref:'§6.2.1',dcTypes:DC_ALL,
          tip:'Uninterruptible Power Supply protects IT loads from power disturbances (sags, surges, outages). Online double-conversion is standard for data centers. Must bridge load until generator starts (~10-15 seconds typically).'},
-        {id:'elec_ups_n1',cat:'elec',label:'UPS N+1 redundancy',tiers:[2,3,4],w:3,ref:'§6.2.2',
+        {id:'elec_ups_n1',cat:'elec',label:'UPS N+1 redundancy',tiers:[2,3,4],w:3,ref:'§6.2.2',dcTypes:['ent','colo','hyper','mod'],
          tip:'N+1 UPS redundancy provides one additional module beyond minimum required capacity. Example: if 4 modules needed for full load, deploy 5. Allows one module failure or maintenance without capacity loss.'},
-        {id:'elec_ups_2n',cat:'elec',label:'UPS 2N configuration',tiers:[4],w:3,ref:'§6.2.3',
+        {id:'elec_ups_2n',cat:'elec',label:'UPS 2N configuration',tiers:[4],w:3,ref:'§6.2.3',dcTypes:['ent','colo','hyper'],
          tip:'2N UPS provides fully independent, mirrored power paths (A+B). Each path carries 100% of load independently. Tier 4 fault-tolerant requirement — any single failure has zero impact on IT operations.'},
-        {id:'elec_generator',cat:'elec',label:'Backup generator(s)',tiers:[2,3,4],w:3,ref:'§6.3.1',
+        {id:'elec_generator',cat:'elec',label:'Backup generator(s)',tiers:[2,3,4],w:3,ref:'§6.3.1',dcTypes:['ent','colo','hyper','mod'],
          tip:'Backup diesel generators provide extended power during utility outages. Must auto-start and accept load within 10-15 seconds. Sized for full critical load plus cooling and support systems.'},
-        {id:'elec_ats',cat:'elec',label:'Automatic transfer switch',tiers:[2,3,4],w:3,ref:'§6.3.2',
+        {id:'elec_ats',cat:'elec',label:'Automatic transfer switch',tiers:[2,3,4],w:3,ref:'§6.3.2',dcTypes:['ent','colo','hyper','mod'],
          tip:'Automatic Transfer Switch (ATS) detects utility failure and transfers load to generator within seconds. Must be rated for full facility load. Types: open transition (brief interruption) or closed transition (make-before-break).'},
-        {id:'elec_fuel_24h',cat:'elec',label:'≥24-hour on-site fuel storage',tiers:[3,4],w:2,ref:'§6.3.3',
+        {id:'elec_fuel_24h',cat:'elec',label:'≥24-hour on-site fuel storage',tiers:[3,4],w:2,ref:'§6.3.3',dcTypes:['ent','colo','hyper'],
          tip:'Minimum 24-hour on-site fuel storage at full generator load. Ensures operation during extended utility outages. Requires fuel maintenance plan, automatic fuel polishing system, and contractual refueling agreements.'},
-        {id:'elec_pdu',cat:'elec',label:'PDUs in computer room',tiers:[1,2,3,4],w:2,ref:'§6.4.1',
+        {id:'elec_pdu',cat:'elec',label:'PDUs in computer room',tiers:[1,2,3,4],w:2,ref:'§6.4.1',dcTypes:DC_ALL,
          tip:'Power Distribution Units in computer room provide final power distribution to racks. Transform voltage (e.g., 480V→208V) and provide branch circuit protection with monitoring. Located near rack rows for short whip lengths.'},
-        {id:'elec_dual_pdu',cat:'elec',label:'Dual A+B PDU feeds per rack',tiers:[3,4],w:3,ref:'§6.4.2',
+        {id:'elec_dual_pdu',cat:'elec',label:'Dual A+B PDU feeds per rack',tiers:[3,4],w:3,ref:'§6.4.2',dcTypes:['ent','colo','hyper'],
          tip:'Dual A+B PDU feeds per rack with independent power paths from separate UPS systems. Each feed powers one PSU in dual-corded equipment. Eliminates PDU, UPS, or utility feed as single point of failure.'},
-        {id:'elec_grounding',cat:'elec',label:'TGB/TMGB grounding system',tiers:[1,2,3,4],w:2,ref:'§6.5',
+        {id:'elec_grounding',cat:'elec',label:'TGB/TMGB grounding system',tiers:[1,2,3,4],w:2,ref:'§6.5',dcTypes:DC_ALL,
          tip:'Telecommunications Grounding Busbar (TGB) and Telecommunications Main Grounding Busbar (TMGB) provide equipotential ground per TIA-607. Prevents ground loops, reduces EMI, and protects from ESD damage.'},
-        {id:'elec_epo',cat:'elec',label:'Emergency Power Off system',tiers:[1,2,3,4],w:2,ref:'§6.6',
+        {id:'elec_epo',cat:'elec',label:'Emergency Power Off system',tiers:[1,2,3,4],w:2,ref:'§6.6',dcTypes:DC_ALL,
          tip:'Emergency Power Off (EPO) provides immediate de-energization of computer room electrical systems in emergencies (fire, flood). Required by NEC 645.10/11. Must be clearly marked, accessible, and properly interlocked.'},
-        {id:'elec_metering',cat:'elec',label:'Branch circuit monitoring',tiers:[2,3,4],w:1,ref:'§6.7',
+        {id:'elec_metering',cat:'elec',label:'Branch circuit monitoring',tiers:[2,3,4],w:1,ref:'§6.7',dcTypes:DC_ALL,
          tip:'Branch circuit monitoring provides real-time visibility into power consumption at circuit level (per-breaker). Enables capacity planning, identifies stranded power, supports PUE optimization and billing accuracy.'},
-        {id:'elec_concurrent',cat:'elec',label:'All electrical concurrently maintainable',tiers:[3,4],w:3,ref:'§6.8',
+        {id:'elec_concurrent',cat:'elec',label:'All electrical concurrently maintainable',tiers:[3,4],w:3,ref:'§6.8',dcTypes:['ent','colo','hyper'],
          tip:'All electrical systems concurrently maintainable — any component can be serviced without IT load interruption. Requires maintenance bypass paths, redundant distribution, wrap-around capability, and trained procedures.'},
         // ── Mechanical / Cooling ──
-        {id:'mech_cooling',cat:'mech',label:'Dedicated computer room cooling',tiers:[1,2,3,4],w:3,ref:'§7.1.1',
+        {id:'mech_cooling',cat:'mech',label:'Dedicated computer room cooling',tiers:[1,2,3,4],w:3,ref:'§7.1.1',dcTypes:DC_ALL,
          tip:'Dedicated precision cooling (CRAC/CRAH units) designed for data centers. Standard office HVAC lacks the precision temperature/humidity control, air filtration (MERV 8+), and 24/7 operation required for IT environments.'},
-        {id:'mech_n1',cat:'mech',label:'N+1 cooling redundancy',tiers:[2,3,4],w:3,ref:'§7.1.2',
+        {id:'mech_n1',cat:'mech',label:'N+1 cooling redundancy',tiers:[2,3,4],w:3,ref:'§7.1.2',dcTypes:['ent','colo','hyper','mod'],
          tip:'N+1 cooling redundancy provides one spare unit beyond minimum required. If 3 CRAC units needed for design load, deploy 4. One unit can fail or undergo maintenance while maintaining ASHRAE A1 conditions.'},
-        {id:'mech_2n',cat:'mech',label:'2N cooling capacity',tiers:[4],w:3,ref:'§7.1.3',
+        {id:'mech_2n',cat:'mech',label:'2N cooling capacity',tiers:[4],w:3,ref:'§7.1.3',dcTypes:['ent','colo','hyper'],
          tip:'2N cooling with fully independent, redundant cooling paths (separate chilled water loops, CRAHs, chillers). Each system handles full heat load independently. Tier 4 fault-tolerance requirement.'},
-        {id:'mech_temp',cat:'mech',label:'Temperature monitoring (ASHRAE 18-27°C)',tiers:[1,2,3,4],w:2,ref:'§7.2',
+        {id:'mech_temp',cat:'mech',label:'Temperature monitoring (ASHRAE 18-27°C)',tiers:[1,2,3,4],w:2,ref:'§7.2',dcTypes:DC_ALL,
          tip:'Continuous temperature monitoring per ASHRAE TC 9.9 A1 recommended envelope (18-27°C / 64.4-80.6°F). Sensors at rack inlet, return air, and supply air. BMS alerts for threshold violations with escalation.'},
-        {id:'mech_humidity',cat:'mech',label:'Humidity control 40-60% RH',tiers:[2,3,4],w:2,ref:'§7.3',
+        {id:'mech_humidity',cat:'mech',label:'Humidity control 40-60% RH',tiers:[2,3,4],w:2,ref:'§7.3',dcTypes:['ent','colo'],
          tip:'Relative humidity maintained 40-60% RH to prevent electrostatic discharge (below 40%) and condensation/corrosion (above 60%). Precision humidifiers/dehumidifiers integrated with CRAC/CRAH units.'},
-        {id:'mech_leak_detect',cat:'mech',label:'Water/leak detection',tiers:[2,3,4],w:2,ref:'§7.4',
+        {id:'mech_leak_detect',cat:'mech',label:'Water/leak detection',tiers:[2,3,4],w:2,ref:'§7.4',dcTypes:['ent','colo','hyper'],
          tip:'Water/liquid leak detection sensors deployed under raised floor, near CRAC drip pans, chilled water pipes, and humidifiers. Cable-style sensors provide continuous coverage. Must alarm to BMS/NOC within 30 seconds.'},
-        {id:'mech_pipe_routing',cat:'mech',label:'Pipes routed away from IT equipment',tiers:[1,2,3,4],w:2,ref:'§7.5',
+        {id:'mech_pipe_routing',cat:'mech',label:'Pipes routed away from IT equipment',tiers:[1,2,3,4],w:2,ref:'§7.5',dcTypes:['ent','colo','hyper'],
          tip:'All water, steam, and drain pipes must be routed away from IT equipment areas. Where unavoidable (e.g., rear-door heat exchangers), pipes must have drip pans, leak detection, and automatic isolation valves.'},
-        {id:'mech_concurrent',cat:'mech',label:'Cooling concurrently maintainable',tiers:[3,4],w:3,ref:'§7.6',
+        {id:'mech_concurrent',cat:'mech',label:'Cooling concurrently maintainable',tiers:[3,4],w:3,ref:'§7.6',dcTypes:['ent','colo','hyper'],
          tip:'Cooling systems concurrently maintainable — any cooling component can be serviced without affecting IT environment conditions. Requires isolation valves, redundant piping loops, bypass capability, and N+1 or 2N capacity.'},
-        {id:'mech_separate_zone',cat:'mech',label:'Separate IT vs office HVAC zones',tiers:[2,3,4],w:1,ref:'§7.7',
+        {id:'mech_separate_zone',cat:'mech',label:'Separate IT vs office HVAC zones',tiers:[2,3,4],w:1,ref:'§7.7',dcTypes:['ent','colo','hyper'],
          tip:'Separate HVAC zones for IT spaces vs. office/support areas. IT areas need 24/7/365 precision cooling at 18-27°C; office areas use standard HVAC with occupancy-based schedules and wider setpoint ranges.'},
         // ── Telecommunications ──
-        {id:'tel_entrance',cat:'tel',label:'Entrance room with demarcation',tiers:[1,2,3,4],w:2,ref:'§8.1',
+        {id:'tel_entrance',cat:'tel',label:'Entrance room with demarcation',tiers:[1,2,3,4],w:2,ref:'§8.1',dcTypes:['ent','colo','hyper'],
          tip:'Dedicated entrance room housing carrier demarcation points where external provider cabling terminates. Requires fire-rated room (1-hr minimum), cable entry protection sleeves, grounding busbar, and physical access control.'},
-        {id:'tel_mda',cat:'tel',label:'Main Distribution Area defined',tiers:[1,2,3,4],w:2,ref:'§8.2.1',
+        {id:'tel_mda',cat:'tel',label:'Main Distribution Area defined',tiers:[1,2,3,4],w:2,ref:'§8.2.1',dcTypes:['ent','colo','hyper'],
          tip:'Main Distribution Area (MDA) is the central cabling hub housing core switches, routers, and main cross-connects. Must be in a dedicated, secure space with adequate power, cooling, and grounding per TIA-942.'},
-        {id:'tel_hda',cat:'tel',label:'Horizontal Distribution Area',tiers:[2,3,4],w:2,ref:'§8.2.2',
+        {id:'tel_hda',cat:'tel',label:'Horizontal Distribution Area',tiers:[2,3,4],w:2,ref:'§8.2.2',dcTypes:['ent','colo','hyper'],
          tip:'Horizontal Distribution Area (HDA) provides intermediate cabling distribution between MDA and equipment racks. Reduces cable run lengths, improves manageability, and enables zone-based network architecture in large facilities.'},
-        {id:'tel_tia568',cat:'tel',label:'Cabling meets TIA-568',tiers:[1,2,3,4],w:2,ref:'§8.3.1',
+        {id:'tel_tia568',cat:'tel',label:'Cabling meets TIA-568',tiers:[1,2,3,4],w:2,ref:'§8.3.1',dcTypes:DC_ALL,
          tip:'All structured cabling must meet ANSI/TIA-568 performance standards for cable types, connectors, installation practices, and testing procedures. Ensures interoperability and provides documented performance baselines for all links and channels.'},
-        {id:'tel_fiber',cat:'tel',label:'Fiber optic backbone',tiers:[1,2,3,4],w:2,ref:'§8.3.2',
+        {id:'tel_fiber',cat:'tel',label:'Fiber optic backbone',tiers:[1,2,3,4],w:2,ref:'§8.3.2',dcTypes:['ent','colo','hyper'],
          tip:'Fiber optic backbone cabling between entrance room, MDA, and HDAs. Provides high bandwidth (100G+), EMI immunity, and supports long distances. OS2 single-mode for backbone runs; OM4/OM5 multimode for short horizontal links.'},
-        {id:'tel_cat6a',cat:'tel',label:'Cat 6A+ copper horizontal',tiers:[2,3,4],w:1,ref:'§8.3.3',
+        {id:'tel_cat6a',cat:'tel',label:'Cat 6A+ copper horizontal',tiers:[2,3,4],w:1,ref:'§8.3.3',dcTypes:DC_ALL,
          tip:'Category 6A or higher copper horizontal cabling supports 10GBASE-T (10 Gbps) over 100m channels. Provides future bandwidth headroom beyond Cat 6. Must meet TIA-568 channel performance with proper alien crosstalk mitigation.'},
-        {id:'tel_redundant_path',cat:'tel',label:'Redundant cabling pathways',tiers:[3,4],w:3,ref:'§8.4',
+        {id:'tel_redundant_path',cat:'tel',label:'Redundant cabling pathways',tiers:[3,4],w:3,ref:'§8.4',dcTypes:['ent','colo','hyper'],
          tip:'Redundant cabling pathways via physically diverse routes between distribution areas. Separate conduits, trays, or riser paths. Eliminates pathway as single point of failure. Critical for Tier 3/4 concurrent maintainability.'},
-        {id:'tel_diverse_entry',cat:'tel',label:'Diverse carrier entrance paths',tiers:[3,4],w:3,ref:'§8.5',
+        {id:'tel_diverse_entry',cat:'tel',label:'Diverse carrier entrance paths',tiers:[3,4],w:3,ref:'§8.5',dcTypes:['ent','colo','hyper'],
          tip:'Diverse carrier entrance paths from different service providers entering building from geographically different directions. Prevents a single utility corridor cut, road construction, or disaster from affecting all carrier services.'},
-        {id:'tel_labeling',cat:'tel',label:'TIA-606 labeling standard',tiers:[1,2,3,4],w:1,ref:'§8.6',
+        {id:'tel_labeling',cat:'tel',label:'TIA-606 labeling standard',tiers:[1,2,3,4],w:1,ref:'§8.6',dcTypes:DC_ALL,
          tip:'TIA-606 administration standard requires consistent labeling of all infrastructure: cables, pathways, spaces, equipment ports, and patch panels. Machine-readable labels enable efficient troubleshooting, moves/adds/changes, and auditing.'},
         // ── Fire Protection ──
-        {id:'fire_detection',cat:'fire',label:'VESDA/smoke detection system',tiers:[1,2,3,4],w:3,ref:'§9.1',
+        {id:'fire_detection',cat:'fire',label:'VESDA/smoke detection system',tiers:[1,2,3,4],w:3,ref:'§9.1',dcTypes:DC_ALL,
          tip:'Very Early Smoke Detection Apparatus (VESDA) or equivalent aspirating system. Detects smoke at pre-combustion stage — 10-100× more sensitive than spot detectors. Provides Alert/Action/Fire alarm stages for graduated response.'},
-        {id:'fire_suppression',cat:'fire',label:'Automatic fire suppression',tiers:[1,2,3,4],w:3,ref:'§9.2',
+        {id:'fire_suppression',cat:'fire',label:'Automatic fire suppression',tiers:[1,2,3,4],w:3,ref:'§9.2',dcTypes:DC_ALL,
          tip:'Automatic fire suppression activated by detection system. Must suppress fire without water damage to IT equipment. System design considers room volume, seal integrity, hold time, and personnel safety with abort switches.'},
-        {id:'fire_clean_agent',cat:'fire',label:'Clean agent (FM-200/Novec 1230)',tiers:[2,3,4],w:2,ref:'§9.2.1',
+        {id:'fire_clean_agent',cat:'fire',label:'Clean agent (FM-200/Novec 1230)',tiers:[2,3,4],w:2,ref:'§9.2.1',dcTypes:['ent','colo','hyper'],
          tip:'Clean agent gaseous suppression (FM-200/HFC-227ea or Novec 1230/FK-5-1-12) suppresses fire without residue or water damage. Safe for occupied spaces at design concentrations. Novec 1230 preferred for low GWP (global warming potential = 1).'},
-        {id:'fire_preaction',cat:'fire',label:'Pre-action sprinkler system',tiers:[2,3,4],w:2,ref:'§9.3',
+        {id:'fire_preaction',cat:'fire',label:'Pre-action sprinkler system',tiers:[2,3,4],w:2,ref:'§9.3',dcTypes:['ent','colo','hyper'],
          tip:'Pre-action sprinkler requires dual activation: (1) detection system alarm AND (2) sprinkler head fusing from heat. Dry pipe until both triggers activate. Dramatically reduces accidental water discharge risk vs. wet-pipe systems.'},
-        {id:'fire_egress',cat:'fire',label:'Emergency egress marked',tiers:[1,2,3,4],w:2,ref:'§9.4',
+        {id:'fire_egress',cat:'fire',label:'Emergency egress marked',tiers:[1,2,3,4],w:2,ref:'§9.4',dcTypes:DC_ALL,
          tip:'Emergency egress paths clearly marked with illuminated EXIT signs (battery backup), photoluminescent floor markers, emergency lighting (90-min minimum), and unobstructed pathways. Maximum travel distance per NFPA 101 Life Safety Code.'},
-        {id:'fire_signage',cat:'fire',label:'Fire safety signage posted',tiers:[1,2,3,4],w:1,ref:'§9.5',
+        {id:'fire_signage',cat:'fire',label:'Fire safety signage posted',tiers:[1,2,3,4],w:1,ref:'§9.5',dcTypes:DC_ALL,
          tip:'Fire safety signage including extinguisher locations, manual pull station locations, evacuation route maps, assembly point identification, and emergency contact numbers. Posted at all entries and throughout facility per local fire code.'},
-        {id:'fire_extinguisher',cat:'fire',label:'Portable extinguishers (Class C)',tiers:[1,2,3,4],w:1,ref:'§9.6',
+        {id:'fire_extinguisher',cat:'fire',label:'Portable extinguishers (Class C)',tiers:[1,2,3,4],w:1,ref:'§9.6',dcTypes:DC_ALL,
          tip:'Portable Class C (energized electrical equipment) fire extinguishers at maximum 15m (50ft) travel distance. Clean agent portable units (CO2 or halotron) preferred in IT spaces to avoid powder residue on electronics.'},
         // ── Physical Security ──
-        {id:'sec_access',cat:'sec',label:'Electronic access control',tiers:[1,2,3,4],w:3,ref:'§10.1',
+        {id:'sec_access',cat:'sec',label:'Electronic access control',tiers:[1,2,3,4],w:3,ref:'§10.1',dcTypes:DC_ALL,
          tip:'Electronic access control (card readers, PIN pads, or biometric) on all entry points to data center spaces. System logs all access events with timestamp, credential ID, and door location. Integrates with CCTV and intrusion alarms.'},
-        {id:'sec_cctv',cat:'sec',label:'CCTV surveillance + recording',tiers:[1,2,3,4],w:2,ref:'§10.2',
+        {id:'sec_cctv',cat:'sec',label:'CCTV surveillance + recording',tiers:[1,2,3,4],w:2,ref:'§10.2',dcTypes:DC_ALL,
          tip:'CCTV surveillance covering all entrances, corridors, computer room aisles, loading dock, and perimeter. Recordings retained minimum 90 days. IP cameras with motion detection, analytics, and remote viewing capability recommended.'},
-        {id:'sec_mantrap',cat:'sec',label:'Man-trap/airlock entry',tiers:[3,4],w:2,ref:'§10.3',
+        {id:'sec_mantrap',cat:'sec',label:'Man-trap/airlock entry',tiers:[3,4],w:2,ref:'§10.3',dcTypes:['ent','colo','hyper'],
          tip:'Man-trap (airlock/sally port) entry requiring authentication at two sequential interlocked doors — only one can be open at any time. Prevents tailgating and piggybacking. Weight sensors or anti-passback logic recommended.'},
-        {id:'sec_visitor',cat:'sec',label:'Visitor management/escort policy',tiers:[1,2,3,4],w:1,ref:'§10.4',
+        {id:'sec_visitor',cat:'sec',label:'Visitor management/escort policy',tiers:[1,2,3,4],w:1,ref:'§10.4',dcTypes:['ent','colo','hyper'],
          tip:'Formal visitor management: pre-registration, government-issued photo ID verification, visitor badge with photo, mandatory escort by authorized personnel at all times, sign-in/sign-out log, and restricted area access control.'},
-        {id:'sec_perimeter',cat:'sec',label:'Perimeter fencing/barrier',tiers:[2,3,4],w:2,ref:'§10.5',
+        {id:'sec_perimeter',cat:'sec',label:'Perimeter fencing/barrier',tiers:[2,3,4],w:2,ref:'§10.5',dcTypes:['ent','colo','hyper','mod'],
          tip:'Perimeter security: fencing minimum 2.4m (8ft) with anti-climb topping (razor wire or similar), vehicle barriers/bollards at entry points, controlled vehicle gates with authentication, and perimeter intrusion detection sensors.'},
-        {id:'sec_biometric',cat:'sec',label:'Biometric authentication',tiers:[3,4],w:2,ref:'§10.6',
+        {id:'sec_biometric',cat:'sec',label:'Biometric authentication',tiers:[3,4],w:2,ref:'§10.6',dcTypes:['ent','colo','hyper'],
          tip:'Biometric authentication (fingerprint, iris scan, or facial recognition) for computer room and critical infrastructure access. Provides non-transferable identity verification. Two-factor authentication (card + biometric) preferred.'},
-        {id:'sec_noc_24x7',cat:'sec',label:'24/7 NOC/security monitoring',tiers:[3,4],w:2,ref:'§10.7',
-         tip:'24/7 Network Operations Center (NOC) and/or security control room with trained operators. Monitors BMS, CCTV, access control, fire/smoke detection, power systems, and environmental sensors. Documented escalation and incident response procedures.'}
+        {id:'sec_noc_24x7',cat:'sec',label:'24/7 NOC/security monitoring',tiers:[3,4],w:2,ref:'§10.7',dcTypes:['ent','colo','hyper'],
+         tip:'24/7 Network Operations Center (NOC) and/or security control room with trained operators. Monitors BMS, CCTV, access control, fire/smoke detection, power systems, and environmental sensors. Documented escalation and incident response procedures.'},
+        // ── Alternative Items (replace existing for specific DC types) ──
+        {id:'site_solid_floor',cat:'site',label:'Structural floor ≥12 kPa with overhead cable management',tiers:[2,3,4],w:2,ref:'§5.2.4',dcTypes:['hyper','mod'],
+         tip:'Structural solid floor rated ≥12 kPa with overhead cable tray/basket management system. Hyperscale and modular facilities use solid floors with top-of-rack cabling instead of raised floor. Overhead pathways must support cable weight and allow hot-aisle containment.'},
+        {id:'mech_humidity_wide',cat:'mech',label:'Humidity monitoring (ASHRAE A2-A4 expanded envelope)',tiers:[2,3,4],w:2,ref:'§7.3',dcTypes:['hyper','edge','mod'],
+         tip:'Humidity monitoring per ASHRAE A2-A4 expanded environmental envelope (8-80% RH non-condensing). Hyperscale, edge, and modular facilities leverage wider allowable ranges to reduce energy spent on active humidity control while monitoring for condensation risk.'},
+        {id:'fire_modular_suppression',cat:'fire',label:'Integrated suppression (factory-installed clean agent/aerosol)',tiers:[2,3,4],w:2,ref:'§9.2.1',dcTypes:['mod'],
+         tip:'Factory-integrated fire suppression system pre-installed in modular unit. Typically uses clean agent (Novec 1230) or condensed aerosol systems designed for enclosed containerized environments. Must be tested and certified before deployment.'},
+        {id:'fire_edge_suppression',cat:'fire',label:'Compact fire suppression (clean agent or aerosol)',tiers:[2,3,4],w:2,ref:'§9.2.1',dcTypes:['edge'],
+         tip:'Compact fire suppression sized for small edge enclosures. Condensed aerosol or small-cylinder clean agent systems designed for enclosed cabinets and micro data centers. Automatic activation with detection system integration.'},
+        {id:'sec_remote_monitoring',cat:'sec',label:'24/7 remote monitoring and automated alerting',tiers:[3,4],w:2,ref:'§10.7',dcTypes:['edge','mod'],
+         tip:'24/7 remote monitoring via centralized NOC or cloud-based platform with automated alerting for environmental, power, security, and connectivity anomalies. Includes automated escalation workflows and remote remediation capabilities for unmanned sites.'},
+        // ── New DC-Type-Specific Items ──
+        // Mechanical/Cooling
+        {id:'mech_containment',cat:'mech',label:'Hot/cold aisle containment',tiers:[2,3,4],w:2,ref:'§7.8',dcTypes:['ent','colo','hyper'],
+         tip:'Physical containment of hot or cold aisles prevents mixing of supply and return air. Improves cooling efficiency by 20-40%, raises allowable supply temperatures, and reduces fan energy. Curtains, panels, or chimney cabinets acceptable.'},
+        {id:'mech_liquid_cooling',cat:'mech',label:'Direct-to-chip liquid cooling infrastructure',tiers:[2,3,4],w:3,ref:'§7.9',dcTypes:['hyper'],
+         tip:'Direct-to-chip liquid cooling using cold plates on CPUs/GPUs with facility water loop (CDU). Required for high-density AI/HPC racks exceeding 30 kW. Includes coolant distribution units, leak detection, and manifold systems per rack row.'},
+        {id:'mech_rdhx',cat:'mech',label:'Rear-door heat exchangers available',tiers:[2,3,4],w:1,ref:'§7.10',dcTypes:['ent','colo','hyper'],
+         tip:'Rear-door heat exchangers (RDHx) provide supplemental or primary cooling at the rack level. Passive or active units remove heat at the source before it enters the room. Useful for high-density racks in mixed environments.'},
+        {id:'mech_env_granularity',cat:'mech',label:'Environmental sensor grid (≥6 sensors per row)',tiers:[2,3,4],w:1,ref:'§7.11',dcTypes:DC_ALL,
+         tip:'Granular environmental monitoring with minimum 6 temperature/humidity sensors per row — top, middle, bottom of inlet and exhaust. Enables thermal mapping, identifies hotspots, and validates cooling effectiveness.'},
+        {id:'mech_hotswap',cat:'mech',label:'Hot-swappable cooling/power components',tiers:[2,3,4],w:2,ref:'§7.12',dcTypes:['mod'],
+         tip:'Modular units designed with hot-swappable cooling fans, power modules, and control boards. Enables field replacement without shutting down the unit. Reduces MTTR and supports concurrent maintainability in prefabricated environments.'},
+        {id:'mech_edge_cooling',cat:'mech',label:'Compact self-contained precision cooling',tiers:[1,2,3,4],w:2,ref:'§7.13',dcTypes:['edge'],
+         tip:'Self-contained precision cooling integrated into edge enclosure. Includes DX split system or thermoelectric cooling sized for enclosure heat load. Must maintain ASHRAE A1/A2 conditions independently with redundant fans.'},
+        {id:'mech_immersion',cat:'mech',label:'Immersion cooling infrastructure',tiers:[3,4],w:2,ref:'§7.14',dcTypes:['hyper'],
+         tip:'Single-phase or two-phase immersion cooling for ultra-high-density compute (50-100+ kW per tank). Requires dielectric fluid management, CDU integration, specialized containment tanks, and modified server hardware support.'},
+        // Electrical
+        {id:'elec_density_monitor',cat:'elec',label:'Per-rack power density monitoring',tiers:[2,3,4],w:2,ref:'§6.9',dcTypes:['colo','hyper'],
+         tip:'Real-time per-rack power monitoring with kW, kWh, voltage, current, and power factor. Enables capacity planning, tenant billing accuracy, and density management. Minimum per-circuit granularity with DCIM integration.'},
+        {id:'elec_bess',cat:'elec',label:'Battery Energy Storage System (BESS)',tiers:[2,3,4],w:2,ref:'§6.10',dcTypes:['hyper','edge','mod'],
+         tip:'Lithium-ion or similar BESS providing extended runtime beyond traditional UPS batteries. Edge/modular sites may use BESS as primary backup (replacing generators). Includes battery management system, thermal management, and fire suppression.'},
+        {id:'elec_renewable',cat:'elec',label:'On-site renewable energy integration',tiers:[2,3,4],w:1,ref:'§6.11',dcTypes:['hyper','mod'],
+         tip:'On-site renewable energy generation (solar PV, wind) with grid-tie inverters and energy storage integration. Supports sustainability targets and provides supplemental power. Requires proper islanding protection and utility interconnection agreement.'},
+        {id:'elec_tenant_metering',cat:'elec',label:'Per-tenant revenue-grade metering',tiers:[2,3,4],w:2,ref:'§6.12',dcTypes:['colo'],
+         tip:'Revenue-grade (ANSI C12.20 Class 0.2) power metering per tenant cage/suite for accurate billing. Includes kW demand, kWh consumption, power factor, and harmonics data. Tamper-evident with independent verification capability.'},
+        {id:'elec_mv_distribution',cat:'elec',label:'Medium-voltage distribution to rows',tiers:[3,4],w:2,ref:'§6.13',dcTypes:['hyper'],
+         tip:'Medium-voltage (e.g., 33kV/11kV) distribution brought closer to IT loads, reducing transformation losses and copper costs. Enables higher density deployments with smaller electrical rooms. Requires qualified MV switchgear and protection.'},
+        {id:'elec_busway',cat:'elec',label:'Overhead busway power distribution',tiers:[2,3,4],w:1,ref:'§6.14',dcTypes:['hyper'],
+         tip:'Overhead busway (busduct) distributing power along rack rows, eliminating underfloor power cabling. Provides flexible tap-off points for rack connections, supports solid-floor designs, and simplifies capacity additions.'},
+        // Telecommunications
+        {id:'tel_remote_mgmt',cat:'tel',label:'Out-of-band remote management (IPMI/iLO)',tiers:[2,3,4],w:3,ref:'§8.7',dcTypes:['edge','mod'],
+         tip:'Out-of-band management via IPMI, iLO, iDRAC, or similar for remote server access independent of primary network. Critical for unmanned edge/modular sites. Includes dedicated management network, VPN access, and KVM-over-IP capability.'},
+        {id:'tel_sla_monitoring',cat:'tel',label:'SLA monitoring and reporting platform',tiers:[2,3,4],w:2,ref:'§8.8',dcTypes:['colo'],
+         tip:'Automated SLA monitoring tracking uptime, power availability, temperature compliance, and response times against contractual commitments. Generates tenant-facing reports with real-time dashboards and historical trend analysis.'},
+        {id:'tel_cross_connect',cat:'tel',label:'Cross-connect management and meet-me room',tiers:[2,3,4],w:2,ref:'§8.9',dcTypes:['colo'],
+         tip:'Dedicated meet-me room for carrier-neutral cross-connections between tenants and service providers. Structured cross-connect management with documented patching, diverse pathway options, and carrier demarcation per tenant.'},
+        {id:'tel_dcim',cat:'tel',label:'DCIM platform with capacity planning',tiers:[2,3,4],w:2,ref:'§8.10',dcTypes:['ent','colo','hyper'],
+         tip:'Data Center Infrastructure Management platform providing unified visibility into power, cooling, space, and network capacity. Includes asset tracking, change management, capacity forecasting, and what-if scenario modeling.'},
+        {id:'tel_mod_connectivity',cat:'tel',label:'Pre-terminated trunk cables and quick-connect',tiers:[1,2,3,4],w:1,ref:'§8.11',dcTypes:['mod'],
+         tip:'Factory-terminated trunk cables with MPO/MTP connectors for rapid deployment of modular units. Quick-connect interfaces for power, cooling, and network between modules and site infrastructure. Reduces deployment time from weeks to days.'},
+        {id:'tel_cellular_backup',cat:'tel',label:'Cellular/satellite backup connectivity',tiers:[2,3,4],w:2,ref:'§8.12',dcTypes:['edge'],
+         tip:'Cellular (4G/5G) or satellite (LEO) backup connectivity for edge sites where diverse fiber paths are unavailable. Provides management plane and critical data path redundancy. Includes automatic failover and bandwidth management.'},
+        // Site
+        {id:'site_mod_anchoring',cat:'site',label:'Modular unit anchoring and weather protection',tiers:[1,2,3,4],w:2,ref:'§5.4',dcTypes:['mod'],
+         tip:'Structural anchoring of modular/container units to foundation (concrete pad, steel piers) rated for local wind/seismic loads. Includes weather protection for external connections, cable entry seals, and drainage provisions.'},
+        {id:'site_edge_enclosure',cat:'site',label:'Ruggedized enclosure (IP55+ rated)',tiers:[1,2,3,4],w:2,ref:'§5.5',dcTypes:['edge'],
+         tip:'IP55 or higher rated enclosure providing protection against dust ingress and water jets. Suitable for deployment in non-datacenter environments (retail, factory floor, outdoor). Includes environmental sealing, tamper-resistant locks, and shock/vibration resistance.'},
+        // Security
+        {id:'sec_tenant_isolation',cat:'sec',label:'Multi-tenant cage/suite isolation',tiers:[2,3,4],w:3,ref:'§10.8',dcTypes:['colo'],
+         tip:'Physical isolation between tenant spaces using floor-to-ceiling mesh cages or solid-wall suites with independent access control. Prevents unauthorized inter-tenant access. Includes individual lock systems, CCTV per cage, and access logging.'},
+        {id:'sec_decommission',cat:'sec',label:'Secure equipment decommissioning process',tiers:[2,3,4],w:1,ref:'§10.9',dcTypes:['ent','colo','hyper'],
+         tip:'Documented secure decommissioning process for retired equipment including data sanitization (NIST 800-88), asset tracking, chain of custody, and certificate of destruction. Prevents data leakage from decommissioned drives and hardware.'},
+        {id:'sec_intrusion_detect',cat:'sec',label:'Physical intrusion detection sensors',tiers:[2,3,4],w:2,ref:'§10.10',dcTypes:['edge','mod'],
+         tip:'Door/panel tamper sensors, vibration detectors, and contact switches on all access points of unmanned edge/modular units. Integrated with remote monitoring platform for immediate alerting on unauthorized physical access attempts.'}
     ];
 
     // ═══ STATE ═══
     var currentTier = 3;
+    var currentDcType = 'ent';
     var checkedItems = {};
     var isPremiumUser = false;
     var userTier = 'free';
     var currentMode = 'free';
     var doughnutChart, barChart, radarChart, mcChart;
 
+    function getFilteredItems(catId) {
+        return ITEMS.filter(function(it) {
+            return it.cat === catId
+                && it.tiers.indexOf(currentTier) !== -1
+                && it.dcTypes.indexOf(currentDcType) !== -1;
+        });
+    }
+    function getAllFilteredItems() {
+        return ITEMS.filter(function(it) {
+            return it.tiers.indexOf(currentTier) !== -1
+                && it.dcTypes.indexOf(currentDcType) !== -1;
+        });
+    }
+
     // ═══ RENDER CHECKLIST ═══
     function renderChecklist() {
         var panel = document.getElementById('checklistPanel');
         panel.innerHTML = '';
         CATEGORIES.forEach(function(cat, ci) {
-            var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(currentTier) !== -1; });
+            var items = getFilteredItems(cat.id);
             var checked = items.filter(function(it) { return checkedItems[it.id]; }).length;
             var div = document.createElement('div');
             div.className = 'checklist-category';
@@ -748,7 +862,7 @@
         var catScores = {};
         var totalWeightedScore = 0, totalMaxWeight = 0;
         CATEGORIES.forEach(function(cat) {
-            var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(currentTier) !== -1; });
+            var items = getFilteredItems(cat.id);
             var checkedW = 0, totalW = 0;
             items.forEach(function(it) {
                 totalW += it.w;
@@ -797,12 +911,17 @@
         });
         document.getElementById('metricChecked').textContent = totalChecked;
         document.getElementById('metricApplicable').textContent = totalApplicable;
+        var statCount = document.getElementById('statItemCount');
+        if (statCount) statCount.textContent = totalApplicable;
         document.getElementById('metricCRI').textContent = Math.round(cri);
         document.getElementById('metricTier').textContent = currentTier;
         document.getElementById('metricWeakest').textContent = Math.round(weakestLink) + '%';
         document.getElementById('metricWeakest').style.color = weakestLink >= 75 ? '#10b981' : (weakestLink >= 50 ? '#f59e0b' : '#ef4444');
         document.getElementById('metricMaturity').textContent = 'L' + maturity;
         document.getElementById('metricMaturity').title = maturityLabels[maturity];
+        var dcObj = DC_TYPES.find(function(d){return d.id===currentDcType;});
+        var metricDcEl = document.getElementById('metricDcType');
+        if (metricDcEl && dcObj) metricDcEl.textContent = dcObj.label;
 
         // Category bars
         var barsHtml = '<div class="cat-bars-title"><i class="fas fa-chart-bar" style="color:var(--accent-emerald);"></i> Category Scores</div>';
@@ -823,7 +942,7 @@
         });
 
         // Recommendations (top 3 unchecked high-weight items)
-        var gaps = ITEMS.filter(function(it) { return it.tiers.indexOf(currentTier) !== -1 && !checkedItems[it.id]; });
+        var gaps = getAllFilteredItems().filter(function(it) { return !checkedItems[it.id]; });
         gaps.sort(function(a, b) { return b.w - a.w; });
         var recHtml = '';
         gaps.slice(0, 3).forEach(function(it) {
@@ -979,7 +1098,7 @@
         if (radarChart) radarChart.destroy();
         var tierDatasets = [1,2,3,4].map(function(t) {
             var ds = CATEGORIES.map(function(cat) {
-                var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(t) !== -1; });
+                var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(t) !== -1 && it.dcTypes.indexOf(currentDcType) !== -1; });
                 var cw = 0, tw = 0;
                 items.forEach(function(it) { tw += it.w; if (checkedItems[it.id]) cw += it.w; });
                 return tw > 0 ? Math.round(cw / tw * 100) : 0;
@@ -998,7 +1117,7 @@
         CATEGORIES.forEach(function(cat) {
             tcHtml += '<tr><td style="font-weight:600;">' + cat.label + '</td>';
             [1,2,3,4].forEach(function(t) {
-                var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(t) !== -1; });
+                var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(t) !== -1 && it.dcTypes.indexOf(currentDcType) !== -1; });
                 var cw = 0, tw = 0;
                 items.forEach(function(it) { tw += it.w; if (checkedItems[it.id]) cw += it.w; });
                 var pct = tw > 0 ? Math.round(cw / tw * 100) : 0;
@@ -1028,7 +1147,7 @@
             // Simulate checking this item
             var simScore = 0, simMax = 0;
             CATEGORIES.forEach(function(c2) {
-                var items2 = ITEMS.filter(function(i2){return i2.cat===c2.id && i2.tiers.indexOf(currentTier)!==-1;});
+                var items2 = ITEMS.filter(function(i2){return i2.cat===c2.id && i2.tiers.indexOf(currentTier)!==-1 && i2.dcTypes.indexOf(currentDcType)!==-1;});
                 var cw2 = 0, tw2 = 0;
                 items2.forEach(function(i2){ tw2 += i2.w; if(checkedItems[i2.id] || i2.id === it.id) cw2 += i2.w; });
                 simScore += (tw2 > 0 ? cw2/tw2*100 : 0) * c2.weight;
@@ -1058,7 +1177,7 @@
         for (var i = 0; i < n; i++) {
             var wScore = 0, wMax = 0;
             CATEGORIES.forEach(function(cat) {
-                var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(currentTier) !== -1; });
+                var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(currentTier) !== -1 && it.dcTypes.indexOf(currentDcType) !== -1; });
                 var cw = 0, tw = 0;
                 items.forEach(function(it) {
                     var variance = 1 + (Math.random() - 0.5) * 0.3;
@@ -1087,6 +1206,19 @@
     function setTier(t) {
         currentTier = t;
         document.querySelectorAll('.tier-btn').forEach(function(b, i) { b.classList.toggle('active', i + 1 === t); });
+        renderChecklist();
+        calculate();
+    }
+
+    // ═══ DC TYPE SELECTOR ═══
+    function setDcType(type) {
+        currentDcType = type;
+        document.querySelectorAll('.dctype-btn').forEach(function(b) {
+            b.classList.toggle('active', b.getAttribute('data-dc') === type);
+        });
+        var dcObj = DC_TYPES.find(function(d){return d.id===type;});
+        var statEl = document.getElementById('statDcType');
+        if (statEl && dcObj) statEl.textContent = dcObj.label;
         renderChecklist();
         calculate();
     }
@@ -1227,11 +1359,13 @@
         var weighted = document.getElementById('metricCRI').textContent;
         var gColor = overall >= 85 ? '#10b981' : (overall >= 65 ? '#f59e0b' : '#ef4444');
 
+        var dcTypeLabel = (DC_TYPES.find(function(d){return d.id===currentDcType;}) || {}).label || 'Enterprise';
+
         // SVG Category Bar
         var svgBar = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" style="width:100%;height:auto;">';
         svgBar += '<text x="200" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">Category Compliance Scores</text>';
         CATEGORIES.forEach(function(cat, i) {
-            var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(currentTier) !== -1; });
+            var items = getFilteredItems(cat.id);
             var cw = 0, tw = 0;
             items.forEach(function(it) { tw += it.w; if (checkedItems[it.id]) cw += it.w; });
             var pct = tw > 0 ? Math.round(cw / tw * 100) : 0;
@@ -1245,7 +1379,7 @@
         svgBar += '</svg>';
 
         // Gap table
-        var gaps = ITEMS.filter(function(it) { return it.tiers.indexOf(currentTier) !== -1 && !checkedItems[it.id]; });
+        var gaps = getAllFilteredItems().filter(function(it) { return !checkedItems[it.id]; });
         gaps.sort(function(a, b) { return b.w - a.w; });
         var gapRows = '';
         gaps.forEach(function(it) {
@@ -1274,49 +1408,20 @@
         html += '.pdf-kpi-label{font-size:8px;color:#6b7280;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px}';
         html += '.pdf-footer{margin-top:20px;padding-top:10px;border-top:2px solid #10b981;text-align:center;font-size:8px;color:#94a3b8}';
         html += '</style></head><body>';
-        html += '<div class="pdf-header"><div><h1>TIA-942 Compliance Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO — Pro Analysis</div></div><div class="pdf-date">Generated '+dateStr+'<br>Tier '+currentTier+' Assessment<br>resistancezero.com</div></div>';
+        html += '<div class="pdf-header"><div><h1>TIA-942 Compliance Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO — Pro Analysis</div></div><div class="pdf-date">Generated '+dateStr+'<br>Tier '+currentTier+' · '+dcTypeLabel+' Facility<br>resistancezero.com</div></div>';
         html += '<div class="pdf-score-row"><div class="pdf-score-card"><div class="pdf-score-value">'+Math.round(overall)+'%</div><div class="pdf-score-label">Overall Compliance</div><div style="margin-top:6px;font-size:12px;font-weight:700;color:'+gColor+';">'+gradeText+'</div></div>';
-        html += '<div style="flex:1.2;"><div class="pdf-kpi-grid" style="grid-template-columns:repeat(2,1fr);height:100%;">';
+        html += '<div style="flex:1.2;"><div class="pdf-kpi-grid" style="grid-template-columns:repeat(3,1fr);height:100%;">';
         html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">'+checked+'</div><div class="pdf-kpi-label">Items Checked</div></div>';
         html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">'+applicable+'</div><div class="pdf-kpi-label">Applicable</div></div>';
         html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">'+weighted+'</div><div class="pdf-kpi-label">Risk Index (CRI)</div></div>';
         html += '<div class="pdf-kpi-card"><div class="pdf-kpi-value">Tier '+currentTier+'</div><div class="pdf-kpi-label">Target Level</div></div>';
+        html += '<div class="pdf-kpi-card" style="grid-column:span 2;"><div class="pdf-kpi-value" style="font-size:13px;">'+dcTypeLabel+'</div><div class="pdf-kpi-label">Facility Type</div></div>';
         html += '</div></div></div>';
         html += '<h2>Category Scores</h2><div style="background:#fafbfc;border:1px solid #e5e7eb;border-radius:8px;padding:8px;">'+svgBar+'</div>';
         if (gapRows) { html += '<h2>Gap Analysis</h2><table><tr><th>Priority</th><th>Item</th><th>Category</th><th>Weight</th><th>Ref</th></tr>'+gapRows+'</table>'; }
-        html += '<h2>Methodology</h2><p style="font-size:10px;color:#6b7280;">Compliance scored using weighted item assessment per ANSI/TIA-942-B standard. Category weights: Electrical (1.5×), Mechanical (1.3×), Fire (1.1×), Site/Telecom (1.0×), Security (0.9×). Grade scale: A+ ≥95%, A ≥85%, B ≥75%, C ≥65%, D ≥50%, F &lt;50%. Monte Carlo simulation uses 10,000 iterations with ±15% weight variance.</p>';
+        html += '<h2>Methodology</h2><p style="font-size:10px;color:#6b7280;">Compliance scored using weighted item assessment per ANSI/TIA-942-B standard. Items filtered by facility type ('+dcTypeLabel+') and tier level ('+currentTier+'). Category weights: Electrical (1.5×), Mechanical (1.3×), Fire (1.1×), Site/Telecom (1.0×), Security (0.9×). Grade scale: A+ ≥95%, A ≥85%, B ≥75%, C ≥65%, D ≥50%, F &lt;50%. Monte Carlo simulation uses 10,000 iterations with ±15% weight variance.</p>';
         html += '<div class="pdf-footer">resistancezero.com · Generated '+dateStr+' · All calculations performed client-side · No data transmitted<br>TIA-942 Compliance Checklist v1.0 — Bagus Dwi Permana Portfolio</div>';
-        html += '
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
-
-<script>
-(function(){
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        cb.classList.add('hidden');
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
-})();
-</script>
-</body></html>';
+        html += '</body></html>';
         w.document.write(html); w.document.close();
         setTimeout(function() { w.print(); }, 500);
     }
@@ -1367,5 +1472,25 @@
     });
     </script>
     <script src="rz-tracker.js"></script>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+    <script>
+    (function(){
+        var cb = document.getElementById('cookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) cb.classList.remove('hidden');
+        var acceptBtn = document.getElementById('cookieAccept');
+        var declineBtn = document.getElementById('cookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
+        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+    })();
+    </script>
 </body>
 </html>

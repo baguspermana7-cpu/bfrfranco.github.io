@@ -1578,37 +1578,7 @@
 
         // Footer
         html+='<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #8b5cf6;font-size:8px;color:#94a3b8;">resistancezero.com &middot; Generated '+dateStr+' &middot; All calculations performed client-side &middot; Tier Advisor v1.0 &middot; &copy; 2026 Bagus Dwi Permana</div>';
-        html+='
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
-
-<script>
-(function(){
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        cb.classList.add('hidden');
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
-})();
-</script>
-</body></html>';
+        html+='</body></html>';
         w.document.write(html);
         w.document.close();
         setTimeout(function(){w.print();},600);
@@ -1809,5 +1779,25 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" onload="if(typeof onChartsReady==='function')onChartsReady();" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation" defer></script>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+    <script>
+    (function(){
+        var cb = document.getElementById('cookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) cb.classList.remove('hidden');
+        var acceptBtn = document.getElementById('cookieAccept');
+        var declineBtn = document.getElementById('cookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
+        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+    })();
+    </script>
 </body>
 </html>

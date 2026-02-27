@@ -459,6 +459,8 @@ CORRECT:
 ### Rule 2: Never place `</script>` inside JS string literals
 The HTML parser terminates `<script>` blocks at the FIRST `</script>` it encounters, regardless of JS string context. Use `<\/script>` or string concatenation instead.
 
+**Real-world bug (fixed 2026-02-27)**: `tia-942-checklist.html` and `tier-advisor.html` had cookie consent HTML (including `<script>...</script>`) concatenated into the PDF export string (`html += '...'`). The `</script>` inside the string closed the MAIN script block, breaking all functions defined after it (auth, tooltips, DOMContentLoaded). Fix: move cookie HTML+JS to a separate block after the main `</script>`, matching the roi-calculator.html pattern.
+
 ### Rule 3: Multi-line strings in JS must use backticks or concatenation
 Single-quoted strings (`'...'`) cannot contain raw newlines. If a batch script splits a string across lines, it creates "Invalid or unexpected token" errors.
 

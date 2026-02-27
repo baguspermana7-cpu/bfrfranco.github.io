@@ -472,6 +472,21 @@
         <div class="hero-badge"><i class="fas fa-chart-line"></i> Financial Analysis Tool</div>
         <h1>DC ROI Calculator</h1>
         <p>Comprehensive investment return analysis with NPV, IRR, payback period, and year-by-year cashflow projections for data center investments</p>
+        <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(59,130,246,0.15);">
+            <img src="assets/roi-calculator-hero.webp" alt="Data Center ROI Calculator — NPV, IRR and Cashflow Analysis" style="width:100%;height:auto;display:block;" loading="lazy">
+        </div>
+        <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(59,130,246,0.04);border:1px solid rgba(59,130,246,0.12);border-radius:12px;">
+            <h3 style="font-size:0.95rem;font-weight:700;color:#1d4ed8;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#3b82f6;"></i> About This Calculator</h3>
+            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">
+                Data center investments range from <strong>$10M to $1B+</strong> with 15-25 year asset lifespans, making rigorous financial modeling essential. This calculator projects <strong>Net Present Value (NPV)</strong>, <strong>Internal Rate of Return (IRR)</strong>, <strong>Profitability Index</strong>, and <strong>payback period</strong> using discounted cash flow analysis tailored to data center economics.
+            </p>
+            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.5rem 0;">
+                The model accounts for <strong>occupancy ramp-up curves</strong>, tiered pricing, power cost escalation, and operational expenditure growth. Revenue inputs support colocation pricing (per kW/month) and wholesale lease structures. The <strong>Monte Carlo simulation</strong> (PRO) runs 10,000 iterations with variance on occupancy, pricing, and OPEX to quantify investment risk and generate probability distributions for key financial metrics.
+            </p>
+            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">
+                Financial assumptions follow industry conventions for <strong>WACC (8-12%)</strong>, depreciation schedules, and terminal value calculations. Results should be validated against site-specific feasibility studies and reviewed by qualified financial professionals.
+            </p>
+        </div>
         <div class="quick-stats">
             <span class="quick-stat"><i class="fas fa-calculator"></i> NPV / IRR / PI</span>
             <span class="quick-stat"><i class="fas fa-chart-area"></i> Year-by-year cashflow</span>
@@ -968,11 +983,7 @@
         var pdfBtn = document.getElementById('btnExportPDF');
         if (pdfBtn) pdfBtn.classList.remove('disabled');
         updateNavbarAuthUI();
-        if (currentMode === 'pro') {
-            var proSection = document.getElementById('proPanelsSection');
-            if (proSection) proSection.classList.remove('locked');
-        }
-        calculate();
+        setMode('pro');
     }
 
     // ══════════════════════════════════════════════════════════════

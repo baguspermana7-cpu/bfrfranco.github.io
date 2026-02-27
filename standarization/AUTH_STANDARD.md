@@ -179,9 +179,24 @@ try {
 } catch(e) { session = null; }
 var isPremium = !!session;
 
-// If premium on load, unlock panels immediately
+// If premium on load, unlock panels AND switch to Pro mode
 if (isPremium) {
-  unlockPanels();
+  activatePremiumUI();  // must call setMode('pro')
+}
+```
+
+### `activatePremiumUI()` Pattern (standalone calculators)
+
+Every standalone calculator's `activatePremiumUI()` function MUST call `setMode('pro')`. This ensures Pro panels auto-populate with data when a stored session is detected on page load. Without it, `currentMode` stays `'free'` and `calculate()` skips Pro panel updates.
+
+```js
+function activatePremiumUI() {
+    var proBtn = document.getElementById('btnProMode');
+    if (proBtn) proBtn.classList.remove('locked-hint');
+    var pdfBtn = document.getElementById('btnExportPDF');
+    if (pdfBtn) pdfBtn.classList.remove('disabled');
+    updateNavbarAuthUI();
+    setMode('pro');  // REQUIRED — triggers calculate() which populates Pro panels
 }
 ```
 
@@ -202,3 +217,5 @@ if (isPremium) {
 |------|-----|-----|
 | 2026-02-16 | Login button visible when already logged in | Added `rz-auth-change` listener to auth.js `updateAuthUI()` |
 | 2026-02-16 | No demo hint in auth.js global modal | Added demo credentials div after Sign In button |
+| 2026-02-27 | ROI calculator Pro panels show "--" on page load with stored session | `activatePremiumUI()` was missing `setMode('pro')` call — added it |
+| 2026-02-27 | tia-942 & tier-advisor: auth/tooltips/DOMContentLoaded broken | `</script>` in PDF export string closed main script block — moved cookie HTML to separate block |
