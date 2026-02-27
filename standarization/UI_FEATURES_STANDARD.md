@@ -599,6 +599,135 @@ CSS uses `!important` to override legacy inline color styles on older disclaimer
 
 ---
 
+## Calculator Hero Section Standard
+
+> **Added**: 2026-02-28
+
+### Requirement
+ALL standalone calculator pages MUST have a hero section with three components:
+1. **Hero image** (WebP, `loading="lazy"`)
+2. **About/Brief box** (page-accent-colored info box)
+3. **Quick stats** (4 stat pills)
+
+### Deployed On
+All 9 standalone calculator pages: pue, capex, opex, roi, carbon-footprint, datahallAI, dc-conventional, tia-942-checklist, tier-advisor.
+
+### Hero Image Rules
+- **Format**: WebP (convert from PNG/JPG with Pillow `quality=80`, typically 90-96% size reduction)
+- **Location**: `assets/[calculator-name]-hero.webp`
+- **HTML**: Max-width 800px container with accent-colored border, rounded corners, lazy loading
+- **Alt text**: Descriptive, includes calculator name and key feature
+
+```html
+<div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(ACCENT_RGB,0.15);">
+    <img src="assets/[name]-hero.webp" alt="[Descriptive alt text]" style="width:100%;height:auto;display:block;" loading="lazy">
+</div>
+```
+
+### About/Brief Box Rules
+- **Position**: Between hero image and quick-stats
+- **Heading**: "About This Calculator" (or "What is [X]?" for concept-specific tools like PUE)
+- **Accent color**: Match the page's accent color (green for carbon, blue for ROI, cyan for PUE, etc.)
+- **Content**: 2-3 paragraphs covering:
+  1. Why this metric/analysis matters, with industry context and numbers
+  2. What the calculator models (tabs, features, methodology)
+  3. Data sources and standards referenced
+- **No asterisks/bold markdown** — use `<strong>` tags inline
+
+```html
+<div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(ACCENT_RGB,0.04);border:1px solid rgba(ACCENT_RGB,0.12);border-radius:12px;">
+    <h3 style="font-size:0.95rem;font-weight:700;color:DARK_ACCENT;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-info-circle" style="color:ACCENT;"></i> About This Calculator
+    </h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">...</p>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.5rem 0;">...</p>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">...</p>
+</div>
+```
+
+### Per-Calculator Accent Colors
+
+| Calculator | Accent RGB | Dark Accent | Border Color |
+|-----------|-----------|-------------|-------------|
+| PUE | `6,182,212` | `#164e63` | cyan |
+| CAPEX | `245,158,11` | `#92400e` | amber |
+| OPEX | `16,185,129` | `#065f46` | emerald |
+| ROI | `59,130,246` | `#1d4ed8` | blue |
+| Carbon Footprint | `34,197,94` | `#15803d` | green |
+| TIA-942 | `16,185,129` | `#065f46` | emerald |
+| Tier Advisor | `99,102,241` | `#3730a3` | indigo |
+| DataHall AI | `139,92,246` | `#5b21b6` | purple |
+| DC Conventional | `6,182,212` | `#164e63` | cyan |
+
+### Hero Image Assets
+
+| Calculator | Asset Path | Format | Size |
+|-----------|-----------|--------|------|
+| PUE | `assets/pue-calculator-hero.jpg` | JPG | — |
+| Carbon Footprint | `assets/carbon-footprint-hero.webp` | WebP | 291 KB |
+| ROI | `assets/roi-calculator-hero.webp` | WebP | 611 KB |
+| TIA-942 | `assets/tia-942-hero.jpg` | JPG | — |
+| CAPEX | `assets/capex-og.jpg` | JPG (OG only) | — |
+| OPEX | `assets/opex-og.jpg` | JPG (OG only) | — |
+
+### Section Order in Hero
+```
+1. .hero-badge (icon + label)
+2. h1 (calculator title)
+3. p (one-line description)
+4. Hero image (WebP, lazy)
+5. About box (2-3 paragraphs)
+6. .quick-stats (4 pills)
+```
+
+---
+
+## Facility Type Selector Standard (TIA-942)
+
+> **Added**: 2026-02-28
+
+The TIA-942 checklist supports 5 facility types alongside 4 tier levels. Each checklist item has a `dcTypes` array property filtering visibility per DC type.
+
+### DC Types
+| ID | Label | Icon | Color |
+|---|---|---|---|
+| `ent` | Enterprise | `fa-building` | `#3b82f6` |
+| `colo` | Colocation | `fa-city` | `#8b5cf6` |
+| `hyper` | Hyperscale/Cloud | `fa-cloud` | `#06b6d4` |
+| `edge` | Edge/Micro | `fa-microchip` | `#f59e0b` |
+| `mod` | Modular/Prefab | `fa-cube` | `#10b981` |
+
+### UI Pattern
+- Pill-bar selector matching tier selector visual language
+- Label above bar with icon (reuses `.dctype-label` class)
+- Active button: white bg + shadow + accent border
+- Mobile: wraps 2 per row at `max-width:768px`
+- Hidden in print CSS
+
+### Data Model
+- `DC_ALL = ['ent','colo','hyper','edge','mod']` constant for items applying to all types
+- Each item: `dcTypes: DC_ALL` or subset (e.g., `['ent','colo','hyper']`)
+- Helpers: `getFilteredItems(catId)`, `getAllFilteredItems()` filter by both `currentTier` and `currentDcType`
+- All scoring, charts, Monte Carlo, PDF export use dcType-aware filters
+
+### Item Counts at Tier 3
+| Type | Items |
+|---|---|
+| Enterprise | 59 |
+| Colocation | 64 |
+| Hyperscale | 65 |
+| Edge | 31 |
+| Modular | 38 |
+
+### Lessons Learned
+- **Selector labels must be consistent** — if one selector has a label, all should
+- **Results panel needs context** — add metric box for selected filter so scrolled-down users know context
+- **Dynamic hero stats** — update item count and type label via `calculate()` on every filter change
+- **PDF KPI orphan cards** — when adding Nth KPI card to a grid, use `grid-column:span 2` or switch columns to avoid orphan. Never leave a cell alone in a row
+- **`cat-body` max-height** — with 85 items, bump accordion max-height to 3000px
+
+---
+
 ## Dark Mode Support
 
 All features support dark mode via `[data-theme="dark"]` selectors:

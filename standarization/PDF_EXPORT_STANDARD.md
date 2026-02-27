@@ -179,7 +179,9 @@ If a section only has 1 chart, create a complementary analysis to fill the adjac
 - Tornado alone → add top-3 drivers table beside it
 
 ### Rule 3: KPI Grid Layout
-KPIs should use 3-4 column grids, never a single centered column:
+KPIs should use 3-4 column grids, never a single centered column.
+
+**Orphan card rule (added 2026-02-28)**: If the number of KPI cards is NOT evenly divisible by the column count, use `grid-column: span 2` on the last card to fill the remaining space, or switch to a column count that divides evenly. Example: 5 cards in a 3-col grid → last card spans 2 columns (3+2 layout). Never leave a single card alone in a row.
 
 ```css
 .pdf-kpi-grid {
