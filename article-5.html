@@ -3491,8 +3491,8 @@
         window.debtHandleLogin = function() {
             var email = document.getElementById('debtLoginEmail').value.trim();
             var pass = document.getElementById('debtLoginPass').value;
-            if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
-                var session = { email: email, tier: 'pro', role: 'pro', expires: new Date(Date.now() + 30*86400000).toISOString() };
+            if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
+                var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 30*86400000).toISOString() };
                 localStorage.setItem('rz_premium_session', JSON.stringify(session));
                 isDebtPremium = true;
                 debtHideLogin();
@@ -4180,7 +4180,7 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 <script>
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">✓ Subscribed successfully!</p>';return false}
 </script>
-<script src="auth.js?v=20260225"></script>
+<script src="auth.js?v=20260228"></script>
 <script src="rz-tracker.js"></script>
 
 <!-- Cookie Consent Banner -->

@@ -3015,7 +3015,9 @@
             var errEl = document.getElementById('alarmLoginError');
             if (!email || !password) { errEl.textContent = 'Please enter email and password'; errEl.style.display = 'block'; return; }
             var validUsers = [
-                { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' }
+                { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },
+                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
+                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }
             ];
             var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
             if (match) {
@@ -4308,7 +4310,7 @@ function finalizeMC(results, N) {
 <script>
 function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
 </script>
-<script src="auth.js?v=20260225"></script>
+<script src="auth.js?v=20260228"></script>
 <script src="rz-tracker.js"></script>
 
 <!-- Cookie Consent Banner -->

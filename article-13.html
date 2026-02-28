@@ -5046,8 +5046,8 @@ function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelec
     window.aigDoLogin = function() {
         var email = $('aigLoginEmail').value.trim().toLowerCase();
         var pass = $('aigLoginPass').value;
-        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
-            var session = { email: email, tier: 'pro', role: 'pro', expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+        if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
+            var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
             localStorage.setItem('rz_premium_session', JSON.stringify(session));
             window.dispatchEvent(new Event('rz-auth-change'));
             aigHideLogin();
@@ -5760,7 +5760,7 @@ function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelec
     }
 })();
 </script>
-<script src="auth.js?v=20260225"></script>
+<script src="auth.js?v=20260228"></script>
 <script src="rz-tracker.js"></script>
 
 <!-- Cookie Consent Banner -->

@@ -839,6 +839,123 @@
             margin-top: 0.15rem;
         }
 
+        /* Article Navigation */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+        .article-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #059669;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+        .article-nav a:hover { color: #10b981; }
+
+        /* Dark Mode Overrides */
+        [data-theme="dark"] .article-content {
+            background: var(--bg, #0f172a);
+        }
+        [data-theme="dark"] .article-body {
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .article-body h2 {
+            color: #34d399;
+            border-bottom-color: rgba(52,211,153,0.3);
+        }
+        [data-theme="dark"] .article-body h3 {
+            color: #10b981;
+        }
+        [data-theme="dark"] .article-body h4 {
+            color: #34d399;
+        }
+        [data-theme="dark"] .article-body blockquote {
+            background: rgba(16,185,129,0.1);
+            color: #6ee7b7;
+        }
+        [data-theme="dark"] .warning-box {
+            background: rgba(245,158,11,0.1);
+            color: #fbbf24;
+        }
+        [data-theme="dark"] .critical-box {
+            background: rgba(220,38,38,0.1);
+            color: #fca5a5;
+        }
+        [data-theme="dark"] .positive-box {
+            background: rgba(16,185,129,0.1);
+            color: #6ee7b7;
+        }
+        [data-theme="dark"] .comparison-card {
+            background: rgba(30,41,59,0.6);
+            border-color: rgba(148,163,184,0.15);
+        }
+        [data-theme="dark"] .comparison-card .value {
+            color: #e2e8f0;
+        }
+        [data-theme="dark"] .comparison-card.threat {
+            background: rgba(220,38,38,0.08);
+            border-color: rgba(220,38,38,0.2);
+        }
+        [data-theme="dark"] .comparison-card.safe {
+            background: rgba(16,185,129,0.08);
+            border-color: rgba(16,185,129,0.2);
+        }
+        [data-theme="dark"] .comparison-card h5,
+        [data-theme="dark"] .unit {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .country-table td,
+        [data-theme="dark"] .data-table td {
+            border-color: rgba(255,255,255,0.08);
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .country-table tr:hover,
+        [data-theme="dark"] .data-table tr:hover {
+            background: rgba(16,185,129,0.08);
+        }
+        [data-theme="dark"] .status-badge.active {
+            background: rgba(16,185,129,0.15);
+            color: #34d399;
+        }
+        [data-theme="dark"] .status-badge.partial {
+            background: rgba(245,158,11,0.15);
+            color: #fbbf24;
+        }
+        [data-theme="dark"] .status-badge.none {
+            background: rgba(148,163,184,0.1);
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .timeline-title {
+            color: #e2e8f0;
+        }
+        [data-theme="dark"] .timeline-date,
+        [data-theme="dark"] .timeline-desc {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .timeline-item::before {
+            border-color: #1e293b;
+        }
+        [data-theme="dark"] .references {
+            background: rgba(30,41,59,0.6);
+        }
+        [data-theme="dark"] .references h3 {
+            color: #34d399;
+        }
+        [data-theme="dark"] .references ol {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .ref-source { color: #64748b; }
+        [data-theme="dark"] .article-nav {
+            border-top-color: rgba(255,255,255,0.08);
+        }
+        [data-theme="dark"] .article-nav a { color: #34d399; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -847,6 +964,7 @@
             .survival-calculator { padding: 1.5rem; }
             .calc-grid { grid-template-columns: 1fr; }
             .comparison-grid { grid-template-columns: 1fr; }
+            .article-nav { flex-direction: column; gap: 1rem; }
             .tooltip-icon::after {
                 left: auto;
                 right: 0;
@@ -1932,6 +2050,16 @@
                     </div>
                 </div>
 
+                <div class="calc-disclaimer" style="border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
+                    <h4 class="disc-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Disclaimer & Data Sources
+                    </h4>
+                    <p class="disc-text">This calculator provides <strong>educational estimates only</strong> and should not replace professional emergency planning guidance. Actual preparedness needs vary by household size, location, and specific risk factors.</p>
+                    <p class="disc-text"><strong>Algorithm & Methodology:</strong> Cost estimates based on 2026 average retail prices. Water requirements follow WHO minimum standards (2.5-3L/person/day). Food calculations based on BNPB emergency preparedness guidelines. Supply duration recommendations aligned with Swedish MSB "Om krisen eller kriget kommer" framework.</p>
+                    <p class="disc-text">All calculations run entirely in your browser — no data is collected or transmitted. <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms & Disclaimer</a></p>
+                </div>
+
                 <h2>6. Why Governments Are Acting Now</h2>
 
                 <p>The simultaneous global push for civilian preparedness reflects several converging assessments:</p>
@@ -2003,7 +2131,7 @@
 
                 
                 <!-- Independence Disclaimer -->
-                <div style="margin:2rem 0 0;padding:1rem 0;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
+                <div style="margin:2rem 0 0;padding:1rem 0;border-top:1px solid rgba(0,0,0,0.08);text-align:center;">
                     <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#8b5cf6;">Terms &amp; Disclaimer</a></p>
                 </div>
 
@@ -2090,14 +2218,68 @@
                 </div>
 
                 <!-- Author Bio -->
-                <div class="author-bio" style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; display: flex; gap: 1.5rem; align-items: center;">
-                    <div style="flex-shrink: 0;">
-                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                <div class="author-bio">
+                    <div class="author-bio-image">
+                        <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
                     </div>
-                    <div>
-                        <h4 style="margin: 0 0 0.5rem 0; color: #1e293b;">Bagus Dwi Permana</h4>
-                        <p style="margin: 0; color: #64748b; font-size: 0.9rem;">Engineering Operations Manager with expertise in critical infrastructure resilience. This analysis draws on infrastructure management experience and ongoing monitoring of global security developments affecting operational continuity.</p>
+                    <div class="author-bio-content">
+                        <h4>Bagus Dwi Permana</h4>
+                        <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
+                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. This analysis draws on infrastructure management experience and ongoing monitoring of global security developments affecting operational continuity.</p>
+                        <div class="author-bio-links">
+                            <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                                LinkedIn
+                            </a>
+                            <a href="https://github.com/baguspermana7-cpu" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                                GitHub
+                            </a>
+                            <a href="mailto:baguspermana7@gmail.com">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                Email
+                            </a>
+                        </div>
                     </div>
+                </div>
+
+                <div class="related-articles">
+                    <h3>Continue Reading</h3>
+                    <div class="related-grid">
+                        <a href="article-10.html" class="related-card">
+                            <div class="related-card-number">10</div>
+                            <div class="related-card-content">
+                                <h4>Water Stress and AI Data Centers</h4>
+                                <p>How cooling demands are reshaping water resource planning</p>
+                            </div>
+                        </a>
+                        <a href="article-5.html" class="related-card">
+                            <div class="related-card-number">05</div>
+                            <div class="related-card-content">
+                                <h4>The Silent Crisis: Fire Safety</h4>
+                                <p>Critical infrastructure protection gaps in modern data centers</p>
+                            </div>
+                        </a>
+                        <a href="article-13.html" class="related-card">
+                            <div class="related-card-number">13</div>
+                            <div class="related-card-content">
+                                <h4>Asia Pacific Data Center Boom</h4>
+                                <p>Geopolitical forces driving regional infrastructure expansion</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article Navigation -->
+                <div class="article-nav">
+                    <a href="geopolitics.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Geopolitics Hub
+                    </a>
+                    <a href="articles.html">
+                        All Articles
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
 
             </div>
@@ -3062,7 +3244,7 @@
 })();
 </script>
 
-<script src="auth.js?v=20260225"></script>
+<script src="auth.js?v=20260228"></script>
 <script src="rz-tracker.js"></script>
 
     <!-- Share Buttons - Floating Sidebar -->

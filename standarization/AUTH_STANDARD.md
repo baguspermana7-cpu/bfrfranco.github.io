@@ -44,12 +44,14 @@
 
 ## Valid Credentials
 
-| Email | Password | Tier | Source |
-|-------|----------|------|--------|
-| `bagus@resistancezero.com` | *(server-side only)* | pro | Supabase (planned) |
-| `admin@resistancezero.com` | *(server-side only)* | pro | Supabase (planned) |
-| `demo@resistancezero.com` | `demo2026` | pro | Hardcoded in auth.js |
-| *(manual accounts)* | *(varies)* | *(varies)* | `rz_manual_accounts` localStorage |
+| Email | Password | Tier | Role | Source |
+|-------|----------|------|------|--------|
+| `bagus@resistancezero.com` | `RZ@Premium2026!` | pro | root | Hardcoded in auth.js + all pages |
+| `admin@resistancezero.com` | `RZ@Premium2026!` | pro | root | Hardcoded in auth.js + all pages |
+| `demo@resistancezero.com` | `demo2026` | pro | pro | Hardcoded in auth.js + all pages |
+| *(manual accounts)* | *(varies)* | *(varies)* | pro | `rz_manual_accounts` localStorage |
+
+**Root** = full pro access + rz-ops admin console. **Pro** = calculator pro features only (no rz-ops access).
 
 **Demo account** is the primary test/showcase credential.
 

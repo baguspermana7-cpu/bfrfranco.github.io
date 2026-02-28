@@ -23,7 +23,9 @@
 
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
-        { email: 'demo@resistancezero.com',  password: 'demo2026',        tier: 'pro', role: 'pro' }
+        { email: 'demo@resistancezero.com',  password: 'demo2026',        tier: 'pro', role: 'pro' },
+        { email: 'bagus@resistancezero.com',  password: 'RZ@Premium2026!', tier: 'pro', role: 'root' },
+        { email: 'admin@resistancezero.com',  password: 'RZ@Premium2026!', tier: 'pro', role: 'root' }
     ];
 
     /* Also check manually-created accounts stored in localStorage by admin */
@@ -36,9 +38,10 @@
 
     function findUser(email, password) {
         var e = email.toLowerCase().trim();
+        var p = password.trim();
         var match = null;
         VALID_USERS.forEach(function (u) {
-            if (u.email === e && u.password === password) {
+            if (u.email === e && u.password === p) {
                 match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
             }
         });
@@ -46,7 +49,7 @@
         /* Check manual accounts */
         var manuals = getManualAccounts();
         manuals.forEach(function (u) {
-            if (u.email.toLowerCase() === e && u.password === password) {
+            if (u.email.toLowerCase() === e && u.password === p) {
                 match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
             }
         });
