@@ -3092,6 +3092,28 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
+        .hist-axis {
+            margin-top: 0.2rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.24rem;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hist-axis span:nth-child(1) { text-align: left; }
+        .hist-axis span:nth-child(2) { text-align: center; }
+        .hist-axis span:nth-child(3) { text-align: right; }
+
+        .hist-yhint {
+            margin-top: 0.14rem;
+            font-size: 0.58rem;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
         .sankey-canvas {
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -3147,10 +3169,11 @@
             position: fixed;
             inset: 0;
             display: none;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            z-index: 10045;
+            z-index: 200000;
             padding: 0.9rem;
+            overflow-y: auto;
         }
 
         .sankey-drill-modal.open {
@@ -3160,15 +3183,18 @@
         .sankey-drill-backdrop {
             position: absolute;
             inset: 0;
+            z-index: 0;
             background: rgba(2, 6, 23, 0.66);
             backdrop-filter: blur(3px);
         }
 
         .sankey-drill-card {
             position: relative;
-            width: min(1180px, calc(100vw - 1rem));
-            max-height: calc(100vh - 1rem);
+            z-index: 2;
+            width: min(1360px, calc(100vw - 0.5rem));
+            max-height: calc(100vh - 0.5rem);
             overflow: auto;
+            margin: 0 auto;
             border-radius: 14px;
             border: 1px solid rgba(148, 163, 184, 0.3);
             background: #0b1531;
@@ -3182,8 +3208,14 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 0.72rem;
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: rgba(11, 21, 49, 0.96);
+            backdrop-filter: blur(3px);
             margin-bottom: 0.55rem;
             padding-bottom: 0.52rem;
+            padding-right: 2.6rem;
             border-bottom: 1px dashed rgba(148, 163, 184, 0.4);
         }
 
@@ -3210,11 +3242,17 @@
 
         .sankey-drill-grid {
             display: grid;
-            grid-template-columns: minmax(0, 2.15fr) minmax(0, 1.35fr);
+            grid-template-columns: minmax(0, 2.75fr) minmax(300px, 1fr);
+            grid-template-areas:
+                "canvas sens"
+                "formula split"
+                "notes split";
             gap: 0.62rem;
+            align-items: start;
         }
 
         .sankey-drill-canvas {
+            grid-area: canvas;
             border: 1px solid rgba(148, 163, 184, 0.24);
             border-radius: 11px;
             background: rgba(15, 23, 42, 0.58);
@@ -3222,9 +3260,48 @@
             overflow: auto;
         }
 
+        .sankey-drill-modal-close {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 200010;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 76px;
+            font-weight: 800;
+            color: #f8fafc !important;
+            background: rgba(15, 23, 42, 0.95) !important;
+            border: 1px solid rgba(148, 163, 184, 0.85) !important;
+            visibility: visible;
+            opacity: 1;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.45);
+        }
+
+        .sankey-drill-card-close {
+            position: absolute;
+            top: 0.42rem;
+            right: 0.42rem;
+            z-index: 6;
+            border: 1px solid rgba(239, 68, 68, 0.88);
+            background: rgba(127, 29, 29, 0.94);
+            color: #fef2f2;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.2rem 0.56rem;
+            cursor: pointer;
+        }
+
+        .sankey-drill-card-close:hover,
+        .sankey-drill-card-close:focus {
+            background: rgba(153, 27, 27, 0.97);
+            outline: none;
+        }
+
         .sankey-drill-svg {
             width: 100%;
-            min-width: 680px;
+            min-width: 560px;
             height: auto;
             display: block;
             color: #cbd5e1;
@@ -3352,9 +3429,23 @@
         }
 
         .sankey-drill-side {
-            display: grid;
-            gap: 0.56rem;
-            align-content: start;
+            display: contents;
+        }
+
+        .sankey-drill-side > .sankey-drill-panel:nth-of-type(1) {
+            grid-area: sens;
+        }
+
+        .sankey-drill-side > .sankey-drill-panel:nth-of-type(2) {
+            grid-area: split;
+        }
+
+        .sankey-drill-side > .sankey-drill-panel:nth-of-type(3) {
+            grid-area: formula;
+        }
+
+        .sankey-drill-side > .sankey-drill-panel:nth-of-type(4) {
+            grid-area: notes;
         }
 
         .sankey-drill-panel {
@@ -3783,6 +3874,17 @@
 
             .sankey-drill-grid {
                 grid-template-columns: 1fr;
+                grid-template-areas:
+                    "canvas"
+                    "sens"
+                    "split"
+                    "formula"
+                    "notes";
+            }
+
+            .sankey-drill-modal-close {
+                top: 0.6rem;
+                right: 0.7rem;
             }
 
             .mode-help-modal {
@@ -3808,7 +3910,7 @@
             }
 
             .sankey-drill-svg {
-                min-width: 620px;
+                min-width: 520px;
             }
         }
 
@@ -3939,7 +4041,7 @@
             }
 
             .sankey-drill-svg {
-                min-width: 520px;
+                min-width: 460px;
             }
 
             .cookie-banner {
@@ -5064,7 +5166,9 @@
 
                     <div class="sankey-drill-modal" id="sankeyDrillModal" aria-hidden="true">
                         <div class="sankey-drill-backdrop" data-sankey-modal-close></div>
+                        <button class="btn-secondary btn-chip sankey-drill-modal-close" id="sankeyDrillCloseTop" type="button" data-sankey-modal-close>Close</button>
                         <section class="sankey-drill-card" role="dialog" aria-modal="true" aria-labelledby="sankeyDrillTitle">
+                            <button class="sankey-drill-card-close" id="sankeyDrillCloseCard" type="button" data-sankey-modal-close>&times; Close</button>
                             <header class="sankey-drill-head">
                                 <div>
                                     <h4 id="sankeyDrillTitle">Sankey Drill-Down</h4>
@@ -5251,6 +5355,17 @@
                                     <option value="live_optimized">Current Optimized Model</option>
                                     <option value="live_baseline">Current Baseline Model</option>
                                 </select>
+                            </div>
+                            <div class="field">
+                                <label for="pdfQualityMode">PDF Compute Quality</label>
+                                <select id="pdfQualityMode">
+                                    <option value="full" selected>Full (Comprehensive)</option>
+                                    <option value="fast">Fast (Preview)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="pdfRandomSeed">Random Seed (Optional)</label>
+                                <input id="pdfRandomSeed" type="number" min="1" step="1" placeholder="e.g. 20260228">
                             </div>
                         </div>
                         <div class="inline-actions">
@@ -5791,6 +5906,8 @@
                 pdfSingleSource: { title: 'PDF Single Source', desc: 'Chooses model source for single PDF report generation.', formula: 'Ref: resolveModelSource(pdfSingleSource).' },
                 pdfCompareLeft: { title: 'PDF Compare Left Source', desc: 'Left-side reference source in compare PDF report.', formula: 'Ref: compare delta is Right - Left.' },
                 pdfCompareRight: { title: 'PDF Compare Right Source', desc: 'Right-side candidate source in compare PDF report.', formula: 'Ref: compare delta is Right - Left.' },
+                pdfQualityMode: { title: 'PDF Compute Quality', desc: 'Controls stochastic depth during PDF build. Full mode uses higher Monte Carlo/Pareto coverage for comprehensive audit reports; Fast mode reduces compute for quick preview.', formula: 'Ref: quality preset controls Monte Carlo samples and Pareto candidate count used in report generation.' },
+                pdfRandomSeed: { title: 'Random Seed', desc: 'Optional deterministic seed for Monte Carlo and Pareto generation. Use the same seed and inputs to reproduce the same report stochastic envelope.', formula: 'Ref: seeded RNG drives stochastic candidate sampling in report pipelines.' },
                 ruleG1: { title: 'Rule G1', desc: 'DSL expression for sensor-quality gate decision. Evaluates to OPEN/ADJ state in control diagram.', formula: 'Variables: monitoring, controlIndex, deltaT, pumpPowerPctIt, riskIndex, pue, targetPue, cop, targetCop.' },
                 ruleG2: { title: 'Rule G2', desc: 'DSL expression for actuator-limit gate decision. Used to decide whether hydraulic/thermal actuation is within tolerance.', formula: 'Expression must resolve to boolean true/false.' },
                 ruleG3: { title: 'Rule G3', desc: 'DSL expression for risk-guard gate decision. Governs final pass/action state in control loop.', formula: 'Expression must resolve to boolean true/false.' },
@@ -5816,7 +5933,14 @@
                 rackDensity: { title: 'Rack Density', desc: 'Computed average rack density from IT load and rack count. Compared against design targets for planning.', formula: 'Formula: rackDensity = IT_kW / rackCount.' },
                 riskIndex: { title: 'Risk Index', desc: 'Composite operational risk indicator based on redundancy, safety strategy, density stress, and controls. Lower is better.', formula: 'Ref: weighted modifier logic with bounds 0-100.' },
                 confidence: { title: 'Data Confidence', desc: 'Confidence indicator for model trust based on telemetry richness and assumption quality. Higher confidence suggests stronger decision support.', formula: 'Ref: weighted by monitoring, controls, and parameter stability.' },
-                calibrationFit: { title: 'Calibration Fit', desc: 'Fit score indicating how closely calibrated model output matches telemetry targets. Higher fit means lower weighted error.', formula: 'Formula: fit = 100 * exp(-error * factor).' }
+                calibrationFit: { title: 'Calibration Fit', desc: 'Fit score indicating how closely calibrated model output matches telemetry targets. Higher fit means lower weighted error.', formula: 'Formula: fit = 100 * exp(-error * factor).' },
+                deltaT: { title: 'Thermal Delta-T', desc: 'Effective liquid temperature lift between return and supply. Delta-T directly controls required mass flow and pump overhead.', formula: 'Formula: deltaT = returnTemp - supplyTemp (with control/future modifiers).' },
+                pumpPowerPctIt: { title: 'Pump % of IT', desc: 'Pump electrical overhead as a percentage of IT load. Used as a governance guardrail for hydraulic efficiency.', formula: 'Formula: pumpPowerPctIt = (pumpPowerKw / itKw) * 100.' },
+                paretoFrontier: { title: 'Pareto Frontier', desc: 'Set of non-dominated operating points balancing efficiency, cost, carbon, and risk objectives under active constraints.', formula: 'Ref: frontier point is retained when no other candidate is better in all objectives.' },
+                monteCarlo: { title: 'Monte Carlo Uncertainty', desc: 'Uncertainty propagation run that perturbs key inputs and reports percentile envelopes for KPI robustness checks.', formula: 'Ref: repeated random perturbation over selected inputs (P10/P50/P90 and tail percentiles).' },
+                hardConstraintCheck: { title: 'Hard Constraint Check', desc: 'Feasibility gate ensuring PUE/COP/Risk/Pump-overhead limits are respected when enforcement is enabled.', formula: 'Constraint set: pue<=max, cop>=min, risk<=max, pumpPct<=max.' },
+                gateState: { title: 'Control Gate State', desc: 'Logical OPEN/LIMIT/ACTION outcomes from rule engine (G1/G2/G3) that determine allowed control envelope.', formula: 'Ref: DSL evaluation of ruleG1/ruleG2/ruleG3 against live model context.' },
+                sankeyDrill: { title: 'Sankey Drill Mode', desc: 'Expanded decomposition of selected Sankey node into parameter-sensitivity, solver split, formula trace, and engineering notes.', formula: 'Ref: selected-node envelope is redistributed by local sensitivity and role-weight allocation.' }
             };
 
             var BENCHMARK_HINTS = {
@@ -5984,7 +6108,33 @@
             };
             var blockPopupState = { open: false, key: '', explorerKey: 'input', trigger: null };
             var sankeyDrillState = { open: false, nodeId: '', trigger: null };
+            var sankeyModalLockY = 0;
             var modeHelpState = { open: false, key: '', trigger: null };
+            var stochasticCache = { monteCarlo: {}, pareto: {} };
+            var REPORT_QUALITY_PRESETS = {
+                fast: { mcSamples: 2400, paretoSamples: 1100, uncertainty: 0.07 },
+                full: { mcSamples: 10000, paretoSamples: 2200, uncertainty: 0.07 }
+            };
+            var PDF_REQUIRED_SECTIONS = {
+                single: [
+                    'Executive Snapshot',
+                    'Executive Scorecard',
+                    'Sankey + Pareto Visual Pack',
+                    'Monte Carlo + Tornado Visual Pack',
+                    'Standards Visual Pack',
+                    'Methodology + Simulation Configuration',
+                    'Complete Runtime Snapshot (Structured Audit)'
+                ],
+                compare: [
+                    'Compare Executive Summary',
+                    'Compare Executive Scorecards',
+                    'Sankey Compare (Left vs Right)',
+                    'Pareto Frontier Compare',
+                    'Monte Carlo Compare',
+                    'Methodology + Simulation Configuration (Compare)',
+                    'Compare Runtime Snapshots (Structured Audit)'
+                ]
+            };
             var MODE_HELP_DOCS = {
                 inFailureMode: {
                     title: 'Failure / Degraded Mode Engine',
@@ -7329,6 +7479,50 @@
                 });
             }
 
+            function inferSectionTooltipKey(text) {
+                var t = String(text || '').toLowerCase();
+                if (!t) return '';
+                var rules = [
+                    { contains: 'pareto', key: 'paretoFrontier' },
+                    { contains: 'monte carlo', key: 'monteCarlo' },
+                    { contains: 'uncertainty', key: 'mcUncertainty' },
+                    { contains: 'sankey', key: 'sankeyDrill' },
+                    { contains: 'hard constraint', key: 'hardConstraintCheck' },
+                    { contains: 'constraint', key: 'conEnforce' },
+                    { contains: 'degraded mode', key: 'failureMode' },
+                    { contains: 'failure mode', key: 'failureMode' },
+                    { contains: 'control logic', key: 'gateState' },
+                    { contains: 'gate', key: 'gateState' },
+                    { contains: 'calibration', key: 'calibrationFit' },
+                    { contains: 'telemetry', key: 'telemetryAggMode' },
+                    { contains: 'risk', key: 'riskIndex' },
+                    { contains: 'target', key: 'targetPue' },
+                    { contains: 'pdf', key: 'pdfQualityMode' }
+                ];
+                for (var i = 0; i < rules.length; i++) {
+                    if (t.indexOf(rules[i].contains) >= 0) return rules[i].key;
+                }
+                return '';
+            }
+
+            function initSectionTooltips() {
+                var selector = [
+                    '#calculator .feature-head h4',
+                    '#calculator .chart-panel-head h5',
+                    '#calculator .feature-block > h3',
+                    '#calculator .feature-block > h4',
+                    '#calculator .feature-block > h5'
+                ].join(', ');
+                document.querySelectorAll(selector).forEach(function(el) {
+                    if (!el || el.querySelector('.tooltip-trigger')) return;
+                    var title = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+                    if (!title) return;
+                    var key = inferSectionTooltipKey(title);
+                    if (!key) return;
+                    appendTooltip(el, resolveTooltipMeta(key, 'processing', title), false);
+                });
+            }
+
             function initTooltipPositioning() {
                 document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
                     if (trigger.dataset.tooltipBound === '1') return;
@@ -7609,6 +7803,8 @@
                     ['controlIndex', 'ctrl idx'],
                     ['controlIndex', 'ctrlidx'],
                     ['controlIndex', 'controlldx'],
+                    ['controlIndex', 'control logic index'],
+                    ['controlIndex', 'control logic quality'],
                     ['riskIndex', 'risk idx'],
                     ['riskIndex', 'riskidx'],
                     ['deltaT', 'delta t'],
@@ -7628,9 +7824,25 @@
                     ['flowLpm', 'lpm'],
                     ['pumpPowerKw', 'pump power'],
                     ['pumpPowerKw', 'pump kw'],
+                    ['pumpPowerPctIt', 'pump % it'],
+                    ['pumpPowerPctIt', 'pump pct it'],
+                    ['pumpPowerPctIt', 'pump percent it'],
                     ['liquidCapture', 'liquid capture'],
                     ['monitoring', 'monitoring coverage'],
                     ['predictiveGain', 'predictive control gain'],
+                    ['failureMode', 'degraded mode'],
+                    ['failureMode', 'degraded mode engine'],
+                    ['failureMode', 'failure mode engine'],
+                    ['conEnforce', 'hard constraint check'],
+                    ['conEnforce', 'constraint mode'],
+                    ['conEnforce', 'constraint engine'],
+                    ['paretoFrontier', 'pareto frontier'],
+                    ['paretoSamples', 'pareto'],
+                    ['monteCarlo', 'monte carlo'],
+                    ['mcUncertainty', 'uncertainty mode'],
+                    ['sankeyMode', 'sankey'],
+                    ['sankeyDrill', 'sankey drill'],
+                    ['gateState', 'gate state'],
                     ['scores.total', 'composite score'],
                     ['scores.total', 'total score']
                 ].forEach(function(row) {
@@ -9226,17 +9438,25 @@
                 return spec;
             }
 
-            function buildSankeyDrillSvg(spec) {
-                if (!spec || !spec.nodes || !spec.links) return { svg: '', w: 960, h: 360, minWidth: 920 };
+            function buildSankeyDrillSvg(spec, options) {
+                if (!spec || !spec.nodes || !spec.links) return { svg: '', w: 920, h: 360, minWidth: 760 };
+                options = options || {};
                 var h = 360;
                 var nodeW = 24;
+                var targetWidth = Number(options.targetWidth || 0);
                 var maxCol = 0;
                 spec.nodes.forEach(function(n) {
                     maxCol = Math.max(maxCol, Math.round(n.col || 0));
                 });
                 var colCount = Math.max(3, maxCol + 1);
-                var w = Math.max(980, 280 + (colCount * 230));
-                var pad = { t: 34, r: 120, b: 30, l: 28 };
+                var fallbackWidth = Math.max(860, 260 + (colCount * 180));
+                var w = targetWidth > 0 ? clamp(targetWidth, 620, 1520) : fallbackWidth;
+                var pad = {
+                    t: 34,
+                    r: colCount >= 4 ? 64 : 54,
+                    b: 30,
+                    l: colCount >= 4 ? 52 : 44
+                };
                 var usableW = w - pad.l - pad.r - nodeW;
                 var colStep = colCount > 1 ? (usableW / (colCount - 1)) : 0;
                 var colXs = [];
@@ -9304,8 +9524,9 @@
                         var ratio = availableH / Math.max(totalH, 1);
                         gap = Math.max(6, gap * ratio);
                         nodes.forEach(function(n) { n.h = Math.max(12, n.h * ratio); });
+                        totalH = nodes.reduce(function(acc, n) { return acc + n.h; }, 0) + (gap * (nodes.length - 1));
                     }
-                    var cursor = pad.t + 26;
+                    var cursor = pad.t + 26 + Math.max(0, (availableH - totalH) * 0.5);
                     nodes.forEach(function(n) {
                         n.y = cursor;
                         cursor += n.h + gap;
@@ -9334,22 +9555,27 @@
                     return a.y - b.y;
                 });
 
+                var labelMax = clamp(Math.floor((colStep - 28) / 6), 12, 28);
+                var valueMax = clamp(Math.floor((colStep - 24) / 6), 11, 26);
                 var nodesSvg = nodeOrder.map(function(n) {
                     var pct = spec.focusValue > 0 ? (' | ' + sankeyPct(n.value, spec.focusValue)) : '';
                     var isLastCol = n.col >= (colCount - 1);
                     var labelX = isLastCol ? (n.x - 8) : (n.x + nodeW + 8);
                     var anchor = isLastCol ? 'end' : 'start';
+                    var fullLabel = String(n.label || '');
+                    var compactLabel = shortText(fullLabel, labelMax);
+                    var valueLabel = shortText(fmtNum(n.value, 0) + ' kW' + pct, valueMax);
                     return '<g>' +
                         '<rect x="' + n.x + '" y="' + fmtNum(n.y, 2) + '" width="' + nodeW + '" height="' + fmtNum(n.h, 2) + '" rx="5" fill="' + n.color + '" fill-opacity="0.92" stroke="rgba(15,23,42,0.45)"></rect>' +
-                        '<text x="' + fmtNum(labelX, 2) + '" y="' + fmtNum(n.y + 12, 2) + '" fill="currentColor" font-size="11" text-anchor="' + anchor + '">' + escapeHtml(n.label) + '</text>' +
-                        '<text x="' + fmtNum(labelX, 2) + '" y="' + fmtNum(n.y + 24, 2) + '" fill="currentColor" opacity="0.78" font-size="10" text-anchor="' + anchor + '">' + fmtNum(n.value, 0) + ' kW' + pct + '</text>' +
+                        '<text x="' + fmtNum(labelX, 2) + '" y="' + fmtNum(n.y + 12, 2) + '" fill="currentColor" font-size="11" text-anchor="' + anchor + '">' + escapeHtml(compactLabel) + '<title>' + escapeHtml(fullLabel) + '</title></text>' +
+                        '<text x="' + fmtNum(labelX, 2) + '" y="' + fmtNum(n.y + 24, 2) + '" fill="currentColor" opacity="0.78" font-size="10" text-anchor="' + anchor + '">' + escapeHtml(valueLabel) + '</text>' +
                     '</g>';
                 }).join('');
 
                 var titles = spec.columnTitles || ['Driver Layer', 'Solver Layer', 'Selected Output'];
                 var headerSvg = [];
                 for (var ti = 0; ti < colCount; ti++) {
-                    headerSvg.push('<text x="' + colXs[ti] + '" y="24" fill="currentColor" opacity="0.86" font-size="11">' + escapeHtml(titles[ti] || ('Layer ' + (ti + 1))) + '</text>');
+                    headerSvg.push('<text x="' + colXs[ti] + '" y="24" fill="currentColor" opacity="0.86" font-size="11">' + escapeHtml(shortText(titles[ti] || ('Layer ' + (ti + 1)), 24)) + '<title>' + escapeHtml(titles[ti] || ('Layer ' + (ti + 1))) + '</title></text>');
                 }
                 var splitSvg = [];
                 for (var si = 1; si < colCount; si++) {
@@ -9359,7 +9585,7 @@
                 return {
                     w: w,
                     h: h,
-                    minWidth: Math.max(940, w),
+                    minWidth: Math.max(460, w),
                     svg: [
                     '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="transparent"></rect>',
                     headerSvg.join(''),
@@ -9389,12 +9615,44 @@
                     '</tbody></table>';
             }
 
+            function setSankeyModalBodyLock(locked) {
+                var body = document.body;
+                if (!body) return;
+                if (locked) {
+                    sankeyModalLockY = window.scrollY || window.pageYOffset || 0;
+                    body.classList.add('sankey-popup-open');
+                    body.style.position = 'fixed';
+                    body.style.top = '-' + sankeyModalLockY + 'px';
+                    body.style.left = '0';
+                    body.style.right = '0';
+                    body.style.width = '100%';
+                    return;
+                }
+                body.classList.remove('sankey-popup-open');
+                body.style.position = '';
+                body.style.top = '';
+                body.style.left = '';
+                body.style.right = '';
+                body.style.width = '';
+                window.scrollTo(0, sankeyModalLockY || 0);
+            }
+
+            function ensureSankeyCloseButtonsVisible() {
+                ['sankeyDrillCloseCard', 'sankeyDrillCloseTop', 'sankeyDrillClose'].forEach(function(id) {
+                    var btn = document.getElementById(id);
+                    if (!btn) return;
+                    btn.style.display = 'inline-flex';
+                    btn.style.visibility = 'visible';
+                    btn.style.opacity = '1';
+                });
+            }
+
             function closeSankeyDrillModal() {
                 var modal = document.getElementById('sankeyDrillModal');
                 if (!modal || !modal.classList.contains('open')) return;
                 modal.classList.remove('open');
                 modal.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('sankey-popup-open');
+                setSankeyModalBodyLock(false);
                 var trigger = sankeyDrillState.trigger;
                 sankeyDrillState = { open: false, nodeId: '', trigger: null };
                 if (trigger && trigger.focus) trigger.focus();
@@ -9421,7 +9679,10 @@
                 metaEl.textContent = spec.subtitle + ' | Source model: ' + sankeyModeLabel(ctx) + ' | Node share of facility: ' + sankeyPct(spec.focusValue, spec.focusTotal);
                 badgeEl.className = 'status-pill ' + (spec.focusValue > 0 ? 'ok' : 'warn');
                 badgeEl.textContent = spec.focusValue > 0 ? ('Drill Active | ' + fmtNum(spec.focusValue, 0) + ' kW') : 'No Power Flow';
-                var drillRender = buildSankeyDrillSvg(spec);
+                var fallbackCanvasW = Math.round(window.innerWidth * 0.6);
+                if (window.innerWidth < 1100) fallbackCanvasW = Math.round(window.innerWidth - 120);
+                var targetCanvasW = clamp(fallbackCanvasW, 520, 1180);
+                var drillRender = buildSankeyDrillSvg(spec, { targetWidth: targetCanvasW });
                 svgEl.setAttribute('viewBox', '0 0 ' + drillRender.w + ' ' + drillRender.h);
                 svgEl.style.minWidth = String(Math.round(drillRender.minWidth || 920)) + 'px';
                 svgEl.innerHTML = drillRender.svg || '';
@@ -9438,8 +9699,27 @@
                 sankeyDrillState = { open: true, nodeId: nodeId, trigger: triggerEl || document.activeElement };
                 modal.classList.add('open');
                 modal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('sankey-popup-open');
-                var closeBtn = document.getElementById('sankeyDrillClose');
+                setSankeyModalBodyLock(true);
+                ensureSankeyCloseButtonsVisible();
+                modal.scrollTop = 0;
+                var cardEl = modal.querySelector('.sankey-drill-card');
+                if (cardEl) cardEl.scrollTop = 0;
+                requestAnimationFrame(function() {
+                    var liveCanvas = document.getElementById('sankeyDrillCanvas');
+                    var liveSvg = document.getElementById('sankeyDrillSvg');
+                    if (!liveCanvas || !liveSvg) return;
+                    var measuredW = clamp(Math.round(liveCanvas.clientWidth || targetCanvasW), 460, 1180);
+                    if (Math.abs(measuredW - drillRender.w) > 18) {
+                        drillRender = buildSankeyDrillSvg(spec, { targetWidth: measuredW });
+                        liveSvg.setAttribute('viewBox', '0 0 ' + drillRender.w + ' ' + drillRender.h);
+                        liveSvg.style.minWidth = String(Math.round(drillRender.minWidth || measuredW)) + 'px';
+                        liveSvg.innerHTML = drillRender.svg || '';
+                    }
+                    liveCanvas.scrollLeft = 0;
+                    liveCanvas.scrollTop = 0;
+                    ensureSankeyCloseButtonsVisible();
+                });
+                var closeBtn = document.getElementById('sankeyDrillCloseCard') || document.getElementById('sankeyDrillCloseTop') || document.getElementById('sankeyDrillClose');
                 if (closeBtn && closeBtn.focus) closeBtn.focus();
             }
 
@@ -9473,6 +9753,10 @@
                     if (ev.key !== 'Escape') return;
                     if (!sankeyDrillState.open) return;
                     closeSankeyDrillModal();
+                });
+                window.addEventListener('resize', function() {
+                    if (!sankeyDrillState.open) return;
+                    ensureSankeyCloseButtonsVisible();
                 });
             }
 
@@ -9872,6 +10156,648 @@
                 return svg.join('');
             }
 
+            function parsePositiveInt(value, fallback) {
+                var n = parseInt(value, 10);
+                if (!isFinite(n) || n <= 0) return fallback;
+                return n;
+            }
+
+            function normalizeReportQualityMode(value) {
+                var mode = String(value || '').trim().toLowerCase();
+                return REPORT_QUALITY_PRESETS[mode] ? mode : 'full';
+            }
+
+            function parseReportSeed(rawValue) {
+                if (rawValue == null || rawValue === '') return null;
+                var n = parseInt(rawValue, 10);
+                if (!isFinite(n) || n <= 0) return null;
+                return (n >>> 0);
+            }
+
+            function makeSeededRandom(seed) {
+                var s = (seed >>> 0) || 0x9e3779b9;
+                return function() {
+                    s += 0x6D2B79F5;
+                    var t = s;
+                    t = Math.imul(t ^ (t >>> 15), t | 1);
+                    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+                };
+            }
+
+            function randomUnit(randomFn) {
+                if (typeof randomFn === 'function') {
+                    var rv = Number(randomFn());
+                    if (isFinite(rv)) return clamp(rv, 0, 1);
+                }
+                return Math.random();
+            }
+
+            function stochasticCacheCleanup() {
+                function prune(mapObj, maxKeep) {
+                    var keys = Object.keys(mapObj || {});
+                    if (keys.length <= maxKeep) return;
+                    keys.sort(function(a, b) {
+                        var ta = (mapObj[a] && mapObj[a].ts) ? mapObj[a].ts : 0;
+                        var tb = (mapObj[b] && mapObj[b].ts) ? mapObj[b].ts : 0;
+                        return ta - tb;
+                    });
+                    while (keys.length > maxKeep) {
+                        var k = keys.shift();
+                        delete mapObj[k];
+                    }
+                }
+                prune(stochasticCache.monteCarlo, 16);
+                prune(stochasticCache.pareto, 16);
+            }
+
+            function stochasticCacheKey(kind, payload) {
+                return kind + '|' + snapshotFingerprint(payload || {});
+            }
+
+            function getCachedStochastic(kind, key) {
+                var bucket = (kind === 'pareto') ? stochasticCache.pareto : stochasticCache.monteCarlo;
+                var item = bucket[key];
+                if (!item) return null;
+                item.ts = Date.now();
+                if (item.kind === 'array') return item.value.slice();
+                return JSON.parse(JSON.stringify(item.value));
+            }
+
+            function setCachedStochastic(kind, key, value) {
+                var bucket = (kind === 'pareto') ? stochasticCache.pareto : stochasticCache.monteCarlo;
+                bucket[key] = {
+                    ts: Date.now(),
+                    kind: Array.isArray(value) ? 'array' : 'object',
+                    value: Array.isArray(value) ? value.slice() : JSON.parse(JSON.stringify(value))
+                };
+                stochasticCacheCleanup();
+            }
+
+            function resolvePdfReportOptions() {
+                var qEl = document.getElementById('pdfQualityMode');
+                var sEl = document.getElementById('pdfRandomSeed');
+                var qualityMode = normalizeReportQualityMode(qEl ? qEl.value : 'full');
+                var preset = REPORT_QUALITY_PRESETS[qualityMode] || REPORT_QUALITY_PRESETS.full;
+                var seed = parseReportSeed(sEl ? sEl.value : '');
+                return {
+                    qualityMode: qualityMode,
+                    seed: seed,
+                    mcSamples: preset.mcSamples,
+                    paretoSamples: preset.paretoSamples,
+                    uncertainty: preset.uncertainty
+                };
+            }
+
+            function dominatesForPareto(x, y) {
+                var noWorse = (x.pue <= y.pue) && (x.netOpex <= y.netOpex) && (x.netCarbonTons <= y.netCarbonTons) && (x.riskIndex <= y.riskIndex);
+                var strict = (x.pue < y.pue) || (x.netOpex < y.netOpex) || (x.netCarbonTons < y.netCarbonTons) || (x.riskIndex < y.riskIndex);
+                return noWorse && strict;
+            }
+
+            function buildParetoNondominated(pool) {
+                var sorted = (pool || []).slice().sort(function(a, b) {
+                    if (a.pue !== b.pue) return a.pue - b.pue;
+                    if (a.netOpex !== b.netOpex) return a.netOpex - b.netOpex;
+                    if (a.netCarbonTons !== b.netCarbonTons) return a.netCarbonTons - b.netCarbonTons;
+                    return a.riskIndex - b.riskIndex;
+                });
+                var nd = [];
+                sorted.forEach(function(candidate) {
+                    var dominated = false;
+                    for (var i = 0; i < nd.length; i++) {
+                        if (dominatesForPareto(nd[i], candidate)) {
+                            dominated = true;
+                            break;
+                        }
+                    }
+                    if (dominated) return;
+                    nd = nd.filter(function(existing) {
+                        return !dominatesForPareto(candidate, existing);
+                    });
+                    nd.push(candidate);
+                });
+                return nd;
+            }
+
+            function generateParetoForInput(baseInput, constraints, samples, options) {
+                if (!baseInput) return [];
+                var base = Object.assign({}, baseInput);
+                var cState = constraints || gatherConstraintState();
+                var opts = options || {};
+                var nSamples = Math.max(200, Math.round(samples || opts.samples || 1000));
+                var seed = parseReportSeed(opts.seed);
+                var randomFn = (seed == null) ? null : makeSeededRandom(seed);
+                var cacheKey = stochasticCacheKey('pareto', {
+                    input: base,
+                    constraints: cState,
+                    samples: nSamples,
+                    seed: seed,
+                    qualityMode: opts.qualityMode || 'default'
+                });
+                var cached = getCachedStochastic('pareto', cacheKey);
+                if (cached && cached.length) return cached;
+                var pool = [];
+                for (var i = 0; i < nSamples; i++) {
+                    var candidate = buildRandomCandidate(base, 1 + (i % 5) * 0.18, randomFn);
+                    var model = computeModel(candidate);
+                    var hard = evaluateHardConstraints(model, cState);
+                    model._feasible = !!hard.feasible;
+                    pool.push(model);
+                }
+                var nondominated = buildParetoNondominated(pool);
+                nondominated.sort(function(a, b) {
+                    return optimizeObjective(a, base, cState) - optimizeObjective(b, base, cState);
+                });
+                var out = nondominated.slice(0, 24);
+                setCachedStochastic('pareto', cacheKey, out);
+                return out;
+            }
+
+            function generateMonteCarloForInput(baseInput, samples, uncertainty, options) {
+                if (!baseInput) return null;
+                var opts = options || {};
+                var nSamples = Math.max(300, Math.round(samples || opts.samples || 1000));
+                var unc = clamp((uncertainty == null ? (opts.uncertainty == null ? 0.07 : opts.uncertainty) : uncertainty), 0.01, 0.35);
+                var seed = parseReportSeed(opts.seed);
+                var randomFn = (seed == null) ? null : makeSeededRandom(seed);
+                var cacheKey = stochasticCacheKey('mc', {
+                    input: baseInput,
+                    samples: nSamples,
+                    unc: unc,
+                    seed: seed,
+                    qualityMode: opts.qualityMode || 'default'
+                });
+                var cached = getCachedStochastic('mc', cacheKey);
+                if (cached && cached.dist) return cached;
+                var keys = ['itLoadMw', 'liquidCapture', 'supplyTemp', 'airCop', 'pumpEff', 'economizerHours', 'controlQuality', 'predictiveGain', 'coefHeatTransfer', 'coefPipeLoss', 'elecPrice', 'carbonIntensity'];
+                var dist = { pue: [], cop: [], opex: [], carbon: [], risk: [] };
+
+                for (var i = 0; i < nSamples; i++) {
+                    var c = Object.assign({}, baseInput);
+                    keys.forEach(function(k) {
+                        var v = c[k];
+                        if (typeof v !== 'number') return;
+                        var delta = ((randomUnit(randomFn) * 2) - 1) * unc;
+                        c[k] = v * (1 + delta);
+                    });
+                    c.returnTemp = clamp(c.supplyTemp + Math.max(baseInput.returnTemp - baseInput.supplyTemp, 6), c.supplyTemp + 5, c.supplyTemp + 18);
+                    var m = computeModel(c);
+                    dist.pue.push(m.pue);
+                    dist.cop.push(m.systemCop);
+                    dist.opex.push(m.netOpex);
+                    dist.carbon.push(m.netCarbonTons);
+                    dist.risk.push(m.riskIndex);
+                }
+
+                Object.keys(dist).forEach(function(k) {
+                    dist[k].sort(function(a, b) { return a - b; });
+                });
+
+                var out = { samples: nSamples, unc: unc, dist: dist, seed: seed };
+                setCachedStochastic('mc', cacheKey, out);
+                return out;
+            }
+
+            function buildPdfSankeyFlowSvg(model, title) {
+                if (!model) return '';
+                var flows = extractSankeyFlows(model);
+                if (!flows || flows.total <= 0.1) return '';
+
+                function bandPath(x0, y0, x1, y1, width) {
+                    var w = Math.max(width, 1);
+                    var c = (x1 - x0) * 0.46;
+                    var y0t = y0 - (w / 2);
+                    var y0b = y0 + (w / 2);
+                    var y1t = y1 - (w / 2);
+                    var y1b = y1 + (w / 2);
+                    return [
+                        'M', fmtNum(x0, 2), fmtNum(y0t, 2),
+                        'C', fmtNum(x0 + c, 2), fmtNum(y0t, 2), fmtNum(x1 - c, 2), fmtNum(y1t, 2), fmtNum(x1, 2), fmtNum(y1t, 2),
+                        'L', fmtNum(x1, 2), fmtNum(y1b, 2),
+                        'C', fmtNum(x1 - c, 2), fmtNum(y1b, 2), fmtNum(x0 + c, 2), fmtNum(y0b, 2), fmtNum(x0, 2), fmtNum(y0b, 2),
+                        'Z'
+                    ].join(' ');
+                }
+
+                var total = flows.total;
+                var scale = 126 / total;
+                var nodeW = 14;
+                var srcX = 28;
+                var midX = 232;
+                var rightX = 438;
+                var source = { id: 'source', label: 'Total Input', value: total, x: srcX, y: 54, h: 146, color: '#1d4ed8' };
+                var mids = [
+                    { id: 'compute', label: 'IT Compute', value: flows.it, x: midX, y: 64, h: 26, color: '#2563eb' },
+                    { id: 'thermal', label: 'Thermal Mgmt', value: flows.thermal, x: midX, y: 112, h: 30, color: '#0891b2' },
+                    { id: 'elec', label: 'Elec Loss', value: flows.elecLoss, x: midX, y: 158, h: 20, color: '#d97706' },
+                    { id: 'aux', label: 'Facility Aux', value: flows.facilityAux, x: midX, y: 194, h: 16, color: '#64748b' }
+                ];
+                var thermal = mids[1];
+                var rights = [
+                    { id: 'liq', label: 'Liquid', value: flows.liquidCore, x: rightX, y: 104, h: 20, color: '#0d9488' },
+                    { id: 'pump', label: 'Pump', value: flows.pump, x: rightX, y: 136, h: 14, color: '#7c3aed' },
+                    { id: 'air', label: 'Air', value: flows.air, x: rightX, y: 164, h: 14, color: '#0284c7' },
+                    { id: 'fan', label: 'Fan', value: flows.fan, x: rightX, y: 192, h: 14, color: '#16a34a' }
+                ];
+
+                function linkWidth(v) {
+                    return clamp(v * scale, 2, 98);
+                }
+                var links = [];
+                var srcOffset = 0;
+                mids.forEach(function(n) {
+                    var h = linkWidth(n.value);
+                    links.push({
+                        x0: source.x + nodeW,
+                        y0: source.y + 8 + srcOffset + (h / 2),
+                        x1: n.x,
+                        y1: n.y + (h / 2),
+                        w: h,
+                        color: n.color
+                    });
+                    srcOffset += h + 1.5;
+                });
+                var thermOffset = 0;
+                rights.forEach(function(n) {
+                    var h = linkWidth(n.value);
+                    links.push({
+                        x0: thermal.x + nodeW,
+                        y0: thermal.y + 5 + thermOffset + (h / 2),
+                        x1: n.x,
+                        y1: n.y + (h / 2),
+                        w: h,
+                        color: n.color
+                    });
+                    thermOffset += h + 1;
+                });
+
+                function nodeSvg(n, totalLoad) {
+                    return '<g>' +
+                        '<rect x="' + n.x + '" y="' + fmtNum(n.y, 2) + '" width="' + nodeW + '" height="' + fmtNum(n.h, 2) + '" rx="4" fill="' + n.color + '" fill-opacity="0.92" stroke="rgba(15,23,42,0.35)" />' +
+                        '<text x="' + (n.x + nodeW + 5) + '" y="' + fmtNum(n.y + 10, 2) + '" fill="#334155" font-size="9">' + escapeHtml(n.label) + '</text>' +
+                        '<text x="' + (n.x + nodeW + 5) + '" y="' + fmtNum(n.y + 20, 2) + '" fill="#475569" font-size="8">' + fmtNum(n.value, 0) + ' kW | ' + sankeyPct(n.value, totalLoad) + '</text>' +
+                    '</g>';
+                }
+
+                return [
+                    '<svg class="r-chart" viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="680" height="240" fill="white"/>',
+                    '<text x="14" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Sankey Distribution') + '</text>',
+                    '<text x="28" y="36" fill="#64748b" font-size="9">SOURCE</text>',
+                    '<text x="232" y="36" fill="#64748b" font-size="9">PRIMARY</text>',
+                    '<text x="438" y="36" fill="#64748b" font-size="9">THERMAL SPLIT</text>',
+                    links.map(function(l) {
+                        return '<path d="' + bandPath(l.x0, l.y0, l.x1, l.y1, l.w) + '" fill="' + l.color + '" fill-opacity="0.45" stroke="' + l.color + '" stroke-opacity="0.55" stroke-width="0.6"></path>';
+                    }).join(''),
+                    nodeSvg(source, total),
+                    mids.map(function(n) { return nodeSvg(n, total); }).join(''),
+                    rights.map(function(n) { return nodeSvg(n, total); }).join(''),
+                    '<rect x="432" y="88" width="230" height="126" fill="none" stroke="rgba(148,163,184,0.24)" stroke-dasharray="2 3" rx="8"/>',
+                    '<text x="28" y="228" fill="#6b7280" font-size="9">Flow width is proportional to kW contribution.</text>',
+                    '</svg>'
+                ].join('');
+            }
+
+            function buildPdfParetoScatterSvg(points, title) {
+                var rows = Array.isArray(points) ? points : [];
+                if (!rows.length) return '';
+                var w = 680;
+                var h = 250;
+                var pad = { l: 70, r: 18, t: 32, b: 40 };
+                var pw = w - pad.l - pad.r;
+                var ph = h - pad.t - pad.b;
+
+                var pueVals = rows.map(function(m) { return m.pue; });
+                var opexVals = rows.map(function(m) { return m.netOpex; });
+                var carbonVals = rows.map(function(m) { return m.netCarbonTons; });
+                var minPue = Math.min.apply(null, pueVals);
+                var maxPue = Math.max.apply(null, pueVals);
+                var minOpex = Math.min.apply(null, opexVals);
+                var maxOpex = Math.max.apply(null, opexVals);
+                if (maxPue === minPue) maxPue = minPue + 0.001;
+                if (maxOpex === minOpex) maxOpex = minOpex + 1;
+                var puePad = (maxPue - minPue) * 0.08;
+                var opexPad = (maxOpex - minOpex) * 0.08;
+                minPue -= puePad; maxPue += puePad;
+                minOpex = Math.max(0, minOpex - opexPad); maxOpex += opexPad;
+                var minCarbon = Math.min.apply(null, carbonVals);
+                var maxCarbon = Math.max.apply(null, carbonVals);
+                if (maxCarbon === minCarbon) maxCarbon = minCarbon + 1;
+
+                function sx(v) { return pad.l + ((v - minPue) / (maxPue - minPue)) * pw; }
+                function sy(v) { return pad.t + ((v - minOpex) / (maxOpex - minOpex)) * ph; }
+                function riskClr(risk) {
+                    if (risk <= 25) return '#059669';
+                    if (risk <= 40) return '#d97706';
+                    return '#dc2626';
+                }
+                var sorted = rows.slice().sort(function(a, b) { return a.pue - b.pue; });
+                var frontier = '';
+                sorted.forEach(function(m, idx) {
+                    frontier += (idx ? ' L ' : 'M ') + fmtNum(sx(m.pue), 2) + ' ' + fmtNum(sy(m.netOpex), 2);
+                });
+
+                var grid = [];
+                for (var i = 0; i <= 5; i++) {
+                    var gx = pad.l + (pw * i / 5);
+                    var gy = pad.t + (ph * i / 5);
+                    var xt = minPue + (maxPue - minPue) * (i / 5);
+                    var yt = minOpex + (maxOpex - minOpex) * (i / 5);
+                    grid.push('<line x1="' + fmtNum(gx, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gx, 2) + '" y2="' + (pad.t + ph) + '" stroke="rgba(148,163,184,0.20)" stroke-width="1"/>');
+                    grid.push('<line x1="' + pad.l + '" y1="' + fmtNum(gy, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gy, 2) + '" stroke="rgba(148,163,184,0.20)" stroke-width="1"/>');
+                    grid.push('<text x="' + fmtNum(gx, 2) + '" y="' + (pad.t + ph + 14) + '" fill="#6b7280" font-size="9" text-anchor="middle">' + fmtNum(xt, 3) + '</text>');
+                    grid.push('<text x="8" y="' + fmtNum(gy + 3, 2) + '" fill="#6b7280" font-size="9">' + fmtUsdCompact(yt) + '</text>');
+                }
+
+                var pointsSvg = rows.map(function(m, idx) {
+                    var x = sx(m.pue);
+                    var y = sy(m.netOpex);
+                    var r = 3.6 + (((m.netCarbonTons - minCarbon) / (maxCarbon - minCarbon)) * 3.1);
+                    var stroke = m._feasible ? '#065f46' : '#9a3412';
+                    var dash = m._feasible ? '' : ' stroke-dasharray="3 2"';
+                    return '<g>' +
+                        '<circle cx="' + fmtNum(x, 2) + '" cy="' + fmtNum(y, 2) + '" r="' + fmtNum(r, 2) + '" fill="' + riskClr(m.riskIndex) + '" fill-opacity="0.86" stroke="' + stroke + '" stroke-width="1.2"' + dash + '></circle>' +
+                        '<text x="' + fmtNum(x + r + 1.5, 2) + '" y="' + fmtNum(y - 1.5, 2) + '" fill="#334155" font-size="8">P' + (idx + 1) + '</text>' +
+                    '</g>';
+                }).join('');
+
+                return [
+                    '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
+                    '<text x="10" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Pareto Scatter (PUE vs Net OPEX)') + '</text>',
+                    '<rect x="' + pad.l + '" y="' + pad.t + '" width="' + pw + '" height="' + ph + '" fill="rgba(59,130,246,0.04)" stroke="rgba(148,163,184,0.34)" rx="8" />',
+                    grid.join(''),
+                    frontier ? '<path d="' + frontier + '" fill="none" stroke="rgba(30,64,175,0.52)" stroke-width="1.4" stroke-dasharray="4 3"></path>' : '',
+                    pointsSvg,
+                    '<text x="' + (pad.l + (pw / 2)) + '" y="' + (h - 8) + '" fill="#475569" font-size="10" text-anchor="middle">PUE (lower is better)</text>',
+                    '<text x="10" y="' + (pad.t - 10) + '" fill="#475569" font-size="10">Net OPEX (lower is better)</text>',
+                    '</svg>'
+                ].join('');
+            }
+
+            function buildPdfMonteCarloHistogramSvg(mcState, title) {
+                if (!mcState || !mcState.dist) return '';
+                var dist = mcState.dist;
+                var specs = [
+                    { key: 'pue', label: 'PUE Distribution', digits: 3, color: '#2563eb' },
+                    { key: 'opex', label: 'Net OPEX Distribution', digits: 0, color: '#7c3aed' }
+                ];
+                var w = 680;
+                var h = 250;
+                var panelW = 316;
+                var panelH = 156;
+                var py = 48;
+
+                var svg = [
+                    '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
+                    '<text x="10" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Monte Carlo Histograms (30 bins)') + '</text>',
+                    '<text x="10" y="34" fill="#6b7280" font-size="9">n=' + fmtNum(mcState.samples || 0, 0) + ' | uncertainty ±' + fmtNum((mcState.unc || 0) * 100, 1) + '%</text>'
+                ];
+
+                specs.forEach(function(spec, idx) {
+                    var arr = (dist[spec.key] || []).slice();
+                    if (!arr.length) return;
+                    arr.sort(function(a, b) { return a - b; });
+                    var hist = buildHistogram(arr, 30);
+                    var p10 = percentile(arr, 0.10);
+                    var p50 = percentile(arr, 0.50);
+                    var p90 = percentile(arr, 0.90);
+                    var x = 12 + (idx * 336);
+                    var bx = x + 10;
+                    var by = py + 16;
+                    var bw = panelW - 22;
+                    var bh = panelH - 28;
+                    svg.push('<rect x="' + x + '" y="' + py + '" width="' + panelW + '" height="' + panelH + '" rx="8" fill="#f8fafc" stroke="#e5e7eb"/>');
+                    svg.push('<text x="' + (x + 8) + '" y="' + (py + 12) + '" fill="#334155" font-size="9">' + escapeHtml(spec.label) + '</text>');
+                    svg.push('<line x1="' + bx + '" y1="' + (by + bh) + '" x2="' + (bx + bw) + '" y2="' + (by + bh) + '" stroke="#94a3b8" stroke-width="1"/>');
+                    var barW = bw / hist.counts.length;
+                    hist.counts.forEach(function(c, bi) {
+                        var hh = (c / hist.maxCount) * (bh - 2);
+                        var xx = bx + (bi * barW);
+                        var yy = by + bh - hh;
+                        svg.push('<rect x="' + fmtNum(xx, 2) + '" y="' + fmtNum(yy, 2) + '" width="' + fmtNum(Math.max(barW - 1, 1), 2) + '" height="' + fmtNum(hh, 2) + '" fill="' + spec.color + '" fill-opacity="0.78"/>');
+                    });
+                    function xFor(v) {
+                        return bx + ((v - hist.min) / Math.max(hist.max - hist.min, 1e-9)) * bw;
+                    }
+                    var xp10 = xFor(p10);
+                    var xp50 = xFor(p50);
+                    var xp90 = xFor(p90);
+                    svg.push('<line x1="' + fmtNum(xp10, 2) + '" y1="' + by + '" x2="' + fmtNum(xp10, 2) + '" y2="' + (by + bh) + '" stroke="#059669" stroke-width="1" stroke-dasharray="3 2"/>');
+                    svg.push('<line x1="' + fmtNum(xp50, 2) + '" y1="' + by + '" x2="' + fmtNum(xp50, 2) + '" y2="' + (by + bh) + '" stroke="#1e3a8a" stroke-width="1.2" stroke-dasharray="2 2"/>');
+                    svg.push('<line x1="' + fmtNum(xp90, 2) + '" y1="' + by + '" x2="' + fmtNum(xp90, 2) + '" y2="' + (by + bh) + '" stroke="#dc2626" stroke-width="1" stroke-dasharray="3 2"/>');
+                    svg.push('<text x="' + bx + '" y="' + (py + panelH - 4) + '" fill="#6b7280" font-size="8">P10 ' + fmtNum(p10, spec.digits) + ' | P50 ' + fmtNum(p50, spec.digits) + ' | P90 ' + fmtNum(p90, spec.digits) + '</text>');
+                });
+
+                svg.push('</svg>');
+                return svg.join('');
+            }
+
+            function buildPdfImpactTornadoSvg(impactRows, title) {
+                var rows = (impactRows || []).map(function(r) {
+                    var raw = parseFloat(String(r.dopex || '').replace(/[^\d+.-]/g, ''));
+                    return {
+                        label: r.param || '-',
+                        value: isFinite(raw) ? raw : 0
+                    };
+                });
+                rows = rows.filter(function(r) { return isFinite(r.value); });
+                if (!rows.length) return '';
+                rows.sort(function(a, b) { return Math.abs(b.value) - Math.abs(a.value); });
+                rows = rows.slice(0, 10);
+                var maxAbs = rows.reduce(function(m, r) { return Math.max(m, Math.abs(r.value)); }, 0);
+                maxAbs = Math.max(maxAbs, 1);
+
+                var w = 680;
+                var h = 300;
+                var cx = 372;
+                var left = 170;
+                var right = 640;
+                var barSpan = 255;
+                var top = 42;
+                var rowGap = 24;
+
+                var svg = [
+                    '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
+                    '<text x="10" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Tornado Sensitivity (dNet OPEX)') + '</text>',
+                    '<text x="10" y="32" fill="#6b7280" font-size="9">Left: negative delta (improvement) | Right: positive delta (worsening)</text>',
+                    '<line x1="' + cx + '" y1="34" x2="' + cx + '" y2="' + (h - 16) + '" stroke="#334155" stroke-width="1.2" stroke-dasharray="3 2"/>'
+                ];
+
+                rows.forEach(function(r, idx) {
+                    var y = top + (idx * rowGap);
+                    var wBar = (Math.abs(r.value) / maxAbs) * barSpan;
+                    var x = r.value >= 0 ? cx : (cx - wBar);
+                    var color = r.value <= 0 ? '#059669' : '#dc2626';
+                    svg.push('<text x="8" y="' + (y + 4) + '" fill="#334155" font-size="9">' + escapeHtml(shortText(r.label, 25)) + '</text>');
+                    svg.push('<rect x="' + left + '" y="' + (y - 6) + '" width="' + (right - left) + '" height="12" fill="#f3f4f6" rx="3"/>');
+                    svg.push('<rect x="' + fmtNum(x, 2) + '" y="' + (y - 6) + '" width="' + fmtNum(Math.max(wBar, 1), 2) + '" height="12" fill="' + color + '" rx="3"/>');
+                    svg.push('<text x="' + (right + 6) + '" y="' + (y + 4) + '" fill="#1f2937" font-size="8">' + signed(r.value, 0, ' USD') + '</text>');
+                });
+
+                svg.push('</svg>');
+                return svg.join('');
+            }
+
+            function standardsColorByScore(score) {
+                if (score >= 85) return '#059669';
+                if (score >= 75) return '#f59e0b';
+                return '#ef4444';
+            }
+
+            function buildPdfStandardsRadarSvg(model, title) {
+                if (!model || !model.scores) return '';
+                var axes = [
+                    { k: 'ASHRAE', v: model.scores.ashrae },
+                    { k: 'ANSI', v: model.scores.ansi },
+                    { k: 'ISO', v: model.scores.iso },
+                    { k: 'NFPA', v: model.scores.nfpa },
+                    { k: 'Uptime', v: model.scores.uptime },
+                    { k: 'Composite', v: model.scores.total }
+                ];
+                var w = 680;
+                var h = 250;
+                var cx = 340;
+                var cy = 134;
+                var radius = 88;
+                function point(idx, ratio) {
+                    var a = (-Math.PI / 2) + (idx * ((Math.PI * 2) / axes.length));
+                    return { x: cx + Math.cos(a) * radius * ratio, y: cy + Math.sin(a) * radius * ratio };
+                }
+                var grid = [];
+                [0.2, 0.4, 0.6, 0.8, 1.0].forEach(function(r) {
+                    var pts = axes.map(function(_, i) {
+                        var p = point(i, r);
+                        return fmtNum(p.x, 2) + ',' + fmtNum(p.y, 2);
+                    }).join(' ');
+                    grid.push('<polygon points="' + pts + '" fill="none" stroke="#e5e7eb" stroke-dasharray="4 4"/>');
+                });
+                var axisLines = axes.map(function(_, i) {
+                    var p = point(i, 1);
+                    return '<line x1="' + cx + '" y1="' + cy + '" x2="' + fmtNum(p.x, 2) + '" y2="' + fmtNum(p.y, 2) + '" stroke="#e5e7eb"/>';
+                }).join('');
+                var benchPts = axes.map(function(_, i) {
+                    var p = point(i, 0.85);
+                    return fmtNum(p.x, 2) + ',' + fmtNum(p.y, 2);
+                }).join(' ');
+                var actualPts = axes.map(function(a, i) {
+                    var p = point(i, clamp(a.v / 100, 0, 1));
+                    return fmtNum(p.x, 2) + ',' + fmtNum(p.y, 2);
+                }).join(' ');
+                var labels = axes.map(function(a, i) {
+                    var p = point(i, 1.18);
+                    return '<text x="' + fmtNum(p.x, 2) + '" y="' + fmtNum(p.y, 2) + '" fill="#334155" font-size="9" text-anchor="middle">' + escapeHtml(a.k) + '</text>';
+                }).join('');
+                return [
+                    '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
+                    '<text x="10" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Standards Radar') + '</text>',
+                    grid.join(''),
+                    axisLines,
+                    '<polygon points="' + benchPts + '" fill="rgba(148,163,184,0.15)" stroke="#64748b" stroke-dasharray="4 3"/>',
+                    '<polygon points="' + actualPts + '" fill="rgba(37,99,235,0.30)" stroke="#1d4ed8" stroke-width="1.5"/>',
+                    labels,
+                    '<text x="10" y="238" fill="#6b7280" font-size="9">Benchmark polygon = 85/100 across all standards</text>',
+                    '</svg>'
+                ].join('');
+            }
+
+            function buildPdfStandardsHeatmapSvg(model, title) {
+                if (!model || !model.scores) return '';
+                var cells = [
+                    { k: 'ASHRAE', v: model.scores.ashrae },
+                    { k: 'ANSI', v: model.scores.ansi },
+                    { k: 'ISO', v: model.scores.iso },
+                    { k: 'NFPA', v: model.scores.nfpa },
+                    { k: 'Uptime', v: model.scores.uptime },
+                    { k: 'Composite', v: model.scores.total }
+                ];
+                var w = 680;
+                var h = 180;
+                var x0 = 16;
+                var y0 = 38;
+                var cw = 212;
+                var ch = 54;
+                var gap = 8;
+                var svg = [
+                    '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
+                    '<text x="10" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Standards Heatmap') + '</text>'
+                ];
+                cells.forEach(function(c, idx) {
+                    var col = idx % 3;
+                    var row = Math.floor(idx / 3);
+                    var x = x0 + col * (cw + gap);
+                    var y = y0 + row * (ch + gap);
+                    var clr = standardsColorByScore(c.v);
+                    svg.push('<rect x="' + x + '" y="' + y + '" width="' + cw + '" height="' + ch + '" rx="8" fill="' + clr + '" fill-opacity="0.16" stroke="' + clr + '"/>');
+                    svg.push('<text x="' + (x + 10) + '" y="' + (y + 20) + '" fill="#334155" font-size="10">' + escapeHtml(c.k) + '</text>');
+                    svg.push('<text x="' + (x + 10) + '" y="' + (y + 40) + '" fill="' + clr + '" font-size="16" font-weight="700">' + fmtNum(c.v, 1) + '/100</text>');
+                });
+                svg.push('<text x="10" y="' + (h - 8) + '" fill="#6b7280" font-size="9">Green >=85 | Amber 75-84.9 | Red <75</text>');
+                svg.push('</svg>');
+                return svg.join('');
+            }
+
+            function buildPdfCompareStandardsRadarSvg(leftModel, rightModel, title) {
+                if (!leftModel || !rightModel || !leftModel.scores || !rightModel.scores) return '';
+                var axes = [
+                    { k: 'ASHRAE', lv: leftModel.scores.ashrae, rv: rightModel.scores.ashrae },
+                    { k: 'ANSI', lv: leftModel.scores.ansi, rv: rightModel.scores.ansi },
+                    { k: 'ISO', lv: leftModel.scores.iso, rv: rightModel.scores.iso },
+                    { k: 'NFPA', lv: leftModel.scores.nfpa, rv: rightModel.scores.nfpa },
+                    { k: 'Uptime', lv: leftModel.scores.uptime, rv: rightModel.scores.uptime },
+                    { k: 'Composite', lv: leftModel.scores.total, rv: rightModel.scores.total }
+                ];
+                var w = 680;
+                var h = 250;
+                var cx = 340;
+                var cy = 134;
+                var radius = 88;
+                function point(idx, ratio) {
+                    var a = (-Math.PI / 2) + (idx * ((Math.PI * 2) / axes.length));
+                    return { x: cx + Math.cos(a) * radius * ratio, y: cy + Math.sin(a) * radius * ratio };
+                }
+                var grid = [];
+                [0.2, 0.4, 0.6, 0.8, 1.0].forEach(function(r) {
+                    var pts = axes.map(function(_, i) {
+                        var p = point(i, r);
+                        return fmtNum(p.x, 2) + ',' + fmtNum(p.y, 2);
+                    }).join(' ');
+                    grid.push('<polygon points="' + pts + '" fill="none" stroke="#e5e7eb" stroke-dasharray="4 4"/>');
+                });
+                var leftPts = axes.map(function(a, i) {
+                    var p = point(i, clamp(a.lv / 100, 0, 1));
+                    return fmtNum(p.x, 2) + ',' + fmtNum(p.y, 2);
+                }).join(' ');
+                var rightPts = axes.map(function(a, i) {
+                    var p = point(i, clamp(a.rv / 100, 0, 1));
+                    return fmtNum(p.x, 2) + ',' + fmtNum(p.y, 2);
+                }).join(' ');
+                return [
+                    '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
+                    '<text x="10" y="18" fill="#1e3a5f" font-size="11">' + escapeHtml(title || 'Standards Radar Compare') + '</text>',
+                    grid.join(''),
+                    axes.map(function(_, i) {
+                        var p = point(i, 1);
+                        return '<line x1="' + cx + '" y1="' + cy + '" x2="' + fmtNum(p.x, 2) + '" y2="' + fmtNum(p.y, 2) + '" stroke="#e5e7eb"/>';
+                    }).join(''),
+                    '<polygon points="' + leftPts + '" fill="rgba(37,99,235,0.28)" stroke="#1d4ed8" stroke-width="1.4"/>',
+                    '<polygon points="' + rightPts + '" fill="rgba(245,158,11,0.28)" stroke="#d97706" stroke-width="1.4"/>',
+                    axes.map(function(a, i) {
+                        var p = point(i, 1.18);
+                        return '<text x="' + fmtNum(p.x, 2) + '" y="' + fmtNum(p.y, 2) + '" fill="#334155" font-size="9" text-anchor="middle">' + escapeHtml(a.k) + '</text>';
+                    }).join(''),
+                    '<rect x="14" y="208" width="12" height="8" fill="rgba(37,99,235,0.48)" stroke="#1d4ed8"/><text x="30" y="215" fill="#334155" font-size="9">Left</text>',
+                    '<rect x="86" y="208" width="12" height="8" fill="rgba(245,158,11,0.48)" stroke="#d97706"/><text x="102" y="215" fill="#334155" font-size="9">Right</text>',
+                    '</svg>'
+                ].join('');
+            }
+
             function evaluateGateStatesWithRules(model, rules) {
                 var ctx = buildRuleContext(model);
                 var activeRules = rules || gateRules;
@@ -9913,6 +10839,7 @@
                     '<div>' +
                     '<h1>' + escapeHtml(title) + '</h1>' +
                     '<p>' + escapeHtml(subtitle) + '</p>' +
+                    '<div class="r-brand">RESISTANCEZERO | Pro Analysis</div>' +
                     '</div>' +
                     '<div class="r-head-meta">' +
                     '<div><strong>Generated:</strong> ' + escapeHtml(nowIso()) + '</div>' +
@@ -9927,38 +10854,113 @@
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>LTC Report</title>' +
                     '<style>' +
-                    '@page{size:A4;margin:12mm;}*{box-sizing:border-box;}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:#0f172a;background:#ffffff;line-height:1.42;}' +
+                    '@page{size:A4;margin:15mm;}*{box-sizing:border-box;}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:#1f2937;background:#ffffff;line-height:1.42;}' +
                     '.r-wrap{padding:10px 14px 20px;} .r-head{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #dbe5ef;padding-bottom:10px;margin-bottom:12px;}' +
-                    '.r-head h1{font-size:20px;margin:0 0 4px;} .r-head p{margin:0;font-size:12px;color:#475569;} .r-head-meta{font-size:11px;line-height:1.55;text-align:right;color:#334155;}' +
-                    '.r-sec{margin-top:12px;border:1px solid #dbe5ef;border-radius:10px;overflow:visible;break-inside:auto;page-break-inside:auto;} .r-sec h2{margin:0;padding:8px 10px;font-size:13px;background:#f1f5f9;border-bottom:1px solid #dbe5ef;}' +
-                    '.r-sec .r-body{padding:9px 10px;} .r-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}' +
-                    '.r-card{border:1px solid #dbe5ef;border-radius:8px;padding:8px;background:#f8fafc;} .r-card .k{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;}' +
-                    '.r-card .v{margin-top:3px;font-size:17px;font-weight:700;color:#0f172a;} .r-card .s{margin-top:3px;font-size:11px;color:#334155;line-height:1.4;}' +
+                    '.r-head h1{font-size:20px;margin:0 0 4px;color:#1e3a5f;} .r-head p{margin:0;font-size:12px;color:#374151;} .r-brand{margin-top:5px;font-size:9px;color:#64748b;letter-spacing:.09em;text-transform:uppercase;font-weight:700;} .r-head-meta{font-size:11px;line-height:1.55;text-align:right;color:#334155;}' +
+                    '.r-sec{margin-top:12px;border:1px solid #dbe5ef;border-radius:10px;overflow:visible;break-inside:auto;page-break-inside:auto;} .r-sec h2{margin:0;padding:8px 10px;font-size:13px;color:#1e3a5f;background:#f8fafc;border-bottom:1px solid #dbe5ef;break-after:avoid-page;page-break-after:avoid;}' +
+                    '.r-sec .r-body{padding:9px 10px;} .r-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}' +
+                    '.r-card{border:1px solid #dbe5ef;border-radius:8px;padding:8px;background:#f8fafc;} .r-card .k{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;}' +
+                    '.r-card .v{margin-top:3px;font-size:17px;font-weight:700;color:#1e3a5f;} .r-card .s{margin-top:3px;font-size:11px;color:#1f2937;line-height:1.4;}' +
+                    '.r-score-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;} .r-score-card{border:2px solid #dbe5ef;border-radius:10px;background:linear-gradient(135deg,#ecfeff,#f0f9ff);padding:10px;} .r-score-card .k{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;} .r-score-card .v{font-size:40px;line-height:1.0;color:#1e3a5f;font-weight:800;font-family:JetBrains Mono,Consolas,monospace;} .r-score-grade{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(37,99,235,0.12);color:#1d4ed8;} .r-score-note{margin-top:6px;font-size:11px;color:#374151;line-height:1.45;}' +
                     '.r-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;} .r-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}' +
                     '.r-chart-wrap{border:1px solid #dbe5ef;border-radius:8px;padding:6px;background:#ffffff;overflow:visible;} .r-chart{width:100%;height:auto;display:block;}' +
-                    '.r-list{margin:0;padding-left:18px;} .r-list li{margin:0 0 4px;font-size:11px;color:#334155;} .r-note{font-size:11px;color:#475569;margin-top:6px;}' +
-                    '.r-conclusion{margin-top:8px;padding:8px 10px;border:1px solid #cbd5e1;border-left:4px solid #2563eb;border-radius:8px;background:#f8fbff;font-size:11px;color:#1e293b;line-height:1.5;}' +
+                    '.r-list{margin:0;padding-left:18px;} .r-list li{margin:0 0 4px;font-size:11px;color:#1f2937;} .r-note{font-size:11px;color:#6b7280;margin-top:6px;}' +
+                    '.r-conclusion{margin-top:8px;padding:8px 10px;border:1px solid #cbd5e1;border-left:4px solid #2563eb;border-radius:8px;background:#f8fbff;font-size:11px;color:#1f2937;line-height:1.5;}' +
                     '.r-conclusion.ok{border-left-color:#059669;background:#f0fdf4;} .r-conclusion.warn{border-left-color:#d97706;background:#fffaf0;} .r-conclusion.bad{border-left-color:#dc2626;background:#fff5f5;}' +
-                    'table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;} th,td{padding:6px 7px;border-bottom:1px solid #e2e8f0;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;} th{background:#f8fafc;text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:#475569;} tr{break-inside:avoid-page;page-break-inside:avoid;}' +
+                    'table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;break-inside:auto;page-break-inside:auto;} th,td{padding:6px 7px;border-bottom:1px solid #e5e7eb;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;color:#1f2937;} th{background:#f8fafc;text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:#374151;} tr{break-inside:avoid-page;page-break-inside:avoid;}' +
                     'tr:last-child td{border-bottom:none;} .ok{color:#047857;font-weight:700;} .warn{color:#b45309;font-weight:700;} .bad{color:#b91c1c;font-weight:700;}' +
                     '.tag{display:inline-block;padding:2px 7px;border:1px solid #dbe5ef;border-radius:999px;font-size:10px;background:#fff;margin-right:4px;margin-bottom:4px;} .muted{color:#64748b;font-size:11px;}' +
                     '.mono{font-family:JetBrains Mono,Consolas,monospace;} .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;} .page-break{page-break-before:always;}' +
                     '.r-json{font-size:9px;line-height:1.32;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;tab-size:2;}' +
                     '.r-json-chunk-label{font-size:10px;color:#475569;margin:0 0 4px;text-transform:uppercase;letter-spacing:.05em;}' +
                     '.r-chart-wrap.allow-break{break-inside:auto;page-break-inside:auto;}' +
-                    '@media print{.page-break{break-before:page;} table{table-layout:fixed;} thead{display:table-header-group;} tfoot{display:table-footer-group;} tr{break-inside:avoid;page-break-inside:avoid;} pre{white-space:pre-wrap !important;word-break:break-word !important;overflow-wrap:anywhere !important;} .r-sec,.r-card,.r-chart-wrap{break-inside:auto !important;page-break-inside:auto !important;} .r-chart-wrap{overflow:visible !important;} .r-chart-wrap.allow-break{break-inside:auto !important;page-break-inside:auto !important;} .r-kpi,.r-grid2,.r-grid3,.split{display:block !important;} .r-kpi>*,.r-grid2>*,.r-grid3>*,.split>*{margin-bottom:8px;} .r-json{font-size:8.2px;line-height:1.24;}}' +
-                    '</style></head><body><div class="r-wrap">' + innerHtml + '</div>' +
+                    '.r-foot{margin-top:16px;padding-top:10px;border-top:2px solid #dbe5ef;text-align:center;font-size:9px;color:#94a3b8;line-height:1.5;}' +
+                    '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;} .page-break{break-before:page;} h2,h3{break-after:avoid-page;page-break-after:avoid;} table{table-layout:fixed;} thead{display:table-header-group;} tfoot{display:table-footer-group;} tr{break-inside:avoid;page-break-inside:avoid;} pre{white-space:pre-wrap !important;word-break:break-word !important;overflow-wrap:anywhere !important;} .r-sec,.r-card,.r-chart-wrap{break-inside:auto !important;page-break-inside:auto !important;} .r-chart-wrap{overflow:visible !important;} .r-chart-wrap.allow-break{break-inside:auto !important;page-break-inside:auto !important;} .r-json{font-size:8.2px;line-height:1.24;}}' +
+                    '</style></head><body><div class="r-wrap">' + innerHtml +
+                    '<footer class="r-foot">resistancezero.com | Generated ' + escapeHtml(nowIso()) + ' | All calculations performed client-side | Print-ready engineering report</footer>' +
+                    '</div>' +
                     '<script>window.addEventListener(\"load\",function(){setTimeout(function(){window.print();},220);});<\/script>' +
                     '</body></html>';
+            }
+
+            function writePdfWindowContent(w, htmlContent) {
+                if (!w || w.closed) return false;
+                w.document.open();
+                w.document.write(reportShell(htmlContent));
+                w.document.close();
+                return true;
             }
 
             function openPdfReport(htmlContent) {
                 var w = window.open('', '_blank', 'width=1200,height=860');
                 if (!w) return false;
+                return writePdfWindowContent(w, htmlContent);
+            }
+
+            function openPdfReportWithBuilder(buildFn) {
+                var w = window.open('', '_blank', 'width=1200,height=860');
+                if (!w) return false;
                 w.document.open();
-                w.document.write(reportShell(htmlContent));
+                w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Preparing LTC Report</title><style>body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f8fafc;color:#1f2937;display:flex;align-items:center;justify-content:center;height:100vh;} .box{max-width:560px;padding:20px;border:1px solid #dbe5ef;border-radius:10px;background:#ffffff;box-shadow:0 10px 30px rgba(15,23,42,0.08);} h1{margin:0 0 8px;font-size:18px;color:#1e3a5f;} p{margin:0;font-size:13px;color:#475569;line-height:1.5;}<\/style></head><body><div class="box"><h1>Preparing PDF Report</h1><p>Generating full engineering content and visual packs. This can take a few seconds for Monte Carlo and compare snapshots.</p></div></body></html>');
                 w.document.close();
+                setTimeout(function() {
+                    try {
+                        var htmlContent = buildFn ? buildFn() : '';
+                        if (!writePdfWindowContent(w, htmlContent)) {
+                            alert('PDF export failed: report window is closed.');
+                        }
+                    } catch (err) {
+                        if (w && !w.closed) {
+                            w.document.open();
+                            w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PDF Export Error</title><style>body{font-family:Inter,Segoe UI,Arial,sans-serif;padding:24px;color:#1f2937;background:#ffffff;} h1{color:#991b1b;} pre{white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;}<\/style></head><body><h1>PDF export failed</h1><p>Unexpected report generation error.</p><pre>' + escapeHtml(String(err && err.message ? err.message : err)) + '<\/pre></body></html>');
+                            w.document.close();
+                        }
+                    }
+                }, 0);
                 return true;
+            }
+
+            function validatePdfCompleteness(htmlContent, reportType) {
+                var html = String(htmlContent || '');
+                var type = (reportType === 'compare') ? 'compare' : 'single';
+                var required = PDF_REQUIRED_SECTIONS[type] || [];
+                var missing = required.filter(function(title) {
+                    return html.indexOf('<h2>' + title + '</h2>') < 0;
+                });
+                var svgCount = (html.match(/<svg\b/g) || []).length;
+                var narrativeCount = (html.match(/Narrative Conclusion:/g) || []).length;
+                var tableCount = (html.match(/<table\b/g) || []).length;
+                var minSvg = type === 'compare' ? 10 : 8;
+                var minNarrative = type === 'compare' ? 10 : 12;
+                var minTable = type === 'compare' ? 12 : 16;
+                var issues = [];
+                if (svgCount < minSvg) issues.push('Low chart count (' + svgCount + '/' + minSvg + ').');
+                if (narrativeCount < minNarrative) issues.push('Low narrative count (' + narrativeCount + '/' + minNarrative + ').');
+                if (tableCount < minTable) issues.push('Low table count (' + tableCount + '/' + minTable + ').');
+                return {
+                    ok: missing.length === 0 && issues.length === 0,
+                    reportType: type,
+                    missing: missing,
+                    issues: issues,
+                    svgCount: svgCount,
+                    narrativeCount: narrativeCount,
+                    tableCount: tableCount
+                };
+            }
+
+            function withPdfCompletenessGuard(htmlContent, reportType) {
+                var html = String(htmlContent || '');
+                var report = validatePdfCompleteness(html, reportType);
+                if (report.ok) return { html: html, report: report };
+                var notice = [
+                    '<section class="r-sec"><h2>Export Completeness Preflight</h2><div class="r-body">',
+                    '<div class="r-conclusion warn"><strong>Preflight Notice:</strong> Report generated with completeness warnings. Review items below before formal sign-off export.</div>',
+                    report.missing.length ? ('<div class="r-note"><strong>Missing required sections:</strong> ' + escapeHtml(report.missing.join(' | ')) + '</div>') : '',
+                    report.issues.length ? ('<ul class="r-list" style="margin-top:6px;">' + report.issues.map(function(t) { return '<li>' + escapeHtml(t) + '</li>'; }).join('') + '</ul>') : '',
+                    '<div class="r-note">Detected counts: svg=' + report.svgCount + ', narrative=' + report.narrativeCount + ', table=' + report.tableCount + '.</div>',
+                    '</div></section>'
+                ].join('');
+                return { html: notice + html, report: report };
             }
 
             function architectureLabelByKey(key) {
@@ -9990,6 +10992,85 @@
                     dry_pipe: 'Dry Pipe'
                 };
                 return map[key] || String(key || 'Unknown');
+            }
+
+            function renderPdfCompactKvTable(title, rows, keyLabel, valueLabel) {
+                var list = Array.isArray(rows) ? rows : [];
+                return [
+                    '<div class="r-chart-wrap">',
+                    '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Table') + '</strong></div>',
+                    '<table><thead><tr><th>' + escapeHtml(keyLabel || 'Parameter') + '</th><th>' + escapeHtml(valueLabel || 'Value') + '</th></tr></thead><tbody>',
+                    list.map(function(r) {
+                        return '<tr><td>' + escapeHtml(String((r && r.k != null) ? r.k : '-')) + '</td><td>' + escapeHtml(String((r && r.v != null) ? r.v : '-')) + '</td></tr>';
+                    }).join(''),
+                    '</tbody></table>',
+                    '</div>'
+                ].join('');
+            }
+
+            function renderPdfParetoLedgerTable(title, rows, selectedIdx) {
+                var list = Array.isArray(rows) ? rows : [];
+                if (!list.length) {
+                    return '<div class="r-chart-wrap"><div class="muted"><strong>' + escapeHtml(title || 'Pareto Ledger') + ':</strong> no rows available.</div></div>';
+                }
+                return [
+                    '<div class="r-chart-wrap allow-break">',
+                    '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Pareto Ledger') + '</strong></div>',
+                    '<table><thead><tr><th>Point</th><th>Feasible</th><th>PUE</th><th>COP</th><th>Net OPEX</th><th>Carbon</th><th>Risk</th></tr></thead><tbody>',
+                    list.map(function(r, idx) {
+                        var sel = (selectedIdx != null && idx === selectedIdx) ? ' style="background:rgba(37,99,235,0.08);"' : '';
+                        return '<tr' + sel + '><td>' + escapeHtml(String(r.point || '-')) + '</td><td>' + escapeHtml(String(r.feasible || '-')) + '</td><td>' + escapeHtml(String(r.pue || '-')) + '</td><td>' + escapeHtml(String(r.cop || '-')) + '</td><td>' + escapeHtml(String(r.opex || '-')) + '</td><td>' + escapeHtml(String(r.carbon || '-')) + '</td><td>' + escapeHtml(String(r.risk || '-')) + '</td></tr>';
+                    }).join(''),
+                    '</tbody></table>',
+                    '</div>'
+                ].join('');
+            }
+
+            function renderPdfMonteDetailTable(title, rows) {
+                var list = Array.isArray(rows) ? rows : [];
+                if (!list.length) {
+                    return '<div class="r-chart-wrap"><div class="muted"><strong>' + escapeHtml(title || 'Monte Carlo Detail') + ':</strong> no rows available.</div></div>';
+                }
+                return [
+                    '<div class="r-chart-wrap allow-break">',
+                    '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Monte Carlo Detail') + '</strong></div>',
+                    '<table><thead><tr><th>Metric</th><th>P5</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>P95</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>',
+                    list.map(function(r) {
+                        return '<tr><td>' + escapeHtml(String(r.metric || '-')) + '</td><td>' + escapeHtml(String(r.p5 || '-')) + '</td><td>' + escapeHtml(String(r.p10 || '-')) + '</td><td>' + escapeHtml(String(r.p25 || '-')) + '</td><td>' + escapeHtml(String(r.p50 || '-')) + '</td><td>' + escapeHtml(String(r.p75 || '-')) + '</td><td>' + escapeHtml(String(r.p90 || '-')) + '</td><td>' + escapeHtml(String(r.p95 || '-')) + '</td><td>' + escapeHtml(String(r.mean || '-')) + '</td><td>' + escapeHtml(String(r.std || '-')) + '</td><td>' + escapeHtml(String(r.min || '-')) + '</td><td>' + escapeHtml(String(r.max || '-')) + '</td></tr>';
+                    }).join(''),
+                    '</tbody></table>',
+                    '</div>'
+                ].join('');
+            }
+
+            function pdfGlossaryRows() {
+                var keys = Object.keys(PARAM_TOOLTIPS || {}).sort();
+                return keys.map(function(k) {
+                    var meta = PARAM_TOOLTIPS[k] || {};
+                    return {
+                        key: k,
+                        title: meta.title || prettifyKey(k),
+                        desc: meta.desc || '-',
+                        formula: meta.formula || '-'
+                    };
+                });
+            }
+
+            function renderPdfGlossaryTable(title, rows) {
+                var list = Array.isArray(rows) ? rows : [];
+                if (!list.length) {
+                    return '<div class="r-chart-wrap"><div class="muted"><strong>' + escapeHtml(title || 'Glossary') + ':</strong> no rows available.</div></div>';
+                }
+                return [
+                    '<div class="r-chart-wrap allow-break">',
+                    '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Glossary') + '</strong></div>',
+                    '<table><thead><tr><th>Key</th><th>Term</th><th>Definition</th><th>Formula / Reference</th></tr></thead><tbody>',
+                    list.map(function(r) {
+                        return '<tr><td class="mono">' + escapeHtml(String(r.key || '-')) + '</td><td>' + escapeHtml(String(r.title || '-')) + '</td><td>' + escapeHtml(String(r.desc || '-')) + '</td><td>' + escapeHtml(String(r.formula || '-')) + '</td></tr>';
+                    }).join(''),
+                    '</tbody></table>',
+                    '</div>'
+                ].join('');
             }
 
             function pdfInputMatrixRows(model) {
@@ -10103,16 +11184,22 @@
             }
 
             function pdfSingleRecommendations(model, hard, gates, constraints) {
-                var out = [];
-                if (model.pue > model.input.targetPue) out.push('PUE above target: tighten thermal and electrical overhead, especially pump and UPS-loss branches.');
-                if (model.systemCop < model.input.targetCop) out.push('COP below target: improve liquid COP pathway via delta-T, capture, and control quality.');
-                if (!hard.feasible) out.push('Hard constraints violated: ' + hard.issues.join(', ') + '. Rebalance setpoints before deployment.');
-                if (hard.pumpPctIt > constraints.pumpPctMax) out.push('Pump as %IT too high (' + fmtNum(hard.pumpPctIt, 2) + '%). Focus on pump efficiency, head, and pipe multiplier.');
-                if (!gates.g1 || !gates.g2 || !gates.g3) out.push('One or more control gates blocked: review rule set and control confidence assumptions.');
-                if (model.riskIndex > 40) out.push('Risk index elevated (' + fmtNum(model.riskIndex, 1) + '). Strengthen redundancy, monitoring, and control reliability.');
-                if (model.netCarbonTons > 55000) out.push('Carbon burden remains high; increase heat reuse and lower non-IT overhead share.');
-                if (!out.length) out.push('Current scenario is balanced across KPI, constraints, and risk envelope. Keep monitoring and validate with telemetry.');
-                return out;
+                var items = [];
+                function push(priority, text) {
+                    items.push({ p: priority, text: text });
+                }
+                if (!hard.feasible) push(1, 'Hard constraints violated (' + hard.issues.join(', ') + '). Rebalance design inputs before deployment sign-off.');
+                if (model.pue > model.input.targetPue) push(1, 'PUE above target by ' + fmtNum(model.pue - model.input.targetPue, 3) + '. Tighten thermal and electrical overhead (pump, air path, UPS-loss).');
+                if (model.systemCop < model.input.targetCop) push(1, 'COP below target by ' + fmtNum(model.input.targetCop - model.systemCop, 2) + '. Improve delta-T stability, liquid capture, and control quality.');
+                if (hard.pumpPctIt > constraints.pumpPctMax) push(1, 'Pump %IT exceeds hard threshold (' + fmtNum(hard.pumpPctIt, 2) + '% > ' + fmtNum(constraints.pumpPctMax, 2) + '%). Rework head/loss/efficiency profile.');
+                if (!gates.g1 || !gates.g2 || !gates.g3) push(2, 'Control gates blocked (G1=' + (gates.g1 ? 'OPEN' : 'BLOCKED') + ', G2=' + (gates.g2 ? 'OPEN' : 'BLOCKED') + ', G3=' + (gates.g3 ? 'OPEN' : 'BLOCKED') + '). Align rule thresholds with instrument confidence.');
+                if (model.riskIndex > 40) push(2, 'Risk index elevated at ' + fmtNum(model.riskIndex, 1) + '. Harden redundancy, monitoring coverage, and degraded-mode procedures.');
+                if (model.netCarbonTons > 55000) push(3, 'Carbon burden remains high (' + fmtNum(model.netCarbonTons, 0) + ' tCO2e/yr). Increase heat reuse and reduce non-IT branch demand.');
+                if (!items.length) push(3, 'Scenario is balanced across KPI, constraints, and risk envelope. Keep telemetry validation cadence and periodic sensitivity checks.');
+                items.sort(function(a, b) { return a.p - b.p; });
+                return items.map(function(item) {
+                    return '[P' + item.p + '] ' + item.text;
+                });
             }
 
             function pdfCompareInputDeltaRows(leftModel, rightModel) {
@@ -10197,6 +11284,48 @@
                     '<table><thead><tr><th>Parameter</th><th>Sens</th><th>kW Eq.</th><th>Impact</th></tr></thead><tbody>',
                     rows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.sens) + '</td><td>' + escapeHtml(r.kw) + '</td><td>' + escapeHtml(r.impact) + '</td></tr>';
+                    }).join(''),
+                    '</tbody></table>',
+                    '</div>'
+                ].join('');
+            }
+
+            function pdfSankeyExpandedRows(model) {
+                if (!model) return [];
+                var nodeIds = ['source', 'thermal', 'liq', 'pump', 'air', 'fan', 'elec', 'aux'];
+                var rows = [];
+                nodeIds.forEach(function(nodeId) {
+                    var spec = buildSankeyDrillSpec(nodeId, model);
+                    if (!spec || !spec.rows || !spec.rows.length) return;
+                    var nodeLabel = (spec.title || nodeId).split('|')[0].trim();
+                    var corr = (spec.corrRows || []).slice(0, 3).map(function(c) {
+                        return String(c.param || '-') + ' (' + String(c.kw || '-') + ')';
+                    }).join(' | ');
+                    spec.rows.forEach(function(r) {
+                        rows.push({
+                            node: nodeLabel,
+                            component: r.label || '-',
+                            value: fmtNum(r.value || 0, 1) + ' kW',
+                            share: r.pct || '-',
+                            corr: corr || '-',
+                            note: shortText(String(r.note || '-'), 140)
+                        });
+                    });
+                });
+                return rows;
+            }
+
+            function renderPdfSankeyExpandedTable(title, rows) {
+                var list = Array.isArray(rows) ? rows : [];
+                if (!list.length) {
+                    return '<div class="r-chart-wrap"><div class="muted"><strong>' + escapeHtml(title || 'Sankey Expanded Drilldown') + ':</strong> no rows available.</div></div>';
+                }
+                return [
+                    '<div class="r-chart-wrap allow-break">',
+                    '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Sankey Expanded Drilldown') + '</strong></div>',
+                    '<table><thead><tr><th>Node</th><th>Component</th><th>Value</th><th>Share</th><th>Top Correlated Parameters</th><th>Notes</th></tr></thead><tbody>',
+                    list.map(function(r) {
+                        return '<tr><td>' + escapeHtml(String(r.node || '-')) + '</td><td>' + escapeHtml(String(r.component || '-')) + '</td><td>' + escapeHtml(String(r.value || '-')) + '</td><td>' + escapeHtml(String(r.share || '-')) + '</td><td>' + escapeHtml(String(r.corr || '-')) + '</td><td>' + escapeHtml(String(r.note || '-')) + '</td></tr>';
                     }).join(''),
                     '</tbody></table>',
                     '</div>'
@@ -10335,8 +11464,11 @@
             function singleRecommendationNarrative(recs) {
                 var arr = Array.isArray(recs) ? recs : [];
                 if (!arr.length) return narrativePack('warn', 'No recommendation items generated.');
-                var level = arr.length >= 5 ? 'warn' : 'ok';
-                var text = 'Action queue contains ' + arr.length + ' prioritized items. First action: ' + shortText(arr[0], 160);
+                var p1 = arr.filter(function(t) { return String(t).indexOf('[P1]') === 0; }).length;
+                var p2 = arr.filter(function(t) { return String(t).indexOf('[P2]') === 0; }).length;
+                var p3 = arr.filter(function(t) { return String(t).indexOf('[P3]') === 0; }).length;
+                var level = p1 > 0 ? 'bad' : (arr.length >= 5 ? 'warn' : 'ok');
+                var text = 'Action queue contains ' + arr.length + ' prioritized items (P1=' + p1 + ', P2=' + p2 + ', P3=' + p3 + '). First action: ' + shortText(arr[0], 180);
                 return narrativePack(level, text);
             }
 
@@ -10434,8 +11566,9 @@
 
             function compareRecommendationNarrative(recommendation, verdict) {
                 var recs = Array.isArray(recommendation) ? recommendation : [];
-                var level = recs.length >= 5 ? 'warn' : 'ok';
-                var text = verdict + ' Priority next move: ' + (recs.length ? shortText(recs[0], 180) : 'no recommendation generated');
+                var p1 = recs.filter(function(t) { return String(t).indexOf('[P1]') === 0; }).length;
+                var level = p1 > 0 ? 'warn' : (recs.length >= 5 ? 'warn' : 'ok');
+                var text = verdict + ' Priority next move: ' + (recs.length ? shortText(recs[0], 180) : 'no recommendation generated') + '. Queue size=' + recs.length + ', P1=' + p1 + '.';
                 return narrativePack(level, text);
             }
 
@@ -10497,9 +11630,10 @@
                 return out;
             }
 
-            function pdfParetoLedgerRows() {
-                if (!latestPareto || !latestPareto.length) return [];
-                return latestPareto.map(function(m, idx) {
+            function pdfParetoLedgerRows(sourcePareto) {
+                var dataset = Array.isArray(sourcePareto) ? sourcePareto : latestPareto;
+                if (!dataset || !dataset.length) return [];
+                return dataset.map(function(m, idx) {
                     return {
                         point: 'P' + (idx + 1),
                         feasible: m._feasible ? 'yes' : 'soft',
@@ -10517,8 +11651,9 @@
                 });
             }
 
-            function pdfMonteCarloDetailRows() {
-                if (!latestMonteCarlo || !latestMonteCarlo.dist) return [];
+            function pdfMonteCarloDetailRows(sourceMc) {
+                var mcState = sourceMc && sourceMc.dist ? sourceMc : latestMonteCarlo;
+                if (!mcState || !mcState.dist) return [];
                 var specs = [
                     { key: 'pue', label: 'PUE', digits: 3 },
                     { key: 'cop', label: 'COP', digits: 2 },
@@ -10527,18 +11662,22 @@
                     { key: 'risk', label: 'Risk Index', digits: 1 }
                 ];
                 return specs.map(function(spec) {
-                    var arr = (latestMonteCarlo.dist[spec.key] || []).slice();
+                    var arr = (mcState.dist[spec.key] || []).slice();
                     if (!arr.length) {
                         return {
-                            metric: spec.label, p10: '-', p50: '-', p90: '-', mean: '-', std: '-', min: '-', max: '-'
+                            metric: spec.label, p5: '-', p10: '-', p25: '-', p50: '-', p75: '-', p90: '-', p95: '-', mean: '-', std: '-', min: '-', max: '-'
                         };
                     }
                     var sorted = arr.slice().sort(function(a, b) { return a - b; });
                     return {
                         metric: spec.label,
+                        p5: fmtNum(percentile(sorted, 0.05), spec.digits),
                         p10: fmtNum(percentile(sorted, 0.10), spec.digits),
+                        p25: fmtNum(percentile(sorted, 0.25), spec.digits),
                         p50: fmtNum(percentile(sorted, 0.50), spec.digits),
+                        p75: fmtNum(percentile(sorted, 0.75), spec.digits),
                         p90: fmtNum(percentile(sorted, 0.90), spec.digits),
+                        p95: fmtNum(percentile(sorted, 0.95), spec.digits),
                         mean: fmtNum(meanArray(sorted), spec.digits),
                         std: fmtNum(stdArray(sorted), spec.digits),
                         min: fmtNum(sorted[0], spec.digits),
@@ -10648,9 +11787,12 @@
                 ];
             }
 
-            function buildPdfRuntimeSnapshot(source, model, constraints, hard, guard, gates, rules) {
-                var mc = pdfMonteCarloDetailRows();
-                var pareto = pdfParetoLedgerRows();
+            function buildPdfRuntimeSnapshot(source, model, constraints, hard, guard, gates, rules, overrides) {
+                var ov = overrides || {};
+                var mcState = ov.mcState || null;
+                var paretoSet = Array.isArray(ov.paretoSet) ? ov.paretoSet : null;
+                var mc = pdfMonteCarloDetailRows(mcState);
+                var pareto = pdfParetoLedgerRows(paretoSet);
                 var telemetry = pdfTelemetrySummary();
                 return {
                     generatedAt: nowIso(),
@@ -10670,14 +11812,18 @@
                     telemetry: telemetry,
                     pareto: {
                         points: pareto.length,
-                        selectedIdx: selectedParetoIdx,
+                        selectedIdx: (ov.selectedParetoIdx == null ? selectedParetoIdx : ov.selectedParetoIdx),
                         rows: pareto
                     },
-                    monteCarlo: latestMonteCarlo ? {
-                        samples: latestMonteCarlo.samples,
-                        uncertainty: latestMonteCarlo.unc,
+                    monteCarlo: (mcState || latestMonteCarlo) ? {
+                        samples: (mcState || latestMonteCarlo).samples,
+                        uncertainty: (mcState || latestMonteCarlo).unc,
                         detail: mc
                     } : null,
+                    stochastic: {
+                        qualityMode: ov.qualityMode || 'default',
+                        seed: (ov.seed == null ? '-' : String(ov.seed))
+                    },
                     scenarios: pdfScenarioRows(),
                     explorer: {
                         state: explorerState,
@@ -10712,6 +11858,7 @@
                 var mc = s.monteCarlo || null;
                 var scenarios = Array.isArray(s.scenarios) ? s.scenarios : [];
                 var explorer = s.explorer || {};
+                var stochastic = s.stochastic || {};
                 var explorerBlocks = Array.isArray(explorer.blocks) ? explorer.blocks : [];
                 var historyTail = Array.isArray(explorer.historyTail) ? explorer.historyTail : [];
                 return {
@@ -10736,6 +11883,7 @@
                     telemetry: 'agg ' + (telemetry.aggregation || '-') + ' | window ' + (telemetry.windowRows || 'all') + ' | rows ' + fmtNum(telemetry.rows || 0, 0) + ' | headers ' + fmtNum(telemetry.headers || 0, 0),
                     pareto: 'points ' + fmtNum(pareto.points || 0, 0) + ' | selected idx ' + fmtNum((pareto.selectedIdx == null ? -1 : pareto.selectedIdx), 0),
                     monteCarlo: mc ? ('samples ' + fmtNum(mc.samples || 0, 0) + ' | uncertainty ±' + fmtNum((mc.uncertainty || 0) * 100, 1) + '%') : 'not available',
+                    stochastic: 'quality ' + String(stochastic.qualityMode || 'default') + ' | seed ' + String(stochastic.seed == null ? '-' : stochastic.seed),
                     scenarios: fmtNum(scenarios.length, 0),
                     explorer: 'blocks ' + fmtNum(explorerBlocks.length, 0) + ' | history tail ' + fmtNum(historyTail.length, 0)
                 };
@@ -10883,6 +12031,7 @@
                     { k: 'Telemetry', v: d.telemetry, n: 'Telemetry parser mode and coverage summary.' },
                     { k: 'Pareto', v: d.pareto, n: 'Frontier count and active selected point.' },
                     { k: 'Monte Carlo', v: d.monteCarlo, n: 'Uncertainty run envelope summary.' },
+                    { k: 'Stochastic Setup', v: d.stochastic, n: 'Quality mode and random seed for reproducibility.' },
                     { k: 'Scenario Vault', v: d.scenarios + ' snapshots', n: 'Stored scenario count at export time.' },
                     { k: 'Explorer', v: d.explorer, n: 'Explorer block and history trace footprint.' },
                     { k: 'Model KPI', v: 'PUE ' + d.pue + ' | COP ' + d.cop + ' | Net OPEX ' + d.netOpex + ' | Carbon ' + d.netCarbon + ' | Risk ' + d.risk, n: 'Primary output vector summary.' }
@@ -10906,9 +12055,9 @@
                     (!hardStops.length && !warnings.length ? '<tr><td>Guardrail</td><td><span class="ok">CLEAR</span></td><td>No hard stop or warning in this runtime snapshot.</td></tr>' : ''),
                     '</tbody></table>',
                     (mcRows.length
-                        ? ('<table style="margin-top:8px;"><thead><tr><th>Monte Carlo Metric</th><th>P10</th><th>P50</th><th>P90</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
+                        ? ('<table style="margin-top:8px;"><thead><tr><th>Monte Carlo Metric</th><th>P5</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>P95</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
                             mcRows.map(function(r) {
-                                return '<tr><td>' + escapeHtml(String(r.metric || '-')) + '</td><td>' + escapeHtml(String(r.p10 || '-')) + '</td><td>' + escapeHtml(String(r.p50 || '-')) + '</td><td>' + escapeHtml(String(r.p90 || '-')) + '</td><td>' + escapeHtml(String(r.mean || '-')) + '</td><td>' + escapeHtml(String(r.std || '-')) + '</td><td>' + escapeHtml(String(r.min || '-')) + '</td><td>' + escapeHtml(String(r.max || '-')) + '</td></tr>';
+                                return '<tr><td>' + escapeHtml(String(r.metric || '-')) + '</td><td>' + escapeHtml(String(r.p5 || '-')) + '</td><td>' + escapeHtml(String(r.p10 || '-')) + '</td><td>' + escapeHtml(String(r.p25 || '-')) + '</td><td>' + escapeHtml(String(r.p50 || '-')) + '</td><td>' + escapeHtml(String(r.p75 || '-')) + '</td><td>' + escapeHtml(String(r.p90 || '-')) + '</td><td>' + escapeHtml(String(r.p95 || '-')) + '</td><td>' + escapeHtml(String(r.mean || '-')) + '</td><td>' + escapeHtml(String(r.std || '-')) + '</td><td>' + escapeHtml(String(r.min || '-')) + '</td><td>' + escapeHtml(String(r.max || '-')) + '</td></tr>';
                             }).join('') +
                             '</tbody></table>')
                         : '<div class="muted" style="margin-top:8px;">Monte Carlo detail not available in current session snapshot.</div>'),
@@ -10951,6 +12100,7 @@
                     { k: 'Telemetry', l: ld.telemetry, r: rd.telemetry },
                     { k: 'Pareto', l: ld.pareto, r: rd.pareto },
                     { k: 'Monte Carlo', l: ld.monteCarlo, r: rd.monteCarlo },
+                    { k: 'Stochastic Setup', l: ld.stochastic, r: rd.stochastic },
                     { k: 'Scenario Vault', l: ld.scenarios + ' snapshots', r: rd.scenarios + ' snapshots' },
                     { k: 'Explorer', l: ld.explorer, r: rd.explorer },
                     { k: 'Model KPI', l: 'PUE ' + ld.pue + ' | COP ' + ld.cop + ' | OPEX ' + ld.netOpex + ' | Carbon ' + ld.netCarbon + ' | Risk ' + ld.risk, r: 'PUE ' + rd.pue + ' | COP ' + rd.cop + ' | OPEX ' + rd.netOpex + ' | Carbon ' + rd.netCarbon + ' | Risk ' + rd.risk }
@@ -11009,7 +12159,8 @@
                 return narrativePack(level, 'Self-test results: ' + pass + '/' + rows.length + ' checks passed in latest run snapshot.');
             }
 
-            function buildSinglePdfReport(source) {
+            function buildSinglePdfReport(source, reportOptions) {
+                var reportOpts = reportOptions || resolvePdfReportOptions();
                 var model = source.model;
                 var rules = source.rules || gateRules;
                 var constraints = source.constraints || gatherConstraintState();
@@ -11032,15 +12183,31 @@
                 var allNodeSensitivityRowsPdf = pdfAllNodeSensitivityRows(model, 4);
                 var inputGuard = evaluateInputHardRules(model.input, model, constraints);
                 var impactRowsPdf = pdfImpactRows(model);
-                var paretoLedgerRowsPdf = pdfParetoLedgerRows();
-                var mcDetailRowsPdf = pdfMonteCarloDetailRows();
+                var reportParetoData = (latestPareto && latestPareto.length) ? latestPareto.slice() : generateParetoForInput(model.input, constraints, reportOpts.paretoSamples, reportOpts);
+                var reportMcState = (latestMonteCarlo && latestMonteCarlo.dist) ? latestMonteCarlo : generateMonteCarloForInput(model.input, reportOpts.mcSamples, reportOpts.uncertainty, reportOpts);
+                var paretoLedgerRowsPdf = pdfParetoLedgerRows(reportParetoData);
+                var mcDetailRowsPdf = pdfMonteCarloDetailRows(reportMcState);
                 var selfTestRowsPdf = pdfSelfTestRowsFromDom();
                 var telemetrySummaryPdf = pdfTelemetrySummary();
                 var telemetryRowsPdf = pdfTelemetryRows();
                 var explorerAuditRowsPdf = pdfExplorerAuditRows(model);
                 var scenarioRowsPdf = pdfScenarioRows();
                 var equationLinesPdf = pdfEquationLines(model);
-                var runtimeSnapshotPdf = buildPdfRuntimeSnapshot(source, model, constraints, hard, inputGuard, gates, rules);
+                var sankeySvgPdf = buildPdfSankeyFlowSvg(model, 'Facility Sankey Distribution');
+                var paretoScatterSvgPdf = buildPdfParetoScatterSvg(reportParetoData, 'Pareto Frontier (PUE vs Net OPEX)');
+                var monteHistSvgPdf = buildPdfMonteCarloHistogramSvg(reportMcState, 'Monte Carlo Histogram Pack');
+                var tornadoSvgPdf = buildPdfImpactTornadoSvg(impactRowsPdf, 'Sensitivity Tornado (dNet OPEX)');
+                var standardsRadarSvgPdf = buildPdfStandardsRadarSvg(model, 'Standards Radar');
+                var standardsHeatmapSvgPdf = buildPdfStandardsHeatmapSvg(model, 'Standards Heatmap');
+                var sankeyExpandedRowsPdf = pdfSankeyExpandedRows(model);
+                var glossaryRowsPdf = pdfGlossaryRows();
+                var runtimeSnapshotPdf = buildPdfRuntimeSnapshot(source, model, constraints, hard, inputGuard, gates, rules, {
+                    paretoSet: reportParetoData,
+                    mcState: reportMcState,
+                    selectedParetoIdx: selectedParetoIdx,
+                    qualityMode: reportOpts.qualityMode,
+                    seed: reportOpts.seed
+                });
                 var nExecutive = singleExecutiveNarrative(model, hard, gates, calScore);
                 var nKpiEnergy = singleKpiEnergyNarrative(model);
                 var nConstraint = singleConstraintNarrative(model, hard, gates, calScore, standards);
@@ -11056,13 +12223,28 @@
                 var nTelemetry = singleTelemetryNarrative(telemetrySummaryPdf, telemetryRowsPdf);
                 var nScenario = singleScenarioNarrative(scenarioRowsPdf);
                 var nSelfTest = singleSelfTestNarrative(selfTestRowsPdf);
+                var nSankeyExpanded = narrativePack('ok', 'Expanded Sankey drilldown maps component-level branch composition with correlated parameter sensitivities across source, thermal, hydraulic, and auxiliary nodes.');
+                var nGlossary = narrativePack('ok', 'Glossary appendix generated from unified tooltip dictionary to keep UI and PDF terminology definitions aligned.');
+                var methodologyRows = [
+                    { k: 'Solver Core', v: 'Deterministic thermo-hydraulic + control correction + loss model' },
+                    { k: 'Constraint Policy', v: 'PUE<=' + fmtNum(constraints.pueMax, 3) + ' | COP>=' + fmtNum(constraints.copMin, 2) + ' | Risk<=' + fmtNum(constraints.riskMax, 1) + ' | Pump%IT<=' + fmtNum(constraints.pumpPctMax, 2) },
+                    { k: 'Monte Carlo', v: 'n=' + fmtNum(reportMcState ? reportMcState.samples : 0, 0) + ' | uncertainty ±' + fmtNum(((reportMcState ? reportMcState.unc : 0) || 0) * 100, 1) + '%' + (reportOpts.seed == null ? '' : (' | seed ' + reportOpts.seed)) },
+                    { k: 'Pareto Frontier', v: fmtNum(reportParetoData.length, 0) + ' nondominated points from stochastic candidate pool' },
+                    { k: 'Compute Quality', v: String(reportOpts.qualityMode || 'full').toUpperCase() + ' | MC preset ' + fmtNum(reportOpts.mcSamples || 0, 0) + ' | Pareto preset ' + fmtNum(reportOpts.paretoSamples || 0, 0) },
+                    { k: 'Sensitivity Method', v: 'Finite-difference local perturbation around active operating point' },
+                    { k: 'Calibration Inputs', v: 'Val err ' + fmtNum(quality.valErr, 2) + '% | CI95 ±' + fmtNum(quality.ci95, 2) + '% | score ' + fmtNum(calScore, 1) + '/100' },
+                    { k: 'Standards Mapping', v: 'ASHRAE + ANSI/TIA-942 + ISO 50001 + NFPA + Uptime weighted synthesis' },
+                    { k: 'Telemetry Mode', v: String((telemetrySummaryPdf && telemetrySummaryPdf.status) ? telemetrySummaryPdf.status : '-') + ' | rows ' + fmtNum((telemetrySummaryPdf && telemetrySummaryPdf.rows) || 0, 0) },
+                    { k: 'Data Provenance', v: 'Generated client-side at ' + nowIso() + ' from source "' + source.label + '"' }
+                ];
+                var nMethodology = narrativePack('ok', 'Methodology bundle captures solver logic, constraints, uncertainty simulation, frontier search, and standards scoring. Use this section for audit traceability and design-governance review.');
                 var mcChart = buildPdfMonteCarloBandSvg();
                 var mcSection = '';
                 var mcRowsForNarrative = null;
                 var mcMetaForNarrative = null;
 
-                if (latestMonteCarlo && latestMonteCarlo.dist) {
-                    var dist = latestMonteCarlo.dist;
+                if (reportMcState && reportMcState.dist) {
+                    var dist = reportMcState.dist;
                     var mcRows = [
                         { k: 'PUE', p10: percentile(dist.pue, 0.10), p50: percentile(dist.pue, 0.50), p90: percentile(dist.pue, 0.90), d: 3 },
                         { k: 'COP', p10: percentile(dist.cop, 0.10), p50: percentile(dist.cop, 0.50), p90: percentile(dist.cop, 0.90), d: 2 },
@@ -11071,14 +12253,14 @@
                         { k: 'Risk Index', p10: percentile(dist.risk, 0.10), p50: percentile(dist.risk, 0.50), p90: percentile(dist.risk, 0.90), d: 1 }
                     ];
                     mcRowsForNarrative = mcRows;
-                    mcMetaForNarrative = { samples: latestMonteCarlo.samples || 0, unc: latestMonteCarlo.unc || 0 };
+                    mcMetaForNarrative = { samples: reportMcState.samples || 0, unc: reportMcState.unc || 0 };
                     mcSection = [
                         '<section class="r-sec"><h2>Uncertainty Envelope (Monte Carlo)</h2><div class="r-body">',
                         '<div class="r-grid2">',
-                        '<div class="r-card"><div class="k">Simulation</div><div class="v">' + fmtNum(latestMonteCarlo.samples || 0, 0) + ' runs</div><div class="s">Input uncertainty ±' + fmtNum((latestMonteCarlo.unc || 0) * 100, 1) + '%</div></div>',
+                        '<div class="r-card"><div class="k">Simulation</div><div class="v">' + fmtNum(reportMcState.samples || 0, 0) + ' runs</div><div class="s">Input uncertainty ±' + fmtNum((reportMcState.unc || 0) * 100, 1) + '%</div></div>',
                         '<div class="r-card"><div class="k">Interpretation</div><div class="s">Use P10/P50/P90 spread to validate robustness before deployment gates and capex commitment.</div></div>',
                         '</div>',
-                        mcChart ? ('<div class="r-chart-wrap" style="margin-top:8px;">' + mcChart + '</div>') : '<div class="muted">Monte Carlo chart unavailable.</div>',
+                        (mcChart || monteHistSvgPdf) ? ('<div class="r-chart-wrap" style="margin-top:8px;">' + (mcChart || monteHistSvgPdf) + '</div>') : '<div class="muted">Monte Carlo chart unavailable.</div>',
                         '<table style="margin-top:8px;"><thead><tr><th>Metric</th><th>P10</th><th>P50</th><th>P90</th></tr></thead><tbody>',
                         mcRows.map(function(r) {
                             return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + fmtNum(r.p10, r.d) + '</td><td>' + fmtNum(r.p50, r.d) + '</td><td>' + fmtNum(r.p90, r.d) + '</td></tr>';
@@ -11109,11 +12291,45 @@
                     narrativeHtml(nExecutive),
                     '</div></section>',
 
+                    '<section class="r-sec"><h2>Executive Scorecard</h2><div class="r-body">',
+                    '<div class="r-score-grid">',
+                    '<div class="r-score-card"><div class="k">Composite Engineering Score</div><div class="v">' + fmtNum(model.scores.total, 1) + '</div><span class="r-score-grade">GRADE ' + grade(model.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(model.pue, 3) + ' | COP ' + fmtNum(model.systemCop, 2) + ' | Risk ' + fmtNum(model.riskIndex, 1) + '/100.</div></div>',
+                    '<div class="r-score-card"><div class="k">Constraint + Gate Readiness</div><div class="v">' + ((hard.feasible ? 1 : 0) + (gates.g1 ? 1 : 0) + (gates.g2 ? 1 : 0) + (gates.g3 ? 1 : 0)) + '/4</div><span class="r-score-grade">' + (hard.feasible ? 'HARD-PASS' : 'HARD-FAIL') + '</span><div class="r-score-note">Gate state: G1 ' + (gates.g1 ? 'OPEN' : 'BLOCKED') + ' | G2 ' + (gates.g2 ? 'OPEN' : 'BLOCKED') + ' | G3 ' + (gates.g3 ? 'OPEN' : 'BLOCKED') + '.</div></div>',
+                    '</div>',
+                    narrativeHtml(nExecutive),
+                    '</div></section>',
+
                     '<section class="r-sec"><h2>KPI + Energy Visualization</h2><div class="r-body"><div class="r-grid2">',
                     '<div class="r-chart-wrap">' + (kpiChart || '<div class="muted">KPI chart unavailable.</div>') + '</div>',
                     '<div class="r-chart-wrap">' + (energyChart || '<div class="muted">Energy distribution chart unavailable.</div>') + '</div>',
                     '</div>',
                     narrativeHtml(nKpiEnergy),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Sankey + Pareto Visual Pack</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (sankeySvgPdf || '<div class="muted">Sankey chart unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (paretoScatterSvgPdf || '<div class="muted">Pareto scatter unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nPareto),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Sankey Expanded Branch Drilldown</h2><div class="r-body">',
+                    renderPdfSankeyExpandedTable('Expanded Sankey Branch Matrix', sankeyExpandedRowsPdf),
+                    narrativeHtml(nSankeyExpanded),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Monte Carlo + Tornado Visual Pack</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (monteHistSvgPdf || '<div class="muted">Monte Carlo histogram unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (tornadoSvgPdf || '<div class="muted">Tornado sensitivity unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(singleImpactNarrative(impactRowsPdf)),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Standards Visual Pack</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (standardsRadarSvgPdf || '<div class="muted">Standards radar unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (standardsHeatmapSvgPdf || '<div class="muted">Standards heatmap unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nConstraint),
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Constraint, Control, Calibration, Standards</h2><div class="r-body">',
@@ -11202,6 +12418,16 @@
 
                     '<section class="r-sec"><h2>Equation Trace (Complete)</h2><div class="r-body"><div class="r-chart-wrap allow-break"><pre class="mono r-json" style="margin:0;">' + escapeHtml(equationLinesPdf.join('\n')) + '</pre></div></div></section>',
 
+                    '<section class="r-sec"><h2>Methodology + Simulation Configuration</h2><div class="r-body">',
+                    '<table><thead><tr><th>Method Block</th><th>Configuration</th></tr></thead><tbody>',
+                    methodologyRows.map(function(r) {
+                        return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(r.v) + '</td></tr>';
+                    }).join(''),
+                    '</tbody></table>',
+                    '<div class="r-note">Model basis: multi-layer input-process-output engine with local perturbation sensitivity, stochastic uncertainty envelope, and standards-weighted compliance scoring.</div>',
+                    narrativeHtml(nMethodology),
+                    '</div></section>',
+
                     '<section class="r-sec"><h2>Impact Matrix (All Tunable Parameters)</h2><div class="r-body"><table><thead><tr><th>Parameter</th><th>Step</th><th>dPUE</th><th>dCOP</th><th>dNet OPEX</th><th>dCarbon</th><th>dRisk</th></tr></thead><tbody>',
                     impactRowsPdf.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.step) + '</td><td>' + escapeHtml(r.dpue) + '</td><td>' + escapeHtml(r.dcop) + '</td><td>' + escapeHtml(r.dopex) + '</td><td>' + escapeHtml(r.dcarbon) + '</td><td>' + escapeHtml(r.drisk) + '</td></tr>';
@@ -11215,6 +12441,7 @@
                         return '<tr><td>' + escapeHtml(r.node) + '</td><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.sens) + '</td><td>' + escapeHtml(r.kw) + '</td><td>' + escapeHtml(r.impact) + '</td></tr>';
                     }).join(''),
                     '</tbody></table>',
+                    narrativeHtml(nSensitivity),
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Pareto Frontier Ledger (Full Session)</h2><div class="r-body">',
@@ -11231,12 +12458,13 @@
 
                     '<section class="r-sec"><h2>Monte Carlo Detail Statistics</h2><div class="r-body">',
                     (mcDetailRowsPdf.length
-                        ? ('<table><thead><tr><th>Metric</th><th>P10</th><th>P50</th><th>P90</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
+                        ? ('<table><thead><tr><th>Metric</th><th>P5</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>P95</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
                             mcDetailRowsPdf.map(function(r) {
-                                return '<tr><td>' + escapeHtml(r.metric) + '</td><td>' + escapeHtml(r.p10) + '</td><td>' + escapeHtml(r.p50) + '</td><td>' + escapeHtml(r.p90) + '</td><td>' + escapeHtml(r.mean) + '</td><td>' + escapeHtml(r.std) + '</td><td>' + escapeHtml(r.min) + '</td><td>' + escapeHtml(r.max) + '</td></tr>';
+                                return '<tr><td>' + escapeHtml(r.metric) + '</td><td>' + escapeHtml(r.p5) + '</td><td>' + escapeHtml(r.p10) + '</td><td>' + escapeHtml(r.p25) + '</td><td>' + escapeHtml(r.p50) + '</td><td>' + escapeHtml(r.p75) + '</td><td>' + escapeHtml(r.p90) + '</td><td>' + escapeHtml(r.p95) + '</td><td>' + escapeHtml(r.mean) + '</td><td>' + escapeHtml(r.std) + '</td><td>' + escapeHtml(r.min) + '</td><td>' + escapeHtml(r.max) + '</td></tr>';
                             }).join('') +
                             '</tbody></table>')
                         : '<div class="muted">No Monte Carlo distribution available.</div>'),
+                    narrativeHtml(singleMonteCarloNarrative(mcRowsForNarrative, mcMetaForNarrative)),
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Explorer Block Audit (All Blocks)</h2><div class="r-body">',
@@ -11282,15 +12510,23 @@
                     narrativeHtml(nSelfTest),
                     '</div></section>',
 
+                    '<section class="r-sec page-break"><h2>Glossary Appendix (Unified Tooltip Dictionary)</h2><div class="r-body">',
+                    renderPdfGlossaryTable('All Terms + Definitions', glossaryRowsPdf),
+                    narrativeHtml(nGlossary),
+                    '</div></section>',
+
                     renderRuntimeStructuredSection('Complete Runtime Snapshot (Structured Audit)', runtimeSnapshotPdf)
                 ].join('');
             }
 
-            function buildComparePdfReport(left, right) {
+            function buildComparePdfReport(left, right, reportOptions) {
+                var reportOpts = reportOptions || resolvePdfReportOptions();
                 var lm = left.model;
                 var rm = right.model;
-                var lHard = evaluateHardConstraints(lm, left.constraints || gatherConstraintState());
-                var rHard = evaluateHardConstraints(rm, right.constraints || gatherConstraintState());
+                var lConstraints = left.constraints || gatherConstraintState();
+                var rConstraints = right.constraints || gatherConstraintState();
+                var lHard = evaluateHardConstraints(lm, lConstraints);
+                var rHard = evaluateHardConstraints(rm, rConstraints);
                 var lg = evaluateGateStatesWithRules(lm, left.rules || gateRules);
                 var rg = evaluateGateStatesWithRules(rm, right.rules || gateRules);
                 var metrics = [
@@ -11309,21 +12545,68 @@
                 var inputDeltaRowsAll = pdfCompareAllInputDeltaRows(lm, rm);
                 var lf = extractSankeyFlows(lm);
                 var rf = extractSankeyFlows(rm);
-                var lGuard = evaluateInputHardRules(lm.input, lm, left.constraints || gatherConstraintState());
-                var rGuard = evaluateInputHardRules(rm.input, rm, right.constraints || gatherConstraintState());
-                var leftRuntimeSnapshot = buildPdfRuntimeSnapshot(left, lm, left.constraints || gatherConstraintState(), lHard, lGuard, lg, left.rules || gateRules);
-                var rightRuntimeSnapshot = buildPdfRuntimeSnapshot(right, rm, right.constraints || gatherConstraintState(), rHard, rGuard, rg, right.rules || gateRules);
+                var lGuard = evaluateInputHardRules(lm.input, lm, lConstraints);
+                var rGuard = evaluateInputHardRules(rm.input, rm, rConstraints);
+                var lImpactRows = pdfImpactRows(lm);
+                var rImpactRows = pdfImpactRows(rm);
+                var lPareto = generateParetoForInput(lm.input, lConstraints, reportOpts.paretoSamples, reportOpts);
+                var rPareto = generateParetoForInput(rm.input, rConstraints, reportOpts.paretoSamples, reportOpts);
+                var lMcState = generateMonteCarloForInput(lm.input, reportOpts.mcSamples, reportOpts.uncertainty, reportOpts);
+                var rMcState = generateMonteCarloForInput(rm.input, reportOpts.mcSamples, reportOpts.uncertainty, reportOpts);
+                var lParetoLedgerRows = pdfParetoLedgerRows(lPareto);
+                var rParetoLedgerRows = pdfParetoLedgerRows(rPareto);
+                var lMcDetailRows = pdfMonteCarloDetailRows(lMcState);
+                var rMcDetailRows = pdfMonteCarloDetailRows(rMcState);
+                var leftSankeyChart = buildPdfSankeyFlowSvg(lm, 'Left Sankey');
+                var rightSankeyChart = buildPdfSankeyFlowSvg(rm, 'Right Sankey');
+                var leftParetoChart = buildPdfParetoScatterSvg(lPareto, 'Left Pareto Frontier');
+                var rightParetoChart = buildPdfParetoScatterSvg(rPareto, 'Right Pareto Frontier');
+                var leftMcChart = buildPdfMonteCarloHistogramSvg(lMcState, 'Left Monte Carlo Histogram');
+                var rightMcChart = buildPdfMonteCarloHistogramSvg(rMcState, 'Right Monte Carlo Histogram');
+                var leftTornadoChart = buildPdfImpactTornadoSvg(lImpactRows, 'Left Tornado (dNet OPEX)');
+                var rightTornadoChart = buildPdfImpactTornadoSvg(rImpactRows, 'Right Tornado (dNet OPEX)');
+                var standardsRadarCompare = buildPdfCompareStandardsRadarSvg(lm, rm, 'Standards Radar Compare');
+                var standardsHeatLeft = buildPdfStandardsHeatmapSvg(lm, 'Left Standards Heatmap');
+                var standardsHeatRight = buildPdfStandardsHeatmapSvg(rm, 'Right Standards Heatmap');
+                var leftSankeyExpandedRows = pdfSankeyExpandedRows(lm);
+                var rightSankeyExpandedRows = pdfSankeyExpandedRows(rm);
+                var glossaryRowsPdf = pdfGlossaryRows();
+                var leftInputRows = pdfInputMatrixRows(lm);
+                var rightInputRows = pdfInputMatrixRows(rm);
+                var leftOutputRows = pdfOutputVectorRows(lm);
+                var rightOutputRows = pdfOutputVectorRows(rm);
+                var leftSolverRows = pdfSolverRows(lm);
+                var rightSolverRows = pdfSolverRows(rm);
+                var leftRuntimeSnapshot = buildPdfRuntimeSnapshot(left, lm, lConstraints, lHard, lGuard, lg, left.rules || gateRules, {
+                    paretoSet: lPareto,
+                    mcState: lMcState,
+                    selectedParetoIdx: 0,
+                    qualityMode: reportOpts.qualityMode,
+                    seed: reportOpts.seed
+                });
+                var rightRuntimeSnapshot = buildPdfRuntimeSnapshot(right, rm, rConstraints, rHard, rGuard, rg, right.rules || gateRules, {
+                    paretoSet: rPareto,
+                    mcState: rMcState,
+                    selectedParetoIdx: 0,
+                    qualityMode: reportOpts.qualityMode,
+                    seed: reportOpts.seed
+                });
 
                 var leftWin = (lHard.feasible ? 1 : 0) + (lm.pue <= lm.input.targetPue ? 1 : 0) + (lm.systemCop >= lm.input.targetCop ? 1 : 0) + (lm.riskIndex <= rm.riskIndex ? 1 : 0);
                 var rightWin = (rHard.feasible ? 1 : 0) + (rm.pue <= rm.input.targetPue ? 1 : 0) + (rm.systemCop >= rm.input.targetCop ? 1 : 0) + (rm.riskIndex <= lm.riskIndex ? 1 : 0);
                 var verdict = rightWin > leftWin ? ('Preferred configuration: ' + right.label) : (leftWin > rightWin ? ('Preferred configuration: ' + left.label) : 'Both configurations are balanced; choose based on deployment constraints.');
-                var recommendation = [];
-                if (rm.pue < lm.pue) recommendation.push('Right scenario reduces PUE by ' + fmtNum(lm.pue - rm.pue, 3) + '.');
-                if (rm.systemCop > lm.systemCop) recommendation.push('Right scenario improves COP by ' + fmtNum(rm.systemCop - lm.systemCop, 2) + '.');
-                if (rm.netOpex < lm.netOpex) recommendation.push('Right scenario lowers net OPEX by ' + fmtUsd(lm.netOpex - rm.netOpex) + ' per year.');
-                if (rm.netCarbonTons < lm.netCarbonTons) recommendation.push('Right scenario reduces annual carbon by ' + fmtNum(lm.netCarbonTons - rm.netCarbonTons, 0) + ' tCO2e.');
-                if (rHard.feasible && !lHard.feasible) recommendation.push('Right scenario clears hard constraints while left does not.');
-                if (!recommendation.length) recommendation.push('Trade-offs are balanced; decision should prioritize deployment risk tolerance and implementation feasibility.');
+                var recommendationItems = [];
+                function addRec(priority, text) {
+                    recommendationItems.push({ p: priority, text: text });
+                }
+                if (rm.pue < lm.pue) addRec(1, 'Right scenario reduces PUE by ' + fmtNum(lm.pue - rm.pue, 3) + '.');
+                if (rm.systemCop > lm.systemCop) addRec(1, 'Right scenario improves COP by ' + fmtNum(rm.systemCop - lm.systemCop, 2) + '.');
+                if (rm.netOpex < lm.netOpex) addRec(1, 'Right scenario lowers net OPEX by ' + fmtUsd(lm.netOpex - rm.netOpex) + ' per year.');
+                if (rm.netCarbonTons < lm.netCarbonTons) addRec(2, 'Right scenario reduces annual carbon by ' + fmtNum(lm.netCarbonTons - rm.netCarbonTons, 0) + ' tCO2e.');
+                if (rHard.feasible && !lHard.feasible) addRec(1, 'Right scenario clears hard constraints while left does not.');
+                if (!recommendationItems.length) addRec(3, 'Trade-offs are balanced; decision should prioritize deployment risk tolerance and implementation feasibility.');
+                recommendationItems.sort(function(a, b) { return a.p - b.p; });
+                var recommendation = recommendationItems.map(function(item) { return '[P' + item.p + '] ' + item.text; });
                 var nCmpExecutive = compareExecutiveNarrative(left, right, lHard, rHard, lg, rg, verdict);
                 var nCmpVisual = compareVisualNarrative(lm, rm, lf, rf);
                 var nCmpKpi = compareKpiNarrative(metrics);
@@ -11331,6 +12614,14 @@
                 var nCmpInput = compareInputNarrative(lm, rm);
                 var nCmpConstraintFlow = compareConstraintFlowNarrative(lm, rm, lHard, rHard, lf, rf);
                 var nCmpRecommendation = compareRecommendationNarrative(recommendation, verdict);
+                var nCmpSankey = narrativePack('ok', 'Distribution compare shows non-IT delta ' + signed((rf ? (rf.total - rf.it) : 0) - (lf ? (lf.total - lf.it) : 0), 0, ' kW') + ', with thermal branch shift ' + signed((rf ? rf.thermal : 0) - (lf ? lf.thermal : 0), 0, ' kW') + '.');
+                var nCmpPareto = narrativePack('ok', 'Pareto projection generated for both snapshots (left ' + fmtNum(lPareto.length, 0) + ' points, right ' + fmtNum(rPareto.length, 0) + ' points) to expose tradeoff envelope differences.');
+                var nCmpMonte = narrativePack('ok', 'Monte Carlo compare built from equivalent simulation bands (left n=' + fmtNum(lMcState ? lMcState.samples : 0, 0) + ', right n=' + fmtNum(rMcState ? rMcState.samples : 0, 0) + ').');
+                var nCmpInputMap = narrativePack('ok', 'Complete field-map delta shows every input key transition. Review all rows marked "changed" before design sign-off.');
+                var nCmpRuntime = narrativePack('ok', 'Runtime structured audit captures constraints, rules, calibration, telemetry, Pareto, Monte Carlo, and explorer state for both snapshots.');
+                var nCmpMethod = narrativePack('ok', 'Both snapshots use a unified modelling stack: deterministic solver, hard-constraint gate checks, Pareto frontier screening, and Monte Carlo uncertainty envelope. This preserves apples-to-apples comparability.');
+                var nCmpSankeyExpanded = narrativePack('ok', 'Expanded Sankey drill matrix compares branch-level contributors and correlated parameter levers across both snapshots.');
+                var nCmpGlossary = narrativePack('ok', 'Glossary appendix keeps terminology synchronized with interactive tooltip definitions.');
 
                 return [
                     renderReportHead('LTC Engineering PDF Report (Compare)', left.label + ' vs ' + right.label),
@@ -11348,6 +12639,73 @@
                     '<div class="r-chart-wrap">' + (mixChart || '<div class="muted">Energy mix compare chart unavailable.</div>') + '</div>',
                     '</div>',
                     narrativeHtml(nCmpVisual),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Compare Executive Scorecards</h2><div class="r-body"><div class="r-score-grid">',
+                    '<div class="r-score-card"><div class="k">Left Composite Score</div><div class="v">' + fmtNum(lm.scores.total, 1) + '</div><span class="r-score-grade">GRADE ' + grade(lm.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(lm.pue, 3) + ' | COP ' + fmtNum(lm.systemCop, 2) + ' | Risk ' + fmtNum(lm.riskIndex, 1) + '.</div></div>',
+                    '<div class="r-score-card"><div class="k">Right Composite Score</div><div class="v">' + fmtNum(rm.scores.total, 1) + '</div><span class="r-score-grade">GRADE ' + grade(rm.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(rm.pue, 3) + ' | COP ' + fmtNum(rm.systemCop, 2) + ' | Risk ' + fmtNum(rm.riskIndex, 1) + '.</div></div>',
+                    '</div>',
+                    narrativeHtml(nCmpExecutive),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Sankey Compare (Left vs Right)</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (leftSankeyChart || '<div class="muted">Left Sankey unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (rightSankeyChart || '<div class="muted">Right Sankey unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nCmpSankey),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Sankey Expanded Drilldown Compare</h2><div class="r-body"><div class="split">',
+                    renderPdfSankeyExpandedTable('Left Sankey Expanded Matrix', leftSankeyExpandedRows),
+                    renderPdfSankeyExpandedTable('Right Sankey Expanded Matrix', rightSankeyExpandedRows),
+                    '</div>',
+                    narrativeHtml(nCmpSankeyExpanded),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Pareto Frontier Compare</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (leftParetoChart || '<div class="muted">Left Pareto unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (rightParetoChart || '<div class="muted">Right Pareto unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nCmpPareto),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Pareto Ledger Compare (Detailed)</h2><div class="r-body"><div class="split">',
+                    renderPdfParetoLedgerTable('Left Pareto Ledger', lParetoLedgerRows, 0),
+                    renderPdfParetoLedgerTable('Right Pareto Ledger', rParetoLedgerRows, 0),
+                    '</div>',
+                    narrativeHtml(nCmpPareto),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Monte Carlo Compare</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (leftMcChart || '<div class="muted">Left Monte Carlo unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (rightMcChart || '<div class="muted">Right Monte Carlo unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nCmpMonte),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Monte Carlo Detail Compare (Percentile Audit)</h2><div class="r-body"><div class="split">',
+                    renderPdfMonteDetailTable('Left Monte Carlo Detail', lMcDetailRows),
+                    renderPdfMonteDetailTable('Right Monte Carlo Detail', rMcDetailRows),
+                    '</div>',
+                    narrativeHtml(nCmpMonte),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Tornado Sensitivity Compare</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (leftTornadoChart || '<div class="muted">Left tornado unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (rightTornadoChart || '<div class="muted">Right tornado unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nCmpConstraintFlow),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Standards Visual Compare</h2><div class="r-body"><div class="r-grid2">',
+                    '<div class="r-chart-wrap">' + (standardsRadarCompare || '<div class="muted">Standards radar compare unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (standardsHeatRight || standardsHeatLeft || '<div class="muted">Standards heatmap unavailable.</div>') + '</div>',
+                    '</div>',
+                    '<div class="r-grid2" style="margin-top:8px;">',
+                    '<div class="r-chart-wrap">' + (standardsHeatLeft || '<div class="muted">Left standards heatmap unavailable.</div>') + '</div>',
+                    '<div class="r-chart-wrap">' + (standardsHeatRight || '<div class="muted">Right standards heatmap unavailable.</div>') + '</div>',
+                    '</div>',
+                    narrativeHtml(nCmpStandards),
                     '</div></section>',
 
                     '<section class="r-sec"><h2>KPI Delta Matrix (Right - Left)</h2><div class="r-body"><table><thead><tr><th>Metric</th><th>Left</th><th>Right</th><th>Delta</th></tr></thead><tbody>',
@@ -11388,6 +12746,35 @@
                         return '<tr><td>' + escapeHtml(r.key) + '</td><td>' + escapeHtml(r.left) + '</td><td>' + escapeHtml(r.right) + '</td><td>' + escapeHtml(r.delta) + '</td></tr>';
                     }).join(''),
                     '</tbody></table>',
+                    narrativeHtml(nCmpInputMap),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Full Input Matrix (Left vs Right)</h2><div class="r-body"><div class="split">',
+                    renderPdfCompactKvTable('Left Inputs', leftInputRows, 'Input Parameter', 'Value'),
+                    renderPdfCompactKvTable('Right Inputs', rightInputRows, 'Input Parameter', 'Value'),
+                    '</div>',
+                    narrativeHtml(nCmpInputMap),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Full Output + Solver Matrix (Left vs Right)</h2><div class="r-body"><div class="split">',
+                    '<div>' + renderPdfCompactKvTable('Left Output Vector', leftOutputRows, 'Output Metric', 'Value') + renderPdfCompactKvTable('Left Solver Internals', leftSolverRows, 'Solver Internal', 'Value') + '</div>',
+                    '<div>' + renderPdfCompactKvTable('Right Output Vector', rightOutputRows, 'Output Metric', 'Value') + renderPdfCompactKvTable('Right Solver Internals', rightSolverRows, 'Solver Internal', 'Value') + '</div>',
+                    '</div>',
+                    narrativeHtml(nCmpKpi),
+                    '</div></section>',
+
+                    '<section class="r-sec"><h2>Methodology + Simulation Configuration (Compare)</h2><div class="r-body">',
+                    '<table><thead><tr><th>Method Block</th><th>Left Snapshot</th><th>Right Snapshot</th></tr></thead><tbody>',
+                    '<tr><td>Solver Core</td><td>Deterministic thermo-hydraulic + control correction + loss model</td><td>Deterministic thermo-hydraulic + control correction + loss model</td></tr>',
+                    '<tr><td>Constraint Policy</td><td>PUE&lt;=' + fmtNum(lConstraints.pueMax, 3) + ' | COP&gt;=' + fmtNum(lConstraints.copMin, 2) + ' | Risk&lt;=' + fmtNum(lConstraints.riskMax, 1) + ' | Pump%IT&lt;=' + fmtNum(lConstraints.pumpPctMax, 2) + '</td><td>PUE&lt;=' + fmtNum(rConstraints.pueMax, 3) + ' | COP&gt;=' + fmtNum(rConstraints.copMin, 2) + ' | Risk&lt;=' + fmtNum(rConstraints.riskMax, 1) + ' | Pump%IT&lt;=' + fmtNum(rConstraints.pumpPctMax, 2) + '</td></tr>',
+                    '<tr><td>Pareto Frontier</td><td>' + fmtNum(lPareto.length, 0) + ' points</td><td>' + fmtNum(rPareto.length, 0) + ' points</td></tr>',
+                    '<tr><td>Monte Carlo</td><td>n=' + fmtNum(lMcState ? lMcState.samples : 0, 0) + ' | uncertainty ±' + fmtNum(((lMcState ? lMcState.unc : 0) || 0) * 100, 1) + '%</td><td>n=' + fmtNum(rMcState ? rMcState.samples : 0, 0) + ' | uncertainty ±' + fmtNum(((rMcState ? rMcState.unc : 0) || 0) * 100, 1) + '%</td></tr>',
+                    '<tr><td>Compute Quality</td><td colspan="2">' + escapeHtml(String(reportOpts.qualityMode || 'full').toUpperCase()) + ' | MC preset ' + fmtNum(reportOpts.mcSamples || 0, 0) + ' | Pareto preset ' + fmtNum(reportOpts.paretoSamples || 0, 0) + (reportOpts.seed == null ? '' : (' | seed ' + reportOpts.seed)) + '</td></tr>',
+                    '<tr><td>Gate State</td><td>G1 ' + (lg.g1 ? 'OPEN' : 'BLOCKED') + ' | G2 ' + (lg.g2 ? 'OPEN' : 'BLOCKED') + ' | G3 ' + (lg.g3 ? 'OPEN' : 'BLOCKED') + '</td><td>G1 ' + (rg.g1 ? 'OPEN' : 'BLOCKED') + ' | G2 ' + (rg.g2 ? 'OPEN' : 'BLOCKED') + ' | G3 ' + (rg.g3 ? 'OPEN' : 'BLOCKED') + '</td></tr>',
+                    '<tr><td>Source + Timestamp</td><td>' + escapeHtml(left.label) + ' | ' + escapeHtml(left.ts || nowIso()) + '</td><td>' + escapeHtml(right.label) + ' | ' + escapeHtml(right.ts || nowIso()) + '</td></tr>',
+                    '</tbody></table>',
+                    '<div class="r-note">Methodology table ensures side-by-side comparability and audit traceability across solver, constraints, frontier generation, uncertainty simulation, and control-state logic.</div>',
+                    narrativeHtml(nCmpMethod),
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Constraint + Flow Envelope Delta</h2><div class="r-body">',
@@ -11412,6 +12799,15 @@
                     narrativeHtml(nCmpRecommendation),
                     '</div></section>',
 
+                    '<section class="r-sec"><h2>Runtime Audit Narrative</h2><div class="r-body">',
+                    narrativeHtml(nCmpRuntime),
+                    '</div></section>',
+
+                    '<section class="r-sec page-break"><h2>Glossary Appendix (Unified Tooltip Dictionary)</h2><div class="r-body">',
+                    renderPdfGlossaryTable('All Terms + Definitions', glossaryRowsPdf),
+                    narrativeHtml(nCmpGlossary),
+                    '</div></section>',
+
                     renderRuntimeStructuredCompareSection(leftRuntimeSnapshot, rightRuntimeSnapshot)
                 ].join('');
             }
@@ -11419,18 +12815,25 @@
             function exportPdfSingle() {
                 var srcSel = document.getElementById('pdfSingleSource');
                 var source = resolveModelSource(srcSel ? srcSel.value : 'live_baseline');
+                var reportOpts = resolvePdfReportOptions();
                 if (!source.ok || !source.model) {
                     alert('PDF single export failed: invalid source model.');
                     return;
                 }
-                if (!openPdfReport(buildSinglePdfReport(source))) {
+                var preflightSingle = { ok: true };
+                if (!openPdfReportWithBuilder(function() {
+                    var built = buildSinglePdfReport(source, reportOpts);
+                    var guarded = withPdfCompletenessGuard(built, 'single');
+                    preflightSingle = guarded.report || { ok: true };
+                    return guarded.html;
+                })) {
                     alert('Popup blocked. Please allow popups and retry PDF export.');
                     return;
                 }
                 var s = document.getElementById('exportStatus');
                 if (s) {
-                    s.className = 'status-pill ok';
-                    s.textContent = 'PDF Single Report Opened';
+                    s.className = preflightSingle.ok ? 'status-pill ok' : 'status-pill warn';
+                    s.textContent = (preflightSingle.ok ? 'PDF Single Report Opened' : 'PDF Single Opened (Preflight Warning)') + ' | ' + String(reportOpts.qualityMode || 'full').toUpperCase() + (reportOpts.seed == null ? '' : (' | seed ' + reportOpts.seed));
                 }
             }
 
@@ -11439,6 +12842,7 @@
                 var rightSel = document.getElementById('pdfCompareRight');
                 var left = resolveModelSource(leftSel ? leftSel.value : 'live_baseline');
                 var right = resolveModelSource(rightSel ? rightSel.value : 'live_optimized');
+                var reportOpts = resolvePdfReportOptions();
                 if (!left.ok || !right.ok || !left.model || !right.model) {
                     alert('PDF compare export failed: invalid compare source.');
                     return;
@@ -11447,14 +12851,20 @@
                     alert('Choose two different sources for compare PDF.');
                     return;
                 }
-                if (!openPdfReport(buildComparePdfReport(left, right))) {
+                var preflightCompare = { ok: true };
+                if (!openPdfReportWithBuilder(function() {
+                    var built = buildComparePdfReport(left, right, reportOpts);
+                    var guarded = withPdfCompletenessGuard(built, 'compare');
+                    preflightCompare = guarded.report || { ok: true };
+                    return guarded.html;
+                })) {
                     alert('Popup blocked. Please allow popups and retry PDF compare export.');
                     return;
                 }
                 var s = document.getElementById('exportStatus');
                 if (s) {
-                    s.className = 'status-pill ok';
-                    s.textContent = 'PDF Compare Report Opened';
+                    s.className = preflightCompare.ok ? 'status-pill ok' : 'status-pill warn';
+                    s.textContent = (preflightCompare.ok ? 'PDF Compare Report Opened' : 'PDF Compare Opened (Preflight Warning)') + ' | ' + String(reportOpts.qualityMode || 'full').toUpperCase() + (reportOpts.seed == null ? '' : (' | seed ' + reportOpts.seed));
                 }
             }
 
@@ -11874,6 +13284,7 @@
                     var p50 = percentile(arr, 0.50);
                     var p90 = percentile(arr, 0.90);
                     var avg = meanArray(arr);
+                    var mid = hist.min + ((hist.max - hist.min) * 0.5);
                     var barClass = metricClassForHistogram(spec.key);
                     var bars = hist.counts.map(function(c, idx) {
                         var h = Math.max(2, (c / hist.maxCount) * 100);
@@ -11889,6 +13300,8 @@
                             '<span class="hist-range">' + fmtNum(hist.min, spec.digits) + ' - ' + fmtNum(hist.max, spec.digits) + '</span>' +
                         '</div>' +
                         '<div class="hist-bars">' + bars + '</div>' +
+                        '<div class="hist-axis"><span>' + fmtNum(hist.min, spec.digits) + '</span><span>' + fmtNum(mid, spec.digits) + '</span><span>' + fmtNum(hist.max, spec.digits) + '</span></div>' +
+                        '<div class="hist-yhint">Frequency Distribution (14 bins)</div>' +
                         '<div class="hist-footer">' +
                             'P10 ' + fmtNum(p10, spec.digits) + ' | P50 ' + fmtNum(p50, spec.digits) + ' | P90 ' + fmtNum(p90, spec.digits) + '<br>' +
                             'mean ' + fmtNum(avg, spec.digits) + spec.suffix +
@@ -11931,15 +13344,16 @@
                 var vb = (svg.viewBox && svg.viewBox.baseVal) ? svg.viewBox.baseVal : null;
                 var w = (vb && vb.width) ? vb.width : 560;
                 var h = (vb && vb.height) ? vb.height : 260;
-                var pad = { l: 84, r: 16, t: 34, b: 42 };
+                var pad = { l: 124, r: 20, t: 66, b: 56 };
                 var pw = w - pad.l - pad.r;
                 var ph = h - pad.t - pad.b;
                 var isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
-                var chartText = isDarkTheme ? '#e2e8f0' : '#334155';
-                var chartTextSoft = isDarkTheme ? '#cbd5e1' : '#475569';
-                var chartTextFaint = isDarkTheme ? '#94a3b8' : '#64748b';
-                var legendFill = isDarkTheme ? 'rgba(15,23,42,0.9)' : 'rgba(255,255,255,0.9)';
-                var legendStroke = isDarkTheme ? 'rgba(148,163,184,0.45)' : 'rgba(148,163,184,0.4)';
+                var chartText = isDarkTheme ? '#f8fafc' : '#1f2937';
+                var chartTextSoft = isDarkTheme ? '#e2e8f0' : '#334155';
+                var chartTextFaint = isDarkTheme ? '#cbd5e1' : '#64748b';
+                var gridStroke = isDarkTheme ? 'rgba(148,163,184,0.28)' : 'rgba(148,163,184,0.2)';
+                var legendFill = isDarkTheme ? 'rgba(2,6,23,0.92)' : 'rgba(255,255,255,0.92)';
+                var legendStroke = isDarkTheme ? 'rgba(203,213,225,0.55)' : 'rgba(148,163,184,0.42)';
 
                 var pueVals = latestPareto.map(function(m) { return m.pue; });
                 var opexVals = latestPareto.map(function(m) { return m.netOpex; });
@@ -11958,6 +13372,28 @@
                 maxPue += puePad;
                 minOpex = Math.max(0, minOpex - opexPad);
                 maxOpex += opexPad;
+                var pueRange = maxPue - minPue;
+                var pueTickDigits = 3;
+                if (pueRange < 0.0005) pueTickDigits = 6;
+                else if (pueRange < 0.002) pueTickDigits = 5;
+                else if (pueRange < 0.01) pueTickDigits = 4;
+                else if (pueRange < 0.08) pueTickDigits = 3;
+                else if (pueRange < 1) pueTickDigits = 2;
+                else pueTickDigits = 1;
+                function pueTickLabel(val, digits) {
+                    return fmtNum(val, digits);
+                }
+                function pueTickHasDuplicate(digits) {
+                    var seen = {};
+                    for (var iTick = 0; iTick <= 5; iTick++) {
+                        var vTick = minPue + (maxPue - minPue) * (iTick / 5);
+                        var text = pueTickLabel(vTick, digits);
+                        if (seen[text]) return true;
+                        seen[text] = 1;
+                    }
+                    return false;
+                }
+                while (pueTickHasDuplicate(pueTickDigits) && pueTickDigits < 7) pueTickDigits += 1;
 
                 function sx(v) { return pad.l + ((v - minPue) / (maxPue - minPue)) * pw; }
                 function sy(v) { return pad.t + ((v - minOpex) / (maxOpex - minOpex)) * ph; }
@@ -11972,10 +13408,10 @@
                     var gy = pad.t + (ph * i / 5);
                     var pueTick = minPue + (maxPue - minPue) * (i / 5);
                     var opexTick = minOpex + (maxOpex - minOpex) * (i / 5);
-                    grid.push('<line x1="' + fmtNum(gx, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gx, 2) + '" y2="' + (pad.t + ph) + '" stroke="rgba(148,163,184,0.18)" stroke-width="1"/>');
-                    grid.push('<line x1="' + pad.l + '" y1="' + fmtNum(gy, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gy, 2) + '" stroke="rgba(148,163,184,0.18)" stroke-width="1"/>');
-                    grid.push('<text x="' + fmtNum(gx, 2) + '" y="' + fmtNum(pad.t + ph + 16, 2) + '" fill="' + chartTextSoft + '" font-size="10" text-anchor="middle">' + fmtNum(pueTick, 3) + '</text>');
-                    grid.push('<text x="8" y="' + fmtNum(gy + 3, 2) + '" fill="' + chartTextSoft + '" font-size="10">' + fmtUsdCompact(opexTick) + '</text>');
+                    grid.push('<line x1="' + fmtNum(gx, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gx, 2) + '" y2="' + (pad.t + ph) + '" stroke="' + gridStroke + '" stroke-width="1"/>');
+                    grid.push('<line x1="' + pad.l + '" y1="' + fmtNum(gy, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gy, 2) + '" stroke="' + gridStroke + '" stroke-width="1"/>');
+                    grid.push('<text x="' + fmtNum(gx, 2) + '" y="' + fmtNum(pad.t + ph + 17, 2) + '" fill="' + chartTextSoft + '" font-size="10" text-anchor="middle">' + pueTickLabel(pueTick, pueTickDigits) + '</text>');
+                    grid.push('<text x="' + (pad.l - 10) + '" y="' + fmtNum(gy + 3, 2) + '" fill="' + chartTextSoft + '" font-size="10" text-anchor="end">' + fmtUsdCompact(opexTick) + '</text>');
                 }
 
                 var frontierPath = '';
@@ -11994,12 +13430,15 @@
                     var selected = idx === selectedParetoIdx;
                     var outer = selected ? '<circle cx="' + fmtNum(x, 2) + '" cy="' + fmtNum(y, 2) + '" r="' + fmtNum(r + 4, 2) + '" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="2 2"></circle>' : '';
                     var title = 'P' + (idx + 1) + ' | PUE ' + fmtNum(m.pue, 3) + ' | COP ' + fmtNum(m.systemCop, 2) + ' | OPEX ' + fmtUsd(m.netOpex) + ' | Carbon ' + fmtNum(m.netCarbonTons, 0) + ' | Risk ' + fmtNum(m.riskIndex, 1);
+                    var labelAnchor = (idx % 2 === 0) ? 'start' : 'end';
+                    var labelX = x + ((idx % 2 === 0) ? (r + 2) : -(r + 3));
+                    var labelY = y + (((idx % 3) - 1) * 6) - 2;
                     return '' +
                         outer +
                         '<circle cx="' + fmtNum(x, 2) + '" cy="' + fmtNum(y, 2) + '" r="' + fmtNum(r, 2) + '" fill="' + riskColor(m.riskIndex) + '" fill-opacity="0.88" stroke="' + stroke + '" stroke-width="1.35"' + strokeDash + ' data-pidx="' + idx + '">' +
                             '<title>' + escapeHtml(title) + '</title>' +
                         '</circle>' +
-                        '<text x="' + fmtNum(x + r + 2, 2) + '" y="' + fmtNum(y - 2, 2) + '" font-size="9" fill="' + chartText + '" opacity="0.9">P' + (idx + 1) + '</text>';
+                        '<text x="' + fmtNum(labelX, 2) + '" y="' + fmtNum(labelY, 2) + '" font-size="9" text-anchor="' + labelAnchor + '" fill="' + chartText + '" opacity="0.9">P' + (idx + 1) + '</text>';
                 }).join('');
 
                 var selectedGuides = '';
@@ -12011,6 +13450,10 @@
                         '<line x1="' + fmtNum(gxSel, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gxSel, 2) + '" y2="' + (pad.t + ph) + '" stroke="rgba(37,99,235,0.42)" stroke-width="1" stroke-dasharray="2 3"></line>' +
                         '<line x1="' + pad.l + '" y1="' + fmtNum(gySel, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gySel, 2) + '" stroke="rgba(37,99,235,0.42)" stroke-width="1" stroke-dasharray="2 3"></line>';
                 }
+                var legendX = w - 232;
+                var legendY = 10;
+                var xMid = pad.l + (pw / 2);
+                var yMid = pad.t + (ph / 2);
 
                 svg.innerHTML = [
                     '<defs><linearGradient id="paretoBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="rgba(59,130,246,0.06)"/><stop offset="100%" stop-color="rgba(16,185,129,0.04)"/></linearGradient></defs>',
@@ -12019,16 +13462,14 @@
                     frontierPath ? '<path d="' + frontierPath + '" fill="none" stroke="rgba(30,64,175,0.5)" stroke-width="1.6" stroke-dasharray="4 3"></path>' : '',
                     selectedGuides,
                     points,
-                    '<text x="' + (pad.l + (pw / 2)) + '" y="' + (h - 8) + '" fill="' + chartText + '" font-size="11" text-anchor="middle">X-Axis: PUE (lower is better)</text>',
-                    '<text x="14" y="' + (pad.t - 14) + '" fill="' + chartTextSoft + '" font-size="11">Net OPEX (lower is better)</text>',
-                    '<rect x="' + (w - 214) + '" y="12" width="196" height="70" rx="8" fill="' + legendFill + '" stroke="' + legendStroke + '"></rect>',
-                    '<text x="' + (w - 204) + '" y="28" fill="' + chartText + '" font-size="10">Legend</text>',
-                    '<circle cx="' + (w - 198) + '" cy="42" r="4.5" fill="#047857"></circle><text x="' + (w - 188) + '" y="45" fill="' + chartText + '" font-size="10">Risk low</text>',
-                    '<circle cx="' + (w - 132) + '" cy="42" r="4.5" fill="#b45309"></circle><text x="' + (w - 122) + '" y="45" fill="' + chartText + '" font-size="10">Risk medium</text>',
-                    '<circle cx="' + (w - 52) + '" cy="42" r="4.5" fill="#b91c1c"></circle><text x="' + (w - 42) + '" y="45" fill="' + chartText + '" font-size="10">Risk high</text>',
-                    '<circle cx="' + (w - 198) + '" cy="60" r="4.5" fill="#64748b" stroke="#9a3412" stroke-width="1.2" stroke-dasharray="3 2"></circle>',
-                    '<text x="' + (w - 188) + '" y="63" fill="' + chartText + '" font-size="10">Soft constraint point</text>',
-                    '<text x="' + (w - 198) + '" y="76" fill="' + chartTextFaint + '" font-size="9">Circle size = carbon burden</text>'
+                    '<text x="' + fmtNum(xMid, 2) + '" y="' + (h - 8) + '" fill="' + chartText + '" font-size="11" font-weight="700" text-anchor="middle">X-Axis: PUE (lower is better)</text>',
+                    '<text x="26" y="' + fmtNum(yMid, 2) + '" fill="' + chartTextSoft + '" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 26 ' + fmtNum(yMid, 2) + ')">Y-Axis: Net OPEX (lower is better)</text>',
+                    '<rect x="' + legendX + '" y="' + legendY + '" width="214" height="48" rx="8" fill="' + legendFill + '" stroke="' + legendStroke + '"></rect>',
+                    '<text x="' + (legendX + 10) + '" y="' + (legendY + 16) + '" fill="' + chartText + '" font-size="10" font-weight="700">Legend</text>',
+                    '<circle cx="' + (legendX + 12) + '" cy="' + (legendY + 30) + '" r="4.5" fill="#047857"></circle><text x="' + (legendX + 22) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk low</text>',
+                    '<circle cx="' + (legendX + 80) + '" cy="' + (legendY + 30) + '" r="4.5" fill="#b45309"></circle><text x="' + (legendX + 90) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk medium</text>',
+                    '<circle cx="' + (legendX + 158) + '" cy="' + (legendY + 30) + '" r="4.5" fill="#b91c1c"></circle><text x="' + (legendX + 168) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk high</text>',
+                    '<text x="' + (legendX + 10) + '" y="' + (legendY + 44) + '" fill="' + chartTextFaint + '" font-size="9">Soft-constraint: dashed stroke | circle size = carbon</text>'
                 ].join('');
 
                 var feasibleCount = latestPareto.filter(function(m) { return m._feasible; }).length;
@@ -12248,27 +13689,15 @@
                 var samples = Math.max(200, Math.round(n('mcSamples')));
                 var unc = clamp(n('mcUncertainty'), 1, 30) / 100;
                 var base = gatherInputs();
-                var keys = ['itLoadMw', 'liquidCapture', 'supplyTemp', 'airCop', 'pumpEff', 'economizerHours', 'controlQuality', 'predictiveGain', 'coefHeatTransfer', 'coefPipeLoss', 'elecPrice', 'carbonIntensity'];
-                var dist = { pue: [], cop: [], opex: [], carbon: [], risk: [] };
-
-                for (var i = 0; i < samples; i++) {
-                    var c = Object.assign({}, base);
-                    keys.forEach(function(k) {
-                        var v = c[k];
-                        if (typeof v !== 'number') return;
-                        var delta = (Math.random() * 2 - 1) * unc;
-                        c[k] = v * (1 + delta);
-                    });
-                    c.returnTemp = clamp(c.supplyTemp + Math.max(base.returnTemp - base.supplyTemp, 6), c.supplyTemp + 5, c.supplyTemp + 18);
-                    var m = computeModel(c);
-                    dist.pue.push(m.pue);
-                    dist.cop.push(m.systemCop);
-                    dist.opex.push(m.netOpex);
-                    dist.carbon.push(m.netCarbonTons);
-                    dist.risk.push(m.riskIndex);
-                }
-
-                Object.keys(dist).forEach(function(k) { dist[k].sort(function(a, b) { return a - b; }); });
+                var seed = parseReportSeed((document.getElementById('pdfRandomSeed') || {}).value);
+                var mcState = generateMonteCarloForInput(base, samples, unc, {
+                    samples: samples,
+                    uncertainty: unc,
+                    seed: seed,
+                    qualityMode: 'interactive'
+                });
+                if (!mcState || !mcState.dist) return;
+                var dist = mcState.dist;
 
                 var rows = [
                     ['PUE', percentile(dist.pue, 0.10), percentile(dist.pue, 0.50), percentile(dist.pue, 0.90), 3, ''],
@@ -12287,9 +13716,9 @@
                 var stat = document.getElementById('mcStatus');
                 if (stat) {
                     stat.className = 'status-pill ok';
-                    stat.textContent = 'MC Complete | n=' + samples + ' | uncertainty ±' + fmtNum(unc * 100, 0) + '%';
+                    stat.textContent = 'MC Complete | n=' + samples + ' | uncertainty ±' + fmtNum(unc * 100, 0) + '%' + (seed == null ? '' : (' | seed ' + seed));
                 }
-                latestMonteCarlo = { samples: samples, unc: unc, dist: dist };
+                latestMonteCarlo = mcState;
                 renderMonteCarloDistributions();
             }
 
@@ -12469,20 +13898,20 @@
                 }).join('');
             }
 
-            function buildRandomCandidate(base, scale) {
+            function buildRandomCandidate(base, scale, randomFn) {
                 var c = Object.assign({}, base);
-                c.liquidCapture = randomInRange(Math.max(30, base.liquidCapture - 28 * scale), Math.min(99, base.liquidCapture + 22 * scale), 1);
-                c.rackDensityTarget = randomInRange(Math.max(8, base.rackDensityTarget - 18 * scale), Math.min(180, base.rackDensityTarget + 22 * scale), 1);
-                c.highDensityShare = randomInRange(Math.max(0, base.highDensityShare - 35 * scale), Math.min(100, base.highDensityShare + 30 * scale), 1);
-                c.supplyTemp = randomInRange(Math.max(19, base.supplyTemp - 5 * scale), Math.min(40, base.supplyTemp + 7 * scale), 0.5);
-                c.airCop = randomInRange(Math.max(1.8, base.airCop - 2.4 * scale), Math.min(12, base.airCop + 2.8 * scale), 0.1);
-                c.pumpEff = randomInRange(Math.max(50, base.pumpEff - 12 * scale), Math.min(95, base.pumpEff + 10 * scale), 1);
-                c.controlQuality = randomInRange(Math.max(20, base.controlQuality - 26 * scale), Math.min(100, base.controlQuality + 18 * scale), 1);
-                c.predictiveGain = randomInRange(Math.max(0, base.predictiveGain - 22 * scale), Math.min(60, base.predictiveGain + 20 * scale), 1);
-                c.coefHeatTransfer = randomInRange(Math.max(68, base.coefHeatTransfer - 12 * scale), Math.min(99, base.coefHeatTransfer + 8 * scale), 0.5);
-                c.coefPipeLoss = randomInRange(Math.max(0.75, base.coefPipeLoss - 0.22 * scale), Math.min(1.8, base.coefPipeLoss + 0.3 * scale), 0.01);
-                c.coefCduLoss = randomInRange(Math.max(0.5, base.coefCduLoss - 0.95 * scale), Math.min(4.5, base.coefCduLoss + 1.05 * scale), 0.05);
-                c.returnTemp = clamp(c.supplyTemp + randomInRange(6, 14, 0.5), c.supplyTemp + 5.5, c.supplyTemp + 16);
+                c.liquidCapture = randomInRange(Math.max(30, base.liquidCapture - 28 * scale), Math.min(99, base.liquidCapture + 22 * scale), 1, randomFn);
+                c.rackDensityTarget = randomInRange(Math.max(8, base.rackDensityTarget - 18 * scale), Math.min(180, base.rackDensityTarget + 22 * scale), 1, randomFn);
+                c.highDensityShare = randomInRange(Math.max(0, base.highDensityShare - 35 * scale), Math.min(100, base.highDensityShare + 30 * scale), 1, randomFn);
+                c.supplyTemp = randomInRange(Math.max(19, base.supplyTemp - 5 * scale), Math.min(40, base.supplyTemp + 7 * scale), 0.5, randomFn);
+                c.airCop = randomInRange(Math.max(1.8, base.airCop - 2.4 * scale), Math.min(12, base.airCop + 2.8 * scale), 0.1, randomFn);
+                c.pumpEff = randomInRange(Math.max(50, base.pumpEff - 12 * scale), Math.min(95, base.pumpEff + 10 * scale), 1, randomFn);
+                c.controlQuality = randomInRange(Math.max(20, base.controlQuality - 26 * scale), Math.min(100, base.controlQuality + 18 * scale), 1, randomFn);
+                c.predictiveGain = randomInRange(Math.max(0, base.predictiveGain - 22 * scale), Math.min(60, base.predictiveGain + 20 * scale), 1, randomFn);
+                c.coefHeatTransfer = randomInRange(Math.max(68, base.coefHeatTransfer - 12 * scale), Math.min(99, base.coefHeatTransfer + 8 * scale), 0.5, randomFn);
+                c.coefPipeLoss = randomInRange(Math.max(0.75, base.coefPipeLoss - 0.22 * scale), Math.min(1.8, base.coefPipeLoss + 0.3 * scale), 0.01, randomFn);
+                c.coefCduLoss = randomInRange(Math.max(0.5, base.coefCduLoss - 0.95 * scale), Math.min(4.5, base.coefCduLoss + 1.05 * scale), 0.05, randomFn);
+                c.returnTemp = clamp(c.supplyTemp + randomInRange(6, 14, 0.5, randomFn), c.supplyTemp + 5.5, c.supplyTemp + 16);
                 return c;
             }
 
@@ -12497,31 +13926,12 @@
                 var samples = Math.max(200, Math.round(n('paretoSamples')));
                 var base = gatherInputs();
                 var constraints = gatherConstraintState();
-                var pool = [];
-
-                for (var i = 0; i < samples; i++) {
-                    var c = buildRandomCandidate(base, 1 + (i % 5) * 0.18);
-                    var m = computeModel(c);
-                    var hard = evaluateHardConstraints(m, constraints);
-                    m._feasible = hard.feasible;
-                    pool.push(m);
-                }
-
-                var nondominated = [];
-                for (var j = 0; j < pool.length; j++) {
-                    var dominated = false;
-                    for (var k = 0; k < pool.length; k++) {
-                        if (j === k) continue;
-                        if (isDominated(pool[j], pool[k])) { dominated = true; break; }
-                    }
-                    if (!dominated) nondominated.push(pool[j]);
-                }
-
-                nondominated.sort(function(a, b) {
-                    return optimizeObjective(a, base, constraints) - optimizeObjective(b, base, constraints);
+                var seed = parseReportSeed((document.getElementById('pdfRandomSeed') || {}).value);
+                latestPareto = generateParetoForInput(base, constraints, samples, {
+                    samples: samples,
+                    seed: seed,
+                    qualityMode: 'interactive'
                 });
-
-                latestPareto = nondominated.slice(0, 24);
                 selectedParetoIdx = -1;
                 for (var si = 0; si < latestPareto.length; si++) {
                     if (latestPareto[si]._feasible) {
@@ -12551,7 +13961,7 @@
                 var stat = document.getElementById('paretoStatus');
                 if (stat) {
                     stat.className = latestPareto.length ? 'status-pill ok' : 'status-pill warn';
-                    stat.textContent = latestPareto.length ? ('Frontier Ready | points=' + latestPareto.length) : 'Frontier Empty';
+                    stat.textContent = latestPareto.length ? ('Frontier Ready | points=' + latestPareto.length + (seed == null ? '' : (' | seed ' + seed))) : 'Frontier Empty';
                 }
                 renderParetoScatter();
             }
@@ -14382,8 +15792,8 @@
                 return score;
             }
 
-            function randomInRange(min, max, step) {
-                var raw = min + (Math.random() * (max - min));
+            function randomInRange(min, max, step, randomFn) {
+                var raw = min + (randomUnit(randomFn) * (max - min));
                 if (step > 0) raw = Math.round(raw / step) * step;
                 return clamp(raw, min, max);
             }
@@ -14825,6 +16235,7 @@
 
             initInputTooltips();
             initOutputTooltips();
+            initSectionTooltips();
             initTooltipPositioning();
             initTermTooltipPositioning();
             initBlockDetailModal();

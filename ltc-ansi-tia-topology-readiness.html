@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>ANSI/TIA Topology Readiness | ResistanceZero</title>
+    <title>ANSI/TIA Topology Readiness — Comprehensive Deep-Dive | ResistanceZero</title>
     <meta name="description" content="Root-only standards deep-dive module for ResistanceZero engineering lab.">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f172a">
@@ -12,359 +12,1291 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0b1324;
-            --card: rgba(15, 23, 42, 0.84);
-            --text: #e2e8f0;
-            --muted: #94a3b8;
+            --bg: #0b1324; --bg-solid: #0b1324;
+            --card: rgba(15, 23, 42, 0.84); --card-inner: rgba(15, 23, 42, 0.6); --card-inner-hover: rgba(15, 23, 42, 0.8);
+            --text: #e2e8f0; --text-strong: #f1f5f9; --text-body: #cbd5e1; --muted: #94a3b8;
             --line: rgba(148, 163, 184, 0.24);
-            --accent: #f59e0b;
-            --accent2: #06b6d4;
+            --accent: #f59e0b; --accent2: #8b5cf6;
+            --shadow: rgba(2, 6, 23, 0.45); --shadow-deep: rgba(2, 6, 23, 0.5);
+            --grad-top: rgba(139,92,246,0.13); --grad-bot: rgba(245,158,11,0.11);
+            --th-bg: rgba(139,92,246,0.12); --th-color: #c4b5fd;
+            --tr-hover: rgba(148,163,184,0.06); --td-border: rgba(148,163,184,0.12);
+            --kv-bg: rgba(15,23,42,0.5);
+            --callout-info-bg: rgba(139,92,246,0.1); --callout-info-border: rgba(139,92,246,0.3); --callout-info-color: #c4b5fd;
+            --callout-warn-bg: rgba(245,158,11,0.1); --callout-warn-border: rgba(245,158,11,0.3); --callout-warn-color: #fde68a;
+            --callout-green-bg: rgba(34,197,94,0.1); --callout-green-border: rgba(34,197,94,0.3); --callout-green-color: #86efac;
+            --pill-bg: rgba(245, 158, 11, 0.16); --pill-border: rgba(245, 158, 11, 0.45); --pill-color: #fde68a;
+            --acc-num-bg: rgba(139,92,246,0.18); --acc-num-color: #a78bfa;
+            --nav-active-color: #c4b5fd; --nav-active-bg: rgba(139,92,246,0.15); --nav-active-border: rgba(139,92,246,0.35);
+            --diag-fill: rgba(30,41,59,0.88); --svg-bg: rgba(15, 23, 42, 0.7);
+        }
+        [data-theme="light"] {
+            --bg: #f1f5f9; --bg-solid: #f1f5f9;
+            --card: rgba(255, 255, 255, 0.92); --card-inner: rgba(241, 245, 249, 0.8); --card-inner-hover: rgba(226, 232, 240, 0.6);
+            --text: #1e293b; --text-strong: #0f172a; --text-body: #334155; --muted: #64748b;
+            --line: rgba(100, 116, 139, 0.22);
+            --accent: #d97706; --accent2: #7c3aed;
+            --shadow: rgba(100, 116, 139, 0.12); --shadow-deep: rgba(100, 116, 139, 0.18);
+            --grad-top: rgba(139,92,246,0.06); --grad-bot: rgba(245,158,11,0.05);
+            --th-bg: rgba(139,92,246,0.08); --th-color: #6d28d9;
+            --tr-hover: rgba(100,116,139,0.06); --td-border: rgba(100,116,139,0.1);
+            --kv-bg: rgba(241,245,249,0.8);
+            --callout-info-bg: rgba(139,92,246,0.06); --callout-info-border: rgba(139,92,246,0.25); --callout-info-color: #6d28d9;
+            --callout-warn-bg: rgba(245,158,11,0.06); --callout-warn-border: rgba(245,158,11,0.25); --callout-warn-color: #92400e;
+            --callout-green-bg: rgba(34,197,94,0.06); --callout-green-border: rgba(34,197,94,0.25); --callout-green-color: #166534;
+            --pill-bg: rgba(245, 158, 11, 0.1); --pill-border: rgba(217, 119, 6, 0.4); --pill-color: #92400e;
+            --acc-num-bg: rgba(139,92,246,0.12); --acc-num-color: #6d28d9;
+            --nav-active-color: #6d28d9; --nav-active-bg: rgba(139,92,246,0.1); --nav-active-border: rgba(139,92,246,0.3);
+            --diag-fill: rgba(241,245,249,0.9); --svg-bg: rgba(241, 245, 249, 0.8);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            background:
-                radial-gradient(ellipse at top right, rgba(6,182,212,0.13), transparent 45%),
-                radial-gradient(ellipse at bottom left, rgba(245,158,11,0.11), transparent 52%),
-                var(--bg);
-            color: var(--text);
+        body { font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; background: radial-gradient(ellipse at top right, var(--grad-top), transparent 45%), radial-gradient(ellipse at bottom left, var(--grad-bot), transparent 52%), var(--bg); color: var(--text); }
+        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11, 19, 36, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
+        [data-theme="light"] .navbar { background: rgba(255, 255, 255, 0.92); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 56px; gap: 0.5rem; }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
+        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+        .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
+        .nav-link { padding: 0.45rem 0.65rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-dropdown { position: relative; }
+        .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
+        .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
+        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-solid); border: 1px solid var(--line); min-width: 180px; border-radius: 10px; box-shadow: 0 10px 40px var(--shadow-deep); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s, visibility 0.2s; z-index: 1001; padding: 8px 0; }
+        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
+        .dropdown-menu li { list-style: none; padding: 0; }
+        .dropdown-menu li::before { display: none; }
+        .dropdown-menu a { display: block; padding: 0.45rem 1rem; color: var(--text-body); text-decoration: none; font-size: 0.8rem; transition: background 0.15s; }
+        .dropdown-menu a:hover { background: rgba(148,163,184,0.1); }
+        .theme-toggle { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(148,163,184,0.1); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .theme-toggle:hover { background: rgba(148,163,184,0.2); transform: scale(1.05); }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle .sun-icon { color: #f59e0b; display: none; }
+        .theme-toggle .moon-icon { color: #94a3b8; display: block; }
+        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle { background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
+        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 8px; border-radius: 8px; }
+        .hamburger:hover { background: rgba(148,163,184,0.1); }
+        .bar { width: 22px; height: 2.5px; background: var(--muted); border-radius: 3px; transition: all 0.3s; }
+        @media (max-width: 900px) {
+            .nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--bg-solid); border-bottom: 1px solid var(--line); flex-direction: column; padding: 0.5rem; gap: 0; box-shadow: 0 8px 20px var(--shadow); }
+            .nav-menu.active { display: flex; }
+            .hamburger { display: flex; }
+            .dropdown-menu { position: static; transform: none; box-shadow: none; border: none; padding-left: 1rem; }
+            .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
         }
         .wrap { max-width: 980px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.7rem;
-            margin-bottom: 0.9rem;
-        }
-        .back {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.55rem 0.8rem;
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.34rem 0.72rem;
-            border-radius: 999px;
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            background: rgba(245, 158, 11, 0.16);
-            color: #fde68a;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .panel {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: var(--card);
-            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.45);
-            padding: 1.1rem;
-        }
-        h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); margin: 0.45rem 0 0.3rem; }
-        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
-        .summary {
-            margin-top: 0.9rem;
-            padding: 0.8rem;
-            border-radius: 12px;
-            border: 1px solid rgba(6, 182, 212, 0.35);
-            background: rgba(6, 182, 212, 0.1);
-            font-size: 0.85rem;
-            line-height: 1.65;
-            color: #c7d2fe;
-        }
-        .grid {
-            margin-top: 0.85rem;
-            display: grid;
-            grid-template-columns: 1.2fr 0.95fr;
-            gap: 0.75rem;
-        }
-        .card {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.62);
-            padding: 0.8rem;
-        }
-        .card h3 {
-            font-size: 0.86rem;
-            color: #f8fafc;
-            margin-bottom: 0.45rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        ul { list-style: none; display: grid; gap: 0.35rem; }
-        li {
-            font-size: 0.82rem;
-            color: #cbd5e1;
-            line-height: 1.55;
-            padding-left: 0.9rem;
-            position: relative;
-        }
-        li::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent2);
-            position: absolute;
-            left: 0;
-            top: 0.45rem;
-        }
-        .cta {
-            margin-top: 0.85rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.42rem;
-            text-decoration: none;
-            border-radius: 10px;
-            padding: 0.58rem 0.82rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .btn-main { background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; }
-        .btn-sub { border: 1px solid var(--line); color: var(--text); }
-        .next {
-            margin-top: 0.8rem;
-            font-size: 0.8rem;
-            color: #f1f5f9;
-            border-top: 1px dashed var(--line);
-            padding-top: 0.7rem;
-            line-height: 1.55;
-        }
-        .legal {
-            margin-top: 0.9rem;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-        .root-gate {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(2, 6, 23, 0.74);
-            padding: 1rem;
-            backdrop-filter: blur(6px);
-        }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }
+        .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+        .back:hover { background: rgba(148,163,184,0.1); }
+        .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.34rem 0.72rem; border-radius: 999px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-color); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+        .pill-purple { border-color: rgba(139,92,246,0.45); background: rgba(139,92,246,0.14); color: var(--th-color); }
+        .hero { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 16px 32px var(--shadow); padding: 1.4rem 1.2rem; margin-bottom: 1rem; }
+        h1 { font-size: clamp(1.4rem, 3vw, 2rem); margin: 0.45rem 0 0.3rem; line-height: 1.3; }
+        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.92rem; max-width: 740px; }
+        .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.6rem; background: rgba(11, 19, 36, 0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        [data-theme="light"] .section-nav { background: rgba(255,255,255,0.92); }
+        .nav-pill { flex-shrink: 0; padding: 0.38rem 0.7rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .nav-pill:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-pill.active { color: var(--nav-active-color); background: var(--nav-active-bg); border-color: var(--nav-active-border); }
+        .section { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 12px 28px var(--shadow); padding: 1.3rem 1.2rem; margin-bottom: 1rem; }
+        .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
+        .section-title i { color: var(--accent2); font-size: 0.95rem; }
+        .section-intro { color: var(--text-body); font-size: 0.88rem; line-height: 1.7; margin-bottom: 0.9rem; }
+        .accordion { margin-bottom: 0.6rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+        .accordion:last-child { margin-bottom: 0; }
+        .accordion-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.85rem; background: var(--card-inner); cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-strong); user-select: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+        .accordion-header:hover { background: var(--card-inner-hover); }
+        .accordion-header .chevron { margin-left: auto; transition: transform 0.25s; font-size: 0.7rem; color: var(--muted); }
+        .accordion.open .accordion-header .chevron { transform: rotate(180deg); }
+        .accordion-header .acc-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: var(--acc-num-bg); color: var(--acc-num-color); font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .accordion.open .accordion-body { max-height: 5000px; }
+        .accordion-content { padding: 0.85rem; font-size: 0.84rem; line-height: 1.7; color: var(--text-body); }
+        .accordion-content p { margin-bottom: 0.6rem; }
+        .accordion-content p:last-child { margin-bottom: 0; }
+        .accordion-content strong { color: var(--text-strong); }
+        .table-wrap { overflow-x: auto; margin: 0.7rem 0; border-radius: 10px; border: 1px solid var(--line); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }
+        .data-table th { background: var(--th-bg); color: var(--th-color); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem; padding: 0.6rem 0.7rem; text-align: left; border-bottom: 1px solid var(--line); }
+        .data-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--td-border); color: var(--text-body); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--tr-hover); }
+        .data-table .highlight { color: var(--accent); font-weight: 600; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.7rem; margin-top: 0.7rem; }
+        .tech-card { border: 1px solid var(--line); border-radius: 12px; background: var(--card-inner); padding: 0.85rem; }
+        .tech-card h4 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+        .tech-card h4 i { color: var(--accent2); font-size: 0.78rem; }
+        .tech-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+        .mindmap-wrap, .envelope-chart { margin: 0.7rem 0; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; background: var(--svg-bg); }
+        .mindmap-wrap { margin: 0.8rem 0; }
+        .envelope-chart { padding: 0.5rem; }
+        .mindmap-wrap svg, .envelope-chart svg { display: block; width: 100%; height: auto; }
+        .mindmap-wrap svg { min-width: 820px; }
+        .envelope-chart svg { min-width: 600px; }
+        .diag-box { fill: var(--diag-fill); stroke: rgba(148, 163, 184, 0.34); stroke-width: 1.4; }
+        .diag-box-purple { fill: rgba(139,92,246,0.1); stroke: rgba(139,92,246,0.4); stroke-width: 1.4; }
+        .diag-box-amber { fill: rgba(245,158,11,0.1); stroke: rgba(245,158,11,0.4); stroke-width: 1.4; }
+        .diag-box-green { fill: rgba(34,197,94,0.1); stroke: rgba(34,197,94,0.4); stroke-width: 1.4; }
+        .diag-t { fill: var(--text); font-size: 12.5px; font-weight: 700; }
+        .diag-v { fill: var(--muted); font-size: 10.5px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .diag-line { stroke: rgba(148, 163, 184, 0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-purple { stroke: rgba(139,92,246,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-amber { stroke: rgba(245,158,11,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-green { stroke: rgba(34,197,94,0.5); stroke-width: 1.6; fill: none; }
+        .diag-center { fill: var(--text-strong); font-size: 14px; font-weight: 800; }
+        .callout { padding: 0.75rem 0.9rem; border-radius: 10px; font-size: 0.82rem; line-height: 1.65; margin: 0.6rem 0; }
+        .callout-info { background: var(--callout-info-bg); border: 1px solid var(--callout-info-border); color: var(--callout-info-color); }
+        .callout-warn { background: var(--callout-warn-bg); border: 1px solid var(--callout-warn-border); color: var(--callout-warn-color); }
+        .callout-green { background: var(--callout-green-bg); border: 1px solid var(--callout-green-border); color: var(--callout-green-color); }
+        .callout i { margin-right: 0.4rem; }
+        .kv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+        .kv-item { padding: 0.55rem 0.7rem; border-radius: 8px; background: var(--kv-bg); border: 1px solid rgba(148,163,184,0.15); }
+        .kv-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+        .kv-value { font-size: 0.88rem; color: var(--text-strong); font-weight: 600; margin-top: 0.15rem; }
+        .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
+        .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
+        .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
+        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
+        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(139,92,246,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s, visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
+        .tooltip-float.visible { opacity: 1; visibility: visible; }
+        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
+        .tooltip-float.above::before { bottom: -6px; left: var(--arrow, 50%); margin-left: -5px; }
+        .tooltip-float.below::before { top: -6px; left: var(--arrow, 50%); margin-left: -5px; transform: rotate(135deg); }
+        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(139,92,246,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+        .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.4rem; margin-top: 0.6rem; }
+        .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
+        .abbr-item:hover { background: var(--card-inner-hover); }
+        .abbr-key { font-weight: 700; color: var(--accent2); min-width: 60px; flex-shrink: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.75rem; }
+        .abbr-val { color: var(--text-body); }
+        .legal { margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.6; text-align: center; padding: 0.8rem 0; }
+        .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(2, 6, 23, 0.74); padding: 1rem; backdrop-filter: blur(6px); }
         body.locked .root-gate { display: flex; }
         body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
-        .root-card {
-            max-width: 430px;
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid rgba(245, 158, 11, 0.38);
-            border-radius: 14px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 18px 36px rgba(2, 6, 23, 0.5);
-        }
+        .root-card { max-width: 430px; width: 100%; background: #0f172a; border: 1px solid rgba(245, 158, 11, 0.38); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 18px 36px var(--shadow-deep); }
+        [data-theme="light"] .root-card { background: #fff; border-color: rgba(217,119,6,0.3); }
+        [data-theme="light"] .root-gate { background: rgba(241,245,249,0.8); }
         .root-card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
-        .root-card p { font-size: 0.83rem; color: #cbd5e1; line-height: 1.55; }
+        .root-card p { font-size: 0.83rem; color: var(--text-body); line-height: 1.55; }
         .root-actions { margin-top: 0.7rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .root-actions button, .root-actions a {
-            border-radius: 9px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            border: 1px solid rgba(148,163,184,0.35);
-            text-decoration: none;
-            cursor: pointer;
-        }
+        .root-actions button, .root-actions a { border-radius: 9px; padding: 0.5rem 0.75rem; font-size: 0.78rem; font-weight: 700; border: 1px solid var(--line); text-decoration: none; cursor: pointer; color: var(--text); }
         .root-actions button { background: #8b5cf6; color: #fff; border: none; }
-        .root-actions a { color: #e2e8f0; }
-        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-
-        .cookie-banner {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10002;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.85rem;
-            padding: 0.8rem 1rem;
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid rgba(148, 163, 184, 0.28);
-            color: #cbd5e1;
-            font-size: 0.8rem;
-        }
-        .cookie-banner.hidden {
-            transform: translateY(120%);
-            pointer-events: none;
-        }
-        .cookie-banner a { color: #93c5fd; text-decoration: underline; }
+        .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.8rem 1rem; background: rgba(15, 23, 42, 0.95); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.8rem; }
+        [data-theme="light"] .cookie-banner { background: rgba(255,255,255,0.95); }
+        .cookie-banner.hidden { transform: translateY(120%); pointer-events: none; }
+        .cookie-banner a { color: #3b82f6; text-decoration: underline; }
         .cookie-actions { display: flex; gap: 0.5rem; }
-        .cookie-accept, .cookie-decline {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            border-radius: 7px;
-            padding: 0.4rem 0.72rem;
-            font-size: 0.74rem;
-            cursor: pointer;
-            background: transparent;
-            color: #e2e8f0;
+        .cookie-accept, .cookie-decline { border: 1px solid var(--line); border-radius: 7px; padding: 0.4rem 0.72rem; font-size: 0.74rem; cursor: pointer; background: transparent; color: var(--text); }
+        .cookie-accept { background: #2563eb; border-color: #2563eb; color: #fff; }
+        @media (max-width: 800px) { .tech-grid { grid-template-columns: 1fr; } .kv-grid { grid-template-columns: 1fr; } .abbr-grid { grid-template-columns: 1fr; } .wrap { padding: 0.8rem 0.6rem 1.5rem; } .section { padding: 1rem 0.8rem; } .hero { padding: 1rem 0.8rem; } }
+        @media (max-width: 760px) { .cookie-banner { flex-direction: column; text-align: center; } }
+        .progress-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; height: 3px; background: transparent; pointer-events: none; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.1s; border-radius: 0 2px 2px 0; }
+        .toolbar { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 0.7rem; flex-wrap: wrap; font-size: 0.75rem; }
+        .toolbar-group { display: flex; align-items: center; gap: 0.3rem; }
+        .toolbar-sep { width: 1px; height: 20px; background: var(--line); margin: 0 0.2rem; flex-shrink: 0; }
+        .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.3rem 0.55rem; border-radius: 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+        .toolbar-btn:hover { color: var(--text); background: var(--card-inner-hover); }
+        .toolbar-btn.active { color: var(--accent2); border-color: var(--nav-active-border); background: var(--nav-active-bg); }
+        .toolbar-btn i { font-size: 0.7rem; }
+        .reading-time { color: var(--muted); font-size: 0.72rem; margin-left: auto; white-space: nowrap; }
+        .reading-time i { margin-right: 0.25rem; color: var(--accent2); }
+        .search-overlay { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(2,6,23,0.7); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding-top: 12vh; }
+        .search-overlay.active { display: flex; }
+        [data-theme="light"] .search-overlay { background: rgba(241,245,249,0.8); }
+        .search-box { width: 90%; max-width: 520px; background: var(--bg-solid); border: 1px solid var(--line); border-radius: 14px; padding: 0.8rem; box-shadow: 0 20px 50px var(--shadow-deep); }
+        .search-input { width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--card-inner); color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; }
+        .search-input:focus { border-color: var(--accent2); }
+        .search-results { max-height: 50vh; overflow-y: auto; margin-top: 0.5rem; }
+        .search-result { padding: 0.5rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.82rem; color: var(--text-body); }
+        .search-result:hover { background: var(--card-inner-hover); }
+        .search-result mark { background: rgba(139,92,246,0.25); color: var(--text); border-radius: 2px; padding: 0 2px; }
+        .search-result .sr-section { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+        .study-check { display: none; float: right; margin-top: 2px; }
+        .study-mode .study-check { display: inline-flex; }
+        .study-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent2); cursor: pointer; }
+        .study-mode .section.studied { opacity: 0.55; }
+        .study-mode .section.studied .section-title::after { content: ' (Completed)'; font-size: 0.7rem; color: var(--callout-green-color); font-weight: 400; }
+        .flashcard-overlay { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(2,6,23,0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; flex-direction: column; gap: 1rem; padding: 1rem; perspective: 1000px; }
+        .flashcard-overlay.active { display: flex; }
+        [data-theme="light"] .flashcard-overlay { background: rgba(241,245,249,0.9); }
+        .flashcard { width: 90%; max-width: 420px; min-height: 200px; background: transparent; border: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0; cursor: pointer; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; position: relative; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .fc-front, .fc-back { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 12px 40px var(--shadow-deep); }
+        .fc-front { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
+        .fc-back { transform: rotateY(180deg); font-size: 0.92rem; color: var(--text-body); line-height: 1.6; }
+        .fc-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .fc-controls button { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.82rem; font-family: inherit; }
+        .fc-controls button:hover { background: var(--card-inner-hover); }
+        .fc-counter { color: var(--muted); font-size: 0.8rem; }
+        .fc-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; z-index: 2; }
+        .fc-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.6rem; font-style: italic; }
+        .fc-mastery { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .fc-mastery button { padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.8rem; font-family: inherit; transition: all 0.2s; }
+        .fc-mastery button:hover { background: var(--card-inner-hover); }
+        .fc-mastery .fc-know { border-color: var(--callout-green-color); color: var(--callout-green-color); }
+        .fc-mastery .fc-know:hover { background: var(--callout-green-color); color: #fff; }
+        .fc-mastery .fc-learning { border-color: var(--accent2); color: var(--accent2); }
+        .fc-mastery .fc-learning:hover { background: var(--accent2); color: #fff; }
+        .fc-mastery .fc-shuffle { border-color: var(--muted); }
+        .fc-progress-bar { width: 90%; max-width: 420px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+        .fc-progress-fill { height: 100%; background: var(--callout-green-color); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .fc-stats { color: var(--muted); font-size: 0.75rem; text-align: center; }
+        .fc-kbd-hint { color: var(--muted); font-size: 0.68rem; text-align: center; opacity: 0.7; }
+        .fc-kbd-hint kbd { display: inline-block; padding: 0.1rem 0.35rem; border-radius: 4px; border: 1px solid var(--line); background: var(--card-inner); font-size: 0.65rem; font-family: inherit; margin: 0 0.1rem; }
+        .inline-calc { padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card-inner); margin: 0.7rem 0; }
+        .inline-calc label { display: block; font-size: 0.76rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+        .inline-calc input, .inline-calc select { width: 100%; padding: 0.45rem 0.6rem; border-radius: 7px; border: 1px solid var(--line); background: var(--kv-bg); color: var(--text); font-size: 0.85rem; font-family: inherit; margin-bottom: 0.5rem; outline: none; }
+        .inline-calc input:focus, .inline-calc select:focus { border-color: var(--accent2); }
+        .calc-result { padding: 0.6rem; border-radius: 8px; background: var(--nav-active-bg); border: 1px solid var(--nav-active-border); text-align: center; }
+        .calc-result .calc-value { font-size: 1.3rem; font-weight: 700; color: var(--accent2); }
+        .calc-result .calc-label { font-size: 0.72rem; color: var(--muted); }
+        .quiz-widget { border: 1px solid var(--accent2); border-radius: 12px; padding: 0.9rem; margin: 0.7rem 0; background: var(--card-inner); }
+        .quiz-question { font-size: 0.88rem; font-weight: 600; color: var(--text-strong); margin-bottom: 0.6rem; }
+        .quiz-options { display: grid; gap: 0.35rem; }
+        .quiz-opt { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; font-size: 0.82rem; color: var(--text-body); transition: all 0.15s; }
+        .quiz-opt:hover { background: var(--card-inner-hover); border-color: var(--accent2); }
+        .quiz-opt.correct { background: var(--callout-green-bg); border-color: var(--callout-green-border); color: var(--callout-green-color); }
+        .quiz-opt.wrong { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+        [data-theme="light"] .quiz-opt.wrong { color: #dc2626; }
+        .quiz-opt .opt-icon { width: 18px; text-align: center; }
+        .quiz-feedback { margin-top: 0.5rem; font-size: 0.8rem; padding: 0.5rem 0.7rem; border-radius: 8px; display: none; }
+        .quiz-feedback.show { display: block; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; margin: 0.7rem 0; }
+        .comparison-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem; background: var(--card-inner); cursor: pointer; transition: all 0.2s; }
+        .comparison-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+        .comparison-card.expanded { grid-column: 1 / -1; }
+        .comparison-card h5 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.3rem; }
+        .comparison-card h5 i { color: var(--accent2); }
+        .comparison-card .cc-summary { font-size: 0.78rem; color: var(--muted); }
+        .comparison-card .cc-detail { display: none; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-body); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 0.5rem; }
+        .comparison-card.expanded .cc-detail { display: block; }
+        .case-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.6rem; background: var(--card-inner); }
+        .case-card h4 { font-size: 0.88rem; color: var(--text-strong); margin-bottom: 0.3rem; }
+        .case-metrics { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
+        .case-metric { padding: 0.3rem 0.55rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+        .case-before { background: rgba(239,68,68,0.12); color: #fca5a5; }
+        .case-after { background: var(--callout-green-bg); color: var(--callout-green-color); }
+        [data-theme="light"] .case-before { color: #dc2626; }
+        .interview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.6rem; margin-top: 0.6rem; }
+        .interview-card { border: 1px solid rgba(139,92,246,0.3); border-radius: 12px; padding: 0.8rem; background: rgba(139,92,246,0.06); }
+        .interview-card h5 { font-size: 0.82rem; color: #a78bfa; margin-bottom: 0.3rem; }
+        [data-theme="light"] .interview-card h5 { color: #7c3aed; }
+        [data-theme="light"] .interview-card { background: rgba(139,92,246,0.04); border-color: rgba(139,92,246,0.2); }
+        .interview-card p { font-size: 0.78rem; color: var(--text-body); line-height: 1.55; }
+        .changelog { margin-top: 0.5rem; }
+        .changelog-entry { display: flex; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px solid var(--line); font-size: 0.78rem; }
+        .changelog-entry:last-child { border-bottom: none; }
+        .changelog-date { color: var(--accent2); font-weight: 600; min-width: 85px; flex-shrink: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.74rem; }
+        .changelog-text { color: var(--text-body); }
+        .checklist { margin: 0.6rem 0; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 0.45rem; padding: 0.35rem 0; font-size: 0.8rem; color: var(--text-body); }
+        .checklist-item i { color: var(--accent2); margin-top: 2px; font-size: 0.7rem; flex-shrink: 0; }
+        .deep-link { opacity: 0; margin-left: 0.3rem; color: var(--muted); font-size: 0.8rem; cursor: pointer; transition: opacity 0.15s; background: none; border: none; }
+        .section-title:hover .deep-link { opacity: 1; }
+        .deep-link:hover { color: var(--accent2); }
+        .deep-link-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent2); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; z-index: 9999; display: none; box-shadow: 0 4px 12px var(--shadow); }
+        body.font-sm .accordion-content, body.font-sm .section-intro, body.font-sm .data-table td, body.font-sm .tech-card p { font-size: 0.76rem; }
+        body.font-lg .accordion-content, body.font-lg .section-intro, body.font-lg .data-table td, body.font-lg .tech-card p { font-size: 0.92rem; }
+        .data-table th.sortable { cursor: pointer; user-select: none; }
+        .data-table th.sortable:hover { background: var(--nav-active-bg); }
+        .data-table th .sort-icon { margin-left: 4px; font-size: 0.6rem; opacity: 0.4; }
+        .data-table th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
+        @media (max-width: 600px) { .data-table { font-size: 0.72rem; } .data-table th, .data-table td { padding: 0.35rem 0.4rem; } }
+        @media print {
+            .navbar, .toolbar, .section-nav, .root-gate, .cookie-banner, .progress-wrap, .search-overlay, .flashcard-overlay, .deep-link, .study-check, .topbar, .tooltip-float { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+            body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; }
+            .section, .hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
+            .accordion-body { max-height: none !important; overflow: visible !important; }
+            .accordion-header .chevron { display: none; }
+            .data-table th { background: #e5e7eb !important; color: #111 !important; }
+            .data-table td { color: #333 !important; border-color: #ddd !important; }
+            .callout { border-color: #ccc !important; color: #333 !important; background: #f9fafb !important; }
+            * { color: #000 !important; }
         }
-        .cookie-accept { background: #2563eb; border-color: #2563eb; }
-        @media (max-width: 760px) {
-            .cookie-banner { flex-direction: column; text-align: center; }
-        }
-
     </style>
 </head>
 <body class="locked">
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="search-overlay" id="searchOverlay"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off"><div class="search-results" id="searchResults"></div></div></div>
+    <div class="flashcard-overlay" id="flashcardOverlay">
+        <button class="fc-close" id="fcClose" aria-label="Close flashcards">&times;</button>
+        <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+        <div class="fc-stats" id="fcStats">0 mastered of 50</div>
+        <div class="flashcard" id="flashcard"><div class="fc-front" id="fcFront"><span id="fcFrontText"></span><span class="fc-hint">Click or press Space to reveal</span></div><div class="fc-back" id="fcBack"><span id="fcBackText"></span><span class="fc-hint">Definition</span></div></div>
+        <div class="fc-controls"><button id="fcPrev"><i class="fas fa-arrow-left"></i> Prev</button><span class="fc-counter" id="fcCounter">1 / 50</span><button id="fcNext">Next <i class="fas fa-arrow-right"></i></button></div>
+        <div class="fc-mastery"><button class="fc-know" id="fcKnow"><i class="fas fa-check"></i> Know it</button><button class="fc-learning" id="fcLearning"><i class="fas fa-redo"></i> Still learning</button><button class="fc-shuffle" id="fcShuffle"><i class="fas fa-random"></i> Shuffle</button></div>
+        <div class="fc-kbd-hint"><kbd>Space</kbd> flip &nbsp; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp; <kbd>1</kbd> know &nbsp; <kbd>2</kbd> learning &nbsp; <kbd>Esc</kbd> close</div>
+    </div>
+    <div class="deep-link-toast" id="deepLinkToast">Link copied to clipboard</div>
+
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu">
+                    <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="datahallAI.html" style="color:#8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                    <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+                    <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="dcmoc/" style="color:#ef4444;font-weight:600;">DC MOC</a></li>
+                </ul>
+            </li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    </div></nav>
+
     <div class="wrap">
         <div class="topbar">
             <a class="back" href="standards-ltc-lab.html"><i class="fas fa-arrow-left"></i> Back to Lab</a>
             <span class="pill"><i class="fas fa-lock"></i> Root Module</span>
         </div>
-        <section class="panel">
-            <span class="pill">ANSI / TIA Infrastructure</span>
-            <h1>ANSI/TIA Topology Readiness</h1>
-            <p class="subtitle">Redundancy mapping, concurrent maintainability paths, and infrastructure testability.</p>
-            <p class="summary">This module maps logical and physical topology into readiness checkpoints so design choices can be reviewed against uptime intent before buildout.</p>
 
-            <div class="grid">
-                <article class="card">
-                    <h3>Coverage</h3>
-                    <ul>
-                        <li>N, N+1, and 2N branch-path validation for critical systems.</li>
-                        <li>Single-point-of-failure discovery across power and cooling chains.</li>
-                        <li>Concurrent maintainability evidence map by subsystem.</li>
-                        <li>Acceptance-test sequence for commissioning and operations.</li>
-                    </ul>
-                </article>
-                <article class="card">
-                    <h3>Focus Blocks</h3>
-                    <ul>
-                        <li>Topology verification matrix</li>
-                        <li>Isolation and failover paths</li>
-                        <li>Maintenance window safety</li>
-                        <li>Test witness checklist</li>
-                    </ul>
-                </article>
+        <section class="hero">
+            <span class="pill-purple" style="padding:0.3rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">ANSI/TIA Standards Ecosystem</span>
+            <h1>ANSI/TIA Data Center Topology — Comprehensive Deep-Dive</h1>
+            <p class="subtitle">From TIA-942 infrastructure ratings and TIA-568 structured cabling to TIA-607 grounding and TIA-606 administration — a complete technical reference for data center physical layer design, redundancy architecture, and commissioning.</p>
+
+            <div class="mindmap-wrap" role="img" aria-label="ANSI/TIA Data Center Standards Mindmap">
+                <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect class="diag-box" x="355" y="220" width="210" height="70" rx="14"/>
+                    <text class="diag-center" x="460" y="250" text-anchor="middle">ANSI/TIA &amp;</text>
+                    <text class="diag-center" x="460" y="270" text-anchor="middle">Data Centers</text>
+                    <path class="diag-line-purple" d="M355,240 L230,110"/>
+                    <rect class="diag-box-purple" x="80" y="30" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="100" y="55" fill="#c4b5fd">TIA-942 Ratings</text>
+                    <text class="diag-v" x="100" y="74">Infrastructure Ratings 1–4</text>
+                    <text class="diag-v" x="100" y="90">Subsystem Requirements</text>
+                    <text class="diag-v" x="100" y="106">Availability Targets</text>
+                    <path class="diag-line-purple" d="M565,240 L690,110"/>
+                    <rect class="diag-box-purple" x="610" y="30" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="630" y="55" fill="#c4b5fd">TIA-568 Cabling</text>
+                    <text class="diag-v" x="630" y="74">Cat6A / Cat8 Copper</text>
+                    <text class="diag-v" x="630" y="90">OM3/OM4/OM5 Fiber</text>
+                    <text class="diag-v" x="630" y="106">Distance &amp; Bandwidth</text>
+                    <path class="diag-line-purple" d="M355,265 L180,290"/>
+                    <rect class="diag-box-purple" x="20" y="260" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="40" y="285" fill="#c4b5fd">TIA-569 Pathways</text>
+                    <text class="diag-v" x="40" y="304">Cable tray &amp; conduit</text>
+                    <text class="diag-v" x="40" y="320">Raised floor / overhead</text>
+                    <text class="diag-v" x="40" y="336">Separation requirements</text>
+                    <path class="diag-line-amber" d="M565,265 L720,290"/>
+                    <rect class="diag-box-amber" x="680" y="260" width="220" height="110" rx="10"/>
+                    <text class="diag-t" x="700" y="285" fill="#fde68a">TIA-607 Grounding</text>
+                    <text class="diag-v" x="700" y="304">TMGB / TGB / BCT</text>
+                    <text class="diag-v" x="700" y="320">Conductor sizing</text>
+                    <text class="diag-v" x="700" y="336">Resistance targets</text>
+                    <text class="diag-v" x="700" y="352">Ground loop prevention</text>
+                    <path class="diag-line-green" d="M400,290 L230,430"/>
+                    <rect class="diag-box-green" x="70" y="400" width="210" height="100" rx="10"/>
+                    <text class="diag-t" x="90" y="425" fill="#86efac">TIA-606 Administration</text>
+                    <text class="diag-v" x="90" y="444">Color code standards</text>
+                    <text class="diag-v" x="90" y="460">Cable labeling</text>
+                    <text class="diag-v" x="90" y="476">DCIM documentation</text>
+                    <path class="diag-line-green" d="M520,290 L660,430"/>
+                    <rect class="diag-box-green" x="580" y="400" width="220" height="100" rx="10"/>
+                    <text class="diag-t" x="600" y="425" fill="#86efac">Commissioning</text>
+                    <text class="diag-v" x="600" y="444">FAT / SAT / IST</text>
+                    <text class="diag-v" x="600" y="460">Witness protocols</text>
+                    <text class="diag-v" x="600" y="476">Test matrices</text>
+                </svg>
             </div>
-
-            <div class="cta">
-                <a class="btn btn-main" href="standards-ltc-lab.html#calculator"><i class="fas fa-chart-line"></i> Open Live Simulation</a>
-                <a class="btn btn-sub" href="datacenter-solutions.html#tools"><i class="fas fa-grid"></i> Back to Tools</a>
-            </div>
-
-            <p class="next">Next step: bind each topology claim with one measurable proof artifact and one fallback runbook.</p>
-            <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review.</p>
+            <p style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem;"><i class="fas fa-info-circle"></i> Purple = Core TIA Standards · Amber = Grounding &amp; Bonding · Green = Administration &amp; Commissioning</p>
         </section>
-    </div>
 
-    <div class="root-gate" id="rootGate">
-        <div class="root-card">
-            <h2>Root Access Required</h2>
-            <p>This deep-dive module is restricted to root accounts.</p>
-            <div class="root-actions">
-                <button id="rootLoginBtn" type="button">Sign In as Root</button>
-                <a href="datacenter-solutions.html">Back</a>
+        <div class="toolbar" id="pageToolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="unitToggle" title="Toggle Metric / Imperial"><i class="fas fa-ruler"></i> Metric</button>
             </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="fontDown" title="Decrease font size"><i class="fas fa-minus"></i> A</button>
+                <button class="toolbar-btn" id="fontUp" title="Increase font size"><i class="fas fa-plus"></i> A</button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="searchBtn" title="Search (Ctrl+K)"><i class="fas fa-search"></i> Search</button>
+                <button class="toolbar-btn" id="studyModeBtn" title="Toggle study mode"><i class="fas fa-graduation-cap"></i> Study</button>
+                <button class="toolbar-btn" id="flashcardBtn" title="Flashcard mode"><i class="fas fa-clone"></i> Cards</button>
+                <button class="toolbar-btn" id="printBtn" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <span class="reading-time" id="readingTime"><i class="fas fa-clock"></i> ~30 min read</span>
         </div>
+
+        <nav class="section-nav" id="sectionNav">
+            <a class="nav-pill active" href="#sec-tiers">Tiers</a>
+            <a class="nav-pill" href="#sec-cabling">Cabling</a>
+            <a class="nav-pill" href="#sec-pathways">Pathways</a>
+            <a class="nav-pill" href="#sec-grounding">Grounding</a>
+            <a class="nav-pill" href="#sec-admin">Admin</a>
+            <a class="nav-pill" href="#sec-redundancy">Redundancy</a>
+            <a class="nav-pill" href="#sec-spof">SPOF</a>
+            <a class="nav-pill" href="#sec-commission">Commission</a>
+            <a class="nav-pill" href="#sec-xref">Cross-Ref</a>
+            <a class="nav-pill" href="#sec-cases">Cases</a>
+            <a class="nav-pill" href="#sec-interview">Interview</a>
+            <a class="nav-pill" href="#sec-abbr">Abbrev.</a>
+        </nav>
+
+        <!-- SECTION 1: TIA-942 Infrastructure Tiers -->
+        <section class="section" id="sec-tiers" data-nav-id="sec-tiers">
+            <h2 class="section-title"><i class="fas fa-layer-group"></i> TIA-942 Infrastructure Ratings <button class="deep-link" onclick="copyDeepLink('sec-tiers')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-942: ANSI/TIA standard for Telecommunications Infrastructure Standard for Data Centers. Defines infrastructure ratings 1-4 for redundancy and availability.">TIA-942-B</span> is the ANSI-accredited standard defining infrastructure requirements for data center facilities. It categorizes data centers into four <strong>Ratings</strong> (1 through 4) based on redundancy, distribution path architecture, and fault tolerance.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Overview &amp; Scope <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TIA-942 was first published in 2005 by the Telecommunications Industry Association as the first standard specifically addressing data center infrastructure design. It covers site selection, architectural considerations, electrical systems, mechanical systems, telecommunications cabling, and fire protection.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Edition</th><th>Year</th><th>Key Changes</th></tr></thead>
+                        <tbody>
+                            <tr><td>TIA-942</td><td>2005</td><td>Original standard; introduced 4-tier classification aligned with Uptime Institute concepts</td></tr>
+                            <tr><td>TIA-942-A</td><td>2012</td><td>Revised tier definitions; added annexes for cabling, grounding, and fire protection</td></tr>
+                            <tr><td class="highlight">TIA-942-B</td><td class="highlight">2017</td><td class="highlight">Renamed tiers to "Ratings"; decoupled from Uptime Institute; added modular DC guidance</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> TIA-942-B uses "Rating" (not "Tier") to distinguish from Uptime Institute's trademarked Tier classification. The two systems have different testing methodologies and should not be used interchangeably.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Rating 1–4 Requirements Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Parameter</th><th>Rating 1</th><th>Rating 2</th><th>Rating 3</th><th>Rating 4</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Distribution Paths</strong></td><td>1</td><td>1</td><td>1 active + 1 alternate</td><td>2 simultaneous active</td></tr>
+                            <tr><td><strong>Component Redundancy</strong></td><td>N</td><td>N+1</td><td>N+1</td><td>Min 2(N+1)</td></tr>
+                            <tr><td><strong>Concurrent Maintainable</strong></td><td>No</td><td>No</td><td class="highlight">Yes</td><td class="highlight">Yes</td></tr>
+                            <tr><td><strong>Fault Tolerant</strong></td><td>No</td><td>No</td><td>No</td><td class="highlight">Yes</td></tr>
+                            <tr><td><strong>Annual Downtime</strong></td><td>28.8 hr</td><td>22.0 hr</td><td>1.6 hr</td><td class="highlight">0.4 hr</td></tr>
+                            <tr><td><strong>Availability</strong></td><td>99.671%</td><td>99.749%</td><td>99.982%</td><td class="highlight">99.995%</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> Rating 3 is the most commonly specified level for enterprise data centers, providing concurrent maintainability without the cost premium of full fault tolerance.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Subsystem Requirements Matrix <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Subsystem</th><th>Rating 1</th><th>Rating 2</th><th>Rating 3</th><th>Rating 4</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Telecom Entrance</strong></td><td>Single</td><td>Single</td><td>Dual (diverse)</td><td>Dual (diverse)</td></tr>
+                            <tr><td><strong>Access Providers</strong></td><td>1</td><td>1</td><td>2+</td><td>2+</td></tr>
+                            <tr><td><strong>Backbone Cabling</strong></td><td>Single path</td><td>Single path</td><td>Redundant paths</td><td>Redundant paths</td></tr>
+                            <tr><td><strong>UPS</strong></td><td>N</td><td>N+1</td><td>N+1, dual bus</td><td>2(N+1), isolated</td></tr>
+                            <tr><td><strong>Generator</strong></td><td>Optional</td><td>N+1</td><td>N+1, auto-start</td><td>2(N+1), auto-start</td></tr>
+                            <tr><td><strong>Cooling</strong></td><td>N</td><td>N+1</td><td>N+1, dual loop</td><td>2(N+1), independent</td></tr>
+                            <tr><td><strong>Fire Suppression</strong></td><td>Wet sprinkler</td><td>Pre-action or clean agent</td><td>Clean agent + pre-action</td><td>Clean agent + pre-action</td></tr>
+                            <tr><td><strong>Physical Security</strong></td><td>Basic access control</td><td>Card access + CCTV</td><td>Biometric + CCTV</td><td>Multi-factor + 24/7 guard</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> TIA vs Uptime Institute Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="comparison-grid">
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-university"></i> Origin &amp; Governance</h5>
+                            <div class="cc-summary">TIA = ANSI standard · Uptime = private certification</div>
+                            <div class="cc-detail">TIA-942 is an ANSI-accredited standard developed through open committee process. Uptime Institute Tier Standard is a proprietary certification program owned by The 451 Group. TIA is a "buy the standard" model; Uptime requires paid certification engagement.</div>
+                        </div>
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-tag"></i> Naming Convention</h5>
+                            <div class="cc-summary">TIA = "Rating" 1–4 · Uptime = "Tier" I–IV</div>
+                            <div class="cc-detail">Since TIA-942-B (2017), TIA uses "Rating" to differentiate from Uptime's trademarked "Tier." The concepts are similar but not identical — different requirements at each level.</div>
+                        </div>
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-clipboard-check"></i> Validation Method</h5>
+                            <div class="cc-summary">TIA = paper-based · Uptime = on-site audit</div>
+                            <div class="cc-detail">TIA compliance is self-declared based on meeting the published standard requirements. Uptime requires TCCF (design) and TCCD (construction) audits with on-site verification by Uptime engineers.</div>
+                        </div>
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-dollar-sign"></i> Cost Structure</h5>
+                            <div class="cc-summary">TIA = standard purchase · Uptime = $50K–200K+ certification</div>
+                            <div class="cc-detail">TIA-942-B standard document costs ~$400. Uptime certification fees range from $50K (TCCF design review) to $200K+ (full TCCD construction audit), plus consulting fees.</div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Quick Quiz — TIA-942 Ratings <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget" id="quiz1">
+                        <div class="quiz-question">Q1: Which TIA-942-B rating first introduces concurrent maintainability?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Rating 1</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Rating 2</div>
+                            <div class="quiz-opt" data-correct="true" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Rating 3</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Rating 4</div>
+                        </div>
+                        <div class="quiz-feedback" id="quiz1fb"></div>
+                    </div>
+                    <div class="quiz-widget" id="quiz2" style="margin-top:0.6rem;">
+                        <div class="quiz-question">Q2: What is the key difference between TIA-942 "Ratings" and Uptime "Tiers"?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> They are identical systems with different names</div>
+                            <div class="quiz-opt" data-correct="true" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> TIA is an ANSI standard; Uptime is a private certification with on-site audits</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> TIA has more levels than Uptime</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Uptime is free; TIA requires payment</div>
+                        </div>
+                        <div class="quiz-feedback" id="quiz2fb"></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Structured Cabling TIA-568 -->
+        <section class="section" id="sec-cabling" data-nav-id="sec-cabling">
+            <h2 class="section-title"><i class="fas fa-ethernet"></i> Structured Cabling — TIA-568 <button class="deep-link" onclick="copyDeepLink('sec-cabling')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-568: Telecommunications cabling standard defining copper and fiber specifications, distance limits, and connector requirements for structured cabling systems.">TIA-568</span> defines the structured cabling infrastructure for data centers, including copper and fiber specifications, distribution hierarchy, and performance requirements.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Backbone Cabling Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TIA-568 establishes a hierarchical cabling architecture with defined distribution areas:</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">MDA</div><div class="kv-value">Main Distribution Area</div></div>
+                        <div class="kv-item"><div class="kv-label">HDA</div><div class="kv-value">Horizontal Distribution Area</div></div>
+                        <div class="kv-item"><div class="kv-label">EDA</div><div class="kv-value">Equipment Distribution Area</div></div>
+                        <div class="kv-item"><div class="kv-label">ZDA</div><div class="kv-value">Zone Distribution Area</div></div>
+                    </div>
+                    <p>The <strong>MDA</strong> contains the main cross-connect and serves as the backbone hub. <strong>HDA</strong> provides horizontal connections to rows of cabinets. <strong>EDA</strong> is where IT equipment connects. <strong>ZDA</strong> is an optional consolidation point for modular or flexible deployments.</p>
+                    <div class="callout callout-info"><i class="fas fa-sitemap"></i> Backbone cabling runs from MDA → HDA using fiber optic cable (typically OM4 or OS2). Horizontal cabling from HDA → EDA uses copper (Cat6A) or fiber depending on speed requirements.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Copper Cabling — Cat5e through Cat8 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Category</th><th>Max Frequency</th><th>Max Throughput</th><th>Max Channel</th><th>Typical Application</th></tr></thead>
+                        <tbody>
+                            <tr><td>Cat5e</td><td>100 MHz</td><td>1 Gbps</td><td class="unit-val" data-m="100">100 m</td><td>Legacy LAN, voice</td></tr>
+                            <tr><td>Cat6</td><td>250 MHz</td><td>1 Gbps (10G @55m)</td><td class="unit-val" data-m="100">100 m</td><td>General LAN, low-speed DC</td></tr>
+                            <tr><td class="highlight">Cat6A</td><td class="highlight">500 MHz</td><td class="highlight">10 Gbps</td><td class="unit-val highlight" data-m="100">100 m</td><td class="highlight">Data center standard</td></tr>
+                            <tr><td>Cat7</td><td>600 MHz</td><td>10 Gbps</td><td class="unit-val" data-m="100">100 m</td><td>Shielded environments</td></tr>
+                            <tr><td>Cat7A</td><td>1000 MHz</td><td>40 Gbps</td><td class="unit-val" data-m="50">50 m</td><td>High-density interconnect</td></tr>
+                            <tr><td class="highlight">Cat8.1</td><td class="highlight">2000 MHz</td><td class="highlight">25/40 Gbps</td><td class="unit-val highlight" data-m="30">30 m</td><td class="highlight">ToR switch to server</td></tr>
+                            <tr><td>Cat8.2</td><td>2000 MHz</td><td>25/40 Gbps</td><td class="unit-val" data-m="30">30 m</td><td>ToR switch (shielded)</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-green"><i class="fas fa-check-circle"></i> <strong>Best practice:</strong> Cat6A is the current minimum recommendation for new data center installations. It supports 10GBASE-T at full 100m channel length and has adequate headroom for future applications.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Fiber Optic Specifications <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Type</th><th>Core</th><th>Wavelength</th><th>10G Distance</th><th>100G Distance</th><th>Application</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="term-tooltip" data-tooltip="OM3: Laser-optimized 50μm multimode fiber supporting 10G at 300m. Suitable for most intra-building data center links.">OM3</span></td><td>50 μm MM</td><td>850 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="100">100 m</td><td>General backbone</td></tr>
+                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="OM4: Enhanced laser-optimized 50μm multimode fiber supporting 10G at 400m and 100G at 150m. Preferred for new DC installations.">OM4</span></td><td class="highlight">50 μm MM</td><td class="highlight">850 nm</td><td class="unit-val highlight" data-m="400">400 m</td><td class="unit-val highlight" data-m="150">150 m</td><td class="highlight">DC backbone standard</td></tr>
+                            <tr><td><span class="term-tooltip" data-tooltip="OM5: Wideband multimode fiber supporting SWDM (Short Wavelength Division Multiplexing) at 850 and 950nm for higher bandwidth density.">OM5</span></td><td>50 μm MM</td><td>850+950 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="150">150 m</td><td>SWDM applications</td></tr>
+                            <tr><td><span class="term-tooltip" data-tooltip="OS2: Single-mode fiber supporting extremely long distances (10+ km). Used for campus backbone, inter-building, and WAN connections.">OS2</span></td><td>9 μm SM</td><td>1310/1550 nm</td><td class="unit-val" data-m="10000">10 km</td><td class="unit-val" data-m="40000">40 km</td><td>Campus/WAN backbone</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-lightbulb"></i> <strong>OM5</strong> enables SWDM (Short Wavelength Division Multiplexing) which multiplexes 4 wavelengths on a single fiber pair, achieving 100G over 2 fibers instead of 8 (parallel) or requiring expensive CWDM optics.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Connectors &amp; Polarity <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Connector</th><th>Fiber Count</th><th>Typical Use</th><th>Density</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>LC Duplex</strong></td><td>2</td><td>10G/25G point-to-point</td><td>Standard</td></tr>
+                            <tr><td class="highlight"><strong>MPO-12</strong></td><td class="highlight">12</td><td class="highlight">40G/100G parallel</td><td class="highlight">High density</td></tr>
+                            <tr><td><strong>MPO-24</strong></td><td>24</td><td>100G/400G parallel</td><td>Very high density</td></tr>
+                            <tr><td><strong>MPO-32</strong></td><td>32</td><td>400G/800G</td><td>Ultra-high density</td></tr>
+                        </tbody>
+                    </table></div>
+                    <p><strong>Polarity methods:</strong> TIA-568 defines three polarity methods (A, B, C) for MPO-based systems. Method B (straight-through with key-up/key-down) is most common. Proper polarity ensures transmit fibers align with receive ports across the link.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Cable Fill Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Calculate maximum cables per conduit using the 40% fill ratio (TIA-569 / NEC Chapter 9 for 3+ cables):</p>
+                    <div class="inline-calc" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                        <div><label>Conduit Inner Diameter (mm)</label><input type="number" id="conduitDia" value="25" min="10" max="150" step="1"></div>
+                        <div><label>Cable Outer Diameter (mm)</label><input type="number" id="cableDia" value="7" min="1" max="30" step="0.5"></div>
+                        <div class="calc-result" style="grid-column:1/-1;">
+                            <div class="calc-label">Maximum Cables (40% fill)</div>
+                            <div class="calc-value" id="fillResult">5 cables</div>
+                            <div class="calc-label" id="fillFormula" style="margin-top:4px;font-size:0.7rem;">Formula: floor(0.40 × conduit area ÷ cable area)</div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Pathways & Spaces TIA-569 -->
+        <section class="section" id="sec-pathways" data-nav-id="sec-pathways">
+            <h2 class="section-title"><i class="fas fa-road"></i> Pathways &amp; Spaces — TIA-569 <button class="deep-link" onclick="copyDeepLink('sec-pathways')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-569: Standard for Telecommunications Pathways and Spaces. Defines cable tray, conduit, and routing requirements for telecommunications infrastructure.">TIA-569</span> defines the pathways (conduits, cable trays, raceways) and spaces (rooms, closets, access floors) that support telecommunications cabling infrastructure.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Cable Tray Systems <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Cable trays provide open pathways for high-density cable routing. Three primary types used in data centers:</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Ladder Tray</div><div class="kv-value">Best airflow, backbone runs</div></div>
+                        <div class="kv-item"><div class="kv-label">Solid Bottom</div><div class="kv-value">EMI shielding, security zones</div></div>
+                        <div class="kv-item"><div class="kv-label">Wire Mesh</div><div class="kv-value">Flexible, easy patching</div></div>
+                        <div class="kv-item"><div class="kv-label">Channel Tray</div><div class="kv-value">Small runs, low cable count</div></div>
+                    </div>
+                    <p><strong>Load ratings:</strong> Cable trays must support the installed cable weight plus a safety factor. Typical data center tray load ratings are 50–100 kg/m depending on span length and support spacing.</p>
+                    <div class="callout callout-info"><i class="fas fa-ruler-combined"></i> <strong>Bend radius:</strong> Minimum bend radius for Cat6A = 4× cable OD (unloaded). For fiber, minimum bend radius = 10× cable OD for OM4, 15× for OS2 during installation.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Conduit Fill Ratios <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Maximum conduit fill ratios per NEC Chapter 9 (referenced by TIA-569):</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Number of Cables</th><th>Maximum Fill %</th><th>Rationale</th></tr></thead>
+                        <tbody>
+                            <tr><td>1 cable</td><td class="highlight">53%</td><td>Easy pulling, heat dissipation</td></tr>
+                            <tr><td>2 cables</td><td class="highlight">31%</td><td>Cable jamming prevention</td></tr>
+                            <tr><td>3+ cables</td><td class="highlight">40%</td><td>Standard data cable fill</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Exceeding fill ratios increases pulling tension, risks cable damage, and impedes future cable additions. Always calculate fill before specifying conduit size.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Raised Floor vs Overhead Routing <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="comparison-grid">
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-arrow-down"></i> Raised Floor</h5>
+                            <div class="cc-summary">Traditional approach — cables under raised floor tiles</div>
+                            <div class="cc-detail"><strong>Pros:</strong> Established practice, power distribution under floor, clean room above. <strong>Cons:</strong> Obstructs airflow (cables block plenum), difficult access for moves/adds/changes, limits cooling efficiency. Cable fill under floor can reduce effective airflow by 30–50% in older installations.</div>
+                        </div>
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-arrow-up"></i> Overhead Routing</h5>
+                            <div class="cc-summary">Modern approach — cable trays above cabinets</div>
+                            <div class="cc-detail"><strong>Pros:</strong> Separates airflow from cabling, easier access for MACs, better cable management visibility, compatible with hot/cold aisle containment. <strong>Cons:</strong> Requires structural support from ceiling grid, higher installation cost, aesthetic considerations. Preferred for new builds.</div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Separation Requirements <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Minimum separation between power and telecommunications cables to prevent electromagnetic interference (EMI):</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Power Source</th><th>Unshielded Data</th><th>Shielded Data</th><th>Fiber</th></tr></thead>
+                        <tbody>
+                            <tr><td>&lt; 2 kVA</td><td class="unit-val" data-m="0.127">127 mm</td><td class="unit-val" data-m="0.064">64 mm</td><td>No requirement</td></tr>
+                            <tr><td>2–5 kVA</td><td class="unit-val" data-m="0.305">305 mm</td><td class="unit-val" data-m="0.152">152 mm</td><td>No requirement</td></tr>
+                            <tr><td>&gt; 5 kVA</td><td class="unit-val" data-m="0.610">610 mm</td><td class="unit-val" data-m="0.305">305 mm</td><td>No requirement</td></tr>
+                            <tr><td>Fluorescent lighting</td><td class="unit-val" data-m="0.305">305 mm</td><td class="unit-val" data-m="0.152">152 mm</td><td>No requirement</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-green"><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Using fiber optic backbone eliminates EMI separation concerns entirely. This is one reason fiber is preferred for backbone cabling in data centers.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Grounding & Bonding TIA-607 -->
+        <section class="section" id="sec-grounding" data-nav-id="sec-grounding">
+            <h2 class="section-title"><i class="fas fa-bolt"></i> Grounding &amp; Bonding — TIA-607 <button class="deep-link" onclick="copyDeepLink('sec-grounding')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-607: Generic Telecommunications Bonding and Grounding for Customer Premises. Defines the grounding infrastructure (TMGB, TGB, BCT, TBB) required for telecommunications systems.">TIA-607</span> defines the bonding and grounding infrastructure required to support telecommunications equipment, protect against electrical hazards, and minimize electromagnetic interference.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> TMGB / TGB / BCT Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">TMGB</div><div class="kv-value">Telecom Main Grounding Busbar</div></div>
+                        <div class="kv-item"><div class="kv-label">TGB</div><div class="kv-value">Telecom Grounding Busbar</div></div>
+                        <div class="kv-item"><div class="kv-label">TBB</div><div class="kv-value">Telecom Bonding Backbone</div></div>
+                        <div class="kv-item"><div class="kv-label">BCT</div><div class="kv-value">Bonding Conductor for Telecom</div></div>
+                    </div>
+                    <p>The <strong>TMGB</strong> is located at the service entrance and connects to the building grounding electrode system. Each floor or zone has a <strong>TGB</strong> connected to the TMGB via the <strong>TBB</strong> (bonding backbone). Individual equipment racks connect to the nearest TGB via <strong>BCT</strong> conductors.</p>
+                    <div class="callout callout-info"><i class="fas fa-bolt"></i> The TMGB must be bonded to the building's main grounding electrode (water pipe, ground rod, or concrete-encased electrode) with a conductor no smaller than 6 AWG (16 mm²).</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Conductor Sizing Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Application</th><th>Min Size (AWG)</th><th>Min Size (mm²)</th><th>Color</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>BCT to TMGB</strong></td><td>6 AWG</td><td>16 mm²</td><td>Green</td><td>Service entrance bond</td></tr>
+                            <tr><td><strong>TBB</strong></td><td>6 AWG</td><td>16 mm²</td><td>Green</td><td>Backbone interconnect</td></tr>
+                            <tr><td><strong>Bonding jumper</strong></td><td>6 AWG</td><td>16 mm²</td><td>Green</td><td>Cross-bonding TGBs</td></tr>
+                            <tr><td><strong>Equipment bonding</strong></td><td>6 AWG</td><td>16 mm²</td><td>Green/yellow</td><td>Cabinet to TGB</td></tr>
+                            <tr><td><strong>Rack bonding</strong></td><td>6 AWG</td><td>16 mm²</td><td>Green/yellow</td><td>Rack frame to busbar</td></tr>
+                        </tbody>
+                    </table></div>
+                    <p>All grounding conductors must be <strong>insulated, continuous, and accessible</strong>. No splices are permitted in the TBB except at listed connectors on grounding busbars.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Resistance Targets <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">TMGB to Building Ground</div><div class="kv-value">&lt; 5 Ω</div></div>
+                        <div class="kv-item"><div class="kv-label">TGB to TMGB</div><div class="kv-value">&lt; 1 Ω</div></div>
+                        <div class="kv-item"><div class="kv-label">Equipment to TGB</div><div class="kv-value">&lt; 0.1 Ω</div></div>
+                        <div class="kv-item"><div class="kv-label">Rack to Ground</div><div class="kv-value">&lt; 1 Ω</div></div>
+                    </div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Ground resistance must be tested at commissioning and annually thereafter. Degradation over time (corrosion, loose connections) is the leading cause of grounding failures in data centers.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Ground Loop Prevention <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Ground loops occur when multiple ground paths create circular current flow, inducing noise on signal cables. TIA-607 recommends:</p>
+                    <ul>
+                        <li><strong>Single-point grounding:</strong> All telecommunications equipment bonds to one ground reference (TGB) per zone. Avoids multiple paths to earth.</li>
+                        <li><strong>Star topology:</strong> Each rack bonds directly to the zone TGB — not daisy-chained from rack to rack.</li>
+                        <li><strong>Isolated ground:</strong> For sensitive equipment, use isolated ground receptacles with dedicated conductors back to the panel ground bar.</li>
+                        <li><strong>Mesh-BN:</strong> For large facilities, a mesh bonding network provides low-impedance equi-potential plane, reducing ground potential differences between racks.</li>
+                    </ul>
+                    <div class="callout callout-green"><i class="fas fa-check-circle"></i> <strong>Best practice:</strong> For new data center builds, install a mesh bonding network (grid of conductors under the raised floor or in the ceiling) to create an equi-potential plane across the entire white space.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Administration & Labeling TIA-606 -->
+        <section class="section" id="sec-admin" data-nav-id="sec-admin">
+            <h2 class="section-title"><i class="fas fa-tags"></i> Administration &amp; Labeling — TIA-606 <button class="deep-link" onclick="copyDeepLink('sec-admin')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-606: Administration Standard for Telecommunications Infrastructure. Defines labeling, color coding, and documentation requirements for cable management.">TIA-606-C</span> provides the framework for documenting, labeling, and managing telecommunications infrastructure. Proper administration reduces errors, speeds troubleshooting, and enables efficient capacity planning.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Color Code Standards <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="kv-grid">
+                        <div class="kv-item" style="border-left:3px solid #f97316;"><div class="kv-label">Orange</div><div class="kv-value">Demarcation / Central Office</div></div>
+                        <div class="kv-item" style="border-left:3px solid #22c55e;"><div class="kv-label">Green</div><div class="kv-value">Network / Customer Side</div></div>
+                        <div class="kv-item" style="border-left:3px solid #a855f7;"><div class="kv-label">Purple</div><div class="kv-value">Common Equipment</div></div>
+                        <div class="kv-item" style="border-left:3px solid #e2e8f0;"><div class="kv-label">White</div><div class="kv-value">First-Level Backbone</div></div>
+                        <div class="kv-item" style="border-left:3px solid #94a3b8;"><div class="kv-label">Gray</div><div class="kv-value">Second-Level Backbone</div></div>
+                        <div class="kv-item" style="border-left:3px solid #3b82f6;"><div class="kv-label">Blue</div><div class="kv-value">Horizontal / Station</div></div>
+                        <div class="kv-item" style="border-left:3px solid #92400e;"><div class="kv-label">Brown</div><div class="kv-value">Inter-Building Backbone</div></div>
+                        <div class="kv-item" style="border-left:3px solid #eab308;"><div class="kv-label">Yellow</div><div class="kv-value">Miscellaneous / Alarms</div></div>
+                        <div class="kv-item" style="border-left:3px solid #ef4444;"><div class="kv-label">Red</div><div class="kv-value">Key Telephone Systems</div></div>
+                        <div class="kv-item" style="border-left:3px solid #ec4899;"><div class="kv-label">Pink</div><div class="kv-value">Spare / Future</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Cable Labeling Convention <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TIA-606-C requires unique identifiers for every cable, pathway, and space. Standard format:</p>
+                    <div class="callout callout-info"><i class="fas fa-tag"></i> <strong>Format:</strong> <code>[Building]-[Floor]-[Room]-[Rack]-[Port]</code></div>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Label</th><th>Meaning</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>DC1-1F-MDA-R01-P24</code></td><td>DC1, 1st floor, MDA, Rack 01, Port 24</td></tr>
+                            <tr><td><code>DC1-2F-HDA-R15-P48</code></td><td>DC1, 2nd floor, HDA, Rack 15, Port 48</td></tr>
+                            <tr><td><code>DC2-GF-ER-FP01</code></td><td>DC2, ground floor, Entrance Room, Fiber Panel 01</td></tr>
+                        </tbody>
+                    </table></div>
+                    <p>Labels must be machine-printed (not handwritten), durable, and placed at both ends of every cable within 300 mm of the termination point.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Documentation &amp; DCIM Integration <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TIA-606-C defines four classes of administration complexity:</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Class</th><th>Scope</th><th>Documentation Required</th></tr></thead>
+                        <tbody>
+                            <tr><td>Class 1</td><td>Single building</td><td>Cable records, patch panel schedules</td></tr>
+                            <tr><td>Class 2</td><td>Single building, campus backbone</td><td>Class 1 + pathway records, space records</td></tr>
+                            <tr><td class="highlight">Class 3</td><td class="highlight">Multiple buildings, campus</td><td class="highlight">Class 2 + inter-building records, as-built drawings</td></tr>
+                            <tr><td>Class 4</td><td>Multi-campus/site</td><td>Class 3 + site-to-site records, WAN documentation</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-database"></i> Modern <span class="term-tooltip" data-tooltip="DCIM (Data Center Infrastructure Management): Software platform that provides real-time monitoring and management of DC assets, capacity, connectivity, and environmental conditions.">DCIM</span> systems automate TIA-606 compliance by maintaining cable records, generating labels, and tracking connections through barcode/RFID scanning.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Redundancy Architecture -->
+        <section class="section" id="sec-redundancy" data-nav-id="sec-redundancy">
+            <h2 class="section-title"><i class="fas fa-code-branch"></i> Redundancy Architecture <button class="deep-link" onclick="copyDeepLink('sec-redundancy')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Redundancy architecture determines a data center's ability to withstand component failures and support maintenance without service interruption. The configuration directly maps to TIA-942 ratings and overall system availability.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> N / N+1 / 2N / 2(N+1) Definitions <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">N (No Redundancy)</div><div class="kv-value">Exact capacity needed. Any failure = downtime.</div></div>
+                        <div class="kv-item"><div class="kv-label">N+1 (Component)</div><div class="kv-value">One spare component. Survives single failure.</div></div>
+                        <div class="kv-item"><div class="kv-label">2N (System)</div><div class="kv-value">Fully duplicated. Complete independent path.</div></div>
+                        <div class="kv-item"><div class="kv-label">2(N+1) (Full)</div><div class="kv-value">Duplicated + spare. Maximum availability.</div></div>
+                    </div>
+                    <p><strong>Example:</strong> If a data center needs 4 UPS modules to carry IT load (N=4), then N+1=5 modules (one spare), 2N=8 modules (two independent sets of 4), and 2(N+1)=10 modules (two independent sets of 5).</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Active-Active vs Active-Standby <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="comparison-grid">
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-exchange-alt"></i> Active-Active</h5>
+                            <div class="cc-summary">Both paths carry load simultaneously</div>
+                            <div class="cc-detail">Load shared across both paths (typically 50/50). Faster failover (no switchover needed — surviving path absorbs full load). More complex controls and load balancing. Each path must be sized to carry 100% load. Used in Tier IV / Rating 4 designs.</div>
+                        </div>
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-toggle-on"></i> Active-Standby</h5>
+                            <div class="cc-summary">One path active, one idle (standby)</div>
+                            <div class="cc-detail">Primary path carries all load; alternate path is energized but unloaded. Requires <span class="term-tooltip" data-tooltip="STS (Static Transfer Switch): Power switching device that transfers load between two independent power sources in < 4-8ms, faster than IT equipment ride-through capability.">STS</span> for automatic transfer (typically &lt; 8ms). Simpler design, lower cost. Risk during switchover if STS fails. Common in Tier III / Rating 3 designs.</div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Path Validation &amp; Testing <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Redundant paths must be validated through systematic testing:</p>
+                    <div class="checklist">
+                        <div class="checklist-item"><i class="far fa-square"></i> Verify each path can independently carry 100% of the design load</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Test automatic transfer (STS) under load — verify transfer time &lt; 8ms</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Simulate single component failure on each path and verify continued operation</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Test maintenance bypass procedures for UPS, PDU, and STS</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Verify automatic retransfer after maintenance (if applicable)</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Document results and include in commissioning records</div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Availability Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Calculate system availability based on redundancy configuration and component reliability:</p>
+                    <div class="inline-calc">
+                        <label>Redundancy Configuration</label>
+                        <select id="redConfig">
+                            <option value="n">N (No redundancy)</option>
+                            <option value="n1" selected>N+1 (Component redundancy)</option>
+                            <option value="2n">2N (System redundancy)</option>
+                            <option value="2n1">2(N+1) (Full redundancy)</option>
+                        </select>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                            <div><label>Component MTBF (hours)</label><input type="number" id="redMtbf" value="50000" min="100" max="1000000" step="1000"></div>
+                            <div><label>Component MTTR (hours)</label><input type="number" id="redMttr" value="4" min="0.5" max="168" step="0.5"></div>
+                        </div>
+                        <div class="calc-result">
+                            <div class="calc-label">System Availability</div>
+                            <div class="calc-value" id="redAvail">99.999994%</div>
+                            <div style="display:flex;gap:1rem;justify-content:center;margin-top:0.3rem;">
+                                <div><div class="calc-label">Annual Downtime</div><div class="calc-value" id="redDown" style="font-size:1rem;">0.0 min/yr</div></div>
+                                <div><div class="calc-label">Nines Rating</div><div class="calc-value" id="redNines" style="font-size:1rem;">5.81 nines</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Quick Quiz — Redundancy <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget" id="quiz3">
+                        <div class="quiz-question">Q3: A data center has N=4 cooling units. What does a 2(N+1) configuration require?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 5 units (4+1 spare)</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 8 units (two sets of 4)</div>
+                            <div class="quiz-opt" data-correct="true" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 10 units (two sets of 4+1)</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 9 units (two sets of 4, plus 1 shared spare)</div>
+                        </div>
+                        <div class="quiz-feedback" id="quiz3fb"></div>
+                    </div>
+                    <div class="quiz-widget" id="quiz4" style="margin-top:0.6rem;">
+                        <div class="quiz-question">Q4: What is the typical STS transfer time for a Class 1 static transfer switch?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" data-correct="true" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> &lt; 4 ms</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> &lt; 100 ms</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> &lt; 1 second</div>
+                            <div class="quiz-opt" data-correct="false" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> &lt; 10 seconds</div>
+                        </div>
+                        <div class="quiz-feedback" id="quiz4fb"></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: Single Point of Failure Analysis -->
+        <section class="section" id="sec-spof" data-nav-id="sec-spof">
+            <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Single Point of Failure Analysis <button class="deep-link" onclick="copyDeepLink('sec-spof')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">A <span class="term-tooltip" data-tooltip="SPOF (Single Point of Failure): Any component whose failure would cause the entire system or service to stop functioning. Identifying and eliminating SPOFs is critical for achieving Rating 3+ availability.">Single Point of Failure (SPOF)</span> is any component whose failure would cause service interruption. Systematic SPOF analysis is essential for achieving TIA-942 Rating 3 or higher.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> SPOF Identification Methodology <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Systematic process for identifying single points of failure:</p>
+                    <div class="checklist">
+                        <div class="checklist-item"><i class="far fa-square"></i> Map complete power path from utility entrance to IT equipment</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Map complete cooling path from chillers to server inlets</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Map network path from carrier demarcation to server NIC</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Identify all non-redundant components on each path</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Assess each SPOF for failure probability (MTBF) and impact severity</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Prioritize mitigation by risk priority number (RPN = severity × occurrence × detection)</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Implement mitigations: redundancy, monitoring, maintenance procedures</div>
+                    </div>
+                    <p><strong>Common SPOF locations:</strong> Single utility feed, single ATS, non-redundant UPS bypass, single PDU whip, single cooling loop header, single network uplink, single fire alarm panel.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Ishikawa (Fishbone) Analysis <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The Ishikawa (fishbone) diagram organizes potential failure causes into six categories for data center root cause analysis:</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Power</div><div class="kv-value">Utility failure, UPS fault, generator fail-to-start, breaker trip</div></div>
+                        <div class="kv-item"><div class="kv-label">Cooling</div><div class="kv-value">Chiller trip, CRAH failure, pump failure, coolant leak</div></div>
+                        <div class="kv-item"><div class="kv-label">Network</div><div class="kv-value">Fiber cut, switch failure, DNS/DHCP outage, routing loop</div></div>
+                        <div class="kv-item"><div class="kv-label">Physical</div><div class="kv-value">Fire, flood, structural failure, contamination</div></div>
+                        <div class="kv-item"><div class="kv-label">Human</div><div class="kv-value">Operator error, incorrect procedure, unauthorized access</div></div>
+                        <div class="kv-item"><div class="kv-label">Environmental</div><div class="kv-value">Temperature excursion, humidity, lightning, seismic</div></div>
+                    </div>
+                    <div class="callout callout-warn"><i class="fas fa-user-times"></i> <strong>Industry data:</strong> Human error accounts for 60–80% of data center outages (Uptime Institute Annual Outage Analysis). Procedures, training, and automation are the most effective mitigations.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> FMEA Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="FMEA (Failure Mode and Effects Analysis): Systematic methodology for identifying potential failure modes, their causes, effects, and mitigations. Uses RPN (Risk Priority Number) scoring to prioritize actions.">Failure Mode and Effects Analysis (FMEA)</span> scoring: Severity (1–10), Occurrence (1–10), Detection (1–10). RPN = S × O × D.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Component</th><th>Failure Mode</th><th>S</th><th>O</th><th>D</th><th>RPN</th><th>Mitigation</th></tr></thead>
+                        <tbody>
+                            <tr><td>UPS Module</td><td>Output failure</td><td>9</td><td>3</td><td>2</td><td class="highlight">54</td><td>N+1 config + monitoring</td></tr>
+                            <tr><td>Generator</td><td>Fail to start</td><td>10</td><td>4</td><td>3</td><td class="highlight">120</td><td>Weekly test + dual gen</td></tr>
+                            <tr><td>CRAH Fan</td><td>Motor failure</td><td>7</td><td>4</td><td>3</td><td class="highlight">84</td><td>N+1 units + vibration sensor</td></tr>
+                            <tr><td>STS</td><td>Transfer failure</td><td>10</td><td>2</td><td>4</td><td class="highlight">80</td><td>Quarterly test + dual STS</td></tr>
+                            <tr><td>Fiber Link</td><td>Cable cut</td><td>8</td><td>3</td><td>5</td><td class="highlight">120</td><td>Diverse routing + monitoring</td></tr>
+                            <tr><td>PDU</td><td>Overload trip</td><td>8</td><td>2</td><td>2</td><td class="highlight">32</td><td>Load monitoring + alerts</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-sort-amount-up"></i> Focus mitigation efforts on items with RPN &gt; 100. Generator fail-to-start and fiber cuts are typically the highest-risk items in a well-designed facility.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: Commissioning & Testing -->
+        <section class="section" id="sec-commission" data-nav-id="sec-commission">
+            <h2 class="section-title"><i class="fas fa-clipboard-check"></i> Commissioning &amp; Testing <button class="deep-link" onclick="copyDeepLink('sec-commission')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Commissioning is the systematic process of verifying that all data center systems perform according to design intent. A rigorous commissioning program is required for TIA-942 Rating 3+ compliance.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> FAT / SAT / IST Definitions <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Test Phase</th><th>Location</th><th>Scope</th><th>Duration</th><th>Pass Criteria</th></tr></thead>
+                        <tbody>
+                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="FAT (Factory Acceptance Test): Testing performed at the manufacturer's facility before equipment is shipped. Verifies component-level performance against specifications.">FAT</span></td><td>Manufacturer facility</td><td>Individual component</td><td>1–5 days</td><td>Meets datasheet specifications</td></tr>
+                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="SAT (Site Acceptance Test): Testing performed at the installation site after equipment is installed. Verifies proper installation and integration with site infrastructure.">SAT</span></td><td>Installation site</td><td>Installed system</td><td>1–2 weeks</td><td>Installed per drawings, functional</td></tr>
+                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="IST (Integrated Systems Test): Testing all systems together under simulated load to verify end-to-end operation, failover behavior, and alarm sequences.">IST</span></td><td>Installation site</td><td>All systems integrated</td><td>2–4 weeks</td><td>End-to-end operation, failover verified</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-project-diagram"></i> The IST is the most critical phase — it validates that all systems work together correctly, including automatic failover sequences, alarm propagation, and emergency procedures.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Witness Protocols <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Each test phase should be witnessed by appropriate stakeholders:</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Test Phase</th><th>Required Witnesses</th><th>Documentation</th></tr></thead>
+                        <tbody>
+                            <tr><td>FAT</td><td>Owner's engineer, manufacturer QA</td><td>Test reports, photos, punch list</td></tr>
+                            <tr><td>SAT</td><td>Owner's engineer, contractor, manufacturer</td><td>Signed test sheets, as-built markups</td></tr>
+                            <tr><td>IST</td><td>Owner, operator, engineer, contractor, AHJ</td><td>Full commissioning report, video records</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Test Matrices <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>System</th><th>Test Type</th><th>Frequency</th><th>Acceptance Criteria</th></tr></thead>
+                        <tbody>
+                            <tr><td>UPS</td><td>Load bank test</td><td>Annual</td><td>&lt; 5% deviation from rated output</td></tr>
+                            <tr><td>Generator</td><td>Full load run</td><td>Annual</td><td>Start &lt; 10s, stable within 60s</td></tr>
+                            <tr><td>ATS</td><td>Transfer test</td><td>Quarterly</td><td>Transfer &lt; 100ms</td></tr>
+                            <tr><td>Cooling</td><td>Capacity test</td><td>Annual</td><td>Design load with N+1 unit offline</td></tr>
+                            <tr><td>Fire</td><td>Alarm test</td><td>Semi-annual</td><td>All zones report within 60s</td></tr>
+                            <tr><td>Network</td><td>Failover test</td><td>Quarterly</td><td>Switchover &lt; 50ms</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Commissioning Checklist <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="checklist">
+                        <div class="checklist-item"><i class="far fa-square"></i> Pre-commissioning: review all submittals, O&M manuals, as-built drawings</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Verify all equipment installed per approved shop drawings</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Complete point-to-point wiring verification</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Perform megger testing on all power cables</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Verify grounding resistance at all TGB and TMGB connections</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Perform cable certification testing (all copper and fiber links)</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Complete individual system SATs (UPS, cooling, fire, security)</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Execute IST with simulated IT load (load banks)</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Test all failover scenarios per redundancy design</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Compile final commissioning report with all test data</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Obtain sign-off from owner, engineer, and AHJ</div>
+                        <div class="checklist-item"><i class="far fa-square"></i> Handover to operations team with training</div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: Cross-Reference -->
+        <section class="section" id="sec-xref" data-nav-id="sec-xref">
+            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Cross-Reference Standards <button class="deep-link" onclick="copyDeepLink('sec-xref')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">TIA-942 operates within a broader ecosystem of international data center standards. Understanding the cross-references enables compliance across multiple frameworks.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> EN 50600 Mapping <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>TIA-942 Rating</th><th>EN 50600 Availability Class</th><th>Key Differences</th></tr></thead>
+                        <tbody>
+                            <tr><td>Rating 1</td><td>Class 1</td><td>EN 50600 adds environmental class (E) and security class (S)</td></tr>
+                            <tr><td>Rating 2</td><td>Class 2</td><td>Similar redundancy requirements; EN adds protection class</td></tr>
+                            <tr><td>Rating 3</td><td>Class 3</td><td>EN 50600-2-2 adds detailed cooling class specifications</td></tr>
+                            <tr><td>Rating 4</td><td>Class 4</td><td>Both require fault tolerance; EN adds energy efficiency metrics</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-globe-europe"></i> EN 50600 is more granular than TIA-942 — it separates availability, protection, and energy efficiency into independent class systems, allowing more flexible facility classification.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> BICSI-002 Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="BICSI-002: BICSI Data Center Design and Implementation Best Practices. Comprehensive design guideline that references TIA-942 but adds implementation-level detail and best practices.">BICSI-002</span> is a comprehensive design guideline that builds upon TIA-942. Key additions:</p>
+                    <ul>
+                        <li><strong>Site selection criteria:</strong> Detailed risk assessment methodology for natural hazards, proximity to services, and regulatory considerations.</li>
+                        <li><strong>Architectural design:</strong> Floor loading requirements, ceiling heights, column spacing, and door sizing specific to data centers.</li>
+                        <li><strong>Cable management:</strong> More detailed pathway fill calculations and cable management best practices beyond TIA-569.</li>
+                        <li><strong>Commissioning:</strong> Expanded commissioning procedures with specific test scripts and acceptance criteria templates.</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> ASHRAE Cross-Reference <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>TIA Rating</th><th>Recommended ASHRAE Class</th><th>Cooling Redundancy</th></tr></thead>
+                        <tbody>
+                            <tr><td>Rating 1</td><td>A1 (recommended range)</td><td>N (no redundancy)</td></tr>
+                            <tr><td>Rating 2</td><td>A1 or A2</td><td>N+1</td></tr>
+                            <tr><td>Rating 3</td><td>A1 (recommended)</td><td>N+1, dual cooling loops</td></tr>
+                            <tr><td>Rating 4</td><td>A1 (recommended)</td><td>2(N+1), independent systems</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Uptime Tier Mapping <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Feature</th><th>TIA Rating 1</th><th>Uptime Tier I</th><th>TIA Rating 4</th><th>Uptime Tier IV</th></tr></thead>
+                        <tbody>
+                            <tr><td>Distribution Paths</td><td>1</td><td>1</td><td>2 active</td><td>2 active</td></tr>
+                            <tr><td>Redundancy</td><td>N</td><td>N</td><td>2(N+1)</td><td>2(N+1)</td></tr>
+                            <tr><td>Availability</td><td>99.671%</td><td>99.671%</td><td>99.995%</td><td>99.995%</td></tr>
+                            <tr><td>Validation</td><td>Self-declared</td><td>Uptime audit</td><td>Self-declared</td><td>Uptime audit (TCCD)</td></tr>
+                            <tr><td>Cost (certification)</td><td>~$400 (standard)</td><td>$50K+ (TCCF)</td><td>~$400 (standard)</td><td>$200K+ (TCCD)</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: Case Studies -->
+        <section class="section" id="sec-cases" data-nav-id="sec-cases">
+            <h2 class="section-title"><i class="fas fa-briefcase"></i> Case Studies</h2>
+            <div class="case-card">
+                <h4><i class="fas fa-ethernet" style="color:var(--accent2);margin-right:0.3rem;"></i> Hyperscale Cabling Standardization</h4>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A hyperscale operator migrated 500 racks from Cat6 to Cat6A with OM4 backbone, enabling 10G to every server port. Structured cabling hierarchy (MDA→HDA→EDA) reduced patch errors by 65% and enabled automated DCIM tracking.</p>
+                <div class="case-metrics"><span class="case-before">Before: 1 Gbps/port, 12% patch errors</span><span class="case-after">After: 10 Gbps/port, 4% patch errors</span></div>
+            </div>
+            <div class="case-card">
+                <h4><i class="fas fa-layer-group" style="color:var(--accent2);margin-right:0.3rem;"></i> Enterprise Rating 3 Achievement</h4>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">Financial services company upgraded from Rating 1 to Rating 3 over 18 months. Added redundant power paths (A+B feeds), N+1 cooling, dual carrier entrances, and comprehensive TIA-606 labeling. Annual downtime reduced from 28+ hours to under 2 hours.</p>
+                <div class="case-metrics"><span class="case-before">Before: Rating 1, 28.8 hr downtime</span><span class="case-after">After: Rating 3, 1.6 hr downtime</span></div>
+            </div>
+            <div class="case-card">
+                <h4><i class="fas fa-building" style="color:var(--accent2);margin-right:0.3rem;"></i> Multi-Tenant Colo Cable Management</h4>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">Colocation provider implemented TIA-606-C Class 3 labeling across 3 data halls serving 200+ tenants. Color-coded pathways by tenant, automated label generation via DCIM, and mandatory pre-approved cable routes.</p>
+                <div class="case-metrics"><span class="case-before">Before: 15% patch errors, 4hr avg MAC</span><span class="case-after">After: 2% patch errors, 45min avg MAC</span></div>
+            </div>
+            <div class="case-card">
+                <h4><i class="fas fa-bolt" style="color:var(--accent2);margin-right:0.3rem;"></i> Edge Modular DC Grounding</h4>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">Deployed TIA-607 grounding infrastructure across 40 edge sites in remote locations. Standardized TMGB/TGB architecture with mesh bonding network in each prefab module. Eliminated ground loop EMI issues that were causing network errors.</p>
+                <div class="case-metrics"><span class="case-before">Before: Ground loops at 60% of sites</span><span class="case-after">After: &lt;0.1Ω at every rack, zero EMI</span></div>
+            </div>
+            <div class="case-card">
+                <h4><i class="fas fa-clipboard-check" style="color:var(--accent2);margin-right:0.3rem;"></i> Prefab DC Commissioning Program</h4>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">Established factory-to-field commissioning program for modular data centers. FAT at manufacturer (UPS, cooling, fire), SAT on deployment site, full IST with load banks. Reduced commissioning timeline from 6 months to 8 weeks.</p>
+                <div class="case-metrics"><span class="case-before">Before: 6-month commissioning</span><span class="case-after">After: 8-week commissioning</span></div>
+            </div>
+        </section>
+
+        <!-- SECTION 11: Interview Prep -->
+        <section class="section" id="sec-interview" data-nav-id="sec-interview">
+            <h2 class="section-title"><i class="fas fa-user-tie"></i> Interview Prep</h2>
+            <div class="interview-grid">
+                <div class="interview-card"><h5>Q: Explain TIA-942 Ratings vs Uptime Tiers</h5><p>TIA-942-B uses "Ratings" 1–4 (ANSI standard, self-declared compliance, ~$400 document). Uptime uses "Tiers" I–IV (proprietary certification, $50K–200K+ on-site audit). Similar concepts but different testing — TIA is paper-based, Uptime requires TCCF/TCCD site verification. Never use terms interchangeably.</p></div>
+                <div class="interview-card"><h5>Q: What is concurrent maintainability?</h5><p>The ability to perform planned maintenance on any infrastructure component without impacting IT operations. Requires multiple distribution paths and N+1 component redundancy so load transfers to alternate path during maintenance. First achieved at Rating 3 / Tier III. Key test: can you take down any single component for maintenance without any IT impact?</p></div>
+                <div class="interview-card"><h5>Q: Design cabling for a 500-rack deployment?</h5><p>Use TIA-568 hierarchy: MDA with core switches and fiber panels → HDA per row/zone with ToR aggregation → EDA at each cabinet. Backbone: OM4 fiber (MPO-12/24) for 40/100G. Horizontal: Cat6A for 10G server connections. Overhead cable trays (not under raised floor). TIA-606-C Class 3 labeling. Budget 30% spare capacity in pathways.</p></div>
+                <div class="interview-card"><h5>Q: Describe a SPOF analysis process</h5><p>Trace every path (power, cooling, network) from source to IT load. Identify non-redundant components using single-line diagrams. Score each SPOF using FMEA (Severity × Occurrence × Detection = RPN). Prioritize RPNs &gt; 100 for immediate mitigation. Common SPOFs: single utility feed, non-redundant ATS, single PDU whip, single carrier entrance.</p></div>
+                <div class="interview-card"><h5>Q: What grounding standard applies to data centers?</h5><p>TIA-607-C defines the telecommunications grounding infrastructure. TMGB at service entrance bonds to building ground electrode. TGB on each floor/zone, connected via TBB backbone. Equipment bonds to TGB via BCT (min 6 AWG). Resistance targets: &lt;5Ω (TMGB to ground), &lt;1Ω (TGB to TMGB), &lt;0.1Ω (equipment to TGB). Mesh bonding network recommended for large facilities.</p></div>
+                <div class="interview-card"><h5>Q: Walk through DC commissioning</h5><p>Three phases: FAT at factory (verify individual components meet specs), SAT on site (verify proper installation and integration), IST (test all systems together under simulated load). IST includes: failover tests for every redundant component, alarm propagation, emergency shutdown, cooling capacity verification. Witnessed by owner, engineer, contractor, and AHJ. Documented in formal commissioning report.</p></div>
+            </div>
+        </section>
+
+        <!-- SECTION 12: Abbreviations -->
+        <section class="section" id="sec-abbr" data-nav-id="sec-abbr">
+            <h2 class="section-title"><i class="fas fa-spell-check"></i> Abbreviations</h2>
+            <div class="abbr-grid">
+                <div class="abbr-item"><span class="abbr-key">AHJ</span><span class="abbr-val">Authority Having Jurisdiction</span></div>
+                <div class="abbr-item"><span class="abbr-key">ANSI</span><span class="abbr-val">American National Standards Institute</span></div>
+                <div class="abbr-item"><span class="abbr-key">ATS</span><span class="abbr-val">Automatic Transfer Switch</span></div>
+                <div class="abbr-item"><span class="abbr-key">AWG</span><span class="abbr-val">American Wire Gauge</span></div>
+                <div class="abbr-item"><span class="abbr-key">BCT</span><span class="abbr-val">Bonding Conductor for Telecommunications</span></div>
+                <div class="abbr-item"><span class="abbr-key">BICSI</span><span class="abbr-val">Building Industry Consulting Service International</span></div>
+                <div class="abbr-item"><span class="abbr-key">BMS</span><span class="abbr-val">Building Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">Cat5e</span><span class="abbr-val">Category 5 Enhanced (copper cabling)</span></div>
+                <div class="abbr-item"><span class="abbr-key">Cat6</span><span class="abbr-val">Category 6 (copper cabling, 250 MHz)</span></div>
+                <div class="abbr-item"><span class="abbr-key">Cat6A</span><span class="abbr-val">Category 6 Augmented (500 MHz, 10G)</span></div>
+                <div class="abbr-item"><span class="abbr-key">Cat7</span><span class="abbr-val">Category 7 (600 MHz, shielded)</span></div>
+                <div class="abbr-item"><span class="abbr-key">Cat8</span><span class="abbr-val">Category 8 (2000 MHz, 25/40G)</span></div>
+                <div class="abbr-item"><span class="abbr-key">CRAH</span><span class="abbr-val">Computer Room Air Handler</span></div>
+                <div class="abbr-item"><span class="abbr-key">CWDM</span><span class="abbr-val">Coarse Wavelength Division Multiplexing</span></div>
+                <div class="abbr-item"><span class="abbr-key">DCIM</span><span class="abbr-val">Data Center Infrastructure Management</span></div>
+                <div class="abbr-item"><span class="abbr-key">EDA</span><span class="abbr-val">Equipment Distribution Area</span></div>
+                <div class="abbr-item"><span class="abbr-key">EMI</span><span class="abbr-val">Electromagnetic Interference</span></div>
+                <div class="abbr-item"><span class="abbr-key">FAT</span><span class="abbr-val">Factory Acceptance Test</span></div>
+                <div class="abbr-item"><span class="abbr-key">FMEA</span><span class="abbr-val">Failure Mode and Effects Analysis</span></div>
+                <div class="abbr-item"><span class="abbr-key">HC</span><span class="abbr-val">Horizontal Cross-Connect</span></div>
+                <div class="abbr-item"><span class="abbr-key">HDA</span><span class="abbr-val">Horizontal Distribution Area</span></div>
+                <div class="abbr-item"><span class="abbr-key">IST</span><span class="abbr-val">Integrated Systems Test</span></div>
+                <div class="abbr-item"><span class="abbr-key">LC</span><span class="abbr-val">Lucent Connector (fiber optic)</span></div>
+                <div class="abbr-item"><span class="abbr-key">LSZH</span><span class="abbr-val">Low Smoke Zero Halogen</span></div>
+                <div class="abbr-item"><span class="abbr-key">MAC</span><span class="abbr-val">Moves, Adds, and Changes</span></div>
+                <div class="abbr-item"><span class="abbr-key">MC</span><span class="abbr-val">Main Cross-Connect</span></div>
+                <div class="abbr-item"><span class="abbr-key">MDA</span><span class="abbr-val">Main Distribution Area</span></div>
+                <div class="abbr-item"><span class="abbr-key">MERV</span><span class="abbr-val">Minimum Efficiency Reporting Value</span></div>
+                <div class="abbr-item"><span class="abbr-key">MM</span><span class="abbr-val">Multimode (fiber optic)</span></div>
+                <div class="abbr-item"><span class="abbr-key">MPO</span><span class="abbr-val">Multi-fiber Push On (connector)</span></div>
+                <div class="abbr-item"><span class="abbr-key">MTBF</span><span class="abbr-val">Mean Time Between Failures</span></div>
+                <div class="abbr-item"><span class="abbr-key">MTP</span><span class="abbr-val">Multi-fiber Termination Push-on</span></div>
+                <div class="abbr-item"><span class="abbr-key">MTTR</span><span class="abbr-val">Mean Time To Repair</span></div>
+                <div class="abbr-item"><span class="abbr-key">NEC</span><span class="abbr-val">National Electrical Code</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA</span><span class="abbr-val">National Fire Protection Association</span></div>
+                <div class="abbr-item"><span class="abbr-key">OM3</span><span class="abbr-val">Optical Multimode 3 (laser-optimized)</span></div>
+                <div class="abbr-item"><span class="abbr-key">OM4</span><span class="abbr-val">Optical Multimode 4 (enhanced laser-opt.)</span></div>
+                <div class="abbr-item"><span class="abbr-key">OM5</span><span class="abbr-val">Optical Multimode 5 (wideband/SWDM)</span></div>
+                <div class="abbr-item"><span class="abbr-key">OS2</span><span class="abbr-val">Optical Singlemode (long-haul fiber)</span></div>
+                <div class="abbr-item"><span class="abbr-key">PDU</span><span class="abbr-val">Power Distribution Unit</span></div>
+                <div class="abbr-item"><span class="abbr-key">RPN</span><span class="abbr-val">Risk Priority Number (FMEA)</span></div>
+                <div class="abbr-item"><span class="abbr-key">RPP</span><span class="abbr-val">Remote Power Panel</span></div>
+                <div class="abbr-item"><span class="abbr-key">SAT</span><span class="abbr-val">Site Acceptance Test</span></div>
+                <div class="abbr-item"><span class="abbr-key">SM</span><span class="abbr-val">Singlemode (fiber optic)</span></div>
+                <div class="abbr-item"><span class="abbr-key">SPOF</span><span class="abbr-val">Single Point of Failure</span></div>
+                <div class="abbr-item"><span class="abbr-key">STS</span><span class="abbr-val">Static Transfer Switch</span></div>
+                <div class="abbr-item"><span class="abbr-key">SWDM</span><span class="abbr-val">Short Wavelength Division Multiplexing</span></div>
+                <div class="abbr-item"><span class="abbr-key">TBB</span><span class="abbr-val">Telecommunications Bonding Backbone</span></div>
+                <div class="abbr-item"><span class="abbr-key">TGB</span><span class="abbr-val">Telecommunications Grounding Busbar</span></div>
+                <div class="abbr-item"><span class="abbr-key">TIA</span><span class="abbr-val">Telecommunications Industry Association</span></div>
+                <div class="abbr-item"><span class="abbr-key">TMGB</span><span class="abbr-val">Telecom Main Grounding Busbar</span></div>
+                <div class="abbr-item"><span class="abbr-key">UPS</span><span class="abbr-val">Uninterruptible Power Supply</span></div>
+                <div class="abbr-item"><span class="abbr-key">VFD</span><span class="abbr-val">Variable Frequency Drive</span></div>
+                <div class="abbr-item"><span class="abbr-key">ZDA</span><span class="abbr-val">Zone Distribution Area</span></div>
+            </div>
+        </section>
+
+        <!-- Version Changelog -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-history"></i> Version Changelog</h2>
+            <div class="changelog">
+                <div class="changelog-entry"><span class="changelog-date">2026-03-01</span><span class="changelog-text">v1.0 — Initial comprehensive deep-dive: TIA-942 ratings (1–4), TIA-568 cabling (Cat5e–Cat8, OM3–OS2), TIA-569 pathways, TIA-607 grounding (TMGB/TGB/BCT), TIA-606 administration, redundancy architecture, SPOF analysis, commissioning, cross-references (EN 50600, BICSI-002, ASHRAE, Uptime), case studies, interview prep, 53 abbreviations, cable fill calculator, availability calculator, SVG mindmap, dark/light mode, study mode, flashcards, search</span></div>
+            </div>
+        </section>
+
+        <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review. TIA-942-B data references the 2017 edition. All data is for educational reference — verify against current published standards for production use.</p>
     </div>
 
-    
+    <div class="tooltip-float" id="tooltipFloat"></div>
+    <div class="root-gate" id="rootGate"><div class="root-card"><h2>Root Access Required</h2><p>This deep-dive module is restricted to root accounts.</p><div class="root-actions"><button id="rootLoginBtn" type="button">Sign In as Root</button><a href="datacenter-solutions.html">Back</a></div></div></div>
+    <div class="cookie-banner hidden" id="cookieBanner"><p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p><div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div></div>
 
-    <div class="cookie-banner hidden" id="cookieBanner">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
-        </div>
-    </div>
-
-    <script src="auth.js?v=20260228"></script>
+    <script src="auth.js?v=20260301"></script>
     <script>
-        (function rootAccessGate() {
-            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
-
-            function detectRole(email) {
-                var e = String(email || '').toLowerCase().trim();
-                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
-            }
-
-            function getSession() {
-                try {
-                    var raw = localStorage.getItem('rz_premium_session');
-                    if (!raw) return null;
-                    var data = JSON.parse(raw);
-                    if (data.expires && new Date(data.expires) < new Date()) {
-                        localStorage.removeItem('rz_premium_session');
-                        return null;
-                    }
-                    if (!data.role) data.role = detectRole(data.email);
-                    return data;
-                } catch (e) {
-                    return null;
-                }
-            }
-
-            function isRoot(session) {
-                return !!(session && String(session.role || '').toLowerCase() === 'root');
-            }
-
-            function applyGate() {
-                document.body.classList.toggle('locked', !isRoot(getSession()));
-            }
-
-            var loginBtn = document.getElementById('rootLoginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function() {
-                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
-                        window._rzAuth.showModal();
-                    }
-                });
-            }
-
-            window.addEventListener('rz-auth-change', applyGate);
-            setTimeout(applyGate, 60);
-            setTimeout(applyGate, 550);
-        })();
-
-
-        (function cookieBanner() {
-            var banner = document.getElementById('cookieBanner');
-            var accepted = localStorage.getItem('rz_cookie_consent');
-            if (!accepted && banner) banner.classList.remove('hidden');
-
-            var accept = document.getElementById('cookieAccept');
-            var decline = document.getElementById('cookieDecline');
-
-            if (accept) {
-                accept.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'accepted');
-                    banner.classList.add('hidden');
-                });
-            }
-
-            if (decline) {
-                decline.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'declined');
-                    banner.classList.add('hidden');
-                    window['ga-disable-G-GED7FX8RTV'] = true;
-                });
-            }
-        })();
+    (function(){var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');function g(){var s=localStorage.getItem('theme');return s||(p.matches?'dark':'light');}function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(g());if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});})();
+    (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
+    (function(){var RE=['admin@resistancezero.com','bagus@resistancezero.com'];function dr(e){return RE.indexOf(String(e||'').toLowerCase().trim())!==-1?'root':'pro';}function gs(){try{var r=localStorage.getItem('rz_premium_session');if(!r)return null;var d=JSON.parse(r);if(d.expires&&new Date(d.expires)<new Date()){localStorage.removeItem('rz_premium_session');return null;}if(!d.role)d.role=dr(d.email);return d;}catch(e){return null;}}function ir(s){return!!(s&&String(s.role||'').toLowerCase()==='root');}function ag(){document.body.classList.toggle('locked',!ir(gs()));}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',ag);setTimeout(ag,60);setTimeout(ag,550);})();
+    (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
+    document.addEventListener('click',function(e){var h=e.target.closest('.accordion-header');if(h)h.parentElement.classList.toggle('open');});
+    (function(){var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');if(!secs.length)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});secs.forEach(function(s){obs.observe(s);});pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-120;window.scrollTo({top:y,behavior:'smooth'});}});});})();
+    (function(){var bar=document.getElementById('progressBar');if(!bar)return;window.addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(window.scrollY/h*100):0)+'%';});})();
+    (function(){var el=document.getElementById('readingTime');if(!el)return;var text=document.querySelector('.wrap');if(!text)return;var words=text.textContent.split(/\s+/).length;var mins=Math.ceil(words/220);el.innerHTML='<i class="fas fa-clock"></i> ~'+mins+' min read';})();
+    /* Unit Toggle (Metric/Imperial) */
+    var unitMode='metric';
+    (function(){var btn=document.getElementById('unitToggle');if(!btn)return;btn.addEventListener('click',function(){unitMode=unitMode==='metric'?'imperial':'metric';btn.innerHTML='<i class="fas fa-ruler"></i> '+(unitMode==='metric'?'Metric':'Imperial');btn.classList.toggle('active',unitMode==='imperial');document.querySelectorAll('.unit-val').forEach(function(el){var m=parseFloat(el.getAttribute('data-m'));if(isNaN(m))return;if(unitMode==='imperial'){if(m>=1)el.textContent=(m*3.28084).toFixed(1)+' ft';else el.textContent=(m*39.3701).toFixed(1)+' in';}else{if(m>=1)el.textContent=m+' m';else el.textContent=(m*1000).toFixed(0)+' mm';}});});})();
+    (function(){var dn=document.getElementById('fontDown'),up=document.getElementById('fontUp');if(!dn||!up)return;dn.addEventListener('click',function(){document.body.classList.remove('font-lg');document.body.classList.toggle('font-sm');});up.addEventListener('click',function(){document.body.classList.remove('font-sm');document.body.classList.toggle('font-lg');});})();
+    (function(){var btn=document.getElementById('studyModeBtn');if(!btn)return;btn.addEventListener('click',function(){document.body.classList.toggle('study-mode');btn.classList.toggle('active');if(document.body.classList.contains('study-mode')){document.querySelectorAll('.section[data-nav-id]').forEach(function(sec){if(sec.querySelector('.study-check'))return;var cb=document.createElement('label');cb.className='study-check';var inp=document.createElement('input');inp.type='checkbox';var key='tia-study-'+sec.getAttribute('data-nav-id');inp.checked=localStorage.getItem(key)==='1';if(inp.checked)sec.classList.add('studied');inp.addEventListener('change',function(){localStorage.setItem(key,this.checked?'1':'0');sec.classList.toggle('studied',this.checked);});cb.appendChild(inp);var title=sec.querySelector('.section-title');if(title)title.appendChild(cb);});}});})();
+    (function(){var overlay=document.getElementById('searchOverlay'),input=document.getElementById('searchInput'),results=document.getElementById('searchResults'),btn=document.getElementById('searchBtn');if(!overlay||!input)return;function open(){overlay.classList.add('active');input.focus();input.value='';}function close(){overlay.classList.remove('active');results.innerHTML='';}if(btn)btn.addEventListener('click',open);overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();open();}if(e.key==='Escape')close();});input.addEventListener('input',function(){var q=this.value.trim().toLowerCase();results.innerHTML='';if(q.length<2)return;var sections=document.querySelectorAll('.accordion-content,.section-intro');var found=0;sections.forEach(function(sec){if(found>=10)return;var text=sec.textContent;var idx=text.toLowerCase().indexOf(q);if(idx===-1)return;found++;var start=Math.max(0,idx-40);var end=Math.min(text.length,idx+q.length+60);var snippet='...'+text.slice(start,end).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')+'...';var parent=sec.closest('.section');var secTitle=parent?parent.querySelector('.section-title'):null;var div=document.createElement('div');div.className='search-result';div.innerHTML=snippet+'<div class="sr-section">'+(secTitle?secTitle.textContent.trim():'')+'</div>';div.addEventListener('click',function(){close();sec.scrollIntoView({behavior:'smooth',block:'center'});});results.appendChild(div);});if(found===0)results.innerHTML='<div class="search-result" style="color:var(--muted)">No results found</div>';});})();
+    (function(){var b=document.getElementById('printBtn');if(b)b.addEventListener('click',function(){window.print();});})();
+    (function(){var overlay=document.getElementById('flashcardOverlay'),card=document.getElementById('flashcard');var frontText=document.getElementById('fcFrontText'),backText=document.getElementById('fcBackText');var counter=document.getElementById('fcCounter'),stats=document.getElementById('fcStats');var progressFill=document.getElementById('fcProgressFill');var btn=document.getElementById('flashcardBtn'),closeBtn=document.getElementById('fcClose');var prevBtn=document.getElementById('fcPrev'),nextBtn=document.getElementById('fcNext');var knowBtn=document.getElementById('fcKnow'),learnBtn=document.getElementById('fcLearning');var shuffleBtn=document.getElementById('fcShuffle');if(!overlay||!card)return;var items=[],idx=0,STORE_KEY='tia-fc-mastered';var mastered={};try{var s=localStorage.getItem(STORE_KEY);if(s)mastered=JSON.parse(s);}catch(e){}document.querySelectorAll('.abbr-item').forEach(function(el){var k=el.querySelector('.abbr-key'),v=el.querySelector('.abbr-val');if(k&&v)items.push({q:k.textContent.trim(),a:v.textContent.trim()});});function saveMastered(){try{localStorage.setItem(STORE_KEY,JSON.stringify(mastered));}catch(e){}}function masteredCount(){var c=0;items.forEach(function(it){if(mastered[it.q])c++;});return c;}function updateProgress(){var m=masteredCount(),total=items.length;if(stats)stats.textContent=m+' mastered of '+total;if(progressFill)progressFill.style.width=total?(m/total*100).toFixed(1)+'%':'0%';}function show(){if(!items.length)return;card.classList.remove('flipped');if(frontText)frontText.textContent=items[idx].q;if(backText)backText.textContent=items[idx].a;if(counter)counter.textContent=(idx+1)+' / '+items.length;updateProgress();}function advance(){idx=(idx+1)%items.length;show();}function shuffle(){for(var i=items.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=items[i];items[i]=items[j];items[j]=t;}idx=0;show();}if(btn)btn.addEventListener('click',function(){overlay.classList.add('active');idx=0;show();});if(closeBtn)closeBtn.addEventListener('click',function(){overlay.classList.remove('active');});overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('active');});if(card)card.addEventListener('click',function(e){if(e.target.closest('.fc-hint'))return;card.classList.toggle('flipped');});if(prevBtn)prevBtn.addEventListener('click',function(){idx=(idx-1+items.length)%items.length;show();});if(nextBtn)nextBtn.addEventListener('click',function(){idx=(idx+1)%items.length;show();});if(knowBtn)knowBtn.addEventListener('click',function(){if(items.length)mastered[items[idx].q]=true;saveMastered();advance();});if(learnBtn)learnBtn.addEventListener('click',function(){if(items.length)delete mastered[items[idx].q];saveMastered();advance();});if(shuffleBtn)shuffleBtn.addEventListener('click',shuffle);document.addEventListener('keydown',function(e){if(!overlay.classList.contains('active'))return;if(e.key===' '||e.code==='Space'){e.preventDefault();card.classList.toggle('flipped');}else if(e.key==='ArrowLeft'){e.preventDefault();idx=(idx-1+items.length)%items.length;show();}else if(e.key==='ArrowRight'){e.preventDefault();advance();}else if(e.key==='1'){e.preventDefault();if(items.length){mastered[items[idx].q]=true;saveMastered();advance();}}else if(e.key==='2'){e.preventDefault();if(items.length){delete mastered[items[idx].q];saveMastered();advance();}}else if(e.key==='Escape'){overlay.classList.remove('active');}});})();
+    function copyDeepLink(id){var url=window.location.origin+window.location.pathname+'#'+id;navigator.clipboard.writeText(url).then(function(){var toast=document.getElementById('deepLinkToast');if(toast){toast.style.display='block';setTimeout(function(){toast.style.display='none';},2000);}});}
+    function checkQuiz(opt){var widget=opt.closest('.quiz-widget');if(!widget)return;var opts=widget.querySelectorAll('.quiz-opt');var answered=widget.getAttribute('data-answered');if(answered)return;widget.setAttribute('data-answered','1');var isCorrect=opt.getAttribute('data-correct')==='true';opts.forEach(function(o){if(o.getAttribute('data-correct')==='true')o.classList.add('correct');else if(o===opt)o.classList.add('wrong');o.querySelector('.opt-icon').innerHTML=o.getAttribute('data-correct')==='true'?'<i class="fas fa-check-circle"></i>':'<i class="fas fa-times-circle"></i>';});var fb=widget.querySelector('.quiz-feedback');if(fb){fb.classList.add('show');fb.className='quiz-feedback show '+(isCorrect?'callout callout-green':'callout callout-warn');fb.innerHTML=isCorrect?'<i class="fas fa-check"></i> Correct!':'<i class="fas fa-times"></i> Incorrect — review the highlighted answer above.';}}
+    /* Cable Fill Calculator */
+    (function(){var conduit=document.getElementById('conduitDia'),cable=document.getElementById('cableDia'),res=document.getElementById('fillResult');if(!conduit||!cable||!res)return;function calc(){var D=parseFloat(conduit.value)||25,d=parseFloat(cable.value)||7;var conduitArea=Math.PI*Math.pow(D/2,2);var cableArea=Math.PI*Math.pow(d/2,2);var maxCables=Math.floor(0.40*conduitArea/cableArea);res.textContent=maxCables+' cables (40% fill)';}conduit.addEventListener('input',calc);cable.addEventListener('input',calc);calc();})();
+    /* Redundancy Availability Calculator */
+    (function(){var configSel=document.getElementById('redConfig'),mtbfIn=document.getElementById('redMtbf'),mttrIn=document.getElementById('redMttr');var resAvail=document.getElementById('redAvail'),resDown=document.getElementById('redDown'),resNines=document.getElementById('redNines');if(!configSel||!mtbfIn||!mttrIn)return;function calc(){var mtbf=parseFloat(mtbfIn.value)||50000,mttr=parseFloat(mttrIn.value)||4;var A=mtbf/(mtbf+mttr);var config=configSel.value;var sysA;if(config==='n')sysA=A;else if(config==='n1')sysA=1-Math.pow(1-A,2);else if(config==='2n')sysA=1-Math.pow(1-A,2);else sysA=1-Math.pow(1-A,3);var pct=(sysA*100);var downMin=(1-sysA)*525960;var nines=sysA>=1?9:-Math.log10(1-sysA);resAvail.textContent=pct.toFixed(6)+'%';resDown.textContent=downMin.toFixed(1)+' min/yr';resNines.textContent=nines.toFixed(2)+' nines';}configSel.addEventListener('change',calc);mtbfIn.addEventListener('input',calc);mttrIn.addEventListener('input',calc);calc();})();
+    document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;var fc=document.getElementById('flashcardOverlay');if(fc&&fc.classList.contains('active'))return;var secs=document.querySelectorAll('[data-nav-id]');if(!secs.length)return;var current=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<150&&s.getBoundingClientRect().top>-s.offsetHeight)current=i;});if(e.key==='ArrowDown'&&!e.ctrlKey){e.preventDefault();var next=Math.min(current+1,secs.length-1);secs[next].scrollIntoView({behavior:'smooth',block:'start'});}if(e.key==='ArrowUp'&&!e.ctrlKey){e.preventDefault();var prev=Math.max(current-1,0);secs[prev].scrollIntoView({behavior:'smooth',block:'start'});}});
+    document.querySelectorAll('.data-table').forEach(function(table){var headers=table.querySelectorAll('th');headers.forEach(function(th,colIdx){th.classList.add('sortable');th.innerHTML+=(' <span class="sort-icon"><i class="fas fa-sort"></i></span>');var asc=true;th.addEventListener('click',function(){var tbody=table.querySelector('tbody');if(!tbody)return;var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var av=a.cells[colIdx]?a.cells[colIdx].textContent.trim():'';var bv=b.cells[colIdx]?b.cells[colIdx].textContent.trim():'';var an=parseFloat(av.replace(/[^0-9.\-]/g,'')),bn=parseFloat(bv.replace(/[^0-9.\-]/g,''));if(!isNaN(an)&&!isNaN(bn))return asc?an-bn:bn-an;return asc?av.localeCompare(bv):bv.localeCompare(av);});asc=!asc;rows.forEach(function(r){tbody.appendChild(r);});headers.forEach(function(h){h.classList.remove('sorted');});th.classList.add('sorted');});});});
+    (function(){var tip=document.getElementById('tooltipFloat');if(!tip)return;var hideTimer=null;function show(el){clearTimeout(hideTimer);var text=el.getAttribute('data-tooltip');if(!text)return;tip.textContent=text;tip.className='tooltip-float';tip.style.opacity='0';tip.style.visibility='visible';var r=el.getBoundingClientRect();var tw=tip.offsetWidth;var th=tip.offsetHeight;var gap=8;var left=r.left+r.width/2-tw/2;if(left<8)left=8;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;var top;if(r.top-th-gap>8){top=r.top-th-gap;tip.classList.add('above');}else{top=r.bottom+gap;tip.classList.add('below');}var arrowLeft=r.left+r.width/2-left;arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));tip.style.setProperty('--arrow',arrowLeft+'px');tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.add('visible');}function hide(){hideTimer=setTimeout(function(){tip.classList.remove('visible');tip.style.visibility='hidden';},80);}document.querySelectorAll('.term-tooltip').forEach(function(el){el.addEventListener('mouseenter',function(){show(el);});el.addEventListener('mouseleave',hide);el.addEventListener('touchstart',function(e){e.preventDefault();show(el);setTimeout(hide,3000);},{passive:false});});})();
+    (function(){if(window.location.hash){var id=window.location.hash.slice(1);var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);}})();
     </script>
 </body>
 </html>

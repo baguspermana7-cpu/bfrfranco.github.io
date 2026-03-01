@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Uptime Tier Alignment | ResistanceZero</title>
+    <title>Uptime Institute Tier Alignment — Comprehensive Deep-Dive | ResistanceZero</title>
     <meta name="description" content="Root-only standards deep-dive module for ResistanceZero engineering lab.">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f172a">
@@ -12,359 +12,1260 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0b1324;
-            --card: rgba(15, 23, 42, 0.84);
-            --text: #e2e8f0;
-            --muted: #94a3b8;
+            --bg: #0b1324; --bg-solid: #0b1324;
+            --card: rgba(15, 23, 42, 0.84); --card-inner: rgba(15, 23, 42, 0.6); --card-inner-hover: rgba(15, 23, 42, 0.8);
+            --text: #e2e8f0; --text-strong: #f1f5f9; --text-body: #cbd5e1; --muted: #94a3b8;
             --line: rgba(148, 163, 184, 0.24);
-            --accent: #f59e0b;
-            --accent2: #06b6d4;
+            --accent: #f59e0b; --accent2: #f59e0b;
+            --shadow: rgba(2, 6, 23, 0.45); --shadow-deep: rgba(2, 6, 23, 0.5);
+            --grad-top: rgba(245,158,11,0.13); --grad-bot: rgba(245,158,11,0.11);
+            --th-bg: rgba(245,158,11,0.12); --th-color: #fde68a;
+            --tr-hover: rgba(148,163,184,0.06); --td-border: rgba(148,163,184,0.12);
+            --kv-bg: rgba(15,23,42,0.5);
+            --callout-info-bg: rgba(245,158,11,0.1); --callout-info-border: rgba(245,158,11,0.3); --callout-info-color: #fde68a;
+            --callout-warn-bg: rgba(239,68,68,0.1); --callout-warn-border: rgba(239,68,68,0.3); --callout-warn-color: #fca5a5;
+            --callout-green-bg: rgba(34,197,94,0.1); --callout-green-border: rgba(34,197,94,0.3); --callout-green-color: #86efac;
+            --pill-bg: rgba(245,158,11,0.16); --pill-border: rgba(245,158,11,0.45); --pill-color: #fde68a;
+            --acc-num-bg: rgba(245,158,11,0.18); --acc-num-color: #fcd34d;
+            --nav-active-color: #fde68a; --nav-active-bg: rgba(245,158,11,0.15); --nav-active-border: rgba(245,158,11,0.35);
+            --diag-fill: rgba(30,41,59,0.88); --svg-bg: rgba(15,23,42,0.7);
+        }
+        [data-theme="light"] {
+            --bg: #f1f5f9; --bg-solid: #f1f5f9;
+            --card: rgba(255,255,255,0.92); --card-inner: rgba(241,245,249,0.8); --card-inner-hover: rgba(226,232,240,0.6);
+            --text: #1e293b; --text-strong: #0f172a; --text-body: #334155; --muted: #64748b;
+            --line: rgba(100,116,139,0.22);
+            --accent: #d97706; --accent2: #d97706;
+            --shadow: rgba(100,116,139,0.12); --shadow-deep: rgba(100,116,139,0.18);
+            --grad-top: rgba(245,158,11,0.06); --grad-bot: rgba(245,158,11,0.05);
+            --th-bg: rgba(245,158,11,0.08); --th-color: #92400e;
+            --tr-hover: rgba(100,116,139,0.06); --td-border: rgba(100,116,139,0.1);
+            --kv-bg: rgba(241,245,249,0.8);
+            --callout-info-bg: rgba(245,158,11,0.06); --callout-info-border: rgba(245,158,11,0.25); --callout-info-color: #92400e;
+            --callout-warn-bg: rgba(239,68,68,0.06); --callout-warn-border: rgba(239,68,68,0.25); --callout-warn-color: #dc2626;
+            --callout-green-bg: rgba(34,197,94,0.06); --callout-green-border: rgba(34,197,94,0.25); --callout-green-color: #166534;
+            --pill-bg: rgba(245,158,11,0.1); --pill-border: rgba(217,119,6,0.4); --pill-color: #92400e;
+            --acc-num-bg: rgba(245,158,11,0.12); --acc-num-color: #92400e;
+            --nav-active-color: #92400e; --nav-active-bg: rgba(245,158,11,0.1); --nav-active-border: rgba(245,158,11,0.3);
+            --diag-fill: rgba(241,245,249,0.9); --svg-bg: rgba(241,245,249,0.8);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            background:
-                radial-gradient(ellipse at top right, rgba(6,182,212,0.13), transparent 45%),
-                radial-gradient(ellipse at bottom left, rgba(245,158,11,0.11), transparent 52%),
-                var(--bg);
-            color: var(--text);
+        body { font-family: Inter,-apple-system,BlinkMacSystemFont,sans-serif; min-height: 100vh; background: radial-gradient(ellipse at top right,var(--grad-top),transparent 45%),radial-gradient(ellipse at bottom left,var(--grad-bot),transparent 52%),var(--bg); color: var(--text); }
+        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11,19,36,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
+        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 56px; gap: 0.5rem; }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
+        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+        .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
+        .nav-link { padding: 0.45rem 0.65rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-dropdown { position: relative; }
+        .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
+        .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
+        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-solid); border: 1px solid var(--line); min-width: 180px; border-radius: 10px; box-shadow: 0 10px 40px var(--shadow-deep); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s,visibility 0.2s; z-index: 1001; padding: 8px 0; }
+        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
+        .dropdown-menu li { list-style: none; padding: 0; }
+        .dropdown-menu li::before { display: none; }
+        .dropdown-menu a { display: block; padding: 0.45rem 1rem; color: var(--text-body); text-decoration: none; font-size: 0.8rem; transition: background 0.15s; }
+        .dropdown-menu a:hover { background: rgba(148,163,184,0.1); }
+        .theme-toggle { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(148,163,184,0.1); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .theme-toggle:hover { background: rgba(148,163,184,0.2); transform: scale(1.05); }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle .sun-icon { color: #f59e0b; display: none; }
+        .theme-toggle .moon-icon { color: #94a3b8; display: block; }
+        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle { background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
+        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 8px; border-radius: 8px; }
+        .hamburger:hover { background: rgba(148,163,184,0.1); }
+        .bar { width: 22px; height: 2.5px; background: var(--muted); border-radius: 3px; transition: all 0.3s; }
+        @media (max-width:900px) {
+            .nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--bg-solid); border-bottom: 1px solid var(--line); flex-direction: column; padding: 0.5rem; gap: 0; box-shadow: 0 8px 20px var(--shadow); }
+            .nav-menu.active { display: flex; }
+            .hamburger { display: flex; }
+            .dropdown-menu { position: static; transform: none; box-shadow: none; border: none; padding-left: 1rem; }
         }
         .wrap { max-width: 980px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.7rem;
-            margin-bottom: 0.9rem;
-        }
-        .back {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.55rem 0.8rem;
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.34rem 0.72rem;
-            border-radius: 999px;
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            background: rgba(245, 158, 11, 0.16);
-            color: #fde68a;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .panel {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: var(--card);
-            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.45);
-            padding: 1.1rem;
-        }
-        h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); margin: 0.45rem 0 0.3rem; }
-        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
-        .summary {
-            margin-top: 0.9rem;
-            padding: 0.8rem;
-            border-radius: 12px;
-            border: 1px solid rgba(6, 182, 212, 0.35);
-            background: rgba(6, 182, 212, 0.1);
-            font-size: 0.85rem;
-            line-height: 1.65;
-            color: #c7d2fe;
-        }
-        .grid {
-            margin-top: 0.85rem;
-            display: grid;
-            grid-template-columns: 1.2fr 0.95fr;
-            gap: 0.75rem;
-        }
-        .card {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.62);
-            padding: 0.8rem;
-        }
-        .card h3 {
-            font-size: 0.86rem;
-            color: #f8fafc;
-            margin-bottom: 0.45rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        ul { list-style: none; display: grid; gap: 0.35rem; }
-        li {
-            font-size: 0.82rem;
-            color: #cbd5e1;
-            line-height: 1.55;
-            padding-left: 0.9rem;
-            position: relative;
-        }
-        li::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent2);
-            position: absolute;
-            left: 0;
-            top: 0.45rem;
-        }
-        .cta {
-            margin-top: 0.85rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.42rem;
-            text-decoration: none;
-            border-radius: 10px;
-            padding: 0.58rem 0.82rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .btn-main { background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; }
-        .btn-sub { border: 1px solid var(--line); color: var(--text); }
-        .next {
-            margin-top: 0.8rem;
-            font-size: 0.8rem;
-            color: #f1f5f9;
-            border-top: 1px dashed var(--line);
-            padding-top: 0.7rem;
-            line-height: 1.55;
-        }
-        .legal {
-            margin-top: 0.9rem;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-        .root-gate {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(2, 6, 23, 0.74);
-            padding: 1rem;
-            backdrop-filter: blur(6px);
-        }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }
+        .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+        .back:hover { background: rgba(148,163,184,0.1); }
+        .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.34rem 0.72rem; border-radius: 999px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-color); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+        .pill-gold { border-color: rgba(245,158,11,0.45); background: rgba(245,158,11,0.14); color: var(--th-color); }
+        .hero { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 16px 32px var(--shadow); padding: 1.4rem 1.2rem; margin-bottom: 1rem; }
+        h1 { font-size: clamp(1.4rem,3vw,2rem); margin: 0.45rem 0 0.3rem; line-height: 1.3; }
+        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.92rem; max-width: 740px; }
+        .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.6rem; background: rgba(11,19,36,0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        [data-theme="light"] .section-nav { background: rgba(255,255,255,0.92); }
+        .nav-pill { flex-shrink: 0; padding: 0.38rem 0.7rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .nav-pill:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-pill.active { color: var(--nav-active-color); background: var(--nav-active-bg); border-color: var(--nav-active-border); }
+        .section { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 12px 28px var(--shadow); padding: 1.3rem 1.2rem; margin-bottom: 1rem; }
+        .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
+        .section-title i { color: var(--accent2); font-size: 0.95rem; }
+        .section-intro { color: var(--text-body); font-size: 0.88rem; line-height: 1.7; margin-bottom: 0.9rem; }
+        .accordion { margin-bottom: 0.6rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+        .accordion:last-child { margin-bottom: 0; }
+        .accordion-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.85rem; background: var(--card-inner); cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-strong); user-select: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+        .accordion-header:hover { background: var(--card-inner-hover); }
+        .accordion-header .chevron { margin-left: auto; transition: transform 0.25s; font-size: 0.7rem; color: var(--muted); }
+        .accordion.open .accordion-header .chevron { transform: rotate(180deg); }
+        .accordion-header .acc-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: var(--acc-num-bg); color: var(--acc-num-color); font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .accordion.open .accordion-body { max-height: 5000px; }
+        .accordion-content { padding: 0.85rem; font-size: 0.84rem; line-height: 1.7; color: var(--text-body); }
+        .accordion-content p { margin-bottom: 0.6rem; }
+        .accordion-content p:last-child { margin-bottom: 0; }
+        .accordion-content strong { color: var(--text-strong); }
+        .table-wrap { overflow-x: auto; margin: 0.7rem 0; border-radius: 10px; border: 1px solid var(--line); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }
+        .data-table th { background: var(--th-bg); color: var(--th-color); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem; padding: 0.6rem 0.7rem; text-align: left; border-bottom: 1px solid var(--line); }
+        .data-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--td-border); color: var(--text-body); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--tr-hover); }
+        .data-table .highlight { color: var(--accent); font-weight: 600; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 0.7rem; margin-top: 0.7rem; }
+        .tech-card { border: 1px solid var(--line); border-radius: 12px; background: var(--card-inner); padding: 0.85rem; }
+        .tech-card h4 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+        .tech-card h4 i { color: var(--accent2); font-size: 0.78rem; }
+        .tech-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+        .mindmap-wrap { margin: 0.8rem 0; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; background: var(--svg-bg); }
+        .mindmap-wrap svg { display: block; width: 100%; height: auto; min-width: 820px; }
+        .diag-box { fill: var(--diag-fill); stroke: rgba(148,163,184,0.34); stroke-width: 1.4; }
+        .diag-box-gold { fill: rgba(245,158,11,0.1); stroke: rgba(245,158,11,0.4); stroke-width: 1.4; }
+        .diag-box-cyan { fill: rgba(6,182,212,0.1); stroke: rgba(6,182,212,0.4); stroke-width: 1.4; }
+        .diag-box-green { fill: rgba(34,197,94,0.1); stroke: rgba(34,197,94,0.4); stroke-width: 1.4; }
+        .diag-t { fill: var(--text); font-size: 12.5px; font-weight: 700; }
+        .diag-v { fill: var(--muted); font-size: 10.5px; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
+        .diag-line { stroke: rgba(148,163,184,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-gold { stroke: rgba(245,158,11,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-cyan { stroke: rgba(6,182,212,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-green { stroke: rgba(34,197,94,0.5); stroke-width: 1.6; fill: none; }
+        .diag-center { fill: var(--text-strong); font-size: 14px; font-weight: 800; }
+        .callout { padding: 0.75rem 0.9rem; border-radius: 10px; font-size: 0.82rem; line-height: 1.65; margin: 0.6rem 0; }
+        .callout-info { background: var(--callout-info-bg); border: 1px solid var(--callout-info-border); color: var(--callout-info-color); }
+        .callout-warn { background: var(--callout-warn-bg); border: 1px solid var(--callout-warn-border); color: var(--callout-warn-color); }
+        .callout-green { background: var(--callout-green-bg); border: 1px solid var(--callout-green-border); color: var(--callout-green-color); }
+        .callout i { margin-right: 0.4rem; }
+        .kv-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+        .kv-item { padding: 0.55rem 0.7rem; border-radius: 8px; background: var(--kv-bg); border: 1px solid rgba(148,163,184,0.15); }
+        .kv-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+        .kv-value { font-size: 0.88rem; color: var(--text-strong); font-weight: 600; margin-top: 0.15rem; }
+        .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
+        .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
+        .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
+        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
+        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(245,158,11,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s,visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
+        .tooltip-float.visible { opacity: 1; visibility: visible; }
+        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
+        .tooltip-float.above::before { bottom: -6px; left: var(--arrow,50%); margin-left: -5px; }
+        .tooltip-float.below::before { top: -6px; left: var(--arrow,50%); margin-left: -5px; transform: rotate(135deg); }
+        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(245,158,11,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+        .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 0.4rem; margin-top: 0.6rem; }
+        .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
+        .abbr-item:hover { background: var(--card-inner-hover); }
+        .abbr-key { font-weight: 700; color: var(--accent2); min-width: 60px; flex-shrink: 0; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size: 0.75rem; }
+        .abbr-val { color: var(--text-body); }
+        .legal { margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.6; text-align: center; padding: 0.8rem 0; }
+        .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.74); padding: 1rem; backdrop-filter: blur(6px); }
         body.locked .root-gate { display: flex; }
         body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
-        .root-card {
-            max-width: 430px;
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid rgba(245, 158, 11, 0.38);
-            border-radius: 14px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 18px 36px rgba(2, 6, 23, 0.5);
-        }
+        .root-card { max-width: 430px; width: 100%; background: #0f172a; border: 1px solid rgba(245,158,11,0.38); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 18px 36px var(--shadow-deep); }
+        [data-theme="light"] .root-card { background: #fff; border-color: rgba(217,119,6,0.3); }
+        [data-theme="light"] .root-gate { background: rgba(241,245,249,0.8); }
         .root-card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
-        .root-card p { font-size: 0.83rem; color: #cbd5e1; line-height: 1.55; }
+        .root-card p { font-size: 0.83rem; color: var(--text-body); line-height: 1.55; }
         .root-actions { margin-top: 0.7rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .root-actions button, .root-actions a {
-            border-radius: 9px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            border: 1px solid rgba(148,163,184,0.35);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .root-actions button { background: #8b5cf6; color: #fff; border: none; }
-        .root-actions a { color: #e2e8f0; }
-        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-
-        .cookie-banner {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10002;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.85rem;
-            padding: 0.8rem 1rem;
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid rgba(148, 163, 184, 0.28);
-            color: #cbd5e1;
-            font-size: 0.8rem;
-        }
-        .cookie-banner.hidden {
-            transform: translateY(120%);
-            pointer-events: none;
-        }
-        .cookie-banner a { color: #93c5fd; text-decoration: underline; }
+        .root-actions button,.root-actions a { border-radius: 9px; padding: 0.5rem 0.75rem; font-size: 0.78rem; font-weight: 700; border: 1px solid var(--line); text-decoration: none; cursor: pointer; color: var(--text); }
+        .root-actions button { background: #f59e0b; color: #0f172a; border: none; }
+        .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.8rem 1rem; background: rgba(15,23,42,0.95); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.8rem; }
+        [data-theme="light"] .cookie-banner { background: rgba(255,255,255,0.95); }
+        .cookie-banner.hidden { transform: translateY(120%); pointer-events: none; }
+        .cookie-banner a { color: #3b82f6; text-decoration: underline; }
         .cookie-actions { display: flex; gap: 0.5rem; }
-        .cookie-accept, .cookie-decline {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            border-radius: 7px;
-            padding: 0.4rem 0.72rem;
-            font-size: 0.74rem;
-            cursor: pointer;
-            background: transparent;
-            color: #e2e8f0;
+        .cookie-accept,.cookie-decline { border: 1px solid var(--line); border-radius: 7px; padding: 0.4rem 0.72rem; font-size: 0.74rem; cursor: pointer; background: transparent; color: var(--text); }
+        .cookie-accept { background: #2563eb; border-color: #2563eb; color: #fff; }
+        @media (max-width:800px) { .tech-grid,.kv-grid,.abbr-grid { grid-template-columns: 1fr; } .wrap { padding: 0.8rem 0.6rem 1.5rem; } .section,.hero { padding: 1rem 0.8rem; } }
+        @media (max-width:760px) { .cookie-banner { flex-direction: column; text-align: center; } }
+        .progress-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; height: 3px; background: transparent; pointer-events: none; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent2),var(--accent)); transition: width 0.1s; border-radius: 0 2px 2px 0; }
+        .toolbar { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 0.7rem; flex-wrap: wrap; font-size: 0.75rem; }
+        .toolbar-group { display: flex; align-items: center; gap: 0.3rem; }
+        .toolbar-sep { width: 1px; height: 20px; background: var(--line); margin: 0 0.2rem; flex-shrink: 0; }
+        .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.3rem 0.55rem; border-radius: 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+        .toolbar-btn:hover { color: var(--text); background: var(--card-inner-hover); }
+        .toolbar-btn.active { color: var(--accent2); border-color: var(--nav-active-border); background: var(--nav-active-bg); }
+        .toolbar-btn i { font-size: 0.7rem; }
+        .reading-time { color: var(--muted); font-size: 0.72rem; margin-left: auto; white-space: nowrap; }
+        .reading-time i { margin-right: 0.25rem; color: var(--accent2); }
+        .search-overlay { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(2,6,23,0.7); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding-top: 12vh; }
+        .search-overlay.active { display: flex; }
+        [data-theme="light"] .search-overlay { background: rgba(241,245,249,0.8); }
+        .search-box { width: 90%; max-width: 520px; background: var(--bg-solid); border: 1px solid var(--line); border-radius: 14px; padding: 0.8rem; box-shadow: 0 20px 50px var(--shadow-deep); }
+        .search-input { width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--card-inner); color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; }
+        .search-input:focus { border-color: var(--accent2); }
+        .search-results { max-height: 50vh; overflow-y: auto; margin-top: 0.5rem; }
+        .search-result { padding: 0.5rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.82rem; color: var(--text-body); }
+        .search-result:hover { background: var(--card-inner-hover); }
+        .search-result mark { background: rgba(245,158,11,0.25); color: var(--text); border-radius: 2px; padding: 0 2px; }
+        .search-result .sr-section { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+        .study-check { display: none; float: right; margin-top: 2px; }
+        .study-mode .study-check { display: inline-flex; }
+        .study-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent2); cursor: pointer; }
+        .study-mode .section.studied { opacity: 0.55; }
+        .study-mode .section.studied .section-title::after { content: ' (Completed)'; font-size: 0.7rem; color: var(--callout-green-color); font-weight: 400; }
+        .flashcard-overlay { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(2,6,23,0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; flex-direction: column; gap: 1rem; padding: 1rem; perspective: 1000px; }
+        .flashcard-overlay.active { display: flex; }
+        [data-theme="light"] .flashcard-overlay { background: rgba(241,245,249,0.9); }
+        .flashcard { width: 90%; max-width: 420px; min-height: 200px; background: transparent; border: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0; cursor: pointer; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; position: relative; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .fc-front,.fc-back { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 12px 40px var(--shadow-deep); }
+        .fc-front { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
+        .fc-back { transform: rotateY(180deg); font-size: 0.92rem; color: var(--text-body); line-height: 1.6; }
+        .fc-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .fc-controls button { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.82rem; font-family: inherit; }
+        .fc-controls button:hover { background: var(--card-inner-hover); }
+        .fc-counter { color: var(--muted); font-size: 0.8rem; }
+        .fc-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; z-index: 2; }
+        .fc-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.6rem; font-style: italic; }
+        .fc-mastery { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .fc-mastery button { padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.8rem; font-family: inherit; transition: all 0.2s; }
+        .fc-mastery button:hover { background: var(--card-inner-hover); }
+        .fc-mastery .fc-know { border-color: var(--callout-green-color); color: var(--callout-green-color); }
+        .fc-mastery .fc-know:hover { background: var(--callout-green-color); color: #fff; }
+        .fc-mastery .fc-learning { border-color: var(--accent2); color: var(--accent2); }
+        .fc-mastery .fc-learning:hover { background: var(--accent2); color: #fff; }
+        .fc-mastery .fc-shuffle { border-color: var(--muted); }
+        .fc-progress-bar { width: 90%; max-width: 420px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+        .fc-progress-fill { height: 100%; background: var(--callout-green-color); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .fc-stats { color: var(--muted); font-size: 0.75rem; text-align: center; }
+        .fc-kbd-hint { color: var(--muted); font-size: 0.68rem; text-align: center; opacity: 0.7; }
+        .fc-kbd-hint kbd { display: inline-block; padding: 0.1rem 0.35rem; border-radius: 4px; border: 1px solid var(--line); background: var(--card-inner); font-size: 0.65rem; font-family: inherit; margin: 0 0.1rem; }
+        .inline-calc { padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card-inner); margin: 0.7rem 0; }
+        .inline-calc label { display: block; font-size: 0.76rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+        .inline-calc input,.inline-calc select { width: 100%; padding: 0.45rem 0.6rem; border-radius: 7px; border: 1px solid var(--line); background: var(--kv-bg); color: var(--text); font-size: 0.85rem; font-family: inherit; margin-bottom: 0.5rem; outline: none; }
+        .inline-calc input:focus,.inline-calc select:focus { border-color: var(--accent2); }
+        .calc-result { padding: 0.6rem; border-radius: 8px; background: var(--nav-active-bg); border: 1px solid var(--nav-active-border); text-align: center; }
+        .calc-result .calc-value { font-size: 1.3rem; font-weight: 700; color: var(--accent2); }
+        .calc-result .calc-label { font-size: 0.72rem; color: var(--muted); }
+        .quiz-widget { border: 1px solid var(--accent2); border-radius: 12px; padding: 0.9rem; margin: 0.7rem 0; background: var(--card-inner); }
+        .quiz-question { font-size: 0.88rem; font-weight: 600; color: var(--text-strong); margin-bottom: 0.6rem; }
+        .quiz-options { display: grid; gap: 0.35rem; }
+        .quiz-opt { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; font-size: 0.82rem; color: var(--text-body); transition: all 0.15s; }
+        .quiz-opt:hover { background: var(--card-inner-hover); border-color: var(--accent2); }
+        .quiz-opt.correct { background: var(--callout-green-bg); border-color: var(--callout-green-border); color: var(--callout-green-color); }
+        .quiz-opt.wrong { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+        [data-theme="light"] .quiz-opt.wrong { color: #dc2626; }
+        .quiz-opt .opt-icon { width: 18px; text-align: center; }
+        .quiz-feedback { margin-top: 0.5rem; font-size: 0.8rem; padding: 0.5rem 0.7rem; border-radius: 8px; display: none; }
+        .quiz-feedback.show { display: block; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.6rem; margin: 0.7rem 0; }
+        .comparison-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem; background: var(--card-inner); cursor: pointer; transition: all 0.2s; }
+        .comparison-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+        .comparison-card.expanded { grid-column: 1 / -1; }
+        .comparison-card h5 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.3rem; }
+        .comparison-card h5 i { color: var(--accent2); }
+        .comparison-card .cc-summary { font-size: 0.78rem; color: var(--muted); }
+        .comparison-card .cc-detail { display: none; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-body); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 0.5rem; }
+        .comparison-card.expanded .cc-detail { display: block; }
+        .case-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.6rem; background: var(--card-inner); }
+        .case-card h4 { font-size: 0.88rem; color: var(--text-strong); margin-bottom: 0.3rem; }
+        .case-metrics { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
+        .case-metric { padding: 0.3rem 0.55rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+        .case-before { background: rgba(239,68,68,0.12); color: #fca5a5; }
+        .case-after { background: var(--callout-green-bg); color: var(--callout-green-color); }
+        [data-theme="light"] .case-before { color: #dc2626; }
+        .interview-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 0.6rem; margin-top: 0.6rem; }
+        .interview-card { border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 0.8rem; background: rgba(245,158,11,0.06); }
+        .interview-card h5 { font-size: 0.82rem; color: #fcd34d; margin-bottom: 0.3rem; }
+        [data-theme="light"] .interview-card h5 { color: #d97706; }
+        [data-theme="light"] .interview-card { background: rgba(245,158,11,0.04); border-color: rgba(245,158,11,0.2); }
+        .interview-card p { font-size: 0.78rem; color: var(--text-body); line-height: 1.55; }
+        .changelog { margin-top: 0.5rem; }
+        .changelog-entry { display: flex; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px solid var(--line); font-size: 0.78rem; }
+        .changelog-entry:last-child { border-bottom: none; }
+        .changelog-date { color: var(--accent2); font-weight: 600; min-width: 85px; flex-shrink: 0; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size: 0.74rem; }
+        .changelog-text { color: var(--text-body); }
+        .deep-link { opacity: 0; margin-left: 0.3rem; color: var(--muted); font-size: 0.8rem; cursor: pointer; transition: opacity 0.15s; background: none; border: none; }
+        .section-title:hover .deep-link { opacity: 1; }
+        .deep-link:hover { color: var(--accent2); }
+        .deep-link-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent2); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; z-index: 9999; display: none; box-shadow: 0 4px 12px var(--shadow); }
+        body.font-sm .accordion-content,body.font-sm .section-intro,body.font-sm .data-table td,body.font-sm .tech-card p { font-size: 0.76rem; }
+        body.font-lg .accordion-content,body.font-lg .section-intro,body.font-lg .data-table td,body.font-lg .tech-card p { font-size: 0.92rem; }
+        .data-table th.sortable { cursor: pointer; user-select: none; }
+        .data-table th.sortable:hover { background: var(--nav-active-bg); }
+        .data-table th .sort-icon { margin-left: 4px; font-size: 0.6rem; opacity: 0.4; }
+        .data-table th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
+        @media (max-width:600px) { .data-table { font-size: 0.72rem; } .data-table th,.data-table td { padding: 0.35rem 0.4rem; } }
+        @media print {
+            .navbar,.toolbar,.section-nav,.root-gate,.cookie-banner,.progress-wrap,.search-overlay,.flashcard-overlay,.deep-link,.study-check,.topbar,.tooltip-float { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+            body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; }
+            .section,.hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
+            .accordion-body { max-height: none !important; overflow: visible !important; }
+            .accordion-header .chevron { display: none; }
+            .data-table th { background: #e5e7eb !important; color: #111 !important; }
+            .data-table td { color: #333 !important; border-color: #ddd !important; }
+            .callout { border-color: #ccc !important; color: #333 !important; background: #f9fafb !important; }
+            * { color: #000 !important; }
         }
-        .cookie-accept { background: #2563eb; border-color: #2563eb; }
-        @media (max-width: 760px) {
-            .cookie-banner { flex-direction: column; text-align: center; }
-        }
-
     </style>
 </head>
 <body class="locked">
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="search-overlay" id="searchOverlay"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off"><div class="search-results" id="searchResults"></div></div></div>
+    <div class="flashcard-overlay" id="flashcardOverlay">
+        <button class="fc-close" id="fcClose" aria-label="Close flashcards">&times;</button>
+        <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+        <div class="fc-stats" id="fcStats">0 mastered of 50</div>
+        <div class="flashcard" id="flashcard"><div class="fc-front" id="fcFront"><span id="fcFrontText"></span><span class="fc-hint">Click or press Space to reveal</span></div><div class="fc-back" id="fcBack"><span id="fcBackText"></span><span class="fc-hint">Definition</span></div></div>
+        <div class="fc-controls"><button id="fcPrev"><i class="fas fa-arrow-left"></i> Prev</button><span class="fc-counter" id="fcCounter">1 / 50</span><button id="fcNext">Next <i class="fas fa-arrow-right"></i></button></div>
+        <div class="fc-mastery"><button class="fc-know" id="fcKnow"><i class="fas fa-check"></i> Know it</button><button class="fc-learning" id="fcLearning"><i class="fas fa-redo"></i> Still learning</button><button class="fc-shuffle" id="fcShuffle"><i class="fas fa-random"></i> Shuffle</button></div>
+        <div class="fc-kbd-hint"><kbd>Space</kbd> flip &nbsp; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp; <kbd>1</kbd> know &nbsp; <kbd>2</kbd> learning &nbsp; <kbd>Esc</kbd> close</div>
+    </div>
+    <div class="deep-link-toast" id="deepLinkToast">Link copied to clipboard</div>
+
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu">
+                    <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="datahallAI.html" style="color:#8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                    <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+                    <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="dcmoc/" style="color:#ef4444;font-weight:600;">DC MOC</a></li>
+                </ul>
+            </li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    </div></nav>
+
     <div class="wrap">
         <div class="topbar">
             <a class="back" href="standards-ltc-lab.html"><i class="fas fa-arrow-left"></i> Back to Lab</a>
             <span class="pill"><i class="fas fa-lock"></i> Root Module</span>
         </div>
-        <section class="panel">
-            <span class="pill">Uptime / Tier Alignment</span>
-            <h1>Uptime Tier Alignment</h1>
-            <p class="subtitle">Tier intent interpretation, maintainability, and service continuity risk.</p>
-            <p class="summary">This module validates architecture claims against tier intent to prevent overstatement and to prioritize resilient design corrections.</p>
 
-            <div class="grid">
-                <article class="card">
-                    <h3>Coverage</h3>
-                    <ul>
-                        <li>Tier intent decomposition by power, cooling, and controls.</li>
-                        <li>Failure containment depth and blast-radius mapping.</li>
-                        <li>Maintenance path validation under live load conditions.</li>
-                        <li>Gap severity ranking with remediation priorities.</li>
-                    </ul>
-                </article>
-                <article class="card">
-                    <h3>Focus Blocks</h3>
-                    <ul>
-                        <li>Tier evidence matrix</li>
-                        <li>Containment boundaries</li>
-                        <li>Live-load maintenance paths</li>
-                        <li>Priority remediation stack</li>
-                    </ul>
-                </article>
+        <section class="hero">
+            <span class="pill-gold" style="padding:0.3rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">Uptime Institute Tier Standard</span>
+            <h1>Uptime Institute Tier Classification — Comprehensive Deep-Dive</h1>
+            <p class="subtitle">From Tier I basic capacity through Tier IV fault tolerance, TCCF/TCCD certification processes, MTBF/MTTR reliability modeling, and redundancy architecture — a complete technical reference for data center availability design.</p>
+            <div class="mindmap-wrap" role="img" aria-label="Uptime Institute Tier Classification Mindmap">
+                <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect class="diag-box" x="355" y="220" width="210" height="70" rx="14"/>
+                    <text class="diag-center" x="460" y="250" text-anchor="middle">Uptime Institute</text>
+                    <text class="diag-center" x="460" y="270" text-anchor="middle">Tier Standard</text>
+                    <path class="diag-line-gold" d="M355,240 L230,110"/>
+                    <rect class="diag-box-gold" x="80" y="30" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="100" y="55" fill="#fde68a">Tier I &amp; II</text>
+                    <text class="diag-v" x="100" y="74">Basic Capacity (99.671%)</text>
+                    <text class="diag-v" x="100" y="90">Redundant Components</text>
+                    <text class="diag-v" x="100" y="106">N+1 Architecture</text>
+                    <path class="diag-line-gold" d="M565,240 L690,110"/>
+                    <rect class="diag-box-gold" x="610" y="30" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="630" y="55" fill="#fde68a">Tier III &amp; IV</text>
+                    <text class="diag-v" x="630" y="74">Concurrently Maintainable</text>
+                    <text class="diag-v" x="630" y="90">Fault Tolerant (99.995%)</text>
+                    <text class="diag-v" x="630" y="106">2N / 2(N+1) Topology</text>
+                    <path class="diag-line-gold" d="M355,265 L180,290"/>
+                    <rect class="diag-box-gold" x="20" y="260" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="40" y="285" fill="#fde68a">Redundancy</text>
+                    <text class="diag-v" x="40" y="304">N / N+1 / 2N / 2(N+1)</text>
+                    <text class="diag-v" x="40" y="320">STS &amp; ATS Transfer</text>
+                    <text class="diag-v" x="40" y="336">Maintenance Bypass</text>
+                    <path class="diag-line-cyan" d="M565,265 L720,290"/>
+                    <rect class="diag-box-cyan" x="680" y="260" width="220" height="110" rx="10"/>
+                    <text class="diag-t" x="700" y="285" fill="#67e8f9">Certification</text>
+                    <text class="diag-v" x="700" y="304">TCCF Design Review</text>
+                    <text class="diag-v" x="700" y="320">TCCD Construction Audit</text>
+                    <text class="diag-v" x="700" y="336">TCOS Operational</text>
+                    <text class="diag-v" x="700" y="352">Management &amp; Operations</text>
+                    <path class="diag-line-green" d="M400,290 L230,430"/>
+                    <rect class="diag-box-green" x="70" y="400" width="210" height="100" rx="10"/>
+                    <text class="diag-t" x="90" y="425" fill="#86efac">Reliability</text>
+                    <text class="diag-v" x="90" y="444">MTBF / MTTR Analysis</text>
+                    <text class="diag-v" x="90" y="460">Availability Calculation</text>
+                    <text class="diag-v" x="90" y="476">Downtime Cost Modeling</text>
+                    <path class="diag-line-green" d="M520,290 L660,430"/>
+                    <rect class="diag-box-green" x="580" y="400" width="220" height="100" rx="10"/>
+                    <text class="diag-t" x="600" y="425" fill="#86efac">Cross-Reference</text>
+                    <text class="diag-v" x="600" y="444">TIA-942 Mapping</text>
+                    <text class="diag-v" x="600" y="460">EN 50600 Classes</text>
+                    <text class="diag-v" x="600" y="476">BICSI-002 Alignment</text>
+                </svg>
             </div>
-
-            <div class="cta">
-                <a class="btn btn-main" href="standards-ltc-lab.html#calculator"><i class="fas fa-chart-line"></i> Open Live Simulation</a>
-                <a class="btn btn-sub" href="datacenter-solutions.html#tools"><i class="fas fa-grid"></i> Back to Tools</a>
-            </div>
-
-            <p class="next">Next step: score every subsystem claim as proven, partial, or unsupported with direct evidence links.</p>
-            <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review.</p>
+            <p style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem;"><i class="fas fa-info-circle"></i> Gold = Tier Classification &amp; Redundancy · Cyan = Certification Process · Green = Reliability &amp; Cross-Reference</p>
         </section>
-    </div>
 
-    <div class="root-gate" id="rootGate">
-        <div class="root-card">
-            <h2>Root Access Required</h2>
-            <p>This deep-dive module is restricted to root accounts.</p>
-            <div class="root-actions">
-                <button id="rootLoginBtn" type="button">Sign In as Root</button>
-                <a href="datacenter-solutions.html">Back</a>
+        <div class="toolbar" id="pageToolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="ninesToggle" title="Toggle Nines / Percentage display"><i class="fas fa-percentage"></i> Nines</button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="fontDown" title="Decrease font size"><i class="fas fa-minus"></i> A</button>
+                <button class="toolbar-btn" id="fontUp" title="Increase font size"><i class="fas fa-plus"></i> A</button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="searchBtn" title="Search (Ctrl+K)"><i class="fas fa-search"></i> Search</button>
+                <button class="toolbar-btn" id="studyModeBtn" title="Toggle study mode"><i class="fas fa-graduation-cap"></i> Study</button>
+                <button class="toolbar-btn" id="flashcardBtn" title="Flashcard mode"><i class="fas fa-clone"></i> Cards</button>
+                <button class="toolbar-btn" id="printBtn" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <span class="reading-time" id="readingTime"><i class="fas fa-clock"></i> ~30 min read</span>
+        </div>
+
+        <nav class="section-nav" id="sectionNav">
+            <a class="nav-pill active" href="#sec-overview">Overview</a>
+            <a class="nav-pill" href="#sec-tier1">Tier I</a>
+            <a class="nav-pill" href="#sec-tier2">Tier II</a>
+            <a class="nav-pill" href="#sec-tier3">Tier III</a>
+            <a class="nav-pill" href="#sec-tier4">Tier IV</a>
+            <a class="nav-pill" href="#sec-redundancy">Redundancy</a>
+            <a class="nav-pill" href="#sec-mttr">MTTR</a>
+            <a class="nav-pill" href="#sec-cert">Certification</a>
+            <a class="nav-pill" href="#sec-xref">Cross-Ref</a>
+            <a class="nav-pill" href="#sec-cases">Cases</a>
+            <a class="nav-pill" href="#sec-interview">Interview</a>
+            <a class="nav-pill" href="#sec-abbr">Abbrev.</a>
+        </nav>
+
+        <!-- SECTION 1: Tier Classification Overview -->
+        <section class="section" id="sec-overview" data-nav-id="sec-overview">
+            <h2 class="section-title"><i class="fas fa-sitemap"></i> Tier Classification Overview <button class="deep-link" onclick="copyDeepLink('sec-overview')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">The <span class="term-tooltip" data-tooltip="Uptime Institute: Independent advisory organization that created the Tier Standard for data center infrastructure topology. Founded in 1993.">Uptime Institute</span> Tier Standard is the globally recognized framework for classifying data center infrastructure topology. It defines four progressive tiers (I through IV) based on redundancy, fault tolerance, and concurrent maintainability.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Tier Definition Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Tier</th><th>Description</th><th>Availability</th><th>Annual Downtime</th><th>Power Path</th><th>Cooling Path</th></tr></thead>
+                        <tbody>
+                            <tr><td>Tier I</td><td>Basic Site Infrastructure</td><td class="avail-val" data-pct="99.671">99.671%</td><td>28.8 hrs</td><td>Single</td><td>Single</td></tr>
+                            <tr><td>Tier II</td><td>Redundant Site Infrastructure Components</td><td class="avail-val" data-pct="99.741">99.741%</td><td>22.7 hrs</td><td>Single</td><td>Single</td></tr>
+                            <tr><td class="highlight">Tier III</td><td class="highlight">Concurrently Maintainable</td><td class="highlight avail-val" data-pct="99.982">99.982%</td><td class="highlight">1.6 hrs</td><td class="highlight">Multiple (one active)</td><td class="highlight">Multiple (one active)</td></tr>
+                            <tr><td class="highlight">Tier IV</td><td class="highlight">Fault Tolerant</td><td class="highlight avail-val" data-pct="99.995">99.995%</td><td class="highlight">0.4 hrs</td><td class="highlight">Multiple (active-active)</td><td class="highlight">Multiple (active-active)</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> The Uptime Institute Tier Standard is topology-based, meaning it evaluates the physical infrastructure design — not operational practices or IT load characteristics.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Cost Multipliers <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Each tier increment increases construction cost significantly due to added redundancy, distribution paths, and fault-tolerant components.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Tier I Base Cost</div><div class="kv-value">$7–10M / MW</div></div>
+                        <div class="kv-item"><div class="kv-label">Tier II Multiplier</div><div class="kv-value">1.2–1.4x</div></div>
+                        <div class="kv-item"><div class="kv-label">Tier III Multiplier</div><div class="kv-value">1.6–2.0x</div></div>
+                        <div class="kv-item"><div class="kv-label">Tier IV Multiplier</div><div class="kv-value">2.2–3.0x</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Availability Targets &amp; Nines <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Availability is commonly expressed as a percentage or in "nines" notation. Each additional nine represents a 10x reduction in downtime.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Nines</th><th>Availability %</th><th>Annual Downtime</th><th>Typical Tier</th></tr></thead>
+                        <tbody>
+                            <tr><td>2 nines</td><td>99%</td><td>87.6 hrs</td><td>Below Tier I</td></tr>
+                            <tr><td>2.5 nines</td><td>99.671%</td><td>28.8 hrs</td><td>Tier I</td></tr>
+                            <tr><td>3 nines</td><td>99.9%</td><td>8.8 hrs</td><td>Tier II+</td></tr>
+                            <tr><td class="highlight">3.5 nines</td><td class="highlight">99.982%</td><td class="highlight">1.6 hrs</td><td class="highlight">Tier III</td></tr>
+                            <tr><td class="highlight">4 nines</td><td class="highlight">99.99%</td><td class="highlight">52.6 min</td><td class="highlight">Tier III+</td></tr>
+                            <tr><td>4.5 nines</td><td>99.995%</td><td>26.3 min</td><td>Tier IV</td></tr>
+                            <tr><td>5 nines</td><td>99.999%</td><td>5.3 min</td><td>Aspirational</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Evolution History <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Year</th><th>Milestone</th></tr></thead>
+                        <tbody>
+                            <tr><td>1993</td><td>Uptime Institute founded; initial tier concepts developed</td></tr>
+                            <tr><td>2005</td><td>First Tier Standard white paper published; formal certification begins</td></tr>
+                            <tr><td>2009</td><td>TCCF and TCCD certifications formalized as separate tracks</td></tr>
+                            <tr><td>2014</td><td>TCOS (Operational Sustainability) certification introduced</td></tr>
+                            <tr><td class="highlight">2018</td><td class="highlight">Tier Standard updated — clarified concurrent maintainability requirements</td></tr>
+                            <tr><td>2022</td><td>Over 2,500 certifications issued worldwide across 100+ countries</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Facility Type Mapping <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Facility Type</th><th>Typical Tier</th><th>Rationale</th></tr></thead>
+                        <tbody>
+                            <tr><td>Edge / Micro DC</td><td>Tier I–II</td><td>Cost-sensitive, small footprint, limited redundancy space</td></tr>
+                            <tr><td>SMB / Enterprise</td><td>Tier II–III</td><td>Balance of cost and uptime for internal IT workloads</td></tr>
+                            <tr><td>Colocation</td><td>Tier III</td><td>SLA-driven; concurrent maintainability is a market expectation</td></tr>
+                            <tr><td class="highlight">Hyperscale</td><td class="highlight">Tier III–IV*</td><td class="highlight">Custom topologies; often exceed Tier III without formal certification</td></tr>
+                            <tr><td>Financial / Mission-Critical</td><td>Tier IV</td><td>Zero tolerance for downtime; regulatory compliance</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> *Hyperscale operators often build custom topologies that achieve fault tolerance through distributed architecture rather than single-site Tier IV compliance.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">6</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">What is the minimum Uptime Tier that supports concurrent maintainability?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier I</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier II</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier III</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier IV</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Tier I -->
+        <section class="section" id="sec-tier1" data-nav-id="sec-tier1">
+            <h2 class="section-title"><i class="fas fa-cube"></i> Tier I: Basic Site Infrastructure <button class="deep-link" onclick="copyDeepLink('sec-tier1')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Tier I provides basic capacity to support IT operations with a single, non-redundant distribution path for power and cooling. There is no requirement for redundant components or multiple paths.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Single-Path Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Tier I facilities have a single path for power and cooling distribution. All capacity components (UPS, cooling units, generators) are non-redundant. Any component failure or required maintenance causes a full site outage.</p>
+                    <ul>
+                        <li>Single utility feed to a single transformer</li>
+                        <li>Single UPS module (no bypass capability required)</li>
+                        <li>Single cooling distribution path</li>
+                        <li>No raised floor requirement</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Component List <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Subsystem</th><th>Tier I Requirement</th><th>Redundancy</th></tr></thead>
+                        <tbody>
+                            <tr><td>Utility Feed</td><td>Single feed</td><td>None</td></tr>
+                            <tr><td>Generator</td><td>Optional (not required)</td><td>N</td></tr>
+                            <tr><td>UPS</td><td>Single module</td><td>N</td></tr>
+                            <tr><td>PDU</td><td>Single path</td><td>N</td></tr>
+                            <tr><td>Cooling</td><td>Single CRAC/CRAH</td><td>N</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Cost Baseline <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Construction Cost</div><div class="kv-value">$7–10M / MW</div></div>
+                        <div class="kv-item"><div class="kv-label">Typical PUE</div><div class="kv-value">1.8–2.5</div></div>
+                        <div class="kv-item"><div class="kv-label">Deploy Time</div><div class="kv-value">3–6 months</div></div>
+                        <div class="kv-item"><div class="kv-label">Target Market</div><div class="kv-value">Small office / edge</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Limitations &amp; Risks <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <ul>
+                        <li>Any planned maintenance requires full shutdown of IT load</li>
+                        <li>Single points of failure exist throughout the infrastructure</li>
+                        <li>No protection against human error during maintenance</li>
+                        <li>Cannot meet SLA requirements for mission-critical applications</li>
+                        <li>Insurance premiums higher due to increased risk profile</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Tier I facilities are susceptible to both planned and unplanned outages. Annual maintenance windows alone can consume the entire 28.8-hour downtime budget.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Tier II -->
+        <section class="section" id="sec-tier2" data-nav-id="sec-tier2">
+            <h2 class="section-title"><i class="fas fa-cubes"></i> Tier II: Redundant Components <button class="deep-link" onclick="copyDeepLink('sec-tier2')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Tier II adds <span class="term-tooltip" data-tooltip="N+1: Redundancy configuration where one additional component is added beyond the minimum needed (N) to support the load. If one fails, the remaining N units handle the full load.">N+1 redundancy</span> for critical capacity components while maintaining a single distribution path. This provides protection against component failure but not path failure.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> N+1 Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The key distinction from Tier I is the addition of redundant capacity components. If any single component fails, the redundant unit takes over without interrupting IT operations. However, the distribution path remains single — a failure in the path (bus, pipe, conduit) still causes downtime.</p>
+                    <ul>
+                        <li>N+1 UPS modules (e.g., 3+1 configuration)</li>
+                        <li>N+1 cooling units</li>
+                        <li>N+1 generator sets</li>
+                        <li>Single distribution path remains a vulnerability</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Component Redundancy Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Subsystem</th><th>Tier II Requirement</th><th>Redundancy</th></tr></thead>
+                        <tbody>
+                            <tr><td>Utility Feed</td><td>Single feed</td><td>N</td></tr>
+                            <tr><td>Generator</td><td>N+1 gensets</td><td>N+1</td></tr>
+                            <tr><td>UPS</td><td>N+1 modules</td><td>N+1</td></tr>
+                            <tr><td>PDU</td><td>Single path</td><td>N</td></tr>
+                            <tr><td>Cooling</td><td>N+1 CRAC/CRAH</td><td>N+1</td></tr>
+                            <tr><td>Fuel Storage</td><td>12 hours on-site</td><td>N+1</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Common Configurations <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="comparison-grid">
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-bolt"></i> UPS 3+1</h5>
+                            <p class="cc-summary">Three active modules plus one standby</p>
+                            <div class="cc-detail">Most common Tier II UPS configuration. Three modules each carry 33% of the load. If one fails, the remaining three (including standby) share the load at ~33% each. Provides protection against single UPS module failure only.</div>
+                        </div>
+                        <div class="comparison-card" onclick="this.classList.toggle('expanded')">
+                            <h5><i class="fas fa-wind"></i> CRAH 4+1</h5>
+                            <p class="cc-summary">Four active units plus one standby</p>
+                            <div class="cc-detail">Four CRAH units serve the whitespace with one additional standby. Loss of any single CRAH is covered. However, the chilled water piping remains a single distribution path — a pipe failure still causes cooling loss.</div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Comparison with Tier I <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Attribute</th><th>Tier I</th><th>Tier II</th></tr></thead>
+                        <tbody>
+                            <tr><td>Component Redundancy</td><td>None (N)</td><td class="highlight">N+1</td></tr>
+                            <tr><td>Distribution Path</td><td>Single</td><td>Single</td></tr>
+                            <tr><td>Planned Maintenance</td><td>Full shutdown</td><td>Component-level swap</td></tr>
+                            <tr><td>Availability</td><td>99.671%</td><td class="highlight">99.741%</td></tr>
+                            <tr><td>Cost Multiplier</td><td>1.0x</td><td>1.2–1.4x</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Tier III -->
+        <section class="section" id="sec-tier3" data-nav-id="sec-tier3">
+            <h2 class="section-title"><i class="fas fa-sync-alt"></i> Tier III: Concurrently Maintainable <button class="deep-link" onclick="copyDeepLink('sec-tier3')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="Concurrent Maintainability: The ability to perform planned maintenance on any infrastructure component or distribution path without interrupting IT operations.">Concurrent maintainability</span> is the defining characteristic of Tier III. Every capacity component and distribution path element can be removed from service on a planned basis without impacting IT operations.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Multiple Distribution Paths <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Tier III requires multiple independent distribution paths for both power and cooling, though only one path needs to be active at any time. This allows any single path to be taken offline for maintenance while the alternate path serves the load.</p>
+                    <ul>
+                        <li>Dual utility feeds (or utility + dedicated generator bus)</li>
+                        <li>Dual UPS paths with automatic transfer capability</li>
+                        <li>Dual cooling distribution (chilled water loops or refrigerant paths)</li>
+                        <li>All IT equipment must have dual-corded power inputs</li>
+                        <li><span class="term-tooltip" data-tooltip="STS: Static Transfer Switch — a solid-state device that transfers electrical load between two sources in less than 4-8 milliseconds.">STS</span> or <span class="term-tooltip" data-tooltip="ATS: Automatic Transfer Switch — an electromechanical switch that transfers load between two power sources, typically in 100-500 milliseconds.">ATS</span> at distribution level</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Maintenance Windows <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Tier III facilities can perform all planned maintenance without IT downtime. This includes:</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Maintenance Activity</th><th>Tier II Impact</th><th>Tier III Impact</th></tr></thead>
+                        <tbody>
+                            <tr><td>UPS battery replacement</td><td>IT shutdown required</td><td class="highlight">No impact</td></tr>
+                            <tr><td>Generator load test</td><td>Reduced redundancy</td><td class="highlight">No impact</td></tr>
+                            <tr><td>Chiller overhaul</td><td>Cooling loss risk</td><td class="highlight">No impact</td></tr>
+                            <tr><td>Switchgear maintenance</td><td>Full shutdown</td><td class="highlight">Transfer to alternate path</td></tr>
+                            <tr><td>Fire suppression test</td><td>Area shutdown</td><td class="highlight">Zone isolation only</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Active/Alternate Topology <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>In Tier III, one path is <strong>active</strong> (carrying the load) and one is <strong>alternate</strong> (available but not actively loaded). During maintenance, load is transferred from the active to the alternate path using STS or ATS devices.</p>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> The key distinction: Tier III protects against <strong>planned</strong> events but may not survive all <strong>unplanned</strong> failures. A fire in the active path could cause downtime before transfer completes.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Concurrent Maintenance Scenarios <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="tech-grid">
+                        <div class="tech-card"><h4><i class="fas fa-bolt"></i> Electrical Maintenance</h4><p>Transfer load to Path B via STS → isolate Path A switchgear → perform maintenance → restore Path A → transfer back. Total: 0 seconds of IT downtime.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-snowflake"></i> Cooling Maintenance</h4><p>Shift cooling to alternate loop → isolate primary chiller → overhaul → restore → rebalance. Requires thermal monitoring throughout to prevent hot spots.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-fire"></i> Fire System Maintenance</h4><p>Zone-based isolation allows testing suppression in one zone while adjacent zones remain protected. Requires fire watch procedures per NFPA requirements.</p></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">In a Tier III facility, how many distribution paths must be active simultaneously?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> One (with an alternate available)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Two (both active simultaneously)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Three (two active, one standby)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> All paths must be active at all times</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Tier IV -->
+        <section class="section" id="sec-tier4" data-nav-id="sec-tier4">
+            <h2 class="section-title"><i class="fas fa-shield-alt"></i> Tier IV: Fault Tolerant <button class="deep-link" onclick="copyDeepLink('sec-tier4')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="Fault Tolerance: The ability to continue operating without interruption when one or more infrastructure components or distribution paths fail unexpectedly.">Fault tolerance</span> is the defining characteristic of Tier IV. The infrastructure can sustain any single unplanned failure — including a fault in a distribution path — without any impact on IT operations.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> 2N Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Tier IV requires a minimum of <strong>2N redundancy</strong> for all capacity components and <strong>simultaneously active</strong> distribution paths. Both paths carry load simultaneously, so failure of either path is absorbed by the other with no transfer time.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Power Redundancy</div><div class="kv-value">2N or 2(N+1)</div></div>
+                        <div class="kv-item"><div class="kv-label">Cooling Redundancy</div><div class="kv-value">2N or 2(N+1)</div></div>
+                        <div class="kv-item"><div class="kv-label">Active Paths</div><div class="kv-value">All paths active</div></div>
+                        <div class="kv-item"><div class="kv-label">Transfer Time</div><div class="kv-value">0 ms (no transfer)</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Automatic Failover <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Unlike Tier III where transfer between paths may involve STS/ATS switching, Tier IV systems are designed so that both paths actively serve the load. When one path fails, the remaining path continues without any switching event.</p>
+                    <ul>
+                        <li>Dual-bus electrical with both buses energized and loaded</li>
+                        <li>Dual cooling plants operating simultaneously</li>
+                        <li>All IT equipment dual-corded to independent paths</li>
+                        <li>Continuous cooling maintained even during chiller plant failure</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> No Single Point of Failure <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Every component in a Tier IV facility must have a redundant counterpart on an independent path. The design must eliminate all <span class="term-tooltip" data-tooltip="SPOF: Single Point of Failure — any component whose failure would cause a system-level outage. Tier IV design eliminates all SPOFs.">single points of failure</span> (SPOFs).</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Component</th><th>SPOF Risk</th><th>Tier IV Mitigation</th></tr></thead>
+                        <tbody>
+                            <tr><td>Main switchgear</td><td>High</td><td>Dual independent switchgear rooms</td></tr>
+                            <tr><td>UPS bus</td><td>High</td><td>Dual UPS systems on separate buses</td></tr>
+                            <tr><td>Chilled water pipe</td><td>Medium</td><td>Dual independent piping loops</td></tr>
+                            <tr><td>Generator fuel line</td><td>Medium</td><td>Separate fuel systems per generator plant</td></tr>
+                            <tr><td>BMS/EPMS controller</td><td>Low</td><td>Redundant controllers with automatic failover</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Continuous Cooling Analysis <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Tier IV mandates <strong>continuous cooling</strong> — the cooling system must survive any single failure without temperature excursion. This requires careful analysis of thermal ride-through time and stored cooling capacity.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Thermal Ride-Through</div><div class="kv-value">&gt; 5 minutes</div></div>
+                        <div class="kv-item"><div class="kv-label">Chilled Water Storage</div><div class="kv-value">Recommended</div></div>
+                        <div class="kv-item"><div class="kv-label">Simultaneous Cooling</div><div class="kv-value">Both plants active</div></div>
+                        <div class="kv-item"><div class="kv-label">Max Temp Rise on Failure</div><div class="kv-value">&lt; 2°C at rack inlet</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">What is the key difference between Tier III and Tier IV?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier IV has more cooling capacity</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier IV survives unplanned failures; Tier III only handles planned maintenance</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier IV uses different UPS technology</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Tier IV requires more floor space</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Redundancy Deep-Dive -->
+        <section class="section" id="sec-redundancy" data-nav-id="sec-redundancy">
+            <h2 class="section-title"><i class="fas fa-code-branch"></i> Redundancy Architecture Deep-Dive <button class="deep-link" onclick="copyDeepLink('sec-redundancy')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Understanding redundancy configurations is critical for designing and evaluating data center infrastructure. Each configuration offers different levels of protection and comes with distinct cost and complexity trade-offs.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> N / N+1 / 2N / 2(N+1) Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Config</th><th>Description</th><th>Example (3 units needed)</th><th>Total Units</th><th>Fault Tolerance</th></tr></thead>
+                        <tbody>
+                            <tr><td>N</td><td>No redundancy</td><td>3 units, all active</td><td>3</td><td>None</td></tr>
+                            <tr><td>N+1</td><td>One spare</td><td>3 active + 1 standby</td><td>4</td><td>1 unit failure</td></tr>
+                            <tr><td class="highlight">2N</td><td class="highlight">Fully duplicated</td><td class="highlight">Two independent sets of 3</td><td class="highlight">6</td><td class="highlight">Full path failure</td></tr>
+                            <tr><td class="highlight">2(N+1)</td><td class="highlight">Duplicated with spare</td><td class="highlight">Two sets of 3+1</td><td class="highlight">8</td><td class="highlight">Path failure + 1 unit</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> STS Operation &amp; Transfer <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <span class="term-tooltip" data-tooltip="STS: Static Transfer Switch — uses semiconductor thyristors (SCRs) to transfer load between two independent power sources in 4-8 milliseconds. Critical for Tier III concurrent maintainability.">Static Transfer Switch (STS)</span> is a critical component in Tier III and above facilities. It enables sub-cycle transfer between two power sources.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Transfer Time (STS)</div><div class="kv-value">4–8 ms</div></div>
+                        <div class="kv-item"><div class="kv-label">Transfer Time (ATS)</div><div class="kv-value">100–500 ms</div></div>
+                        <div class="kv-item"><div class="kv-label">STS Technology</div><div class="kv-value">SCR thyristors</div></div>
+                        <div class="kv-item"><div class="kv-label">Typical Load per STS</div><div class="kv-value">100–800 kVA</div></div>
+                    </div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> STS devices themselves can become a SPOF. Tier IV designs often bypass the STS entirely by using dual-corded IT equipment connected to two independent buses.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Maintenance Bypass <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Maintenance bypass allows technicians to isolate individual components for service without affecting load. Critical elements include:</p>
+                    <ul>
+                        <li><strong>UPS maintenance bypass:</strong> Wraparound or external bypass to route power around UPS during service</li>
+                        <li><strong>Generator bypass:</strong> Utility-direct feed during generator maintenance</li>
+                        <li><strong>Valve isolation:</strong> Cooling loop isolation valves for chiller/pump maintenance</li>
+                        <li><strong>Breaker racking:</strong> Draw-out circuit breakers for safe switchgear maintenance</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Availability Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="inline-calc">
+                        <label>Redundancy Configuration</label>
+                        <select id="availConfig">
+                            <option value="n">N (No redundancy)</option>
+                            <option value="n1">N+1 (One spare)</option>
+                            <option value="2n" selected>2N (Fully duplicated)</option>
+                            <option value="2n1">2(N+1) (Duplicated + spare)</option>
+                        </select>
+                        <label>Component MTBF (hours)</label>
+                        <input type="number" id="availMtbf" value="50000" min="1000" max="500000">
+                        <label>Component MTTR (hours)</label>
+                        <input type="number" id="availMttr" value="4" min="0.5" max="168" step="0.5">
+                        <div class="calc-result"><div class="calc-value" id="availResult">99.9999%</div><div class="calc-label">System Availability</div></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+                            <div class="calc-result"><div class="calc-value" id="availDown" style="font-size:1rem;">0.3 min/yr</div><div class="calc-label">Annual Downtime</div></div>
+                            <div class="calc-result"><div class="calc-value" id="availNines" style="font-size:1rem;">5.10</div><div class="calc-label">Nines</div></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: MTTR & Availability -->
+        <section class="section" id="sec-mttr" data-nav-id="sec-mttr">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> MTTR &amp; Availability Calculations <button class="deep-link" onclick="copyDeepLink('sec-mttr')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Reliability engineering provides the mathematical foundation for availability predictions. Understanding <span class="term-tooltip" data-tooltip="MTBF: Mean Time Between Failures — the average elapsed time between inherent failures of a system during operation. Higher MTBF = more reliable component.">MTBF</span>, <span class="term-tooltip" data-tooltip="MTTR: Mean Time To Repair — the average time required to diagnose and repair a failed component and restore it to operation. Lower MTTR = faster recovery.">MTTR</span>, and their relationship to system availability is essential for tier-level design decisions.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Core Formulas <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Single Component</div><div class="kv-value">A = MTBF / (MTBF + MTTR)</div></div>
+                        <div class="kv-item"><div class="kv-label">Series System</div><div class="kv-value">A_sys = A₁ × A₂ × ... × Aₙ</div></div>
+                        <div class="kv-item"><div class="kv-label">Parallel (2N)</div><div class="kv-value">A_sys = 1 - (1-A)²</div></div>
+                        <div class="kv-item"><div class="kv-label">Nines</div><div class="kv-value">Nines = -log₁₀(1 - A)</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Series vs Parallel Reliability <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>Series:</strong> Components in series reduce availability — the system fails if any component fails. Used to model single-path (Tier I/II) configurations.</p>
+                    <p><strong>Parallel:</strong> Components in parallel increase availability — the system only fails if all redundant components fail simultaneously. Used to model N+1 and 2N configurations.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Configuration</th><th>Component A = 99.9%</th><th>System Availability</th><th>Improvement</th></tr></thead>
+                        <tbody>
+                            <tr><td>Single (N)</td><td>99.9%</td><td>99.9%</td><td>Baseline</td></tr>
+                            <tr><td>2 in Series</td><td>99.9% each</td><td>99.8%</td><td>Worse</td></tr>
+                            <tr><td class="highlight">2 in Parallel (2N)</td><td class="highlight">99.9% each</td><td class="highlight">99.9999%</td><td class="highlight">1000x better</td></tr>
+                            <tr><td>3 in Parallel</td><td>99.9% each</td><td>99.9999999%</td><td>1M x better</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Component MTBF Reference Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Component</th><th>Typical MTBF (hrs)</th><th>Typical MTTR (hrs)</th><th>Single-Component A</th></tr></thead>
+                        <tbody>
+                            <tr><td>UPS Module</td><td>150,000</td><td>4</td><td class="avail-val" data-pct="99.9973">99.9973%</td></tr>
+                            <tr><td>Diesel Generator</td><td>15,000</td><td>8</td><td class="avail-val" data-pct="99.9467">99.9467%</td></tr>
+                            <tr><td>ATS/STS</td><td>500,000</td><td>2</td><td class="avail-val" data-pct="99.9996">99.9996%</td></tr>
+                            <tr><td>Chiller</td><td>26,000</td><td>24</td><td class="avail-val" data-pct="99.9078">99.9078%</td></tr>
+                            <tr><td>CRAH Unit</td><td>100,000</td><td>4</td><td class="avail-val" data-pct="99.9960">99.9960%</td></tr>
+                            <tr><td>PDU/Transformer</td><td>300,000</td><td>8</td><td class="avail-val" data-pct="99.9973">99.9973%</td></tr>
+                            <tr><td>Circuit Breaker</td><td>1,000,000</td><td>1</td><td class="avail-val" data-pct="99.9999">99.9999%</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Downtime Cost Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="inline-calc">
+                        <label>Revenue per Hour ($)</label>
+                        <input type="number" id="costRevenue" value="100000" min="1000" max="10000000" step="1000">
+                        <label>Downtime Minutes per Year</label>
+                        <input type="number" id="costMinutes" value="26" min="1" max="10000">
+                        <label>Penalty Multiplier (SLA breaches, reputation)</label>
+                        <input type="number" id="costMultiplier" value="2.5" min="1" max="10" step="0.1">
+                        <div class="calc-result"><div class="calc-value" id="costResult">$108,333</div><div class="calc-label">Estimated Annual Downtime Cost</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">If a component has MTBF = 10,000 hours and MTTR = 10 hours, what is its availability?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 99.99%</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> 99.9% (10000 / 10010)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 99.0%</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 99.999%</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: TCCF/TCCD Certification -->
+        <section class="section" id="sec-cert" data-nav-id="sec-cert">
+            <h2 class="section-title"><i class="fas fa-certificate"></i> TCCF / TCCD Certification <button class="deep-link" onclick="copyDeepLink('sec-cert')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">The Uptime Institute offers three certification tracks: <span class="term-tooltip" data-tooltip="TCCF: Tier Certification of Constructed Facility — validates that the as-built data center infrastructure meets the claimed Tier level requirements.">TCCF</span> (Constructed Facility), <span class="term-tooltip" data-tooltip="TCCD: Tier Certification of Design Documents — validates that the design documents meet the requirements of the claimed Tier level before construction.">TCCD</span> (Design Documents), and <span class="term-tooltip" data-tooltip="TCOS: Tier Certification of Operational Sustainability — evaluates the operational behaviors, procedures, and management of a certified facility.">TCOS</span> (Operational Sustainability).</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> TCCD — Design Review <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TCCD evaluates design documents <strong>before construction</strong> to confirm the topology meets the claimed Tier level. It reviews single-line diagrams, mechanical schematics, and architectural plans.</p>
+                    <ul>
+                        <li>Submittal of complete design package (electrical, mechanical, architectural)</li>
+                        <li>Uptime Institute engineers review for Tier compliance</li>
+                        <li>Iterative feedback process (typically 2–4 review cycles)</li>
+                        <li>Certification valid for 2 years or until construction begins</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> TCCF — Construction Audit <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TCCF validates that the <strong>as-built facility</strong> matches the certified design and meets Tier requirements. This includes on-site inspection and functional testing.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Phase</th><th>Activity</th><th>Duration</th></tr></thead>
+                        <tbody>
+                            <tr><td>Pre-Visit</td><td>Document review, as-built comparison</td><td>2–4 weeks</td></tr>
+                            <tr><td>Site Visit</td><td>Physical inspection, functional testing</td><td>3–5 days</td></tr>
+                            <tr><td>Report</td><td>Findings, observations, certification decision</td><td>4–6 weeks</td></tr>
+                            <tr><td>Remediation</td><td>Address findings (if any)</td><td>Variable</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> TCOS — Operational Sustainability <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>TCOS evaluates whether operational behaviors, staffing, maintenance, and management processes sustain the Tier-level performance over time. A perfectly designed Tier IV facility can perform at Tier II levels with poor operations.</p>
+                    <ul>
+                        <li>Staffing levels and qualifications assessment</li>
+                        <li>Maintenance program review (preventive, predictive, corrective)</li>
+                        <li>Emergency procedures and escalation protocols</li>
+                        <li>Change management and MOC (Management of Change) processes</li>
+                        <li>Training records and competency verification</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Cost &amp; Timeline Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Certification</th><th>Typical Cost</th><th>Timeline</th><th>Validity</th></tr></thead>
+                        <tbody>
+                            <tr><td>TCCD (Design)</td><td>$30,000–$80,000</td><td>6–12 weeks</td><td>2 years</td></tr>
+                            <tr><td>TCCF (Constructed)</td><td>$50,000–$150,000</td><td>8–16 weeks</td><td>Perpetual</td></tr>
+                            <tr><td>TCOS (Operations)</td><td>$40,000–$100,000</td><td>6–12 weeks</td><td>3 years (renewable)</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> Costs vary significantly based on facility size, complexity, and geographic location. Larger multi-MW facilities typically incur higher fees due to extended review and site visit requirements.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">Which Uptime Institute certification evaluates operational behaviors and management processes?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> TCCD</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> TCCF</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> TCOS</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> TCDD</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: Cross-Reference -->
+        <section class="section" id="sec-xref" data-nav-id="sec-xref">
+            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Cross-Reference Standards <button class="deep-link" onclick="copyDeepLink('sec-xref')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">The Uptime Institute Tier Standard does not exist in isolation. Understanding its relationship to other data center standards helps engineers navigate multi-standard compliance environments.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> TIA-942 Mapping <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Uptime Tier</th><th>TIA-942 Rating</th><th>Key Differences</th></tr></thead>
+                        <tbody>
+                            <tr><td>Tier I</td><td>Rating 1</td><td>Similar scope — TIA adds cabling/grounding requirements</td></tr>
+                            <tr><td>Tier II</td><td>Rating 2</td><td>TIA specifies N+1 for more subsystems</td></tr>
+                            <tr><td>Tier III</td><td>Rating 3</td><td>TIA requires specific cable pathway redundancy</td></tr>
+                            <tr><td>Tier IV</td><td>Rating 4</td><td>TIA includes fire suppression requirements not in Uptime</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> TIA-942 "Ratings" and Uptime "Tiers" are NOT interchangeable. TIA-942 is a prescriptive standard (specifies what to build), while Uptime is topology-based (evaluates how the design works).</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> EN 50600 Classes <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Uptime Tier</th><th>EN 50600 Class</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Tier I</td><td>Class 1</td><td>Low availability, basic infrastructure</td></tr>
+                            <tr><td>Tier II</td><td>Class 2</td><td>Component redundancy</td></tr>
+                            <tr><td>Tier III</td><td>Class 3</td><td>Concurrent maintainability</td></tr>
+                            <tr><td>Tier IV</td><td>Class 4</td><td>Fault tolerance</td></tr>
+                        </tbody>
+                    </table></div>
+                    <p>EN 50600 is the European standard series covering data center design and operation. Its availability classes closely mirror Uptime tiers but include additional requirements for energy efficiency (EN 50600-4 series).</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> BICSI-002 Alignment <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="BICSI-002: Data Center Design and Implementation Best Practices standard published by BICSI. Uses availability classes (F0–F4) that map roughly to Uptime tiers.">BICSI-002</span> uses availability classes F0 through F4. These align approximately with Uptime tiers but include additional guidance on telecommunications infrastructure and physical security.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Uptime Tier</th><th>BICSI Class</th><th>Availability Target</th></tr></thead>
+                        <tbody>
+                            <tr><td>—</td><td>F0</td><td>&lt;99.671%</td></tr>
+                            <tr><td>Tier I</td><td>F1</td><td>99.671%</td></tr>
+                            <tr><td>Tier II</td><td>F2</td><td>99.741%</td></tr>
+                            <tr><td>Tier III</td><td>F3</td><td>99.982%</td></tr>
+                            <tr><td>Tier IV</td><td>F4</td><td>99.995%</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> ASHRAE Thermal Alignment <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>While Uptime focuses on topology and redundancy, <span class="term-tooltip" data-tooltip="ASHRAE TC 9.9: Technical Committee responsible for thermal guidelines for data processing environments. Defines recommended and allowable temperature/humidity envelopes.">ASHRAE TC 9.9</span> defines the thermal environment requirements. Higher tiers typically require tighter environmental controls:</p>
+                    <ul>
+                        <li><strong>Tier I/II:</strong> ASHRAE A1–A2 envelope acceptable (wider range, lower cost)</li>
+                        <li><strong>Tier III:</strong> ASHRAE A1 recommended (18–27°C supply air)</li>
+                        <li><strong>Tier IV:</strong> ASHRAE A1 with additional monitoring and thermal ride-through analysis</li>
+                    </ul>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: Case Studies -->
+        <section class="section" id="sec-cases" data-nav-id="sec-cases">
+            <h2 class="section-title"><i class="fas fa-building"></i> Case Studies <button class="deep-link" onclick="copyDeepLink('sec-cases')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <div class="case-card">
+                <h4><i class="fas fa-server" style="color:var(--accent2);margin-right:0.3rem;"></i> Tier I Edge Deployment — Retail Chain</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Central DC only</span><span class="case-metric case-after">After: 200+ edge Tier I nodes</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A national retail chain deployed 200+ Tier I edge micro-DCs at store locations to support POS systems and local inventory management. Each node: single UPS, single cooling, 2 kW IT load. Cost: $15K per node. Accepted higher failure risk in exchange for local processing speed and reduced WAN dependency.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-building" style="color:var(--accent2);margin-right:0.3rem;"></i> Tier II Colocation — Regional Provider</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Tier I (28.8 hrs downtime)</span><span class="case-metric case-after">After: Tier II (22.7 hrs, N+1 UPS)</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A regional colocation provider upgraded from Tier I to Tier II by adding N+1 UPS modules and redundant cooling units. Investment: $2.1M for a 500 kW facility. Result: 23% reduction in annual downtime and ability to perform component-level maintenance without full outage.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-university" style="color:var(--accent2);margin-right:0.3rem;"></i> Tier III Enterprise — Financial Services</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Tier II (no concurrent maint.)</span><span class="case-metric case-after">After: Tier III TCCF certified</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A financial services firm achieved Tier III TCCF certification for their 2 MW primary data center. Key additions: dual electrical buses with STS, dual chilled water loops, and all IT equipment dual-corded. Investment: $18M (new build). Zero planned downtime achieved in first 3 years of operation.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-shield-alt" style="color:var(--accent2);margin-right:0.3rem;"></i> Tier IV — Government Defense</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Tier III (1.6 hrs downtime target)</span><span class="case-metric case-after">After: Tier IV (0.4 hrs, fault tolerant)</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A government defense agency built a Tier IV facility with 2(N+1) power and cooling. Dual independent utility feeds from separate substations, dual generator plants, and 2N+2 UPS configuration. Cost: $45M for 3 MW. Achieved zero unplanned downtime in 5 years including surviving a regional power grid failure.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-arrow-up" style="color:var(--accent2);margin-right:0.3rem;"></i> Hybrid Upgrade — Tier II to III</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Tier II single-path</span><span class="case-metric case-after">After: Tier III with dual paths</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">An enterprise data center upgraded from Tier II to Tier III by retrofitting a second electrical distribution path and adding a second chilled water loop. Challenges: limited space for new switchgear, structural considerations for second pipe routing. Investment: $8M retrofit on a $12M original build. Achieved TCCD certification for the upgraded design.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 11: Interview Prep -->
+        <section class="section" id="sec-interview" data-nav-id="sec-interview">
+            <h2 class="section-title"><i class="fas fa-user-tie"></i> Interview Prep <button class="deep-link" onclick="copyDeepLink('sec-interview')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <div class="interview-grid">
+                <div class="interview-card"><h5>Q: What is the difference between Tier III and Tier IV?</h5><p>Tier III supports concurrent maintainability — any component can be maintained without IT impact during planned events. Tier IV adds fault tolerance — the infrastructure survives any single unplanned failure automatically. Tier III has active/standby paths; Tier IV has simultaneously active paths.</p></div>
+                <div class="interview-card"><h5>Q: Why might a hyperscaler not pursue Tier IV certification?</h5><p>Hyperscalers achieve fault tolerance through distributed architecture across multiple sites rather than single-site redundancy. Their custom topologies may exceed Tier IV availability without conforming to the standard's topology requirements. The certification cost also provides limited value when operating proprietary designs.</p></div>
+                <div class="interview-card"><h5>Q: How does MTBF affect tier selection?</h5><p>Lower MTBF components require higher redundancy levels to achieve the same availability target. For example, if generator MTBF is only 15,000 hours, N+1 (Tier II) provides 99.9999% for that subsystem, but the distribution path remains a SPOF. Tier III adds path redundancy; Tier IV eliminates all SPOFs.</p></div>
+                <div class="interview-card"><h5>Q: What is the difference between TCCF and TCCD?</h5><p>TCCD certifies the design documents before construction, confirming the topology meets the claimed tier. TCCF certifies the as-built facility, verifying the construction matches the design and functions correctly. TCCD typically precedes TCCF.</p></div>
+                <div class="interview-card"><h5>Q: How do you calculate system availability for a 2N configuration?</h5><p>For 2N parallel redundancy: A_system = 1 - (1 - A_component)². If each path has 99.9% availability, the 2N system achieves 1 - (0.001)² = 99.9999%. This assumes independent failure modes — common-cause failures (like shared fuel supply) reduce actual availability.</p></div>
+                <div class="interview-card"><h5>Q: What is concurrent maintainability vs fault tolerance?</h5><p>Concurrent maintainability (Tier III) means you can plan to take any component offline without IT impact. Fault tolerance (Tier IV) means unplanned failures are automatically absorbed. The distinction: Tier III requires operator action to transfer load before maintenance; Tier IV handles failures without operator intervention.</p></div>
+            </div>
+        </section>
+
+        <!-- SECTION 12: Abbreviations -->
+        <section class="section" id="sec-abbr" data-nav-id="sec-abbr">
+            <h2 class="section-title"><i class="fas fa-spell-check"></i> Abbreviations &amp; Glossary <button class="deep-link" onclick="copyDeepLink('sec-abbr')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+            <div class="abbr-grid">
+                <div class="abbr-item"><span class="abbr-key">AHU</span><span class="abbr-val">Air Handling Unit</span></div>
+                <div class="abbr-item"><span class="abbr-key">ATS</span><span class="abbr-val">Automatic Transfer Switch</span></div>
+                <div class="abbr-item"><span class="abbr-key">BMS</span><span class="abbr-val">Building Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">BICSI</span><span class="abbr-val">Building Industry Consulting Service International</span></div>
+                <div class="abbr-item"><span class="abbr-key">CAPEX</span><span class="abbr-val">Capital Expenditure</span></div>
+                <div class="abbr-item"><span class="abbr-key">CRAC</span><span class="abbr-val">Computer Room Air Conditioner</span></div>
+                <div class="abbr-item"><span class="abbr-key">CRAH</span><span class="abbr-val">Computer Room Air Handler</span></div>
+                <div class="abbr-item"><span class="abbr-key">DCiE</span><span class="abbr-val">Data Center Infrastructure Efficiency</span></div>
+                <div class="abbr-item"><span class="abbr-key">EPMS</span><span class="abbr-val">Electrical Power Monitoring System</span></div>
+                <div class="abbr-item"><span class="abbr-key">EPO</span><span class="abbr-val">Emergency Power Off</span></div>
+                <div class="abbr-item"><span class="abbr-key">FAT</span><span class="abbr-val">Factory Acceptance Test</span></div>
+                <div class="abbr-item"><span class="abbr-key">FMEA</span><span class="abbr-val">Failure Mode and Effects Analysis</span></div>
+                <div class="abbr-item"><span class="abbr-key">HV</span><span class="abbr-val">High Voltage</span></div>
+                <div class="abbr-item"><span class="abbr-key">HVAC</span><span class="abbr-val">Heating, Ventilation, and Air Conditioning</span></div>
+                <div class="abbr-item"><span class="abbr-key">IST</span><span class="abbr-val">Integrated Systems Test</span></div>
+                <div class="abbr-item"><span class="abbr-key">LV</span><span class="abbr-val">Low Voltage</span></div>
+                <div class="abbr-item"><span class="abbr-key">MDB</span><span class="abbr-val">Main Distribution Board</span></div>
+                <div class="abbr-item"><span class="abbr-key">MEP</span><span class="abbr-val">Mechanical, Electrical, and Plumbing</span></div>
+                <div class="abbr-item"><span class="abbr-key">MOC</span><span class="abbr-val">Management of Change</span></div>
+                <div class="abbr-item"><span class="abbr-key">MTBF</span><span class="abbr-val">Mean Time Between Failures</span></div>
+                <div class="abbr-item"><span class="abbr-key">MTTR</span><span class="abbr-val">Mean Time To Repair</span></div>
+                <div class="abbr-item"><span class="abbr-key">MV</span><span class="abbr-val">Medium Voltage</span></div>
+                <div class="abbr-item"><span class="abbr-key">N+1</span><span class="abbr-val">One additional redundant component</span></div>
+                <div class="abbr-item"><span class="abbr-key">OPEX</span><span class="abbr-val">Operating Expenditure</span></div>
+                <div class="abbr-item"><span class="abbr-key">PDU</span><span class="abbr-val">Power Distribution Unit</span></div>
+                <div class="abbr-item"><span class="abbr-key">PUE</span><span class="abbr-val">Power Usage Effectiveness</span></div>
+                <div class="abbr-item"><span class="abbr-key">RCM</span><span class="abbr-val">Reliability-Centered Maintenance</span></div>
+                <div class="abbr-item"><span class="abbr-key">RPP</span><span class="abbr-val">Remote Power Panel</span></div>
+                <div class="abbr-item"><span class="abbr-key">SAT</span><span class="abbr-val">Site Acceptance Test</span></div>
+                <div class="abbr-item"><span class="abbr-key">SLA</span><span class="abbr-val">Service Level Agreement</span></div>
+                <div class="abbr-item"><span class="abbr-key">SPOF</span><span class="abbr-val">Single Point of Failure</span></div>
+                <div class="abbr-item"><span class="abbr-key">STS</span><span class="abbr-val">Static Transfer Switch</span></div>
+                <div class="abbr-item"><span class="abbr-key">TCCF</span><span class="abbr-val">Tier Certification of Constructed Facility</span></div>
+                <div class="abbr-item"><span class="abbr-key">TCCD</span><span class="abbr-val">Tier Certification of Design Documents</span></div>
+                <div class="abbr-item"><span class="abbr-key">TCOS</span><span class="abbr-val">Tier Certification of Operational Sustainability</span></div>
+                <div class="abbr-item"><span class="abbr-key">UPS</span><span class="abbr-val">Uninterruptible Power Supply</span></div>
+                <div class="abbr-item"><span class="abbr-key">VFD</span><span class="abbr-val">Variable Frequency Drive</span></div>
+                <div class="abbr-item"><span class="abbr-key">2N</span><span class="abbr-val">Fully duplicated redundancy</span></div>
+                <div class="abbr-item"><span class="abbr-key">2(N+1)</span><span class="abbr-val">Duplicated with spare per side</span></div>
+                <div class="abbr-item"><span class="abbr-key">AHJ</span><span class="abbr-val">Authority Having Jurisdiction</span></div>
+                <div class="abbr-item"><span class="abbr-key">BIA</span><span class="abbr-val">Business Impact Analysis</span></div>
+                <div class="abbr-item"><span class="abbr-key">CFD</span><span class="abbr-val">Computational Fluid Dynamics</span></div>
+                <div class="abbr-item"><span class="abbr-key">CUE</span><span class="abbr-val">Carbon Usage Effectiveness</span></div>
+                <div class="abbr-item"><span class="abbr-key">DRUPS</span><span class="abbr-val">Diesel Rotary UPS</span></div>
+                <div class="abbr-item"><span class="abbr-key">EMS</span><span class="abbr-val">Energy Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">GIS</span><span class="abbr-val">Gas Insulated Switchgear</span></div>
+                <div class="abbr-item"><span class="abbr-key">kVA</span><span class="abbr-val">Kilovolt-Ampere (apparent power)</span></div>
+                <div class="abbr-item"><span class="abbr-key">MCB</span><span class="abbr-val">Miniature Circuit Breaker</span></div>
+                <div class="abbr-item"><span class="abbr-key">NEC</span><span class="abbr-val">National Electrical Code</span></div>
+                <div class="abbr-item"><span class="abbr-key">RTO</span><span class="abbr-val">Recovery Time Objective</span></div>
+                <div class="abbr-item"><span class="abbr-key">RPO</span><span class="abbr-val">Recovery Point Objective</span></div>
+                <div class="abbr-item"><span class="abbr-key">SCR</span><span class="abbr-val">Silicon Controlled Rectifier (thyristor)</span></div>
+                <div class="abbr-item"><span class="abbr-key">WUE</span><span class="abbr-val">Water Usage Effectiveness</span></div>
+            </div>
+        </section>
+
+        <div class="section" style="padding:0.8rem 1rem;">
+            <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:0.4rem;"><i class="fas fa-history" style="color:var(--accent2);margin-right:0.3rem;"></i> Changelog</h3>
+            <div class="changelog">
+                <div class="changelog-entry"><span class="changelog-date">2026-03-01</span><span class="changelog-text">Initial release — full deep-dive with 12 sections, calculators, quizzes, and flashcard support</span></div>
             </div>
         </div>
-    </div>
 
-    
-
-    <div class="cookie-banner hidden" id="cookieBanner">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        <div class="legal">
+            <p>This module is for educational and training purposes only. The Uptime Institute Tier Standard is a proprietary framework owned by Uptime Institute LLC. All references are for study purposes. Content does not constitute professional engineering advice.</p>
+            <p style="margin-top:0.3rem;"><a href="privacy.html" style="color:var(--accent2);">Privacy</a> · <a href="terms.html" style="color:var(--accent2);">Terms</a></p>
         </div>
+
     </div>
 
-    <script src="auth.js?v=20260228"></script>
+    <div id="tooltipFloat" class="tooltip-float"></div>
+    <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#f59e0b;margin-right:0.3rem;"></i> Root Access Required</h2><p>This deep-dive module is restricted to root-level accounts. Please authenticate with a root account to access the full content.</p><div class="root-actions"><button id="rootLoginBtn">Authenticate</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
+    <div class="cookie-banner hidden" id="cookieBanner"><p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p><div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div></div>
+
+    <script src="auth.js?v=20260301"></script>
     <script>
-        (function rootAccessGate() {
-            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
-
-            function detectRole(email) {
-                var e = String(email || '').toLowerCase().trim();
-                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
-            }
-
-            function getSession() {
-                try {
-                    var raw = localStorage.getItem('rz_premium_session');
-                    if (!raw) return null;
-                    var data = JSON.parse(raw);
-                    if (data.expires && new Date(data.expires) < new Date()) {
-                        localStorage.removeItem('rz_premium_session');
-                        return null;
-                    }
-                    if (!data.role) data.role = detectRole(data.email);
-                    return data;
-                } catch (e) {
-                    return null;
-                }
-            }
-
-            function isRoot(session) {
-                return !!(session && String(session.role || '').toLowerCase() === 'root');
-            }
-
-            function applyGate() {
-                document.body.classList.toggle('locked', !isRoot(getSession()));
-            }
-
-            var loginBtn = document.getElementById('rootLoginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function() {
-                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
-                        window._rzAuth.showModal();
-                    }
-                });
-            }
-
-            window.addEventListener('rz-auth-change', applyGate);
-            setTimeout(applyGate, 60);
-            setTimeout(applyGate, 550);
-        })();
-
-
-        (function cookieBanner() {
-            var banner = document.getElementById('cookieBanner');
-            var accepted = localStorage.getItem('rz_cookie_consent');
-            if (!accepted && banner) banner.classList.remove('hidden');
-
-            var accept = document.getElementById('cookieAccept');
-            var decline = document.getElementById('cookieDecline');
-
-            if (accept) {
-                accept.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'accepted');
-                    banner.classList.add('hidden');
-                });
-            }
-
-            if (decline) {
-                decline.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'declined');
-                    banner.classList.add('hidden');
-                    window['ga-disable-G-GED7FX8RTV'] = true;
-                });
-            }
-        })();
+    (function(){var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');function g(){var s=localStorage.getItem('theme');return s||(p.matches?'dark':'light');}function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(g());if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});})();
+    (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
+    (function(){var RE=['admin@resistancezero.com','bagus@resistancezero.com'];function dr(e){return RE.indexOf(String(e||'').toLowerCase().trim())!==-1?'root':'pro';}function gs(){try{var r=localStorage.getItem('rz_premium_session');if(!r)return null;var d=JSON.parse(r);if(d.expires&&new Date(d.expires)<new Date()){localStorage.removeItem('rz_premium_session');return null;}if(!d.role)d.role=dr(d.email);return d;}catch(e){return null;}}function ir(s){return!!(s&&String(s.role||'').toLowerCase()==='root');}function ag(){document.body.classList.toggle('locked',!ir(gs()));}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',ag);setTimeout(ag,60);setTimeout(ag,550);})();
+    (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
+    document.addEventListener('click',function(e){var h=e.target.closest('.accordion-header');if(h)h.parentElement.classList.toggle('open');});
+    document.addEventListener('click',function(e){var c=e.target.closest('.comparison-card');if(c)c.classList.toggle('expanded');});
+    (function(){var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');if(!secs.length)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});secs.forEach(function(s){obs.observe(s);});pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-120;window.scrollTo({top:y,behavior:'smooth'});}});});})();
+    (function(){var bar=document.getElementById('progressBar');if(!bar)return;window.addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(window.scrollY/h*100):0)+'%';});})();
+    (function(){var el=document.getElementById('readingTime');if(!el)return;var text=document.querySelector('.wrap');if(!text)return;var words=text.textContent.split(/\s+/).length;var mins=Math.ceil(words/220);el.innerHTML='<i class="fas fa-clock"></i> ~'+mins+' min read';})();
+    /* Nines Toggle */
+    var ninesMode='nines';
+    (function(){var btn=document.getElementById('ninesToggle');if(!btn)return;btn.addEventListener('click',function(){ninesMode=ninesMode==='nines'?'pct':'nines';btn.innerHTML='<i class="fas fa-percentage"></i> '+(ninesMode==='nines'?'Nines':'Percent');btn.classList.toggle('active',ninesMode==='pct');document.querySelectorAll('.avail-val').forEach(function(el){var pct=parseFloat(el.getAttribute('data-pct'));if(isNaN(pct))return;if(ninesMode==='pct'){el.textContent=pct+'%';}else{var nines=pct>=100?'∞':-Math.log10(1-pct/100);el.textContent=typeof nines==='string'?nines:nines.toFixed(2)+' nines';}});});})();
+    (function(){var dn=document.getElementById('fontDown'),up=document.getElementById('fontUp');if(!dn||!up)return;dn.addEventListener('click',function(){document.body.classList.remove('font-lg');document.body.classList.toggle('font-sm');});up.addEventListener('click',function(){document.body.classList.remove('font-sm');document.body.classList.toggle('font-lg');});})();
+    (function(){var btn=document.getElementById('studyModeBtn');if(!btn)return;btn.addEventListener('click',function(){document.body.classList.toggle('study-mode');btn.classList.toggle('active');if(document.body.classList.contains('study-mode')){document.querySelectorAll('.section[data-nav-id]').forEach(function(sec){if(sec.querySelector('.study-check'))return;var cb=document.createElement('label');cb.className='study-check';var inp=document.createElement('input');inp.type='checkbox';var key='uptime-study-'+sec.getAttribute('data-nav-id');inp.checked=localStorage.getItem(key)==='1';if(inp.checked)sec.classList.add('studied');inp.addEventListener('change',function(){localStorage.setItem(key,this.checked?'1':'0');sec.classList.toggle('studied',this.checked);});cb.appendChild(inp);var title=sec.querySelector('.section-title');if(title)title.appendChild(cb);});}});})();
+    (function(){var overlay=document.getElementById('searchOverlay'),input=document.getElementById('searchInput'),results=document.getElementById('searchResults'),btn=document.getElementById('searchBtn');if(!overlay||!input)return;function open(){overlay.classList.add('active');input.focus();input.value='';}function close(){overlay.classList.remove('active');results.innerHTML='';}if(btn)btn.addEventListener('click',open);overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();open();}if(e.key==='Escape')close();});input.addEventListener('input',function(){var q=this.value.trim().toLowerCase();results.innerHTML='';if(q.length<2)return;var sections=document.querySelectorAll('.accordion-content,.section-intro');var found=0;sections.forEach(function(sec){if(found>=10)return;var text=sec.textContent;var idx=text.toLowerCase().indexOf(q);if(idx===-1)return;found++;var start=Math.max(0,idx-40);var end=Math.min(text.length,idx+q.length+60);var snippet='...'+text.slice(start,end).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')+'...';var parent=sec.closest('.section');var secTitle=parent?parent.querySelector('.section-title'):null;var div=document.createElement('div');div.className='search-result';div.innerHTML=snippet+'<div class="sr-section">'+(secTitle?secTitle.textContent.trim():'')+'</div>';div.addEventListener('click',function(){close();sec.scrollIntoView({behavior:'smooth',block:'center'});});results.appendChild(div);});if(found===0)results.innerHTML='<div class="search-result" style="color:var(--muted)">No results found</div>';});})();
+    (function(){var b=document.getElementById('printBtn');if(b)b.addEventListener('click',function(){window.print();});})();
+    (function(){var overlay=document.getElementById('flashcardOverlay'),card=document.getElementById('flashcard');var frontText=document.getElementById('fcFrontText'),backText=document.getElementById('fcBackText');var counter=document.getElementById('fcCounter'),stats=document.getElementById('fcStats');var progressFill=document.getElementById('fcProgressFill');var btn=document.getElementById('flashcardBtn'),closeBtn=document.getElementById('fcClose');var prevBtn=document.getElementById('fcPrev'),nextBtn=document.getElementById('fcNext');var knowBtn=document.getElementById('fcKnow'),learnBtn=document.getElementById('fcLearning');var shuffleBtn=document.getElementById('fcShuffle');if(!overlay||!card)return;var items=[],idx=0,STORE_KEY='uptime-fc-mastered';var mastered={};try{var s=localStorage.getItem(STORE_KEY);if(s)mastered=JSON.parse(s);}catch(e){}document.querySelectorAll('.abbr-item').forEach(function(el){var k=el.querySelector('.abbr-key'),v=el.querySelector('.abbr-val');if(k&&v)items.push({q:k.textContent.trim(),a:v.textContent.trim()});});function saveMastered(){try{localStorage.setItem(STORE_KEY,JSON.stringify(mastered));}catch(e){}}function masteredCount(){var c=0;items.forEach(function(it){if(mastered[it.q])c++;});return c;}function updateProgress(){var m=masteredCount(),total=items.length;if(stats)stats.textContent=m+' mastered of '+total;if(progressFill)progressFill.style.width=total?(m/total*100).toFixed(1)+'%':'0%';}function show(){if(!items.length)return;card.classList.remove('flipped');if(frontText)frontText.textContent=items[idx].q;if(backText)backText.textContent=items[idx].a;if(counter)counter.textContent=(idx+1)+' / '+items.length;updateProgress();}function advance(){idx=(idx+1)%items.length;show();}function shuffle(){for(var i=items.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=items[i];items[i]=items[j];items[j]=t;}idx=0;show();}if(btn)btn.addEventListener('click',function(){overlay.classList.add('active');idx=0;show();});if(closeBtn)closeBtn.addEventListener('click',function(){overlay.classList.remove('active');});overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('active');});if(card)card.addEventListener('click',function(e){if(e.target.closest('.fc-hint'))return;card.classList.toggle('flipped');});if(prevBtn)prevBtn.addEventListener('click',function(){idx=(idx-1+items.length)%items.length;show();});if(nextBtn)nextBtn.addEventListener('click',function(){idx=(idx+1)%items.length;show();});if(knowBtn)knowBtn.addEventListener('click',function(){if(items.length)mastered[items[idx].q]=true;saveMastered();advance();});if(learnBtn)learnBtn.addEventListener('click',function(){if(items.length)delete mastered[items[idx].q];saveMastered();advance();});if(shuffleBtn)shuffleBtn.addEventListener('click',shuffle);document.addEventListener('keydown',function(e){if(!overlay.classList.contains('active'))return;if(e.key===' '||e.code==='Space'){e.preventDefault();card.classList.toggle('flipped');}else if(e.key==='ArrowLeft'){e.preventDefault();idx=(idx-1+items.length)%items.length;show();}else if(e.key==='ArrowRight'){e.preventDefault();advance();}else if(e.key==='1'){e.preventDefault();if(items.length){mastered[items[idx].q]=true;saveMastered();advance();}}else if(e.key==='2'){e.preventDefault();if(items.length){delete mastered[items[idx].q];saveMastered();advance();}}else if(e.key==='Escape'){overlay.classList.remove('active');}});})();
+    function copyDeepLink(id){var url=window.location.origin+window.location.pathname+'#'+id;navigator.clipboard.writeText(url).then(function(){var toast=document.getElementById('deepLinkToast');if(toast){toast.style.display='block';setTimeout(function(){toast.style.display='none';},2000);}});}
+    function checkQuiz(opt){var widget=opt.closest('.quiz-widget');if(!widget)return;var opts=widget.querySelectorAll('.quiz-opt');var answered=widget.getAttribute('data-answered');if(answered)return;widget.setAttribute('data-answered','1');var isCorrect=opt.getAttribute('data-correct')==='true';opts.forEach(function(o){if(o.getAttribute('data-correct')==='true')o.classList.add('correct');else if(o===opt)o.classList.add('wrong');o.querySelector('.opt-icon').innerHTML=o.getAttribute('data-correct')==='true'?'<i class="fas fa-check-circle"></i>':'<i class="fas fa-times-circle"></i>';});var fb=widget.querySelector('.quiz-feedback');if(fb){fb.classList.add('show');fb.className='quiz-feedback show '+(isCorrect?'callout callout-green':'callout callout-warn');fb.innerHTML=isCorrect?'<i class="fas fa-check"></i> Correct!':'<i class="fas fa-times"></i> Incorrect — review the highlighted answer above.';}}
+    /* Availability Calculator */
+    (function(){var configSel=document.getElementById('availConfig'),mtbfIn=document.getElementById('availMtbf'),mttrIn=document.getElementById('availMttr');var resAvail=document.getElementById('availResult'),resDown=document.getElementById('availDown'),resNines=document.getElementById('availNines');if(!configSel||!mtbfIn||!mttrIn)return;function calc(){var mtbf=parseFloat(mtbfIn.value)||50000,mttr=parseFloat(mttrIn.value)||4;var A=mtbf/(mtbf+mttr);var config=configSel.value;var sysA;if(config==='n')sysA=A;else if(config==='n1')sysA=1-Math.pow(1-A,2);else if(config==='2n')sysA=1-Math.pow(1-A,2);else sysA=1-Math.pow(1-A,3);var pct=(sysA*100);var downMin=(1-sysA)*525960;var nines=sysA>=1?9:-Math.log10(1-sysA);resAvail.textContent=pct.toFixed(6)+'%';resDown.textContent=downMin.toFixed(1)+' min/yr';resNines.textContent=nines.toFixed(2)+' nines';}configSel.addEventListener('change',calc);mtbfIn.addEventListener('input',calc);mttrIn.addEventListener('input',calc);calc();})();
+    /* Downtime Cost Calculator */
+    (function(){var revIn=document.getElementById('costRevenue'),minIn=document.getElementById('costMinutes'),mulIn=document.getElementById('costMultiplier');var resEl=document.getElementById('costResult');if(!revIn||!minIn||!mulIn||!resEl)return;function calc(){var rev=parseFloat(revIn.value)||100000;var mins=parseFloat(minIn.value)||26;var mul=parseFloat(mulIn.value)||2.5;var cost=(rev/60)*mins*mul;resEl.textContent='$'+Math.round(cost).toLocaleString();}revIn.addEventListener('input',calc);minIn.addEventListener('input',calc);mulIn.addEventListener('input',calc);calc();})();
+    document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;var fc=document.getElementById('flashcardOverlay');if(fc&&fc.classList.contains('active'))return;var secs=document.querySelectorAll('[data-nav-id]');if(!secs.length)return;var current=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<150&&s.getBoundingClientRect().top>-s.offsetHeight)current=i;});if(e.key==='ArrowDown'&&!e.ctrlKey){e.preventDefault();var next=Math.min(current+1,secs.length-1);secs[next].scrollIntoView({behavior:'smooth',block:'start'});}if(e.key==='ArrowUp'&&!e.ctrlKey){e.preventDefault();var prev=Math.max(current-1,0);secs[prev].scrollIntoView({behavior:'smooth',block:'start'});}});
+    document.querySelectorAll('.data-table').forEach(function(table){var headers=table.querySelectorAll('th');headers.forEach(function(th,colIdx){th.classList.add('sortable');th.innerHTML+=(' <span class="sort-icon"><i class="fas fa-sort"></i></span>');var asc=true;th.addEventListener('click',function(){var tbody=table.querySelector('tbody');if(!tbody)return;var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var av=a.cells[colIdx]?a.cells[colIdx].textContent.trim():'';var bv=b.cells[colIdx]?b.cells[colIdx].textContent.trim():'';var an=parseFloat(av.replace(/[^0-9.\-]/g,'')),bn=parseFloat(bv.replace(/[^0-9.\-]/g,''));if(!isNaN(an)&&!isNaN(bn))return asc?an-bn:bn-an;return asc?av.localeCompare(bv):bv.localeCompare(av);});asc=!asc;rows.forEach(function(r){tbody.appendChild(r);});headers.forEach(function(h){h.classList.remove('sorted');});th.classList.add('sorted');});});});
+    (function(){var tip=document.getElementById('tooltipFloat');if(!tip)return;var hideTimer=null;function show(el){clearTimeout(hideTimer);var text=el.getAttribute('data-tooltip');if(!text)return;tip.textContent=text;tip.className='tooltip-float';tip.style.opacity='0';tip.style.visibility='visible';var r=el.getBoundingClientRect();var tw=tip.offsetWidth;var th=tip.offsetHeight;var gap=8;var left=r.left+r.width/2-tw/2;if(left<8)left=8;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;var top;if(r.top-th-gap>8){top=r.top-th-gap;tip.classList.add('above');}else{top=r.bottom+gap;tip.classList.add('below');}var arrowLeft=r.left+r.width/2-left;arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));tip.style.setProperty('--arrow',arrowLeft+'px');tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.add('visible');}function hide(){hideTimer=setTimeout(function(){tip.classList.remove('visible');tip.style.visibility='hidden';},80);}document.querySelectorAll('.term-tooltip').forEach(function(el){el.addEventListener('mouseenter',function(){show(el);});el.addEventListener('mouseleave',hide);el.addEventListener('touchstart',function(e){e.preventDefault();show(el);setTimeout(hide,3000);},{passive:false});});})();
+    (function(){if(window.location.hash){var id=window.location.hash.slice(1);var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);}})();
     </script>
 </body>
 </html>

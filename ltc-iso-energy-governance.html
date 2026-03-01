@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>ISO Energy Governance | ResistanceZero</title>
+    <title>ISO Energy &amp; Governance — Comprehensive Deep-Dive | ResistanceZero</title>
     <meta name="description" content="Root-only standards deep-dive module for ResistanceZero engineering lab.">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f172a">
@@ -12,359 +12,1698 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0b1324;
-            --card: rgba(15, 23, 42, 0.84);
-            --text: #e2e8f0;
-            --muted: #94a3b8;
-            --line: rgba(148, 163, 184, 0.24);
-            --accent: #f59e0b;
-            --accent2: #06b6d4;
+            --bg: #0b1324; --bg-solid: #0b1324;
+            --card: rgba(15,23,42,0.84); --card-inner: rgba(15,23,42,0.6); --card-inner-hover: rgba(15,23,42,0.8);
+            --text: #e2e8f0; --text-strong: #f1f5f9; --text-body: #cbd5e1; --muted: #94a3b8;
+            --line: rgba(148,163,184,0.24);
+            --accent: #f59e0b; --accent2: #10b981;
+            --shadow: rgba(2,6,23,0.45); --shadow-deep: rgba(2,6,23,0.5);
+            --grad-top: rgba(16,185,129,0.13); --grad-bot: rgba(245,158,11,0.11);
+            --th-bg: rgba(16,185,129,0.12); --th-color: #6ee7b7;
+            --tr-hover: rgba(148,163,184,0.06); --td-border: rgba(148,163,184,0.12);
+            --kv-bg: rgba(15,23,42,0.5);
+            --callout-info-bg: rgba(16,185,129,0.1); --callout-info-border: rgba(16,185,129,0.3); --callout-info-color: #6ee7b7;
+            --callout-warn-bg: rgba(245,158,11,0.1); --callout-warn-border: rgba(245,158,11,0.3); --callout-warn-color: #fde68a;
+            --callout-green-bg: rgba(34,197,94,0.1); --callout-green-border: rgba(34,197,94,0.3); --callout-green-color: #86efac;
+            --pill-bg: rgba(245,158,11,0.16); --pill-border: rgba(245,158,11,0.45); --pill-color: #fde68a;
+            --acc-num-bg: rgba(16,185,129,0.18); --acc-num-color: #34d399;
+            --nav-active-color: #6ee7b7; --nav-active-bg: rgba(16,185,129,0.15); --nav-active-border: rgba(16,185,129,0.35);
+            --diag-fill: rgba(30,41,59,0.88); --svg-bg: rgba(15,23,42,0.7);
+        }
+        [data-theme="light"] {
+            --bg: #f1f5f9; --bg-solid: #f1f5f9;
+            --card: rgba(255,255,255,0.92); --card-inner: rgba(241,245,249,0.8); --card-inner-hover: rgba(226,232,240,0.6);
+            --text: #1e293b; --text-strong: #0f172a; --text-body: #334155; --muted: #64748b;
+            --line: rgba(100,116,139,0.22);
+            --accent: #d97706; --accent2: #059669;
+            --shadow: rgba(100,116,139,0.12); --shadow-deep: rgba(100,116,139,0.18);
+            --grad-top: rgba(16,185,129,0.06); --grad-bot: rgba(245,158,11,0.05);
+            --th-bg: rgba(16,185,129,0.08); --th-color: #065f46;
+            --tr-hover: rgba(100,116,139,0.06); --td-border: rgba(100,116,139,0.1);
+            --kv-bg: rgba(241,245,249,0.8);
+            --callout-info-bg: rgba(16,185,129,0.06); --callout-info-border: rgba(16,185,129,0.25); --callout-info-color: #065f46;
+            --callout-warn-bg: rgba(245,158,11,0.06); --callout-warn-border: rgba(245,158,11,0.25); --callout-warn-color: #92400e;
+            --callout-green-bg: rgba(34,197,94,0.06); --callout-green-border: rgba(34,197,94,0.25); --callout-green-color: #166534;
+            --pill-bg: rgba(245,158,11,0.1); --pill-border: rgba(217,119,6,0.4); --pill-color: #92400e;
+            --acc-num-bg: rgba(16,185,129,0.12); --acc-num-color: #065f46;
+            --nav-active-color: #065f46; --nav-active-bg: rgba(16,185,129,0.1); --nav-active-border: rgba(16,185,129,0.3);
+            --diag-fill: rgba(241,245,249,0.9); --svg-bg: rgba(241,245,249,0.8);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            background:
-                radial-gradient(ellipse at top right, rgba(6,182,212,0.13), transparent 45%),
-                radial-gradient(ellipse at bottom left, rgba(245,158,11,0.11), transparent 52%),
-                var(--bg);
-            color: var(--text);
-        }
+        body { font-family: Inter,-apple-system,BlinkMacSystemFont,sans-serif; min-height: 100vh; background: radial-gradient(ellipse at top right,var(--grad-top),transparent 45%),radial-gradient(ellipse at bottom left,var(--grad-bot),transparent 52%),var(--bg); color: var(--text); }
+        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11,19,36,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
+        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 56px; gap: 0.5rem; }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
+        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+        .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
+        .nav-link { padding: 0.45rem 0.65rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-dropdown { position: relative; }
+        .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
+        .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
+        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-solid); border: 1px solid var(--line); min-width: 180px; border-radius: 10px; box-shadow: 0 10px 40px var(--shadow-deep); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s,visibility 0.2s; z-index: 1001; padding: 8px 0; }
+        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
+        .dropdown-menu li { list-style: none; padding: 0; }
+        .dropdown-menu li::before { display: none; }
+        .dropdown-menu a { display: block; padding: 0.45rem 1rem; color: var(--text-body); text-decoration: none; font-size: 0.8rem; transition: background 0.15s; }
+        .dropdown-menu a:hover { background: rgba(148,163,184,0.1); }
+        .theme-toggle { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(148,163,184,0.1); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .theme-toggle:hover { background: rgba(148,163,184,0.2); transform: scale(1.05); }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle .sun-icon { color: #f59e0b; display: none; }
+        .theme-toggle .moon-icon { color: #94a3b8; display: block; }
+        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle { background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
+        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 8px; border-radius: 8px; }
+        .hamburger:hover { background: rgba(148,163,184,0.1); }
+        .bar { width: 22px; height: 2.5px; background: var(--muted); border-radius: 3px; transition: all 0.3s; }
+        @media (max-width:900px) { .nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--bg-solid); border-bottom: 1px solid var(--line); flex-direction: column; padding: 0.5rem; gap: 0; box-shadow: 0 8px 20px var(--shadow); } .nav-menu.active { display: flex; } .hamburger { display: flex; } .dropdown-menu { position: static; transform: none; box-shadow: none; border: none; padding-left: 1rem; } }
         .wrap { max-width: 980px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.7rem;
-            margin-bottom: 0.9rem;
-        }
-        .back {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.55rem 0.8rem;
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.34rem 0.72rem;
-            border-radius: 999px;
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            background: rgba(245, 158, 11, 0.16);
-            color: #fde68a;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .panel {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: var(--card);
-            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.45);
-            padding: 1.1rem;
-        }
-        h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); margin: 0.45rem 0 0.3rem; }
-        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
-        .summary {
-            margin-top: 0.9rem;
-            padding: 0.8rem;
-            border-radius: 12px;
-            border: 1px solid rgba(6, 182, 212, 0.35);
-            background: rgba(6, 182, 212, 0.1);
-            font-size: 0.85rem;
-            line-height: 1.65;
-            color: #c7d2fe;
-        }
-        .grid {
-            margin-top: 0.85rem;
-            display: grid;
-            grid-template-columns: 1.2fr 0.95fr;
-            gap: 0.75rem;
-        }
-        .card {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.62);
-            padding: 0.8rem;
-        }
-        .card h3 {
-            font-size: 0.86rem;
-            color: #f8fafc;
-            margin-bottom: 0.45rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        ul { list-style: none; display: grid; gap: 0.35rem; }
-        li {
-            font-size: 0.82rem;
-            color: #cbd5e1;
-            line-height: 1.55;
-            padding-left: 0.9rem;
-            position: relative;
-        }
-        li::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent2);
-            position: absolute;
-            left: 0;
-            top: 0.45rem;
-        }
-        .cta {
-            margin-top: 0.85rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.42rem;
-            text-decoration: none;
-            border-radius: 10px;
-            padding: 0.58rem 0.82rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .btn-main { background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; }
-        .btn-sub { border: 1px solid var(--line); color: var(--text); }
-        .next {
-            margin-top: 0.8rem;
-            font-size: 0.8rem;
-            color: #f1f5f9;
-            border-top: 1px dashed var(--line);
-            padding-top: 0.7rem;
-            line-height: 1.55;
-        }
-        .legal {
-            margin-top: 0.9rem;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-        .root-gate {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(2, 6, 23, 0.74);
-            padding: 1rem;
-            backdrop-filter: blur(6px);
-        }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }
+        .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+        .back:hover { background: rgba(148,163,184,0.1); }
+        .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.34rem 0.72rem; border-radius: 999px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-color); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+        .pill-emerald { border-color: rgba(16,185,129,0.45); background: rgba(16,185,129,0.14); color: var(--th-color); }
+        .hero { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 16px 32px var(--shadow); padding: 1.4rem 1.2rem; margin-bottom: 1rem; }
+        h1 { font-size: clamp(1.4rem,3vw,2rem); margin: 0.45rem 0 0.3rem; line-height: 1.3; }
+        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.92rem; max-width: 740px; }
+        .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.6rem; background: rgba(11,19,36,0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        [data-theme="light"] .section-nav { background: rgba(255,255,255,0.92); }
+        .nav-pill { flex-shrink: 0; padding: 0.38rem 0.7rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .nav-pill:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-pill.active { color: var(--nav-active-color); background: var(--nav-active-bg); border-color: var(--nav-active-border); }
+        .section { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 12px 28px var(--shadow); padding: 1.3rem 1.2rem; margin-bottom: 1rem; }
+        .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
+        .section-title i { color: var(--accent2); font-size: 0.95rem; }
+        .section-intro { color: var(--text-body); font-size: 0.88rem; line-height: 1.7; margin-bottom: 0.9rem; }
+        .accordion { margin-bottom: 0.6rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+        .accordion:last-child { margin-bottom: 0; }
+        .accordion-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.85rem; background: var(--card-inner); cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-strong); user-select: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+        .accordion-header:hover { background: var(--card-inner-hover); }
+        .accordion-header .chevron { margin-left: auto; transition: transform 0.25s; font-size: 0.7rem; color: var(--muted); }
+        .accordion.open .accordion-header .chevron { transform: rotate(180deg); }
+        .accordion-header .acc-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: var(--acc-num-bg); color: var(--acc-num-color); font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .accordion.open .accordion-body { max-height: 5000px; }
+        .accordion-content { padding: 0.85rem; font-size: 0.84rem; line-height: 1.7; color: var(--text-body); }
+        .accordion-content p { margin-bottom: 0.6rem; }
+        .accordion-content p:last-child { margin-bottom: 0; }
+        .accordion-content strong { color: var(--text-strong); }
+        .table-wrap { overflow-x: auto; margin: 0.7rem 0; border-radius: 10px; border: 1px solid var(--line); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }
+        .data-table th { background: var(--th-bg); color: var(--th-color); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem; padding: 0.6rem 0.7rem; text-align: left; border-bottom: 1px solid var(--line); }
+        .data-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--td-border); color: var(--text-body); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--tr-hover); }
+        .data-table .highlight { color: var(--accent); font-weight: 600; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 0.7rem; margin-top: 0.7rem; }
+        .tech-card { border: 1px solid var(--line); border-radius: 12px; background: var(--card-inner); padding: 0.85rem; }
+        .tech-card h4 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+        .tech-card h4 i { color: var(--accent2); font-size: 0.78rem; }
+        .tech-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+        .mindmap-wrap { margin: 0.8rem 0; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; background: var(--svg-bg); }
+        .mindmap-wrap svg { display: block; width: 100%; height: auto; min-width: 820px; }
+        .diag-box { fill: var(--diag-fill); stroke: rgba(148,163,184,0.34); stroke-width: 1.4; }
+        .diag-box-emerald { fill: rgba(16,185,129,0.1); stroke: rgba(16,185,129,0.4); stroke-width: 1.4; }
+        .diag-box-amber { fill: rgba(245,158,11,0.1); stroke: rgba(245,158,11,0.4); stroke-width: 1.4; }
+        .diag-box-green { fill: rgba(34,197,94,0.1); stroke: rgba(34,197,94,0.4); stroke-width: 1.4; }
+        .diag-t { fill: var(--text); font-size: 12.5px; font-weight: 700; }
+        .diag-v { fill: var(--muted); font-size: 10.5px; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
+        .diag-line { stroke: rgba(148,163,184,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-emerald { stroke: rgba(16,185,129,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-amber { stroke: rgba(245,158,11,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-green { stroke: rgba(34,197,94,0.5); stroke-width: 1.6; fill: none; }
+        .diag-center { fill: var(--text-strong); font-size: 14px; font-weight: 800; }
+        .callout { padding: 0.75rem 0.9rem; border-radius: 10px; font-size: 0.82rem; line-height: 1.65; margin: 0.6rem 0; }
+        .callout-info { background: var(--callout-info-bg); border: 1px solid var(--callout-info-border); color: var(--callout-info-color); }
+        .callout-warn { background: var(--callout-warn-bg); border: 1px solid var(--callout-warn-border); color: var(--callout-warn-color); }
+        .callout-green { background: var(--callout-green-bg); border: 1px solid var(--callout-green-border); color: var(--callout-green-color); }
+        .callout i { margin-right: 0.4rem; }
+        .kv-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+        .kv-item { padding: 0.55rem 0.7rem; border-radius: 8px; background: var(--kv-bg); border: 1px solid rgba(148,163,184,0.15); }
+        .kv-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+        .kv-value { font-size: 0.88rem; color: var(--text-strong); font-weight: 600; margin-top: 0.15rem; }
+        .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
+        .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
+        .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
+        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
+        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(16,185,129,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s,visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
+        .tooltip-float.visible { opacity: 1; visibility: visible; }
+        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
+        .tooltip-float.above::before { bottom: -6px; left: var(--arrow,50%); margin-left: -5px; }
+        .tooltip-float.below::before { top: -6px; left: var(--arrow,50%); margin-left: -5px; transform: rotate(135deg); }
+        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(16,185,129,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+        .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 0.4rem; margin-top: 0.6rem; }
+        .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
+        .abbr-item:hover { background: var(--card-inner-hover); }
+        .abbr-key { font-weight: 700; color: var(--accent2); min-width: 60px; flex-shrink: 0; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size: 0.75rem; }
+        .abbr-val { color: var(--text-body); }
+        .legal { margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.6; text-align: center; padding: 0.8rem 0; }
+        .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.74); padding: 1rem; backdrop-filter: blur(6px); }
         body.locked .root-gate { display: flex; }
         body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
-        .root-card {
-            max-width: 430px;
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid rgba(245, 158, 11, 0.38);
-            border-radius: 14px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 18px 36px rgba(2, 6, 23, 0.5);
-        }
+        .root-card { max-width: 430px; width: 100%; background: #0f172a; border: 1px solid rgba(245,158,11,0.38); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 18px 36px var(--shadow-deep); }
+        [data-theme="light"] .root-card { background: #fff; border-color: rgba(217,119,6,0.3); }
+        [data-theme="light"] .root-gate { background: rgba(241,245,249,0.8); }
         .root-card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
-        .root-card p { font-size: 0.83rem; color: #cbd5e1; line-height: 1.55; }
+        .root-card p { font-size: 0.83rem; color: var(--text-body); line-height: 1.55; }
         .root-actions { margin-top: 0.7rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .root-actions button, .root-actions a {
-            border-radius: 9px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            border: 1px solid rgba(148,163,184,0.35);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .root-actions button { background: #8b5cf6; color: #fff; border: none; }
-        .root-actions a { color: #e2e8f0; }
-        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-
-        .cookie-banner {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10002;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.85rem;
-            padding: 0.8rem 1rem;
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid rgba(148, 163, 184, 0.28);
-            color: #cbd5e1;
-            font-size: 0.8rem;
-        }
-        .cookie-banner.hidden {
-            transform: translateY(120%);
-            pointer-events: none;
-        }
-        .cookie-banner a { color: #93c5fd; text-decoration: underline; }
+        .root-actions button,.root-actions a { border-radius: 9px; padding: 0.5rem 0.75rem; font-size: 0.78rem; font-weight: 700; border: 1px solid var(--line); text-decoration: none; cursor: pointer; color: var(--text); }
+        .root-actions button { background: #10b981; color: #0f172a; border: none; }
+        .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.8rem 1rem; background: rgba(15,23,42,0.95); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.8rem; }
+        [data-theme="light"] .cookie-banner { background: rgba(255,255,255,0.95); }
+        .cookie-banner.hidden { transform: translateY(120%); pointer-events: none; }
+        .cookie-banner a { color: #3b82f6; text-decoration: underline; }
         .cookie-actions { display: flex; gap: 0.5rem; }
-        .cookie-accept, .cookie-decline {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            border-radius: 7px;
-            padding: 0.4rem 0.72rem;
-            font-size: 0.74rem;
-            cursor: pointer;
-            background: transparent;
-            color: #e2e8f0;
-        }
-        .cookie-accept { background: #2563eb; border-color: #2563eb; }
-        @media (max-width: 760px) {
-            .cookie-banner { flex-direction: column; text-align: center; }
-        }
-
+        .cookie-accept,.cookie-decline { border: 1px solid var(--line); border-radius: 7px; padding: 0.4rem 0.72rem; font-size: 0.74rem; cursor: pointer; background: transparent; color: var(--text); }
+        .cookie-accept { background: #2563eb; border-color: #2563eb; color: #fff; }
+        @media (max-width:800px) { .tech-grid,.kv-grid,.abbr-grid { grid-template-columns: 1fr; } .wrap { padding: 0.8rem 0.6rem 1.5rem; } .section,.hero { padding: 1rem 0.8rem; } }
+        @media (max-width:760px) { .cookie-banner { flex-direction: column; text-align: center; } }
+        .progress-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; height: 3px; background: transparent; pointer-events: none; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent2),var(--accent)); transition: width 0.1s; border-radius: 0 2px 2px 0; }
+        .toolbar { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 0.7rem; flex-wrap: wrap; font-size: 0.75rem; }
+        .toolbar-group { display: flex; align-items: center; gap: 0.3rem; }
+        .toolbar-sep { width: 1px; height: 20px; background: var(--line); margin: 0 0.2rem; flex-shrink: 0; }
+        .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.3rem 0.55rem; border-radius: 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+        .toolbar-btn:hover { color: var(--text); background: var(--card-inner-hover); }
+        .toolbar-btn.active { color: var(--accent2); border-color: var(--nav-active-border); background: var(--nav-active-bg); }
+        .toolbar-btn i { font-size: 0.7rem; }
+        .reading-time { color: var(--muted); font-size: 0.72rem; margin-left: auto; white-space: nowrap; }
+        .reading-time i { margin-right: 0.25rem; color: var(--accent2); }
+        .search-overlay { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(2,6,23,0.7); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding-top: 12vh; }
+        .search-overlay.active { display: flex; }
+        [data-theme="light"] .search-overlay { background: rgba(241,245,249,0.8); }
+        .search-box { width: 90%; max-width: 520px; background: var(--bg-solid); border: 1px solid var(--line); border-radius: 14px; padding: 0.8rem; box-shadow: 0 20px 50px var(--shadow-deep); }
+        .search-input { width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--card-inner); color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; }
+        .search-input:focus { border-color: var(--accent2); }
+        .search-results { max-height: 50vh; overflow-y: auto; margin-top: 0.5rem; }
+        .search-result { padding: 0.5rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.82rem; color: var(--text-body); }
+        .search-result:hover { background: var(--card-inner-hover); }
+        .search-result mark { background: rgba(16,185,129,0.25); color: var(--text); border-radius: 2px; padding: 0 2px; }
+        .search-result .sr-section { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+        .study-check { display: none; float: right; margin-top: 2px; }
+        .study-mode .study-check { display: inline-flex; }
+        .study-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent2); cursor: pointer; }
+        .study-mode .section.studied { opacity: 0.55; }
+        .study-mode .section.studied .section-title::after { content: ' (Completed)'; font-size: 0.7rem; color: var(--callout-green-color); font-weight: 400; }
+        .flashcard-overlay { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(2,6,23,0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; flex-direction: column; gap: 1rem; padding: 1rem; perspective: 1000px; }
+        .flashcard-overlay.active { display: flex; }
+        [data-theme="light"] .flashcard-overlay { background: rgba(241,245,249,0.9); }
+        .flashcard { width: 90%; max-width: 420px; min-height: 200px; background: transparent; border: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0; cursor: pointer; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; position: relative; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .fc-front,.fc-back { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 12px 40px var(--shadow-deep); }
+        .fc-front { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
+        .fc-back { transform: rotateY(180deg); font-size: 0.92rem; color: var(--text-body); line-height: 1.6; }
+        .fc-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .fc-controls button { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.82rem; font-family: inherit; }
+        .fc-controls button:hover { background: var(--card-inner-hover); }
+        .fc-counter { color: var(--muted); font-size: 0.8rem; }
+        .fc-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; z-index: 2; }
+        .fc-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.6rem; font-style: italic; }
+        .fc-mastery { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .fc-mastery button { padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.8rem; font-family: inherit; transition: all 0.2s; }
+        .fc-mastery button:hover { background: var(--card-inner-hover); }
+        .fc-mastery .fc-know { border-color: var(--callout-green-color); color: var(--callout-green-color); }
+        .fc-mastery .fc-know:hover { background: var(--callout-green-color); color: #fff; }
+        .fc-mastery .fc-learning { border-color: var(--accent2); color: var(--accent2); }
+        .fc-mastery .fc-learning:hover { background: var(--accent2); color: #fff; }
+        .fc-mastery .fc-shuffle { border-color: var(--muted); }
+        .fc-progress-bar { width: 90%; max-width: 420px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+        .fc-progress-fill { height: 100%; background: var(--callout-green-color); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .fc-stats { color: var(--muted); font-size: 0.75rem; text-align: center; }
+        .fc-kbd-hint { color: var(--muted); font-size: 0.68rem; text-align: center; opacity: 0.7; }
+        .fc-kbd-hint kbd { display: inline-block; padding: 0.1rem 0.35rem; border-radius: 4px; border: 1px solid var(--line); background: var(--card-inner); font-size: 0.65rem; font-family: inherit; margin: 0 0.1rem; }
+        .inline-calc { padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card-inner); margin: 0.7rem 0; }
+        .inline-calc label { display: block; font-size: 0.76rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+        .inline-calc input,.inline-calc select { width: 100%; padding: 0.45rem 0.6rem; border-radius: 7px; border: 1px solid var(--line); background: var(--kv-bg); color: var(--text); font-size: 0.85rem; font-family: inherit; margin-bottom: 0.5rem; outline: none; }
+        .inline-calc input:focus,.inline-calc select:focus { border-color: var(--accent2); }
+        .calc-result { padding: 0.6rem; border-radius: 8px; background: var(--nav-active-bg); border: 1px solid var(--nav-active-border); text-align: center; }
+        .calc-result .calc-value { font-size: 1.3rem; font-weight: 700; color: var(--accent2); }
+        .calc-result .calc-label { font-size: 0.72rem; color: var(--muted); }
+        .quiz-widget { border: 1px solid var(--accent2); border-radius: 12px; padding: 0.9rem; margin: 0.7rem 0; background: var(--card-inner); }
+        .quiz-question { font-size: 0.88rem; font-weight: 600; color: var(--text-strong); margin-bottom: 0.6rem; }
+        .quiz-options { display: grid; gap: 0.35rem; }
+        .quiz-opt { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; font-size: 0.82rem; color: var(--text-body); transition: all 0.15s; }
+        .quiz-opt:hover { background: var(--card-inner-hover); border-color: var(--accent2); }
+        .quiz-opt.correct { background: var(--callout-green-bg); border-color: var(--callout-green-border); color: var(--callout-green-color); }
+        .quiz-opt.wrong { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+        [data-theme="light"] .quiz-opt.wrong { color: #dc2626; }
+        .quiz-opt .opt-icon { width: 18px; text-align: center; }
+        .quiz-feedback { margin-top: 0.5rem; font-size: 0.8rem; padding: 0.5rem 0.7rem; border-radius: 8px; display: none; }
+        .quiz-feedback.show { display: block; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.6rem; margin: 0.7rem 0; }
+        .comparison-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem; background: var(--card-inner); cursor: pointer; transition: all 0.2s; }
+        .comparison-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+        .comparison-card.expanded { grid-column: 1 / -1; }
+        .comparison-card h5 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.3rem; }
+        .comparison-card h5 i { color: var(--accent2); }
+        .comparison-card .cc-summary { font-size: 0.78rem; color: var(--muted); }
+        .comparison-card .cc-detail { display: none; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-body); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 0.5rem; }
+        .comparison-card.expanded .cc-detail { display: block; }
+        .case-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.6rem; background: var(--card-inner); }
+        .case-card h4 { font-size: 0.88rem; color: var(--text-strong); margin-bottom: 0.3rem; }
+        .case-metrics { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
+        .case-metric { padding: 0.3rem 0.55rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+        .case-before { background: rgba(239,68,68,0.12); color: #fca5a5; }
+        .case-after { background: var(--callout-green-bg); color: var(--callout-green-color); }
+        [data-theme="light"] .case-before { color: #dc2626; }
+        .interview-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 0.6rem; margin-top: 0.6rem; }
+        .interview-card { border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 0.8rem; background: rgba(16,185,129,0.06); }
+        .interview-card h5 { font-size: 0.82rem; color: #34d399; margin-bottom: 0.3rem; }
+        [data-theme="light"] .interview-card h5 { color: #059669; }
+        [data-theme="light"] .interview-card { background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.2); }
+        .interview-card p { font-size: 0.78rem; color: var(--text-body); line-height: 1.55; }
+        .changelog { margin-top: 0.5rem; }
+        .changelog-entry { display: flex; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px solid var(--line); font-size: 0.78rem; }
+        .changelog-entry:last-child { border-bottom: none; }
+        .changelog-date { color: var(--accent2); font-weight: 600; min-width: 85px; flex-shrink: 0; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size: 0.74rem; }
+        .changelog-text { color: var(--text-body); }
+        .deep-link { opacity: 0; margin-left: 0.3rem; color: var(--muted); font-size: 0.8rem; cursor: pointer; transition: opacity 0.15s; background: none; border: none; }
+        .section-title:hover .deep-link { opacity: 1; }
+        .deep-link:hover { color: var(--accent2); }
+        .deep-link-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent2); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; z-index: 9999; display: none; box-shadow: 0 4px 12px var(--shadow); }
+        body.font-sm .accordion-content,body.font-sm .section-intro,body.font-sm .data-table td,body.font-sm .tech-card p { font-size: 0.76rem; }
+        body.font-lg .accordion-content,body.font-lg .section-intro,body.font-lg .data-table td,body.font-lg .tech-card p { font-size: 0.92rem; }
+        .data-table th.sortable { cursor: pointer; user-select: none; }
+        .data-table th.sortable:hover { background: var(--nav-active-bg); }
+        .data-table th .sort-icon { margin-left: 4px; font-size: 0.6rem; opacity: 0.4; }
+        .data-table th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
+        @media (max-width:600px) { .data-table { font-size: 0.72rem; } .data-table th,.data-table td { padding: 0.35rem 0.4rem; } }
+        @media print { .navbar,.toolbar,.section-nav,.root-gate,.cookie-banner,.progress-wrap,.search-overlay,.flashcard-overlay,.deep-link,.study-check,.topbar,.tooltip-float { display: none !important; } body { background: #fff !important; color: #000 !important; } body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; } .section,.hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; } .accordion-body { max-height: none !important; overflow: visible !important; } .accordion-header .chevron { display: none; } .data-table th { background: #e5e7eb !important; color: #111 !important; } .data-table td { color: #333 !important; border-color: #ddd !important; } .callout { border-color: #ccc !important; color: #333 !important; background: #f9fafb !important; } * { color: #000 !important; } }
     </style>
 </head>
 <body class="locked">
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="search-overlay" id="searchOverlay"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off"><div class="search-results" id="searchResults"></div></div></div>
+    <div class="flashcard-overlay" id="flashcardOverlay">
+        <button class="fc-close" id="fcClose" aria-label="Close flashcards">&times;</button>
+        <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+        <div class="fc-stats" id="fcStats">0 mastered of 50</div>
+        <div class="flashcard" id="flashcard"><div class="fc-front" id="fcFront"><span id="fcFrontText"></span><span class="fc-hint">Click or press Space to reveal</span></div><div class="fc-back" id="fcBack"><span id="fcBackText"></span><span class="fc-hint">Definition</span></div></div>
+        <div class="fc-controls"><button id="fcPrev"><i class="fas fa-arrow-left"></i> Prev</button><span class="fc-counter" id="fcCounter">1 / 50</span><button id="fcNext">Next <i class="fas fa-arrow-right"></i></button></div>
+        <div class="fc-mastery"><button class="fc-know" id="fcKnow"><i class="fas fa-check"></i> Know it</button><button class="fc-learning" id="fcLearning"><i class="fas fa-redo"></i> Still learning</button><button class="fc-shuffle" id="fcShuffle"><i class="fas fa-random"></i> Shuffle</button></div>
+        <div class="fc-kbd-hint"><kbd>Space</kbd> flip &nbsp; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp; <kbd>1</kbd> know &nbsp; <kbd>2</kbd> learning &nbsp; <kbd>Esc</kbd> close</div>
+    </div>
+    <div class="deep-link-toast" id="deepLinkToast">Link copied to clipboard</div>
+
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu">
+                    <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="datahallAI.html" style="color:#8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                    <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+                    <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="dcmoc/" style="color:#ef4444;font-weight:600;">DC MOC</a></li>
+                </ul>
+            </li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    </div></nav>
+
     <div class="wrap">
         <div class="topbar">
             <a class="back" href="standards-ltc-lab.html"><i class="fas fa-arrow-left"></i> Back to Lab</a>
             <span class="pill"><i class="fas fa-lock"></i> Root Module</span>
         </div>
-        <section class="panel">
-            <span class="pill">ISO / Energy Management</span>
-            <h1>ISO Energy Governance</h1>
-            <p class="subtitle">KPI governance, measurement integrity, and continuous improvement cadence.</p>
-            <p class="summary">This module structures governance from data capture up to executive review so every efficiency claim can be audited and repeated.</p>
 
-            <div class="grid">
-                <article class="card">
-                    <h3>Coverage</h3>
-                    <ul>
-                        <li>KPI hierarchy from subsystem to board-level reporting.</li>
-                        <li>Metering quality gates: completeness, drift, and traceability.</li>
-                        <li>Target-vs-actual loop with corrective-action tracking.</li>
-                        <li>Audit-friendly evidence pack aligned to ISO improvement cycle.</li>
-                    </ul>
-                </article>
-                <article class="card">
-                    <h3>Focus Blocks</h3>
-                    <ul>
-                        <li>KPI ownership model</li>
-                        <li>Data quality score</li>
-                        <li>Action closure discipline</li>
-                        <li>Audit trace design</li>
-                    </ul>
-                </article>
+        <section class="hero">
+            <span class="pill-emerald" style="padding:0.3rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">ISO Energy &amp; Governance Standards</span>
+            <h1>ISO Energy &amp; Governance — Comprehensive Deep-Dive</h1>
+            <p class="subtitle">From ISO 50001 energy management systems and ISO 30134 data center KPIs to ISO 27001 information security, ISO 22301 business continuity, and ISO 14001 environmental management — a complete technical reference for energy governance, certification, and continuous improvement in mission-critical facilities.</p>
+            <div class="mindmap-wrap" role="img" aria-label="ISO Energy and Governance Standards Mindmap">
+                <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect class="diag-box" x="340" y="220" width="240" height="70" rx="14"/>
+                    <text class="diag-center" x="460" y="250" text-anchor="middle">ISO Energy</text>
+                    <text class="diag-center" x="460" y="270" text-anchor="middle">&amp; Governance</text>
+
+                    <path class="diag-line-emerald" d="M340,240 L210,110"/>
+                    <rect class="diag-box-emerald" x="60" y="30" width="210" height="100" rx="10"/>
+                    <text class="diag-t" x="80" y="55" fill="#6ee7b7">ISO 50001 Energy Mgmt</text>
+                    <text class="diag-v" x="80" y="74">PDCA cycle</text>
+                    <text class="diag-v" x="80" y="90">Energy policy</text>
+                    <text class="diag-v" x="80" y="106">Baseline &amp; targets</text>
+
+                    <path class="diag-line-emerald" d="M580,240 L710,110"/>
+                    <rect class="diag-box-emerald" x="620" y="30" width="210" height="100" rx="10"/>
+                    <text class="diag-t" x="640" y="55" fill="#6ee7b7">ISO 30134 DC KPIs</text>
+                    <text class="diag-v" x="640" y="74">PUE / WUE / CUE</text>
+                    <text class="diag-v" x="640" y="90">ERF / REF</text>
+                    <text class="diag-v" x="640" y="106">Benchmarking</text>
+
+                    <path class="diag-line-emerald" d="M340,265 L160,290"/>
+                    <rect class="diag-box-emerald" x="10" y="260" width="210" height="100" rx="10"/>
+                    <text class="diag-t" x="30" y="285" fill="#6ee7b7">ISO 27001 Security</text>
+                    <text class="diag-v" x="30" y="304">Access control</text>
+                    <text class="diag-v" x="30" y="320">CCTV &amp; monitoring</text>
+                    <text class="diag-v" x="30" y="336">Visitor management</text>
+
+                    <path class="diag-line-amber" d="M580,265 L730,290"/>
+                    <rect class="diag-box-amber" x="690" y="260" width="220" height="110" rx="10"/>
+                    <text class="diag-t" x="710" y="285" fill="#fde68a">ISO 22301 Continuity</text>
+                    <text class="diag-v" x="710" y="304">BIA methodology</text>
+                    <text class="diag-v" x="710" y="320">RTO / RPO targets</text>
+                    <text class="diag-v" x="710" y="336">Crisis management</text>
+                    <text class="diag-v" x="710" y="352">Annual exercises</text>
+
+                    <path class="diag-line-green" d="M400,290 L220,430"/>
+                    <rect class="diag-box-green" x="60" y="400" width="220" height="100" rx="10"/>
+                    <text class="diag-t" x="80" y="425" fill="#86efac">ISO 14001 Environmental</text>
+                    <text class="diag-v" x="80" y="444">Carbon footprint</text>
+                    <text class="diag-v" x="80" y="460">Waste management</text>
+                    <text class="diag-v" x="80" y="476">Sustainability reporting</text>
+
+                    <path class="diag-line-green" d="M520,290 L670,430"/>
+                    <rect class="diag-box-green" x="580" y="400" width="220" height="100" rx="10"/>
+                    <text class="diag-t" x="600" y="425" fill="#86efac">Certification</text>
+                    <text class="diag-v" x="600" y="444">Gap analysis</text>
+                    <text class="diag-v" x="600" y="460">Audit stages 1 &amp; 2</text>
+                    <text class="diag-v" x="600" y="476">Cost &amp; timeline</text>
+                </svg>
             </div>
-
-            <div class="cta">
-                <a class="btn btn-main" href="standards-ltc-lab.html#calculator"><i class="fas fa-chart-line"></i> Open Live Simulation</a>
-                <a class="btn btn-sub" href="datacenter-solutions.html#tools"><i class="fas fa-grid"></i> Back to Tools</a>
-            </div>
-
-            <p class="next">Next step: define monthly governance ritual (owner, metric, threshold, correction timeline).</p>
-            <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review.</p>
+            <p style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem;"><i class="fas fa-info-circle"></i> Emerald = Core ISO Standards &middot; Amber = Business Continuity &middot; Green = Environmental &amp; Certification</p>
         </section>
-    </div>
 
-    <div class="root-gate" id="rootGate">
-        <div class="root-card">
-            <h2>Root Access Required</h2>
-            <p>This deep-dive module is restricted to root accounts.</p>
-            <div class="root-actions">
-                <button id="rootLoginBtn" type="button">Sign In as Root</button>
-                <a href="datacenter-solutions.html">Back</a>
+        <div class="toolbar" id="pageToolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="unitToggle" title="Toggle kW / BTU"><i class="fas fa-fire"></i> kW</button>
             </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="fontDown" title="Decrease font size"><i class="fas fa-minus"></i> A</button>
+                <button class="toolbar-btn" id="fontUp" title="Increase font size"><i class="fas fa-plus"></i> A</button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="searchBtn" title="Search (Ctrl+K)"><i class="fas fa-search"></i> Search</button>
+                <button class="toolbar-btn" id="studyModeBtn" title="Toggle study mode"><i class="fas fa-graduation-cap"></i> Study</button>
+                <button class="toolbar-btn" id="flashcardBtn" title="Flashcard mode"><i class="fas fa-clone"></i> Cards</button>
+                <button class="toolbar-btn" id="printBtn" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <span class="reading-time" id="readingTime"><i class="fas fa-clock"></i> ~35 min read</span>
         </div>
+
+        <nav class="section-nav" id="sectionNav">
+            <a class="nav-pill active" href="#sec-50001">50001</a>
+            <a class="nav-pill" href="#sec-30134">30134</a>
+            <a class="nav-pill" href="#sec-27001">27001</a>
+            <a class="nav-pill" href="#sec-22301">22301</a>
+            <a class="nav-pill" href="#sec-14001">14001</a>
+            <a class="nav-pill" href="#sec-audit">Audit</a>
+            <a class="nav-pill" href="#sec-improve">Improve</a>
+            <a class="nav-pill" href="#sec-cert">Cert</a>
+            <a class="nav-pill" href="#sec-xref">Cross-Ref</a>
+            <a class="nav-pill" href="#sec-cases">Cases</a>
+            <a class="nav-pill" href="#sec-interview">Interview</a>
+            <a class="nav-pill" href="#sec-abbr">Abbrev.</a>
+        </nav>
+
+        <!-- ========== Section 1: ISO 50001 Energy Management ========== -->
+        <section class="section" id="sec-50001" data-nav-id="sec-50001">
+            <h2 class="section-title"><i class="fas fa-bolt"></i> ISO 50001 Energy Management <button class="deep-link" onclick="copyDeepLink('sec-50001')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">ISO 50001 provides a systematic framework for establishing an <span class="term-tooltip" data-tooltip="Energy Management System — a structured approach to managing energy use, consumption, and efficiency within an organization.">Energy Management System (EnMS)</span>. It uses the Plan-Do-Check-Act (PDCA) cycle to drive continuous improvement in energy performance, enabling data centers to reduce costs, lower carbon emissions, and demonstrate compliance with energy governance requirements.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> PDCA Cycle (Plan-Do-Check-Act) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <strong>PDCA cycle</strong> is the backbone of ISO 50001 and all ISO management system standards. It provides a continuous loop of improvement.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Plan</div><div class="kv-value">Set energy policy, objectives, targets, and action plans</div></div>
+                        <div class="kv-item"><div class="kv-label">Do</div><div class="kv-value">Implement the energy action plans and operational controls</div></div>
+                        <div class="kv-item"><div class="kv-label">Check</div><div class="kv-value">Monitor, measure, and analyze energy performance vs. EnPIs</div></div>
+                        <div class="kv-item"><div class="kv-label">Act</div><div class="kv-value">Take corrective actions and feed lessons into the next cycle</div></div>
+                    </div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> ISO 50001:2018 aligns with the Annex SL high-level structure, making integration with ISO 14001, ISO 27001, and ISO 22301 straightforward.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Energy Policy Requirements <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Top management must establish an <strong>energy policy</strong> that is appropriate to the purpose and scale of the organization's energy use. The policy must include commitments to:</p>
+                    <ul>
+                        <li>Continual improvement of energy performance and the EnMS</li>
+                        <li>Availability of information and resources to achieve energy objectives</li>
+                        <li>Compliance with applicable legal and other requirements</li>
+                        <li>Supporting procurement of energy-efficient products and services</li>
+                        <li>Consideration of design activities that improve energy performance</li>
+                    </ul>
+                    <p>The policy must be documented, communicated within the organization, and available to interested parties as appropriate.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Energy Baseline Establishment <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>An <strong>energy baseline (EnB)</strong> is a quantitative reference that provides a basis for comparison of energy performance. It is established using data from a suitable time period (typically 12 months) and must account for:</p>
+                    <ul>
+                        <li><strong>Relevant variables</strong> — factors that significantly affect energy consumption (IT load, outdoor temperature, occupancy)</li>
+                        <li><strong>Static factors</strong> — conditions that affect energy use but are not expected to change routinely (building envelope, installed equipment capacity)</li>
+                        <li><strong>Normalization</strong> — adjusting the baseline for fair comparison when relevant variables change</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> The baseline must be revised when EnPIs no longer reflect the organization's energy use, or when there have been major changes to static factors (e.g., new cooling infrastructure, capacity expansion).</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Energy Targets &amp; EnPIs <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>Energy Performance Indicators (EnPIs)</strong> are quantitative values or measures of energy performance defined by the organization. Typical data center EnPIs include:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>EnPI</th><th>Formula</th><th>Target Range</th><th>Frequency</th></tr></thead><tbody>
+                        <tr><td>PUE</td><td>Total Facility / IT Load</td><td class="highlight">&le; 1.4</td><td>Monthly</td></tr>
+                        <tr><td>kWh per Rack</td><td>Total Energy / Rack Count</td><td>&le; 50,000 kWh/yr</td><td>Quarterly</td></tr>
+                        <tr><td>Cooling Efficiency</td><td>Cooling Energy / IT Load</td><td>&le; 0.30</td><td>Monthly</td></tr>
+                        <tr><td>UPS Efficiency</td><td>IT Output / UPS Input</td><td>&ge; 95%</td><td>Monthly</td></tr>
+                    </tbody></table></div>
+                    <p>Each EnPI must have an associated <strong>energy target</strong> — a measurable result set by the organization consistent with the energy policy.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Monitoring &amp; Measurement (M&amp;V) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>ISO 50001 requires the organization to determine what needs to be monitored and measured, the methods for monitoring, measurement, analysis, and evaluation, and when monitoring and measurement shall be performed.</p>
+                    <ul>
+                        <li><strong>Energy metering</strong> — sub-metering at panel level for IT, cooling, lighting, and auxiliary loads</li>
+                        <li><strong>Data collection</strong> — automated BMS/DCIM integration with minimum 15-minute intervals</li>
+                        <li><strong>Calibration</strong> — all measurement equipment must be calibrated or verified at defined intervals</li>
+                        <li><strong>Analysis</strong> — trend analysis, regression modeling, and comparison against the energy baseline</li>
+                        <li><strong>Records</strong> — retain monitoring data as documented information for audit evidence</li>
+                    </ul>
+                    <div class="callout callout-green"><i class="fas fa-check-circle"></i> Best practice: implement real-time energy dashboards with automated alerts when EnPIs deviate from targets by more than 5%.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">6</span> Management Review <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Top management must review the EnMS at planned intervals (typically quarterly or semi-annually) to ensure its continuing suitability, adequacy, and effectiveness. Review inputs include:</p>
+                    <ul>
+                        <li>Status of actions from previous management reviews</li>
+                        <li>Changes in external and internal issues relevant to the EnMS</li>
+                        <li>Energy performance and improvement in EnPIs</li>
+                        <li>Degree of achievement of energy objectives and targets</li>
+                        <li>Results of audits, evaluations of compliance, and nonconformities</li>
+                        <li>Opportunities for continual improvement</li>
+                    </ul>
+                    <p>Review outputs must include decisions related to improvement opportunities, need for changes to the EnMS, and reallocation of resources.</p>
+
+                    <div class="quiz-widget">
+                        <div class="quiz-question"><i class="fas fa-question-circle" style="color:var(--accent2);margin-right:0.3rem;"></i> Which cycle does ISO 50001 use for continuous improvement?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> DMAIC</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"></span> PDCA (Plan-Do-Check-Act)</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> OODA Loop</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Six Sigma DFSS</div>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 2: ISO 30134 DC KPIs ========== -->
+        <section class="section" id="sec-30134" data-nav-id="sec-30134">
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> ISO 30134 DC KPIs <button class="deep-link" onclick="copyDeepLink('sec-30134')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">ISO/IEC 30134 is a multi-part standard that defines key performance indicators for data centers. These KPIs provide a standardized way to measure, compare, and communicate the resource efficiency of data center operations — from energy and water to carbon emissions and renewable energy use.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> PUE — Power Usage Effectiveness <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>PUE (ISO/IEC 30134-2)</strong> is the most widely adopted data center efficiency metric. It measures the ratio of total facility energy to IT equipment energy.</p>
+                    <p style="font-family:ui-monospace,monospace;font-size:0.9rem;text-align:center;padding:0.5rem;background:var(--kv-bg);border-radius:8px;border:1px solid var(--line);margin:0.5rem 0;"><strong>PUE = Total Facility Energy / IT Equipment Energy</strong></p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>PUE Range</th><th>Rating</th><th>Typical Scenario</th></tr></thead><tbody>
+                        <tr><td class="highlight">1.0 – 1.2</td><td>Excellent</td><td>Best-in-class hyperscale, free cooling dominant</td></tr>
+                        <tr><td>1.2 – 1.5</td><td>Good</td><td>Modern colocation with efficient cooling</td></tr>
+                        <tr><td>1.5 – 2.0</td><td>Average</td><td>Older enterprise data centers, mixed cooling</td></tr>
+                        <tr><td>&gt; 2.0</td><td>Poor</td><td>Legacy facilities, oversized/inefficient HVAC</td></tr>
+                    </tbody></table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> The Uptime Institute global average PUE in 2024 was 1.58. Industry leaders like Google report annualized PUE of 1.10.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> WUE — Water Usage Effectiveness <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>WUE (ISO/IEC 30134-9)</strong> measures the annual water consumption relative to IT equipment energy consumption.</p>
+                    <p style="font-family:ui-monospace,monospace;font-size:0.9rem;text-align:center;padding:0.5rem;background:var(--kv-bg);border-radius:8px;border:1px solid var(--line);margin:0.5rem 0;"><strong>WUE = Annual Water Usage (liters) / IT Equipment Energy (kWh)</strong></p>
+                    <ul>
+                        <li><strong>Excellent:</strong> &le; 0.5 L/kWh (air-cooled or closed-loop systems)</li>
+                        <li><strong>Good:</strong> 0.5 – 1.0 L/kWh (efficient evaporative cooling)</li>
+                        <li><strong>Average:</strong> 1.0 – 1.8 L/kWh (open evaporative towers)</li>
+                        <li><strong>Poor:</strong> &gt; 1.8 L/kWh (water-cooled chillers with once-through systems)</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> CUE — Carbon Usage Effectiveness <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>CUE (ISO/IEC 30134-8)</strong> quantifies the total greenhouse gas emissions attributable to the data center relative to its IT energy consumption.</p>
+                    <p style="font-family:ui-monospace,monospace;font-size:0.9rem;text-align:center;padding:0.5rem;background:var(--kv-bg);border-radius:8px;border:1px solid var(--line);margin:0.5rem 0;"><strong>CUE = Total CO<sub>2</sub> Emissions (kgCO<sub>2</sub>e) / IT Equipment Energy (kWh)</strong></p>
+                    <ul>
+                        <li>A CUE of 0 indicates 100% carbon-free energy</li>
+                        <li>Grid emission factors vary: Nordic countries ~0.02 kgCO<sub>2</sub>/kWh vs. coal-heavy grids ~0.9 kgCO<sub>2</sub>/kWh</li>
+                        <li>Scope 2 (market-based) accounting allows RECs and PPAs to reduce CUE</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> ERF &amp; REF — Energy &amp; Renewable Factors <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>ERF (Energy Reuse Factor)</strong> measures the proportion of data center energy that is reused outside the facility boundary (e.g., district heating). <strong>REF (Renewable Energy Factor)</strong> measures the proportion of energy sourced from renewables.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">ERF Formula</div><div class="kv-value">Energy Reused / Total DC Energy</div></div>
+                        <div class="kv-item"><div class="kv-label">ERF Target</div><div class="kv-value">&ge; 0.10 (10% reuse)</div></div>
+                        <div class="kv-item"><div class="kv-label">REF Formula</div><div class="kv-value">Renewable Energy / Total DC Energy</div></div>
+                        <div class="kv-item"><div class="kv-label">REF Target</div><div class="kv-value">&ge; 0.75 (75% renewable)</div></div>
+                    </div>
+                    <div class="callout callout-green"><i class="fas fa-leaf"></i> Nordic data centers achieve ERF &gt; 0.30 by supplying waste heat to district heating networks, effectively turning the DC into a local heat utility.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> DCiE — Data Center Infrastructure Efficiency <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>DCiE</strong> is the reciprocal of PUE, expressed as a percentage. While PUE is more commonly used, DCiE can be more intuitive for some stakeholders.</p>
+                    <p style="font-family:ui-monospace,monospace;font-size:0.9rem;text-align:center;padding:0.5rem;background:var(--kv-bg);border-radius:8px;border:1px solid var(--line);margin:0.5rem 0;"><strong>DCiE = (IT Equipment Energy / Total Facility Energy) &times; 100%</strong></p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>PUE</th><th>DCiE</th><th>Rating</th></tr></thead><tbody>
+                        <tr><td>1.2</td><td class="highlight">83.3%</td><td>Excellent</td></tr>
+                        <tr><td>1.5</td><td>66.7%</td><td>Good</td></tr>
+                        <tr><td>2.0</td><td>50.0%</td><td>Poor</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">6</span> KPI Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Calculate your data center KPIs by entering the values below.</p>
+                    <div class="inline-calc">
+                        <label for="kpiIT">IT Equipment Load (kW)</label>
+                        <input type="number" id="kpiIT" value="1000" min="1" step="1">
+                        <label for="kpiFacility">Total Facility Load (kW)</label>
+                        <input type="number" id="kpiFacility" value="1500" min="1" step="1">
+                        <label for="kpiWater">Annual Water Usage (liters)</label>
+                        <input type="number" id="kpiWater" value="500000" min="0" step="1000">
+                        <label for="kpiCarbon">Annual CO<sub>2</sub> Emissions (kgCO<sub>2</sub>e)</label>
+                        <input type="number" id="kpiCarbon" value="3000000" min="0" step="1000">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+                            <div class="calc-result"><div class="calc-value" id="kpiPueResult">1.50</div><div class="calc-label">PUE</div></div>
+                            <div class="calc-result"><div class="calc-value" id="kpiDcieResult">66.7%</div><div class="calc-label">DCiE</div></div>
+                            <div class="calc-result"><div class="calc-value" id="kpiWueResult">0.057</div><div class="calc-label">WUE (L/kWh)</div></div>
+                            <div class="calc-result"><div class="calc-value" id="kpiCueResult">0.342</div><div class="calc-label">CUE (kgCO<sub>2</sub>/kWh)</div></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 3: ISO 27001 Physical Security ========== -->
+        <section class="section" id="sec-27001" data-nav-id="sec-27001">
+            <h2 class="section-title"><i class="fas fa-lock"></i> ISO 27001 Physical Security <button class="deep-link" onclick="copyDeepLink('sec-27001')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">ISO/IEC 27001 establishes the requirements for an <span class="term-tooltip" data-tooltip="Information Security Management System — a framework for managing sensitive company information and ensuring its confidentiality, integrity, and availability.">Information Security Management System (ISMS)</span>. Annex A.11 (Physical and Environmental Security) is particularly critical for data centers, addressing physical access control, equipment protection, and environmental threat mitigation.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Access Control Zones (Annex A.11) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Data centers should implement a <strong>layered security model</strong> with progressively restricted access zones:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Zone</th><th>Area</th><th>Access Method</th><th>Personnel</th></tr></thead><tbody>
+                        <tr><td>Zone 1</td><td>Perimeter / Parking</td><td>Fence, gate, guards</td><td>All authorized visitors</td></tr>
+                        <tr><td>Zone 2</td><td>Building Lobby</td><td>Badge + reception desk</td><td>Registered visitors</td></tr>
+                        <tr><td>Zone 3</td><td>Operations Center</td><td>Badge + PIN</td><td>Facility staff</td></tr>
+                        <tr><td>Zone 4</td><td>Data Hall</td><td>Biometric + badge</td><td>Approved technicians</td></tr>
+                        <tr><td>Zone 5</td><td>Cage / Cabinet</td><td>Key + badge + biometric</td><td>Named individuals only</td></tr>
+                    </tbody></table></div>
+                    <div class="callout callout-info"><i class="fas fa-shield-alt"></i> Each zone transition must be logged with timestamp, personnel ID, and access method for audit trail purposes.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> CCTV &amp; Monitoring <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>CCTV surveillance is a key control in ISO 27001 physical security. Requirements include:</p>
+                    <ul>
+                        <li><strong>Coverage</strong> — all entry/exit points, corridors, data halls, and loading docks</li>
+                        <li><strong>Retention</strong> — minimum 90 days of recorded footage (industry standard)</li>
+                        <li><strong>Resolution</strong> — minimum 1080p for identification purposes at access points</li>
+                        <li><strong>Monitoring</strong> — 24/7 live monitoring by security operations center (SOC)</li>
+                        <li><strong>Tamper detection</strong> — alerts for camera offline, obstruction, or repositioning</li>
+                        <li><strong>Integration</strong> — CCTV feeds linked to access control events for correlation analysis</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Environmental Monitoring <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>ISO 27001 Annex A.11.1.4 requires protection against natural disasters and environmental threats. Data center environmental monitoring should include:</p>
+                    <ul>
+                        <li><strong>Temperature &amp; humidity</strong> — sensors per rack row (ASHRAE A1 envelope: 18-27&deg;C, 20-80% RH)</li>
+                        <li><strong>Water leak detection</strong> — cable-based sensors under raised floors and around CRAC/CRAH units</li>
+                        <li><strong>Smoke detection</strong> — VESDA aspirating systems with early warning capability</li>
+                        <li><strong>Seismic monitoring</strong> — accelerometers in high-risk regions for immediate shutdown triggers</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> All environmental monitoring systems must have redundant communication paths and battery backup to ensure alerting during power failures.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Visitor Management <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Visitor management is an essential control for maintaining the security perimeter:</p>
+                    <ul>
+                        <li><strong>Pre-registration</strong> — visitors must be pre-approved by an authorized sponsor</li>
+                        <li><strong>Identity verification</strong> — government-issued photo ID required at check-in</li>
+                        <li><strong>Temporary badges</strong> — time-limited, zone-restricted visitor badges with distinct visual marking</li>
+                        <li><strong>Escort policy</strong> — all visitors must be escorted beyond Zone 2 at all times</li>
+                        <li><strong>NDA requirement</strong> — visitors accessing Zone 3+ must sign a non-disclosure agreement</li>
+                        <li><strong>Check-out</strong> — badge return verified, visit record closed with departure timestamp</li>
+                    </ul>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 4: ISO 22301 Business Continuity ========== -->
+        <section class="section" id="sec-22301" data-nav-id="sec-22301">
+            <h2 class="section-title"><i class="fas fa-life-ring"></i> ISO 22301 Business Continuity <button class="deep-link" onclick="copyDeepLink('sec-22301')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">ISO 22301 specifies requirements for a <span class="term-tooltip" data-tooltip="Business Continuity Management System — a management framework that identifies potential threats and their impacts, and provides a process for building organizational resilience.">Business Continuity Management System (BCMS)</span>. For data centers, this means ensuring that critical IT services can be maintained or rapidly restored following a disruptive incident — whether power failure, natural disaster, cyberattack, or supply chain disruption.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Business Impact Analysis (BIA) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>A <strong>Business Impact Analysis</strong> identifies critical business functions, assesses the impact of disruption over time, and establishes recovery priorities. Key BIA outputs include:</p>
+                    <ul>
+                        <li><strong>Critical function inventory</strong> — ranked list of services by business impact severity</li>
+                        <li><strong>Maximum Tolerable Period of Disruption (MTPD)</strong> — the longest time a function can be unavailable before causing unacceptable damage</li>
+                        <li><strong>Dependencies mapping</strong> — upstream (power, cooling, connectivity) and downstream (applications, users) dependencies</li>
+                        <li><strong>Resource requirements</strong> — people, technology, facilities, and information needed for recovery</li>
+                    </ul>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> BIA should be reviewed annually or whenever there is a significant change to the service portfolio, customer base, or infrastructure.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> RTO &amp; RPO Definitions <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>Recovery Time Objective (RTO)</strong> is the target duration for restoring a service after disruption. <strong>Recovery Point Objective (RPO)</strong> is the maximum acceptable amount of data loss measured in time.</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Tier</th><th>Service Type</th><th>RTO</th><th>RPO</th><th>Example</th></tr></thead><tbody>
+                        <tr><td>Tier 1</td><td>Mission-critical</td><td class="highlight">&lt; 15 min</td><td>0 (sync replication)</td><td>Financial trading, healthcare</td></tr>
+                        <tr><td>Tier 2</td><td>Business-critical</td><td>1 – 4 hr</td><td>&lt; 1 hr</td><td>ERP, CRM, email</td></tr>
+                        <tr><td>Tier 3</td><td>Important</td><td>4 – 24 hr</td><td>&lt; 4 hr</td><td>File shares, development</td></tr>
+                        <tr><td>Tier 4</td><td>Non-critical</td><td>24 – 72 hr</td><td>&lt; 24 hr</td><td>Archive, test environments</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Testing &amp; Exercises <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>ISO 22301 requires regular testing of business continuity plans to ensure they remain effective. Testing types include:</p>
+                    <div class="tech-grid">
+                        <div class="tech-card"><h4><i class="fas fa-clipboard-list"></i> Desktop Exercise</h4><p>Walk-through of scenarios with key personnel. Low risk, identifies gaps in procedures. Frequency: semi-annual.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-cogs"></i> Simulation</h4><p>Simulated incident with realistic conditions but no actual service impact. Tests communication and decision-making. Frequency: annual.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-bolt"></i> Full Failover</h4><p>Actual switchover to DR site or backup systems. Highest confidence but highest risk. Tests real RTO/RPO. Frequency: annual.</p></div>
+                    </div>
+                    <p>All exercises must be documented with lessons learned and corrective actions tracked to closure.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Crisis Management <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The crisis management framework defines how the organization responds to and manages an incident from detection through resolution:</p>
+                    <ul>
+                        <li><strong>Incident detection &amp; escalation</strong> — automated monitoring triggers + manual escalation matrix</li>
+                        <li><strong>Crisis team activation</strong> — predefined roles (Incident Commander, Technical Lead, Communications Lead)</li>
+                        <li><strong>Communication plan</strong> — internal (staff, management) and external (customers, regulators, media) communication templates</li>
+                        <li><strong>Decision authority</strong> — clear delegation of authority for key decisions (service failover, facility evacuation, vendor activation)</li>
+                        <li><strong>Stand-down criteria</strong> — defined conditions for declaring the crisis resolved and returning to normal operations</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> ISO 22301 vs ISO 27001 Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Aspect</th><th>ISO 22301 (BCMS)</th><th>ISO 27001 (ISMS)</th></tr></thead><tbody>
+                        <tr><td>Primary Focus</td><td>Business resilience &amp; recovery</td><td>Information confidentiality, integrity, availability</td></tr>
+                        <tr><td>Key Process</td><td>BIA + recovery planning</td><td>Risk assessment + controls</td></tr>
+                        <tr><td>Scope</td><td>All business disruptions</td><td>Information security threats</td></tr>
+                        <tr><td>Key Deliverable</td><td>Business continuity plans</td><td>Statement of Applicability (SoA)</td></tr>
+                        <tr><td>Testing</td><td>Exercises &amp; failover tests</td><td>Penetration testing &amp; audits</td></tr>
+                    </tbody></table></div>
+
+                    <div class="quiz-widget">
+                        <div class="quiz-question"><i class="fas fa-question-circle" style="color:var(--accent2);margin-right:0.3rem;"></i> What does RPO measure?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Time to restore a service after disruption</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"></span> Maximum acceptable data loss measured in time</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Number of recovery points stored in backup</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Cost of recovery per outage hour</div>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 5: ISO 14001 Environmental ========== -->
+        <section class="section" id="sec-14001" data-nav-id="sec-14001">
+            <h2 class="section-title"><i class="fas fa-leaf"></i> ISO 14001 Environmental <button class="deep-link" onclick="copyDeepLink('sec-14001')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">ISO 14001 provides a framework for an <span class="term-tooltip" data-tooltip="Environmental Management System — a structured approach to managing an organization's environmental responsibilities in a systematic manner.">Environmental Management System (EMS)</span> that helps organizations reduce their environmental footprint, comply with regulations, and demonstrate environmental stewardship. For data centers, this encompasses carbon emissions, water usage, waste management, and supply chain sustainability.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Carbon Footprint (Scope 1/2/3) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <strong>GHG Protocol</strong> classifies emissions into three scopes:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Scope</th><th>Description</th><th>DC Examples</th><th>Typical Share</th></tr></thead><tbody>
+                        <tr><td class="highlight">Scope 1</td><td>Direct emissions from owned sources</td><td>Diesel generators, refrigerant leaks</td><td>5 – 15%</td></tr>
+                        <tr><td class="highlight">Scope 2</td><td>Indirect emissions from purchased energy</td><td>Grid electricity, purchased cooling</td><td>60 – 80%</td></tr>
+                        <tr><td>Scope 3</td><td>Other indirect emissions in the value chain</td><td>Embodied carbon in servers, employee commuting</td><td>15 – 30%</td></tr>
+                    </tbody></table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> Scope 2 emissions can be reported using location-based (grid average) or market-based (contractual instruments like RECs/PPAs) accounting methods.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Waste Management <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Data centers generate significant waste streams that must be managed under ISO 14001:</p>
+                    <ul>
+                        <li><strong>Electronic waste (e-waste)</strong> — decommissioned servers, UPS batteries, HDDs/SSDs. Requires certified ITAD (IT Asset Disposition) vendors with chain-of-custody documentation</li>
+                        <li><strong>Packaging waste</strong> — cardboard, plastic, foam from new equipment delivery. Target: 95%+ recycling rate</li>
+                        <li><strong>Hazardous waste</strong> — lead-acid batteries, diesel fuel, refrigerants. Must comply with local hazardous waste regulations</li>
+                        <li><strong>Construction waste</strong> — from fit-out and renovation projects. Diversion targets: 90%+ from landfill</li>
+                    </ul>
+                    <div class="callout callout-green"><i class="fas fa-recycle"></i> Best practice: establish a zero-waste-to-landfill program with quarterly waste audits and supplier scorecards.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Supply Chain Sustainability <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>ISO 14001 requires organizations to consider lifecycle perspective and influence the environmental performance of their supply chain:</p>
+                    <ul>
+                        <li><strong>Procurement criteria</strong> — EPEAT-certified servers, Energy Star UPS, low-GWP refrigerants</li>
+                        <li><strong>Supplier assessments</strong> — environmental questionnaires, on-site audits, ISO 14001 certification preference</li>
+                        <li><strong>Conflict minerals</strong> — due diligence for tantalum, tin, tungsten, and gold (3TG) in electronics supply chain</li>
+                        <li><strong>Circular economy</strong> — refurbishment programs, component harvesting, and responsible recycling partnerships</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Reporting Frameworks (GRI/CDP/TCFD) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>ISO 14001 data feeds into multiple sustainability reporting frameworks:</p>
+                    <div class="tech-grid">
+                        <div class="tech-card"><h4><i class="fas fa-globe"></i> GRI Standards</h4><p>Global Reporting Initiative. Comprehensive sustainability reporting covering energy (GRI 302), water (GRI 303), emissions (GRI 305), and waste (GRI 306).</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-cloud"></i> CDP (Carbon Disclosure Project)</h4><p>Annual questionnaire scoring organizations A–D on climate change, water security, and forests. Data center operators typically report under Climate Change.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-chart-line"></i> TCFD Recommendations</h4><p>Task Force on Climate-related Financial Disclosures. Focuses on governance, strategy, risk management, and metrics/targets for climate-related financial risk.</p></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 6: Energy Audit Framework ========== -->
+        <section class="section" id="sec-audit" data-nav-id="sec-audit">
+            <h2 class="section-title"><i class="fas fa-search-dollar"></i> Energy Audit Framework <button class="deep-link" onclick="copyDeepLink('sec-audit')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">A structured energy audit framework provides the foundation for identifying and quantifying energy conservation measures (ECMs). Whether conducted as part of ISO 50001 implementation, EN 16247 compliance, or standalone efficiency programs, the audit process follows a systematic approach from baseline measurement through savings verification.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Baseline Measurement <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The baseline establishes current energy performance as a reference point for measuring improvement:</p>
+                    <ul>
+                        <li><strong>Utility data collection</strong> — 12-24 months of electricity, gas, and water bills with demand profiles</li>
+                        <li><strong>Sub-metering survey</strong> — identify gaps in metering coverage; target 100% of loads &gt; 10 kW</li>
+                        <li><strong>Load profiling</strong> — 15-minute interval data for IT, cooling, lighting, and miscellaneous loads</li>
+                        <li><strong>Occupancy &amp; weather correlation</strong> — regression analysis to normalize consumption against relevant variables</li>
+                        <li><strong>Equipment inventory</strong> — nameplate ratings, operating hours, and efficiency curves for major equipment</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> M&amp;V Plans (IPMVP) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <strong>International Performance Measurement and Verification Protocol (IPMVP)</strong> provides four options for quantifying savings:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Option</th><th>Method</th><th>Use Case</th><th>Accuracy</th></tr></thead><tbody>
+                        <tr><td>Option A</td><td>Retrofit Isolation — Key Parameter</td><td>Single measure, partial measurement</td><td>Medium</td></tr>
+                        <tr><td>Option B</td><td>Retrofit Isolation — All Parameters</td><td>Single measure, full measurement</td><td class="highlight">High</td></tr>
+                        <tr><td>Option C</td><td>Whole Facility</td><td>Multiple measures, utility billing</td><td>Medium</td></tr>
+                        <tr><td>Option D</td><td>Calibrated Simulation</td><td>Complex facilities, new construction</td><td>Variable</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> ECM Identification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>Energy Conservation Measures (ECMs)</strong> are specific actions that reduce energy consumption. Common data center ECMs ranked by typical ROI:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>ECM</th><th>Savings</th><th>CAPEX</th><th>Payback</th></tr></thead><tbody>
+                        <tr><td>Raise supply temperature to 25&deg;C</td><td class="highlight">5 – 15%</td><td>Minimal</td><td>&lt; 1 month</td></tr>
+                        <tr><td>Hot/cold aisle containment</td><td>10 – 25%</td><td>$200–500/rack</td><td>6 – 18 months</td></tr>
+                        <tr><td>VSD on cooling pumps &amp; fans</td><td>15 – 30%</td><td>$5K–15K/unit</td><td>12 – 24 months</td></tr>
+                        <tr><td>Free cooling (economizer)</td><td>20 – 40%</td><td>$100K–500K</td><td>18 – 36 months</td></tr>
+                        <tr><td>High-efficiency UPS upgrade</td><td>2 – 5%</td><td>$50K–200K/unit</td><td>24 – 48 months</td></tr>
+                        <tr><td>LED lighting + occupancy sensors</td><td>1 – 3%</td><td>$10K–50K</td><td>12 – 24 months</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Savings Verification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Post-implementation verification confirms that ECMs are delivering the projected savings:</p>
+                    <ul>
+                        <li><strong>Baseline comparison</strong> — normalize post-retrofit consumption against the original baseline using agreed M&amp;V methodology</li>
+                        <li><strong>Measurement period</strong> — minimum 12 months post-implementation to capture seasonal variations</li>
+                        <li><strong>Avoided energy</strong> — calculated as baseline consumption minus post-retrofit consumption, adjusted for changes in relevant variables</li>
+                        <li><strong>Persistence monitoring</strong> — ongoing measurement (years 2-5) to verify savings are maintained and not degrading</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Audit Checklist <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Pre-audit preparation checklist for a comprehensive data center energy audit:</p>
+                    <ul>
+                        <li>Collect 24 months of utility bills (electricity, gas, water)</li>
+                        <li>Obtain single-line electrical diagrams and mechanical schematics</li>
+                        <li>Compile equipment nameplate data and maintenance records</li>
+                        <li>Review BMS/DCIM trending data for the past 12 months</li>
+                        <li>Verify sub-meter accuracy and calibration records</li>
+                        <li>Document current operating procedures and setpoints</li>
+                        <li>Identify all major loads and their operating schedules</li>
+                        <li>Review previous audit reports and ECM implementation status</li>
+                        <li>Confirm access arrangements for all mechanical and electrical spaces</li>
+                        <li>Prepare thermal imaging and power quality measurement equipment</li>
+                    </ul>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 7: Continuous Improvement ========== -->
+        <section class="section" id="sec-improve" data-nav-id="sec-improve">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Continuous Improvement <button class="deep-link" onclick="copyDeepLink('sec-improve')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Continuous improvement is the engine that drives sustained energy performance gains. By establishing KPI trending, formal review cadences, and a structured maturity model, organizations can move from reactive operations to proactive optimization and eventually to predictive, self-optimizing data center environments.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> KPI Trending &amp; Dashboards <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Effective KPI trending requires both real-time visibility and historical analysis:</p>
+                    <ul>
+                        <li><strong>Real-time dashboards</strong> — PUE, cooling load, IT load, and temperature displayed on NOC monitors with 15-second refresh</li>
+                        <li><strong>Trend charts</strong> — daily, weekly, monthly PUE trends with rolling averages and standard deviation bands</li>
+                        <li><strong>Anomaly detection</strong> — automated alerts when KPIs deviate more than 2 standard deviations from the rolling mean</li>
+                        <li><strong>Benchmarking</strong> — compare KPIs against industry benchmarks (Uptime Institute, Green Grid) and peer facilities</li>
+                        <li><strong>Reporting cadence</strong> — weekly operational reports, monthly management summaries, quarterly board updates</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Management Review Process <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Formal management reviews ensure that energy performance remains a strategic priority:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Review Type</th><th>Frequency</th><th>Attendees</th><th>Key Outputs</th></tr></thead><tbody>
+                        <tr><td>Operational Review</td><td>Weekly</td><td>Facility Manager, Engineers</td><td>Action items, immediate corrections</td></tr>
+                        <tr><td>Performance Review</td><td>Monthly</td><td>+Site Director, Energy Manager</td><td>KPI trends, ECM pipeline review</td></tr>
+                        <tr><td>Management Review</td><td>Quarterly</td><td>+VP Operations, Finance</td><td>Budget allocation, strategic decisions</td></tr>
+                        <tr><td>Board Review</td><td>Annual</td><td>+C-suite, Board</td><td>ESG targets, capital planning</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Corrective &amp; Preventive Actions <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>When energy performance deviates from targets, a structured CAPA (Corrective and Preventive Action) process must be followed:</p>
+                    <ul>
+                        <li><strong>Nonconformity identification</strong> — EnPI exceeds threshold, audit finding, or customer complaint</li>
+                        <li><strong>Root cause analysis</strong> — 5-Why, Ishikawa diagram, or fault tree analysis to determine underlying cause</li>
+                        <li><strong>Corrective action</strong> — address the root cause to eliminate the nonconformity</li>
+                        <li><strong>Preventive action</strong> — implement controls to prevent recurrence across similar systems</li>
+                        <li><strong>Effectiveness review</strong> — verify the corrective action resolved the issue within 30-90 days</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> All CAPAs must be tracked in a centralized register with owner, due date, status, and evidence of closure. Overdue CAPAs should be escalated in management reviews.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Maturity Model (Level 1-5) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The energy management maturity model provides a roadmap for organizational growth:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Level</th><th>Name</th><th>Description</th><th>Typical PUE</th></tr></thead><tbody>
+                        <tr><td>1</td><td>Initial</td><td>No formal energy management. Reactive only. No metering beyond utility bills.</td><td>&gt; 2.0</td></tr>
+                        <tr><td>2</td><td>Managed</td><td>Basic metering installed. PUE tracked monthly. Some ECMs implemented.</td><td>1.6 – 2.0</td></tr>
+                        <tr><td>3</td><td>Defined</td><td>Formal EnMS (ISO 50001). Sub-metering complete. M&amp;V plans in place.</td><td>1.4 – 1.6</td></tr>
+                        <tr><td>4</td><td>Optimized</td><td>Real-time optimization. Predictive analytics. Continuous commissioning.</td><td class="highlight">1.2 – 1.4</td></tr>
+                        <tr><td>5</td><td>Innovative</td><td>AI-driven operations. Waste heat reuse. Carbon-negative targets.</td><td class="highlight">&lt; 1.2</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 8: Certification Roadmap ========== -->
+        <section class="section" id="sec-cert" data-nav-id="sec-cert">
+            <h2 class="section-title"><i class="fas fa-road"></i> Certification Roadmap <button class="deep-link" onclick="copyDeepLink('sec-cert')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Achieving ISO certification demonstrates to customers, regulators, and stakeholders that your data center operates to internationally recognized standards. The certification journey typically takes 6-18 months depending on the standard, organizational readiness, and scope complexity.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Gap Analysis <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>A <strong>gap analysis</strong> compares the organization's current state against the requirements of the target ISO standard:</p>
+                    <ul>
+                        <li><strong>Document review</strong> — assess existing policies, procedures, and records against standard requirements</li>
+                        <li><strong>Process mapping</strong> — identify which clauses are fully addressed, partially addressed, or not addressed</li>
+                        <li><strong>Risk assessment</strong> — evaluate the effort and timeline needed to close each gap</li>
+                        <li><strong>Priority matrix</strong> — rank gaps by severity (mandatory clauses first, then Annex controls)</li>
+                        <li><strong>Action plan</strong> — assign owners, timelines, and resources for each gap closure activity</li>
+                    </ul>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> Many organizations engage an external consultant for the gap analysis to get an objective, experienced perspective.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Stage 1 Audit (Documentation Review) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <strong>Stage 1 audit</strong> is a readiness review conducted by the certification body:</p>
+                    <ul>
+                        <li>Review of management system documentation (policies, manuals, procedures)</li>
+                        <li>Evaluation of the organization's understanding of standard requirements</li>
+                        <li>Confirmation that the scope is clearly defined and appropriate</li>
+                        <li>Assessment of internal audit and management review processes</li>
+                        <li>Identification of any significant concerns that could prevent Stage 2 success</li>
+                    </ul>
+                    <p>Stage 1 typically takes 1-2 days on-site and occurs 4-8 weeks before Stage 2.</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Stage 2 Audit (Certification Assessment) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <strong>Stage 2 audit</strong> is the full certification assessment:</p>
+                    <ul>
+                        <li>Detailed evaluation of management system implementation and effectiveness</li>
+                        <li>Interviews with staff at all levels to verify awareness and competence</li>
+                        <li>Observation of processes and activities in the data center</li>
+                        <li>Review of records and documented information for evidence of conformity</li>
+                        <li>Assessment of monitoring, measurement, and reporting effectiveness</li>
+                    </ul>
+                    <p>Findings are classified as: <strong>Major nonconformity</strong> (prevents certification), <strong>Minor nonconformity</strong> (must be resolved within 90 days), or <strong>Observation</strong> (improvement opportunity).</p>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Surveillance &amp; Recertification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>After initial certification, ongoing compliance is maintained through regular audits:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Audit Type</th><th>Timing</th><th>Scope</th><th>Duration</th></tr></thead><tbody>
+                        <tr><td>Surveillance 1</td><td>Year 1 (12 months)</td><td>Partial — key clauses &amp; selected processes</td><td>1-2 days</td></tr>
+                        <tr><td>Surveillance 2</td><td>Year 2 (24 months)</td><td>Partial — remaining clauses &amp; processes</td><td>1-2 days</td></tr>
+                        <tr><td class="highlight">Recertification</td><td>Year 3 (36 months)</td><td>Full — all requirements reviewed</td><td>2-4 days</td></tr>
+                    </tbody></table></div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Certification is valid for 3 years. Missing a surveillance audit can result in suspension or withdrawal of certification.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Certification Cost Estimator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Estimate the cost and timeline for ISO certification based on your organization scope.</p>
+                    <div class="inline-calc">
+                        <label for="certScope">Organization Scope (Number of Employees)</label>
+                        <select id="certScope">
+                            <option value="small">Small (1-50 employees)</option>
+                            <option value="medium" selected>Medium (51-250 employees)</option>
+                            <option value="large">Large (251-1000 employees)</option>
+                            <option value="enterprise">Enterprise (1000+ employees)</option>
+                        </select>
+                        <div class="calc-result" id="certResult">
+                            <div class="calc-value" id="certCostValue">$25,000 – $45,000</div>
+                            <div class="calc-label" id="certTimeValue">Timeline: 9 – 12 months</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.76rem;color:var(--muted);margin-top:0.4rem;">Estimates include gap analysis, consultant fees, certification body fees, and internal resource costs. Actual costs vary by standard, accreditation body, and geographic region.</p>
+
+                    <div class="quiz-widget">
+                        <div class="quiz-question"><i class="fas fa-question-circle" style="color:var(--accent2);margin-right:0.3rem;"></i> How often must ISO certification be fully renewed (recertification)?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Every year</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Every 2 years</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"></span> Every 3 years</div>
+                            <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="false"><span class="opt-icon"></span> Every 5 years</div>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 9: Cross-Reference ========== -->
+        <section class="section" id="sec-xref" data-nav-id="sec-xref">
+            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Cross-Reference <button class="deep-link" onclick="copyDeepLink('sec-xref')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">ISO standards do not exist in isolation. Understanding how they map to and complement other frameworks helps organizations build integrated management systems and avoid duplicated effort.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> ASHRAE 90.4 Energy Standard <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>ASHRAE Standard 90.4</strong> provides minimum energy efficiency requirements specifically for data centers. Cross-reference with ISO standards:</p>
+                    <ul>
+                        <li><strong>MLC (Mechanical Load Component)</strong> maps to ISO 30134 cooling KPIs — both track cooling efficiency relative to IT load</li>
+                        <li><strong>ELC (Electrical Loss Component)</strong> maps to ISO 50001 energy monitoring — UPS, PDU, and transformer losses</li>
+                        <li>ASHRAE 90.4 compliance supports ISO 50001 Clause 8.1 (Operational Planning and Control) by providing specific energy budgets</li>
+                        <li>The PUE reporting methodology in ASHRAE 90.4 is consistent with ISO/IEC 30134-2</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> EN 50600-4 Series (DC KPIs) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>EN 50600-4</strong> is the European equivalent to ISO 30134, defining data center KPIs:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>EN 50600 Part</th><th>KPI</th><th>ISO 30134 Equivalent</th></tr></thead><tbody>
+                        <tr><td>EN 50600-4-2</td><td>PUE</td><td>ISO/IEC 30134-2</td></tr>
+                        <tr><td>EN 50600-4-3</td><td>REF (Renewable Energy Factor)</td><td>ISO/IEC 30134-3</td></tr>
+                        <tr><td>EN 50600-4-4</td><td>ERF (Energy Reuse Factor)</td><td>—</td></tr>
+                        <tr><td>EN 50600-4-5</td><td>CUE (Carbon Usage Effectiveness)</td><td>ISO/IEC 30134-8</td></tr>
+                        <tr><td>EN 50600-4-6</td><td>WUE (Water Usage Effectiveness)</td><td>ISO/IEC 30134-9</td></tr>
+                    </tbody></table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> EN 50600 is increasingly referenced in EU regulations including the Energy Efficiency Directive (EED) recast requiring DC operators above 500 kW to report KPIs.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> GRI / CDP / TCFD Frameworks <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>ISO standards provide the management system backbone for ESG reporting frameworks:</p>
+                    <div class="table-wrap"><table class="data-table"><thead><tr><th>Framework</th><th>ISO Data Sources</th><th>Key Disclosures</th></tr></thead><tbody>
+                        <tr><td>GRI 302 (Energy)</td><td>ISO 50001 EnPIs</td><td>Energy consumption, intensity, reduction</td></tr>
+                        <tr><td>GRI 303 (Water)</td><td>ISO 30134-9 WUE</td><td>Water withdrawal, consumption, recycling</td></tr>
+                        <tr><td>GRI 305 (Emissions)</td><td>ISO 14001 + 30134-8 CUE</td><td>Scope 1/2/3 GHG emissions</td></tr>
+                        <tr><td>CDP Climate</td><td>ISO 14001 EMS data</td><td>Governance, risks, targets, emissions data</td></tr>
+                        <tr><td>TCFD</td><td>ISO 14001 + ISO 22301</td><td>Climate risk, strategy, metrics</td></tr>
+                    </tbody></table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> UN SDG Alignment <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Data center ISO compliance contributes to multiple UN Sustainable Development Goals:</p>
+                    <div class="tech-grid">
+                        <div class="tech-card"><h4><i class="fas fa-bolt"></i> SDG 7: Affordable &amp; Clean Energy</h4><p>ISO 50001 drives energy efficiency. ISO 30134 REF promotes renewable energy adoption. Direct contribution through PPA and REC procurement.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-industry"></i> SDG 9: Industry, Innovation &amp; Infrastructure</h4><p>ISO-certified data centers represent sustainable infrastructure. Continuous improvement drives innovation in cooling, power, and operations.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-city"></i> SDG 11: Sustainable Cities</h4><p>Waste heat reuse (ERF) supports district heating. Environmental management reduces urban pollution and resource consumption.</p></div>
+                        <div class="tech-card"><h4><i class="fas fa-globe-americas"></i> SDG 13: Climate Action</h4><p>ISO 14001 + CUE tracking drive carbon reduction. Scope 1/2/3 reporting enables transparent climate commitments.</p></div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- ========== Section 10: Case Studies ========== -->
+        <section class="section" id="sec-cases" data-nav-id="sec-cases">
+            <h2 class="section-title"><i class="fas fa-briefcase"></i> Case Studies <button class="deep-link" onclick="copyDeepLink('sec-cases')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Real-world examples demonstrating the impact of ISO standard implementation in data center environments.</p>
+
+            <div class="case-card">
+                <h4><i class="fas fa-bolt" style="color:var(--accent2);margin-right:0.3rem;"></i> ISO 50001 Energy Reduction Program</h4>
+                <div class="case-metrics">
+                    <span class="case-metric case-before">Before: PUE 1.80</span>
+                    <span class="case-metric case-after">After: PUE 1.35</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A 10 MW colocation provider implemented ISO 50001 across three facilities. Through systematic energy baseline establishment, ECM identification (free cooling retrofit, VSD upgrades, containment), and rigorous M&amp;V, they achieved a 25% reduction in energy consumption within 18 months. Annual savings exceeded $2.4M, with the certification project paying for itself within 8 months.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-chart-bar" style="color:var(--accent2);margin-right:0.3rem;"></i> PUE Optimization with ISO 30134 KPIs</h4>
+                <div class="case-metrics">
+                    <span class="case-metric case-before">Before: No real-time monitoring</span>
+                    <span class="case-metric case-after">After: Real-time EnPI tracking</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A hyperscale operator adopted ISO 30134 KPIs as the foundation for a real-time energy management dashboard. By standardizing PUE measurement methodology (Category 2, monthly measurement) across 12 sites, they identified 3 underperforming facilities. Targeted interventions reduced the portfolio-wide PUE from 1.52 to 1.28, saving over 85 GWh annually.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-shield-alt" style="color:var(--accent2);margin-right:0.3rem;"></i> ISO 27001 Security Certification</h4>
+                <div class="case-metrics">
+                    <span class="case-metric case-before">Before: Ad-hoc access controls</span>
+                    <span class="case-metric case-after">After: Zone-based ISMS</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A financial services data center transitioned from informal security practices to a certified ISO 27001 ISMS. Implementation included 5-zone access control, biometric authentication, 90-day CCTV retention, and comprehensive visitor management. The certification enabled the organization to win 3 new enterprise clients who required ISO 27001 as a contractual prerequisite, generating $8M in new annual revenue.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-life-ring" style="color:var(--accent2);margin-right:0.3rem;"></i> Business Continuity Testing Program</h4>
+                <div class="case-metrics">
+                    <span class="case-metric case-before">Before: No BIA, untested plans</span>
+                    <span class="case-metric case-after">After: Annual exercises, RTO &lt; 4 hr</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">Following a prolonged power outage that caused 18 hours of downtime, an enterprise data center implemented ISO 22301. The BIA identified 47 critical services, established tiered RTO/RPO targets, and created detailed recovery procedures. After 3 rounds of exercises (desktop, simulation, full failover), the facility demonstrated consistent RTO of under 4 hours for Tier 1 services, compared to the previous 18+ hours during an actual incident.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-leaf" style="color:var(--accent2);margin-right:0.3rem;"></i> Carbon Neutrality Journey</h4>
+                <div class="case-metrics">
+                    <span class="case-metric case-before">Before: 15,000 tCO<sub>2</sub>e (Scope 1+2)</span>
+                    <span class="case-metric case-after">After: Net zero via RECs + offsets</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A Nordic data center operator used ISO 14001 as the framework for a 5-year carbon neutrality program. Year 1 focused on Scope 1 reductions (replacing diesel generators with battery + grid, switching to low-GWP refrigerants). Years 2-3 addressed Scope 2 through a 100% renewable PPA. Years 4-5 tackled Scope 3 through supply chain engagement and carbon offset procurement for residual emissions, achieving verified net-zero status.</p>
+            </div>
+        </section>
+
+        <!-- ========== Section 11: Interview Prep ========== -->
+        <section class="section" id="sec-interview" data-nav-id="sec-interview">
+            <h2 class="section-title"><i class="fas fa-user-tie"></i> Interview Prep <button class="deep-link" onclick="copyDeepLink('sec-interview')"><i class="fas fa-link"></i></button></h2>
+            <p class="section-intro">Common interview questions for data center engineering, operations, and sustainability roles focusing on ISO energy governance standards.</p>
+
+            <div class="interview-grid">
+                <div class="interview-card">
+                    <h5><i class="fas fa-question-circle"></i> What is PUE and what is a good target?</h5>
+                    <p>PUE (Power Usage Effectiveness) is the ratio of total facility energy to IT equipment energy. A PUE of 1.0 means all energy goes to IT — theoretically perfect. A good target for a modern facility is 1.2–1.4. Industry leaders achieve below 1.15 using free cooling, high-efficiency UPS, and optimized power distribution. The global average is approximately 1.58 (Uptime Institute 2024).</p>
+                </div>
+                <div class="interview-card">
+                    <h5><i class="fas fa-question-circle"></i> How does ISO 50001 differ from ISO 14001?</h5>
+                    <p>ISO 50001 focuses specifically on energy management — establishing baselines, setting EnPIs, and driving energy performance improvement. ISO 14001 covers the broader environmental management system including waste, water, emissions, and compliance obligations. They share the PDCA structure and Annex SL framework, making integration straightforward. Many organizations pursue both simultaneously.</p>
+                </div>
+                <div class="interview-card">
+                    <h5><i class="fas fa-question-circle"></i> Explain RTO vs RPO</h5>
+                    <p>RTO (Recovery Time Objective) is the maximum time to restore a service after disruption — it answers "how quickly must we recover?" RPO (Recovery Point Objective) is the maximum acceptable data loss — it answers "how much data can we afford to lose?" For example, a financial trading system might have RTO of 15 minutes and RPO of 0 (synchronous replication), while a development environment might have RTO of 24 hours and RPO of 4 hours.</p>
+                </div>
+                <div class="interview-card">
+                    <h5><i class="fas fa-question-circle"></i> What are Scope 1, 2, and 3 emissions?</h5>
+                    <p>Scope 1 covers direct emissions from owned sources (diesel generators, refrigerant leaks). Scope 2 covers indirect emissions from purchased energy (grid electricity). Scope 3 covers all other indirect emissions in the value chain (embodied carbon in equipment, employee travel). For data centers, Scope 2 is typically 60-80% of total emissions, making renewable energy procurement the highest-impact decarbonization lever.</p>
+                </div>
+                <div class="interview-card">
+                    <h5><i class="fas fa-question-circle"></i> How do you conduct an energy audit?</h5>
+                    <p>Start with 12-24 months of utility data and establish a baseline. Survey sub-metering coverage and fill gaps. Profile all major loads (IT, cooling, lighting, auxiliary) with 15-minute interval data. Identify ECMs by comparing actual performance against best-practice benchmarks. Prioritize by ROI and feasibility. Implement using IPMVP methodology for savings verification. Report results and feed into the continuous improvement cycle.</p>
+                </div>
+                <div class="interview-card">
+                    <h5><i class="fas fa-question-circle"></i> What is the PDCA cycle in ISO context?</h5>
+                    <p>Plan-Do-Check-Act is the continuous improvement methodology used across all ISO management system standards. Plan: establish objectives and processes. Do: implement the processes. Check: monitor and measure results against policy, objectives, and requirements. Act: take actions to continually improve. In ISO 50001, this means setting energy targets (Plan), implementing ECMs (Do), measuring EnPIs (Check), and adjusting based on results (Act).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== Section 12: Abbreviations ========== -->
+        <section class="section" id="sec-abbr" data-nav-id="sec-abbr">
+            <h2 class="section-title"><i class="fas fa-spell-check"></i> Abbreviations <button class="deep-link" onclick="copyDeepLink('sec-abbr')"><i class="fas fa-link"></i></button></h2>
+            <div class="abbr-grid">
+                <div class="abbr-item"><span class="abbr-key">ASHRAE</span><span class="abbr-val">American Society of Heating, Refrigerating and Air-Conditioning Engineers</span></div>
+                <div class="abbr-item"><span class="abbr-key">BCMS</span><span class="abbr-val">Business Continuity Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">BIA</span><span class="abbr-val">Business Impact Analysis</span></div>
+                <div class="abbr-item"><span class="abbr-key">BMS</span><span class="abbr-val">Building Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">CAPA</span><span class="abbr-val">Corrective and Preventive Action</span></div>
+                <div class="abbr-item"><span class="abbr-key">CDP</span><span class="abbr-val">Carbon Disclosure Project</span></div>
+                <div class="abbr-item"><span class="abbr-key">CUE</span><span class="abbr-val">Carbon Usage Effectiveness</span></div>
+                <div class="abbr-item"><span class="abbr-key">DCIM</span><span class="abbr-val">Data Center Infrastructure Management</span></div>
+                <div class="abbr-item"><span class="abbr-key">DCiE</span><span class="abbr-val">Data Center Infrastructure Efficiency</span></div>
+                <div class="abbr-item"><span class="abbr-key">DR</span><span class="abbr-val">Disaster Recovery</span></div>
+                <div class="abbr-item"><span class="abbr-key">ECM</span><span class="abbr-val">Energy Conservation Measure</span></div>
+                <div class="abbr-item"><span class="abbr-key">EED</span><span class="abbr-val">Energy Efficiency Directive (EU)</span></div>
+                <div class="abbr-item"><span class="abbr-key">EMS</span><span class="abbr-val">Environmental Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">EnB</span><span class="abbr-val">Energy Baseline</span></div>
+                <div class="abbr-item"><span class="abbr-key">EnMS</span><span class="abbr-val">Energy Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">EnPI</span><span class="abbr-val">Energy Performance Indicator</span></div>
+                <div class="abbr-item"><span class="abbr-key">EPEAT</span><span class="abbr-val">Electronic Product Environmental Assessment Tool</span></div>
+                <div class="abbr-item"><span class="abbr-key">EPO</span><span class="abbr-val">Emergency Power Off</span></div>
+                <div class="abbr-item"><span class="abbr-key">ERF</span><span class="abbr-val">Energy Reuse Factor</span></div>
+                <div class="abbr-item"><span class="abbr-key">ESG</span><span class="abbr-val">Environmental, Social, and Governance</span></div>
+                <div class="abbr-item"><span class="abbr-key">GHG</span><span class="abbr-val">Greenhouse Gas</span></div>
+                <div class="abbr-item"><span class="abbr-key">GRI</span><span class="abbr-val">Global Reporting Initiative</span></div>
+                <div class="abbr-item"><span class="abbr-key">GWP</span><span class="abbr-val">Global Warming Potential</span></div>
+                <div class="abbr-item"><span class="abbr-key">HVAC</span><span class="abbr-val">Heating, Ventilation, and Air Conditioning</span></div>
+                <div class="abbr-item"><span class="abbr-key">IPMVP</span><span class="abbr-val">International Performance Measurement and Verification Protocol</span></div>
+                <div class="abbr-item"><span class="abbr-key">ISMS</span><span class="abbr-val">Information Security Management System</span></div>
+                <div class="abbr-item"><span class="abbr-key">ISO</span><span class="abbr-val">International Organization for Standardization</span></div>
+                <div class="abbr-item"><span class="abbr-key">ITAD</span><span class="abbr-val">IT Asset Disposition</span></div>
+                <div class="abbr-item"><span class="abbr-key">KPI</span><span class="abbr-val">Key Performance Indicator</span></div>
+                <div class="abbr-item"><span class="abbr-key">LED</span><span class="abbr-val">Light-Emitting Diode</span></div>
+                <div class="abbr-item"><span class="abbr-key">M&amp;V</span><span class="abbr-val">Measurement and Verification</span></div>
+                <div class="abbr-item"><span class="abbr-key">MLC</span><span class="abbr-val">Mechanical Load Component</span></div>
+                <div class="abbr-item"><span class="abbr-key">MTPD</span><span class="abbr-val">Maximum Tolerable Period of Disruption</span></div>
+                <div class="abbr-item"><span class="abbr-key">NDA</span><span class="abbr-val">Non-Disclosure Agreement</span></div>
+                <div class="abbr-item"><span class="abbr-key">NOC</span><span class="abbr-val">Network Operations Center</span></div>
+                <div class="abbr-item"><span class="abbr-key">PDCA</span><span class="abbr-val">Plan-Do-Check-Act</span></div>
+                <div class="abbr-item"><span class="abbr-key">PDU</span><span class="abbr-val">Power Distribution Unit</span></div>
+                <div class="abbr-item"><span class="abbr-key">PPA</span><span class="abbr-val">Power Purchase Agreement</span></div>
+                <div class="abbr-item"><span class="abbr-key">PUE</span><span class="abbr-val">Power Usage Effectiveness</span></div>
+                <div class="abbr-item"><span class="abbr-key">REC</span><span class="abbr-val">Renewable Energy Certificate</span></div>
+                <div class="abbr-item"><span class="abbr-key">REF</span><span class="abbr-val">Renewable Energy Factor</span></div>
+                <div class="abbr-item"><span class="abbr-key">RH</span><span class="abbr-val">Relative Humidity</span></div>
+                <div class="abbr-item"><span class="abbr-key">ROI</span><span class="abbr-val">Return on Investment</span></div>
+                <div class="abbr-item"><span class="abbr-key">RPO</span><span class="abbr-val">Recovery Point Objective</span></div>
+                <div class="abbr-item"><span class="abbr-key">RTO</span><span class="abbr-val">Recovery Time Objective</span></div>
+                <div class="abbr-item"><span class="abbr-key">SDG</span><span class="abbr-val">Sustainable Development Goal (UN)</span></div>
+                <div class="abbr-item"><span class="abbr-key">SoA</span><span class="abbr-val">Statement of Applicability (ISO 27001)</span></div>
+                <div class="abbr-item"><span class="abbr-key">SOC</span><span class="abbr-val">Security Operations Center</span></div>
+                <div class="abbr-item"><span class="abbr-key">TCFD</span><span class="abbr-val">Task Force on Climate-related Financial Disclosures</span></div>
+                <div class="abbr-item"><span class="abbr-key">UPS</span><span class="abbr-val">Uninterruptible Power Supply</span></div>
+                <div class="abbr-item"><span class="abbr-key">VESDA</span><span class="abbr-val">Very Early Smoke Detection Apparatus</span></div>
+                <div class="abbr-item"><span class="abbr-key">VSD</span><span class="abbr-val">Variable Speed Drive</span></div>
+                <div class="abbr-item"><span class="abbr-key">WUE</span><span class="abbr-val">Water Usage Effectiveness</span></div>
+            </div>
+        </section>
+
+        <!-- Version Changelog -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-history"></i> Version Changelog</h2>
+            <div class="changelog">
+                <div class="changelog-entry"><span class="changelog-date">2026-03-01</span><span class="changelog-text">v2.0 — Full deep-dive: 12 sections, 50 accordions, SVG mindmap, 2 inline calculators (KPI + Certification Cost), 3 quizzes, 6 interview cards, 5 case studies, 53 abbreviations, toolbar (kW/BTU toggle, font size, search, study mode, flashcards, print), dark/light theme, cross-references (ASHRAE 90.4, EN 50600, GRI/CDP/TCFD, UN SDG), term tooltips, table sorting, keyboard navigation</span></div>
+                <div class="changelog-entry"><span class="changelog-date">2026-02-27</span><span class="changelog-text">v0.1 — Initial skeleton page with stub content</span></div>
+            </div>
+        </section>
+
+        <!-- Footer Legal -->
+        <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review. ISO standard references are based on the latest published editions as of 2025. All data is for educational reference — verify against current published standards for production use. &copy; 2026 ResistanceZero. <a href="privacy.html" style="color:var(--muted);text-decoration:underline;">Privacy</a> &middot; <a href="terms.html" style="color:var(--muted);text-decoration:underline;">Terms</a></p>
     </div>
 
-    
+    <div id="tooltipFloat" class="tooltip-float"></div>
+    <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#10b981;margin-right:0.3rem;"></i> Root Access Required</h2><p>This deep-dive module is restricted to root-level accounts. Please authenticate with a root account to access the full content.</p><div class="root-actions"><button id="rootLoginBtn">Authenticate</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
+    <div class="cookie-banner hidden" id="cookieBanner"><p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p><div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div></div>
 
-    <div class="cookie-banner hidden" id="cookieBanner">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
-        </div>
-    </div>
-
-    <script src="auth.js?v=20260228"></script>
+    <script src="auth.js?v=20260301"></script>
     <script>
-        (function rootAccessGate() {
-            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+    /* ===== Dark/Light Theme ===== */
+    (function(){
+        var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');
+        function g(){var s=localStorage.getItem('theme');return s||(p.matches?'dark':'light');}
+        function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}
+        a(g());
+        if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});
+        p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});
+    })();
 
-            function detectRole(email) {
-                var e = String(email || '').toLowerCase().trim();
-                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
-            }
+    /* ===== Hamburger ===== */
+    (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
 
-            function getSession() {
-                try {
-                    var raw = localStorage.getItem('rz_premium_session');
-                    if (!raw) return null;
-                    var data = JSON.parse(raw);
-                    if (data.expires && new Date(data.expires) < new Date()) {
-                        localStorage.removeItem('rz_premium_session');
-                        return null;
-                    }
-                    if (!data.role) data.role = detectRole(data.email);
-                    return data;
-                } catch (e) {
-                    return null;
-                }
-            }
+    /* ===== Root Access Gate ===== */
+    (function(){
+        var RE=['admin@resistancezero.com','bagus@resistancezero.com'];
+        function dr(e){return RE.indexOf(String(e||'').toLowerCase().trim())!==-1?'root':'pro';}
+        function gs(){try{var r=localStorage.getItem('rz_premium_session');if(!r)return null;var d=JSON.parse(r);if(d.expires&&new Date(d.expires)<new Date()){localStorage.removeItem('rz_premium_session');return null;}if(!d.role)d.role=dr(d.email);return d;}catch(e){return null;}}
+        function ir(s){return!!(s&&String(s.role||'').toLowerCase()==='root');}
+        function ag(){document.body.classList.toggle('locked',!ir(gs()));}
+        var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});
+        window.addEventListener('rz-auth-change',ag);setTimeout(ag,60);setTimeout(ag,550);
+    })();
 
-            function isRoot(session) {
-                return !!(session && String(session.role || '').toLowerCase() === 'root');
-            }
+    /* ===== Cookie Banner ===== */
+    (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
 
-            function applyGate() {
-                document.body.classList.toggle('locked', !isRoot(getSession()));
-            }
+    /* ===== Accordion Toggle ===== */
+    document.addEventListener('click',function(e){var h=e.target.closest('.accordion-header');if(h)h.parentElement.classList.toggle('open');});
 
-            var loginBtn = document.getElementById('rootLoginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function() {
-                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
-                        window._rzAuth.showModal();
-                    }
+    /* ===== Sticky Nav IntersectionObserver ===== */
+    (function(){
+        var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');
+        if(!secs.length)return;
+        var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});
+        secs.forEach(function(s){obs.observe(s);});
+        pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-120;window.scrollTo({top:y,behavior:'smooth'});}});});
+    })();
+
+    /* ===== Progress Bar ===== */
+    (function(){
+        var bar=document.getElementById('progressBar');
+        if(!bar)return;
+        window.addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(window.scrollY/h*100):0)+'%';});
+    })();
+
+    /* ===== Reading Time ===== */
+    (function(){
+        var el=document.getElementById('readingTime');if(!el)return;
+        var text=document.querySelector('.wrap');if(!text)return;
+        var words=text.textContent.split(/\s+/).length;
+        var mins=Math.ceil(words/220);
+        el.innerHTML='<i class="fas fa-clock"></i> ~'+mins+' min read';
+    })();
+
+    /* ===== kW / BTU Toggle ===== */
+    var energyUnit='kW';
+    (function(){
+        var btn=document.getElementById('unitToggle');if(!btn)return;
+        btn.addEventListener('click',function(){
+            energyUnit=energyUnit==='kW'?'BTU':'kW';
+            btn.innerHTML='<i class="fas fa-fire"></i> '+energyUnit;
+            btn.classList.toggle('active',energyUnit==='BTU');
+            document.querySelectorAll('.energy-val').forEach(function(el){
+                var kw=parseFloat(el.getAttribute('data-kw'));
+                if(isNaN(kw))return;
+                if(energyUnit==='BTU')el.textContent=(kw*3412.14).toFixed(0)+' BTU/hr';
+                else el.textContent=kw+' kW';
+            });
+        });
+    })();
+
+    /* ===== Font Size ===== */
+    (function(){
+        var dn=document.getElementById('fontDown'),up=document.getElementById('fontUp');
+        if(!dn||!up)return;
+        dn.addEventListener('click',function(){document.body.classList.remove('font-lg');document.body.classList.toggle('font-sm');});
+        up.addEventListener('click',function(){document.body.classList.remove('font-sm');document.body.classList.toggle('font-lg');});
+    })();
+
+    /* ===== Study Mode ===== */
+    (function(){
+        var btn=document.getElementById('studyModeBtn');if(!btn)return;
+        btn.addEventListener('click',function(){
+            document.body.classList.toggle('study-mode');
+            btn.classList.toggle('active');
+            if(document.body.classList.contains('study-mode')){
+                document.querySelectorAll('.section[data-nav-id]').forEach(function(sec){
+                    if(sec.querySelector('.study-check'))return;
+                    var cb=document.createElement('label');cb.className='study-check';
+                    var inp=document.createElement('input');inp.type='checkbox';
+                    var key='iso-study-'+sec.getAttribute('data-nav-id');
+                    inp.checked=localStorage.getItem(key)==='1';
+                    if(inp.checked)sec.classList.add('studied');
+                    inp.addEventListener('change',function(){
+                        localStorage.setItem(key,this.checked?'1':'0');
+                        sec.classList.toggle('studied',this.checked);
+                    });
+                    cb.appendChild(inp);
+                    var title=sec.querySelector('.section-title');
+                    if(title)title.appendChild(cb);
                 });
             }
+        });
+    })();
 
-            window.addEventListener('rz-auth-change', applyGate);
-            setTimeout(applyGate, 60);
-            setTimeout(applyGate, 550);
-        })();
+    /* ===== Search ===== */
+    (function(){
+        var overlay=document.getElementById('searchOverlay'),input=document.getElementById('searchInput'),results=document.getElementById('searchResults'),btn=document.getElementById('searchBtn');
+        if(!overlay||!input)return;
+        function open(){overlay.classList.add('active');input.focus();input.value='';}
+        function close(){overlay.classList.remove('active');results.innerHTML='';}
+        if(btn)btn.addEventListener('click',open);
+        overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
+        document.addEventListener('keydown',function(e){
+            if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();open();}
+            if(e.key==='Escape')close();
+        });
+        input.addEventListener('input',function(){
+            var q=this.value.trim().toLowerCase();results.innerHTML='';
+            if(q.length<2)return;
+            var sections=document.querySelectorAll('.accordion-content,.section-intro');
+            var found=0;
+            sections.forEach(function(sec){
+                if(found>=10)return;
+                var text=sec.textContent;var idx=text.toLowerCase().indexOf(q);
+                if(idx===-1)return;
+                found++;
+                var start=Math.max(0,idx-40);var end=Math.min(text.length,idx+q.length+60);
+                var snippet='...'+text.slice(start,end).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')+'...';
+                var parent=sec.closest('.section');var secTitle=parent?parent.querySelector('.section-title'):null;
+                var div=document.createElement('div');div.className='search-result';
+                div.innerHTML=snippet+'<div class="sr-section">'+(secTitle?secTitle.textContent.trim():'')+'</div>';
+                div.addEventListener('click',function(){close();sec.scrollIntoView({behavior:'smooth',block:'center'});});
+                results.appendChild(div);
+            });
+            if(found===0)results.innerHTML='<div class="search-result" style="color:var(--muted)">No results found</div>';
+        });
+    })();
 
+    /* ===== Print ===== */
+    (function(){var b=document.getElementById('printBtn');if(b)b.addEventListener('click',function(){window.print();});})();
 
-        (function cookieBanner() {
-            var banner = document.getElementById('cookieBanner');
-            var accepted = localStorage.getItem('rz_cookie_consent');
-            if (!accepted && banner) banner.classList.remove('hidden');
+    /* ===== Flashcard Mode ===== */
+    (function(){
+        var overlay=document.getElementById('flashcardOverlay'),card=document.getElementById('flashcard');
+        var frontText=document.getElementById('fcFrontText'),backText=document.getElementById('fcBackText');
+        var counter=document.getElementById('fcCounter'),stats=document.getElementById('fcStats');
+        var progressFill=document.getElementById('fcProgressFill');
+        var btn=document.getElementById('flashcardBtn'),closeBtn=document.getElementById('fcClose');
+        var prevBtn=document.getElementById('fcPrev'),nextBtn=document.getElementById('fcNext');
+        var knowBtn=document.getElementById('fcKnow'),learnBtn=document.getElementById('fcLearning');
+        var shuffleBtn=document.getElementById('fcShuffle');
+        if(!overlay||!card)return;
 
-            var accept = document.getElementById('cookieAccept');
-            var decline = document.getElementById('cookieDecline');
+        var items=[],idx=0,STORE_KEY='iso-fc-mastered';
+        var mastered={};
+        try{var s=localStorage.getItem(STORE_KEY);if(s)mastered=JSON.parse(s);}catch(e){}
 
-            if (accept) {
-                accept.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'accepted');
-                    banner.classList.add('hidden');
-                });
+        document.querySelectorAll('.abbr-item').forEach(function(el){
+            var k=el.querySelector('.abbr-key'),v=el.querySelector('.abbr-val');
+            if(k&&v)items.push({q:k.textContent.trim(),a:v.textContent.trim()});
+        });
+
+        function saveMastered(){try{localStorage.setItem(STORE_KEY,JSON.stringify(mastered));}catch(e){}}
+        function masteredCount(){var c=0;items.forEach(function(it){if(mastered[it.q])c++;});return c;}
+
+        function updateProgress(){
+            var m=masteredCount(),total=items.length;
+            if(stats)stats.textContent=m+' mastered of '+total;
+            if(progressFill)progressFill.style.width=total?(m/total*100).toFixed(1)+'%':'0%';
+        }
+
+        function show(){
+            if(!items.length)return;
+            card.classList.remove('flipped');
+            if(frontText)frontText.textContent=items[idx].q;
+            if(backText)backText.textContent=items[idx].a;
+            if(counter)counter.textContent=(idx+1)+' / '+items.length;
+            updateProgress();
+        }
+
+        function advance(){idx=(idx+1)%items.length;show();}
+
+        function shuffle(){
+            for(var i=items.length-1;i>0;i--){
+                var j=Math.floor(Math.random()*(i+1));
+                var t=items[i];items[i]=items[j];items[j]=t;
             }
+            idx=0;show();
+        }
 
-            if (decline) {
-                decline.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'declined');
-                    banner.classList.add('hidden');
-                    window['ga-disable-G-GED7FX8RTV'] = true;
+        if(btn)btn.addEventListener('click',function(){overlay.classList.add('active');idx=0;show();});
+        if(closeBtn)closeBtn.addEventListener('click',function(){overlay.classList.remove('active');});
+        overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('active');});
+        if(card)card.addEventListener('click',function(e){
+            if(e.target.closest('.fc-hint'))return;
+            card.classList.toggle('flipped');
+        });
+        if(prevBtn)prevBtn.addEventListener('click',function(){idx=(idx-1+items.length)%items.length;show();});
+        if(nextBtn)nextBtn.addEventListener('click',function(){idx=(idx+1)%items.length;show();});
+        if(knowBtn)knowBtn.addEventListener('click',function(){
+            if(items.length)mastered[items[idx].q]=true;
+            saveMastered();advance();
+        });
+        if(learnBtn)learnBtn.addEventListener('click',function(){
+            if(items.length)delete mastered[items[idx].q];
+            saveMastered();advance();
+        });
+        if(shuffleBtn)shuffleBtn.addEventListener('click',shuffle);
+
+        document.addEventListener('keydown',function(e){
+            if(!overlay.classList.contains('active'))return;
+            if(e.key===' '||e.code==='Space'){e.preventDefault();card.classList.toggle('flipped');}
+            else if(e.key==='ArrowLeft'){e.preventDefault();idx=(idx-1+items.length)%items.length;show();}
+            else if(e.key==='ArrowRight'){e.preventDefault();advance();}
+            else if(e.key==='1'){e.preventDefault();if(items.length){mastered[items[idx].q]=true;saveMastered();advance();}}
+            else if(e.key==='2'){e.preventDefault();if(items.length){delete mastered[items[idx].q];saveMastered();advance();}}
+            else if(e.key==='Escape'){overlay.classList.remove('active');}
+        });
+    })();
+
+    /* ===== Deep Link Copy ===== */
+    function copyDeepLink(id){
+        var url=window.location.origin+window.location.pathname+'#'+id;
+        navigator.clipboard.writeText(url).then(function(){
+            var toast=document.getElementById('deepLinkToast');
+            if(toast){toast.style.display='block';setTimeout(function(){toast.style.display='none';},2000);}
+        });
+    }
+
+    /* ===== Quiz ===== */
+    function checkQuiz(opt){
+        var widget=opt.closest('.quiz-widget');if(!widget)return;
+        var opts=widget.querySelectorAll('.quiz-opt');
+        var answered=widget.getAttribute('data-answered');if(answered)return;
+        widget.setAttribute('data-answered','1');
+        var isCorrect=opt.getAttribute('data-correct')==='true';
+        opts.forEach(function(o){
+            if(o.getAttribute('data-correct')==='true')o.classList.add('correct');
+            else if(o===opt)o.classList.add('wrong');
+            o.querySelector('.opt-icon').innerHTML=o.getAttribute('data-correct')==='true'?'<i class="fas fa-check-circle"></i>':'<i class="fas fa-times-circle"></i>';
+        });
+        var fb=widget.querySelector('.quiz-feedback');
+        if(fb){fb.classList.add('show');fb.className='quiz-feedback show '+(isCorrect?'callout callout-green':'callout callout-warn');fb.innerHTML=isCorrect?'<i class="fas fa-check"></i> Correct!':'<i class="fas fa-times"></i> Incorrect — review the highlighted answer above.';}
+    }
+
+    /* ===== KPI Calculator ===== */
+    (function(){
+        var itEl=document.getElementById('kpiIT'),facEl=document.getElementById('kpiFacility');
+        var waterEl=document.getElementById('kpiWater'),carbonEl=document.getElementById('kpiCarbon');
+        var pueRes=document.getElementById('kpiPueResult'),dcieRes=document.getElementById('kpiDcieResult');
+        var wueRes=document.getElementById('kpiWueResult'),cueRes=document.getElementById('kpiCueResult');
+        if(!itEl||!facEl)return;
+        function calc(){
+            var it=parseFloat(itEl.value)||1;
+            var fac=parseFloat(facEl.value)||1;
+            var water=parseFloat(waterEl.value)||0;
+            var carbon=parseFloat(carbonEl.value)||0;
+            var pue=fac/it;
+            var dcie=(it/fac)*100;
+            var itAnnualKWh=it*8760;
+            var wue=itAnnualKWh>0?(water/itAnnualKWh):0;
+            var cue=itAnnualKWh>0?(carbon/itAnnualKWh):0;
+            if(pueRes)pueRes.textContent=pue.toFixed(2);
+            if(dcieRes)dcieRes.textContent=dcie.toFixed(1)+'%';
+            if(wueRes)wueRes.textContent=wue.toFixed(3);
+            if(cueRes)cueRes.textContent=cue.toFixed(3);
+        }
+        itEl.addEventListener('input',calc);facEl.addEventListener('input',calc);
+        if(waterEl)waterEl.addEventListener('input',calc);
+        if(carbonEl)carbonEl.addEventListener('input',calc);
+        calc();
+    })();
+
+    /* ===== Certification Cost Estimator ===== */
+    (function(){
+        var scopeEl=document.getElementById('certScope');
+        var costVal=document.getElementById('certCostValue');
+        var timeVal=document.getElementById('certTimeValue');
+        if(!scopeEl||!costVal)return;
+        var data={
+            small:{cost:'$10,000 – $25,000',time:'Timeline: 6 – 9 months'},
+            medium:{cost:'$25,000 – $45,000',time:'Timeline: 9 – 12 months'},
+            large:{cost:'$45,000 – $80,000',time:'Timeline: 12 – 15 months'},
+            enterprise:{cost:'$80,000 – $150,000+',time:'Timeline: 15 – 18 months'}
+        };
+        function calc(){
+            var v=scopeEl.value;
+            var d=data[v]||data.medium;
+            costVal.textContent=d.cost;
+            if(timeVal)timeVal.textContent=d.time;
+        }
+        scopeEl.addEventListener('change',calc);
+        calc();
+    })();
+
+    /* ===== Keyboard Navigation ===== */
+    document.addEventListener('keydown',function(e){
+        if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+        var fc=document.getElementById('flashcardOverlay');
+        if(fc&&fc.classList.contains('active'))return;
+        var secs=document.querySelectorAll('[data-nav-id]');if(!secs.length)return;
+        var current=-1;
+        secs.forEach(function(s,i){if(s.getBoundingClientRect().top<150&&s.getBoundingClientRect().top>-s.offsetHeight)current=i;});
+        if(e.key==='ArrowDown'&&!e.ctrlKey){e.preventDefault();var next=Math.min(current+1,secs.length-1);secs[next].scrollIntoView({behavior:'smooth',block:'start'});}
+        if(e.key==='ArrowUp'&&!e.ctrlKey){e.preventDefault();var prev=Math.max(current-1,0);secs[prev].scrollIntoView({behavior:'smooth',block:'start'});}
+    });
+
+    /* ===== Table Sorting ===== */
+    document.querySelectorAll('.data-table').forEach(function(table){
+        var headers=table.querySelectorAll('th');
+        headers.forEach(function(th,colIdx){
+            th.classList.add('sortable');
+            th.innerHTML+=(' <span class="sort-icon"><i class="fas fa-sort"></i></span>');
+            var asc=true;
+            th.addEventListener('click',function(){
+                var tbody=table.querySelector('tbody');if(!tbody)return;
+                var rows=Array.from(tbody.querySelectorAll('tr'));
+                rows.sort(function(a,b){
+                    var av=a.cells[colIdx]?a.cells[colIdx].textContent.trim():'';
+                    var bv=b.cells[colIdx]?b.cells[colIdx].textContent.trim():'';
+                    var an=parseFloat(av.replace(/[^0-9.\-]/g,'')),bn=parseFloat(bv.replace(/[^0-9.\-]/g,''));
+                    if(!isNaN(an)&&!isNaN(bn))return asc?an-bn:bn-an;
+                    return asc?av.localeCompare(bv):bv.localeCompare(av);
                 });
+                asc=!asc;
+                rows.forEach(function(r){tbody.appendChild(r);});
+                headers.forEach(function(h){h.classList.remove('sorted');});
+                th.classList.add('sorted');
+            });
+        });
+    });
+
+    /* ===== Floating Tooltips ===== */
+    (function(){
+        var tip=document.getElementById('tooltipFloat');
+        if(!tip)return;
+        var hideTimer=null;
+        function show(el){
+            clearTimeout(hideTimer);
+            var text=el.getAttribute('data-tooltip');
+            if(!text)return;
+            tip.textContent=text;
+            tip.className='tooltip-float';
+            tip.style.opacity='0';
+            tip.style.visibility='visible';
+            var r=el.getBoundingClientRect();
+            var tw=tip.offsetWidth;
+            var th=tip.offsetHeight;
+            var gap=8;
+            var left=r.left+r.width/2-tw/2;
+            if(left<8)left=8;
+            if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
+            var top;
+            if(r.top-th-gap>8){
+                top=r.top-th-gap;
+                tip.classList.add('above');
+            }else{
+                top=r.bottom+gap;
+                tip.classList.add('below');
             }
-        })();
+            var arrowLeft=r.left+r.width/2-left;
+            arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));
+            tip.style.setProperty('--arrow',arrowLeft+'px');
+            tip.style.left=left+'px';
+            tip.style.top=top+'px';
+            tip.classList.add('visible');
+        }
+        function hide(){
+            hideTimer=setTimeout(function(){
+                tip.classList.remove('visible');
+                tip.style.visibility='hidden';
+            },80);
+        }
+        document.querySelectorAll('.term-tooltip').forEach(function(el){
+            el.addEventListener('mouseenter',function(){show(el);});
+            el.addEventListener('mouseleave',hide);
+            el.addEventListener('touchstart',function(e){
+                e.preventDefault();
+                show(el);
+                setTimeout(hide,3000);
+            },{passive:false});
+        });
+    })();
+
+    /* ===== Comparison Card Toggle ===== */
+    document.addEventListener('click',function(e){
+        var card=e.target.closest('.comparison-card');
+        if(card)card.classList.toggle('expanded');
+    });
+
+    /* ===== Section Deep-Link on Hash ===== */
+    (function(){
+        if(window.location.hash){
+            var id=window.location.hash.slice(1);
+            var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');
+            if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);
+        }
+    })();
     </script>
 </body>
 </html>

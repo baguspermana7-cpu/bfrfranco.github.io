@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>NFPA Fire and Life-Safety Risk | ResistanceZero</title>
+    <title>NFPA Fire &amp; Safety Risk — Comprehensive Deep-Dive | ResistanceZero</title>
     <meta name="description" content="Root-only standards deep-dive module for ResistanceZero engineering lab.">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f172a">
@@ -12,359 +12,1335 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0b1324;
-            --card: rgba(15, 23, 42, 0.84);
-            --text: #e2e8f0;
-            --muted: #94a3b8;
-            --line: rgba(148, 163, 184, 0.24);
-            --accent: #f59e0b;
-            --accent2: #06b6d4;
+            --bg: #0b1324; --bg-solid: #0b1324;
+            --card: rgba(15,23,42,0.84); --card-inner: rgba(15,23,42,0.6); --card-inner-hover: rgba(15,23,42,0.8);
+            --text: #e2e8f0; --text-strong: #f1f5f9; --text-body: #cbd5e1; --muted: #94a3b8;
+            --line: rgba(148,163,184,0.24);
+            --accent: #f59e0b; --accent2: #ef4444;
+            --shadow: rgba(2,6,23,0.45); --shadow-deep: rgba(2,6,23,0.5);
+            --grad-top: rgba(239,68,68,0.13); --grad-bot: rgba(245,158,11,0.11);
+            --th-bg: rgba(239,68,68,0.12); --th-color: #fca5a5;
+            --tr-hover: rgba(148,163,184,0.06); --td-border: rgba(148,163,184,0.12);
+            --kv-bg: rgba(15,23,42,0.5);
+            --callout-info-bg: rgba(239,68,68,0.1); --callout-info-border: rgba(239,68,68,0.3); --callout-info-color: #fca5a5;
+            --callout-warn-bg: rgba(245,158,11,0.1); --callout-warn-border: rgba(245,158,11,0.3); --callout-warn-color: #fde68a;
+            --callout-green-bg: rgba(34,197,94,0.1); --callout-green-border: rgba(34,197,94,0.3); --callout-green-color: #86efac;
+            --pill-bg: rgba(245,158,11,0.16); --pill-border: rgba(245,158,11,0.45); --pill-color: #fde68a;
+            --acc-num-bg: rgba(239,68,68,0.18); --acc-num-color: #f87171;
+            --nav-active-color: #fca5a5; --nav-active-bg: rgba(239,68,68,0.15); --nav-active-border: rgba(239,68,68,0.35);
+            --diag-fill: rgba(30,41,59,0.88); --svg-bg: rgba(15,23,42,0.7);
+        }
+        [data-theme="light"] {
+            --bg: #f1f5f9; --bg-solid: #f1f5f9;
+            --card: rgba(255,255,255,0.92); --card-inner: rgba(241,245,249,0.8); --card-inner-hover: rgba(226,232,240,0.6);
+            --text: #1e293b; --text-strong: #0f172a; --text-body: #334155; --muted: #64748b;
+            --line: rgba(100,116,139,0.22);
+            --accent: #d97706; --accent2: #dc2626;
+            --shadow: rgba(100,116,139,0.12); --shadow-deep: rgba(100,116,139,0.18);
+            --grad-top: rgba(239,68,68,0.06); --grad-bot: rgba(245,158,11,0.05);
+            --th-bg: rgba(239,68,68,0.08); --th-color: #991b1b;
+            --tr-hover: rgba(100,116,139,0.06); --td-border: rgba(100,116,139,0.1);
+            --kv-bg: rgba(241,245,249,0.8);
+            --callout-info-bg: rgba(239,68,68,0.06); --callout-info-border: rgba(239,68,68,0.25); --callout-info-color: #991b1b;
+            --callout-warn-bg: rgba(245,158,11,0.06); --callout-warn-border: rgba(245,158,11,0.25); --callout-warn-color: #92400e;
+            --callout-green-bg: rgba(34,197,94,0.06); --callout-green-border: rgba(34,197,94,0.25); --callout-green-color: #166534;
+            --pill-bg: rgba(245,158,11,0.1); --pill-border: rgba(217,119,6,0.4); --pill-color: #92400e;
+            --acc-num-bg: rgba(239,68,68,0.12); --acc-num-color: #991b1b;
+            --nav-active-color: #991b1b; --nav-active-bg: rgba(239,68,68,0.1); --nav-active-border: rgba(239,68,68,0.3);
+            --diag-fill: rgba(241,245,249,0.9); --svg-bg: rgba(241,245,249,0.8);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            background:
-                radial-gradient(ellipse at top right, rgba(6,182,212,0.13), transparent 45%),
-                radial-gradient(ellipse at bottom left, rgba(245,158,11,0.11), transparent 52%),
-                var(--bg);
-            color: var(--text);
-        }
+        body { font-family: Inter,-apple-system,BlinkMacSystemFont,sans-serif; min-height: 100vh; background: radial-gradient(ellipse at top right,var(--grad-top),transparent 45%),radial-gradient(ellipse at bottom left,var(--grad-bot),transparent 52%),var(--bg); color: var(--text); }
+        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11,19,36,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
+        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 56px; gap: 0.5rem; }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
+        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+        .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
+        .nav-link { padding: 0.45rem 0.65rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-dropdown { position: relative; }
+        .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
+        .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
+        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-solid); border: 1px solid var(--line); min-width: 180px; border-radius: 10px; box-shadow: 0 10px 40px var(--shadow-deep); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s,visibility 0.2s; z-index: 1001; padding: 8px 0; }
+        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
+        .dropdown-menu li { list-style: none; padding: 0; }
+        .dropdown-menu li::before { display: none; }
+        .dropdown-menu a { display: block; padding: 0.45rem 1rem; color: var(--text-body); text-decoration: none; font-size: 0.8rem; transition: background 0.15s; }
+        .dropdown-menu a:hover { background: rgba(148,163,184,0.1); }
+        .theme-toggle { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(148,163,184,0.1); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .theme-toggle:hover { background: rgba(148,163,184,0.2); transform: scale(1.05); }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle .sun-icon { color: #f59e0b; display: none; }
+        .theme-toggle .moon-icon { color: #94a3b8; display: block; }
+        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle { background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
+        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 8px; border-radius: 8px; }
+        .hamburger:hover { background: rgba(148,163,184,0.1); }
+        .bar { width: 22px; height: 2.5px; background: var(--muted); border-radius: 3px; transition: all 0.3s; }
+        @media (max-width:900px) { .nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--bg-solid); border-bottom: 1px solid var(--line); flex-direction: column; padding: 0.5rem; gap: 0; box-shadow: 0 8px 20px var(--shadow); } .nav-menu.active { display: flex; } .hamburger { display: flex; } .dropdown-menu { position: static; transform: none; box-shadow: none; border: none; padding-left: 1rem; } }
         .wrap { max-width: 980px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.7rem;
-            margin-bottom: 0.9rem;
-        }
-        .back {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.55rem 0.8rem;
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.34rem 0.72rem;
-            border-radius: 999px;
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            background: rgba(245, 158, 11, 0.16);
-            color: #fde68a;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .panel {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: var(--card);
-            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.45);
-            padding: 1.1rem;
-        }
-        h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); margin: 0.45rem 0 0.3rem; }
-        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
-        .summary {
-            margin-top: 0.9rem;
-            padding: 0.8rem;
-            border-radius: 12px;
-            border: 1px solid rgba(6, 182, 212, 0.35);
-            background: rgba(6, 182, 212, 0.1);
-            font-size: 0.85rem;
-            line-height: 1.65;
-            color: #c7d2fe;
-        }
-        .grid {
-            margin-top: 0.85rem;
-            display: grid;
-            grid-template-columns: 1.2fr 0.95fr;
-            gap: 0.75rem;
-        }
-        .card {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.62);
-            padding: 0.8rem;
-        }
-        .card h3 {
-            font-size: 0.86rem;
-            color: #f8fafc;
-            margin-bottom: 0.45rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        ul { list-style: none; display: grid; gap: 0.35rem; }
-        li {
-            font-size: 0.82rem;
-            color: #cbd5e1;
-            line-height: 1.55;
-            padding-left: 0.9rem;
-            position: relative;
-        }
-        li::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent2);
-            position: absolute;
-            left: 0;
-            top: 0.45rem;
-        }
-        .cta {
-            margin-top: 0.85rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.42rem;
-            text-decoration: none;
-            border-radius: 10px;
-            padding: 0.58rem 0.82rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .btn-main { background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; }
-        .btn-sub { border: 1px solid var(--line); color: var(--text); }
-        .next {
-            margin-top: 0.8rem;
-            font-size: 0.8rem;
-            color: #f1f5f9;
-            border-top: 1px dashed var(--line);
-            padding-top: 0.7rem;
-            line-height: 1.55;
-        }
-        .legal {
-            margin-top: 0.9rem;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-        .root-gate {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(2, 6, 23, 0.74);
-            padding: 1rem;
-            backdrop-filter: blur(6px);
-        }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }
+        .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+        .back:hover { background: rgba(148,163,184,0.1); }
+        .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.34rem 0.72rem; border-radius: 999px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-color); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+        .pill-red { border-color: rgba(239,68,68,0.45); background: rgba(239,68,68,0.14); color: var(--th-color); }
+        .hero { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 16px 32px var(--shadow); padding: 1.4rem 1.2rem; margin-bottom: 1rem; }
+        h1 { font-size: clamp(1.4rem,3vw,2rem); margin: 0.45rem 0 0.3rem; line-height: 1.3; }
+        .subtitle { color: var(--muted); line-height: 1.6; font-size: 0.92rem; max-width: 740px; }
+        .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.6rem; background: rgba(11,19,36,0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        [data-theme="light"] .section-nav { background: rgba(255,255,255,0.92); }
+        .nav-pill { flex-shrink: 0; padding: 0.38rem 0.7rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .nav-pill:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-pill.active { color: var(--nav-active-color); background: var(--nav-active-bg); border-color: var(--nav-active-border); }
+        .section { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 12px 28px var(--shadow); padding: 1.3rem 1.2rem; margin-bottom: 1rem; }
+        .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
+        .section-title i { color: var(--accent2); font-size: 0.95rem; }
+        .section-intro { color: var(--text-body); font-size: 0.88rem; line-height: 1.7; margin-bottom: 0.9rem; }
+        .accordion { margin-bottom: 0.6rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+        .accordion:last-child { margin-bottom: 0; }
+        .accordion-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.85rem; background: var(--card-inner); cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-strong); user-select: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+        .accordion-header:hover { background: var(--card-inner-hover); }
+        .accordion-header .chevron { margin-left: auto; transition: transform 0.25s; font-size: 0.7rem; color: var(--muted); }
+        .accordion.open .accordion-header .chevron { transform: rotate(180deg); }
+        .accordion-header .acc-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: var(--acc-num-bg); color: var(--acc-num-color); font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .accordion.open .accordion-body { max-height: 5000px; }
+        .accordion-content { padding: 0.85rem; font-size: 0.84rem; line-height: 1.7; color: var(--text-body); }
+        .accordion-content p { margin-bottom: 0.6rem; }
+        .accordion-content p:last-child { margin-bottom: 0; }
+        .accordion-content strong { color: var(--text-strong); }
+        .table-wrap { overflow-x: auto; margin: 0.7rem 0; border-radius: 10px; border: 1px solid var(--line); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }
+        .data-table th { background: var(--th-bg); color: var(--th-color); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem; padding: 0.6rem 0.7rem; text-align: left; border-bottom: 1px solid var(--line); }
+        .data-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--td-border); color: var(--text-body); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--tr-hover); }
+        .data-table .highlight { color: var(--accent); font-weight: 600; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 0.7rem; margin-top: 0.7rem; }
+        .tech-card { border: 1px solid var(--line); border-radius: 12px; background: var(--card-inner); padding: 0.85rem; }
+        .tech-card h4 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+        .tech-card h4 i { color: var(--accent2); font-size: 0.78rem; }
+        .tech-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+        .mindmap-wrap { margin: 0.8rem 0; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; background: var(--svg-bg); }
+        .mindmap-wrap svg { display: block; width: 100%; height: auto; min-width: 820px; }
+        .diag-box { fill: var(--diag-fill); stroke: rgba(148,163,184,0.34); stroke-width: 1.4; }
+        .diag-box-red { fill: rgba(239,68,68,0.1); stroke: rgba(239,68,68,0.4); stroke-width: 1.4; }
+        .diag-box-amber { fill: rgba(245,158,11,0.1); stroke: rgba(245,158,11,0.4); stroke-width: 1.4; }
+        .diag-box-green { fill: rgba(34,197,94,0.1); stroke: rgba(34,197,94,0.4); stroke-width: 1.4; }
+        .diag-t { fill: var(--text); font-size: 12.5px; font-weight: 700; }
+        .diag-v { fill: var(--muted); font-size: 10.5px; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
+        .diag-line { stroke: rgba(148,163,184,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-red { stroke: rgba(239,68,68,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-amber { stroke: rgba(245,158,11,0.5); stroke-width: 1.6; fill: none; }
+        .diag-line-green { stroke: rgba(34,197,94,0.5); stroke-width: 1.6; fill: none; }
+        .diag-center { fill: var(--text-strong); font-size: 14px; font-weight: 800; }
+        .callout { padding: 0.75rem 0.9rem; border-radius: 10px; font-size: 0.82rem; line-height: 1.65; margin: 0.6rem 0; }
+        .callout-info { background: var(--callout-info-bg); border: 1px solid var(--callout-info-border); color: var(--callout-info-color); }
+        .callout-warn { background: var(--callout-warn-bg); border: 1px solid var(--callout-warn-border); color: var(--callout-warn-color); }
+        .callout-green { background: var(--callout-green-bg); border: 1px solid var(--callout-green-border); color: var(--callout-green-color); }
+        .callout i { margin-right: 0.4rem; }
+        .kv-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+        .kv-item { padding: 0.55rem 0.7rem; border-radius: 8px; background: var(--kv-bg); border: 1px solid rgba(148,163,184,0.15); }
+        .kv-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+        .kv-value { font-size: 0.88rem; color: var(--text-strong); font-weight: 600; margin-top: 0.15rem; }
+        .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
+        .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
+        .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
+        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
+        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(239,68,68,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s,visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
+        .tooltip-float.visible { opacity: 1; visibility: visible; }
+        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
+        .tooltip-float.above::before { bottom: -6px; left: var(--arrow,50%); margin-left: -5px; }
+        .tooltip-float.below::before { top: -6px; left: var(--arrow,50%); margin-left: -5px; transform: rotate(135deg); }
+        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(239,68,68,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+        .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 0.4rem; margin-top: 0.6rem; }
+        .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
+        .abbr-item:hover { background: var(--card-inner-hover); }
+        .abbr-key { font-weight: 700; color: var(--accent2); min-width: 60px; flex-shrink: 0; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size: 0.75rem; }
+        .abbr-val { color: var(--text-body); }
+        .legal { margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.6; text-align: center; padding: 0.8rem 0; }
+        .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.74); padding: 1rem; backdrop-filter: blur(6px); }
         body.locked .root-gate { display: flex; }
         body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
-        .root-card {
-            max-width: 430px;
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid rgba(245, 158, 11, 0.38);
-            border-radius: 14px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 18px 36px rgba(2, 6, 23, 0.5);
-        }
+        .root-card { max-width: 430px; width: 100%; background: #0f172a; border: 1px solid rgba(245,158,11,0.38); border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 18px 36px var(--shadow-deep); }
+        [data-theme="light"] .root-card { background: #fff; border-color: rgba(217,119,6,0.3); }
+        [data-theme="light"] .root-gate { background: rgba(241,245,249,0.8); }
         .root-card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
-        .root-card p { font-size: 0.83rem; color: #cbd5e1; line-height: 1.55; }
+        .root-card p { font-size: 0.83rem; color: var(--text-body); line-height: 1.55; }
         .root-actions { margin-top: 0.7rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .root-actions button, .root-actions a {
-            border-radius: 9px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            border: 1px solid rgba(148,163,184,0.35);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .root-actions button { background: #8b5cf6; color: #fff; border: none; }
-        .root-actions a { color: #e2e8f0; }
-        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-
-        .cookie-banner {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10002;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.85rem;
-            padding: 0.8rem 1rem;
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid rgba(148, 163, 184, 0.28);
-            color: #cbd5e1;
-            font-size: 0.8rem;
-        }
-        .cookie-banner.hidden {
-            transform: translateY(120%);
-            pointer-events: none;
-        }
-        .cookie-banner a { color: #93c5fd; text-decoration: underline; }
+        .root-actions button,.root-actions a { border-radius: 9px; padding: 0.5rem 0.75rem; font-size: 0.78rem; font-weight: 700; border: 1px solid var(--line); text-decoration: none; cursor: pointer; color: var(--text); }
+        .root-actions button { background: #ef4444; color: #fff; border: none; }
+        .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.8rem 1rem; background: rgba(15,23,42,0.95); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.8rem; }
+        [data-theme="light"] .cookie-banner { background: rgba(255,255,255,0.95); }
+        .cookie-banner.hidden { transform: translateY(120%); pointer-events: none; }
+        .cookie-banner a { color: #3b82f6; text-decoration: underline; }
         .cookie-actions { display: flex; gap: 0.5rem; }
-        .cookie-accept, .cookie-decline {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            border-radius: 7px;
-            padding: 0.4rem 0.72rem;
-            font-size: 0.74rem;
-            cursor: pointer;
-            background: transparent;
-            color: #e2e8f0;
-        }
-        .cookie-accept { background: #2563eb; border-color: #2563eb; }
-        @media (max-width: 760px) {
-            .cookie-banner { flex-direction: column; text-align: center; }
-        }
-
+        .cookie-accept,.cookie-decline { border: 1px solid var(--line); border-radius: 7px; padding: 0.4rem 0.72rem; font-size: 0.74rem; cursor: pointer; background: transparent; color: var(--text); }
+        .cookie-accept { background: #2563eb; border-color: #2563eb; color: #fff; }
+        @media (max-width:800px) { .tech-grid,.kv-grid,.abbr-grid { grid-template-columns: 1fr; } .wrap { padding: 0.8rem 0.6rem 1.5rem; } .section,.hero { padding: 1rem 0.8rem; } }
+        @media (max-width:760px) { .cookie-banner { flex-direction: column; text-align: center; } }
+        .progress-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; height: 3px; background: transparent; pointer-events: none; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent2),var(--accent)); transition: width 0.1s; border-radius: 0 2px 2px 0; }
+        .toolbar { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 0.7rem; flex-wrap: wrap; font-size: 0.75rem; }
+        .toolbar-group { display: flex; align-items: center; gap: 0.3rem; }
+        .toolbar-sep { width: 1px; height: 20px; background: var(--line); margin: 0 0.2rem; flex-shrink: 0; }
+        .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.3rem 0.55rem; border-radius: 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+        .toolbar-btn:hover { color: var(--text); background: var(--card-inner-hover); }
+        .toolbar-btn.active { color: var(--accent2); border-color: var(--nav-active-border); background: var(--nav-active-bg); }
+        .toolbar-btn i { font-size: 0.7rem; }
+        .reading-time { color: var(--muted); font-size: 0.72rem; margin-left: auto; white-space: nowrap; }
+        .reading-time i { margin-right: 0.25rem; color: var(--accent2); }
+        .search-overlay { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(2,6,23,0.7); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding-top: 12vh; }
+        .search-overlay.active { display: flex; }
+        [data-theme="light"] .search-overlay { background: rgba(241,245,249,0.8); }
+        .search-box { width: 90%; max-width: 520px; background: var(--bg-solid); border: 1px solid var(--line); border-radius: 14px; padding: 0.8rem; box-shadow: 0 20px 50px var(--shadow-deep); }
+        .search-input { width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--card-inner); color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; }
+        .search-input:focus { border-color: var(--accent2); }
+        .search-results { max-height: 50vh; overflow-y: auto; margin-top: 0.5rem; }
+        .search-result { padding: 0.5rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.82rem; color: var(--text-body); }
+        .search-result:hover { background: var(--card-inner-hover); }
+        .search-result mark { background: rgba(239,68,68,0.25); color: var(--text); border-radius: 2px; padding: 0 2px; }
+        .search-result .sr-section { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+        .study-check { display: none; float: right; margin-top: 2px; }
+        .study-mode .study-check { display: inline-flex; }
+        .study-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent2); cursor: pointer; }
+        .study-mode .section.studied { opacity: 0.55; }
+        .study-mode .section.studied .section-title::after { content: ' (Completed)'; font-size: 0.7rem; color: var(--callout-green-color); font-weight: 400; }
+        .flashcard-overlay { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(2,6,23,0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; flex-direction: column; gap: 1rem; padding: 1rem; perspective: 1000px; }
+        .flashcard-overlay.active { display: flex; }
+        [data-theme="light"] .flashcard-overlay { background: rgba(241,245,249,0.9); }
+        .flashcard { width: 90%; max-width: 420px; min-height: 200px; background: transparent; border: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0; cursor: pointer; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; position: relative; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .fc-front,.fc-back { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 12px 40px var(--shadow-deep); }
+        .fc-front { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
+        .fc-back { transform: rotateY(180deg); font-size: 0.92rem; color: var(--text-body); line-height: 1.6; }
+        .fc-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .fc-controls button { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.82rem; font-family: inherit; }
+        .fc-controls button:hover { background: var(--card-inner-hover); }
+        .fc-counter { color: var(--muted); font-size: 0.8rem; }
+        .fc-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; z-index: 2; }
+        .fc-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.6rem; font-style: italic; }
+        .fc-mastery { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .fc-mastery button { padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: 0.8rem; font-family: inherit; transition: all 0.2s; }
+        .fc-mastery button:hover { background: var(--card-inner-hover); }
+        .fc-mastery .fc-know { border-color: var(--callout-green-color); color: var(--callout-green-color); }
+        .fc-mastery .fc-know:hover { background: var(--callout-green-color); color: #fff; }
+        .fc-mastery .fc-learning { border-color: var(--accent2); color: var(--accent2); }
+        .fc-mastery .fc-learning:hover { background: var(--accent2); color: #fff; }
+        .fc-mastery .fc-shuffle { border-color: var(--muted); }
+        .fc-progress-bar { width: 90%; max-width: 420px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+        .fc-progress-fill { height: 100%; background: var(--callout-green-color); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .fc-stats { color: var(--muted); font-size: 0.75rem; text-align: center; }
+        .fc-kbd-hint { color: var(--muted); font-size: 0.68rem; text-align: center; opacity: 0.7; }
+        .fc-kbd-hint kbd { display: inline-block; padding: 0.1rem 0.35rem; border-radius: 4px; border: 1px solid var(--line); background: var(--card-inner); font-size: 0.65rem; font-family: inherit; margin: 0 0.1rem; }
+        .inline-calc { padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card-inner); margin: 0.7rem 0; }
+        .inline-calc label { display: block; font-size: 0.76rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+        .inline-calc input,.inline-calc select { width: 100%; padding: 0.45rem 0.6rem; border-radius: 7px; border: 1px solid var(--line); background: var(--kv-bg); color: var(--text); font-size: 0.85rem; font-family: inherit; margin-bottom: 0.5rem; outline: none; }
+        .inline-calc input:focus,.inline-calc select:focus { border-color: var(--accent2); }
+        .calc-result { padding: 0.6rem; border-radius: 8px; background: var(--nav-active-bg); border: 1px solid var(--nav-active-border); text-align: center; }
+        .calc-result .calc-value { font-size: 1.3rem; font-weight: 700; color: var(--accent2); }
+        .calc-result .calc-label { font-size: 0.72rem; color: var(--muted); }
+        .quiz-widget { border: 1px solid var(--accent2); border-radius: 12px; padding: 0.9rem; margin: 0.7rem 0; background: var(--card-inner); }
+        .quiz-question { font-size: 0.88rem; font-weight: 600; color: var(--text-strong); margin-bottom: 0.6rem; }
+        .quiz-options { display: grid; gap: 0.35rem; }
+        .quiz-opt { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; font-size: 0.82rem; color: var(--text-body); transition: all 0.15s; }
+        .quiz-opt:hover { background: var(--card-inner-hover); border-color: var(--accent2); }
+        .quiz-opt.correct { background: var(--callout-green-bg); border-color: var(--callout-green-border); color: var(--callout-green-color); }
+        .quiz-opt.wrong { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+        [data-theme="light"] .quiz-opt.wrong { color: #dc2626; }
+        .quiz-opt .opt-icon { width: 18px; text-align: center; }
+        .quiz-feedback { margin-top: 0.5rem; font-size: 0.8rem; padding: 0.5rem 0.7rem; border-radius: 8px; display: none; }
+        .quiz-feedback.show { display: block; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.6rem; margin: 0.7rem 0; }
+        .comparison-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem; background: var(--card-inner); cursor: pointer; transition: all 0.2s; }
+        .comparison-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+        .comparison-card.expanded { grid-column: 1 / -1; }
+        .comparison-card h5 { font-size: 0.82rem; color: var(--text-strong); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.3rem; }
+        .comparison-card h5 i { color: var(--accent2); }
+        .comparison-card .cc-summary { font-size: 0.78rem; color: var(--muted); }
+        .comparison-card .cc-detail { display: none; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-body); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 0.5rem; }
+        .comparison-card.expanded .cc-detail { display: block; }
+        .case-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.6rem; background: var(--card-inner); }
+        .case-card h4 { font-size: 0.88rem; color: var(--text-strong); margin-bottom: 0.3rem; }
+        .case-metrics { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0; }
+        .case-metric { padding: 0.3rem 0.55rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+        .case-before { background: rgba(239,68,68,0.12); color: #fca5a5; }
+        .case-after { background: var(--callout-green-bg); color: var(--callout-green-color); }
+        [data-theme="light"] .case-before { color: #dc2626; }
+        .interview-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 0.6rem; margin-top: 0.6rem; }
+        .interview-card { border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 0.8rem; background: rgba(239,68,68,0.06); }
+        .interview-card h5 { font-size: 0.82rem; color: #f87171; margin-bottom: 0.3rem; }
+        [data-theme="light"] .interview-card h5 { color: #dc2626; }
+        [data-theme="light"] .interview-card { background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.2); }
+        .interview-card p { font-size: 0.78rem; color: var(--text-body); line-height: 1.55; }
+        .changelog { margin-top: 0.5rem; }
+        .changelog-entry { display: flex; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px solid var(--line); font-size: 0.78rem; }
+        .changelog-entry:last-child { border-bottom: none; }
+        .changelog-date { color: var(--accent2); font-weight: 600; min-width: 85px; flex-shrink: 0; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size: 0.74rem; }
+        .changelog-text { color: var(--text-body); }
+        .deep-link { opacity: 0; margin-left: 0.3rem; color: var(--muted); font-size: 0.8rem; cursor: pointer; transition: opacity 0.15s; background: none; border: none; }
+        .section-title:hover .deep-link { opacity: 1; }
+        .deep-link:hover { color: var(--accent2); }
+        .deep-link-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent2); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; z-index: 9999; display: none; box-shadow: 0 4px 12px var(--shadow); }
+        body.font-sm .accordion-content,body.font-sm .section-intro,body.font-sm .data-table td,body.font-sm .tech-card p { font-size: 0.76rem; }
+        body.font-lg .accordion-content,body.font-lg .section-intro,body.font-lg .data-table td,body.font-lg .tech-card p { font-size: 0.92rem; }
+        .data-table th.sortable { cursor: pointer; user-select: none; }
+        .data-table th.sortable:hover { background: var(--nav-active-bg); }
+        .data-table th .sort-icon { margin-left: 4px; font-size: 0.6rem; opacity: 0.4; }
+        .data-table th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
+        @media (max-width:600px) { .data-table { font-size: 0.72rem; } .data-table th,.data-table td { padding: 0.35rem 0.4rem; } }
+        @media print { .navbar,.toolbar,.section-nav,.root-gate,.cookie-banner,.progress-wrap,.search-overlay,.flashcard-overlay,.deep-link,.study-check,.topbar,.tooltip-float { display: none !important; } body { background: #fff !important; color: #000 !important; } body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; } .section,.hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; } .accordion-body { max-height: none !important; overflow: visible !important; } .accordion-header .chevron { display: none; } .data-table th { background: #e5e7eb !important; color: #111 !important; } .data-table td { color: #333 !important; border-color: #ddd !important; } .callout { border-color: #ccc !important; color: #333 !important; background: #f9fafb !important; } * { color: #000 !important; } }
     </style>
 </head>
 <body class="locked">
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="search-overlay" id="searchOverlay"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off"><div class="search-results" id="searchResults"></div></div></div>
+    <div class="flashcard-overlay" id="flashcardOverlay">
+        <button class="fc-close" id="fcClose" aria-label="Close flashcards">&times;</button>
+        <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+        <div class="fc-stats" id="fcStats">0 mastered of 50</div>
+        <div class="flashcard" id="flashcard"><div class="fc-front" id="fcFront"><span id="fcFrontText"></span><span class="fc-hint">Click or press Space to reveal</span></div><div class="fc-back" id="fcBack"><span id="fcBackText"></span><span class="fc-hint">Definition</span></div></div>
+        <div class="fc-controls"><button id="fcPrev"><i class="fas fa-arrow-left"></i> Prev</button><span class="fc-counter" id="fcCounter">1 / 50</span><button id="fcNext">Next <i class="fas fa-arrow-right"></i></button></div>
+        <div class="fc-mastery"><button class="fc-know" id="fcKnow"><i class="fas fa-check"></i> Know it</button><button class="fc-learning" id="fcLearning"><i class="fas fa-redo"></i> Still learning</button><button class="fc-shuffle" id="fcShuffle"><i class="fas fa-random"></i> Shuffle</button></div>
+        <div class="fc-kbd-hint"><kbd>Space</kbd> flip &nbsp; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp; <kbd>1</kbd> know &nbsp; <kbd>2</kbd> learning &nbsp; <kbd>Esc</kbd> close</div>
+    </div>
+    <div class="deep-link-toast" id="deepLinkToast">Link copied to clipboard</div>
+
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu">
+                    <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="datahallAI.html" style="color:#8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                    <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+                    <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+                    <li style="border-bottom:1px solid rgba(148,163,184,0.15);margin:4px 0;"></li>
+                    <li><a href="dcmoc/" style="color:#ef4444;font-weight:600;">DC MOC</a></li>
+                </ul>
+            </li>
+            <li><a href="articles.html" class="nav-link">Articles</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    </div></nav>
+
     <div class="wrap">
         <div class="topbar">
             <a class="back" href="standards-ltc-lab.html"><i class="fas fa-arrow-left"></i> Back to Lab</a>
             <span class="pill"><i class="fas fa-lock"></i> Root Module</span>
         </div>
-        <section class="panel">
-            <span class="pill">NFPA / Safety Posture</span>
-            <h1>NFPA Fire and Life-Safety Risk</h1>
-            <p class="subtitle">Suppression strategy, response pathways, and integrated safety posture.</p>
-            <p class="summary">This module compares suppression architectures and response readiness to reduce high-impact failure scenarios in mission-critical halls.</p>
 
-            <div class="grid">
-                <article class="card">
-                    <h3>Coverage</h3>
-                    <ul>
-                        <li>Suppression mode comparison: clean agent, water mist, pre-action.</li>
-                        <li>Detection-to-response latency assumptions and blind spots.</li>
-                        <li>Cross-impact of fire controls to uptime and recovery path.</li>
-                        <li>Emergency drills and response-role maturity scoring.</li>
-                    </ul>
-                </article>
-                <article class="card">
-                    <h3>Focus Blocks</h3>
-                    <ul>
-                        <li>Hazard profile map</li>
-                        <li>Response timeline</li>
-                        <li>Suppression tradeoffs</li>
-                        <li>Recovery readiness</li>
-                    </ul>
-                </article>
+        <section class="hero">
+            <span class="pill-red" style="padding:0.3rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">NFPA Fire &amp; Safety Standards</span>
+            <h1>NFPA Fire &amp; Safety Risk — Comprehensive Deep-Dive</h1>
+            <p class="subtitle">From NFPA 75 IT equipment protection and NFPA 2001 clean agent systems to NFPA 72 detection and NFPA 13 sprinklers — a complete technical reference for data center fire protection, life safety, and suppression system design.</p>
+            <div class="mindmap-wrap" role="img" aria-label="NFPA Data Center Fire Safety Mindmap">
+                <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect class="diag-box" x="355" y="220" width="210" height="70" rx="14"/>
+                    <text class="diag-center" x="460" y="250" text-anchor="middle">NFPA Fire</text>
+                    <text class="diag-center" x="460" y="270" text-anchor="middle">&amp; Safety</text>
+                    <path class="diag-line-red" d="M355,240 L230,110"/>
+                    <rect class="diag-box-red" x="80" y="30" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="100" y="55" fill="#fca5a5">NFPA 75 IT</text>
+                    <text class="diag-v" x="100" y="74">IT equipment protection</text>
+                    <text class="diag-v" x="100" y="90">Construction requirements</text>
+                    <text class="diag-v" x="100" y="106">HVAC disconnect</text>
+                    <path class="diag-line-red" d="M565,240 L690,110"/>
+                    <rect class="diag-box-red" x="610" y="30" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="630" y="55" fill="#fca5a5">NFPA 2001</text>
+                    <text class="diag-v" x="630" y="74">FM-200 / Novec 1230</text>
+                    <text class="diag-v" x="630" y="90">IG-541 Inert Gas</text>
+                    <text class="diag-v" x="630" y="106">Design concentration</text>
+                    <path class="diag-line-red" d="M355,265 L180,290"/>
+                    <rect class="diag-box-red" x="20" y="260" width="200" height="100" rx="10"/>
+                    <text class="diag-t" x="40" y="285" fill="#fca5a5">NFPA 72 Detection</text>
+                    <text class="diag-v" x="40" y="304">VESDA aspirating</text>
+                    <text class="diag-v" x="40" y="320">Spot detectors</text>
+                    <text class="diag-v" x="40" y="336">Notification appliances</text>
+                    <path class="diag-line-amber" d="M565,265 L720,290"/>
+                    <rect class="diag-box-amber" x="680" y="260" width="220" height="110" rx="10"/>
+                    <text class="diag-t" x="700" y="285" fill="#fde68a">NFPA 13 Sprinkler</text>
+                    <text class="diag-v" x="700" y="304">Pre-action systems</text>
+                    <text class="diag-v" x="700" y="320">Wet vs dry pipe</text>
+                    <text class="diag-v" x="700" y="336">Design density</text>
+                    <text class="diag-v" x="700" y="352">Occupancy classification</text>
+                    <path class="diag-line-green" d="M400,290 L230,430"/>
+                    <rect class="diag-box-green" x="70" y="400" width="210" height="100" rx="10"/>
+                    <text class="diag-t" x="90" y="425" fill="#86efac">NFPA 76 Telecom</text>
+                    <text class="diag-v" x="90" y="444">Hazard classification</text>
+                    <text class="diag-v" x="90" y="460">Area protection</text>
+                    <text class="diag-v" x="90" y="476">Differences from 75</text>
+                    <path class="diag-line-green" d="M520,290 L660,430"/>
+                    <rect class="diag-box-green" x="580" y="400" width="220" height="100" rx="10"/>
+                    <text class="diag-t" x="600" y="425" fill="#86efac">NFPA 101 Life Safety</text>
+                    <text class="diag-v" x="600" y="444">EPO &amp; egress design</text>
+                    <text class="diag-v" x="600" y="460">Emergency lighting</text>
+                    <text class="diag-v" x="600" y="476">ADA accessibility</text>
+                </svg>
             </div>
-
-            <div class="cta">
-                <a class="btn btn-main" href="standards-ltc-lab.html#calculator"><i class="fas fa-chart-line"></i> Open Live Simulation</a>
-                <a class="btn btn-sub" href="datacenter-solutions.html#tools"><i class="fas fa-grid"></i> Back to Tools</a>
-            </div>
-
-            <p class="next">Next step: build tabletop scenario set (detection miss, delayed discharge, failover under alarm).</p>
-            <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review.</p>
+            <p style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem;"><i class="fas fa-info-circle"></i> Red = Core NFPA Standards · Amber = Sprinkler &amp; Water Systems · Green = Telecom &amp; Life Safety</p>
         </section>
-    </div>
 
-    <div class="root-gate" id="rootGate">
-        <div class="root-card">
-            <h2>Root Access Required</h2>
-            <p>This deep-dive module is restricted to root accounts.</p>
-            <div class="root-actions">
-                <button id="rootLoginBtn" type="button">Sign In as Root</button>
-                <a href="datacenter-solutions.html">Back</a>
+        <div class="toolbar" id="pageToolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="unitToggle" title="Toggle kW / BTU"><i class="fas fa-fire"></i> kW</button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="fontDown" title="Decrease font size"><i class="fas fa-minus"></i> A</button>
+                <button class="toolbar-btn" id="fontUp" title="Increase font size"><i class="fas fa-plus"></i> A</button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="searchBtn" title="Search (Ctrl+K)"><i class="fas fa-search"></i> Search</button>
+                <button class="toolbar-btn" id="studyModeBtn" title="Toggle study mode"><i class="fas fa-graduation-cap"></i> Study</button>
+                <button class="toolbar-btn" id="flashcardBtn" title="Flashcard mode"><i class="fas fa-clone"></i> Cards</button>
+                <button class="toolbar-btn" id="printBtn" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <span class="reading-time" id="readingTime"><i class="fas fa-clock"></i> ~30 min read</span>
+        </div>
+
+        <nav class="section-nav" id="sectionNav">
+            <a class="nav-pill active" href="#sec-nfpa75">NFPA 75</a>
+            <a class="nav-pill" href="#sec-nfpa76">NFPA 76</a>
+            <a class="nav-pill" href="#sec-cleanagent">Clean Agent</a>
+            <a class="nav-pill" href="#sec-detection">Detection</a>
+            <a class="nav-pill" href="#sec-sprinkler">Sprinkler</a>
+            <a class="nav-pill" href="#sec-suppression">Suppression</a>
+            <a class="nav-pill" href="#sec-epo">EPO</a>
+            <a class="nav-pill" href="#sec-containment">Containment</a>
+            <a class="nav-pill" href="#sec-xref">Cross-Ref</a>
+            <a class="nav-pill" href="#sec-cases">Cases</a>
+            <a class="nav-pill" href="#sec-interview">Interview</a>
+            <a class="nav-pill" href="#sec-abbr">Abbrev.</a>
+        </nav>
+
+        <!-- SECTION 1: NFPA 75 IT Equipment -->
+        <section class="section" id="sec-nfpa75" data-nav-id="sec-nfpa75">
+            <h2 class="section-title"><i class="fas fa-server"></i> NFPA 75 — IT Equipment Protection <button class="deep-link" onclick="copyDeepLink('sec-nfpa75')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 75: Standard for the Fire Protection of Information Technology Equipment. Covers rooms >460 sq ft containing IT equipment.">NFPA 75</span> establishes the minimum fire protection requirements for information technology equipment rooms and areas. It addresses construction, fire detection, suppression, and emergency procedures for spaces housing servers, networking gear, and storage systems.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Scope &amp; Purpose <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>NFPA 75 covers the protection of <strong>information technology equipment</strong> and <strong>information technology equipment areas</strong>. It applies to rooms exceeding <strong>460 sq ft (42.7 m&sup2;)</strong> that contain IT equipment.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Minimum Room Size</div><div class="kv-value">&gt;460 sq ft</div></div>
+                        <div class="kv-item"><div class="kv-label">Equipment Types</div><div class="kv-value">Servers, Storage, Network</div></div>
+                        <div class="kv-item"><div class="kv-label">Current Edition</div><div class="kv-value">NFPA 75 (2024)</div></div>
+                        <div class="kv-item"><div class="kv-label">Companion Standard</div><div class="kv-value">NFPA 76 (Telecom)</div></div>
+                    </div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> NFPA 75 is typically adopted by the <span class="term-tooltip" data-tooltip="AHJ: Authority Having Jurisdiction — the organization, office, or individual responsible for enforcing code requirements.">AHJ</span> as part of the building code for data center projects. It is referenced by IBC, IFC, and FM Global data sheets.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Construction Requirements <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>NFPA 75 mandates specific construction standards for IT equipment rooms to contain fire and prevent spread to adjacent spaces.</p>
+                    <ul>
+                        <li><strong>1-hour fire-rated walls:</strong> Minimum separation between IT rooms and adjacent spaces</li>
+                        <li><strong>Automatic door closers:</strong> All doors into IT rooms must have self-closing hardware</li>
+                        <li><strong>Slab-to-slab construction:</strong> Fire-rated walls must extend from the structural floor to the structural ceiling above, sealing the plenum space</li>
+                        <li><strong>Floor/ceiling penetrations:</strong> All penetrations through fire-rated assemblies must be firestopped per ASTM E814</li>
+                        <li><strong>Raised floor considerations:</strong> Sub-floor area must be included in the fire protection zone</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> A common compliance gap: walls that stop at the drop ceiling rather than extending to the structural deck above. This allows fire and smoke to bypass the fire barrier through the plenum.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> HVAC Disconnect <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Upon fire detection, the HVAC system serving the IT room must be automatically shut down to prevent smoke migration and oxygen supply to the fire.</p>
+                    <ul>
+                        <li><strong>Automatic HVAC shutdown:</strong> Triggered by fire alarm signal from the <span class="term-tooltip" data-tooltip="FACP: Fire Alarm Control Panel — the central brain of the fire alarm system that monitors inputs and activates outputs.">FACP</span></li>
+                        <li><strong>Damper closure:</strong> Fire and smoke dampers in all ductwork penetrating the IT room must close automatically</li>
+                        <li><strong>Prevent smoke migration:</strong> System must prevent smoke from spreading to other areas via the HVAC ductwork</li>
+                        <li><strong>Clean agent coordination:</strong> HVAC shutdown must occur <strong>before</strong> clean agent discharge to maintain design concentration</li>
+                    </ul>
+                    <div class="callout callout-green"><i class="fas fa-check-circle"></i> Best practice: Interlock HVAC shutdown with the first alarm stage (VESDA Alert/Action) rather than waiting for full alarm to minimize smoke spread.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Extinguishing Requirements <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>NFPA 75 requires appropriate fire suppression systems for IT rooms, with emphasis on minimizing damage to sensitive electronic equipment.</p>
+                    <ul>
+                        <li><strong>Clean agent systems:</strong> FM-200, Novec 1230, or IG-541 total flooding systems per NFPA 2001</li>
+                        <li><strong>Pre-action sprinkler:</strong> Double-interlock pre-action systems per NFPA 13 — requires both detection and heat activation</li>
+                        <li><strong>Portable extinguishers:</strong> CO2 or clean agent rated (Class C minimum) — water-based extinguishers are prohibited near energized IT equipment</li>
+                        <li><strong>Extinguisher placement:</strong> Within 50 ft travel distance, mounted at conspicuous locations near exits</li>
+                    </ul>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>System Type</th><th>Agent</th><th>Discharge Time</th><th>IT Equipment Safe</th><th>Re-entry Time</th></tr></thead>
+                        <tbody>
+                            <tr><td>Clean Agent</td><td>FM-200 / Novec</td><td class="highlight">10 seconds</td><td class="highlight">Yes</td><td>Immediate</td></tr>
+                            <tr><td>Inert Gas</td><td>IG-541</td><td>60 seconds</td><td class="highlight">Yes</td><td>Verify O2 level</td></tr>
+                            <tr><td>Pre-Action Sprinkler</td><td>Water</td><td>On heat activation</td><td>Partial risk</td><td>Immediate</td></tr>
+                            <tr><td>Wet Pipe Sprinkler</td><td>Water</td><td>On heat activation</td><td>High risk</td><td>Immediate</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Signage &amp; Marking <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Proper signage is critical for emergency response and personnel safety in IT equipment rooms.</p>
+                    <ul>
+                        <li><strong>EPO signage:</strong> <span class="term-tooltip" data-tooltip="EPO: Emergency Power Off — a mechanism to disconnect all power to IT equipment in an emergency. Required by NFPA 70 and NFPA 75.">EPO</span> buttons must be clearly labeled with permanent signage visible from all approaches</li>
+                        <li><strong>Hazard labels:</strong> Warning signs for clean agent systems indicating potential oxygen displacement</li>
+                        <li><strong>Fire suppression status indicators:</strong> Visual indicators showing system armed/disarmed status at every entry point</li>
+                        <li><strong>Room identification:</strong> IT equipment room designations on all doors</li>
+                        <li><strong>Agent type posting:</strong> Type and quantity of suppression agent posted at room entrances</li>
+                    </ul>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: NFPA 76 Telecom -->
+        <section class="section" id="sec-nfpa76" data-nav-id="sec-nfpa76">
+            <h2 class="section-title"><i class="fas fa-broadcast-tower"></i> NFPA 76 — Telecommunications Facilities <button class="deep-link" onclick="copyDeepLink('sec-nfpa76')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 76: Standard for the Fire Protection of Telecommunications Facilities. Covers central offices, switching centers, and carrier hotels.">NFPA 76</span> provides fire protection requirements specifically for telecommunications facilities including central offices, switching centers, and carrier hotels. While similar to NFPA 75, it addresses the unique hazards of high-density telecom equipment.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Hazard Classification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>NFPA 76 classifies telecom facility hazards into three categories based on equipment density, criticality, and fire load.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Class</th><th>Description</th><th>Equipment Density</th><th>Protection Level</th></tr></thead>
+                        <tbody>
+                            <tr><td class="highlight">Class A</td><td>Essential / High Priority</td><td>High density</td><td class="highlight">Total flooding + VESDA</td></tr>
+                            <tr><td>Class B</td><td>Important / Standard</td><td>Medium density</td><td>Clean agent or pre-action</td></tr>
+                            <tr><td>Class C</td><td>Support / Low Priority</td><td>Low density</td><td>Sprinkler adequate</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> Class A facilities include 911 call centers, major internet exchange points, and critical backbone switching centers where any outage affects public safety.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Area Protection <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Total flooding requirements vary by hazard class, with higher-class facilities requiring more comprehensive protection.</p>
+                    <ul>
+                        <li><strong>Class A:</strong> Total flooding clean agent system covering the entire equipment space including sub-floor and ceiling plenum</li>
+                        <li><strong>Class B:</strong> Clean agent or pre-action sprinkler system with aspirating detection</li>
+                        <li><strong>Class C:</strong> Standard wet or dry pipe sprinkler acceptable with spot detection</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Total flooding requires a sealed enclosure. Door seals, HVAC damper closure, and all penetrations must be sealed to maintain agent concentration for the required 10-minute hold time.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Environmental Controls <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Telecom facilities require specific environmental controls that integrate with fire protection systems.</p>
+                    <ul>
+                        <li><strong>Smoke removal:</strong> Dedicated smoke exhaust or purge capability after fire event</li>
+                        <li><strong>HVAC integration:</strong> Automatic shutdown and damper closure coordinated with fire alarm system</li>
+                        <li><strong>Temperature monitoring:</strong> Continuous thermal monitoring to detect overheating equipment before ignition</li>
+                        <li><strong>Cable management:</strong> Use of <span class="term-tooltip" data-tooltip="LSZH: Low Smoke Zero Halogen — cable jacketing that produces minimal smoke and no halogen gases when burned, reducing toxicity and equipment corrosion.">LSZH</span> cables to reduce toxic smoke generation</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Differences from NFPA 75 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>While NFPA 75 and NFPA 76 share common fire protection principles, they differ in scope, hazard classification, and application.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Attribute</th><th>NFPA 75</th><th>NFPA 76</th></tr></thead>
+                        <tbody>
+                            <tr><td>Primary Scope</td><td>IT equipment rooms</td><td class="highlight">Telecom facilities</td></tr>
+                            <tr><td>Facility Types</td><td>Data centers, server rooms</td><td>Central offices, carrier hotels</td></tr>
+                            <tr><td>Size Threshold</td><td>&gt;460 sq ft</td><td>No minimum size</td></tr>
+                            <tr><td>Hazard Classes</td><td>Not classified</td><td class="highlight">Class A / B / C</td></tr>
+                            <tr><td>Battery Rooms</td><td>Referenced to NFPA 1</td><td>Specific requirements</td></tr>
+                            <tr><td>Cable Protection</td><td>General requirements</td><td>LSZH emphasis</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: NFPA 2001 Clean Agent -->
+        <section class="section" id="sec-cleanagent" data-nav-id="sec-cleanagent">
+            <h2 class="section-title"><i class="fas fa-cloud"></i> NFPA 2001 — Clean Agent Systems <button class="deep-link" onclick="copyDeepLink('sec-cleanagent')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 2001: Standard on Clean Agent Fire Extinguishing Systems. Covers design, installation, and maintenance of gaseous suppression systems.">NFPA 2001</span> governs the design, installation, testing, and maintenance of clean agent fire extinguishing systems. These agents leave no residue and are safe for use around sensitive electronic equipment, making them the preferred choice for data centers.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> FM-200 (HFC-227ea) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>FM-200</strong> (chemical name HFC-227ea) is the most widely deployed clean agent in data centers worldwide. It extinguishes fire primarily through heat absorption.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Chemical Name</div><div class="kv-value">Heptafluoropropane</div></div>
+                        <div class="kv-item"><div class="kv-label">GWP</div><div class="kv-value">3220</div></div>
+                        <div class="kv-item"><div class="kv-label">ODP</div><div class="kv-value">0</div></div>
+                        <div class="kv-item"><div class="kv-label">Design Concentration</div><div class="kv-value">7.0% (Class A)</div></div>
+                        <div class="kv-item"><div class="kv-label">Hold Time</div><div class="kv-value">10 minutes minimum</div></div>
+                        <div class="kv-item"><div class="kv-label">Discharge Time</div><div class="kv-value">&le;10 seconds</div></div>
+                        <div class="kv-item"><div class="kv-label">Storage</div><div class="kv-value">Liquid in pressurized cylinders</div></div>
+                        <div class="kv-item"><div class="kv-label">Safety</div><div class="kv-value">NOAEL 9.0%</div></div>
+                    </div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> FM-200 has a high <span class="term-tooltip" data-tooltip="GWP: Global Warming Potential — a measure of how much heat a greenhouse gas traps compared to CO2. FM-200's GWP of 3220 means it traps 3220x more heat than CO2.">GWP</span> of 3220. Many jurisdictions are phasing out HFC agents due to environmental regulations (EU F-Gas, Kigali Amendment). Plan for Novec 1230 or inert gas alternatives.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Novec 1230 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>Novec 1230</strong> (FK-5-1-12) is a fluoroketone clean agent with exceptional environmental performance. It is increasingly replacing FM-200 in new installations.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Chemical Name</div><div class="kv-value">Fluoroketone (FK-5-1-12)</div></div>
+                        <div class="kv-item"><div class="kv-label">GWP</div><div class="kv-value highlight">1</div></div>
+                        <div class="kv-item"><div class="kv-label">ODP</div><div class="kv-value">0</div></div>
+                        <div class="kv-item"><div class="kv-label">Design Concentration</div><div class="kv-value">5.6% (Class A)</div></div>
+                        <div class="kv-item"><div class="kv-label">Atmospheric Lifetime</div><div class="kv-value">5 days</div></div>
+                        <div class="kv-item"><div class="kv-label">Discharge Time</div><div class="kv-value">&le;10 seconds</div></div>
+                        <div class="kv-item"><div class="kv-label">Storage</div><div class="kv-value">Liquid, super-pressurized (N2)</div></div>
+                        <div class="kv-item"><div class="kv-label">Safety</div><div class="kv-value">NOAEL 10.0%</div></div>
+                    </div>
+                    <div class="callout callout-green"><i class="fas fa-leaf"></i> Novec 1230 has a GWP of just 1 and an atmospheric lifetime of only 5 days — making it the most environmentally friendly clean agent available. It is exempt from EU F-Gas regulation phase-down schedules.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> IG-541 (Inergen) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>IG-541</strong> (marketed as Inergen) is a blend of naturally occurring gases that extinguishes fire by reducing oxygen concentration below the combustion threshold while maintaining breathable levels.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Composition</div><div class="kv-value">52% N2 / 40% Ar / 8% CO2</div></div>
+                        <div class="kv-item"><div class="kv-label">GWP</div><div class="kv-value highlight">0</div></div>
+                        <div class="kv-item"><div class="kv-label">ODP</div><div class="kv-value">0</div></div>
+                        <div class="kv-item"><div class="kv-label">Design Concentration</div><div class="kv-value">34.2% (min. for Class A)</div></div>
+                        <div class="kv-item"><div class="kv-label">O2 Reduction</div><div class="kv-value">12.5% (from 21%)</div></div>
+                        <div class="kv-item"><div class="kv-label">Discharge Time</div><div class="kv-value">&le;60 seconds</div></div>
+                        <div class="kv-item"><div class="kv-label">Storage</div><div class="kv-value">High-pressure cylinders (200/300 bar)</div></div>
+                        <div class="kv-item"><div class="kv-label">Safety</div><div class="kv-value">Breathable at design conc.</div></div>
+                    </div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> IG-541 requires significantly more storage space than chemical agents (FM-200/Novec) due to high-pressure gas cylinders. A typical 500 m&sup3; data hall may need 40-60 cylinders compared to 8-12 for FM-200.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Design Concentration Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The design concentration determines how much agent is needed to extinguish a fire in a given volume. Lower concentrations mean less agent and smaller storage requirements.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Agent</th><th>Design Conc. (Class A)</th><th>NOAEL</th><th>Safety Margin</th><th>Storage per m&sup3;</th></tr></thead>
+                        <tbody>
+                            <tr><td>FM-200</td><td>7.0%</td><td>9.0%</td><td>2.0%</td><td>0.59 kg</td></tr>
+                            <tr><td class="highlight">Novec 1230</td><td class="highlight">5.6%</td><td class="highlight">10.0%</td><td class="highlight">4.4%</td><td class="highlight">0.53 kg</td></tr>
+                            <tr><td>IG-541</td><td>34.2%</td><td>43.0%</td><td>8.8%</td><td>1.28 m&sup3;</td></tr>
+                            <tr><td>IG-55</td><td>38.0%</td><td>43.0%</td><td>5.0%</td><td>1.42 m&sup3;</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> <span class="term-tooltip" data-tooltip="NOAEL: No Observed Adverse Effect Level — the highest concentration at which no adverse health effects are observed in test subjects.">NOAEL</span> represents the maximum safe exposure level. The safety margin (NOAEL minus design concentration) indicates how far below the harmful threshold the system operates.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Clean Agent Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Calculate the quantity of clean agent required based on room volume and agent type.</p>
+                    <div class="inline-calc">
+                        <label>Room Volume (m&sup3;)</label>
+                        <input type="number" id="cleanVol" value="200" min="10" max="10000">
+                        <label>Agent Type</label>
+                        <select id="cleanAgent">
+                            <option value="fm200">FM-200 (HFC-227ea)</option>
+                            <option value="novec" selected>Novec 1230 (FK-5-1-12)</option>
+                            <option value="ig541">IG-541 (Inergen)</option>
+                            <option value="ig55">IG-55 (Argonite)</option>
+                        </select>
+                        <div class="calc-result" id="cleanResult"><div class="calc-value">106.0 kg</div><div class="calc-label">Novec 1230 Required &middot; 2 cylinders</div></div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">6</span> Hold Time Requirements <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>After agent discharge, the protected space must maintain the design concentration for a minimum period to ensure complete fire extinguishment and prevent re-ignition.</p>
+                    <ul>
+                        <li><strong>10-minute minimum:</strong> NFPA 2001 requires agent concentration to remain at or above design level for at least 10 minutes</li>
+                        <li><strong>Integrity testing:</strong> Door fan test per ISO 14520 Annex E or NFPA 2001 Annex C to verify enclosure can hold agent</li>
+                        <li><strong>Door seals:</strong> Drop seals on all doors, gaskets on all penetrations, damper closure verified</li>
+                        <li><strong>Leakage rate:</strong> Maximum allowable leakage must not reduce concentration below extinguishing level within hold time</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Door fan testing should be performed annually and after any construction or modification to the protected enclosure. Even small gaps (cable penetrations, unsealed conduits) can cause rapid agent loss.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">7</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">Which clean agent has the lowest Global Warming Potential (GWP)?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> FM-200 (GWP 3220)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> Novec 1230 (GWP 1)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> IG-541 (GWP 0)</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> Halon 1301 (GWP 7140)</div>
+                    </div><div class="quiz-feedback"></div></div>
+                    <div class="callout callout-info" style="margin-top:0.5rem;"><i class="fas fa-info-circle"></i> Trick question! While IG-541 has a GWP of 0, it is technically not a "clean agent" in the chemical sense — it is an inert gas blend. Among chemical clean agents, Novec 1230 has the lowest GWP at 1. However, if including all agents under NFPA 2001, IG-541 technically wins at 0.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: NFPA 72 Detection -->
+        <section class="section" id="sec-detection" data-nav-id="sec-detection">
+            <h2 class="section-title"><i class="fas fa-bell"></i> NFPA 72 — Fire Detection Systems <button class="deep-link" onclick="copyDeepLink('sec-detection')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 72: National Fire Alarm and Signaling Code. Covers installation, testing, and maintenance of fire alarm systems including detection, notification, and emergency communications.">NFPA 72</span> governs fire detection and alarm systems. In data centers, early detection is critical because fires in IT equipment produce minimal heat initially, making traditional heat-based detection inadequate.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> VESDA Aspirating Detection <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong><span class="term-tooltip" data-tooltip="VESDA: Very Early Smoke Detection Apparatus — an aspirating smoke detection system that continuously draws air samples through a pipe network to a laser-based detection chamber.">VESDA</span></strong> (Very Early Smoke Detection Apparatus) is the gold standard for data center fire detection. It uses a network of sampling pipes with laser-based smoke analysis.</p>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Detection Method</div><div class="kv-value">Laser nephelometry</div></div>
+                        <div class="kv-item"><div class="kv-label">Sensitivity Range</div><div class="kv-value">0.005–20% obs/m</div></div>
+                        <div class="kv-item"><div class="kv-label">Response Time</div><div class="kv-value">&lt;30 seconds</div></div>
+                        <div class="kv-item"><div class="kv-label">Coverage Area</div><div class="kv-value">Up to 2000 m&sup2; per unit</div></div>
+                    </div>
+                    <p><strong>4 Alarm Levels:</strong></p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Level</th><th>Name</th><th>Typical Action</th><th>Sensitivity</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td>Alert</td><td>Notify operations team</td><td>0.025% obs/m</td></tr>
+                            <tr><td>2</td><td>Action</td><td>Investigate, prepare for shutdown</td><td>0.05% obs/m</td></tr>
+                            <tr><td>3</td><td class="highlight">Fire 1</td><td class="highlight">HVAC shutdown, pre-alarm</td><td>0.1% obs/m</td></tr>
+                            <tr><td>4</td><td class="highlight">Fire 2</td><td class="highlight">Agent discharge, EPO consideration</td><td>0.15% obs/m</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Spot Detectors <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Conventional spot-type smoke detectors are point devices mounted on the ceiling grid. They are less sensitive than aspirating systems but remain common in support areas.</p>
+                    <ul>
+                        <li><strong>Photoelectric:</strong> Uses light scattering — better for slow, smoldering fires typical of cable/insulation fires. Preferred for data centers</li>
+                        <li><strong>Ionization:</strong> Uses radioactive source — better for fast, flaming fires. Not recommended as primary DC detection due to slower response to smoldering</li>
+                        <li><strong>Placement grid:</strong> Per NFPA 72, maximum spacing of 30 ft (9.1 m) on center for smooth ceiling installations</li>
+                        <li><strong>Raised floor/plenum:</strong> Detectors required both above and below raised floor, and in ceiling plenum above drop ceiling</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Multi-Criteria Detectors <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Multi-criteria detectors combine multiple sensing technologies in a single device to improve accuracy and reduce false alarms.</p>
+                    <ul>
+                        <li><strong>Combined sensing:</strong> Smoke (photoelectric) + heat (thermistor) + CO (electrochemical) in one unit</li>
+                        <li><strong>Algorithm-based:</strong> Internal logic evaluates multiple inputs before alarming — reduces nuisance alarms by up to 95%</li>
+                        <li><strong>Adaptive sensitivity:</strong> Some models adjust sensitivity based on environmental conditions (humidity, airflow)</li>
+                        <li><strong>Best for:</strong> Areas with high airflow, dust, or other environmental factors that cause false alarms with single-sensor detectors</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Notification Appliances <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Notification appliances alert building occupants to fire conditions. NFPA 72 and ADA requirements govern their placement and characteristics.</p>
+                    <ul>
+                        <li><strong>Audible devices:</strong> Horns/speakers at minimum 15 dBA above ambient, or 5 dBA above maximum sound level (whichever is greater)</li>
+                        <li><strong>Visual devices (strobes):</strong> Minimum <strong>15 candela</strong> in corridors, 75-177 cd in rooms depending on size</li>
+                        <li><strong>ADA requirements:</strong> Visual notification required in all public and common-use areas for hearing-impaired occupants</li>
+                        <li><strong>Voice evacuation:</strong> Required in large facilities — intelligible voice messages with &ge;0.50 STI (Speech Transmission Index)</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Detector Selection Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Type</th><th>Response Time</th><th>False Alarm Rate</th><th>Relative Cost</th><th>Best For</th></tr></thead>
+                        <tbody>
+                            <tr><td class="highlight">VESDA (Aspirating)</td><td class="highlight">&lt;30 sec</td><td class="highlight">Very Low</td><td>High ($$$)</td><td class="highlight">Data halls, critical IT rooms</td></tr>
+                            <tr><td>Spot Photoelectric</td><td>2-5 min</td><td>Moderate</td><td>Low ($)</td><td>Support rooms, offices</td></tr>
+                            <tr><td>Multi-Criteria</td><td>1-3 min</td><td>Very Low</td><td>Medium ($$)</td><td>High-airflow areas</td></tr>
+                            <tr><td>Beam Detector</td><td>1-3 min</td><td>Moderate</td><td>Medium ($$)</td><td>Large open spaces, warehouses</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-green"><i class="fas fa-check-circle"></i> Best practice: Use VESDA as primary detection in all data halls, with spot detectors as secondary/backup. Multi-criteria detectors excel in areas with environmental challenges (loading docks, near HVAC equipment).</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: NFPA 13 Sprinkler -->
+        <section class="section" id="sec-sprinkler" data-nav-id="sec-sprinkler">
+            <h2 class="section-title"><i class="fas fa-tint"></i> NFPA 13 — Sprinkler Systems <button class="deep-link" onclick="copyDeepLink('sec-sprinkler')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 13: Standard for the Installation of Sprinkler Systems. The primary standard governing automatic sprinkler system design, installation, and requirements.">NFPA 13</span> governs the design and installation of automatic sprinkler systems. While clean agents are preferred for IT spaces, sprinklers remain a code requirement in many jurisdictions and serve as backup protection.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Pre-Action Systems <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><strong>Double-interlock pre-action</strong> systems are the preferred sprinkler type for data centers because they require <strong>two independent conditions</strong> before water is released.</p>
+                    <ul>
+                        <li><strong>Condition 1:</strong> Fire detection system activates (smoke/heat alarm signal)</li>
+                        <li><strong>Condition 2:</strong> Individual sprinkler head fuses from heat exposure</li>
+                        <li><strong>Dry pipe normally:</strong> Piping is filled with supervisory air (not water) — a broken pipe or accidental head knock does not release water</li>
+                        <li><strong>Supervision:</strong> Air pressure monitored continuously — loss of pressure triggers supervisory alarm</li>
+                    </ul>
+                    <div class="callout callout-green"><i class="fas fa-shield-alt"></i> Double-interlock pre-action eliminates the two most common causes of accidental water discharge: (1) broken sprinkler head and (2) false detection alarm. Both must occur simultaneously for water to flow.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Wet vs Dry Pipe Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Attribute</th><th>Wet Pipe</th><th>Dry Pipe</th><th>Pre-Action (Double)</th></tr></thead>
+                        <tbody>
+                            <tr><td>Pipe Contents</td><td>Water</td><td>Compressed air/N2</td><td class="highlight">Supervisory air</td></tr>
+                            <tr><td>Response Time</td><td class="highlight">Fastest</td><td>30-60 sec delay</td><td>45-90 sec delay</td></tr>
+                            <tr><td>Freeze Risk</td><td>High</td><td class="highlight">None</td><td class="highlight">None</td></tr>
+                            <tr><td>False Discharge Risk</td><td>High</td><td>Medium</td><td class="highlight">Very Low</td></tr>
+                            <tr><td>Maintenance</td><td>Low</td><td>Medium</td><td>Higher</td></tr>
+                            <tr><td>DC Suitability</td><td>Not recommended</td><td>Acceptable</td><td class="highlight">Preferred</td></tr>
+                            <tr><td>Cost</td><td>Lowest</td><td>Moderate</td><td>Highest</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Occupancy Classification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>NFPA 13 classifies occupancies by fire hazard level, which determines sprinkler design density, spacing, and water supply requirements.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Classification</th><th>Application</th><th>Design Density</th><th>Area of Operation</th></tr></thead>
+                        <tbody>
+                            <tr><td class="highlight">Ordinary Hazard Group 1</td><td class="highlight">Most DC white space</td><td class="highlight">0.15 GPM/ft&sup2;</td><td class="highlight">1500 ft&sup2;</td></tr>
+                            <tr><td>Ordinary Hazard Group 2</td><td>Mechanical/electrical rooms</td><td>0.20 GPM/ft&sup2;</td><td>1500 ft&sup2;</td></tr>
+                            <tr><td>Extra Hazard Group 1</td><td>Battery rooms (VRLA/Li-ion)</td><td>0.30 GPM/ft&sup2;</td><td>2500 ft&sup2;</td></tr>
+                            <tr><td>Extra Hazard Group 2</td><td>Diesel fuel storage</td><td>0.40 GPM/ft&sup2;</td><td>2500 ft&sup2;</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Battery rooms with lithium-ion batteries are increasingly classified as Extra Hazard Group 1 due to thermal runaway risk. Consult the AHJ and NFPA 855 for battery-specific requirements.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Sprinkler Design Density Calculator <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="inline-calc">
+                        <label>Hazard Classification</label>
+                        <select id="sprinklerHazard">
+                            <option value="0.10">Light Hazard (0.10 GPM/ft&sup2;)</option>
+                            <option value="0.15" selected>Ordinary Hazard Group 1 (0.15 GPM/ft&sup2;)</option>
+                            <option value="0.20">Ordinary Hazard Group 2 (0.20 GPM/ft&sup2;)</option>
+                            <option value="0.30">Extra Hazard Group 1 (0.30 GPM/ft&sup2;)</option>
+                            <option value="0.40">Extra Hazard Group 2 (0.40 GPM/ft&sup2;)</option>
+                        </select>
+                        <label>Design Area (ft&sup2;)</label>
+                        <input type="number" id="sprinklerArea" value="1500" min="100" max="10000">
+                        <div class="calc-result"><div class="calc-value" id="sprinklerResult">225 GPM</div><div class="calc-label">Required Water Flow Rate</div></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+                            <div class="calc-result"><div class="calc-value" id="sprinklerDensity" style="font-size:1rem;">0.15 GPM/ft&sup2;</div><div class="calc-label">Design Density</div></div>
+                            <div class="calc-result"><div class="calc-value" id="sprinklerLPM" style="font-size:1rem;">851.4 LPM</div><div class="calc-label">Liters Per Minute</div></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">Why are pre-action sprinkler systems preferred in data centers?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> They are cheaper to install than wet pipe systems</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> They respond faster than any other system</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> They require two conditions to activate, reducing accidental water discharge</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> They do not use water at all</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Fire Suppression Technology Matrix -->
+        <section class="section" id="sec-suppression" data-nav-id="sec-suppression">
+            <h2 class="section-title"><i class="fas fa-fire-extinguisher"></i> Suppression Technology Matrix <button class="deep-link" onclick="copyDeepLink('sec-suppression')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro">Data centers deploy a variety of fire suppression technologies. Each has distinct advantages and trade-offs. Click any card below to expand details.</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h5><i class="fas fa-cloud"></i> Clean Agent (FM-200 / Novec)</h5>
+                    <p class="cc-summary">Fast discharge, no residue, safe for electronics</p>
+                    <div class="cc-detail">
+                        <p>Clean agents extinguish fire through chemical inhibition (FM-200) or heat absorption (Novec 1230). Discharge in &le;10 seconds. No residue, no water damage, no cleanup. Highest equipment protection. Cost: $15-25/m&sup3; protected volume. Requires sealed enclosure with verified integrity.</p>
+                        <div class="kv-grid">
+                            <div class="kv-item"><div class="kv-label">Discharge Time</div><div class="kv-value">&le;10 sec</div></div>
+                            <div class="kv-item"><div class="kv-label">Equipment Damage</div><div class="kv-value">None</div></div>
+                            <div class="kv-item"><div class="kv-label">Relative Cost</div><div class="kv-value">$$$</div></div>
+                            <div class="kv-item"><div class="kv-label">Recharge Time</div><div class="kv-value">24-48 hours</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <h5><i class="fas fa-water"></i> Water Mist</h5>
+                    <p class="cc-summary">Fine droplets, reduced water damage, versatile</p>
+                    <div class="cc-detail">
+                        <p>Water mist systems use high-pressure nozzles to create fine droplets (&lt;1000 &mu;m) that cool the fire and displace oxygen. Significantly less water than traditional sprinklers — up to 90% less water usage. Reduced water damage to equipment. Effective against Class A and B fires. Does not require sealed enclosure.</p>
+                        <div class="kv-grid">
+                            <div class="kv-item"><div class="kv-label">Droplet Size</div><div class="kv-value">&lt;1000 &mu;m</div></div>
+                            <div class="kv-item"><div class="kv-label">Water Reduction</div><div class="kv-value">Up to 90%</div></div>
+                            <div class="kv-item"><div class="kv-label">Relative Cost</div><div class="kv-value">$$</div></div>
+                            <div class="kv-item"><div class="kv-label">Recharge Time</div><div class="kv-value">Continuous supply</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <h5><i class="fas fa-wind"></i> Inert Gas (IG-541 / IG-55)</h5>
+                    <p class="cc-summary">Zero GWP, safe for occupied spaces, natural gases</p>
+                    <div class="cc-detail">
+                        <p>Inert gas systems reduce oxygen from 21% to ~12.5%, below combustion threshold but above human survival level. Zero GWP, zero ODP — no environmental impact. Safe for occupied spaces at design concentration. Requires larger storage (high-pressure cylinders). Slower discharge than chemical agents (60 seconds).</p>
+                        <div class="kv-grid">
+                            <div class="kv-item"><div class="kv-label">GWP / ODP</div><div class="kv-value">0 / 0</div></div>
+                            <div class="kv-item"><div class="kv-label">O2 Level After</div><div class="kv-value">12.5%</div></div>
+                            <div class="kv-item"><div class="kv-label">Relative Cost</div><div class="kv-value">$$</div></div>
+                            <div class="kv-item"><div class="kv-label">Storage Footprint</div><div class="kv-value">Large</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <h5><i class="fas fa-spray-can"></i> Aerosol</h5>
+                    <p class="cc-summary">Compact, no piping, limited DC applications</p>
+                    <div class="cc-detail">
+                        <p>Condensed aerosol generators produce fine particles that chemically inhibit combustion. Extremely compact — no piping network required. Units mount directly in the protected space. Limited applications in data centers due to residue concerns and restricted approvals. Best suited for small, enclosed electrical cabinets and unmanned telecom shelters.</p>
+                        <div class="kv-grid">
+                            <div class="kv-item"><div class="kv-label">Piping Required</div><div class="kv-value">None</div></div>
+                            <div class="kv-item"><div class="kv-label">Residue</div><div class="kv-value">Fine particulate</div></div>
+                            <div class="kv-item"><div class="kv-label">Relative Cost</div><div class="kv-value">$</div></div>
+                            <div class="kv-item"><div class="kv-label">DC Use</div><div class="kv-value">Cabinets only</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: EPO & Life Safety -->
+        <section class="section" id="sec-epo" data-nav-id="sec-epo">
+            <h2 class="section-title"><i class="fas fa-door-open"></i> EPO &amp; Life Safety <button class="deep-link" onclick="copyDeepLink('sec-epo')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro">Emergency Power Off (EPO) systems and life safety features are critical elements of data center fire protection. These systems protect personnel and enable safe evacuation during fire events.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> EPO Design <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <span class="term-tooltip" data-tooltip="EPO: Emergency Power Off — a mechanism to disconnect all power to IT equipment in an emergency. Required by NFPA 70 Article 645 and NFPA 75.">EPO</span> system provides a means to disconnect power to all IT equipment in an emergency, as required by NFPA 70 (NEC) Article 645.</p>
+                    <ul>
+                        <li><strong>Mushroom button:</strong> Red, illuminated mushroom-head push button at each principal exit door</li>
+                        <li><strong>Shunt trip:</strong> EPO activates shunt trip breakers on all PDUs and RPPs serving IT equipment</li>
+                        <li><strong>Disconnect sequence:</strong> IT loads first, then UPS output, then HVAC serving the room</li>
+                        <li><strong>Guard/cover:</strong> Protective cover (flip-up or breakable) to prevent accidental activation</li>
+                        <li><strong>Testing:</strong> Functional test required annually per NFPA 70 — full load test during scheduled maintenance windows</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> EPO is controversial in modern data centers. Accidental EPO activation has caused more downtime than the fires it was designed to prevent. Many operators request AHJ approval to eliminate EPO per NEC Article 645.10 exception, using alternative disconnecting means.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> NFPA 101 Egress <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="NFPA 101: Life Safety Code — comprehensive standard covering building design and operation features to protect occupants from fire, smoke, and toxic fumes.">NFPA 101</span> (Life Safety Code) establishes egress requirements for data center facilities.</p>
+                    <ul>
+                        <li><strong>Two exits minimum:</strong> Any room exceeding 1000 sq ft or with more than 50 occupants requires two separate exits</li>
+                        <li><strong>Travel distance:</strong> Maximum 200 ft (61 m) to an exit in a sprinklered building, 150 ft (46 m) without sprinklers</li>
+                        <li><strong>Door swing direction:</strong> Doors must swing in the direction of egress travel (outward from the room)</li>
+                        <li><strong>Corridor width:</strong> Minimum 44 inches (112 cm) for corridors serving &gt;50 occupants</li>
+                        <li><strong>Dead-end corridors:</strong> Maximum 50 ft (15 m) in sprinklered buildings, 20 ft (6 m) without</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Emergency Lighting <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Emergency lighting ensures safe evacuation when normal power fails during a fire event.</p>
+                    <ul>
+                        <li><strong>90-minute battery backup:</strong> All emergency lighting must operate for minimum 90 minutes on battery power</li>
+                        <li><strong>1 foot-candle minimum:</strong> Illumination level along the path of egress at floor level</li>
+                        <li><strong>Exit signs:</strong> Illuminated exit signs at all exit doors and along egress paths — visible from 100 ft</li>
+                        <li><strong>Monthly testing:</strong> 30-second functional test monthly, 90-minute full duration test annually</li>
+                        <li><strong>Generator backup:</strong> In data centers with generators, emergency lighting typically transfers to generator power within 10 seconds</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> ADA Accessibility <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Fire protection and life safety systems must accommodate persons with disabilities per ADA and NFPA 72 requirements.</p>
+                    <ul>
+                        <li><strong>Wheelchair clearance:</strong> Minimum 32-inch clear door width, 60-inch turning radius at corridors</li>
+                        <li><strong>Tactile signage:</strong> Raised characters and Braille on exit signs and room identification</li>
+                        <li><strong>Visual alarms:</strong> Strobe lights required in addition to audible alarms in all areas</li>
+                        <li><strong>Area of refuge:</strong> Protected waiting areas for persons unable to use stairs, with two-way communication</li>
+                        <li><strong>Accessible EPO:</strong> EPO buttons mounted at 48 inches maximum above floor (accessible reach range)</li>
+                    </ul>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: Containment & Fire Rating -->
+        <section class="section" id="sec-containment" data-nav-id="sec-containment">
+            <h2 class="section-title"><i class="fas fa-border-all"></i> Containment &amp; Fire Rating <button class="deep-link" onclick="copyDeepLink('sec-containment')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro">Fire-rated construction, penetration seals, and containment systems form the passive fire protection framework for data centers. These elements work together to compartmentalize fire and smoke.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> Fire Barriers <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Fire-rated barriers separate data center spaces into compartments to limit fire spread and provide time for detection, suppression, and evacuation.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Rating</th><th>Assembly Type</th><th>UL Design No.</th><th>Typical Use</th></tr></thead>
+                        <tbody>
+                            <tr><td class="highlight">1-Hour</td><td>Gypsum on steel studs</td><td>UL U305, U411</td><td class="highlight">IT room to corridor (NFPA 75 minimum)</td></tr>
+                            <tr><td>2-Hour</td><td>Double layer gypsum / CMU</td><td>UL U301, U309</td><td>IT room to IT room, transformer vaults</td></tr>
+                            <tr><td>3-Hour</td><td>CMU / reinforced concrete</td><td>UL U902, U903</td><td>Building separation, generator rooms</td></tr>
+                            <tr><td>4-Hour</td><td>Reinforced concrete / masonry</td><td>Various</td><td>Fuel storage, hazmat separation</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> Penetration Seals <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="Through-penetration firestop: A system designed to restore the fire-resistance rating of a wall or floor where it has been penetrated by cables, conduits, pipes, or ducts.">Through-penetration firestop systems</span> maintain fire barrier integrity where cables, conduits, and pipes pass through rated walls and floors.</p>
+                    <ul>
+                        <li><strong>Annular space:</strong> The gap between the penetrating item and the opening must be sealed with a listed firestop system</li>
+                        <li><strong>W rating:</strong> Resistance to water passage under hose stream test conditions</li>
+                        <li><strong>L rating:</strong> Leakage rate in CFM/ft&sup2; — critical for clean agent room integrity</li>
+                        <li><strong>Cable tray penetrations:</strong> Use intumescent pillows, caulk, or putty per UL 1479 (ASTM E814)</li>
+                        <li><strong>Re-penetration:</strong> After pulling new cables through existing firestop, the seal must be restored to its listed configuration</li>
+                    </ul>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> Firestop is the #1 maintenance failure point in data center fire protection. Cable additions that breach firestop seals without proper restoration void the fire rating and compromise clean agent hold time.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> Fire &amp; Smoke Dampers <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Dampers in HVAC ductwork prevent fire and smoke from spreading through the air distribution system.</p>
+                    <ul>
+                        <li><strong>Combination dampers:</strong> Fire/smoke combination dampers (FSD) provide both fire resistance and smoke control in a single device</li>
+                        <li><strong>Corridor protection:</strong> Required where ducts penetrate fire-rated corridor walls</li>
+                        <li><strong>Duct sensors:</strong> Duct smoke detectors trigger damper closure and HVAC shutdown</li>
+                        <li><strong>UL 555 / UL 555S:</strong> Fire dampers rated per UL 555, smoke dampers per UL 555S</li>
+                        <li><strong>Inspection frequency:</strong> Per NFPA 80 — every 4 years for fire dampers after initial 1-year inspection</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> Hot/Cold Aisle Containment <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>Aisle containment improves cooling efficiency but introduces fire protection considerations that must be addressed in the system design.</p>
+                    <ul>
+                        <li><strong>Suppression impact:</strong> Containment panels may obstruct sprinkler spray patterns — verify coverage with the fire protection engineer</li>
+                        <li><strong>Detector placement:</strong> Smoke detectors must be located both inside and outside containment zones</li>
+                        <li><strong>VESDA sampling:</strong> Aspirating detection pipes must sample air from within the contained aisle</li>
+                        <li><strong>Sprinkler coverage:</strong> Each contained zone must have independent sprinkler coverage — panels that block spray require additional heads</li>
+                        <li><strong>Drop-away panels:</strong> Containment ceiling panels should be designed to drop away at elevated temperatures (e.g., fusible link release) to allow sprinkler coverage</li>
+                    </ul>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> When using containment with clean agent systems, ensure the agent can flow freely into the contained aisle. Sealed containment creates sub-zones that may not reach design concentration.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">5</span> Knowledge Check <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <div class="quiz-widget"><p class="quiz-question">What is the minimum fire rating for a data center room wall per NFPA 75?</p><div class="quiz-options">
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 30 minutes</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)" data-correct="true"><span class="opt-icon"><i class="far fa-circle"></i></span> 1 hour</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 2 hours</div>
+                        <div class="quiz-opt" onclick="checkQuiz(this)"><span class="opt-icon"><i class="far fa-circle"></i></span> 4 hours</div>
+                    </div><div class="quiz-feedback"></div></div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: Cross-Reference -->
+        <section class="section" id="sec-xref" data-nav-id="sec-xref">
+            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Cross-Reference Standards <button class="deep-link" onclick="copyDeepLink('sec-xref')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <p class="section-intro">Data center fire protection draws from multiple overlapping standards. Understanding the relationships between these standards is essential for comprehensive compliance.</p>
+
+            <div class="accordion open">
+                <button class="accordion-header"><span class="acc-num">1</span> IBC / IFC <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>The <span class="term-tooltip" data-tooltip="IBC: International Building Code — model building code published by the International Code Council (ICC). Adopted by most US jurisdictions.">IBC</span> (International Building Code) and <span class="term-tooltip" data-tooltip="IFC: International Fire Code — companion fire code to the IBC, covering fire prevention, fire protection systems, and emergency planning.">IFC</span> (International Fire Code) provide the baseline building and fire code requirements adopted by most US jurisdictions.</p>
+                    <ul>
+                        <li><strong>IBC Chapter 5:</strong> General building heights and areas — affects data center building classification</li>
+                        <li><strong>IBC Chapter 7:</strong> Fire and smoke protection features — fire-rated assemblies, firestopping</li>
+                        <li><strong>IFC Chapter 6:</strong> Building services and systems — fire alarm, sprinkler, emergency lighting</li>
+                        <li><strong>IFC Chapter 9:</strong> Fire protection and life safety systems — detailed requirements for detection and suppression</li>
+                        <li><strong>NFPA adoption:</strong> IBC/IFC reference NFPA 13, 72, 75, and 2001 for specific technical requirements</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">2</span> FM Global Data Sheets <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="FM Global: One of the world's largest commercial property insurers. Their data sheets provide loss prevention recommendations that often exceed code minimums.">FM Global</span> data sheets provide insurance-grade fire protection recommendations that frequently exceed code minimums.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Data Sheet</th><th>Title</th><th>Key Requirements</th></tr></thead>
+                        <tbody>
+                            <tr><td class="highlight">DS 5-32</td><td>Data Centers and Related Facilities</td><td>Comprehensive DC fire protection, VESDA required, clean agent + pre-action</td></tr>
+                            <tr><td>DS 5-33</td><td>Electrical Energy Storage Systems</td><td>Battery room protection, thermal runaway mitigation</td></tr>
+                            <tr><td>DS 4-0</td><td>Special Protection Systems</td><td>Clean agent system design, room integrity</td></tr>
+                            <tr><td>DS 4-9</td><td>Clean Agent Suppression Systems</td><td>Agent quantities, nozzle placement, hold time</td></tr>
+                            <tr><td>DS 5-48</td><td>Smoke Detection Systems</td><td>Aspirating detection requirements, spacing</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> FM Global DS 5-32 is the most comprehensive data center fire protection standard. FM-insured facilities must comply with these recommendations, which often exceed NFPA minimums.</div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">3</span> UL Standards <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p>UL (Underwriters Laboratories) standards cover product testing and certification for fire protection equipment.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Standard</th><th>Title</th><th>Application</th></tr></thead>
+                        <tbody>
+                            <tr><td>UL 2127</td><td>Inert Gas Clean Agent Systems</td><td>IG-541, IG-55, IG-100 system testing</td></tr>
+                            <tr><td>UL 2166</td><td>Halocarbon Clean Agent Systems</td><td>FM-200, Novec 1230 system testing</td></tr>
+                            <tr><td>UL 268</td><td>Smoke Detectors for Fire Alarm Systems</td><td>Spot detector listing and sensitivity</td></tr>
+                            <tr><td>UL 864</td><td>Control Units for Fire Alarm Systems</td><td>FACP listing and functionality</td></tr>
+                            <tr><td>UL 1479</td><td>Fire Tests of Through-Penetration Firestops</td><td>Firestop system ratings (F/T/L)</td></tr>
+                        </tbody>
+                    </table></div>
+                </div></div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header"><span class="acc-num">4</span> EN 50600-2-5 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
+                <div class="accordion-body"><div class="accordion-content">
+                    <p><span class="term-tooltip" data-tooltip="EN 50600-2-5: European standard for data center facilities — Part 2-5: Security systems. Covers physical security including fire protection integration.">EN 50600-2-5</span> is the European standard for data center fire protection, part of the comprehensive EN 50600 series for data center design and operation.</p>
+                    <div class="table-wrap"><table class="data-table">
+                        <thead><tr><th>Aspect</th><th>NFPA (US)</th><th>EN 50600 (EU)</th></tr></thead>
+                        <tbody>
+                            <tr><td>Primary Standard</td><td>NFPA 75 / 76</td><td>EN 50600-2-5</td></tr>
+                            <tr><td>Clean Agent</td><td>NFPA 2001</td><td>EN 15004 series</td></tr>
+                            <tr><td>Detection</td><td>NFPA 72</td><td>EN 54 series</td></tr>
+                            <tr><td>Sprinkler</td><td>NFPA 13</td><td>EN 12845</td></tr>
+                            <tr><td>Classification</td><td>Hazard-based</td><td class="highlight">Availability class-based (1-4)</td></tr>
+                            <tr><td>Approach</td><td>Prescriptive</td><td>Performance-based</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> EN 50600 aligns fire protection requirements with availability classes (similar to Uptime Tiers). Higher availability classes require more robust detection, suppression, and redundancy in fire protection systems.</div>
+                </div></div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: Case Studies -->
+        <section class="section" id="sec-cases" data-nav-id="sec-cases">
+            <h2 class="section-title"><i class="fas fa-building"></i> Case Studies <button class="deep-link" onclick="copyDeepLink('sec-cases')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+
+            <div class="case-card">
+                <h4><i class="fas fa-cloud" style="color:var(--accent2);margin-right:0.3rem;"></i> Clean Agent FM-200 Deployment — Financial DC</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Wet pipe sprinkler only</span><span class="case-metric case-after">After: FM-200 + pre-action backup</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A Tier III financial data center replaced its wet pipe sprinkler system with FM-200 clean agent as primary suppression and double-interlock pre-action as backup. Investment: $280K for a 400 m&sup3; data hall. Result: Zero equipment damage from suppression system in 5 years. Insurance premium reduced by 15% due to FM Global DS 5-32 compliance.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-bell" style="color:var(--accent2);margin-right:0.3rem;"></i> VESDA Implementation — Enterprise Campus</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Spot detectors (10 min detection)</span><span class="case-metric case-after">After: VESDA (&lt;30 sec detection)</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">An enterprise campus data center upgraded from ceiling-mounted spot photoelectric detectors to VESDA aspirating detection. Sampling pipes installed above and below raised floor. Detection time improved from an average of 10 minutes to under 30 seconds. Two incipient overheating events detected and resolved before ignition, preventing potential losses estimated at $2M.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-tint" style="color:var(--accent2);margin-right:0.3rem;"></i> Pre-Action Double Interlock — Colocation Facility</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Wet pipe, 3 false discharges/year</span><span class="case-metric case-after">After: Pre-action, zero false discharges</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A colocation facility experienced three accidental water discharges in one year from its wet pipe system (two from physical damage to sprinkler heads during rack installation, one from a corroded fitting). Retrofit to double-interlock pre-action system cost $185K for 1500 ft&sup2;. Zero false discharges in 4 years since installation. Annual maintenance cost increased by $8K but offset by elimination of water damage claims.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-border-all" style="color:var(--accent2);margin-right:0.3rem;"></i> Hot Aisle Containment Fire Rating Upgrade</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Non-rated containment panels</span><span class="case-metric case-after">After: 1-hr rated containment + drop-away</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A hyperscale operator discovered their hot aisle containment ceiling panels were blocking sprinkler spray patterns, creating unprotected zones. Replaced standard polycarbonate panels with 1-hour rated panels featuring fusible-link drop-away mechanisms. Added VESDA sampling points inside each contained aisle. Cost: $45K per data hall (240 racks). Passed FM Global audit with zero deficiencies.</p>
+            </div>
+
+            <div class="case-card">
+                <h4><i class="fas fa-exclamation-triangle" style="color:var(--accent2);margin-right:0.3rem;"></i> Post-Incident Lessons — Sprinkler Water Damage</h4>
+                <div class="case-metrics"><span class="case-metric case-before">Before: Wet pipe sprinkler, $1.2M water damage</span><span class="case-metric case-after">After: Pre-action + clean agent, zero incidents</span></div>
+                <p style="font-size:0.82rem;color:var(--text-body);line-height:1.6;">A managed services provider suffered $1.2M in equipment damage when a corroded wet pipe sprinkler fitting failed above a row of production servers. 1200 gallons of water discharged before the system was isolated. Post-incident: replaced wet pipe with double-interlock pre-action throughout the facility, added FM-200 clean agent as primary suppression, and installed VESDA with 4-level alarm hierarchy. Total investment: $450K. Insurance claim fully covered the incident but premiums increased 40% — reduced back to baseline after clean agent installation.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 11: Interview Prep -->
+        <section class="section" id="sec-interview" data-nav-id="sec-interview">
+            <h2 class="section-title"><i class="fas fa-user-tie"></i> Interview Prep <button class="deep-link" onclick="copyDeepLink('sec-interview')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <div class="interview-grid">
+                <div class="interview-card"><h5>Q: Why are clean agents preferred over water in data centers?</h5><p>Clean agents (FM-200, Novec 1230, IG-541) leave no residue and cause no secondary damage to sensitive electronic equipment. They discharge rapidly (&le;10 seconds for chemical agents) and allow immediate re-entry. Water-based systems risk causing more damage than the fire itself — a single sprinkler head can discharge 15-25 GPM, flooding servers and causing corrosion, short circuits, and permanent data loss.</p></div>
+                <div class="interview-card"><h5>Q: What is VESDA and why is it used in data centers?</h5><p>VESDA (Very Early Smoke Detection Apparatus) is an aspirating smoke detection system that draws air samples through a pipe network to a laser-based detection chamber. It is used in data centers because IT equipment fires begin with overheating that produces very small smoke particles long before visible flames. VESDA detects smoke at concentrations 1000x lower than spot detectors, providing 30-second response time vs 5-10 minutes for conventional detectors.</p></div>
+                <div class="interview-card"><h5>Q: Explain double-interlock pre-action sprinkler systems.</h5><p>Double-interlock pre-action requires TWO independent conditions before water flows: (1) the fire detection system must activate, AND (2) an individual sprinkler head must fuse from heat. The piping is normally dry (filled with supervisory air). This prevents accidental discharge from either a false alarm alone or a broken sprinkler head alone — both conditions must occur simultaneously. This is why pre-action is preferred in data centers where accidental water discharge can be catastrophic.</p></div>
+                <div class="interview-card"><h5>Q: What are NFPA 75 construction requirements for IT rooms?</h5><p>NFPA 75 requires: (1) minimum 1-hour fire-rated walls extending slab-to-slab (structural floor to structural deck), (2) automatic door closers on all room entries, (3) through-penetration firestop systems maintaining the fire barrier rating, (4) automatic HVAC disconnect upon fire detection, and (5) appropriate suppression systems (clean agent or pre-action preferred). The standard applies to rooms exceeding 460 sq ft containing IT equipment.</p></div>
+                <div class="interview-card"><h5>Q: How does hot/cold aisle containment affect fire protection?</h5><p>Containment creates enclosed zones that impact fire protection in several ways: (1) ceiling panels can obstruct sprinkler spray patterns, requiring redesigned head placement or drop-away panels, (2) smoke detectors must be placed both inside and outside containment, (3) VESDA sampling pipes must draw from within the contained aisle, and (4) clean agent systems must be verified to achieve design concentration inside the containment zone. Fire protection engineers must review containment designs before installation.</p></div>
+                <div class="interview-card"><h5>Q: What is the EPO and when should it be activated?</h5><p>The EPO (Emergency Power Off) is a mechanism to disconnect all power to IT equipment, required by NEC Article 645. It should only be activated when there is an immediate threat to life safety — such as a confirmed fire that cannot be controlled by suppression systems, or when first responders require de-energized equipment for safe firefighting. EPO activation causes complete IT shutdown and potential data loss. Many modern data centers seek AHJ approval to replace EPO with alternative disconnecting means due to the risk of accidental activation.</p></div>
+            </div>
+        </section>
+
+        <!-- SECTION 12: Abbreviations -->
+        <section class="section" id="sec-abbr" data-nav-id="sec-abbr">
+            <h2 class="section-title"><i class="fas fa-spell-check"></i> Abbreviations &amp; Glossary <button class="deep-link" onclick="copyDeepLink('sec-abbr')" title="Copy link"><i class="fas fa-link"></i></button></h2>
+
+            <div class="abbr-grid">
+                <div class="abbr-item"><span class="abbr-key">AFFF</span><span class="abbr-val">Aqueous Film-Forming Foam</span></div>
+                <div class="abbr-item"><span class="abbr-key">AHJ</span><span class="abbr-val">Authority Having Jurisdiction</span></div>
+                <div class="abbr-item"><span class="abbr-key">ASD</span><span class="abbr-val">Aspirating Smoke Detection</span></div>
+                <div class="abbr-item"><span class="abbr-key">BCT</span><span class="abbr-val">Battery Charging Temperature</span></div>
+                <div class="abbr-item"><span class="abbr-key">BDA</span><span class="abbr-val">Bi-Directional Amplifier (radio)</span></div>
+                <div class="abbr-item"><span class="abbr-key">CPVC</span><span class="abbr-val">Chlorinated Polyvinyl Chloride (piping)</span></div>
+                <div class="abbr-item"><span class="abbr-key">DCIM</span><span class="abbr-val">Data Center Infrastructure Management</span></div>
+                <div class="abbr-item"><span class="abbr-key">EPO</span><span class="abbr-val">Emergency Power Off</span></div>
+                <div class="abbr-item"><span class="abbr-key">EWFD</span><span class="abbr-val">Early Warning Fire Detection</span></div>
+                <div class="abbr-item"><span class="abbr-key">FACP</span><span class="abbr-val">Fire Alarm Control Panel</span></div>
+                <div class="abbr-item"><span class="abbr-key">FDS</span><span class="abbr-val">Fire Detection System</span></div>
+                <div class="abbr-item"><span class="abbr-key">FK-5-1-12</span><span class="abbr-val">Fluoroketone (Novec 1230)</span></div>
+                <div class="abbr-item"><span class="abbr-key">FM-200</span><span class="abbr-val">Heptafluoropropane (HFC-227ea)</span></div>
+                <div class="abbr-item"><span class="abbr-key">FSD</span><span class="abbr-val">Fire/Smoke Damper (combination)</span></div>
+                <div class="abbr-item"><span class="abbr-key">GPM</span><span class="abbr-val">Gallons Per Minute</span></div>
+                <div class="abbr-item"><span class="abbr-key">GWP</span><span class="abbr-val">Global Warming Potential</span></div>
+                <div class="abbr-item"><span class="abbr-key">HFC</span><span class="abbr-val">Hydrofluorocarbon</span></div>
+                <div class="abbr-item"><span class="abbr-key">HSSD</span><span class="abbr-val">High Sensitivity Smoke Detection</span></div>
+                <div class="abbr-item"><span class="abbr-key">HVAC</span><span class="abbr-val">Heating, Ventilation, and Air Conditioning</span></div>
+                <div class="abbr-item"><span class="abbr-key">IBC</span><span class="abbr-val">International Building Code</span></div>
+                <div class="abbr-item"><span class="abbr-key">IFC</span><span class="abbr-val">International Fire Code</span></div>
+                <div class="abbr-item"><span class="abbr-key">IG-541</span><span class="abbr-val">Inert Gas blend (52% N2, 40% Ar, 8% CO2)</span></div>
+                <div class="abbr-item"><span class="abbr-key">IG-55</span><span class="abbr-val">Inert Gas blend (50% N2, 50% Ar)</span></div>
+                <div class="abbr-item"><span class="abbr-key">LPM</span><span class="abbr-val">Liters Per Minute</span></div>
+                <div class="abbr-item"><span class="abbr-key">LSZH</span><span class="abbr-val">Low Smoke Zero Halogen</span></div>
+                <div class="abbr-item"><span class="abbr-key">MCP</span><span class="abbr-val">Manual Call Point</span></div>
+                <div class="abbr-item"><span class="abbr-key">NAC</span><span class="abbr-val">Notification Appliance Circuit</span></div>
+                <div class="abbr-item"><span class="abbr-key">NEC</span><span class="abbr-val">National Electrical Code (NFPA 70)</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA</span><span class="abbr-val">National Fire Protection Association</span></div>
+                <div class="abbr-item"><span class="abbr-key">NOAEL</span><span class="abbr-val">No Observed Adverse Effect Level</span></div>
+                <div class="abbr-item"><span class="abbr-key">ODP</span><span class="abbr-val">Ozone Depletion Potential</span></div>
+                <div class="abbr-item"><span class="abbr-key">PDU</span><span class="abbr-val">Power Distribution Unit</span></div>
+                <div class="abbr-item"><span class="abbr-key">PLB</span><span class="abbr-val">Plenum-rated Low-smoke Box</span></div>
+                <div class="abbr-item"><span class="abbr-key">RPP</span><span class="abbr-val">Remote Power Panel</span></div>
+                <div class="abbr-item"><span class="abbr-key">SLC</span><span class="abbr-val">Signaling Line Circuit</span></div>
+                <div class="abbr-item"><span class="abbr-key">STI</span><span class="abbr-val">Speech Transmission Index</span></div>
+                <div class="abbr-item"><span class="abbr-key">UL</span><span class="abbr-val">Underwriters Laboratories</span></div>
+                <div class="abbr-item"><span class="abbr-key">UPS</span><span class="abbr-val">Uninterruptible Power Supply</span></div>
+                <div class="abbr-item"><span class="abbr-key">VESDA</span><span class="abbr-val">Very Early Smoke Detection Apparatus</span></div>
+                <div class="abbr-item"><span class="abbr-key">VRLA</span><span class="abbr-val">Valve-Regulated Lead-Acid (battery)</span></div>
+                <div class="abbr-item"><span class="abbr-key">WFI</span><span class="abbr-val">Water Flow Indicator</span></div>
+                <div class="abbr-item"><span class="abbr-key">CMU</span><span class="abbr-val">Concrete Masonry Unit</span></div>
+                <div class="abbr-item"><span class="abbr-key">FPE</span><span class="abbr-val">Fire Protection Engineer</span></div>
+                <div class="abbr-item"><span class="abbr-key">HAI</span><span class="abbr-val">Hot Aisle / Cold Aisle Isolation</span></div>
+                <div class="abbr-item"><span class="abbr-key">ITM</span><span class="abbr-val">Inspection, Testing &amp; Maintenance</span></div>
+                <div class="abbr-item"><span class="abbr-key">LOAEL</span><span class="abbr-val">Lowest Observed Adverse Effect Level</span></div>
+                <div class="abbr-item"><span class="abbr-key">PAD</span><span class="abbr-val">Pre-Action Deluge (valve type)</span></div>
+                <div class="abbr-item"><span class="abbr-key">PIV</span><span class="abbr-val">Post Indicator Valve</span></div>
+                <div class="abbr-item"><span class="abbr-key">SCBA</span><span class="abbr-val">Self-Contained Breathing Apparatus</span></div>
+                <div class="abbr-item"><span class="abbr-key">TFM</span><span class="abbr-val">Total Flooding Method</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA 13</span><span class="abbr-val">Standard for Installation of Sprinkler Systems</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA 72</span><span class="abbr-val">National Fire Alarm and Signaling Code</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA 75</span><span class="abbr-val">Fire Protection of IT Equipment</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA 76</span><span class="abbr-val">Fire Protection of Telecom Facilities</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA 101</span><span class="abbr-val">Life Safety Code</span></div>
+                <div class="abbr-item"><span class="abbr-key">NFPA 2001</span><span class="abbr-val">Standard on Clean Agent Fire Extinguishing</span></div>
+            </div>
+        </section>
+
+        <div class="section" style="padding:0.8rem 1rem;">
+            <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:0.4rem;"><i class="fas fa-history" style="color:var(--accent2);margin-right:0.3rem;"></i> Changelog</h3>
+            <div class="changelog">
+                <div class="changelog-entry"><span class="changelog-date">2026-03-01</span><span class="changelog-text">Initial release — full deep-dive with 12 sections, calculators, quizzes, and flashcard support</span></div>
             </div>
         </div>
-    </div>
 
-    
-
-    <div class="cookie-banner hidden" id="cookieBanner">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        <div class="legal">
+            <p>This module is for educational and training purposes only. NFPA standards are proprietary documents published by the National Fire Protection Association. All references are for study purposes. Content does not constitute professional fire protection engineering advice.</p>
+            <p style="margin-top:0.3rem;"><a href="privacy.html" style="color:var(--accent2);">Privacy</a> &middot; <a href="terms.html" style="color:var(--accent2);">Terms</a></p>
         </div>
+
     </div>
 
-    <script src="auth.js?v=20260228"></script>
+    <div id="tooltipFloat" class="tooltip-float"></div>
+    <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#ef4444;margin-right:0.3rem;"></i> Root Access Required</h2><p>This deep-dive module is restricted to root-level accounts. Please authenticate with a root account to access the full content.</p><div class="root-actions"><button id="rootLoginBtn">Authenticate</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
+    <div class="cookie-banner hidden" id="cookieBanner"><p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p><div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div></div>
+
+    <script src="auth.js?v=20260301"></script>
     <script>
-        (function rootAccessGate() {
-            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
-
-            function detectRole(email) {
-                var e = String(email || '').toLowerCase().trim();
-                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
-            }
-
-            function getSession() {
-                try {
-                    var raw = localStorage.getItem('rz_premium_session');
-                    if (!raw) return null;
-                    var data = JSON.parse(raw);
-                    if (data.expires && new Date(data.expires) < new Date()) {
-                        localStorage.removeItem('rz_premium_session');
-                        return null;
-                    }
-                    if (!data.role) data.role = detectRole(data.email);
-                    return data;
-                } catch (e) {
-                    return null;
-                }
-            }
-
-            function isRoot(session) {
-                return !!(session && String(session.role || '').toLowerCase() === 'root');
-            }
-
-            function applyGate() {
-                document.body.classList.toggle('locked', !isRoot(getSession()));
-            }
-
-            var loginBtn = document.getElementById('rootLoginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function() {
-                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
-                        window._rzAuth.showModal();
-                    }
-                });
-            }
-
-            window.addEventListener('rz-auth-change', applyGate);
-            setTimeout(applyGate, 60);
-            setTimeout(applyGate, 550);
-        })();
-
-
-        (function cookieBanner() {
-            var banner = document.getElementById('cookieBanner');
-            var accepted = localStorage.getItem('rz_cookie_consent');
-            if (!accepted && banner) banner.classList.remove('hidden');
-
-            var accept = document.getElementById('cookieAccept');
-            var decline = document.getElementById('cookieDecline');
-
-            if (accept) {
-                accept.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'accepted');
-                    banner.classList.add('hidden');
-                });
-            }
-
-            if (decline) {
-                decline.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'declined');
-                    banner.classList.add('hidden');
-                    window['ga-disable-G-GED7FX8RTV'] = true;
-                });
-            }
-        })();
+    /* 1. Theme Toggle */
+    (function(){var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');function g(){var s=localStorage.getItem('theme');return s||(p.matches?'dark':'light');}function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(g());if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});})();
+    /* 2. Hamburger */
+    (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
+    /* 3. Root Gate Auth */
+    (function(){var RE=['admin@resistancezero.com','bagus@resistancezero.com'];function dr(e){return RE.indexOf(String(e||'').toLowerCase().trim())!==-1?'root':'pro';}function gs(){try{var r=localStorage.getItem('rz_premium_session');if(!r)return null;var d=JSON.parse(r);if(d.expires&&new Date(d.expires)<new Date()){localStorage.removeItem('rz_premium_session');return null;}if(!d.role)d.role=dr(d.email);return d;}catch(e){return null;}}function ir(s){return!!(s&&String(s.role||'').toLowerCase()==='root');}function ag(){document.body.classList.toggle('locked',!ir(gs()));}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',ag);setTimeout(ag,60);setTimeout(ag,550);})();
+    /* 4. Cookie Banner */
+    (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
+    /* 5. Accordion Toggle */
+    document.addEventListener('click',function(e){var h=e.target.closest('.accordion-header');if(h)h.parentElement.classList.toggle('open');});
+    /* 6. Comparison Card Toggle */
+    document.addEventListener('click',function(e){var c=e.target.closest('.comparison-card');if(c)c.classList.toggle('expanded');});
+    /* 7. Section Nav Scroll Spy */
+    (function(){var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');if(!secs.length)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});secs.forEach(function(s){obs.observe(s);});pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-120;window.scrollTo({top:y,behavior:'smooth'});}});});})();
+    /* 8. Progress Bar */
+    (function(){var bar=document.getElementById('progressBar');if(!bar)return;window.addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(window.scrollY/h*100):0)+'%';});})();
+    /* 9. Reading Time */
+    (function(){var el=document.getElementById('readingTime');if(!el)return;var text=document.querySelector('.wrap');if(!text)return;var words=text.textContent.split(/\s+/).length;var mins=Math.ceil(words/220);el.innerHTML='<i class="fas fa-clock"></i> ~'+mins+' min read';})();
+    /* 10. kW/BTU Unit Toggle */
+    var unitMode='kw';
+    (function(){var btn=document.getElementById('unitToggle');if(!btn)return;btn.addEventListener('click',function(){unitMode=unitMode==='kw'?'btu':'kw';btn.innerHTML='<i class="fas fa-fire"></i> '+(unitMode==='kw'?'kW':'BTU');btn.classList.toggle('active',unitMode==='btu');document.querySelectorAll('.unit-val').forEach(function(el){var kw=parseFloat(el.getAttribute('data-kw'));if(isNaN(kw))return;el.textContent=unitMode==='btu'?(kw*3412.14).toFixed(0)+' BTU/hr':kw+' kW';});});})();
+    /* 11. Font Size */
+    (function(){var dn=document.getElementById('fontDown'),up=document.getElementById('fontUp');if(!dn||!up)return;dn.addEventListener('click',function(){document.body.classList.remove('font-lg');document.body.classList.toggle('font-sm');});up.addEventListener('click',function(){document.body.classList.remove('font-sm');document.body.classList.toggle('font-lg');});})();
+    /* 12. Study Mode */
+    (function(){var btn=document.getElementById('studyModeBtn');if(!btn)return;btn.addEventListener('click',function(){document.body.classList.toggle('study-mode');btn.classList.toggle('active');if(document.body.classList.contains('study-mode')){document.querySelectorAll('.section[data-nav-id]').forEach(function(sec){if(sec.querySelector('.study-check'))return;var cb=document.createElement('label');cb.className='study-check';var inp=document.createElement('input');inp.type='checkbox';var key='nfpa-study-'+sec.getAttribute('data-nav-id');inp.checked=localStorage.getItem(key)==='1';if(inp.checked)sec.classList.add('studied');inp.addEventListener('change',function(){localStorage.setItem(key,this.checked?'1':'0');sec.classList.toggle('studied',this.checked);});cb.appendChild(inp);var title=sec.querySelector('.section-title');if(title)title.appendChild(cb);});}});})();
+    /* 13. Search */
+    (function(){var overlay=document.getElementById('searchOverlay'),input=document.getElementById('searchInput'),results=document.getElementById('searchResults'),btn=document.getElementById('searchBtn');if(!overlay||!input)return;function open(){overlay.classList.add('active');input.focus();input.value='';}function close(){overlay.classList.remove('active');results.innerHTML='';}if(btn)btn.addEventListener('click',open);overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();open();}if(e.key==='Escape')close();});input.addEventListener('input',function(){var q=this.value.trim().toLowerCase();results.innerHTML='';if(q.length<2)return;var sections=document.querySelectorAll('.accordion-content,.section-intro');var found=0;sections.forEach(function(sec){if(found>=10)return;var text=sec.textContent;var idx=text.toLowerCase().indexOf(q);if(idx===-1)return;found++;var start=Math.max(0,idx-40);var end=Math.min(text.length,idx+q.length+60);var snippet='...'+text.slice(start,end).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')+'...';var parent=sec.closest('.section');var secTitle=parent?parent.querySelector('.section-title'):null;var div=document.createElement('div');div.className='search-result';div.innerHTML=snippet+'<div class="sr-section">'+(secTitle?secTitle.textContent.trim():'')+'</div>';div.addEventListener('click',function(){close();sec.scrollIntoView({behavior:'smooth',block:'center'});});results.appendChild(div);});if(found===0)results.innerHTML='<div class="search-result" style="color:var(--muted)">No results found</div>';});})();
+    /* 14. Print */
+    (function(){var b=document.getElementById('printBtn');if(b)b.addEventListener('click',function(){window.print();});})();
+    /* 15. Flashcards */
+    (function(){var overlay=document.getElementById('flashcardOverlay'),card=document.getElementById('flashcard');var frontText=document.getElementById('fcFrontText'),backText=document.getElementById('fcBackText');var counter=document.getElementById('fcCounter'),stats=document.getElementById('fcStats');var progressFill=document.getElementById('fcProgressFill');var btn=document.getElementById('flashcardBtn'),closeBtn=document.getElementById('fcClose');var prevBtn=document.getElementById('fcPrev'),nextBtn=document.getElementById('fcNext');var knowBtn=document.getElementById('fcKnow'),learnBtn=document.getElementById('fcLearning');var shuffleBtn=document.getElementById('fcShuffle');if(!overlay||!card)return;var items=[],idx=0,STORE_KEY='nfpa-fc-mastered';var mastered={};try{var s=localStorage.getItem(STORE_KEY);if(s)mastered=JSON.parse(s);}catch(e){}document.querySelectorAll('.abbr-item').forEach(function(el){var k=el.querySelector('.abbr-key'),v=el.querySelector('.abbr-val');if(k&&v)items.push({q:k.textContent.trim(),a:v.textContent.trim()});});function saveMastered(){try{localStorage.setItem(STORE_KEY,JSON.stringify(mastered));}catch(e){}}function masteredCount(){var c=0;items.forEach(function(it){if(mastered[it.q])c++;});return c;}function updateProgress(){var m=masteredCount(),total=items.length;if(stats)stats.textContent=m+' mastered of '+total;if(progressFill)progressFill.style.width=total?(m/total*100).toFixed(1)+'%':'0%';}function show(){if(!items.length)return;card.classList.remove('flipped');if(frontText)frontText.textContent=items[idx].q;if(backText)backText.textContent=items[idx].a;if(counter)counter.textContent=(idx+1)+' / '+items.length;updateProgress();}function advance(){idx=(idx+1)%items.length;show();}function shuffle(){for(var i=items.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=items[i];items[i]=items[j];items[j]=t;}idx=0;show();}if(btn)btn.addEventListener('click',function(){overlay.classList.add('active');idx=0;show();});if(closeBtn)closeBtn.addEventListener('click',function(){overlay.classList.remove('active');});overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('active');});if(card)card.addEventListener('click',function(e){if(e.target.closest('.fc-hint'))return;card.classList.toggle('flipped');});if(prevBtn)prevBtn.addEventListener('click',function(){idx=(idx-1+items.length)%items.length;show();});if(nextBtn)nextBtn.addEventListener('click',function(){idx=(idx+1)%items.length;show();});if(knowBtn)knowBtn.addEventListener('click',function(){if(items.length)mastered[items[idx].q]=true;saveMastered();advance();});if(learnBtn)learnBtn.addEventListener('click',function(){if(items.length)delete mastered[items[idx].q];saveMastered();advance();});if(shuffleBtn)shuffleBtn.addEventListener('click',shuffle);document.addEventListener('keydown',function(e){if(!overlay.classList.contains('active'))return;if(e.key===' '||e.code==='Space'){e.preventDefault();card.classList.toggle('flipped');}else if(e.key==='ArrowLeft'){e.preventDefault();idx=(idx-1+items.length)%items.length;show();}else if(e.key==='ArrowRight'){e.preventDefault();advance();}else if(e.key==='1'){e.preventDefault();if(items.length){mastered[items[idx].q]=true;saveMastered();advance();}}else if(e.key==='2'){e.preventDefault();if(items.length){delete mastered[items[idx].q];saveMastered();advance();}}else if(e.key==='Escape'){overlay.classList.remove('active');}});})();
+    /* 16. Deep Link Copy */
+    function copyDeepLink(id){var url=window.location.origin+window.location.pathname+'#'+id;navigator.clipboard.writeText(url).then(function(){var toast=document.getElementById('deepLinkToast');if(toast){toast.style.display='block';setTimeout(function(){toast.style.display='none';},2000);}});}
+    /* 17. Quiz Check */
+    function checkQuiz(opt){var widget=opt.closest('.quiz-widget');if(!widget)return;var opts=widget.querySelectorAll('.quiz-opt');var answered=widget.getAttribute('data-answered');if(answered)return;widget.setAttribute('data-answered','1');var isCorrect=opt.getAttribute('data-correct')==='true';opts.forEach(function(o){if(o.getAttribute('data-correct')==='true')o.classList.add('correct');else if(o===opt)o.classList.add('wrong');o.querySelector('.opt-icon').innerHTML=o.getAttribute('data-correct')==='true'?'<i class="fas fa-check-circle"></i>':'<i class="fas fa-times-circle"></i>';});var fb=widget.querySelector('.quiz-feedback');if(fb){fb.classList.add('show');fb.className='quiz-feedback show '+(isCorrect?'callout callout-green':'callout callout-warn');fb.innerHTML=isCorrect?'<i class="fas fa-check"></i> Correct!':'<i class="fas fa-times"></i> Incorrect — review the highlighted answer above.';}}
+    /* 18. Clean Agent Calculator */
+    (function(){var volIn=document.getElementById('cleanVol'),agentSel=document.getElementById('cleanAgent'),resEl=document.getElementById('cleanResult');if(!volIn||!agentSel||!resEl)return;function calc(){var vol=parseFloat(volIn.value)||200;var agent=agentSel.value;var densities={fm200:0.59,novec:0.53,ig541:1.28,ig55:1.42};var cylSizes={fm200:70,novec:65,ig541:80,ig55:80};var names={fm200:'FM-200',novec:'Novec 1230',ig541:'IG-541',ig55:'IG-55'};var density=densities[agent]||0.59;var cylSize=cylSizes[agent]||70;var total=vol*density;var cyls=Math.ceil(total/cylSize);resEl.innerHTML='<div class="calc-value">'+total.toFixed(1)+' '+(agent==='ig541'||agent==='ig55'?'m&sup3;':'kg')+'</div><div class="calc-label">'+names[agent]+' Required &middot; '+cyls+' cylinder'+(cyls!==1?'s':'')+'</div>';}agentSel.addEventListener('change',calc);volIn.addEventListener('input',calc);calc();})();
+    /* 19. Sprinkler Density Calculator */
+    (function(){var hazSel=document.getElementById('sprinklerHazard'),areaIn=document.getElementById('sprinklerArea');var resEl=document.getElementById('sprinklerResult'),densEl=document.getElementById('sprinklerDensity'),lpmEl=document.getElementById('sprinklerLPM');if(!hazSel||!areaIn)return;function calc(){var density=parseFloat(hazSel.value)||0.15;var area=parseFloat(areaIn.value)||1500;var gpm=density*area;var lpm=gpm*3.78541;if(resEl)resEl.textContent=Math.round(gpm)+' GPM';if(densEl)densEl.textContent=density.toFixed(2)+' GPM/ft\u00B2';if(lpmEl)lpmEl.textContent=lpm.toFixed(1)+' LPM';}hazSel.addEventListener('change',calc);areaIn.addEventListener('input',calc);calc();})();
+    /* 20. Keyboard Navigation */
+    document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;var fc=document.getElementById('flashcardOverlay');if(fc&&fc.classList.contains('active'))return;var secs=document.querySelectorAll('[data-nav-id]');if(!secs.length)return;var current=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<150&&s.getBoundingClientRect().top>-s.offsetHeight)current=i;});if(e.key==='ArrowDown'&&!e.ctrlKey){e.preventDefault();var next=Math.min(current+1,secs.length-1);secs[next].scrollIntoView({behavior:'smooth',block:'start'});}if(e.key==='ArrowUp'&&!e.ctrlKey){e.preventDefault();var prev=Math.max(current-1,0);secs[prev].scrollIntoView({behavior:'smooth',block:'start'});}});
+    /* 21. Table Sort */
+    document.querySelectorAll('.data-table').forEach(function(table){var headers=table.querySelectorAll('th');headers.forEach(function(th,colIdx){th.classList.add('sortable');th.innerHTML+=(' <span class="sort-icon"><i class="fas fa-sort"></i></span>');var asc=true;th.addEventListener('click',function(){var tbody=table.querySelector('tbody');if(!tbody)return;var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var av=a.cells[colIdx]?a.cells[colIdx].textContent.trim():'';var bv=b.cells[colIdx]?b.cells[colIdx].textContent.trim():'';var an=parseFloat(av.replace(/[^0-9.\-]/g,'')),bn=parseFloat(bv.replace(/[^0-9.\-]/g,''));if(!isNaN(an)&&!isNaN(bn))return asc?an-bn:bn-an;return asc?av.localeCompare(bv):bv.localeCompare(av);});asc=!asc;rows.forEach(function(r){tbody.appendChild(r);});headers.forEach(function(h){h.classList.remove('sorted');});th.classList.add('sorted');});});});
+    /* 22. Tooltip */
+    (function(){var tip=document.getElementById('tooltipFloat');if(!tip)return;var hideTimer=null;function show(el){clearTimeout(hideTimer);var text=el.getAttribute('data-tooltip');if(!text)return;tip.textContent=text;tip.className='tooltip-float';tip.style.opacity='0';tip.style.visibility='visible';var r=el.getBoundingClientRect();var tw=tip.offsetWidth;var th=tip.offsetHeight;var gap=8;var left=r.left+r.width/2-tw/2;if(left<8)left=8;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;var top;if(r.top-th-gap>8){top=r.top-th-gap;tip.classList.add('above');}else{top=r.bottom+gap;tip.classList.add('below');}var arrowLeft=r.left+r.width/2-left;arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));tip.style.setProperty('--arrow',arrowLeft+'px');tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.add('visible');}function hide(){hideTimer=setTimeout(function(){tip.classList.remove('visible');tip.style.visibility='hidden';},80);}document.querySelectorAll('.term-tooltip').forEach(function(el){el.addEventListener('mouseenter',function(){show(el);});el.addEventListener('mouseleave',hide);el.addEventListener('touchstart',function(e){e.preventDefault();show(el);setTimeout(hide,3000);},{passive:false});});})();
+    /* 23. Hash Scroll */
+    (function(){if(window.location.hash){var id=window.location.hash.slice(1);var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);}})();
     </script>
 </body>
 </html>
