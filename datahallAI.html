@@ -109,7 +109,7 @@ svg text{user-select:none}
 @keyframes wR{0%{transform:translateX(0);opacity:.25}100%{transform:translateX(42px);opacity:0}}.wr{animation:wR 1.6s ease-out infinite}
 @keyframes wL{0%{transform:translateX(0);opacity:.25}100%{transform:translateX(-42px);opacity:0}}.wl{animation:wL 1.6s ease-out infinite}
 @keyframes sh{0%{opacity:.02}50%{opacity:.07}100%{opacity:.02}}.sh{animation:sh 2.5s ease infinite}
-@keyframes ep{0%,100%{opacity:.4}50%{opacity:.9}}.ep{animation:ep 1.5s ease infinite}
+@keyframes ep{0%,100%{opacity:.4}50%{opacity:.9}}svg .ep{animation:ep 1.5s ease infinite}
 @keyframes lv{0%,100%{fill-opacity:.6}50%{fill-opacity:1}}.lv{animation:lv 2s ease infinite}
 @keyframes pmp{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.pmp{animation:pmp 2s linear infinite;transform-origin:center}
 /* Responsive - Comprehensive Mobile Support */
@@ -559,22 +559,22 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 </div>
 <div class="ep" id="ep-dh01">
 <div class="bx"><h3>DH-01 Electrical SLD</h3><div class="su" id="elecDH1Su"></div>
-<svg id="elecDH1Svg" viewBox="0 0 1200 3800" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH1C"></g></svg></div>
+<svg id="elecDH1Svg" viewBox="0 0 1200 2400" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH1C"></g></svg></div>
 <div class="gr" id="elecDH1Cards"></div>
 </div>
 <div class="ep" id="ep-dh02">
 <div class="bx"><h3>DH-02 Electrical SLD</h3><div class="su" id="elecDH2Su"></div>
-<svg id="elecDH2Svg" viewBox="0 0 1200 3800" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH2C"></g></svg></div>
+<svg id="elecDH2Svg" viewBox="0 0 1200 2400" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH2C"></g></svg></div>
 <div class="gr" id="elecDH2Cards"></div>
 </div>
 <div class="ep" id="ep-dh03">
 <div class="bx"><h3>DH-03 Electrical SLD</h3><div class="su" id="elecDH3Su"></div>
-<svg id="elecDH3Svg" viewBox="0 0 1200 3800" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH3C"></g></svg></div>
+<svg id="elecDH3Svg" viewBox="0 0 1200 2400" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH3C"></g></svg></div>
 <div class="gr" id="elecDH3Cards"></div>
 </div>
 <div class="ep" id="ep-dh04">
 <div class="bx"><h3>DH-04 Electrical SLD</h3><div class="su" id="elecDH4Su"></div>
-<svg id="elecDH4Svg" viewBox="0 0 1200 3800" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH4C"></g></svg></div>
+<svg id="elecDH4Svg" viewBox="0 0 1200 2400" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH4C"></g></svg></div>
 <div class="gr" id="elecDH4Cards"></div>
 </div>
 <div class="gr" id="elecCards"></div></div>
@@ -3596,11 +3596,11 @@ const arrowL=(x,y)=>`<polygon points="${x-4},${y-3} ${x-8},${y} ${x-4},${y+3}" f
 s+=arrowL(550,RY);s+=arrowL(400,RY);s+=arrowL(750,RY);
 // Phase 2: Multi-particle flow dots on supply pipes
 function pDots(x1,y1,x2,y2,n,c,dur){var r='';for(var pi=0;pi<n;pi++){var dl=pi*(dur/n);r+=`<circle r="1.5" fill="${c}" opacity=".5"><animateMotion dur="${dur}s" begin="${dl}s" repeatCount="indefinite" path="M${x1},${y1} L${x2},${y2}"/></circle>`;}return r;}
-// Supply flow dots (cold → warm)
-s+=pDots(195,90,295,90,4,'var(--c)',2.5);
+// Supply flow dots (circuit-colored: CW=purple, FWS=cyan, TCS=pink)
+s+=pDots(195,90,295,90,4,'var(--p)',2.5);
 s+=pDots(300,95,520,95,5,'var(--c)',3);
-s+=pDots(525,90,645,90,4,'var(--g)',2.5);
-s+=pDots(650,88,825,88,5,'var(--g)',3);
+s+=pDots(525,90,645,90,4,'var(--c)',2.5);
+s+=pDots(650,88,825,88,5,'var(--pk)',3);
 // Return flow dots (warm → cold)
 s+=pDots(925,RY,800,RY,4,'var(--o)',2.5);
 s+=pDots(650,RY,525,RY,5,'var(--o)',3);
@@ -3789,11 +3789,13 @@ else if(sym.sym==='sensor')s+=symSensor(sym.x+15,LY+40,'var(--o)','T');
 else if(sym.sym==='motor')s+=symMotor(sym.x+15,LY+40,'var(--b)');
 s+=tx(sym.x+35,LY+43,sym.t,'var(--t2)',5);
 });
-// Flow colors
+// Flow colors — circuit-based legend
 s+=tx(470,LY+35,'Flow Lines:','var(--t3)',5,0,1);
-s+=`<line x1="530" y1="${LY+33}" x2="580" y2="${LY+33}" stroke="var(--c)" stroke-width="2.5" class="fR"/>`;s+=tx(590,LY+35,'Supply (cold)','var(--t2)',5);
-s+=`<line x1="670" y1="${LY+33}" x2="720" y2="${LY+33}" stroke="var(--o)" stroke-width="2" class="fL"/>`;s+=tx(730,LY+35,'Return (warm)','var(--t2)',5);
-s+=`<line x1="820" y1="${LY+33}" x2="870" y2="${LY+33}" stroke="var(--g)" stroke-width="2.5" class="fR"/>`;s+=tx(880,LY+35,'FWS','var(--t2)',5);
+s+=`<line x1="530" y1="${LY+33}" x2="560" y2="${LY+33}" stroke="var(--p)" stroke-width="2.5" class="fR"/>`;s+=tx(565,LY+35,'CW','var(--t2)',5);
+s+=`<line x1="590" y1="${LY+33}" x2="620" y2="${LY+33}" stroke="var(--c)" stroke-width="2.5" class="fR"/>`;s+=tx(625,LY+35,'FWS','var(--t2)',5);
+s+=`<line x1="660" y1="${LY+33}" x2="690" y2="${LY+33}" stroke="var(--pk)" stroke-width="2.5" class="fR"/>`;s+=tx(695,LY+35,'TCS','var(--t2)',5);
+s+=`<line x1="730" y1="${LY+33}" x2="760" y2="${LY+33}" stroke="var(--b)" stroke-width="2.5"/>`;s+=tx(765,LY+35,'Air','var(--t2)',5);
+s+=`<line x1="800" y1="${LY+33}" x2="830" y2="${LY+33}" stroke="var(--o)" stroke-width="2" class="fL"/>`;s+=tx(835,LY+35,'Return','var(--t2)',5);
 // Fluid specs
 s+=tx(30,LY+65,'Fluid Specifications:','var(--t3)',5,0,1);
 const fluids=[
