@@ -2727,114 +2727,67 @@ s+=connector(AX,L2+98,L3+20,CA,'fD');
 s+=connector(BX,L2+98,L3+20,CG,'fD');
 
 // ==== L3: MSB + LV DISTRIBUTION ====
-s+=sH(L3,'L3: LV DISTRIBUTION \u2014 MSB-'+n+'A/B 6300A Form 4b \u2014 LV Tie \u2014 Outgoing Feeders','var(--g)');
+s+=sH(L3,'L3: MSB-'+n+'A/B 6300A Form 4b \u2014 LV Tie \u2014 Outgoing Feeders','var(--g)');
 
 // MSB-nA bus bar — RED tint
 s+='<rect x="'+(AX-100)+'" y="'+(L3+38)+'" width="200" height="7" rx="2" fill="rgba(239,68,68,.1)" stroke="'+CA+'" stroke-width=".8"/>';
-s+=tx(AX,L3+34,'MSB-'+n+'A BUS 400V 6300A',CA,5,'middle',1);
+s+=tx(AX,L3+34,'MSB-'+n+'A 400V 6300A',CA,5,'middle',1);
 s+='<text x="'+AX+'" y="'+(L3+55)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eMSB'+n+'A">398V | 5,200A | PF 0.97</text>';
 
 // MSB-nB bus bar — GREEN tint
 s+='<rect x="'+(BX-100)+'" y="'+(L3+38)+'" width="200" height="7" rx="2" fill="rgba(34,197,94,.1)" stroke="'+CG+'" stroke-width=".8"/>';
-s+=tx(BX,L3+34,'MSB-'+n+'B BUS 400V 6300A',CG,5,'middle',1);
+s+=tx(BX,L3+34,'MSB-'+n+'B 400V 6300A',CG,5,'middle',1);
 s+='<text x="'+BX+'" y="'+(L3+55)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eMSB'+n+'B">399V | 5,100A | PF 0.97</text>';
 
 // LV Bus Tie N.O.
 s+='<line x1="'+(AX+100)+'" y1="'+(L3+41)+'" x2="'+(BX-100)+'" y2="'+(L3+41)+'" stroke="var(--p)" stroke-width="1" stroke-dasharray="5 3"/>';
 s+=cbOpen(500,L3+41,'ACB-TIE-LV',['400V|6300A|N.O.'],'var(--p)');
 
-// Outgoing feeders from MSB-A — UPS-A (RED)
-var ofy=L3+64;
-s+=fLine(AX-40,L3+45,AX-40,ofy,CA,'fD',.5,1);
-s+=cblSide(AX-40,ofy+8,'ACB-UPS-'+n+'A',['4000A|65kA','UPS Feed'],CA,'R');
-// ATS-A feeder (orange for mech)
-s+=sLine(AX+40,L3+45,AX+40,ofy,'var(--o)',.5,1);
-s+=cblSide(AX+40,ofy+8,'MCCB-ATS-'+n+'A',['1600A|50kA','ATS Mech'],'var(--o)','R');
+// Outgoing feeders from MSB-A
+var ofy=L3+62;
+// UPS-A feeder (RED) — straight down at AX
+s+=fLine(AX,L3+45,AX,ofy,CA,'fD',.5,1);
+s+=cblSide(AX,ofy+8,'ACB-UPS-'+n+'A',['4000A|65kA','UPS Feed'],CA,'R');
+// ATS feeder A (orange) — CB-Normal + CB-Emergency with interlock
+// This is the LV ATS: 2 breakers side-by-side from MSB outgoing to mech loads
+s+=sLine(AX+70,L3+45,AX+70,ofy,'var(--o)',.5,1);
+s+=cblSide(AX+70,ofy+8,'CB-N-'+n+'A',['1600A|CLOSED'],CA,'R');
+s+=cbOpenSide(AX+130,ofy+8,'CB-E-'+n+'A',['1600A|OPEN'],DEAD,'R');
+s+=deadLine(AX+130,L3+45,AX+130,ofy,1);
+s+=tx(AX+130,ofy-4,'GEN',DEAD,3.5,'middle');
+// ATS interlock dashed line
+s+='<line x1="'+(AX+78)+'" y1="'+(ofy+8)+'" x2="'+(AX+122)+'" y2="'+(ofy+8)+'" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2"/>';
+s+=tx(AX+100,ofy+4,'ATS','var(--r)',3.5,'middle',1);
 // DB-NC feeder (cyan)
-s+=sLine(AX-100,L3+45,AX-100,ofy,'var(--c)',.5,1);
-s+=cblSide(AX-100,ofy+8,'MCCB-NC-'+n,['800A|36kA','695kW NC'],'var(--c)','R');
+s+=sLine(AX-70,L3+45,AX-70,ofy,'var(--c)',.5,1);
+s+=cblSide(AX-70,ofy+8,'MCCB-NC-'+n,['800A|36kA','695kW NC'],'var(--c)','R');
 
-// Outgoing feeders from MSB-B — UPS-B (GREEN)
-s+=fLine(BX+40,L3+45,BX+40,ofy,CG,'fD',.5,1);
-s+=cblSide(BX+40,ofy+8,'ACB-UPS-'+n+'B',['4000A|65kA','UPS Feed'],CG,'L');
-// ATS-B feeder (orange)
-s+=sLine(BX-40,L3+45,BX-40,ofy,'var(--o)',.5,1);
-s+=cblSide(BX-40,ofy+8,'MCCB-ATS-'+n+'B',['1600A|50kA','ATS Mech'],'var(--o)','L');
+// Outgoing feeders from MSB-B
+// UPS-B feeder (GREEN) — straight down at BX
+s+=fLine(BX,L3+45,BX,ofy,CG,'fD',.5,1);
+s+=cblSide(BX,ofy+8,'ACB-UPS-'+n+'B',['4000A|65kA','UPS Feed'],CG,'L');
+// ATS feeder B (orange)
+s+=sLine(BX-70,L3+45,BX-70,ofy,'var(--o)',.5,1);
+s+=cblSide(BX-70,ofy+8,'CB-N-'+n+'B',['1600A|CLOSED'],CG,'L');
+s+=cbOpenSide(BX-130,ofy+8,'CB-E-'+n+'B',['1600A|OPEN'],DEAD,'L');
+s+=deadLine(BX-130,L3+45,BX-130,ofy,1);
+s+=tx(BX-130,ofy-4,'GEN',DEAD,3.5,'middle');
+s+='<line x1="'+(BX-78)+'" y1="'+(ofy+8)+'" x2="'+(BX-122)+'" y2="'+(ofy+8)+'" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2"/>';
+s+=tx(BX-100,ofy+4,'ATS','var(--r)',3.5,'middle',1);
 // DB-COOL feeder (blue)
-s+=sLine(BX+100,L3+45,BX+100,ofy,'var(--b)',.5,1);
-s+=cblSide(BX+100,ofy+8,'MCCB-COOL-'+n,['1250A|50kA','2170kW Cool'],'var(--b)','L');
+s+=sLine(BX+70,L3+45,BX+70,ofy,'var(--b)',.5,1);
+s+=cblSide(BX+70,ofy+8,'MCCB-COOL-'+n,['1250A|50kA','2170kW Cool'],'var(--b)','L');
 
-// Spare feeders (gray)
-s+=sLine(AX+100,L3+45,AX+100,ofy,'var(--t3)',.3,1);
-s+=cblSide(AX+100,ofy+8,'MCCB-SPR-'+n+'A',['800A|36kA','Spare'],'var(--t3)','R');
-s+=sLine(BX-100,L3+45,BX-100,ofy,'var(--t3)',.3,1);
-s+=cblSide(BX-100,ofy+8,'MCCB-SPR-'+n+'B',['800A|36kA','Spare'],'var(--t3)','L');
-
-// Lines continuing to UPS (L3→L5)
-s+=fLine(AX-40,ofy+22,AX-40,ofy+32,CA,'fD',.5,1);
-s+=fLine(BX+40,ofy+22,BX+40,ofy+32,CG,'fD',.5,1);
-// Lines continuing to ATS (L3→L4)
-s+=sLine(AX+40,ofy+22,AX+40,ofy+32,'var(--o)',.5,1);
-s+=sLine(BX-40,ofy+22,BX-40,ofy+32,'var(--o)',.5,1);
-
-// L3→L5 UPS path connectors (main IT path)
-s+=connector(AX-40,ofy+32,L5+20,CA,'fD');
-s+=connector(BX+40,ofy+32,L5+20,CG,'fD');
-// L3→L4 ATS branch connectors
-s+=connector(AX+40,ofy+32,L4+25,'var(--o)','fD');
-s+=connector(BX-40,ofy+32,L4+25,'var(--o)','fD');
-
-// ==== L4: ATS + GENSET DETAIL ====
-s+=sH(L4,'L4: ATS \u2014 CB-Normal + CB-Emergency + Interlock + ATS Controller','var(--r)');
-
-// ATS-nA (left)
-s+=bx(120,L4+25,260,85,'var(--r)');
-s+=tx(250,L4+36,'ATS-'+n+'A','var(--r)',5.5,'middle',1);
-// CB-Normal (from MSB-A, CLOSED) — RED
-s+=fLine(180,L4+42,180,L4+52,CA,'fD',.5,1);
-s+=tx(180,L4+41,'FROM MSB',CA,4,'middle');
-s+=cblSide(180,L4+58,'CB-NORM-A',['1600A|CLOSED'],CA,'R');
-s+=fLine(180,L4+68,180,L4+80,CA,'fD',.5,1);
-// CB-Emergency (from GenSet, OPEN) — GRAY dead
-s+=deadLine(320,L4+42,320,L4+52,1);
-s+=tx(320,L4+41,'GENSET',DEAD,4,'middle');
-s+=cbOpenSide(320,L4+58,'CB-EMRG-A',['1600A|OPEN|STBY'],DEAD,'L');
-s+=deadLine(320,L4+68,320,L4+80,1);
-// Interlock
-s+='<line x1="195" y1="'+(L4+58)+'" x2="305" y2="'+(L4+58)+'" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2"/>';
-s+=tx(250,L4+54,'\u2297 INTLK','var(--r)',4,'middle',1);
-// Controller
-s+=tx(250,L4+92,'ATS MTZ <100ms','var(--t2)',4.5,'middle');
-s+=tx(250,L4+104,'\u2192 Mechanical Loads','var(--o)',4.5,'middle',1);
-
-// ATS-nB (right)
-s+=bx(620,L4+25,260,85,'var(--r)');
-s+=tx(750,L4+36,'ATS-'+n+'B','var(--r)',5.5,'middle',1);
-// CB-Normal B (from MSB-B, CLOSED) — GREEN
-s+=fLine(680,L4+42,680,L4+52,CG,'fD',.5,1);
-s+=tx(680,L4+41,'FROM MSB',CG,4,'middle');
-s+=cblSide(680,L4+58,'CB-NORM-B',['1600A|CLOSED'],CG,'L');
-s+=fLine(680,L4+68,680,L4+80,CG,'fD',.5,1);
-// CB-Emergency B (GRAY dead)
-s+=deadLine(820,L4+42,820,L4+52,1);
-s+=tx(820,L4+41,'GENSET',DEAD,4,'middle');
-s+=cbOpenSide(820,L4+58,'CB-EMRG-B',['1600A|OPEN|STBY'],DEAD,'R');
-s+=deadLine(820,L4+68,820,L4+80,1);
-// Interlock B
-s+='<line x1="695" y1="'+(L4+58)+'" x2="805" y2="'+(L4+58)+'" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2"/>';
-s+=tx(750,L4+54,'\u2297 INTLK','var(--r)',4,'middle',1);
-s+=tx(750,L4+92,'ATS MTZ <100ms','var(--t2)',4.5,'middle');
-s+=tx(750,L4+104,'\u2192 Mechanical Loads','var(--o)',4.5,'middle',1);
-
-// GenSet detail box (center) — GRAY dead
-s+='<rect x="300" y="'+(L4+115)+'" width="400" height="30" rx="4" fill="'+DEAD_BG+'" stroke="'+DEAD+'" stroke-width=".5" stroke-dasharray="'+DEAD_DASH+'"/>';
-s+=tx(500,L4+128,'GENERATOR POOL: 6\u00D7 Cat 3516E 8MW N+1 | ASCO 7000 APS | STANDBY',DEAD,4.5,'middle',1);
-s+=tx(500,L4+140,'48hr fuel | Auto <10s | Step-up 11/20kV \u2192 MV Bus','var(--t3)',4,'middle');
+// L3→L5 UPS connectors — straight at AX and BX
+s+=fLine(AX,ofy+22,AX,ofy+30,CA,'fD',.5,1);
+s+=fLine(BX,ofy+22,BX,ofy+30,CG,'fD',.5,1);
+s+=connector(AX,ofy+30,L5+20,CA,'fD');
+s+=connector(BX,ofy+30,L5+20,CG,'fD');
 
 // ==== L5: UPS + BATTERY ====
-s+=sH(L5,'L5: UPS SYSTEM \u2014 2\u00D7 Vertiv EXL S1 8MW \u2014 VFI-SS-111 Double-Conv','var(--g)');
+s+=sH(L5,'L5: UPS \u2014 2\u00D7 Vertiv EXL S1 8MW \u2014 VFI-SS-111 Double-Conv','var(--g)');
 
-// UPS-nA — RED path
+// UPS-nA — RED path, straight at AX
 s+=fLine(AX,L5+20,AX,L5+35,CA,'fD',.5,1.5);
 s+='<g data-tip="UPS-'+n+'A: Vertiv EXL S1 8MW, modular 8\u00D71MW, VFI-SS-111, '+DH[n-1]+' Feed A">';
 s+=bx(AX-80,L5+37,160,50,CA);
@@ -2844,19 +2797,19 @@ s+=tx(AX+30,L5+58,'8\u00D71MW VFI-SS-111','var(--t3)',4.5);
 s+='<text x="'+AX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'A">5,420 kW | 68% | \u03B796.2%</text>';
 s+='</g>';
 
-// Battery-A (beside UPS-A)
-s+=sLine(AX+80,L5+60,AX+100,L5+60,CA,.5,1);
-s+=bx(AX+100,L5+42,120,40,CA);
-s+=tx(AX+160,L5+55,'BAT-'+n+'A',CA,5,'middle',1);
-s+=tx(AX+160,L5+65,'1,333 kWh NMC 10min','var(--t3)',4.5,'middle');
-s+='<text x="'+(AX+160)+'" y="'+(L5+75)+'" fill="var(--g)" font-family="'+J+'" font-size="4.5" text-anchor="middle" font-weight="600" class="lv" id="eBat'+n+'A">SOC 98%</text>';
+// Battery-A — LEFT of UPS-A (no overlap)
+s+=sLine(AX-80,L5+60,AX-95,L5+60,CA,.5,1);
+s+=bx(AX-210,L5+44,115,36,CA);
+s+=tx(AX-152,L5+57,'BAT-'+n+'A',CA,5,'middle',1);
+s+=tx(AX-152,L5+67,'1,333kWh NMC 10min','var(--t3)',4,'middle');
+s+='<text x="'+(AX-152)+'" y="'+(L5+76)+'" fill="var(--g)" font-family="'+J+'" font-size="4.5" text-anchor="middle" font-weight="600" class="lv" id="eBat'+n+'A">SOC 98%</text>';
 
 // UPS-nA output ACB
 s+=fLine(AX,L5+87,AX,L5+96,CA,'fD',.5,1.5);
-s+=cblSide(AX,L5+103,'ACB-UPS-OUT-'+n+'A',['4000A|65kA','UPS Output'],CA,'R');
+s+=cblSide(AX,L5+103,'ACB-OUT-'+n+'A',['4000A|65kA','UPS Out'],CA,'R');
 s+=fLine(AX,L5+113,AX,L5+125,CA,'fD',.5,1.5);
 
-// UPS-nB — GREEN path
+// UPS-nB — GREEN path, straight at BX
 s+=fLine(BX,L5+20,BX,L5+35,CG,'fD',.5,1.5);
 s+='<g data-tip="UPS-'+n+'B: Vertiv EXL S1 8MW, modular 8\u00D71MW, VFI-SS-111, '+DH[n-1]+' Feed B">';
 s+=bx(BX-80,L5+37,160,50,CG);
@@ -2866,16 +2819,16 @@ s+=tx(BX-30,L5+58,'8\u00D71MW VFI-SS-111','var(--t3)',4.5,'end');
 s+='<text x="'+BX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'B">5,380 kW | 67% | \u03B796.1%</text>';
 s+='</g>';
 
-// Battery-B (beside UPS-B)
-s+=sLine(BX-80,L5+60,BX-100,L5+60,CG,.5,1);
-s+=bx(BX-220,L5+42,120,40,CG);
-s+=tx(BX-160,L5+55,'BAT-'+n+'B',CG,5,'middle',1);
-s+=tx(BX-160,L5+65,'1,333 kWh NMC 10min','var(--t3)',4.5,'middle');
-s+='<text x="'+(BX-160)+'" y="'+(L5+75)+'" fill="var(--g)" font-family="'+J+'" font-size="4.5" text-anchor="middle" font-weight="600" class="lv" id="eBat'+n+'B">SOC 97%</text>';
+// Battery-B — RIGHT of UPS-B (no overlap)
+s+=sLine(BX+80,L5+60,BX+95,L5+60,CG,.5,1);
+s+=bx(BX+95,L5+44,115,36,CG);
+s+=tx(BX+152,L5+57,'BAT-'+n+'B',CG,5,'middle',1);
+s+=tx(BX+152,L5+67,'1,333kWh NMC 10min','var(--t3)',4,'middle');
+s+='<text x="'+(BX+152)+'" y="'+(L5+76)+'" fill="var(--g)" font-family="'+J+'" font-size="4.5" text-anchor="middle" font-weight="600" class="lv" id="eBat'+n+'B">SOC 97%</text>';
 
 // UPS-nB output ACB
 s+=fLine(BX,L5+87,BX,L5+96,CG,'fD',.5,1.5);
-s+=cblSide(BX,L5+103,'ACB-UPS-OUT-'+n+'B',['4000A|65kA','UPS Output'],CG,'L');
+s+=cblSide(BX,L5+103,'ACB-OUT-'+n+'B',['4000A|65kA','UPS Out'],CG,'L');
 s+=fLine(BX,L5+113,BX,L5+125,CG,'fD',.5,1.5);
 
 // No STS label
