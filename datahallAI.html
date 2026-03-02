@@ -2215,7 +2215,7 @@ upd();setInterval(upd,3000)})();
 
 
 // ==== ELECTRICAL SLD v5 — TRUE 2N TIER III+ — 4 DATA HALLS — COLOR-CODED FEED A(RED)/B(GREEN) ====
-$('elecOvSu').textContent='PLN 20kV Dual Feed \u2192 MV Customer Substation (SM6 24kV + GenSet APS Interlock) \u2192 4\u00D7 RMU RM6 3-Panel (Feed A + Bus Tie + Feed B) \u2192 8\u00D710MVA TX \u2192 8\u00D7MSB 6300A \u2192 ATS (CB-Normal + CB-Emergency + Interlock) \u2192 6\u00D78MW GenSet Pool N+1 \u2192 8\u00D7UPS 8MW Li-Ion \u2192 8\u00D7Busway 12,000A \u2192 88\u00D7RPP 800A \u2192 Dual-Corded Rack PSU 50VDC | 4 Data Halls 28.5MW IT | True 2N | v5 Color-Coded';
+$('elecOvSu').textContent='PLN 20kV Dual Feed \u2192 MV Customer Substation (SM6 24kV) \u2192 4\u00D7 RMU RM6 3-Panel (Feed A + Bus Tie + Feed B) \u2192 8\u00D710MVA TX \u2192 8\u00D7MSB 6300A \u2192 ATS (CB-Normal + CB-Emergency + Interlock) \u21CC 6\u00D78MW GenSet Pool N+1 \u2192 8\u00D7UPS 8MW Li-Ion \u2192 8\u00D7Busway 12,000A \u2192 88\u00D7RPP 800A \u2192 Dual-Corded Rack PSU 50VDC | 4 Data Halls 28.5MW IT | True 2N | v5 Color-Coded';
 
 // ==== OVERVIEW IIFE ====
 (function(){
@@ -2235,7 +2235,7 @@ s+='<rect x="0" y="0" width="'+W+'" height="28" fill="rgba(245,158,11,.06)"/>';
 s+=tx(600,19,'FACILITY ELECTRICAL SLD v5 \u2014 4 DATA HALLS \u2014 28.5 MW IT \u2014 TRUE 2N \u2014 FEED A (RED) / FEED B (GREEN)','var(--o)',8,'middle',1);
 
 // ======== MV CUSTOMER SUBSTATION (30-210) ========
-s+=sH(30,'MV CUSTOMER SUBSTATION \u2014 Schneider SM6 24kV Gas-Insulated \u2014 11 Panels (2 Inc + 1 Tie + 8 Fdr) + GenSet APS','var(--o)');
+s+=sH(30,'MV CUSTOMER SUBSTATION \u2014 Schneider SM6 24kV Gas-Insulated \u2014 11 Panels (2 Inc + 1 Tie + 8 Fdr)','var(--o)');
 
 // PLN Source A — RED
 s+=bx(30,55,120,50,'var(--r)');
@@ -2276,11 +2276,6 @@ s+=symCB(505,126,'var(--p)',false);
 s+=tx(505,145,'VCB-TIE','var(--p)',5,'middle',1);
 s+=tx(505,155,'N.O.','var(--o)',5,'middle');
 
-// GenSet APS Interlock indicator
-s+='<line x1="410" y1="115" x2="490" y2="126" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2" opacity=".4"/>';
-s+='<line x1="520" y1="126" x2="600" y2="115" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2" opacity=".4"/>';
-s+=tx(505,112,'\u2297 GenSet APS Interlock','var(--r)',5,'middle');
-
 // 8 Feeder VCBs — Feed A (RED) from Bus A, Feed B (GREEN) from Bus B
 var fdrAx=[250,330,390,450];
 var fdrBx=[560,620,680,760];
@@ -2300,15 +2295,15 @@ s+='<rect x="1020" y="50" width="170" height="165" rx="5" fill="rgba(107,114,128
 s+=tx(1105,67,'GENERATOR POOL','rgba(107,114,128,.6)',6,'middle',1);
 s+=tx(1105,80,'6\u00D7 Cat 3516E 8MW V16','var(--t3)',5,'middle');
 s+=tx(1105,91,'N+1: 5+1 = 48MW cap.','var(--t3)',5,'middle');
-s+=tx(1105,102,'ASCO 7000 APS | STANDBY','var(--t3)',5,'middle');
+s+=tx(1105,102,'ASCO 7000 ATS | STANDBY','var(--t3)',5,'middle');
 for(var gi=0;gi<6;gi++){
 var gx=1030+(gi%3)*55,gy=110+(Math.floor(gi/3))*42;
 s+=symGen(gx+15,gy+15,'rgba(107,114,128,.4)');
 s+=tx(gx+15,gy+32,'GEN-'+(gi+1)+(gi===5?' STBY':''),'var(--t3)',5,'middle');
 s+=tx(gx+15,gy+40,'8MW','rgba(107,114,128,.5)',5,'middle',1);
 }
-s+=tx(1105,198,'\u2192 MV Bus via APS','var(--t3)',5,'middle');
-s+=tx(1105,208,'\u2297 Interlock w/ Incomers','var(--r)',5,'middle');
+s+=tx(1105,198,'\u2192 LV 400V via ATS','var(--t3)',5,'middle');
+s+=tx(1105,208,'\u2297 Interlock w/ MSB Incomers','var(--r)',5,'middle');
 
 // ======== 4 DH COLUMNS (220-680) ========
 s+=sH(215,'4 DATA HALLS \u2014 TRUE 2N POWER PATH \u2014 CLICK COLUMN FOR DETAIL','var(--g)');
@@ -2459,7 +2454,7 @@ var ovSpec=[
 ['',0,'11 panels: 2 inc+1 tie+8 fdr'],
 ['',0,'Feed A = RED | Feed B = GREEN'],
 ['',0,'Per-DH RMU: Schneider RM6'],
-['',0,'GenSet pool = GRAY (standby)'],
+['',0,'GenSet at LV via ATS (standby)'],
 ['',0,''],
 ['var(--o)',0,'TRANSFORMERS'],
 ['',0,'8\u00D7 ABB RESIBLOC 10MVA'],
@@ -2471,7 +2466,7 @@ var ovSpec=[
 ['',0,'6\u00D7 Cat 3516E 8MW V16'],
 ['',0,'N+1: 5 running+1 standby'],
 ['',0,'Total: 48MW capacity'],
-['',0,'ASCO 7000 APS controller'],
+['',0,'ASCO 7000 ATS controller'],
 ['',0,'Auto-start <10s'],
 ['',0,''],
 ['var(--g)',0,'UPS SYSTEM'],
@@ -2518,9 +2513,9 @@ var ep=$('ep-dh0'+n);if(ep)ep.classList.add('on');
 
 // Overview cards
 $('elecOvCards').innerHTML=[
-mc('var(--o)','MV Customer Substation','SM6 24kV + GenSet APS + Interlock',[['Central','SM6 24kV gas-insulated 11 panels'],['Incomers','VCB-INC-A/B: 630A/25kA (PLN A+B)'],['Bus Tie','VCB-TIE: 20kV/630A N.O. motorized'],['GenSet','VCB-GEN: 630A/25kA + Interlock APS'],['Feeders','8\u00D7 VCB (4 from Bus A + 4 from Bus B)'],['Per-DH RMU','RM6 3-panel (A VCB + Tie + B VCB)'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['Standard','IEC 62271 / SNI 0225']]),
+mc('var(--o)','MV Customer Substation','SM6 24kV Dual Feed',[['Central','SM6 24kV gas-insulated 11 panels'],['Incomers','VCB-INC-A/B: 630A/25kA (PLN A+B)'],['Bus Tie','VCB-TIE: 20kV/630A N.O. motorized'],['Feeders','8\u00D7 VCB (4 from Bus A + 4 from Bus B)'],['Per-DH RMU','RM6 3-panel (A VCB + Tie + B VCB)'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['Standard','IEC 62271 / SNI 0225']]),
 mc('var(--o)','Transformers','8\u00D7 ABB RESIBLOC 10MVA',[['Rating','10,000 kVA per unit (2 per DH)'],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA secondary'],['Cooling','AN/AF (forced at 80% load)'],['Tap','\u00B12.5%\u00D72 OCTC'],['ACBs','6300A/100kA ABB Emax2 E6.2'],['Total','80MVA facility capacity']]),
-mc('var(--r)','Generator Pool','6\u00D7 Cat 3516E 8MW N+1',[['Units','6\u00D7 8,000 kW V16 diesel (N+1)'],['Engine','Caterpillar 3516E at 11kV'],['Step-up TX','11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling'],['Start','Auto <10s on MV undervoltage'],['Capacity','5 running = 40MW for 31.8MW load'],['Fuel','48hr base tank + day tanks'],['Maintenance','250hr oil | 1000hr major']]),
+mc('var(--r)','Generator Pool','6\u00D7 Cat 3516E 8MW N+1',[['Units','6\u00D7 8,000 kW V16 diesel (N+1)'],['Engine','Caterpillar 3516E at 400V LV'],['ATS','CB-Normal + CB-Emergency at MSB'],['Controller','ASCO 7000 auto-paralleling'],['Start','Auto <10s on utility fail'],['Capacity','5 running = 40MW for 31.8MW load'],['Fuel','48hr base tank + day tanks'],['Maintenance','250hr oil | 1000hr major']]),
 mc('var(--g)','UPS System','8\u00D7 Vertiv EXL S1 8MW',[['Rating','8,000 kW per unit (2 per DH)'],['Type','VFI-SS-111 double-conversion'],['Modules','8\u00D71MW modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['THDi/THDv','<3% / <1%'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['Standard','IEC 62040-3']]),
 mc('var(--c)','Non-Critical','DB-NC: 695 kW Total',[['AHU 1+2','2\u00D7150kW Carrier 39HQ'],['VRV','4\u00D725kW Daikin VRV IV'],['Lighting','80kW LED DALI'],['Fire','30kW FACP + Novec'],['Security','20kW CCTV+Access'],['BMS','40kW EcoStruxure'],['Elevators','60kW (2\u00D730kW)'],['WTP','50kW treatment']]),
 mc('var(--b)','Cooling Loads','DB-COOL: 2,170 kW Total',[['Chillers','4\u00D7350kW Carrier 19DV'],['CW Pumps','4\u00D775kW Grundfos NB'],['DC Fans','8\u00D745kW BAC Trillium'],['CDU Pumps','110kW/hall (UPS-fed)'],['Note','CDU pumps UPS-backed for critical cooling']]),
@@ -2536,7 +2531,7 @@ var FL=['Floor 2','Floor 2','Floor 3','Floor 3'];
 function drawDH(n,cId,suId,cardsId){
 var el=$(cId);if(!el)return;
 var su=$(suId);
-if(su)su.textContent='PLN 20kV \u2192 MV Customer Substation (SM6 Bus A/B + Tie + GenSet APS) \u2192 RMU-'+n+' (RM6 3-Panel + Bus Tie) \u2192 2\u00D7TX 10MVA \u2192 MSB-'+n+'A/B 6300A \u2192 ATS \u21CC GenSet Pool \u2192 UPS 8MW \u2192 BW 12kA \u2192 11\u00D7RPP 800A \u2192 22 Racks Dual-Corded | '+DH[n-1]+' '+FL[n-1]+' | v5';
+if(su)su.textContent='PLN 20kV \u2192 MV Customer Substation (SM6 Bus A/B + Tie) \u2192 RMU-'+n+' (RM6 3-Panel + Bus Tie) \u2192 2\u00D7TX 10MVA \u2192 MSB-'+n+'A/B 6300A \u2192 ATS (CB-N + CB-E) \u21CC GenSet Pool \u2192 UPS 8MW \u2192 BW 12kA \u2192 11\u00D7RPP 800A \u2192 22 Racks Dual-Corded | '+DH[n-1]+' '+FL[n-1]+' | v5';
 var s='';
 var W=1200,H=2400;
 // Section header
@@ -2980,9 +2975,9 @@ var dhSpec=[
 ['',0,'MSB-'+n+'B \u2192 UPS-'+n+'B \u2192 BW-'+n+'B'],
 ['',0,''],
 [DEAD,0,'STANDBY (GRAY)'],
-['',0,'GenSet Pool: 6\u00D78MW N+1'],
-['',0,'VCB-GEN: OPEN'],
-['',0,'CB-Emergency: OPEN'],
+['',0,'ATS: CB-Emergency OPEN'],
+['',0,'GenSet Pool: 6\u00D78MW N+1 standby'],
+['',0,'Connects at LV 400V via ATS'],
 ['',0,'Gray dashed = no power flow'],
 ['',0,''],
 ['var(--o)',0,'TRANSFORMERS'],
@@ -3027,7 +3022,7 @@ if(svgEl)svgEl.setAttribute('viewBox','0 0 '+W+' '+H);
 var cEl=$(cardsId);
 if(cEl){
 cEl.innerHTML=[
-mc(CA,'MV Customer Sub.','SM6 24kV + GenSet APS',[['PLN Sources','Dual 20kV feed A(RED)+B(GREEN)'],['Incomers','VCB-INC-A/B: 630A/25kA vacuum'],['Bus Tie','VCB-TIE: 20kV/630A N.O. motorized'],['GenSet','GRAY standby: VCB-GEN OPEN'],['Feeders','F'+n+'A(RED)/B(GREEN) to RMU-'+n]]),
+mc(CA,'MV Customer Sub.','SM6 24kV Dual Feed',[['PLN Sources','Dual 20kV feed A(RED)+B(GREEN)'],['Incomers','VCB-INC-A/B: 630A/25kA vacuum'],['Bus Tie','VCB-TIE: 20kV/630A N.O. motorized'],['Feeders','F'+n+'A(RED)/B(GREEN) to RMU-'+n],['Protection','IDMT OC 50/51, E/F 50N/51N']]),
 mc('var(--o)','RMU-'+n+' (RM6)','3-Panel with Bus Tie',[['Feed A','VCB-RMU-'+n+'A: 20kV/630A (RED)'],['Bus Tie','VCB-TIE-RMU: N.O. (purple)'],['Feed B','VCB-RMU-'+n+'B: 20kV/630A (GREEN)'],['Type','RM6 24kV SF6-free 3-panel'],['Metering','CT 200/5A cl0.5 per feed']]),
 mc('var(--o)','Transformers','2x ABB RESIBLOC 10MVA',[['TX-'+n+'A','10MVA Feed A (RED) | ACB 6300A'],['TX-'+n+'B','10MVA Feed B (GREEN) | ACB 6300A'],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA sec.'],['Cooling','AN/AF (forced at 80%)']]),
 mc('var(--g)','LV Distribution','MSB 6300A + All CBs',[['MSB-'+n+'A','RED tint | 6300A Form 4b'],['MSB-'+n+'B','GREEN tint | 6300A Form 4b'],['LV Tie','ACB-TIE-LV: N.O. (purple)'],['UPS Feed','ACB-UPS: 4000A/65kA per path'],['NC/Cool','MCCB-NC 800A + MCCB-COOL 1250A']]),
