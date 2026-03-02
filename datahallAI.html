@@ -440,7 +440,7 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="pn" id="p-over">
 <div class="bx"><h3>Building Overview</h3><div class="su">Click any floor to explore room layout &mdash; 72m &times; 48m &times; 4 levels &mdash; 13,824 m&sup2; total</div>
 <div id="bldgWrap">
-<svg id="bldgSvg" viewBox="0 0 960 660" preserveAspectRatio="xMidYMid meet" style="width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:5px" xmlns="http://www.w3.org/2000/svg"><g id="bldgC"></g></svg>
+<svg id="bldgSvg" viewBox="0 0 1200 1020" preserveAspectRatio="xMidYMid meet" style="width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:5px" xmlns="http://www.w3.org/2000/svg"><g id="bldgC"></g></svg>
 </div>
 <div id="floorDetail" style="display:none">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -660,7 +660,7 @@ function mc(c,t,su,rows){let h='<div class="cd"><h4><b style="background:'+c+'">
 // ===== BUILDING OVERVIEW — 3D ISOMETRIC + FLOOR PLANS =====
 (function(){
 var bC=$('bldgC'),fC=$('floorC');if(!bC)return;
-var S=2.6,ZS=2.2,OX=420,OY=380;
+var S=5.2,ZS=3.0,OX=530,OY=580;
 function iX(x,y){return Math.round(OX+(x-y)*0.866*S)}
 function iY(x,y,z){return Math.round(OY+(x+y)*0.5*S-z*ZS)}
 // Isometric polygon for a slab top face
@@ -694,14 +694,14 @@ return'<text x="'+iX(x,y)+'" y="'+iY(x,y,z)+'" fill="'+color+'" font-family="'+J
 // 3D equipment box: isoBox(x,y,w,d,z,h,fill,label)
 function isoBox(x,y,w,d,z,h,fill,label,labelColor){
 var s=drawSlab(x,y,w,d,z,h,fill,'rgba(255,255,255,.3)',.6);
-if(label)s+=isoLabel(x+w/2,y+d/2,z+h+0.5,label,labelColor||'#fff',5,1);
+if(label)s+=isoLabel(x+w/2,y+d/2,z+h+0.8,label,labelColor||'#fff',7,1);
 return s;
 }
 // Building dimensions
 var BW=72,BD=48;
 // Floor z positions (exploded view with gaps)
-var FH=5; // floor slab height
-var GAP=14; // gap between floors (reduced for proportional fit)
+var FH=6; // floor slab height
+var GAP=18; // gap between floors
 var Z_GF=0, Z_F2=FH+GAP, Z_F3=(FH+GAP)*2, Z_RF=(FH+GAP)*3;
 var floors=[
 {z:Z_GF,label:'GROUND FLOOR',sub:'MEP · Infrastructure · Support',color:'#f59e0b',key:'gf'},
@@ -715,10 +715,10 @@ var s='';
 // Defs
 s+='<defs><filter id="bSh" x="-5%" y="-5%" width="120%" height="130%"><feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity=".15"/></filter>';
 s+='<pattern id="bGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.015)" stroke-width=".3"/></pattern></defs>';
-s+='<rect width="960" height="660" fill="url(#bGrid)"/>';
+s+='<rect width="1200" height="1020" fill="url(#bGrid)"/>';
 // Title
-s+=tx(480,22,'BUILDING OVERVIEW \u2014 4-STORY AI DATA CENTER','var(--t1)',11,'middle',1);
-s+=tx(480,40,'72m \u00D7 48m \u00D7 4 Levels \u2502 13,824 m\u00B2 Total \u2502 4\u00D7 GB200 NVL72 Data Halls \u2502 28.4 MW IT','var(--t3)',7,'middle');
+s+=tx(600,22,'BUILDING OVERVIEW \u2014 4-STORY AI DATA CENTER','var(--t1)',13,'middle',1);
+s+=tx(600,40,'72m \u00D7 48m \u00D7 4 Levels \u2502 13,824 m\u00B2 Total \u2502 4\u00D7 GB200 NVL72 Data Halls \u2502 28.4 MW IT','var(--t3)',8,'middle');
 
 // Ground plane / shadow
 s+='<polygon points="'+isoTop(-3,-3,BW+6,BD+6,-2)+'" fill="rgba(0,0,0,.08)" filter="url(#bSh)"/>';
@@ -858,8 +858,8 @@ for(var vi=0;vi<4;vi++)s+=isoBox(37+vi*7,30,5,4,f.z+FH,1.5,'#f59e0b','VRF','#fde
 // Floor label (right side)
 var lx=iX(BW+4,BD*0.5);
 var ly=iY(BW+4,BD*0.5,f.z+FH/2);
-s+='<text x="'+lx+'" y="'+(ly-2)+'" fill="'+f.color+'" font-family="'+J+'" font-size="10" font-weight="700">'+f.label+'</text>';
-s+='<text x="'+lx+'" y="'+(ly+12)+'" fill="var(--t3)" font-family="'+J+'" font-size="7">'+f.sub+'</text>';
+s+='<text x="'+lx+'" y="'+(ly-2)+'" fill="'+f.color+'" font-family="'+J+'" font-size="13" font-weight="700">'+f.label+'</text>';
+s+='<text x="'+lx+'" y="'+(ly+14)+'" fill="var(--t3)" font-family="'+J+'" font-size="9">'+f.sub+'</text>';
 
 // Clickable overlay (transparent polygon over top face)
 s+='<polygon points="'+isoTop(0,0,BW,BD,f.z+FH)+'" fill="transparent" data-floor="'+f.key+'" style="cursor:pointer" class="iso-floor"><title>Click to view '+f.label+'</title></polygon>';
@@ -891,7 +891,7 @@ s+=isoLabel(BW+8,7,3,'FUEL','#f59e0b',6,1);
 s+=isoLabel(BW+8,7,1.5,'80,000L','var(--t3)',5);
 
 // Compass rose (top-right)
-s+='<g transform="translate(890,80)">';
+s+='<g transform="translate(1130,80)">';
 s+='<circle cx="0" cy="0" r="22" fill="none" stroke="var(--bd2)" stroke-width=".5"/>';
 s+='<polygon points="0,-20 4,-6 -4,-6" fill="var(--r)" opacity=".6"/>';
 s+='<polygon points="0,20 4,6 -4,6" fill="var(--t3)" opacity=".3"/>';
@@ -902,8 +902,8 @@ s+=tx(28,3,'E','var(--t3)',6,'middle');
 s+='</g>';
 
 // Legend strip at bottom
-var LY=580;
-s+='<rect x="20" y="'+(LY-8)+'" width="920" height="38" rx="4" fill="rgba(255,255,255,.02)" stroke="var(--bd)" stroke-width=".5"/>';
+var LY=940;
+s+='<rect x="20" y="'+(LY-8)+'" width="1160" height="38" rx="4" fill="rgba(255,255,255,.02)" stroke="var(--bd)" stroke-width=".5"/>';
 var lgd=[
 {c:'#f59e0b',l:'Ground — MEP/Infra'},{c:'#22c55e',l:'Floor 2/3 — Data Halls'},
 {c:'#06b6d4',l:'Roof — Mechanical'},{c:'#ef4444',l:'External — MV/Utility'},
@@ -912,13 +912,13 @@ var lgd=[
 var lx2=40;
 lgd.forEach(function(l){
 s+='<rect x="'+lx2+'" y="'+(LY)+'" width="10" height="10" rx="2" fill="'+l.c+'" fill-opacity=".5"/>';
-s+=tx(lx2+14,LY+9,l.l,'var(--t3)',7);
-lx2+=150;
+s+=tx(lx2+14,LY+9,l.l,'var(--t3)',8);
+lx2+=185;
 });
 
 // KPI summary strip
-s+='<rect x="20" y="50" width="240" height="105" rx="5" fill="rgba(255,255,255,.03)" stroke="var(--bd)" stroke-width=".5"/>';
-s+=tx(30,68,'FACILITY SUMMARY','var(--t1)',8,0,1);
+s+='<rect x="20" y="50" width="280" height="115" rx="5" fill="rgba(255,255,255,.03)" stroke="var(--bd)" stroke-width=".5"/>';
+s+=tx(30,68,'FACILITY SUMMARY','var(--t1)',9,0,1);
 var kpis=[
 ['Total IT Load','28.4 MW','var(--o)'],
 ['Total Facility','30.7 MW (PUE 1.08)','var(--g)'],
@@ -927,15 +927,15 @@ var kpis=[
 ['Cooling','Dry Cooler + DLC','var(--c)'],
 ['Redundancy','2N Power / N+1 Cool','var(--t2)']
 ];
-var ky=82;
+var ky=84;
 kpis.forEach(function(k){
-s+=tx(34,ky,k[0],'var(--t3)',6.5);
-s+=tx(250,ky,k[1],k[2],6.5,'end',1);
-ky+=14;
+s+=tx(34,ky,k[0],'var(--t3)',7.5);
+s+=tx(290,ky,k[1],k[2],7.5,'end',1);
+ky+=15;
 });
 
 // Click hint
-s+=tx(480,565,'Click any floor layer to explore detailed room layout','var(--t3)',7,'middle');
+s+=tx(600,975,'Click any floor layer to explore detailed room layout','var(--t3)',8,'middle');
 
 bC.innerHTML=s;
 
@@ -2693,6 +2693,17 @@ s+=fLine(AX,L2+58,AX,L2+68,CA,'fD',.5,1.5);
 s+=cblSide(AX,L2+75,'ACB-'+n+'A',['400V|6300A|100kA','ABB Emax2 E6.2'],CA,'R');
 s+=fLine(AX,L2+85,AX,L2+98,CA,'fD',.5,1.5);
 
+// GenSet incomer A — GRAY standby (beside ACB-nA, as MSB incomer)
+var GXA=180;
+s+=symGen(GXA-60,L2+75,DEAD);
+s+=tx(GXA-60,L2+62,'GenSet',DEAD,4.5,'middle');
+s+=deadLine(GXA-48,L2+75,GXA-8,L2+75,.8);
+s+=cbOpenSide(GXA,L2+75,'ACB-GEN-'+n+'A',['400V|1600A','GenSet Inc.'],DEAD,'L');
+s+=deadLine(GXA,L2+85,GXA,L2+98,.8);
+// ATS interlock between ACB-GEN-A and ACB-A
+s+='<line x1="'+(GXA+8)+'" y1="'+(L2+75)+'" x2="'+(AX-8)+'" y2="'+(L2+75)+'" stroke="var(--r)" stroke-width=".8" stroke-dasharray="3 2"/>';
+s+=tx((GXA+AX)/2,L2+69,'ATS','var(--r)',5,'middle',1);
+
 // TX-nB — GREEN
 s+=fLine(BX,L2+20,BX,L2+32,CG,'fD',.5,1.5);
 s+='<g data-tip="TX-'+n+'B: ABB RESIBLOC 10MVA cast-resin dry, 20kV\u21920.4kV, Dyn11, Zk=6%, '+DH[n-1]+' Feed B">';
@@ -2704,20 +2715,33 @@ s+=fLine(BX,L2+58,BX,L2+68,CG,'fD',.5,1.5);
 s+=cblSide(BX,L2+75,'ACB-'+n+'B',['400V|6300A|100kA','ABB Emax2 E6.2'],CG,'L');
 s+=fLine(BX,L2+85,BX,L2+98,CG,'fD',.5,1.5);
 
-// L2→L3 connectors
+// GenSet incomer B — GRAY standby (beside ACB-nB, as MSB incomer)
+var GXB=820;
+s+=symGen(GXB+60,L2+75,DEAD);
+s+=tx(GXB+60,L2+62,'GenSet',DEAD,4.5,'middle');
+s+=deadLine(GXB+8,L2+75,GXB+48,L2+75,.8);
+s+=cbOpenSide(GXB,L2+75,'ACB-GEN-'+n+'B',['400V|1600A','GenSet Inc.'],DEAD,'R');
+s+=deadLine(GXB,L2+85,GXB,L2+98,.8);
+// ATS interlock between ACB-B and ACB-GEN-B
+s+='<line x1="'+(BX+8)+'" y1="'+(L2+75)+'" x2="'+(GXB-8)+'" y2="'+(L2+75)+'" stroke="var(--r)" stroke-width=".8" stroke-dasharray="3 2"/>';
+s+=tx((BX+GXB)/2,L2+69,'ATS','var(--r)',5,'middle',1);
+
+// L2→L3 connectors (TX incomers animated, GenSet incomers dead)
 s+=connector(AX,L2+98,L3+20,CA,'fD');
 s+=connector(BX,L2+98,L3+20,CG,'fD');
+s+=deadLine(GXA,L2+98,GXA,L3+38,.8);
+s+=deadLine(GXB,L2+98,GXB,L3+38,.8);
 
 // ==== L3: MSB + LV DISTRIBUTION ====
 s+=sH(L3,'L3: MSB-'+n+'A/B 6300A Form 4b \u2014 LV Tie \u2014 Outgoing Feeders','var(--g)');
 
-// MSB-nA bus bar — RED tint
-s+='<rect x="'+(AX-100)+'" y="'+(L3+38)+'" width="200" height="7" rx="2" fill="rgba(239,68,68,.1)" stroke="'+CA+'" stroke-width=".8"/>';
+// MSB-nA bus bar — RED tint (extended to cover GenSet incomer at GXA)
+s+='<rect x="'+(GXA-10)+'" y="'+(L3+38)+'" width="'+(AX+100-GXA+10)+'" height="7" rx="2" fill="rgba(239,68,68,.1)" stroke="'+CA+'" stroke-width=".8"/>';
 s+=tx(AX,L3+34,'MSB-'+n+'A 400V 6300A',CA,5,'middle',1);
 s+='<text x="'+AX+'" y="'+(L3+55)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eMSB'+n+'A">398V | 5,200A | PF 0.97</text>';
 
-// MSB-nB bus bar — GREEN tint
-s+='<rect x="'+(BX-100)+'" y="'+(L3+38)+'" width="200" height="7" rx="2" fill="rgba(34,197,94,.1)" stroke="'+CG+'" stroke-width=".8"/>';
+// MSB-nB bus bar — GREEN tint (extended to cover GenSet incomer at GXB)
+s+='<rect x="'+(BX-100)+'" y="'+(L3+38)+'" width="'+(GXB+10-BX+100)+'" height="7" rx="2" fill="rgba(34,197,94,.1)" stroke="'+CG+'" stroke-width=".8"/>';
 s+=tx(BX,L3+34,'MSB-'+n+'B 400V 6300A',CG,5,'middle',1);
 s+='<text x="'+BX+'" y="'+(L3+55)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eMSB'+n+'B">399V | 5,100A | PF 0.97</text>';
 
@@ -2730,16 +2754,6 @@ var ofy=L3+62;
 // UPS-A feeder (RED) — straight down at AX
 s+=fLine(AX,L3+45,AX,ofy,CA,'fD',.5,1);
 s+=cblSide(AX,ofy+8,'ACB-UPS-'+n+'A',['4000A|65kA','UPS Feed'],CA,'R');
-// ATS feeder A (orange) — CB-Normal + CB-Emergency with interlock
-// This is the LV ATS: 2 breakers side-by-side from MSB outgoing to mech loads
-s+=sLine(AX+70,L3+45,AX+70,ofy,'var(--o)',.5,1);
-s+=cblSide(AX+70,ofy+8,'CB-N-'+n+'A',['1600A|CLOSED'],CA,'R');
-s+=cbOpenSide(AX+130,ofy+8,'CB-E-'+n+'A',['1600A|OPEN'],DEAD,'R');
-s+=deadLine(AX+130,L3+45,AX+130,ofy,1);
-s+=tx(AX+130,ofy-4,'GEN',DEAD,3.5,'middle');
-// ATS interlock dashed line
-s+='<line x1="'+(AX+78)+'" y1="'+(ofy+8)+'" x2="'+(AX+122)+'" y2="'+(ofy+8)+'" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2"/>';
-s+=tx(AX+100,ofy+4,'ATS','var(--r)',3.5,'middle',1);
 // DB-NC feeder (cyan)
 s+=sLine(AX-70,L3+45,AX-70,ofy,'var(--c)',.5,1);
 s+=cblSide(AX-70,ofy+8,'MCCB-NC-'+n,['800A|36kA','695kW NC'],'var(--c)','R');
@@ -2748,14 +2762,6 @@ s+=cblSide(AX-70,ofy+8,'MCCB-NC-'+n,['800A|36kA','695kW NC'],'var(--c)','R');
 // UPS-B feeder (GREEN) — straight down at BX
 s+=fLine(BX,L3+45,BX,ofy,CG,'fD',.5,1);
 s+=cblSide(BX,ofy+8,'ACB-UPS-'+n+'B',['4000A|65kA','UPS Feed'],CG,'L');
-// ATS feeder B (orange)
-s+=sLine(BX-70,L3+45,BX-70,ofy,'var(--o)',.5,1);
-s+=cblSide(BX-70,ofy+8,'CB-N-'+n+'B',['1600A|CLOSED'],CG,'L');
-s+=cbOpenSide(BX-130,ofy+8,'CB-E-'+n+'B',['1600A|OPEN'],DEAD,'L');
-s+=deadLine(BX-130,L3+45,BX-130,ofy,1);
-s+=tx(BX-130,ofy-4,'GEN',DEAD,3.5,'middle');
-s+='<line x1="'+(BX-78)+'" y1="'+(ofy+8)+'" x2="'+(BX-122)+'" y2="'+(ofy+8)+'" stroke="var(--r)" stroke-width=".6" stroke-dasharray="3 2"/>';
-s+=tx(BX-100,ofy+4,'ATS','var(--r)',3.5,'middle',1);
 // DB-COOL feeder (blue)
 s+=sLine(BX+70,L3+45,BX+70,ofy,'var(--b)',.5,1);
 s+=cblSide(BX+70,ofy+8,'MCCB-COOL-'+n,['1250A|50kA','2170kW Cool'],'var(--b)','L');
@@ -3026,7 +3032,7 @@ mc(CA,'MV Customer Sub.','SM6 24kV Dual Feed',[['PLN Sources','Dual 20kV feed A(
 mc('var(--o)','RMU-'+n+' (RM6)','3-Panel with Bus Tie',[['Feed A','VCB-RMU-'+n+'A: 20kV/630A (RED)'],['Bus Tie','VCB-TIE-RMU: N.O. (purple)'],['Feed B','VCB-RMU-'+n+'B: 20kV/630A (GREEN)'],['Type','RM6 24kV SF6-free 3-panel'],['Metering','CT 200/5A cl0.5 per feed']]),
 mc('var(--o)','Transformers','2x ABB RESIBLOC 10MVA',[['TX-'+n+'A','10MVA Feed A (RED) | ACB 6300A'],['TX-'+n+'B','10MVA Feed B (GREEN) | ACB 6300A'],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA sec.'],['Cooling','AN/AF (forced at 80%)']]),
 mc('var(--g)','LV Distribution','MSB 6300A + All CBs',[['MSB-'+n+'A','RED tint | 6300A Form 4b'],['MSB-'+n+'B','GREEN tint | 6300A Form 4b'],['LV Tie','ACB-TIE-LV: N.O. (purple)'],['UPS Feed','ACB-UPS: 4000A/65kA per path'],['NC/Cool','MCCB-NC 800A + MCCB-COOL 1250A']]),
-mc('var(--r)','ATS + GenSet','Proper Topology',[['CB-Normal A','RED CLOSED from MSB-A'],['CB-Normal B','GREEN CLOSED from MSB-B'],['CB-Emergency','GRAY OPEN (standby)'],['Controller','MTZ <100ms Auto/Manual'],['GenSet','GRAY standby: 6x8MW N+1']]),
+mc('var(--r)','ATS + GenSet','Dual Incomer to MSB',[['ACB-'+n+'A/B','TX incomer CLOSED (normal)'],['ACB-GEN-'+n+'A/B','GenSet incomer OPEN (standby)'],['ATS Interlock','Dashed line between ACBs'],['Controller','ASCO 7000 <10s auto-transfer'],['GenSet Pool','6\u00D78MW Cat 3516E N+1 standby']]),
 mc('var(--g)','UPS System','2x Vertiv EXL S1 8MW',[['UPS-'+n+'A','RED path 8MW'],['UPS-'+n+'B','GREEN path 8MW'],['Battery','2x 1,333 kWh NMC 10min'],['Output ACB','4000A/65kA per path'],['STS','NOT REQUIRED (dual-corded)']]),
 mc('var(--o)','Busway + RPP','2x 12,000A Cu Overhead',[['BW-'+n+'A','RED stroke/tint 12kA'],['BW-'+n+'B','GREEN stroke/tint 12kA'],['RPP/busway','11x 800A MCCB NSX800'],['Tap-offs','A=RED leftward | B=GREEN rightward'],['Rack PSU','2x OCP ORV3 400V\u219250VDC']])
 ].join('');
