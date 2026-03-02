@@ -1956,7 +1956,7 @@
           <g transform="translate(400, 32)">
             <rect class="tag" x="0" y="-18" rx="8" ry="8" width="130" height="28"></rect>
             <text class="tagTxt" x="10" y="2">T1</text>
-            <text class="tagTxt" x="38" y="2"><tspan id="tpl_t1">19.2</tspan>°C</text>
+            <text class="tagTxt" x="38" y="2"><tspan id="tpl_t1">19.2</tspan><tspan id="tpl_t1Unit">°C</tspan></text>
           </g>
           <g transform="translate(540, 32)">
             <rect class="tag" x="0" y="-18" rx="8" ry="8" width="50" height="28"></rect>
@@ -1971,7 +1971,7 @@
           <g transform="translate(510, 160)">
             <rect class="tag" x="0" y="0" rx="8" ry="8" width="130" height="28"></rect>
             <text class="tagTxt" x="10" y="18">T2</text>
-            <text class="tagTxt" x="38" y="18"><tspan id="tpl_t2">22.6</tspan>°C</text>
+            <text class="tagTxt" x="38" y="18"><tspan id="tpl_t2">22.6</tspan><tspan id="tpl_t2Unit">°C</tspan></text>
           </g>
 
           <!-- Instruments -->
@@ -2446,6 +2446,7 @@ function applyConfigSnapshot(snap){
   $("motionMode").value = ui.motion;
   $("unitSystem").value = ui.unitSystem;
   $("viewMode").value = ui.viewMode;
+  $("scenarioPreset").value = "custom";
   setSwitch($("swMaint"), ui.maint);
   applyMotionState();
   applyViewMode();
@@ -2677,7 +2678,9 @@ function cloneTemplateInto(loopHostId, chId){
     ["tpl_ct2",  `ch${chId}_ct2`],
     ["tpl_ct3",  `ch${chId}_ct3`],
     ["tpl_t1",   `ch${chId}_t1`],
+    ["tpl_t1Unit",   `ch${chId}_t1Unit`],
     ["tpl_t2",   `ch${chId}_t2`],
+    ["tpl_t2Unit",   `ch${chId}_t2Unit`],
     ["tpl_trendFlow", `ch${chId}_trendFlow`],
     ["tpl_trendNow", `ch${chId}_trendNow`],
   ];
@@ -2763,6 +2766,8 @@ function writeLoopValues(ch){
   const d2u = $(`ch${ch.id}_dp2Unit`); if(d2u) d2u.textContent = p2.u;
   const t1 = $(`ch${ch.id}_t1`); if(t1) t1.textContent = t1v.v;
   const t2 = $(`ch${ch.id}_t2`); if(t2) t2.textContent = t2v.v;
+  const t1u = $(`ch${ch.id}_t1Unit`); if(t1u) t1u.textContent = t1v.u;
+  const t2u = $(`ch${ch.id}_t2Unit`); if(t2u) t2u.textContent = t2v.u;
 }
 
 function updateCard(ch){
@@ -2922,7 +2927,8 @@ function applyBranchLabelLayout(){
     if(!g) return;
     const rect = g.querySelector("rect");
     const txt = g.querySelector("text");
-    const label = `CH-${d.id} • ${round1(d.flow)} L/s`;
+    const flow = fmtFlow(d.flow);
+    const label = `CH-${d.id} • ${flow.v} ${flow.u}`;
     if(txt){
       txt.textContent = label;
       txt.setAttribute("x", "8");
@@ -3106,17 +3112,21 @@ function renderLoopModal(chId){
   });
   const dpAvg = (ch.dp1 + ch.dp2) / 2;
   const dt = ch.t2 - ch.t1;
+  const dtV = ui.unitSystem === "ip" ? fmtNumber(dt * 9/5, 1) : round1(dt);
+  const dtUnit = ui.unitSystem === "ip" ? "°F" : "°C";
+  const flow = fmtFlow(ch.flow);
+  const dp = fmtPressure(dpAvg);
   const compOn = ch.comps.reduce((s,v)=>s+v,0);
   const evalResult = evaluateLoopEnvelope(ch);
   const envelope = evalResult.disconnected ? "DISCONNECTED" : (evalResult.level === "NORMAL" ? "STABLE" : "LIMITING");
 
   $("loopModalTitle").textContent = `CH-${String(ch.id).padStart(2,"0")} Detailed Diagnostics`;
-  $("loopModalHint").textContent = `Maintenance mode ${ui.maint ? "ON" : "OFF"} • Motion ${ui.motion.toUpperCase()} • Envelope ${envelope}`;
+  $("loopModalHint").textContent = `Maintenance mode ${ui.maint ? "ON" : "OFF"} • Motion ${ui.motion.toUpperCase()} • Units ${ui.unitSystem.toUpperCase()} • Envelope ${envelope}`;
 
   $("loopStatGrid").innerHTML = `
-    <div class="loopStat"><div class="k">FLOW</div><div class="v">${round1(ch.flow)} <small>L/s</small></div></div>
-    <div class="loopStat"><div class="k">dT</div><div class="v">${round1(dt)} <small>°C</small></div></div>
-    <div class="loopStat"><div class="k">DP AVG</div><div class="v">${Math.round(dpAvg)} <small>kPa</small></div></div>
+    <div class="loopStat"><div class="k">FLOW</div><div class="v">${flow.v} <small>${flow.u}</small></div></div>
+    <div class="loopStat"><div class="k">dT</div><div class="v">${dtV} <small>${dtUnit}</small></div></div>
+    <div class="loopStat"><div class="k">DP AVG</div><div class="v">${dp.v} <small>${dp.u}</small></div></div>
     <div class="loopStat"><div class="k">COMP RUNNING</div><div class="v">${compOn} <small>/3</small></div></div>
   `;
 
@@ -3929,8 +3939,16 @@ function init(){
   $("btnGuide").addEventListener("click", openGuide);
   $("btnPoints").addEventListener("click", openPoints);
   $("btnPrintMode").addEventListener("click", ()=>{
+    pushConfigSnapshot("print-mode-toggle");
     ui.printMode = !ui.printMode;
     applyPrintMode();
+  });
+  $("btnUndoCfg").addEventListener("click", undoConfig);
+  $("btnRedoCfg").addEventListener("click", redoConfig);
+  $("btnSetBaseline").addEventListener("click", ()=>{
+    setBaselineFromCurrent();
+    pushAlarmHistory("NORMAL", "Baseline updated", "Current runtime state captured as new comparison baseline.");
+    renderAll();
   });
   $("btnClosePoints").addEventListener("click", closePoints);
   $("btnCloseLoopModal").addEventListener("click", closeLoopModal);
@@ -3959,33 +3977,57 @@ function init(){
   $("btnExport").addEventListener("click", exportPNG);
   $("btnExportA4").addEventListener("click", exportA4PNG);
 
+  $("viewMode").addEventListener("change", (e)=>{
+    pushConfigSnapshot("view-mode");
+    ui.viewMode = e.target.value;
+    applyViewMode();
+    renderAll();
+  });
+  $("unitSystem").addEventListener("change", (e)=>{
+    pushConfigSnapshot("unit-system");
+    ui.unitSystem = e.target.value;
+    renderAll();
+  });
+  $("scenarioPreset").addEventListener("change", (e)=>{
+    applyScenarioPreset(e.target.value);
+  });
+
   // Operator controls
   $("sp_chws").addEventListener("input", (e)=>{
     state.sp.chws = Number(e.target.value);
+    $("scenarioPreset").value = "custom";
     updateOpsReadout();
   });
   $("sp_dp").addEventListener("input", (e)=>{
     state.sp.dp = Number(e.target.value);
+    $("scenarioPreset").value = "custom";
     updateOpsReadout();
   });
   $("sp_flow").addEventListener("input", (e)=>{
     state.sp.flowEach = Number(e.target.value);
+    $("scenarioPreset").value = "custom";
     updateOpsReadout();
   });
   $("motionMode").addEventListener("change", (e)=>{
+    pushConfigSnapshot("motion-mode");
     ui.motion = e.target.value;
+    $("scenarioPreset").value = "custom";
     applyMotionState();
     renderAll();
   });
   $("btnForceDisconnect").addEventListener("click", ()=>{
+    pushConfigSnapshot("fault-inject");
     const loopId = Number($("forceLoop").value);
     ui.forcedDisconnect.add(loopId);
+    $("scenarioPreset").value = "custom";
     pushAlarmHistory("ALARM", `Forced disconnect injected`, `CH-${loopId} set to disconnected drill mode.`);
     renderAll();
   });
   $("btnClearForce").addEventListener("click", ()=>{
     if(ui.forcedDisconnect.size > 0){
+      pushConfigSnapshot("fault-clear");
       ui.forcedDisconnect.clear();
+      $("scenarioPreset").value = "custom";
       pushAlarmHistory("NORMAL", "Forced disconnect cleared", "Simulation returned to autonomous behavior.");
       renderAll();
     }
@@ -4023,7 +4065,9 @@ function init(){
     renderAll();
   });
   swMaint.addEventListener("click", ()=>{
+    pushConfigSnapshot("maint-toggle");
     ui.maint = !ui.maint;
+    $("scenarioPreset").value = "custom";
     setSwitch(swMaint, ui.maint);
 
     // when enabling maint, stop aggressive randomization and settle; keep pump selection stable
@@ -4043,9 +4087,13 @@ function init(){
   setSwitch(swSim, ui.simOn);
   setSwitch(swMaint, ui.maint);
   $("motionMode").value = ui.motion;
+  $("unitSystem").value = ui.unitSystem;
+  $("viewMode").value = ui.viewMode;
+  $("scenarioPreset").value = "custom";
   applySimState();
   applyMotionState();
   applyPrintMode();
+  applyViewMode();
 
   renderAll();
 

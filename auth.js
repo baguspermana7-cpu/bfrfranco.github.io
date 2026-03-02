@@ -20,6 +20,84 @@
         var e = String(email || '').toLowerCase().trim();
         return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
     }
+    function getRoleFromSession(session) {
+        if (!session) return '';
+        return session.role || detectRole(session.email);
+    }
+    function normalizePathFromHref(href) {
+        if (!href) return '';
+        try {
+            return new URL(href, window.location.href).pathname.toLowerCase();
+        } catch (e) {
+            return String(href).toLowerCase().split('#')[0].split('?')[0];
+        }
+    }
+    function isRootOnlyHref(href) {
+        var path = normalizePathFromHref(href);
+        if (!path) return false;
+        if (path.indexOf('/datahallai.html') !== -1) return true;
+        if (path.indexOf('/dc-conventional.html') !== -1) return true;
+        if (path === '/dcmoc' || path === '/dcmoc/' || path.indexOf('/dcmoc/') !== -1) return true;
+        return false;
+    }
+    function ensureLockIcon(link) {
+        if (!link || link.querySelector('.rz-lock-icon, .fa-lock')) return;
+        var icon = document.createElement('i');
+        icon.className = 'fas fa-lock rz-lock-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        var floatingLabel = link.querySelector('.floating-card-label');
+        if (floatingLabel) {
+            floatingLabel.insertAdjacentElement('afterbegin', icon);
+            return;
+        }
+        link.insertAdjacentElement('afterbegin', icon);
+    }
+    function handleRootOnlyLinkClick(e) {
+        var session = getSession();
+        var role = getRoleFromSession(session);
+        if (role === 'root') return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var message = session
+            ? 'This module is root-only. Please sign in using a root account.'
+            : 'Please sign in with a root account to access this module.';
+
+        if (window._rzAuth && typeof window._rzAuth.showRootGatePrompt === 'function') {
+            window._rzAuth.showRootGatePrompt(message);
+            return;
+        }
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
+            window._rzAuth.showModal();
+            var err = document.getElementById('rzModalError');
+            if (err) {
+                err.textContent = message;
+                err.classList.add('show');
+            }
+            return;
+        }
+        alert(message);
+    }
+    function updateRootOnlyLinksUI() {
+        var session = getSession();
+        var role = getRoleFromSession(session);
+        var links = document.querySelectorAll('a[href]');
+        links.forEach(function (link) {
+            var href = link.getAttribute('href');
+            if (!isRootOnlyHref(href)) return;
+            link.classList.add('rz-root-link');
+            ensureLockIcon(link);
+            var locked = role !== 'root';
+            link.classList.toggle('rz-root-locked', locked);
+            link.setAttribute('data-rz-root-only', '1');
+            link.setAttribute('title', locked ? 'Root account required' : 'Root access enabled');
+            if (!link.dataset.rzRootGuardBound) {
+                link.dataset.rzRootGuardBound = '1';
+                link.addEventListener('click', handleRootOnlyLinkClick, true);
+            }
+        });
+    }
 
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
@@ -159,6 +237,10 @@
             '[data-theme="light"] .rz-pro-link:hover{color:#6d28d9 !important;}',
             /* Pro link */
             '.rz-pro-link:hover{color:#a78bfa !important;text-decoration:underline !important;}',
+            '.rz-root-link .rz-lock-icon{font-size:.7em;margin-right:5px;opacity:.65;}',
+            '.rz-root-link.rz-root-locked{filter:saturate(0.9);}',
+            '.floating-side-card.rz-root-link .floating-card-label{display:inline-flex;align-items:center;}',
+            '.floating-side-card.rz-root-link .rz-lock-icon{font-size:.72em;margin-right:6px;opacity:.85;}',
             /* Responsive */
             '@media(max-width:768px){.rz-user-email{display:none;}.rz-login-btn .rz-login-text{display:none;}.rz-login-btn{padding:8px 12px;}}'
         ].join('\n');
@@ -335,6 +417,7 @@
             userBtn.style.display = 'none';
             if (dropdown) dropdown.classList.remove('show');
         }
+        updateRootOnlyLinksUI();
     }
 
     /* ───────── Public API ───────── */
@@ -376,6 +459,15 @@
             if (overlay) overlay.classList.remove('show');
             if (this._trapHandler) document.removeEventListener('keydown', this._trapHandler);
             if (this._prevFocus) { try { this._prevFocus.focus(); } catch(e){} }
+        },
+
+        showRootGatePrompt: function (message) {
+            this.showModal();
+            var error = document.getElementById('rzModalError');
+            if (error) {
+                error.textContent = message || 'Root account required for this module.';
+                error.classList.add('show');
+            }
         },
 
         doLogin: function () {
@@ -462,6 +554,7 @@
         injectAuthButton();
         injectLoginModal();
         updateAuthUI();
+        updateRootOnlyLinksUI();
     }
 
     if (document.readyState === 'loading') {
