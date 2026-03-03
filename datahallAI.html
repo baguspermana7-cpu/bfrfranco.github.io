@@ -334,7 +334,19 @@ svg text{user-select:none}
 .sld-mimic-hdr .badge{font-family:'JetBrains Mono';font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--g);margin-left:8px}
 .sld-mimic-close{background:none;border:1px solid rgba(239,68,68,.3);border-radius:4px;color:var(--r);cursor:pointer;font-size:14px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:.2s}
 .sld-mimic-close:hover{background:rgba(239,68,68,.15)}
-.sld-mimic-body{flex:1;overflow-y:auto;padding:10px 14px}
+.sld-zoom-controls{display:flex;gap:4px;margin-left:auto;margin-right:8px}
+.sld-zoom-btn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:3px;color:var(--o);cursor:pointer;font-family:'JetBrains Mono';font-size:10px;padding:2px 8px;transition:.2s}
+.sld-zoom-btn:hover{background:rgba(245,158,11,.2)}
+.sld-tooltip{position:fixed;z-index:310;display:none;max-width:250px;padding:8px 10px;background:rgba(10,22,40,.95);border:1px solid rgba(245,158,11,.4);border-radius:6px;font-family:'JetBrains Mono';font-size:10px;color:var(--t2);line-height:1.5;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+.sld-tooltip b{color:var(--o);font-size:11px}
+.sld-tooltip .tt-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04);padding:2px 0}
+.sld-tooltip .tt-val{color:var(--g)}
+/* Idea 44: Context menu */
+.sld-ctx-menu{position:fixed;z-index:320;display:none;min-width:150px;background:rgba(10,22,40,.95);border:1px solid rgba(245,158,11,.4);border-radius:4px;font-family:'JetBrains Mono';font-size:10px;color:var(--t2);box-shadow:0 4px 20px rgba(0,0,0,.6);overflow:hidden}
+.sld-ctx-menu div{padding:6px 12px;cursor:pointer;transition:.15s}
+.sld-ctx-menu div:hover{background:rgba(245,158,11,.12);color:var(--o)}
+.sld-mimic-body svg.hl-a [data-feed="B"]{opacity:.2!important}
+.sld-mimic-body svg.hl-b [data-feed="A"]{opacity:.2!important}
 .sld-mimic-body svg{width:100%;border-radius:4px;background:#080e1a}
 [data-theme="light"] .sld-mimic-panel{background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-color:rgba(245,158,11,.55)}
 [data-theme="light"] .sld-mimic-hdr{background:linear-gradient(90deg,rgba(245,158,11,.1),rgba(239,68,68,.04))}
@@ -343,6 +355,36 @@ svg text{user-select:none}
 [data-sld-click]{cursor:pointer;transition:filter .2s}
 [data-sld-click]:hover{filter:brightness(1.25)}
 @media(max-width:600px){.sld-mimic-panel{max-width:100vw;max-height:100vh;border-radius:0}.sld-mimic-overlay{padding:0}}
+/* Phase 8: Results panel + print mode */
+.sld-mimic-content{display:flex;flex:1;overflow:hidden}
+.sld-results-panel{width:220px;min-width:220px;display:flex;flex-direction:column;border-left:1px solid rgba(245,158,11,.2);background:rgba(0,0,0,.2);transition:width .3s,min-width .3s}
+.sld-results-panel.collapsed{width:0;min-width:0;overflow:hidden;border:none}
+.sld-results-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid rgba(245,158,11,.15);font-family:'JetBrains Mono';font-size:10px;color:var(--o);font-weight:600}
+.sld-results-toggle{background:none;border:1px solid rgba(245,158,11,.2);border-radius:3px;color:var(--o);cursor:pointer;font-size:10px;padding:1px 5px}
+.sld-results-body{flex:1;overflow-y:auto;padding:8px;font-family:'JetBrains Mono';font-size:9px;color:var(--t2)}
+.sld-results-body table{width:100%;border-collapse:collapse}
+.sld-results-body th{text-align:left;color:var(--o);font-size:8px;padding:3px 4px;border-bottom:1px solid rgba(245,158,11,.15)}
+.sld-results-body td{padding:2px 4px;border-bottom:1px solid rgba(255,255,255,.03);font-size:8px}
+.sld-results-body .rv{color:var(--g);font-weight:600}
+[data-theme="light"] .sld-results-panel{background:rgba(0,0,0,.03)}
+.sld-mimic-body{flex:1;overflow-y:auto;padding:10px 14px}
+.sld-mimic-panel.print-mode .sld-mimic-body svg{background:#fff!important;filter:grayscale(1) contrast(1.2)}
+.sld-mimic-panel.print-mode .sld-mimic-hdr{background:rgba(0,0,0,.05)}
+.sld-mimic-panel.print-mode{background:#fff;border-color:#333}
+/* Battery ESS HMI Modal */
+.bat-hmi{position:fixed;z-index:310;display:none;width:780px;max-width:92vw;max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#0a1628,#050c18);border:1px solid rgba(245,158,11,.4);border-radius:8px;box-shadow:0 12px 50px rgba(0,0,0,.8);backdrop-filter:blur(12px)}
+.bat-hmi.show{display:block}
+.bat-hmi-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(90deg,rgba(245,158,11,.12),rgba(34,197,94,.08));border-bottom:1px solid rgba(245,158,11,.2)}
+.bat-hmi-hdr h4{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:var(--o);margin:0}
+.bat-hmi-hdr .mode{font-family:'JetBrains Mono';font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--g)}
+.bat-hmi-close{background:none;border:1px solid rgba(239,68,68,.3);border-radius:4px;color:var(--r);cursor:pointer;font-size:14px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.bat-hmi-close:hover{background:rgba(239,68,68,.15)}
+.bat-hmi-body{padding:10px 14px}
+.bat-hmi svg{width:100%;border-radius:4px;background:#080e1a}
+[data-theme="light"] .bat-hmi{background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-color:rgba(245,158,11,.5)}
+[data-theme="light"] .bat-hmi-hdr{background:linear-gradient(90deg,rgba(245,158,11,.1),rgba(34,197,94,.06))}
+[data-theme="light"] .bat-hmi-hdr h4{color:#d97706}
+[data-theme="light"] .bat-hmi svg{background:#f8fafc}
 /* Overview Tab */
 [data-tab]{cursor:pointer;transition:filter .2s,transform .15s}
 [data-tab]:hover{filter:brightness(1.3);transform:translateY(-1px)}
@@ -620,10 +662,12 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 </div>
 <div class="sld-mimic-overlay" id="sldMimic">
 <div class="sld-mimic-panel">
-<div class="sld-mimic-hdr"><h4 id="sldMimicTitle">SLD Mimic</h4><span class="badge">ENERGIZED</span><button class="sld-mimic-close" id="sldMimicClose">&times;</button></div>
-<div class="sld-mimic-body"><svg id="sldMimicSvg" viewBox="0 0 920 600" xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div class="sld-mimic-hdr"><h4 id="sldMimicTitle">SLD Mimic</h4><span class="badge">ENERGIZED</span><span class="sld-zoom-controls"><button class="sld-zoom-btn" id="sldZoomIn" title="Zoom In">+</button><button class="sld-zoom-btn" id="sldZoomOut" title="Zoom Out">&minus;</button><button class="sld-zoom-btn" id="sldZoomFit" title="Fit">Fit</button><button class="sld-zoom-btn" id="sldPrint" title="Print Mode">Print</button></span><button class="sld-mimic-close" id="sldMimicClose">&times;</button></div>
+<div class="sld-mimic-content"><div class="sld-mimic-body"><svg id="sldMimicSvg" viewBox="0 0 920 600" xmlns="http://www.w3.org/2000/svg"></svg></div><div class="sld-results-panel" id="sldResults"><div class="sld-results-hdr"><span>RESULTS</span><button class="sld-results-toggle" id="sldResultsToggle">&#9664;</button></div><div class="sld-results-body" id="sldResultsBody"></div></div></div>
 </div>
 </div>
+<div id="sldTooltip" class="sld-tooltip"></div>
+<div id="sldCtxMenu" class="sld-ctx-menu"></div>
 <div class="ch-hmi" id="chHmi">
 <div class="ch-hmi-hdr"><h4 id="chHmiTitle">CH-1 HMI</h4><span class="mode" id="chHmiMode">RUN</span><button class="ch-hmi-close" onclick="$('chHmi').classList.remove('show')">&times;</button></div>
 <div class="ch-hmi-body"><svg id="chHmiSvg" viewBox="0 0 780 580" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -647,6 +691,10 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="corr-hmi" id="corrHmi">
 <div class="corr-hmi-hdr"><h4 id="corrHmiTitle">Corridor Service</h4><span class="mode" id="corrHmiMode">Online</span><button class="corr-hmi-close" onclick="$('corrHmi').classList.remove('show')">&times;</button></div>
 <div class="corr-hmi-body"><svg id="corrHmiSvg" viewBox="0 0 780 480" xmlns="http://www.w3.org/2000/svg"></svg></div>
+</div>
+<div class="bat-hmi" id="batHmi">
+<div class="bat-hmi-hdr"><h4 id="batHmiTitle">SCiB ESS 480VDC — System View</h4><span class="mode" id="batHmiMode">Normal</span><button class="bat-hmi-close" onclick="$('batHmi').classList.remove('show')">&times;</button></div>
+<div class="bat-hmi-body"><svg id="batHmiSvg" viewBox="0 0 740 520" xmlns="http://www.w3.org/2000/svg"></svg></div>
 </div>
 <script>
 
@@ -3288,10 +3336,11 @@ if(!overlay)return;
 var mimicTimer=null;
 var W=920,CA='var(--r)',CG='var(--g)',J='JetBrains Mono';
 
-function closeMimic(){overlay.classList.remove('show');if(mimicTimer){clearInterval(mimicTimer);mimicTimer=null}}
+function closeBatHmi(){var bh=$('batHmi');if(bh)bh.classList.remove('show');if(typeof batTimer!=='undefined'&&batTimer){clearInterval(batTimer);batTimer=null}}
+function closeMimic(){overlay.classList.remove('show');if(mimicTimer){clearInterval(mimicTimer);mimicTimer=null};sldZoom=1;sldBaseVB=null;var sp=overlay.querySelector('.sld-mimic-panel');if(sp)sp.classList.remove('print-mode');var pb=$('sldPrint');if(pb)pb.textContent='Print';closeBatHmi()}
 $('sldMimicClose').onclick=closeMimic;
 overlay.addEventListener('click',function(e){if(e.target===overlay)closeMimic()});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('show'))closeMimic()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){var bh=$('batHmi');if(bh&&bh.classList.contains('show')){closeBatHmi();return}if(overlay.classList.contains('show'))closeMimic()}});
 
 // Event delegation on all DH SVG containers
 ['elecDH1Svg','elecDH2Svg','elecDH3Svg','elecDH4Svg'].forEach(function(id){
@@ -3301,6 +3350,169 @@ var g=e.target.closest('[data-sld-click]');
 if(!g)return;
 showMimic(g.getAttribute('data-sld-click'),parseInt(g.getAttribute('data-dh')))})});
 
+// Idea 39: Zoom controls
+var sldZoom=1,sldBaseVB=null;
+function sldSetZoom(z){
+sldZoom=Math.max(0.5,Math.min(3,z));
+if(!sldBaseVB)return;
+var cw=sldBaseVB[2]/sldZoom,ch=sldBaseVB[3]/sldZoom;
+var cx=sldBaseVB[2]/2-cw/2,cy=sldBaseVB[3]/2-ch/2;
+svg.setAttribute('viewBox',Math.round(cx)+' '+Math.round(cy)+' '+Math.round(cw)+' '+Math.round(ch));
+}
+$('sldZoomIn').onclick=function(){sldSetZoom(sldZoom*1.25)};
+$('sldZoomOut').onclick=function(){sldSetZoom(sldZoom/1.25)};
+$('sldZoomFit').onclick=function(){sldZoom=1;if(sldBaseVB)svg.setAttribute('viewBox',sldBaseVB.join(' '))};
+svg.addEventListener('wheel',function(e){if(!overlay.classList.contains('show'))return;e.preventDefault();sldSetZoom(sldZoom*(e.deltaY<0?1.1:0.9))},{passive:false});
+
+// Idea 41: Equipment tooltip
+var sldTip=$('sldTooltip');
+var lastFeed=null;
+svg.addEventListener('mousemove',function(e){
+var el=e.target.closest('[data-tip]');
+if(!el){sldTip.style.display='none';
+// Idea 45: reset feed highlight on no target
+var feed=null;
+if(feed!==lastFeed){svg.classList.remove('hl-a','hl-b');lastFeed=null}
+return}
+sldTip.innerHTML=el.getAttribute('data-tip');
+sldTip.style.display='block';
+var tx=e.clientX+12,ty=e.clientY+12;
+if(tx+260>window.innerWidth)tx=e.clientX-260;
+if(ty+150>window.innerHeight)ty=e.clientY-150;
+sldTip.style.left=tx+'px';sldTip.style.top=ty+'px';
+// Idea 45: Path highlighting on hover
+var feed=el.getAttribute('data-feed');
+if(feed!==lastFeed){
+svg.classList.remove('hl-a','hl-b');
+if(feed==='A')svg.classList.add('hl-a');
+else if(feed==='B')svg.classList.add('hl-b');
+lastFeed=feed;
+}
+});
+svg.addEventListener('mouseleave',function(){sldTip.style.display='none';svg.classList.remove('hl-a','hl-b');lastFeed=null});
+
+// Idea 42: Click-to-select highlighting
+var sldSelected=null;
+svg.addEventListener('click',function(e){
+var el=e.target.closest('[data-tip]');
+if(sldSelected){sldSelected.removeAttribute('filter');sldSelected.style.opacity=''}
+if(!el||el===sldSelected){sldSelected=null;return}
+sldSelected=el;
+el.setAttribute('filter','url(#sldGlow)');
+el.style.opacity='0.9';
+});
+
+// Battery ESS click → opens Toshiba SCiB ESS detail modal
+svg.addEventListener('click',function(e){
+var bat=e.target.closest('[data-bat]');
+if(!bat)return;
+e.stopPropagation();
+var unit=bat.getAttribute('data-bat');
+var dh=parseInt(bat.getAttribute('data-dh'))||1;
+var hmi=$('batHmi'),bSvg=$('batHmiSvg'),title=$('batHmiTitle'),mode=$('batHmiMode');
+if(hmi&&bSvg){
+title.textContent='SCiB ESS 480VDC — Unit '+unit+' — DH-0'+dh;
+mode.textContent='Normal';mode.style.color='var(--g)';mode.style.borderColor='rgba(34,197,94,.3)';mode.style.background='rgba(34,197,94,.12)';
+renderBatteryEss(bSvg,unit,dh);
+hmi.style.left=Math.max(10,(window.innerWidth-780)/2)+'px';
+hmi.style.top=Math.max(10,(window.innerHeight-520)/2)+'px';
+hmi.classList.add('show');
+}
+});
+
+// Idea 43: Breaker toggle simulation (dblclick shows TRIPPED label for 3s)
+svg.addEventListener('dblclick',function(e){
+var cb=e.target.closest('[data-cb]');
+if(!cb)return;
+var pt=svg.createSVGPoint();
+pt.x=e.clientX;pt.y=e.clientY;
+var svgPt=pt.matrixTransform(svg.getScreenCTM().inverse());
+var trip=document.createElementNS('http://www.w3.org/2000/svg','text');
+trip.setAttribute('x',svgPt.x+15);trip.setAttribute('y',svgPt.y);
+trip.setAttribute('fill','var(--r)');trip.setAttribute('font-family',J);
+trip.setAttribute('font-size','5');trip.setAttribute('font-weight','600');
+trip.textContent='TRIPPED';
+svg.appendChild(trip);
+setTimeout(function(){if(trip.parentNode)trip.parentNode.removeChild(trip)},3000);
+});
+
+// Idea 44: Right-click context menu
+var sldCtx=$('sldCtxMenu');
+if(sldCtx){
+svg.addEventListener('contextmenu',function(e){
+e.preventDefault();
+sldCtx.innerHTML='<div data-ctx="datasheet">[i] View Data Sheet</div><div data-ctx="loadflow">[P] Load Flow Results</div><div data-ctx="protection">[R] Protection Info</div><div data-ctx="path">[~] Trace Feed Path</div>';
+sldCtx.style.display='block';
+var cx=e.clientX,cy=e.clientY;
+if(cx+160>window.innerWidth)cx=e.clientX-160;
+if(cy+120>window.innerHeight)cy=e.clientY-120;
+sldCtx.style.left=cx+'px';sldCtx.style.top=cy+'px';
+});
+document.addEventListener('click',function(){if(sldCtx)sldCtx.style.display='none'});
+sldCtx.addEventListener('click',function(e){
+var item=e.target.closest('[data-ctx]');
+if(!item)return;
+sldCtx.style.display='none';
+});
+}
+
+// Idea 46: Results panel toggle
+var sldResultsPanel=$('sldResults'),sldResultsBody=$('sldResultsBody'),sldResultsToggle=$('sldResultsToggle');
+if(sldResultsToggle)sldResultsToggle.onclick=function(){
+sldResultsPanel.classList.toggle('collapsed');
+sldResultsToggle.textContent=sldResultsPanel.classList.contains('collapsed')?'\u25b6':'\u25c4';
+};
+
+// Idea 46: Populate results table
+function populateResults(type,dh){
+var h='';
+if(type==='mv-sub'||type==='rmu'||type==='tx'||type==='msb'){
+h+='<table><tr><th>Bus</th><th>V</th><th>Status</th></tr>';
+h+='<tr><td>SM6-A</td><td class="rv">'+R(19.8,20.2)+' kV</td><td style="color:var(--g)">OK</td></tr>';
+h+='<tr><td>SM6-B</td><td class="rv">'+R(19.8,20.2)+' kV</td><td style="color:var(--g)">OK</td></tr>';
+if(type==='msb'||type==='tx'){h+='<tr><td>LV-A</td><td class="rv">'+RI(396,400)+' V</td><td style="color:var(--g)">OK</td></tr>';
+h+='<tr><td>LV-B</td><td class="rv">'+RI(396,400)+' V</td><td style="color:var(--g)">OK</td></tr>';}
+h+='</table>';
+h+='<div style="margin-top:8px;color:var(--o);font-weight:600;font-size:8px">BRANCH FLOWS</div>';
+h+='<table><tr><th>Branch</th><th>P(kW)</th><th>I(A)</th></tr>';
+h+='<tr><td>Feed A</td><td class="rv">'+R(8200,9400)+'</td><td>'+RI(240,280)+'</td></tr>';
+h+='<tr><td>Feed B</td><td class="rv">'+R(8100,9300)+'</td><td>'+RI(238,278)+'</td></tr>';
+h+='</table>';
+h+='<div style="margin-top:8px;color:var(--o);font-weight:600;font-size:8px">LOADING</div>';
+h+='<table><tr><th>Equipment</th><th>%</th></tr>';
+h+='<tr><td>VCB-A</td><td>'+RI(38,44)+'%</td></tr>';
+h+='<tr><td>VCB-B</td><td>'+RI(37,43)+'%</td></tr>';
+h+='</table>';
+}else if(type==='ups'){
+h+='<table><tr><th>Bus</th><th>V</th></tr>';
+h+='<tr><td>DC-A</td><td class="rv">'+RI(715,725)+' VDC</td></tr>';
+h+='<tr><td>DC-B</td><td class="rv">'+RI(714,724)+' VDC</td></tr></table>';
+h+='<div style="margin-top:8px;color:var(--o);font-weight:600;font-size:8px">UPS STATUS</div>';
+h+='<table><tr><th>Unit</th><th>Load</th><th>\u03b7</th></tr>';
+h+='<tr><td>UPS-A</td><td>'+RI(65,70)+'%</td><td>'+R(96,96.5)+'%</td></tr>';
+h+='<tr><td>UPS-B</td><td>'+RI(64,69)+'%</td><td>'+R(96,96.4)+'%</td></tr></table>';
+}else if(type==='busway'){
+h+='<table><tr><th>Busway</th><th>V</th><th>I</th><th>Load</th></tr>';
+h+='<tr><td>BW-A</td><td class="rv">'+RI(396,400)+'V</td><td>'+RI(4800,5400)+'A</td><td>'+RI(62,70)+'%</td></tr>';
+h+='<tr><td>BW-B</td><td class="rv">'+RI(396,400)+'V</td><td>'+RI(4700,5300)+'A</td><td>'+RI(61,69)+'%</td></tr></table>';
+}else if(type==='rack-psu'){
+h+='<table><tr><th>PSU</th><th>In</th><th>Out</th><th>\u03b7</th></tr>';
+h+='<tr><td>PSU-A</td><td>'+RI(3200,3500)+'W</td><td>'+RI(3100,3400)+'W</td><td>'+R(97,97.8)+'%</td></tr>';
+h+='<tr><td>PSU-B</td><td>'+RI(3100,3400)+'W</td><td>'+RI(3000,3300)+'W</td><td>'+R(97,97.7)+'%</td></tr></table>';
+}else{
+h+='<div style="color:var(--t3);padding:10px">P&amp;ID \u2014 no load flow data</div>';
+}
+if(sldResultsBody)sldResultsBody.innerHTML=h;
+}
+
+// Idea 50: Print mode toggle
+var sldPanel=overlay.querySelector('.sld-mimic-panel');
+var sldPrintBtn=$('sldPrint');
+if(sldPrintBtn)sldPrintBtn.onclick=function(){
+sldPanel.classList.toggle('print-mode');
+this.textContent=sldPanel.classList.contains('print-mode')?'Color':'Print';
+};
+
 function showMimic(type,dh){
 closeMimic();
 var titles={'mv-sub':'MV Customer Substation','rmu':'RMU Panel','tx':'Transformer','msb':'MSB Panel','ups':'UPS + Battery','busway':'Busway + RPP','rack-psu':'Rack Power / PSU','cooling':'Cooling Plant'};
@@ -3308,6 +3520,8 @@ titleEl.textContent='DH-0'+dh+' '+titles[type]+' — SCADA Mimic';
 var renderers={'mv-sub':renderMvSub,'rmu':renderRmu,'tx':renderTx,'msb':renderMsb,'ups':renderUps,'busway':renderBusway,'rack-psu':renderPsu,'cooling':renderCooling};
 var fn=renderers[type];if(!fn)return;
 fn(dh);
+populateResults(type,dh);
+sldBaseVB=svg.getAttribute('viewBox').split(' ').map(Number);sldZoom=1;
 overlay.classList.add('show')}
 
 // Helper: live text element
@@ -3344,6 +3558,13 @@ s+='</marker>';
 s+='<marker id="sldArrowR" viewBox="0 0 6 6" refX="6" refY="3" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6 Z" fill="var(--r)"/></marker>';
 s+='<marker id="sldArrowC" viewBox="0 0 6 6" refX="6" refY="3" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6 Z" fill="var(--c)"/></marker>';
 s+='<marker id="sldArrowO" viewBox="0 0 6 6" refX="6" refY="3" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6 Z" fill="var(--o)"/></marker>';
+// Idea 8: Voltage-level gradients for bus coloring
+s+='<linearGradient id="mvGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(239,68,68,.15)"/><stop offset="100%" stop-color="rgba(239,68,68,.05)"/></linearGradient>';
+s+='<linearGradient id="lvGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(59,130,246,.15)"/><stop offset="100%" stop-color="rgba(59,130,246,.05)"/></linearGradient>';
+s+='<linearGradient id="dcGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(245,158,11,.15)"/><stop offset="100%" stop-color="rgba(245,158,11,.05)"/></linearGradient>';
+s+='<linearGradient id="tieGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(139,92,246,.15)"/><stop offset="100%" stop-color="rgba(139,92,246,.05)"/></linearGradient>';
+// Idea 42: Glow filter for selected equipment
+s+='<filter id="sldGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
 s+='</defs>';
 s+='<rect width="'+w+'" height="'+h+'" fill="var(--bg2)"/>';
 s+='<rect width="'+w+'" height="'+h+'" fill="url(#sldGrid)"/>';
@@ -3543,18 +3764,231 @@ var fc=pct<70?'var(--g)':pct<85?'var(--o)':'var(--r)';
 return tx2(x,y,actual+'/'+rated+'A ('+pct+'%)',fc,3.5);
 }
 
+// ===== Phase 5 Helpers =====
+
+// Idea 2: Power loss annotation on cables
+function lossAnnot(x,y,loss,pct){
+return tx2(x,y,'Loss: '+loss+' kW ('+pct+'%)','rgba(239,68,68,.55)',3.5,'middle');
+}
+
+// Idea 3: Transformer loss breakdown
+function txLoss(x,y,fe,cu,total){
+var s='<rect x="'+x+'" y="'+y+'" width="100" height="20" rx="2" fill="rgba(0,0,0,.35)" stroke="rgba(245,158,11,.2)" stroke-width=".3"/>';
+s+=tx2(x+50,y+8,'Fe:'+fe+'kW Cu:'+cu+'kW','var(--o)',3.5,'middle');
+s+=tx2(x+50,y+17,'Total:'+total+'kW','rgba(239,68,68,.6)',3.5,'middle');
+return s;
+}
+
+// Idea 5: Branch impedance label (R+jX)
+function impedLabel(x,y,r,jx,len){
+return tx2(x,y,'Z='+r+'+j'+jx+' \u03A9/km \u00D7'+len+'m','rgba(139,92,246,.5)',3);
+}
+
+// Idea 31: Short-circuit current at buses
+function iscLabel(x,y,kA){
+return'<rect x="'+x+'" y="'+y+'" width="44" height="10" rx="1" fill="rgba(239,68,68,.12)" stroke="rgba(239,68,68,.2)" stroke-width=".3"/>'+tx2(x+22,y+7,'Isc='+kA+'kA','var(--r)',3.5,'middle',1);
+}
+
+// Idea 34: Arc flash incident energy label
+function afLabel(x,y,cal,cat){
+var fc=cat<=1?'var(--g)':cat<=2?'var(--o)':cat<=3?'rgba(239,68,68,.7)':'var(--r)';
+var s='<rect x="'+x+'" y="'+y+'" width="70" height="14" rx="2" fill="rgba(0,0,0,.3)" stroke="'+fc+'" stroke-width=".4"/>';
+s+=tx2(x+35,y+6,'AF:'+cal+' cal/cm²',fc,3,'middle');
+s+=tx2(x+35,y+12,'Cat '+cat+' PPE',fc,3,'middle');
+return s;
+}
+
+// ===== Phase 6 Helpers =====
+
+// Idea 10: Three-phase bus representation (horizontal)
+function threePhase(x,y,w){
+var s='<line x1="'+x+'" y1="'+(y+18)+'" x2="'+(x+w)+'" y2="'+(y+18)+'" stroke="var(--r)" stroke-width=".6" opacity=".5"/>';
+s+='<line x1="'+x+'" y1="'+(y+20)+'" x2="'+(x+w)+'" y2="'+(y+20)+'" stroke="var(--o)" stroke-width=".6" opacity=".5"/>';
+s+='<line x1="'+x+'" y1="'+(y+22)+'" x2="'+(x+w)+'" y2="'+(y+22)+'" stroke="var(--b)" stroke-width=".6" opacity=".5"/>';
+return s;
+}
+
+// Idea 10: Three-phase bus representation (vertical)
+function threePhaseV(x,y,h){
+var s='<line x1="'+(x-3)+'" y1="'+y+'" x2="'+(x-3)+'" y2="'+(y+h)+'" stroke="var(--r)" stroke-width=".4" opacity=".4"/>';
+s+='<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+h)+'" stroke="var(--o)" stroke-width=".4" opacity=".4"/>';
+s+='<line x1="'+(x+3)+'" y1="'+y+'" x2="'+(x+3)+'" y2="'+(y+h)+'" stroke="var(--b)" stroke-width=".4" opacity=".4"/>';
+return s;
+}
+
+// Idea 22: Animated power flow particle along vertical feeder
+function flowParticle(x,y1,y2,dur,c){
+var s='<circle r="1.5" fill="'+c+'" opacity=".7">';
+s+='<animateMotion dur="'+dur+'s" repeatCount="indefinite" path="M'+x+' '+y1+' L'+x+' '+y2+'"/>';
+s+='</circle>';
+return s;
+}
+
+// Idea 28: Per-phase voltage bar chart
+function phaseBarChart(x,y,l1v,l2v,l3v,nominal){
+var bw=12,bh=40,gap=3;
+var s='<rect x="'+x+'" y="'+y+'" width="'+(3*bw+4*gap)+'" height="'+(bh+12)+'" rx="2" fill="rgba(0,0,0,.3)" stroke="rgba(255,255,255,.06)" stroke-width=".3"/>';
+var ny=y+bh+4-(bh*nominal/240);
+s+='<line x1="'+x+'" y1="'+ny+'" x2="'+(x+3*bw+4*gap)+'" y2="'+ny+'" stroke="rgba(255,255,255,.15)" stroke-width=".4" stroke-dasharray="2 1"/>';
+s+=tx2(x+3*bw+4*gap+2,ny+2,nominal+'V','var(--t3)',2.5);
+var vals=[l1v,l2v,l3v],colors=['var(--r)','var(--o)','var(--b)'],labels=['L1','L2','L3'];
+for(var i=0;i<3;i++){
+var bx=x+gap+i*(bw+gap);
+var barH=Math.round(bh*vals[i]/240);
+var by=y+bh+4-barH;
+s+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+barH+'" rx="1" fill="'+colors[i]+'" opacity=".4"/>';
+s+=tx2(bx+bw/2,y+bh+11,labels[i],colors[i],3,'middle')}
+return s;
+}
+
+// Idea 29: Voltage heat map strip along busway trunk (vertical)
+function busHeatStrip(x,y,h,id){
+var s='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(34,197,94,.3)"/><stop offset="60%" stop-color="rgba(245,158,11,.2)"/><stop offset="100%" stop-color="rgba(239,68,68,.15)"/></linearGradient></defs>';
+s+='<rect x="'+x+'" y="'+y+'" width="6" height="'+h+'" rx="1" fill="url(#'+id+')" opacity=".6"/>';
+return s;
+}
+
+// Idea 49: 3D beveled equipment box (enhanced bx2)
+function bx3(x,y,w,h,c,r){
+var s='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(r||3)+'" fill="rgba(255,255,255,.03)" stroke="'+c+'" stroke-width=".8"/>';
+s+='<line x1="'+(x+3)+'" y1="'+(y+1)+'" x2="'+(x+w-3)+'" y2="'+(y+1)+'" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>';
+s+='<line x1="'+(x+3)+'" y1="'+(y+h-1)+'" x2="'+(x+w-3)+'" y2="'+(y+h-1)+'" stroke="rgba(0,0,0,.1)" stroke-width=".5"/>';
+return s;
+}
+
+// Idea 41: Invisible hover zone for equipment tooltip (data-tip + optional data-feed)
+function tipZone(x,y,w,h,tip,feed){
+var f=feed?' data-feed="'+feed+'"':'';
+return'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="transparent" data-tip="'+tip+'"'+f+' style="cursor:help"/>';
+}
+
+// Idea 43: Invisible click zone for breaker toggle simulation
+function cbToggle(cx,cy,id){
+return'<rect x="'+(cx-8)+'" y="'+(cy-8)+'" width="16" height="16" fill="transparent" data-cb="'+id+'" style="cursor:pointer"/>';
+}
+
+// Idea 48: Equipment nameplate vs actual comparison table
+function nameplate(x,y,items){
+var h=items.length*10+14;
+var s='<rect x="'+x+'" y="'+y+'" width="90" height="'+h+'" rx="2" fill="rgba(0,0,0,.35)" stroke="rgba(245,158,11,.15)" stroke-width=".3"/>';
+s+=tx2(x+45,y+9,'NAMEPLATE','var(--o)',3.5,'middle',1);
+for(var i=0;i<items.length;i++){
+s+=tx2(x+4,y+20+i*10,items[i][0],'var(--t3)',3);
+s+=tx2(x+86,y+20+i*10,items[i][1],'var(--g)',3,'end');
+}
+return s;
+}
+
+// Idea 37: Professional engineering title block
+function titleBlock(x,y,w,drawNo,rev,dh){
+var s='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="40" rx="0" fill="rgba(0,0,0,.3)" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>';
+s+='<line x1="'+x+'" y1="'+(y+13)+'" x2="'+(x+w)+'" y2="'+(y+13)+'" stroke="rgba(255,255,255,.06)" stroke-width=".3"/>';
+s+=tx2(x+4,y+10,'Project: Resistance Zero AI DC','var(--t3)',3.5,0,1);
+s+=tx2(x+w/2,y+10,'Dwg: '+drawNo,'var(--t3)',3.5,'middle');
+s+=tx2(x+w-4,y+10,'Rev: '+rev,'var(--t3)',3.5,'end');
+s+=tx2(x+4,y+25,'DH-0'+dh+' | Scale: NTS','var(--t3)',3);
+s+=tx2(x+w/2,y+25,'Date: 2026-03-03','var(--t3)',3,'middle');
+s+=tx2(x+w-4,y+25,'Chk: ETAP LF Sim','var(--t3)',3,'end');
+s+=tx2(x+4,y+37,'Designed: RZ Engineering','var(--t3)',3);
+s+=tx2(x+w-4,y+37,'Status: AS-BUILT','var(--g)',3,'end');
+return s;
+}
+
+// Idea 30: Voltage deviation summary badge
+function vDevBadge(x,y){
+var dv=R(-1.5,-2.5),bus=['LV-A','LV-B','MV-A','MV-B','DC-A'][RI(0,4)];
+var fc=parseFloat(dv)>-2?'var(--g)':'var(--o)';
+var s='<rect x="'+x+'" y="'+y+'" width="105" height="18" rx="3" fill="rgba(0,0,0,.4)" stroke="'+fc+'" stroke-width=".5"/>';
+s+=tx2(x+52,y+7,'Max \u0394V: '+dv+'%',fc,4,'middle',1);
+s+=tx2(x+52,y+15,'@ '+bus,'var(--t3)',3,'middle');
+return s;
+}
+
+// Idea 7: Bus node numbering system
+function busNodeId(x,y,id,c){
+var s='<circle cx="'+x+'" cy="'+y+'" r="8" fill="rgba(0,0,0,.3)" stroke="'+c+'" stroke-width=".5"/>';
+s+=tx2(x,y+3,id,c,3.5,'middle',1);
+return s;
+}
+
+// ===== Phase 9 Helpers =====
+
+// Idea 32: Trip sequence number indicator near relay boxes
+function tripSeq(x,y,seq,c){
+var s='<circle cx="'+x+'" cy="'+y+'" r="7" fill="rgba(0,0,0,.3)" stroke="'+c+'" stroke-width=".5"/>';
+s+=tx2(x,y+1,seq,c,5,'middle',1);
+s+=tx2(x,y+12,'trip','var(--t3)',3,'middle');
+return s;
+}
+
+// Idea 32: Mini time-current curve thumbnail
+function miniTI(x,y,c){
+var s='<rect x="'+x+'" y="'+y+'" width="24" height="20" rx="1" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.06)" stroke-width=".3"/>';
+s+='<line x1="'+(x+4)+'" y1="'+(y+2)+'" x2="'+(x+4)+'" y2="'+(y+17)+'" stroke="rgba(255,255,255,.1)" stroke-width=".3"/>';
+s+='<line x1="'+(x+4)+'" y1="'+(y+17)+'" x2="'+(x+22)+'" y2="'+(y+17)+'" stroke="rgba(255,255,255,.1)" stroke-width=".3"/>';
+s+='<path d="M'+(x+6)+' '+(y+3)+' Q'+(x+10)+' '+(y+10)+' '+(x+14)+' '+(y+13)+' Q'+(x+18)+' '+(y+15)+' '+(x+21)+' '+(y+16)+'" fill="none" stroke="'+c+'" stroke-width=".6"/>';
+s+='<line x1="'+(x+18)+'" y1="'+(y+3)+'" x2="'+(x+18)+'" y2="'+(y+16)+'" stroke="var(--r)" stroke-width=".4" stroke-dasharray="1 1"/>';
+return s;
+}
+
+// Idea 33: Breaker capacity vs fault current utilisation bar
+function faultBar(x,y,rated,available,c){
+var pct=Math.min(100,Math.round(available/rated*100));
+var fc=pct<70?'var(--g)':pct<85?'var(--o)':'var(--r)';
+var fw=Math.round(40*pct/100);
+var s='<rect x="'+x+'" y="'+y+'" width="40" height="6" rx="1" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.06)" stroke-width=".3"/>';
+s+='<rect x="'+x+'" y="'+y+'" width="'+fw+'" height="6" rx="1" fill="'+fc+'" opacity=".5"/>';
+s+=tx2(x+20,y-2,available+'/'+rated+'kA',c,3,'middle');
+return s;
+}
+
+// Idea 35: Equipment alarm triangle indicator
+function alarmIcon(x,y,msg){
+var s='<polygon points="'+(x-5)+','+(y+4)+' '+x+','+(y-5)+' '+(x+5)+','+(y+4)+'" fill="rgba(239,68,68,.2)" stroke="var(--r)" stroke-width=".6"/>';
+s+='<text x="'+x+'" y="'+(y+2)+'" fill="var(--r)" font-family="'+J+'" font-size="5" text-anchor="middle" font-weight="700">!</text>';
+s+=tx2(x,y+12,msg,'var(--r)',3,'middle');
+return s;
+}
+
+// ===== Phase 10 Helpers =====
+
+// Idea 24: Bus-tie transfer arrow annotation
+function tieArrow(x,y,mw,state){
+var s='<rect x="'+(x-30)+'" y="'+(y-6)+'" width="60" height="12" rx="2" fill="rgba(0,0,0,.35)" stroke="var(--p)" stroke-width=".3"/>';
+if(state==='OPEN'){
+s+=tx2(x,y+3,'0 MW \u2014 OPEN','var(--p)',3.5,'middle');
+}else{
+s+='<line x1="'+(x-25)+'" y1="'+y+'" x2="'+(x-10)+'" y2="'+y+'" stroke="var(--p)" stroke-width="1" marker-end="url(#sldArrow)"/>';
+s+='<line x1="'+(x+25)+'" y1="'+y+'" x2="'+(x+10)+'" y2="'+y+'" stroke="var(--p)" stroke-width="1" marker-end="url(#sldArrow)"/>';
+s+=tx2(x,y+3,mw+' MW','var(--p)',3.5,'middle');
+}
+return s;
+}
+
+// Idea 25: Reactive power (Q) flow dashed arrows beside main feeders
+function qFlowArrow(x1,y1,x2,y2,qVal,c){
+var mx=(x1+x2)/2,my=(y1+y2)/2;
+var s='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--c)" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#sldArrowC)" opacity=".4"/>';
+s+='<rect x="'+(mx-16)+'" y="'+(my-5)+'" width="32" height="10" rx="1" fill="rgba(0,0,0,.3)"/>';
+s+=tx2(mx,my+3,'Q='+qVal,'var(--c)',3,'middle');
+return s;
+}
+
 // ===== 1. MV Customer Substation =====
 function renderMvSub(dh){
 var H=520;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
 s+=tx2(W/2,18,'MV CUSTOMER SUBSTATION — DH-0'+dh+' — SM6 24kV','var(--o)',8,'middle',1);
 s+=lfLegend(5,25);
-// PLN Sources
-s+=bx2(80,35,160,40,CA);s+=tx2(160,55,'PLN 20kV Source A',CA,5,'middle',1);s+=tx2(160,65,'150kV Substation','var(--t3)',4,'middle');
-s+=bx2(680,35,160,40,CG);s+=tx2(760,55,'PLN 20kV Source B',CG,5,'middle',1);s+=tx2(760,65,'150kV Substation','var(--t3)',4,'middle');
+// PLN Sources — Idea 49: bx3 beveled boxes
+s+=bx3(80,35,160,40,CA);s+=tx2(160,55,'PLN 20kV Source A',CA,5,'middle',1);s+=tx2(160,65,'150kV Substation','var(--t3)',4,'middle');
+s+=bx3(680,35,160,40,CG);s+=tx2(760,55,'PLN 20kV Source B',CG,5,'middle',1);s+=tx2(760,65,'150kV Substation','var(--t3)',4,'middle');
 // Idea 21: Flow arrows from PLN sources downward
 s+=flowArrow(155,75,155,90,'P='+R(8.2,9.6)+'MW',CA,'sldArrowR');
 s+=flowArrow(765,75,765,90,'P='+R(8.1,9.5)+'MW',CG,'sldArrow');
+// Idea 25: Q-flow arrows beside PLN feeders
+s+=qFlowArrow(165,75,165,90,R(1.8,2.4)+' MVAr',CA);
+s+=qFlowArrow(755,75,755,90,R(1.7,2.3)+' MVAr',CG);
 // VCB Incomers
 s+=fl2(160,75,160,90,CA,'fD');s+=symCBe(160,100,CA,true,'LSI');s+=tx2(190,95,'VCB-INC-A',CA,5,0,1);s+=tx2(190,105,'630A/25kA Vacuum','var(--t3)',4);
 s+=fl2(760,75,760,90,CG,'fD');s+=symCBe(760,100,CG,true,'LSI');s+=tx2(730,95,'VCB-INC-B',CG,5,'end',1);s+=tx2(730,105,'630A/25kA Vacuum','var(--t3)',4,'end');
@@ -3572,11 +4006,28 @@ s+=busEtap(60,145,300,'SM6 BUS A — 20kV',CA,'20.04 kV / -2.3°');s+=busEtap(56
 // Idea 26: Voltage profile overlay rects on buses (updated in timer)
 s+='<rect id="vp-mvA" x="60" y="145" width="300" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
 s+='<rect id="vp-mvB" x="560" y="145" width="300" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+// Idea 8: MV voltage-level gradient overlays on SM6 buses
+s+='<rect x="60" y="145" width="300" height="14" rx="2" fill="url(#mvGrad)" opacity=".4" pointer-events="none"/>';
+s+='<rect x="560" y="145" width="300" height="14" rx="2" fill="url(#mvGrad)" opacity=".4" pointer-events="none"/>';
+// Idea 22: Animated flow particles PLN → Bus
+s+=flowParticle(160,75,145,2,CA);
+s+=flowParticle(760,75,145,2,CG);
+// Idea 27: Voltage angle annotations at bus nodes
+s+=lv('va-angA',350,142,R(-2.0,-2.8)+'°','var(--t3)',3.5);
+s+=lv('va-angB',850,142,R(-1.5,-2.3)+'°','var(--t3)',3.5);
+// Idea 31: Short-circuit current at MV buses
+s+=iscLabel(60,162,25);
+s+=iscLabel(560,162,25);
+// Idea 34: Arc flash incident energy at MV buses
+s+=afLabel(115,160,R(12,18),3);
+s+=afLabel(615,160,R(11,17),3);
 // VT — Idea 18: IEC VT symbol
-s+=symVT(130,165,CA);s+=symVT(790,165,CG);
+s+=symVT(130,178,CA);s+=symVT(790,178,CG);
 // Bus Tie
 s+='<line x1="360" y1="149" x2="560" y2="149" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="6 4"/>';
 s+=symCBe(460,149,'var(--p)',false);s+=tx2(460,170,'VCB-TIE N.O.','var(--p)',5,'middle',1);
+// Idea 24: Bus-tie transfer arrow annotation
+s+=tieArrow(460,183,'0','OPEN');
 // 4 Feeder VCBs per bus
 var feeders=['F1','F2','F3','F4'];
 for(var i=0;i<4;i++){var fx=90+i*70;
@@ -3585,23 +4036,38 @@ s+=tx2(fx,208,(i===0?'to RMU':'Spare'),'var(--t3)',3,'middle')}
 for(var i=0;i<4;i++){var fx=590+i*70;
 s+=fl2(fx,153,fx,175,CG,'fD');s+=symCBe(fx,185,CG,true);s+=tx2(fx,200,'F'+dh+'B.'+(i+1),CG,3.5,'middle');
 s+=tx2(fx,208,(i===0?'to RMU':'Spare'),'var(--t3)',3,'middle')}
-// Protection relays
+// Protection relays — Idea 49: bx3 beveled boxes
 s+=sectionSep(215,'LEVEL 1 — PROTECTION');
-s+=bx2(80,220,300,55,CA);s+=tx2(230,235,'PROTECTION RELAY A — MICOM P143',CA,4.5,'middle',1);
+s+=bx3(80,220,300,55,CA);s+=tx2(230,235,'PROTECTION RELAY A — MICOM P143',CA,4.5,'middle',1);
 s+=tx2(90,250,'50/51 IDMT OC','var(--t2)',4);s+=tx2(90,260,'50N/51N E/F','var(--t2)',4);
 s+=tx2(230,250,'Pickup: 1.2×In','var(--t2)',4);s+=tx2(230,260,'TMS: 0.3 SI','var(--t2)',4);
-s+=bx2(540,220,300,55,CG);s+=tx2(690,235,'PROTECTION RELAY B — MICOM P143',CG,4.5,'middle',1);
+s+=bx3(540,220,300,55,CG);s+=tx2(690,235,'PROTECTION RELAY B — MICOM P143',CG,4.5,'middle',1);
 s+=tx2(550,250,'50/51 IDMT OC','var(--t2)',4);s+=tx2(550,260,'50N/51N E/F','var(--t2)',4);
 s+=tx2(690,250,'Pickup: 1.2×In','var(--t2)',4);s+=tx2(690,260,'TMS: 0.3 SI','var(--t2)',4);
+// Idea 32: Trip sequence + mini T-I curve indicators near protection relays
+s+=tripSeq(395,240,'1st',CA);s+=miniTI(410,235,CA);
+s+=tripSeq(855,240,'1st',CG);s+=miniTI(870,235,CG);
+// Idea 32: 2nd trip coordination indicators at VCB incomers
+s+=tripSeq(130,100,'2nd',CA);
+s+=tripSeq(790,100,'2nd',CG);
+// Idea 33: Fault current utilisation bars at VCB incomers
+s+=faultBar(135,115,25,RI(18,22),CA);
+s+=faultBar(735,115,25,RI(17,21),CG);
 // CTs — Idea 18: IEC CT symbol
 s+=symCT(160,290,CA);s+=tx2(185,293,'200/5A cl0.5',CA,4);
 s+=symCT(760,290,CG);s+=tx2(735,293,'200/5A cl0.5',CG,4,'end');
 // Cable terminations
 s+=bx2(120,310,80,30,CA);s+=tx2(160,328,'XLPE 3×1c','var(--t2)',4,'middle');s+=tx2(160,338,'240mm² Cu','var(--t3)',3.5,'middle');
 s+=bx2(720,310,80,30,CG);s+=tx2(760,328,'XLPE 3×1c','var(--t2)',4,'middle');s+=tx2(760,338,'240mm² Cu','var(--t3)',3.5,'middle');
+// Idea 5: Branch impedance labels
+s+=impedLabel(110,342,'0.125','0.08','50');
+s+=impedLabel(720,342,'0.125','0.08','50');
 // Idea 15: Cable ampacity utilization display
 s+=cableAmp(160,350,RI(240,280),455,CA);
 s+=cableAmp(760,350,RI(238,278),455,CG);
+// Idea 2: Power loss annotations on cables
+s+=lossAnnot(160,358,R(10,15),R(0.10,0.16));
+s+=lossAnnot(760,358,R(9.5,14.5),R(0.10,0.15));
 // SF6 & Temp indicators
 s+=sectionSep(355,'LEVEL 2 — MONITORING');
 s+=bx2(80,360,360,50,CA);s+=tx2(260,375,'FEED A — LIVE PARAMETERS',CA,5,'middle',1);
@@ -3625,6 +4091,24 @@ s+=lv('mm-tb',400,455,RI(32,42)+'°C','var(--o)',5);s+=tx2(400,465,'Switchgear',
 s+=lv('mm-hum',520,455,RI(45,65)+'% RH','var(--c)',5);s+=tx2(520,465,'Humidity','var(--t3)',3.5);
 s+=lv('mm-freq',640,455,R(49.9,50.1)+' Hz','var(--g)',5);s+=tx2(640,465,'Frequency','var(--t3)',3.5);
 
+// Idea 41: Tooltip zones — MV Substation
+s+=tipZone(80,35,160,40,'<b>PLN Source A</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>20kV</span></div><div class=&quot;tt-row&quot;>Substation<span class=&quot;tt-val&quot;>150kV Grid</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Radial Feed</span></div>','A');
+s+=tipZone(680,35,160,40,'<b>PLN Source B</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>20kV</span></div><div class=&quot;tt-row&quot;>Substation<span class=&quot;tt-val&quot;>150kV Grid</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Radial Feed</span></div>','B');
+s+=tipZone(80,220,300,55,'<b>MICOM P143 Relay A</b><div class=&quot;tt-row&quot;>Function<span class=&quot;tt-val&quot;>50/51 OC + 50N/51N EF</span></div><div class=&quot;tt-row&quot;>Curve<span class=&quot;tt-val&quot;>SI (IEC)</span></div><div class=&quot;tt-row&quot;>TMS<span class=&quot;tt-val&quot;>0.3</span></div>','A');
+s+=tipZone(540,220,300,55,'<b>MICOM P143 Relay B</b><div class=&quot;tt-row&quot;>Function<span class=&quot;tt-val&quot;>50/51 OC + 50N/51N EF</span></div><div class=&quot;tt-row&quot;>Curve<span class=&quot;tt-val&quot;>SI (IEC)</span></div><div class=&quot;tt-row&quot;>TMS<span class=&quot;tt-val&quot;>0.3</span></div>','B');
+// Idea 43: CB toggle zones — MV Substation
+s+=cbToggle(160,100,'mvA-inc');
+s+=cbToggle(760,100,'mvB-inc');
+// Idea 30: Voltage deviation badge
+s+=vDevBadge(W-120,5);
+// Idea 7: Bus node IDs on MV buses
+s+=busNodeId(55,152,'1-01',CA);s+=busNodeId(555,152,'1-02',CG);
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'SLD-MV-'+dh,'A',dh);
+// Idea 35: Alarm placeholders (hidden by default, toggled in timer)
+s+='<g id="alm-mvA" style="display:none">'+alarmIcon(200,295,'OVERCURRENT')+'</g>';
+s+='<g id="alm-mvB" style="display:none">'+alarmIcon(720,295,'TEMP ALARM')+'</g>';
+
 svg.innerHTML=s;
 startTimer(function(){
 var e=$('mm-va');if(e)e.textContent=R(19.8,20.2)+' kV';
@@ -3643,7 +4127,13 @@ e=$('mm-hum');if(e)e.textContent=RI(45,65)+'% RH';
 e=$('mm-freq');if(e)e.textContent=R(49.9,50.1)+' Hz';
 // Idea 26: voltage profile bus color update
 var vpu=parseFloat(R(0.97,1.02));var vpe=$('vp-mvA');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
-vpu=parseFloat(R(0.97,1.02));vpe=$('vp-mvB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu))})}
+vpu=parseFloat(R(0.97,1.02));vpe=$('vp-mvB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
+// Idea 27: voltage angle live update
+e=$('va-angA');if(e)e.textContent=R(-2.0,-2.8)+'°';
+e=$('va-angB');if(e)e.textContent=R(-1.5,-2.3)+'°';
+// Idea 35: Random alarm simulation (~5% chance each tick)
+var alm=$('alm-mvA');if(alm)alm.style.display=Math.random()>0.95?'block':'none';
+alm=$('alm-mvB');if(alm)alm.style.display=Math.random()>0.95?'block':'none'})}
 
 // ===== 2. RMU Panel =====
 function renderRmu(dh){
@@ -3663,8 +4153,12 @@ s+=symMeter(205,115,CA,'kW');s+=symCT(170,130,CA);s+=tx2(150,133,'200/5A',CA,3.5
 s+=fl2(205,122,205,145,CA,'fD');
 // Cable box A
 s+=bx2(175,148,60,25,CA);s+=tx2(205,163,'Cable Box','var(--t3)',3.5,'middle');s+=tx2(205,173,'XLPE 240mm²',CA,3.5,'middle');
+// Idea 5: Branch impedance label A
+s+=impedLabel(165,178,'0.125','0.08','30');
 // Idea 15: Cable ampacity utilization A
 s+=cableAmp(205,185,RI(240,280),455,CA);
+// Idea 2: Power loss annotation A
+s+=lossAnnot(205,195,R(5,10),R(0.05,0.10));
 // Earthing switch A — Idea 20: IEC earth symbol
 s+=tx2(130,170,'ES-A','var(--c)',4);s+='<line x1="145" y1="165" x2="170" y2="155" stroke="var(--c)" stroke-width=".8"/>';s+=symEarth(135,175,'var(--c)');
 // Gas pressure A
@@ -3672,6 +4166,8 @@ s+=symSensor(250,175,CA,'P');s+=tx2(265,178,'SF6-Free','var(--t3)',3.5);
 // Bus Tie
 s+=fl2(330,60,330,80,'var(--p)','fD');s+=symCBe(460,90,'var(--p)',false);s+=tx2(460,110,'VCB-TIE N.O.','var(--p)',4.5,'middle',1);
 s+='<line x1="340" y1="100" x2="580" y2="100" stroke="var(--p)" stroke-width="1" stroke-dasharray="5 3"/>';
+// Idea 24: Bus-tie transfer arrow annotation
+s+=tieArrow(460,122,'0','OPEN');
 // VCB-B feed
 s+=fl2(715,60,715,80,CG,'fD');s+=symCBe(715,90,CG,true,'LSI');s+=tx2(690,87,'VCB-RMU-'+dh+'B',CG,4.5,'end',1);s+=tx2(690,97,'20kV/630A IDMT','var(--t3)',4,'end');
 // Idea 1: P/Q/I annotation near VCB-B feed
@@ -3680,16 +4176,32 @@ s+=symMeter(715,115,CG,'kW');s+=symCT(750,130,CG);s+=tx2(770,133,'200/5A',CG,3.5
 s+=fl2(715,122,715,145,CG,'fD');
 // Cable box B
 s+=bx2(685,148,60,25,CG);s+=tx2(715,163,'Cable Box','var(--t3)',3.5,'middle');s+=tx2(715,173,'XLPE 240mm²',CG,3.5,'middle');
+// Idea 5: Branch impedance label B
+s+=impedLabel(675,178,'0.125','0.08','30');
 // Idea 15: Cable ampacity utilization B
 s+=cableAmp(715,185,RI(238,278),455,CG);
+// Idea 2: Power loss annotation B
+s+=lossAnnot(715,195,R(4.8,9.5),R(0.05,0.10));
 // Earthing switch B — Idea 20: IEC earth symbol
 s+=tx2(780,170,'ES-B','var(--c)',4);s+=symEarth(795,175,'var(--c)');
 s+=symSensor(670,175,CG,'P');s+=tx2(650,178,'SF6-Free','var(--t3)',3.5,'end');
 // Bus connections
-s+=busEtap(120,190,220,'RMU BUS A — 20kV',CA,'20.01 kV / -2.5°');s+=busEtap(580,190,220,'RMU BUS B — 20kV',CG,'19.98 kV / -2.1°');
+s+=busEtap(120,205,220,'RMU BUS A — 20kV',CA,'20.01 kV / -2.5°');s+=busEtap(580,205,220,'RMU BUS B — 20kV',CG,'19.98 kV / -2.1°');
+// Idea 27: Voltage angle annotations at RMU bus nodes
+s+=lv('vr-angA',330,203,R(-2.2,-3.0)+'°','var(--t3)',3.5);
+s+=lv('vr-angB',790,203,R(-1.8,-2.6)+'°','var(--t3)',3.5);
+// Idea 31: Short-circuit current at RMU buses
+s+=iscLabel(120,222,25);
+s+=iscLabel(580,222,25);
+// Idea 34: Arc flash incident energy at RMU buses
+s+=afLabel(170,220,R(12,18),3);
+s+=afLabel(630,220,R(11,17),3);
 // Idea 26: voltage profile overlays on RMU buses
-s+='<rect id="vp-rmuA" x="120" y="190" width="220" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
-s+='<rect id="vp-rmuB" x="580" y="190" width="220" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+s+='<rect id="vp-rmuA" x="120" y="205" width="220" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+s+='<rect id="vp-rmuB" x="580" y="205" width="220" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+// Idea 8: MV voltage-level gradient overlays on RMU buses
+s+='<rect x="120" y="205" width="220" height="14" rx="2" fill="url(#mvGrad)" opacity=".4" pointer-events="none"/>';
+s+='<rect x="580" y="205" width="220" height="14" rx="2" fill="url(#mvGrad)" opacity=".4" pointer-events="none"/>';
 // Live parameters
 s+=bx2(60,260,380,55,CA);s+=tx2(250,275,'FEED A — LIVE',CA,5,'middle',1);
 s+=lv('mr-va',80,295,R(19.8,20.2)+' kV',CA,5);s+=tx2(80,305,'Voltage','var(--t3)',3.5);
@@ -3707,6 +4219,12 @@ s+=bx2(250,330,420,45,'var(--o)');s+=tx2(460,345,'ENVIRONMENT','var(--o)',5,'mid
 s+=lv('mr-ta',320,365,RI(28,34)+'°C','var(--o)',5);s+=tx2(320,375,'Panel','var(--t3)',3.5);
 s+=lv('mr-tb',440,365,RI(24,30)+'°C','var(--c)',5);s+=tx2(440,375,'Ambient','var(--t3)',3.5);
 s+=lv('mr-hum',560,365,RI(45,60)+'% RH','var(--c)',5);s+=tx2(560,375,'Humidity','var(--t3)',3.5);
+// Idea 30: Voltage deviation badge
+s+=vDevBadge(W-120,5);
+// Idea 7: Bus node IDs on RMU buses
+s+=busNodeId(115,212,'1-03',CA);s+=busNodeId(575,212,'1-04',CG);
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'SLD-RMU-'+dh,'A',dh);
 
 svg.innerHTML=s;
 startTimer(function(){
@@ -3714,7 +4232,10 @@ var ids=[['mr-va',function(){return R(19.8,20.2)+' kV'}],['mr-vb',function(){ret
 ids.forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 // Idea 26: voltage profile bus color update
 var vpu=parseFloat(R(0.97,1.02));var vpe=$('vp-rmuA');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
-vpu=parseFloat(R(0.97,1.02));vpe=$('vp-rmuB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu))})}
+vpu=parseFloat(R(0.97,1.02));vpe=$('vp-rmuB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
+// Idea 27: voltage angle live update
+var ea=$('vr-angA');if(ea)ea.textContent=R(-2.2,-3.0)+'°';
+var eb=$('vr-angB');if(eb)eb.textContent=R(-1.8,-2.6)+'°'})}
 
 // ===== 3. Transformer =====
 function renderTx(dh){
@@ -3722,8 +4243,8 @@ var H=520;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
 s+=tx2(W/2,18,'TRANSFORMER TX-'+dh+'A/B — ABB RESIBLOC 10MVA — Dyn11 20/0.4kV','var(--o)',8,'middle',1);
 s+=lfLegend(5,25);
-// TX-A (left)
-s+=bx2(40,35,400,280,CA);s+=tx2(240,52,'TX-'+dh+'A — FEED A',CA,6,'middle',1);
+// TX-A (left) — Idea 49: bx3 beveled panel box
+s+=bx3(40,35,400,280,CA);s+=tx2(240,52,'TX-'+dh+'A — FEED A',CA,6,'middle',1);
 // Idea 11: Transformer loading bar TX-A
 s+=txLoadBar(40,95,RI(72,84),CA,'tlb-a');
 // HV Bushing
@@ -3736,6 +4257,8 @@ s+=flowArrow(155,80,155,95,'P='+R(8.0,9.2)+'MW',CA,'sldArrowR');
 // Transformer symbol (large) — Idea 16: IEC enlarged TX symbol
 s+=symTXe(160,131,CA);s+=symEarth(160,155,CA);
 s+=tx2(200,130,'Dyn11',CA,5,0,1);s+=tx2(200,142,'Zk=6%','var(--t3)',4);s+=tx2(200,154,'10MVA','var(--o)',4.5,0,1);
+// Idea 3: Transformer loss breakdown TX-A
+s+=txLoss(230,115,R(7,9),R(58,66),R(65,75));
 // OCTC Tap Changer
 s+=bx2(60,108,60,35,'var(--o)');s+=tx2(90,122,'OCTC','var(--o)',4,'middle',1);s+=tx2(90,133,'±2.5%×2','var(--t3)',3.5,'middle');
 s+=lv('mt-tapa',90,143,'Tap 3','var(--o)',4,'middle');
@@ -3745,7 +4268,11 @@ s+=fl2(160,168,160,195,CA,'fD');
 s+=vDropAnnot(60,165,'-'+R(0.5,1.2),'-'+R(0.1,0.3),CA);
 // Idea 21: Flow arrow from LV bushing to ACB TX-A
 s+=flowArrow(155,195,155,240,'P='+R(8.0,9.2)+'MW',CA,'sldArrowR');
+// Idea 25: Q-flow arrow beside TX-A LV output
+s+=qFlowArrow(165,195,165,240,R(1.4,2.0)+' MVAr',CA);
 s+=tx2(160,205,'LV BUSHING 400V',CA,4.5,'middle',1);
+// Idea 2: Power loss annotation near ACB TX-A
+s+=lossAnnot(240,270,R(3,6),R(0.03,0.07));
 // PT100 sensors
 s+=bx2(260,85,160,70,'var(--o)');s+=tx2(340,100,'PT100 SENSORS','var(--o)',4.5,'middle',1);
 s+=lv('mt-wa',280,118,RI(58,68)+'°C','var(--o)',4.5);s+=tx2(280,128,'Winding','var(--t3)',3.5);
@@ -3766,8 +4293,8 @@ s+=lv('mt-sva',170,300,RI(396,400)+' V',CA,4.5);s+=tx2(170,310,'Secondary','var(
 s+=lv('mt-lda',265,300,RI(7200,8400)+' kVA','var(--o)',4.5);s+=tx2(265,310,'Load','var(--t3)',3);
 s+=lv('mt-effa',370,300,R(98.5,99.2)+'%','var(--g)',4.5);s+=tx2(370,310,'Efficiency','var(--t3)',3);
 
-// TX-B (right)
-s+=bx2(480,35,400,280,CG);s+=tx2(680,52,'TX-'+dh+'B — FEED B',CG,6,'middle',1);
+// TX-B (right) — Idea 49: bx3 beveled panel box
+s+=bx3(480,35,400,280,CG);s+=tx2(680,52,'TX-'+dh+'B — FEED B',CG,6,'middle',1);
 // Idea 11: Transformer loading bar TX-B
 s+=txLoadBar(870,95,RI(71,83),CG,'tlb-b');
 s+=tx2(680,70,'HV BUSHING 20kV',CG,4.5,'middle',1);
@@ -3779,6 +4306,8 @@ s+=flowArrow(685,80,685,95,'P='+R(7.9,9.1)+'MW',CG,'sldArrow');
 // Transformer symbol TX-B — Idea 16: IEC enlarged TX symbol
 s+=symTXe(680,131,CG);s+=symEarth(680,155,CG);
 s+=tx2(720,130,'Dyn11',CG,5,0,1);s+=tx2(720,142,'Zk=6%','var(--t3)',4);s+=tx2(720,154,'10MVA','var(--o)',4.5,0,1);
+// Idea 3: Transformer loss breakdown TX-B
+s+=txLoss(590,115,R(6.8,8.8),R(57,65),R(64,74));
 s+=bx2(800,108,60,35,'var(--o)');s+=tx2(830,122,'OCTC','var(--o)',4,'middle',1);s+=tx2(830,133,'±2.5%×2','var(--t3)',3.5,'middle');
 s+=lv('mt-tapb',830,143,'Tap 3','var(--o)',4,'middle');
 s+=fl2(680,168,680,195,CG,'fD');
@@ -3786,7 +4315,11 @@ s+=fl2(680,168,680,195,CG,'fD');
 s+=vDropAnnot(780,165,'-'+R(0.5,1.2),'-'+R(0.1,0.3),CG);
 // Idea 21: Flow arrow from LV bushing to ACB TX-B
 s+=flowArrow(685,195,685,240,'P='+R(7.9,9.1)+'MW',CG,'sldArrow');
+// Idea 25: Q-flow arrow beside TX-B LV output
+s+=qFlowArrow(675,195,675,240,R(1.3,1.9)+' MVAr',CG);
 s+=tx2(680,205,'LV BUSHING 400V',CG,4.5,'middle',1);
+// Idea 2: Power loss annotation near ACB TX-B
+s+=lossAnnot(700,270,R(2.8,5.5),R(0.03,0.06));
 s+=bx2(500,85,160,70,'var(--o)');s+=tx2(580,100,'PT100 SENSORS','var(--o)',4.5,'middle',1);
 s+=lv('mt-wb',520,118,RI(57,67)+'°C','var(--o)',4.5);s+=tx2(520,128,'Winding','var(--t3)',3.5);
 s+=lv('mt-cb',610,118,RI(49,59)+'°C','var(--o)',4.5);s+=tx2(610,128,'Core','var(--t3)',3.5);
@@ -3800,6 +4333,11 @@ s+=lv('mt-svb',610,300,RI(396,400)+' V',CG,4.5);s+=tx2(610,310,'Secondary','var(
 s+=lv('mt-ldb',705,300,RI(7100,8300)+' kVA','var(--o)',4.5);s+=tx2(705,310,'Load','var(--t3)',3);
 s+=lv('mt-effb',810,300,R(98.4,99.1)+'%','var(--g)',4.5);s+=tx2(810,310,'Efficiency','var(--t3)',3);
 
+// Idea 22: Animated flow particles along TX feeder paths
+s+=flowParticle(160,75,120,1.5,CA);
+s+=flowParticle(160,168,240,1.5,CA);
+s+=flowParticle(680,75,120,1.5,CG);
+s+=flowParticle(680,168,240,1.5,CG);
 // GenSet + ATS
 s+=sectionSep(330,'GENSET / BACKUP');
 s+=bx2(200,340,520,80,'rgba(107,114,128,.4)');s+=tx2(460,355,'GENSET POOL + ATS','var(--t3)',5,'middle',1);
@@ -3812,12 +4350,32 @@ s+=bx2(200,430,520,45,'var(--c)');s+=tx2(460,445,'INSULATION MONITORING','var(--
 s+=tx2(260,465,'Cast-resin dry (no oil)','var(--t2)',4);s+=tx2(460,465,'IP31 enclosure','var(--t2)',4);
 s+=tx2(660,465,'Class F (155°C max)','var(--t2)',4);
 
+// Idea 41: Tooltip zones — Transformer
+s+=tipZone(40,35,400,280,'<b>TX-'+dh+'A — ABB RESIBLOC</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>10 MVA</span></div><div class=&quot;tt-row&quot;>Voltage<span class=&quot;tt-val&quot;>20/0.4 kV</span></div><div class=&quot;tt-row&quot;>Vector<span class=&quot;tt-val&quot;>Dyn11</span></div><div class=&quot;tt-row&quot;>Impedance<span class=&quot;tt-val&quot;>Zk=6%</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Cast Resin Dry</span></div>','A');
+s+=tipZone(480,35,400,280,'<b>TX-'+dh+'B — ABB RESIBLOC</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>10 MVA</span></div><div class=&quot;tt-row&quot;>Voltage<span class=&quot;tt-val&quot;>20/0.4 kV</span></div><div class=&quot;tt-row&quot;>Vector<span class=&quot;tt-val&quot;>Dyn11</span></div><div class=&quot;tt-row&quot;>Impedance<span class=&quot;tt-val&quot;>Zk=6%</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Cast Resin Dry</span></div>','B');
+// Idea 43: CB toggle zones — Transformer
+s+=cbToggle(160,250,'txA-acb');
+s+=cbToggle(680,250,'txB-acb');
+// Idea 48: Nameplate vs actual comparison
+s+=nameplate(310,160,[['Rated','10 MVA'],['Actual',R(7.2,8.4)+' MVA'],['Margin',RI(14,28)+'%']]);
+s+=nameplate(780,160,[['Rated','10 MVA'],['Actual',R(7.1,8.3)+' MVA'],['Margin',RI(13,27)+'%']]);
+// Idea 30: Voltage deviation badge
+s+=vDevBadge(W-120,5);
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'SLD-TX-'+dh,'A',dh);
+// Idea 35: Alarm placeholders — Transformer winding temp
+s+='<g id="alm-txA" style="display:none">'+alarmIcon(300,200,'WINDING TEMP')+'</g>';
+s+='<g id="alm-txB" style="display:none">'+alarmIcon(600,200,'WINDING TEMP')+'</g>';
+
 svg.innerHTML=s;
 startTimer(function(){
 [['mt-wa',function(){return RI(58,68)+'°C'}],['mt-wb',function(){return RI(57,67)+'°C'}],['mt-ca',function(){return RI(50,60)+'°C'}],['mt-cb',function(){return RI(49,59)+'°C'}],['mt-pva',function(){return R(19.8,20.2)+' kV'}],['mt-pvb',function(){return R(19.8,20.2)+' kV'}],['mt-sva',function(){return RI(396,400)+' V'}],['mt-svb',function(){return RI(396,400)+' V'}],['mt-lda',function(){return RI(7200,8400)+' kVA'}],['mt-ldb',function(){return RI(7100,8300)+' kVA'}],['mt-effa',function(){return R(98.5,99.2)+'%'}],['mt-effb',function(){return R(98.4,99.1)+'%'}],['mt-f1a',function(){return RI(58,68)>65?'ON':'AUTO'}],['mt-f2a',function(){return RI(58,68)>65?'ON':'AUTO'}],['mt-f1b',function(){return RI(57,67)>65?'ON':'AUTO'}],['mt-f2b',function(){return RI(57,67)>65?'ON':'AUTO'}],['mt-tapa',function(){return'Tap '+RI(2,4)}],['mt-tapb',function(){return'Tap '+RI(2,4)}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 // Idea 11: TX loading bar live update
 var lp=RI(72,84);var tlb=$('tlb-a');if(tlb){tlb.setAttribute('height',Math.round(60*lp/100));tlb.setAttribute('y',95+60-Math.round(60*lp/100));tlb.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
-lp=RI(71,83);tlb=$('tlb-b');if(tlb){tlb.setAttribute('height',Math.round(60*lp/100));tlb.setAttribute('y',95+60-Math.round(60*lp/100));tlb.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}})}
+lp=RI(71,83);tlb=$('tlb-b');if(tlb){tlb.setAttribute('height',Math.round(60*lp/100));tlb.setAttribute('y',95+60-Math.round(60*lp/100));tlb.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
+// Idea 35: Random alarm simulation
+var alm=$('alm-txA');if(alm)alm.style.display=Math.random()>0.95?'block':'none';
+alm=$('alm-txB');if(alm)alm.style.display=Math.random()>0.95?'block':'none'})}
 
 // ===== 4. MSB Panel =====
 function renderMsb(dh){
@@ -3825,17 +4383,21 @@ var H=530;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
 s+=tx2(W/2,18,'MSB-'+dh+'A/B — 400V 6300A Form 4b — LV Distribution','var(--g)',8,'middle',1);
 s+=lfLegend(5,25);
-// MSB-A panel
-s+=bx2(30,35,420,250,CA);s+=tx2(240,52,'MSB-'+dh+'A — FEED A',CA,6,'middle',1);
+// MSB-A panel — Idea 49: bx3 beveled panel box
+s+=bx3(30,35,420,250,CA);s+=tx2(240,52,'MSB-'+dh+'A — FEED A',CA,6,'middle',1);
 // Incoming ACB from TX
 s+=fl2(180,60,180,80,CA,'fD');
 // Idea 21: Flow arrow down toward incoming ACB MSB-A
 s+=flowArrow(175,60,175,78,'5.4 MW',CA,'sldArrowR');
+// Idea 25: Q-flow arrow beside incoming ACB MSB-A
+s+=qFlowArrow(185,60,185,78,R(1.2,1.5)+' MVAr',CA);
 // Idea 1: P/Q/I annotation near incoming ACB MSB-A
 s+=lfAnnot(210,65,R(5200,5600),R(1200,1500),RI(4800,5400),CA);
 s+=symCBe(180,90,CA,true,'LSI');s+=tx2(205,87,'ACB-'+dh+'A Inc',CA,4.5,0,1);s+=tx2(205,97,'6300A/100kA','var(--t3)',4);
 // Idea 12: CB gauge above incoming ACB-A
 s+=cbGauge(180,72,RI(78,86),CA,'cg-msbA');
+// Idea 33: Fault current bar ACB-A
+s+=faultBar(205,103,100,RI(55,70),CA);
 // GenSet ACB (gray)
 s+=fl2(80,60,80,80,'rgba(107,114,128,.4)','fD');s+=symCBe(80,90,'rgba(107,114,128,.4)',false);
 s+=tx2(55,87,'ACB-GEN',CA,4,'end');s+=tx2(55,97,'OPEN','var(--t3)',3.5,'end');
@@ -3849,6 +4411,18 @@ s+=busEtap(50,118,390,'MSB-'+dh+'A BUS 400V 6300A',CA,'398 V / 0.0°');
 s+=busLoadBar(50,118,390,RI(78,86),'blb-msbA');
 // Idea 26: voltage profile overlay MSB-A
 s+='<rect id="vp-msbA" x="50" y="118" width="390" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+// Idea 8: LV voltage-level gradient overlay MSB-A
+s+='<rect x="50" y="118" width="390" height="14" rx="2" fill="url(#lvGrad)" opacity=".4" pointer-events="none"/>';
+// Idea 10: Three-phase conductor lines along MSB-A bus
+s+=threePhase(50,118,390);
+// Idea 22: Flow particle ACB → Bus MSB-A
+s+=flowParticle(180,60,118,1.5,CA);
+// Idea 27: Voltage angle annotation MSB-A
+s+=lv('vm-angA',440,115,R(-0.5,-1.5)+'°','var(--t3)',3.5);
+// Idea 31: Short-circuit current at MSB-A bus
+s+=iscLabel(50,136,'100');
+// Idea 34: Arc flash at MSB-A bus
+s+=afLabel(100,134,R(6,10),2);
 // Idea 4: Voltage drop annotation below incoming ACB to bus MSB-A
 s+=vDropAnnot(240,105,'-'+R(0.3,0.8),'-'+R(0.1,0.2),CA);
 // 3-phase labels
@@ -3867,16 +4441,20 @@ s+=symMeter(ox,oy+50,oA[i].c,'kW')}
 s+=bx2(60,240,370,40,CA);s+=tx2(245,252,'METERING CTs/VTs',CA,4.5,'middle',1);
 s+=tx2(80,268,'CT: 6000/5A cl0.5S','var(--t2)',4);s+=tx2(250,268,'VT: 400/\\u221A3 : 110/\\u221A3','var(--t2)',4);
 
-// MSB-B panel
-s+=bx2(470,35,420,250,CG);s+=tx2(680,52,'MSB-'+dh+'B — FEED B',CG,6,'middle',1);
+// MSB-B panel — Idea 49: bx3 beveled panel box
+s+=bx3(470,35,420,250,CG);s+=tx2(680,52,'MSB-'+dh+'B — FEED B',CG,6,'middle',1);
 s+=fl2(680,60,680,80,CG,'fD');
 // Idea 21: Flow arrow down toward incoming ACB MSB-B
 s+=flowArrow(675,60,675,78,'5.3 MW',CG,'sldArrow');
+// Idea 25: Q-flow arrow beside incoming ACB MSB-B
+s+=qFlowArrow(665,60,665,78,R(1.1,1.4)+' MVAr',CG);
 // Idea 1: P/Q/I annotation near incoming ACB MSB-B
 s+=lfAnnot(710,65,R(5100,5500),R(1100,1400),RI(4700,5300),CG);
 s+=symCBe(680,90,CG,true,'LSI');s+=tx2(705,87,'ACB-'+dh+'B Inc',CG,4.5,0,1);s+=tx2(705,97,'6300A/100kA','var(--t3)',4);
 // Idea 12: CB gauge above incoming ACB-B
 s+=cbGauge(680,72,RI(76,84),CG,'cg-msbB');
+// Idea 33: Fault current bar ACB-B
+s+=faultBar(705,103,100,RI(53,68),CG);
 s+=fl2(820,60,820,80,'rgba(107,114,128,.4)','fD');s+=symCBe(820,90,'rgba(107,114,128,.4)',false);
 s+=tx2(845,87,'ACB-GEN',CG,4);s+=tx2(845,97,'OPEN','var(--t3)',3.5);
 s+='<line x1="690" y1="90" x2="810" y2="90" stroke="var(--r)" stroke-width=".8" stroke-dasharray="3 2"/>';
@@ -3887,6 +4465,18 @@ s+=busEtap(480,118,390,'MSB-'+dh+'B BUS 400V 6300A',CG,'397 V / 0.0°');
 s+=busLoadBar(480,118,390,RI(76,84),'blb-msbB');
 // Idea 26: voltage profile overlay MSB-B
 s+='<rect id="vp-msbB" x="480" y="118" width="390" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+// Idea 8: LV voltage-level gradient overlay MSB-B
+s+='<rect x="480" y="118" width="390" height="14" rx="2" fill="url(#lvGrad)" opacity=".4" pointer-events="none"/>';
+// Idea 10: Three-phase conductor lines along MSB-B bus
+s+=threePhase(480,118,390);
+// Idea 22: Flow particle ACB → Bus MSB-B
+s+=flowParticle(680,60,118,1.5,CG);
+// Idea 27: Voltage angle annotation MSB-B
+s+=lv('vm-angB',870,115,R(-0.4,-1.4)+'°','var(--t3)',3.5);
+// Idea 31: Short-circuit current at MSB-B bus
+s+=iscLabel(480,136,'100');
+// Idea 34: Arc flash at MSB-B bus
+s+=afLabel(530,134,R(5.5,9),2);
 // Idea 4: Voltage drop annotation below incoming ACB to bus MSB-B
 s+=vDropAnnot(640,105,'-'+R(0.3,0.8),'-'+R(0.1,0.2),CG);
 s+=tx2(510,140,'L1','var(--r)',4);s+=tx2(540,140,'L2','var(--o)',4);s+=tx2(570,140,'L3','var(--b)',4);s+=tx2(600,140,'N','var(--t3)',4);s+=symEarth(600,152,CG);
@@ -3904,6 +4494,8 @@ s+=tx2(510,268,'CT: 6000/5A cl0.5S','var(--t2)',4);s+=tx2(680,268,'VT: 400/\\u22
 s+='<line x1="440" y1="122" x2="480" y2="122" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="5 3"/>';
 s+=symCBe(460,122,'var(--p)',false);s+=tx2(460,110,'ACB-TIE-LV N.O.','var(--p)',4,'middle',1);
 s+=tx2(460,137,'6300A/100kA','var(--t3)',3.5,'middle');
+// Idea 24: Bus-tie transfer arrow annotation
+s+=tieArrow(460,152,'0','OPEN');
 
 // Per-phase live
 s+=sectionSep(290,'PER-PHASE MONITORING');
@@ -3920,6 +4512,9 @@ s+=lv('msb-l'+i+'b',510+i*120,340,RI(228,232)+' V','var(--g)',5);
 s+=tx2(510+i*120,355,ph[i]+'-N Voltage','var(--t3)',3.5);
 s+=lv('msb-i'+i+'b',510+i*120,370,RI(1500,1770)+' A','var(--o)',5);
 s+=tx2(510+i*120,380,ph[i]+' Current','var(--t3)',3.5)}
+// Idea 28: Per-phase voltage bar charts
+s+=phaseBarChart(395,305,RI(228,232),RI(228,232),RI(228,232),230);
+s+=phaseBarChart(815,305,RI(228,232),RI(228,232),RI(228,232),230);
 
 // GenSet + Tie status
 s+=sectionSep(390,'AUXILIARY');
@@ -3927,6 +4522,22 @@ s+=bx2(200,400,520,55,'var(--t3)');s+=tx2(460,415,'AUXILIARY STATUS','var(--t3)'
 s+=lv('msb-gen',280,440,'STANDBY','var(--g)',5);s+=tx2(280,450,'GenSet','var(--t3)',3.5);
 s+=lv('msb-tie',460,440,'OPEN','var(--p)',5);s+=tx2(460,450,'Bus Tie','var(--t3)',3.5);
 s+=lv('msb-kw',640,440,RI(5200,5600)+' kW','var(--o)',5);s+=tx2(640,450,'Total Load A','var(--t3)',3.5);
+
+// Idea 41: Tooltip zones — MSB Panel
+s+=tipZone(30,35,420,250,'<b>MSB-'+dh+'A — 400V 6300A</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>6300A Cu</span></div>','A');
+s+=tipZone(470,35,420,250,'<b>MSB-'+dh+'B — 400V 6300A</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>6300A Cu</span></div>','B');
+// Idea 43: CB toggle zones — MSB Panel
+s+=cbToggle(180,90,'msbA-inc');
+s+=cbToggle(680,90,'msbB-inc');
+// Idea 30: Voltage deviation badge
+s+=vDevBadge(W-120,5);
+// Idea 7: Bus node IDs on LV buses
+s+=busNodeId(45,125,'2-01',CA);s+=busNodeId(475,125,'2-02',CG);
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'SLD-MSB-'+dh,'A',dh);
+// Idea 35: Alarm placeholders — MSB overload
+s+='<g id="alm-msbA" style="display:none">'+alarmIcon(380,160,'OVERLOAD')+'</g>';
+s+='<g id="alm-msbB" style="display:none">'+alarmIcon(820,160,'OVERLOAD')+'</g>';
 
 svg.innerHTML=s;
 startTimer(function(){
@@ -3941,130 +4552,485 @@ var lp=RI(78,86);var bl=$('blb-msbA');if(bl){bl.setAttribute('width',Math.round(
 lp=RI(76,84);bl=$('blb-msbB');if(bl){bl.setAttribute('width',Math.round(390*lp/100));bl.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
 // Idea 26: voltage profile bus color update
 var vpu=parseFloat(R(0.97,1.02));var vpe=$('vp-msbA');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
-vpu=parseFloat(R(0.97,1.02));vpe=$('vp-msbB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu))})}
+vpu=parseFloat(R(0.97,1.02));vpe=$('vp-msbB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
+// Idea 27: voltage angle live update
+var eA=$('vm-angA');if(eA)eA.textContent=R(-0.5,-1.5)+'°';
+var eB=$('vm-angB');if(eB)eB.textContent=R(-0.4,-1.4)+'°';
+// Idea 35: Random alarm simulation
+var alm=$('alm-msbA');if(alm)alm.style.display=Math.random()>0.95?'block':'none';
+alm=$('alm-msbB');if(alm)alm.style.display=Math.random()>0.95?'block':'none'})}
 
-// ===== 5. UPS + Battery =====
+// ===== 5. UPS + Battery (Vertiv APM2 Touchscreen Style) =====
 function renderUps(dh){
-var H=560;svg.setAttribute('viewBox','0 0 '+W+' '+H);
+var H=700;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
-s+=tx2(W/2,18,'UPS-'+dh+'A/B — Vertiv EXL S1 8MW — Double Conversion VFI-SS-111','var(--g)',8,'middle',1);
-s+=lfLegend(5,25);
-// UPS-A block
-s+=bx2(30,35,420,300,CA);s+=tx2(240,52,'UPS-'+dh+'A — FEED A — 8MW',CA,6,'middle',1);
-// Input ACB
-s+=fl2(180,62,180,80,CA,'fD');s+=symCBe(180,90,CA,true,'LSI');s+=tx2(205,87,'ACB-IN',CA,4.5,0,1);s+=tx2(205,97,'4000A/65kA','var(--t3)',4);
-// Idea 12: CB gauge above input ACB UPS-A
-s+=cbGauge(180,72,RI(65,70),CA,'cg-upsA');
-// Rectifier
-s+=fl2(180,100,180,120,CA,'fD');
-s+=bx2(130,125,100,35,'var(--o)');s+=tx2(180,140,'RECTIFIER','var(--o)',4.5,'middle',1);s+=tx2(180,155,'AC→DC PFC','var(--t3)',3.5,'middle');
-// DC Bus
-s+=fl2(180,160,180,175,CA,'fD');
-s+=busEtap(80,180,200,'DC BUS 720V',CA,'720 VDC');
-// Idea 9: Bus loading bar UPS-A DC bus
-s+=busLoadBar(80,180,200,RI(65,70),'blb-upsA');
-// Idea 26: voltage profile overlay UPS-A DC bus
-s+='<rect id="vp-upsA" x="80" y="180" width="200" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
-// Inverter
-s+=fl2(180,188,180,200,CA,'fD');
-s+=bx2(130,205,100,35,'var(--g)');s+=tx2(180,220,'INVERTER','var(--g)',4.5,'middle',1);s+=tx2(180,235,'DC→AC PWM','var(--t3)',3.5,'middle');
-// Output ACB
-s+=fl2(180,240,180,260,CA,'fD');s+=symCBe(180,270,CA,true,'LSI');s+=tx2(205,267,'ACB-OUT',CA,4.5,0,1);s+=tx2(205,277,'4000A/65kA','var(--t3)',4);
-// Static bypass
-s+=bx2(310,120,120,40,'var(--p)');s+=tx2(370,138,'STATIC','var(--p)',4,'middle',1);s+=tx2(370,150,'BYPASS','var(--p)',4,'middle');
-s+=symCBe(370,170,'var(--p)',false);s+=tx2(395,168,'N.O.','var(--t3)',3.5);
-// Manual bypass
-s+=tx2(370,195,'Manual MBP','var(--t3)',3.5,'middle');
-// 8 module slots — Idea 13: UPS module loading heat map
-s+=bx2(50,290,380,35,CA);s+=tx2(240,302,'8 × 1MW MODULES',CA,4.5,'middle',1);
-for(var m=0;m<8;m++){var mx=62+m*46,ml=RI(60,85);
-var mfc=ml<70?'rgba(34,197,94,.2)':ml<80?'rgba(245,158,11,.2)':'rgba(239,68,68,.2)';
-var msc=ml<70?'var(--g)':ml<80?'var(--o)':'var(--r)';
-s+='<rect x="'+mx+'" y="308" width="38" height="12" rx="1" fill="'+mfc+'" stroke="'+msc+'" stroke-width=".5"/>';
-s+=tx2(mx+19,317,ml+'%',msc,3,'middle')}
+// ---- Top bar (Vertiv-style status bar) ----
+s+='<rect x="0" y="0" width="'+W+'" height="24" rx="0" fill="rgba(60,60,60,.9)"/>';
+s+=tx2(14,16,'STATUS','var(--t2)',6,0,1);s+=tx2(70,16,'OPERATE','var(--t2)',6,0,1);
+s+='<rect x="55" y="20" width="50" height="2" rx="1" fill="var(--o)"/>';
+s+='<rect x="150" y="4" width="300" height="16" rx="3" fill="rgba(34,197,94,.2)" stroke="rgba(34,197,94,.4)" stroke-width=".5"/>';
+s+='<circle cx="165" cy="12" r="5" fill="none" stroke="var(--g)" stroke-width="1"/><path d="M162 12 L164 14 L169 9" fill="none" stroke="var(--g)" stroke-width="1"/>';
+s+=tx2(300,16,'LOAD ON INVERTER','var(--g)',7,'middle',1);
+s+=tx2(W-80,16,'DH-0'+dh+' UPS','var(--t3)',5,'middle');
 
-// Battery-A branch
-s+=bx2(50,70,80,85,'var(--o)');s+=tx2(90,83,'BATTERY A','var(--o)',4.5,'middle',1);
-s+=tx2(90,100,'NMC LiFePO4','var(--t3)',3.5,'middle');s+=tx2(90,112,'1,333 kWh','var(--t3)',3.5,'middle');
-s+=tx2(90,124,'10 min','var(--t3)',3.5,'middle');
+// Helper: draw one UPS unit in Vertiv APM2 style
+// ox=left offset, label=A/B, c=color, sfx=suffix for IDs
+function drawUpsUnit(ox,label,c,sfx){
+var ux=ox,uw=450;
+// ---- SINGLE SYSTEM panel (left side of unit) ----
+s+='<rect x="'+ux+'" y="30" width="260" height="310" rx="4" fill="rgba(30,40,55,.85)" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>';
+s+='<rect x="'+(ux+1)+'" y="31" width="258" height="18" rx="3" fill="rgba(255,255,255,.03)"/>';
+s+=tx2(ux+10,44,'SINGLE SYSTEM — '+label,'var(--t2)',5.5,0,1);
+s+=lv('ups-mode'+sfx,ux+200,44,'NORMAL','var(--g)',4.5,'middle');
+
+// Power path coordinates (relative to ux)
+var mx=ux+65,my=80; // mains input point
+var bpx=ux+65; // bypass branch x
+
+// ---- INPUT from MSB (top-left) ----
+s+='<circle cx="'+(ux+20)+'" cy="90" r="6" fill="none" stroke="'+c+'" stroke-width="1"/>';
+s+='<path d="M'+(ux+17)+' 88 L'+(ux+20)+' 92 L'+(ux+23)+' 88" fill="none" stroke="'+c+'" stroke-width=".8"/>';
+s+=tx2(ux+20,104,'Input','var(--t3)',3.5,'middle');
+
+// Input line → Q3 (input breaker)
+s+='<line x1="'+(ux+26)+'" y1="90" x2="'+(ux+50)+'" y2="90" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+s+=flowParticle(ux+26,90,90,.8,c);
+// Q3 breaker
+s+=symCBe(ux+58,90,c,true);
+s+=tx2(ux+58,78,'Q3','var(--t2)',4,'middle',1);
+// Q3 → split point
+s+='<line x1="'+(ux+66)+'" y1="90" x2="'+(ux+90)+'" y2="90" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+// Split: vertical up to bypass, horizontal to rectifier
+s+='<circle cx="'+(ux+90)+'" cy="90" r="1.5" fill="'+c+'"/>';
+
+// ---- BYPASS PATH (top branch) ----
+s+='<line x1="'+(ux+90)+'" y1="90" x2="'+(ux+90)+'" y2="65" stroke="var(--p)" stroke-width="1" opacity=".4"/>';
+s+='<line x1="'+(ux+90)+'" y1="65" x2="'+(ux+210)+'" y2="65" stroke="var(--p)" stroke-width="1" opacity=".4"/>';
+// Q2 bypass breaker
+s+=symCBe(ux+120,65,'var(--p)',false);
+s+=tx2(ux+120,57,'Q2','var(--t2)',4,'middle',1);
+s+=tx2(ux+150,60,'Bypass','var(--t3)',3.5);
+
+// ---- RECTIFIER (AC→DC) ----
+s+='<line x1="'+(ux+90)+'" y1="90" x2="'+(ux+110)+'" y2="90" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+// Rectifier box with bridge symbol
+s+='<rect x="'+(ux+110)+'" y="78" width="40" height="24" rx="2" fill="rgba(245,158,11,.08)" stroke="var(--o)" stroke-width=".8"/>';
+// Bridge rectifier symbol (simplified)
+s+='<path d="M'+(ux+118)+' 82 L'+(ux+130)+' 90 L'+(ux+118)+' 98" fill="none" stroke="var(--o)" stroke-width=".7"/>';
+s+='<path d="M'+(ux+142)+' 82 L'+(ux+130)+' 90 L'+(ux+142)+' 98" fill="none" stroke="var(--o)" stroke-width=".7"/>';
+s+='<line x1="'+(ux+118)+'" y1="82" x2="'+(ux+142)+'" y2="82" stroke="var(--o)" stroke-width=".5"/>';
+s+='<line x1="'+(ux+118)+'" y1="98" x2="'+(ux+142)+'" y2="98" stroke="var(--o)" stroke-width=".5"/>';
+s+=tx2(ux+130,110,'AC/DC','var(--t3)',3.5,'middle');
+
+// ---- DC BUS (vertical section) ----
+s+='<line x1="'+(ux+150)+'" y1="90" x2="'+(ux+165)+'" y2="90" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+s+='<line x1="'+(ux+165)+'" y1="90" x2="'+(ux+165)+'" y2="155" stroke="var(--o)" stroke-width="2" opacity=".5"/>';
+s+=flowParticle(ux+165,90,155,1.2,'var(--o)');
+s+=tx2(ux+170,125,'DC','var(--o)',3.5,0,1);
+s+=tx2(ux+170,133,RI(715,725)+' V','var(--t3)',3);
+// DC bus node
+s+='<circle cx="'+(ux+165)+'" cy="155" r="2" fill="var(--o)"/>';
+
+// ---- BATTERY BRANCH (from DC bus going down) ----
+s+='<line x1="'+(ux+165)+'" y1="155" x2="'+(ux+165)+'" y2="185" stroke="var(--o)" stroke-width="1.2" opacity=".5"/>';
+// Q4 battery breaker (NEW — was missing!)
+s+=symCBe(ux+165,195,'var(--o)',true);
+s+=tx2(ux+165,183,'Q4','var(--t2)',4,'middle',1);
+s+='<line x1="'+(ux+165)+'" y1="203" x2="'+(ux+165)+'" y2="218" stroke="var(--o)" stroke-width="1.2" opacity=".5"/>';
+// Battery symbol
+s+='<rect x="'+(ux+145)+'" y="220" width="40" height="28" rx="3" fill="rgba(245,158,11,.08)" stroke="var(--o)" stroke-width=".8"/>';
+s+='<line x1="'+(ux+155)+'" y1="229" x2="'+(ux+175)+'" y2="229" stroke="var(--o)" stroke-width="1.5"/>';
+s+='<line x1="'+(ux+159)+'" y1="234" x2="'+(ux+171)+'" y2="234" stroke="var(--o)" stroke-width="1"/>';
+s+='<line x1="'+(ux+155)+'" y1="239" x2="'+(ux+175)+'" y2="239" stroke="var(--o)" stroke-width="1.5"/>';
+s+='<line x1="'+(ux+159)+'" y1="244" x2="'+(ux+171)+'" y2="244" stroke="var(--o)" stroke-width="1"/>';
+s+=tx2(ux+165,260,'NMC LiFePO4','var(--t3)',3,'middle');
+s+=tx2(ux+165,268,'1,333 kWh / 10 min','var(--t3)',3,'middle');
+// Battery click zone → opens ESS detail modal
+s+='<rect x="'+(ux+140)+'" y="215" width="50" height="60" fill="transparent" data-bat="'+label+'" data-dh="'+dh+'" style="cursor:pointer"/>';
+
+// ---- INVERTER (DC→AC) ----
+s+='<line x1="'+(ux+165)+'" y1="155" x2="'+(ux+185)+'" y2="155" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+// Inverter box with wave symbol
+s+='<rect x="'+(ux+185)+'" y="143" width="40" height="24" rx="2" fill="rgba(34,197,94,.08)" stroke="var(--g)" stroke-width=".8"/>';
+s+='<path d="M'+(ux+193)+' 155 Q'+(ux+198)+' 148 '+(ux+205)+' 155 Q'+(ux+212)+' 162 '+(ux+217)+' 155" fill="none" stroke="var(--g)" stroke-width=".8"/>';
+s+=tx2(ux+205,175,'DC/AC','var(--t3)',3.5,'middle');
+s+=flowParticle(ux+185,155,155,1,c);
+
+// Inverter → output line
+s+='<line x1="'+(ux+225)+'" y1="155" x2="'+(ux+245)+'" y2="155" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+
+// ---- STATIC BYPASS merges here ----
+s+='<line x1="'+(ux+210)+'" y1="65" x2="'+(ux+210)+'" y2="140" stroke="var(--p)" stroke-width="1" opacity=".3"/>';
+s+='<line x1="'+(ux+210)+'" y1="140" x2="'+(ux+245)+'" y2="140" stroke="var(--p)" stroke-width="1" opacity=".3"/>';
+s+='<line x1="'+(ux+245)+'" y1="140" x2="'+(ux+245)+'" y2="155" stroke="var(--p)" stroke-width="1" opacity=".3"/>';
+// Q5 static transfer switch
+s+=symCBe(ux+210,140,'var(--p)',false);
+s+=tx2(ux+210,132,'Q5','var(--t2)',4,'middle',1);
+
+// ---- Q1 OUTPUT BREAKER ----
+// Merge point
+s+='<circle cx="'+(ux+245)+'" cy="155" r="1.5" fill="'+c+'"/>';
+s+='<line x1="'+(ux+245)+'" y1="155" x2="'+(ux+245)+'" y2="175" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+s+=symCBe(ux+245,185,c,true);
+s+=tx2(ux+245,175,'Q1','var(--t2)',4,'middle',1);
+s+='<line x1="'+(ux+245)+'" y1="193" x2="'+(ux+245)+'" y2="210" stroke="'+c+'" stroke-width="1.5" opacity=".6"/>';
+s+=flowParticle(ux+245,193,210,1,c);
+
+// ---- OUTPUT symbol ----
+s+='<circle cx="'+(ux+245)+'" cy="218" r="6" fill="none" stroke="'+c+'" stroke-width="1"/>';
+s+='<line x1="'+(ux+242)+'" y1="218" x2="'+(ux+248)+'" y2="218" stroke="'+c+'" stroke-width="1"/>';
+s+='<line x1="'+(ux+245)+'" y1="215" x2="'+(ux+245)+'" y2="221" stroke="'+c+'" stroke-width="1"/>';
+s+=tx2(ux+245,232,'Output','var(--t3)',3.5,'middle');
+
+// ---- Module bar (bottom of SLD panel) ----
+s+='<rect x="'+(ux+5)+'" y="278" width="250" height="16" rx="2" fill="rgba(0,0,0,.2)" stroke="rgba(255,255,255,.05)" stroke-width=".3"/>';
+s+=tx2(ux+130,288,'8 x 1MW MODULES',c,3.5,'middle',1);
+for(var m=0;m<8;m++){var mmx=ux+10+m*31,ml=RI(60,85);
+var mfc=ml<70?'rgba(34,197,94,.15)':ml<80?'rgba(245,158,11,.15)':'rgba(239,68,68,.15)';
+var msc=ml<70?'var(--g)':ml<80?'var(--o)':'var(--r)';
+s+='<rect x="'+mmx+'" y="296" width="26" height="8" rx="1" fill="'+mfc+'" stroke="'+msc+'" stroke-width=".4"/>';
+s+=tx2(mmx+13,303,ml+'%',msc,2.5,'middle')}
+
+// ---- Flow particles on main path ----
+s+=flowParticle(ux+90,90,90,1,c);
+
+// ==== UNIT STATUS panel (right side of unit) ====
+var rx=ux+265;
+s+='<rect x="'+rx+'" y="30" width="185" height="310" rx="4" fill="rgba(30,40,55,.85)" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>';
+s+='<rect x="'+(rx+1)+'" y="31" width="183" height="18" rx="3" fill="rgba(255,255,255,.03)"/>';
+s+=tx2(rx+10,44,'UNIT STATUS — '+label,'var(--t2)',5.5,0,1);
+
+// Status icons row: Load, Input, Bypass, Battery
+var icons=[['Load','var(--g)'],['Input','var(--g)'],['Bypass','var(--t3)'],['Battery','var(--g)']];
+for(var ic=0;ic<4;ic++){var ix=rx+10+ic*44;
+s+='<rect x="'+ix+'" y="54" width="40" height="28" rx="3" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.06)" stroke-width=".3"/>';
+s+=tx2(ix+20,70,icons[ic][0],icons[ic][1],3.5,'middle',1)}
+
+// ---- Load gauge (semicircular) ----
+var gcx=rx+92,gcy=145,gr=48;
+// Gauge background arc
+s+='<path d="M'+(gcx-gr)+' '+gcy+' A'+gr+' '+gr+' 0 0 1 '+(gcx+gr)+' '+gcy+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="6"/>';
+// Gauge tick marks
+for(var tk=0;tk<=10;tk++){var ta=Math.PI*(1-tk/10);
+var t1x=gcx+Math.cos(ta)*(gr-2),t1y=gcy-Math.sin(ta)*(gr-2);
+var t2x=gcx+Math.cos(ta)*(gr+4),t2y=gcy-Math.sin(ta)*(gr+4);
+s+='<line x1="'+t1x.toFixed(1)+'" y1="'+t1y.toFixed(1)+'" x2="'+t2x.toFixed(1)+'" y2="'+t2y.toFixed(1)+'" stroke="rgba(255,255,255,.15)" stroke-width=".5"/>';
+if(tk%2===0)s+=tx2(gcx+Math.cos(ta)*(gr+10),gcy-Math.sin(ta)*(gr+10)+2,(tk*10)+'','var(--t3)',3,'middle')}
+// Gauge colored arc (load percentage)
+var ldPct=RI(65,70);
+var ldAng=Math.PI*(1-ldPct/100);
+var ldEx=gcx+gr*Math.cos(ldAng),ldEy=gcy-gr*Math.sin(ldAng);
+var ldLarge=ldPct>50?1:0;
+var ldColor=ldPct<70?'var(--g)':ldPct<85?'var(--o)':'var(--r)';
+s+='<path id="ug-arc'+sfx+'" d="M'+(gcx-gr)+' '+gcy+' A'+gr+' '+gr+' 0 '+ldLarge+' 1 '+ldEx.toFixed(1)+' '+ldEy.toFixed(1)+'" fill="none" stroke="'+ldColor+'" stroke-width="6" stroke-linecap="round"/>';
+// Center load text
+s+=lv('ug-pct'+sfx,gcx,gcy-10,ldPct+'%',ldColor,14,'middle');
+s+=lv('ug-kw'+sfx,gcx,gcy+2,'Load: '+RI(5100,5500)+' kW','var(--t2)',4.5,'middle');
+
+// ---- Voltage table ----
+var ty=gcy+18;
+s+='<rect x="'+(rx+15)+'" y="'+ty+'" width="155" height="50" rx="2" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.05)" stroke-width=".3"/>';
+// Header row
+s+=tx2(rx+40,ty+10,'Voltage','var(--t3)',3.5,'middle',1);
+s+=tx2(rx+90,ty+10,'A','var(--t3)',3.5,'middle',1);
+s+=tx2(rx+120,ty+10,'B','var(--t3)',3.5,'middle',1);
+s+=tx2(rx+150,ty+10,'C','var(--t3)',3.5,'middle',1);
+// Input row
+s+=tx2(rx+40,ty+21,'Input','var(--t3)',3.5,'middle');
+s+=lv('uv-inA'+sfx,rx+90,ty+21,RI(228,232)+'','var(--g)',3.5,'middle');
+s+=lv('uv-inB'+sfx,rx+120,ty+21,RI(228,232)+'','var(--g)',3.5,'middle');
+s+=lv('uv-inC'+sfx,rx+150,ty+21,RI(228,232)+'','var(--g)',3.5,'middle');
+// Output row
+s+=tx2(rx+40,ty+31,'Output','var(--t3)',3.5,'middle');
+s+=lv('uv-outA'+sfx,rx+90,ty+31,RI(228,232)+'','var(--g)',3.5,'middle');
+s+=lv('uv-outB'+sfx,rx+120,ty+31,RI(228,232)+'','var(--g)',3.5,'middle');
+s+=lv('uv-outC'+sfx,rx+150,ty+31,RI(228,232)+'','var(--g)',3.5,'middle');
+// Bypass row
+s+=tx2(rx+40,ty+41,'Bypass','var(--t3)',3.5,'middle');
+s+=lv('uv-bypA'+sfx,rx+90,ty+41,RI(228,232)+'','var(--t3)',3.5,'middle');
+s+=lv('uv-bypB'+sfx,rx+120,ty+41,RI(228,232)+'','var(--t3)',3.5,'middle');
+s+=lv('uv-bypC'+sfx,rx+150,ty+41,RI(228,232)+'','var(--t3)',3.5,'middle');
+
+// ---- Battery section ----
+var by=ty+58;
+s+=lv('ug-bat'+sfx,rx+92,by,'Battery: '+RI(8,12)+' Min','var(--t3)',4.5,'middle');
 // SOC bar
-s+='<rect x="60" y="130" width="60" height="8" rx="2" fill="rgba(255,255,255,.05)" stroke="var(--o)" stroke-width=".4"/>';
-s+='<rect x="61" y="131" width="56" height="6" rx="1" fill="rgba(34,197,94,.4)"/>';
-s+=lv('mu-soca',90,145,'SOC 98%','var(--g)',4,'middle');
-// BMS + Temp
-s+=tx2(90,155,'BMS: OK','var(--g)',3.5,'middle');
-s+=lv('mu-bta',90,165,RI(22,28)+'°C','var(--c)',3.5,'middle');
-
-// UPS-A live
-s+=lv('mu-ina',90,285,RI(5200,5600)+' kW in','var(--o)',4.5,'middle');
-s+=lv('mu-outa',240,285,RI(5100,5500)+' kW out','var(--g)',4.5,'middle');
-s+=lv('mu-effa',370,285,'η '+R(96.0,96.5)+'%','var(--c)',4.5,'middle');
-
-// UPS-B block
-s+=bx2(470,35,420,300,CG);s+=tx2(680,52,'UPS-'+dh+'B — FEED B — 8MW',CG,6,'middle',1);
-s+=fl2(680,62,680,80,CG,'fD');s+=symCBe(680,90,CG,true,'LSI');s+=tx2(705,87,'ACB-IN',CG,4.5,0,1);s+=tx2(705,97,'4000A/65kA','var(--t3)',4);
-// Idea 12: CB gauge above input ACB UPS-B
-s+=cbGauge(680,72,RI(64,69),CG,'cg-upsB');
-s+=fl2(680,100,680,120,CG,'fD');
-s+=bx2(630,125,100,35,'var(--o)');s+=tx2(680,140,'RECTIFIER','var(--o)',4.5,'middle',1);s+=tx2(680,155,'AC→DC PFC','var(--t3)',3.5,'middle');
-s+=fl2(680,160,680,175,CG,'fD');
-s+=busEtap(580,180,200,'DC BUS 720V',CG,'718 VDC');
-// Idea 9: Bus loading bar UPS-B DC bus
-s+=busLoadBar(580,180,200,RI(64,69),'blb-upsB');
-// Idea 26: voltage profile overlay UPS-B DC bus
-s+='<rect id="vp-upsB" x="580" y="180" width="200" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
-s+=fl2(680,188,680,200,CG,'fD');
-s+=bx2(630,205,100,35,'var(--g)');s+=tx2(680,220,'INVERTER','var(--g)',4.5,'middle',1);s+=tx2(680,235,'DC→AC PWM','var(--t3)',3.5,'middle');
-s+=fl2(680,240,680,260,CG,'fD');s+=symCBe(680,270,CG,true,'LSI');s+=tx2(705,267,'ACB-OUT',CG,4.5,0,1);s+=tx2(705,277,'4000A/65kA','var(--t3)',4);
-s+=bx2(500,120,120,40,'var(--p)');s+=tx2(560,138,'STATIC','var(--p)',4,'middle',1);s+=tx2(560,150,'BYPASS','var(--p)',4,'middle');
-s+=symCBe(560,170,'var(--p)',false);
-s+=bx2(490,290,380,35,CG);s+=tx2(680,302,'8 × 1MW MODULES',CG,4.5,'middle',1);
-// Idea 13: UPS-B module loading heat map
-for(var m=0;m<8;m++){var mx=502+m*46,ml=RI(60,85);
-var mfc=ml<70?'rgba(34,197,94,.2)':ml<80?'rgba(245,158,11,.2)':'rgba(239,68,68,.2)';
-var msc=ml<70?'var(--g)':ml<80?'var(--o)':'var(--r)';
-s+='<rect x="'+mx+'" y="308" width="38" height="12" rx="1" fill="'+mfc+'" stroke="'+msc+'" stroke-width=".5"/>';
-s+=tx2(mx+19,317,ml+'%',msc,3,'middle')}
-
-// Battery-B
-s+=bx2(790,70,80,85,'var(--o)');s+=tx2(830,83,'BATTERY B','var(--o)',4.5,'middle',1);
-s+=tx2(830,100,'NMC LiFePO4','var(--t3)',3.5,'middle');s+=tx2(830,112,'1,333 kWh','var(--t3)',3.5,'middle');
-s+=tx2(830,124,'10 min','var(--t3)',3.5,'middle');
-s+='<rect x="800" y="130" width="60" height="8" rx="2" fill="rgba(255,255,255,.05)" stroke="var(--o)" stroke-width=".4"/>';
-s+='<rect x="801" y="131" width="56" height="6" rx="1" fill="rgba(34,197,94,.4)"/>';
-s+=lv('mu-socb',830,145,'SOC 97%','var(--g)',4,'middle');
-s+=tx2(830,155,'BMS: OK','var(--g)',3.5,'middle');
-s+=lv('mu-btb',830,165,RI(22,28)+'°C','var(--c)',3.5,'middle');
-
-s+=lv('mu-inb',570,285,RI(5100,5500)+' kW in','var(--o)',4.5,'middle');
-s+=lv('mu-outb',720,285,RI(5000,5400)+' kW out','var(--g)',4.5,'middle');
-s+=lv('mu-effb',850,285,'η '+R(96.0,96.4)+'%','var(--c)',4.5,'middle');
-
-// System summary
-s+=sectionSep(340,'SYSTEM SUMMARY');
-s+=bx2(100,350,720,80,'var(--o)');s+=tx2(460,365,'UPS SYSTEM SUMMARY','var(--o)',5.5,'middle',1);
-s+=lv('mu-dcva',180,390,RI(715,725)+' VDC','var(--o)',5);s+=tx2(180,402,'DC Bus A','var(--t3)',3.5);
-s+=lv('mu-dcvb',320,390,RI(714,724)+' VDC','var(--o)',5);s+=tx2(320,402,'DC Bus B','var(--t3)',3.5);
-s+=lv('mu-ldpa',460,390,RI(65,70)+'%','var(--g)',5);s+=tx2(460,402,'Load A','var(--t3)',3.5);
-s+=lv('mu-ldpb',600,390,RI(64,69)+'%','var(--g)',5);s+=tx2(600,402,'Load B','var(--t3)',3.5);
-s+=lv('mu-byp',740,390,'OFF','var(--g)',5);s+=tx2(740,402,'Bypass','var(--t3)',3.5);
-
+s+='<rect x="'+(rx+30)+'" y="'+(by+6)+'" width="125" height="8" rx="2" fill="rgba(255,255,255,.04)" stroke="var(--o)" stroke-width=".3"/>';
+var socPct=RI(94,100);
+var socW=Math.round(123*socPct/100);
+s+='<rect x="'+(rx+31)+'" y="'+(by+7)+'" width="'+socW+'" height="6" rx="1" fill="rgba(34,197,94,.4)"/>';
+s+=lv('ug-soc'+sfx,rx+92,by+22,'SOC '+socPct+'%','var(--g)',5,'middle');
 // Battery health
-s+=bx2(100,445,720,55,'var(--c)');s+=tx2(460,460,'BATTERY HEALTH','var(--c)',5.5,'middle',1);
-s+=lv('mu-soha',200,485,'SOH 99%','var(--g)',5);s+=tx2(200,495,'BAT-A Health','var(--t3)',3.5);
-s+=lv('mu-sohb',360,485,'SOH 98%','var(--g)',5);s+=tx2(360,495,'BAT-B Health','var(--t3)',3.5);
-s+=lv('mu-cyca',520,485,RI(120,200)+' cycles','var(--t2)',5);s+=tx2(520,495,'A Cycles','var(--t3)',3.5);
-s+=lv('mu-cycb',680,485,RI(118,198)+' cycles','var(--t2)',5);s+=tx2(680,495,'B Cycles','var(--t3)',3.5);
+s+=tx2(rx+45,by+32,'SOH','var(--t3)',3.5,'middle');
+s+=lv('ug-soh'+sfx,rx+80,by+32,RI(97,100)+'%','var(--g)',3.5,'middle');
+s+=tx2(rx+110,by+32,'Cycles','var(--t3)',3.5,'middle');
+s+=lv('ug-cyc'+sfx,rx+150,by+32,RI(120,200)+'','var(--t2)',3.5,'middle');
+// BMS + Temp
+s+=tx2(rx+45,by+42,'BMS','var(--t3)',3.5,'middle');
+s+=lv('ug-bms'+sfx,rx+75,by+42,'OK','var(--g)',3.5);
+s+=tx2(rx+110,by+42,'Temp','var(--t3)',3.5,'middle');
+s+=lv('ug-tmp'+sfx,rx+150,by+42,RI(22,28)+'\u00B0C','var(--c)',3.5,'middle');
+
+// ---- Efficiency + power summary at bottom ----
+s+='<rect x="'+(rx+5)+'" y="308" width="175" height="28" rx="2" fill="rgba(0,0,0,.2)" stroke="rgba(255,255,255,.05)" stroke-width=".3"/>';
+s+=lv('ug-pin'+sfx,rx+48,320,RI(5200,5600)+' kW','var(--o)',4,'middle');
+s+=tx2(rx+48,328,'Input','var(--t3)',3);
+s+=lv('ug-pout'+sfx,rx+112,320,RI(5100,5500)+' kW','var(--g)',4,'middle');
+s+=tx2(rx+112,328,'Output','var(--t3)',3);
+s+=lv('ug-eff'+sfx,rx+162,320,R(96.0,96.5)+'%','var(--c)',4,'middle');
+s+=tx2(rx+162,328,'\u03B7','var(--t3)',3,'middle');
+
+// Tooltip zone for entire unit
+s+=tipZone(ux,30,uw,310,'<b>UPS-'+dh+label+' \u2014 Vertiv EXL S1</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>8 MW</span></div><div class=&quot;tt-row&quot;>Topology<span class=&quot;tt-val&quot;>VFI-SS-111 Double Conv</span></div><div class=&quot;tt-row&quot;>Modules<span class=&quot;tt-val&quot;>8 x 1MW</span></div><div class=&quot;tt-row&quot;>Battery<span class=&quot;tt-val&quot;>NMC LiFePO4 1333kWh</span></div><div class=&quot;tt-row&quot;>Breakers<span class=&quot;tt-val&quot;>Q1-Q5 (Q4=Battery)</span></div>',label);
+// CB toggle zones
+s+=cbToggle(ux+58,90,'ups'+sfx+'-q3');
+s+=cbToggle(ux+245,185,'ups'+sfx+'-q1');
+s+=cbToggle(ux+165,195,'ups'+sfx+'-q4');
+}
+
+// Draw both units
+drawUpsUnit(0,'A',CA,'A');
+drawUpsUnit(460,'B',CG,'B');
+
+// ---- System Summary bar (bottom) ----
+s+=sectionSep(350,'SYSTEM SUMMARY');
+s+=bx2(20,360,880,60,'var(--o)');
+s+=tx2(460,375,'UPS SYSTEM SUMMARY \u2014 DH-0'+dh,'var(--o)',5.5,'middle',1);
+s+=lv('mu-dcva',100,395,RI(715,725)+' VDC','var(--o)',5);s+=tx2(100,407,'DC Bus A','var(--t3)',3.5);
+s+=lv('mu-dcvb',240,395,RI(714,724)+' VDC','var(--o)',5);s+=tx2(240,407,'DC Bus B','var(--t3)',3.5);
+s+=lv('mu-ldpa',380,395,RI(65,70)+'%','var(--g)',5);s+=tx2(380,407,'Load A','var(--t3)',3.5);
+s+=lv('mu-ldpb',520,395,RI(64,69)+'%','var(--g)',5);s+=tx2(520,407,'Load B','var(--t3)',3.5);
+s+=lv('mu-byp',660,395,'OFF','var(--g)',5);s+=tx2(660,407,'Bypass','var(--t3)',3.5);
+s+=lv('mu-efft',800,395,R(96.0,96.5)+'%','var(--c)',5);s+=tx2(800,407,'Avg \u03B7','var(--t3)',3.5);
+
+// Battery health row
+s+=bx2(20,430,880,50,'var(--c)');
+s+=tx2(460,445,'BATTERY HEALTH','var(--c)',5.5,'middle',1);
+s+=lv('mu-soha',150,470,'SOH '+RI(98,100)+'%','var(--g)',5);s+=tx2(150,480,'BAT-A','var(--t3)',3.5);
+s+=lv('mu-sohb',320,470,'SOH '+RI(97,100)+'%','var(--g)',5);s+=tx2(320,480,'BAT-B','var(--t3)',3.5);
+s+=lv('mu-cyca',490,470,RI(120,200)+' cycles','var(--t2)',5);s+=tx2(490,480,'A Cycles','var(--t3)',3.5);
+s+=lv('mu-cycb',660,470,RI(118,198)+' cycles','var(--t2)',5);s+=tx2(660,480,'B Cycles','var(--t3)',3.5);
+s+=lv('mu-bms',830,470,'ALL OK','var(--g)',5);s+=tx2(830,480,'BMS','var(--t3)',3.5);
+
+// Nameplate comparison
+s+=nameplate(20,495,[['Rated','2 x 8 MW'],['Actual',R(10.2,11.0)+' MW'],['Margin',RI(28,36)+'%'],['Redundancy','N+1']]);
+
+// Alarm placeholders
+s+='<g id="alm-upsA" style="display:none">'+alarmIcon(200,50,'BATTERY LOW')+'</g>';
+s+='<g id="alm-upsB" style="display:none">'+alarmIcon(660,50,'BATTERY LOW')+'</g>';
+
+// Voltage deviation badge + title block
+s+=vDevBadge(W-120,360);
+s+=titleBlock(W-260,H-48,250,'SLD-UPS-'+dh,'A',dh);
 
 svg.innerHTML=s;
 startTimer(function(){
-[['mu-ina',function(){return RI(5200,5600)+' kW in'}],['mu-outa',function(){return RI(5100,5500)+' kW out'}],['mu-effa',function(){return'η '+R(96.0,96.5)+'%'}],['mu-inb',function(){return RI(5100,5500)+' kW in'}],['mu-outb',function(){return RI(5000,5400)+' kW out'}],['mu-effb',function(){return'η '+R(96.0,96.4)+'%'}],['mu-soca',function(){return'SOC '+RI(94,100)+'%'}],['mu-socb',function(){return'SOC '+RI(93,100)+'%'}],['mu-bta',function(){return RI(22,28)+'°C'}],['mu-btb',function(){return RI(22,28)+'°C'}],['mu-dcva',function(){return RI(715,725)+' VDC'}],['mu-dcvb',function(){return RI(714,724)+' VDC'}],['mu-ldpa',function(){return RI(65,70)+'%'}],['mu-ldpb',function(){return RI(64,69)+'%'}],['mu-byp',function(){return'OFF'}],['mu-soha',function(){return'SOH '+RI(98,100)+'%'}],['mu-sohb',function(){return'SOH '+RI(97,100)+'%'}],['mu-cyca',function(){return RI(120,200)+' cycles'}],['mu-cycb',function(){return RI(118,198)+' cycles'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
-// Idea 9: Bus loading bar dynamic update UPS
-var lp=RI(65,70);var bl=$('blb-upsA');if(bl){bl.setAttribute('width',Math.round(200*lp/100));bl.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
-lp=RI(64,69);bl=$('blb-upsB');if(bl){bl.setAttribute('width',Math.round(200*lp/100));bl.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
-// Idea 26: voltage profile DC bus color update
-var vpu=parseFloat(R(0.97,1.02));var vpe=$('vp-upsA');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
-vpu=parseFloat(R(0.97,1.02));vpe=$('vp-upsB');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu))})}
+// System summary values
+[['mu-dcva',function(){return RI(715,725)+' VDC'}],['mu-dcvb',function(){return RI(714,724)+' VDC'}],['mu-ldpa',function(){return RI(65,70)+'%'}],['mu-ldpb',function(){return RI(64,69)+'%'}],['mu-byp',function(){return'OFF'}],['mu-efft',function(){return R(96.0,96.5)+'%'}],['mu-soha',function(){return'SOH '+RI(98,100)+'%'}],['mu-sohb',function(){return'SOH '+RI(97,100)+'%'}],['mu-cyca',function(){return RI(120,200)+' cycles'}],['mu-cycb',function(){return RI(118,198)+' cycles'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+// Per-unit live updates (A and B)
+['A','B'].forEach(function(sfx){
+var ldP=RI(sfx==='A'?65:64,sfx==='A'?70:69);
+var ldC=ldP<70?'var(--g)':ldP<85?'var(--o)':'var(--r)';
+var e=$('ug-pct'+sfx);if(e){e.textContent=ldP+'%';e.setAttribute('fill',ldC)}
+e=$('ug-kw'+sfx);if(e)e.textContent='Load: '+RI(5100,5600)+' kW';
+e=$('ug-pin'+sfx);if(e)e.textContent=RI(5200,5600)+' kW';
+e=$('ug-pout'+sfx);if(e)e.textContent=RI(5100,5500)+' kW';
+e=$('ug-eff'+sfx);if(e)e.textContent=R(96.0,96.5)+'%';
+e=$('ug-soc'+sfx);if(e)e.textContent='SOC '+RI(94,100)+'%';
+e=$('ug-soh'+sfx);if(e)e.textContent=RI(97,100)+'%';
+e=$('ug-cyc'+sfx);if(e)e.textContent=RI(120,200)+'';
+e=$('ug-tmp'+sfx);if(e)e.textContent=RI(22,28)+'\u00B0C';
+e=$('ug-bat'+sfx);if(e)e.textContent='Battery: '+RI(8,12)+' Min';
+// Per-phase voltages
+['inA','inB','inC','outA','outB','outC','bypA','bypB','bypC'].forEach(function(k){
+var v=$(('uv-'+k+sfx));if(v)v.textContent=RI(228,232)+''});
+// Mode simulation
+var uMode=Math.random();
+e=$('ups-mode'+sfx);if(e){
+if(uMode>.98){e.textContent='DISCHARGE';e.setAttribute('fill','var(--o)')}
+else if(uMode>.95){e.textContent='RECHARGE';e.setAttribute('fill','var(--c)')}
+else{e.textContent='NORMAL';e.setAttribute('fill','var(--g)')}}
+});
+// Alarms
+var alm=$('alm-upsA');if(alm)alm.style.display=Math.random()>.95?'block':'none';
+alm=$('alm-upsB');if(alm)alm.style.display=Math.random()>.95?'block':'none';
+})}
+
+// ===== Battery ESS Detail Modal (Toshiba SCiB style) =====
+var batTimer=null;
+function renderBatteryEss(bSvg,unit,dh){
+if(batTimer){clearInterval(batTimer);batTimer=null}
+var u=unit; // 'A' or 'B'
+var uc=u==='A'?CA:CG; // unit color
+var BW=740,BH=520;
+bSvg.setAttribute('viewBox','0 0 '+BW+' '+BH);
+// Unit-specific base values (A vs B have different ranges)
+var socBase=u==='A'?[96,100]:[94,99];
+var vBase=u==='A'?[478,483]:[475,481];
+var tBase=u==='A'?[23,27]:[25,29];
+var dcBase=u==='A'?[562,568]:[558,565];
+var ldBase=u==='A'?[65,70]:[64,69];
+var dischBase=u==='A'?8:12;
+var cycBase=u==='A'?[120,160]:[140,190];
+var essOff=u==='A'?0:8; // ESS ID offset: A=0-7, B=8-15
+
+var s='';
+// Background
+s+='<rect width="'+BW+'" height="'+BH+'" fill="#0a0e18"/>';
+s+='<defs><pattern id="batGrid'+u+'" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".5"/></pattern></defs>';
+s+='<rect width="'+BW+'" height="'+BH+'" fill="url(#batGrid'+u+')"/>';
+
+// ---- Title bar ----
+s+='<rect x="0" y="0" width="'+BW+'" height="32" fill="rgba(40,50,70,.9)"/>';
+s+='<text x="20" y="21" fill="var(--o)" font-family="'+J+'" font-size="11" font-weight="600">SCiB ESS 480VDC \u2014 System View</text>';
+s+='<text x="'+BW/2+'" y="21" fill="'+uc+'" font-family="'+J+'" font-size="9" text-anchor="middle" font-weight="600">UNIT '+u+' \u2014 DH-0'+dh+'</text>';
+s+='<text x="'+(BW-20)+'" y="21" fill="var(--t3)" font-family="'+J+'" font-size="7" text-anchor="end">TOSHIBA</text>';
+
+// ---- Normal Operation banner ----
+s+='<rect x="20" y="42" width="'+(BW-40)+'" height="28" rx="4" fill="rgba(34,197,94,.08)" stroke="rgba(34,197,94,.3)" stroke-width=".8"/>';
+s+='<circle cx="40" cy="56" r="6" fill="none" stroke="var(--g)" stroke-width="1"/>';
+s+='<path d="M37 56 L39 58 L43 53" fill="none" stroke="var(--g)" stroke-width="1.2"/>';
+s+='<text id="bat-ban'+u+'" x="'+BW/2+'" y="60" fill="var(--g)" font-family="'+J+'" font-size="10" text-anchor="middle" font-weight="600">Normal Operation</text>';
+
+// ---- Left Panel: UPS Reference (unit-specific) ----
+var lpx=20,lpy=82;
+s+='<rect x="'+lpx+'" y="'+lpy+'" width="160" height="130" rx="4" fill="rgba(30,40,55,.7)" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>';
+s+='<rect x="'+(lpx+1)+'" y="'+(lpy+1)+'" width="158" height="18" rx="3" fill="rgba(255,255,255,.03)"/>';
+s+='<text x="'+(lpx+80)+'" y="'+(lpy+13)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="600">UPS-'+dh+u+' REFERENCE</text>';
+// UPS icon with unit color
+s+='<rect x="'+(lpx+55)+'" y="'+(lpy+28)+'" width="50" height="32" rx="3" fill="rgba(139,92,246,.08)" stroke="'+uc+'" stroke-width=".6"/>';
+s+='<text x="'+(lpx+80)+'" y="'+(lpy+48)+'" fill="'+uc+'" font-family="'+J+'" font-size="9" text-anchor="middle" font-weight="700">UPS-'+u+'</text>';
+s+='<text x="'+(lpx+80)+'" y="'+(lpy+70)+'" fill="var(--t2)" font-family="'+J+'" font-size="5" text-anchor="middle">Vertiv EXL S1 8MW</text>';
+// Load bar
+s+='<text x="'+(lpx+40)+'" y="'+(lpy+85)+'" fill="var(--t3)" font-family="'+J+'" font-size="5">Load</text>';
+var uLd=RI(ldBase[0],ldBase[1]);
+s+='<rect x="'+(lpx+70)+'" y="'+(lpy+78)+'" width="70" height="8" rx="2" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.06)" stroke-width=".3"/>';
+s+='<rect id="bat-ldBar'+u+'" x="'+(lpx+71)+'" y="'+(lpy+79)+'" width="'+Math.round(68*uLd/100)+'" height="6" rx="1" fill="rgba(34,197,94,.5)"/>';
+s+='<text id="bat-upsLd'+u+'" x="'+(lpx+105)+'" y="'+(lpy+85)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" font-weight="600">'+uLd+'%</text>';
+// Status
+s+='<text x="'+(lpx+80)+'" y="'+(lpy+100)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Status</text>';
+s+='<rect x="'+(lpx+40)+'" y="'+(lpy+105)+'" width="80" height="14" rx="3" fill="rgba(34,197,94,.08)" stroke="rgba(34,197,94,.2)" stroke-width=".4"/>';
+s+='<text id="bat-upsSt'+u+'" x="'+(lpx+80)+'" y="'+(lpy+115)+'" fill="var(--g)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="600">On-Line</text>';
+
+// ---- Right top: Status / SOC / DC-Link ----
+var rpx=195,rpy=82;
+s+='<rect x="'+rpx+'" y="'+rpy+'" width="'+(BW-rpx-20)+'" height="55" rx="4" fill="rgba(30,40,55,.7)" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>';
+s+='<rect x="'+(rpx+1)+'" y="'+(rpy+1)+'" width="'+(BW-rpx-22)+'" height="18" rx="3" fill="rgba(255,255,255,.03)"/>';
+s+='<text x="'+(rpx+10)+'" y="'+(rpy+13)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" font-weight="600">SYSTEM STATUS \u2014 BAT-'+u+'</text>';
+var initSoc=RI(socBase[0],socBase[1]);
+var initDcV=RI(dcBase[0],dcBase[1]);
+var statCols=[
+['Status','Normal','var(--g)'],
+['State of Charge',initSoc+'%','var(--g)'],
+['DC-Link Voltage',initDcV+' V','var(--o)']
+];
+for(var ci=0;ci<3;ci++){
+var cx=rpx+20+ci*175;
+s+='<text x="'+cx+'" y="'+(rpy+33)+'" fill="var(--t3)" font-family="'+J+'" font-size="5">'+statCols[ci][0]+'</text>';
+s+='<text id="bat-st'+ci+u+'" x="'+cx+'" y="'+(rpy+46)+'" fill="'+statCols[ci][2]+'" font-family="'+J+'" font-size="10" font-weight="600">'+statCols[ci][1]+'</text>';
+}
+
+// ---- Operation Mode / Discharges / Charge Current ----
+var omy=rpy+62;
+s+='<rect x="'+rpx+'" y="'+omy+'" width="'+(BW-rpx-20)+'" height="48" rx="4" fill="rgba(30,40,55,.7)" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>';
+s+='<rect x="'+(rpx+1)+'" y="'+(omy+1)+'" width="'+(BW-rpx-22)+'" height="18" rx="3" fill="rgba(255,255,255,.03)"/>';
+s+='<text x="'+(rpx+10)+'" y="'+(omy+13)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" font-weight="600">OPERATION \u2014 BAT-'+u+'</text>';
+var opsCols=[
+['Operation Mode','Fully Charged','var(--g)'],
+['Discharges',dischBase+'','var(--t2)'],
+['Charge Current','0 A','var(--t3)']
+];
+for(var oi=0;oi<3;oi++){
+var ox=rpx+20+oi*175;
+s+='<text x="'+ox+'" y="'+(omy+33)+'" fill="var(--t3)" font-family="'+J+'" font-size="5">'+opsCols[oi][0]+'</text>';
+s+='<text id="bat-op'+oi+u+'" x="'+ox+'" y="'+(omy+44)+'" fill="'+opsCols[oi][2]+'" font-family="'+J+'" font-size="9" font-weight="600">'+opsCols[oi][1]+'</text>';
+}
+
+// ---- ESS Module Grid (8 modules per unit) ----
+var gx=20,gy=225;
+s+='<rect x="'+gx+'" y="'+gy+'" width="'+(BW-40)+'" height="18" rx="3" fill="rgba(255,255,255,.03)"/>';
+s+='<text x="'+(BW/2)+'" y="'+(gy+13)+'" fill="var(--o)" font-family="'+J+'" font-size="7" text-anchor="middle" font-weight="600">ESS MODULES \u2014 BAT-'+u+' \u2014 NMC LiFePO4 Bank</text>';
+
+gy+=25;
+var mw=160,mh=110,gap=12,cols2=4,rows=2;
+for(var mi=0;mi<8;mi++){
+var mr=Math.floor(mi/cols2),mc=mi%cols2;
+var mx=gx+mc*(mw+gap),my=gy+mr*(mh+gap);
+var essId=essOff+mi; // A: 0-7, B: 8-15
+// Module card
+s+='<rect x="'+mx+'" y="'+my+'" width="'+mw+'" height="'+mh+'" rx="5" fill="rgba(30,40,55,.8)" stroke="rgba(245,158,11,.15)" stroke-width=".6"/>';
+// Header with unit prefix
+s+='<rect x="'+(mx+1)+'" y="'+(my+1)+'" width="'+(mw-2)+'" height="16" rx="4" fill="rgba(245,158,11,.06)"/>';
+s+='<text x="'+(mx+mw/2)+'" y="'+(my+12)+'" fill="var(--o)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="600">ESS '+u+'-'+mi+' (ID '+essId+')</text>';
+
+// Battery icon
+var bix=mx+mw/2,biy=my+48;
+s+='<rect x="'+(bix-16)+'" y="'+(biy-14)+'" width="32" height="28" rx="3" fill="rgba(34,197,94,.06)" stroke="'+uc+'" stroke-width=".7"/>';
+s+='<rect x="'+(bix-5)+'" y="'+(biy-17)+'" width="10" height="4" rx="1" fill="rgba(34,197,94,.15)" stroke="'+uc+'" stroke-width=".5"/>';
+for(var bb=0;bb<4;bb++){
+var barY=biy+10-bb*6;
+s+='<rect x="'+(bix-12)+'" y="'+barY+'" width="24" height="4" rx="1" fill="rgba(34,197,94,.4)" stroke="rgba(34,197,94,.2)" stroke-width=".3"/>';
+}
+s+='<path d="M'+(bix-2)+' '+(biy-8)+' L'+(bix+1)+' '+(biy-2)+' L'+(bix-1)+' '+(biy-2)+' L'+(bix+2)+' '+(biy+6)+' L'+(bix-1)+' '+(biy)+' L'+(bix+1)+' '+(biy)+'" fill="var(--o)" opacity=".6"/>';
+
+// Status
+s+='<text id="bat-mSt'+u+mi+'" x="'+(mx+mw/2)+'" y="'+(my+75)+'" fill="var(--g)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="600">Fully Charged</text>';
+// SOC
+s+='<text x="'+(mx+20)+'" y="'+(my+90)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">SOC</text>';
+s+='<text id="bat-mSoc'+u+mi+'" x="'+(mx+55)+'" y="'+(my+90)+'" fill="var(--g)" font-family="'+J+'" font-size="5" font-weight="600">'+RI(socBase[0],socBase[1])+'%</text>';
+// Voltage
+s+='<text x="'+(mx+85)+'" y="'+(my+90)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">Volt</text>';
+s+='<text id="bat-mV'+u+mi+'" x="'+(mx+115)+'" y="'+(my+90)+'" fill="var(--o)" font-family="'+J+'" font-size="5" font-weight="600">'+R(vBase[0],vBase[1])+' V</text>';
+// Temp
+s+='<text x="'+(mx+20)+'" y="'+(my+102)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">Temp</text>';
+s+='<text id="bat-mT'+u+mi+'" x="'+(mx+55)+'" y="'+(my+102)+'" fill="var(--c)" font-family="'+J+'" font-size="5" font-weight="600">'+RI(tBase[0],tBase[1])+'\u00B0C</text>';
+// Current
+s+='<text x="'+(mx+85)+'" y="'+(my+102)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">I</text>';
+s+='<text id="bat-mI'+u+mi+'" x="'+(mx+115)+'" y="'+(my+102)+'" fill="var(--t2)" font-family="'+J+'" font-size="5" font-weight="600">0 A</text>';
+}
+
+// ---- Bottom summary bar ----
+var sy=gy+rows*(mh+gap)+10;
+s+='<rect x="20" y="'+sy+'" width="'+(BW-40)+'" height="40" rx="4" fill="rgba(30,40,55,.7)" stroke="rgba(245,158,11,.12)" stroke-width=".5"/>';
+s+='<rect x="21" y="'+(sy+1)+'" width="'+(BW-42)+'" height="16" rx="3" fill="rgba(255,255,255,.02)"/>';
+s+='<text x="'+(BW/2)+'" y="'+(sy+12)+'" fill="var(--o)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="600">BATTERY BANK SUMMARY \u2014 BAT-'+u+'</text>';
+var initAvail=RI(8,12),initAvgSoc=RI(socBase[0],socBase[1]),initAvgT=RI(tBase[0],tBase[1]);
+var sumItems=[
+['Total Energy','1,333 kWh','var(--o)'],
+['Available',initAvail+' min','var(--g)'],
+['Avg SOC',initAvgSoc+'%','var(--g)'],
+['Avg Temp',initAvgT+'\u00B0C','var(--c)'],
+['Strings','2S4P','var(--t2)'],
+['Cycles',RI(cycBase[0],cycBase[1])+'','var(--t2)'],
+['BMS','OK','var(--g)']
+];
+for(var si=0;si<sumItems.length;si++){
+var sx2=30+si*100;
+s+='<text x="'+sx2+'" y="'+(sy+28)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">'+sumItems[si][0]+'</text>';
+s+='<text id="bat-sm'+u+si+'" x="'+sx2+'" y="'+(sy+36)+'" fill="'+sumItems[si][2]+'" font-family="'+J+'" font-size="5.5" font-weight="600">'+sumItems[si][1]+'</text>';
+}
+
+bSvg.innerHTML=s;
+
+// Live update timer (all IDs use unit suffix)
+batTimer=setInterval(function(){
+var e=$('bat-st1'+u);if(e)e.textContent=RI(socBase[0],socBase[1])+'%';
+e=$('bat-st2'+u);if(e)e.textContent=RI(dcBase[0],dcBase[1])+' V';
+e=$('bat-op2'+u);if(e)e.textContent=R(0,0.5)+' A';
+var uL=RI(ldBase[0],ldBase[1]);
+e=$('bat-upsLd'+u);if(e)e.textContent=uL+'%';
+var lb=$('bat-ldBar'+u);if(lb)lb.setAttribute('width',Math.round(68*uL/100));
+for(var mi=0;mi<8;mi++){
+e=$('bat-mSoc'+u+mi);if(e)e.textContent=RI(socBase[0],socBase[1])+'%';
+e=$('bat-mV'+u+mi);if(e)e.textContent=R(vBase[0],vBase[1])+' V';
+e=$('bat-mT'+u+mi);if(e)e.textContent=RI(tBase[0],tBase[1])+'\u00B0C';
+e=$('bat-mI'+u+mi);if(e)e.textContent=R(0,0.3)+' A';
+}
+e=$('bat-sm'+u+'1');if(e)e.textContent=RI(8,12)+' min';
+e=$('bat-sm'+u+'2');if(e)e.textContent=RI(socBase[0],socBase[1])+'%';
+e=$('bat-sm'+u+'3');if(e)e.textContent=RI(tBase[0],tBase[1])+'\u00B0C';
+},4000);
+}
 
 // ===== 6. Busway + RPP =====
 function renderBusway(dh){
@@ -4084,11 +5050,19 @@ s+=bx2(40,115,180,420,CA);s+=tx2(130,130,'BW-'+dh+'A 12kA Cu',CA,5,'middle',1);
 s+='<rect x="120" y="140" width="20" height="390" rx="2" fill="rgba(239,68,68,.05)" stroke="'+CA+'" stroke-width=".6"/>';
 // Idea 4: Voltage drop annotation along busway A trunk mid-height
 s+=vDropAnnot(155,300,'-'+R(1.0,2.5),'-'+R(0.3,0.6),CA);
+// Idea 10: Three-phase vertical conductors along busway A trunk
+s+=threePhaseV(130,140,390);
+// Idea 29: Voltage heat map strip along busway A trunk
+s+=busHeatStrip(112,140,390,'bhs-a');
 // Busway B trunk
 s+=bx2(700,115,180,420,CG);s+=tx2(790,130,'BW-'+dh+'B 12kA Cu',CG,5,'middle',1);
 s+='<rect x="780" y="140" width="20" height="390" rx="2" fill="rgba(34,197,94,.05)" stroke="'+CG+'" stroke-width=".6"/>';
 // Idea 4: Voltage drop annotation along busway B trunk mid-height
 s+=vDropAnnot(700,300,'-'+R(1.0,2.5),'-'+R(0.3,0.6),CG);
+// Idea 10: Three-phase vertical conductors along busway B trunk
+s+=threePhaseV(790,140,390);
+// Idea 29: Voltage heat map strip along busway B trunk
+s+=busHeatStrip(802,140,390,'bhs-b');
 // 11 tap-offs — Idea 14: Busway tap-off loading bars
 for(var r=0;r<11;r++){var ry=150+r*35;
 // A side tap-off → RPP
@@ -4126,10 +5100,20 @@ s+=lv('mb-vb',510,505,RI(396,400)+' V',CG,5);s+=tx2(510,515,'Voltage','var(--t3)
 s+=lv('mb-ib',610,505,RI(4700,5300)+' A',CG,5);s+=tx2(610,515,'Current','var(--t3)',3.5);
 s+=lv('mb-lb',710,505,RI(61,69)+'%','var(--g)',5);s+=tx2(710,515,'Load','var(--t3)',3.5);
 s+=lv('mb-tb',810,505,RI(37,47)+'°C','var(--o)',5);s+=tx2(810,515,'Temp','var(--t3)',3.5);
+// Idea 30: Voltage deviation badge
+s+=vDevBadge(W-120,5);
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'SLD-BW-'+dh,'A',dh);
+// Idea 35: Alarm placeholders — Busway temperature high
+s+='<g id="alm-bwA" style="display:none">'+alarmIcon(130,530,'TEMP HIGH')+'</g>';
+s+='<g id="alm-bwB" style="display:none">'+alarmIcon(790,530,'TEMP HIGH')+'</g>';
 
 svg.innerHTML=s;
 startTimer(function(){
-[['mb-va',function(){return RI(396,400)+' V'}],['mb-vb',function(){return RI(396,400)+' V'}],['mb-ia',function(){return RI(4800,5400)+' A'}],['mb-ib',function(){return RI(4700,5300)+' A'}],['mb-la',function(){return RI(62,70)+'%'}],['mb-lb',function(){return RI(61,69)+'%'}],['mb-ta',function(){return RI(38,48)+'°C'}],['mb-tb',function(){return RI(37,47)+'°C'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()})})}
+[['mb-va',function(){return RI(396,400)+' V'}],['mb-vb',function(){return RI(396,400)+' V'}],['mb-ia',function(){return RI(4800,5400)+' A'}],['mb-ib',function(){return RI(4700,5300)+' A'}],['mb-la',function(){return RI(62,70)+'%'}],['mb-lb',function(){return RI(61,69)+'%'}],['mb-ta',function(){return RI(38,48)+'°C'}],['mb-tb',function(){return RI(37,47)+'°C'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+// Idea 35: Random alarm simulation
+var alm=$('alm-bwA');if(alm)alm.style.display=Math.random()>0.95?'block':'none';
+alm=$('alm-bwB');if(alm)alm.style.display=Math.random()>0.95?'block':'none'})}
 
 // ===== 7. Rack Power / PSU =====
 function renderPsu(dh){
@@ -4156,6 +5140,11 @@ s+=bx2(300,165,320,30,'var(--p)');s+=tx2(460,183,'OR-ing FETs — Seamless Failo
 s+=busEtap(100,210,720,'50VDC BUS — 4,000A Cu','var(--o)','50.1 VDC');
 // Idea 26: voltage profile overlay PSU 50VDC bus
 s+='<rect id="vp-psu" x="100" y="210" width="720" height="14" rx="2" fill="rgba(34,197,94,.12)" opacity=".5" pointer-events="none"/>';
+// Idea 8: DC voltage-level gradient overlay on 50VDC bus
+s+='<rect x="100" y="210" width="720" height="14" rx="2" fill="url(#dcGrad)" opacity=".4" pointer-events="none"/>';
+// Idea 22: Flow particles PSU input feeders → 50VDC bus
+s+=flowParticle(160,65,115,1.5,CA);
+s+=flowParticle(680,65,115,1.5,CG);
 // Fuse per tray — Idea 19: IEC fuse symbols
 s+=tx2(460,230,'Fuse per tray — Semiconductor grade','var(--t3)',4,'middle');
 s+=symFuse(420,240,'var(--o)','125A');s+=symFuse(460,240,'var(--o)','125A');s+=symFuse(500,240,'var(--o)','125A');
@@ -4191,6 +5180,12 @@ s+=lv('mp-dcv',300,525,R(49.5,50.5)+' VDC','var(--o)',5);s+=tx2(300,535,'DC Bus'
 s+=lv('mp-dci',420,525,RI(6200,6600)+' A','var(--o)',5);s+=tx2(420,535,'DC Current','var(--t3)',3.5);
 s+=lv('mp-gpu',540,525,RI(4000,4800)+' W','var(--g)',5);s+=tx2(540,535,'GPU Power','var(--t3)',3.5);
 s+=lv('mp-it',660,525,RI(6200,6800)+' W','var(--o)',5);s+=tx2(660,535,'IT Total','var(--t3)',3.5);
+// Idea 30: Voltage deviation badge
+s+=vDevBadge(W-120,5);
+// Idea 7: Bus node ID on 50VDC bus
+s+=busNodeId(95,217,'3-03','var(--o)');
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'SLD-PSU-'+dh,'A',dh);
 
 svg.innerHTML=s;
 startTimer(function(){
@@ -4267,6 +5262,8 @@ s+=bx2(200,510,520,45,'var(--o)');s+=tx2(460,525,'HEAT REJECTION SPLIT','var(--o
 s+=tx2(300,545,'DLC 85%: 6,060 kW','var(--c)',4.5,'middle');
 s+=tx2(460,545,'Air 15%: 1,070 kW','var(--b)',4.5,'middle');
 s+=lv('mc-tot',640,545,RI(7050,7200)+' kW total','var(--g)',4.5,'middle');
+// Idea 37: Title block
+s+=titleBlock(W-260,H-48,250,'PID-COOL-'+dh,'A',dh);
 
 svg.innerHTML=s;
 startTimer(function(){
