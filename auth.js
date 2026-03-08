@@ -7,11 +7,13 @@
 (function () {
     'use strict';
 
-    /* ───────── Load FontAwesome if not present ───────── */
+    /* ───────── Load FontAwesome if not present (async via print/onload pattern) ───────── */
     if (!document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"]')) {
         var fa = document.createElement('link');
         fa.rel = 'stylesheet';
         fa.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        fa.media = 'print';
+        fa.onload = function() { this.media = 'all'; this.onload = null; };
         document.head.appendChild(fa);
     }
 
@@ -250,7 +252,7 @@
     /* ───────── HTML Templates ───────── */
     function authButtonHTML() {
         return '<div class="rz-auth-wrap" id="rzAuthWrap">' +
-            '<button class="rz-login-btn" id="rzLoginBtn" onclick="window._rzAuth.showModal()">' +
+            '<button class="rz-login-btn" id="rzLoginBtn" onclick="window._rzAuth.showModal()" aria-label="Login">' +
                 '<i class="fas fa-user-circle"></i>' +
                 '<span class="rz-login-text">Login</span>' +
             '</button>' +

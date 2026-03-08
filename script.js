@@ -150,33 +150,22 @@ function initNavigation() {
         }
     });
     
-    // Update active nav link based on scroll position (throttled)
-    updateActiveNavLink();
-    window.addEventListener('scroll', throttle(updateActiveNavLink, 100));
-}
-
-function updateActiveNavLink() {
+    // Update active nav link using IntersectionObserver (more efficient than scroll)
     const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    let currentSection = '';
-    const scrollPosition = window.scrollY + 100;
-
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            currentSection = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${currentSection}`) {
-            link.classList.add('active');
-        }
-    });
+    const allNavLinks = document.querySelectorAll('.nav-link');
+    if (sections.length && allNavLinks.length) {
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    allNavLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                    });
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+        sections.forEach(s => sectionObserver.observe(s));
+    }
 }
 
 /* ==========================================
@@ -607,29 +596,34 @@ function initCursorSpotlight() {
    3D Card Tilt Effect
    ========================================== */
 function initCardTilt() {
+    // Skip on touch devices
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
     const cards = document.querySelectorAll('.metric-card, .case-card');
 
     cards.forEach(card => {
+        let tiltRaf = null;
+        card.style.willChange = 'transform';
+
         card.addEventListener('mousemove', function(e) {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
+            if (tiltRaf) return; // throttle to 1 transform per frame
+            tiltRaf = requestAnimationFrame(() => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
 
-            const rotateX = (y - centerY) / 20;
-            const rotateY = (centerX - x) / 20;
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
 
-            card.style.transform = `
-                perspective(1000px)
-                rotateX(${rotateX}deg)
-                rotateY(${rotateY}deg)
-                translateY(-10px)
-                scale(1.02)
-            `;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px) scale(1.02)`;
+                tiltRaf = null;
+            });
         });
 
         card.addEventListener('mouseleave', function() {
+            if (tiltRaf) { cancelAnimationFrame(tiltRaf); tiltRaf = null; }
             card.style.transform = '';
         });
     });

@@ -1,14 +1,26 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    // Load on first user interaction or after 4s idle
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,8 +39,11 @@
     <!-- Resource Hints -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://ipapi.co">
     <!-- Open Graph Meta Tags (og:type=profile for personal branding) -->
     <meta property="og:type" content="profile">
     <meta property="og:url" content="https://resistancezero.com/">
@@ -51,6 +66,9 @@
     <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
     <meta name="twitter:image:alt" content="Bagus Dwi Permana - Engineering Operations Manager and Ahli K3 Listrik">
 
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://ipapi.co https://www.google-analytics.com https://cdn.jsdelivr.net;">
+
     <!-- Theme Color -->
     <meta name="theme-color" content="#0066cc">
     <meta name="msapplication-TileColor" content="#0066cc">
@@ -63,13 +81,13 @@
     <link rel="alternate" type="application/rss+xml" title="Bagus Dwi Permana - Operations Engineering Journal" href="feed.xml">
 
     <!-- Preload Critical Resources for LCP Optimization -->
-    <link rel="preload" href="assets/profile-light.jpg" as="image" fetchpriority="high">
+    <link rel="preload" href="assets/profile-light.webp" as="image" fetchpriority="high" type="image/webp">
 
     <!-- Preconnect to third-party origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"></noscript>
 
     <!-- Critical CSS: above-the-fold styles inlined for fast FCP -->
     <style>
@@ -135,121 +153,8 @@
     </style>
 
     <!-- Full stylesheet loaded asynchronously -->
-    <link rel="stylesheet" href="styles.min.css?v=20260225" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="styles.min.css?v=20260225"></noscript>
-
-    <!-- WebSite Schema for SEO & Sitelinks -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Bagus Dwi Permana Portfolio",
-        "alternateName": ["Bagus Permana", "Data Center Operations Expert"],
-        "url": "https://resistancezero.com/",
-        "description": "Engineering Operations Manager & Ahli K3 Listrik specializing in Data Center Infrastructure",
-        "inLanguage": ["en", "id"],
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://resistancezero.com/articles.html?q={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-        },
-        "author": {
-            "@type": "Person",
-            "name": "Bagus Dwi Permana"
-        }
-    }
-    </script>
-
-    <!-- SiteNavigationElement Schema for Rich Results -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SiteNavigationElement",
-        "name": ["Home", "DC Solutions", "Results", "Case Studies", "Articles", "Contact"],
-        "url": [
-            "https://resistancezero.com/",
-            "https://resistancezero.com/datacenter-solutions.html",
-            "https://resistancezero.com/#metrics",
-            "https://resistancezero.com/#case-studies",
-            "https://resistancezero.com/articles.html",
-            "https://resistancezero.com/#contact"
-        ]
-    }
-    </script>
-
-    <!-- Organization Schema for Brand Recognition -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Bagus Dwi Permana - Engineering Operations",
-        "url": "https://resistancezero.com/",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://resistancezero.com/assets/profile-photo.jpg",
-            "width": 1200,
-            "height": 630
-        },
-        "founder": {
-            "@type": "Person",
-            "name": "Bagus Dwi Permana",
-            "jobTitle": "Engineering Operations Manager"
-        },
-        "sameAs": [
-            "https://www.linkedin.com/in/bagus-dwi-permana-ba90b092",
-            "https://github.com/baguspermana7-cpu",
-            "https://wa.me/6281216874606"
-        ],
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+6281216874606",
-            "contactType": "Professional Services",
-            "email": "baguspermana7@gmail.com",
-            "availableLanguage": ["English", "Indonesian"]
-        }
-    }
-    </script>
-
-    <!-- Structured Data - ProfilePage -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "ProfilePage",
-        "mainEntity": {
-            "@type": "Person",
-            "name": "Bagus Dwi Permana",
-            "alternateName": "Bagus Permana",
-            "jobTitle": "Engineering Operations Manager",
-            "description": "Engineering Operations Manager specializing in Data Center Infrastructure, Critical Systems, and Operational Excellence",
-            "url": "https://resistancezero.com/",
-            "image": "https://resistancezero.com/assets/profile-photo.jpg",
-            "knowsAbout": [
-                "Data Center Operations",
-                "Critical Infrastructure Management",
-                "HVAC & Mechanical Systems",
-                "Electrical Power Distribution",
-                "Operational Excellence",
-                "Safety Management Systems",
-                "Preventive & Predictive Maintenance",
-                "Building Management Systems"
-            ],
-            "hasCredential": [
-                {
-                    "@type": "EducationalOccupationalCredential",
-                    "credentialCategory": "Professional Certification",
-                    "name": "Ahli K3 Listrik"
-                }
-            ],
-            "sameAs": [
-                "https://www.linkedin.com/in/bagus-dwi-permana-ba90b092",
-                "https://github.com/baguspermana7-cpu"
-            ]
-        }
-    }
-    </script>
+    <link rel="stylesheet" href="styles.min.css?v=20260308" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="styles.min.css?v=20260308"></noscript>
 
     <link rel="prefetch" href="articles.html">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
@@ -260,7 +165,7 @@
     <div class="search-modal" id="searchModal">
         <div class="search-input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, and tools">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -281,10 +186,10 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Scroll Progress Bar -->
-    <div class="scroll-progress" id="scrollProgress"></div>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
     <!-- Cursor Spotlight Effect -->
-    <div class="cursor-spotlight" id="cursorSpotlight"></div>
+    <div class="cursor-spotlight" id="cursorSpotlight" aria-hidden="true"></div>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -382,9 +287,9 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-background"></div>
-        <canvas id="particles-canvas" class="particles-canvas"></canvas>
+        <canvas id="particles-canvas" class="particles-canvas" aria-hidden="true"></canvas>
         <!-- Floating Decorative Shapes -->
-        <div class="floating-shapes">
+        <div class="floating-shapes" aria-hidden="true">
             <div class="floating-shape floating-shape-1"></div>
             <div class="floating-shape floating-shape-2"></div>
             <div class="floating-shape floating-shape-3"></div>
@@ -407,8 +312,14 @@
                 </div>
                 <div class="bento-card bento-photo-card">
                     <div class="bento-photo-gradient"></div>
-                    <img src="assets/profile-light.jpg" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img hero-photo-day" fetchpriority="high" width="400" height="519">
-                    <img src="assets/profile-dark.jpg" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img hero-photo-dark" loading="lazy" decoding="async" width="400" height="481">
+                    <picture class="hero-photo-day">
+                        <source srcset="assets/profile-light.webp" type="image/webp">
+                        <img src="assets/profile-light.jpg" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img" fetchpriority="high" width="400" height="519">
+                    </picture>
+                    <picture class="hero-photo-dark">
+                        <source srcset="assets/profile-dark.webp" type="image/webp">
+                        <img src="assets/profile-dark.jpg" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img" loading="lazy" decoding="async" width="400" height="481">
+                    </picture>
                     <div class="bento-photo-info">
                         <p class="bento-status-title">Data Center Engineering Professional</p>
                     </div>
@@ -421,7 +332,7 @@
                 <div class="bento-card bento-exp-card">
                     <div class="bento-exp-top">
                         <span class="bento-tag">2011</span>
-                        <img src="assets/zte.svg" alt="ZTE" class="bento-company-logo">
+                        <img src="assets/zte.svg" alt="ZTE" class="bento-company-logo" width="32" height="32">
                     </div>
                     <div class="bento-exp-bottom">
                         <h3 class="bento-exp-company">ZTE Corporation</h3>
@@ -431,7 +342,7 @@
                 <div class="bento-card bento-exp-card bento-exp-award">
                     <div class="bento-exp-top">
                         <span class="bento-tag">2014</span>
-                        <img src="assets/aal.svg" alt="Astra" class="bento-company-logo">
+                        <img src="assets/aal.svg" alt="Astra" class="bento-company-logo" width="32" height="32">
                     </div>
                     <div class="bento-exp-bottom">
                         <h3 class="bento-exp-company">Astra Agro Lestari</h3>
@@ -443,7 +354,7 @@
                     <div class="bento-exp-top">
                         <span class="bento-tag">2018</span>
                         <img src="assets/Cargill.webp" alt="Cargill" class="bento-company-logo bento-logo-lg exp-logo-cargill-day" width="279" height="181">
-                        <img src="assets/Cargilldarkmode.webp" alt="Cargill" class="bento-company-logo bento-logo-lg exp-logo-cargill-dark" width="300" height="168">
+                        <img src="assets/Cargilldarkmode.webp" alt="Cargill" class="bento-company-logo bento-logo-lg exp-logo-cargill-dark" width="300" height="168" loading="lazy" decoding="async">
                     </div>
                     <div class="bento-exp-bottom">
                         <h3 class="bento-exp-company">Cargill Indonesia</h3>
@@ -454,8 +365,8 @@
                 <div class="bento-card bento-exp-card">
                     <div class="bento-exp-top">
                         <span class="bento-tag">2020</span>
-                        <img src="assets/aws-day.svg" alt="AWS" class="bento-company-logo bento-logo-lg exp-logo-aws-day">
-                        <img src="assets/aws-dark.svg" alt="AWS" class="bento-company-logo bento-logo-lg exp-logo-aws-dark">
+                        <img src="assets/aws-day.svg" alt="AWS" class="bento-company-logo bento-logo-lg exp-logo-aws-day" width="38" height="38">
+                        <img src="assets/aws-dark.svg" alt="AWS" class="bento-company-logo bento-logo-lg exp-logo-aws-dark" width="38" height="38">
                     </div>
                     <div class="bento-exp-bottom">
                         <h3 class="bento-exp-company">Amazon Web Services</h3>
@@ -524,7 +435,7 @@
     </section>
 
     <!-- Data Flow Lines SVG -->
-    <div class="flow-lines-section">
+    <div class="flow-lines-section" aria-hidden="true">
         <svg class="flow-svg" viewBox="0 0 1200 100" preserveAspectRatio="none">
             <path class="flow-line" d="M0,50 Q300,20 600,50 T1200,50" />
             <path class="flow-line-subtle" d="M0,30 Q400,60 800,30 T1200,30" />
@@ -955,37 +866,37 @@
                         <div class="certifications-grid">
                             <div class="certifications-grid">
     <div class="cert-item" title="Indonesia Electrical Safety Expert (AK3L)">
-        <img loading="lazy" decoding="async" src="Article/badges/Ahli K3 Listrik Indonesia.webp" alt="Ahli K3 Listrik Indonesia (AK3L) - Certified Electrical Safety Expert Badge held by Bagus Dwi Permana">
+        <img loading="lazy" decoding="async" src="Article/badges/Ahli K3 Listrik Indonesia.webp" alt="Ahli K3 Listrik Indonesia (AK3L) - Certified Electrical Safety Expert Badge held by Bagus Dwi Permana" width="80" height="60">
         <span class="cert-name">Indonesia Electrical Safety Expert (AK3L)</span>
     </div>
     <div class="cert-item" title="Data Centre Facilities Operation Manager (CDFOM)">
-        <img loading="lazy" decoding="async" src="Article/badges/cdfom.png" alt="CDFOM Certification Badge - Data Centre Facilities Operation Manager credential for Technical Program Management">
+        <img loading="lazy" decoding="async" src="Article/badges/cdfom.webp" alt="CDFOM Certification Badge - Data Centre Facilities Operation Manager credential for Technical Program Management" width="80" height="60">
         <span class="cert-name">CDFOM - Data Centre Facilities Operation Manager</span>
     </div>
     <div class="cert-item" title="SKTTK L6 Manager - Ministry of Energy and Mineral Resources">
-        <img loading="lazy" decoding="async" src="Article/badges/SKTTK L6 Manager.png" alt="SKTTK L6 Manager Badge - Ministry of Energy and Mineral Resources Competency Certification for Engineering Operations">
+        <img loading="lazy" decoding="async" src="Article/badges/SKTTK L6 Manager.webp" alt="SKTTK L6 Manager Badge - Ministry of Energy and Mineral Resources Competency Certification for Engineering Operations" width="80" height="60">
         <span class="cert-name">L6 Competent Manager-Ministry of Energy and Mineral Resources</span>
     </div>
     <div class="cert-item" title="IOSH Managing Safely">
-        <img loading="lazy" decoding="async" src="Article/badges/IOSH Managing safely.jpg" alt="IOSH Managing Safely Certificate Badge - International Occupational Safety and Health credential for Operations Leadership">
+        <img loading="lazy" decoding="async" src="Article/badges/IOSH Managing safely.webp" alt="IOSH Managing Safely Certificate Badge - International Occupational Safety and Health credential for Operations Leadership" width="80" height="60">
         <span class="cert-name">IOSH Managing Safely</span>
     </div>
     
     <div class="cert-item" title="High Voltage Authorized Person">
         <img loading="lazy" decoding="async" src="Article/badges/High Voltage Authorized Person.webp"
-             alt="High Voltage Authorized Person Badge - Ahli K3 Listrik qualification for HV electrical systems safety">
+             alt="High Voltage Authorized Person Badge - Ahli K3 Listrik qualification for HV electrical systems safety" width="80" height="60">
         <span class="cert-name">High Voltage Authorized Person</span>
     </div>
 
     <div class="cert-item" title="Low Voltage Authorized Person">
         <img loading="lazy" decoding="async" src="Article/badges/Low Voltage Authorized Person.webp"
-             alt="Low Voltage Authorized Person Badge - Engineering Operations Manager electrical safety certification">
+             alt="Low Voltage Authorized Person Badge - Engineering Operations Manager electrical safety certification" width="80" height="60">
         <span class="cert-name">Low Voltage Authorized Person</span>
     </div>
 
     <div class="cert-item" title="Senior Authorized Person">
         <img loading="lazy" decoding="async" src="Article/badges/Senior Authorized Person.webp"
-             alt="Senior Authorized Person Badge - Advanced electrical systems authorization for critical infrastructure operations">
+             alt="Senior Authorized Person Badge - Advanced electrical systems authorization for critical infrastructure operations" width="80" height="60">
         <span class="cert-name">Senior Authorized Person</span>
     </div>
 </div>
@@ -994,7 +905,10 @@
                 </div>
                 <div class="about-visual fade-in delay-1">
                     <div class="about-image-wrapper">
-                        <img loading="lazy" decoding="async" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana - Certified Ahli K3 Listrik with 12+ Years Professional Experience in Critical Infrastructure" class="about-image" width="400" height="400">
+                        <picture>
+                            <source srcset="assets/profile-photo.webp" type="image/webp">
+                            <img loading="lazy" decoding="async" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana - Certified Ahli K3 Listrik with 12+ Years Professional Experience in Critical Infrastructure" class="about-image" width="400" height="400">
+                        </picture>
                     </div>
                     <div class="experience-card">
                         <div class="exp-number gradient-text">12+</div>
@@ -1236,7 +1150,7 @@
         </a>
     </div>
 
-    <script src="script.min.js?v=20260225"></script>
+    <script src="script.min.js?v=20260308" defer></script>
 
     <!-- Advanced Schema.org JSON-LD - Person Type (Perfect 100) -->
     <script type="application/ld+json">
@@ -1506,22 +1420,24 @@
         var tickerContent = document.getElementById('tickerContent');
         if (!tickerContent) return;
         // Adjust animation duration based on content width
-        setTimeout(function() {
-            var contentWidth = tickerContent.scrollWidth / 2;
-            var duration = Math.max(20, contentWidth / 50);
-            tickerContent.style.animationDuration = duration + 's';
-        }, 100);
+        var contentWidth = tickerContent.scrollWidth / 2;
+        var duration = Math.max(20, contentWidth / 50);
+        tickerContent.style.animationDuration = duration + 's';
     })();
     </script>
 
-    <!-- Hero Particle System -->
+    <!-- Hero Particle System (deferred) -->
     <script>
+    (typeof requestIdleCallback==='function'?requestIdleCallback:function(cb){setTimeout(cb,200)})(function(){
     (function(){
         var cv=document.getElementById('particles-canvas');
         if(!cv)return;
+        // Reduce particles on mobile for performance
+        var isMobile=window.innerWidth<=768;
+        if(isMobile)return; // particles hidden via CSS on mobile
         var ctx=cv.getContext('2d',{alpha:true,desynchronized:true});
         var W,H,dpr,particles=[],mouse={x:-9999,y:-9999},raf;
-        var COUNT=22,CONNECT_DIST=140,MOUSE_R=100,FRICTION=0.97;
+        var COUNT=15,CONNECT_DIST=140,MOUSE_R=100,FRICTION=0.97;
 
         function isDark(){return document.documentElement.getAttribute('data-theme')==='dark'}
 
@@ -1657,8 +1573,9 @@
 
         init();
     })();
+    });
     </script>
-<script src="auth.js?v=20260228"></script>
+<script src="auth.js?v=20260308" defer></script>
 <script>
 // Defer rz-tracker to after main content is interactive
 (typeof requestIdleCallback==='function'?requestIdleCallback:function(cb){setTimeout(cb,2000)})(function(){
@@ -1681,7 +1598,7 @@
 </button>
 
 <script>
-(function(){
+(typeof requestIdleCallback==='function'?requestIdleCallback:function(cb){setTimeout(cb,0)})(function(){
     // Cookie Banner
     var cb = document.getElementById('cookieBanner');
     var consent = localStorage.getItem('rz_cookie_consent');
@@ -1697,7 +1614,6 @@
     if (declineBtn) declineBtn.addEventListener('click', function(){
         localStorage.setItem('rz_cookie_consent', 'declined');
         cb.classList.add('hidden');
-        // Disable GA
         window['ga-disable-G-GED7FX8RTV'] = true;
     });
 
@@ -1722,11 +1638,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
-})();
+});
 </script>
 
-<!-- ═══ Feature 21: Global Search ═══ -->
+<!-- ═══ Feature 21: Global Search (deferred) ═══ -->
 <script>
+(typeof requestIdleCallback==='function'?requestIdleCallback:function(cb){setTimeout(cb,100)})(function(){
 (function() {
     var searchBtn = document.getElementById('navSearchBtn');
     var overlay = document.getElementById('searchOverlay');
@@ -2028,7 +1945,14 @@
         });
     }
 })();
+});
 </script>
+
+<!-- JSON-LD Schemas (moved from head for faster parsing) -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bagus Dwi Permana Portfolio","alternateName":["Bagus Permana","Data Center Operations Expert"],"url":"https://resistancezero.com/","description":"Engineering Operations Manager & Ahli K3 Listrik specializing in Data Center Infrastructure","inLanguage":["en","id"],"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://resistancezero.com/articles.html?q={search_term_string}"},"query-input":"required name=search_term_string"},"author":{"@type":"Person","name":"Bagus Dwi Permana"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SiteNavigationElement","name":["Home","DC Solutions","Results","Case Studies","Articles","Contact"],"url":["https://resistancezero.com/","https://resistancezero.com/datacenter-solutions.html","https://resistancezero.com/#metrics","https://resistancezero.com/#case-studies","https://resistancezero.com/articles.html","https://resistancezero.com/#contact"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Bagus Dwi Permana - Engineering Operations","url":"https://resistancezero.com/","logo":{"@type":"ImageObject","url":"https://resistancezero.com/assets/profile-photo.jpg","width":1200,"height":630},"founder":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"},"sameAs":["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092","https://github.com/baguspermana7-cpu","https://wa.me/6281216874606"],"contactPoint":{"@type":"ContactPoint","telephone":"+6281216874606","contactType":"Professional Services","email":"baguspermana7@gmail.com","availableLanguage":["English","Indonesian"]}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfilePage","mainEntity":{"@type":"Person","name":"Bagus Dwi Permana","alternateName":"Bagus Permana","jobTitle":"Engineering Operations Manager","description":"Engineering Operations Manager specializing in Data Center Infrastructure, Critical Systems, and Operational Excellence","url":"https://resistancezero.com/","image":"https://resistancezero.com/assets/profile-photo.jpg","knowsAbout":["Data Center Operations","Critical Infrastructure Management","HVAC & Mechanical Systems","Electrical Power Distribution","Operational Excellence","Safety Management Systems","Preventive & Predictive Maintenance","Building Management Systems"],"hasCredential":[{"@type":"EducationalOccupationalCredential","credentialCategory":"Professional Certification","name":"Ahli K3 Listrik"}],"sameAs":["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092","https://github.com/baguspermana7-cpu"]}}</script>
 
 </body>
 </html>

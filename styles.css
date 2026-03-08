@@ -1167,7 +1167,7 @@ a {
 .bento-tag {
     font-family: 'JetBrains Mono', 'Courier New', monospace;
     font-size: 0.5rem;
-    color: var(--gray-500);
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -1177,7 +1177,7 @@ a {
 }
 
 [data-theme="dark"] .bento-tag {
-    color: #94a3b8;
+    color: #cbd5e1;
     border-color: rgba(255, 255, 255, 0.05);
 }
 
@@ -1203,7 +1203,7 @@ a {
 }
 
 .bento-desc {
-    color: var(--gray-600);
+    color: #4b5563;
     font-size: 1.1rem;
     line-height: 1.7;
     max-width: 640px;
@@ -1211,11 +1211,14 @@ a {
 }
 
 [data-theme="dark"] .bento-desc {
-    color: #94a3b8;
+    color: #cbd5e1;
 }
 
 .bento-accent-text {
-    color: var(--accent-emerald);
+    color: #059669;
+}
+[data-theme="dark"] .bento-accent-text {
+    color: #34d399;
 }
 
 .bento-cta {
@@ -1409,9 +1412,12 @@ a {
 .bento-exp-badge {
     font-size: 0.5625rem;
     font-weight: 700;
-    color: var(--accent-emerald);
+    color: #059669;
     text-transform: uppercase;
     margin-bottom: 0.25rem;
+}
+[data-theme="dark"] .bento-exp-badge {
+    color: #34d399;
 }
 
 .bento-badge-orange {
@@ -1433,12 +1439,12 @@ a {
 
 .bento-exp-desc {
     font-size: 0.625rem;
-    color: var(--gray-500);
+    color: #6b7280;
     line-height: 1.5;
 }
 
 [data-theme="dark"] .bento-exp-desc {
-    color: #64748b;
+    color: #94a3b8;
 }
 
 /* Experience Card Variants */
@@ -2924,6 +2930,7 @@ section {
     stroke-dasharray: 10 5;
     fill: none;
     animation: flowAnimation 2s linear infinite;
+    will-change: transform;
     filter: drop-shadow(0 0 4px var(--accent-gold));
     opacity: 0.7;
 }
@@ -2934,6 +2941,7 @@ section {
     stroke-dasharray: 5 10;
     fill: none;
     animation: flowAnimation 3s linear infinite;
+    will-change: transform;
     filter: drop-shadow(0 0 3px var(--accent-orange));
     opacity: 0.5;
 }
@@ -6328,3 +6336,53 @@ section {
     .scroll-top-btn { bottom: 90px; right: 16px; }
 }
 @media print { .scroll-top-btn { display: none; } }
+
+/* ==========================================
+   Accessibility: Focus-Visible Styles
+   ========================================== */
+:focus-visible {
+    outline: 2px solid var(--accent-blue, #5ba3cb);
+    outline-offset: 2px;
+}
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--accent-gold);
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   Accessibility: Prefers Reduced Motion
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .ticker-content { animation: none !important; }
+    .particles-canvas { display: none !important; }
+    .cursor-spotlight { display: none !important; }
+    .floating-shapes { display: none !important; }
+    .flow-line, .flow-line-subtle { animation: none !important; }
+    .fade-in { opacity: 1 !important; transform: none !important; }
+}
+
+/* Mobile: disable decorative animations for performance */
+@media (max-width: 768px) {
+    .flow-line, .flow-line-subtle { animation: none; }
+    .floating-shapes { display: none; }
+}
+
+/* ==========================================
+   Performance: content-visibility for below-fold
+   ========================================== */
+.metrics,
+.case-studies,
+.about,
+.faq,
+.contact,
+footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+}
