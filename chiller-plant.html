@@ -138,7 +138,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .hist-item.warn .lvl{border-color:rgba(182,141,73,.62);background:rgba(182,141,73,.18);color:#e2c78d}
 .hist-item.alarm .lvl{border-color:rgba(187,93,93,.66);background:rgba(187,93,93,.18);color:#ebb8b8}
 
-.grid line{stroke:rgba(148,163,184,.10);stroke-width:1}
+.grid line{stroke:rgba(148,163,184,.05);stroke-width:1}
 .frame{fill:rgba(21,31,44,.34);stroke:#53657d;stroke-width:1.2;stroke-dasharray:4 5}
 .section-title{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;letter-spacing:.05em;fill:#dce4ef}
 .label{font-family:"JetBrains Mono",monospace;font-size:12px;fill:#b4c2d3}
@@ -149,8 +149,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .panel-warn{stroke:var(--warn)}
 .panel-alarm{stroke:var(--alarm)}
 .field-box{fill:#213044;stroke:#60738d;stroke-width:1}
-.pipe{fill:none;stroke:#697b92;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-.flow{fill:none;stroke-width:1.8;stroke-dasharray:8 7;animation:flow 6s linear infinite;stroke-linecap:round}
+.pipe{fill:none;stroke:#697b92;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.flow{fill:none;stroke-width:2.4;stroke-dasharray:8 7;animation:flow 6s linear infinite;stroke-linecap:round}
 .flow.chws{stroke:var(--chws)}
 .flow.chwr{stroke:var(--chwr);animation-direction:reverse;animation-duration:6.3s}
 .flow.broken{stroke:var(--alarm)!important;stroke-dasharray:7 7;animation-duration:1.3s!important}
@@ -172,7 +172,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .sup-card{fill:url(#gSupCard);stroke:#4e6580;stroke-width:1.2;rx:8}
 .sup-card-hdr{fill:#1e3348;stroke:none}
 .sup-title{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.06em;fill:#8fa8c4;text-transform:uppercase}
-.sup-val{font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700;fill:#e8eef6}
+.sup-val{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:700;fill:#e8eef6}
 .sup-unit-sm{font-family:"JetBrains Mono",monospace;font-size:11px;fill:#8fa0b4}
 .sup-divider{stroke:#3a4f66;stroke-width:1}
 .zone-label{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;fill:#6b8199;letter-spacing:.08em;text-transform:uppercase}
@@ -705,8 +705,8 @@ function loopSvg(loop, pos){
     ${text(x+w-108,supY+3,"unit","CHWS OUT")}
     <rect x="${x+w-118}" y="${retY-12}" width="96" height="20" rx="6" class="field-box" />
     ${text(x+w-108,retY+3,"unit","CHWR IN")}
-    <circle cx="${portX}" cy="${supY}" r="5" class="tee" />
-    <circle cx="${portX}" cy="${retY}" r="5" class="tee" />
+    <circle cx="${portX}" cy="${supY}" r="7" class="tee" />
+    <circle cx="${portX}" cy="${retY}" r="7" class="tee" />
 
     <!-- ISA instrument bubbles -->
     ${isaBubble(ins.x+28, y+220, "FT", `${loop.id}01`)}
@@ -757,8 +757,8 @@ function drawPid(){
       <line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="${fs}" />
       <line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="pipe" />
       <line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="${fs}" />
-      <circle cx="${bxS}" cy="${HDR_CHWS_Y}" r="5" class="tee" />
-      <circle cx="${bxS}" cy="${supY}" r="5" class="tee" />
+      <circle cx="${bxS}" cy="${HDR_CHWS_Y}" r="7" class="tee" />
+      <circle cx="${bxS}" cy="${supY}" r="7" class="tee" />
       ${flowArrow(bxS, HDR_CHWS_Y+18, "down", "supply")}
       ${i===0?`<text x="${bxS-16}" y="${HDR_CHWS_Y+32}" class="pipe-label">DN100</text>`:''}
 
@@ -766,8 +766,8 @@ function drawPid(){
       <line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="${fr}" />
       <line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="pipe" />
       <line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="${fr}" />
-      <circle cx="${bxR}" cy="${HDR_CHWR_Y}" r="5" class="tee" />
-      <circle cx="${bxR}" cy="${retY}" r="5" class="tee" />
+      <circle cx="${bxR}" cy="${HDR_CHWR_Y}" r="7" class="tee" />
+      <circle cx="${bxR}" cy="${retY}" r="7" class="tee" />
       ${flowArrow(bxR, retY-20, "up", "return")}
     `;
   }).join("");
@@ -844,10 +844,10 @@ function drawPid(){
 
     <line x1="${PZ_X+PZ_W+8}" y1="${PZ_Y+4}" x2="${PZ_X+PZ_W+8}" y2="${VH-140}" class="sup-divider" stroke-dasharray="6 4" />
 
-    <!-- Building Load symbol at header ends -->
-    <rect x="${HDR_X2+6}" y="${HDR_CHWS_Y-30}" width="80" height="${HDR_CHWR_Y-HDR_CHWS_Y+60}" rx="6" fill="rgba(98,140,183,.06)" stroke="rgba(98,140,183,.3)" stroke-width="1" stroke-dasharray="4 3" />
-    ${text(HDR_X2+14, HDR_CHWS_Y-14, "zone-label", "BUILDING")}
-    ${text(HDR_X2+14, HDR_CHWS_Y-4, "zone-label", "AHU LOAD")}
+    <!-- Building Load symbol at header ends (item 47: larger) -->
+    <rect x="${HDR_X2+6}" y="${HDR_CHWS_Y-40}" width="100" height="${HDR_CHWR_Y-HDR_CHWS_Y+80}" rx="8" fill="rgba(98,140,183,.08)" stroke="rgba(98,140,183,.4)" stroke-width="1.2" stroke-dasharray="4 3" />
+    ${text(HDR_X2+16, HDR_CHWS_Y-20, "label", "BUILDING")}
+    ${text(HDR_X2+16, HDR_CHWS_Y-4, "label", "AHU LOAD")}
     ${flowArrow(HDR_X2+6, HDR_CHWS_Y, "right", "supply")}
     ${flowArrow(HDR_X2+6, HDR_CHWR_Y, "left", "return")}
 
@@ -857,7 +857,6 @@ function drawPid(){
     ${text(HDR_X1+8,HDR_CHWS_Y-8,"hdr-pipe-label supply","CHWS SUPPLY HEADER")}
     ${flowArrow(HDR_X1+195, HDR_CHWS_Y, "right", "supply")}
     ${text(HDR_X2-40, HDR_CHWS_Y-8, "pipe-label", "DN200")}
-    ${isaBubble(HDR_X1-30, HDR_CHWS_Y, "PT", "001")}
 
     <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />
     <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="flow chwr" />
@@ -865,7 +864,6 @@ function drawPid(){
     ${text(HDR_X1+8,HDR_CHWR_Y+18,"hdr-pipe-label return","CHWR RETURN HEADER")}
     ${flowArrow(HDR_X1+195, HDR_CHWR_Y, "left", "return")}
     ${text(HDR_X2-40, HDR_CHWR_Y+18, "pipe-label", "DN200")}
-    ${isaBubble(HDR_X1-30, HDR_CHWR_Y, "PT", "002")}
 
     <!-- Row 1: Flow, DP, Delta-T -->
     <rect x="${CX}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
@@ -873,7 +871,7 @@ function drawPid(){
     <line x1="${CX}" y1="${R1Y+22}" x2="${CX+C3W}" y2="${R1Y+22}" class="sup-divider" />
     ${text(CX+12,R1Y+16,"sup-title","HEADER FLOW")}
     ${text(CX+12,R1Y+52,"sup-val",hFlow)}
-    ${sparkline(CX+12, R1Y+62, C3W-24, 20, st.spark.flow, "var(--chws)")}
+    ${sparkline(CX+12, R1Y+60, C3W-24, 30, st.spark.flow, "var(--chws)")}
     ${text(CX+12,R1Y+96,"sup-unit-sm","MFM \u2022 Header")}
 
     <rect x="${CX+C3W+10}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
@@ -881,7 +879,7 @@ function drawPid(){
     <line x1="${CX+C3W+10}" y1="${R1Y+22}" x2="${CX+C3W*2+10}" y2="${R1Y+22}" class="sup-divider" />
     ${text(CX+C3W+22,R1Y+16,"sup-title","DIFFERENTIAL PRESSURE")}
     ${text(CX+C3W+22,R1Y+52,"sup-val",hDp)}
-    ${sparkline(CX+C3W+22, R1Y+62, C3W-32, 20, st.spark.dp, "#7f93ab")}
+    ${sparkline(CX+C3W+22, R1Y+60, C3W-32, 30, st.spark.dp, "#7f93ab")}
     ${text(CX+C3W+22,R1Y+96,"sup-unit-sm","Avg DPS1/DPS2")}
 
     <rect x="${CX+C3W*2+20}" y="${R1Y}" width="${CW-C3W*2-20}" height="104" rx="8" class="sup-card" />
@@ -909,7 +907,7 @@ function drawPid(){
     <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX+C2W+10}" y1="${R2Y+22}" x2="${CX+CW}" y2="${R2Y+22}" class="sup-divider" />
     ${text(CX+C2W+22,R2Y+16,"sup-title","PLANT EFFICIENCY")}
-    ${copGauge(CX+C2W+60, R2Y+68, 28, plantCop, 6)}
+    ${copGauge(CX+C2W+60, R2Y+68, 36, plantCop, 6)}
     ${text(CX+C2W+60,R2Y+66,"sup-val",String(plantCop))}
     ${text(CX+C2W+60,R2Y+78,"isa-tag","COP")}
     ${text(CX+C2W+140,R2Y+48,"label","kW")}
@@ -940,14 +938,13 @@ function drawPid(){
     ${text(CX+12,R4Y+16,"sup-title","LOOP SUMMARY TABLE")}
     ${text(CX+16,R4Y+42,"zone-label","LOOP")}
     ${text(CX+100,R4Y+42,"zone-label","FLOW")}
-    ${text(CX+230,R4Y+42,"zone-label","CHWS")}
-    ${text(CX+340,R4Y+42,"zone-label","CHWR")}
-    ${text(CX+440,R4Y+42,"zone-label","DP AVG")}
-    ${text(CX+540,R4Y+42,"zone-label","PUMP")}
-    ${text(CX+600,R4Y+42,"zone-label","dT")}
-    ${text(CX+670,R4Y+42,"zone-label","kW")}
-    ${text(CX+720,R4Y+42,"zone-label","LOAD")}
-    ${text(CX+780,R4Y+42,"zone-label","STATUS")}
+    ${text(CX+240,R4Y+42,"zone-label","CHWS")}
+    ${text(CX+360,R4Y+42,"zone-label","CHWR")}
+    ${text(CX+470,R4Y+42,"zone-label","DP AVG")}
+    ${text(CX+580,R4Y+42,"zone-label","PUMP")}
+    ${text(CX+640,R4Y+42,"zone-label","dT")}
+    ${text(CX+730,R4Y+42,"zone-label","LOAD")}
+    ${text(CX+810,R4Y+42,"zone-label","STATUS")}
     <line x1="${CX+10}" y1="${R4Y+46}" x2="${CX+CW-10}" y2="${R4Y+46}" class="sup-divider" />
     ${st.loops.map((lp,i)=>{
       const ly = R4Y + 68 + i*25;
@@ -960,16 +957,16 @@ function drawPid(){
         <rect x="${CX+6}" y="${ly-14}" width="${CW-12}" height="23" rx="3" fill="${rowBg}" />
         ${text(CX+16,ly,"metric-row",`CH-${lp.id}`)}
         ${text(CX+100,ly,"metric-val-inline",`${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`)}
-        ${text(CX+230,ly,"metric-row",`${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`)}
-        ${text(CX+340,ly,"metric-row",`${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`)}
-        ${text(CX+440,ly,"metric-row",`${conv.p(dpA,ui.unit)} ${conv.pu(ui.unit)}`)}
-        ${text(CX+540,ly,"metric-row",lp.pumpA?"A":"B")}
-        ${text(CX+600,ly,"metric-row",`${ui.unit==="ip"?r1(dtLoop*9/5):dtLoop} ${ui.unit==="ip"?"F":"C"}`)}
-        ${text(CX+670,ly,"metric-row",String(loopMetrics(lp).compKw))}
-        <rect x="${CX+720}" y="${ly-10}" width="36" height="8" rx="2" fill="#1a2534" stroke="#3a4f66" stroke-width=".6" />
-        <rect x="${CX+720}" y="${ly-10}" width="${Math.round(36*(lp.flow/24))}" height="8" rx="2" fill="${sC}" opacity=".7" />
-        <circle cx="${CX+784}" cy="${ly-4}" r="4" fill="${sC}" />
-        ${text(CX+794,ly,"metric-row",ev.level)}
+        ${text(CX+240,ly,"metric-row",`${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`)}
+        ${text(CX+360,ly,"metric-row",`${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`)}
+        ${text(CX+470,ly,"metric-row",`${conv.p(dpA,ui.unit)} ${conv.pu(ui.unit)}`)}
+        ${text(CX+580,ly,"metric-row",lp.pumpA?"A":"B")}
+        ${text(CX+640,ly,"metric-row",`${ui.unit==="ip"?r1(dtLoop*9/5):dtLoop} ${ui.unit==="ip"?"F":"C"}`)}
+        <rect x="${CX+730}" y="${ly-10}" width="50" height="12" rx="3" fill="#1a2534" stroke="#3a4f66" stroke-width=".6" />
+        <rect x="${CX+730}" y="${ly-10}" width="${Math.round(50*(lp.flow/24))}" height="12" rx="3" fill="${sC}" opacity=".7" />
+        <circle cx="${CX+814}" cy="${ly-4}" r="4" fill="${sC}" />
+        ${text(CX+826,ly,"metric-row",ev.level)}
+        ${i<3?`<line x1="${CX+10}" y1="${ly+10}" x2="${CX+CW-10}" y2="${ly+10}" stroke="#2e3e52" stroke-width=".6" />`:''}
       `;
     }).join("")}
 
