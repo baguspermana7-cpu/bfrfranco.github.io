@@ -13,11 +13,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin="" defer></script>
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#0b1120;color:#e2e8f0;min-height:100vh;display:flex}
@@ -741,6 +741,10 @@
             </a>
             <a class="nav-item" data-section="settings" onclick="showSection('settings')">
                 <i class="fas fa-cog"></i> Settings
+            </a>
+            <div class="nav-group-label" style="margin-top:0.75rem">Personal Apps</div>
+            <a class="nav-item" data-section="stock-investment" onclick="showSection('stock-investment')">
+                <i class="fas fa-chart-line"></i> Stock Investment
             </a>
         </nav>
         <div class="sidebar-footer">
@@ -1787,6 +1791,11 @@
     </div>
 </div>
 
+<!-- ══════════════════════════════════════ STOCK INVESTMENT ══════════════════════════════════════ -->
+<div class="section" id="sec-stock-investment">
+    <iframe id="dca-iframe" src="Apps/dca-app/dist/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:transparent;" loading="lazy" title="DCA Portfolio Intelligence"></iframe>
+</div>
+
         </div><!-- /main-content -->
     </main><!-- /main-wrap -->
 
@@ -1997,9 +2006,10 @@ function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     document.getElementById('sec-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
-    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings'};
+    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment'};
     if(id==='mayar'&&typeof renderMayar==='function')renderMayar();
     if(id==='activity'&&typeof renderActivity==='function')renderActivity();
+    if(id==='stock-investment'){var dcaIf=document.getElementById('dca-iframe');var isL=document.body.classList.contains('light-mode');if(dcaIf&&dcaIf.contentWindow){try{dcaIf.contentWindow.postMessage({type:'theme-sync',theme:isL?'light':'dark'},'*')}catch(e){}}}
     document.getElementById('topbarTitle').textContent=titles[id]||id;
     if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
 }
@@ -2024,6 +2034,9 @@ function toggleAdminTheme(){
             else{dcMap.removeLayer(mapLightTiles);mapDarkTiles.addTo(dcMap)}
         }catch(e){}
     }
+    // Sync theme to DCA iframe
+    var dcaIframe=document.getElementById('dca-iframe');
+    if(dcaIframe&&dcaIframe.contentWindow){try{dcaIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},'*')}catch(e){}}
 }
 
 // Clock
