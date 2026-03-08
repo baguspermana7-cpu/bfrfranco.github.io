@@ -1,0 +1,28 @@
+Pertanyaan ini sering muncul dan jawabannya tidak sesederhana "Singapore lebih bagus." Jawabannya tergantung workload yang dijalankan.
+
+Fakta biaya:
+Batam dan Singapore jaraknya cuma 20 km. Listrik Batam USD 0.07-0.09/kWh, Singapore USD 0.17-0.22/kWh. Tanah 40-100x lebih murah. Tenaga kerja 4-5x lebih murah. Untuk fasilitas 50 MW, selisih listrik saja bisa lebih dari USD 25 juta per tahun.
+
+Tapi kenapa perusahaan hosting tetap pilih Singapore?
+
+1. Konektivitas: Singapore punya 26+ sistem kabel bawah laut dan 260+ anggota peering di SGIX. Semua cloud provider besar (AWS, GCP, Azure) punya region utama di sana. Kepadatan jaringan ini menciptakan efek gravitasi — sekali cukup banyak jaringan berkumpul di satu titik, keuntungan latency dan biaya transit jadi self-reinforcing.
+
+2. Kepastian yurisdiksi: Sistem hukum Singapore konsisten masuk top 3 dunia untuk penegakan kontrak. Framework perlindungan data (PDPA) sudah punya satu dekade preseden enforcement. Ketika perusahaan multinasional commit ratusan juta dolar, mereka butuh kepastian bahwa izin tetap berlaku dan kontrak bisa ditegakkan.
+
+3. Ekosistem: Cloud provider datang duluan. Enterprise mengikuti. Managed service provider, firma keamanan siber, CDN operator semuanya berkumpul. Pada titik ini, tidak berada di Singapore berarti lebih jauh dari cloud provider, CDN, dan peers.
+
+Fakta kritis soal Batam: sebagian besar kabel bawah laut Batam terhubung ke Singapore. Artinya traffic dari Batam ke destinasi global tetap routing lewat Singapore, menambah satu hop tanpa menghilangkan satu pun. Untuk perusahaan hosting yang melayani pelanggan global, Batam menawarkan penghematan biaya tapi bukan perbaikan konektivitas.
+
+Kapan pilih mana:
+- Pilih Singapore: workload latency-sensitive (hosting, VPS, SaaS), kebutuhan compliance enterprise (keuangan, kesehatan, pemerintah)
+- Pilih Batam: workload latency-tolerant dan compute-heavy (AI training, batch processing, backup/DR, storage)
+- Pilih keduanya (corridor model): production-grade front-end di Singapore + back-end hemat biaya di Batam. Kabel submarine dedicated (24 fiber pair, 20 Tbps per pair, target Q4 2026) sedang dibangun khusus untuk interkoneksi ini. Latency antar keduanya di bawah 2ms.
+
+Batam bukan alternatif yang kalah. Batam adalah layer berbeda dalam arsitektur regional. Singapore tetap jadi front door premium; Batam jadi engine room yang cost-efficient. Operator paling cerdas sudah membangun di keduanya.
+
+Yang perlu Batam untuk naik kelas: keandalan grid listrik (saat ini masih bergantung diesel backup), implementasi regulasi UU PDP 2022 (belum ada peraturan pelaksana), dan 3-5 tahun track record operasional dari gelombang data center yang sedang dibangun sekarang.
+
+Kesimpulan: tidak ada lokasi yang selalu paling benar. Yang benar adalah yang paling sesuai dengan workload, requirement compliance, dan horizon bisnis.
+
+Saya menulis analisis lengkap dengan decision matrix (6 tipe workload), perbandingan biaya detail, dan model corridor di sini:
+https://resistancezero.com/article-19.html
