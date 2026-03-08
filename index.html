@@ -66,9 +66,6 @@
     <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
     <meta name="twitter:image:alt" content="Bagus Dwi Permana - Engineering Operations Manager and Ahli K3 Listrik">
 
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://ipapi.co https://www.google-analytics.com https://cdn.jsdelivr.net;">
-
     <!-- Theme Color -->
     <meta name="theme-color" content="#0066cc">
     <meta name="msapplication-TileColor" content="#0066cc">
@@ -1434,10 +1431,12 @@
         // Ticker items are pre-duplicated in HTML for fast LCP (no innerHTML rewrite)
         var tickerContent = document.getElementById('tickerContent');
         if (!tickerContent) return;
-        // Adjust animation duration based on content width
-        var contentWidth = tickerContent.scrollWidth / 2;
-        var duration = Math.max(20, contentWidth / 50);
-        tickerContent.style.animationDuration = duration + 's';
+        // Adjust animation duration based on content width (deferred to avoid forced reflow)
+        requestAnimationFrame(function() {
+            var contentWidth = tickerContent.scrollWidth / 2;
+            var duration = Math.max(20, contentWidth / 50);
+            tickerContent.style.animationDuration = duration + 's';
+        });
     })();
     </script>
 
@@ -1568,14 +1567,16 @@
         });
         obs.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 
-        window.addEventListener('resize',function(){resize();ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr)});
+        var cachedRect=null;
+        function getRect(){if(!cachedRect)cachedRect=cv.parentElement.getBoundingClientRect();return cachedRect}
+        window.addEventListener('resize',function(){cachedRect=null;resize();ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr)});
         cv.parentElement.addEventListener('mousemove',function(e){
-            var rect=cv.parentElement.getBoundingClientRect();
+            var rect=getRect();
             mouse.x=e.clientX-rect.left;mouse.y=e.clientY-rect.top;
         });
         cv.parentElement.addEventListener('mouseleave',function(){mouse.x=-9999;mouse.y=-9999});
         cv.parentElement.addEventListener('touchmove',function(e){
-            var rect=cv.parentElement.getBoundingClientRect();
+            var rect=getRect();
             mouse.x=e.touches[0].clientX-rect.left;mouse.y=e.touches[0].clientY-rect.top;
         },{passive:true});
         cv.parentElement.addEventListener('touchend',function(){mouse.x=-9999;mouse.y=-9999});
@@ -1599,8 +1600,8 @@
 </script>
 
 <!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+<div class="cookie-banner hidden" id="cookieBanner" style="display:none">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Read our Privacy Policy</a></p>
     <div class="cookie-actions">
         <button class="cookie-accept" id="cookieAccept">Accept</button>
         <button class="cookie-decline" id="cookieDecline">Decline</button>
@@ -1618,6 +1619,7 @@
     var cb = document.getElementById('cookieBanner');
     var consent = localStorage.getItem('rz_cookie_consent');
     if (!consent && cb) {
+        cb.style.display = '';
         cb.classList.remove('hidden');
     }
     var acceptBtn = document.getElementById('cookieAccept');

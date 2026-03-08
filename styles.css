@@ -670,8 +670,6 @@ a {
     background-size: 60px 60px;
     background-position: center center;
     z-index: -2;
-    animation: gridPulse 4s ease-in-out infinite;
-    will-change: opacity;
 }
 
 .hero-background::before {
@@ -683,7 +681,7 @@ a {
     height: 60%;
     background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
     opacity: 0.12;
-    animation: floatGlow 8s ease-in-out infinite;
+    animation: gentleGlow 8s ease-in-out infinite;
 }
 
 .hero-background::after {
@@ -695,27 +693,12 @@ a {
     height: 50%;
     background: radial-gradient(circle, var(--accent-orange) 0%, transparent 60%);
     opacity: 0.1;
-    animation: floatGlow 6s ease-in-out infinite reverse;
+    animation: gentleGlow 6s ease-in-out infinite reverse;
 }
 
-@keyframes gridPulse {
-    0%, 100% {
-        opacity: 0.6;
-    }
-    50% {
-        opacity: 1;
-    }
-}
-
-@keyframes floatGlow {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.08;
-    }
-    50% {
-        transform: translate(30px, -30px) scale(1.15);
-        opacity: 0.15;
-    }
+@keyframes gentleGlow {
+    0%, 100% { opacity: 0.08; }
+    50% { opacity: 0.14; }
 }
 
 .hero-content {
@@ -794,7 +777,6 @@ a {
     height: 100%;
     object-fit: cover;
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    animation: morphing 8s ease-in-out infinite;
     box-shadow:
         0 25px 50px rgba(30, 58, 95, 0.3),
         0 0 30px rgba(245, 158, 11, 0.2);
@@ -817,20 +799,15 @@ a {
     bottom: -10px;
     background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 50%, var(--accent-coral) 100%);
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    animation: morphing 8s ease-in-out infinite, glowPulse 2s ease-in-out infinite;
+    filter: blur(4px);
+    animation: glowPulse 2s ease-in-out infinite;
     opacity: 0.4;
     z-index: 1;
 }
 
 @keyframes glowPulse {
-    0%, 100% {
-        filter: blur(0px);
-        opacity: 0.3;
-    }
-    50% {
-        filter: blur(8px);
-        opacity: 0.5;
-    }
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.5; }
 }
 
 .hero-shape {
@@ -838,23 +815,7 @@ a {
     height: 350px;
     background: var(--primary-gradient);
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    animation: morphing 8s ease-in-out infinite;
     opacity: 0.15;
-}
-
-@keyframes morphing {
-    0%, 100% {
-        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    }
-    25% {
-        border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
-    }
-    50% {
-        border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
-    }
-    75% {
-        border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
-    }
 }
 
 .scroll-indicator {
@@ -1974,7 +1935,7 @@ section {
     border-radius: 14px;
     box-shadow: var(--glass-shadow);
     border: 1px solid var(--glass-border);
-    transition: all var(--transition-normal);
+    transition: transform 0.3s ease;
     position: relative;
     overflow: hidden;
 }
@@ -1994,7 +1955,6 @@ section {
 
 .oe-card:hover {
     transform: translateY(-5px);
-    box-shadow: var(--glass-shadow), 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 .oe-card:hover::before {
@@ -3185,12 +3145,8 @@ section {
 }
 
 @keyframes floatShape {
-    0%, 100% {
-        transform: translateY(0) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-30px) rotate(180deg);
-    }
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.08; }
 }
 
 /* ==========================================
@@ -5798,7 +5754,7 @@ section {
     color: #6b7280;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s ease;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
     font-family: 'Inter', sans-serif;
 }
 .search-chip:hover {
@@ -6374,15 +6330,4 @@ section {
     .floating-shapes { display: none; }
 }
 
-/* ==========================================
-   Performance: content-visibility for below-fold
-   ========================================== */
-.metrics,
-.case-studies,
-.about,
-.faq,
-.contact,
-footer {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
-}
+/* content-visibility removed: caused CLS regression (0.706 mobile / 1.014 desktop) */
