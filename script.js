@@ -559,50 +559,8 @@ function initScrollProgress() {
    Cursor Spotlight Effect
    ========================================== */
 function initCursorSpotlight() {
-    const spotlight = document.getElementById('cursorSpotlight');
-    if (!spotlight) return;
-
-    // Skip on touch devices (no cursor)
-    if (!window.matchMedia('(pointer: fine)').matches) return;
-
-    // Performance: hint GPU compositing
-    spotlight.style.willChange = 'transform, left, top';
-
-    let mouseX = 0, mouseY = 0;
-    let spotX = 0, spotY = 0;
-    let dirty = false;
-    let rafId = null;
-
-    document.addEventListener('mousemove', function(e) {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        spotlight.classList.add('active');
-        if (!dirty) {
-            dirty = true;
-            if (!rafId) rafId = requestAnimationFrame(animateSpotlight);
-        }
-    });
-
-    document.addEventListener('mouseleave', function() {
-        spotlight.classList.remove('active');
-        dirty = false;
-    });
-
-    // Smooth follow animation — only runs when mouse is moving
-    function animateSpotlight() {
-        spotX += (mouseX - spotX) * 0.1;
-        spotY += (mouseY - spotY) * 0.1;
-        spotlight.style.left = spotX + 'px';
-        spotlight.style.top = spotY + 'px';
-
-        // Stop animating once we've caught up (within 0.5px)
-        if (Math.abs(mouseX - spotX) > 0.5 || Math.abs(mouseY - spotY) > 0.5) {
-            rafId = requestAnimationFrame(animateSpotlight);
-        } else {
-            rafId = null;
-            dirty = false;
-        }
-    }
+    // Disabled — cursor spotlight circle removed for cleaner UX
+    return;
 }
 
 /* ==========================================
@@ -751,6 +709,8 @@ function initMotionEffects() {
     }
 
     function initCursorEffects() {
+        // Disabled — all cursor following/magnetic effects removed for cleaner UX
+        return;
         // --- #1: Magnetic Cursor Pull ---
         var magneticEls = document.querySelectorAll('[data-magnetic], .nav-link, .theme-toggle');
         magneticEls.forEach(function(el) {
