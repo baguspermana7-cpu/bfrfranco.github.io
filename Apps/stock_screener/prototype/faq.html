@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StockMap FAQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css?v=20260316m">
+</head>
+<body data-page="faq">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="page-shell">
+    <nav class="nav">
+      <div class="nav-inner">
+        <a class="logo" href="./index.html">StockMap<span>.</span></a>
+        <div class="nav-actions">
+          <a class="nav-link" href="./app.html">Open App</a>
+          <a class="nav-link" href="./methodology.html">Methodology</a>
+          <a class="nav-link" href="./faq.html">FAQ</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="simple-wrap" id="main-content">
+      <section class="page-hero">
+        <div class="eyebrow">Detailed definitions for sourced coverage</div>
+        <h1>StockMap <em>FAQ</em></h1>
+        <p class="page-sub">
+          Halaman ini menjelaskan istilah inti di app secara detail: apa yang sebenarnya dihitung, apa yang hanya diinfersikan, dan bagaimana hasilnya dipakai untuk menyusun prioritas research tanpa mencampur placeholder atau market hype.
+        </p>
+      </section>
+
+      <section class="faq-anchor-wrap">
+        <div class="chip-row faq-anchors">
+          <a class="chip-link" href="#faq-basics">Basics</a>
+          <a class="chip-link" href="#faq-float">Float Screener</a>
+          <a class="chip-link" href="#faq-network">Issuer Overlap</a>
+          <a class="chip-link" href="#faq-ledger">Source Ledger</a>
+          <a class="chip-link" href="#faq-priority">Priority Queue</a>
+          <a class="chip-link" href="#faq-audit">Audit Workflow</a>
+          <a class="chip-link" href="#faq-limits">Limits</a>
+        </div>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-basics">
+        <article class="simple-card">
+          <h2>What exactly is this app?</h2>
+          <p class="simple-copy">
+            Ini adalah app untuk membaca struktur kepemilikan saham Indonesia dari sumber issuer. Fokusnya bukan tape intraday atau broker flow. Fokusnya adalah:
+            siapa pemegang saham strategis, berapa free float yang realistis, siapa holder yang overlap lintas issuer, dan seberapa besar bagian float yang terlihat versus yang masih tersembunyi di bawah ambang tabel holder.
+          </p>
+          <div class="callout" style="margin-top:16px">
+            <div class="callout-title">Core principle</div>
+            <p>
+              App ini hanya menampilkan analytics untuk ticker yang punya source issuer yang cukup kuat untuk dipertanggungjawabkan. Kalau struktur holder belum defensible, ticker dipindahkan ke `review_required` dan tidak masuk screener aktif.
+            </p>
+          </div>
+        </article>
+        <article class="simple-card">
+          <h2>What is the app not doing?</h2>
+          <p class="simple-copy">
+            App ini tidak sedang berpura-pura memberi live price tape, target price, atau kepastian multibagger. Ia juga tidak menyamakan semua issuer ke satu tanggal fiktif. Setiap issuer mempertahankan `as-of date` sendiri, karena memang disclosure ownership tiap perusahaan terbit di waktu yang berbeda.
+          </p>
+          <ul class="faq-list">
+            <li>No placeholder screener rows.</li>
+            <li>No fake same-day market snapshot.</li>
+            <li>No fallback investor graph tanpa bukti holder-table.</li>
+            <li>No final buy call tanpa cek valuasi live.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-float">
+        <article class="simple-card">
+          <h2>What is the Free Float Screener?</h2>
+          <p class="simple-copy">
+            `Free Float Screener` adalah tabel yang mengurutkan issuer berdasarkan saham yang secara realistis tersedia untuk diperdagangkan setelah blok strategis dikeluarkan. Ini bukan sekadar angka `public ownership` mentah. App ini memisahkan holder strategis dari holder portofolio, lalu menghitung kembali porsi saham yang benar-benar berpotensi berada di pasar.
+          </p>
+          <div class="formula" style="margin-top:16px">
+            Free Float = 100% - Strategic Holdings
+            <small>Strategic Holdings = blok pengendali, parent, state control, affiliated vehicles, dan insider yang lolos aturan klasifikasi strategis</small>
+          </div>
+          <ul class="faq-list">
+            <li>Kalau free float sangat rendah, supply saham bisa ketat dan gerakan harga bisa lebih eksplosif.</li>
+            <li>Kalau free float cukup besar, saham biasanya lebih layak untuk institusi dan positioning jangka menengah.</li>
+            <li>Angka ini tetap harus dibaca bersama `risk`, `blind spot`, dan `coverage`.</li>
+          </ul>
+        </article>
+        <article class="simple-card">
+          <h2>What do each float fields mean?</h2>
+          <div class="faq-definition">
+            <strong>Strategic Held</strong>
+            <p>Persentase saham yang diklasifikasikan tidak bebas diperdagangkan, misalnya parent, government control block, atau kendaraan afiliasi yang bertindak sebagai controller.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>Visible Coverage</strong>
+            <p>Jumlah persen saham yang benar-benar terlihat di tabel holder yang kita punya. Kalau issuer hanya memberi kontrol blok plus kategori publik agregat, visible coverage akan berbeda dibanding issuer yang memberi daftar top-20 public holders.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>Blind Spot</strong>
+            <p>Bagian free float yang tidak terlihat langsung di holder rows yang tersedia. Biasanya ini adalah kumpulan holder kecil, sub-1% positions, atau kategori publik agregat yang tidak dirinci nama per nama.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>HHI</strong>
+            <p>`Herfindahl-Hirschman Index` untuk visible holder structure. Semakin tinggi, semakin terkonsentrasi kepemilikannya pada segelintir holder. HHI tinggi tidak otomatis jelek, tapi berarti struktur lebih bergantung pada sedikit pihak.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>L/F</strong>
+            <p>Campuran `Local / Foreign` hanya ditampilkan kalau nationality disclosure cukup jelas. Kalau sumber issuer tidak cukup detail, field ini sengaja dikosongkan agar tidak memalsukan presisi.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section">
+        <article class="simple-card">
+          <h2>How should I read float risk?</h2>
+          <p class="simple-copy">
+            `Risk` di screener adalah ringkasan dari beberapa komponen sekaligus, bukan hanya free float mentah. App melihat:
+          </p>
+          <ul class="faq-list">
+            <li>berapa kecil free float-nya,</li>
+            <li>seberapa dominan holder strategis terbesar,</li>
+            <li>seberapa tinggi konsentrasi visible holders,</li>
+            <li>seberapa besar blind spot yang tersisa.</li>
+          </ul>
+          <p class="simple-copy">
+            Jadi dua saham dengan free float mirip bisa punya `risk` berbeda kalau satu memiliki coverage tipis dan satu lagi memiliki holder table yang lebih jelas.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>How are foundations, cooperatives, and internal vehicles classified?</h2>
+          <p class="simple-copy">
+            App ini tidak otomatis menganggap semua yayasan atau koperasi sebagai free float. Kalau nama entitasnya jelas menunjukkan kendaraan grup atau ekosistem issuer, app akan cenderung menaruhnya di sisi `strategic`, bukan `float`.
+          </p>
+          <ul class="faq-list">
+            <li>`Yayasan` yang memakai nama grup issuer biasanya dibaca sebagai affiliated foundation, jadi strategic.</li>
+            <li>`Koperasi` yang jelas terikat ke grup parent, kendaraan internal, atau program MESOP grup bisa dibaca sebagai strategic bila afiliasinya cukup defensible.</li>
+            <li>kalau afiliasi tidak jelas dan bukti kontrol tidak ada, entitas seperti ini tidak boleh dipaksa masuk strategic hanya karena namanya terdengar internal.</li>
+            <li>kalau bukti afiliasi masih abu-abu, ticker lebih baik ditahan di `review_required` daripada diberi presisi palsu.</li>
+          </ul>
+          <p class="simple-copy">
+            Jadi klasifikasinya bukan berdasarkan bentuk hukum semata, tetapi pada bukti apakah entitas itu benar-benar bagian dari kontrol atau kendaraan internal grup.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>When is low float useful and when is it dangerous?</h2>
+          <p class="simple-copy">
+            Low float berguna ketika Anda sedang mencari saham yang secara struktur supply-nya ketat dan bisa bergerak cepat saat ada katalis nyata. Low float berbahaya kalau:
+          </p>
+          <ul class="faq-list">
+            <li>blind spot besar sehingga distribusi riil tidak jelas,</li>
+            <li>katalis bisnis tidak kuat,</li>
+            <li>likuiditas terlalu tipis,</li>
+            <li>struktur terlalu mudah dimanipulasi oleh sedikit holder.</li>
+          </ul>
+          <p class="simple-copy">
+            Karena itu app tidak pernah menjadikan `float ketat` sebagai sinyal beli final. Ia hanya mengangkat nama untuk dianalisis lebih lanjut.
+          </p>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-network">
+        <article class="simple-card">
+          <h2>What is Investor-Ticker Network?</h2>
+          <p class="simple-copy">
+            `Investor-Ticker Network` memetakan hubungan antara holder yang muncul di beberapa issuer. Fokusnya bukan sekadar siapa punya saham apa, tapi siapa yang berulang lintas nama. Kalau satu investor muncul di banyak issuer yang berbeda, itu memberi petunjuk tentang recurring sponsorship, strategic family, state cluster, atau institutional overlap.
+          </p>
+          <ul class="faq-list">
+            <li>Node `investor` mewakili holder yang berulang di beberapa issuer.</li>
+            <li>Node `ticker` mewakili emiten yang sedang diinspeksi.</li>
+            <li>Edge `focus stake` berarti posisi utama dari investor fokus ke ticker tersebut.</li>
+            <li>Edge `strategic co-holder` atau `float co-holder` menunjukkan siapa lagi yang duduk di tabel holder ticker yang sama.</li>
+            <li>Edge `blind spot` mengingatkan bahwa sebagian float tetap tidak terlihat secara nama per nama.</li>
+          </ul>
+        </article>
+        <article class="simple-card">
+          <h2>What is issuer overlap?</h2>
+          <p class="simple-copy">
+            `Issuer overlap` artinya ada holder yang sama di beberapa issuer, atau ada beberapa issuer yang terhubung lewat holder keluarga/strategis yang sama. Overlap ini berguna untuk:
+          </p>
+          <ul class="faq-list">
+            <li>melihat cluster negara atau konglomerasi,</li>
+            <li>membaca apakah satu dana atau institusi sedang membangun exposure tematik,</li>
+            <li>memisahkan sinyal `recurring institutional interest` dari kasus satu saham yang berdiri sendiri,</li>
+            <li>membandingkan kualitas float antar issuer yang punya sponsor serupa.</li>
+          </ul>
+          <div class="callout" style="margin-top:16px">
+            <div class="callout-title">Important limit</div>
+            <p>
+              Network ini tidak mengklaim hubungan ekonomi di luar yang benar-benar terlihat dari holder tables. Kalau satu relasi tidak punya bukti holder-table, app ini tidak akan menggambar edge buatan.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-ledger">
+        <article class="simple-card">
+          <h2>What is Source Ledger?</h2>
+          <p class="simple-copy">
+            `Source Ledger` adalah daftar audit untuk setiap ticker yang aktif di app. Di sini Anda bisa melihat:
+          </p>
+          <ul class="faq-list">
+            <li>status ticker (`ready` atau `review_required`),</li>
+            <li>`as-of date` kepemilikan,</li>
+            <li>source label utama,</li>
+            <li>tautan langsung ke dokumen atau halaman issuer,</li>
+            <li>catatan kenapa ticker itu bisa atau belum bisa masuk analytics.</li>
+          </ul>
+          <p class="simple-copy">
+            Kalau Anda ingin memverifikasi angka di screener, titik masuknya adalah `Source Ledger`, bukan tabel ranking.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>What does review_required mean?</h2>
+          <p class="simple-copy">
+            `review_required` berarti sumber issuer memang ada, tetapi klasifikasi strategisnya belum cukup aman untuk dijadikan analytics aktif. Contoh umum:
+          </p>
+          <ul class="faq-list">
+            <li>holder corporate muncul, tetapi afiliasinya tidak jelas,</li>
+            <li>issuer hanya memberi informasi agregat yang tidak cukup untuk memisahkan kontrol dari portofolio,</li>
+            <li>ada kemungkinan double count antara parent, nominee, atau kendaraan afiliasi.</li>
+          </ul>
+          <p class="simple-copy">
+            Status ini lebih jujur daripada memaksa ticker masuk screener dengan angka yang terlihat presisi tetapi sebenarnya belum defensible.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>What if the issuer page is official but undated?</h2>
+          <p class="simple-copy">
+            Kadang issuer menaruh `shareholders composition` di halaman IR resmi tanpa tanggal snapshot eksplisit. Dalam kasus seperti itu, app ini tidak akan pura-pura menyebut tanggal yang tidak ditulis issuer.
+          </p>
+          <ul class="faq-list">
+            <li>ledger akan menulis bahwa itu adalah `current IR page retrieved [date]`,</li>
+            <li>catatan ledger akan menyebut bahwa tanggal itu adalah tanggal pengambilan, bukan tanggal snapshot yang distempel issuer,</li>
+            <li>status tetap bisa `ready` kalau struktur holder-nya jelas, sederhana, dan berasal dari halaman resmi issuer,</li>
+            <li>tetapi nuansa ini tetap dianggap `inference from official source`, bukan fakta tanggal yang diterbitkan issuer.</li>
+          </ul>
+          <p class="simple-copy">
+            Itu lebih defensible daripada mengarang tanggal `as-of` yang tidak pernah dinyatakan oleh perusahaan.
+          </p>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-priority">
+        <article class="simple-card">
+          <h2>What is the Priority Queue?</h2>
+          <p class="simple-copy">
+            `Priority Queue` adalah layer keputusan di atas ownership data. Ia tidak mengganti analisa fundamental, tetapi membantu Anda memutuskan ticker mana yang pantas dipelajari lebih dulu. Queue ini sekarang punya dua mode:
+          </p>
+          <div class="faq-definition">
+            <strong>Allocation Mode</strong>
+            <p>Dirancang untuk mencari kandidat yang ownership-nya bersih, earnings-nya stabil, balance sheet-nya kuat, dan katalisnya lebih mirip compounding daripada narasi liar.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>Multibagger Mode</strong>
+            <p>Dirancang untuk mencari optionality: project pipeline, cycle turn, restructuring, atau supply-tight setup yang bisa menghasilkan rerating besar kalau eksekusi berjalan benar.</p>
+          </div>
+        </article>
+        <article class="simple-card">
+          <h2>What do Accumulate, Watch, and Avoid mean?</h2>
+          <div class="faq-definition">
+            <strong>Accumulate</strong>
+            <p>Bukan sinyal beli final. Artinya ticker tersebut lolos screen mode aktif dan pantas jadi prioritas utama untuk valuation check serta position sizing review.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>Watch</strong>
+            <p>Thesis ada, tetapi masih ada hal penting yang harus dikonfirmasi: harga, leverage, project timing, margin sustainability, atau kualitas katalis.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>Avoid</strong>
+            <p>Di mode aktif saat ini, struktur ownership, balance sheet, atau eksekusi catalyst belum cukup aman untuk ditaruh ke prioritas riset awal.</p>
+          </div>
+          <p class="simple-copy">
+            Jadi label action di app lebih tepat dipakai sebagai `research sequencing`, bukan keputusan investasi final tanpa konteks tambahan.
+          </p>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-audit">
+        <article class="simple-card">
+          <h2>How do I audit one ticker manually?</h2>
+          <ol class="faq-list">
+            <li>Buka `Source Ledger` dan catat `source label` serta `as-of date` ticker tersebut.</li>
+            <li>Buka dokumen issuer asli dan cari tabel kepemilikan saham atau catatan pemegang saham.</li>
+            <li>Verifikasi siapa holder yang jelas-jelas strategis: parent, government block, kendaraan afiliasi, insider, atau treasury shares.</li>
+            <li>Hitung ulang `Strategic Held`, lalu cocokkan dengan `Free Float`, `Visible Coverage`, dan `Blind Spot` di app.</li>
+            <li>Lanjut ke `Decision Layer` untuk melihat apakah earnings, balance sheet, dan catalyst memang mendukung struktur ownership itu.</li>
+          </ol>
+          <p class="simple-copy">
+            Kalau setelah audit manual Anda menemukan holder yang seharusnya strategis tetapi belum diperlakukan demikian, ticker itu seharusnya pindah ke status review, bukan dipaksa tetap aktif.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>Why does source date matter so much?</h2>
+          <p class="simple-copy">
+            Ownership data tidak bergerak setiap hari seperti harga saham. Karena itu kesalahan terbesar dalam tool ownership adalah membuat tampilan yang seolah-olah semua angka berlaku `hari ini` dengan tingkat kesegaran yang sama. App ini sengaja mempertahankan `as-of date` per issuer karena:
+          </p>
+          <ul class="faq-list">
+            <li>perubahan corporate action bisa mengubah float secara material,</li>
+            <li>perpindahan holder strategis bisa membuat network lama menjadi tidak relevan,</li>
+            <li>ticker yang belum update source tidak boleh disamakan dengan ticker yang baru punya disclosure kuartalan.</li>
+          </ul>
+          <p class="simple-copy">
+            Jadi `source date` adalah bagian dari kualitas data, bukan sekadar metadata dekoratif.
+          </p>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section">
+        <article class="simple-card">
+          <h2>Why can a ticker be Accumulate in Allocation but only Watch in Multibagger?</h2>
+          <p class="simple-copy">
+            Karena dua mode bertanya hal yang berbeda.
+          </p>
+          <div class="faq-definition">
+            <strong>Allocation Mode</strong>
+            <p>Mencari struktur yang lebih bersih, earnings lebih stabil, dan neraca lebih kuat. Ticker defensif berkualitas bisa naik ke `Accumulate` di sini walau upside eksplosifnya terbatas.</p>
+          </div>
+          <div class="faq-definition">
+            <strong>Multibagger Mode</strong>
+            <p>Mencari asymmetry yang lebih besar. Kalau catalyst-nya tidak cukup tajam, atau free float-nya terlalu longgar untuk supply squeeze, ticker berkualitas tetap bisa turun menjadi `Watch`.</p>
+          </div>
+          <p class="simple-copy">
+            Jadi perbedaan label antar mode bukan kontradiksi. Itu menunjukkan tipe peluang yang berbeda.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>What is the right workflow before I invest?</h2>
+          <ol class="faq-list">
+            <li>Pilih mode yang sesuai tujuan: `Allocation` untuk compounding, `Multibagger` untuk optionality.</li>
+            <li>Pilih 3-5 ticker teratas, bukan langsung seluruh daftar.</li>
+            <li>Buka `entity page` tiap ticker dan baca `Decision Layer` plus `Visible Holder Table`.</li>
+            <li>Verifikasi source issuer asli.</li>
+            <li>Baru lakukan cek live valuation, liquidity, downside, dan ukuran posisi.</li>
+          </ol>
+          <p class="simple-copy">
+            Kalau salah satu langkah ini dilewati, app akan tetap terlihat canggih tetapi keputusan Anda kembali rawan bias.
+          </p>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section">
+        <article class="simple-card">
+          <h2>Can this app find early stocks that can go up 10x?</h2>
+          <p class="simple-copy">
+            Bisa membantu menemukan kandidat lebih awal, tetapi tidak bisa menjamin hasil `10x`. Ownership structure paling kuat untuk menjawab pertanyaan seperti:
+          </p>
+          <ul class="faq-list">
+            <li>apakah supply saham ketat atau longgar,</li>
+            <li>siapa yang mengontrol saham,</li>
+            <li>apakah ada recurring institutional interest,</li>
+            <li>apakah ada blind spot besar yang membuat struktur kurang transparan.</li>
+          </ul>
+          <p class="simple-copy">
+            Namun saham yang naik berlipat besar biasanya tetap butuh perubahan bisnis yang besar: pertumbuhan laba, ekspansi proyek, deleveraging, atau rerating siklus. Karena itu app ini diposisikan sebagai `ownership intelligence layer`, bukan mesin ramalan multibagger.
+          </p>
+        </article>
+        <article class="simple-card">
+          <h2>How should I actually use it?</h2>
+          <ul class="faq-list">
+            <li>Mulai dari `Priority Queue` untuk menentukan urutan research.</li>
+            <li>Buka `Free Float Screener` untuk cek apakah setup supply-nya masuk akal.</li>
+            <li>Buka `Network` untuk lihat overlap investor dan recurring holder.</li>
+            <li>Buka `Source Ledger` untuk verifikasi dokumen asli dan tanggalnya.</li>
+            <li>Baru setelah itu cek valuasi live, laba, utang, dan katalis yang belum tertangkap penuh di ownership layer.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="simple-grid faq-section" id="faq-limits">
+        <article class="simple-card">
+          <h2>What are the current limitations?</h2>
+          <ul class="faq-list">
+            <li>Cakupan aktif masih sourced subset, belum seluruh market.</li>
+            <li>Valuation tidak di-hardcode sebagai angka final karena live market check bisa berubah harian.</li>
+            <li>Beberapa issuer hanya memberi aggregate public categories, jadi blind spot tetap ada.</li>
+            <li>Decision labels adalah inference layer dari data resmi, bukan quote resmi dari issuer.</li>
+          </ul>
+        </article>
+        <article class="simple-card">
+          <h2>Why can numbers differ from other sites?</h2>
+          <p class="simple-copy">
+            Karena metodologi dan sumber berbeda. Satu situs mungkin memakai public ownership mentah. Situs lain mungkin menghitung free float dengan aturan index-provider tertentu. App ini memilih pendekatan yang konservatif: jika holder terlihat strategis, dia dikeluarkan dari float sampai ada alasan kuat untuk tidak melakukannya.
+          </p>
+          <div class="callout" style="margin-top:16px">
+            <div class="callout-title">Bottom line</div>
+            <p>
+              Kalau Anda ingin hasil yang lebih presisi, jangan hanya melihat angka akhir. Lihat juga `source label`, `as-of date`, dan struktur holder mentah yang mendasarinya.
+            </p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="simple-footer">
+      FAQ - March 2026 sourced-coverage glossary and usage guidance
+    </footer>
+  </div>
+</body>
+</html>

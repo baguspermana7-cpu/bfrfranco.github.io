@@ -3,9 +3,9 @@
 This manual set documents the current `official-source-only` build.
 
 Current scope:
-- 13 `ready` tickers in analytics
+- 24 `ready` tickers in analytics
 - 1 `review_required` ticker in the source ledger only
-- 7 recurring investor scenarios
+- 10 recurring investor scenarios
 - 0 synthetic screener rows
 - 0 fallback entity pages
 
@@ -13,6 +13,7 @@ Primary routes:
 - `prototype/index.html`
 - `prototype/app.html`
 - `prototype/methodology.html`
+- `prototype/faq.html`
 - `prototype/entity.html`
 
 Manuals:

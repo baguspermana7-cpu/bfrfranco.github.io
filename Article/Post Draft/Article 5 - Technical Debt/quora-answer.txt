@@ -1,0 +1,31 @@
+QUORA ANSWER DRAFT
+==================
+Target Question: "What is technical debt in data centers?"
+(Also fits: "What causes data center outages?", "How do aging infrastructure components create risk?", "What is deferred maintenance risk?")
+
+---
+
+ANSWER:
+
+Software engineers talk about technical debt constantly. In physical infrastructure, we rarely name it — but it kills facilities just the same.
+
+Technical debt in a live data center looks like this:
+
+- A BMS controller running firmware from 2014 because "it still works" (until the day the vendor drops support and you can't patch a critical vulnerability)
+- Cooling pipes with 40% reduced flow because nobody budgeted descaling in 5 years
+- An electrical switchboard with a known arc flash risk that keeps getting deferred because it requires a full shutdown to remediate
+- 200+ cable trays at 90% fill rate because "we'll reorganize next quarter" — for the last 3 years
+
+The insidious part: technical debt compounds. Each deferred item increases the blast radius of adjacent failures. That BMS controller that "still works" is now the single point of failure for your chiller sequencing. Those clogged pipes reduce cooling capacity just enough that one hot day plus one chiller trip equals a thermal event.
+
+I've developed a debt quantification method that converts deferred maintenance items into annualized risk-dollars:
+
+Risk ($) = P(failure) x Impact($) x Exposure(years)
+
+A facility I audited had $2.3M in quantified technical debt across 47 items. The remediation cost was $680K. They'd been deferring for 3 years because "nothing has gone wrong." The expected annual loss from that debt portfolio was $410K — meaning they'd already exceeded the fix cost in accumulated risk.
+
+Full analysis with the quantification framework, prioritization matrix, and board-level presentation template:
+
+https://resistancezero.com/article-5.html
+
+Suggested Quora Topics: Data Centers, Risk Management, Infrastructure Engineering, Technical Debt, Facility Management

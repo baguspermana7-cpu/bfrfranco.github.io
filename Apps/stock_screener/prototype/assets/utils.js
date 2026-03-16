@@ -440,6 +440,23 @@
     return data.tickerAnalytics?.[ticker] || null;
   }
 
+  function getDecisionEntry(ticker) {
+    return data.decisionLedger?.[ticker] || null;
+  }
+
+  function getDecisionRows() {
+    return getFloatRows()
+      .map((row) => {
+        const decision = getDecisionEntry(row.ticker);
+        if (!decision) return null;
+        return {
+          ...row,
+          decision
+        };
+      })
+      .filter(Boolean);
+  }
+
   function getFloatRows() {
     if (floatRowsCache) {
       return floatRowsCache.slice();
@@ -1217,6 +1234,8 @@
     getSourceLedgerRows,
     getFloatRows,
     getNetworkScenarios,
+    getDecisionEntry,
+    getDecisionRows,
     getTickerAnalytics,
     isAllowedToken,
     isStrategicHolder,

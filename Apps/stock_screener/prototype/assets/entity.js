@@ -13,6 +13,7 @@
     entityHref,
     escapeHtml,
     formatPct,
+    getDecisionEntry,
     getSourceEntry,
     parsePct,
     round2
@@ -73,7 +74,8 @@
       })),
       related: (base.related || []).filter((item) => item.kind !== "group"),
       sourceStatus: source.status,
-      source
+      source,
+      decision: getDecisionEntry(id)
     };
   }
 
@@ -313,6 +315,44 @@
       .join("");
   }
 
+  function renderDecision(entity) {
+    const section = $("#entity-decision-section");
+    const title = $("#entity-decision-title");
+    const operating = $("#entity-decision-operating");
+    const protocol = $("#entity-decision-protocol");
+    if (!section || !title || !operating || !protocol) return;
+
+    if (entity.kind !== "ticker" || !entity.decision) {
+      section.classList.add("hide");
+      return;
+    }
+
+    section.classList.remove("hide");
+    title.textContent = "Decision Layer";
+
+    operating.innerHTML = [
+      { label: "Earnings", tone: "tone-blue", value: entity.decision.earningsView, note: entity.decision.earningsNote },
+      { label: "Balance / Debt", tone: "tone-green", value: entity.decision.balanceView, note: entity.decision.balanceNote },
+      { label: "Catalyst", tone: "tone-violet", value: entity.decision.catalystView, note: entity.decision.catalystNote }
+    ].map((item) => `
+      <div class="entity-summary-item">
+        <span class="type-badge ${item.tone}">${escapeHtml(item.label)}: ${escapeHtml(item.value)}</span>
+        <div style="margin-top:8px">${escapeHtml(item.note)}</div>
+      </div>
+    `).join("");
+
+    protocol.innerHTML = [
+      entity.decision.valuationGate,
+      `Allocation fit: ${entity.decision.allocationFit}. Multibagger fit: ${entity.decision.multibaggerFit}.`,
+      `Decision source: ${entity.decision.sourceLabel} (${entity.decision.asOf}).`,
+      `Watch items: ${(entity.decision.watchItems || []).join(", ")}.`
+    ].map((item, index) => `
+      <div class="entity-summary-item">
+        ${index === 2 && entity.decision.sourceUrl ? `<a class="entity-inline-link" href="${entity.decision.sourceUrl}" target="_blank" rel="noreferrer">${escapeHtml(item)}</a>` : escapeHtml(item)}
+      </div>
+    `).join("");
+  }
+
   function initCharts(entity) {
     const pieTarget = $("#entity-pie-chart");
     const barTarget = $("#entity-bar-chart");
@@ -414,6 +454,7 @@
 
     renderHero(entity);
     renderSummary(entity);
+    renderDecision(entity);
     renderTable(entity);
     initCharts(entity);
   });

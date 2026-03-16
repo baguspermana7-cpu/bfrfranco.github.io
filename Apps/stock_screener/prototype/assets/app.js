@@ -15,6 +15,7 @@
     entityHref,
     escapeHtml,
     filterFloatRows,
+    getDecisionRows,
     formatPct,
     getFloatRows,
     getNetworkScenarios,
@@ -32,7 +33,10 @@
     sortKey: "freeFloat",
     sortDir: "asc",
     sectorFilter: "all",
+    floatDecisionFilter: "all",
     currentNetworkId: "",
+    priorityMode: "allocation",
+    networkShowAllLabels: false,
     charts: {}
   };
 
@@ -98,6 +102,7 @@
 
     const items = [
       { id: "overview-section", label: "Overview", note: "Source status" },
+      { id: "priority-section", label: "Priority Queue", note: "Decision mode" },
       { id: "screener-section", label: "Float Screener", note: "Sourced rows" },
       { id: "network-section", label: "Network", note: "Issuer overlap" },
       { id: "source-section", label: "Source Ledger", note: "As-of dates" },
@@ -232,6 +237,316 @@
     }
   }
 
+  function getRecurringInvestorMap() {
+    return new Map(
+      getNetworkScenarios()
+        .filter((item) => item.type === "investor")
+        .map((item) => [item.id, Number(item.stats.find((row) => row.label === "Positions")?.value || 0)])
+    );
+  }
+
+  function scoreRecency(asOf) {
+    const timestamp = parseAsOf(asOf);
+    if (!timestamp) return 0;
+    const days = Math.max(0, Math.round((Date.now() - timestamp) / 86400000));
+    if (days <= 120) return 6;
+    if (days <= 240) return 4;
+    if (days <= 365) return 2;
+    return 0;
+  }
+
+  function buildOwnershipAssessment(row, recurringNamedHolders) {
+    let score = 38;
+    const positives = [];
+    const cautions = [];
+
+    if (row.freeFloat >= 25 && row.freeFloat <= 50) score += 18;
+    else if (row.freeFloat >= 15 && row.freeFloat < 25) score += 10;
+    else if (row.freeFloat > 50) score += 6;
+    else if (row.freeFloat >= 5) score += 1;
+    else score -= 26;
+
+    if (row.risk === "Low") score += 18;
+    else if (row.risk === "Medium") score += 6;
+    else score -= 20;
+
+    if (row.blindSpot <= 10) score += 10;
+    else if (row.blindSpot <= 20) score += 6;
+    else if (row.blindSpot > 35) score -= 10;
+
+    if (row.visibleHeld >= 60) score += 8;
+    else if (row.visibleHeld >= 40) score += 4;
+    else score -= 4;
+
+    if (row.concentrationBand === "Distributed") score += 6;
+    else if (row.concentrationBand === "Concentrated") score -= 4;
+    else score -= 10;
+
+    if (row.strategicHeld >= 85) score -= 14;
+    else if (row.strategicHeld >= 70) score -= 6;
+    else if (row.strategicHeld >= 50 && row.strategicHeld <= 65) score += 4;
+
+    score += Math.min(16, recurringNamedHolders * 4);
+    score += scoreRecency(row.asOf);
+
+    if (row.freeFloat >= 35) positives.push(`float ${formatPct(row.freeFloat)}`);
+    else if (row.freeFloat >= 15) positives.push(`screenable float ${formatPct(row.freeFloat)}`);
+    else cautions.push(`float only ${formatPct(row.freeFloat)}`);
+
+    if (row.visibleHeld >= 60) positives.push(`coverage ${formatPct(row.visibleHeld)}`);
+    else if (row.visibleHeld < 40) cautions.push("thin visible coverage");
+
+    if (recurringNamedHolders >= 2) positives.push(`${recurringNamedHolders} recurring holders`);
+    if (row.risk === "Low") positives.push("low ownership risk");
+    if (row.risk === "Medium") cautions.push("medium ownership risk");
+    if (row.risk === "High") cautions.push("high ownership risk");
+    if (row.blindSpot > 25) cautions.push(`blind spot ${formatPct(row.blindSpot)}`);
+    if (row.concentrationBand === "Tight") cautions.push("tight concentration");
+    if (row.strategicHeld >= 85) cautions.push("strategic block dominates");
+
+    return {
+      ownershipScore: Math.max(0, Math.min(100, Math.round(score))),
+      positives: positives.slice(0, 3),
+      cautions: cautions.slice(0, 3)
+    };
+  }
+
+  function scoreDecisionValue(value, map) {
+    return map?.[value] ?? 0;
+  }
+
+  function buildPriorityQueue(mode = state.priorityMode) {
+    const recurringMap = getRecurringInvestorMap();
+    const modeConfig = mode === "multibagger"
+      ? {
+        label: "Multibagger",
+        earningsMap: { Strong: 10, Stable: 9, Cyclical: 11, Turnaround: 8 },
+        balanceMap: { Strong: 10, Adequate: 8, Restructuring: -4 },
+        catalystMap: { Compounding: 5, Project: 16, Policy: 9, Cycle: 13, Turnaround: 18 },
+        fitMap: { High: 18, Medium: 13, Selective: 8, Low: 1 },
+        fitKey: "multibaggerFit"
+      }
+      : {
+        label: "Allocation",
+        earningsMap: { Strong: 18, Stable: 14, Cyclical: 8, Turnaround: 2 },
+        balanceMap: { Strong: 18, Adequate: 12, Restructuring: 0 },
+        catalystMap: { Compounding: 10, Project: 11, Policy: 8, Cycle: 6, Turnaround: 4 },
+        fitMap: { High: 14, Medium: 8, Selective: 4, Low: 0 },
+        fitKey: "allocationFit"
+      };
+
+    return getDecisionRows()
+      .map((row) => {
+        const entity = data.entities?.tickers?.[row.ticker];
+        const decision = row.decision;
+        const recurringNamedHolders = (entity?.holderTable || []).filter((holder) => recurringMap.has(holder.entityId)).length;
+        const ownership = buildOwnershipAssessment(row, recurringNamedHolders);
+        let score = ownership.ownershipScore * (mode === "multibagger" ? 0.38 : 0.46);
+
+        score += scoreDecisionValue(decision.earningsView, modeConfig.earningsMap);
+        score += scoreDecisionValue(decision.balanceView, modeConfig.balanceMap);
+        score += scoreDecisionValue(decision.catalystView, modeConfig.catalystMap);
+        score += scoreDecisionValue(decision[modeConfig.fitKey], modeConfig.fitMap);
+        score += scoreRecency(decision.asOf);
+
+        if (mode === "multibagger") {
+          if (row.freeFloat >= 8 && row.freeFloat <= 30) score += 12;
+          else if (row.freeFloat > 30 && row.freeFloat <= 45) score += 8;
+          else if (row.freeFloat > 45) score += 3;
+          else score -= 6;
+
+          if (row.risk === "High") score -= 14;
+          if (decision.balanceView === "Restructuring") score -= 12;
+        } else {
+          if (row.freeFloat > 50) score -= 3;
+          if (row.risk === "High") score -= 12;
+        }
+
+        const modeFit = decision[modeConfig.fitKey];
+        const finalScore = Math.max(0, Math.min(100, Math.round(score)));
+        const action = mode === "multibagger"
+          ? (finalScore >= 90
+            && ["High", "Medium"].includes(modeFit)
+            && decision.balanceView !== "Restructuring"
+            && row.risk !== "High"
+            && row.freeFloat >= 8
+            && row.freeFloat <= 35
+            ? "Accumulate"
+            : finalScore >= 56 ? "Watch" : "Avoid")
+          : (finalScore >= 90
+            && modeFit === "High"
+            && ["Strong", "Adequate"].includes(decision.balanceView)
+            && decision.earningsView !== "Turnaround"
+            && row.risk === "Low"
+            ? "Accumulate"
+            : finalScore >= 58 ? "Watch" : "Avoid");
+
+        return {
+          ...row,
+          mode: modeConfig.label,
+          modeFit,
+          score: finalScore,
+          recurringNamedHolders,
+          action,
+          positives: ownership.positives,
+          cautions: ownership.cautions
+        };
+      })
+      .sort((a, b) => {
+        const actionWeight = { Accumulate: 3, Watch: 2, Avoid: 1 };
+        return (actionWeight[b.action] || 0) - (actionWeight[a.action] || 0)
+          || b.score - a.score
+          || b.recurringNamedHolders - a.recurringNamedHolders
+          || b.freeFloat - a.freeFloat
+          || a.ticker.localeCompare(b.ticker);
+      })
+      .map((row, index) => ({
+        ...row,
+        rank: index + 1
+      }));
+  }
+
+  function renderPriorityQueue() {
+    const statGrid = $("#priority-stat-grid");
+    const allocationList = $("#priority-allocation-list");
+    const watchList = $("#priority-watch-list");
+    const methodList = $("#priority-method-list");
+    const riskList = $("#priority-risk-list");
+    const body = $("#priority-body");
+    const note = $("#priority-note");
+    const allocationBtn = $("#priority-mode-allocation");
+    const multibaggerBtn = $("#priority-mode-multibagger");
+    if (!statGrid || !allocationList || !watchList || !methodList || !riskList || !body) return;
+
+    const queue = buildPriorityQueue(state.priorityMode);
+    const accumulate = queue.filter((row) => row.action === "Accumulate");
+    const watch = queue.filter((row) => row.action === "Watch");
+    const avoid = queue.filter((row) => row.action === "Avoid");
+    const avgScore = queue.length ? round2(queue.reduce((sum, row) => sum + row.score, 0) / queue.length) : 0;
+    const activeMode = state.priorityMode === "multibagger" ? "Multibagger" : "Allocation";
+
+    if (allocationBtn && multibaggerBtn) {
+      allocationBtn.classList.toggle("is-active", state.priorityMode === "allocation");
+      multibaggerBtn.classList.toggle("is-active", state.priorityMode === "multibagger");
+    }
+
+    if (note) {
+      note.textContent = state.priorityMode === "multibagger"
+        ? "Multibagger mode looks for asymmetry, project optionality, cycle turns, and tighter ownership setups. It is stricter on execution risk and still requires live price work."
+        : "Allocation mode looks for cleaner ownership plus stable issuer-side operating evidence. Use it to decide where core research time should go first.";
+    }
+
+    statGrid.innerHTML = [
+      { label: "Mode", value: activeMode },
+      { label: "Accumulate", value: String(accumulate.length) },
+      { label: "Watch", value: String(watch.length) },
+      { label: "Avoid", value: String(avoid.length) },
+      { label: "Avg Score", value: String(avgScore) }
+    ].map((item) => `
+      <div class="snapshot">
+        <strong>${escapeHtml(item.value)}</strong>
+        <span>${escapeHtml(item.label)}</span>
+      </div>
+    `).join("");
+
+    allocationList.innerHTML = accumulate.length
+      ? accumulate.slice(0, 6).map((row) => `
+        <div class="list-row">
+          <span><a class="entity-inline-link" href="${entityHref("ticker", row.ticker)}">${escapeHtml(row.ticker)}</a> - ${escapeHtml(row.decision.earningsView)} / ${escapeHtml(row.decision.catalystView)}</span>
+          <span class="mono muted">${escapeHtml(`${row.score}/100`)}</span>
+        </div>
+      `).join("")
+      : '<div class="list-row"><span>No accumulate candidate under the current mode.</span></div>';
+
+    watchList.innerHTML = watch.length
+      ? watch.slice(0, 6).map((row) => `
+        <div class="list-row">
+          <span><a class="entity-inline-link" href="${entityHref("ticker", row.ticker)}">${escapeHtml(row.ticker)}</a> - ${escapeHtml(row.cautions[0] || row.decision.watchItems[0] || row.signalSummary)}</span>
+          <span class="mono muted">${escapeHtml(`${row.score}/100`)}</span>
+        </div>
+      `).join("")
+      : '<div class="list-row"><span>No watch candidate under the current mode.</span></div>';
+
+    methodList.innerHTML = (state.priorityMode === "multibagger"
+      ? [
+        "Multibagger mode is not asking which business is safest. It is asking where optionality can re-rate materially if execution lands.",
+        "Project, cycle, and turnaround catalysts receive more weight here, but weak balance sheets still block automatic accumulate labels.",
+        "Tight float alone is never enough. The catalyst has to be specific and sourced from issuer-side disclosures.",
+        "Use this mode to build a speculative watchlist, not to skip valuation discipline."
+      ]
+      : [
+        "Allocation mode starts from cleaner ownership and then checks whether the issuer still shows stable operating evidence.",
+        "Strong balance-sheet language, recurring earnings power, and disciplined catalyst paths rank above story-heavy optionality.",
+        "Use Accumulate as a research-priority label, then run your own live valuation check before entry.",
+        "If a ticker lands in Watch, it means the case is real but still needs price, debt, or execution confirmation."
+      ]).map((item) => `
+      <div class="list-row">
+        <span class="mono muted">RULE</span>
+        <span>${escapeHtml(item)}</span>
+      </div>
+    `).join("");
+
+    riskList.innerHTML = (state.priorityMode === "multibagger"
+      ? [
+        "Avoid names where balance repair is still open-ended unless you deliberately want turnaround risk.",
+        "If free float is too tight and blind spot is too large, treat the move as trade-only until new disclosure arrives.",
+        "Project optionality must be tied to named milestones such as commissioning, RKAB, or network rollout.",
+        "Every multibagger candidate still needs a live downside map before capital deployment."
+      ]
+      : [
+        "Do not turn an ownership score into a buy call without checking live valuation multiples.",
+        "High-risk float structures stay out of Accumulate even if the business case looks attractive.",
+        "Debt, funding, or tariff sensitivity can overturn a clean ownership setup; always read the issuer release itself.",
+        "If the source date is older than your holding horizon requires, refresh the thesis before acting."
+      ]).map((item) => `
+      <div class="list-row">
+        <span class="mono muted">RULE</span>
+        <span>${escapeHtml(item)}</span>
+      </div>
+    `).join("");
+
+    body.innerHTML = queue
+      .map((row) => `
+        <tr>
+          <td class="mono">${escapeHtml(String(row.rank))}</td>
+          <td class="mono"><a class="entity-inline-link" href="${entityHref("ticker", row.ticker)}">${escapeHtml(row.ticker)}</a></td>
+          <td><span class="type-badge ${row.action === "Accumulate" ? "tone-green" : row.action === "Watch" ? "tone-accent" : "tone-red"}">${escapeHtml(row.action)}</span></td>
+          <td><span class="type-badge ${row.modeFit === "High" ? "tone-green" : row.modeFit === "Medium" ? "tone-blue" : row.modeFit === "Selective" ? "tone-violet" : "tone-red"}">${escapeHtml(row.modeFit)}</span></td>
+          <td class="right mono">${escapeHtml(String(row.score))}</td>
+          <td>${escapeHtml(row.positives.join(", ") || row.signalSummary)}</td>
+          <td><span class="type-badge tone-blue">${escapeHtml(row.decision.earningsView)}</span> ${escapeHtml(row.decision.earningsNote)}</td>
+          <td><span class="type-badge tone-green">${escapeHtml(row.decision.balanceView)}</span> ${escapeHtml(row.decision.balanceNote)}</td>
+          <td><span class="type-badge tone-violet">${escapeHtml(row.decision.catalystView)}</span> ${escapeHtml(row.decision.catalystNote)}</td>
+          <td>${escapeHtml(row.decision.valuationGate)}</td>
+          <td>${row.decision.sourceUrl ? `<a class="entity-inline-link" href="${row.decision.sourceUrl}" target="_blank" rel="noreferrer">${escapeHtml(row.decision.sourceLabel)}</a>` : escapeHtml(row.decision.sourceLabel)}<div class="mono muted" style="margin-top:6px">${escapeHtml(row.decision.asOf)}</div></td>
+        </tr>
+      `)
+      .join("");
+  }
+
+  function bindPriorityMode() {
+    const allocationBtn = $("#priority-mode-allocation");
+    const multibaggerBtn = $("#priority-mode-multibagger");
+    if (!allocationBtn || !multibaggerBtn) return;
+
+    allocationBtn.addEventListener("click", () => {
+      state.priorityMode = "allocation";
+      renderPriorityQueue();
+    });
+
+    multibaggerBtn.addEventListener("click", () => {
+      state.priorityMode = "multibagger";
+      renderPriorityQueue();
+    });
+  }
+
+  function getDecisionMaps() {
+    return {
+      allocation: new Map(buildPriorityQueue("allocation").map((row) => [row.ticker, row])),
+      multibagger: new Map(buildPriorityQueue("multibagger").map((row) => [row.ticker, row]))
+    };
+  }
+
   function compareValues(a, b, key) {
     const riskWeight = { Low: 1, Medium: 2, High: 3 };
     const stringKeys = new Set(["ticker", "company", "holder", "largestStrategicHolder", "sector", "signalSummary", "coverageBand", "concentrationBand"]);
@@ -248,8 +563,27 @@
   }
 
   function getRenderedFloatRows() {
+    const decisionMaps = getDecisionMaps();
     const rows = filterFloatRows(state.currentTab)
+      .map((row) => {
+        const allocation = decisionMaps.allocation.get(row.ticker);
+        const multibagger = decisionMaps.multibagger.get(row.ticker);
+        return {
+          ...row,
+          allocationAction: allocation?.action || "N/A",
+          allocationScore: allocation?.score || 0,
+          multibaggerAction: multibagger?.action || "N/A",
+          multibaggerScore: multibagger?.score || 0
+        };
+      })
       .filter((row) => state.sectorFilter === "all" || row.sector === state.sectorFilter)
+      .filter((row) => {
+        if (state.floatDecisionFilter === "allocation-accumulate") return row.allocationAction === "Accumulate";
+        if (state.floatDecisionFilter === "multibagger-accumulate") return row.multibaggerAction === "Accumulate";
+        if (state.floatDecisionFilter === "watch-only") return row.allocationAction === "Watch" || row.multibaggerAction === "Watch";
+        if (state.floatDecisionFilter === "avoid-any") return row.allocationAction === "Avoid" || row.multibaggerAction === "Avoid";
+        return true;
+      })
       .slice();
 
     rows.sort((a, b) => {
@@ -269,6 +603,8 @@
     const avgBlindSpot = rows.length ? round2(rows.reduce((sum, row) => sum + row.blindSpot, 0) / rows.length) : 0;
     const avgHHI = rows.length ? round2(rows.reduce((sum, row) => sum + row.hhi, 0) / rows.length) : 0;
     const highRisk = rows.filter((row) => row.risk === "High").length;
+    const allocationAccumulate = rows.filter((row) => row.allocationAction === "Accumulate").length;
+    const multibaggerAccumulate = rows.filter((row) => row.multibaggerAction === "Accumulate").length;
 
     const cards = [
       { label: "Avg Free Float", value: formatPct(avgFloat) },
@@ -276,6 +612,8 @@
       { label: "Avg Blind Spot", value: formatPct(avgBlindSpot) },
       { label: "Avg HHI", value: avgHHI.toFixed(0) },
       { label: "High Risk", value: String(highRisk) },
+      { label: "Alloc A", value: String(allocationAccumulate) },
+      { label: "Multi A", value: String(multibaggerAccumulate) },
       { label: "Rows", value: String(rows.length) }
     ];
 
@@ -308,7 +646,14 @@
     const note = $("#float-table-note");
     if (note) {
       const latest = rows.slice().sort((a, b) => parseAsOf(b.asOf) - parseAsOf(a.asOf))[0]?.asOf || "N/A";
-      note.textContent = `${rows.length} sourced row(s) in view. 0 synthetic rows. Latest snapshot among visible rows: ${latest}.`;
+      const filterLabels = {
+        all: "All decisions",
+        "allocation-accumulate": "Allocation Accumulate",
+        "multibagger-accumulate": "Multibagger Accumulate",
+        "watch-only": "Any Watch",
+        "avoid-any": "Any Avoid"
+      };
+      note.textContent = `${rows.length} sourced row(s) in view. Decision filter: ${filterLabels[state.floatDecisionFilter] || "All decisions"}. Latest snapshot among visible rows: ${latest}.`;
     }
 
     renderTopStats(rows);
@@ -316,7 +661,7 @@
     updateSortHeaders();
 
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="12" class="muted-copy">No rows match the current filter.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="14" class="muted-copy">No rows match the current filter.</td></tr>';
       return;
     }
 
@@ -336,6 +681,18 @@
             <td class="right mono">${escapeHtml(item.hhi.toFixed(0))}</td>
             <td class="right mono">${escapeHtml(mix)}</td>
             <td class="right ${riskClass(item.risk)}">${escapeHtml(item.risk)}</td>
+            <td>
+              <div class="decision-chip-row">
+                <span class="type-badge ${item.allocationAction === "Accumulate" ? "tone-green" : item.allocationAction === "Watch" ? "tone-accent" : "tone-red"}">${escapeHtml(item.allocationAction)}</span>
+                <span class="mono muted">${escapeHtml(String(item.allocationScore))}</span>
+              </div>
+            </td>
+            <td>
+              <div class="decision-chip-row">
+                <span class="type-badge ${item.multibaggerAction === "Accumulate" ? "tone-green" : item.multibaggerAction === "Watch" ? "tone-accent" : "tone-red"}">${escapeHtml(item.multibaggerAction)}</span>
+                <span class="mono muted">${escapeHtml(String(item.multibaggerScore))}</span>
+              </div>
+            </td>
             <td><span class="mono muted">${escapeHtml(item.signalSummary)}</span></td>
           </tr>
         `;
@@ -379,14 +736,29 @@
 
   function bindFloatFilters() {
     const sectorSelect = $("#float-sector-filter");
-    if (!sectorSelect) return;
+    const decisionSelect = $("#float-decision-filter");
+    if (!sectorSelect || !decisionSelect) return;
 
     const sectors = Array.from(new Set(getFloatRows().map((row) => row.sector).filter(Boolean))).sort();
     sectorSelect.innerHTML = ["<option value=\"all\">All sectors</option>", ...sectors.map((sector) => `<option value="${escapeHtml(sector)}">${escapeHtml(sector)}</option>`)].join("");
     sectorSelect.value = state.sectorFilter;
 
+    decisionSelect.innerHTML = [
+      { value: "all", label: "All decisions" },
+      { value: "allocation-accumulate", label: "Allocation Accumulate" },
+      { value: "multibagger-accumulate", label: "Multibagger Accumulate" },
+      { value: "watch-only", label: "Any Watch" },
+      { value: "avoid-any", label: "Any Avoid" }
+    ].map((item) => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`).join("");
+    decisionSelect.value = state.floatDecisionFilter;
+
     sectorSelect.addEventListener("change", () => {
       state.sectorFilter = sectorSelect.value || "all";
+      renderFloatTable();
+    });
+
+    decisionSelect.addEventListener("change", () => {
+      state.floatDecisionFilter = decisionSelect.value || "all";
       renderFloatTable();
     });
   }
@@ -409,6 +781,10 @@
         { label: "Local Visible", value: (row) => row.localPct || "" },
         { label: "Foreign Visible", value: (row) => row.foreignPct || "" },
         { label: "Risk", value: "risk" },
+        { label: "Allocation Action", value: "allocationAction" },
+        { label: "Allocation Score", value: "allocationScore" },
+        { label: "Multibagger Action", value: "multibaggerAction" },
+        { label: "Multibagger Score", value: "multibaggerScore" },
         { label: "Signal", value: "signalSummary" },
         { label: "As Of", value: "asOf" },
         { label: "Source", value: "sourceLabel" }
@@ -474,8 +850,12 @@
     const brief = $("#network-brief");
     const edgeList = $("#network-edge-list");
     const evidenceBody = $("#network-evidence-body");
+    const canvasNote = $("#network-canvas-note");
 
     if (note) note.textContent = scenario.note;
+    if (canvasNote) {
+      canvasNote.textContent = `${scenario.nodes.length} nodes • ${scenario.links.length} links • scroll to zoom • drag to inspect dense clusters`;
+    }
 
     if (statsGrid) {
       statsGrid.innerHTML = scenario.stats
@@ -538,9 +918,22 @@
     }
   }
 
+  function shouldShowNodeLabel(node) {
+    if (state.networkShowAllLabels) return true;
+    if (node.category === 0) return true;
+    if (node.kind === "ticker") return true;
+    if (node.category === 2) return true;
+    return (node.symbolSize || node.value || 0) >= 24;
+  }
+
   function renderNetworkGraph(scenario) {
     const chart = state.charts.network;
     if (!chart || !scenario) return;
+
+    const dense = scenario.nodes.length >= 14 || scenario.links.length >= 18;
+    const repulsion = dense ? Math.min(1200, 420 + scenario.nodes.length * 28) : 340;
+    const edgeLength = dense ? [120, 220] : [90, 170];
+    const zoom = dense ? 0.84 : 0.96;
 
     chart.off("click");
     chart.setOption({
@@ -561,29 +954,49 @@
           layout: "force",
           roam: true,
           draggable: true,
+          zoom,
           force: {
-            repulsion: 220,
-            edgeLength: 110,
-            gravity: 0.06
+            repulsion,
+            edgeLength,
+            gravity: dense ? 0.02 : 0.045,
+            friction: 0.12
           },
           emphasis: { focus: "adjacency" },
+          labelLayout: {
+            hideOverlap: !state.networkShowAllLabels,
+            moveOverlap: "shiftY"
+          },
           label: {
-            show: true,
             color: "#5c5850",
             fontFamily: "JetBrains Mono, monospace",
-            fontSize: 10
+            fontSize: 10,
+            position: "right"
           },
           data: scenario.nodes.map((node) => ({
             ...node,
+            label: {
+              show: shouldShowNodeLabel(node),
+              formatter: node.name,
+              color: "#5c5850",
+              fontFamily: "JetBrains Mono, monospace",
+              fontSize: node.kind === "ticker" ? 11 : 10
+            },
+            emphasis: {
+              label: {
+                show: true
+              }
+            },
             itemStyle: {
               color: node.category === 0 ? "#e55300" : node.category === 1 ? "#2563eb" : node.category === 2 ? "#1a8754" : "#7c3aed"
             }
           })),
           links: scenario.links,
-          lineStyle: { color: "rgba(0,0,0,0.12)", curveness: 0.08 }
+          lineStyle: { color: "rgba(0,0,0,0.12)", curveness: 0.1, opacity: 0.7 }
         }
       ]
-    });
+    }, true);
+
+    chart.resize();
 
     chart.on("click", (params) => {
       const href = params?.data?.href;
@@ -610,6 +1023,8 @@
 
   function bindNetworkControls() {
     const select = $("#network-scenario-select");
+    const fitButton = $("#network-fit-btn");
+    const labelButton = $("#network-label-toggle-btn");
     const scenarios = getNetworkScenarios();
     if (!select || !scenarios.length) return;
 
@@ -625,6 +1040,25 @@
     select.addEventListener("change", () => {
       renderNetworkScenario(select.value);
     });
+
+    if (fitButton) {
+      fitButton.addEventListener("click", () => {
+        renderNetworkScenario(state.currentNetworkId);
+      });
+    }
+
+    if (labelButton) {
+      const syncLabelButton = () => {
+        labelButton.textContent = state.networkShowAllLabels ? "Show Key Labels" : "Show All Labels";
+      };
+
+      syncLabelButton();
+      labelButton.addEventListener("click", () => {
+        state.networkShowAllLabels = !state.networkShowAllLabels;
+        syncLabelButton();
+        renderNetworkScenario(state.currentNetworkId);
+      });
+    }
 
     renderNetworkScenario(state.currentNetworkId);
   }
@@ -840,6 +1274,8 @@
     renderSidebar();
     attachSearch();
     renderOverviewPanels();
+    renderPriorityQueue();
+    bindPriorityMode();
     bindAssistant();
     bindFloatFilters();
     bindFloatSorting();

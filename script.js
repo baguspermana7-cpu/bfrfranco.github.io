@@ -567,6 +567,8 @@ function initCursorSpotlight() {
    3D Card Tilt Effect
    ========================================== */
 function initCardTilt() {
+    // Disabled — 3D card tilt removed for cleaner UX
+    return;
     // Skip on touch devices
     if (!window.matchMedia('(pointer: fine)').matches) return;
 
@@ -1156,16 +1158,16 @@ function initMotionEffects() {
         }, { threshold: 0.5 });
         scrambleEls.forEach(function(el) { scrambleIO.observe(el); });
 
-        // --- #24: Glitch Text on Hover ---
-        var glitchTitles = document.querySelectorAll('.section-title');
-        glitchTitles.forEach(function(title) {
-            title.addEventListener('mouseenter', function() {
-                title.classList.add('glitch-active');
-            });
-            title.addEventListener('animationend', function() {
-                title.classList.remove('glitch-active');
-            });
-        });
+        // --- #24: Glitch Text on Hover --- (Disabled for cleaner UX)
+        // var glitchTitles = document.querySelectorAll('.section-title');
+        // glitchTitles.forEach(function(title) {
+        //     title.addEventListener('mouseenter', function() {
+        //         title.classList.add('glitch-active');
+        //     });
+        //     title.addEventListener('animationend', function() {
+        //         title.classList.remove('glitch-active');
+        //     });
+        // });
     }
 
     // =============================================
@@ -1174,6 +1176,8 @@ function initMotionEffects() {
     initCardEffects();
 
     function initCardEffects() {
+        // Disabled — card flip/trail/expand effects removed for cleaner UX
+        return;
         // --- #25: Card Flip Preview --- (only on desktop hover)
         if (hasPointer && !isMobile) {
             var caseCards = document.querySelectorAll('.case-card[data-flip-text]');
@@ -1245,6 +1249,8 @@ function initMotionEffects() {
     }
 
     function initButtonEffects() {
+        // Disabled — button magnetic snap/ripple removed for cleaner UX
+        return;
         // --- #37: Button Magnetic Snap ---
         var btns = document.querySelectorAll('.btn, .btn-primary, .btn-bento-primary, .btn-explore-articles');
         btns.forEach(function(btn) {

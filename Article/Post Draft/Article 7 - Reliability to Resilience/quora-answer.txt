@@ -1,0 +1,30 @@
+QUORA ANSWER DRAFT
+==================
+Target Question: "What is the difference between reliability and resilience in data centers?"
+(Also fits: "Are Uptime Institute tier ratings still relevant?", "What is graceful degradation?", "How do you design for resilience, not just redundancy?")
+
+---
+
+ANSWER:
+
+Reliability: "this component will run for 50,000 hours without failure."
+Resilience: "when this component fails — and it will — the system continues operating."
+
+The data center industry has spent 20 years obsessing over reliability (Tier ratings, redundancy levels, SLAs). But reliability is a component property. Resilience is a system property. They're not the same thing.
+
+A Tier IV facility with 2N redundancy everywhere is highly reliable on paper. But if the operations team has never practiced a failover, if the automatic transfer switch has never been tested under real load, if the fuel delivery contract doesn't cover weekends — the resilience is far lower than the tier rating suggests.
+
+I've seen Tier II facilities outperform Tier IV facilities during real incidents. The difference wasn't equipment — it was adaptive capacity. The Tier II team practiced failure scenarios monthly, had clear escalation paths, and could make decisions in minutes. The Tier IV team relied on redundancy to prevent the scenario they'd never rehearsed.
+
+The shift from reliability thinking to resilience thinking requires:
+
+1. Assume failure, don't prevent it. Design for graceful degradation, not perfect uptime.
+2. Test the response, not just the equipment. Tabletop exercises, load bank tests, live failover drills.
+3. Measure recovery capability, not just failure rate. MTTR matters more than MTBF.
+4. Build adaptive capacity in people, not just systems.
+
+Full analysis of why tier ratings alone are insufficient and a resilience assessment framework:
+
+https://resistancezero.com/article-7.html
+
+Suggested Quora Topics: Data Centers, Resilience Engineering, Reliability Engineering, Infrastructure, Uptime Institute

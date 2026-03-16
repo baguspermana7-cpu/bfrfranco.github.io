@@ -1,0 +1,34 @@
+QUORA ANSWER DRAFT
+==================
+Target Question: "Will AI data centers eliminate the need for chillers?"
+(Also fits: "Does liquid cooling replace HVAC?", "Can Nvidia GPU liquid cooling work in tropical climates?", "What cooling does a 100kW rack need?")
+
+---
+
+ANSWER:
+
+Short answer: No. And anyone telling you otherwise hasn't done the thermal math for tropical climates.
+
+Here's the reality that gets lost in the hype around direct-to-chip liquid cooling:
+
+Yes, Nvidia's Rubin/Blackwell GPUs with direct-to-chip cooling remove ~70-80% of the heat at the chip level. That's impressive. But it doesn't eliminate the remaining 20-30% of heat that still radiates into the room — from VRMs, NVLink switches, NVMe drives, power supplies, and network equipment.
+
+In a 100 kW rack, that's 20-30 kW of residual heat per rack that still needs traditional air cooling.
+
+Now add the tropical factor: outdoor ambient in Southeast Asia averages 28-35C with 70-90% relative humidity. Free cooling (using outdoor air directly) requires outdoor temps below ~18C to be effective. That means zero free cooling hours in most of SEA.
+
+The liquid cooling loop itself needs heat rejection. Those rear-door heat exchangers or CDUs (Coolant Distribution Units) reject heat to... a cooling tower or dry cooler. In tropical climates with wet-bulb temps of 27-28C, you still need mechanical cooling (chillers) to get coolant temps low enough.
+
+What actually changes:
+- Chiller CAPACITY reduces (you're cooling 20-30% of heat, not 100%)
+- Chiller TYPE may change (higher temp setpoints enable more efficient operation)
+- PUE improves (from 1.3-1.5 down to 1.1-1.2)
+- But HVAC doesn't disappear. It transforms.
+
+I built a fault scenario analysis showing exactly what happens when liquid cooling fails in a 50 MW tropical facility. Spoiler: you have 3-8 minutes before thermal throttling.
+
+Full technical analysis with hybrid cooling architecture diagrams and tropical climate calculations:
+
+https://resistancezero.com/article-9.html
+
+Suggested Quora Topics: Data Center Cooling, HVAC, Liquid Cooling, Nvidia, AI Infrastructure, Tropical Engineering

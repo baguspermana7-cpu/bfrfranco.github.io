@@ -1,0 +1,32 @@
+QUORA ANSWER DRAFT
+==================
+Target Question: "How do hyperscale data centers distribute power?"
+(Also fits: "What voltage do data centers use?", "Why are data centers moving to 48V DC?", "How does AWS/Google power distribution work?")
+
+---
+
+ANSWER:
+
+The power distribution architectures of AWS, Google, Microsoft, and xAI are fundamentally different from each other — and from traditional data centers. I spent months analyzing their patents, blog posts, and conference presentations to map the differences.
+
+Quick comparison:
+
+AWS: Traditional AC architecture with custom UPS modules. They design their own power equipment (Nitro Power) to eliminate vendor dependency. 480V AC distribution.
+
+Google: Pioneered 48V DC distribution at the server level. Their servers have been running on 48V DC since 2016. This eliminates 2-3 power conversion stages and improves efficiency by 8-12%.
+
+Microsoft: Hybrid approach. 380V DC distribution in newer Azure facilities. They've also experimented with hydrogen fuel cells as primary power (not backup) in some facilities.
+
+xAI (Memphis): 100 MW campus built in 5 months. Direct 480V to server racks with minimal transformation stages. Speed over optimization.
+
+The big shift happening now: 800V DC distribution. This is borrowed from EV technology (Tesla uses 800V in its powertrain). At 800V, current drops by half vs. 400V, which means smaller cables, less copper, lower losses.
+
+Why this matters: power distribution is 6-10% of total data center energy loss. At 100 MW scale, that's $5-10M per year in wasted electricity. The architecture choice determines this loss.
+
+I analyzed failure scenarios for each architecture — what happens when a bus bar fails, when a PDU trips, when utility power drops. The resilience profiles are surprisingly different.
+
+Full architecture comparison with failure scenario analysis:
+
+https://resistancezero.com/article-13.html
+
+Suggested Quora Topics: Data Center Design, Power Distribution, AWS, Google Cloud, Hyperscale, Electrical Engineering

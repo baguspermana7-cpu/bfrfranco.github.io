@@ -14,6 +14,8 @@ const ROUTES = new Map([
   ["/app.html", "prototype/app.html"],
   ["/methodology", "prototype/methodology.html"],
   ["/methodology.html", "prototype/methodology.html"],
+  ["/faq", "prototype/faq.html"],
+  ["/faq.html", "prototype/faq.html"],
   ["/affiliate", "prototype/affiliate.html"],
   ["/affiliate.html", "prototype/affiliate.html"],
   ["/entity", "prototype/entity.html"],

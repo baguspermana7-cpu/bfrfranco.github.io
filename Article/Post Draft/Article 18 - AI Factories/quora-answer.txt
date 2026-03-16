@@ -1,0 +1,30 @@
+QUORA ANSWER DRAFT
+==================
+Target Question: "What is an AI factory data center?"
+(Also fits: "How are AI data centers different from traditional ones?", "Why do AI workloads need different infrastructure?", "What is the future of data center design?")
+
+---
+
+ANSWER:
+
+Jensen Huang (Nvidia CEO) calls them "AI factories" for a reason. They're not data centers with GPUs bolted on. They're fundamentally different facilities with different physics.
+
+Here's what changes at 130 kW per rack (AI factory density) vs. 8-15 kW per rack (traditional):
+
+Power density: A traditional 10 MW data center fills a 5,000 sqm hall. An AI factory puts 10 MW in 800 sqm. Same power, 6x the density. Your entire electrical distribution system must be redesigned.
+
+Cooling: Air cooling physically cannot remove 130 kW from a single rack. The laws of thermodynamics say no. You need direct-to-chip liquid cooling at minimum, with rear-door heat exchangers or overhead CDUs for residual heat. This means plumbing in your server room — leaks become a new failure mode.
+
+Network fabric: AI training workloads require all-to-all GPU communication with consistent sub-microsecond latency. InfiniBand or RoCEv2 at 400-800 Gbps per GPU. A single 8-GPU node generates 3.2 Tbps of east-west traffic. Your network is now the bottleneck, not compute.
+
+Power quality: GPU power draw fluctuates dramatically with workload phase (forward pass vs. backward pass). A rack can swing from 40 kW to 130 kW in milliseconds. Traditional UPS systems aren't designed for this kind of transient load.
+
+Floor loading: A fully loaded AI rack weighs 1,200-1,800 kg. Standard raised floor tiles are rated for 340 kg. You need structural reinforcement or slab-on-grade construction.
+
+$600B+ in hyperscaler CAPEX is flowing into these facilities. Traditional data center architecture faces genuine technical extinction for AI workloads.
+
+I built an AI Factory readiness calculator that scores existing facilities against AI workload requirements:
+
+https://resistancezero.com/article-18.html
+
+Suggested Quora Topics: Data Centers, AI Infrastructure, Nvidia, Liquid Cooling, GPU Computing, Hyperscale

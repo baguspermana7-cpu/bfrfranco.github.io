@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overflow Check</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 12px; }
+    iframe { width: 390px; height: 844px; border: 1px solid #ccc; display: block; margin-bottom: 12px; }
+    pre { white-space: pre-wrap; font-size: 12px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <iframe id="frame" src="file:///home/baguspermana7/rz-work/geopolitics-3.html"></iframe>
+  <pre id="report">Loading...</pre>
+  <script>
+    window.addEventListener('load', function() {
+      var frame = document.getElementById('frame');
+      var report = document.getElementById('report');
+      setTimeout(function() {
+        try {
+          var doc = frame.contentDocument;
+          var win = frame.contentWindow;
+          var vw = win.innerWidth;
+          var rows = [];
+          doc.querySelectorAll('*').forEach(function(el) {
+            var r = el.getBoundingClientRect();
+            if (r.width > vw + 1 || r.right > vw + 1 || r.left < -1) {
+              rows.push({
+                tag: el.tagName.toLowerCase(),
+                cls: el.className || '',
+                id: el.id || '',
+                width: Math.round(r.width),
+                left: Math.round(r.left),
+                right: Math.round(r.right),
+                text: (el.textContent || '').trim().slice(0, 80)
+              });
+            }
+          });
+          report.textContent = JSON.stringify({
+            viewport: vw,
+            bodyScrollWidth: doc.body.scrollWidth,
+            htmlScrollWidth: doc.documentElement.scrollWidth,
+            offenders: rows.slice(0, 40)
+          }, null, 2);
+        } catch (err) {
+          report.textContent = 'ERROR: ' + err.message;
+        }
+      }, 3500);
+    });
+  </script>
+</body>
+</html>

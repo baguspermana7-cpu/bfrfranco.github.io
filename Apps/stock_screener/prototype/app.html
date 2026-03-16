@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/styles.css">
+  <link rel="stylesheet" href="./assets/styles.css?v=20260316m">
 </head>
 <body data-page="app">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -19,6 +19,7 @@
           <div class="nav-actions">
             <a class="nav-link" href="./index.html">Home</a>
             <a class="nav-link" href="./methodology.html">Methodology</a>
+            <a class="nav-link" href="./faq.html">FAQ</a>
           </div>
         </div>
       </nav>
@@ -82,12 +83,70 @@
               </div>
             </section>
 
+            <section class="app-card reveal" id="priority-section">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--violet)"></span><span>Ownership Priority Queue</span></div>
+              <div class="app-topbar" style="margin-top:14px">
+                <div class="eyebrow" id="priority-note">Ownership-first ordering only. This is not valuation or earnings advice.</div>
+                <div class="app-tab-row" id="priority-mode-tabs">
+                  <button class="app-tab is-active" id="priority-mode-allocation" type="button">Allocation Mode</button>
+                  <button class="app-tab" id="priority-mode-multibagger" type="button">Multibagger Mode</button>
+                </div>
+              </div>
+              <div class="snapshot-grid analytics-grid" id="priority-stat-grid" style="margin-top:14px"></div>
+              <div class="app-grid" style="margin-top:14px">
+                <div class="stack-card">
+                  <article class="app-card" style="padding:14px">
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Accumulate Candidates</span></div>
+                    <div class="list-stack" id="priority-allocation-list"></div>
+                  </article>
+                  <article class="app-card" style="padding:14px">
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Watchlist</span></div>
+                    <div class="list-stack" id="priority-watch-list"></div>
+                  </article>
+                </div>
+                <div class="stack-card">
+                  <article class="app-card" style="padding:14px">
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Mode Discipline</span></div>
+                    <div class="list-stack" id="priority-method-list"></div>
+                  </article>
+                  <article class="app-card" style="padding:14px">
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Risk Protocol</span></div>
+                    <div class="list-stack" id="priority-risk-list"></div>
+                  </article>
+                </div>
+              </div>
+              <div class="table-wrap" style="margin-top:14px">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Rank</th>
+                      <th scope="col">Ticker</th>
+                      <th scope="col">Action</th>
+                      <th scope="col">Mode</th>
+                      <th scope="col" class="right">Score</th>
+                      <th scope="col">Ownership Setup</th>
+                      <th scope="col">Earnings</th>
+                      <th scope="col">Balance / Debt</th>
+                      <th scope="col">Catalyst</th>
+                      <th scope="col">Valuation Gate</th>
+                      <th scope="col">Decision Source</th>
+                    </tr>
+                  </thead>
+                  <tbody id="priority-body"></tbody>
+                </table>
+              </div>
+              <div class="info-note">
+                Decision queue ini tetap bukan personal financial advice. Ranking menggabungkan ownership structure dan issuer-side operating evidence, tetapi live price, valuation multiple, dan position sizing tetap harus Anda cek sendiri.
+              </div>
+            </section>
+
             <section class="app-card reveal" id="screener-section">
               <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Free Float Screener</span></div>
               <div class="app-topbar" style="margin-top:14px">
                 <div class="eyebrow" id="float-table-note">All rows are sourced from issuer disclosures. Review-required names are excluded.</div>
                 <div class="filter-row">
                   <select class="inline-input" id="float-sector-filter" aria-label="Filter float screener by sector"></select>
+                  <select class="inline-input" id="float-decision-filter" aria-label="Filter float screener by decision state"></select>
                   <button class="ghost-btn" id="float-export-btn" type="button">Export CSV</button>
                 </div>
               </div>
@@ -114,6 +173,8 @@
                       <th scope="col" class="right" data-sort-key="hhi">HHI</th>
                       <th scope="col" class="right" data-sort-key="localPct">L/F</th>
                       <th scope="col" class="right" data-sort-key="risk">Risk</th>
+                      <th scope="col" data-sort-key="allocationScore">Alloc</th>
+                      <th scope="col" data-sort-key="multibaggerScore">Multi</th>
                       <th scope="col" data-sort-key="signalSummary">Signal</th>
                     </tr>
                   </thead>
@@ -129,11 +190,22 @@
               <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Investor-Ticker Network</span></div>
               <div class="app-topbar" style="margin-top:14px">
                 <div class="eyebrow" id="network-note">Network edges are derived from issuer holder tables only.</div>
-                <select class="inline-input" id="network-scenario-select" aria-label="Select investor or ticker network scenario" style="min-width:320px"></select>
+                <div class="filter-row">
+                  <select class="inline-input" id="network-scenario-select" aria-label="Select investor or ticker network scenario" style="min-width:320px"></select>
+                  <button class="ghost-btn" id="network-fit-btn" type="button">Fit Graph</button>
+                  <button class="ghost-btn" id="network-label-toggle-btn" type="button">Show All Labels</button>
+                </div>
               </div>
               <div class="snapshot-grid analytics-grid" id="network-stat-grid" style="margin-top:14px"></div>
-              <div class="app-grid" style="margin-top:14px">
-                <div class="stack-card">
+              <div class="network-layout" style="margin-top:14px">
+                <article class="app-card network-graph-card" style="padding:14px">
+                  <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Graph Canvas</span></div>
+                  <div class="network-canvas-meta">
+                    <div class="eyebrow" id="network-canvas-note">Scroll to zoom. Drag nodes or background to inspect dense clusters.</div>
+                  </div>
+                  <div class="graph-shell graph-shell-network" id="app-network-chart"></div>
+                </article>
+                <div class="network-meta-grid">
                   <article class="app-card" style="padding:14px">
                     <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Scenario Composition</span></div>
                     <div class="chart-shell" id="app-ownership-chart"></div>
@@ -148,9 +220,6 @@
                     <div class="list-stack" id="network-edge-list"></div>
                   </article>
                 </div>
-                <article class="app-card" style="padding:14px">
-                  <div class="graph-shell" id="app-network-chart"></div>
-                </article>
               </div>
               <div class="table-wrap" style="margin-top:14px">
                 <table class="table">
@@ -230,8 +299,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-  <script src="./assets/mock-data.js"></script>
-  <script src="./assets/utils.js"></script>
-  <script src="./assets/app.js"></script>
+  <script src="./assets/mock-data.js?v=20260316m"></script>
+  <script src="./assets/utils.js?v=20260316m"></script>
+  <script src="./assets/app.js?v=20260316m"></script>
 </body>
 </html>

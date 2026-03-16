@@ -1,0 +1,33 @@
+QUORA ANSWER DRAFT
+==================
+Target Question: "Why do operators ignore alarms in control rooms?"
+(Also fits: "What is alarm fatigue?", "How many alarms per hour is normal in a data center?", "How do you fix alarm flooding in BMS systems?")
+
+---
+
+ANSWER:
+
+I'll give you a number that should terrify anyone running critical infrastructure: the average data center BMS generates 3,000-10,000 alarms per day. Most operators acknowledge fewer than 15% of them.
+
+This isn't laziness. This is a predictable system design failure.
+
+When everything is "critical," nothing is critical. When a single chiller trip cascades into 47 simultaneous alarms — compressor fault, flow loss, high temp, low pressure, pump interlock, valve position, redundancy loss — the operator's brain does exactly what any human brain would do: it tunes out.
+
+ISA-18.2 (the international standard for alarm management) defines this precisely. A well-designed alarm system should produce no more than 6 alarms per hour during normal operations and no more than 10 during upset conditions.
+
+Most facilities I've assessed run at 30-80 alarms per hour. Some hit 200+ during cascading events.
+
+The fix is not training operators to pay more attention. The fix is alarm rationalization:
+
+1. Audit every alarm. If it doesn't require a specific human action within a specific timeframe, it's not an alarm — it's a notification. Reclassify it.
+2. Set proper deadbands. A temperature oscillating around setpoint should not generate 50 alarms per hour.
+3. Implement shelving and suppression for maintenance windows.
+4. State-based alarming: different alarm configurations for different plant states (startup vs. steady state vs. shutdown).
+
+I've seen facilities reduce their alarm count by 70-85% through rationalization alone. Not by removing real alarms — by removing noise.
+
+The full analysis with ISA-18.2 framework, decision trees for alarm classification, and a BMS alarm audit checklist:
+
+https://resistancezero.com/article-2.html
+
+Suggested Quora Topics: Data Centers, SCADA, Building Management Systems, Alarm Management, Control Systems Engineering
