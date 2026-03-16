@@ -74,8 +74,9 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
 
-    <!-- RSS Feed -->
+    <!-- RSS Feed & Sitemap -->
     <link rel="alternate" type="application/rss+xml" title="Bagus Dwi Permana - Operations Engineering Journal" href="feed.xml">
+    <link rel="sitemap" type="application/xml" href="sitemap.xml">
 
     <!-- Preload Critical Resources for LCP Optimization -->
     <link rel="preload" href="assets/profile-light.webp" as="image" fetchpriority="high" type="image/webp">
@@ -165,8 +166,8 @@
     </style>
 
     <!-- Full stylesheet loaded asynchronously -->
-    <link rel="stylesheet" href="styles.min.css?v=20260308" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="styles.min.css?v=20260308"></noscript>
+    <link rel="stylesheet" href="styles.min.css?v=20260316" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="styles.min.css?v=20260316"></noscript>
 
     <link rel="prefetch" href="articles.html">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
@@ -174,7 +175,7 @@
 <body>
     <!-- Search Overlay & Modal -->
     <div class="search-overlay" id="searchOverlay"></div>
-    <div class="search-modal" id="searchModal">
+    <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search content">
         <div class="search-input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, and tools">
@@ -273,6 +274,7 @@
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
+            <span class="nav-indicator" aria-hidden="true"></span>
         </div>
     </nav>
 
@@ -297,7 +299,7 @@
     </div>
 
     <!-- Hero Section -->
-    <section id="home" class="hero" aria-label="Introduction">
+    <section id="home" class="hero" aria-label="Introduction" data-spotlight-color="gold">
         <div class="hero-background"></div>
         <canvas id="particles-canvas" class="particles-canvas" aria-hidden="true"></canvas>
         <!-- Floating Decorative Shapes -->
@@ -305,7 +307,15 @@
             <div class="floating-shape floating-shape-1"></div>
             <div class="floating-shape floating-shape-2"></div>
             <div class="floating-shape floating-shape-3"></div>
+            <div class="floating-shape floating-shape-4"></div>
+            <div class="floating-shape floating-shape-5"></div>
+            <div class="floating-shape floating-shape-6"></div>
+            <div class="floating-shape floating-shape-7"></div>
         </div>
+        <!-- Aurora Borealis Background -->
+        <div class="aurora-orb aurora-orb-1" aria-hidden="true"></div>
+        <div class="aurora-orb aurora-orb-2" aria-hidden="true"></div>
+        <div class="aurora-orb aurora-orb-3" aria-hidden="true"></div>
         <!-- Bento Grid Executive Dashboard -->
         <div class="bento-container fade-in">
             <!-- ROW 1: IDENTITY & PROFILE -->
@@ -319,7 +329,7 @@
                         high-voltage infrastructure, and industrial automation.
                     </p>
                     <div class="bento-cta">
-                        <a href="Article/CV/CV_Bagus%20Dwi%20Permana.pdf" class="btn-bento-primary" download>Download Resume</a>
+                        <a href="Article/CV/CV_Bagus%20Dwi%20Permana.pdf" class="btn-bento-primary" download data-tooltip="Download my CV" data-magnetic>Download Resume</a>
                     </div>
                 </div>
                 <div class="bento-card bento-photo-card">
@@ -456,7 +466,7 @@
     </div>
 
     <!-- Key Metrics Section -->
-    <section id="metrics" class="metrics" aria-label="Career achievements">
+    <section id="metrics" class="metrics" aria-label="Career achievements" data-spotlight-color="amber">
         <div class="container">
             <div class="section-header fade-in">
                 <h2 class="section-title">Career Achievements</h2>
@@ -472,7 +482,7 @@
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                         </svg>
                     </div>
-                    <div class="metric-value" data-target="91">0%</div>
+                    <div class="metric-value" data-target="91" aria-live="polite">0%</div>
                     <div class="metric-label">Team Retention</div>
                     <div class="metric-comparison">Best-in-class vs industry avg ~82%</div>
                 </div>
@@ -483,7 +493,7 @@
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                         </svg>
                     </div>
-                    <div class="metric-value" data-target="50" data-prefix="$" data-suffix="K">$0K</div>
+                    <div class="metric-value" data-target="50" data-prefix="$" data-suffix="K" aria-live="polite">$0K</div>
                     <div class="metric-label">Annual OPEX Savings</div>
                     <div class="metric-comparison">Typical annual achievement</div>
                 </div>
@@ -494,7 +504,7 @@
                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
                     </div>
-                    <div class="metric-value" data-target="99.9" data-suffix="%">0%</div>
+                    <div class="metric-value" data-target="99.9" data-suffix="%" aria-live="polite">0%</div>
                     <div class="metric-label">Work Order Compliance</div>
                     <div class="metric-comparison">Exceeding SLA targets</div>
                 </div>
@@ -506,7 +516,7 @@
                             <path d="M6 20v-6"></path>
                         </svg>
                     </div>
-                    <div class="metric-value" data-target="97">0%</div>
+                    <div class="metric-value" data-target="97" aria-live="polite">0%</div>
                     <div class="metric-label">Alarm Reduction</div>
                     <div class="metric-comparison">False alarm elimination</div>
                 </div>
@@ -523,7 +533,7 @@
     </div>
 
     <!-- Operational Excellence Section -->
-    <section id="operational-excellence" class="operational-excellence" aria-label="Operational excellence">
+    <section id="operational-excellence" class="operational-excellence" aria-label="Operational excellence" data-spotlight-color="emerald">
         <div class="container">
             <div class="section-header fade-in">
                 <h2 class="section-title">Operational Excellence</h2>
@@ -722,14 +732,14 @@
     </div>
 
     <!-- Case Studies Section -->
-    <section id="case-studies" class="case-studies" aria-label="Case studies">
+    <section id="case-studies" class="case-studies" aria-label="Case studies" data-spotlight-color="gold">
         <div class="container">
             <div class="section-header section-header-row fade-in">
                 <div>
                     <h2 class="section-title">Mission Critical Case Studies.</h2>
                     <p class="section-subtitle">Core competencies developed through hands-on operational leadership</p>
                 </div>
-                <a href="articles.html" class="btn-explore-articles">
+                <a href="articles.html" class="btn-explore-articles" data-tooltip="View 20+ engineering articles" data-magnetic>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;">
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -743,7 +753,7 @@
             </div>
             <div class="cases-grid">
                 <!-- Case Study 1 -->
-                <article class="case-card fade-in delay-1 glow-border gradient-border">
+                <article class="case-card fade-in delay-1 glow-border gradient-border" data-flip-text="91% team retention through structured mentorship, career pathways, and recognition programs that exceed industry benchmarks.">
                     <div class="case-header">
                         <span class="case-number">01</span>
                         <span class="case-category">People & Culture</span>
@@ -777,7 +787,7 @@
                 </article>
 
                 <!-- Case Study 2 -->
-                <article class="case-card fade-in delay-2 glow-border gradient-border">
+                <article class="case-card fade-in delay-2 glow-border gradient-border" data-flip-text="$40-50K annual OPEX savings via vendor optimization, predictive maintenance, and continuous efficiency monitoring.">
                     <div class="case-header">
                         <span class="case-number">02</span>
                         <span class="case-category">Financial Optimization</span>
@@ -811,7 +821,7 @@
                 </article>
 
                 <!-- Case Study 3 -->
-                <article class="case-card fade-in delay-3 glow-border gradient-border">
+                <article class="case-card fade-in delay-3 glow-border gradient-border" data-flip-text="97% alarm reduction through ISA-18.2 rationalization, eliminating false positives and chattering alarms.">
                     <div class="case-header">
                         <span class="case-number">03</span>
                         <span class="case-category">Technical Excellence</span>
@@ -848,7 +858,7 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="about" aria-label="About me">
+    <section id="about" class="about" aria-label="About me" data-spotlight-color="blue">
         <div class="container">
             <div class="about-content">
                 <div class="about-text fade-in">
@@ -932,7 +942,7 @@
     </section>
 
     <!-- FAQ Section -->
-    <section id="faq" class="faq" aria-label="Frequently asked questions">
+    <section id="faq" class="faq" aria-label="Frequently asked questions" data-spotlight-color="blue">
         <div class="container">
             <div class="section-header fade-in">
                 <h2 class="section-title">Frequently Asked Questions</h2>
@@ -1016,7 +1026,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="contact" aria-label="Contact">
+    <section id="contact" class="contact" aria-label="Contact" data-spotlight-color="teal">
         <div class="container">
             <div class="section-header fade-in">
                 <h2 class="section-title">Let's Connect</h2>
@@ -1107,7 +1117,7 @@
                     <div class="form-group">
                         <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+                    <button type="submit" class="btn btn-primary btn-full" data-tooltip="Opens your email client" data-magnetic>Send Message</button>
                     <p style="font-size: 0.8rem; color: var(--gray-500); text-align: center; margin-top: 1rem;">
                         * Clicking "Send" will open your email app with the message ready to send.
                     </p>
@@ -1162,7 +1172,7 @@
         </a>
     </div>
 
-    <script src="script.min.js?v=20260308" defer></script>
+    <script src="script.min.js?v=20260316" defer></script>
 
     <!-- Advanced Schema.org JSON-LD - Person Type (Perfect 100) -->
     <script type="application/ld+json">
@@ -1527,6 +1537,23 @@
                         ctx.moveTo(particles[i].x,particles[i].y);
                         ctx.lineTo(particles[j].x,particles[j].y);
                         ctx.stroke();
+                        // #43: Constellation triangles — fill when 3 particles are close
+                        for(var k=j+1;k<particles.length;k++){
+                            var dx2=particles[i].x-particles[k].x;
+                            var dy2=particles[i].y-particles[k].y;
+                            var dx3=particles[j].x-particles[k].x;
+                            var dy3=particles[j].y-particles[k].y;
+                            if(Math.sqrt(dx2*dx2+dy2*dy2)<CONNECT_DIST&&Math.sqrt(dx3*dx3+dy3*dy3)<CONNECT_DIST){
+                                ctx.globalAlpha=0.02;
+                                ctx.fillStyle=p.fill[0];
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x,particles[i].y);
+                                ctx.lineTo(particles[j].x,particles[j].y);
+                                ctx.lineTo(particles[k].x,particles[k].y);
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+                        }
                     }
                 }
             }
@@ -1591,7 +1618,7 @@
     })();
     });
     </script>
-<script src="auth.js?v=20260308" defer></script>
+<script src="auth.js?v=20260316" defer></script>
 <script>
 // Defer rz-tracker to after main content is interactive
 (typeof requestIdleCallback==='function'?requestIdleCallback:function(cb){setTimeout(cb,2000)})(function(){
@@ -1969,7 +1996,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bagus Dwi Permana Portfolio","alternateName":["Bagus Permana","Data Center Operations Expert"],"url":"https://resistancezero.com/","description":"Engineering Operations Manager & Ahli K3 Listrik specializing in Data Center Infrastructure","inLanguage":["en","id"],"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://resistancezero.com/articles.html?q={search_term_string}"},"query-input":"required name=search_term_string"},"author":{"@type":"Person","name":"Bagus Dwi Permana"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SiteNavigationElement","name":["Home","DC Solutions","Results","Case Studies","Articles","Contact"],"url":["https://resistancezero.com/","https://resistancezero.com/datacenter-solutions.html","https://resistancezero.com/#metrics","https://resistancezero.com/#case-studies","https://resistancezero.com/articles.html","https://resistancezero.com/#contact"]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Bagus Dwi Permana - Engineering Operations","url":"https://resistancezero.com/","logo":{"@type":"ImageObject","url":"https://resistancezero.com/assets/profile-photo.jpg","width":1200,"height":630},"founder":{"@type":"Person","name":"Bagus Dwi Permana","jobTitle":"Engineering Operations Manager"},"sameAs":["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092","https://github.com/baguspermana7-cpu","https://wa.me/6281216874606"],"contactPoint":{"@type":"ContactPoint","telephone":"+6281216874606","contactType":"Professional Services","email":"baguspermana7@gmail.com","availableLanguage":["English","Indonesian"]}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfilePage","mainEntity":{"@type":"Person","name":"Bagus Dwi Permana","alternateName":"Bagus Permana","jobTitle":"Engineering Operations Manager","description":"Engineering Operations Manager specializing in Data Center Infrastructure, Critical Systems, and Operational Excellence","url":"https://resistancezero.com/","image":"https://resistancezero.com/assets/profile-photo.jpg","knowsAbout":["Data Center Operations","Critical Infrastructure Management","HVAC & Mechanical Systems","Electrical Power Distribution","Operational Excellence","Safety Management Systems","Preventive & Predictive Maintenance","Building Management Systems"],"hasCredential":[{"@type":"EducationalOccupationalCredential","credentialCategory":"Professional Certification","name":"Ahli K3 Listrik"}],"sameAs":["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092","https://github.com/baguspermana7-cpu"]}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfilePage","dateCreated":"2024-01-01","dateModified":"2026-03-16","mainEntity":{"@type":"Person","name":"Bagus Dwi Permana","alternateName":"Bagus Permana","jobTitle":"Engineering Operations Manager","description":"Engineering Operations Manager specializing in Data Center Infrastructure, Critical Systems, and Operational Excellence. 12+ years experience, CDFOM & Ahli K3 Listrik certified.","url":"https://resistancezero.com/","image":"https://resistancezero.com/assets/profile-photo.jpg","knowsAbout":["Data Center Operations","Critical Infrastructure Management","HVAC & Mechanical Systems","Electrical Power Distribution","Operational Excellence","Safety Management Systems","Preventive & Predictive Maintenance","Building Management Systems","SCADA Systems","Power Usage Effectiveness"],"hasCredential":[{"@type":"EducationalOccupationalCredential","credentialCategory":"Professional Certification","name":"Ahli K3 Listrik"},{"@type":"EducationalOccupationalCredential","credentialCategory":"Professional Certification","name":"CDFOM"},{"@type":"EducationalOccupationalCredential","credentialCategory":"Professional Certification","name":"IOSH Managing Safely"}],"worksFor":{"@type":"Organization","name":"Pure Data Centres"},"nationality":{"@type":"Country","name":"Indonesia"},"sameAs":["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092","https://github.com/baguspermana7-cpu"]}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What certifications does Bagus Dwi Permana hold?","acceptedAnswer":{"@type":"Answer","text":"Bagus holds Ahli K3 Listrik (Electrical Safety Expert) certification from Indonesian Ministry of Manpower, CDFOM (Certified Data Centre Facilities Operations Manager), and IOSH Managing Safely certification."}},{"@type":"Question","name":"What is Bagus Dwi Permana's experience in data center operations?","acceptedAnswer":{"@type":"Answer","text":"Bagus has 12+ years of experience in data center infrastructure and engineering operations, achieving 91% team retention, $50K annual OPEX savings, 99.9% work order compliance, and 97% alarm reduction."}},{"@type":"Question","name":"What services does Bagus Dwi Permana provide?","acceptedAnswer":{"@type":"Answer","text":"Bagus specializes in Engineering Operations Management including critical infrastructure management, HVAC & mechanical systems, electrical power distribution, operational excellence programs, and safety management systems."}}]}</script>
 
 </body>
 </html>

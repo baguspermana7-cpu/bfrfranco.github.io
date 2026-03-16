@@ -4346,17 +4346,17 @@ section {
 }
 
 [data-theme="dark"] .oe-desc {
-    color: var(--gray-400);
+    color: #94a3b8;
 }
 
 [data-theme="dark"] .oe-unit {
-    color: var(--gray-400);
+    color: #94a3b8;
 }
 
 [data-theme="dark"] .oe-tag {
-    background: rgba(74, 144, 184, 0.1);
-    color: var(--gray-300);
-    border-color: rgba(74, 144, 184, 0.2);
+    background: rgba(74, 144, 184, 0.15);
+    color: #94a3b8;
+    border-color: rgba(74, 144, 184, 0.25);
 }
 
 [data-theme="dark"] .oe-badge-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
@@ -4385,6 +4385,68 @@ section {
 [data-theme="dark"] .oe-icon-red svg { stroke: #f87171; }
 [data-theme="dark"] .oe-icon-teal svg { stroke: #2dd4bf; }
 [data-theme="dark"] .oe-icon-orange svg { stroke: #fb923c; }
+
+/* --- Dark Mode: Case Card Text Contrast Fixes --- */
+[data-theme="dark"] .case-title {
+    color: #e2e8f0;
+}
+[data-theme="dark"] .case-description {
+    color: #94a3b8;
+}
+[data-theme="dark"] .case-category {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.15);
+}
+[data-theme="dark"] .case-outcomes h4 {
+    color: #e2e8f0;
+}
+[data-theme="dark"] .case-outcomes li {
+    color: #94a3b8;
+}
+[data-theme="dark"] .stat-label {
+    color: #94a3b8;
+}
+[data-theme="dark"] .stat-before {
+    color: #64748b;
+}
+[data-theme="dark"] .tag {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.12);
+}
+[data-theme="dark"] .case-highlight {
+    background: rgba(74, 144, 184, 0.08);
+}
+
+/* --- Dark Mode: Metric Card Text Contrast Fixes --- */
+[data-theme="dark"] .metric-label {
+    color: #e2e8f0;
+}
+[data-theme="dark"] .metric-comparison {
+    color: #94a3b8;
+}
+[data-theme="dark"] .metric-icon svg {
+    stroke: #60a5fa;
+}
+
+/* --- Dark Mode: Section Text Contrast Fixes --- */
+[data-theme="dark"] .section-subtitle {
+    color: #94a3b8;
+}
+[data-theme="dark"] .about-text p {
+    color: #cbd5e1;
+}
+[data-theme="dark"] .contact-text h3 {
+    color: #e2e8f0;
+}
+[data-theme="dark"] .contact-text p {
+    color: #94a3b8;
+}
+[data-theme="dark"] .faq-q {
+    color: #e2e8f0;
+}
+[data-theme="dark"] .faq-a {
+    color: #94a3b8;
+}
 
 [data-theme="dark"] .about {
     background: linear-gradient(180deg, var(--section-alt-bg) 0%, var(--body-bg) 100%);
@@ -6331,3 +6393,884 @@ section {
 }
 
 /* content-visibility removed: caused CLS regression (0.706 mobile / 1.014 desktop) */
+
+/* ==========================================
+   50 Motion Effects — CSS-Only Effects
+   Performance, Accessibility & Best Practices
+   ========================================== */
+
+/* --- Performance: CSS Containment & Scroll Vars --- */
+:root {
+    --scroll-ls: 0px;
+}
+.section-title {
+    letter-spacing: var(--scroll-ls);
+    transition: letter-spacing 0.2s ease;
+}
+section {
+    contain: style;
+}
+.metric-card, .case-card, .oe-card {
+    contain: style paint;
+}
+
+/* --- #27: Card Depth Shadow Layers --- */
+.metric-card:hover,
+.case-card:hover {
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.04),
+        0 4px 8px rgba(0,0,0,0.06),
+        0 8px 16px rgba(0,0,0,0.08),
+        0 16px 32px rgba(0,0,0,0.10),
+        0 0 20px rgba(245,158,11,0.25);
+}
+[data-theme="dark"] .metric-card:hover,
+[data-theme="dark"] .case-card:hover {
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.12),
+        0 4px 8px rgba(0,0,0,0.16),
+        0 8px 16px rgba(0,0,0,0.20),
+        0 16px 32px rgba(0,0,0,0.24),
+        0 0 20px rgba(245,158,11,0.3);
+}
+
+/* --- #29: Card Glass Morphism Intensify on Hover --- */
+.metric-card,
+.case-card,
+.oe-card {
+    transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1),
+                box-shadow 0.4s cubic-bezier(0.2, 1, 0.3, 1),
+                border-color 0.4s ease,
+                backdrop-filter 0.4s ease,
+                -webkit-backdrop-filter 0.4s ease;
+}
+.metric-card:hover,
+.case-card:hover,
+.oe-card:hover {
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+/* --- #32: Card Entry Swing --- */
+@keyframes swingIn {
+    0%   { transform: rotate(-6deg) translateY(20px); opacity: 0; }
+    40%  { transform: rotate(3deg) translateY(-5px); opacity: 1; }
+    70%  { transform: rotate(-1.5deg) translateY(2px); }
+    100% { transform: rotate(0deg) translateY(0); }
+}
+.oe-card.visible {
+    animation: swingIn 0.6s ease-out both;
+}
+.oe-card.visible:nth-child(2) { animation-delay: 0.08s; }
+.oe-card.visible:nth-child(3) { animation-delay: 0.16s; }
+.oe-card.visible:nth-child(4) { animation-delay: 0.24s; }
+.oe-card.visible:nth-child(5) { animation-delay: 0.32s; }
+.oe-card.visible:nth-child(6) { animation-delay: 0.40s; }
+.oe-card.visible:nth-child(7) { animation-delay: 0.48s; }
+.oe-card.visible:nth-child(8) { animation-delay: 0.56s; }
+
+/* --- #34: Metric Card Pulse on Hover --- */
+@keyframes metricPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
+    50%  { box-shadow: 0 0 0 20px rgba(245,158,11,0.08); }
+    100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+}
+.metric-card:hover {
+    animation: metricPulse 1s ease-out;
+    transform: translateY(-6px) scale(1.02);
+}
+
+/* --- #36: Button Liquid Fill --- */
+.btn-primary,
+.btn-secondary,
+.btn-bento-primary,
+.btn-explore-articles {
+    position: relative;
+    z-index: 1;
+}
+/* overflow:hidden only on btns WITHOUT tooltip (tooltip needs overflow visible) */
+.btn-primary:not([data-tooltip]),
+.btn-secondary:not([data-tooltip]),
+.btn-bento-primary:not([data-tooltip]),
+.btn-explore-articles:not([data-tooltip]) {
+    overflow: hidden;
+}
+[data-tooltip].btn-primary,
+[data-tooltip].btn-secondary,
+[data-tooltip].btn-bento-primary,
+[data-tooltip].btn-explore-articles {
+    overflow: visible;
+}
+.btn-secondary::before,
+.btn-bento-primary::before,
+.btn-explore-articles::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+    z-index: -1;
+}
+.btn-secondary:hover::before,
+.btn-bento-primary:hover::before,
+.btn-explore-articles:hover::before {
+    transform: scaleY(1);
+}
+
+/* --- #38: Button Press Depth --- */
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-bento-primary:active,
+.btn-explore-articles:active {
+    transform: translateY(2px) scale(0.97) !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2) !important;
+    transition-duration: 0.05s !important;
+}
+
+/* --- #39: Button Shine Sweep (extend to all buttons) --- */
+.btn-secondary,
+.btn-bento-primary,
+.btn-explore-articles,
+.btn-download {
+    overflow: hidden;
+}
+.btn-secondary::after,
+.btn-download::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+    pointer-events: none;
+}
+.btn-secondary:hover::after,
+.btn-download:hover::after {
+    left: 100%;
+}
+
+/* --- #40: Button Icon Animation --- */
+.btn svg,
+.btn-bento-primary svg,
+.btn-explore-articles svg:last-child {
+    transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+.btn:hover svg,
+.btn-bento-primary:hover svg {
+    transform: translateX(3px);
+}
+.btn-explore-articles:hover svg:last-child {
+    transform: translateX(5px);
+}
+
+/* --- #42: Button Tooltip Float-Up --- */
+[data-tooltip] {
+    position: relative;
+}
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: var(--gray-900);
+    color: var(--gray-100);
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 100;
+}
+[data-theme="dark"] [data-tooltip]::after {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* --- #19: Gradient Text Shimmer on Hover --- */
+@keyframes shimmerSweep {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+.section-title,
+.bento-name,
+.case-title {
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+.section-title:hover,
+.case-title:hover {
+    background-image: linear-gradient(90deg, var(--heading-color) 0%, var(--accent-gold) 25%, var(--accent-orange) 50%, var(--accent-gold) 75%, var(--heading-color) 100%);
+    -webkit-text-fill-color: transparent;
+    animation: shimmerSweep 1.2s ease forwards;
+    text-shadow: 0 0 30px rgba(245,158,11,0.25), 0 0 60px rgba(245,158,11,0.1);
+    filter: drop-shadow(0 0 12px rgba(245,158,11,0.2));
+}
+.bento-name:hover {
+    animation: shimmerSweep 1.2s ease forwards;
+}
+
+/* --- #22: Enhanced Underline Draw Animation --- */
+.nav-link::after {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+.nav-link:hover::after {
+    clip-path: inset(0 0 0 0);
+}
+
+/* --- #44: Additional Floating Geometric Shapes --- */
+.floating-shape-4 {
+    position: absolute;
+    top: 25%;
+    right: 8%;
+    width: 60px;
+    height: 60px;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(255,107,53,0.04));
+    animation: floatShape 9s ease-in-out infinite;
+    animation-delay: -2s;
+}
+.floating-shape-5 {
+    position: absolute;
+    bottom: 20%;
+    left: 12%;
+    width: 50px;
+    height: 50px;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    background: linear-gradient(135deg, rgba(74,144,184,0.06), rgba(91,163,203,0.03));
+    animation: floatShape 10s ease-in-out infinite;
+    animation-delay: -4s;
+}
+.floating-shape-6 {
+    position: absolute;
+    top: 60%;
+    right: 20%;
+    width: 40px;
+    height: 40px;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(16,185,129,0.03));
+    animation: floatShape 7s ease-in-out infinite;
+    animation-delay: -1s;
+}
+.floating-shape-7 {
+    position: absolute;
+    top: 10%;
+    left: 30%;
+    width: 55px;
+    height: 55px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(139,92,246,0.02));
+    animation: floatShape 11s ease-in-out infinite;
+    animation-delay: -3s;
+}
+
+/* --- #45: Aurora Borealis Background Orbs --- */
+@keyframes auroraFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(50px, -30px) scale(1.1); }
+    66%      { transform: translate(-30px, 20px) scale(0.95); }
+}
+@keyframes auroraFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(-40px, 40px) scale(1.05); }
+    66%      { transform: translate(60px, -20px) scale(0.9); }
+}
+@keyframes auroraFloat3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(30px, 30px) scale(0.95); }
+    66%      { transform: translate(-50px, -40px) scale(1.1); }
+}
+.aurora-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: -1;
+    will-change: transform;
+}
+.aurora-orb-1 {
+    width: 500px;
+    height: 500px;
+    top: 5%;
+    left: 5%;
+    background: radial-gradient(circle, rgba(74,144,184,0.6), transparent 70%);
+    animation: auroraFloat1 15s ease-in-out infinite;
+}
+.aurora-orb-2 {
+    width: 450px;
+    height: 450px;
+    top: 35%;
+    right: 0;
+    background: radial-gradient(circle, rgba(16,185,129,0.5), transparent 70%);
+    animation: auroraFloat2 18s ease-in-out infinite;
+}
+.aurora-orb-3 {
+    width: 400px;
+    height: 400px;
+    bottom: 5%;
+    left: 25%;
+    background: radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%);
+    animation: auroraFloat3 20s ease-in-out infinite;
+}
+[data-theme="dark"] .aurora-orb { opacity: 0.18; }
+
+/* --- #48: Scroll Snap disabled — conflicts with JS scroll effects --- */
+/* Keeping as reference; re-enable only without scroll-linked JS effects */
+
+/* --- #49: Navbar Hover Indicator Slide --- */
+.nav-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange));
+    border-radius: 2px;
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* --- Motion Effects: Cursor & Trail Containers --- */
+.custom-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--accent-gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s cubic-bezier(0.2, 1, 0.3, 1),
+                height 0.3s cubic-bezier(0.2, 1, 0.3, 1),
+                border-radius 0.3s ease,
+                background 0.3s ease,
+                border-color 0.3s ease,
+                opacity 0.2s ease;
+    opacity: 0;
+}
+.custom-cursor.active { opacity: 1; }
+.custom-cursor.cursor-link {
+    width: 60px;
+    height: 60px;
+    background: rgba(245,158,11,0.08);
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 20px rgba(245,158,11,0.15);
+}
+.custom-cursor.cursor-card {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 0 30px rgba(255,255,255,0.05);
+}
+/* Breathing animation on cursor */
+@keyframes cursorBreathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%      { transform: translate(-50%, -50%) scale(1.12); }
+}
+.custom-cursor.active {
+    animation: cursorBreathe 2.5s ease-in-out infinite;
+}
+.custom-cursor.cursor-link,
+.custom-cursor.cursor-card,
+.custom-cursor.cursor-text {
+    animation: none;
+}
+.custom-cursor.cursor-text {
+    width: 4px;
+    height: 24px;
+    border-radius: 2px;
+    border: none;
+    background: var(--accent-gold);
+}
+
+.cursor-trail-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 99997;
+    overflow: hidden;
+}
+.cursor-trail-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+
+/* --- Cursor Text Follower (#5) --- */
+.cursor-text-follower {
+    position: fixed;
+    padding: 6px 14px;
+    background: var(--gray-900);
+    color: var(--gray-100);
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 99998;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+[data-theme="dark"] .cursor-text-follower {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+.cursor-text-follower.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* --- Click Ripple (#4) --- */
+@keyframes rippleExpand {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+.click-ripple {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.3), transparent 70%);
+    pointer-events: none;
+    z-index: 99996;
+    animation: rippleExpand 0.6s ease-out forwards;
+}
+
+/* --- Material Ripple (#41) --- */
+@keyframes materialRipple {
+    0%   { transform: scale(0); opacity: 0.3; }
+    100% { transform: scale(4); opacity: 0; }
+}
+.material-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    pointer-events: none;
+    animation: materialRipple 0.6s ease-out forwards;
+}
+
+/* --- Glitch Effect (#24) --- */
+@keyframes glitchShake {
+    0%   { transform: translate(0); }
+    20%  { transform: translate(-2px, 1px); }
+    40%  { transform: translate(2px, -1px); }
+    60%  { transform: translate(-1px, -1px); }
+    80%  { transform: translate(1px, 1px); }
+    100% { transform: translate(0); }
+}
+.glitch-active {
+    animation: glitchShake 0.3s ease;
+    text-shadow: 2px 0 rgba(255,0,0,0.4), -2px 0 rgba(0,255,0,0.4);
+}
+
+/* --- Section Progress Bar (#13) --- */
+.section-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange));
+    width: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: width 0.1s ease-out;
+    border-radius: 0 2px 2px 0;
+}
+
+/* --- Section Reveal (#10) --- */
+.section-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.section-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Grid Reveal Canvas (#46) --- */
+.grid-reveal-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 99995;
+    opacity: 0.5;
+}
+
+/* --- Gradient Orbs (#47) --- */
+.gradient-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.06;
+    transition: none;
+}
+.gradient-orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(245,158,11,0.6), transparent 70%); }
+.gradient-orb-2 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(74,144,184,0.6), transparent 70%); }
+.gradient-orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(16,185,129,0.6), transparent 70%); }
+[data-theme="dark"] .gradient-orb { opacity: 0.10; }
+
+/* --- Card Flip (#25) --- */
+.case-card {
+    perspective: 1200px;
+}
+.case-card-inner {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    position: relative;
+}
+.case-card-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--card-bg);
+    border-radius: inherit;
+    font-size: 0.9rem;
+    color: var(--body-color);
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* --- Card Border Light Trail (#26) --- */
+@keyframes borderTrailMove {
+    0%   { top: 0; left: 0; }
+    25%  { top: 0; left: calc(100% - 8px); }
+    50%  { top: calc(100% - 8px); left: calc(100% - 8px); }
+    75%  { top: calc(100% - 8px); left: 0; }
+    100% { top: 0; left: 0; }
+}
+.border-trail-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    box-shadow: 0 0 16px rgba(245,158,11,0.7), 0 0 32px rgba(245,158,11,0.4), 0 0 48px rgba(245,158,11,0.15);
+    pointer-events: none;
+    z-index: 10;
+    animation: borderTrailMove 2s linear infinite;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* --- Card Holographic Tilt Overlay (#35) --- */
+.holo-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        var(--holo-angle, 135deg),
+        rgba(255,0,0,0.08),
+        rgba(255,136,0,0.08),
+        rgba(255,255,0,0.08),
+        rgba(0,255,0,0.08),
+        rgba(0,136,255,0.08),
+        rgba(136,0,255,0.08)
+    );
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.metric-card:hover .holo-overlay,
+.case-card:hover .holo-overlay {
+    opacity: 1;
+}
+
+/* --- Card Tilt Reflection (#31) --- */
+.tilt-reflection {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        ellipse at var(--reflect-x, 50%) var(--reflect-y, 50%),
+        rgba(255,255,255,0.15),
+        transparent 60%
+    );
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.metric-card:hover .tilt-reflection,
+.case-card:hover .tilt-reflection {
+    opacity: 1;
+}
+
+/* --- Career Card Spread (#33) --- */
+.bento-row-career {
+    transition: gap 0.4s ease;
+}
+.bento-row-career:hover {
+    gap: 1.5rem;
+}
+.bento-row-career .bento-card {
+    transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+}
+.bento-row-career:hover .bento-card:nth-child(1) { transform: rotate(-2deg) translateY(-4px); }
+.bento-row-career:hover .bento-card:nth-child(2) { transform: rotate(-1deg) translateY(-6px); }
+.bento-row-career:hover .bento-card:nth-child(3) { transform: translateY(-8px); }
+.bento-row-career:hover .bento-card:nth-child(4) { transform: rotate(1deg) translateY(-6px); }
+.bento-row-career:hover .bento-card:nth-child(5) { transform: rotate(2deg) translateY(-4px); }
+
+/* --- Hover Expand Preview (#30) --- */
+.oe-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: max-height 0.4s ease, -webkit-line-clamp 0s;
+    max-height: 3em;
+}
+.oe-card:hover .oe-desc {
+    -webkit-line-clamp: unset;
+    max-height: 10em;
+    overflow: visible;
+}
+
+/* --- Scroll-to-Top Morph (#50) --- */
+.scroll-top-btn {
+    transition: all 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+    overflow: hidden;
+}
+.scroll-top-btn .progress-text {
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: none;
+}
+.scroll-top-btn.morphed {
+    border-radius: 12px;
+    width: 48px;
+}
+.scroll-top-btn.morphed .progress-text {
+    display: block;
+}
+
+/* --- Word Reveal (#20) --- */
+.word-reveal {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.word-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Split Character Reveal (#17) --- */
+.char-reveal {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px) rotate(8deg);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.char-reveal.visible {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+}
+.char-reveal.space { width: 0.3em; }
+
+/* --- Magnetic Element Reset --- */
+[data-magnetic] {
+    transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* --- Dark Mode: Enhanced Card Borders & Glow --- */
+[data-theme="dark"] .metric-card {
+    border-color: rgba(96, 165, 250, 0.12);
+}
+[data-theme="dark"] .metric-card:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.2),
+        0 4px 8px rgba(0,0,0,0.24),
+        0 8px 16px rgba(0,0,0,0.28),
+        0 16px 32px rgba(0,0,0,0.32),
+        0 0 30px rgba(245,158,11,0.15);
+}
+[data-theme="dark"] .case-card {
+    border-color: rgba(96, 165, 250, 0.1);
+}
+[data-theme="dark"] .case-card:hover {
+    border-color: rgba(96, 165, 250, 0.25);
+    box-shadow:
+        0 4px 16px rgba(0,0,0,0.3),
+        0 0 24px rgba(96, 165, 250, 0.08);
+}
+[data-theme="dark"] .oe-card {
+    border-color: rgba(96, 165, 250, 0.08);
+}
+[data-theme="dark"] .oe-card:hover {
+    border-color: rgba(96, 165, 250, 0.2);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(96, 165, 250, 0.06);
+}
+
+/* --- Metric Value Glow on Hover --- */
+.metric-card:hover .metric-value {
+    filter: drop-shadow(0 0 8px rgba(30, 58, 95, 0.2));
+}
+[data-theme="dark"] .metric-card:hover .metric-value {
+    filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.35));
+}
+
+/* --- OE Card Number Glow on Hover --- */
+.oe-card:hover .oe-number {
+    filter: drop-shadow(0 0 6px currentColor);
+    transition: filter 0.3s ease;
+}
+
+/* --- Bento Name Subtle Animation --- */
+@keyframes nameGlow {
+    0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+    50%      { filter: drop-shadow(0 0 20px rgba(74,144,184,0.15)); }
+}
+.bento-name {
+    animation: nameGlow 4s ease-in-out infinite;
+}
+
+/* --- Case Card Image Zoom on Hover --- */
+.case-card:hover .case-image img {
+    transform: scale(1.05);
+    transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+}
+.case-image img {
+    transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* --- Floating Shapes Enhanced: scale on scroll --- */
+.floating-shape-4,
+.floating-shape-5,
+.floating-shape-6,
+.floating-shape-7 {
+    transition: opacity 0.6s ease;
+}
+[data-theme="dark"] .floating-shape-4 { background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(255,107,53,0.06)); }
+[data-theme="dark"] .floating-shape-5 { background: linear-gradient(135deg, rgba(96,165,250,0.1), rgba(96,165,250,0.04)); }
+[data-theme="dark"] .floating-shape-6 { background: linear-gradient(135deg, rgba(52,211,153,0.1), rgba(52,211,153,0.04)); }
+[data-theme="dark"] .floating-shape-7 { background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(167,139,250,0.04)); }
+
+/* --- Nav Link Hover Enhancement --- */
+.nav-link:hover {
+    color: var(--accent-gold);
+    transition: color 0.2s ease;
+}
+[data-theme="dark"] .nav-link:hover {
+    color: #fbbf24;
+}
+
+/* --- Section Title Dark Mode Enhancement --- */
+[data-theme="dark"] .section-title {
+    text-shadow: 0 0 40px rgba(96,165,250,0.08);
+}
+
+/* --- Enhanced Card Entry Animations --- */
+.fade-in {
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-in.delay-1 { transition-delay: 0.05s; }
+.fade-in.delay-2 { transition-delay: 0.1s; }
+.fade-in.delay-3 { transition-delay: 0.15s; }
+.fade-in.delay-4 { transition-delay: 0.2s; }
+
+/* ==========================================
+   Extended Reduced Motion — Disable ALL New Effects
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    .custom-cursor,
+    .cursor-trail-container,
+    .cursor-text-follower,
+    .click-ripple,
+    .aurora-orb,
+    .grid-reveal-canvas,
+    .gradient-orb,
+    .section-progress,
+    .nav-indicator,
+    .border-trail-dot,
+    .holo-overlay,
+    .tilt-reflection {
+        display: none !important;
+    }
+    [data-magnetic] { transform: none !important; }
+    .section-reveal { opacity: 1 !important; transform: none !important; }
+    .oe-card.visible { animation: none !important; }
+    .word-reveal, .char-reveal { opacity: 1 !important; transform: none !important; }
+    .glitch-active { animation: none !important; text-shadow: none !important; }
+    .bento-name { animation: none !important; }
+    .bento-row-career:hover .bento-card { transform: none !important; }
+    html { scroll-snap-type: none !important; }
+}
+
+/* Forced colors (Windows High Contrast) */
+@media (forced-colors: active) {
+    .custom-cursor,
+    .cursor-trail-container,
+    .cursor-text-follower,
+    .click-ripple,
+    .aurora-orb,
+    .grid-reveal-canvas,
+    .gradient-orb,
+    .holo-overlay,
+    .tilt-reflection { display: none !important; }
+}
+
+/* Mobile: disable new decorative effects for performance */
+@media (max-width: 768px) {
+    .custom-cursor,
+    .cursor-trail-container,
+    .cursor-text-follower,
+    .grid-reveal-canvas,
+    .gradient-orb,
+    .nav-indicator,
+    .aurora-orb { display: none !important; }
+    .floating-shape-4,
+    .floating-shape-5,
+    .floating-shape-6,
+    .floating-shape-7 { display: none; }
+    html { scroll-snap-type: none !important; }
+}
