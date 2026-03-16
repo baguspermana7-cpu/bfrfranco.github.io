@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StockMap Indonesia Prototype</title>
+  <meta name="description" content="Prototype package for a stock ownership intelligence product modeled on StockMap-style flow, KSEI data structure, free-float screening, and market visualization.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body data-page="landing">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="page-shell">
+    <div class="sticky-top">
+      <a class="aff-banner" href="./affiliate.html">Jadi Affiliate. Hingga 30% komisi per sale.</a>
+      <nav class="nav">
+        <div class="nav-inner">
+          <a class="logo" href="./index.html">StockMap<span>.</span></a>
+          <div class="nav-actions">
+            <a class="nav-link" href="./app.html">Open App</a>
+            <a class="nav-link" href="./methodology.html">Methodology</a>
+            <a class="nav-link" href="./affiliate.html">Affiliate</a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <main class="content-wrap" id="main-content">
+      <section class="hero">
+        <div class="hero-tag">Data source: KSEI • 27 Feb 2026</div>
+        <h1>Know Who Owns <em>Every Stock</em> in Indonesia</h1>
+        <p class="hero-sub">
+          Search any stock or investor. Trace ownership. Screen free float. Map conglomerates.
+          Review hidden 1% positions and compare local-versus-foreign participation in one interface.
+        </p>
+        <div class="hero-actions">
+          <a class="hero-cta" href="./app.html">Open Full App</a>
+          <a class="ghost-btn" href="./methodology.html">See Methodology</a>
+        </div>
+        <div class="hero-price">
+          <strong>Direct local build</strong>
+          <span> - full feature access, research workflow, and entity drilldowns are open by default</span>
+        </div>
+      </section>
+
+      <section class="stats-bar scroll-reveal">
+        <div class="stats-row" id="landing-stats"></div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">Features</h2>
+        <p class="section-sub">
+          Research flow modeled on the target product: fast search, holder intelligence, free-float screening,
+          network views, and whole-market scanning.
+        </p>
+        <div class="feature-grid" id="feature-grid"></div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">See It In Action</h2>
+        <p class="section-sub">
+          Same high-level composition as the researched product: search, KPI ribbon, market overview,
+          trending entities, foreign holders, and conglomerate signals.
+        </p>
+        <div class="surface-block">
+          <div class="preview-topbar">
+            <div class="logo" style="font-size:22px">StockMap<span>.</span></div>
+            <div class="search-shell">
+              <input class="search-input" id="landing-search-input" aria-label="Search ticker or investor" placeholder="Search ticker or investor...">
+              <div class="search-results" id="landing-search-results"></div>
+            </div>
+            <a class="ghost-btn" href="./app.html">Enter App</a>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="mini-stat-value">955</div><div class="mini-stat-label">Tickers</div></div>
+            <div class="mini-stat"><div class="mini-stat-value">5,270</div><div class="mini-stat-label">Investors</div></div>
+            <div class="mini-stat"><div class="mini-stat-value">57.3%</div><div class="mini-stat-label">Local</div></div>
+            <div class="mini-stat"><div class="mini-stat-value">42.7%</div><div class="mini-stat-label">Foreign</div></div>
+          </div>
+          <div class="panel-grid">
+            <article class="panel">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Market Overview</span></div>
+              <div class="list-stack" id="market-overview-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Hot Searches</span></div>
+              <div class="list-stack" id="hot-searches-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Top Foreign Investors</span></div>
+              <div class="list-stack" id="top-foreign-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Conglomerates</span></div>
+              <div class="list-stack" id="conglomerate-list"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">Track Mutual Fund Portfolios</h2>
+        <p class="section-sub">
+          Fund list on the left, fund detail on the right. This mirrors the two-panel snippet found in the researched landing flow.
+        </p>
+        <div class="mf-grid">
+          <article class="preview-card">
+            <div class="panel-head">
+              <span class="type-badge tone-green">MF</span>
+              <span style="font-family:var(--font-serif);font-style:italic;font-size:20px">Mutual Fund</span>
+              <span class="mono muted" style="margin-left:auto">136 investors</span>
+            </div>
+            <div class="list-stack" id="fund-list-body"></div>
+          </article>
+          <article class="preview-card">
+            <div style="font-size:18px;font-weight:700" id="fund-detail-title"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 18px" id="fund-detail-tags"></div>
+            <div class="panel-head">
+              <span class="panel-stripe" style="background:var(--blue)"></span>
+              <span class="mono" style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase">Portfolio</span>
+            </div>
+            <div class="list-stack" id="fund-detail-body"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+          <h2 class="section-title" style="margin:0">Screen by Free Float</h2>
+          <span class="type-badge tone-accent">New</span>
+        </div>
+        <p class="section-sub">
+          Filter by float concentration, inspect strategic holder dominance, and surface regulatory or liquidity risk more quickly.
+        </p>
+        <div class="surface-block">
+          <div class="tab-row">
+            <span class="tab is-active">Low Float (&lt;5%)</span>
+            <span class="tab">Below 15%</span>
+            <span class="tab">Mid Float</span>
+            <span class="tab">High Float</span>
+            <span class="tab">All 955</span>
+          </div>
+          <div class="table-wrap" style="margin-top:14px">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Ticker</th>
+                  <th scope="col">Largest Strategic Holder</th>
+                  <th scope="col" class="right">Total Held</th>
+                  <th scope="col" class="right">Free Float</th>
+                </tr>
+              </thead>
+              <tbody id="free-float-preview-body"></tbody>
+            </table>
+          </div>
+          <div style="text-align:center;padding-top:16px">
+            <a class="hero-cta" href="./app.html#screener-section">Screen All Tickers</a>
+          </div>
+          <div class="info-note">
+            Free float in this prototype follows the MSCI-aligned structure documented in the methodology page:
+            strategic holder categories are excluded, while portfolio holders count as float.
+          </div>
+        </div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">Sample Data</h2>
+        <p class="section-sub">
+          Hidden 1% positions and non-obvious ownership are a major value proposition, so the prototype includes locked-table patterns and overlay CTAs.
+        </p>
+        <div class="preview-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">Investor</th>
+                <th scope="col">Type</th>
+                <th scope="col">L/F</th>
+                <th scope="col" class="right">%</th>
+              </tr>
+            </thead>
+            <tbody id="hidden-lkh-body"></tbody>
+          </table>
+          <div class="overlay-cta">
+            <a class="hero-cta" href="./app.html#watchlist-section">Open Full Data View</a>
+          </div>
+        </div>
+        <div style="height:14px"></div>
+        <div class="preview-card">
+          <div class="eyebrow">Government of Norway - Hidden 1% Positions</div>
+          <div style="height:10px"></div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">Investor</th>
+                <th scope="col">Type</th>
+                <th scope="col">L/F</th>
+                <th scope="col" class="right">%</th>
+              </tr>
+            </thead>
+            <tbody id="hidden-norway-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">Network Graph</h2>
+        <p class="section-sub">
+          ECharts is used here as the chart engine for a force-directed prototype. The production version can keep ECharts or switch to D3 if lower-level control is needed.
+        </p>
+        <div class="preview-card">
+          <div class="eyebrow">Scenario Network - Investor and Holder Overlap</div>
+          <div style="height:12px"></div>
+          <div class="graph-shell" id="landing-network-chart"></div>
+          <div class="overlay-cta">
+            <a class="hero-cta" href="./app.html#network-section">Explore Network Graphs</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">Entity Drilldown</h2>
+        <p class="section-sub">
+          The prototype now includes reusable detail pages for tickers, investors, and conglomerates so research does not stop at dashboard widgets.
+        </p>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon">Ticker</div>
+            <h3>BBCA</h3>
+            <p>Example ticker page with holder table, local-versus-foreign split, and related-entity navigation.</p>
+            <div style="margin-top:16px"><a class="entity-inline-link" href="./entity.html?kind=ticker&id=BBCA">Open detail</a></div>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">Investor</div>
+            <h3>Government of Norway</h3>
+            <p>Example investor page showing visible positions and the methodological nuance of type interpretation.</p>
+            <div style="margin-top:16px"><a class="entity-inline-link" href="./entity.html?kind=investor&id=government-of-norway">Open detail</a></div>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">Group</div>
+            <h3>Salim Group</h3>
+            <p>Example conglomerate page for mapped group-level research, not just single ticker lookup.</p>
+            <div style="margin-top:16px"><a class="entity-inline-link" href="./entity.html?kind=group&id=salim-group">Open detail</a></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section scroll-reveal">
+        <h2 class="section-title">Market Heatmap</h2>
+        <p class="section-sub">
+          The prototype uses ECharts treemap rendering to approximate a live market heatmap with cap-driven area and return-driven color.
+        </p>
+        <div class="preview-card">
+          <div class="eyebrow">IDX Market Heatmap - Prototype</div>
+          <div style="height:12px"></div>
+          <div class="heatmap-shell" id="landing-heatmap-chart"></div>
+          <div class="overlay-cta">
+            <a class="hero-cta" href="./app.html#heatmap-section">Explore Market Heatmap</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <div class="cta-box">
+          <h2>Full Access. <span style="color:var(--accent)">Everything Open.</span></h2>
+          <p class="section-sub" style="margin-top:10px">
+            This local build opens directly into the complete app shell. No login dialog, no access gate, and no locked preview mode.
+          </p>
+          <div class="feature-grid" style="margin-top:26px">
+            <article class="feature-card">
+              <div class="feature-icon">Open</div>
+              <h3>Direct Dashboard</h3>
+              <p>The app opens straight into screener, charts, analysis lab, and watchlist.</p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-icon">955</div>
+              <h3>Full Preview Surface</h3>
+              <p>Landing cards now behave as direct navigation into the live prototype sections.</p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-icon">AI</div>
+              <h3>Research Workflow</h3>
+              <p>Use search, entity drilldowns, and the local AI-style prompt block without gating.</p>
+            </article>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
+            <a class="hero-cta" href="./app.html">Open App</a>
+            <a class="ghost-btn" href="./app.html#analysis-section">Jump to Analysis Lab</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="landing-footer">
+      StockMap Indonesia prototype - Data source framing based on KSEI structure - Local planning build
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="./assets/mock-data.js"></script>
+  <script src="./assets/utils.js"></script>
+  <script src="./assets/site.js"></script>
+</body>
+</html>

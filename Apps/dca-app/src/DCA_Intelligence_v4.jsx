@@ -107,6 +107,25 @@ const DEFAULTS = {
   editIdx:null, showCfg:true,
 };
 const LS_KEY="dca-portfolio-state";
+const FH_KEY_LS="dca-finnhub-key";
+function getFinnhubKey(){return localStorage.getItem(FH_KEY_LS)||"";}
+function setFinnhubKey(k){localStorage.setItem(FH_KEY_LS,k);}
+
+async function fetchLivePrices(tickers,apiKey){
+  if(!apiKey)return{};
+  const results={};
+  for(const tk of tickers){
+    try{
+      const res=await fetch(`https://finnhub.io/api/v1/quote?symbol=${tk}&token=${apiKey}`);
+      const data=await res.json();
+      if(data&&data.c>0){
+        results[tk]={price:data.c,change:data.d,changePct:data.dp,prevClose:data.pc,high:data.h,low:data.l};
+      }
+    }catch(e){console.warn(`Failed to fetch ${tk}:`,e);}
+  }
+  return results;
+}
+
 function loadState(){
   try{const s=localStorage.getItem(LS_KEY);if(s){const p=JSON.parse(s);return{...DEFAULTS,...p,view:"main",editIdx:null};}}catch{}
   return DEFAULTS;
@@ -365,6 +384,30 @@ export default function App(){
   const[saveName,setSaveName]=useState("");
   const[cmpIds,setCmpIds]=useState([null,null]);
   const[fireTarget,setFireTarget]=useState(2000);
+  const[livePrices,setLivePrices]=useState({});
+  const[lastPriceUpdate,setLastPriceUpdate]=useState(null);
+  const[fhKey,setFhKey]=useState(getFinnhubKey);
+  const[fhKeyInput,setFhKeyInput]=useState("");
+  const[showKeyModal,setShowKeyModal]=useState(!getFinnhubKey());
+  const[priceLoading,setPriceLoading]=useState(false);
+
+  // Fetch live prices and auto-refresh every hour
+  const refreshPrices=useCallback(async()=>{
+    if(!fhKey)return;
+    setPriceLoading(true);
+    try{
+      const tickers=[...new Set(slots.map(s=>s.tk))];
+      const prices=await fetchLivePrices(tickers,fhKey);
+      if(Object.keys(prices).length>0){setLivePrices(prices);setLastPriceUpdate(new Date());}
+    }catch(e){console.warn("Price refresh failed:",e);}
+    setPriceLoading(false);
+  },[fhKey,slots]);
+
+  useEffect(()=>{
+    if(fhKey){refreshPrices();}
+    const interval=setInterval(()=>{if(fhKey)refreshPrices();},3600000);
+    return()=>clearInterval(interval);
+  },[fhKey]);
 
   // Persist state to localStorage
   useEffect(()=>{saveState(s);},[s]);
@@ -384,12 +427,13 @@ export default function App(){
     const inv=txns.reduce((a,t)=>a+ +t.am,0);
     const sh=txns.reduce((a,t)=>a+ +t.am/+t.pr,0);
     const avg=sh>0?inv/sh:0;
-    const last=txns.length>0?+txns[txns.length-1].pr:0;
+    const last=livePrices[sl.tk]?.price||(txns.length>0?+txns[txns.length-1].pr:0);
     const cur=sh*last; const gl=cur-inv; const glP=inv>0?gl/inv*100:0;
     const annD=cur*etf.d/100;
     const perUSD=allocMode==="usd"?sl.usd:grossPer*sl.alloc/100;
-    return{i,tk:sl.tk,al:sl.alloc,usd:sl.usd,etf,fc,txns:sl.txns,inv,sh,avg,last,cur,gl,glP,annD,perUSD,txnCount:txns.length};
-  }),[slots,grossPer,adj,allocMode]);
+    const isLive=!!livePrices[sl.tk];
+    return{i,tk:sl.tk,al:sl.alloc,usd:sl.usd,etf,fc,txns:sl.txns,inv,sh,avg,last,cur,gl,glP,annD,perUSD,txnCount:txns.length,isLive,liveData:livePrices[sl.tk]||null};
+  }),[slots,grossPer,adj,allocMode,livePrices]);
 
   const tot=useMemo(()=>{
     const t={inv:0,cur:0,annD:0};
@@ -565,6 +609,27 @@ export default function App(){
   <div style={{fontFamily:cs.f,background:"transparent",color:cs.t1,minHeight:"100vh",padding:"0 20px",transition:"color .3s"}}>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 
+    {/* ═══ FINNHUB API KEY MODAL ═══ */}
+    {showKeyModal&&(
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}>
+        <div style={{background:cs.sf,border:`1px solid ${cs.bd}`,borderRadius:16,padding:24,width:380,maxWidth:"90vw",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}}>
+          <div style={{fontSize:16,fontWeight:700,marginBottom:4}}>🔑 Finnhub API Key</div>
+          <div style={{fontSize:12,color:cs.t3,marginBottom:12,lineHeight:1.5}}>
+            Enter your free Finnhub API key to enable live ETF prices and real-time P&L updates.
+            Get a free key at <a href="https://finnhub.io/register" target="_blank" rel="noopener" style={{color:cs.acc,textDecoration:"underline"}}>finnhub.io/register</a>
+          </div>
+          <input value={fhKeyInput} onChange={e=>setFhKeyInput(e.target.value)} placeholder="Your API key (e.g. cs1abc...)"
+            style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${cs.bd}`,background:cs.inp,color:cs.t1,fontSize:13,fontFamily:cs.m,outline:"none",marginBottom:12,boxSizing:"border-box"}}/>
+          <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+            {fhKey&&<button onClick={()=>setShowKeyModal(false)} style={{padding:"8px 16px",borderRadius:8,border:`1px solid ${cs.bd}`,background:"transparent",color:cs.t3,fontSize:12,cursor:"pointer"}}>Cancel</button>}
+            <button onClick={()=>{if(!fhKeyInput.trim())return;setFinnhubKey(fhKeyInput.trim());setFhKey(fhKeyInput.trim());setShowKeyModal(false);}}
+              style={{padding:"8px 20px",borderRadius:8,border:"none",background:`linear-gradient(135deg,${cs.acc},${cs.acc}cc)`,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>Save & Connect</button>
+          </div>
+          <div style={{fontSize:10,color:cs.t4||cs.t3,marginTop:10,opacity:0.6}}>Free tier: 60 calls/min, ~15 min delayed quotes. No credit card required.</div>
+        </div>
+      </div>
+    )}
+
     {/* ═══ HEADER ═══ */}
     <div style={{padding:isMobile?"10px 0":"14px 0 10px",borderBottom:`1px solid ${cs.bd}`}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
@@ -677,6 +742,27 @@ export default function App(){
       )}
     </div>
 
+    {/* ═══ LIVE PRICE STATUS BAR ═══ */}
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 12px",marginTop:4,background:cs.sf,borderRadius:8,border:`1px solid ${cs.bd}`,fontSize:11}}>
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        <span style={{width:7,height:7,borderRadius:"50%",background:fhKey?(lastPriceUpdate?cs.grn:cs.amb):cs.red,display:"inline-block",
+          animation:priceLoading?"pulse 1s infinite":"none"}}/>
+        <span style={{color:cs.t3}}>
+          {fhKey?(lastPriceUpdate?`Live prices · Updated ${lastPriceUpdate.toLocaleTimeString()}`:(priceLoading?"Fetching prices...":"Connecting...")):"Prices offline — no API key"}
+        </span>
+        {fhKey&&Object.keys(livePrices).length>0&&<span style={{color:cs.t4||cs.t3,fontFamily:cs.m}}>({Object.keys(livePrices).length} ETFs)</span>}
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        {fhKey&&<button onClick={refreshPrices} disabled={priceLoading} title="Refresh prices now"
+          style={{padding:"2px 8px",borderRadius:4,border:`1px solid ${cs.bd}`,background:"transparent",color:cs.t3,fontSize:11,cursor:priceLoading?"wait":"pointer",opacity:priceLoading?0.5:1}}>
+          {priceLoading?"...":"↻ Refresh"}</button>}
+        <button onClick={()=>{setFhKeyInput(fhKey);setShowKeyModal(true);}} title={fhKey?"Change API key":"Set API key"}
+          style={{padding:"2px 8px",borderRadius:4,border:`1px solid ${cs.bd}`,background:fhKey?"transparent":`${cs.acc}15`,color:fhKey?cs.t3:cs.acc,fontSize:11,cursor:"pointer"}}>
+          {fhKey?"⚙":"🔑 Set Key"}</button>
+      </div>
+    </div>
+    <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}`}</style>
+
     {/* ═══ NAV ═══ */}
     <div style={{display:"flex",gap:2,padding:"6px 0",marginBottom:4,background:cs.sf,borderRadius:10,border:`1px solid ${cs.bd}`,marginTop:8}}>
       {[{id:"main",l:"Dashboard",ic:"📊"},...(appMode==="record"?[{id:"txn",l:"Record",ic:"📒"}]:[]),{id:"proj",l:"Projection",ic:"📈"},{id:"anal",l:"Analysis",ic:"🧠"},...(appMode==="sim"&&savedSims.length>=2?[{id:"compare",l:"Compare",ic:"⚖️"}]:[])].map(n=>
@@ -696,7 +782,7 @@ export default function App(){
       {/* Metrics */}
       {appMode==="record"&&(
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr",gap:8,marginBottom:12}}>
-          {[{l:"Invested",v:$(tot.inv),g:cs.acc},{l:"Value",v:$(tot.cur),c:cs.acc,g:cs.acc},{l:"P&L",v:`${tot.gl>=0?"+":""}${$(tot.gl)}`,c:tot.gl>=0?cs.grn:cs.red,s:P(tot.glP),g:tot.gl>=0?cs.grn:cs.red},{l:"Div/yr",v:$(tot.annD),c:cs.cyn,g:cs.cyn}]
+          {[{l:"Invested",v:$(tot.inv),g:cs.acc},{l:<span>Value {Object.keys(livePrices).length>0&&<span style={{fontSize:8,color:cs.grn,fontWeight:700}}>LIVE</span>}</span>,v:$(tot.cur),c:cs.acc,g:cs.acc},{l:"P&L",v:`${tot.gl>=0?"+":""}${$(tot.gl)}`,c:tot.gl>=0?cs.grn:cs.red,s:P(tot.glP),g:tot.gl>=0?cs.grn:cs.red},{l:"Div/yr",v:$(tot.annD),c:cs.cyn,g:cs.cyn}]
             .map((x,i)=><Box cs={cs} key={i} glow={x.g} style={{padding:"12px 14px"}}><Num cs={cs} l={x.l} v={x.v} c={x.c} s={x.s}/></Box>)}
         </div>
       )}
@@ -965,7 +1051,8 @@ export default function App(){
             {appMode==="record"&&x.txnCount>0&&(
               <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:4,padding:6,background:cs.bg,borderRadius:4}}>
                 <Num cs={cs} l="Shares" v={x.sh>0?x.sh.toFixed(3):"—"}/><Num cs={cs} l="Avg" v={x.avg>0?$(x.avg,2):"—"}/>
-                <Num cs={cs} l="Value" v={$(x.cur)} c={cs.acc}/><Num cs={cs} l="P&L" v={x.inv>0?`${x.gl>=0?"+":""}${P(x.glP)}`:"—"} c={x.gl>=0?cs.grn:cs.red}/>
+                <Num cs={cs} l={<span>Price {x.isLive&&<span style={{fontSize:8,color:cs.grn,fontWeight:700,marginLeft:2}}>LIVE</span>}</span>} v={x.last>0?$(x.last,2):"—"} c={x.isLive?cs.grn:cs.t2} s={x.liveData?`${x.liveData.changePct>=0?"+":""}${x.liveData.changePct?.toFixed(2)}%`:undefined}/>
+                <Num cs={cs} l="P&L" v={x.inv>0?`${x.gl>=0?"+":""}${$(x.gl)}`:"—"} c={x.gl>=0?cs.grn:cs.red} s={x.inv>0?P(x.glP):undefined}/>
               </div>
             )}
           </Box>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StockMap Methodology Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body data-page="methodology">
+  <div class="page-shell">
+    <nav class="nav">
+      <div class="nav-inner">
+        <a class="logo" href="./index.html">StockMap<span>.</span></a>
+        <div class="nav-actions">
+          <a class="nav-link" href="./app.html">Open App</a>
+          <a class="nav-link" href="./affiliate.html">Affiliate</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="method-wrap">
+      <section class="page-hero">
+        <div class="eyebrow">MSCI-aligned classification framework</div>
+        <h1>Free Float <em>Methodology</em></h1>
+        <p class="page-sub">
+          This page translates the researched methodology into a local prototype document:
+          strategic holder categories, conditional individual logic, and explicit limitations.
+        </p>
+      </section>
+
+      <section class="method-grid">
+        <article class="method-card">
+          <h2>Core Formula</h2>
+          <p class="method-copy">
+            Free float represents shares realistically available to trade. Strategic ownership is removed from the float pool.
+          </p>
+          <div class="formula">
+            Free Float = 100% - Strategic Holdings
+            <small>Strategic Holdings = all non-free-float investor categories plus verified affiliated individuals</small>
+          </div>
+          <div class="method-stats" id="method-stats"></div>
+        </article>
+
+        <article class="method-card">
+          <h2>Individual Holder Logic</h2>
+          <p class="method-copy">
+            Individual shareholders require an extra reasoning layer. Percentage size alone is not enough.
+          </p>
+          <div class="flowchart">
+            Is the individual holding 20% or more?<br>
+            <span class="label-danger">YES</span> -> Strategic<br><br>
+            Verified as founder, director, commissioner, family vehicle, or affiliated insider?<br>
+            <span class="label-danger">YES</span> -> Strategic<br><br>
+            Holds material stakes across multiple issuers without control evidence?<br>
+            <span class="label-warn">YES</span> -> Manual review, not automatic strategic<br><br>
+            No control evidence found?<br>
+            <span class="label-success">YES</span> -> Free float
+          </div>
+          <ul id="method-id-rules" style="margin-top:16px"></ul>
+        </article>
+      </section>
+
+      <section class="simple-grid">
+        <article class="simple-card">
+          <h2>Investor Type Classification</h2>
+          <p class="simple-copy">
+            KSEI-style investor codes are mapped into strategic, conditional, or free-float status.
+          </p>
+          <div class="table-wrap" style="margin-top:16px">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Classification</th>
+                  <th>Rationale</th>
+                </tr>
+              </thead>
+              <tbody id="method-classification-body"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="simple-card">
+          <h2>Limits and Assumptions</h2>
+          <p class="simple-copy">
+            The product needs to be honest about where the data stops and where model assumptions start.
+          </p>
+          <ul id="method-limitations" style="margin-top:16px"></ul>
+          <div class="callout" style="margin-top:18px">
+            <div class="callout-title">Implementation note</div>
+            <p>
+              In production, this methodology should be versioned. Every free-float snapshot should store a
+              `method_version` value so future rule changes do not silently rewrite historical results. Treasury shares,
+              lock-ups, and foreign-ownership limits should also be modeled explicitly instead of being left as analyst notes.
+            </p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="simple-footer">
+      Methodology prototype - March 2026 framing - Local planning build
+    </footer>
+  </div>
+
+  <script src="./assets/mock-data.js"></script>
+  <script src="./assets/utils.js"></script>
+  <script src="./assets/site.js"></script>
+</body>
+</html>

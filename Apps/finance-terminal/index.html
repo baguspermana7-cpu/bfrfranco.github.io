@@ -103,7 +103,7 @@ table.dtbl td{padding:.55rem .75rem;border-bottom:1px solid var(--bd2);color:var
 table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 .txt-r{text-align:right}.txt-c{text-align:center}
 .c-grn{color:var(--grn)}.c-red{color:var(--red)}.c-amb{color:var(--amb)}.c-blu{color:var(--blu)}.c-acc{color:var(--acc2)}.c-t1{color:var(--t1)}.c-t3{color:var(--t3)}.c-t4{color:var(--t4)}
-.fw7{font-weight:700}.fw6{font-weight:600}.mono{font-family:var(--mono)}
+.fw7{font-weight:700}.fw6{font-weight:600}.fw5{font-weight:500}.fw8{font-weight:800}.mono{font-family:var(--mono)}
 
 /* INPUTS */
 .inp{padding:8px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-size:.8rem;outline:none;transition:border-color .2s}
@@ -194,6 +194,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 .badge-r{background:var(--redbg);color:var(--red)}
 .badge-a{background:var(--ambbg);color:var(--amb)}
 .badge-b{background:var(--blubg);color:var(--blu)}
+.badge-o{background:rgba(251,146,60,.15);color:#fb923c}
+.badge-p{background:rgba(168,85,247,.15);color:#a855f7}
 
 /* SCREENER FILTERS */
 .filters{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem}
@@ -639,7 +641,9 @@ const S={
   news:[],earnings:[],ipos:[],newsMode:'news',
   cmdSym:'GLD',cmdTf:'3M',
   alerts:[],triggeredAlerts:[],
-  charts:{},timers:{}
+  charts:{},timers:{},
+  chartType:'line',indicators:{sma:true,ema:false,bb:false,vwap:false},
+  compareSyms:[],futSym:'SPY',futTf:'M',_batchQ:{},_portPrices:{}
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -681,6 +685,21 @@ async function fk(ep,params={}){
   const u=new URL(CFG.FK+ep);
   Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,String(v)));
   const r=await fetch(u);if(!r.ok)throw new Error('FK '+r.status);return r.json();
+}
+async function yahooCandles(symbol,range,interval){
+  // Yahoo Finance chart API via AllOrigins CORS proxy — free, no key needed, returns OHLCV
+  const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval||'1d'}&range=${range||'1mo'}`;
+  const url=`https://api.allorigins.win/raw?url=${encodeURIComponent(yUrl)}`;
+  const r=await fetch(url);if(!r.ok)throw new Error('Yahoo '+r.status);
+  const json=await r.json();
+  const result=json.chart?.result?.[0];
+  if(!result||!result.timestamp||!result.timestamp.length)return null;
+  const q=result.indicators?.quote?.[0]||{};
+  const data={t:result.timestamp,c:q.close||[],o:q.open||[],h:q.high||[],l:q.low||[],v:q.volume||[]};
+  const valid=[];
+  for(let i=0;i<data.c.length;i++){if(data.c[i]!=null&&data.o[i]!=null)valid.push(i)}
+  if(!valid.length)return null;
+  return{s:'ok',t:valid.map(i=>data.t[i]),c:valid.map(i=>data.c[i]),o:valid.map(i=>data.o[i]),h:valid.map(i=>data.h[i]),l:valid.map(i=>data.l[i]),v:valid.map(i=>data.v[i])};
 }
 
 const CACHE={_s:{},get(k,ms){const i=this._s[k];if(!i)return null;if(Date.now()-i.t>ms){delete this._s[k];return null}return i.d},set(k,d){this._s[k]={d,t:Date.now()}},clear(){this._s={}}};
@@ -776,15 +795,19 @@ function skipApiKey(){S.fhKey=null;hideApiModal();loadOverview()}
 /* ═══════════════════════════════════════════════════════════════
    SECTION 9: TICKER TAPE
    ═══════════════════════════════════════════════════════════════ */
-async function loadTickerTape(){
+async function loadTickerTape(batchQ){
   const tape=$('tickerTape');
   try{
-    // Load indices from Finnhub
     const quotes=[];
-    if(S.fhKey){
-      for(const sym of CFG.INDICES){
-        try{const q=await fh('/quote',{symbol:sym});quotes.push({sym,name:CFG.IDX_NAMES[sym]||sym,...q})}catch(e){}
-      }
+    // Use batch data for indices
+    const bq=batchQ||S._batchQ||{};
+    for(const sym of CFG.INDICES){
+      const q=bq[sym];
+      if(q)quotes.push({sym,name:CFG.IDX_NAMES[sym]||sym,...q});
+    }
+    // If no batch data, fetch directly
+    if(!quotes.length&&S.fhKey){
+      for(const sym of CFG.INDICES){try{const q=await fh('/quote',{symbol:sym});quotes.push({sym,name:CFG.IDX_NAMES[sym]||sym,...q})}catch(e){}}
     }
     // Load crypto top 5
     try{
@@ -805,7 +828,6 @@ async function loadTickerTape(){
       const cls=chgClass(q.dp||q.d||0);
       html+=`<span class="tape-item"><span class="tape-sym">${q.name||q.sym}</span><span class="tape-price">${fmtP(q.c,q.c>100?2:4)}</span><span class="tape-chg ${cls}">${q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':''}</span></span>`;
     });
-    // Duplicate for seamless scroll
     tape.innerHTML=html+html;
     S.indices=quotes.reduce((a,q)=>{a[q.sym]=q;return a},{});
   }catch(e){tape.innerHTML='<span class="tape-item"><span class="tape-sym">Error loading data</span></span>'}
@@ -815,21 +837,32 @@ async function loadTickerTape(){
    SECTION 10: TAB 1 - MARKET OVERVIEW
    ═══════════════════════════════════════════════════════════════ */
 async function loadOverview(){
-  loadTickerTape();
-  loadOverviewKpis();
-  loadWorldIndices();
-  loadCommodityKpis();
-  loadHeatmap();
-  loadGainersLosers();
-  loadSentimentGauge();
+  updateMarketStatus();
+  // Batch-fetch ALL overview symbols in parallel to avoid rate-limit
+  const allSyms=[...CFG.INDICES,'XLK','XLV','XLF','XLY','XLI','XLC','XLP','XLE','XLB','XLRE','XLU','SLV','UNG','EWJ','EWU','EWG','FXI','EWY','EWA','AAPL','MSFT','GOOGL','AMZN','NVDA','META','TSLA','AMD','NFLX','CRM','INTC','BA','DIS','PYPL','SQ','COIN','PLTR','UBER','ABNB','SNAP'];
+  const uniqueSyms=[...new Set(allSyms)];
+  const batchQuotes={};
+  if(S.fhKey){
+    const results=await Promise.allSettled(uniqueSyms.map(sym=>fh('/quote',{symbol:sym})));
+    results.forEach((r,i)=>{if(r.status==='fulfilled'&&r.value?.c>0)batchQuotes[uniqueSyms[i]]=r.value});
+  }
+  S._batchQ=batchQuotes;
+  // Now render everything using cached batch data
+  loadTickerTape(batchQuotes);
+  renderOverviewKpis(batchQuotes);
+  renderWorldIndices(batchQuotes);
+  renderCommodityKpis(batchQuotes);
+  renderHeatmapFromBatch(batchQuotes);
+  renderGainersLosers(batchQuotes);
+  loadSentimentGauge(batchQuotes);
   loadOverviewDominance();
   loadOverviewNews();
   loadOverviewEarnings();
-  updateMarketStatus();
 }
 
-async function loadCommodityKpis(){
+function renderCommodityKpis(batchQ){
   const el=$('commodityKpis');
+  const bq=batchQ||S._batchQ||{};
   const items=[
     {sym:'GLD',name:'Gold',icon:'fa-coins',bg:'ambbg',fg:'amb'},
     {sym:'SLV',name:'Silver',icon:'fa-circle',bg:'blubg',fg:'blu'},
@@ -841,10 +874,8 @@ async function loadCommodityKpis(){
   if(!S.fhKey){el.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-key"></i><p>Enter API key for commodities</p></div>';return}
   let html='';
   for(const item of items){
-    try{
-      const q=item.sym==='DXY'?{c:0,dp:0}:await fh('/quote',{symbol:item.sym});
-      html+=`<div class="kpi" style="padding:.8rem"><div class="kpi-icon" style="background:var(--${item.bg});color:var(--${item.fg});width:30px;height:30px;font-size:.75rem"><i class="fas ${item.icon}"></i></div><div class="kpi-label" style="font-size:.58rem">${item.name}</div><div class="kpi-val" style="font-size:1.1rem">$${fmtP(q.c)}</div><div class="kpi-sub ${chgClass(q.dp)}" style="font-size:.6rem">${q.dp>0?'+':''}${fmtP(q.dp)}%</div></div>`;
-    }catch(e){html+=`<div class="kpi" style="padding:.8rem"><div class="kpi-label" style="font-size:.58rem">${item.name}</div><div class="kpi-val" style="font-size:1.1rem">--</div></div>`}
+    const q=item.sym==='DXY'?{c:0,dp:0}:(bq[item.sym]||{c:0,dp:0});
+    html+=`<div class="kpi" style="padding:.8rem"><div class="kpi-icon" style="background:var(--${item.bg});color:var(--${item.fg});width:30px;height:30px;font-size:.75rem"><i class="fas ${item.icon}"></i></div><div class="kpi-label" style="font-size:.58rem">${item.name}</div><div class="kpi-val" style="font-size:1.1rem">${q.c>0?'$'+fmtP(q.c):'--'}</div><div class="kpi-sub ${chgClass(q.dp)}" style="font-size:.6rem">${q.dp>0?'+':''}${fmtP(q.dp||0)}%</div></div>`;
   }
   el.innerHTML=html;
 }
@@ -864,11 +895,12 @@ async function loadOverviewDominance(){
   }catch(e){}
 }
 
-async function loadOverviewKpis(){
+async function renderOverviewKpis(batchQ){
   const el=$('overviewKpis');
   try{
-    let spyQ={c:0,dp:0},btcQ={usd:0},cryptoG={};
-    if(S.fhKey)try{spyQ=await fh('/quote',{symbol:'SPY'})}catch(e){}
+    const bq=batchQ||S._batchQ||{};
+    const spyQ=bq['SPY']||{c:0,dp:0};
+    let btcQ={usd:0},cryptoG={};
     try{btcQ=(await cg('/simple/price',{ids:'bitcoin',vs_currencies:'usd',include_24hr_change:'true'})).bitcoin||{usd:0}}catch(e){}
     try{cryptoG=await cg('/global')}catch(e){}
     const gd=cryptoG.data||{};
@@ -881,9 +913,10 @@ async function loadOverviewKpis(){
   updLastUp();
 }
 
-async function loadHeatmap(){
+function renderHeatmapFromBatch(batchQ){
   const el=$('heatmapGrid');
   if(!S.fhKey){el.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-key"></i><p>Enter Finnhub API key to see market heatmap</p></div>';return}
+  const bq=batchQ||S._batchQ||{};
   const sectors=[
     {n:'Technology',s:'XLK',wide:true},{n:'Healthcare',s:'XLV'},{n:'Financials',s:'XLF'},
     {n:'Consumer Disc.',s:'XLY'},{n:'Industrials',s:'XLI'},{n:'Comm. Services',s:'XLC'},
@@ -892,23 +925,22 @@ async function loadHeatmap(){
   ];
   let html='';
   for(const sec of sectors){
-    try{
-      const q=await fh('/quote',{symbol:sec.s});
-      const pct=q.dp||0;
-      const bg=getHeatmapColor(pct);
-      html+=`<div class="hm-cell${sec.wide?' hm-wide':''}" style="background:${bg}" title="${sec.n}: ${pct>0?'+':''}${fmtP(pct)}%"><div class="hm-name">${sec.n}</div><div class="hm-val">${pct>0?'+':''}${fmtP(pct)}%</div><div class="hm-sub">${sec.s} $${fmtP(q.c)}</div></div>`;
-    }catch(e){html+=`<div class="hm-cell${sec.wide?' hm-wide':''}" style="background:#334155"><div class="hm-name">${sec.n}</div><div class="hm-val">--</div></div>`}
+    const q=bq[sec.s]||{c:0,dp:0};
+    const pct=q.dp||0;
+    const bg=q.c>0?getHeatmapColor(pct):'#334155';
+    html+=`<div class="hm-cell${sec.wide?' hm-wide':''}" style="background:${bg}" title="${sec.n}: ${pct>0?'+':''}${fmtP(pct)}%"><div class="hm-name">${sec.n}</div><div class="hm-val">${q.c>0?((pct>0?'+':'')+fmtP(pct)+'%'):'--'}</div><div class="hm-sub">${sec.s} ${q.c>0?'$'+fmtP(q.c):''}</div></div>`;
   }
   el.innerHTML=html;
 }
 
-async function loadGainersLosers(){
+function renderGainersLosers(batchQ){
   if(!S.fhKey)return;
-  // Use a set of popular stocks for demo gainers/losers
+  const bq=batchQ||S._batchQ||{};
   const syms=['AAPL','MSFT','GOOGL','AMZN','NVDA','META','TSLA','AMD','NFLX','CRM','INTC','BA','DIS','PYPL','SQ','COIN','PLTR','UBER','ABNB','SNAP'];
   const all=[];
   for(const sym of syms){
-    try{const q=await fh('/quote',{symbol:sym});if(q.c>0)all.push({sym,c:q.c,d:q.d,dp:q.dp})}catch(e){}
+    const q=bq[sym];
+    if(q&&q.c>0)all.push({sym,c:q.c,d:q.d,dp:q.dp});
   }
   all.sort((a,b)=>b.dp-a.dp);
   S.gainers=all.slice(0,5);S.losers=all.slice(-5).reverse();
@@ -924,9 +956,10 @@ function renderMiniTable(id,data){
   el.innerHTML=html+'</tbody>';
 }
 
-function loadSentimentGauge(){
+function loadSentimentGauge(batchQ){
   // Simple gauge based on S&P change
-  const spyChg=S.indices['SPY']?.dp||0;
+  const bq=batchQ||S._batchQ||{};
+  const spyChg=bq['SPY']?.dp||S.indices['SPY']?.dp||0;
   const score=Math.min(100,Math.max(0,50+spyChg*10));
   S.sentiment=score;
   const el=$('gaugeWrap');
@@ -1220,20 +1253,22 @@ function initStockTfBar(){
 async function loadStockChart(tf){
   S.stockTf=tf;
   document.querySelectorAll('#stockTfBar .tf-btn').forEach(b=>b.classList.toggle('active',b.textContent===({W:'1W',M:'1M','3M':'3M','6M':'6M',Y:'1Y','5Y':'5Y'}[tf]||tf)));
-  if(!S.curStock||!S.fhKey)return;
-  const now=Math.floor(Date.now()/1000);
-  const ranges={W:7*86400,M:30*86400,'3M':90*86400,'6M':180*86400,Y:365*86400,'5Y':5*365*86400};
-  const from=now-(ranges[tf]||30*86400);
-  const res=tf==='W'?'5':'D';
+  if(!S.curStock)return;
+  const rangeMap={W:'5d',M:'1mo','3M':'3mo','6M':'6mo',Y:'1y','5Y':'5y'};
+  const interval=tf==='W'?'15m':'1d';
+  const range=rangeMap[tf]||'1mo';
   try{
-    const data=await fh('/stock/candle',{symbol:S.curStock,resolution:res,from,to:now});
-    if(!data||data.s!=='ok'||!data.c||!data.c.length){
-      $('stockChart').parentElement.innerHTML='<div class="loading-text">No chart data available for this timeframe</div><canvas id="stockChart" height="300"></canvas>';
+    const filtered=await yahooCandles(S.curStock,range,interval);
+    if(!filtered){
+      $('stockChart').parentElement.innerHTML='<div class="loading-text">No chart data available</div><canvas id="stockChart" height="300"></canvas>';
       return;
     }
-    S.stockCandles=data;
+    S.stockCandles=filtered;
     rebuildStockChart();
-  }catch(e){console.error('Chart error:',e)}
+  }catch(e){
+    console.error('Chart error:',e);
+    $('stockChart').parentElement.innerHTML='<div class="loading-text">Chart data unavailable</div><canvas id="stockChart" height="300"></canvas>';
+  }
 }
 // Technical indicator calculations
 function calcSMA(data,period){
@@ -1304,8 +1339,6 @@ function calcVWAP(closes,volumes){
   return vwap;
 }
 
-// Indicator state
-S.indicators={sma:true,ema:false,bb:false,vwap:false};
 function toggleIndicator(ind){
   S.indicators[ind]=!S.indicators[ind];
   document.querySelectorAll('#indicatorToggles .btn').forEach(b=>b.classList.toggle('active',S.indicators[b.dataset.ind]));
@@ -1490,15 +1523,15 @@ function renderFxGrid(){
     else if(to==='USD'&&S.fxBase[from])rate=1/S.fxBase[from];
     else if(S.fxBase[from]&&S.fxBase[to])rate=S.fxBase[to]/S.fxBase[from];
     const active=pair===S.fxPair?' active':'';
-    html+=`<div class="fx-card${active}" onclick="selectFxPair('${pair}')"><div class="fx-pair">${pair}</div><div class="fx-rate">${rate.toFixed(4)}</div></div>`;
+    html+=`<div class="fx-card${active}" onclick="selectFxPair('${pair}',this)"><div class="fx-pair">${pair}</div><div class="fx-rate">${rate.toFixed(4)}</div></div>`;
   });
   el.innerHTML=html;
 }
 
-function selectFxPair(pair){
+function selectFxPair(pair,el){
   S.fxPair=pair;
   document.querySelectorAll('.fx-card').forEach(c=>c.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  if(el)el.classList.add('active');
   loadFxChart();
 }
 
@@ -1749,6 +1782,7 @@ async function runCryptoPreset(name){
   if(name==='Top 50'){$('scrMinMcap').value='';$('scrChg').value=''}
   else if(name==='Gainers 24h'){$('scrChg').value='up'}
   else if(name==='Losers 24h'){$('scrChg').value='down'}
+  else if(name==='DeFi'){$('scrMinMcap').value='';$('scrChg').value='';S.cryptoCategory='decentralized-finance-defi'}
   runCryptoScreen();
 }
 
@@ -2042,14 +2076,13 @@ function initCmdTfBar(){
 }
 
 async function loadCmdChart(){
-  if(!S.fhKey)return;
-  const now=Math.floor(Date.now()/1000);
-  const tfDays={'1W':7,'1M':30,'3M':90,'6M':180,'1Y':365};
-  const from=now-((tfDays[S.cmdTf]||90)*86400);
+  const rangeMap={'1W':'5d','1M':'1mo','3M':'3mo','6M':'6mo','1Y':'1y'};
+  const range=rangeMap[S.cmdTf]||'3mo';
+  const interval=S.cmdTf==='1W'?'15m':'1d';
   document.querySelectorAll('#cmdTfBar .tf-btn').forEach(b=>b.classList.toggle('active',b.textContent===S.cmdTf));
   try{
-    const data=await fh('/stock/candle',{symbol:S.cmdSym,resolution:'D',from,to:now});
-    if(!data||data.s!=='ok'||!data.c)return;
+    const data=await yahooCandles(S.cmdSym,range,interval);
+    if(!data||!data.c)return;
     const cc=chartColors();destroyChart('cmd');
     const name=COMMODITIES.find(c=>c.sym===S.cmdSym)?.name||S.cmdSym;
     S.charts.cmd=new Chart($('cmdChart'),{
@@ -2060,7 +2093,7 @@ async function loadCmdChart(){
         ]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:cc.text,font:{size:10}}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': $'+fmtP(ctx.raw)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>'$'+fmt(v),font:{size:10}}}}}
     });
-  }catch(e){}
+  }catch(e){console.error('Commodity chart error:',e)}
 }
 
 async function loadCmdComparison(){
@@ -2331,14 +2364,11 @@ function updCryptoConv(){const amt=parseFloat($('ccAmt').value)||0;$('ccResult')
 async function loadPortfolioAnalytics(){
   if(!S.port.length||S.port.length<1)return;
   const el=$('portRiskMetrics');if(!el)return;
-  // Fetch 1-year candles for all holdings + SPY
+  // Fetch 1-year candles for all holdings + SPY via Yahoo Finance
   const syms=[...new Set(S.port.map(h=>h.tk)),'SPY'];
-  const now=Math.floor(Date.now()/1000);
-  const from=now-365*86400;
   const candles={};
-  for(const sym of syms){
-    try{const d=await fh('/stock/candle',{symbol:sym,resolution:'D',from,to:now});if(d&&d.s==='ok')candles[sym]=d}catch(e){}
-  }
+  const candleResults=await Promise.allSettled(syms.map(sym=>yahooCandles(sym,'1y','1d')));
+  candleResults.forEach((r,i)=>{if(r.status==='fulfilled'&&r.value)candles[syms[i]]=r.value});
   // Calculate daily returns for portfolio
   const spyData=candles['SPY'];
   if(!spyData||!spyData.c||spyData.c.length<30){el.innerHTML='<div class="c-t4" style="font-size:.75rem">Insufficient data for analytics</div>';return}
@@ -2450,8 +2480,6 @@ const FUTURES_PROXIES=[
   {name:'Euro FX (6E)',sym:'FXE',icon:'fa-euro-sign'},
   {name:'VIX (VX)',sym:'VIXY',icon:'fa-bolt'}
 ];
-S.futSym='SPY';S.futTf='M';
-
 async function loadFutures(){
   const quotes={};
   for(const f of FUTURES_PROXIES){try{const q=await fh('/quote',{symbol:f.sym});quotes[f.sym]=q}catch(e){}}
@@ -2486,12 +2514,11 @@ async function loadFutures(){
 async function loadFuturesChart(tf){
   S.futTf=tf;
   document.querySelectorAll('#futuresTfBar .tf-btn').forEach(b=>b.classList.toggle('active',b.textContent===({M:'1M','3M':'3M','6M':'6M',Y:'1Y'}[tf]||tf)));
-  const now=Math.floor(Date.now()/1000);
-  const ranges={M:30*86400,'3M':90*86400,'6M':180*86400,Y:365*86400};
-  const from=now-(ranges[tf]||30*86400);
+  const rangeMap={M:'1mo','3M':'3mo','6M':'6mo',Y:'1y'};
+  const range=rangeMap[tf]||'1mo';
   try{
-    const data=await fh('/stock/candle',{symbol:S.futSym,resolution:'D',from,to:now});
-    if(!data||data.s!=='ok'||!data.c)return;
+    const data=await yahooCandles(S.futSym,range,'1d');
+    if(!data||!data.c)return;
     const cc=chartColors();
     destroyChart('futures');
     const labels=data.t.map(t=>new Date(t*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}));
@@ -2634,7 +2661,6 @@ function updateMarketStatus(){
 /* ═══════════════════════════════════════════════════════════════
    SECTION 27: CANDLESTICK CHART + CHART TYPE TOGGLE
    ═══════════════════════════════════════════════════════════════ */
-S.chartType='line';
 function setChartType(type){
   S.chartType=type;
   document.querySelectorAll('#chartTypeToggle .ct-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===type));
@@ -2665,8 +2691,9 @@ function buildCandlestickDatasets(data,labels,cc){
 /* ═══════════════════════════════════════════════════════════════
    SECTION 28: WORLD MARKET INDICES
    ═══════════════════════════════════════════════════════════════ */
-async function loadWorldIndices(){
+function renderWorldIndices(batchQ){
   const el=$('worldKpis');if(!el||!S.fhKey)return;
+  const bq=batchQ||S._batchQ||{};
   const indices=[
     {sym:'EWJ',name:'Japan (EWJ)',icon:'fa-yen-sign',bg:'redbg',fg:'red'},
     {sym:'EWU',name:'UK (EWU)',icon:'fa-pound-sign',bg:'blubg',fg:'blu'},
@@ -2677,10 +2704,8 @@ async function loadWorldIndices(){
   ];
   let html='';
   for(const idx of indices){
-    try{
-      const q=await fh('/quote',{symbol:idx.sym});
-      html+=`<div class="kpi"><div class="kpi-icon" style="background:var(--${idx.bg});color:var(--${idx.fg})"><i class="fas ${idx.icon}"></i></div><div class="kpi-label">${idx.name}</div><div class="kpi-val">$${fmtP(q.c||0)}</div><div class="kpi-sub ${chgClass(q.dp)}">${q.dp>0?'+':''}${fmtP(q.dp||0)}%</div></div>`;
-    }catch(e){html+=`<div class="kpi"><div class="kpi-label">${idx.name}</div><div class="kpi-val">--</div></div>`}
+    const q=bq[idx.sym]||{c:0,dp:0};
+    html+=`<div class="kpi"><div class="kpi-icon" style="background:var(--${idx.bg});color:var(--${idx.fg})"><i class="fas ${idx.icon}"></i></div><div class="kpi-label">${idx.name}</div><div class="kpi-val">${q.c>0?'$'+fmtP(q.c):'--'}</div><div class="kpi-sub ${chgClass(q.dp)}">${q.dp>0?'+':''}${fmtP(q.dp||0)}%</div></div>`;
   }
   el.innerHTML=html;
 }
@@ -2688,8 +2713,6 @@ async function loadWorldIndices(){
 /* ═══════════════════════════════════════════════════════════════
    SECTION 29: STOCK COMPARISON TOOL
    ═══════════════════════════════════════════════════════════════ */
-S.compareSyms=[];
-
 async function addCompareStock(){
   const sym=($('compareInput').value||'').toUpperCase().trim();
   if(!sym||S.compareSyms.includes(sym))return;
@@ -2712,19 +2735,16 @@ function renderCompareChips(){
 }
 
 async function loadCompareChart(){
-  if(!S.compareSyms.length||!S.fhKey)return;
+  if(!S.compareSyms.length)return;
   const syms=[S.curStock,...S.compareSyms].filter(Boolean);
-  const now=Math.floor(Date.now()/1000);
-  const from=now-90*86400;// 3 months
   const colors=['#8b5cf6','#34d399','#f87171','#60a5fa','#fbbf24','#22d3ee'];
   const datasets=[];const quotes={};
   let labels=[];
   for(let i=0;i<syms.length;i++){
     try{
-      const d=await fh('/stock/candle',{symbol:syms[i],resolution:'D',from,to:now});
-      if(!d||d.s!=='ok')continue;
-      const q=await fh('/quote',{symbol:syms[i]});
-      quotes[syms[i]]=q;
+      const d=await yahooCandles(syms[i],'3mo','1d');
+      if(!d)continue;
+      if(S.fhKey){try{const q=await fh('/quote',{symbol:syms[i]});quotes[syms[i]]=q}catch(e){}}
       // Normalize to % change from first day
       const base=d.c[0];
       const normalized=d.c.map(v=>((v-base)/base)*100);
@@ -2879,6 +2899,7 @@ runStockPreset=async function(name){
   else if(name==='Small Cap'&&$('scrMinMcap'))$('scrMinMcap').value='300e6';
   else if(name==='Tech Giants'){if($('scrSector'))$('scrSector').value='Technology';if($('scrMinMcap'))$('scrMinMcap').value='200e9'}
   else if(name==='Big Movers'&&$('scrDayChg'))$('scrDayChg').value='big';
+  else if(name==='High Volume'){/* uses default screen with volume sort */}
   runStockScreen();
 };
 
@@ -2933,10 +2954,12 @@ async function loadYieldCurve(){
    ═══════════════════════════════════════════════════════════════ */
 function startAutoUpdate(){
   // Quotes refresh every 5 min
-  S.timers.quotes=setInterval(()=>{
-    if(S.tab==='overview')loadOverviewKpis();
-    if(S.tab==='watchlist')loadWlPrices();
-    loadTickerTape();
+  S.timers.quotes=setInterval(async()=>{
+    if(S.tab==='overview')loadOverview();
+    else{
+      if(S.tab==='watchlist')loadWlPrices();
+      loadTickerTape();
+    }
   },CFG.REFRESH.QUOTES);
   // News refresh every 30 min
   S.timers.news=setInterval(()=>{
