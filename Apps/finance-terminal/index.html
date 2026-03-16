@@ -650,21 +650,19 @@ const S={
    SECTION 3: RATE LIMITER & API LAYER
    ═══════════════════════════════════════════════════════════════ */
 class RateLimiter{
-  constructor(max,win){this.max=max;this.win=win;this.q=[];this.ts=[];this.busy=false}
+  constructor(max,win,conc){this.max=max;this.win=win;this.conc=conc||8;this.q=[];this.ts=[];this.active=0}
   add(fn){return new Promise((res,rej)=>{this.q.push({fn,res,rej});this._run()})}
   async _run(){
-    if(this.busy)return;this.busy=true;
-    while(this.q.length){
+    while(this.q.length&&this.active<this.conc){
       const now=Date.now();this.ts=this.ts.filter(t=>now-t<this.win);
-      if(this.ts.length>=this.max){await sleep(this.win-(now-this.ts[0])+100);continue}
-      const{fn,res,rej}=this.q.shift();this.ts.push(Date.now());
-      try{res(await fn())}catch(e){rej(e)}
+      if(this.ts.length>=this.max){setTimeout(()=>this._run(),this.win-(now-this.ts[0])+100);return}
+      const{fn,res,rej}=this.q.shift();this.ts.push(Date.now());this.active++;
+      fn().then(res).catch(rej).finally(()=>{this.active--;this._run()});
     }
-    this.busy=false;
   }
 }
-const fhLim=new RateLimiter(50,60000);
-const cgLim=new RateLimiter(25,60000);
+const fhLim=new RateLimiter(50,60000,10);
+const cgLim=new RateLimiter(25,60000,5);
 
 async function fh(ep,params={}){
   return fhLim.add(async()=>{
@@ -839,22 +837,30 @@ async function loadTickerTape(batchQ){
 async function loadOverview(){
   updateMarketStatus();
   // Batch-fetch ALL overview symbols in parallel to avoid rate-limit
-  const allSyms=[...CFG.INDICES,'XLK','XLV','XLF','XLY','XLI','XLC','XLP','XLE','XLB','XLRE','XLU','SLV','UNG','EWJ','EWU','EWG','FXI','EWY','EWA','AAPL','MSFT','GOOGL','AMZN','NVDA','META','TSLA','AMD','NFLX','CRM','INTC','BA','DIS','PYPL','SQ','COIN','PLTR','UBER','ABNB','SNAP'];
+  const allSyms=[...CFG.INDICES,'XLK','XLV','XLF','XLY','XLI','XLC','XLP','XLE','XLB','XLRE','XLU','SLV','UNG','TLT','EWJ','EWU','EWG','FXI','EWY','EWA','AAPL','MSFT','GOOGL','AMZN','NVDA','META','TSLA','AMD','NFLX','CRM','INTC','BA','DIS','PYPL','SQ','COIN','PLTR','UBER','ABNB','SNAP'];
   const uniqueSyms=[...new Set(allSyms)];
   const batchQuotes={};
   if(S.fhKey){
-    const results=await Promise.allSettled(uniqueSyms.map(sym=>fh('/quote',{symbol:sym})));
-    results.forEach((r,i)=>{if(r.status==='fulfilled'&&r.value?.c>0)batchQuotes[uniqueSyms[i]]=r.value});
+    try{
+      const results=await Promise.allSettled(uniqueSyms.map(sym=>fh('/quote',{symbol:sym})));
+      let ok=0,fail=0;
+      results.forEach((r,i)=>{
+        if(r.status==='fulfilled'&&r.value&&typeof r.value.c==='number'&&r.value.c>0){batchQuotes[uniqueSyms[i]]=r.value;ok++}
+        else{fail++;if(r.status==='rejected')console.warn('FH fail:',uniqueSyms[i],r.reason?.message||r.reason)}
+      });
+      console.log(`[FT] Batch: ${ok} ok, ${fail} fail of ${uniqueSyms.length}`);
+    }catch(e){console.error('[FT] Batch error:',e)}
   }
   S._batchQ=batchQuotes;
-  // Now render everything using cached batch data
+  // Render Finnhub data immediately
   loadTickerTape(batchQuotes);
-  renderOverviewKpis(batchQuotes);
   renderWorldIndices(batchQuotes);
   renderCommodityKpis(batchQuotes);
   renderHeatmapFromBatch(batchQuotes);
   renderGainersLosers(batchQuotes);
   loadSentimentGauge(batchQuotes);
+  // Async: CoinGecko KPIs + other data (don't block above)
+  renderOverviewKpis(batchQuotes);
   loadOverviewDominance();
   loadOverviewNews();
   loadOverviewEarnings();
