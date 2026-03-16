@@ -1,11 +1,13 @@
 window.StockMapMock = {
   meta: {
     siteName: "StockMap Indonesia",
-    kseiDate: "27 Feb 2026",
+    kseiDate: "Source dates vary by issuer",
     methodologyDate: "March 2026",
     allowedTokens: ["prototype-token", "meta-demo-2026"],
     accessMode: "Direct full access",
-    sourceCopy: "Data source: KSEI",
+    sourceCopy: "Official issuer disclosures only",
+    coverageMode: "Official-source-only",
+    coverageDate: "16 Mar 2026",
     paymentProvider: "Mayar.id"
   },
   landingStats: [
@@ -218,20 +220,92 @@ window.StockMapMock = {
       "If no control evidence is found, treat the individual as free float."
     ],
     stats: [
-      { label: "Tickers Covered", value: "955" },
-      { label: "Ownership Records", value: "7,257" },
-      { label: "Affiliated Individuals", value: "807" },
-      { label: "Controlling >=20%", value: "187" },
-      { label: "Multi-Stock Controllers", value: "133" },
-      { label: "Verified Insiders", value: "487" }
+      { label: "Ready Tickers", value: "9" },
+      { label: "Review Queue", value: "1" },
+      { label: "Named Holders", value: "10" },
+      { label: "Official Sources", value: "10" },
+      { label: "Latest Snapshot", value: "31 Jan 2026" },
+      { label: "Earliest Snapshot", value: "31 Dec 2023" }
     ],
     limitations: [
-      "Only holders with 1% or more ownership appear in the KSEI reporting set.",
-      "Treasury shares, IPO lock-up periods, and foreign-ownership limits require extra treatment beyond this prototype.",
-      "Some small-cap insiders may not be captured when public governance data is incomplete.",
-      "Monthly KSEI publication means intra-month changes are not reflected.",
-      "Sub-1% holders are assumed to be free float for estimation purposes, so the estimate should be read with error bounds in mind."
+      "This local build now excludes synthetic aggregate rows from the app and keeps only issuer-sourced ownership snapshots.",
+      "Source dates differ by issuer, so every row must be read together with its as-of date rather than as a same-day market snapshot.",
+      "Some issuers publish only controlling blocks plus public categories, while others publish top public holder tables.",
+      "Strategic classification can remain review-sensitive when named corporate holders appear without explicit affiliation disclosure.",
+      "Rows marked review-required stay visible in the source ledger but are excluded from sourced analytics until classification is defensible."
     ]
+  },
+  sourceLedger: {
+    BBCA: {
+      status: "ready",
+      asOf: "31 Dec 2024",
+      sourceLabel: "BCA Annual Report 2024",
+      sourceUrl: "https://www.bca.co.id",
+      note: "Strategic control anchored by PT Dwimuria Investama Andalan. Public float uses issuer disclosure."
+    },
+    BBRI: {
+      status: "ready",
+      asOf: "31 Dec 2023",
+      sourceLabel: "BRI Annual Report 2023",
+      sourceUrl: "https://bri.co.id",
+      note: "Public ownership split is sourced from the issuer annual report ownership composition disclosure."
+    },
+    TLKM: {
+      status: "ready",
+      asOf: "31 Dec 2024",
+      sourceLabel: "Telkom Annual Report 2024",
+      sourceUrl: "https://www.telkom.co.id",
+      note: "Named public holders come from the 20 largest public shareholders table in the annual report."
+    },
+    BMRI: {
+      status: "ready",
+      asOf: "30 Sep 2025",
+      sourceLabel: "Bank Mandiri September 2025 Corporate Presentation",
+      sourceUrl: "https://bankmandiri.co.id",
+      note: "Ownership composition uses the issuer presentation table; note states the majority state block was transferred to Danantara while Government retains Series A."
+    },
+    BBNI: {
+      status: "ready",
+      asOf: "31 Dec 2025",
+      sourceLabel: "BNI Annual Report 2025 / Shareholder Structure",
+      sourceUrl: "https://www.bni.co.id",
+      note: "Danantara and Government rows are sourced from the issuer ownership structure, with domestic and foreign public categories preserved."
+    },
+    ASII: {
+      status: "ready",
+      asOf: "31 Dec 2025",
+      sourceLabel: "Astra Shareholder Composition",
+      sourceUrl: "https://www.astra.co.id",
+      note: "Foreign public mix is net of Jardine's strategic block so float is not double counted."
+    },
+    TINS: {
+      status: "ready",
+      asOf: "31 Dec 2025",
+      sourceLabel: "PT Timah Shareholder Composition",
+      sourceUrl: "https://timah.com",
+      note: "Issuer disclosure shows a 65.00% strategic state block and 35.00% public ownership."
+    },
+    ITMG: {
+      status: "ready",
+      asOf: "31 Dec 2024",
+      sourceLabel: "ITMG Annual Report 2024",
+      sourceUrl: "https://www.itmg.co.id",
+      note: "Top 10 shareholders table provides the strategic parent and named public holders above 1%."
+    },
+    GIAA: {
+      status: "ready",
+      asOf: "08 Dec 2025",
+      sourceLabel: "Garuda PMTHMETD Completion Disclosure",
+      sourceUrl: "https://www.garuda-indonesia.com",
+      note: "Post-PMTHMETD capital structure is recomputed from issued shares after Danantara subscribed 315.61 billion new series D shares."
+    },
+    BUMI: {
+      status: "review_required",
+      asOf: "30 Jan 2026",
+      sourceLabel: "Bumi Resources Shareholder Composition",
+      sourceUrl: "https://www.bumiresources.com",
+      note: "Named corporate holders are official, but strategic-versus-portfolio classification is still under review and excluded from sourced analytics."
+    }
   },
   affiliate: {
     steps: [
@@ -282,25 +356,20 @@ window.StockMapMock = {
           { label: "P/B", value: "4.8x" },
           { label: "ROE", value: "21.4%" }
         ],
-        localForeign: [
-          { name: "Local", value: 61 },
-          { name: "Foreign", value: 39 }
-        ],
+        localForeign: null,
         summaryPoints: [
           "Djarum strategic layer keeps effective control even while the free float remains investable.",
           "Foreign participation is still material enough to keep BBCA relevant for institutional flow tracking.",
           "Investor page links are useful here because cross-holdings tend to matter more than a raw holder list."
         ],
         holderTable: [
-          { name: "PT DWIMURIA INVESTAMA ANDALAN", type: "CP", nat: "L", pct: "54.94%", strategic: true },
-          { name: "UOB KAY HIAN PTE LTD", type: "IB", nat: "F", pct: "1.44%", classificationOverride: "float", entityId: "uob-kay-hian-pte-ltd", entityKind: "investor" },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.21%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "FIDELITY FUNDS", type: "MF", nat: "F", pct: "1.08%", strategic: false }
+          { name: "PT DWIMURIA INVESTAMA ANDALAN", type: "CP", nat: "L", pct: "54.94%", strategic: true, entityId: "pt-dwimuria-investama-andalan", entityKind: "investor" },
+          { name: "CITIBANK SINGAPORE S/A GOVERNMENT OF SINGAPORE", type: "PF", nat: "F", pct: "1.44%", classificationOverride: "float", entityId: "government-of-singapore", entityKind: "investor" },
+          { name: "OTHER PUBLIC SHAREHOLDERS", type: "MF", nat: "", pct: "43.62%", classificationOverride: "float" }
         ],
         related: [
-          { label: "UOB KAY HIAN PTE LTD", kind: "investor", id: "uob-kay-hian-pte-ltd" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" },
-          { label: "Salim Group", kind: "group", id: "salim-group" }
+          { label: "PT Dwimuria Investama Andalan", kind: "investor", id: "pt-dwimuria-investama-andalan" },
+          { label: "Government of Singapore", kind: "investor", id: "government-of-singapore" }
         ]
       },
       BBRI: {
@@ -323,8 +392,8 @@ window.StockMapMock = {
           { label: "ROE", value: "19.1%" }
         ],
         localForeign: [
-          { name: "Local", value: 68 },
-          { name: "Foreign", value: 32 }
+          { name: "Local", value: 63.44 },
+          { name: "Foreign", value: 36.56 }
         ],
         summaryPoints: [
           "Strategic control is still clear despite large public market participation.",
@@ -332,15 +401,11 @@ window.StockMapMock = {
           "BRI is useful for explaining how state-linked control can still coexist with liquid float."
         ],
         holderTable: [
-          { name: "PT DANANTARA ASSET MANAGEMENT", type: "CP", nat: "L", pct: "53.19%", strategic: true, entityId: "pt-danantara-asset-management", entityKind: "investor" },
-          { name: "NEGARA REPUBLIK INDONESIA SERI A", type: "CP", nat: "L", pct: "5.31%", strategic: true },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.43%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "BLACKROCK FUNDS", type: "MF", nat: "F", pct: "1.10%", strategic: false },
-          { name: "BPJS KETENAGAKERJAAN", type: "PF", nat: "L", pct: "1.04%", strategic: false }
+          { name: "GOVERNMENT OF THE REPUBLIC OF INDONESIA", type: "CP", nat: "L", pct: "53.19%", strategic: true },
+          { name: "DOMESTIC PUBLIC HOLDERS", type: "PF", nat: "L", pct: "10.25%", classificationOverride: "float" },
+          { name: "FOREIGN PUBLIC HOLDERS", type: "PF", nat: "F", pct: "36.56%", classificationOverride: "float" }
         ],
         related: [
-          { label: "PT Danantara Asset Management", kind: "investor", id: "pt-danantara-asset-management" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" },
           { label: "TLKM", kind: "ticker", id: "TLKM" }
         ]
       },
@@ -364,8 +429,8 @@ window.StockMapMock = {
           { label: "ROE", value: "16.5%" }
         ],
         localForeign: [
-          { name: "Local", value: 59 },
-          { name: "Foreign", value: 41 }
+          { name: "Local", value: 54.9 },
+          { name: "Foreign", value: 45.1 }
         ],
         summaryPoints: [
           "Telkom is a useful benchmark for strategic state control without collapsing tradable float.",
@@ -373,16 +438,20 @@ window.StockMapMock = {
           "A production entity page should show historical shifts in strategic versus float composition."
         ],
         holderTable: [
-          { name: "PT DANANTARA ASSET MANAGEMENT", type: "CP", nat: "L", pct: "52.09%", strategic: true, entityId: "pt-danantara-asset-management", entityKind: "investor" },
-          { name: "YAYASAN KESEJAHTERAAN KARYAWAN TELKOM", type: "FD", nat: "L", pct: "4.01%", strategic: true },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.09%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "BPJS KETENAGAKERJAAN", type: "PF", nat: "L", pct: "1.03%", strategic: false },
-          { name: "VANGUARD FUNDS", type: "MF", nat: "F", pct: "1.01%", strategic: false }
+          { name: "GOVERNMENT OF THE REPUBLIC OF INDONESIA", type: "CP", nat: "L", pct: "52.09%", strategic: true },
+          { name: "DJS KETENAGAKERJAAN PROGRAM JHT", type: "PF", nat: "L", pct: "2.39%", classificationOverride: "float", entityId: "bpjs-ketenagakerjaan", entityKind: "investor" },
+          { name: "EMPLOYEES PROVIDENT FUND BOARD", type: "PF", nat: "F", pct: "1.79%", classificationOverride: "float", entityId: "employees-provident-fund-board", entityKind: "investor" },
+          { name: "CITIBANK N.A. S/A GOVERNMENT OF SINGAPORE", type: "PF", nat: "F", pct: "1.46%", classificationOverride: "float", entityId: "government-of-singapore", entityKind: "investor" },
+          { name: "JPMCB NA RE-VANGUARD TOTAL INTERNATIONAL STOCK INDEX FUND", type: "MF", nat: "F", pct: "0.66%", classificationOverride: "float", entityId: "vanguard-total-international-stock-index-fund", entityKind: "investor" },
+          { name: "JPMCB NA RE-VANGUARD EMERGING MARKETS STOCK INDEX FUND", type: "MF", nat: "F", pct: "0.60%", classificationOverride: "float", entityId: "vanguard-emerging-markets-stock-index-fund", entityKind: "investor" },
+          { name: "THE BANK OF NEW YORK MELLON S/A GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "0.29%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
+          { name: "DJS PENSION PROGRAM JP", type: "PF", nat: "L", pct: "0.42%", classificationOverride: "float", entityId: "bpjs-ketenagakerjaan", entityKind: "investor" },
+          { name: "OTHER PUBLIC SHAREHOLDERS", type: "MF", nat: "", pct: "40.30%", classificationOverride: "float" }
         ],
         related: [
-          { label: "PT Danantara Asset Management", kind: "investor", id: "pt-danantara-asset-management" },
-          { label: "BBRI", kind: "ticker", id: "BBRI" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" }
+          { label: "BPJS Ketenagakerjaan", kind: "investor", id: "bpjs-ketenagakerjaan" },
+          { label: "Government of Singapore", kind: "investor", id: "government-of-singapore" },
+          { label: "Employees Provident Fund Board", kind: "investor", id: "employees-provident-fund-board" }
         ]
       },
       BMRI: {
@@ -405,8 +474,8 @@ window.StockMapMock = {
           { label: "ROE", value: "20.2%" }
         ],
         localForeign: [
-          { name: "Local", value: 71 },
-          { name: "Foreign", value: 29 }
+          { name: "Local", value: 70.37 },
+          { name: "Foreign", value: 29.63 }
         ],
         summaryPoints: [
           "Danantara remains the anchor strategic holder, but the float profile is still healthier than tightly held small caps.",
@@ -414,15 +483,15 @@ window.StockMapMock = {
           "Holder-level detail matters because the gap between visible coverage and strategic holdings is narrower than in many small-cap names."
         ],
         holderTable: [
-          { name: "PT DANANTARA ASSET MANAGEMENT", type: "CP", nat: "L", pct: "52.44%", strategic: true, entityId: "pt-danantara-asset-management", entityKind: "investor" },
-          { name: "BANK MANDIRI PENSIUN RESERVE FOUNDATION", type: "FD", nat: "L", pct: "3.16%", strategic: true },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.20%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "BPJS KETENAGAKERJAAN", type: "PF", nat: "L", pct: "1.00%", strategic: false }
+          { name: "GOVERNMENT OF THE REPUBLIC OF INDONESIA / DANANTARA NOTE", type: "CP", nat: "L", pct: "52.00%", strategic: true },
+          { name: "INDONESIA INVESTMENT AUTHORITY", type: "CP", nat: "L", pct: "8.00%", strategic: true, entityId: "indonesia-investment-authority", entityKind: "investor" },
+          { name: "LOCAL INSTITUTIONS", type: "PF", nat: "L", pct: "5.25%", classificationOverride: "float" },
+          { name: "LOCAL RETAIL", type: "ID", nat: "L", pct: "5.12%", classificationOverride: "float" },
+          { name: "FOREIGN INVESTORS", type: "PF", nat: "F", pct: "29.63%", classificationOverride: "float" }
         ],
         related: [
-          { label: "PT Danantara Asset Management", kind: "investor", id: "pt-danantara-asset-management" },
-          { label: "BBRI", kind: "ticker", id: "BBRI" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" }
+          { label: "Indonesia Investment Authority", kind: "investor", id: "indonesia-investment-authority" },
+          { label: "BBRI", kind: "ticker", id: "BBRI" }
         ]
       },
       BBNI: {
@@ -445,8 +514,8 @@ window.StockMapMock = {
           { label: "ROE", value: "15.1%" }
         ],
         localForeign: [
-          { name: "Local", value: 66 },
-          { name: "Foreign", value: 34 }
+          { name: "Local", value: 76.89 },
+          { name: "Foreign", value: 23.11 }
         ],
         summaryPoints: [
           "BNNI sits in the same strategic-control family as the other state banks, but at a cheaper valuation profile.",
@@ -454,15 +523,13 @@ window.StockMapMock = {
           "The main research value is comparing how similar control structures still produce different float and valuation outcomes."
         ],
         holderTable: [
+          { name: "GOVERNMENT OF THE REPUBLIC OF INDONESIA", type: "CP", nat: "L", pct: "0.60%", strategic: true },
           { name: "PT DANANTARA ASSET MANAGEMENT", type: "CP", nat: "L", pct: "59.40%", strategic: true, entityId: "pt-danantara-asset-management", entityKind: "investor" },
-          { name: "BPJS KETENAGAKERJAAN", type: "PF", nat: "L", pct: "1.05%", strategic: false, entityId: "bpjs-ketenagakerjaan", entityKind: "investor" },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.08%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "BLACKROCK FUNDS", type: "MF", nat: "F", pct: "1.03%", strategic: false, entityId: "blackrock-funds", entityKind: "investor" }
+          { name: "DOMESTIC PUBLIC HOLDERS", type: "PF", nat: "L", pct: "16.89%", classificationOverride: "float" },
+          { name: "FOREIGN HOLDERS", type: "PF", nat: "F", pct: "23.11%", classificationOverride: "float" }
         ],
         related: [
-          { label: "PT Danantara Asset Management", kind: "investor", id: "pt-danantara-asset-management" },
-          { label: "BPJS Ketenagakerjaan", kind: "investor", id: "bpjs-ketenagakerjaan" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" }
+          { label: "PT Danantara Asset Management", kind: "investor", id: "pt-danantara-asset-management" }
         ]
       },
       ASII: {
@@ -485,8 +552,8 @@ window.StockMapMock = {
           { label: "ROE", value: "17.2%" }
         ],
         localForeign: [
-          { name: "Local", value: 6 },
-          { name: "Foreign", value: 94 }
+          { name: "Local", value: 13.98 },
+          { name: "Foreign", value: 86.02 }
         ],
         summaryPoints: [
           "ASII is a useful reminder that concentrated strategic ownership does not automatically imply a tight float.",
@@ -495,14 +562,11 @@ window.StockMapMock = {
         ],
         holderTable: [
           { name: "JARDINE CYCLE & CARRIAGE LTD", type: "CP", nat: "F", pct: "50.11%", strategic: true, entityId: "jardine-cycle-carriage-ltd", entityKind: "investor" },
-          { name: "UOB KAY HIAN PTE LTD", type: "IB", nat: "F", pct: "1.02%", classificationOverride: "float", entityId: "uob-kay-hian-pte-ltd", entityKind: "investor" },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.01%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "VANGUARD FUNDS", type: "MF", nat: "F", pct: "1.00%", strategic: false, entityId: "vanguard-funds", entityKind: "investor" }
+          { name: "DOMESTIC PUBLIC HOLDERS", type: "PF", nat: "L", pct: "13.98%", classificationOverride: "float" },
+          { name: "FOREIGN PUBLIC HOLDERS EX-JARDINE", type: "PF", nat: "F", pct: "35.91%", classificationOverride: "float" }
         ],
         related: [
-          { label: "Jardine Cycle & Carriage Ltd", kind: "investor", id: "jardine-cycle-carriage-ltd" },
-          { label: "UOB Kay Hian Pte Ltd", kind: "investor", id: "uob-kay-hian-pte-ltd" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" }
+          { label: "Jardine Cycle & Carriage Ltd", kind: "investor", id: "jardine-cycle-carriage-ltd" }
         ]
       },
       TINS: {
@@ -524,25 +588,18 @@ window.StockMapMock = {
           { label: "P/B", value: "0.9x" },
           { label: "ROE", value: "11.3%" }
         ],
-        localForeign: [
-          { name: "Local", value: 96.9 },
-          { name: "Foreign", value: 3.1 }
-        ],
+        localForeign: null,
         summaryPoints: [
           "TINS is useful for showing how a government strategic block can coexist with visible foreign fund participation.",
           "Norway, Vanguard, and BPJS create a cleaner institutional overlap map than many small-cap names.",
           "The core distinction here is between strategic state control and still-tradeable public float."
         ],
         holderTable: [
-          { name: "MINING INDUSTRY INDONESIA", type: "CP", nat: "L", pct: "65.00%", strategic: true },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.11%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "VANGUARD FUNDS", type: "MF", nat: "F", pct: "1.02%", strategic: false, entityId: "vanguard-funds", entityKind: "investor" },
-          { name: "BPJS KETENAGAKERJAAN", type: "PF", nat: "L", pct: "1.01%", strategic: false, entityId: "bpjs-ketenagakerjaan", entityKind: "investor" }
+          { name: "PT MINERAL INDUSTRI INDONESIA (MIND ID)", type: "CP", nat: "L", pct: "65.00%", strategic: true, entityId: "mineral-industri-indonesia", entityKind: "investor" },
+          { name: "PUBLIC HOLDERS", type: "PF", nat: "", pct: "35.00%", classificationOverride: "float" }
         ],
         related: [
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" },
-          { label: "Vanguard Funds", kind: "investor", id: "vanguard-funds" },
-          { label: "BPJS Ketenagakerjaan", kind: "investor", id: "bpjs-ketenagakerjaan" }
+          { label: "PT Mineral Industri Indonesia (MIND ID)", kind: "investor", id: "mineral-industri-indonesia" }
         ]
       },
       ITMG: {
@@ -564,10 +621,7 @@ window.StockMapMock = {
           { label: "P/B", value: "1.6x" },
           { label: "ROE", value: "22.6%" }
         ],
-        localForeign: [
-          { name: "Local", value: 1.5 },
-          { name: "Foreign", value: 98.5 }
-        ],
+        localForeign: null,
         summaryPoints: [
           "ITMG is a strong contrast case to state-linked strategic blocks because control sits with a corporate foreign parent.",
           "The overlap with BPJS, Norway, and Vanguard keeps the ticker analytically interesting beyond the parent stake itself.",
@@ -575,14 +629,14 @@ window.StockMapMock = {
         ],
         holderTable: [
           { name: "BANPU MINERAL (SINGAPORE) PTE LTD", type: "CP", nat: "F", pct: "65.14%", strategic: true, entityId: "banpu-mineral-singapore-pte-ltd", entityKind: "investor" },
-          { name: "BPJS KETENAGAKERJAAN", type: "PF", nat: "L", pct: "1.04%", strategic: false, entityId: "bpjs-ketenagakerjaan", entityKind: "investor" },
-          { name: "GOVERNMENT OF NORWAY", type: "PF", nat: "F", pct: "1.01%", classificationOverride: "float", entityId: "government-of-norway", entityKind: "investor" },
-          { name: "VANGUARD FUNDS", type: "MF", nat: "F", pct: "1.01%", strategic: false, entityId: "vanguard-funds", entityKind: "investor" }
+          { name: "DJS KETENAGAKERJAAN PROGRAM JHT", type: "PF", nat: "L", pct: "1.04%", classificationOverride: "float", entityId: "bpjs-ketenagakerjaan", entityKind: "investor" },
+          { name: "SEB AB LUXEMBOURG BRANCH A/C CLIENTS", type: "IB", nat: "F", pct: "1.49%", classificationOverride: "float", entityId: "seb-ab-luxembourg-branch-ac-clients", entityKind: "investor" },
+          { name: "OTHER PUBLIC HOLDERS", type: "MF", nat: "", pct: "32.33%", classificationOverride: "float" }
         ],
         related: [
           { label: "Banpu Mineral (Singapore) Pte Ltd", kind: "investor", id: "banpu-mineral-singapore-pte-ltd" },
-          { label: "Government of Norway", kind: "investor", id: "government-of-norway" },
-          { label: "BPJS Ketenagakerjaan", kind: "investor", id: "bpjs-ketenagakerjaan" }
+          { label: "BPJS Ketenagakerjaan", kind: "investor", id: "bpjs-ketenagakerjaan" },
+          { label: "SEB AB Luxembourg Branch A/C Clients", kind: "investor", id: "seb-ab-luxembourg-branch-ac-clients" }
         ]
       },
       GIAA: {
@@ -604,18 +658,17 @@ window.StockMapMock = {
           { label: "P/B", value: "1.1x" },
           { label: "Risk", value: "Medium" }
         ],
-        localForeign: [
-          { name: "Local", value: 100 },
-          { name: "Foreign", value: 0 }
-        ],
+        localForeign: null,
         summaryPoints: [
           "GIAA is still strategically controlled, but the official ownership structure suggests a materially larger float than the earlier prototype row showed.",
           "This is a good example of why replacing fabricated placeholders with source-backed structures matters.",
           "The blind-spot component remains important because visible float holders above 1% are still sparse."
         ],
         holderTable: [
-          { name: "GOVERNMENT OF INDONESIA", type: "CP", nat: "L", pct: "64.54%", strategic: true },
-          { name: "PT TRANS AIRWAYS", type: "CP", nat: "L", pct: "8.70%", strategic: true }
+          { name: "PT DANANTARA ASSET MANAGEMENT", type: "CP", nat: "L", pct: "77.53%", strategic: true, entityId: "pt-danantara-asset-management", entityKind: "investor" },
+          { name: "GOVERNMENT OF INDONESIA", type: "CP", nat: "L", pct: "14.50%", strategic: true },
+          { name: "PT TRANS AIRWAYS", type: "CP", nat: "L", pct: "1.80%", strategic: true },
+          { name: "PUBLIC HOLDERS", type: "MF", nat: "", pct: "6.17%", classificationOverride: "float" }
         ],
         related: [
           { label: "PT Danantara Asset Management", kind: "investor", id: "pt-danantara-asset-management" }
@@ -640,19 +693,19 @@ window.StockMapMock = {
           { label: "ROE", value: "8.4%" },
           { label: "Liquidity Risk", value: "High" }
         ],
-        localForeign: [
-          { name: "Local", value: 92 },
-          { name: "Foreign", value: 8 }
-        ],
+        localForeign: null,
         summaryPoints: [
           "This is the clearest float-risk case in the prototype dataset.",
           "Strategic concentration dominates any narrative about broad public ownership.",
           "A serious screener should flag names like this at the top of compliance and liquidity reviews."
         ],
         holderTable: [
-          { name: "BAKRIE CAPITAL INDONESIA", type: "CP", nat: "L", pct: "73.14%", strategic: true },
-          { name: "LONG HAUL HOLDINGS", type: "OT", nat: "F", pct: "24.80%", strategic: true },
-          { name: "PUBLIC FREE FLOAT CLUSTER", type: "ID", nat: "L", pct: "0.20%", strategic: false }
+          { name: "MACH ENERGY (HONG KONG) LIMITED", type: "CP", nat: "F", pct: "45.78%", strategic: true, entityId: "mach-energy-hong-kong-limited", entityKind: "investor" },
+          { name: "UBS AG SWITZERLAND S/A CLIENT ASSETS", type: "IB", nat: "F", pct: "5.10%", classificationOverride: "float" },
+          { name: "CRIS DEVELOPMENTS LIMITED", type: "CP", nat: "F", pct: "4.86%" },
+          { name: "TREASURE GLOBAL INVESTMENTS LTD", type: "CP", nat: "F", pct: "3.18%" },
+          { name: "HSBC-FUND CHENGDONG NO. 1 PRIVATE EQUITY FUND", type: "MF", nat: "F", pct: "2.81%", classificationOverride: "float" },
+          { name: "OTHER PUBLIC HOLDERS", type: "MF", nat: "", pct: "38.27%", classificationOverride: "float" }
         ],
         related: [
           { label: "Bakrie Group", kind: "group", id: "bakrie-group" }
