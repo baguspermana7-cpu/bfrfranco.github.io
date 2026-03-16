@@ -8,18 +8,14 @@
 
   const {
     $,
-    computeLocalForeign,
+    collectInvestorPositions,
     computeTickerMetrics,
     entityHref,
     escapeHtml,
-    findSearchItem,
     formatPct,
-    getFloatRows,
-    isStrategicHolder,
-    normalize,
+    getSourceEntry,
     parsePct,
-    riskClass,
-    searchEntities
+    round2
   } = utils;
 
   function enableDirectAccess() {
@@ -27,188 +23,167 @@
     return "prototype-token";
   }
 
-  function wireSessionLinks(token) {
+  function wireSessionLinks() {
     const appLink = $("#entity-app-link");
     const backLink = $("#entity-back-link");
     if (appLink) appLink.href = "./app.html";
     if (backLink) backLink.href = "./app.html";
   }
 
-  function formatMarketCap(value) {
-    if (!Number.isFinite(value)) return "N/A";
-    return `Rp${value.toLocaleString("en-US")}T`;
-  }
+  function buildTickerEntity(id) {
+    const base = data.entities?.tickers?.[id];
+    const source = getSourceEntry(id);
+    if (!base || !source) return null;
 
-  function patchTickerMetrics(baseMetrics, analytics, marketCap) {
-    const metrics = (baseMetrics || []).map((item) => {
-      if (item.label === "Market Cap") return { ...item, value: formatMarketCap(marketCap) };
-      if (item.label === "Free Float") return { ...item, value: formatPct(analytics.freeFloat) };
-      if (item.label === "Visible Held" || item.label === "Total Held") return { ...item, value: formatPct(analytics.visibleHeld) };
-      if (item.label === "Strategic Held") return { ...item, value: formatPct(analytics.strategicHeld) };
-      if (item.label === "Liquidity Risk" || item.label === "Risk") return { label: "Risk", value: analytics.risk };
-      return item;
-    });
-
-    if (!metrics.some((item) => item.label === "Free Float")) {
-      metrics.unshift({ label: "Free Float", value: formatPct(analytics.freeFloat) });
-    }
-
-    if (!metrics.some((item) => item.label === "Visible Held")) {
-      metrics.splice(Math.min(1, metrics.length), 0, { label: "Visible Held", value: formatPct(analytics.visibleHeld) });
-    }
-
-    if (!metrics.some((item) => item.label === "Strategic Held")) {
-      metrics.splice(Math.min(2, metrics.length), 0, { label: "Strategic Held", value: formatPct(analytics.strategicHeld) });
-    }
-
-    if (!metrics.some((item) => item.label === "Risk")) {
-      metrics.push({ label: "Risk", value: analytics.risk });
-    }
-
-    return metrics;
-  }
-
-  function hydrateTickerEntity(entity) {
-    const analytics = computeTickerMetrics(entity);
-    const tags = Array.from(new Set([...(entity.tags || []).filter((tag) => !/risk/i.test(tag)), `${analytics.risk} Float Risk`]));
-
-    return {
-      ...entity,
-      tags,
-      metrics: patchTickerMetrics(entity.metrics, analytics, entity.marketCap),
-      localForeign: entity.localForeign?.length ? entity.localForeign : analytics.localForeign,
-      holderTable: analytics.rows.map((row) => ({
-        ...row,
-        pct: row.pct || formatPct(row.pctValue),
-        strategic: row.strategic
-      })),
-      _fallback: false
-    };
-  }
-
-  function buildFallbackTickerEntity(id) {
-    const floatRow = getFloatRows().find((item) => item.ticker === id) || data.freeFloat.find((item) => item.ticker === id);
-    const heatmapRow = data.heatmap.find((item) => item.ticker === id);
-    const sampleRows = [...data.hiddenPositions, ...data.norwayPositions]
-      .filter((item) => item.ticker === id)
-      .map((row) => ({
-        name: row.investor,
-        type: row.type,
-        nat: row.nationality,
-        pct: row.pct,
-        strategic: isStrategicHolder(row)
-      }));
-
-    const localForeign = sampleRows.length
-      ? computeLocalForeign(sampleRows.map((row) => ({ ...row, pctValue: parsePct(row.pct) })))
-      : null;
+    const metrics = computeTickerMetrics(base);
+    const tags = [
+      base.sector,
+      `${metrics.risk} Risk`,
+      `As of ${source.asOf}`,
+      source.status === "ready" ? "Sourced" : "Review Required"
+    ].filter(Boolean);
 
     return {
       kind: "ticker",
       id,
-      name: floatRow?.company || `${id} detail`,
+      name: base.name,
       eyebrow: "Ticker detail",
-      summary: "Fallback ticker page generated from aggregate prototype tables. It prevents dead-end navigation but does not replace a fully authored research page.",
-      tags: [heatmapRow?.sector || "Unknown Sector", floatRow?.risk ? `${floatRow.risk} Risk` : "Prototype"],
+      summary: `${base.name} in sourced-coverage mode. Ownership metrics below are calculated from official issuer disclosures dated ${source.asOf}.`,
+      tags,
       metrics: [
-        { label: "Market Cap", value: heatmapRow ? formatMarketCap(heatmapRow.cap) : "N/A" },
-        { label: "Free Float", value: floatRow ? formatPct(floatRow.freeFloat) : "N/A" },
-        { label: "Strategic Held", value: floatRow ? formatPct(floatRow.totalHeld) : "N/A" },
-        { label: "Visible Held", value: floatRow ? formatPct(floatRow.visibleHeld || floatRow.totalHeld) : "N/A" },
-        { label: "Daily Change", value: heatmapRow ? `${heatmapRow.change > 0 ? "+" : ""}${heatmapRow.change}%` : "N/A" },
-        { label: "Risk", value: floatRow?.risk || "Unknown" }
+        { label: "Source Date", value: source.asOf },
+        { label: "Source", value: source.sourceLabel },
+        { label: "Free Float", value: formatPct(metrics.freeFloat) },
+        { label: "Strategic Held", value: formatPct(metrics.strategicHeld) },
+        { label: "Visible Coverage", value: formatPct(metrics.visibleHeld) },
+        { label: "Risk", value: metrics.risk }
       ],
-      localForeign,
-      styleBreakdown: localForeign ? null : [{ name: "Fallback summary", value: 100 }],
+      localForeign: metrics.localForeign,
+      styleBreakdown: null,
       summaryPoints: [
-        "This page is assembled from screener rows and sample hidden-position tables rather than a dedicated authored profile.",
-        "Fallback entities keep navigation intact while making the coverage gap explicit.",
-        "A production entity page should add evidence trails, source links, and a complete holder table."
-      ],
-      holderTable: sampleRows.length
-        ? sampleRows
-        : [
-            {
-              name: floatRow?.holder || "Prototype row not authored",
-              type: "N/A",
-              nat: "N/A",
-              pct: floatRow ? formatPct(Math.max(0, 100 - floatRow.freeFloat)) : "N/A",
-              strategic: true
-            }
-          ],
-      related: [],
-      _fallback: true
+        `${source.sourceLabel} is the controlling source for this ticker, with snapshot date ${source.asOf}.`,
+        `Largest strategic holder is ${metrics.largestStrategic?.name || "N/A"} at ${formatPct(metrics.largestStrategicPct)}.`,
+        `Visible coverage is ${formatPct(metrics.visibleHeld)} and blind-spot float is ${formatPct(metrics.hiddenFloat)}.`,
+        source.note
+      ].filter(Boolean),
+      holderTable: metrics.rows.map((row) => ({
+        ...row,
+        pct: row.pct || formatPct(row.pctValue),
+        strategic: row.strategic
+      })),
+      related: (base.related || []).filter((item) => item.kind !== "group"),
+      sourceStatus: source.status,
+      source
     };
   }
 
-  function buildFallbackInvestorEntity(id) {
-    const searchItem = findSearchItem(id) || searchEntities(id, 1)[0];
-    const displayName = searchItem?.label || id.replace(/-/g, " ").toUpperCase();
-    const rows = [...data.hiddenPositions, ...data.norwayPositions].filter((row) => {
-      const investorName = normalize(row.investor);
-      const target = normalize(displayName);
-      return investorName.includes(target) || target.includes(investorName);
+  function inferInvestorMeta(positions) {
+    const typeCounts = new Map();
+    const natCounts = new Map();
+
+    positions.forEach((position) => {
+      const type = String(position.focusRowType || "").trim() || "N/A";
+      const nat = String(position.focusNat || "").trim() || "N/A";
+      typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
+      natCounts.set(nat, (natCounts.get(nat) || 0) + 1);
     });
+
+    const dominantType = Array.from(typeCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+    const dominantNat = Array.from(natCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+
+    return {
+      type: dominantType,
+      nationality: dominantNat === "L" ? "Local" : dominantNat === "F" ? "Foreign" : "Mixed / Undisclosed"
+    };
+  }
+
+  function buildInvestorEntity(id) {
+    const manual = data.entities?.investors?.[id] || null;
+    const seed = manual || {
+      kind: "investor",
+      id,
+      name: id.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+    };
+    const positions = collectInvestorPositions(seed);
+    if (!positions.length) return null;
+
+    const meta = inferInvestorMeta(positions);
+    const totalStake = round2(positions.reduce((sum, row) => sum + row.pctValue, 0));
+    const avgFloat = round2(positions.reduce((sum, row) => sum + (row.floatRow?.freeFloat || 0), 0) / positions.length);
+    const sectors = Array.from(new Set(positions.map((row) => row.sector).filter(Boolean)));
+    const styleBreakdown = sectors
+      .map((sector) => ({
+        name: sector,
+        value: round2(positions.filter((row) => row.sector === sector).reduce((sum, row) => sum + row.pctValue, 0))
+      }))
+      .sort((a, b) => b.value - a.value);
 
     return {
       kind: "investor",
       id,
-      name: displayName,
+      name: manual?.name || seed.name,
       eyebrow: "Investor detail",
-      summary: "Fallback investor page generated because this entity appears in linked sample data but does not yet have a dedicated authored profile.",
-      tags: ["Investor", rows[0]?.nationality === "F" ? "Foreign" : "Local", "Prototype"],
+      summary: `${manual?.name || seed.name} is derived only from issuer-sourced holder tables currently included in the app.`,
+      tags: [
+        meta.nationality,
+        `Type ${meta.type}`,
+        `${positions.length} sourced positions`
+      ],
       metrics: [
-        { label: "Visible Positions", value: String(rows.length || 0) },
-        { label: "Nationality", value: rows[0]?.nationality === "F" ? "Foreign" : rows[0]?.nationality === "L" ? "Local" : "N/A" },
-        { label: "Investor Type", value: rows[0]?.type || "N/A" },
-        { label: "Affiliated", value: "Unknown" }
+        { label: "Visible Positions", value: String(positions.length) },
+        { label: "Total Visible Stake", value: formatPct(totalStake) },
+        { label: "Avg Target Float", value: formatPct(avgFloat) },
+        { label: "Investor Type", value: meta.type },
+        { label: "Nationality", value: meta.nationality }
       ],
-      styleBreakdown: [{ name: "Visible rows", value: rows.length || 1 }],
+      localForeign: null,
+      styleBreakdown,
       summaryPoints: [
-        "Fallback investor pages keep search results and sample tables navigable.",
-        "The next product step is adding beneficial-owner interpretation and historical changes.",
-        "Linked holdings below come only from the visible prototype rows, not a complete portfolio." 
+        `This page is computed from holder-table rows that explicitly reference ${manual?.name || seed.name}.`,
+        `Current sourced coverage links this investor to ${positions.length} ticker(s) across ${sectors.length} sector(s).`,
+        `Average target free float across those tickers is ${formatPct(avgFloat)}.`,
+        "No synthetic holdings are injected into this page."
       ],
-      holdings: rows.map((row) => ({
-        ticker: row.ticker,
-        company: row.ticker,
-        pct: row.pct
+      holdings: positions.map((position) => ({
+        ticker: position.ticker,
+        company: position.company,
+        pct: formatPct(position.pctValue)
       })),
-      related: [],
-      _fallback: true
+      related: positions.slice(0, 4).map((position) => ({
+        label: position.ticker,
+        kind: "ticker",
+        id: position.ticker
+      }))
     };
   }
 
-  function buildFallbackEntity(kind, id) {
-    if (kind === "ticker") return buildFallbackTickerEntity(id);
-    if (kind === "investor") return buildFallbackInvestorEntity(id);
-
+  function buildUnavailableEntity(kind, id) {
     return {
       kind,
       id,
       name: id,
-      eyebrow: "Entity detail",
-      summary: "Fallback entity profile.",
-      tags: ["Prototype"],
+      eyebrow: "Unavailable",
+      summary: "This entity is not available in sourced-coverage mode.",
+      tags: ["Unavailable"],
       metrics: [
-        { label: "Status", value: "Draft" },
-        { label: "Kind", value: kind },
-        { label: "Records", value: "0" },
-        { label: "Coverage", value: "Partial" }
+        { label: "Status", value: "Unavailable" },
+        { label: "Reason", value: "No sourced holder table" }
       ],
-      styleBreakdown: [{ name: "Prototype", value: 100 }],
-      summaryPoints: ["This entity is not fully authored yet."],
+      localForeign: null,
+      styleBreakdown: null,
+      summaryPoints: [
+        "Only issuer-sourced ticker coverage and investors derivable from those holder tables are exposed here.",
+        "Fallback pages have been removed to avoid placeholder data."
+      ],
       holdings: [],
-      related: [],
-      _fallback: true
+      related: []
     };
   }
 
   function resolveEntity(kind, id) {
-    if (kind === "ticker" && data.entities.tickers[id]) return hydrateTickerEntity(data.entities.tickers[id]);
-    if (kind === "investor" && data.entities.investors[id]) return { ...data.entities.investors[id], _fallback: false };
-    if (kind === "group" && data.entities.groups[id]) return { ...data.entities.groups[id], _fallback: false };
-    return buildFallbackEntity(kind, id);
+    if (kind === "ticker") return buildTickerEntity(id) || buildUnavailableEntity(kind, id);
+    if (kind === "investor") return buildInvestorEntity(id) || buildUnavailableEntity(kind, id);
+    return buildUnavailableEntity(kind, id);
   }
 
   function renderHero(entity) {
@@ -247,15 +222,18 @@
     const related = $("#entity-related");
 
     if (summary) {
-      summary.innerHTML = (entity.summaryPoints || [])
+      const sourceLink = entity.source?.sourceUrl
+        ? [`<div class="entity-summary-item"><a class="entity-inline-link" href="${entity.source.sourceUrl}" target="_blank" rel="noreferrer">Open primary source</a></div>`]
+        : [];
+
+      summary.innerHTML = sourceLink.concat((entity.summaryPoints || [])
         .map((item) => `<div class="entity-summary-item">${escapeHtml(item)}</div>`)
-        .join("");
+      ).join("");
     }
 
     if (!related) return;
-
     if (!entity.related || !entity.related.length) {
-      related.innerHTML = '<div class="entity-related-card">No related entities authored yet.</div>';
+      related.innerHTML = '<div class="entity-related-card">No related sourced entities available.</div>';
       return;
     }
 
@@ -279,7 +257,7 @@
     if (!head || !body || !title) return;
 
     if (entity.kind === "ticker") {
-      title.textContent = entity._fallback ? "Visible Holder Table / Fallback Approximation" : "Visible Holder Table";
+      title.textContent = "Visible Holder Table";
       head.innerHTML = `
         <tr>
           <th scope="col">Holder</th>
@@ -298,7 +276,7 @@
             <tr>
               <td>${linkedName}</td>
               <td class="mono">${escapeHtml(row.type)}</td>
-              <td class="mono">${escapeHtml(row.nat || row.nationality || "N/A")}</td>
+              <td class="mono">${escapeHtml(row.nat || "N/A")}</td>
               <td class="right mono">${escapeHtml(row.pct || formatPct(row.pctValue || 0))}</td>
               <td class="right ${row.strategic ? "risk-high" : "risk-low"}">${row.strategic ? "Yes" : "No"}</td>
             </tr>
@@ -318,7 +296,7 @@
     `;
 
     if (!entity.holdings || !entity.holdings.length) {
-      body.innerHTML = '<tr><td colspan="3" class="muted-copy">No holdings authored yet.</td></tr>';
+      body.innerHTML = '<tr><td colspan="3" class="muted-copy">No sourced holdings available.</td></tr>';
       return;
     }
 
@@ -346,11 +324,11 @@
       return;
     }
 
-    const pieData = entity.localForeign || entity.styleBreakdown || [{ name: "Prototype", value: 100 }];
+    const pieData = entity.localForeign || entity.styleBreakdown || [{ name: "Sourced rows", value: 100 }];
     const pieChart = window.echarts.init(pieTarget, null, { renderer: "canvas" });
     const chartTitle = $("#entity-chart-title");
     if (chartTitle) {
-      chartTitle.textContent = entity.kind === "ticker" && entity.localForeign ? "Visible Holder Mix" : entity.localForeign ? "Local vs Foreign" : "Portfolio Composition";
+      chartTitle.textContent = entity.localForeign ? "Local vs Foreign" : "Composition";
     }
     pieChart.setOption({
       tooltip: { trigger: "item" },
@@ -372,13 +350,13 @@
 
     const barChart = window.echarts.init(barTarget, null, { renderer: "canvas" });
     const barRows = entity.kind === "ticker"
-      ? (entity.holderTable || []).map((row, index) => ({
+      ? (entity.holderTable || []).map((row) => ({
           name: row.name.length > 24 ? `${row.name.slice(0, 24)}...` : row.name,
-          value: parsePct(row.pct) || Math.max(1, (entity.holderTable || []).length - index)
+          value: parsePct(row.pct)
         }))
-      : (entity.holdings || []).map((row, index) => ({
+      : (entity.holdings || []).map((row) => ({
           name: row.ticker,
-          value: parsePct(row.pct) || Math.max(1, (entity.holdings || []).length - index)
+          value: parsePct(row.pct)
         }));
 
     const barTitle = $("#entity-bar-title");
@@ -426,7 +404,7 @@
     const token = enableDirectAccess();
     if (!token) return;
 
-    wireSessionLinks(token);
+    wireSessionLinks();
 
     const params = new URLSearchParams(window.location.search);
     const kind = params.get("kind") || "ticker";

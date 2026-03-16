@@ -1,103 +1,46 @@
 # User Manual
 
-## Opening the prototype
+## Open the app
+1. Open `prototype/index.html` for the sourced-coverage landing page.
+2. Open `prototype/app.html` for the main dashboard.
+3. Open `prototype/methodology.html` for classification rules and limitations.
+4. Open `prototype/entity.html?kind=ticker&id=BBCA` or another sourced entity for detail pages.
 
-Recommended local run:
+## Main workflow
+1. Search a sourced ticker or investor from the landing page or app header.
+2. Review `Overview` to see sourced coverage status, latest issuer dates, and recurring holders.
+3. Use `Free Float Screener` to sort and filter sourced rows by sector and float band.
+4. Use `Investor-Ticker Network` to inspect overlap derived from issuer holder tables.
+5. Use `Source Ledger` to inspect primary source labels and save tickers locally.
+6. Use `Saved Tickers` for a local shortlist with source date, free float, and risk.
 
-1. Open a terminal in `/home/baguspermana7/rz-work/Apps/stock_screener`
-2. Run `npm run dev`
-3. Open `http://127.0.0.1:4173`
+## Important behavior
+1. The screener excludes `review_required` names.
+2. Entity pages do not use fallback or aggregate placeholder records.
+3. Investor pages are derived only from holder-table evidence inside sourced ticker coverage.
+4. Every ticker row in analytics carries an explicit `as-of` date.
 
-Primary entry pages:
+## Current sourced tickers in analytics
+- `BBCA`
+- `BBRI`
+- `TLKM`
+- `BMRI`
+- `BBNI`
+- `ASII`
+- `TINS`
+- `ITMG`
+- `GIAA`
+- `ANTM`
+- `PTBA`
+- `INCO`
+- `PGAS`
 
-1. `/home/baguspermana7/rz-work/Apps/stock_screener/prototype/index.html`
-2. `/home/baguspermana7/rz-work/Apps/stock_screener/prototype/app.html`
-3. `/home/baguspermana7/rz-work/Apps/stock_screener/prototype/methodology.html`
-4. `/home/baguspermana7/rz-work/Apps/stock_screener/prototype/entity.html`
+## Review queue
+- `BUMI`
 
-Suggested open sequence:
-
-1. Open `prototype/index.html`
-2. Review landing sections and previews
-3. Open `prototype/app.html`
-4. Use the dashboard directly
-5. Open ticker, investor, and group detail pages through search or links
-
-## Main user flows
-
-### Landing flow
-
-The landing page includes:
-
-1. Affiliate banner
-2. Hero with direct-open access copy
-3. Stats ribbon
-4. Feature grid
-5. Dashboard preview
-6. Mutual fund preview
-7. Free float preview
-8. Hidden positions sample
-9. Network graph
-10. Entity drilldown section
-11. Heatmap
-
-### Direct access flow
-
-The app now opens directly in `prototype/app.html`.
-
-Behavior:
-
-1. The local build enters dashboard mode immediately.
-2. No login dialog is shown.
-3. Entity pages also open directly.
-
-### Dashboard flow
-
-The dashboard contains:
-
-1. Search suggestions
-2. KPI ribbon
-3. Market overview cards
-4. Hot searches
-5. Top foreign investors
-6. Conglomerate cards
-7. AI spotlight
-8. Local AI-style question box
-9. Free float screener with filter tabs, sector and source filters, sorting, and CSV export
-10. Runtime-derived analytics cards for free float, strategic held, blind spot, coverage, and HHI
-11. Scenario composition chart
-12. Investor-ticker network graph
-13. Scenario selector for investor-led and ticker-led maps
-14. Network evidence ledger and connection highlights
-15. Analysis Lab with price chart, technical indicators, fundamentals, and peer comparison
-16. Market heatmap
-17. Local vs foreign by sector chart
-18. Hidden positions sample
-19. Local-storage watchlist
-
-### Entity flow
-
-Entity pages are reached from:
-
-1. Search results
-2. Hot search list
-3. Top foreign investor list
-4. Conglomerate list
-5. Ticker columns in tables
-6. Entity drilldown cards on the landing page
-
-Supported kinds:
-
-1. `ticker`
-2. `investor`
-3. `group`
-
-## Notes for prototype use
-
-1. Charts use ECharts from CDN. If the CDN fails to load, chart areas fall back to text placeholders.
-2. Some entities use fallback detail generation when a fully-authored page is not yet present in mock data.
-3. Screener analytics are now fully runtime-derived:
-   Authored tickers use holder-table calculations, while non-authored rows use synthesized aggregate analytics from the placeholder dataset.
-4. Network scenarios are also runtime-derived:
-   investor pages, ticker holder tables, overlap holdings, and blind-spot estimates are merged into each scenario graph.
-5. Watchlist state is stored in the browser and is not shared across devices or users.
+## Removed from the active app surface
+- placeholder heatmap
+- placeholder hot-search and top-foreign cards
+- synthetic float rows
+- fallback entity pages
+- placeholder analysis-lab pricing widgets

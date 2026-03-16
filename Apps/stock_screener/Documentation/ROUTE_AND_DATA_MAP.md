@@ -1,97 +1,30 @@
 # Route And Data Map
 
 ## Routes
-
-### Public
-
 1. `prototype/index.html`
-2. `prototype/methodology.html`
-3. `prototype/affiliate.html`
-4. `prototype/terms.html`
-5. `/` via `server.mjs`
+   Landing page for sourced coverage.
+2. `prototype/app.html`
+   Main dashboard.
+3. `prototype/methodology.html`
+   Methodology and limitations.
+4. `prototype/entity.html`
+   Ticker and investor detail route.
 
-### Direct-open app
+## App sections
+1. `overview-section`
+   Coverage summary, source discipline, latest issuer dates, recurring holders.
+2. `screener-section`
+   Sourced free-float screener.
+3. `network-section`
+   Issuer-derived investor-ticker scenarios.
+4. `source-section`
+   Source ledger and sector exposure.
+5. `saved-section`
+   Local saved-ticker table.
 
-1. `prototype/app.html`
-2. `prototype/entity.html`
-
-### Entity route
-
-1. `prototype/entity.html?kind=ticker&id=BBCA`
-2. `prototype/entity.html?kind=investor&id=lo-kheng-hong`
-3. `prototype/entity.html?kind=group&id=salim-group`
-
-## Entity coverage
-
-### Authored ticker entities
-
-1. `BBCA`
-2. `BBRI`
-3. `TLKM`
-4. `BMRI`
-5. `BBNI`
-6. `ASII`
-7. `TINS`
-8. `ITMG`
-9. `GIAA`
-10. `BUMI`
-
-### Authored investor entities
-
-1. `lo-kheng-hong`
-2. `government-of-norway`
-3. `uob-kay-hian-pte-ltd`
-4. `happy-hapsoro`
-5. `pt-danantara-asset-management`
-6. `bpjs-ketenagakerjaan`
-7. `blackrock-funds`
-8. `vanguard-funds`
-9. `banpu-mineral-singapore-pte-ltd`
-10. `jardine-cycle-carriage-ltd`
-
-### Authored group entities
-
-1. `salim-group`
-2. `bakrie-group`
-3. `lippo-group`
-
-### Fallback entity support
-
-If an entity is linked from sample tables but not fully authored, `entity.js` generates a fallback page from:
-
-1. computed screener rows from authored ticker pages when possible
-2. `heatmap`
-3. `hiddenPositions`
-4. `norwayPositions`
-
-## Data blocks inside `mock-data.js`
-
-1. `meta`
-2. `landingStats`
-3. `featureCards`
-4. `overview`
-5. `funds`
-6. `freeFloat`
-7. `hiddenPositions`
-8. `norwayPositions`
-9. `network`
-10. `heatmap`
-11. `methodology`
-12. `affiliate`
-13. `sectorExposure`
-14. `spotlights`
-15. `entities`
-16. `tickerAnalytics`
-17. `searchIndex`
-18. `searchables`
-
-## Derived data at runtime
-
-`assets/utils.js` computes the following structures at runtime:
-
-1. Search corpus merged from `searchIndex`, `entities`, `freeFloat`, and `heatmap`
-2. Free-float rows recomputed from authored ticker `holderTable` entries
-3. Synthetic aggregate free-float rows for non-authored symbols
-4. Weighted sector exposure from authored ticker holder tables with `marketCap`
-5. Local AI-answer summaries used by the dashboard question panel
-6. Investor-led and ticker-led network scenarios with overlap evidence
+## Data flow
+1. `mock-data.js` defines `sourceLedger` and `entities.tickers[*].holderTable`.
+2. `utils.js` converts those into screener rows and network scenarios.
+3. `app.js` renders sourced dashboard sections only.
+4. `site.js` renders landing and methodology sections using sourced coverage summaries.
+5. `entity.js` resolves tickers from `sourceLedger` and investors from holder-table references.

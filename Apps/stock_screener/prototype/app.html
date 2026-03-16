@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>StockMap App Prototype</title>
+  <title>StockMap App</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -30,11 +30,10 @@
           <aside class="sidebar">
             <div class="sidebar-card">
               <div class="sidebar-title">Dashboard</div>
-              <div class="eyebrow" style="margin-top:10px">Full access mode</div>
+              <div class="eyebrow" style="margin-top:10px">Official-source-only mode</div>
               <div class="sidebar-list" id="sidebar-nav"></div>
               <div class="sidebar-note">
-                This local build opens directly into the full feature shell:
-                search, KPI strip, float screener, graph, heatmap, and ownership detail patterns.
+                This build excludes synthetic rows. Every screener and network result is derived from issuer disclosures with explicit snapshot dates.
               </div>
             </div>
           </aside>
@@ -44,44 +43,40 @@
               <div class="app-topbar">
                 <div class="logo" style="font-size:22px">StockMap<span>.</span></div>
                 <div class="search-shell">
-                  <input class="app-search-input" id="app-search-input" aria-label="Search investors, tickers, or companies" placeholder="Search investors, tickers, companies...">
+                  <input class="app-search-input" id="app-search-input" aria-label="Search investors, tickers, or companies" placeholder="Search sourced tickers or investors...">
                   <div class="search-results" id="app-search-results"></div>
                 </div>
-                <div class="eyebrow">App Shell</div>
+                <div class="eyebrow">Sourced Coverage</div>
               </div>
               <div class="app-mini-stats" id="app-top-stats"></div>
               <article class="app-card" style="padding:14px;margin-top:14px">
-                <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Ask StockMap AI</span></div>
+                <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Ask StockMap</span></div>
                 <div class="form-grid" style="margin-top:14px">
                   <label for="assistant-query">Question</label>
-                  <input class="inline-input" id="assistant-query" type="text" aria-label="Ask a question about the prototype dataset" placeholder="BBCA free float, Norway holdings, lowest float names...">
+                  <input class="inline-input" id="assistant-query" type="text" aria-label="Ask a question about sourced ownership data" placeholder="lowest free float, TLKM, Danantara, most concentrated names...">
                   <button class="primary-btn" id="assistant-ask-btn" type="button">Ask</button>
-                  <div class="form-msg" id="assistant-answer">Ask about a ticker, an investor, or the lowest free-float names.</div>
+                  <div class="form-msg" id="assistant-answer">Ask about sourced free float, recurring holders, or concentration.</div>
                 </div>
               </article>
               <div class="app-grid" style="margin-top:14px">
                 <div class="stack-card">
                   <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Market Overview</span></div>
-                    <div class="list-stack" id="app-market-overview"></div>
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Coverage Summary</span></div>
+                    <div class="list-stack" id="coverage-summary-list"></div>
                   </article>
                   <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Hot Searches</span></div>
-                    <div class="list-stack" id="app-hot-searches"></div>
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Source Discipline</span></div>
+                    <div class="list-stack" id="source-discipline-list"></div>
                   </article>
                 </div>
                 <div class="stack-card">
                   <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Top Foreign Investors</span></div>
-                    <div class="list-stack" id="app-top-foreign"></div>
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Latest Official Snapshots</span></div>
+                    <div class="list-stack" id="latest-source-list"></div>
                   </article>
                   <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Conglomerates</span></div>
-                    <div class="list-stack" id="app-conglomerates"></div>
-                  </article>
-                  <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>AI Spotlight</span></div>
-                    <div class="list-stack" id="app-spotlights"></div>
+                    <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Recurring Named Holders</span></div>
+                    <div class="list-stack" id="holder-pattern-list"></div>
                   </article>
                 </div>
               </div>
@@ -90,23 +85,18 @@
             <section class="app-card reveal" id="screener-section">
               <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Free Float Screener</span></div>
               <div class="app-topbar" style="margin-top:14px">
-                <div class="eyebrow" id="float-table-note">Computed holder-table logic is used where authored ticker profiles exist.</div>
+                <div class="eyebrow" id="float-table-note">All rows are sourced from issuer disclosures. Review-required names are excluded.</div>
                 <div class="filter-row">
                   <select class="inline-input" id="float-sector-filter" aria-label="Filter float screener by sector"></select>
-                  <select class="inline-input" id="float-source-filter" aria-label="Filter float screener by data source">
-                    <option value="all">All sources</option>
-                    <option value="authored">Authored only</option>
-                    <option value="synthetic">Synthetic only</option>
-                  </select>
                   <button class="ghost-btn" id="float-export-btn" type="button">Export CSV</button>
                 </div>
               </div>
               <div class="app-tab-row">
                 <button class="app-tab" data-tab="low" type="button">0-5% (High Risk)</button>
-                <button class="app-tab is-active" data-tab="below15" type="button">5-15%</button>
-                <button class="app-tab" data-tab="mid" type="button">15-50%</button>
+                <button class="app-tab" data-tab="below15" type="button">5-15%</button>
+                <button class="app-tab is-active" data-tab="mid" type="button">15-50%</button>
                 <button class="app-tab" data-tab="high" type="button">&gt;50%</button>
-                <button class="app-tab" data-tab="all" type="button">All Tickers</button>
+                <button class="app-tab" data-tab="all" type="button">All Sourced</button>
               </div>
               <div class="snapshot-grid analytics-grid" id="float-analytics-grid" style="margin-top:14px"></div>
               <div class="table-wrap" style="margin-top:14px">
@@ -116,7 +106,6 @@
                       <th scope="col" data-sort-key="ticker">Ticker</th>
                       <th scope="col" data-sort-key="company">Company</th>
                       <th scope="col" data-sort-key="sector">Sector</th>
-                      <th scope="col" class="right" data-sort-key="marketCap">MCap</th>
                       <th scope="col" data-sort-key="holder">Largest Strategic Holder</th>
                       <th scope="col" class="right" data-sort-key="totalHeld">Strategic Held</th>
                       <th scope="col" class="right" data-sort-key="freeFloat">Free Float</th>
@@ -132,15 +121,15 @@
                 </table>
               </div>
               <div class="info-note">
-                Screener now separates strategic held, visible coverage, and blind-spot float. CP, IB, FD, OT are strategic; MF, IS, PF, SC are float; ID is conditional.
+                Rows with incomplete nationality disclosure show `-` in L/F. Review-required names are kept out of this screener until strategic classification is defensible.
               </div>
             </section>
 
             <section class="app-card reveal" id="network-section">
               <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Investor-Ticker Network</span></div>
               <div class="app-topbar" style="margin-top:14px">
-                <div class="eyebrow" id="network-note">Derived multi-hop investor-ticker maps from authored entities and linked holder tables.</div>
-                <select class="inline-input" id="network-scenario-select" aria-label="Select investor or ticker network scenario" style="min-width:280px"></select>
+                <div class="eyebrow" id="network-note">Network edges are derived from issuer holder tables only.</div>
+                <select class="inline-input" id="network-scenario-select" aria-label="Select investor or ticker network scenario" style="min-width:320px"></select>
               </div>
               <div class="snapshot-grid analytics-grid" id="network-stat-grid" style="margin-top:14px"></div>
               <div class="app-grid" style="margin-top:14px">
@@ -182,101 +171,56 @@
               </div>
             </section>
 
-            <section class="app-card reveal" id="analysis-section">
-              <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Analysis Lab</span></div>
-              <div class="app-topbar" style="margin-top:14px">
-                <div class="eyebrow">Price history, technical indicators, dividend view, and peer comparison.</div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                  <select class="inline-input" id="analysis-ticker-select" aria-label="Select ticker for analysis" style="min-width:220px"></select>
-                  <button class="ghost-btn" id="watchlist-add-btn" type="button">Add to Watchlist</button>
-                </div>
-              </div>
+            <section class="app-card reveal" id="source-section">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Source Ledger</span></div>
               <div class="app-grid" style="margin-top:14px">
-                <div class="stack-card">
-                  <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Price & Technical</span></div>
-                    <div class="chart-shell" id="analysis-price-chart"></div>
-                    <div class="snapshot-grid" id="analysis-technical-grid" style="margin-top:14px"></div>
-                  </article>
-                  <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Fundamentals & Alerts</span></div>
-                    <div class="snapshot-grid" id="analysis-fundamentals-grid" style="margin-top:14px"></div>
-                    <div class="callout" id="analysis-alerts" style="margin-top:14px"></div>
-                  </article>
-                </div>
                 <article class="app-card" style="padding:14px">
-                  <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Peer Comparison</span></div>
-                  <div class="table-wrap" style="margin-top:14px">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th scope="col">Ticker</th>
-                          <th scope="col">Company</th>
-                          <th scope="col" class="right">P/E</th>
-                          <th scope="col" class="right">P/B</th>
-                          <th scope="col" class="right">ROE</th>
-                          <th scope="col" class="right">Div</th>
-                          <th scope="col" class="right">Float</th>
-                        </tr>
-                      </thead>
-                      <tbody id="peer-compare-body"></tbody>
-                    </table>
-                  </div>
+                  <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Sector Exposure</span></div>
+                  <div class="chart-shell" id="app-sector-chart"></div>
+                </article>
+                <article class="app-card" style="padding:14px">
+                  <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Source Notes</span></div>
+                  <div class="list-stack" id="source-ledger-note-list"></div>
                 </article>
               </div>
-            </section>
-
-            <section class="app-card reveal" id="heatmap-section">
-              <div class="app-grid">
-                <article class="app-card" style="padding:14px">
-                  <div class="panel-head"><span class="panel-stripe" style="background:var(--accent)"></span><span>Market Heatmap</span></div>
-                  <div class="heatmap-shell" id="app-heatmap-chart"></div>
-                </article>
-                <div class="stack-card">
-                  <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Local vs Foreign by Sector</span></div>
-                    <div class="chart-shell" id="app-sector-chart"></div>
-                  </article>
-                  <article class="app-card" style="padding:14px">
-                    <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Hidden Positions Sample</span></div>
-                    <div class="table-wrap">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">Ticker</th>
-                            <th scope="col">Investor</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">L/F</th>
-                            <th scope="col" class="right">%</th>
-                          </tr>
-                        </thead>
-                        <tbody id="app-hidden-positions"></tbody>
-                      </table>
-                    </div>
-                  </article>
-                </div>
-              </div>
-            </section>
-
-            <section class="app-card reveal" id="watchlist-section">
-              <div class="panel-head"><span class="panel-stripe" style="background:var(--blue)"></span><span>Watchlist & Alerts</span></div>
               <div class="table-wrap" style="margin-top:14px">
                 <table class="table">
                   <thead>
                     <tr>
                       <th scope="col">Ticker</th>
                       <th scope="col">Company</th>
-                      <th scope="col" class="right">Last Price</th>
+                      <th scope="col">As Of</th>
+                      <th scope="col">Primary Source</th>
+                      <th scope="col">Status</th>
                       <th scope="col" class="right">Free Float</th>
-                      <th scope="col" class="right">Risk</th>
-                      <th scope="col">Action</th>
+                      <th scope="col">Note</th>
+                      <th scope="col">Save</th>
                     </tr>
                   </thead>
-                  <tbody id="watchlist-body"></tbody>
+                  <tbody id="source-ledger-body"></tbody>
                 </table>
               </div>
-              <div class="info-note">
-                Watchlist items are stored in browser `localStorage` for this prototype session.
+            </section>
+
+            <section class="app-card reveal" id="saved-section">
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--red)"></span><span>Saved Tickers</span></div>
+              <div class="info-note" style="margin-top:14px">
+                Saved tickers use browser `localStorage` only and keep sourced metadata: source date, free float, and current risk classification.
+              </div>
+              <div class="table-wrap" style="margin-top:14px">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Ticker</th>
+                      <th scope="col">Company</th>
+                      <th scope="col">As Of</th>
+                      <th scope="col" class="right">Free Float</th>
+                      <th scope="col" class="right">Risk</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="saved-body"></tbody>
+                </table>
               </div>
             </section>
           </div>

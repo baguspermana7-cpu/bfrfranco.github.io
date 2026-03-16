@@ -55,6 +55,35 @@
     return `Rp${Number(value).toLocaleString("en-US")}T`;
   }
 
+  function getSourceEntry(ticker) {
+    return data.sourceLedger?.[ticker] || null;
+  }
+
+  function getSourceLedgerRows(options = {}) {
+    const includeReview = Boolean(options.includeReview);
+
+    return Object.entries(data.entities?.tickers || {})
+      .map(([ticker, entity]) => {
+        const source = getSourceEntry(ticker);
+        if (!source) return null;
+        if (!includeReview && source.status !== "ready") return null;
+
+        return {
+          ticker,
+          company: entity.name,
+          sector: entity.sector,
+          marketCap: entity.marketCap,
+          status: source.status,
+          asOf: source.asOf,
+          sourceLabel: source.sourceLabel,
+          sourceUrl: source.sourceUrl || "",
+          note: source.note || "",
+          entity
+        };
+      })
+      .filter(Boolean);
+  }
+
   function entityHref(kind, id) {
     return `./entity.html?kind=${encodeURIComponent(kind)}&id=${encodeURIComponent(id)}`;
   }
@@ -123,56 +152,31 @@
       });
     }
 
-    (data.searchIndex || []).forEach((item) => upsert(item));
-
-    Object.values(data.entities?.tickers || {}).forEach((entity) => {
-      upsert({
-        label: entity.id,
-        kind: "ticker",
-        id: entity.id,
-        subtitle: entity.name,
-        aliases: [entity.name]
+    getSourceLedgerRows()
+      .forEach(({ entity }) => {
+        upsert({
+          label: entity.id,
+          kind: "ticker",
+          id: entity.id,
+          subtitle: entity.name,
+          aliases: [entity.name]
+        });
       });
-    });
 
-    Object.values(data.entities?.investors || {}).forEach((entity) => {
-      upsert({
-        label: entity.name,
-        kind: "investor",
-        id: entity.id,
-        subtitle: entity.tags?.join(" / ") || "Investor",
-        aliases: [entity.id.replace(/-/g, " ")]
+    getSourceLedgerRows()
+      .forEach(({ entity }) => {
+        (entity.holderTable || [])
+          .filter((row) => row.entityKind === "investor" && row.entityId)
+          .forEach((row) => {
+            upsert({
+              label: row.name,
+              kind: "investor",
+              id: row.entityId,
+              subtitle: "Issuer-sourced holder",
+              aliases: [row.entityId.replace(/-/g, " ")]
+            });
+          });
       });
-    });
-
-    Object.values(data.entities?.groups || {}).forEach((entity) => {
-      upsert({
-        label: entity.name,
-        kind: "group",
-        id: entity.id,
-        subtitle: entity.tags?.join(" / ") || "Group",
-        aliases: [entity.id.replace(/-/g, " ")]
-      });
-    });
-
-    (data.freeFloat || []).forEach((row) => {
-      upsert({
-        label: row.ticker,
-        kind: "ticker",
-        id: row.ticker,
-        subtitle: row.company,
-        aliases: [row.company]
-      });
-    });
-
-    (data.heatmap || []).forEach((row) => {
-      upsert({
-        label: row.ticker,
-        kind: "ticker",
-        id: row.ticker,
-        subtitle: `${row.sector} ticker`
-      });
-    });
 
     return Array.from(corpus.values());
   }
@@ -350,19 +354,17 @@
 
   function resolveTickerMeta(ticker) {
     const entity = data.entities?.tickers?.[ticker] || null;
-    const freeFloatRow = (data.freeFloat || []).find((row) => row.ticker === ticker) || null;
-    const heatmapRow = (data.heatmap || []).find((row) => row.ticker === ticker) || null;
+    const sourceEntry = getSourceEntry(ticker);
     const analytics = data.tickerAnalytics?.[ticker] || null;
 
     return {
       ticker,
       entity,
-      freeFloatRow,
-      heatmapRow,
+      sourceEntry,
       analytics,
-      company: entity?.name || freeFloatRow?.company || analytics?.company || ticker,
-      sector: entity?.sector || heatmapRow?.sector || "Unknown",
-      marketCap: entity?.marketCap || heatmapRow?.cap || 0
+      company: entity?.name || analytics?.company || ticker,
+      sector: entity?.sector || "Unknown",
+      marketCap: entity?.marketCap || 0
     };
   }
 
@@ -384,10 +386,8 @@
     const freeFloat = round2(Math.max(0, 100 - strategicHeld));
     const hiddenFloat = round2(Math.max(0, freeFloat - visibleFloat));
     const coverageGap = round2(Math.max(0, 100 - visibleHeld));
-    const localForeign = computeLocalForeign(rows)
-      || (Array.isArray(entity?.localForeign) && entity.localForeign.length
-        ? entity.localForeign.map((item) => ({ name: item.name, value: round2(item.value) }))
-        : null);
+    const hasUnknownNat = rows.some((row) => !["L", "F"].includes(String(row?.nat || row?.nationality || "").toUpperCase()));
+    const localForeign = hasUnknownNat ? null : computeLocalForeign(rows);
     const localPctVisible = round2(localForeign?.find((item) => item.name === "Local")?.value || 0);
     const foreignPctVisible = round2(localForeign?.find((item) => item.name === "Foreign")?.value || 0);
     const largestHolder = rows.slice().sort((a, b) => b.pctValue - a.pctValue)[0] || null;
@@ -445,13 +445,12 @@
       return floatRowsCache.slice();
     }
 
-    const computedRows = new Map();
-
-    Object.values(data.entities?.tickers || {}).forEach((entity) => {
+    const rows = getSourceLedgerRows()
+      .map(({ entity, asOf, sourceLabel }) => {
       const metrics = computeTickerMetrics(entity);
       const meta = resolveTickerMeta(entity.id);
 
-      computedRows.set(entity.id, {
+      return {
         ticker: entity.id,
         company: meta.company,
         holder: metrics.largestStrategic?.name || "N/A",
@@ -481,82 +480,11 @@
         signalSummary: metrics.signalSummary,
         sector: meta.sector,
         marketCap: meta.marketCap,
+        asOf,
+        sourceLabel,
         derived: true,
         source: "authored"
-      });
-    });
-
-    const rows = [];
-
-    (data.freeFloat || []).forEach((row) => {
-      if (computedRows.has(row.ticker)) {
-        rows.push(computedRows.get(row.ticker));
-        return;
-      }
-
-      const strategicHeld = round2(Number(row.totalHeld) || Math.max(0, 100 - Number(row.freeFloat || 0)));
-      const freeFloat = round2(Number(row.freeFloat) || Math.max(0, 100 - strategicHeld));
-      const visibleHeld = round2(strategicHeld);
-      const coverageGap = round2(Math.max(0, 100 - visibleHeld));
-      const riskMetrics = {
-        freeFloat,
-        largestStrategicPct: strategicHeld,
-        visibleHeld,
-        coverageGap,
-        hhiVisible: 10000
       };
-      const riskScore = computeRiskScore(riskMetrics);
-      const meta = resolveTickerMeta(row.ticker);
-      const sectorMix = (data.sectorExposure || []).find((item) => item.sector === meta.sector) || null;
-
-      rows.push({
-        ticker: row.ticker,
-        company: row.company,
-        holder: row.holder,
-        largestStrategicHolder: row.holder,
-        largestHolder: row.holder,
-        totalHeld: strategicHeld,
-        strategicHeld,
-        visibleHeld,
-        visibleFloat: 0,
-        blindSpot: freeFloat,
-        freeFloat,
-        largestStrategicPct: strategicHeld,
-        secondStrategicPct: 0,
-        controlGap: strategicHeld,
-        risk: computeRisk({ ...riskMetrics, riskScore }),
-        riskScore,
-        concentrationBand: strategicHeld >= 60 ? "Tight" : strategicHeld >= 40 ? "Concentrated" : "Distributed",
-        coverageBand: classifyCoverage(visibleHeld),
-        hhi: 10000,
-        hhiStrategic: 10000,
-        localPct: round2(sectorMix?.local || 0),
-        foreignPct: round2(sectorMix?.foreign || 0),
-        localForeign: sectorMix ? [
-          { name: "Local", value: round2(sectorMix.local) },
-          { name: "Foreign", value: round2(sectorMix.foreign) }
-        ] : null,
-        strategicBlockCount: 1,
-        floatBlockCount: 0,
-        visibleFloatShare: 0,
-        signalSummary: buildSignalSummary({
-          freeFloat,
-          largestStrategicPct: strategicHeld,
-          coverageGap,
-          foreignPctVisible: 0,
-          floatBlockCount: 0
-        }),
-        sector: meta.sector,
-        marketCap: meta.marketCap,
-        derived: true,
-        source: "synthetic"
-      });
-    });
-
-    computedRows.forEach((row, ticker) => {
-      if (!(data.freeFloat || []).some((item) => item.ticker === ticker)) {
-        rows.push(row);
-      }
     });
 
     floatRowsCache = rows;
@@ -576,22 +504,20 @@
     const groups = new Map();
 
     getFloatRows()
-      .filter((row) => row.source === "authored" && Number.isFinite(row.marketCap) && row.marketCap > 0 && Number.isFinite(row.localPct + row.foreignPct) && (row.localPct || row.foreignPct))
+      .filter((row) => row.source === "authored" && Number.isFinite(row.localPct + row.foreignPct) && (row.localPct || row.foreignPct))
       .forEach((row) => {
         const current = groups.get(row.sector) || {
           sector: row.sector,
-          marketCap: 0,
-          localWeighted: 0,
-          foreignWeighted: 0,
-          floatWeighted: 0,
+          localTotal: 0,
+          foreignTotal: 0,
+          floatTotal: 0,
           highRiskCount: 0,
           names: 0
         };
 
-        current.marketCap += row.marketCap;
-        current.localWeighted += row.marketCap * (row.localPct / 100);
-        current.foreignWeighted += row.marketCap * (row.foreignPct / 100);
-        current.floatWeighted += row.marketCap * (row.freeFloat / 100);
+        current.localTotal += row.localPct;
+        current.foreignTotal += row.foreignPct;
+        current.floatTotal += row.freeFloat;
         current.highRiskCount += row.risk === "High" ? 1 : 0;
         current.names += 1;
         groups.set(row.sector, current);
@@ -604,14 +530,13 @@
     return Array.from(groups.values())
       .map((group) => ({
         sector: group.sector,
-        local: round2((group.localWeighted / group.marketCap) * 100),
-        foreign: round2((group.foreignWeighted / group.marketCap) * 100),
-        avgFloat: round2((group.floatWeighted / group.marketCap) * 100),
-        marketCap: round2(group.marketCap),
+        local: round2(group.localTotal / group.names),
+        foreign: round2(group.foreignTotal / group.names),
+        avgFloat: round2(group.floatTotal / group.names),
         highRiskCount: group.highRiskCount,
         names: group.names
       }))
-      .sort((a, b) => b.marketCap - a.marketCap);
+      .sort((a, b) => b.names - a.names || a.sector.localeCompare(b.sector));
   }
 
   function toCsv(rows, columns) {
@@ -646,9 +571,21 @@
       return data.entities.investors[row.entityId];
     }
 
+    if (row.entityKind === "investor" && row.entityId) {
+      return {
+        kind: "investor",
+        id: row.entityId,
+        name: row.name
+      };
+    }
+
     const match = findSearchItem(row.name);
-    if (match?.kind === "investor" && data.entities?.investors?.[match.id]) {
-      return data.entities.investors[match.id];
+    if (match?.kind === "investor") {
+      return data.entities?.investors?.[match.id] || {
+        kind: "investor",
+        id: match.id,
+        name: match.label
+      };
     }
 
     return null;
@@ -683,18 +620,7 @@
       });
     }
 
-    (investor.holdings || []).forEach((holding) => {
-      upsertPosition({
-        ticker: holding.ticker,
-        company: holding.company,
-        pct: holding.pct,
-        source: "investor-page",
-        focusRowType: investor.metrics?.find((item) => item.label === "Investor Type")?.value || "N/A",
-        focusNat: investor.metrics?.find((item) => item.label === "Nationality")?.value || "N/A"
-      });
-    });
-
-    Object.values(data.entities?.tickers || {}).forEach((tickerEntity) => {
+    getSourceLedgerRows().forEach(({ entity: tickerEntity }) => {
       (tickerEntity.holderTable || []).forEach((row) => {
         if (!rowMatchesInvestor(row, investor)) return;
         upsertPosition({
@@ -794,8 +720,8 @@
         name: position.ticker,
         kind: "ticker",
         category: 1,
-        value: Math.max(18, Math.min(34, 12 + (position.marketCap || 0) / 55)),
-        symbolSize: Math.max(18, Math.min(34, 12 + (position.marketCap || 0) / 55)),
+        value: Math.max(18, Math.min(34, 12 + ((position.floatRow?.freeFloat || 0) / 3) + (position.pctValue / 8))),
+        symbolSize: Math.max(18, Math.min(34, 12 + ((position.floatRow?.freeFloat || 0) / 3) + (position.pctValue / 8))),
         href: entityHref("ticker", position.ticker)
       });
 
@@ -1050,8 +976,8 @@
               name: position.ticker,
               kind: "ticker",
               category: 1,
-              value: Math.max(12, Math.min(22, 10 + (position.marketCap || 0) / 90)),
-              symbolSize: Math.max(12, Math.min(22, 10 + (position.marketCap || 0) / 90)),
+              value: Math.max(12, Math.min(22, 10 + (position.pctValue / 10) + ((position.floatRow?.freeFloat || 0) / 10))),
+              symbolSize: Math.max(12, Math.min(22, 10 + (position.pctValue / 10) + ((position.floatRow?.freeFloat || 0) / 10))),
               href: entityHref("ticker", position.ticker)
             });
 
@@ -1118,7 +1044,7 @@
       type: "ticker",
       label: `${entity.id} holder stack`,
       title: `${entity.id} holder stack`,
-      description: `Ticker-centered graph built from the authored holder table plus linked investor overlap for named holders that also appear elsewhere in the prototype.`,
+      description: "Ticker-centered graph built from the sourced holder table plus linked investor overlap for holders that recur across issuer disclosures.",
       note: `${metrics.strategicBlockCount} strategic blocks and ${metrics.floatBlockCount} visible float blocks inside the authored table.`,
       nodes: Array.from(nodeMap.values()),
       links: Array.from(linkMap.values()),
@@ -1154,31 +1080,45 @@
     }
 
     const scenarios = [];
-    const investorPriority = [
-      "pt-danantara-asset-management",
-      "bpjs-ketenagakerjaan",
-      "government-of-norway",
-      "blackrock-funds",
-      "vanguard-funds",
-      "uob-kay-hian-pte-ltd",
-      "jardine-cycle-carriage-ltd",
-      "banpu-mineral-singapore-pte-ltd",
-      "lo-kheng-hong",
-      "happy-hapsoro"
-    ];
-    const tickerPriority = ["BBCA", "BBRI", "TLKM", "BMRI", "BBNI", "ASII", "TINS", "ITMG", "GIAA", "BUMI"];
+    const investorMap = new Map();
 
-    investorPriority.forEach((id) => {
-      const investor = data.entities?.investors?.[id];
-      const scenario = buildInvestorNetworkScenario(investor);
-      if (scenario) scenarios.push(scenario);
+    getSourceLedgerRows().forEach(({ entity }) => {
+      (entity.holderTable || [])
+        .filter((row) => row.entityKind === "investor" && row.entityId)
+        .forEach((row) => {
+          if (!investorMap.has(row.entityId)) {
+            investorMap.set(row.entityId, resolveInvestorEntityForRow(row) || {
+              kind: "investor",
+              id: row.entityId,
+              name: row.name
+            });
+          }
+        });
     });
 
-    tickerPriority.forEach((id) => {
-      const entity = data.entities?.tickers?.[id];
-      const scenario = buildTickerNetworkScenario(entity);
-      if (scenario) scenarios.push(scenario);
-    });
+    Array.from(investorMap.values())
+      .map((investor) => ({
+        investor,
+        positions: collectInvestorPositions(investor)
+      }))
+      .filter((entry) => entry.positions.length >= 2)
+      .sort((a, b) => b.positions.length - a.positions.length || a.investor.name.localeCompare(b.investor.name))
+      .forEach((entry) => {
+        const scenario = buildInvestorNetworkScenario(entry.investor);
+        if (scenario) scenarios.push(scenario);
+      });
+
+    getSourceLedgerRows()
+      .map(({ entity }) => entity)
+      .sort((a, b) => {
+        const aMetrics = computeTickerMetrics(a);
+        const bMetrics = computeTickerMetrics(b);
+        return aMetrics.freeFloat - bMetrics.freeFloat || a.id.localeCompare(b.id);
+      })
+      .forEach((entity) => {
+        const scenario = buildTickerNetworkScenario(entity);
+        if (scenario) scenarios.push(scenario);
+      });
 
     networkScenariosCache = scenarios;
     return scenarios.slice();
@@ -1195,12 +1135,12 @@
 
     if (normalizedQuery.includes("lowest") && normalizedQuery.includes("float")) {
       const rows = floatRows.slice().sort((a, b) => a.freeFloat - b.freeFloat).slice(0, 3);
-      return `Lowest free-float names in the prototype are ${rows.map((row) => `${row.ticker} ${formatPct(row.freeFloat)}`).join(", ")}.`;
+      return `Lowest sourced free-float names are ${rows.map((row) => `${row.ticker} ${formatPct(row.freeFloat)}`).join(", ")}.`;
     }
 
     if (normalizedQuery.includes("highest") && normalizedQuery.includes("float")) {
       const rows = floatRows.slice().sort((a, b) => b.freeFloat - a.freeFloat).slice(0, 3);
-      return `Highest free-float names in the prototype are ${rows.map((row) => `${row.ticker} ${formatPct(row.freeFloat)}`).join(", ")}.`;
+      return `Highest sourced free-float names are ${rows.map((row) => `${row.ticker} ${formatPct(row.freeFloat)}`).join(", ")}.`;
     }
 
     if (normalizedQuery.includes("concentrated") || normalizedQuery.includes("hhi")) {
@@ -1249,7 +1189,7 @@
       return `Within authored ticker coverage, ${topSector.sector} has the highest foreign mix at ${formatPct(topSector.foreign)}.`;
     }
 
-    return "No exact entity match was resolved. Try a ticker like BBCA, an investor like Danantara or Government of Norway, or a question such as most concentrated names.";
+    return "No exact sourced entity match was resolved. Try a ticker like BBCA or TLKM, or a question such as lowest free float or most concentrated names.";
   }
 
   window.StockMapUtils = {
@@ -1273,6 +1213,8 @@
     findSearchItem,
     formatMarketCap,
     formatPct,
+    getSourceEntry,
+    getSourceLedgerRows,
     getFloatRows,
     getNetworkScenarios,
     getTickerAnalytics,
