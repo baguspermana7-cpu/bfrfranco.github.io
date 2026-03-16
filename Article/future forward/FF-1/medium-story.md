@@ -1,10 +1,10 @@
-SEO Title: Are Websites Really Dead? What the Data Actually Shows | by Bagusdpermana
+SEO Title: The Web Didn't Die. It Split. | by Bagusdpermana
 SEO Description: I researched web traffic patterns since 2020, AI search impact, and platform migration. The web isn't dying -- it's splitting into winners and losers.
 Tags: Web Development, Technology Trends, AI, Digital Transformation, Future of Web
 
 ---
 
-Are Websites Really Dead? What the Data Actually Shows
+The Web Didn't Die. It Split.
 
 Every few years, someone declares the traditional website dead. In 2015, mobile was the killer. In 2018, apps would replace everything. In 2020, social media made blogs irrelevant. Now in 2026, AI-generated answers are supposedly the final nail in the coffin.
 
@@ -32,4 +32,4 @@ My full analysis covers the evolution of web traffic from 2020 to present, exact
 
 This is the first piece in a new series called Future Forward, where I research technology trends by looking backward at what actually changed and forward at where things are heading.
 
-Originally published at resistancezero.com. Read the full interactive article with data visualizations at resistancezero.com/future-forward-1.html
+Originally published at resistancezero.com. Read the full interactive article with data visualizations at resistancezero.com/FF-1.html
