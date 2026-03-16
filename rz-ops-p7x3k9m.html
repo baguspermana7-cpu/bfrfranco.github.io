@@ -746,6 +746,10 @@
             <a class="nav-item" data-section="stock-investment" onclick="showSection('stock-investment')">
                 <i class="fas fa-chart-line"></i> Stock Investment
             </a>
+            <a class="nav-item" data-section="finance-terminal" onclick="showSection('finance-terminal')">
+                <i class="fas fa-terminal"></i> Finance Terminal
+                <span class="badge green">Live</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <div class="sidebar-user">
@@ -1796,6 +1800,11 @@
     <iframe id="dca-iframe" src="Apps/dca-app/dist/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:transparent;" loading="lazy" title="DCA Portfolio Intelligence"></iframe>
 </div>
 
+<!-- ══════════════════════════════════════ FINANCE TERMINAL ══════════════════════════════════════ -->
+<div class="section" id="sec-finance-terminal">
+    <iframe id="finance-terminal-iframe" src="Apps/finance-terminal/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:#0b1120;" loading="lazy" title="Finance Terminal"></iframe>
+</div>
+
         </div><!-- /main-content -->
     </main><!-- /main-wrap -->
 
@@ -2006,10 +2015,11 @@ function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     document.getElementById('sec-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
-    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment'};
+    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment','finance-terminal':'Finance Terminal'};
     if(id==='mayar'&&typeof renderMayar==='function')renderMayar();
     if(id==='activity'&&typeof renderActivity==='function')renderActivity();
     if(id==='stock-investment'){var dcaIf=document.getElementById('dca-iframe');var isL=document.body.classList.contains('light-mode');if(dcaIf&&dcaIf.contentWindow){try{dcaIf.contentWindow.postMessage({type:'theme-sync',theme:isL?'light':'dark'},'*')}catch(e){}}}
+    if(id==='finance-terminal'){var ftIf=document.getElementById('finance-terminal-iframe');var isL2=document.body.classList.contains('light-mode');if(ftIf&&ftIf.contentWindow){try{ftIf.contentWindow.postMessage({type:'theme-sync',theme:isL2?'light':'dark'},'*')}catch(e){}}}
     document.getElementById('topbarTitle').textContent=titles[id]||id;
     if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
 }
@@ -2037,6 +2047,9 @@ function toggleAdminTheme(){
     // Sync theme to DCA iframe
     var dcaIframe=document.getElementById('dca-iframe');
     if(dcaIframe&&dcaIframe.contentWindow){try{dcaIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},'*')}catch(e){}}
+    // Sync theme to Finance Terminal iframe
+    var ftIframe=document.getElementById('finance-terminal-iframe');
+    if(ftIframe&&ftIframe.contentWindow){try{ftIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},'*')}catch(e){}}
 }
 
 // Clock
