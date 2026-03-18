@@ -663,6 +663,232 @@ body {
 .rfs-proc-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .rfs-proc-filter-row select { width: auto; font-size: 0.75rem; padding: 4px 8px; }
 
+/* ── Enhancement CSS (85 improvements) ── */
+.rfs-search-bar {
+    display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+    background: var(--rfs-glass); border: 1px solid var(--rfs-glass-border);
+    border-radius: var(--rfs-radius); font-size: 0.78rem; color: var(--rfs-text); width: 100%;
+}
+.rfs-search-bar input {
+    border: none; background: transparent; flex: 1; font-size: 0.78rem;
+    color: var(--rfs-text); outline: none; font-family: var(--rfs-font);
+}
+.rfs-search-bar i { color: var(--rfs-text3); font-size: 0.75rem; }
+.rfs-bulk-bar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    background: rgba(20,184,166,0.08); border: 1px solid var(--rfs-teal);
+    border-radius: var(--rfs-radius); font-size: 0.75rem; margin-bottom: 8px;
+}
+.rfs-bulk-bar .count { font-weight: 700; color: var(--rfs-teal); }
+.rfs-fab {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9000;
+}
+.rfs-fab-toggle {
+    width: 48px; height: 48px; border-radius: 50%; border: none;
+    background: var(--rfs-teal); color: #fff; font-size: 1.2rem;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(20,184,166,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.rfs-fab-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(20,184,166,0.5); }
+.rfs-fab-menu {
+    position: absolute; bottom: 56px; right: 0; display: none;
+    flex-direction: column; gap: 6px; align-items: flex-end;
+}
+.rfs-fab.open .rfs-fab-menu { display: flex; }
+.rfs-fab.open .rfs-fab-toggle { transform: rotate(45deg); }
+.rfs-fab-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+    background: var(--rfs-card-bg); border: 1px solid var(--rfs-glass-border);
+    border-radius: 20px; font-size: 0.72rem; cursor: pointer; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: background 0.15s;
+}
+.rfs-fab-item:hover { background: var(--rfs-bg3); }
+.rfs-fab-item i { color: var(--rfs-teal); width: 16px; text-align: center; }
+.rfs-notif-bell {
+    position: relative; cursor: pointer; font-size: 0.85rem; color: var(--rfs-text2);
+    padding: 4px 6px; background: none; border: none;
+}
+.rfs-notif-count {
+    position: absolute; top: -2px; right: -2px; min-width: 14px; height: 14px;
+    background: var(--rfs-red); color: #fff; font-size: 0.55rem; font-weight: 700;
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    padding: 0 3px; line-height: 1;
+}
+.rfs-notif-dropdown {
+    position: absolute; top: 100%; right: 0; width: 300px; max-height: 360px;
+    background: var(--rfs-card-bg); border: 1px solid var(--rfs-glass-border);
+    border-radius: var(--rfs-radius); box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    z-index: 9001; display: none; overflow-y: auto;
+}
+.rfs-notif-dropdown.open { display: block; }
+.rfs-notif-dropdown .rfs-notif-item {
+    padding: 10px 14px; border-bottom: 1px solid var(--rfs-border);
+    font-size: 0.75rem; cursor: pointer;
+}
+.rfs-notif-dropdown .rfs-notif-item:hover { background: var(--rfs-bg2); }
+.rfs-notif-dropdown .rfs-notif-item .rfs-notif-time { font-size: 0.65rem; color: var(--rfs-text3); margin-top: 2px; }
+.rfs-inline-edit {
+    cursor: pointer; border-bottom: 1px dashed var(--rfs-text3);
+    transition: border-color 0.15s;
+}
+.rfs-inline-edit:hover { border-color: var(--rfs-teal); }
+.rfs-pagination {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    margin-top: 12px; font-size: 0.75rem;
+}
+.rfs-pagination button {
+    padding: 4px 10px; border: 1px solid var(--rfs-glass-border);
+    background: var(--rfs-glass); border-radius: 4px; cursor: pointer;
+    font-size: 0.72rem; color: var(--rfs-text);
+}
+.rfs-pagination button.active { background: var(--rfs-teal); color: #fff; border-color: var(--rfs-teal); }
+.rfs-pagination button:disabled { opacity: 0.4; cursor: default; }
+.rfs-table th { position: sticky; top: 0; z-index: 2; background: var(--rfs-bg2); }
+.rfs-sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+.rfs-sortable::after { content: ' ⇅'; font-size: 0.6rem; opacity: 0.4; }
+.rfs-sort-asc::after { content: ' ▲'; opacity: 0.8; color: var(--rfs-teal); }
+.rfs-sort-desc::after { content: ' ▼'; opacity: 0.8; color: var(--rfs-teal); }
+[data-cbmode="on"] .rfs-gate-cell[data-status="approved"] { background: repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(16,185,129,0.08) 3px,rgba(16,185,129,0.08) 6px) !important; }
+[data-cbmode="on"] .rfs-gate-cell[data-status="blocked"] { background: repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(239,68,68,0.08) 3px,rgba(239,68,68,0.08) 6px) !important; }
+[data-cbmode="on"] .rfs-gate-cell[data-status="open"] { background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(245,158,11,0.08) 3px,rgba(245,158,11,0.08) 6px) !important; }
+.rfs-fullscreen .rfs-navbar, .rfs-fullscreen .rfs-hero, .rfs-fullscreen .rfs-hero-strip, .rfs-fullscreen .rfs-footer { display: none !important; }
+.rfs-fullscreen .rfs-main { padding-top: 0; }
+.rfs-chart-svg { width: 100%; max-width: 720px; margin: 12px auto; display: block; }
+.rfs-chart-svg text { font-family: var(--rfs-font); font-size: 10px; fill: var(--rfs-text2); }
+.rfs-chart-svg .bar-label { font-size: 9px; fill: var(--rfs-text3); text-anchor: middle; }
+.rfs-chart-svg .axis-line { stroke: var(--rfs-border); stroke-width: 1; }
+.rfs-heatmap-cell {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 24px; border-radius: 3px; font-size: 0.6rem;
+    font-weight: 700; font-family: var(--rfs-mono);
+}
+.rfs-breadcrumb {
+    display: flex; align-items: center; gap: 4px; padding: 6px 1.5rem;
+    font-size: 0.72rem; color: var(--rfs-text3); background: var(--rfs-bg2);
+    border-bottom: 1px solid var(--rfs-border);
+}
+.rfs-breadcrumb span { cursor: pointer; }
+.rfs-breadcrumb span:hover { color: var(--rfs-teal); }
+.rfs-breadcrumb .sep { color: var(--rfs-border); margin: 0 2px; }
+.rfs-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.rfs-calendar-header { font-size: 0.65rem; font-weight: 700; text-align: center; color: var(--rfs-text3); padding: 4px; }
+.rfs-calendar-day {
+    min-height: 48px; padding: 3px; border: 1px solid var(--rfs-border);
+    border-radius: 4px; font-size: 0.6rem; background: var(--rfs-bg);
+}
+.rfs-calendar-day .day-num { font-weight: 700; color: var(--rfs-text3); margin-bottom: 2px; }
+.rfs-calendar-chip {
+    display: block; padding: 1px 3px; border-radius: 2px; margin-bottom: 1px;
+    font-size: 0.55rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    cursor: pointer;
+}
+.rfs-sla-timer { font-size: 0.65rem; font-family: var(--rfs-mono); font-weight: 600; }
+.rfs-sla-overdue { color: var(--rfs-red); font-weight: 700; }
+.rfs-sla-ok { color: var(--rfs-emerald); }
+.rfs-faq-item {
+    border: 1px solid var(--rfs-glass-border); border-radius: var(--rfs-radius);
+    margin-bottom: 6px; overflow: hidden;
+}
+.rfs-faq-q {
+    padding: 12px 16px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--rfs-glass); color: var(--rfs-text); transition: background 0.15s;
+}
+.rfs-faq-q:hover { background: var(--rfs-bg3); }
+.rfs-faq-q i { transition: transform 0.2s; color: var(--rfs-text3); font-size: 0.7rem; }
+.rfs-faq-item.open .rfs-faq-q i { transform: rotate(180deg); }
+.rfs-faq-a {
+    padding: 0 16px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;
+    font-size: 0.78rem; line-height: 1.65; color: var(--rfs-text2);
+}
+.rfs-faq-item.open .rfs-faq-a { max-height: 500px; padding: 12px 16px; }
+.rfs-faq-category {
+    font-size: 0.72rem; font-weight: 700; color: var(--rfs-teal); text-transform: uppercase;
+    letter-spacing: 0.5px; margin: 16px 0 8px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--rfs-glass-border);
+}
+.rfs-manual-section {
+    margin-bottom: 20px; padding: 16px; background: var(--rfs-glass);
+    border: 1px solid var(--rfs-glass-border); border-radius: var(--rfs-radius);
+}
+.rfs-manual-section h3 {
+    font-size: 0.9rem; font-weight: 700; color: var(--rfs-text); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+}
+.rfs-manual-section h3 .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%; background: var(--rfs-teal);
+    color: #fff; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+}
+.rfs-manual-step {
+    padding: 8px 0 8px 32px; font-size: 0.78rem; line-height: 1.6;
+    color: var(--rfs-text2); position: relative;
+}
+.rfs-manual-step::before {
+    content: '→'; position: absolute; left: 16px; color: var(--rfs-teal); font-weight: 700;
+}
+.rfs-manual-note {
+    padding: 8px 12px; margin: 8px 0; background: rgba(20,184,166,0.06);
+    border-left: 3px solid var(--rfs-teal); border-radius: 0 6px 6px 0;
+    font-size: 0.75rem; color: var(--rfs-text2);
+}
+.rfs-kbd {
+    display: inline-block; padding: 2px 6px; background: var(--rfs-bg3);
+    border: 1px solid var(--rfs-border); border-radius: 4px;
+    font-family: var(--rfs-mono); font-size: 0.65rem; font-weight: 600;
+    color: var(--rfs-text2); line-height: 1.4;
+}
+.rfs-milestone {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+    border-left: 3px solid var(--rfs-teal); background: var(--rfs-glass);
+    border-radius: 0 var(--rfs-radius) var(--rfs-radius) 0; margin-bottom: 6px;
+    font-size: 0.78rem;
+}
+.rfs-milestone .ms-gate { font-family: var(--rfs-mono); font-weight: 700; color: var(--rfs-teal); min-width: 28px; }
+.rfs-milestone .ms-label { flex: 1; color: var(--rfs-text); }
+.rfs-milestone .ms-date { font-family: var(--rfs-mono); font-size: 0.72rem; color: var(--rfs-text3); }
+.rfs-whatif-slider {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    font-size: 0.78rem;
+}
+.rfs-whatif-slider label { min-width: 140px; color: var(--rfs-text2); font-weight: 500; }
+.rfs-whatif-slider input[type="range"] { flex: 1; accent-color: var(--rfs-teal); }
+.rfs-whatif-slider .val { font-family: var(--rfs-mono); font-weight: 700; color: var(--rfs-teal); min-width: 40px; text-align: right; }
+.rfs-vendor-card {
+    padding: 12px; background: var(--rfs-glass); border: 1px solid var(--rfs-glass-border);
+    border-radius: var(--rfs-radius); display: flex; flex-direction: column; gap: 4px;
+    font-size: 0.78rem;
+}
+.rfs-vendor-card .v-name { font-weight: 700; color: var(--rfs-text); }
+.rfs-vendor-card .v-meta { font-size: 0.7rem; color: var(--rfs-text3); }
+.rfs-spare-row { font-size: 0.75rem; }
+.rfs-spare-row td { vertical-align: middle; }
+.rfs-dashboard-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin-bottom: 16px;
+}
+.rfs-dash-card {
+    padding: 14px; background: var(--rfs-glass); border: 1px solid var(--rfs-glass-border);
+    border-radius: var(--rfs-radius); cursor: pointer; transition: border-color 0.15s;
+}
+.rfs-dash-card:hover { border-color: var(--rfs-teal); }
+.rfs-dash-card .dc-icon { font-size: 1.4rem; margin-bottom: 6px; color: var(--rfs-teal); }
+.rfs-dash-card .dc-value { font-size: 1.3rem; font-weight: 800; font-family: var(--rfs-mono); color: var(--rfs-text); }
+.rfs-dash-card .dc-label { font-size: 0.72rem; color: var(--rfs-text3); margin-top: 2px; }
+.rfs-audit-log { max-height: 300px; overflow-y: auto; }
+.rfs-audit-entry {
+    display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--rfs-border);
+    font-size: 0.72rem;
+}
+.rfs-audit-entry .ts { font-family: var(--rfs-mono); color: var(--rfs-text3); min-width: 130px; }
+.rfs-audit-entry .act { color: var(--rfs-text); flex: 1; }
+.rfs-tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    background: var(--rfs-red); color: #fff; font-size: 0.55rem;
+    font-weight: 700; margin-left: 4px; padding: 0 4px;
+}
+
 /* ── Print Stylesheet ── */
 @media print {
     body { background:#fff !important;color:#1f2937 !important; }
@@ -706,6 +932,14 @@ body {
     #rfsTooltipBox { width: 260px; }
     .rfs-proc-filter-row { flex-direction: column; gap: 4px; }
     .rfs-proc-filter-row select { width: 100%; }
+    .rfs-fab { bottom: 16px; right: 16px; }
+    .rfs-breadcrumb { padding: 4px 0.75rem; font-size: 0.65rem; }
+    .rfs-calendar { grid-template-columns: repeat(7, 1fr); font-size: 0.55rem; }
+    .rfs-calendar-day { min-height: 36px; }
+    .rfs-dashboard-grid { grid-template-columns: 1fr 1fr; }
+    .rfs-notif-dropdown { width: 260px; }
+    .rfs-whatif-slider { flex-direction: column; align-items: stretch; gap: 4px; }
+    .rfs-whatif-slider label { min-width: auto; }
 }
 @media (max-width: 480px) {
     .rfs-archetype-grid { grid-template-columns: 1fr; }
@@ -795,14 +1029,23 @@ body {
     <button class="rfs-mode-btn" data-tab="procedures" onclick="RfsUI.switchTab('procedures')"><i class="fas fa-clipboard-list"></i> Procedures <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Procedures Register" data-desc="Manage MOP (Method of Procedure), SOP (Standard Operating Procedure), and EOP (Emergency Operating Procedure) documents. Track revision, approval status, and gate associations." data-ref="MOP / SOP / EOP"></div></span></button>
     <button class="rfs-mode-btn" data-tab="forecast" onclick="RfsUI.switchTab('forecast')"><i class="fas fa-chart-line"></i> Forecast <span class="rfs-tip">?<div class="rfs-tip-data" data-title="RFS Forecast" data-desc="Projected Ready-for-Service dates per unit with drag components: blockers, evidence gaps, sign-off delays, retest, witness scheduling."></div></span></button>
     <button class="rfs-mode-btn" data-tab="report" onclick="RfsUI.switchTab('report')"><i class="fas fa-file-pdf"></i> Report <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Reports" data-desc="Generate PDF reports: Executive Snapshot, Gate Readiness Pack, Defect Aging, Customer Witness Pack, Forecast Summary."></div></span></button>
+    <button class="rfs-mode-btn" data-tab="faq" onclick="RfsUI.switchTab('faq')"><i class="fas fa-question-circle"></i> FAQ</button>
+    <button class="rfs-mode-btn" data-tab="manual" onclick="RfsUI.switchTab('manual')"><i class="fas fa-book"></i> Manual</button>
     <div class="rfs-mode-actions">
         <span id="rfsLastSaved" style="font-size:0.65rem;color:var(--rfs-text3);"></span>
+        <button class="rfs-notif-bell" onclick="RfsUtils.toggleNotifs()" title="Notifications"><i class="fas fa-bell"></i><span class="rfs-notif-count" id="rfsNotifCount" style="display:none;">0</span></button>
+        <div class="rfs-notif-dropdown" id="rfsNotifDropdown"></div>
         <button class="rfs-btn-import" onclick="RfsStore.showImport()" title="Import JSON"><i class="fas fa-upload"></i></button>
         <button class="rfs-btn-export" onclick="RfsStore.exportJson()" title="Export JSON"><i class="fas fa-download"></i></button>
+        <button style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--rfs-text3);padding:4px;" onclick="document.body.classList.toggle('rfs-fullscreen')" title="Fullscreen"><i class="fas fa-expand"></i></button>
+        <button style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--rfs-text3);padding:4px;" onclick="document.documentElement.toggleAttribute('data-cbmode',document.documentElement.getAttribute('data-cbmode')!=='on');document.documentElement.setAttribute('data-cbmode',document.documentElement.getAttribute('data-cbmode')==='on'?'on':'off')" title="Color-blind mode"><i class="fas fa-eye"></i></button>
         <button class="rfs-btn-free active" id="rfsBtnFree" onclick="handleFreeMode()">FREE</button>
         <button class="rfs-btn-pro" id="rfsBtnPro" onclick="handleProMode()"><i class="fas fa-crown"></i> PRO</button>
     </div>
 </nav>
+
+<!-- BREADCRUMB -->
+<div class="rfs-breadcrumb" id="rfsBreadcrumb"><span onclick="RfsUI.switchTab('setup')">RFS Workbench</span><span class="sep">/</span><span>Setup</span></div>
 
 <!-- MAIN APP -->
 <main class="rfs-main" id="rfsMain">
@@ -1041,11 +1284,19 @@ body {
         <span class="rfs-toolbar-title"><i class="fas fa-columns" style="color:var(--rfs-teal);margin-right:8px;"></i>Gate Board</span>
     </div>
     <div id="rfsGateBoardWrap"></div>
+    <div id="rfsGateHeatmapArea"></div>
 
     <!-- Checklist Panel -->
     <div class="rfs-checklist-panel" id="rfsChecklistPanel">
         <div class="rfs-toolbar" style="margin-top:1.5rem;">
             <span class="rfs-toolbar-title"><i class="fas fa-clipboard-check" style="color:var(--rfs-teal);margin-right:8px;"></i>Requirements Checklist</span>
+            <div style="flex:1;"></div>
+            <div class="rfs-search-bar" style="max-width:220px;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="rfsChecklistSearch" placeholder="Search requirements..." oninput="RfsUI.filterChecklist()">
+            </div>
+            <button class="rfs-btn rfs-btn-sm rfs-btn-secondary" onclick="RfsUI.exportChecklistCsv()" title="Export CSV"><i class="fas fa-file-csv"></i></button>
+            <button class="rfs-btn rfs-btn-sm rfs-btn-secondary" onclick="RfsUI.printChecklist()" title="Print"><i class="fas fa-print"></i></button>
         </div>
         <div class="rfs-cl-unit-select">
             <label><i class="fas fa-cube" style="margin-right:4px;"></i> Unit</label>
@@ -1062,6 +1313,16 @@ body {
 
     <div class="rfs-narrative" id="rfsGateNarrative" style="margin-top:1rem;">
         Save a project and add delivery units to see the gate board.
+    </div>
+
+    <!-- Domain-specific sub-panels -->
+    <div id="rfsDomainPanels" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+        <div id="rfsPanelSpares"></div>
+        <div id="rfsPanelVendors"></div>
+        <div id="rfsPanelWeather"></div>
+        <div id="rfsPanelPhotos"></div>
+        <div id="rfsPanelSafety"></div>
+        <div id="rfsPanelRegulatory"></div>
     </div>
 </section>
 
@@ -1105,8 +1366,13 @@ body {
             </select>
             <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultTests()"><i class="fas fa-magic"></i> Generate Defaults</button>
             <button class="rfs-btn rfs-btn-primary rfs-btn-sm" onclick="RfsUI.addTestPackage()"><i class="fas fa-plus"></i> Add Package</button>
+            <span style="border-left:1px solid var(--rfs-border);height:20px;margin:0 4px;"></span>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.toggleTestView('table')" title="Table view"><i class="fas fa-table"></i></button>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.toggleTestView('calendar')" title="Calendar view"><i class="fas fa-calendar"></i></button>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.toggleTestView('dashboard')" title="Dashboard"><i class="fas fa-chart-bar"></i></button>
         </div>
     </div>
+    <div id="rfsTestsAltView" style="display:none;"></div>
     <div class="rfs-table-wrap" id="rfsTestsTableWrap" style="display:none;">
         <table class="rfs-table">
             <thead>
@@ -1143,8 +1409,37 @@ body {
     <div class="rfs-kpi-row" id="rfsDefectsKpis"></div>
     <div class="rfs-toolbar">
         <span class="rfs-toolbar-title"><i class="fas fa-bug" style="color:var(--rfs-red);margin-right:8px;"></i>Defect Register</span>
+        <div style="flex:1;"></div>
+        <div class="rfs-proc-filter-row">
+            <select class="rfs-input" onchange="RfsUI._defectFilters.severity=this.value;RfsUI.renderDefects()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+                <option value="">All Severity</option>
+                <option value="critical">Critical</option>
+                <option value="major">Major</option>
+                <option value="moderate">Moderate</option>
+                <option value="minor">Minor</option>
+                <option value="observation">Observation</option>
+            </select>
+            <select class="rfs-input" onchange="RfsUI._defectFilters.status=this.value;RfsUI.renderDefects()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="assigned">Assigned</option>
+                <option value="in-progress">In Progress</option>
+                <option value="retest">Retest</option>
+                <option value="closed">Closed</option>
+            </select>
+            <select class="rfs-input" onchange="RfsUI._defectFilters.rootCause=this.value;RfsUI.renderDefects()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+                <option value="">All Root Causes</option>
+                <option value="Design">Design</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Installation">Installation</option>
+                <option value="Commissioning">Commissioning</option>
+                <option value="Operations">Operations</option>
+                <option value="Environmental">Environmental</option>
+            </select>
+        </div>
         <button class="rfs-btn rfs-btn-primary rfs-btn-sm" onclick="RfsUI.addDefect()"><i class="fas fa-plus"></i> New Defect</button>
     </div>
+    <div id="rfsDefectTrend"></div>
     <div class="rfs-table-wrap" id="rfsDefectsTableWrap">
         <table class="rfs-table">
             <thead>
@@ -1246,8 +1541,14 @@ body {
             </div>
             <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultProcedures()"><i class="fas fa-magic"></i> Generate Defaults</button>
             <button class="rfs-btn rfs-btn-primary rfs-btn-sm" onclick="RfsUI.addProcedure()"><i class="fas fa-plus"></i> Add Procedure</button>
+            <span style="border-left:1px solid var(--rfs-border);height:20px;margin:0 4px;"></span>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.downloadProcedureTemplate('MOP')" title="Download MOP template"><i class="fas fa-download"></i> MOP</button>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.downloadProcedureTemplate('SOP-P')" title="Download SOP-P template"><i class="fas fa-download"></i> SOP-P</button>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.downloadProcedureTemplate('SOP-O')" title="Download SOP-O template"><i class="fas fa-download"></i> SOP-O</button>
+            <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.downloadProcedureTemplate('EOP')" title="Download EOP template"><i class="fas fa-download"></i> EOP</button>
         </div>
     </div>
+    <div id="rfsProcCompletenessArea"></div>
     <div class="rfs-table-wrap" id="rfsProcTableWrap" style="display:none;">
         <table class="rfs-table">
             <thead>
@@ -1306,8 +1607,9 @@ body {
                 <div class="rfs-radio-card" onclick="RfsUI.selectReportType('customer_witness')">Customer Witness Pack</div>
                 <div class="rfs-radio-card" onclick="RfsUI.selectReportType('forecast')">Forecast Summary</div>
             </div>
-            <div style="margin-top:1rem;">
+            <div style="margin-top:1rem;display:flex;gap:6px;flex-wrap:wrap;">
                 <button class="rfs-btn rfs-btn-primary" onclick="RfsReportEngine.exportPdf()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                <button class="rfs-btn rfs-btn-secondary" onclick="RfsUI.exportCurrentTabPdf()"><i class="fas fa-print"></i> Print Current Tab</button>
             </div>
         </div>
         <div class="rfs-card">
@@ -1317,9 +1619,54 @@ body {
             </div>
         </div>
     </div>
+    <!-- Audit Log -->
+    <div class="rfs-card" style="margin-top:12px;">
+        <div class="rfs-card-title"><i class="fas fa-history" style="color:var(--rfs-teal);margin-right:6px;"></i>Audit Log</div>
+        <div id="rfsAuditLogArea"></div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FAQ SECTION -->
+<!-- ══════════════════════════════════════════ -->
+<section id="rfsSectionFaq" class="rfs-section">
+    <div class="rfs-toolbar">
+        <span class="rfs-toolbar-title"><i class="fas fa-question-circle" style="color:var(--rfs-cyan);margin-right:8px;"></i>Frequently Asked Questions</span>
+        <div style="flex:1;"></div>
+        <div class="rfs-search-bar" style="max-width:280px;">
+            <i class="fas fa-search"></i>
+            <input type="text" id="rfsFaqSearch" placeholder="Search FAQ..." oninput="RfsUI.filterFaq()">
+        </div>
+    </div>
+    <div id="rfsFaqContent"></div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MANUAL SECTION -->
+<!-- ══════════════════════════════════════════ -->
+<section id="rfsSectionManual" class="rfs-section">
+    <div class="rfs-toolbar">
+        <span class="rfs-toolbar-title"><i class="fas fa-book" style="color:var(--rfs-purple);margin-right:8px;"></i>User Manual — Panduan Penggunaan</span>
+        <div style="flex:1;"></div>
+        <select class="rfs-input" id="rfsManualJump" onchange="RfsUI.jumpManualSection(this.value)" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+            <option value="">Jump to section...</option>
+        </select>
+    </div>
+    <div id="rfsManualContent"></div>
 </section>
 
 </main>
+
+<!-- FAB (Floating Action Button) -->
+<div class="rfs-fab" id="rfsFab">
+    <div class="rfs-fab-menu">
+        <div class="rfs-fab-item" onclick="if(activeProjectId){RfsUI.switchTab('defects');RfsUI.addDefect();}else{RfsUI.showToast('Create a project first.','warning');}"><i class="fas fa-bug"></i> Add Defect</div>
+        <div class="rfs-fab-item" onclick="if(activeProjectId){RfsUI.switchTab('tests');RfsUI.addTestPackage();}else{RfsUI.showToast('Create a project first.','warning');}"><i class="fas fa-vial"></i> Add Test</div>
+        <div class="rfs-fab-item" onclick="if(activeProjectId){RfsStore.DOMAINS.forEach(function(d){RfsStore.saveDomain(activeProjectId,d,projectData[d]);});RfsUI.showToast('Saved.','success');}"><i class="fas fa-save"></i> Save</div>
+        <div class="rfs-fab-item" onclick="RfsStore.exportJson()"><i class="fas fa-download"></i> Export</div>
+    </div>
+    <button class="rfs-fab-toggle" onclick="document.getElementById('rfsFab').classList.toggle('open')" title="Quick Actions"><i class="fas fa-plus"></i></button>
+</div>
 
 <!-- DRAWER -->
 <div class="rfs-drawer-overlay" id="rfsDrawerOverlay" onclick="RfsUI.closeDrawer()"></div>
@@ -1864,7 +2211,7 @@ var RfsLibrary = {
 // ══════════════════════════════════════════
 var RfsStore = {
     _writeTimers: {},
-    DOMAINS: ['core','units','gates','tests','defects','evidence','signoffs','overlay','waivers','forecast','procedures','audit'],
+    DOMAINS: ['core','units','gates','tests','defects','evidence','signoffs','overlay','waivers','forecast','procedures','audit','spareParts','vendors','weatherLog','photoLog','safetyIncidents','regulatory'],
 
     _key: function(projectId, domain) {
         return 'rfs_project_' + projectId + '_' + domain + '_v1';
@@ -2542,6 +2889,353 @@ var RfsReportEngine = {
 };
 
 // ══════════════════════════════════════════
+// RFS UTILS — Shared utilities for 85 enhancements
+// ══════════════════════════════════════════
+var RfsUtils = {
+    // ── Undo/Redo (#69) ──
+    _undoStack: [],
+    _redoStack: [],
+    _maxUndo: 10,
+    pushUndo: function(label) {
+        if (!activeProjectId) return;
+        var snapshot = JSON.stringify(projectData);
+        this._undoStack.push({ label: label, data: snapshot });
+        if (this._undoStack.length > this._maxUndo) this._undoStack.shift();
+        this._redoStack = [];
+    },
+    undo: function() {
+        if (this._undoStack.length === 0) { RfsUI.showToast('Nothing to undo.', 'info'); return; }
+        this._redoStack.push({ label: 'redo', data: JSON.stringify(projectData) });
+        var prev = this._undoStack.pop();
+        projectData = JSON.parse(prev.data);
+        RfsStore.DOMAINS.forEach(function(d) { RfsStore.saveDomain(activeProjectId, d, projectData[d]); });
+        RfsUI.renderAll();
+        RfsUI.showToast('Undo: ' + prev.label, 'info');
+    },
+    redo: function() {
+        if (this._redoStack.length === 0) { RfsUI.showToast('Nothing to redo.', 'info'); return; }
+        this._undoStack.push({ label: 'redo', data: JSON.stringify(projectData) });
+        var next = this._redoStack.pop();
+        projectData = JSON.parse(next.data);
+        RfsStore.DOMAINS.forEach(function(d) { RfsStore.saveDomain(activeProjectId, d, projectData[d]); });
+        RfsUI.renderAll();
+        RfsUI.showToast('Redo applied.', 'info');
+    },
+
+    // ── Auto-save (#70) ──
+    _autoSaveTimer: null,
+    startAutoSave: function() {
+        var self = this;
+        clearInterval(this._autoSaveTimer);
+        this._autoSaveTimer = setInterval(function() {
+            if (!activeProjectId) return;
+            RfsStore.DOMAINS.forEach(function(d) { RfsStore.saveDomain(activeProjectId, d, projectData[d]); });
+            var el = document.getElementById('rfsLastSaved');
+            if (el) el.textContent = 'Auto-saved ' + new Date().toLocaleTimeString();
+        }, 30000);
+    },
+
+    // ── Audit Log (#76) ──
+    logAction: function(action, detail) {
+        if (!activeProjectId) return;
+        var log = projectData.audit || [];
+        log.push({ ts: new Date().toISOString(), action: action, detail: detail || '' });
+        if (log.length > 200) log = log.slice(-200);
+        projectData.audit = log;
+        RfsStore.saveDomain(activeProjectId, 'audit', log);
+    },
+
+    // ── Deep Linking (#72) ──
+    handleHash: function() {
+        var hash = window.location.hash.replace('#', '');
+        if (hash && RfsUI) {
+            var parts = hash.split('/');
+            RfsUI.switchTab(parts[0]);
+        }
+    },
+    setHash: function(tab) {
+        if (history.replaceState) history.replaceState(null, '', '#' + tab);
+    },
+
+    // ── Sort (#64) ──
+    _sortStates: {},
+    sortArray: function(arr, key, dir) {
+        return arr.slice().sort(function(a, b) {
+            var va = (a[key] || ''), vb = (b[key] || '');
+            if (typeof va === 'number' && typeof vb === 'number') return dir === 'asc' ? va - vb : vb - va;
+            va = String(va).toLowerCase(); vb = String(vb).toLowerCase();
+            return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        });
+    },
+    toggleSort: function(tableId, key, renderFn) {
+        var state = this._sortStates[tableId] || {};
+        if (state.key === key) state.dir = state.dir === 'asc' ? 'desc' : 'asc';
+        else { state.key = key; state.dir = 'asc'; }
+        this._sortStates[tableId] = state;
+        if (renderFn) renderFn();
+    },
+    getSortState: function(tableId) { return this._sortStates[tableId] || {}; },
+
+    // ── Pagination (#65) ──
+    _pageStates: {},
+    paginate: function(arr, tableId, perPage) {
+        perPage = perPage || 25;
+        var page = this._pageStates[tableId] || 1;
+        var total = Math.ceil(arr.length / perPage) || 1;
+        if (page > total) page = total;
+        this._pageStates[tableId] = page;
+        return {
+            items: arr.slice((page - 1) * perPage, page * perPage),
+            page: page, total: total, count: arr.length, perPage: perPage
+        };
+    },
+    setPage: function(tableId, page, renderFn) {
+        this._pageStates[tableId] = page;
+        if (renderFn) renderFn();
+    },
+    renderPagination: function(pag, tableId, renderFn) {
+        if (pag.total <= 1) return '';
+        var h = '<div class="rfs-pagination">';
+        h += '<button ' + (pag.page <= 1 ? 'disabled' : 'onclick="RfsUtils.setPage(\'' + tableId + '\',' + (pag.page - 1) + ',function(){RfsUI.render' + tableId + '();})"') + '>&laquo;</button>';
+        for (var i = 1; i <= pag.total; i++) {
+            if (pag.total > 7 && Math.abs(i - pag.page) > 2 && i !== 1 && i !== pag.total) {
+                if (i === 2 || i === pag.total - 1) h += '<span>…</span>';
+                continue;
+            }
+            h += '<button class="' + (i === pag.page ? 'active' : '') + '" onclick="RfsUtils.setPage(\'' + tableId + '\',' + i + ',function(){RfsUI.render' + tableId + '();})">' + i + '</button>';
+        }
+        h += '<button ' + (pag.page >= pag.total ? 'disabled' : 'onclick="RfsUtils.setPage(\'' + tableId + '\',' + (pag.page + 1) + ',function(){RfsUI.render' + tableId + '();})"') + '>&raquo;</button>';
+        h += '<span style="margin-left:8px;color:var(--rfs-text3);font-size:0.65rem;">' + pag.count + ' items</span>';
+        h += '</div>';
+        return h;
+    },
+
+    // ── CSV Export (#6) ──
+    exportCsv: function(headers, rows, filename) {
+        var csv = headers.join(',') + '\n';
+        rows.forEach(function(row) {
+            csv += row.map(function(cell) {
+                var s = String(cell || '').replace(/"/g, '""');
+                return '"' + s + '"';
+            }).join(',') + '\n';
+        });
+        var blob = new Blob([csv], { type: 'text/csv' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename || 'export.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        RfsUI.showToast('CSV exported: ' + filename, 'success');
+    },
+
+    // ── SVG Chart Generators ──
+    svgBar: function(data, opts) {
+        opts = opts || {};
+        var w = opts.width || 600, h = opts.height || 200, pad = 40;
+        var barW = Math.max(12, Math.min(40, (w - pad * 2) / data.length - 4));
+        var maxVal = Math.max.apply(null, data.map(function(d) { return d.value; })) || 1;
+        var chartH = h - pad * 2;
+        var svg = '<svg class="rfs-chart-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+        svg += '<line class="axis-line" x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - 10) + '" y2="' + (h - pad) + '"/>';
+        data.forEach(function(d, i) {
+            var barH = (d.value / maxVal) * chartH;
+            var x = pad + i * ((w - pad * 2) / data.length) + ((w - pad * 2) / data.length - barW) / 2;
+            var y = h - pad - barH;
+            svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + (d.color || 'var(--rfs-teal)') + '" rx="2"/>';
+            svg += '<text class="bar-label" x="' + (x + barW / 2) + '" y="' + (h - pad + 14) + '">' + (d.label || '') + '</text>';
+            svg += '<text class="bar-label" x="' + (x + barW / 2) + '" y="' + (y - 4) + '">' + d.value + '</text>';
+        });
+        svg += '</svg>';
+        return svg;
+    },
+
+    svgTrend: function(points, opts) {
+        opts = opts || {};
+        var w = opts.width || 600, h = opts.height || 180, pad = 40;
+        if (points.length < 2) return '<div style="text-align:center;font-size:0.75rem;color:var(--rfs-text3);">Need ≥2 snapshots for trend</div>';
+        var maxVal = Math.max.apply(null, points.map(function(p) { return p.value; })) || 1;
+        var chartW = w - pad * 2, chartH = h - pad * 2;
+        var svg = '<svg class="rfs-chart-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+        svg += '<line class="axis-line" x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - 10) + '" y2="' + (h - pad) + '"/>';
+        var pathD = '';
+        points.forEach(function(p, i) {
+            var x = pad + (i / (points.length - 1)) * chartW;
+            var y = h - pad - (p.value / maxVal) * chartH;
+            pathD += (i === 0 ? 'M' : 'L') + x + ',' + y;
+            svg += '<circle cx="' + x + '" cy="' + y + '" r="3" fill="' + (opts.color || 'var(--rfs-teal)') + '"/>';
+            svg += '<text class="bar-label" x="' + x + '" y="' + (h - pad + 14) + '">' + (p.label || '') + '</text>';
+        });
+        svg += '<path d="' + pathD + '" fill="none" stroke="' + (opts.color || 'var(--rfs-teal)') + '" stroke-width="2"/>';
+        svg += '</svg>';
+        return svg;
+    },
+
+    svgWaterfall: function(segments, opts) {
+        opts = opts || {};
+        var w = opts.width || 600, h = opts.height || 160, pad = 40;
+        var total = segments.reduce(function(s, seg) { return s + seg.value; }, 0) || 1;
+        var chartW = w - pad * 2;
+        var svg = '<svg class="rfs-chart-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+        var x = pad, barH = 28, y = (h - barH) / 2;
+        segments.forEach(function(seg) {
+            var segW = (seg.value / total) * chartW;
+            if (segW < 1) segW = 1;
+            svg += '<rect x="' + x + '" y="' + y + '" width="' + segW + '" height="' + barH + '" fill="' + (seg.color || 'var(--rfs-teal)') + '" rx="2"/>';
+            if (segW > 30) svg += '<text x="' + (x + segW / 2) + '" y="' + (y + barH / 2 + 4) + '" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">' + seg.label + '</text>';
+            svg += '<text class="bar-label" x="' + (x + segW / 2) + '" y="' + (y - 6) + '">' + seg.value + 'd</text>';
+            x += segW;
+        });
+        svg += '</svg>';
+        return svg;
+    },
+
+    svgHeatmap: function(matrix, opts) {
+        opts = opts || {};
+        var cellW = opts.cellW || 40, cellH = opts.cellH || 24, pad = 80;
+        var cols = matrix.cols || [], rows = matrix.rows || [], data = matrix.data || [];
+        var w = pad + cols.length * cellW + 10, h = 30 + rows.length * cellH + 10;
+        var svg = '<svg class="rfs-chart-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+        cols.forEach(function(c, ci) {
+            svg += '<text x="' + (pad + ci * cellW + cellW / 2) + '" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rfs-text3)">' + c + '</text>';
+        });
+        rows.forEach(function(r, ri) {
+            svg += '<text x="' + (pad - 4) + '" y="' + (30 + ri * cellH + cellH / 2 + 3) + '" text-anchor="end" font-size="9" fill="var(--rfs-text3)">' + r + '</text>';
+            cols.forEach(function(c, ci) {
+                var val = (data[ri] && data[ri][ci]) || 0;
+                var color = val >= 100 ? 'rgba(16,185,129,0.6)' : val >= 75 ? 'rgba(16,185,129,0.3)' : val >= 50 ? 'rgba(245,158,11,0.3)' : val > 0 ? 'rgba(239,68,68,0.2)' : 'rgba(148,163,184,0.1)';
+                svg += '<rect x="' + (pad + ci * cellW + 1) + '" y="' + (30 + ri * cellH) + '" width="' + (cellW - 2) + '" height="' + (cellH - 2) + '" fill="' + color + '" rx="3"/>';
+                svg += '<text x="' + (pad + ci * cellW + cellW / 2) + '" y="' + (30 + ri * cellH + cellH / 2 + 3) + '" text-anchor="middle" font-size="8" font-weight="600" fill="var(--rfs-text)">' + val + '%</text>';
+            });
+        });
+        svg += '</svg>';
+        return svg;
+    },
+
+    // ── Keyboard Shortcuts (#58) ──
+    initShortcuts: function() {
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z') { e.preventDefault(); RfsUtils.undo(); return; }
+                if (e.key === 'y') { e.preventDefault(); RfsUtils.redo(); return; }
+                if (e.key === 's') { e.preventDefault(); if (activeProjectId) RfsStore.DOMAINS.forEach(function(d) { RfsStore.saveDomain(activeProjectId, d, projectData[d]); }); RfsUI.showToast('Saved.', 'success'); return; }
+            }
+            var tabs = ['setup','units','gates','tests','defects','overlay','procedures','forecast','report','faq','manual'];
+            if (e.key >= '1' && e.key <= '9') { var idx = parseInt(e.key) - 1; if (tabs[idx]) { RfsUI.switchTab(tabs[idx]); } return; }
+            if (e.key === '0') { RfsUI.switchTab('faq'); return; }
+            if (e.key === '/') { e.preventDefault(); RfsUI.switchTab('faq'); return; }
+            if (e.key === '?') { RfsUI.switchTab('manual'); return; }
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.rfs-drawer-overlay.open').forEach(function(o){o.classList.remove('open');});
+                document.querySelectorAll('.rfs-drawer.open').forEach(function(d){d.classList.remove('open');});
+                document.querySelectorAll('.rfs-modal.open').forEach(function(m){m.classList.remove('open');});
+                var fab = document.querySelector('.rfs-fab');
+                if (fab) fab.classList.remove('open');
+                var ndd = document.querySelector('.rfs-notif-dropdown');
+                if (ndd) ndd.classList.remove('open');
+            }
+        });
+    },
+
+    // ── Notifications (#60) ──
+    _notifications: [],
+    addNotif: function(text, type) {
+        this._notifications.unshift({ text: text, type: type || 'info', ts: new Date().toISOString(), read: false });
+        if (this._notifications.length > 50) this._notifications.pop();
+        this.renderNotifBadge();
+    },
+    renderNotifBadge: function() {
+        var unread = this._notifications.filter(function(n) { return !n.read; }).length;
+        var badge = document.getElementById('rfsNotifCount');
+        if (badge) {
+            badge.textContent = unread;
+            badge.style.display = unread > 0 ? 'flex' : 'none';
+        }
+    },
+    renderNotifs: function() {
+        var dd = document.getElementById('rfsNotifDropdown');
+        if (!dd) return;
+        if (this._notifications.length === 0) {
+            dd.innerHTML = '<div style="padding:20px;text-align:center;font-size:0.75rem;color:var(--rfs-text3);">No notifications</div>';
+        } else {
+            dd.innerHTML = this._notifications.map(function(n) {
+                return '<div class="rfs-notif-item" onclick="this.style.opacity=0.5">' +
+                    '<div>' + n.text + '</div>' +
+                    '<div class="rfs-notif-time">' + new Date(n.ts).toLocaleString() + '</div></div>';
+            }).join('');
+        }
+        this._notifications.forEach(function(n) { n.read = true; });
+        this.renderNotifBadge();
+    },
+    toggleNotifs: function() {
+        var dd = document.getElementById('rfsNotifDropdown');
+        if (!dd) return;
+        dd.classList.toggle('open');
+        if (dd.classList.contains('open')) this.renderNotifs();
+    },
+    checkNotifications: function() {
+        if (!activeProjectId) return;
+        this._notifications = [];
+        // Overdue defects
+        var defects = projectData.defects || [];
+        var now = Date.now();
+        defects.forEach(function(d) {
+            if (d.status === 'open' && d.severity === 'critical') {
+                var age = Math.floor((now - new Date(d.created).getTime()) / 86400000);
+                if (age > 3) RfsUtils.addNotif('Critical defect "' + d.title + '" open ' + age + ' days', 'warning');
+            }
+        });
+        // Pending witness
+        var tests = projectData.tests || [];
+        tests.forEach(function(t) {
+            if (t.status === 'scheduled' && t.witness === 'H') {
+                RfsUtils.addNotif('Test "' + t.title + '" awaiting witness hold', 'info');
+            }
+        });
+        // Overdue procedures
+        var procs = projectData.procedures || [];
+        procs.forEach(function(p) {
+            if (p.status === 'draft' && p.reviewDueDate && new Date(p.reviewDueDate) < new Date()) {
+                RfsUtils.addNotif('Procedure "' + p.title + '" review overdue', 'warning');
+            }
+        });
+        this.renderNotifBadge();
+    },
+
+    // ── Schema Versioning (#74) ──
+    migrateSchema: function(data) {
+        var v = (data.core && data.core.schemaVersion) || 1;
+        if (v < 2) {
+            // v1 → v2: add procedures if missing, add new domains
+            if (!data.procedures) data.procedures = [];
+            if (!data.audit) data.audit = [];
+            ['spareParts','vendors','weatherLog','photoLog','safetyIncidents','regulatory'].forEach(function(d) {
+                if (!data[d]) data[d] = [];
+            });
+            if (data.core) data.core.schemaVersion = 2;
+        }
+        return data;
+    },
+
+    // ── Time Utilities ──
+    formatDuration: function(ms) {
+        if (!ms || ms < 0) return '—';
+        var d = Math.floor(ms / 86400000), h = Math.floor((ms % 86400000) / 3600000);
+        if (d > 0) return d + 'd ' + h + 'h';
+        var m = Math.floor((ms % 3600000) / 60000);
+        return h + 'h ' + m + 'm';
+    },
+    timeAgo: function(date) {
+        if (!date) return '—';
+        var diff = Date.now() - new Date(date).getTime();
+        if (diff < 60000) return 'just now';
+        if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+        return Math.floor(diff / 86400000) + 'd ago';
+    }
+};
+
+// ══════════════════════════════════════════
 // RFS UI — Tab switching, rendering, events
 // ══════════════════════════════════════════
 var RfsUI = {
@@ -2551,14 +3245,20 @@ var RfsUI = {
 
     init: function() {
         this.bindEvents();
+        RfsUtils.initShortcuts();
         // Load existing project if any
         var projects = RfsStore.listProjects().filter(function(p){return !p.archived;});
         if (projects.length > 0) {
             activeProjectId = projects[0].id;
             projectData = RfsStore.loadProject(activeProjectId);
+            projectData = RfsUtils.migrateSchema(projectData);
             this.populateSetupFromCore();
         }
         this.renderAll();
+        RfsUtils.startAutoSave();
+        RfsUtils.handleHash();
+        setTimeout(function() { RfsUtils.checkNotifications(); }, 1000);
+        window.addEventListener('hashchange', function() { RfsUtils.handleHash(); });
     },
 
     switchTab: function(tab) {
@@ -2615,7 +3315,7 @@ var RfsUI = {
 
     renderSection: function(tab) {
         var map = {
-            setup: function(){}, // static HTML, no dynamic render needed unless loading
+            setup: this.renderDashboard.bind(this),
             units: this.renderUnits.bind(this),
             gates: this.renderGates.bind(this),
             defects: this.renderDefects.bind(this),
@@ -2623,9 +3323,18 @@ var RfsUI = {
             tests: this.renderTests.bind(this),
             overlay: this.renderOverlay.bind(this),
             procedures: this.renderProcedures.bind(this),
-            report: function(){}
+            report: this.renderReport.bind(this),
+            faq: this.renderFaq.bind(this),
+            manual: this.renderManual.bind(this)
         };
         if (map[tab]) map[tab]();
+        // Update breadcrumb
+        var bc = document.getElementById('rfsBreadcrumb');
+        if (bc) {
+            var names = {setup:'Setup',units:'Units',gates:'Gates',tests:'Tests',defects:'Defects',overlay:'Overlay',procedures:'Procedures',forecast:'Forecast',report:'Report',faq:'FAQ',manual:'Manual'};
+            bc.innerHTML = '<span onclick="RfsUI.switchTab(\'setup\')" style="cursor:pointer">RFS Workbench</span><span class="sep">/</span><span>' + (names[tab] || tab) + '</span>';
+        }
+        RfsUtils.setHash(tab);
     },
 
     // ── Setup ──
@@ -2865,10 +3574,27 @@ var RfsUI = {
         html += '</div>';
         document.getElementById('rfsGateBoardWrap').innerHTML = html;
 
+        // Heatmap
+        var heatmapArea = document.getElementById('rfsGateHeatmapArea');
+        if (heatmapArea) heatmapArea.innerHTML = this.renderGateHeatmap();
+
         // Narrative
         document.getElementById('rfsGateNarrative').innerHTML = RfsNarrativeEngine.hero();
         // Render checklist panel
         this.renderGatesChecklist();
+        // Domain panels
+        var ps = document.getElementById('rfsPanelSpares');
+        if (ps) ps.innerHTML = this.renderSpareParts();
+        var pv = document.getElementById('rfsPanelVendors');
+        if (pv) pv.innerHTML = this.renderVendorDirectory();
+        var pw = document.getElementById('rfsPanelWeather');
+        if (pw) pw.innerHTML = this.renderWeatherLog();
+        var pp = document.getElementById('rfsPanelPhotos');
+        if (pp) pp.innerHTML = this.renderPhotoLog();
+        var psa = document.getElementById('rfsPanelSafety');
+        if (psa) psa.innerHTML = this.renderSafetyIncidents();
+        var pr = document.getElementById('rfsPanelRegulatory');
+        if (pr) pr.innerHTML = this.renderRegulatoryTracker();
     },
 
     openGateDrawer: function(unitId, gateCode) {
@@ -3036,37 +3762,63 @@ var RfsUI = {
         if (defects.length === 0) { empty.style.display = ''; tableWrap.style.display = 'none'; document.getElementById('rfsDefectsKpis').innerHTML=''; return; }
         empty.style.display = 'none'; tableWrap.style.display = '';
 
+        // Apply filters
+        var fSev = this._defectFilters.severity;
+        var fUnit = this._defectFilters.unit;
+        var fStatus = this._defectFilters.status;
+        var fRoot = this._defectFilters.rootCause;
+        var filtered = defects.filter(function(d) {
+            if (fSev && d.severity !== fSev) return false;
+            if (fUnit && d.unitId !== fUnit) return false;
+            if (fStatus && d.status !== fStatus) return false;
+            if (fRoot && d.rootCause !== fRoot) return false;
+            return true;
+        });
+
         var critical = defects.filter(function(d){return d.severity==='critical'&&d.status!=='closed'&&d.status!=='waived';}).length;
         var major = defects.filter(function(d){return d.severity==='major'&&d.status!=='closed'&&d.status!=='waived';}).length;
         var open = defects.filter(function(d){return d.status!=='closed'&&d.status!=='waived';}).length;
         var closed = defects.filter(function(d){return d.status==='closed';}).length;
+        var totalCost = defects.reduce(function(s, d) { return s + (parseFloat(d.estimatedCost) || 0); }, 0);
         document.getElementById('rfsDefectsKpis').innerHTML =
             this._kpiCard('Critical', critical, critical>0?'var(--rfs-red)':'var(--rfs-emerald)') +
             this._kpiCard('Major', major, major>0?'var(--rfs-amber)':'var(--rfs-emerald)') +
             this._kpiCard('Open', open, 'var(--rfs-blue)') +
             this._kpiCard('Closed', closed, 'var(--rfs-emerald)') +
-            this._kpiCard('Total', defects.length, 'var(--rfs-text2)');
+            this._kpiCard('Total', defects.length, 'var(--rfs-text2)') +
+            (totalCost > 0 ? this._kpiCard('Est. Cost', '$' + totalCost.toLocaleString(), 'var(--rfs-amber)') : '');
+
+        // Sort
+        var sortState = RfsUtils.getSortState('Defects');
+        if (sortState.key) filtered = RfsUtils.sortArray(filtered, sortState.key, sortState.dir);
 
         var units = projectData.units || [];
-        document.getElementById('rfsDefectsBody').innerHTML = defects.map(function(d) {
+        var self = this;
+        document.getElementById('rfsDefectsBody').innerHTML = filtered.map(function(d) {
             var unit = units.find(function(u){return u.id===d.unitId;});
             var age = Math.floor((Date.now() - new Date(d.createdAt).getTime()) / 86400000);
             var thresh = RfsLibrary.AGING_THRESHOLDS[d.severity] || {warning:10,overdue:20};
             var ageColor = age >= thresh.overdue ? 'var(--rfs-red)' : (age >= thresh.warning ? 'var(--rfs-amber)' : 'var(--rfs-text2)');
+            var ageIcon = age >= thresh.overdue ? '<i class="fas fa-exclamation-circle" style="color:var(--rfs-red);margin-right:2px;"></i>' : '';
             return '<tr>'
                 +'<td style="font-family:var(--rfs-mono);font-size:0.72rem;">'+d.id.slice(-6)+'</td>'
-                +'<td><strong>'+d.title+'</strong></td>'
+                +'<td><strong>'+d.title+'</strong><br><span style="font-size:0.65rem;color:var(--rfs-text3);">'+(d.rootCause||'')+(d.responsibleParty?' · '+d.responsibleParty:'')+'</span></td>'
                 +'<td>'+(unit?unit.label:'—')+'</td>'
                 +'<td><span class="rfs-sev rfs-sev-'+d.severity+'">'+d.severity+'</span></td>'
-                +'<td><span class="rfs-pill rfs-pill-'+(d.status==='closed'?'approved':(d.status==='waived'?'not-started':(d.status==='open'||d.status==='assigned'?'blocked':'progress')))+'">'+d.status+'</span></td>'
+                +'<td><span class="rfs-pill rfs-pill-'+(d.status==='closed'?'approved':(d.status==='waived'?'not-started':(d.status==='open'||d.status==='assigned'?'blocked':'progress')))+'">'+d.status+'</span>'
+                +'<br>'+self.renderSlaTimer(d)+'</td>'
                 +'<td>'+(d.owner||'—')+'</td>'
-                +'<td style="color:'+ageColor+';font-weight:600;font-family:var(--rfs-mono);">'+age+'d</td>'
+                +'<td style="color:'+ageColor+';font-weight:600;font-family:var(--rfs-mono);">'+ageIcon+age+'d</td>'
                 +'<td>'+(d.gateImpact?d.gateImpact.join(', '):'—')+'</td>'
                 +'<td>'
                 +'<button class="rfs-btn rfs-btn-sm rfs-btn-secondary" onclick="RfsUI.changeDefectStatus(\''+d.id+'\')"><i class="fas fa-exchange-alt"></i></button> '
                 +'<button class="rfs-btn rfs-btn-sm rfs-btn-danger" onclick="RfsUI.deleteDefect(\''+d.id+'\')"><i class="fas fa-trash"></i></button>'
                 +'</td></tr>';
         }).join('');
+
+        // Trend chart
+        var trendArea = document.getElementById('rfsDefectTrend');
+        if (trendArea) trendArea.innerHTML = this.renderDefectTrend();
     },
 
     addDefect: function() {
@@ -3076,6 +3828,7 @@ var RfsUI = {
         var defects = projectData.defects || [];
         if (!isPremiumUser && defects.length >= 25) { this.showToast('Free tier: 25 defects max.', 'warning'); return; }
 
+        RfsUtils.pushUndo('Add defect');
         var title = prompt('Defect title:');
         if (!title || title.trim().length < 3) return;
         var severity = prompt('Severity (critical/major/moderate/minor/observation):', 'major');
@@ -3096,7 +3849,13 @@ var RfsUI = {
             gateImpact: gateImpact,
             retestRequired: severity === 'critical' || severity === 'major',
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            rootCause: '',
+            responsibleParty: '',
+            estimatedCost: 0,
+            photoRef: '',
+            linkedDefects: [],
+            linkedTests: []
         });
         projectData.defects = defects;
         RfsStore.saveDomain(activeProjectId, 'defects', defects);
@@ -3104,6 +3863,7 @@ var RfsUI = {
         this.renderDefects();
         this.renderHero();
         this.showToast('Defect added: ' + title, 'success');
+        RfsUtils.logAction('Add defect', title + ' (' + severity + ')');
     },
 
     changeDefectStatus: function(id) {
@@ -3270,8 +4030,18 @@ var RfsUI = {
         });
         var empty = document.getElementById('rfsTestsEmpty');
         var tableWrap = document.getElementById('rfsTestsTableWrap');
-        if (tests.length === 0) { empty.style.display=''; tableWrap.style.display='none'; document.getElementById('rfsTestsKpis').innerHTML=''; return; }
-        empty.style.display='none'; tableWrap.style.display='';
+        var altView = document.getElementById('rfsTestsAltView');
+        if (tests.length === 0) { empty.style.display=''; tableWrap.style.display='none'; if(altView)altView.style.display='none'; document.getElementById('rfsTestsKpis').innerHTML=''; return; }
+        empty.style.display='none';
+
+        // Handle alternative views
+        if (this._testView === 'calendar') {
+            tableWrap.style.display='none'; if(altView){altView.style.display='';altView.innerHTML=this.renderTestCalendar();}
+        } else if (this._testView === 'dashboard') {
+            tableWrap.style.display='none'; if(altView){altView.style.display='';altView.innerHTML=this.renderTestDashboard();}
+        } else {
+            tableWrap.style.display=''; if(altView)altView.style.display='none';
+        }
 
         var passed = tests.filter(function(t){return t.status==='passed';}).length;
         var failed = tests.filter(function(t){return t.status==='failed'||t.status==='retest';}).length;
@@ -3712,6 +4482,10 @@ var RfsUI = {
                 '</tr>';
         });
         document.getElementById('rfsProcBody').innerHTML = html;
+
+        // Completeness chart
+        var compArea = document.getElementById('rfsProcCompletenessArea');
+        if (compArea) compArea.innerHTML = this.renderProcedureCompleteness();
     },
 
     addProcedure: function() {
@@ -3842,6 +4616,13 @@ var RfsUI = {
         });
         html += '</tbody></table></div>';
         html += '<div class="rfs-disclaimer" style="margin-top:1rem;"><i class="fas fa-info-circle"></i> Directional estimate only. Not a vendor quote or contractual value. Drag components are additive: blockers + evidence + signoff + retest + witness + uncertainty.</div>';
+
+        // Enhanced analytics (#45-54)
+        html += this.renderForecastWaterfall();
+        html += this.calculateCriticalPath();
+        html += this.renderForecastTrend();
+        html += this.renderWhatIf();
+
         document.getElementById('rfsForecastContent').innerHTML = html;
 
         // Render snapshots
@@ -3894,6 +4675,10 @@ var RfsUI = {
     },
 
     // ── Report ──
+    renderReport: function() {
+        var area = document.getElementById('rfsAuditLogArea');
+        if (area) area.innerHTML = this.renderAuditLog();
+    },
     selectReportType: function(type) {
         RfsReportEngine.selectedType = type;
         document.querySelectorAll('#rfsReportTypeGroup .rfs-radio-card').forEach(function(c) {
@@ -4114,6 +4899,945 @@ var RfsUI = {
     // ── Shared ──
     _kpiCard: function(label, value, color) {
         return '<div class="rfs-kpi-card"><div class="rfs-kpi-label">'+label+'</div><div class="rfs-kpi-value" style="color:'+color+'">'+value+'</div></div>';
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 2: FAQ + MANUAL
+    // ══════════════════════════════════════════
+
+    FAQ_DATA: [
+        { cat: 'General', q: 'What is the RFS Readiness Workbench?', a: 'A gate-driven commissioning readiness tracker for data center Ready-for-Service planning. It manages G0-G7 gates, requirements checklists, test packages, defect tracking, procedures, and RFS forecast — all in your browser using localStorage.' },
+        { cat: 'General', q: 'Where is my data stored?', a: 'All data is stored in your browser\'s localStorage. No server, no cloud, no account required. Export regularly as JSON backup using the Export button in the mode bar.' },
+        { cat: 'General', q: 'What is the difference between Free and Pro?', a: 'Free tier: 1 project, basic gates/defects/procedures. Pro tier: unlimited projects, Tests tab, Customer Overlay tab, advanced Forecast, and full PDF report exports.' },
+        { cat: 'General', q: 'How do I import/export project data?', a: 'Click the Upload icon (Import) to paste JSON data, or the Download icon (Export) to save your project as a JSON file. This is your backup and transfer mechanism.' },
+        { cat: 'General', q: 'What units/measurements does this use?', a: 'The workbench is unit-agnostic. Enter capacity in MW, cooling in kW/tons, areas in sqm/sqft — whatever your project standards require.' },
+        { cat: 'General', q: 'What are Gates (G0-G7)?', a: 'G0: Baseline/Design → G1: Factory/Procurement → G2: Installation Complete → G3: Individual Commissioning → G4: Integrated Testing → G5: IST/Performance → G6: Ops Readiness → G7: RFS/Handover. Each gate has specific requirements that must be met before progressing.' },
+        { cat: 'General', q: 'What is Confidence Score?', a: 'A calculated metric based on evidence completeness, defect aging, sign-off status, and prior gate approvals. ≥80% = High, ≥60% = Moderate, ≥40% = Weak, <40% = Unstable.' },
+        { cat: 'General', q: 'What are blockers?', a: 'Gates in "blocked" status caused by critical/major open defects, missing mandatory evidence, or unresolved hard blocker requirements. Blockers must be resolved before a gate can be approved.' },
+        { cat: 'General', q: 'Can I manage multiple projects?', a: 'Free tier: 1 active project. Pro tier: unlimited projects. Use the Setup tab to create new projects or switch between existing ones.' },
+        { cat: 'General', q: 'How do I reset everything?', a: 'Clear your browser\'s localStorage for this site. Warning: this deletes ALL projects permanently. Always export a backup first.' },
+        { cat: 'Gates & Checklist', q: 'What is the Gate Board?', a: 'A visual matrix showing all units (rows) × all gates G0-G7 (columns). Each cell shows the gate status: not-started, open, blocked, or approved. Click a cell to see details.' },
+        { cat: 'Gates & Checklist', q: 'How do I approve a gate?', a: 'A gate can be approved when all mandatory requirements are checked, no hard blockers exist, and sign-offs are complete. Click the gate cell and use the approval workflow.' },
+        { cat: 'Gates & Checklist', q: 'What are hard vs soft blockers?', a: 'Hard blockers (red dot) prevent gate approval — they must be resolved. Soft blockers (amber dot) are warnings that should be addressed but don\'t prevent progression.' },
+        { cat: 'Gates & Checklist', q: 'How does the checklist work?', a: 'Each gate has discipline-grouped requirements. Check off items as they are completed. Mandatory items (M) must be done; desirable items (D) improve confidence but aren\'t required.' },
+        { cat: 'Gates & Checklist', q: 'What are W1/W2/W3 weight classes?', a: 'W1 = High impact, W2 = Medium impact, W3 = Low impact. Weight affects how much each requirement contributes to the gate\'s readiness percentage and confidence score.' },
+        { cat: 'Gates & Checklist', q: 'What are Source A/B/C/D?', a: 'Source A = Industry standard (IEEE/ASHRAE/etc.), Source B = Company standard, Source C = Customer requirement, Source D = Best practice. Sources A & B are baseline; C & D come from Customer Overlay.' },
+        { cat: 'Gates & Checklist', q: 'How do I add evidence?', a: 'Check a requirement in the checklist. Evidence is automatically tracked with timestamp. You can add file references and notes to each evidence entry.' },
+        { cat: 'Gates & Checklist', q: 'What are sign-offs?', a: 'Formal approvals required to progress a gate. Each gate may require sign-offs from different stakeholders (Cx Manager, Client, Contractor). Track their status in the gate detail view.' },
+        { cat: 'Tests', q: 'What are L0-L6 test levels?', a: 'L0: Design/Planning Review → L1: Factory Acceptance (FAT) → L2: Installation Verification (IVT) → L3: Individual Commissioning → L4: Functional/Integrated Testing → L5: IST/Performance → L6: Turnover & Closeout.' },
+        { cat: 'Tests', q: 'How do I generate default tests?', a: 'Click "Generate Defaults" in the Tests toolbar. This creates 115 test packages across L0-L6, correlated with CX Calculator activities. Duplicates are automatically skipped.' },
+        { cat: 'Tests', q: 'What is witness H/W/R?', a: 'H = Hold (must witness, stops if absent), W = Witness (should attend, can proceed), R = Review (reviews documentation only). Determines customer/authority involvement.' },
+        { cat: 'Tests', q: 'How does pass/fail work?', a: 'Click the status badge on each test to cycle: planned → scheduled → in-progress → passed/failed. Failed tests can be retested. Pass rate is tracked per discipline.' },
+        { cat: 'Tests', q: 'How do test failures affect gates?', a: 'Failed tests on critical systems can block the associated gate. The gate engine checks test results when evaluating gate readiness and confidence.' },
+        { cat: 'Tests', q: 'What is CX correlation?', a: 'Each test has a CX ID (e.g., L3_E_UP_CX) that maps to the CX Calculator activity structure. This ensures alignment between commissioning planning and execution tracking.' },
+        { cat: 'Defects', q: 'How does the defect register work?', a: 'Log commissioning defects with severity (Critical/Major/Minor/Observation), assign to a unit and gate, and track through the lifecycle: open → in-progress → resolved → closed.' },
+        { cat: 'Defects', q: 'How does severity affect gates?', a: 'Critical and Major open defects automatically block the affected gate. Minor defects and observations are tracked but don\'t block progression.' },
+        { cat: 'Defects', q: 'What is defect aging?', a: 'The number of days a defect has been open. Aging indicators change color: green (<7d), amber (7-14d), red (>14d). Critical defects aging >3 days trigger notifications.' },
+        { cat: 'Defects', q: 'How do defects link to gates?', a: 'Each defect is assigned to a specific gate (G0-G7). The gate engine evaluates open defects when calculating gate status and confidence. Resolve defects to unblock gates.' },
+        { cat: 'Defects', q: 'What is the defect status lifecycle?', a: 'Open → In Progress → Resolved → Closed. Only "Closed" removes the defect from gate blocking calculations. "Resolved" still requires verification before closure.' },
+        { cat: 'Procedures', q: 'What are MOP/SOP-P/SOP-O/EOP?', a: 'MOP = Method of Procedure (step-by-step work instruction). SOP-P = Standard Operating Procedure — Pre/During Handover. SOP-O = SOP — Operations Ready (by ops team). EOP = Emergency Operating Procedure.' },
+        { cat: 'Procedures', q: 'How do I generate default procedures?', a: 'Click "Generate Defaults" in the Procedures toolbar. This creates 107 procedures across G0-G7 covering all disciplines (Electrical, Mechanical, Controls, Safety, Operations).' },
+        { cat: 'Procedures', q: 'How do procedure statuses work?', a: 'Draft → Review → Approved → Issued. Click the status badge to cycle forward. Each status change increments the revision number and adds to the history.' },
+        { cat: 'Procedures', q: 'What is the difference between SOP-P and SOP-O?', a: 'SOP-P (Pre/During Handover) covers procedures for the commissioning and handover phase — led by the Cx team. SOP-O (Ops Ready) covers procedures that Operations must have in place before RFS.' },
+        { cat: 'Overlay', q: 'What is Customer Overlay?', a: 'Additional requirements layered on top of the baseline gate checklist. These come from customer-specific standards, contracts, or project requirements (Source C/D).' },
+        { cat: 'Overlay', q: 'What is the Source C/D restriction?', a: 'Source C (Customer requirement) and Source D (Best practice) items from overlay can only soft-block gates. Only Source A/B items can hard-block. This prevents customer-specific items from overriding industry standards.' },
+        { cat: 'Overlay', q: 'How does overlay affect confidence?', a: 'Uncompleted overlay items reduce confidence score proportionally to their weight. High-weight (W1) overlay items have more impact than low-weight (W3) items.' },
+        { cat: 'Overlay', q: 'How do overlay items progress?', a: 'Same as base requirements: check them off in the checklist. They appear alongside base requirements in the gate checklist, distinguished by their source tag (C/D).' },
+        { cat: 'Forecast & Reports', q: 'How is the RFS forecast calculated?', a: 'Based on target RFS date minus estimated drag days. Drag components include: open blockers, evidence gaps, sign-off delays, test retests, and witness scheduling delays.' },
+        { cat: 'Forecast & Reports', q: 'What are drag components?', a: 'Factors that push the RFS date later: blocker days (open critical defects × days), evidence gap days, sign-off delay days, retest days, and witness scheduling gaps.' },
+        { cat: 'Forecast & Reports', q: 'What are snapshots?', a: 'Point-in-time captures of the forecast state. Take snapshots regularly to track progress over time. Compare snapshots to see if the project is improving or deteriorating.' },
+        { cat: 'Forecast & Reports', q: 'What report types are available?', a: 'Executive Snapshot, Gate Readiness Pack, Defect Aging Summary, Customer Witness Pack, and Forecast Summary. Each generates a printable PDF.' },
+        { cat: 'Forecast & Reports', q: 'How do I export PDF reports?', a: 'Go to the Report tab, select a report type, and click Export PDF. The report opens in a new window formatted for printing. Use your browser\'s Print → Save as PDF.' }
+    ],
+
+    renderFaq: function() {
+        var container = document.getElementById('rfsFaqContent');
+        if (!container) return;
+        var search = (document.getElementById('rfsFaqSearch') || {}).value || '';
+        search = search.toLowerCase();
+        var categories = {};
+        this.FAQ_DATA.forEach(function(item) {
+            if (search && item.q.toLowerCase().indexOf(search) === -1 && item.a.toLowerCase().indexOf(search) === -1) return;
+            if (!categories[item.cat]) categories[item.cat] = [];
+            categories[item.cat].push(item);
+        });
+        var h = '';
+        Object.keys(categories).forEach(function(cat) {
+            h += '<div class="rfs-faq-category"><i class="fas fa-folder-open" style="margin-right:6px;"></i>' + cat + ' (' + categories[cat].length + ')</div>';
+            categories[cat].forEach(function(item, i) {
+                h += '<div class="rfs-faq-item" onclick="this.classList.toggle(\'open\')">';
+                h += '<div class="rfs-faq-q"><span>' + item.q + '</span><i class="fas fa-chevron-down"></i></div>';
+                h += '<div class="rfs-faq-a">' + item.a + '</div>';
+                h += '</div>';
+            });
+        });
+        if (!h) h = '<div style="text-align:center;padding:40px;font-size:0.82rem;color:var(--rfs-text3);">No FAQ entries match your search.</div>';
+        container.innerHTML = h;
+    },
+
+    filterFaq: function() { this.renderFaq(); },
+
+    MANUAL_DATA: [
+        { title: 'Getting Started', icon: 'fa-rocket', steps: [
+            'Open the RFS Readiness Workbench in your browser — no installation needed.',
+            'In the <strong>Setup</strong> tab, enter your project name, client, location, and planned RFS date.',
+            'Select an <strong>archetype</strong> that matches your data center type (e.g., Enterprise, Hyperscale, Colocation, Edge).',
+            'Configure capacity (MW), cooling type, and redundancy tier to customize the requirements baseline.',
+            'Click <strong>Create Project</strong> to save your baseline. Your project is now stored in localStorage.',
+            '<em>Tip:</em> Export a JSON backup immediately after creation for safekeeping.'
+        ]},
+        { title: 'Delivery Units', icon: 'fa-cubes', steps: [
+            'Navigate to the <strong>Units</strong> tab to manage your delivery units.',
+            'Click <strong>Add Unit</strong> to create a new building/hall/plant. Enter label, type, and capacity.',
+            'Use <strong>Generate from Archetype</strong> to auto-create units based on your selected archetype template.',
+            'Each unit progresses independently through G0-G7. Edit or delete units as your project evolves.',
+            'Units appear as rows in the Gate Board matrix — one row per unit, one column per gate.'
+        ]},
+        { title: 'Gate Board & Checklist', icon: 'fa-columns', steps: [
+            'The <strong>Gates</strong> tab shows a visual matrix of all units × gates (G0-G7).',
+            'Click any gate cell to open the detailed checklist for that unit-gate combination.',
+            'Requirements are grouped by <strong>discipline</strong> (Electrical, Mechanical, Controls, Fire/Safety, General).',
+            'Check off requirements as they are completed. Mandatory items (M) must be done for gate approval.',
+            'Use the <strong>search bar</strong> to filter requirements by keyword across all disciplines.',
+            'Use <strong>Bulk Check Mandatory</strong> to quickly mark all mandatory items in a gate.',
+            '<strong>Export CSV</strong> downloads the checklist status for reporting.',
+            '<strong>Print Checklist</strong> opens a printer-friendly view.',
+            '<em>Understanding status:</em> Not Started → Open → Blocked → Approved. Hard blockers (red) prevent approval.'
+        ]},
+        { title: 'Test Packages', icon: 'fa-vial', steps: [
+            'Navigate to the <strong>Tests</strong> tab (Pro feature) to manage commissioning test campaigns.',
+            'Click <strong>Generate Defaults</strong> to create 115 test packages across L0-L6 levels, correlated with CX Calculator.',
+            'Filter tests by <strong>level</strong> (L0-L6), <strong>discipline</strong>, or <strong>status</strong>.',
+            'Click the <strong>status badge</strong> on each test to cycle: Planned → Scheduled → In Progress → Passed/Failed.',
+            'Tests with <strong>witness class H</strong> (Hold) require customer/authority presence before proceeding.',
+            'Use the <strong>Dashboard</strong> view to see pass rate charts by discipline.',
+            'Use the <strong>Calendar</strong> view to visualize test scheduling on a monthly grid.',
+            'Add custom tests with <strong>Add Test</strong> — duplicate detection prevents double entries.',
+            '<em>Tip:</em> Failed tests can be linked to defects for traceability.'
+        ]},
+        { title: 'Defect Register', icon: 'fa-bug', steps: [
+            'Navigate to the <strong>Defects</strong> tab to log commissioning defects.',
+            'Click <strong>Add Defect</strong> to open the defect form. Enter title, severity, unit, gate, and description.',
+            'Select <strong>severity</strong>: Critical (blocks gate), Major (blocks gate), Minor (warning), Observation (info only).',
+            'Assign a <strong>root cause</strong>: Design, Manufacturing, Installation, Commissioning, Operations, or Environmental.',
+            'Set <strong>responsible party</strong>: Contractor, Vendor, or Internal team.',
+            'Click the <strong>status badge</strong> to cycle: Open → In Progress → Resolved → Closed.',
+            'Use <strong>filters</strong> to view by severity, unit, status, or root cause.',
+            '<strong>Aging indicators</strong> show how long defects have been open — red = overdue.',
+            '<em>Critical defects open >3 days trigger notification bell alerts.</em>'
+        ]},
+        { title: 'Customer Overlay', icon: 'fa-layer-group', steps: [
+            'Navigate to the <strong>Overlay</strong> tab (Pro feature) to add customer-specific requirements.',
+            'Overlay items are <strong>Source C</strong> (customer requirement) or <strong>Source D</strong> (best practice).',
+            'Assign each overlay item to a specific gate, discipline, and weight class (W1/W2/W3).',
+            'Source C/D items can only <strong>soft-block</strong> gates — they cannot hard-block like Source A/B items.',
+            'Overlay items appear in the gate checklist alongside baseline requirements, tagged with their source.',
+            '<em>Tip:</em> Use overlay for contract-specific acceptance criteria or enhanced testing requirements.'
+        ]},
+        { title: 'Procedures (MOP/SOP/EOP)', icon: 'fa-clipboard-list', steps: [
+            'Navigate to the <strong>Procedures</strong> tab to manage commissioning documentation.',
+            'Click <strong>Generate Defaults</strong> to create 107 procedures across G0-G7.',
+            '<strong>MOP</strong> = Method of Procedure — step-by-step work instructions for commissioning activities.',
+            '<strong>SOP-P</strong> = Standard Operating Procedure (Pre/During Handover) — Cx team procedures.',
+            '<strong>SOP-O</strong> = Standard Operating Procedure (Ops Ready) — procedures Operations must prepare before RFS.',
+            '<strong>EOP</strong> = Emergency Operating Procedure — emergency response and safety procedures.',
+            'Click the <strong>status badge</strong> to cycle: Draft → Review → Approved → Issued.',
+            'Filter by <strong>type</strong>, <strong>status</strong>, or <strong>gate</strong> to find specific procedures.',
+            '<em>Tip:</em> All SOP-O procedures must be Issued before G6 can be approved.'
+        ]},
+        { title: 'RFS Forecast', icon: 'fa-chart-line', steps: [
+            'Navigate to the <strong>Forecast</strong> tab to see projected RFS dates.',
+            'The forecast calculates drag days from: blockers, evidence gaps, sign-off delays, retest, and witness scheduling.',
+            '<strong>Take Snapshot</strong> to capture the current forecast state for historical tracking.',
+            'Use <strong>What-If</strong> sliders to simulate the impact of resolving defects, adding evidence, or completing sign-offs.',
+            'The <strong>Trend Chart</strong> shows forecast changes over time from snapshot history.',
+            'The <strong>Waterfall Chart</strong> breaks down drag components visually.',
+            '<strong>Critical Path</strong> highlights the unit with the longest drag — your bottleneck.',
+            '<em>Tip:</em> Compare snapshots week-over-week to track if your project is converging on RFS.'
+        ]},
+        { title: 'Reports', icon: 'fa-file-pdf', steps: [
+            'Navigate to the <strong>Report</strong> tab to generate PDF reports.',
+            'Select a report type: Executive Snapshot, Gate Readiness Pack, Defect Aging, Customer Witness Pack, or Forecast Summary.',
+            'Click <strong>Export PDF</strong> to open the report in a new window.',
+            'Use your browser\'s <strong>Print → Save as PDF</strong> to save the report.',
+            '<em>Tip:</em> The Executive Snapshot is ideal for weekly steering committee meetings.'
+        ]},
+        { title: 'Import/Export & Data', icon: 'fa-database', steps: [
+            'Use the <strong>Export</strong> button (download icon) to save your entire project as a JSON file.',
+            'Use the <strong>Import</strong> button (upload icon) to load a previously exported project.',
+            '<strong>Auto-save</strong> runs every 30 seconds. The "Last saved" timestamp shows in the mode bar.',
+            '<strong>Undo/Redo</strong> is available via Ctrl+Z / Ctrl+Y for the last 10 actions.',
+            'localStorage has a ~5MB limit per domain. Monitor storage usage — export regularly.',
+            '<em>Warning:</em> Clearing browser data deletes all projects. Always maintain JSON backups.'
+        ]},
+        { title: 'Free vs Pro Features', icon: 'fa-crown', steps: [
+            '<table class="rfs-table" style="font-size:0.75rem;"><thead><tr><th>Feature</th><th>Free</th><th>Pro</th></tr></thead><tbody>' +
+            '<tr><td>Projects</td><td>1</td><td>Unlimited</td></tr>' +
+            '<tr><td>Gate Board & Checklist</td><td>Yes</td><td>Yes</td></tr>' +
+            '<tr><td>Defect Register</td><td>Yes</td><td>Yes</td></tr>' +
+            '<tr><td>Procedures</td><td>Yes</td><td>Yes</td></tr>' +
+            '<tr><td>Test Packages</td><td>—</td><td>Yes</td></tr>' +
+            '<tr><td>Customer Overlay</td><td>—</td><td>Yes</td></tr>' +
+            '<tr><td>Advanced Forecast</td><td>Basic</td><td>Full</td></tr>' +
+            '<tr><td>PDF Reports</td><td>Basic</td><td>All types</td></tr>' +
+            '<tr><td>Import/Export</td><td>Yes</td><td>Yes</td></tr>' +
+            '</tbody></table>'
+        ]},
+        { title: 'Keyboard Shortcuts', icon: 'fa-keyboard', steps: [
+            '<table class="rfs-table" style="font-size:0.75rem;"><thead><tr><th>Key</th><th>Action</th></tr></thead><tbody>' +
+            '<tr><td><span class="rfs-kbd">1</span>-<span class="rfs-kbd">9</span></td><td>Switch tabs (Setup, Units, Gates...)</td></tr>' +
+            '<tr><td><span class="rfs-kbd">0</span></td><td>Open FAQ</td></tr>' +
+            '<tr><td><span class="rfs-kbd">/</span></td><td>Search / FAQ</td></tr>' +
+            '<tr><td><span class="rfs-kbd">?</span></td><td>Open Manual</td></tr>' +
+            '<tr><td><span class="rfs-kbd">Ctrl+Z</span></td><td>Undo</td></tr>' +
+            '<tr><td><span class="rfs-kbd">Ctrl+Y</span></td><td>Redo</td></tr>' +
+            '<tr><td><span class="rfs-kbd">Ctrl+S</span></td><td>Save</td></tr>' +
+            '<tr><td><span class="rfs-kbd">Esc</span></td><td>Close drawer/modal/FAB</td></tr>' +
+            '</tbody></table>'
+        ]},
+        { title: 'Troubleshooting', icon: 'fa-wrench', steps: [
+            '<strong>Data not saving?</strong> Check if localStorage is full (>5MB). Export and clear old projects.',
+            '<strong>Gate stuck on blocked?</strong> Check for open Critical/Major defects, missing mandatory evidence, or unsigned sign-offs.',
+            '<strong>Tests tab locked?</strong> Tests require Pro mode. Click PRO and enter credentials.',
+            '<strong>Forecast shows no date?</strong> Ensure you have at least one unit and have set a target RFS date in Setup.',
+            '<strong>Import failed?</strong> Verify the JSON is valid and contains a core.id field.',
+            '<strong>Page slow?</strong> Too many defects or tests. Export old completed items and clear them.',
+            '<strong>PDF blank?</strong> Ensure pop-up blocker is not preventing the report window from opening.',
+            '<em>Still stuck? Contact support at resistancezero.com/contact.</em>'
+        ]}
+    ],
+
+    renderManual: function() {
+        var container = document.getElementById('rfsManualContent');
+        var jumpSelect = document.getElementById('rfsManualJump');
+        if (!container) return;
+        var h = '';
+        var opts = '<option value="">Jump to section...</option>';
+        this.MANUAL_DATA.forEach(function(sec, i) {
+            var id = 'manual-sec-' + i;
+            opts += '<option value="' + id + '">' + (i + 1) + '. ' + sec.title + '</option>';
+            h += '<div class="rfs-manual-section" id="' + id + '">';
+            h += '<h3><span class="section-num">' + (i + 1) + '</span><i class="fas ' + sec.icon + '" style="color:var(--rfs-teal);"></i> ' + sec.title + '</h3>';
+            sec.steps.forEach(function(step) {
+                h += '<div class="rfs-manual-step">' + step + '</div>';
+            });
+            h += '</div>';
+        });
+        container.innerHTML = h;
+        if (jumpSelect) jumpSelect.innerHTML = opts;
+    },
+
+    jumpManualSection: function(id) {
+        if (!id) return;
+        var el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 3: GATE/CHECKLIST IMPROVEMENTS #1-12
+    // ══════════════════════════════════════════
+
+    filterChecklist: function() {
+        var search = (document.getElementById('rfsChecklistSearch') || {}).value || '';
+        search = search.toLowerCase();
+        document.querySelectorAll('.rfs-cl-item').forEach(function(item) {
+            var text = (item.textContent || '').toLowerCase();
+            item.style.display = (!search || text.indexOf(search) !== -1) ? '' : 'none';
+        });
+    },
+
+    bulkCheckMandatory: function(gateCode) {
+        if (!activeProjectId || !this.selectedUnitId) return;
+        RfsUtils.pushUndo('Bulk check mandatory ' + gateCode);
+        var reqs = RfsLibrary.getRequirementsForGate(gateCode);
+        var evidence = projectData.evidence || [];
+        var changed = 0;
+        reqs.forEach(function(r) {
+            if (r.mandatory !== 'M') return;
+            var exists = evidence.find(function(e) { return e.unitId === RfsUI.selectedUnitId && e.gateCode === gateCode && e.reqId === r.id; });
+            if (!exists) {
+                evidence.push({ unitId: RfsUI.selectedUnitId, gateCode: gateCode, reqId: r.id, checked: true, ts: new Date().toISOString(), fileRef: '', notes: '' });
+                changed++;
+            }
+        });
+        projectData.evidence = evidence;
+        RfsStore.saveDomain(activeProjectId, 'evidence', evidence);
+        RfsUI.showToast('Checked ' + changed + ' mandatory items in ' + gateCode + '.', 'success');
+        RfsUtils.logAction('Bulk check', gateCode + ' — ' + changed + ' items');
+        this.renderGates();
+    },
+
+    exportChecklistCsv: function() {
+        if (!activeProjectId) return;
+        var headers = ['Gate', 'Discipline', 'Requirement', 'Mandatory', 'Weight', 'Checked', 'Date'];
+        var rows = [];
+        var evidence = projectData.evidence || [];
+        RfsLibrary.GATE_CODES.forEach(function(gc) {
+            var reqs = RfsLibrary.getRequirementsForGate(gc);
+            reqs.forEach(function(r) {
+                var ev = evidence.find(function(e) { return e.unitId === RfsUI.selectedUnitId && e.gateCode === gc && e.reqId === r.id; });
+                rows.push([gc, r.discipline, r.text, r.mandatory, r.weight, ev ? 'Yes' : 'No', ev ? ev.ts : '']);
+            });
+        });
+        RfsUtils.exportCsv(headers, rows, 'checklist-' + (RfsUI.selectedUnitId || 'all') + '.csv');
+        RfsUtils.logAction('Export CSV', 'Checklist');
+    },
+
+    printChecklist: function() {
+        if (!activeProjectId) return;
+        var w = window.open('', '_blank');
+        var evidence = projectData.evidence || [];
+        var unit = (projectData.units || []).find(function(u) { return u.id === RfsUI.selectedUnitId; });
+        var html = '<html><head><title>Checklist — ' + ((unit || {}).label || '') + '</title>';
+        html += '<style>body{font-family:Inter,sans-serif;font-size:12px;margin:20px;}table{width:100%;border-collapse:collapse;margin-bottom:20px;}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;}th{background:#f1f5f9;font-weight:700;}.checked{color:#10b981;font-weight:700;}h2{margin-top:24px;color:#0d9488;}</style></head><body>';
+        html += '<h1>RFS Checklist — ' + ((unit || {}).label || 'All Units') + '</h1>';
+        html += '<p>Generated: ' + new Date().toLocaleDateString() + '</p>';
+        RfsLibrary.GATE_CODES.forEach(function(gc) {
+            var reqs = RfsLibrary.getRequirementsForGate(gc);
+            if (reqs.length === 0) return;
+            html += '<h2>' + gc + ' — ' + (RfsLibrary.GATE_NAMES[gc] || '') + '</h2>';
+            html += '<table><tr><th>Discipline</th><th>Requirement</th><th>M/D</th><th>W</th><th>Status</th></tr>';
+            reqs.forEach(function(r) {
+                var ev = evidence.find(function(e) { return e.unitId === RfsUI.selectedUnitId && e.gateCode === gc && e.reqId === r.id; });
+                html += '<tr><td>' + r.discipline + '</td><td>' + r.text + '</td><td>' + r.mandatory + '</td><td>' + r.weight + '</td>';
+                html += '<td class="' + (ev ? 'checked' : '') + '">' + (ev ? '✓' : '—') + '</td></tr>';
+            });
+            html += '</table>';
+        });
+        html += '</body></html>';
+        w.document.write(html);
+        w.document.close();
+        w.print();
+        RfsUtils.logAction('Print checklist', (unit || {}).label || '');
+    },
+
+    addRequirementNote: function(gateCode, reqId) {
+        var note = prompt('Add note for this requirement:');
+        if (note === null) return;
+        var evidence = projectData.evidence || [];
+        var ev = evidence.find(function(e) { return e.unitId === this.selectedUnitId && e.gateCode === gateCode && e.reqId === reqId; }.bind(this));
+        if (ev) {
+            ev.notes = note;
+        } else {
+            evidence.push({ unitId: this.selectedUnitId, gateCode: gateCode, reqId: reqId, checked: false, ts: new Date().toISOString(), notes: note, fileRef: '' });
+        }
+        projectData.evidence = evidence;
+        RfsStore.saveDomain(activeProjectId, 'evidence', evidence);
+        this.showToast('Note saved.', 'success');
+    },
+
+    renderGateHeatmap: function() {
+        var units = projectData.units || [];
+        var evidence = projectData.evidence || [];
+        if (units.length === 0) return '';
+        var matrix = { cols: RfsLibrary.GATE_CODES, rows: [], data: [] };
+        units.forEach(function(u) {
+            matrix.rows.push(u.label || u.id);
+            var row = [];
+            RfsLibrary.GATE_CODES.forEach(function(gc) {
+                var reqs = RfsLibrary.getRequirementsForGate(gc);
+                var total = reqs.length || 1;
+                var done = evidence.filter(function(e) { return e.unitId === u.id && e.gateCode === gc && e.checked; }).length;
+                row.push(Math.round((done / total) * 100));
+            });
+            matrix.data.push(row);
+        });
+        return '<div style="margin:12px 0;"><div style="font-size:0.78rem;font-weight:700;margin-bottom:8px;color:var(--rfs-text);">Progress Heatmap (Unit × Gate)</div>' + RfsUtils.svgHeatmap(matrix) + '</div>';
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 4: TESTS IMPROVEMENTS #13-24
+    // ══════════════════════════════════════════
+
+    _testView: 'table',
+
+    toggleTestView: function(view) {
+        this._testView = view;
+        this.renderTests();
+    },
+
+    renderTestCalendar: function() {
+        var tests = projectData.tests || [];
+        var now = new Date();
+        var year = now.getFullYear(), month = now.getMonth();
+        var firstDay = new Date(year, month, 1).getDay();
+        var daysInMonth = new Date(year, month + 1, 0).getDate();
+        var monthName = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+        var h = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+        h += '<button class="rfs-btn rfs-btn-sm" onclick="RfsUI._calMonth=-1;RfsUI.renderTests()"><i class="fas fa-chevron-left"></i></button>';
+        h += '<strong style="font-size:0.85rem;">' + monthName + '</strong>';
+        h += '<button class="rfs-btn rfs-btn-sm" onclick="RfsUI._calMonth=1;RfsUI.renderTests()"><i class="fas fa-chevron-right"></i></button>';
+        h += '</div>';
+        h += '<div class="rfs-calendar">';
+        ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(d) {
+            h += '<div class="rfs-calendar-header">' + d + '</div>';
+        });
+        for (var blank = 0; blank < firstDay; blank++) h += '<div class="rfs-calendar-day"></div>';
+        for (var day = 1; day <= daysInMonth; day++) {
+            var dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+            var dayTests = tests.filter(function(t) { return t.scheduledDate && t.scheduledDate.slice(0, 10) === dateStr; });
+            h += '<div class="rfs-calendar-day"><div class="day-num">' + day + '</div>';
+            dayTests.forEach(function(t) {
+                var color = t.level === 'L0' ? '#6b7280' : t.level === 'L1' ? '#6366f1' : t.level === 'L2' ? '#3b82f6' : t.level === 'L3' ? '#14b8a6' : t.level === 'L4' ? '#f59e0b' : t.level === 'L5' ? '#ef4444' : '#ec4899';
+                h += '<div class="rfs-calendar-chip" style="background:' + color + '22;color:' + color + ';" title="' + t.title + '">' + (t.level || '') + ' ' + (t.title || '').slice(0, 12) + '</div>';
+            });
+            h += '</div>';
+        }
+        h += '</div>';
+        return h;
+    },
+
+    renderTestDashboard: function() {
+        var tests = projectData.tests || [];
+        if (tests.length === 0) return '<div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--rfs-text3);">No test data for dashboard.</div>';
+        var disciplines = {};
+        tests.forEach(function(t) {
+            var d = t.discipline || 'General';
+            if (!disciplines[d]) disciplines[d] = { total: 0, passed: 0, failed: 0 };
+            disciplines[d].total++;
+            if (t.status === 'passed') disciplines[d].passed++;
+            if (t.status === 'failed') disciplines[d].failed++;
+        });
+        var barData = Object.keys(disciplines).map(function(d) {
+            var pct = Math.round((disciplines[d].passed / disciplines[d].total) * 100);
+            return { label: d.slice(0, 8), value: pct, color: pct >= 80 ? 'var(--rfs-emerald)' : pct >= 50 ? 'var(--rfs-amber)' : 'var(--rfs-red)' };
+        });
+        return '<div style="font-size:0.78rem;font-weight:700;margin-bottom:8px;">Pass Rate by Discipline (%)</div>' + RfsUtils.svgBar(barData);
+    },
+
+    bulkUpdateTestStatus: function(status) {
+        var checkboxes = document.querySelectorAll('.rfs-test-checkbox:checked');
+        if (checkboxes.length === 0) { this.showToast('No tests selected.', 'warning'); return; }
+        RfsUtils.pushUndo('Bulk test status → ' + status);
+        var tests = projectData.tests || [];
+        checkboxes.forEach(function(cb) {
+            var test = tests.find(function(t) { return t.id === cb.value; });
+            if (test) test.status = status;
+        });
+        RfsStore.saveDomain(activeProjectId, 'tests', tests);
+        RfsUtils.logAction('Bulk test status', checkboxes.length + ' tests → ' + status);
+        this.renderTests();
+    },
+
+    generateTestReport: function(testId) {
+        var test = (projectData.tests || []).find(function(t) { return t.id === testId; });
+        if (!test) return;
+        var w = window.open('', '_blank');
+        var html = '<html><head><title>Test Report — ' + test.title + '</title>';
+        html += '<style>body{font-family:Inter,sans-serif;font-size:12px;margin:20px;}table{width:100%;border-collapse:collapse;margin:12px 0;}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;}th{background:#f1f5f9;}</style></head><body>';
+        html += '<h1>Test Completion Report</h1>';
+        html += '<table><tr><th>Field</th><th>Value</th></tr>';
+        html += '<tr><td>Title</td><td>' + test.title + '</td></tr>';
+        html += '<tr><td>CX ID</td><td>' + (test.cxId || '—') + '</td></tr>';
+        html += '<tr><td>Level</td><td>' + (test.level || '') + '</td></tr>';
+        html += '<tr><td>Discipline</td><td>' + (test.discipline || '') + '</td></tr>';
+        html += '<tr><td>Status</td><td>' + (test.status || '') + '</td></tr>';
+        html += '<tr><td>Witness Class</td><td>' + (test.witness || '') + '</td></tr>';
+        html += '<tr><td>Gate</td><td>' + (test.gate || '') + '</td></tr>';
+        html += '<tr><td>Description</td><td>' + (test.desc || '') + '</td></tr>';
+        html += '<tr><td>Started</td><td>' + (test.startedAt || '—') + '</td></tr>';
+        html += '<tr><td>Completed</td><td>' + (test.completedAt || '—') + '</td></tr>';
+        html += '<tr><td>Duration</td><td>' + (test.startedAt && test.completedAt ? RfsUtils.formatDuration(new Date(test.completedAt) - new Date(test.startedAt)) : '—') + '</td></tr>';
+        html += '<tr><td>Retest Count</td><td>' + (test.retestCount || 0) + '</td></tr>';
+        html += '</table></body></html>';
+        w.document.write(html);
+        w.document.close();
+        w.print();
+    },
+
+    linkTestToDefect: function(testId) {
+        var test = (projectData.tests || []).find(function(t) { return t.id === testId; });
+        if (!test) return;
+        var title = prompt('Defect title for failed test "' + test.title + '":');
+        if (!title) return;
+        var defects = projectData.defects || [];
+        var defect = {
+            id: 'DEF-' + String(defects.length + 1).padStart(3, '0'),
+            title: title, severity: 'major', status: 'open', gate: test.gate || 'G3',
+            unitId: test.unitId || '', created: new Date().toISOString(),
+            description: 'Auto-created from failed test: ' + test.title + ' (' + test.cxId + ')',
+            rootCause: 'Commissioning', responsibleParty: 'Contractor', linkedTests: [testId]
+        };
+        defects.push(defect);
+        projectData.defects = defects;
+        if (!test.linkedDefects) test.linkedDefects = [];
+        test.linkedDefects.push(defect.id);
+        RfsStore.saveDomain(activeProjectId, 'defects', defects);
+        RfsStore.saveDomain(activeProjectId, 'tests', projectData.tests);
+        RfsUtils.logAction('Link test→defect', test.title + ' → ' + defect.id);
+        this.showToast('Defect ' + defect.id + ' created from test.', 'success');
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 5: DEFECTS IMPROVEMENTS #25-34
+    // ══════════════════════════════════════════
+
+    _defectFilters: { severity: '', unit: '', status: '', rootCause: '' },
+
+    renderDefectTrend: function() {
+        var audit = projectData.audit || [];
+        var defectLogs = audit.filter(function(a) { return a.action && a.action.indexOf('efect') !== -1; });
+        if (defectLogs.length < 2) return '';
+        var byWeek = {};
+        defectLogs.forEach(function(a) {
+            var week = a.ts.slice(0, 10);
+            if (!byWeek[week]) byWeek[week] = 0;
+            byWeek[week]++;
+        });
+        var points = Object.keys(byWeek).sort().slice(-10).map(function(w) {
+            return { label: w.slice(5), value: byWeek[w] };
+        });
+        if (points.length < 2) return '';
+        return '<div style="margin:12px 0;"><div style="font-size:0.78rem;font-weight:700;margin-bottom:8px;">Defect Activity Trend</div>' + RfsUtils.svgTrend(points) + '</div>';
+    },
+
+    getSlaDeadline: function(defect) {
+        if (!defect.created) return null;
+        var daysMap = { critical: 3, major: 7, minor: 14, observation: 30 };
+        var days = daysMap[defect.severity] || 14;
+        var deadline = new Date(defect.created);
+        deadline.setDate(deadline.getDate() + days);
+        return deadline;
+    },
+
+    renderSlaTimer: function(defect) {
+        if (defect.status === 'closed' || defect.status === 'resolved') return '';
+        var deadline = this.getSlaDeadline(defect);
+        if (!deadline) return '';
+        var remaining = deadline - Date.now();
+        var days = Math.ceil(remaining / 86400000);
+        if (days <= 0) return '<span class="rfs-sla-timer rfs-sla-overdue">SLA overdue (' + Math.abs(days) + 'd)</span>';
+        return '<span class="rfs-sla-timer rfs-sla-ok">' + days + 'd to SLA</span>';
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 6: PROCEDURES IMPROVEMENTS #35-44
+    // ══════════════════════════════════════════
+
+    downloadProcedureTemplate: function(type) {
+        var templates = {
+            'MOP': 'METHOD OF PROCEDURE (MOP)\n================================\nDocument ID: MOP-XXX\nTitle: [Title]\nRevision: 0\nDate: [Date]\nPrepared By: [Name]\nApproved By: [Name]\n\n1. PURPOSE\n   [Describe the purpose of this procedure]\n\n2. SCOPE\n   [Define what systems/equipment this covers]\n\n3. REFERENCES\n   - [Reference standards, drawings, manuals]\n\n4. PREREQUISITES\n   - [ ] Equipment isolated and tagged out (if applicable)\n   - [ ] Tools and materials prepared\n   - [ ] Safety briefing completed\n   - [ ] Permits obtained\n\n5. PROCEDURE STEPS\n   Step 1: [Description]\n   Step 2: [Description]\n   Step 3: [Description]\n\n6. VERIFICATION\n   - [ ] All steps completed\n   - [ ] Results documented\n   - [ ] System returned to normal\n\n7. SIGN-OFF\n   Executed By: __________ Date: __________\n   Witnessed By: __________ Date: __________',
+            'SOP-P': 'STANDARD OPERATING PROCEDURE — PRE/DURING HANDOVER (SOP-P)\n================================\nDocument ID: SOP-P-XXX\nTitle: [Title]\nRevision: 0\n\n1. PURPOSE\n2. SCOPE\n3. RESPONSIBILITIES\n4. PROCEDURE\n5. HANDOVER CHECKLIST\n6. SIGN-OFF',
+            'SOP-O': 'STANDARD OPERATING PROCEDURE — OPERATIONS READY (SOP-O)\n================================\nDocument ID: SOP-O-XXX\nTitle: [Title]\nRevision: 0\n\n1. PURPOSE\n2. SCOPE\n3. ROLES & RESPONSIBILITIES\n4. NORMAL OPERATIONS\n5. MONITORING & ALARMS\n6. ESCALATION MATRIX\n7. TRAINING REQUIREMENTS\n8. REVIEW SCHEDULE',
+            'EOP': 'EMERGENCY OPERATING PROCEDURE (EOP)\n================================\nDocument ID: EOP-XXX\nTitle: [Title]\nRevision: 0\n\n1. EMERGENCY TYPE\n2. IMMEDIATE ACTIONS\n3. NOTIFICATION TREE\n4. CONTAINMENT STEPS\n5. RECOVERY PROCEDURE\n6. POST-INCIDENT REVIEW\n7. SIGN-OFF'
+        };
+        var text = templates[type] || templates['MOP'];
+        var blob = new Blob([text], { type: 'text/plain' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = type + '-template.txt';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        this.showToast(type + ' template downloaded.', 'success');
+    },
+
+    renderProcedureCompleteness: function() {
+        var procs = projectData.procedures || [];
+        if (procs.length === 0) return '';
+        var byGate = {};
+        procs.forEach(function(p) {
+            var g = p.gate || 'G0';
+            if (!byGate[g]) byGate[g] = { total: 0, approved: 0 };
+            byGate[g].total++;
+            if (p.status === 'approved' || p.status === 'issued') byGate[g].approved++;
+        });
+        var barData = RfsLibrary.GATE_CODES.map(function(gc) {
+            var g = byGate[gc];
+            if (!g) return { label: gc, value: 0 };
+            return { label: gc, value: Math.round((g.approved / g.total) * 100), color: g.approved === g.total ? 'var(--rfs-emerald)' : 'var(--rfs-amber)' };
+        });
+        return '<div style="margin:12px 0;"><div style="font-size:0.78rem;font-weight:700;margin-bottom:8px;">Procedure Approval by Gate (%)</div>' + RfsUtils.svgBar(barData) + '</div>';
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 7: FORECAST/ANALYTICS #45-54
+    // ══════════════════════════════════════════
+
+    renderForecastTrend: function() {
+        var forecast = projectData.forecast || {};
+        var snapshots = forecast.snapshots || [];
+        if (snapshots.length < 2) return '<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--rfs-text3);">Take ≥2 snapshots to see trend chart.</div>';
+        var points = snapshots.slice(-12).map(function(s) {
+            return { label: (s.date || '').slice(5, 10), value: s.totalDragDays || 0 };
+        });
+        return '<div style="margin:16px 0;"><div style="font-size:0.78rem;font-weight:700;margin-bottom:8px;">Forecast Trend — Total Drag Days</div>' + RfsUtils.svgTrend(points, { color: 'var(--rfs-amber)' }) + '</div>';
+    },
+
+    renderForecastWaterfall: function() {
+        var fc = RfsForecastEngine.forecastProject();
+        if (!fc.projectForecast) return '';
+        var drag = fc.projectForecast;
+        var segments = [
+            { label: 'Blockers', value: drag.blockerDrag || 0, color: 'var(--rfs-red)' },
+            { label: 'Evidence', value: drag.evidenceDrag || 0, color: 'var(--rfs-amber)' },
+            { label: 'Sign-offs', value: drag.signoffDrag || 0, color: 'var(--rfs-purple)' },
+            { label: 'Retest', value: drag.retestDrag || 0, color: 'var(--rfs-blue)' },
+            { label: 'Witness', value: drag.witnessDrag || 0, color: 'var(--rfs-cyan)' }
+        ].filter(function(s) { return s.value > 0; });
+        if (segments.length === 0) return '<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--rfs-emerald);">No drag components — on track!</div>';
+        return '<div style="margin:16px 0;"><div style="font-size:0.78rem;font-weight:700;margin-bottom:8px;">Drag Component Breakdown (days)</div>' + RfsUtils.svgWaterfall(segments) + '</div>';
+    },
+
+    renderWhatIf: function() {
+        var h = '<div style="margin:16px 0;padding:16px;background:var(--rfs-glass);border:1px solid var(--rfs-glass-border);border-radius:var(--rfs-radius);">';
+        h += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:12px;"><i class="fas fa-sliders-h" style="color:var(--rfs-teal);margin-right:8px;"></i>What-If Scenario Simulator</div>';
+        h += '<div class="rfs-whatif-slider"><label>Defects Resolved (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfDefects" oninput="document.getElementById(\'rfsWifDefVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()"><span class="val" id="rfsWifDefVal">0%</span></div>';
+        h += '<div class="rfs-whatif-slider"><label>Evidence Completed (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfEvidence" oninput="document.getElementById(\'rfsWifEvVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()"><span class="val" id="rfsWifEvVal">0%</span></div>';
+        h += '<div class="rfs-whatif-slider"><label>Sign-offs Obtained (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfSignoffs" oninput="document.getElementById(\'rfsWifSoVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()"><span class="val" id="rfsWifSoVal">0%</span></div>';
+        h += '<div id="rfsWhatIfResult" style="margin-top:12px;padding:10px;background:var(--rfs-bg2);border-radius:6px;font-size:0.78rem;color:var(--rfs-text);">Adjust sliders to simulate impact on RFS date.</div>';
+        h += '</div>';
+        return h;
+    },
+
+    recalcWhatIf: function() {
+        var defPct = parseInt(document.getElementById('rfsWhatIfDefects').value) || 0;
+        var evPct = parseInt(document.getElementById('rfsWhatIfEvidence').value) || 0;
+        var soPct = parseInt(document.getElementById('rfsWhatIfSignoffs').value) || 0;
+        var fc = RfsForecastEngine.forecastProject();
+        if (!fc.projectForecast) return;
+        var drag = fc.projectForecast;
+        var origDrag = (drag.blockerDrag || 0) + (drag.evidenceDrag || 0) + (drag.signoffDrag || 0) + (drag.retestDrag || 0) + (drag.witnessDrag || 0);
+        var newDrag = Math.round(
+            (drag.blockerDrag || 0) * (1 - defPct / 100) +
+            (drag.evidenceDrag || 0) * (1 - evPct / 100) +
+            (drag.signoffDrag || 0) * (1 - soPct / 100) +
+            (drag.retestDrag || 0) + (drag.witnessDrag || 0)
+        );
+        var saved = origDrag - newDrag;
+        var el = document.getElementById('rfsWhatIfResult');
+        if (el) el.innerHTML = '<strong>Scenario:</strong> Drag reduced from ' + origDrag + ' to ' + newDrag + ' days (<span style="color:var(--rfs-emerald);">−' + saved + ' days saved</span>).';
+    },
+
+    calculateCriticalPath: function() {
+        var fc = RfsForecastEngine.forecastProject();
+        if (!fc.unitForecasts || fc.unitForecasts.length === 0) return '';
+        var maxDrag = 0, critUnit = '';
+        fc.unitForecasts.forEach(function(uf) {
+            var drag = uf.totalDragDays || 0;
+            if (drag > maxDrag) { maxDrag = drag; critUnit = uf.unitLabel || uf.unitId; }
+        });
+        if (maxDrag === 0) return '<div style="font-size:0.78rem;color:var(--rfs-emerald);"><i class="fas fa-check-circle"></i> No critical path delays.</div>';
+        return '<div class="rfs-milestone"><span class="ms-gate"><i class="fas fa-exclamation-triangle" style="color:var(--rfs-red);"></i></span><span class="ms-label">Critical Path: <strong>' + critUnit + '</strong> — ' + maxDrag + ' drag days</span></div>';
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 8: UI/UX #55-66
+    // ══════════════════════════════════════════
+
+    renderDashboard: function() {
+        if (!activeProjectId) return;
+        var core = projectData.core || {};
+        var units = projectData.units || [];
+        var defects = projectData.defects || [];
+        var tests = projectData.tests || [];
+        var procs = projectData.procedures || [];
+        var evidence = projectData.evidence || [];
+
+        // Calculate quick stats
+        var openDefects = defects.filter(function(d) { return d.status === 'open' || d.status === 'in-progress'; }).length;
+        var critDefects = defects.filter(function(d) { return d.severity === 'critical' && d.status !== 'closed'; }).length;
+        var passedTests = tests.filter(function(t) { return t.status === 'passed'; }).length;
+        var approvedProcs = procs.filter(function(p) { return p.status === 'approved' || p.status === 'issued'; }).length;
+        var totalEvidence = evidence.filter(function(e) { return e.checked; }).length;
+        var blockers = RfsGateEngine.countBlockers();
+        var confidence = RfsGateEngine.avgConfidence();
+
+        var dash = document.getElementById('rfsDashboardArea');
+        if (!dash) {
+            // Create dashboard area in setup section
+            var setupSection = document.getElementById('rfsSectionSetup');
+            if (!setupSection) return;
+            var existing = setupSection.querySelector('.rfs-dashboard-grid');
+            if (existing) existing.parentElement.removeChild(existing);
+            var area = document.createElement('div');
+            area.id = 'rfsDashboardArea';
+            setupSection.insertBefore(area, setupSection.firstChild);
+            dash = area;
+        }
+
+        if (!core.name) { dash.innerHTML = ''; return; }
+
+        var h = '<div style="font-size:0.85rem;font-weight:700;margin-bottom:12px;"><i class="fas fa-tachometer-alt" style="color:var(--rfs-teal);margin-right:8px;"></i>Project Dashboard — ' + (core.name || '') + '</div>';
+        h += '<div class="rfs-dashboard-grid">';
+        h += '<div class="rfs-dash-card" onclick="RfsUI.switchTab(\'units\')"><div class="dc-icon"><i class="fas fa-cubes"></i></div><div class="dc-value">' + units.length + '</div><div class="dc-label">Delivery Units</div></div>';
+        h += '<div class="rfs-dash-card" onclick="RfsUI.switchTab(\'gates\')"><div class="dc-icon"><i class="fas fa-columns"></i></div><div class="dc-value">' + confidence + '%</div><div class="dc-label">Avg Confidence</div></div>';
+        h += '<div class="rfs-dash-card" onclick="RfsUI.switchTab(\'defects\')"><div class="dc-icon"><i class="fas fa-bug" style="color:' + (critDefects > 0 ? 'var(--rfs-red)' : 'var(--rfs-emerald)') + ';"></i></div><div class="dc-value">' + openDefects + '</div><div class="dc-label">Open Defects (' + critDefects + ' Critical)</div></div>';
+        h += '<div class="rfs-dash-card" onclick="RfsUI.switchTab(\'tests\')"><div class="dc-icon"><i class="fas fa-vial"></i></div><div class="dc-value">' + passedTests + '/' + tests.length + '</div><div class="dc-label">Tests Passed</div></div>';
+        h += '<div class="rfs-dash-card" onclick="RfsUI.switchTab(\'procedures\')"><div class="dc-icon"><i class="fas fa-clipboard-list"></i></div><div class="dc-value">' + approvedProcs + '/' + procs.length + '</div><div class="dc-label">Procedures Approved</div></div>';
+        h += '<div class="rfs-dash-card" onclick="RfsUI.switchTab(\'gates\')"><div class="dc-icon"><i class="fas fa-check-circle" style="color:' + (blockers > 0 ? 'var(--rfs-red)' : 'var(--rfs-emerald)') + ';"></i></div><div class="dc-value">' + blockers + '</div><div class="dc-label">Blocked Gates</div></div>';
+        h += '</div>';
+
+        // Quick nav
+        h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">';
+        var quickNav = [
+            { tab: 'gates', icon: 'fa-columns', label: 'Gate Board' },
+            { tab: 'tests', icon: 'fa-vial', label: 'Tests' },
+            { tab: 'defects', icon: 'fa-bug', label: 'Defects' },
+            { tab: 'procedures', icon: 'fa-clipboard-list', label: 'Procedures' },
+            { tab: 'forecast', icon: 'fa-chart-line', label: 'Forecast' },
+            { tab: 'report', icon: 'fa-file-pdf', label: 'Reports' },
+            { tab: 'faq', icon: 'fa-question-circle', label: 'FAQ' },
+            { tab: 'manual', icon: 'fa-book', label: 'Manual' }
+        ];
+        quickNav.forEach(function(q) {
+            h += '<button class="rfs-btn rfs-btn-sm" onclick="RfsUI.switchTab(\'' + q.tab + '\')"><i class="fas ' + q.icon + '"></i> ' + q.label + '</button>';
+        });
+        h += '</div>';
+
+        dash.innerHTML = h;
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 9: DATA/INTEGRATION #67-76
+    // ══════════════════════════════════════════
+
+    saveProjectTemplate: function() {
+        if (!activeProjectId) return;
+        var name = prompt('Template name:');
+        if (!name) return;
+        var templates = [];
+        try { templates = JSON.parse(localStorage.getItem('rfs_templates_v1') || '[]'); } catch(e) {}
+        var tmpl = {
+            name: name,
+            createdAt: new Date().toISOString(),
+            core: Object.assign({}, projectData.core, { id: null, name: name + ' (Template)' })
+        };
+        templates.push(tmpl);
+        localStorage.setItem('rfs_templates_v1', JSON.stringify(templates));
+        this.showToast('Template "' + name + '" saved.', 'success');
+        RfsUtils.logAction('Save template', name);
+    },
+
+    archiveProject: function(projectId) {
+        var projects = RfsStore.listProjects();
+        var proj = projects.find(function(p) { return p.id === projectId; });
+        if (!proj) return;
+        if (!confirm('Archive project "' + proj.name + '"? It will be hidden from the active list.')) return;
+        proj.archived = true;
+        RfsStore._saveIndex(projects);
+        if (activeProjectId === projectId) {
+            activeProjectId = null;
+            projectData = {};
+        }
+        this.renderAll();
+        this.showToast('Project archived.', 'success');
+        RfsUtils.logAction('Archive project', proj.name);
+    },
+
+    restoreProject: function(projectId) {
+        var projects = RfsStore.listProjects();
+        var proj = projects.find(function(p) { return p.id === projectId; });
+        if (!proj) return;
+        proj.archived = false;
+        RfsStore._saveIndex(projects);
+        this.showToast('Project restored.', 'success');
+        RfsUtils.logAction('Restore project', proj.name);
+    },
+
+    renderAuditLog: function() {
+        var log = projectData.audit || [];
+        if (log.length === 0) return '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-text3);">No audit entries yet.</div>';
+        var h = '<div class="rfs-audit-log">';
+        log.slice().reverse().slice(0, 50).forEach(function(entry) {
+            h += '<div class="rfs-audit-entry"><span class="ts">' + new Date(entry.ts).toLocaleString() + '</span><span class="act">' + entry.action + (entry.detail ? ' — ' + entry.detail : '') + '</span></div>';
+        });
+        h += '</div>';
+        return h;
+    },
+
+    exportCurrentTabPdf: function() {
+        var section = document.querySelector('.rfs-section.active');
+        if (!section) return;
+        var w = window.open('', '_blank');
+        w.document.write('<html><head><title>RFS — ' + this.activeTab + '</title><style>body{font-family:Inter,sans-serif;font-size:12px;margin:20px;}</style></head><body>');
+        w.document.write(section.innerHTML);
+        w.document.write('</body></html>');
+        w.document.close();
+        w.print();
+    },
+
+    // ══════════════════════════════════════════
+    // PHASE 10: DOMAIN-SPECIFIC #77-85
+    // ══════════════════════════════════════════
+
+    renderSpareParts: function() {
+        var parts = projectData.spareParts || [];
+        var h = '<div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-boxes" style="color:var(--rfs-amber);margin-right:6px;"></i>Spare Parts Inventory</div>';
+        h += '<div style="margin-bottom:8px;"><button class="rfs-btn rfs-btn-sm" onclick="RfsUI.addSparePart()"><i class="fas fa-plus"></i> Add Part</button></div>';
+        if (parts.length === 0) {
+            h += '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-text3);">No spare parts logged.</div>';
+        } else {
+            h += '<div class="rfs-table-wrap"><table class="rfs-table"><thead><tr><th>Part</th><th>Qty</th><th>Location</th><th>Lead Time</th><th>Criticality</th></tr></thead><tbody>';
+            parts.forEach(function(p) {
+                h += '<tr class="rfs-spare-row"><td>' + p.name + '</td><td>' + p.qty + '</td><td>' + (p.location || '—') + '</td><td>' + (p.leadTime || '—') + '</td><td>' + (p.criticality || '—') + '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+        return h;
+    },
+
+    addSparePart: function() {
+        var name = prompt('Part name:');
+        if (!name) return;
+        var qty = prompt('Quantity:') || '0';
+        var parts = projectData.spareParts || [];
+        parts.push({ id: 'SP-' + Date.now(), name: name, qty: parseInt(qty), location: '', leadTime: '', criticality: 'Medium' });
+        projectData.spareParts = parts;
+        RfsStore.saveDomain(activeProjectId, 'spareParts', parts);
+        this.renderGates();
+        RfsUtils.logAction('Add spare part', name);
+    },
+
+    renderVendorDirectory: function() {
+        var vendors = projectData.vendors || [];
+        var h = '<div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-address-book" style="color:var(--rfs-blue);margin-right:6px;"></i>Vendor Directory</div>';
+        h += '<div style="margin-bottom:8px;"><button class="rfs-btn rfs-btn-sm" onclick="RfsUI.addVendor()"><i class="fas fa-plus"></i> Add Vendor</button></div>';
+        if (vendors.length === 0) {
+            h += '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-text3);">No vendors registered.</div>';
+        } else {
+            h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;">';
+            vendors.forEach(function(v) {
+                h += '<div class="rfs-vendor-card"><div class="v-name">' + v.name + '</div>';
+                h += '<div class="v-meta"><i class="fas fa-envelope"></i> ' + (v.email || '—') + '</div>';
+                h += '<div class="v-meta"><i class="fas fa-phone"></i> ' + (v.phone || '—') + '</div>';
+                h += '<div class="v-meta"><i class="fas fa-handshake"></i> SLA: ' + (v.sla || '—') + '</div>';
+                h += '<div class="v-meta"><i class="fas fa-shield-alt"></i> Warranty: ' + (v.warranty || '—') + '</div>';
+                h += '</div>';
+            });
+            h += '</div>';
+        }
+        return h;
+    },
+
+    addVendor: function() {
+        var name = prompt('Vendor name:');
+        if (!name) return;
+        var vendors = projectData.vendors || [];
+        vendors.push({ id: 'V-' + Date.now(), name: name, email: '', phone: '', sla: '', warranty: '', discipline: '' });
+        projectData.vendors = vendors;
+        RfsStore.saveDomain(activeProjectId, 'vendors', vendors);
+        this.showToast('Vendor added.', 'success');
+        RfsUtils.logAction('Add vendor', name);
+    },
+
+    renderWeatherLog: function() {
+        var log = projectData.weatherLog || [];
+        var h = '<div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-cloud-sun" style="color:var(--rfs-cyan);margin-right:6px;"></i>Weather/Ambient Conditions Log</div>';
+        h += '<div style="margin-bottom:8px;"><button class="rfs-btn rfs-btn-sm" onclick="RfsUI.addWeatherEntry()"><i class="fas fa-plus"></i> Log Entry</button></div>';
+        if (log.length === 0) {
+            h += '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-text3);">No weather entries.</div>';
+        } else {
+            h += '<div class="rfs-table-wrap"><table class="rfs-table"><thead><tr><th>Date</th><th>Temp (°C)</th><th>Humidity (%)</th><th>Conditions</th><th>Notes</th></tr></thead><tbody>';
+            log.slice().reverse().slice(0, 20).forEach(function(e) {
+                h += '<tr><td>' + (e.date || '').slice(0, 10) + '</td><td>' + (e.temp || '') + '</td><td>' + (e.humidity || '') + '</td><td>' + (e.conditions || '') + '</td><td>' + (e.notes || '') + '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+        return h;
+    },
+
+    addWeatherEntry: function() {
+        var temp = prompt('Temperature (°C):');
+        if (temp === null) return;
+        var humidity = prompt('Humidity (%):') || '';
+        var conditions = prompt('Conditions (sunny/cloudy/rain/etc):') || '';
+        var log = projectData.weatherLog || [];
+        log.push({ id: 'WX-' + Date.now(), date: new Date().toISOString(), temp: temp, humidity: humidity, conditions: conditions, notes: '' });
+        projectData.weatherLog = log;
+        RfsStore.saveDomain(activeProjectId, 'weatherLog', log);
+        this.showToast('Weather entry logged.', 'success');
+        RfsUtils.logAction('Weather log', temp + '°C, ' + humidity + '%');
+    },
+
+    renderSafetyIncidents: function() {
+        var incidents = projectData.safetyIncidents || [];
+        var h = '<div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-hard-hat" style="color:var(--rfs-red);margin-right:6px;"></i>Safety Incident Register</div>';
+        h += '<div style="margin-bottom:8px;"><button class="rfs-btn rfs-btn-sm" onclick="RfsUI.addSafetyIncident()"><i class="fas fa-plus"></i> Log Incident</button></div>';
+        if (incidents.length === 0) {
+            h += '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-emerald);">No safety incidents — keep it up!</div>';
+        } else {
+            h += '<div class="rfs-table-wrap"><table class="rfs-table"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Severity</th><th>Status</th></tr></thead><tbody>';
+            incidents.forEach(function(inc) {
+                var sevColor = inc.type === 'incident' ? 'var(--rfs-red)' : 'var(--rfs-amber)';
+                h += '<tr><td>' + (inc.date || '').slice(0, 10) + '</td><td style="color:' + sevColor + ';font-weight:600;">' + (inc.type || 'near-miss') + '</td>';
+                h += '<td>' + (inc.description || '') + '</td><td>' + (inc.severity || '') + '</td>';
+                h += '<td>' + (inc.status || 'open') + '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+        return h;
+    },
+
+    addSafetyIncident: function() {
+        var type = prompt('Type (near-miss / incident / observation):') || 'near-miss';
+        var desc = prompt('Description:');
+        if (!desc) return;
+        var incidents = projectData.safetyIncidents || [];
+        incidents.push({ id: 'SI-' + Date.now(), date: new Date().toISOString(), type: type, description: desc, severity: type === 'incident' ? 'high' : 'low', status: 'open' });
+        projectData.safetyIncidents = incidents;
+        RfsStore.saveDomain(activeProjectId, 'safetyIncidents', incidents);
+        this.showToast('Safety incident logged.', 'info');
+        RfsUtils.logAction('Safety incident', type + ' — ' + desc.slice(0, 30));
+    },
+
+    renderRegulatoryTracker: function() {
+        var regs = projectData.regulatory || [];
+        var h = '<div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-gavel" style="color:var(--rfs-purple);margin-right:6px;"></i>Regulatory Submissions & Permits</div>';
+        h += '<div style="margin-bottom:8px;"><button class="rfs-btn rfs-btn-sm" onclick="RfsUI.addRegulatory()"><i class="fas fa-plus"></i> Add Submission</button></div>';
+        if (regs.length === 0) {
+            h += '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-text3);">No regulatory submissions tracked.</div>';
+        } else {
+            h += '<div class="rfs-table-wrap"><table class="rfs-table"><thead><tr><th>Permit/Submission</th><th>Authority</th><th>Submitted</th><th>Status</th><th>Expiry</th></tr></thead><tbody>';
+            regs.forEach(function(r) {
+                var stColor = r.status === 'approved' ? 'var(--rfs-emerald)' : r.status === 'pending' ? 'var(--rfs-amber)' : 'var(--rfs-text3)';
+                h += '<tr><td>' + r.name + '</td><td>' + (r.authority || '—') + '</td><td>' + (r.submittedDate || '—').slice(0, 10) + '</td>';
+                h += '<td style="color:' + stColor + ';font-weight:600;">' + (r.status || 'draft') + '</td>';
+                h += '<td>' + (r.expiryDate || '—').slice(0, 10) + '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+        return h;
+    },
+
+    addRegulatory: function() {
+        var name = prompt('Permit/Submission name:');
+        if (!name) return;
+        var regs = projectData.regulatory || [];
+        regs.push({ id: 'REG-' + Date.now(), name: name, authority: '', submittedDate: '', status: 'draft', expiryDate: '' });
+        projectData.regulatory = regs;
+        RfsStore.saveDomain(activeProjectId, 'regulatory', regs);
+        this.showToast('Regulatory submission added.', 'success');
+        RfsUtils.logAction('Add regulatory', name);
+    },
+
+    renderPhotoLog: function() {
+        var photos = projectData.photoLog || [];
+        var h = '<div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;"><i class="fas fa-camera" style="color:var(--rfs-emerald);margin-right:6px;"></i>Photo Log / Evidence Gallery</div>';
+        h += '<div style="margin-bottom:8px;"><button class="rfs-btn rfs-btn-sm" onclick="RfsUI.addPhotoEntry()"><i class="fas fa-plus"></i> Add Entry</button></div>';
+        if (photos.length === 0) {
+            h += '<div style="text-align:center;padding:20px;font-size:0.75rem;color:var(--rfs-text3);">No photo entries.</div>';
+        } else {
+            h += '<div class="rfs-table-wrap"><table class="rfs-table"><thead><tr><th>Date</th><th>File Reference</th><th>Location</th><th>Description</th><th>Gate</th></tr></thead><tbody>';
+            photos.slice().reverse().slice(0, 30).forEach(function(p) {
+                h += '<tr><td>' + (p.date || '').slice(0, 10) + '</td><td style="font-family:var(--rfs-mono);font-size:0.72rem;">' + (p.fileRef || '—') + '</td>';
+                h += '<td>' + (p.location || '—') + '</td><td>' + (p.description || '') + '</td><td>' + (p.gate || '—') + '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+        return h;
+    },
+
+    addPhotoEntry: function() {
+        var fileRef = prompt('File reference (filename or URL):');
+        if (!fileRef) return;
+        var desc = prompt('Description:') || '';
+        var photos = projectData.photoLog || [];
+        photos.push({ id: 'PH-' + Date.now(), date: new Date().toISOString(), fileRef: fileRef, location: '', description: desc, gate: '' });
+        projectData.photoLog = photos;
+        RfsStore.saveDomain(activeProjectId, 'photoLog', photos);
+        this.showToast('Photo entry added.', 'success');
+        RfsUtils.logAction('Photo log', fileRef);
     },
 
     showToast: function(msg, type) {
