@@ -760,6 +760,50 @@
             --card-border: rgba(245, 158, 11, 0.4);
             --card-accent: var(--accent-gold);
         }
+        .card-cx {
+            --card-gradient: linear-gradient(90deg, #0e7490, #22d3ee);
+            --card-glow: rgba(14, 116, 144, 0.2);
+            --card-icon-bg: rgba(14, 116, 144, 0.15);
+            --card-accent: #0e7490;
+        }
+        .card-rfs {
+            --card-gradient: linear-gradient(90deg, #14b8a6, #f59e0b);
+            --card-glow: rgba(20, 184, 166, 0.2);
+            --card-border: rgba(20, 184, 166, 0.4);
+            --card-accent: #14b8a6;
+        }
+        .card-capex {
+            --card-gradient: linear-gradient(90deg, #f59e0b, #fbbf24);
+            --card-glow: rgba(245, 158, 11, 0.2);
+            --card-border: rgba(245, 158, 11, 0.4);
+            --card-accent: var(--accent-gold);
+        }
+        .card-opex {
+            --card-gradient: linear-gradient(90deg, #10b981, #34d399);
+            --card-glow: rgba(16, 185, 129, 0.2);
+            --card-border: rgba(16, 185, 129, 0.4);
+            --card-accent: var(--accent-emerald);
+        }
+        .card-moc {
+            --card-gradient: linear-gradient(90deg, #06b6d4, #22d3ee);
+            --card-glow: rgba(6, 182, 212, 0.2);
+            --card-border: rgba(6, 182, 212, 0.4);
+            --card-accent: var(--accent-cyan);
+        }
+        .card-pro-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
         .card-icon {
             width: 60px;
@@ -865,23 +909,7 @@
             font-size: 1rem;
         }
 
-        /* Cost Card Hover Glow */
-        .cost-card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), 0 8px 32px rgba(0,0,0,0.3);
-        }
-        a.cost-card-hover[href*="capex"]:hover {
-            border-color: rgba(245, 158, 11, 0.7) !important;
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.2), 0 8px 32px rgba(0,0,0,0.3);
-        }
-        a.cost-card-hover[href*="opex"]:hover {
-            border-color: rgba(16, 185, 129, 0.7) !important;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2), 0 8px 32px rgba(0,0,0,0.3);
-        }
-        a.cost-card-hover[href*="dcmoc"]:hover {
-            border-color: rgba(6, 182, 212, 0.7) !important;
-            box-shadow: 0 0 40px rgba(6, 182, 212, 0.25), 0 8px 32px rgba(0,0,0,0.3);
-        }
+        /* Legacy cost-card-hover removed — now using solution-card pattern */
 
         /* Cost Simulator Section */
         .simulator-section {
@@ -2044,8 +2072,14 @@
                         <a href="tia-942-checklist.html" class="dropdown-item" style="color: #10b981;">
                             <i class="fas fa-certificate"></i> TIA-942 Checklist
                         </a>
+                        <a href="cx-calculator.html" class="dropdown-item" style="color: #0e7490;">
+                            <i class="fas fa-clipboard-check"></i> Cx Calculator
+                        </a>
                         <a href="dcmoc/" class="dropdown-item" style="color: #22d3ee; border-top: 1px solid rgba(6,182,212,0.2); margin-top: 4px; padding-top: 10px;">
                             <i class="fas fa-chart-line"></i> DC MOC <span style="font-size:0.65rem;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);padding:1px 5px;border-radius:4px;margin-left:4px;">PRO</span>
+                        </a>
+                        <a href="rfs-readiness-workbench.html" class="dropdown-item" style="color: #14b8a6;">
+                            <i class="fas fa-tasks"></i> RFS Workbench <span style="font-size:0.65rem;background:rgba(20,184,166,0.15);border:1px solid rgba(20,184,166,0.3);padding:1px 5px;border-radius:4px;margin-left:4px;">PRO</span>
                         </a>
                     </div>
                 </div>
@@ -2107,15 +2141,17 @@
             </div>
         </section>
 
-        <!-- Solutions Grid -->
-        <section id="solutions" class="solutions-section">
+        <!-- Category 1: Infrastructure Platforms -->
+        <section id="platforms" class="solutions-section">
             <div class="section-header">
-                <h2>Solutions & Services</h2>
-                <p>End-to-end data center engineering from design to operations</p>
+                <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:0.5rem;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(74,144,184,0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-server" style="color:#4a90b8;font-size:1rem;"></i></div>
+                    <h2 style="margin:0;">Infrastructure Platforms</h2>
+                </div>
+                <p>Interactive telemetry dashboards for conventional and AI-powered data centers</p>
             </div>
 
             <div class="solutions-grid">
-                <!-- AI Datahall - First -->
                 <a href="datahallAI.html" class="solution-card card-ai fade-in delay-1">
                     <div class="card-icon" style="background: rgba(139, 92, 246, 0.15);">
                         <i class="fas fa-robot"></i>
@@ -2133,7 +2169,6 @@
                     </span>
                 </a>
 
-                <!-- Conventional DC - Second -->
                 <a href="dc-conventional.html" class="solution-card card-conventional fade-in delay-2">
                     <div class="card-icon" style="background: rgba(74, 144, 184, 0.15);">
                         <i class="fas fa-server"></i>
@@ -2150,31 +2185,41 @@
                         View Systems <i class="fas fa-arrow-right"></i>
                     </span>
                 </a>
+            </div>
+        </section>
 
-                <!-- CAPEX Calculator -->
-                <a href="capex-calculator.html" class="solution-card card-cost fade-in delay-3">
+        <!-- Category 2: Planning & Cost Tools -->
+        <section id="tools-cost" class="solutions-section">
+            <div class="section-header">
+                <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:0.5rem;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-calculator" style="color:#f59e0b;font-size:1rem;"></i></div>
+                    <h2 style="margin:0;">Planning & Cost Tools</h2>
+                </div>
+                <p>Professional-grade calculators for capital expenditure, operations, commissioning, and project readiness</p>
+            </div>
+
+            <div class="solutions-grid">
+                <a href="capex-calculator.html" class="solution-card card-capex fade-in delay-1">
                     <div class="card-icon" style="background: rgba(245, 158, 11, 0.15);">
-                        <i class="fas fa-calculator"></i>
+                        <i class="fas fa-building"></i>
                     </div>
                     <h3 class="card-title">CAPEX Calculator</h3>
                     <p class="card-desc">Interactive capital expenditure calculator for data center construction with comprehensive breakdown of all infrastructure components.</p>
                     <ul class="card-features">
-                        <li><i class="fas fa-check"></i> Building & Civil Works</li>
-                        <li><i class="fas fa-check"></i> Electrical & Mechanical</li>
-                        <li><i class="fas fa-check"></i> Fire Alarm & Suppression</li>
+                        <li><i class="fas fa-check"></i> 14-Component Cost Breakdown</li>
+                        <li><i class="fas fa-check"></i> Scenario Comparison (A vs B)</li>
                         <li><i class="fas fa-check"></i> Tier Classification & PUE</li>
+                        <li><i class="fas fa-check"></i> PDF Export & Cost Narrative</li>
                     </ul>
                     <span class="card-action">
-                        Calculate Now <i class="fas fa-arrow-right"></i>
+                        Calculate CAPEX <i class="fas fa-arrow-right"></i>
                     </span>
                 </a>
 
-                <!-- OPEX Calculator - NEW -->
-                <a href="opex-calculator.html" class="solution-card fade-in delay-4" style="border: 2px solid rgba(16, 185, 129, 0.3);">
+                <a href="opex-calculator.html" class="solution-card card-opex fade-in delay-2">
                     <div class="card-icon" style="background: rgba(16, 185, 129, 0.15);">
-                        <i class="fas fa-chart-line"></i>
+                        <i class="fas fa-coins"></i>
                     </div>
-                    <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.65rem; font-weight: 700;">NEW</div>
                     <h3 class="card-title">OPEX Calculator</h3>
                     <p class="card-desc">Comprehensive operational cost analysis with 30+ countries, climate zones, cooling types, and flexible staffing models.</p>
                     <ul class="card-features">
@@ -2188,86 +2233,69 @@
                     </span>
                 </a>
 
-                <!-- Technical Papers -->
-                <a href="#papers" class="solution-card card-papers fade-in delay-5">
-                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.15);">
-                        <i class="fas fa-file-alt"></i>
+                <a href="dcmoc/" class="solution-card card-moc fade-in delay-3">
+                    <div class="card-icon" style="background: rgba(6, 182, 212, 0.15);">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3 class="card-title">Technical Papers</h3>
-                    <p class="card-desc">Research documents, technical specifications, and industry standards for data center design and operations.</p>
+                    <span class="card-pro-badge"><i class="fas fa-crown" style="margin-right:4px;font-size:0.55rem;"></i> PRO</span>
+                    <h3 class="card-title">DC MOC</h3>
+                    <p class="card-desc">All-in-one Maintenance & Operations Calculator — combines CAPEX + OPEX with staffing models, shift optimization, Monte Carlo, and executive reporting.</p>
                     <ul class="card-features">
-                        <li><i class="fas fa-check"></i> White Papers & Case Studies</li>
-                        <li><i class="fas fa-check"></i> TIA-942 & Uptime Standards</li>
-                        <li><i class="fas fa-check"></i> PUIL & SNI Compliance</li>
-                        <li><i class="fas fa-check"></i> K3 Listrik Documentation</li>
+                        <li><i class="fas fa-check"></i> Integrated CAPEX + OPEX Engine</li>
+                        <li><i class="fas fa-check"></i> Monte Carlo Risk Simulation</li>
+                        <li><i class="fas fa-check"></i> Shift & Staffing Optimization</li>
+                        <li><i class="fas fa-check"></i> Financial Projections & PDF</li>
                     </ul>
-                    <span class="card-action">
-                        View Documents <i class="fas fa-arrow-right"></i>
+                    <span class="card-action" style="color: #06b6d4;">
+                        Launch DC MOC <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <a href="cx-calculator.html" class="solution-card card-cx fade-in delay-4">
+                    <div class="card-icon" style="background: rgba(14, 116, 144, 0.15);">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <span class="card-pro-badge"><i class="fas fa-crown" style="margin-right:4px;font-size:0.55rem;"></i> PRO</span>
+                    <h3 class="card-title">Cx Calculator</h3>
+                    <p class="card-desc">Full-lifecycle L0-L6 commissioning cost and schedule estimator. Covers enterprise, colo, hyperscale, and AI factory archetypes with interactive Gantt and Monte Carlo analysis.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> L0-L6 Full Lifecycle (7 Phases)</li>
+                        <li><i class="fas fa-check"></i> Interactive 5-Level Gantt Chart</li>
+                        <li><i class="fas fa-check"></i> Monte Carlo & Sensitivity Analysis</li>
+                        <li><i class="fas fa-check"></i> 8 Archetype Presets incl. AI Factory</li>
+                    </ul>
+                    <span class="card-action" style="color: #0e7490;">
+                        Estimate Cx Cost <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <a href="rfs-readiness-workbench.html" class="solution-card card-rfs fade-in delay-5">
+                    <div class="card-icon" style="background: rgba(20, 184, 166, 0.15);">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <span class="card-pro-badge"><i class="fas fa-crown" style="margin-right:4px;font-size:0.55rem;"></i> PRO</span>
+                    <h3 class="card-title">RFS Readiness Workbench</h3>
+                    <p class="card-desc">Gate-driven commissioning readiness tracker for DC Ready-for-Service planning. Manage delivery units, track defects, and forecast RFS confidence.</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> G0-G7 Gate Board with Blocker Logic</li>
+                        <li><i class="fas fa-check"></i> Defect & Evidence Tracking</li>
+                        <li><i class="fas fa-check"></i> Customer Overlay Management</li>
+                        <li><i class="fas fa-check"></i> Drag-Based Forecast Engine</li>
+                    </ul>
+                    <span class="card-action" style="color: #14b8a6;">
+                        Open Workbench <i class="fas fa-arrow-right"></i>
                     </span>
                 </a>
             </div>
         </section>
 
-        <!-- Cost Simulator (linked to dedicated page) -->
-        <section id="simulator" class="simulator-section">
-            <div class="section-header">
-                <h2>Data Center Cost Tools</h2>
-                <p>Professional-grade calculators for capital and operational expenditure analysis</p>
-            </div>
-
-            <div style="max-width:900px;margin:0 auto;">
-                <!-- CAPEX + OPEX Row -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-                    <a href="capex-calculator.html" class="cost-card-hover" style="text-decoration:none;background:linear-gradient(135deg,#1e3a5f,#2d5a87);border:2px solid rgba(245,158,11,0.3);border-radius:16px;padding:2.5rem;text-align:center;transition:all 0.4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;align-items:center;gap:1rem;">
-                        <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;"><i class="fas fa-building" style="color:white;font-size:1.5rem;"></i></div>
-                        <h3 style="color:#f59e0b;font-size:1.15rem;font-weight:700;">CAPEX Calculator</h3>
-                        <p style="color:#94a3b8;font-size:0.85rem;line-height:1.5;">Construction cost estimation with 12+ configurable variables, detailed breakdown, PDF export, and scenario comparison.</p>
-                        <span style="color:#fbbf24;font-size:0.82rem;font-weight:600;margin-top:auto;">Open Calculator <i class="fas fa-arrow-right" style="margin-left:6px;"></i></span>
-                    </a>
-                    <a href="opex-calculator.html" class="cost-card-hover" style="text-decoration:none;background:linear-gradient(135deg,#0f3a2e,#1a5c47);border:2px solid rgba(16,185,129,0.3);border-radius:16px;padding:2.5rem;text-align:center;transition:all 0.4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;align-items:center;gap:1rem;">
-                        <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;"><i class="fas fa-coins" style="color:white;font-size:1.5rem;"></i></div>
-                        <h3 style="color:#10b981;font-size:1.15rem;font-weight:700;">OPEX Calculator</h3>
-                        <p style="color:#94a3b8;font-size:0.85rem;line-height:1.5;">Operational cost analysis with energy modeling, staffing, maintenance, SLA-based pricing, and multi-year forecasting.</p>
-                        <span style="color:#34d399;font-size:0.82rem;font-weight:600;margin-top:auto;">Open Calculator <i class="fas fa-arrow-right" style="margin-left:6px;"></i></span>
-                    </a>
-                </div>
-
-                <!-- Connector -->
-                <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:1rem 0;">
-                    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.4),rgba(6,182,212,0.6));"></div>
-                    <div style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(6,182,212,0.5);display:flex;align-items:center;justify-content:center;background:rgba(6,182,212,0.1);"><i class="fas fa-chevron-down" style="color:#22d3ee;font-size:0.7rem;"></i></div>
-                    <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,0.6),rgba(16,185,129,0.4),transparent);"></div>
-                </div>
-
-                <!-- DC MOC Card -->
-                <a href="dcmoc/" class="cost-card-hover" style="text-decoration:none;display:flex;align-items:center;gap:2rem;background:linear-gradient(135deg,#0c1929,#122040,#0c1929);border:2px solid rgba(6,182,212,0.35);border-radius:20px;padding:2rem 2.5rem;transition:all 0.4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;">
-                    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(245,158,11,0.06),transparent 50%),radial-gradient(ellipse at 80% 50%,rgba(16,185,129,0.06),transparent 50%);pointer-events:none;"></div>
-                    <div style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#0891b2,#22d3ee);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 24px rgba(6,182,212,0.3);position:relative;z-index:1;">
-                        <i class="fas fa-chart-line" style="color:white;font-size:1.6rem;"></i>
-                    </div>
-                    <div style="flex:1;position:relative;z-index:1;">
-                        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.4rem;">
-                            <h3 style="color:#22d3ee;font-size:1.3rem;font-weight:800;margin:0;">DC MOC</h3>
-                            <span style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#67e8f9;padding:0.15rem 0.6rem;border-radius:6px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Pro</span>
-                        </div>
-                        <div style="color:#94a3b8;font-size:0.78rem;margin-bottom:0.6rem;font-weight:500;">Data Center Maintenance & Operations Calculator</div>
-                        <p style="color:#64748b;font-size:0.82rem;line-height:1.5;margin:0;">All-in-one simulation engine — combines CAPEX + OPEX with staffing models, shift optimization, risk analysis, Monte Carlo, financial projections, and executive reporting.</p>
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;flex-shrink:0;position:relative;z-index:1;">
-                        <div style="width:40px;height:40px;border-radius:50%;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);display:flex;align-items:center;justify-content:center;"><i class="fas fa-arrow-right" style="color:#22d3ee;font-size:0.9rem;"></i></div>
-                        <span style="color:#67e8f9;font-size:0.7rem;font-weight:600;">Launch</span>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- REMOVED: Embedded CAPEX calculator (now at capex-calculator.html) -->
-        <!-- Original simulator-container content deleted to avoid duplication -->
-
-        <!-- Technical Papers Section -->
+        <!-- Category 4: Technical Papers -->
         <section id="papers" class="papers-section">
             <div class="section-header">
-                <h2>Technical Papers & Research</h2>
+                <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:0.5rem;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-file-alt" style="color:#f59e0b;font-size:1rem;"></i></div>
+                    <h2 style="margin:0;">Technical Papers & Research</h2>
+                </div>
                 <p>Industry standards, best practices, and technical documentation</p>
             </div>
 
@@ -2387,11 +2415,14 @@
             </div>
         </section>
 
-        <!-- Tools Section -->
-        <section class="tools-section" id="tools">
+        <!-- Category 3: Engineering & Compliance Tools -->
+        <section class="tools-section" id="tools-engineering">
             <div class="section-header">
-                <h2>Engineering Tools</h2>
-                <p>Additional calculators and compliance checkers</p>
+                <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:0.5rem;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-wrench" style="color:#8b5cf6;font-size:1rem;"></i></div>
+                    <h2 style="margin:0;">Engineering & Compliance Tools</h2>
+                </div>
+                <p>Standards assessment, efficiency analysis, and regulatory compliance checkers</p>
             </div>
             <div class="tools-grid">
                 <a href="pue-calculator.html" class="tool-card" style="text-decoration:none;color:inherit;">

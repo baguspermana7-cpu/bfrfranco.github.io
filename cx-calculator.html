@@ -1352,6 +1352,16 @@ var CX_ACTIVITY_MAP = {
   'L1_F_SP2':{t:'visual_inspection',p:{component:'suppression nozzle pattern'}},
   'L1_F_DT':{t:'functional_sequence',p:{system_name:'fire detection panel',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'zone detect, cross-zone, supervisory'}},
   'L1_F_DP':{t:'functional_sequence',p:{system_name:'fire damper actuator',settle_time:'60s',setpoint_tolerance:'5',interlock_list:'fire alarm interlock'}},
+  // L1 — New FAT items (VFD, Office AHU, Fire Pump)
+  'L1_E_VF_SP':{t:'vfd_test',p:{vfd_tag:'sample VFD',stop_time:'5'}},
+  'L1_E_VF_BP':{t:'vfd_test',p:{vfd_tag:'sample VFD',stop_time:'5'}},
+  'L1_E_VF_HR':{t:'vfd_test',p:{vfd_tag:'sample VFD',stop_time:'5'}},
+  'L1_M_OH_AF':{t:'airflow_balance',p:{system_name:'office AHU',design_cfm:'per design',measure_height:'1.0m'}},
+  'L1_M_OH_FN':{t:'visual_inspection',p:{component:'office AHU fan motor performance'}},
+  'L1_F_FP_MN':{t:'fire_pump_test',p:{pump_type:'electric main',start_time:'10',relief_psi:'per design'}},
+  'L1_F_FP_JK':{t:'fire_pump_test',p:{pump_type:'jockey',start_time:'N/A',relief_psi:'N/A'}},
+  'L1_F_FP_CT':{t:'functional_sequence',p:{system_name:'fire pump controller',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'auto-start, phase reversal, pump running'}},
+  'L1_F_FP_PR':{t:'visual_inspection',p:{component:'fire pump pressure relief valve'}},
   // L2 — Installation Verification
   'L2_E_SW_MG1':{t:'ir_test',p:{voltage_class:'LV bus',min_ir:'100MΩ',test_voltage:'1kV'}},
   'L2_E_SW_MG2':{t:'cable_test',p:{min_ir:'5MΩ/kV',max_att:'0.4'}},
@@ -1519,6 +1529,48 @@ var CX_ACTIVITY_MAP = {
   'L3_B_P2P_AI2':{t:'bms_p2p',p:{ai_tolerance:'2'}},
   'L3_B_P2P_AO1':{t:'bms_p2p',p:{ai_tolerance:'3'}},
   'L3_B_P2P_AO2':{t:'bms_p2p',p:{ai_tolerance:'3'}},
+  // L3 — New systems (LVSB/DB, Busway, VFD, Lighting, Office HVAC, Degasser, Water, Sump, Fire Pump, BMS Graphics, Security, VESDA, Ventilation, Smoke, PA)
+  'L3_E_LV_PF':{t:'doc_review',p:{review_days:'1'}},
+  'L3_E_LV_EN':{t:'functional_sequence',p:{system_name:'LVSB/DB sequential energization',settle_time:'5min',setpoint_tolerance:'2',interlock_list:'upstream protection enabled'}},
+  'L3_E_LV_VR':{t:'functional_sequence',p:{system_name:'LVSB feeder voltage verification',settle_time:'2min',setpoint_tolerance:'2',interlock_list:'all phases present'}},
+  'L3_E_BW_EN':{t:'functional_sequence',p:{system_name:'busway sectional energization',settle_time:'5min',setpoint_tolerance:'2',interlock_list:'section isolation, IR clearance'}},
+  'L3_E_BW_TH':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  'L3_E_VF_PR':{t:'vfd_test',p:{vfd_tag:'per schedule',stop_time:'5'}},
+  'L3_E_VF_MT':{t:'vfd_test',p:{vfd_tag:'per schedule',stop_time:'5'}},
+  'L3_E_VF_BP':{t:'vfd_test',p:{vfd_tag:'per schedule',stop_time:'5'}},
+  'L3_E_LT_EN':{t:'functional_sequence',p:{system_name:'lighting circuit energization',settle_time:'1min',setpoint_tolerance:'5',interlock_list:'circuit breaker, contactor'}},
+  'L3_E_LT_DM':{t:'functional_sequence',p:{system_name:'dimming & lighting control',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'occupancy sensor, time schedule'}},
+  'L3_E_LT_EM':{t:'functional_sequence',p:{system_name:'emergency lighting battery test',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'charger status, lamp function'}},
+  'L3_M_OH_ST':{t:'airflow_balance',p:{system_name:'office AHU/FCU',design_cfm:'per design',measure_height:'1.0m'}},
+  'L3_M_OH_VL':{t:'functional_sequence',p:{system_name:'HVAC valve/damper modulation',settle_time:'60s',setpoint_tolerance:'3',interlock_list:'BMS control, fire interlock'}},
+  'L3_M_DG_ST':{t:'functional_sequence',p:{system_name:'degasser first start',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'flow, pressure, level'}},
+  'L3_M_DG_PR':{t:'functional_sequence',p:{system_name:'degasser performance',settle_time:'15min',setpoint_tolerance:'5',interlock_list:'dissolved gas reading'}},
+  'L3_M_WT_DS':{t:'water_quality_test',p:{system_type:'closed loop CHW',ph_min:'7.0',ph_max:'9.0',conductivity_max:'3000',glycol_pct:'N/A'}},
+  'L3_M_WT_QA':{t:'water_quality_test',p:{system_type:'closed loop CHW',ph_min:'7.0',ph_max:'9.0',conductivity_max:'3000',glycol_pct:'N/A'}},
+  'L3_M_MU_FL':{t:'functional_sequence',p:{system_name:'makeup water fill',settle_time:'15min',setpoint_tolerance:'5',interlock_list:'level switch, fill valve'}},
+  'L3_M_MU_LC':{t:'functional_sequence',p:{system_name:'makeup water level control',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'high level, low level, valve'}},
+  'L3_M_SP_FT':{t:'functional_sequence',p:{system_name:'sump pump float switch',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'high level, pump run, alarm'}},
+  'L3_M_SP_CP':{t:'functional_sequence',p:{system_name:'sump pump capacity',settle_time:'5min',setpoint_tolerance:'10',interlock_list:'flow rate, runtime'}},
+  'L3_M_CA_ST':{t:'functional_sequence',p:{system_name:'compressor first start',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'pressure switch, motor overload'}},
+  'L3_M_CA_QA':{t:'functional_sequence',p:{system_name:'compressed air quality',settle_time:'10min',setpoint_tolerance:'5',interlock_list:'dew point, particle count'}},
+  'L3_B_GR_LD':{t:'bms_p2p',p:{ai_tolerance:'N/A'}},
+  'L3_B_GR_NV':{t:'bms_p2p',p:{ai_tolerance:'N/A'}},
+  'L3_B_GR_AL':{t:'bms_p2p',p:{ai_tolerance:'N/A'}},
+  'L3_B_SC_AC':{t:'access_control_test',p:{zone_name:'all zones',response_time:'3',held_time:'30',alarm_time:'10'}},
+  'L3_B_SC_ID':{t:'access_control_test',p:{zone_name:'perimeter',response_time:'3',held_time:'30',alarm_time:'10'}},
+  'L3_B_SC_CC':{t:'visual_inspection',p:{component:'CCTV image quality and field of view verification'}},
+  'L3_B_VD_AS':{t:'vesda_aspiration',p:{zone_name:'data hall',max_transport:'120'}},
+  'L3_B_VD_SN':{t:'vesda_aspiration',p:{zone_name:'data hall',max_transport:'120'}},
+  'L3_B_FP_MN':{t:'fire_pump_test',p:{pump_type:'electric main',start_time:'10',relief_psi:'per design'}},
+  'L3_B_FP_JK':{t:'fire_pump_test',p:{pump_type:'jockey',start_time:'N/A',relief_psi:'N/A'}},
+  'L3_B_FP_CT':{t:'functional_sequence',p:{system_name:'fire pump controller',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'auto-start, phase reversal, pump running'}},
+  'L3_B_EV_ST':{t:'functional_sequence',p:{system_name:'battery room ventilation',settle_time:'5min',setpoint_tolerance:'10',interlock_list:'H₂ sensor, exhaust fan, damper'}},
+  'L3_B_GV_ST':{t:'functional_sequence',p:{system_name:'generator room ventilation fan',settle_time:'5min',setpoint_tolerance:'10',interlock_list:'gen start signal, fan run'}},
+  'L3_B_GV_DM':{t:'functional_sequence',p:{system_name:'generator room damper interlock',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'damper open before gen start'}},
+  'L3_B_SM_DM':{t:'smoke_damper_test',p:{system_name:'smoke control zone',close_time:'75',min_dp:'12.5',max_dp:'87'}},
+  'L3_B_SM_FN':{t:'smoke_damper_test',p:{system_name:'smoke exhaust fan',close_time:'75',min_dp:'12.5',max_dp:'87'}},
+  'L3_B_PA_SP':{t:'functional_sequence',p:{system_name:'PA speaker coverage',settle_time:'5s',setpoint_tolerance:'5',interlock_list:'amplifier, zone select'}},
+  'L3_B_PA_IC':{t:'functional_sequence',p:{system_name:'intercom 2-way',settle_time:'5s',setpoint_tolerance:'5',interlock_list:'handset, call button'}},
   // L4 — Performance Testing
   'L4_E_PA_LB1':{t:'generator_load_bank',p:{start_time:'10',step1_pct:'25',step1_min:'30',step2_pct:'50',step2_min:'30',step3_pct:'75',step3_min:'30',step4_pct:'100',step4_min:'60',ats_time:'10',exhaust_max:'550',coolant_max:'95',cooldown_min:'15'}},
   'L4_E_PA_LB2':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
@@ -1546,6 +1598,37 @@ var CX_ACTIVITY_MAP = {
   'L4_C_DC_CP':{t:'functional_sequence',p:{system_name:'DCIM capacity views',settle_time:'1min',setpoint_tolerance:'5',interlock_list:'threshold alarms'}},
   'L4_C_EP_1':{t:'ist_scenario',p:{load_condition:'100% design',scenario_description:'EPO activation — full power shutdown',acceptance_specific:'All power removed within 2 seconds of EPO activation. Recovery procedure executable within 60 minutes.',stabilize_min:'30'}},
   'L4_C_EP_2':{t:'ist_scenario',p:{load_condition:'100% design',scenario_description:'Fire suppression HVAC interlock',acceptance_specific:'HVAC shutdown within 5 seconds of fire alarm. Dampers close. No power interruption to IT.',stabilize_min:'15'}},
+  // L4 — New systems (Selective Coordination, Office HVAC, Water Quality, Degasser, Fire Pump, BMS Graphics, Security, Lux, Ventilation, Containment, VESDA, Pressurization, Sump, Compressed Air)
+  'L4_E_SC_LV':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  'L4_E_SC_MC':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  'L4_E_SC_BW':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  'L4_M_OH_AF':{t:'airflow_balance',p:{system_name:'office HVAC',design_cfm:'per design',measure_height:'1.0m'}},
+  'L4_M_OH_TP':{t:'functional_sequence',p:{system_name:'HVAC temperature setpoint response',settle_time:'15min',setpoint_tolerance:'1',interlock_list:'supply temp, return temp, valve position'}},
+  'L4_M_WT_QA':{t:'water_quality_test',p:{system_type:'closed loop CHW',ph_min:'7.0',ph_max:'9.0',conductivity_max:'3000',glycol_pct:'N/A'}},
+  'L4_M_WT_DS':{t:'water_quality_test',p:{system_type:'dosing system',ph_min:'7.0',ph_max:'9.0',conductivity_max:'3000',glycol_pct:'N/A'}},
+  'L4_M_DG_AR':{t:'functional_sequence',p:{system_name:'degasser dissolved gas measurement',settle_time:'15min',setpoint_tolerance:'5',interlock_list:'gas level below threshold'}},
+  'L4_M_FP_FL':{t:'fire_pump_test',p:{pump_type:'electric main',start_time:'10',relief_psi:'per design'}},
+  'L4_M_FP_PR':{t:'fire_pump_test',p:{pump_type:'electric main (churn)',start_time:'N/A',relief_psi:'per design'}},
+  'L4_C_BG_NV':{t:'bms_p2p',p:{ai_tolerance:'N/A'}},
+  'L4_C_BG_AL':{t:'bms_p2p',p:{ai_tolerance:'N/A'}},
+  'L4_C_BG_RP':{t:'bms_p2p',p:{ai_tolerance:'N/A'}},
+  'L4_C_SC_AC':{t:'access_control_test',p:{zone_name:'all zones',response_time:'3',held_time:'30',alarm_time:'10'}},
+  'L4_C_SC_ID':{t:'access_control_test',p:{zone_name:'perimeter',response_time:'3',held_time:'30',alarm_time:'10'}},
+  'L4_C_SC_CC':{t:'visual_inspection',p:{component:'CCTV recording, coverage, and retention verification'}},
+  'L4_C_LX_DH':{t:'lux_survey',p:{zone_type:'data hall',target_lux:'200',measure_height:'1.0m',uniformity_ratio:'0.6'}},
+  'L4_C_LX_OF':{t:'lux_survey',p:{zone_type:'office',target_lux:'500',measure_height:'0.8m',uniformity_ratio:'0.6'}},
+  'L4_C_LX_EM':{t:'lux_survey',p:{zone_type:'emergency',target_lux:'1',measure_height:'floor',uniformity_ratio:'0.01'}},
+  'L4_C_EV_BR':{t:'airflow_balance',p:{system_name:'battery room ventilation',design_cfm:'per ASHRAE 62.1',measure_height:'breathing zone'}},
+  'L4_C_EV_GR':{t:'airflow_balance',p:{system_name:'generator room ventilation',design_cfm:'per combustion + cooling air calc',measure_height:'intake/exhaust'}},
+  'L4_C_CN_LK':{t:'containment_leak_test',p:{containment_zone:'data hall',cold_target:'22',hot_target:'35'}},
+  'L4_C_CN_DT':{t:'containment_leak_test',p:{containment_zone:'data hall',cold_target:'22',hot_target:'35'}},
+  'L4_C_VD_SN':{t:'vesda_aspiration',p:{zone_name:'data hall',max_transport:'120'}},
+  'L4_C_VD_TT':{t:'vesda_aspiration',p:{zone_name:'data hall',max_transport:'120'}},
+  'L4_C_SM_DP':{t:'smoke_damper_test',p:{system_name:'stairwell',close_time:'75',min_dp:'12.5',max_dp:'87'}},
+  'L4_C_SM_FN':{t:'smoke_damper_test',p:{system_name:'smoke exhaust',close_time:'75',min_dp:'12.5',max_dp:'87'}},
+  'L4_C_SP_FL':{t:'functional_sequence',p:{system_name:'sump pump capacity at design head',settle_time:'5min',setpoint_tolerance:'10',interlock_list:'flow rate verification'}},
+  'L4_C_CA_PR':{t:'functional_sequence',p:{system_name:'compressed air pressure regulation',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'regulator accuracy'}},
+  'L4_C_CA_QA':{t:'functional_sequence',p:{system_name:'compressed air dew point & particle',settle_time:'10min',setpoint_tolerance:'5',interlock_list:'quality specification'}},
   // L5 — IST Scenarios
   'L5_E_BK_UT1':{t:'ist_scenario',p:{load_condition:'100% design',scenario_description:'Black start — open main utility breaker',acceptance_specific:'UPS holds load with no interruption. Generators auto-start within 10s. Stable operation 30min minimum.',stabilize_min:'30'}},
   'L5_E_BK_UT2':{t:'ist_scenario',p:{load_condition:'100% design',scenario_description:'UPS battery hold during utility loss',acceptance_specific:'UPS output voltage maintained within ±1%. No waveform distortion. Battery autonomy ≥ rated.',stabilize_min:'5'}},
@@ -1569,6 +1652,20 @@ var CX_ACTIVITY_MAP = {
   'L5_O_EX_D111':{t:'ist_scenario',p:{load_condition:'100% sustained',scenario_description:'72-hr test Day 1 — voltage/current monitoring',acceptance_specific:'Voltage within ±2% of nominal. Current balance ≤5%. No bus overheating.',stabilize_min:'1440'}},
   'L5_O_EX_D112':{t:'ist_scenario',p:{load_condition:'100% sustained',scenario_description:'72-hr test Day 1 — temperature monitoring all zones',acceptance_specific:'All zones within design temperature. No trending upward.',stabilize_min:'1440'}},
   'L5_O_EX_D113':{t:'ist_scenario',p:{load_condition:'100% sustained',scenario_description:'72-hr test Day 1 — fuel consumption rate',acceptance_specific:'Fuel consumption within OEM rated ±10%. Tank level reconciliation matches meters.',stabilize_min:'1440'}},
+  // L5 — New IST items (Fire Pump, VESDA, Cross-System, Ventilation)
+  'L5_F_FP_1':{t:'ist_scenario',p:{load_condition:'standby',scenario_description:'Fire pump auto-start on pressure drop',acceptance_specific:'Main pump auto-starts within 10 seconds of pressure drop. Jockey pump stops. System pressure restored.',stabilize_min:'5'}},
+  'L5_F_FP_2':{t:'ist_scenario',p:{load_condition:'standby',scenario_description:'Main pump auto-start, jockey pump auto-stop',acceptance_specific:'Main pump delivers rated flow. Jockey pump cuts out. No system over-pressure.',stabilize_min:'5'}},
+  'L5_F_VD_1':{t:'ist_scenario',p:{load_condition:'normal operation',scenario_description:'Smoke injection triggers VESDA alarm',acceptance_specific:'VESDA detects smoke within transport time. Alert/Fire1/Fire2 thresholds trigger sequentially.',stabilize_min:'5'}},
+  'L5_F_VD_2':{t:'ist_scenario',p:{load_condition:'normal operation',scenario_description:'VESDA alarm triggers BMS HVAC shutdown',acceptance_specific:'BMS receives VESDA Fire1 signal. HVAC shutdown in affected zone within 5s. Dampers close.',stabilize_min:'10'}},
+  'L5_O_IX_FB':{t:'ist_scenario',p:{load_condition:'normal operation',scenario_description:'Fire alarm triggers BMS HVAC shutdown in fire zone',acceptance_specific:'HVAC shutdown within 5s of fire alarm. Smoke dampers close. Adjacent zones pressurize.',stabilize_min:'10'}},
+  'L5_O_IX_SB':{t:'ist_scenario',p:{load_condition:'normal operation',scenario_description:'Security breach triggers BMS alarm and CCTV recording',acceptance_specific:'BMS receives security alarm within 5s. CCTV records at associated camera. Event logged.',stabilize_min:'5'}},
+  'L5_O_IX_EP':{t:'ist_scenario',p:{load_condition:'100% design',scenario_description:'EPO activation triggers security camera continuous recording',acceptance_specific:'All cameras switch to continuous recording on EPO. Event logged with timestamp.',stabilize_min:'5'}},
+  'L5_O_VN_1':{t:'ist_scenario',p:{load_condition:'normal operation',scenario_description:'Trip battery room exhaust fan — verify backup/alarm',acceptance_specific:'Exhaust fan trip detected. Backup fan starts (if equipped) or H₂ alarm triggers. BMS notified.',stabilize_min:'5'}},
+  'L5_O_VN_2':{t:'ist_scenario',p:{load_condition:'normal operation',scenario_description:'Battery room ventilation backup fan activation',acceptance_specific:'Backup fan operates. Airflow maintained. Alarm cleared when primary restored.',stabilize_min:'5'}},
+  // L0 — New items (Temporary Infrastructure)
+  'L0_S_TI_OF':{t:'doc_review',p:{review_days:'3'}},
+  'L0_S_TI_LB':{t:'doc_review',p:{review_days:'2'}},
+  'L0_S_TI_TL':{t:'doc_review',p:{review_days:'2'}},
   // L6 — Turnover & Closeout
   'L6_D_PL_CR1':{t:'closeout',p:{}},
   'L6_D_PL_CR2':{t:'closeout',p:{}},
@@ -1594,7 +1691,14 @@ var CX_ACTIVITY_MAP = {
   'L6_H_CR_TR2':{t:'closeout',p:{}},
   'L6_H_SO_SG1':{t:'closeout',p:{}},
   'L6_H_SO_SG2':{t:'closeout',p:{}},
-  'L6_H_SO_SG3':{t:'closeout',p:{}}
+  'L6_H_SO_SG3':{t:'closeout',p:{}},
+  // L6 — New training items (Fire/Life Safety, Lighting, Ventilation)
+  'L6_T_TR_FS1':{t:'training',p:{competency_tasks:'fire pump operation, manual start, controller',pass_score:'80'}},
+  'L6_T_TR_FS2':{t:'training',p:{competency_tasks:'security system operation, alarm response, access control',pass_score:'80'}},
+  'L6_T_TR_LT1':{t:'training',p:{competency_tasks:'lighting control system, dimming, scheduling',pass_score:'80'}},
+  'L6_T_TR_LT2':{t:'training',p:{competency_tasks:'emergency lighting test procedure, battery replacement',pass_score:'80'}},
+  'L6_T_TR_VN1':{t:'training',p:{competency_tasks:'battery room ventilation operations, H₂ alarm response',pass_score:'80'}},
+  'L6_T_TR_VN2':{t:'training',p:{competency_tasks:'generator room ventilation, damper interlock verification',pass_score:'80'}}
 };
 
 // Resolve template+params into full procedure object for a given activity ID
@@ -2037,6 +2141,11 @@ function cxBuildGantt(inp,res){
           {id:'L0_S_QA_D',name:'Document control procedures',lvl:4,dur:0.3},
           {id:'L0_S_QA_N',name:'NCR (Non-Conformance) process',lvl:4,dur:0.3},
           {id:'L0_S_QA_I',name:'Inspection & test plan (ITP)',lvl:4,dur:0.3}
+        ]},
+        {id:'L0_S_TI',name:'Temporary Infrastructure Plan',lvl:3,dur:Math.max(1,Math.ceil(d.l0*0.05)),children:[
+          {id:'L0_S_TI_OF',name:'Cx office setup & IT',lvl:4,dur:0.3},
+          {id:'L0_S_TI_LB',name:'Load bank staging plan',lvl:4,dur:0.2},
+          {id:'L0_S_TI_TL',name:'Temp power/lighting plan',lvl:4,dur:0.2}
         ]}
       ]}
     ]},
@@ -2178,8 +2287,14 @@ function cxBuildGantt(inp,res){
           {id:'L1_F_SP2',name:'Nozzle pattern check',lvl:4,dur:0.1}
         ]},
         {id:'L1_F_DT',name:'Detection Panel FAT',lvl:3,dur:0.3},
-        {id:'L1_F_DP',name:'Damper Actuator Test',lvl:3,dur:0.2}
-      ]}
+        {id:'L1_F_DP',name:'Damper Actuator Test',lvl:3,dur:0.2},
+        hasFirePump?{id:'L1_F_FP',name:'Fire Pump FAT (×'+eq.firePumps+')',lvl:3,dur:1,children:[
+          {id:'L1_F_FP_MN',name:'Main pump performance curve',lvl:4,dur:0.3},
+          {id:'L1_F_FP_JK',name:'Jockey pump cycling test',lvl:4,dur:0.2},
+          {id:'L1_F_FP_CT',name:'Controller & ATS test',lvl:4,dur:0.2},
+          {id:'L1_F_FP_PR',name:'Pressure relief valve',lvl:4,dur:0.1}
+        ]}:null
+      ].filter(Boolean)}
     ]},
     // ========== L2 — INSTALLATION VERIFICATION ==========
     {id:'L2',name:'L2 — Installation Verification',dur:d.l2,color:'#10b981',children:[
@@ -2474,6 +2589,25 @@ function cxBuildGantt(inp,res){
         {id:'L3_E_PD',name:'PDU Energization (×'+eq.pdus+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.pdus*0.15)),children:[
           {id:'L3_E_PD_EN',name:'Sequential board energization',lvl:4,dur:0.2},
           {id:'L3_E_PD_MT',name:'Metering accuracy verification',lvl:4,dur:0.1}
+        ]},
+        {id:'L3_E_LV',name:'LVSB/DB Energization (×'+(eq.lvsb+eq.db)+')',lvl:3,dur:Math.max(0.5,Math.ceil((eq.lvsb+eq.db)*0.15)),children:[
+          {id:'L3_E_LV_PF',name:'Pre-flight checklist',lvl:4,dur:0.1},
+          {id:'L3_E_LV_EN',name:'Sequential board energization',lvl:4,dur:0.3},
+          {id:'L3_E_LV_VR',name:'Voltage verification all feeders',lvl:4,dur:0.2}
+        ]},
+        {id:'L3_E_BW',name:'Busway Energization',lvl:3,dur:Math.max(0.5,Math.ceil(eq.busway*0.3)),children:[
+          {id:'L3_E_BW_EN',name:'Sectional energization',lvl:4,dur:0.2},
+          {id:'L3_E_BW_TH',name:'Thermal scan at rated current',lvl:4,dur:0.2}
+        ]},
+        {id:'L3_E_VF',name:'VFD Startup (×'+eq.vfd+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.vfd*0.15)),children:[
+          {id:'L3_E_VF_PR',name:'Parameter programming',lvl:4,dur:0.2},
+          {id:'L3_E_VF_MT',name:'Motor start & speed test',lvl:4,dur:0.2},
+          {id:'L3_E_VF_BP',name:'Bypass transfer test',lvl:4,dur:0.1}
+        ]},
+        {id:'L3_E_LT',name:'Lighting Circuit Energization',lvl:3,dur:Math.max(0.3,Math.ceil(eq.lightZones*0.1)),children:[
+          {id:'L3_E_LT_EN',name:'Circuit-by-circuit energization',lvl:4,dur:0.2},
+          {id:'L3_E_LT_DM',name:'Dimming & control test',lvl:4,dur:0.1},
+          {id:'L3_E_LT_EM',name:'Emergency lighting battery test',lvl:4,dur:0.2}
         ]}
       ]},
       {id:'L3_M',name:'Mechanical Startup',lvl:2,dur:Math.ceil(d.l3*0.35),children:[
@@ -2522,6 +2656,30 @@ function cxBuildGantt(inp,res){
             {id:'L3_M_DL_RD2',name:'Flowrate maintained ≥95%',lvl:5,dur:0.1},
             {id:'L3_M_DL_RD3',name:'Temperature excursion ≤2°C',lvl:5,dur:0.1}
           ]}
+        ]}:null,
+        {id:'L3_M_OH',name:'Office/Control Room HVAC Start',lvl:3,dur:Math.max(0.5,Math.ceil(eq.ahu*0.3)),children:[
+          {id:'L3_M_OH_ST',name:'AHU/FCU first start',lvl:4,dur:0.2},
+          {id:'L3_M_OH_VL',name:'Valve/damper modulation test',lvl:4,dur:0.1}
+        ]},
+        isDLC?{id:'L3_M_DG',name:'Degasser System Startup',lvl:3,dur:0.5,children:[
+          {id:'L3_M_DG_ST',name:'First start & air removal',lvl:4,dur:0.2},
+          {id:'L3_M_DG_PR',name:'Performance verification',lvl:4,dur:0.1}
+        ]}:null,
+        {id:'L3_M_WT',name:'Water Treatment Startup',lvl:3,dur:0.5,children:[
+          {id:'L3_M_WT_DS',name:'Chemical dosing initiation',lvl:4,dur:0.2},
+          {id:'L3_M_WT_QA',name:'Initial water quality test',lvl:4,dur:0.1}
+        ]},
+        {id:'L3_M_MU',name:'Makeup Water Fill',lvl:3,dur:0.5,children:[
+          {id:'L3_M_MU_FL',name:'System fill & pressurization',lvl:4,dur:0.2},
+          {id:'L3_M_MU_LC',name:'Level control verification',lvl:4,dur:0.1}
+        ]},
+        {id:'L3_M_SP',name:'Sump Pump Startup',lvl:3,dur:0.3,children:[
+          {id:'L3_M_SP_FT',name:'Float switch test',lvl:4,dur:0.1},
+          {id:'L3_M_SP_CP',name:'Capacity verification',lvl:4,dur:0.1}
+        ]},
+        hasCompressedAir?{id:'L3_M_CA',name:'Compressor Startup',lvl:3,dur:0.5,children:[
+          {id:'L3_M_CA_ST',name:'First start & pressure build',lvl:4,dur:0.2},
+          {id:'L3_M_CA_QA',name:'Air quality test',lvl:4,dur:0.1}
         ]}:null
       ].filter(Boolean)},
       {id:'L3_B',name:'BMS / Controls Commissioning',lvl:2,dur:Math.ceil(d.l3*0.2),children:[
@@ -2541,8 +2699,42 @@ function cxBuildGantt(inp,res){
           {id:'L3_B_AL_CL',name:'Critical alarm annunciation',lvl:4,dur:0.2},
           {id:'L3_B_AL_ES',name:'Escalation & auto-notification',lvl:4,dur:0.2}
         ]},
-        {id:'L3_B_TR',name:'Trend & Logging Verification',lvl:3,dur:0.5}
-      ]}
+        {id:'L3_B_TR',name:'Trend & Logging Verification',lvl:3,dur:0.5},
+        {id:'L3_B_GR',name:'BMS Graphics / HMI',lvl:3,dur:Math.max(0.5,Math.ceil(CX_BMS[inp.bmsComplexity].pts*0.05/100)),children:[
+          {id:'L3_B_GR_LD',name:'Graphics page loading',lvl:4,dur:0.2},
+          {id:'L3_B_GR_NV',name:'Navigation structure test',lvl:4,dur:0.1},
+          {id:'L3_B_GR_AL',name:'Alarm banner & notification',lvl:4,dur:0.2}
+        ]},
+        {id:'L3_B_SC',name:'Security System Commissioning',lvl:3,dur:Math.max(0.5,Math.ceil(eq.accessDoors*0.02)),children:[
+          {id:'L3_B_SC_AC',name:'Access control enrollment',lvl:4,dur:0.2},
+          {id:'L3_B_SC_ID',name:'Intrusion sensor enrollment',lvl:4,dur:0.2},
+          {id:'L3_B_SC_CC',name:'CCTV image verification',lvl:4,dur:0.1}
+        ]},
+        hasVESDA?{id:'L3_B_VD',name:'VESDA Commissioning',lvl:3,dur:Math.max(0.5,Math.ceil(eq.fireZones*0.2)),children:[
+          {id:'L3_B_VD_AS',name:'Aspiration test per port',lvl:4,dur:0.3},
+          {id:'L3_B_VD_SN',name:'Sensitivity calibration',lvl:4,dur:0.2}
+        ]}:null,
+        hasFirePump?{id:'L3_B_FP',name:'Fire Pump Startup',lvl:3,dur:1,children:[
+          {id:'L3_B_FP_MN',name:'Main pump startup',lvl:4,dur:0.3},
+          {id:'L3_B_FP_JK',name:'Jockey pump auto-cycle test',lvl:4,dur:0.2},
+          {id:'L3_B_FP_CT',name:'Controller commissioning',lvl:4,dur:0.2}
+        ]}:null,
+        {id:'L3_B_EV',name:'Battery Room Ventilation Start',lvl:3,dur:0.3,children:[
+          {id:'L3_B_EV_ST',name:'Fan startup & interlock test',lvl:4,dur:0.1}
+        ]},
+        {id:'L3_B_GV',name:'Generator Room Ventilation Start',lvl:3,dur:0.3,children:[
+          {id:'L3_B_GV_ST',name:'Fan start on gen signal',lvl:4,dur:0.1},
+          {id:'L3_B_GV_DM',name:'Damper interlock verification',lvl:4,dur:0.1}
+        ]},
+        hasSmokeExhaust?{id:'L3_B_SM',name:'Smoke Damper & Exhaust Test',lvl:3,dur:0.5,children:[
+          {id:'L3_B_SM_DM',name:'Damper closure on fire alarm',lvl:4,dur:0.2},
+          {id:'L3_B_SM_FN',name:'Exhaust fan start test',lvl:4,dur:0.1}
+        ]}:null,
+        {id:'L3_B_PA',name:'PA / Intercom Test',lvl:3,dur:0.3,children:[
+          {id:'L3_B_PA_SP',name:'Speaker coverage test',lvl:4,dur:0.1},
+          {id:'L3_B_PA_IC',name:'Intercom 2-way test',lvl:4,dur:0.1}
+        ]}
+      ].filter(Boolean)}
     ]},
     // ========== L4 — PERFORMANCE TESTING ==========
     {id:'L4',name:'L4 — Performance Testing',dur:d.l4,color:'#8b5cf6',children:[
@@ -2573,6 +2765,11 @@ function cxBuildGantt(inp,res){
           ]},
           {id:'L4_E_EP_AL',name:'EPMS alarm thresholds',lvl:4,dur:0.3},
           {id:'L4_E_EP_RP',name:'Report generation (PUE calc)',lvl:4,dur:0.3}
+        ]},
+        {id:'L4_E_SC',name:'Selective Coordination Test',lvl:3,dur:Math.max(1,Math.ceil((eq.lvsb+eq.db)*0.2)),children:[
+          {id:'L4_E_SC_LV',name:'LVSB/DB breaker coordination',lvl:4,dur:0.3},
+          {id:'L4_E_SC_MC',name:'MCC starter coordination',lvl:4,dur:0.2},
+          {id:'L4_E_SC_BW',name:'Busway thermal scan under load',lvl:4,dur:0.2}
         ]}
       ].filter(Boolean)},
       {id:'L4_M',name:'Mechanical Performance',lvl:2,dur:Math.ceil(d.l4*0.4),children:[
@@ -2611,8 +2808,23 @@ function cxBuildGantt(inp,res){
         {id:'L4_M_CT',name:'Cooling System Capacity Test',lvl:3,dur:Math.max(1,Math.ceil(d.l4*0.1)),children:[
           {id:'L4_M_CT_FL',name:'Full cooling at 100% IT load',lvl:4,dur:0.5},
           {id:'L4_M_CT_N1',name:'N+1 cooling (one unit offline)',lvl:4,dur:0.5}
-        ]}
-      ]},
+        ]},
+        {id:'L4_M_OH',name:'Office/Control Room HVAC Balance',lvl:3,dur:Math.max(0.5,Math.ceil(eq.ahu*0.3)),children:[
+          {id:'L4_M_OH_AF',name:'Airflow balance per zone',lvl:4,dur:0.3},
+          {id:'L4_M_OH_TP',name:'Temperature setpoint response',lvl:4,dur:0.2}
+        ]},
+        {id:'L4_M_WT',name:'Water Quality Performance',lvl:3,dur:0.5,children:[
+          {id:'L4_M_WT_QA',name:'Water quality at steady state',lvl:4,dur:0.2},
+          {id:'L4_M_WT_DS',name:'Dosing system accuracy',lvl:4,dur:0.1}
+        ]},
+        isDLC?{id:'L4_M_DG',name:'Degasser Performance',lvl:3,dur:0.3,children:[
+          {id:'L4_M_DG_AR',name:'Dissolved gas level measurement',lvl:4,dur:0.2}
+        ]}:null,
+        hasFirePump?{id:'L4_M_FP',name:'Fire Pump Flow Test (NFPA 25)',lvl:3,dur:1,children:[
+          {id:'L4_M_FP_FL',name:'Flow test at 100% & 150% rated',lvl:4,dur:0.3},
+          {id:'L4_M_FP_PR',name:'Churn (no-flow) pressure',lvl:4,dur:0.2}
+        ]}:null
+      ].filter(Boolean)},
       {id:'L4_C',name:'Controls & Sequences',lvl:2,dur:Math.ceil(d.l4*0.2),children:[
         {id:'L4_C_AS',name:'Automatic Sequences',lvl:3,dur:Math.max(1,Math.ceil(d.l4*0.1)),children:[
           {id:'L4_C_AS_LL',name:'Lead/lag staging (all plant)',lvl:4,dur:0.3,children:[
@@ -2629,8 +2841,46 @@ function cxBuildGantt(inp,res){
         {id:'L4_C_EP',name:'EPO / Emergency Sequences',lvl:3,dur:0.5,children:[
           {id:'L4_C_EP_1',name:'EPO button → full power shutdown',lvl:4,dur:0.2},
           {id:'L4_C_EP_2',name:'Fire suppression interlock',lvl:4,dur:0.2}
-        ]}
-      ]}
+        ]},
+        {id:'L4_C_BG',name:'BMS Graphics Performance',lvl:3,dur:Math.max(0.5,Math.ceil(d.l4*0.05)),children:[
+          {id:'L4_C_BG_NV',name:'Full navigation walkthrough',lvl:4,dur:0.2},
+          {id:'L4_C_BG_AL',name:'Alarm management verification',lvl:4,dur:0.2},
+          {id:'L4_C_BG_RP',name:'Report generation test',lvl:4,dur:0.1}
+        ]},
+        {id:'L4_C_SC',name:'Security System Performance',lvl:3,dur:Math.max(0.5,Math.ceil(eq.accessDoors*0.02)),children:[
+          {id:'L4_C_SC_AC',name:'Anti-passback & duress test',lvl:4,dur:0.2},
+          {id:'L4_C_SC_ID',name:'Perimeter intrusion response',lvl:4,dur:0.2},
+          {id:'L4_C_SC_CC',name:'CCTV recording & coverage',lvl:4,dur:0.1}
+        ]},
+        {id:'L4_C_LX',name:'Lux Survey (all zones)',lvl:3,dur:Math.max(0.5,Math.ceil(eq.lightZones*0.1)),children:[
+          {id:'L4_C_LX_DH',name:'Data hall lux measurement',lvl:4,dur:0.2},
+          {id:'L4_C_LX_OF',name:'Office/control room lux',lvl:4,dur:0.1},
+          {id:'L4_C_LX_EM',name:'Emergency lighting 90-min test',lvl:4,dur:0.2}
+        ]},
+        {id:'L4_C_EV',name:'Ventilation Performance',lvl:3,dur:0.5,children:[
+          {id:'L4_C_EV_BR',name:'Battery room airflow measurement',lvl:4,dur:0.1},
+          {id:'L4_C_EV_GR',name:'Generator room airflow measurement',lvl:4,dur:0.1}
+        ]},
+        {id:'L4_C_CN',name:'Containment Integrity Test',lvl:3,dur:Math.max(0.5,Math.ceil(eq.racks*0.005)),children:[
+          {id:'L4_C_CN_LK',name:'Bypass leakage measurement',lvl:4,dur:0.2},
+          {id:'L4_C_CN_DT',name:'Delta-T vs design prediction',lvl:4,dur:0.2}
+        ]},
+        hasVESDA?{id:'L4_C_VD',name:'VESDA Sensitivity Test',lvl:3,dur:Math.max(0.3,Math.ceil(eq.fireZones*0.1)),children:[
+          {id:'L4_C_VD_SN',name:'Sensitivity per zone',lvl:4,dur:0.2},
+          {id:'L4_C_VD_TT',name:'Transport time verification',lvl:4,dur:0.1}
+        ]}:null,
+        hasSmokeExhaust?{id:'L4_C_SM',name:'Pressurization Test',lvl:3,dur:0.5,children:[
+          {id:'L4_C_SM_DP',name:'Stairwell pressure differential',lvl:4,dur:0.2},
+          {id:'L4_C_SM_FN',name:'Smoke exhaust fan capacity',lvl:4,dur:0.1}
+        ]}:null,
+        {id:'L4_C_SP',name:'Sump Pump Capacity Test',lvl:3,dur:0.2,children:[
+          {id:'L4_C_SP_FL',name:'Flow at design head',lvl:4,dur:0.1}
+        ]},
+        hasCompressedAir?{id:'L4_C_CA',name:'Compressed Air Quality',lvl:3,dur:0.3,children:[
+          {id:'L4_C_CA_PR',name:'Pressure regulation accuracy',lvl:4,dur:0.1},
+          {id:'L4_C_CA_QA',name:'Dew point & particle test',lvl:4,dur:0.1}
+        ]}:null
+      ].filter(Boolean)}
     ]},
     // ========== L5 — INTEGRATED SYSTEMS TESTING ==========
     {id:'L5',name:'L5 — Integrated Systems Testing',dur:d.l5,color:'#ef4444',children:[
@@ -2715,8 +2965,16 @@ function cxBuildGantt(inp,res){
           {id:'L5_F_FS_1',name:'Detector → panel → discharge seq.',lvl:4,dur:0.2},
           {id:'L5_F_FS_2',name:'HVAC shutdown & damper close',lvl:4,dur:0.1},
           {id:'L5_F_FS_3',name:'Abort function test',lvl:4,dur:0.1}
-        ]}
-      ]},
+        ]},
+        hasFirePump?{id:'L5_F_FP',name:'IST: Fire Pump Auto-Start',lvl:3,dur:0.5,children:[
+          {id:'L5_F_FP_1',name:'Pressure drop simulated',lvl:4,dur:0.2},
+          {id:'L5_F_FP_2',name:'Main pump auto-starts, jockey stops',lvl:4,dur:0.2}
+        ]}:null,
+        hasVESDA?{id:'L5_F_VD',name:'IST: VESDA Integration',lvl:3,dur:0.5,children:[
+          {id:'L5_F_VD_1',name:'Smoke injection → VESDA alarm',lvl:4,dur:0.2},
+          {id:'L5_F_VD_2',name:'BMS receives alarm → HVAC shutdown',lvl:4,dur:0.2}
+        ]}:null
+      ].filter(Boolean)},
       {id:'L5_O',name:'Operational IST',lvl:2,dur:Math.ceil(d.l5*0.42),children:[
         (inp.redundancy!=='N')?{id:'L5_O_CM',name:'IST-008: Concurrent Maintenance',lvl:3,dur:2,children:[
           {id:'L5_O_CM_EP',name:'Isolate electrical Path A',lvl:4,dur:0.5,children:[
@@ -2729,6 +2987,15 @@ function cxBuildGantt(inp,res){
           ]},
           {id:'L5_O_CM_DF',name:'Dual-fault during maintenance',lvl:4,dur:0.5}
         ]}:null,
+        {id:'L5_O_IX',name:'IST: Cross-System Integration',lvl:3,dur:1,children:[
+          {id:'L5_O_IX_FB',name:'Fire alarm → BMS HVAC shutdown',lvl:4,dur:0.2},
+          {id:'L5_O_IX_SB',name:'Security breach → BMS alarm',lvl:4,dur:0.2},
+          {id:'L5_O_IX_EP',name:'EPO → security camera recording',lvl:4,dur:0.2}
+        ]},
+        {id:'L5_O_VN',name:'IST: Ventilation Failure',lvl:3,dur:0.5,children:[
+          {id:'L5_O_VN_1',name:'Trip battery room exhaust fan',lvl:4,dur:0.15},
+          {id:'L5_O_VN_2',name:'Backup fan / alarm activates',lvl:4,dur:0.15}
+        ]},
         {id:'L5_O_EX',name:'IST-010: 72-Hour Extended Load Test',lvl:3,dur:5,children:[
           {id:'L5_O_EX_RU',name:'Ramp-up to 100% design load',lvl:4,dur:0.5},
           {id:'L5_O_EX_D1',name:'Day 1 (0–24h): Sustained operation',lvl:4,dur:1,children:[
@@ -2794,6 +3061,18 @@ function cxBuildGantt(inp,res){
           {id:'L6_T_TR_EM',name:'Emergency procedures training',lvl:4,dur:0.3,children:[
             {id:'L6_T_TR_EM1',name:'EPO procedure walkthrough',lvl:5,dur:0.1},
             {id:'L6_T_TR_EM2',name:'Fire response drill',lvl:5,dur:0.1}
+          ]},
+          {id:'L6_T_TR_FS',name:'Fire & life safety systems',lvl:4,dur:0.3,children:[
+            hasFirePump?{id:'L6_T_TR_FS1',name:'Fire pump operation',lvl:5,dur:0.1}:null,
+            {id:'L6_T_TR_FS2',name:'Security system operation',lvl:5,dur:0.1}
+          ].filter(Boolean)},
+          {id:'L6_T_TR_LT',name:'Lighting & emergency systems',lvl:4,dur:0.2,children:[
+            {id:'L6_T_TR_LT1',name:'Lighting control system',lvl:5,dur:0.1},
+            {id:'L6_T_TR_LT2',name:'Emergency lighting test procedure',lvl:5,dur:0.1}
+          ]},
+          {id:'L6_T_TR_VN',name:'Ventilation systems',lvl:4,dur:0.2,children:[
+            {id:'L6_T_TR_VN1',name:'Battery room ventilation ops',lvl:5,dur:0.1},
+            {id:'L6_T_TR_VN2',name:'Gen room ventilation ops',lvl:5,dur:0.1}
           ]}
         ]},
         {id:'L6_T_SM',name:'Systems Manual & As-Builts',lvl:3,dur:Math.max(1,Math.ceil(d.l6*0.1)),children:[
