@@ -5147,16 +5147,19 @@ var RfsUI = {
     },
 
     bulkCheckMandatory: function(gateCode) {
-        if (!activeProjectId || !this.selectedUnitId) return;
+        if (!activeProjectId) return;
+        var sel = document.getElementById('rfsChecklistUnit');
+        var unitId = sel ? sel.value : '';
+        if (!unitId) { this.showToast('Select a unit first.', 'warning'); return; }
         RfsUtils.pushUndo('Bulk check mandatory ' + gateCode);
-        var reqs = RfsLibrary.getRequirementsForGate(gateCode);
+        var reqs = RfsLibrary.getRequirements(gateCode);
         var evidence = projectData.evidence || [];
         var changed = 0;
         reqs.forEach(function(r) {
-            if (r.mandatory !== 'M') return;
-            var exists = evidence.find(function(e) { return e.unitId === RfsUI.selectedUnitId && e.gateCode === gateCode && e.reqId === r.id; });
+            if (!r.mandatory) return;
+            var exists = evidence.some(function(e) { return e.requirementId === r.id && e.unitId === unitId && e.status === 'accepted'; });
             if (!exists) {
-                evidence.push({ unitId: RfsUI.selectedUnitId, gateCode: gateCode, reqId: r.id, checked: true, ts: new Date().toISOString(), fileRef: '', notes: '' });
+                evidence.push({ id: 'ev_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), title: r.evidenceType + ' — ' + r.title, requirementId: r.id, unitId: unitId, type: r.evidenceType, status: 'accepted', sourceClass: r.sourceClass, uploadedAt: new Date().toISOString(), notes: 'Bulk checked' });
                 changed++;
             }
         });
@@ -5169,17 +5172,19 @@ var RfsUI = {
 
     exportChecklistCsv: function() {
         if (!activeProjectId) return;
+        var sel = document.getElementById('rfsChecklistUnit');
+        var unitId = sel ? sel.value : '';
         var headers = ['Gate', 'Discipline', 'Requirement', 'Mandatory', 'Weight', 'Checked', 'Date'];
         var rows = [];
         var evidence = projectData.evidence || [];
         RfsLibrary.GATE_CODES.forEach(function(gc) {
-            var reqs = RfsLibrary.getRequirementsForGate(gc);
+            var reqs = RfsLibrary.getRequirements(gc);
             reqs.forEach(function(r) {
-                var ev = evidence.find(function(e) { return e.unitId === RfsUI.selectedUnitId && e.gateCode === gc && e.reqId === r.id; });
-                rows.push([gc, r.discipline, r.text, r.mandatory, r.weight, ev ? 'Yes' : 'No', ev ? ev.ts : '']);
+                var ev = evidence.find(function(e) { return e.requirementId === r.id && e.unitId === unitId && e.status === 'accepted'; });
+                rows.push([gc, r.discipline, r.title, r.mandatory ? 'M' : 'D', r.weight, ev ? 'Yes' : 'No', ev ? ev.uploadedAt : '']);
             });
         });
-        RfsUtils.exportCsv(headers, rows, 'checklist-' + (RfsUI.selectedUnitId || 'all') + '.csv');
+        RfsUtils.exportCsv(headers, rows, 'checklist-' + (unitId || 'all') + '.csv');
         RfsUtils.logAction('Export CSV', 'Checklist');
     },
 
@@ -5187,19 +5192,21 @@ var RfsUI = {
         if (!activeProjectId) return;
         var w = window.open('', '_blank');
         var evidence = projectData.evidence || [];
-        var unit = (projectData.units || []).find(function(u) { return u.id === RfsUI.selectedUnitId; });
+        var unitSel = document.getElementById('rfsChecklistUnit');
+        var unitId = unitSel ? unitSel.value : '';
+        var unit = (projectData.units || []).find(function(u) { return u.id === unitId; });
         var html = '<html><head><title>Checklist — ' + ((unit || {}).label || '') + '</title>';
         html += '<style>body{font-family:Inter,sans-serif;font-size:12px;margin:20px;}table{width:100%;border-collapse:collapse;margin-bottom:20px;}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;}th{background:#f1f5f9;font-weight:700;}.checked{color:#10b981;font-weight:700;}h2{margin-top:24px;color:#0d9488;}</style></head><body>';
         html += '<h1>RFS Checklist — ' + ((unit || {}).label || 'All Units') + '</h1>';
         html += '<p>Generated: ' + new Date().toLocaleDateString() + '</p>';
         RfsLibrary.GATE_CODES.forEach(function(gc) {
-            var reqs = RfsLibrary.getRequirementsForGate(gc);
+            var reqs = RfsLibrary.getRequirements(gc);
             if (reqs.length === 0) return;
             html += '<h2>' + gc + ' — ' + (RfsLibrary.GATE_NAMES[gc] || '') + '</h2>';
             html += '<table><tr><th>Discipline</th><th>Requirement</th><th>M/D</th><th>W</th><th>Status</th></tr>';
             reqs.forEach(function(r) {
-                var ev = evidence.find(function(e) { return e.unitId === RfsUI.selectedUnitId && e.gateCode === gc && e.reqId === r.id; });
-                html += '<tr><td>' + r.discipline + '</td><td>' + r.text + '</td><td>' + r.mandatory + '</td><td>' + r.weight + '</td>';
+                var ev = evidence.find(function(e) { return e.requirementId === r.id && e.unitId === unitId && e.status === 'accepted'; });
+                html += '<tr><td>' + r.discipline + '</td><td>' + r.title + '</td><td>' + (r.mandatory ? 'M' : 'D') + '</td><td>' + r.weight + '</td>';
                 html += '<td class="' + (ev ? 'checked' : '') + '">' + (ev ? '✓' : '—') + '</td></tr>';
             });
             html += '</table>';
@@ -5214,12 +5221,14 @@ var RfsUI = {
     addRequirementNote: function(gateCode, reqId) {
         var note = prompt('Add note for this requirement:');
         if (note === null) return;
+        var unitSel = document.getElementById('rfsChecklistUnit');
+        var unitId = unitSel ? unitSel.value : '';
         var evidence = projectData.evidence || [];
-        var ev = evidence.find(function(e) { return e.unitId === this.selectedUnitId && e.gateCode === gateCode && e.reqId === reqId; }.bind(this));
+        var ev = evidence.find(function(e) { return e.requirementId === reqId && e.unitId === unitId; });
         if (ev) {
             ev.notes = note;
         } else {
-            evidence.push({ unitId: this.selectedUnitId, gateCode: gateCode, reqId: reqId, checked: false, ts: new Date().toISOString(), notes: note, fileRef: '' });
+            evidence.push({ id: 'ev-' + Date.now(), title: 'Note', requirementId: reqId, unitId: unitId, type: 'note', status: 'pending', sourceClass: '', uploadedAt: new Date().toISOString(), notes: note });
         }
         projectData.evidence = evidence;
         RfsStore.saveDomain(activeProjectId, 'evidence', evidence);
@@ -5235,9 +5244,10 @@ var RfsUI = {
             matrix.rows.push(u.label || u.id);
             var row = [];
             RfsLibrary.GATE_CODES.forEach(function(gc) {
-                var reqs = RfsLibrary.getRequirementsForGate(gc);
+                var reqs = RfsLibrary.getRequirements(gc);
                 var total = reqs.length || 1;
-                var done = evidence.filter(function(e) { return e.unitId === u.id && e.gateCode === gc && e.checked; }).length;
+                var reqIds = reqs.map(function(r) { return r.id; });
+                var done = evidence.filter(function(e) { return e.unitId === u.id && reqIds.indexOf(e.requirementId) !== -1 && e.status === 'accepted'; }).length;
                 row.push(Math.round((done / total) * 100));
             });
             matrix.data.push(row);
@@ -5539,7 +5549,7 @@ var RfsUI = {
         var critDefects = defects.filter(function(d) { return d.severity === 'critical' && d.status !== 'closed'; }).length;
         var passedTests = tests.filter(function(t) { return t.status === 'passed'; }).length;
         var approvedProcs = procs.filter(function(p) { return p.status === 'approved' || p.status === 'issued'; }).length;
-        var totalEvidence = evidence.filter(function(e) { return e.checked; }).length;
+        var totalEvidence = evidence.filter(function(e) { return e.status === 'accepted'; }).length;
         var blockers = RfsGateEngine.countBlockers();
         var confidence = RfsGateEngine.avgConfidence();
 
