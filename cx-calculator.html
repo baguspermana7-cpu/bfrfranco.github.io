@@ -365,11 +365,123 @@ a:hover{text-decoration:underline;}
 /* ===== MOBILE REFINEMENTS ===== */
 @media(max-width:600px){
   .cx-toolbar{flex-direction:column;align-items:stretch;}
-  .cx-mode-bar{justify-content:center;}
+  .cx-mode-bar{justify-content:center;flex-wrap:wrap;}
   .cx-toolbar-actions{justify-content:center;}
   .cx-toolbar-btn{font-size:0.78rem;padding:0.5rem 0.75rem;}
   .cx-equip-grid{grid-template-columns:repeat(2,1fr);}
   .cx-benchmark-meta{flex-direction:column;gap:0.5rem;}
+  .cx-faq-section,.cx-manual-section{padding:0.75rem;}
+  .cx-manual-nav{flex-direction:column;}
+  .cx-manual-sidebar{width:100%;max-height:200px;overflow-y:auto;}
+  .cx-comparison-grid{grid-template-columns:1fr!important;}
+}
+
+/* ===== FAQ SECTION ===== */
+.cx-faq-section{display:none;max-width:1200px;margin:0 auto;padding:1.5rem;}
+.cx-faq-section.active{display:block;}
+.cx-faq-header{text-align:center;margin-bottom:2rem;}
+.cx-faq-header h2{font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:0.5rem;}
+.cx-faq-header p{font-size:0.9rem;color:#94a3b8;}
+.cx-faq-search{width:100%;max-width:500px;margin:1rem auto;display:block;padding:12px 18px;border-radius:12px;border:2px solid rgba(148,163,184,0.15);background:rgba(30,41,59,0.6);color:#e2e8f0;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;}
+.cx-faq-search:focus{border-color:#0e7490;}
+.cx-faq-search::placeholder{color:#64748b;}
+.cx-faq-count{text-align:center;font-size:0.78rem;color:#64748b;margin-bottom:1.5rem;}
+.cx-faq-category{margin-bottom:1.5rem;border-radius:12px;background:rgba(30,41,59,0.4);border:1px solid rgba(148,163,184,0.08);overflow:hidden;}
+.cx-faq-cat-header{padding:1rem 1.25rem;background:rgba(14,116,144,0.08);cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;font-size:0.95rem;color:#e2e8f0;transition:background 0.2s;user-select:none;}
+.cx-faq-cat-header:hover{background:rgba(14,116,144,0.15);}
+.cx-faq-cat-header i:first-child{color:#22d3ee;width:20px;text-align:center;}
+.cx-faq-cat-chevron{margin-left:auto;transition:transform 0.3s;color:#64748b;font-size:0.8rem;}
+.cx-faq-cat-header.open .cx-faq-cat-chevron{transform:rotate(90deg);}
+.cx-faq-cat-body{display:none;padding:0.5rem 0;}
+.cx-faq-cat-header.open+.cx-faq-cat-body{display:block;}
+.cx-faq-item{border-bottom:1px solid rgba(148,163,184,0.06);}
+.cx-faq-item:last-child{border-bottom:none;}
+.cx-faq-q{padding:0.85rem 1.25rem;cursor:pointer;display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;font-weight:600;color:#cbd5e1;transition:color 0.2s;user-select:none;}
+.cx-faq-q:hover{color:#22d3ee;}
+.cx-faq-q-icon{color:#0e7490;font-size:0.75rem;margin-top:3px;flex-shrink:0;}
+.cx-faq-q-chevron{margin-left:auto;transition:transform 0.3s;color:#475569;font-size:0.7rem;flex-shrink:0;margin-top:3px;}
+.cx-faq-q.open .cx-faq-q-chevron{transform:rotate(90deg);}
+.cx-faq-a{display:none;padding:0 1.25rem 1rem 2.5rem;font-size:0.84rem;color:#94a3b8;line-height:1.7;}
+.cx-faq-q.open+.cx-faq-a{display:block;}
+.cx-faq-a code{background:rgba(14,116,144,0.15);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#22d3ee;}
+.cx-faq-a strong{color:#cbd5e1;}
+.cx-faq-a ul,.cx-faq-a ol{margin:0.5rem 0;padding-left:1.5rem;}
+.cx-faq-a li{margin-bottom:0.3rem;}
+.cx-faq-highlight{background:rgba(234,179,8,0.25);padding:1px 3px;border-radius:3px;}
+.cx-faq-back{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;padding:8px 16px;border-radius:8px;background:rgba(14,116,144,0.1);border:1px solid rgba(14,116,144,0.3);color:#22d3ee;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.2s;width:fit-content;}
+.cx-faq-back:hover{background:rgba(14,116,144,0.2);}
+
+/* ===== MANUAL SECTION ===== */
+.cx-manual-section{display:none;max-width:1400px;margin:0 auto;padding:1.5rem;}
+.cx-manual-section.active{display:block;}
+.cx-manual-header{text-align:center;margin-bottom:2rem;}
+.cx-manual-header h2{font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:0.5rem;}
+.cx-manual-header p{font-size:0.9rem;color:#94a3b8;}
+.cx-manual-nav{display:flex;gap:1.5rem;align-items:flex-start;}
+.cx-manual-sidebar{width:260px;flex-shrink:0;position:sticky;top:72px;max-height:calc(100vh - 100px);overflow-y:auto;background:rgba(30,41,59,0.5);border-radius:12px;border:1px solid rgba(148,163,184,0.08);padding:0.75rem 0;}
+.cx-manual-sidebar::-webkit-scrollbar{width:4px;}
+.cx-manual-sidebar::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.2);border-radius:2px;}
+.cx-manual-toc-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:0.82rem;color:#94a3b8;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;}
+.cx-manual-toc-item:hover{color:#e2e8f0;background:rgba(255,255,255,0.03);}
+.cx-manual-toc-item.active{color:#22d3ee;background:rgba(14,116,144,0.08);border-left-color:#22d3ee;font-weight:600;}
+.cx-manual-toc-num{width:22px;height:22px;border-radius:6px;background:rgba(14,116,144,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:#22d3ee;flex-shrink:0;}
+.cx-manual-content{flex:1;min-width:0;}
+.cx-manual-chapter{margin-bottom:2rem;background:rgba(30,41,59,0.4);border-radius:12px;border:1px solid rgba(148,163,184,0.08);overflow:hidden;}
+.cx-manual-chapter-head{padding:1.25rem 1.5rem;background:rgba(14,116,144,0.06);border-bottom:1px solid rgba(148,163,184,0.06);}
+.cx-manual-chapter-head h3{font-size:1.1rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:10px;}
+.cx-manual-chapter-head h3 i{color:#22d3ee;}
+.cx-manual-chapter-head p{font-size:0.82rem;color:#64748b;margin-top:0.3rem;}
+.cx-manual-chapter-body{padding:1.25rem 1.5rem;}
+.cx-manual-step{display:flex;gap:12px;margin-bottom:1rem;padding:0.75rem;border-radius:8px;background:rgba(15,23,42,0.4);border:1px solid rgba(148,163,184,0.05);}
+.cx-manual-step-num{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0e7490,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;}
+.cx-manual-step-text{font-size:0.85rem;color:#cbd5e1;line-height:1.6;}
+.cx-manual-step-text strong{color:#f1f5f9;}
+.cx-manual-step-text code{background:rgba(14,116,144,0.15);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:#22d3ee;}
+.cx-manual-note{display:flex;gap:10px;padding:0.75rem 1rem;border-radius:8px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);margin:0.75rem 0;font-size:0.82rem;color:#fbbf24;line-height:1.6;}
+.cx-manual-note i{margin-top:2px;flex-shrink:0;}
+.cx-manual-tip{display:flex;gap:10px;padding:0.75rem 1rem;border-radius:8px;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);margin:0.75rem 0;font-size:0.82rem;color:#22d3ee;line-height:1.6;}
+.cx-manual-tip i{margin-top:2px;flex-shrink:0;}
+.cx-manual-table{width:100%;border-collapse:collapse;font-size:0.82rem;margin:0.75rem 0;}
+.cx-manual-table th{background:rgba(14,116,144,0.1);color:#22d3ee;font-weight:600;padding:8px 12px;text-align:left;border:1px solid rgba(148,163,184,0.08);}
+.cx-manual-table td{padding:8px 12px;color:#cbd5e1;border:1px solid rgba(148,163,184,0.06);}
+.cx-manual-table tr:nth-child(even) td{background:rgba(15,23,42,0.3);}
+.cx-manual-kbd{display:inline-flex;padding:2px 8px;border-radius:4px;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.2);font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#94a3b8;margin:0 2px;}
+.cx-manual-back{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;padding:8px 16px;border-radius:8px;background:rgba(14,116,144,0.1);border:1px solid rgba(14,116,144,0.3);color:#22d3ee;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.2s;width:fit-content;}
+.cx-manual-back:hover{background:rgba(14,116,144,0.2);}
+
+/* ===== COMPARISON TABLE ===== */
+.cx-comparison-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0;}
+.cx-comparison-card{background:rgba(30,41,59,0.5);border-radius:10px;border:1px solid rgba(148,163,184,0.08);padding:1rem;}
+.cx-comparison-card h4{font-size:0.9rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;}
+
+/* ===== ENHANCED KPI ANIMATION ===== */
+.cx-kpi-card{transition:transform 0.2s,box-shadow 0.2s;}
+.cx-kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+
+/* ===== TOOLBAR EXTENSION ===== */
+.cx-btn-faq,.cx-btn-manual{background:transparent;border:1px solid rgba(148,163,184,0.15);color:#94a3b8;transition:all 0.2s;}
+.cx-btn-faq:hover,.cx-btn-manual:hover{color:#22d3ee;border-color:rgba(34,211,238,0.3);background:rgba(14,116,144,0.08);}
+.cx-btn-faq.active{color:#22d3ee;border-color:rgba(34,211,238,0.4);background:rgba(14,116,144,0.15);}
+.cx-btn-manual.active{color:#22d3ee;border-color:rgba(34,211,238,0.4);background:rgba(14,116,144,0.15);}
+
+/* ===== CURRENCY SELECTOR ===== */
+.cx-currency-sel{padding:4px 8px;border-radius:6px;background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);color:#94a3b8;font-size:0.75rem;font-family:inherit;cursor:pointer;outline:none;}
+.cx-currency-sel:focus{border-color:#0e7490;}
+
+/* ===== SHARE URL ===== */
+.cx-share-btn{padding:4px 10px;border-radius:6px;background:rgba(14,116,144,0.1);border:1px solid rgba(14,116,144,0.3);color:#22d3ee;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background 0.2s;display:inline-flex;align-items:center;gap:4px;}
+.cx-share-btn:hover{background:rgba(14,116,144,0.2);}
+
+/* ===== PHASE PROGRESS MINI ===== */
+.cx-phase-mini{display:flex;gap:4px;margin-top:6px;}
+.cx-phase-mini-bar{height:4px;border-radius:2px;flex:1;background:rgba(148,163,184,0.15);}
+.cx-phase-mini-bar.filled{background:linear-gradient(90deg,#0e7490,#22d3ee);}
+
+/* ===== ADDITIONAL RESPONSIVE ===== */
+@media(max-width:768px){
+  .cx-manual-nav{flex-direction:column;}
+  .cx-manual-sidebar{width:100%;position:static;max-height:none;}
+  .cx-faq-header h2,.cx-manual-header h2{font-size:1.3rem;}
 }
 </style>
 </head>
@@ -411,8 +523,22 @@ a:hover{text-decoration:underline;}
       <button type="button" class="cx-toolbar-btn cx-btn-free active" onclick="cxSwitchMode('free')"><i class="fas fa-chart-bar" style="margin-right:6px;"></i>Free Assessment</button>
       <button type="button" class="cx-toolbar-btn cx-btn-pro" onclick="cxSwitchMode('pro')"><i class="fas fa-crown" style="margin-right:6px;"></i>Pro Analysis</button>
       <span id="cxPremiumBadge" class="cx-premium-badge">PRO ACTIVE</span>
+      <div style="width:1px;height:24px;background:rgba(148,163,184,0.15);margin:0 4px;"></div>
+      <button type="button" class="cx-toolbar-btn cx-btn-manual" onclick="cxSwitchMode('manual')"><i class="fas fa-book" style="margin-right:6px;"></i>Manual</button>
+      <button type="button" class="cx-toolbar-btn cx-btn-faq" onclick="cxSwitchMode('faq')"><i class="fas fa-circle-question" style="margin-right:6px;"></i>FAQ</button>
     </div>
     <div class="cx-toolbar-actions">
+      <select class="cx-currency-sel" id="cxCurrency" onchange="cxSetCurrency(this.value)" title="Display Currency">
+        <option value="USD">USD $</option>
+        <option value="EUR">EUR &euro;</option>
+        <option value="GBP">GBP &pound;</option>
+        <option value="AUD">AUD A$</option>
+        <option value="SGD">SGD S$</option>
+        <option value="JPY">JPY &yen;</option>
+        <option value="AED">AED د.إ</option>
+        <option value="INR">INR &#8377;</option>
+      </select>
+      <button type="button" class="cx-share-btn" onclick="cxShareConfig()" title="Copy shareable link"><i class="fas fa-share-nodes"></i> Share</button>
       <button type="button" class="cx-btn-reset" onclick="cxReset()"><i class="fas fa-undo" style="margin-right:6px;"></i>Reset</button>
       <button type="button" class="cx-btn-pdf" onclick="cxExportPDF()" id="cxExportBtn"><i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export PDF</button>
       <button type="button" id="cxPremiumBtn" class="cx-premium-btn" onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:6px;"></i>Unlock Pro</button>
@@ -772,6 +898,43 @@ a:hover{text-decoration:underline;}
         <h3><i class="fas fa-crown"></i> Commissioning Program KPI Dashboard</h3>
         <div class="cx-kpi-grid-6" id="cxDashboardKpis"></div>
       </div>
+      <!-- Panel 15: Scenario Comparison -->
+      <div class="cx-pro-panel gated" id="cxPanelComparison">
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <h3><i class="fas fa-crown"></i> Scenario Comparison</h3>
+        <p style="font-size:0.8rem;color:#64748b;margin:0.5rem 0;">Compare your current configuration against preset archetypes</p>
+        <div id="cxComparisonContent"></div>
+      </div>
+      <!-- Panel 16: Cost Waterfall -->
+      <div class="cx-pro-panel gated" id="cxPanelWaterfall">
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <h3><i class="fas fa-crown"></i> Cost Waterfall Analysis</h3>
+        <div id="cxWaterfallContent"></div>
+      </div>
+      <!-- Panel 17: Timeline Milestones -->
+      <div class="cx-pro-panel gated" id="cxPanelMilestones">
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <h3><i class="fas fa-crown"></i> Key Milestones &amp; Decision Points</h3>
+        <div id="cxMilestonesContent"></div>
+      </div>
+      <!-- Panel 18: Team Org Chart -->
+      <div class="cx-pro-panel gated" id="cxPanelTeam">
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <h3><i class="fas fa-crown"></i> Recommended CxA Team Composition</h3>
+        <div id="cxTeamContent"></div>
+      </div>
+      <!-- Panel 19: Regional Benchmark -->
+      <div class="cx-pro-panel gated" id="cxPanelBenchmark">
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <h3><i class="fas fa-crown"></i> Regional Benchmark Comparison</h3>
+        <div id="cxBenchmarkContent"></div>
+      </div>
+      <!-- Panel 20: Environmental Impact -->
+      <div class="cx-pro-panel gated" id="cxPanelEnvironmental">
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <h3><i class="fas fa-crown"></i> Commissioning Environmental Impact</h3>
+        <div id="cxEnvironmentalContent"></div>
+      </div>
     </div>
   </div>
 
@@ -826,6 +989,13 @@ a:hover{text-decoration:underline;}
       <div class="cx-glossary-item"><span class="cx-glossary-term">CVaR-95:</span><span class="cx-glossary-def">Conditional Value at Risk at 95% — the expected cost given that costs exceed the P95 percentile. Represents tail-risk exposure.</span></div>
     </div>
   </div>
+
+  <!-- ===== FAQ SECTION ===== -->
+  <div class="cx-faq-section" id="cxFaqSection"></div>
+
+  <!-- ===== MANUAL SECTION ===== -->
+  <div class="cx-manual-section" id="cxManualSection"></div>
+
 </div>
 
 <!-- Footer -->
@@ -1993,14 +2163,17 @@ function cxCalcTotalCost(inp){
   };
 }
 
-// --- MONTE CARLO ---
+// --- MONTE CARLO (Enhanced: varies IT load, adds schedule/cost uncertainty) ---
 function cxRunMonteCarlo(inp){
   var N=10000,results=[];
   for(var i=0;i<N;i++){
     var vi=Object.assign({},inp);
+    // Vary IT load ±7.5%
     vi.itLoad=Math.max(100,Math.round(inp.itLoad*(1+cxRandNorm(0,0.075))));
     var r=cxCalcTotalCost(vi);
-    results.push(r.grandTotal);
+    // Add stochastic cost uncertainty ±5% (contractor pricing, material costs)
+    var costNoise=1+cxRandNorm(0,0.05);
+    results.push(r.grandTotal*Math.max(0.85,costNoise));
   }
   results.sort(function(a,b){return a-b;});
   var mean=results.reduce(function(a,b){return a+b;},0)/N;
@@ -4441,6 +4614,9 @@ function cxCalculate(){
   var ganttData=cxBuildGantt(inp,res);
   cxLastSchedule=ganttData;
   cxRenderGantt(ganttData);
+  cxRenderGanttStats(ganttData);
+  cxValidateInputs();
+  cxShowLastSaved();
 
   // Pro section visibility based on mode
   var proSec=document.getElementById('cxProSection');
@@ -4550,6 +4726,24 @@ function cxCalculate(){
       // Panel 14: KPI Dashboard
       cxRenderDashboard(inp,res,ganttData);
 
+      // Panel 15: Scenario Comparison
+      cxRenderComparison(inp,res);
+
+      // Panel 16: Cost Waterfall
+      cxRenderWaterfall(res,inp);
+
+      // Panel 17: Milestones
+      cxRenderMilestones(res,inp);
+
+      // Panel 18: Team Composition
+      cxRenderTeam(res,inp);
+
+      // Panel 19: Regional Benchmark
+      cxRenderBenchmarkPanel(res,inp);
+
+      // Panel 20: Environmental Impact
+      cxRenderEnvironmental(res,inp);
+
       document.getElementById('cxLoading').classList.remove('active');
     },50); // Small delay to allow loading spinner to render
   }
@@ -4609,18 +4803,63 @@ function cxSwitchMode(mode){
     return;
   }
   cxCurrentMode=mode;
-  // Update button states
+  // Update ALL button states
   var freeBtn=document.querySelector('.cx-btn-free');
   var proBtn=document.querySelector('.cx-btn-pro');
+  var faqBtn=document.querySelector('.cx-btn-faq');
+  var manualBtn=document.querySelector('.cx-btn-manual');
+  [freeBtn,proBtn,faqBtn,manualBtn].forEach(function(b){if(b)b.classList.remove('active');});
+  // Calculator sections
+  var calcEls=['cxInputsGrid','cxScenarioSelect','cxResults','cxLoading'];
+  var scenarioBar=document.querySelector('.cx-scenario-bar');
+  var inputsGrid=document.getElementById('cxInputsGrid');
+  var resultsEl=document.getElementById('cxResults');
+  var disclaimerEl=document.querySelector('.cx-disclaimer');
+  var privacyEl=document.querySelector('.cx-privacy-badge');
+  var benchEl=document.querySelector('.cx-benchmark-meta');
+  var glossaryEl=document.querySelector('.cx-glossary');
+  var actionsEl=document.querySelector('.cx-toolbar-actions');
+  var faqSec=document.getElementById('cxFaqSection');
+  var manualSec=document.getElementById('cxManualSection');
+  var proSec=document.getElementById('cxProSection');
+  // Helper to show/hide calculator chrome
+  function showCalc(v){
+    var d=v?'':'none';
+    if(scenarioBar)scenarioBar.style.display=v?'flex':'none';
+    if(inputsGrid)inputsGrid.style.display=v?'grid':'none';
+    if(resultsEl)resultsEl.style.display=v?'block':'none';
+    if(disclaimerEl)disclaimerEl.style.display=v?'flex':'none';
+    if(privacyEl)privacyEl.style.display=v?'flex':'none';
+    if(benchEl)benchEl.style.display=v?'flex':'none';
+    if(glossaryEl)glossaryEl.style.display=v?'block':'none';
+    if(actionsEl)actionsEl.style.display=v?'flex':'none';
+  }
+  if(mode==='faq'){
+    if(faqBtn)faqBtn.classList.add('active');
+    showCalc(false);
+    if(faqSec){faqSec.classList.add('active');cxRenderFaq();}
+    if(manualSec)manualSec.classList.remove('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  if(mode==='manual'){
+    if(manualBtn)manualBtn.classList.add('active');
+    showCalc(false);
+    if(manualSec){manualSec.classList.add('active');cxRenderManual();}
+    if(faqSec)faqSec.classList.remove('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  // Free or Pro mode — show calculator, hide FAQ/Manual
+  showCalc(true);
+  if(faqSec)faqSec.classList.remove('active');
+  if(manualSec)manualSec.classList.remove('active');
   if(mode==='free'){
     if(freeBtn)freeBtn.classList.add('active');
-    if(proBtn)proBtn.classList.remove('active');
   } else {
-    if(freeBtn)freeBtn.classList.remove('active');
     if(proBtn)proBtn.classList.add('active');
   }
   // Toggle pro section visibility
-  var proSec=document.getElementById('cxProSection');
   if(proSec){
     if(mode==='pro'&&cxIsPremium){proSec.style.display='block';}
     else{proSec.style.display='none';}
@@ -4802,10 +5041,661 @@ document.getElementById('cxLoginModal').addEventListener('click',function(e){
   if(e.target===this)cxCloseModal();
 });
 
-// --- KEYBOARD SHORTCUTS ---
+// --- FAQ RENDER ---
+var _cxFaqRendered=false;
+function cxRenderFaq(){
+  if(_cxFaqRendered)return;
+  _cxFaqRendered=true;
+  var el=document.getElementById('cxFaqSection');
+  if(!el)return;
+  var faqData=[
+    {cat:'General',icon:'fa-circle-info',items:[
+      {q:'What is this calculator?',a:'This is a <strong>free, client-side</strong> commissioning cost and schedule estimator for data center projects. It covers the full L0-L6 lifecycle — from Design &amp; Cx Planning through Integrated Systems Testing to Turnover &amp; Closeout. All calculations run in your browser; no data is transmitted to any server.'},
+      {q:'What do L0 through L6 mean?',a:'L0-L6 are project-delivery commissioning levels used in industry practice:<ul><li><strong>L0</strong> — Design &amp; Cx Planning</li><li><strong>L1</strong> — Factory Witness Testing (FAT)</li><li><strong>L2</strong> — Installation Verification</li><li><strong>L3</strong> — Component Startup</li><li><strong>L4</strong> — Functional Performance Testing</li><li><strong>L5</strong> — Integrated Systems Testing (IST)</li><li><strong>L6</strong> — Turnover &amp; Closeout</li></ul>Note: These are <strong>industry interpretations</strong>, not an ASHRAE-defined numbering scheme. ASHRAE Guideline 0-2019 provides the commissioning process backbone.'},
+      {q:'Is my data stored or sent anywhere?',a:'<strong>No.</strong> All calculations are performed 100% in your browser using JavaScript. No data is transmitted to any server. Your last inputs are saved in browser <code>localStorage</code> for convenience and can be cleared anytime with the Reset button.'},
+      {q:'What standards does this calculator reference?',a:'The calculator is grounded in:<ul><li><strong>ASHRAE Guideline 0-2019</strong> — Lifecycle commissioning process</li><li><strong>NETA ECS/ATS-2025</strong> — Electrical testing standards</li><li><strong>BSRIA BG 49:2023</strong> — Commissioning benchmarks</li><li><strong>Uptime Institute Tier Standard 2024</strong></li><li><strong>IEEE 519-2022</strong> — Harmonic limits</li><li><strong>NFPA 72/75/76/2001</strong> — Fire protection</li><li><strong>RSMeans 2025</strong> — Cost data</li></ul>'},
+      {q:'How accurate are the estimates?',a:'These are <strong>budgetary estimates</strong> suitable for planning and benchmarking. Actual costs vary based on local conditions, contractor availability, regulatory requirements, and project complexity. Source confidence is clearly labeled — some values are publicly sourced (BSRIA, RSMeans, Uptime surveys), others are expert assumptions based on industry experience.'},
+      {q:'Can I use this for contract pricing?',a:'<strong>No.</strong> This tool provides directional estimates only. It should not be used for contractual pricing, procurement, or binding financial commitments. Always obtain formal quotes from qualified commissioning firms for actual project pricing.'},
+      {q:'What is the difference between Free and Pro?',a:'<strong>Free</strong> includes: 4 KPI cards, cost/schedule bar charts, auto-generated narrative, interactive Gantt chart with 7 levels of depth, activity procedures, acceptance criteria, logsheets, and basic PDF export.<br><br><strong>Pro</strong> adds: 6 additional inputs, Monte Carlo simulation (10,000 iterations), sensitivity tornado analysis, cost breakdown by discipline, resource loading histogram, witness/hold point matrix, risk assessment, equipment inventory, KPI dashboard, and an enhanced 20-section PDF report.'},
+      {q:'Is this tool free to use?',a:'The <strong>Free Assessment</strong> mode is completely free with no registration required. The <strong>Pro Analysis</strong> mode requires a login and provides advanced analytics. A demo account is available: <code>demo@resistancezero.com</code> / <code>demo2026</code>.'},
+      {q:'What browsers are supported?',a:'Any modern browser: Chrome 90+, Firefox 90+, Safari 15+, Edge 90+. The calculator uses standard JavaScript (ES5 compatible) and Chart.js for visualizations. No frameworks or build tools required.'},
+      {q:'Can I bookmark or share my configuration?',a:'Your inputs are auto-saved in browser localStorage. To share a configuration with a colleague, use the <strong>Export PDF</strong> feature which includes all input parameters, or manually copy your scenario settings.'}
+    ]},
+    {cat:'Inputs & Configuration',icon:'fa-sliders',items:[
+      {q:'What is IT Load Capacity?',a:'The total planned IT electrical load in kilowatts (kW). This is the <strong>primary scaling factor</strong> for all commissioning costs, durations, and equipment quantities. Range: 100 kW (edge) to 100,000 kW (hyperscale campus). Example: a 2,000 kW facility is a typical enterprise data center; 50,000 kW is hyperscale.'},
+      {q:'How does Cooling Type affect commissioning?',a:'Cooling type is the <strong>second-biggest cost driver</strong> after redundancy. Multipliers:<ul><li>Raised Floor CRAC/CRAH: 1.0x (baseline)</li><li>In-Row Cooling: 1.12x</li><li>Rear Door Heat Exchanger: 1.25x</li><li>Direct Liquid Cooling (DLC): 1.45x</li><li>Immersion Cooling: 1.55x</li></ul>DLC/immersion add entirely new commissioning disciplines: CDU redundancy testing, liquid loop zoning, coolant flow balancing, manifold pressure testing, and rack-level thermal acceptance.'},
+      {q:'What do the Redundancy levels mean?',a:'Redundancy is the <strong>biggest cost driver</strong> — going from N+1 to 2N roughly doubles commissioning scope.<ul><li><strong>N</strong> — No redundancy (single path)</li><li><strong>N+1</strong> — One extra component per group (Tier II/III)</li><li><strong>2N</strong> — Fully redundant parallel paths (Tier III/IV)</li><li><strong>2N+1</strong> — Dual path plus spare (Tier IV+)</li></ul>Higher redundancy means every failure scenario must be tested for both paths.'},
+      {q:'What is Rack Density and why does it matter?',a:'Rack density is the average IT power per rack:<ul><li><strong>Standard</strong>: 4-8 kW/rack — traditional enterprise</li><li><strong>Medium</strong>: 8-15 kW/rack — modern enterprise/colo</li><li><strong>High</strong>: 15-30 kW/rack — GPU compute, HPC</li><li><strong>Ultra-High</strong>: 50-100+ kW/rack — AI factory, dense GPU clusters</li></ul>Higher density increases cooling system complexity, thermal testing scope, and the consequence of single-rack failures during IST.'},
+      {q:'What are the Scenario Presets?',a:'Eight pre-configured archetypes with industry-standard parameters:<ol><li><strong>Enterprise 2MW</strong> — Tier III, N+1, air cooling</li><li><strong>Colocation 10MW</strong> — Tier III+, 2N, in-row</li><li><strong>Hyperscale 50MW</strong> — 2N+1, DLC</li><li><strong>AI Factory 100MW</strong> — 2N+1, DLC, ultra-high density (2026)</li><li><strong>Edge 500kW</strong> — Tier II, N+1, modular</li><li><strong>Modular 5MW</strong> — Prefab pods, RDHX</li><li><strong>Fast-Track 10MW</strong> — Repurposed warehouse</li><li><strong>Recommissioning 3MW</strong> — Existing facility upgrade</li></ol>Load a preset to auto-fill all inputs, then customize as needed.'},
+      {q:'What Pro inputs are available?',a:'Pro mode adds 6 additional parameters:<ul><li><strong>Generator Type</strong> — Diesel, gas, dual-fuel, BESS (affects FAT and startup testing)</li><li><strong>Seismic Zone</strong> — 0 to 4 (adds anchor bolt, rack seismic, isolation testing)</li><li><strong>Cx Scope</strong> — New build, retrofit, expansion, recommissioning</li><li><strong>Substation Config</strong> — Utility-fed, ring bus, dual sub (ring bus adds 80-110%)</li><li><strong>BMS/DCIM Complexity</strong> — Basic to AI-driven (doubles controls Cx scope)</li><li><strong>Delivery Method</strong> — Traditional, design-build, EPC, fast-track</li></ul>'},
+      {q:'What does Region selection affect?',a:'Region determines <strong>labor day rates</strong> for 5 role types: CxA (Commissioning Authority), Field Technician, OEM Specialist, Witness Engineer, and Per Diem. 30 regions are available spanning North America, Europe, Asia-Pacific, Middle East, and emerging markets. Example: Northern Virginia CxA rate ~$2,400/day vs Jakarta ~$800/day.'},
+      {q:'Why do some inputs show a lock icon?',a:'Inputs marked with <i class="fas fa-crown" style="color:#a855f7;"></i> are Pro-only features. They are visible but locked in Free mode. Sign in with a Pro account to unlock them. Pro inputs significantly affect cost accuracy for complex facilities.'}
+    ]},
+    {cat:'Calculation & Results',icon:'fa-calculator',items:[
+      {q:'How is the total commissioning cost calculated?',a:'The calculator uses a <strong>parametric model</strong>:<ol><li>Base cost per kW per discipline (electrical, mechanical, controls, fire, building) from BSRIA/RSMeans data</li><li>Scaled by IT load capacity</li><li>Multiplied by 12+ adjustment factors: cooling type, redundancy, building type, seismic zone, substation, BMS, delivery method, fire suppression, UPS type, generator type, density, scope</li><li>Distributed across 7 phases (L0-L6) using phase allocation percentages</li><li>Regional labor rates applied to person-day estimates</li></ol>Pro mode adds: overtime premium, weather delay, learning curve, travel cost, instrument rental, and escalation factors.'},
+      {q:'What are the 4 KPI cards?',a:'<ul><li><strong>Total Cx Cost</strong> — Estimated total commissioning cost in USD</li><li><strong>Duration (Weeks)</strong> — Total estimated program duration</li><li><strong>Cost per kW</strong> — Cx cost divided by IT load ($/kW)</li><li><strong>% of CAPEX</strong> — Cx cost as percentage of total facility CAPEX</li></ul>Each card includes a sub-label showing the range context (e.g., "Industry range: $120-300/kW").'},
+      {q:'What does the narrative section explain?',a:'The auto-generated narrative provides 3 paragraphs of context:<ol><li>Overview of the facility type, scale, and key cost drivers</li><li>Phase-by-phase breakdown with duration and percentage allocation</li><li>Recommendations for CxA firm selection and risk mitigation</li></ol>Pro mode generates an extended intelligence brief with additional insights on regional benchmarks, team composition, and program management recommendations.'},
+      {q:'What is Monte Carlo simulation?',a:'Monte Carlo runs <strong>10,000 random iterations</strong> varying the IT load using a normal distribution (±7.5% standard deviation). Each iteration produces a different total cost. The results show:<ul><li><strong>P5</strong> — 5th percentile (optimistic low)</li><li><strong>P25</strong> — 25th percentile</li><li><strong>P50</strong> — Median (most likely)</li><li><strong>P75</strong> — 75th percentile</li><li><strong>P95</strong> — 95th percentile (conservative high)</li><li><strong>CVaR-95</strong> — Expected cost if costs exceed P95 (tail risk)</li></ul>This helps quantify cost uncertainty and set appropriate contingency budgets.'},
+      {q:'What is Sensitivity Analysis?',a:'The sensitivity tornado chart tests <strong>7 parameters</strong> individually by varying each between its extreme low and high values while holding all others constant. Parameters tested: IT Load (±20%), Cooling Type (air vs DLC), Redundancy (N vs 2N+1), Building Type, Seismic Zone, Substation Config, BMS Complexity. The chart shows which parameters have the largest impact on total cost — helping you focus risk management on the biggest drivers.'},
+      {q:'How is commissioning duration estimated?',a:'Duration uses a base-weeks-per-kW model scaled by:<ul><li>Phase allocation (L0 gets 8%, L5 gets 22%, etc.)</li><li>Cooling type duration multiplier</li><li>Redundancy duration multiplier</li><li>Delivery method (fast-track compresses by 20%)</li><li>Scope type (recommissioning shorter than new build)</li></ul>The Gantt chart shows the detailed breakdown with overlapping phases where applicable. Duration does not include pre-commissioning construction time.'},
+      {q:'What does "% of CAPEX" mean?',a:'The commissioning cost expressed as a percentage of the total facility capital expenditure. Industry benchmarks:<ul><li>Enterprise: 3-4% of CAPEX</li><li>Colocation: 3-5%</li><li>Hyperscale: 2-4% (economies of scale)</li><li>AI Factory: 2-4% (higher $/kW but massive scale)</li></ul>This metric helps validate whether the estimate is within expected industry ranges.'},
+      {q:'What is the Risk Score?',a:'A Pro feature that calculates a <strong>0-100 risk score</strong> based on facility complexity factors: redundancy level, cooling type, facility scale, substation configuration, building type, BMS complexity, seismic zone, and delivery method. Scores are categorized as Low (&lt;30), Moderate (30-55), High (55-75), or Very High (&gt;75). Higher scores warrant more experienced CxA firms and larger contingency budgets.'}
+    ]},
+    {cat:'Gantt Chart & Schedule',icon:'fa-diagram-project',items:[
+      {q:'How does the interactive Gantt chart work?',a:'The Gantt chart visualizes the commissioning schedule across all 7 phases (L0-L6) with up to <strong>7 levels of hierarchical depth</strong>: Phase → Discipline → System → Detail → Sub-detail. Click any row to expand/collapse children. Click a leaf activity to open the Activity Detail Drawer with procedure, acceptance criteria, logsheet, and tools.'},
+      {q:'What are the Gantt toolbar controls?',a:'<ul><li><strong>Search</strong> — Filter activities by keyword (highlights matching rows)</li><li><strong>Expand/Collapse</strong> — Open or close all tree nodes</li><li><strong>Day/Week/Month</strong> — Change the time axis zoom level</li><li><strong>Phase Filter</strong> — Show only a specific phase (L0-L6) or all</li><li><strong>CSV Export</strong> — Download the schedule as a CSV file</li><li><strong>Procedures Export</strong> — Bulk export all mapped procedures as PDF</li></ul>'},
+      {q:'What is an Activity Detail Drawer?',a:'When you click a leaf-level activity in the Gantt chart, a slide-out drawer opens with <strong>4 tabs</strong>:<ol><li><strong>Procedure</strong> — Step-by-step commissioning procedure with standards references</li><li><strong>Acceptance</strong> — Pass/fail criteria with industry standard and justification</li><li><strong>Logsheet</strong> — Data capture fields for test records</li><li><strong>Tools &amp; Safety</strong> — Required instruments, PPE, and safety precautions</li></ol>Each tab includes witness classification (Hold / Witness / Review) and can be exported as PDF.'},
+      {q:'What are Hold, Witness, and Review points?',a:'Quality inspection classifications per ASHRAE Guideline 0:<ul><li><strong>Hold (H)</strong> — Work stops until the witness is present. Cannot proceed without sign-off. Used for critical safety systems (e.g., generator first start, MV switchgear energization).</li><li><strong>Witness (W)</strong> — Witness should be present but work can proceed if notified. Used for important but non-critical tests (e.g., UPS load testing, chiller startup).</li><li><strong>Review (R)</strong> — Documentation review only. Witness reviews records after completion. Used for routine verifications (e.g., cable labeling, visual inspections).</li></ul>'},
+      {q:'How are activity durations calculated?',a:'Durations are calculated based on equipment quantities derived from IT load. For example, a 10MW facility might have 5 HV transformers — each requiring 2 days for FAT. The <code>cxEquipScale()</code> function calculates 24 equipment types from the IT load, and each Gantt activity uses these quantities to determine person-days. Phase-level durations are aggregated and adjusted by cooling, redundancy, and delivery multipliers.'},
+      {q:'Can I export the Gantt schedule?',a:'Yes, two export options:<ul><li><strong>CSV Export</strong> — Downloads a spreadsheet-compatible file with activity ID, name, level, duration, start/end weeks</li><li><strong>PDF Export</strong> — Pro PDF includes a tabular Gantt schedule section with week-by-week breakdown</li></ul>Individual activities can also be exported as procedure PDFs from the Activity Detail Drawer.'}
+    ]},
+    {cat:'Pro Features',icon:'fa-crown',items:[
+      {q:'What are the 14 Pro panels?',a:'<ol><li>Cost Breakdown by Discipline (doughnut chart + 6 KPIs)</li><li>Resource Loading &amp; Personnel (6 KPIs)</li><li>Monte Carlo Distribution (n=10,000, histogram + percentiles)</li><li>Sensitivity Tornado (top 7 cost drivers)</li><li>Executive Intelligence Brief (extended narrative)</li><li>Equipment Count Summary (24 equipment types)</li><li>Commissioning Risk Assessment (0-100 score)</li><li>Resource Loading Table (phase × role matrix)</li><li>Phase Gate Checklist Preview</li><li>Resource Histogram (stacked bar, person-days/week)</li><li>Witness / Hold Point Matrix (H/W/R by phase)</li><li>Cost Adjustment Factors (overtime, weather, learning, escalation, travel, instruments)</li><li>Test Instrument Inventory (ranked by usage)</li><li>Commissioning Program KPI Dashboard (9 metrics)</li></ol>'},
+      {q:'How do I access Pro mode?',a:'Click the <strong>"Unlock Pro"</strong> button or the <strong>"Pro Analysis"</strong> tab. Enter your credentials in the login dialog. A demo account is available: <code>demo@resistancezero.com</code> / <code>demo2026</code>. Sessions persist for 30 days via localStorage.'},
+      {q:'What additional PDF sections does Pro include?',a:'Pro PDF adds 8 sections beyond Free:<ul><li>Monte Carlo Risk Simulation (percentiles + algorithm)</li><li>Sensitivity Analysis (tornado chart + data table)</li><li>Risk Assessment (score + factor breakdown)</li><li>Multiplier Impact Analysis (12 multipliers)</li><li>Phase Gate Requirements</li><li>Industry Benchmark Comparison (6 archetypes)</li><li>Team Composition Recommendation</li><li>Algorithm &amp; Methodology Documentation</li></ul>Total: 20 sections vs 12 in Free.'},
+      {q:'What are Cost Adjustment Factors?',a:'Pro Panel 12 shows 6 real-world cost modifiers:<ul><li><strong>Learning Curve</strong> — Wright\'s 85% model: productivity improves with repetition on campus-scale projects</li><li><strong>Overtime Premium</strong> — Premium rates for compressed timelines (1.2-1.5x)</li><li><strong>Weather Factor</strong> — Regional weather delay probability (0.02-0.12)</li><li><strong>Travel Cost</strong> — Full-team travel estimate based on region and team size</li><li><strong>Escalation</strong> — Annual CPI escalation at 3.5% per year</li><li><strong>Instrument Rental</strong> — Calibrated test equipment rental cost</li></ul>'},
+      {q:'What is the KPI Dashboard?',a:'Pro Panel 14 displays 9 program-level metrics:<ul><li>Test Coverage % (activities with mapped procedures)</li><li>Avg Duration/Activity (person-days)</li><li>Cost/MW ratio</li><li>Person-days per MW</li><li>IST as % of total cost</li><li>Equipment-to-test ratio</li><li>Disciplines covered</li><li>Total Gantt activities</li><li>Unique procedure templates used</li></ul>'}
+    ]},
+    {cat:'PDF Export',icon:'fa-file-pdf',items:[
+      {q:'What does the PDF contain?',a:'<strong>Free PDF (12 sections):</strong> Executive Summary, Input Parameters, Cost by Level, Visualizations (SVG charts), Per-Level Analysis (L0-L6 with algorithm boxes), Discipline Breakdown, Equipment Scale, Resource Loading, Regional Rates, Recommendations, Methodology, Disclaimer.<br><br><strong>Pro PDF (20 sections):</strong> All of the above plus Monte Carlo, Sensitivity, Risk Assessment, Multipliers, Phase Gates, Benchmarks, Team Composition, Tabular Gantt, and Algorithm Documentation.'},
+      {q:'Can I export individual activity procedures?',a:'Yes. Click any leaf activity in the Gantt chart to open the drawer. Use the footer buttons:<ul><li><strong>Export Procedure</strong> — Procedure steps + acceptance criteria</li><li><strong>Export Logsheet</strong> — Data capture form for field use</li><li><strong>Full Package</strong> — Combined procedure + acceptance + logsheet + tools</li></ul>Each exports as a print-ready PDF in a new window.'},
+      {q:'Why are charts shown as SVG in the PDF?',a:'PDF is generated via <code>window.open()</code> with inline HTML/CSS. Canvas-based charts (Chart.js) cannot be transferred to a new window, so the calculator uses custom <strong>inline SVG generators</strong> to recreate bar charts, horizontal bars, and tornado charts. This ensures charts render correctly in the print dialog without depending on external libraries.'},
+      {q:'Can I customize the PDF branding?',a:'Currently the PDF uses the Resistance Zero branding. For custom branding or white-label reports, contact us directly. The PDF generation code is entirely client-side, so no server modifications are needed.'}
+    ]},
+    {cat:'Standards & Technical',icon:'fa-book-open',items:[
+      {q:'Is L0-L6 an ASHRAE standard?',a:'<strong>No.</strong> L0-L6 are <strong>project-delivery levels used in industry practice</strong>, not an ASHRAE-defined numbering scheme. ASHRAE Guideline 0-2019 describes the commissioning process from predesign through occupancy and operations. The L0-L6 mapping is an industry interpretation that aligns with common data center commissioning practice.'},
+      {q:'What NETA standards are referenced?',a:'<strong>NETA ECS-2025</strong> (Engineering Commissioning Specifications) and <strong>NETA ATS-2025</strong> (Acceptance Testing Specifications) provide the electrical testing framework: insulation resistance values, relay testing procedures, transformer testing requirements, protective device coordination, and acceptance thresholds.'},
+      {q:'How does the calculator handle fire suppression systems?',a:'Six fire suppression types are modeled:<ul><li>Clean Agent (FM-200/Novec) — NFPA 2001</li><li>Pre-Action Sprinkler — NFPA 13/72</li><li>Water Mist — NFPA 750</li><li>Inert Gas (IG-55/IG-541) — NFPA 2001</li><li>VESDA (aspirating detection) — NFPA 72, EN 54-20</li><li>Dual-system (clean agent + pre-action)</li></ul>Each type adds specific commissioning tests: agent concentration testing, door fan integrity, discharge timing, detector response, and suppression system integration.'},
+      {q:'What is a Cause-and-Effect Matrix?',a:'A document reviewed during L0 that maps every system input (sensor, alarm, interlock) to its expected output (trip, alarm, status change). During IST (L5), the CxA tests each cause-and-effect pair to verify the facility responds correctly to failure conditions. Example: Loss of chiller → BMS alarm → standby chiller auto-start → cooling maintained.'},
+      {q:'What is IST and why is it the most expensive phase?',a:'<strong>Integrated Systems Testing (L5)</strong> tests all facility systems together under simulated failure conditions. It is the most expensive phase (typically 20-25% of total Cx cost) because it requires:<ul><li>Full facility power and cooling operational</li><li>Load banks simulating IT load</li><li>Multiple simultaneous teams for concurrent failure scenarios</li><li>72-hour extended run tests</li><li>OEM specialists on standby</li><li>Witness engineers for every Hold point</li></ul>IST scenarios include: black start, generator fail-to-start, UPS bypass, cooling failure, concurrent maintenance (Tier III), and fault tolerance (Tier IV).'}
+    ]}
+  ];
+  var html='<button class="cx-faq-back" onclick="cxSwitchMode(\'free\')"><i class="fas fa-arrow-left"></i> Back to Calculator</button>';
+  html+='<div class="cx-faq-header"><h2><i class="fas fa-circle-question" style="color:#22d3ee;margin-right:10px;"></i>Frequently Asked Questions</h2><p>'+faqData.reduce(function(n,c){return n+c.items.length;},0)+' answers across '+faqData.length+' categories — everything you need to know about the Cx Calculator</p></div>';
+  html+='<input type="text" class="cx-faq-search" id="cxFaqSearch" placeholder="Search FAQ..." oninput="cxFilterFaq(this.value)">';
+  html+='<div class="cx-faq-count" id="cxFaqCount"></div>';
+  faqData.forEach(function(cat,ci){
+    html+='<div class="cx-faq-category" data-faqcat="'+ci+'">';
+    html+='<div class="cx-faq-cat-header open" onclick="this.classList.toggle(\'open\')"><i class="fas '+cat.icon+'"></i>'+cat.cat+' <span style="font-weight:400;color:#64748b;font-size:0.82rem;">('+cat.items.length+')</span><i class="fas fa-chevron-right cx-faq-cat-chevron"></i></div>';
+    html+='<div class="cx-faq-cat-body">';
+    cat.items.forEach(function(item,ii){
+      html+='<div class="cx-faq-item" data-faqq="'+cat.cat.toLowerCase()+' '+item.q.toLowerCase()+'">';
+      html+='<div class="cx-faq-q" onclick="this.classList.toggle(\'open\')"><i class="fas fa-circle-question cx-faq-q-icon"></i>'+item.q+'<i class="fas fa-chevron-right cx-faq-q-chevron"></i></div>';
+      html+='<div class="cx-faq-a">'+item.a+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+function cxFilterFaq(val){
+  var term=val.toLowerCase().trim();
+  var items=document.querySelectorAll('.cx-faq-item');
+  var shown=0;
+  items.forEach(function(it){
+    var match=!term||it.getAttribute('data-faqq').indexOf(term)>-1;
+    it.style.display=match?'':'none';
+    if(match)shown++;
+  });
+  // Auto-expand categories with matches
+  document.querySelectorAll('.cx-faq-cat-header').forEach(function(h){
+    if(term)h.classList.add('open');
+  });
+  // Show questions that match
+  if(term){
+    items.forEach(function(it){
+      if(it.style.display!=='none'){
+        var q=it.querySelector('.cx-faq-q');
+        if(q)q.classList.add('open');
+      }
+    });
+  }
+  var countEl=document.getElementById('cxFaqCount');
+  if(countEl)countEl.textContent=term?'Showing '+shown+' of '+items.length+' questions':'';
+}
+
+// --- MANUAL RENDER ---
+var _cxManualRendered=false;
+function cxRenderManual(){
+  if(_cxManualRendered)return;
+  _cxManualRendered=true;
+  var el=document.getElementById('cxManualSection');
+  if(!el)return;
+  var chapters=[
+    {id:'getting-started',title:'Getting Started',icon:'fa-rocket',desc:'First steps with the Cx Calculator',body:function(){
+      return s(1,'Open the calculator','Navigate to <code>cx-calculator.html</code>. The calculator loads with default Enterprise 2MW parameters. All inputs are immediately editable.')+
+      s(2,'Select a Scenario Preset (optional)','Choose one of 8 predefined archetypes from the <strong>Scenario Preset</strong> dropdown and click <strong>Load</strong>. This auto-fills all input parameters for a typical facility of that type. You can then customize individual inputs.')+
+      s(3,'Adjust input parameters','Modify the 8 free inputs (or 14 with Pro) to match your project. The <strong>IT Load</strong> slider is the primary scaling factor. Hover over the <strong>?</strong> icons for detailed descriptions of each parameter.')+
+      s(4,'View results','Results appear automatically after any input change. Scroll down to see KPI cards, charts, narrative, and the interactive Gantt chart.')+
+      s(5,'Explore the Gantt chart','Click phase headers to expand/collapse. Click any leaf activity to see its detailed commissioning procedure, acceptance criteria, logsheet, and required tools.')+
+      s(6,'Export your results','Click <strong>Export PDF</strong> to generate a comprehensive report. Pro users get a 20-section report; Free users get 12 sections.')+
+      note('Your inputs are auto-saved in browser localStorage. When you return, your last configuration will be restored automatically.');
+    }},
+    {id:'input-params',title:'Input Parameters',icon:'fa-sliders',desc:'Detailed guide to all 14 configuration parameters',body:function(){
+      return '<table class="cx-manual-table"><thead><tr><th>#</th><th>Parameter</th><th>Range</th><th>Impact</th><th>Mode</th></tr></thead><tbody>'+
+      '<tr><td>1</td><td><strong>IT Load Capacity</strong></td><td>100–100,000 kW</td><td>Primary scaling factor for all costs and durations</td><td>Free</td></tr>'+
+      '<tr><td>2</td><td><strong>Cooling Type</strong></td><td>Air / In-Row / RDHX / DLC / Immersion</td><td>1.0x to 1.55x cost multiplier</td><td>Free</td></tr>'+
+      '<tr><td>3</td><td><strong>Redundancy</strong></td><td>N / N+1 / 2N / 2N+1</td><td>Biggest cost driver — 2N doubles scope</td><td>Free</td></tr>'+
+      '<tr><td>4</td><td><strong>Rack Density</strong></td><td>Standard / Medium / High / Ultra-High</td><td>Cooling complexity and thermal risk</td><td>Free</td></tr>'+
+      '<tr><td>5</td><td><strong>Building Type</strong></td><td>Purpose-built / Warehouse / Modular / High-rise</td><td>+25-30% for high-rise vs purpose-built</td><td>Free</td></tr>'+
+      '<tr><td>6</td><td><strong>Fire Suppression</strong></td><td>6 types (clean agent to dual system)</td><td>Determines fire testing scope and IST integration</td><td>Free</td></tr>'+
+      '<tr><td>7</td><td><strong>UPS Type</strong></td><td>Static / Rotary / Flywheel / Li-ion</td><td>Affects battery testing and disposal procedures</td><td>Free</td></tr>'+
+      '<tr><td>8</td><td><strong>Region</strong></td><td>30 global regions</td><td>Labor day rates (3x variation globally)</td><td>Free</td></tr>'+
+      '<tr><td>9</td><td><strong>Generator Type</strong></td><td>Diesel / Gas / Dual-fuel / BESS</td><td>FAT and startup testing scope</td><td>Pro</td></tr>'+
+      '<tr><td>10</td><td><strong>Seismic Zone</strong></td><td>Zone 0–4</td><td>Adds anchor bolt, rack seismic, isolation testing</td><td>Pro</td></tr>'+
+      '<tr><td>11</td><td><strong>Cx Scope</strong></td><td>New / Retrofit / Expansion / Recommission</td><td>Baseline scope and approach</td><td>Pro</td></tr>'+
+      '<tr><td>12</td><td><strong>Substation Config</strong></td><td>Utility-fed / Ring bus / Dual sub / Onsite gen</td><td>Ring bus adds 80-110% to electrical Cx</td><td>Pro</td></tr>'+
+      '<tr><td>13</td><td><strong>BMS/DCIM</strong></td><td>Basic / Standard / Advanced / AI-driven</td><td>Doubles controls Cx scope for AI-driven</td><td>Pro</td></tr>'+
+      '<tr><td>14</td><td><strong>Delivery Method</strong></td><td>Traditional / Design-build / EPC / Fast-track</td><td>Fast-track compresses duration ~20%</td><td>Pro</td></tr>'+
+      '</tbody></table>'+
+      note('Parameters 9-14 require Pro mode. Free mode uses industry-standard defaults for these parameters.');
+    }},
+    {id:'scenarios',title:'Scenario Presets',icon:'fa-layer-group',desc:'Understanding the 8 facility archetypes',body:function(){
+      return '<table class="cx-manual-table"><thead><tr><th>Preset</th><th>IT Load</th><th>Cooling</th><th>Redundancy</th><th>Typical Cx Cost</th><th>Duration</th></tr></thead><tbody>'+
+      '<tr><td><strong>Enterprise 2MW</strong></td><td>2,000 kW</td><td>Air (CRAC)</td><td>N+1</td><td>$120-180/kW</td><td>16-24 weeks</td></tr>'+
+      '<tr><td><strong>Colo 10MW</strong></td><td>10,000 kW</td><td>In-Row</td><td>2N</td><td>$150-250/kW</td><td>24-36 weeks</td></tr>'+
+      '<tr><td><strong>Hyperscale 50MW</strong></td><td>50,000 kW</td><td>DLC</td><td>2N+1</td><td>$100-200/kW</td><td>36-52 weeks</td></tr>'+
+      '<tr><td><strong>AI Factory 100MW</strong></td><td>100,000 kW</td><td>DLC</td><td>2N+1</td><td>$150-300/kW</td><td>40-60+ weeks</td></tr>'+
+      '<tr><td><strong>Edge 500kW</strong></td><td>500 kW</td><td>In-Row</td><td>N+1</td><td>$80-150/kW</td><td>8-12 weeks</td></tr>'+
+      '<tr><td><strong>Modular 5MW</strong></td><td>5,000 kW</td><td>RDHX</td><td>N+1</td><td>$80-150/kW</td><td>12-20 weeks</td></tr>'+
+      '<tr><td><strong>Fast-Track 10MW</strong></td><td>10,000 kW</td><td>In-Row</td><td>N+1</td><td>$100-180/kW</td><td>20-30 weeks</td></tr>'+
+      '<tr><td><strong>Recommission 3MW</strong></td><td>3,000 kW</td><td>Air</td><td>N+1</td><td>$60-120/kW</td><td>10-16 weeks</td></tr>'+
+      '</tbody></table>'+
+      tip('Load a preset first, then customize individual parameters. This is the fastest way to get an accurate estimate for your specific project.');
+    }},
+    {id:'results',title:'Understanding Results',icon:'fa-chart-bar',desc:'How to interpret KPIs, charts, and narrative',body:function(){
+      return '<h4 style="color:#f1f5f9;margin-bottom:0.5rem;">KPI Cards</h4>'+
+      s(1,'Total Cx Cost','The estimated total commissioning program cost in USD. This includes all phases (L0-L6), all disciplines, labor, equipment rental, travel, and overhead. <strong>Does not include</strong> construction cost, equipment purchase, or facility fit-out.')+
+      s(2,'Duration (Weeks)','Total estimated program duration from L0 kickoff to L6 closeout. Phases may overlap in practice (e.g., L1 FAT can start while L0 planning continues). The Gantt chart shows the detailed phase sequencing.')+
+      s(3,'Cost per kW','Total Cx cost divided by IT load capacity. This normalized metric allows comparison across different facility sizes. Industry benchmarks: enterprise $120-180/kW, hyperscale $100-200/kW, AI factory $150-300/kW.')+
+      s(4,'% of CAPEX','Commissioning cost as a percentage of estimated total facility CAPEX. The CAPEX estimate uses RSMeans 2025 data scaled by facility type and cooling. Typical range: 2-5% of CAPEX.')+
+      '<h4 style="color:#f1f5f9;margin:1rem 0 0.5rem;">Charts</h4>'+
+      s(5,'Cost by Level','Bar chart showing the cost allocation across L0-L6. L5 (IST) is typically the most expensive phase at 20-25% of total cost. L2 (Installation Verification) is usually the second-largest.')+
+      s(6,'Schedule by Level','Horizontal bar chart showing duration in weeks per phase. Hover over bars to see exact values. Note that real-world phases may overlap.');
+    }},
+    {id:'gantt',title:'Gantt Chart',icon:'fa-diagram-project',desc:'Interactive schedule with 7 levels of depth',body:function(){
+      return s(1,'Navigate the hierarchy','The Gantt chart has up to <strong>7 levels</strong> of depth: Phase → Discipline → System → Detail → Sub-detail. Click the <strong>▶</strong> arrow on any row to expand its children.')+
+      s(2,'Search activities','Type in the search box to filter. Only matching activities (and their parents) are shown. Clear the search to show all.')+
+      s(3,'Change zoom level','Use <strong>Day / Week / Month</strong> buttons to adjust the time axis. Week view is default and works best for most facilities.')+
+      s(4,'Filter by phase','Use the phase dropdown to show only L0, L1, L2, etc. Select "All Phases" to restore the full view.')+
+      s(5,'View activity details','Click any <strong>leaf activity</strong> (no expand arrow) to open the Activity Detail Drawer. The drawer shows 4 tabs: Procedure, Acceptance, Logsheet, and Tools &amp; Safety.')+
+      s(6,'Export','Use <strong>CSV</strong> to download the schedule as a spreadsheet. Use <strong>Procedures</strong> to bulk-export all mapped procedures as a single PDF document.')+
+      note('Activity durations are calculated from equipment quantities, which are derived from your IT load input. Changing the IT load will update all activity durations proportionally.')+
+      '<h4 style="color:#f1f5f9;margin:1rem 0 0.5rem;">Phase Color Legend</h4>'+
+      '<table class="cx-manual-table"><thead><tr><th>Color</th><th>Phase</th><th>Typical %</th></tr></thead><tbody>'+
+      '<tr><td style="color:#64748b;">Gray</td><td>L0 — Design &amp; Planning</td><td>8%</td></tr>'+
+      '<tr><td style="color:#3b82f6;">Blue</td><td>L1 — FAT</td><td>12%</td></tr>'+
+      '<tr><td style="color:#10b981;">Green</td><td>L2 — Installation</td><td>20%</td></tr>'+
+      '<tr><td style="color:#f59e0b;">Amber</td><td>L3 — Startup</td><td>18%</td></tr>'+
+      '<tr><td style="color:#8b5cf6;">Purple</td><td>L4 — Performance</td><td>15%</td></tr>'+
+      '<tr><td style="color:#ef4444;">Red</td><td>L5 — IST</td><td>22%</td></tr>'+
+      '<tr><td style="color:#f97316;">Orange</td><td>L6 — Turnover</td><td>5%</td></tr>'+
+      '</tbody></table>';
+    }},
+    {id:'procedures',title:'Activity Procedures',icon:'fa-clipboard-list',desc:'Commissioning procedures, acceptance criteria, and logsheets',body:function(){
+      return s(1,'Open the drawer','Click any leaf activity in the Gantt chart. The Activity Detail Drawer slides in from the right.')+
+      s(2,'Procedure tab','Step-by-step commissioning procedure based on industry templates. Each procedure references the applicable standard (NETA, IEEE, ASHRAE, NFPA) and includes detailed instructions for each test step.')+
+      s(3,'Acceptance tab','Pass/fail criteria for the activity. Each criterion includes:<ul><li><strong>Criterion</strong> — The measurable requirement</li><li><strong>Standard</strong> — Reference standard (e.g., NETA ATS-2025 §7.3)</li><li><strong>Justification</strong> — Why this criterion matters</li></ul>')+
+      s(4,'Logsheet tab','Data capture fields for test records. Includes:<ul><li>Field name and unit of measurement</li><li>Min/max acceptable ranges where applicable</li><li>Space for actual measured values</li></ul>Export as a fillable PDF form for field use.')+
+      s(5,'Tools & Safety tab','Required test instruments (e.g., Megger, DLRO, thermal camera) and PPE requirements. Also shows the witness classification (Hold/Witness/Review).')+
+      s(6,'Export options','Three export buttons in the drawer footer:<ul><li><strong>Export Procedure</strong> — Procedure + acceptance criteria only</li><li><strong>Export Logsheet</strong> — Logsheet form for field use</li><li><strong>Full Package</strong> — All 4 tabs combined into one PDF</li></ul>')+
+      tip('Use "Full Package" export to generate complete test documentation for each commissioning activity. This can be used as a starting template for actual project commissioning procedures.');
+    }},
+    {id:'pro-features',title:'Pro Features',icon:'fa-crown',desc:'Advanced analytics, Monte Carlo, sensitivity, and more',body:function(){
+      return '<p style="color:#94a3b8;font-size:0.85rem;margin-bottom:1rem;">Pro mode unlocks 6 additional input parameters and 14 advanced analysis panels. Access with demo credentials: <code>demo@resistancezero.com</code> / <code>demo2026</code></p>'+
+      s(1,'Monte Carlo Simulation','Runs 10,000 random iterations varying IT load by ±7.5% standard deviation. Produces a probability distribution of commissioning costs with P5/P25/P50/P75/P95 percentiles and CVaR-95 tail risk metric.')+
+      s(2,'Sensitivity Analysis','Tests 7 parameters individually between extreme values. The tornado chart shows which parameters have the largest impact on total cost — crucial for risk-focused budgeting.')+
+      s(3,'Cost by Discipline','Doughnut chart breaking down costs into 5 disciplines: Electrical, Mechanical, Controls/BMS, Fire/Life Safety, and Building/Architectural.')+
+      s(4,'Resource Histogram','Stacked bar chart showing person-days per week by role type (CxA, Field Tech, OEM, Witness). Helps with workforce planning and scheduling.')+
+      s(5,'Risk Assessment','Automated 0-100 risk score based on facility complexity. Considers redundancy, cooling, scale, substation, building type, BMS, seismic, and delivery method.')+
+      s(6,'Equipment Inventory','Lists all 24 equipment types with quantities calculated from IT load: transformers, generators, UPS modules, chillers, CDUs, AHUs, panels, and more.')+
+      note('Pro PDF export includes all 14 panels as dedicated sections, plus algorithm documentation and industry benchmark comparisons.');
+    }},
+    {id:'monte-carlo',title:'Monte Carlo Analysis',icon:'fa-dice',desc:'Understanding probabilistic cost estimation',body:function(){
+      return s(1,'What it does','Runs <strong>10,000 random iterations</strong> of the cost model. In each iteration, the IT load is randomly varied using a normal (Gaussian) distribution with ±7.5% standard deviation. This simulates real-world uncertainty in facility sizing.')+
+      s(2,'How to interpret','The histogram shows the distribution of possible costs. The vertical lines mark key percentiles:<ul><li><strong>P5</strong> — Only 5% chance costs will be below this (optimistic)</li><li><strong>P50</strong> — Median (50/50 chance of above/below)</li><li><strong>P95</strong> — Only 5% chance costs will exceed this (conservative)</li></ul>')+
+      s(3,'CVaR-95','Conditional Value at Risk at 95% — the <strong>expected cost if costs exceed P95</strong>. This is a tail-risk metric used in financial risk management. If you want to budget for worst-case scenarios, use CVaR-95.')+
+      s(4,'Budget recommendation','<ul><li><strong>Optimistic budget</strong>: P25 (75% confidence)</li><li><strong>Likely budget</strong>: P50 (50% confidence)</li><li><strong>Conservative budget</strong>: P75 (25% probability of overrun)</li><li><strong>Risk-averse budget</strong>: P95 (5% probability of overrun)</li></ul>')+
+      tip('For contractual budgeting, most owners use P75 as the base estimate with P95 as the not-to-exceed ceiling. The difference (P95 - P75) represents recommended contingency.');
+    }},
+    {id:'pdf-export',title:'PDF Export',icon:'fa-file-pdf',desc:'Generating comprehensive commissioning reports',body:function(){
+      return s(1,'Generate the PDF','Click <strong>Export PDF</strong> (Free) or <strong>Export Full Report</strong> (Pro) in the toolbar. A new browser window opens with the formatted report.')+
+      s(2,'Print or save','Use your browser\'s print dialog (Ctrl+P / Cmd+P) to save as PDF or print on paper. The report is optimized for A4 page size.')+
+      s(3,'Free PDF contents','12 sections: Executive Summary, Input Parameters, Cost by Level, Visualizations, Per-Level Analysis (L0-L6 with algorithm explanations), Discipline Breakdown, Equipment Scale, Resource Loading, Regional Rates, Recommendations, Methodology, Disclaimer.')+
+      s(4,'Pro PDF additions','8 additional sections: Monte Carlo, Sensitivity, Risk Assessment, Multiplier Analysis, Phase Gates, Benchmarks, Team Composition, Algorithm Documentation. Total: 20 sections.')+
+      s(5,'Activity PDFs','Individual procedure exports from the Gantt drawer. Each generates a standalone PDF with procedure steps, acceptance criteria, logsheet fields, tools, safety requirements, and witness classification.')+
+      note('All charts in the PDF use inline SVG (not Canvas) to ensure they render correctly in the print dialog across all browsers.');
+    }},
+    {id:'keyboard',title:'Keyboard Shortcuts',icon:'fa-keyboard',desc:'Quick navigation and actions',body:function(){
+      return '<table class="cx-manual-table"><thead><tr><th>Key</th><th>Action</th><th>Context</th></tr></thead><tbody>'+
+      '<tr><td><span class="cx-manual-kbd">Enter</span></td><td>Run calculation</td><td>When not in an input field or modal</td></tr>'+
+      '<tr><td><span class="cx-manual-kbd">Esc</span></td><td>Close modal / drawer</td><td>When modal or drawer is open</td></tr>'+
+      '<tr><td><span class="cx-manual-kbd">Ctrl</span>+<span class="cx-manual-kbd">P</span></td><td>Print / Save as PDF</td><td>In PDF export window</td></tr>'+
+      '</tbody></table>'+
+      tip('The calculator auto-recalculates when you change any input. No need to manually trigger calculation unless using keyboard shortcuts.');
+    }},
+    {id:'troubleshooting',title:'Troubleshooting',icon:'fa-wrench',desc:'Common issues and solutions',body:function(){
+      return s(1,'Results not showing','Make sure the IT Load is at least 100 kW. The calculator requires a minimum load to generate meaningful estimates. Try clicking the "Reset" button and reconfiguring inputs.')+
+      s(2,'Gantt chart is empty','The Gantt chart only renders after the first calculation. Adjust any input parameter to trigger a calculation, or press Enter.')+
+      s(3,'Pro features locked','Click "Unlock Pro" and sign in with valid credentials. Demo account: <code>demo@resistancezero.com</code> / <code>demo2026</code>. If the session expired (30 days), sign in again.')+
+      s(4,'PDF export blank','Ensure pop-ups are not blocked by your browser. The PDF opens in a new window via <code>window.open()</code>. Whitelist the calculator page in your pop-up blocker settings.')+
+      s(5,'Charts not rendering','Chart.js is loaded from CDN (cdn.jsdelivr.net). Ensure you have internet access or that your network does not block CDN requests. The SVG fallback charts in the PDF do not require internet.')+
+      s(6,'Mobile layout issues','The calculator is responsive but optimized for desktop use. On mobile screens below 480px, some charts may be compressed. Use landscape orientation for the best mobile experience.')+
+      s(7,'Data not saving','localStorage must be enabled in your browser. Private/incognito browsing may disable localStorage. Your inputs are saved automatically on every change.');
+    }},
+    {id:'glossary-ext',title:'Extended Glossary',icon:'fa-book-open',desc:'Complete terminology reference (30+ terms)',body:function(){
+      return '<table class="cx-manual-table"><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody>'+
+      '<tr><td><strong>BOD</strong></td><td>Basis of Design — describes how the design meets the OPR</td></tr>'+
+      '<tr><td><strong>BMS</strong></td><td>Building Management System — monitors and controls mechanical/electrical systems</td></tr>'+
+      '<tr><td><strong>CAPEX</strong></td><td>Capital Expenditure — total facility construction cost</td></tr>'+
+      '<tr><td><strong>CDU</strong></td><td>Coolant Distribution Unit — circulates liquid coolant to IT racks</td></tr>'+
+      '<tr><td><strong>CRAC/CRAH</strong></td><td>Computer Room Air Conditioner / Computer Room Air Handler</td></tr>'+
+      '<tr><td><strong>CVaR-95</strong></td><td>Conditional Value at Risk at 95% — expected cost given costs exceed P95</td></tr>'+
+      '<tr><td><strong>CxA</strong></td><td>Commissioning Authority — independent party executing the Cx plan</td></tr>'+
+      '<tr><td><strong>DCIM</strong></td><td>Data Center Infrastructure Management — software for monitoring and managing DC assets</td></tr>'+
+      '<tr><td><strong>DLC</strong></td><td>Direct Liquid Cooling — coolant delivered directly to server components</td></tr>'+
+      '<tr><td><strong>EPC</strong></td><td>Engineering, Procurement, Construction — delivery method</td></tr>'+
+      '<tr><td><strong>FAT</strong></td><td>Factory Acceptance Test — witnessing equipment tests at manufacturer</td></tr>'+
+      '<tr><td><strong>IST</strong></td><td>Integrated Systems Testing — testing all systems together under failure conditions</td></tr>'+
+      '<tr><td><strong>L0-L6</strong></td><td>Commissioning levels from Design Planning to Turnover &amp; Closeout</td></tr>'+
+      '<tr><td><strong>MCC</strong></td><td>Motor Control Center — electrical panel for motor starters and VFDs</td></tr>'+
+      '<tr><td><strong>NETA</strong></td><td>National Electrical Testing Association — electrical testing standards</td></tr>'+
+      '<tr><td><strong>OPR</strong></td><td>Owner\'s Project Requirements — defines functional and performance criteria</td></tr>'+
+      '<tr><td><strong>P5/P25/P50/P75/P95</strong></td><td>Monte Carlo percentiles — probability thresholds for cost estimates</td></tr>'+
+      '<tr><td><strong>PDU</strong></td><td>Power Distribution Unit — distributes power to IT racks</td></tr>'+
+      '<tr><td><strong>RDHX</strong></td><td>Rear Door Heat Exchanger — passive/active cooling at rack rear door</td></tr>'+
+      '<tr><td><strong>RFS</strong></td><td>Ready for Service — formal milestone after L5 completion and L6 closeout</td></tr>'+
+      '<tr><td><strong>SLD</strong></td><td>Single Line Diagram — electrical power distribution schematic</td></tr>'+
+      '<tr><td><strong>STS</strong></td><td>Static Transfer Switch — transfers load between two power sources</td></tr>'+
+      '<tr><td><strong>UPS</strong></td><td>Uninterruptible Power Supply — provides backup power during outages</td></tr>'+
+      '<tr><td><strong>VESDA</strong></td><td>Very Early Smoke Detection Apparatus — aspirating smoke detection system</td></tr>'+
+      '<tr><td><strong>VFD</strong></td><td>Variable Frequency Drive — controls motor speed for pumps, fans, compressors</td></tr>'+
+      '</tbody></table>';
+    }}
+  ];
+  function s(n,title,desc){return '<div class="cx-manual-step"><div class="cx-manual-step-num">'+n+'</div><div class="cx-manual-step-text"><strong>'+title+'</strong><br>'+desc+'</div></div>';}
+  function note(t){return '<div class="cx-manual-note"><i class="fas fa-triangle-exclamation"></i><div>'+t+'</div></div>';}
+  function tip(t){return '<div class="cx-manual-tip"><i class="fas fa-lightbulb"></i><div>'+t+'</div></div>';}
+  var html='<button class="cx-manual-back" onclick="cxSwitchMode(\'free\')"><i class="fas fa-arrow-left"></i> Back to Calculator</button>';
+  html+='<div class="cx-manual-header"><h2><i class="fas fa-book" style="color:#22d3ee;margin-right:10px;"></i>User Manual</h2><p>Comprehensive guide to the Data Center Commissioning Calculator — '+chapters.length+' chapters</p></div>';
+  html+='<div class="cx-manual-nav">';
+  // Sidebar TOC
+  html+='<div class="cx-manual-sidebar">';
+  chapters.forEach(function(ch,i){
+    html+='<div class="cx-manual-toc-item'+(i===0?' active':'')+'" onclick="cxScrollToChapter(\''+ch.id+'\',this)"><div class="cx-manual-toc-num">'+(i+1)+'</div>'+ch.title+'</div>';
+  });
+  html+='</div>';
+  // Content
+  html+='<div class="cx-manual-content">';
+  chapters.forEach(function(ch,i){
+    html+='<div class="cx-manual-chapter" id="cxManCh_'+ch.id+'">';
+    html+='<div class="cx-manual-chapter-head"><h3><i class="fas '+ch.icon+'"></i>Chapter '+(i+1)+': '+ch.title+'</h3><p>'+ch.desc+'</p></div>';
+    html+='<div class="cx-manual-chapter-body">'+ch.body()+'</div>';
+    html+='</div>';
+  });
+  html+='</div></div>';
+  el.innerHTML=html;
+}
+function cxScrollToChapter(id,tocItem){
+  var ch=document.getElementById('cxManCh_'+id);
+  if(ch)ch.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.cx-manual-toc-item').forEach(function(t){t.classList.remove('active');});
+  if(tocItem)tocItem.classList.add('active');
+}
+
+// --- CURRENCY SYSTEM ---
+var CX_CURRENCY_RATES={USD:1,EUR:0.92,GBP:0.79,AUD:1.53,SGD:1.34,JPY:149.5,AED:3.67,INR:83.1};
+var CX_CURRENCY_SYMBOLS={USD:'$',EUR:'\u20ac',GBP:'\u00a3',AUD:'A$',SGD:'S$',JPY:'\u00a5',AED:'AED ',INR:'\u20b9'};
+var cxSelectedCurrency='USD';
+function cxSetCurrency(c){
+  cxSelectedCurrency=c;
+  if(cxLastResults)cxCalculate();
+}
+function cxFmtCur(usd){
+  var converted=usd*CX_CURRENCY_RATES[cxSelectedCurrency];
+  var sym=CX_CURRENCY_SYMBOLS[cxSelectedCurrency];
+  if(cxSelectedCurrency==='JPY')return sym+Math.round(converted).toLocaleString();
+  if(converted>=1e6)return sym+(converted/1e6).toFixed(2)+'M';
+  if(converted>=1e3)return sym+(converted/1e3).toFixed(0)+'K';
+  return sym+Math.round(converted).toLocaleString();
+}
+
+// --- SHARE CONFIG ---
+function cxShareConfig(){
+  var inp=cxReadInputs();
+  var params=new URLSearchParams();
+  Object.keys(inp).forEach(function(k){params.set(k,inp[k]);});
+  var url=window.location.origin+window.location.pathname+'?'+params.toString();
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(function(){
+      var btn=document.querySelector('.cx-share-btn');
+      if(btn){var orig=btn.innerHTML;btn.innerHTML='<i class="fas fa-check"></i> Copied!';setTimeout(function(){btn.innerHTML=orig;},2000);}
+    });
+  } else {
+    prompt('Copy this link:',url);
+  }
+}
+// Restore from URL params on load
+(function cxRestoreFromUrl(){
+  var params=new URLSearchParams(window.location.search);
+  if(params.has('itLoad')){
+    var fields={itLoad:'cxItLoad',coolingType:'cxCoolingType',redundancy:'cxRedundancy',rackDensity:'cxRackDensity',buildingType:'cxBuildingType',fireSuppression:'cxFireSuppression',upsType:'cxUpsType',region:'cxRegion',generatorType:'cxGeneratorType',seismicZone:'cxSeismicZone',cxScope:'cxScope',substationConfig:'cxSubstation',bmsComplexity:'cxBmsComplexity',deliveryMethod:'cxDeliveryMethod'};
+    Object.keys(fields).forEach(function(k){
+      var v=params.get(k);
+      if(v){
+        var el=document.getElementById(fields[k]);
+        if(el)el.value=v;
+      }
+    });
+    var il=params.get('itLoad');
+    if(il){document.getElementById('cxItLoadNum').value=il;document.getElementById('cxItLoadVal').textContent=il+' kW';}
+    setTimeout(function(){cxCalculate();},100);
+  }
+})();
+
+// --- PANEL 15: SCENARIO COMPARISON ---
+function cxRenderComparison(inp,res){
+  var el=document.getElementById('cxComparisonContent');
+  if(!el)return;
+  var presets=['enterprise_2mw','colo_10mw','hyperscale_50mw','ai_factory_100mw','modular_5mw','fast_track'];
+  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th>Metric</th><th style="color:#22d3ee;">Your Config</th>';
+  var compResults=[];
+  presets.forEach(function(pk){
+    var s=CX_SCENARIOS[pk];
+    var ci={itLoad:s.itLoad,coolingType:s.coolingType,redundancy:s.redundancy,rackDensity:s.rackDensity,buildingType:s.buildingType,fireSuppression:s.fireSuppression||'novec',upsType:s.upsType||'modular',region:inp.region,generatorType:s.generatorType||'diesel',seismicZone:s.seismicZone||'1',cxScope:s.cxScope||'new_build',substationConfig:s.substationConfig||'single_sub',bmsComplexity:s.bmsComplexity||'standard',deliveryMethod:s.deliveryMethod||'traditional'};
+    var cr=cxCalcTotalCost(ci);
+    compResults.push({name:pk.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}),res:cr,inp:ci});
+    html+='<th>'+pk.split('_')[0].charAt(0).toUpperCase()+pk.split('_')[0].slice(1)+'</th>';
+  });
+  html+='</tr></thead><tbody>';
+  var rows=[
+    ['Total Cost',function(r){return cxFmtCur(r.grandTotal);}],
+    ['$/kW',function(r){return '$'+r.perKw.toFixed(0);}],
+    ['% CAPEX',function(r){return r.pctCapex.toFixed(1)+'%';}],
+    ['Duration',function(r){return r.duration.weeks+' wks';}],
+    ['Risk Score',function(r,i){return cxCalcRiskScore(i,r)+'/100';}]
+  ];
+  rows.forEach(function(row){
+    html+='<tr><td><strong>'+row[0]+'</strong></td><td style="color:#22d3ee;font-weight:600;">'+row[1](res,inp)+'</td>';
+    compResults.forEach(function(c){html+='<td>'+row[1](c.res,c.inp)+'</td>';});
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+// --- PANEL 16: COST WATERFALL ---
+function cxRenderWaterfall(res,inp){
+  var el=document.getElementById('cxWaterfallContent');
+  if(!el)return;
+  var items=[
+    {label:'Base (Electrical)',val:res.disciplines.electrical,color:'#3b82f6'},
+    {label:'+ Mechanical',val:res.disciplines.mechanical,color:'#10b981'},
+    {label:'+ Controls/BMS',val:res.disciplines.controls,color:'#8b5cf6'},
+    {label:'+ Fire/Life Safety',val:res.disciplines.fire,color:'#ef4444'},
+    {label:'+ Security',val:res.disciplines.security,color:'#f59e0b'},
+    {label:'+ IT/Network',val:res.disciplines.it,color:'#06b6d4'},
+    {label:'+ Building',val:res.disciplines.building,color:'#64748b'},
+    {label:'+ Management',val:res.disciplines.management,color:'#a855f7'},
+    {label:'+ Contingency (15%)',val:res.contingency,color:'#f97316'}
+  ];
+  var cumul=0;
+  var maxVal=res.grandTotal;
+  var barW=100;
+  var html='<div style="font-size:0.78rem;">';
+  items.forEach(function(it){
+    var pct=(it.val/maxVal)*barW;
+    var leftPct=(cumul/maxVal)*barW;
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+    html+='<div style="width:140px;text-align:right;color:#94a3b8;font-size:0.75rem;flex-shrink:0;">'+it.label+'</div>';
+    html+='<div style="flex:1;height:22px;background:rgba(148,163,184,0.06);border-radius:4px;position:relative;overflow:hidden;">';
+    html+='<div style="position:absolute;left:'+leftPct+'%;width:'+Math.max(pct,0.5)+'%;height:100%;background:'+it.color+';border-radius:3px;"></div>';
+    html+='</div>';
+    html+='<div style="width:80px;text-align:right;color:#cbd5e1;font-weight:600;">'+cxFmtCur(it.val)+'</div>';
+    html+='</div>';
+    cumul+=it.val;
+  });
+  html+='<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(148,163,184,0.1);">';
+  html+='<div style="width:140px;text-align:right;color:#22d3ee;font-weight:700;">= Grand Total</div>';
+  html+='<div style="flex:1;height:26px;background:rgba(14,116,144,0.15);border-radius:4px;"></div>';
+  html+='<div style="width:80px;text-align:right;color:#22d3ee;font-weight:700;">'+cxFmtCur(res.grandTotal)+'</div>';
+  html+='</div></div>';
+  el.innerHTML=html;
+}
+
+// --- PANEL 17: MILESTONES ---
+function cxRenderMilestones(res,inp){
+  var el=document.getElementById('cxMilestonesContent');
+  if(!el)return;
+  var totalWeeks=res.duration.weeks;
+  var milestones=[
+    {week:0,label:'Project Kickoff',desc:'Cx plan approved, CxA mobilized',icon:'fa-flag',color:'#64748b'},
+    {week:Math.round(totalWeeks*0.05),label:'L0 Complete',desc:'OPR/BOD aligned, energization strategy approved',icon:'fa-clipboard-check',color:'#64748b'},
+    {week:Math.round(totalWeeks*0.12),label:'FAT Complete',desc:'All factory witness testing signed off',icon:'fa-industry',color:'#3b82f6'},
+    {week:Math.round(totalWeeks*0.30),label:'Installation Verified',desc:'All L2 static tests pass, ready for energization',icon:'fa-wrench',color:'#10b981'},
+    {week:Math.round(totalWeeks*0.50),label:'All Systems Energized',desc:'First power-on complete, BMS functional',icon:'fa-bolt',color:'#f59e0b'},
+    {week:Math.round(totalWeeks*0.70),label:'Performance Validated',desc:'All systems pass individual performance tests',icon:'fa-chart-line',color:'#8b5cf6'},
+    {week:Math.round(totalWeeks*0.85),label:'IST Start',desc:'Integrated failure scenario testing begins',icon:'fa-triangle-exclamation',color:'#ef4444'},
+    {week:Math.round(totalWeeks*0.95),label:'IST Complete',desc:'All failure scenarios tested, 72-hr load test pass',icon:'fa-check-double',color:'#ef4444'},
+    {week:totalWeeks,label:'RFS / Turnover',desc:'Facility accepted, operations handover complete',icon:'fa-flag-checkered',color:'#22d3ee'}
+  ];
+  var html='<div style="position:relative;padding-left:30px;">';
+  html+='<div style="position:absolute;left:14px;top:0;bottom:0;width:2px;background:rgba(148,163,184,0.15);"></div>';
+  milestones.forEach(function(m){
+    html+='<div style="position:relative;margin-bottom:1rem;display:flex;gap:12px;align-items:flex-start;">';
+    html+='<div style="position:absolute;left:-24px;width:20px;height:20px;border-radius:50%;background:'+m.color+';display:flex;align-items:center;justify-content:center;z-index:1;"><i class="fas '+m.icon+'" style="font-size:0.55rem;color:#fff;"></i></div>';
+    html+='<div><div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;">Week '+m.week+' — '+m.label+'</div>';
+    html+='<div style="font-size:0.78rem;color:#94a3b8;">'+m.desc+'</div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+// --- PANEL 18: TEAM COMPOSITION ---
+function cxRenderTeam(res,inp){
+  var el=document.getElementById('cxTeamContent');
+  if(!el)return;
+  var load=inp.itLoad;
+  var isDLC=(inp.coolingType==='dlc'||inp.coolingType==='immersion');
+  var roles=[
+    {role:'Lead CxA',count:1,phase:'L0-L6',note:'Overall program lead, client interface'},
+    {role:'Electrical CxA',count:load>=50000?3:load>=10000?2:1,phase:'L1-L5',note:'MV/LV switchgear, generators, UPS, STS'},
+    {role:'Mechanical CxA',count:load>=50000?(isDLC?3:2):1,phase:'L2-L5',note:'Chillers, CW systems'+(isDLC?', CDU/DLC':'')},
+    {role:'Controls/BMS Engineer',count:load>=50000?2:1,phase:'L3-L5',note:'BMS commissioning, point-to-point, graphics'},
+    {role:'Fire/Life Safety',count:1,phase:'L2-L5',note:'Detection, suppression, VESDA, dampers'},
+    {role:'Field Technicians',count:load>=50000?8:load>=10000?5:3,phase:'L2-L4',note:'Cable testing, insulation resistance, torque'},
+    {role:'OEM Specialists',count:Math.ceil(res.equipment.generators+res.equipment.chillers+res.equipment.ups_modules)*0.3,phase:'L3-L4',note:'Generator, chiller, UPS startup (vendor)'},
+    {role:'Witness Engineers',count:load>=50000?4:load>=10000?2:1,phase:'L1,L4-L5',note:'Owner/3rd party witnesses for Hold points'},
+    {role:'Documentation',count:1,phase:'L0,L6',note:'Document control, as-built, closeout packages'},
+    {role:'Project Manager',count:load>=50000?2:1,phase:'L0-L6',note:'Schedule, cost, resource coordination'}
+  ];
+  var total=roles.reduce(function(s,r){return s+Math.ceil(r.count);},0);
+  var html='<div style="font-size:0.78rem;margin-bottom:0.75rem;color:#94a3b8;">Recommended team: <strong style="color:#22d3ee;">'+total+' personnel</strong> (peak deployment during L3-L5)</div>';
+  html+='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th>Role</th><th>Count</th><th>Phases</th><th>Responsibility</th></tr></thead><tbody>';
+  roles.forEach(function(r){
+    html+='<tr><td><strong>'+r.role+'</strong></td><td style="text-align:center;color:#22d3ee;font-weight:600;">'+Math.ceil(r.count)+'</td><td>'+r.phase+'</td><td style="color:#94a3b8;">'+r.note+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+// --- PANEL 19: REGIONAL BENCHMARK ---
+function cxRenderBenchmarkPanel(res,inp){
+  var el=document.getElementById('cxBenchmarkContent');
+  if(!el)return;
+  var regions=['us_virginia','uk_london','singapore','australia_sydney','uae_dubai','japan_tokyo','india_mumbai','germany_frankfurt'];
+  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th>Region</th><th>CxA Day Rate</th><th>Est. Total Cost</th><th>Cost Index</th></tr></thead><tbody>';
+  var baseTotal=res.grandTotal;
+  regions.forEach(function(rk){
+    var rate=cxGetRate(rk);
+    if(!rate)return;
+    var ti=Object.assign({},inp,{region:rk});
+    var tr=cxCalcTotalCost(ti);
+    var idx=((tr.grandTotal/baseTotal)*100).toFixed(0);
+    var hi=rk===inp.region;
+    html+='<tr'+(hi?' style="background:rgba(14,116,144,0.1);"':'')+'>';
+    html+='<td>'+(hi?'<strong style="color:#22d3ee;">':'')+(rate.name||rk)+(hi?' (Current)</strong>':'')+'</td>';
+    html+='<td>'+cxFmtCur(rate.cxDay)+'/day</td>';
+    html+='<td>'+cxFmtCur(tr.grandTotal)+'</td>';
+    html+='<td>'+(idx>110?'<span style="color:#ef4444;">':idx<90?'<span style="color:#10b981;">':'<span style="color:#94a3b8;">')+idx+'%</span></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  html+='<div style="font-size:0.72rem;color:#64748b;margin-top:0.5rem;">Cost Index: 100% = your current region. Values &gt;110% are more expensive; &lt;90% are cheaper.</div>';
+  el.innerHTML=html;
+}
+
+// --- PANEL 20: ENVIRONMENTAL IMPACT ---
+function cxRenderEnvironmental(res,inp){
+  var el=document.getElementById('cxEnvironmentalContent');
+  if(!el)return;
+  // Estimates based on industry benchmarks
+  var daysOnsite=res.duration.total;
+  var teamSize=inp.itLoad>=50000?15:inp.itLoad>=10000?8:5;
+  var flightsCO2=teamSize*2*0.5; // 2 round trips × 0.5 tonnes each (avg)
+  var dailyTransportCO2=teamSize*daysOnsite*0.02; // 20kg CO2/person/day commuting
+  var loadBankCO2=res.duration.l5*8*0.8; // 8hrs/day × 0.8 tonnes CO2/hr (diesel gen load bank)
+  var dieselTestCO2=res.equipment.generators*4*0.8; // 4hrs each × 0.8 tonnes/hr
+  var totalCO2=flightsCO2+dailyTransportCO2+loadBankCO2+dieselTestCO2;
+  var wasteKg=(res.equipment.switchgear+res.equipment.transformers)*50+(res.equipment.racks*5); // packaging, cable offcuts
+  var waterL=0;
+  if(inp.coolingType==='dlc'||inp.coolingType==='immersion'){
+    waterL=res.equipment.cooling_units*2000; // 2000L coolant fill for testing
+  } else {
+    waterL=res.equipment.chillers*5000; // CHW system fill
+  }
+  var items=[
+    {label:'Travel Emissions',val:flightsCO2.toFixed(1)+' tCO2e',icon:'fa-plane',desc:'Team mobilization flights'},
+    {label:'Commuting Emissions',val:dailyTransportCO2.toFixed(1)+' tCO2e',icon:'fa-car',desc:daysOnsite+' days × '+teamSize+' people'},
+    {label:'Load Bank Testing',val:loadBankCO2.toFixed(1)+' tCO2e',icon:'fa-gas-pump',desc:'Diesel generator load testing (L5 IST)'},
+    {label:'Generator Testing',val:dieselTestCO2.toFixed(1)+' tCO2e',icon:'fa-bolt',desc:res.equipment.generators+' generators × 4hr each'},
+    {label:'Total CO2 Estimate',val:totalCO2.toFixed(1)+' tCO2e',icon:'fa-cloud',desc:'Entire Cx program carbon footprint'},
+    {label:'Construction Waste',val:(wasteKg/1000).toFixed(1)+' tonnes',icon:'fa-recycle',desc:'Packaging, cable offcuts, test materials'},
+    {label:'Water Usage',val:(waterL/1000).toFixed(1)+' m\u00b3',icon:'fa-droplet',desc:inp.coolingType==='dlc'?'Coolant fill/flush for DLC testing':'CHW system fill for testing'}
+  ];
+  var html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;">';
+  items.forEach(function(it){
+    var isTotal=it.label.indexOf('Total')>-1;
+    html+='<div style="padding:0.75rem;border-radius:8px;background:'+(isTotal?'rgba(14,116,144,0.1)':'rgba(15,23,42,0.4)')+';border:1px solid '+(isTotal?'rgba(14,116,144,0.3)':'rgba(148,163,184,0.06)')+';">';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><i class="fas '+it.icon+'" style="color:'+(isTotal?'#22d3ee':'#64748b')+';font-size:0.8rem;"></i><span style="font-size:0.82rem;font-weight:700;color:'+(isTotal?'#22d3ee':'#e2e8f0')+';">'+it.val+'</span></div>';
+    html+='<div style="font-size:0.75rem;color:#94a3b8;">'+it.label+'</div>';
+    html+='<div style="font-size:0.72rem;color:#64748b;">'+it.desc+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:0.72rem;color:#64748b;margin-top:0.75rem;">Estimates based on industry averages. Actual emissions depend on local grid mix, transport methods, and testing protocols. Consider carbon offsets for large commissioning programs.</div>';
+  el.innerHTML=html;
+}
+
+// --- ANIMATED KPI COUNTER ---
+function cxAnimateValue(el,start,end,duration){
+  if(!el)return;
+  var range=end-start;
+  var startTime=null;
+  var isUSD=el.textContent.indexOf('$')>-1||el.textContent.indexOf('M')>-1||el.textContent.indexOf('K')>-1;
+  function step(ts){
+    if(!startTime)startTime=ts;
+    var progress=Math.min((ts-startTime)/duration,1);
+    var eased=1-Math.pow(1-progress,3); // ease-out cubic
+    var current=Math.round(start+range*eased);
+    if(isUSD){
+      if(current>=1e6)el.textContent='$'+(current/1e6).toFixed(2)+'M';
+      else if(current>=1e3)el.textContent='$'+Math.round(current/1e3)+'K';
+      else el.textContent='$'+current;
+    } else {
+      el.textContent=current;
+    }
+    if(progress<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// --- LAST SAVED INDICATOR ---
+var _cxLastSaveEl=null;
+function cxShowLastSaved(){
+  if(!_cxLastSaveEl){
+    _cxLastSaveEl=document.createElement('span');
+    _cxLastSaveEl.style.cssText='font-size:0.68rem;color:#64748b;margin-left:8px;';
+    var actions=document.querySelector('.cx-toolbar-actions');
+    if(actions)actions.appendChild(_cxLastSaveEl);
+  }
+  var now=new Date();
+  _cxLastSaveEl.textContent='Saved '+now.toLocaleTimeString();
+}
+
+// --- GANTT STATS BAR ---
+function cxRenderGanttStats(ganttData){
+  var progEl=document.getElementById('cxGanttProgress');
+  if(!progEl)return;
+  // Count total activities and mapped activities
+  var total=0,mapped=0,phases={};
+  function walk(items){
+    items.forEach(function(it){
+      if(!it.children||it.children.length===0){
+        total++;
+        if(typeof CX_ACTIVITY_MAP!=='undefined'&&CX_ACTIVITY_MAP[it.id])mapped++;
+        var ph=it.id.substring(0,2);
+        phases[ph]=(phases[ph]||0)+1;
+      }
+      if(it.children)walk(it.children);
+    });
+  }
+  walk(ganttData);
+  var pct=total>0?Math.round((mapped/total)*100):0;
+  var html='<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.78rem;color:#94a3b8;">';
+  html+='<span><strong style="color:#22d3ee;">'+total+'</strong> activities</span>';
+  html+='<span><strong style="color:#10b981;">'+mapped+'</strong> with procedures ('+pct+'%)</span>';
+  Object.keys(phases).sort().forEach(function(ph){
+    html+='<span>'+ph+': <strong>'+phases[ph]+'</strong></span>';
+  });
+  html+='</div>';
+  progEl.innerHTML=html;
+}
+
+// --- INPUT VALIDATION BADGES ---
+function cxValidateInputs(){
+  var itLoad=parseInt(document.getElementById('cxItLoad').value);
+  var warnings=[];
+  var cooling=document.getElementById('cxCoolingType').value;
+  var redundancy=document.getElementById('cxRedundancy').value;
+  var density=document.getElementById('cxRackDensity').value;
+  // Validate combinations
+  if(density==='ai_hpc'&&cooling==='air'){
+    warnings.push('Ultra-high density (50-100kW/rack) typically requires DLC or immersion cooling, not air cooling.');
+  }
+  if(itLoad>=50000&&redundancy==='N'){
+    warnings.push('N redundancy (no backup) is unusual for facilities above 50MW. Consider N+1 or higher.');
+  }
+  if(itLoad<500&&redundancy==='2N+1'){
+    warnings.push('2N+1 redundancy is uncommon for small facilities under 500kW. N+1 is typical.');
+  }
+  // Show warnings
+  var existing=document.getElementById('cxValidationWarn');
+  if(existing)existing.remove();
+  if(warnings.length>0){
+    var div=document.createElement('div');
+    div.id='cxValidationWarn';
+    div.style.cssText='margin:0.5rem 0;padding:0.75rem 1rem;border-radius:8px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);font-size:0.8rem;color:#fbbf24;';
+    div.innerHTML='<i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i>'+warnings.join('<br><i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i>');
+    var inputGrid=document.getElementById('cxInputsGrid');
+    if(inputGrid)inputGrid.parentNode.insertBefore(div,inputGrid.nextSibling);
+  }
+}
+
+// --- ENHANCED KEYBOARD SHORTCUTS ---
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&!e.target.closest('.cx-modal')&&e.target.tagName!=='INPUT')cxCalculate();
-  if(e.key==='Escape'){cxCloseModal();}
+  // Don't intercept when in input/modal
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')return;
+  if(e.target.closest('.cx-modal'))return;
+  if(e.key==='Enter')cxCalculate();
+  if(e.key==='Escape'){cxCloseModal();cxCloseDrawer();}
+  if(e.key==='?'||e.key==='/'){e.preventDefault();cxSwitchMode('faq');}
+  if(e.key==='m'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('manual');}
+  if(e.key==='f'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('free');}
+  if(e.key==='p'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('pro');}
+  if(e.key==='r'&&!e.ctrlKey&&!e.metaKey){cxReset();}
+  if(e.key==='e'&&!e.ctrlKey&&!e.metaKey){cxExportPDF();}
 });
 
 // --- AUTO-SAVE / RESTORE INPUTS ---
@@ -4813,6 +5703,7 @@ function cxSaveInputs(){
   try{
     var inp=cxReadInputs();
     localStorage.setItem('cx_calc_last_inputs',JSON.stringify(inp));
+    cxShowLastSaved();
   }catch(e){}
 }
 function cxRestoreInputs(){
@@ -4884,6 +5775,27 @@ document.querySelectorAll('.cx-input-field, .cx-input-range').forEach(function(e
     cxSaveInputs();
     if(cxLastResults)cxCalculate();
   });
+});
+
+// --- AUTO-SAVE TIMER (30 seconds) ---
+setInterval(function(){
+  if(cxLastResults){
+    cxSaveInputs();
+  }
+},30000);
+
+// --- PRINT SHORTCUT ---
+window.addEventListener('beforeprint',function(){
+  // Auto-expand all Gantt nodes for printing
+  document.querySelectorAll('.cx-gantt-row.collapsed').forEach(function(r){r.classList.remove('collapsed');});
+});
+
+// --- ACCESSIBILITY: Focus visible outline ---
+document.addEventListener('keydown',function(e){
+  if(e.key==='Tab')document.body.classList.add('cx-keyboard-nav');
+});
+document.addEventListener('mousedown',function(){
+  document.body.classList.remove('cx-keyboard-nav');
 });
 
 // --- SCROLL TO TOP ---
