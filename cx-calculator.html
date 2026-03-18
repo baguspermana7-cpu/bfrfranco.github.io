@@ -1502,6 +1502,30 @@ var CX_ACTIVITY_MAP = {
   'L1_E_ST_TT':{t:'breaker_test',p:{close_ms:'5',open_ms:'5',cr_uohm:'50',cycle_count:'10'}},
   'L1_E_ST_PS':{t:'functional_sequence',p:{system_name:'STS',settle_time:'100ms',setpoint_tolerance:'1',interlock_list:'preferred source detect, backfeed prevent'}},
   'L1_E_ST_MB':{t:'functional_sequence',p:{system_name:'STS make-before-break',settle_time:'100ms',setpoint_tolerance:'1',interlock_list:'source sync window'}},
+  // L1 — FAT: LVSB/DB
+  'L1_E_LV_IR':{t:'ir_test',p:{voltage_class:'LV bus',min_ir:'100MΩ',test_voltage:'1kV'}},
+  'L1_E_LV_BK':{t:'breaker_test',p:{close_ms:'5',open_ms:'5',cr_uohm:'50',cycle_count:'10'}},
+  'L1_E_LV_MT':{t:'functional_sequence',p:{system_name:'LVSB metering calibration',settle_time:'2min',setpoint_tolerance:'1',interlock_list:'CT ratio, PT ratio'}},
+  'L1_E_LV_LB':{t:'visual_inspection',p:{component:'LVSB/DB labeling and nameplate verification'}},
+  // L1 — FAT: MCC
+  'L1_E_MC_SW':{t:'visual_inspection',p:{component:'MCC starter wiring point-to-point'}},
+  'L1_E_MC_OL':{t:'functional_sequence',p:{system_name:'MCC overload relay settings',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'OLR class, FLA setting'}},
+  'L1_E_MC_IR':{t:'ir_test',p:{voltage_class:'LV bucket',min_ir:'100MΩ',test_voltage:'1kV'}},
+  'L1_E_MC_CT':{t:'functional_sequence',p:{system_name:'MCC control circuit',settle_time:'5s',setpoint_tolerance:'2',interlock_list:'start/stop, HOA, interlock'}},
+  // L1 — FAT: PDU
+  'L1_E_PD_BK':{t:'breaker_test',p:{close_ms:'5',open_ms:'5',cr_uohm:'50',cycle_count:'5'}},
+  'L1_E_PD_MT':{t:'functional_sequence',p:{system_name:'PDU metering calibration',settle_time:'2min',setpoint_tolerance:'1',interlock_list:'branch metering, main metering'}},
+  'L1_E_PD_TR':{t:'ir_test',p:{voltage_class:'PDU transformer',min_ir:'100MΩ',test_voltage:'1kV'}},
+  'L1_E_PD_IR':{t:'ir_test',p:{voltage_class:'PDU bus',min_ir:'100MΩ',test_voltage:'1kV'}},
+  // L1 — FAT: Busway
+  'L1_E_BW_JT':{t:'visual_inspection',p:{component:'busway joint integrity and torque marks'}},
+  'L1_E_BW_IR':{t:'ir_test',p:{voltage_class:'busway section',min_ir:'100MΩ',test_voltage:'1kV'}},
+  'L1_E_BW_TQ':{t:'visual_inspection',p:{component:'bus bar bolted connection torque verification'}},
+  // L1 — FAT: ATS
+  'L1_E_AT_TT':{t:'breaker_test',p:{close_ms:'100',open_ms:'100',cr_uohm:'50',cycle_count:'10'}},
+  'L1_E_AT_SS':{t:'functional_sequence',p:{system_name:'ATS source sensing',settle_time:'5s',setpoint_tolerance:'2',interlock_list:'voltage sense, frequency sense, phase angle'}},
+  'L1_E_AT_EX':{t:'functional_sequence',p:{system_name:'ATS exerciser timer',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'timer interval, transfer duration'}},
+  'L1_E_AT_BP':{t:'functional_sequence',p:{system_name:'ATS bypass operation',settle_time:'30s',setpoint_tolerance:'2',interlock_list:'bypass interlock, load continuity'}},
   // L1 — FAT: Mechanical
   'L1_M_CH_CP1':{t:'chiller_startup',p:{capacity_pct:'5'}},
   'L1_M_CH_CP2':{t:'chiller_startup',p:{capacity_pct:'5'}},
@@ -1705,6 +1729,17 @@ var CX_ACTIVITY_MAP = {
   'L3_E_LV_VR':{t:'functional_sequence',p:{system_name:'LVSB feeder voltage verification',settle_time:'2min',setpoint_tolerance:'2',interlock_list:'all phases present'}},
   'L3_E_BW_EN':{t:'functional_sequence',p:{system_name:'busway sectional energization',settle_time:'5min',setpoint_tolerance:'2',interlock_list:'section isolation, IR clearance'}},
   'L3_E_BW_TH':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  // L3 — MCC Startup
+  'L3_E_MC_EN':{t:'functional_sequence',p:{system_name:'MCC starter energization',settle_time:'2min',setpoint_tolerance:'2',interlock_list:'upstream breaker, control power'}},
+  'L3_E_MC_MR':{t:'functional_sequence',p:{system_name:'motor rotation verification',settle_time:'30s',setpoint_tolerance:'5',interlock_list:'phase rotation, motor direction'}},
+  'L3_E_MC_OL':{t:'functional_sequence',p:{system_name:'OLR trip verification',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'trip current, reset function'}},
+  // L3 — STS On-Site Commissioning
+  'L3_E_ST_TT':{t:'breaker_test',p:{close_ms:'4',open_ms:'4',cr_uohm:'50',cycle_count:'10'}},
+  'L3_E_ST_PS':{t:'functional_sequence',p:{system_name:'STS preferred source failover',settle_time:'100ms',setpoint_tolerance:'1',interlock_list:'source detection, backfeed prevent'}},
+  'L3_E_ST_WF':{t:'functional_sequence',p:{system_name:'STS waveform capture',settle_time:'100ms',setpoint_tolerance:'1',interlock_list:'waveform recorder, transfer event'}},
+  // L3 — PDU Energization (missing map entries)
+  'L3_E_PD_EN':{t:'functional_sequence',p:{system_name:'PDU sequential board energization',settle_time:'5min',setpoint_tolerance:'2',interlock_list:'upstream protection, branch breakers'}},
+  'L3_E_PD_MT':{t:'functional_sequence',p:{system_name:'PDU metering accuracy',settle_time:'2min',setpoint_tolerance:'1',interlock_list:'CT ratio, branch metering'}},
   'L3_E_VF_PR':{t:'vfd_test',p:{vfd_tag:'per schedule',stop_time:'5'}},
   'L3_E_VF_MT':{t:'vfd_test',p:{vfd_tag:'per schedule',stop_time:'5'}},
   'L3_E_VF_BP':{t:'vfd_test',p:{vfd_tag:'per schedule',stop_time:'5'}},
@@ -1772,6 +1807,14 @@ var CX_ACTIVITY_MAP = {
   'L4_E_SC_LV':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
   'L4_E_SC_MC':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
   'L4_E_SC_BW':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  // L4 — PDU Performance
+  'L4_E_PD_TH':{t:'thermal_survey',p:{load_pct:'75',stabilize_min:'30',emissivity:'0.95',max_dt:'10'}},
+  'L4_E_PD_MT':{t:'functional_sequence',p:{system_name:'PDU metering under load',settle_time:'5min',setpoint_tolerance:'1',interlock_list:'branch current, main metering'}},
+  'L4_E_PD_LB':{t:'functional_sequence',p:{system_name:'PDU load balance verification',settle_time:'5min',setpoint_tolerance:'5',interlock_list:'phase balance, branch distribution'}},
+  // L4 — STS Performance
+  'L4_E_ST_TL':{t:'ist_scenario',p:{load_condition:'100% design',scenario_description:'STS transfer under load',acceptance_specific:'Transfer time ≤¼ cycle with no load interruption under full IT load.',stabilize_min:'15'}},
+  'L4_E_ST_WQ':{t:'functional_sequence',p:{system_name:'STS waveform quality analysis',settle_time:'100ms',setpoint_tolerance:'1',interlock_list:'THD, voltage sag, transient'}},
+  'L4_E_ST_TT':{t:'thermal_survey',p:{load_pct:'100',stabilize_min:'60',emissivity:'0.95',max_dt:'15'}},
   'L4_M_OH_AF':{t:'airflow_balance',p:{system_name:'office HVAC',design_cfm:'per design',measure_height:'1.0m'}},
   'L4_M_OH_TP':{t:'functional_sequence',p:{system_name:'HVAC temperature setpoint response',settle_time:'15min',setpoint_tolerance:'1',interlock_list:'supply temp, return temp, valve position'}},
   'L4_M_WT_QA':{t:'water_quality_test',p:{system_type:'closed loop CHW',ph_min:'7.0',ph_max:'9.0',conductivity_max:'3000',glycol_pct:'N/A'}},
@@ -1948,7 +1991,9 @@ function cxEquipScale(inp){
     cameras:Math.ceil(kw/200)+20,
     lightZones:Math.ceil(kw/1000)+4,
     emergLights:Math.ceil(kw/500)+20,
-    sumpPumps:Math.ceil(kw/5000)+2
+    sumpPumps:Math.ceil(kw/5000)+2,
+    ats:Math.ceil(kw/2000),
+    rpp:Math.ceil(kw/200)
   };
 }
 
@@ -1974,7 +2019,7 @@ function cxCalcL0Cost(inp,dur){
 }
 
 function cxCalcL1Dur(inp,eq){
-  var d=eq.switchgear*2+eq.transformers*3+eq.generators*2+2+eq.chillers*0.5+1;
+  var d=eq.switchgear*2+eq.transformers*3+eq.generators*2+2+eq.chillers*0.5+1+eq.lvsb*0.5+eq.mcc*0.5+eq.pdus*0.3+eq.busway*0.3+eq.ats*0.3;
   if(inp.coolingType==='dlc'||inp.coolingType==='immersion')d+=2;
   if(inp.deliveryMethod==='modular_pod')d*=1.5;
   return Math.ceil(d*CX_SCOPE[inp.cxScope].dur);
@@ -2421,6 +2466,35 @@ function cxBuildGantt(inp,res){
           {id:'L1_E_VF_SP',name:'Speed/torque at rated motor',lvl:4,dur:0.2},
           {id:'L1_E_VF_BP',name:'Bypass transfer function',lvl:4,dur:0.1},
           {id:'L1_E_VF_HR',name:'Harmonic filter verification',lvl:4,dur:0.1}
+        ]},
+        {id:'L1_E_LV',name:'LVSB/DB FAT (×'+(eq.lvsb+eq.db)+')',lvl:3,dur:Math.max(0.5,Math.ceil((eq.lvsb+eq.db)*0.3)),children:[
+          {id:'L1_E_LV_IR',name:'Bus insulation resistance',lvl:4,dur:0.2},
+          {id:'L1_E_LV_BK',name:'Breaker operation & trip test',lvl:4,dur:0.3},
+          {id:'L1_E_LV_MT',name:'Metering calibration',lvl:4,dur:0.2},
+          {id:'L1_E_LV_LB',name:'Labeling & nameplate verification',lvl:4,dur:0.1}
+        ]},
+        {id:'L1_E_MC',name:'MCC FAT (×'+eq.mcc+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.mcc*0.4)),children:[
+          {id:'L1_E_MC_SW',name:'Starter wiring verification',lvl:4,dur:0.2},
+          {id:'L1_E_MC_OL',name:'OLR settings confirmation',lvl:4,dur:0.2},
+          {id:'L1_E_MC_IR',name:'Insulation resistance per bucket',lvl:4,dur:0.2},
+          {id:'L1_E_MC_CT',name:'Control circuit functional test',lvl:4,dur:0.2}
+        ]},
+        {id:'L1_E_PD',name:'PDU FAT (×'+eq.pdus+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.pdus*0.3)),children:[
+          {id:'L1_E_PD_BK',name:'Breaker schedule verification',lvl:4,dur:0.2},
+          {id:'L1_E_PD_MT',name:'Metering calibration',lvl:4,dur:0.2},
+          {id:'L1_E_PD_TR',name:'Transformer turns ratio test',lvl:4,dur:0.2},
+          {id:'L1_E_PD_IR',name:'Insulation resistance',lvl:4,dur:0.1}
+        ]},
+        {id:'L1_E_BW',name:'Busway FAT (×'+eq.busway+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.busway*0.3)),children:[
+          {id:'L1_E_BW_JT',name:'Joint integrity test',lvl:4,dur:0.2},
+          {id:'L1_E_BW_IR',name:'IR per section',lvl:4,dur:0.2},
+          {id:'L1_E_BW_TQ',name:'Bus bar torque verification',lvl:4,dur:0.1}
+        ]},
+        {id:'L1_E_AT',name:'ATS FAT (×'+eq.ats+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.ats*0.3)),children:[
+          {id:'L1_E_AT_TT',name:'Transfer time measurement',lvl:4,dur:0.2},
+          {id:'L1_E_AT_SS',name:'Source sensing verification',lvl:4,dur:0.2},
+          {id:'L1_E_AT_EX',name:'Exerciser timer function',lvl:4,dur:0.1},
+          {id:'L1_E_AT_BP',name:'Bypass operation test',lvl:4,dur:0.1}
         ]}
       ]},
       {id:'L1_M',name:'Mechanical FAT',lvl:2,dur:Math.ceil(d.l1*0.3),children:[
@@ -2772,6 +2846,16 @@ function cxBuildGantt(inp,res){
           {id:'L3_E_BW_EN',name:'Sectional energization',lvl:4,dur:0.2},
           {id:'L3_E_BW_TH',name:'Thermal scan at rated current',lvl:4,dur:0.2}
         ]},
+        {id:'L3_E_MC',name:'MCC Startup (×'+eq.mcc+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.mcc*0.3)),children:[
+          {id:'L3_E_MC_EN',name:'Starter energization sequence',lvl:4,dur:0.2},
+          {id:'L3_E_MC_MR',name:'Motor rotation verification',lvl:4,dur:0.2},
+          {id:'L3_E_MC_OL',name:'OLR trip verification',lvl:4,dur:0.1}
+        ]},
+        {id:'L3_E_ST',name:'STS On-Site Commissioning (×'+eq.sts+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.sts*0.3)),children:[
+          {id:'L3_E_ST_TT',name:'Transfer time under site conditions',lvl:4,dur:0.2},
+          {id:'L3_E_ST_PS',name:'Preferred source failover',lvl:4,dur:0.2},
+          {id:'L3_E_ST_WF',name:'Waveform capture during transfer',lvl:4,dur:0.1}
+        ]},
         {id:'L3_E_VF',name:'VFD Startup (×'+eq.vfd+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.vfd*0.15)),children:[
           {id:'L3_E_VF_PR',name:'Parameter programming',lvl:4,dur:0.2},
           {id:'L3_E_VF_MT',name:'Motor start & speed test',lvl:4,dur:0.2},
@@ -2938,6 +3022,16 @@ function cxBuildGantt(inp,res){
           ]},
           {id:'L4_E_EP_AL',name:'EPMS alarm thresholds',lvl:4,dur:0.3},
           {id:'L4_E_EP_RP',name:'Report generation (PUE calc)',lvl:4,dur:0.3}
+        ]},
+        {id:'L4_E_PD',name:'PDU Performance (×'+eq.pdus+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.pdus*0.2)),children:[
+          {id:'L4_E_PD_TH',name:'Branch circuit thermal scan',lvl:4,dur:0.3},
+          {id:'L4_E_PD_MT',name:'Metering accuracy under load',lvl:4,dur:0.2},
+          {id:'L4_E_PD_LB',name:'Load balance verification',lvl:4,dur:0.2}
+        ]},
+        {id:'L4_E_ST',name:'STS Performance (×'+eq.sts+')',lvl:3,dur:Math.max(0.5,Math.ceil(eq.sts*0.3)),children:[
+          {id:'L4_E_ST_TL',name:'Transfer under load test',lvl:4,dur:0.3},
+          {id:'L4_E_ST_WQ',name:'Waveform quality analysis',lvl:4,dur:0.2},
+          {id:'L4_E_ST_TT',name:'Thyristor thermal imaging',lvl:4,dur:0.2}
         ]},
         {id:'L4_E_SC',name:'Selective Coordination Test',lvl:3,dur:Math.max(1,Math.ceil((eq.lvsb+eq.db)*0.2)),children:[
           {id:'L4_E_SC_LV',name:'LVSB/DB breaker coordination',lvl:4,dur:0.3},
@@ -3966,11 +4060,11 @@ function cxExportPDF(){
 
   // L1
   h+='<div class="pdf-level"><div class="pdf-level-title">L1 — Factory Witness Testing ('+Math.ceil(res.duration.l1/5)+' weeks, '+cxFmt(res.levels.l1)+')</div>';
-  h+='<b>Scope:</b> Witness equipment tests at manufacturer premises before shipping. Covers switchgear ('+eq.switchgear+' units), transformers ('+eq.transformers+'), generators ('+eq.generators+'), UPS systems, chillers ('+eq.chillers+').<br>';
+  h+='<b>Scope:</b> Witness equipment tests at manufacturer premises before shipping. Covers switchgear ('+eq.switchgear+' units), transformers ('+eq.transformers+'), generators ('+eq.generators+'), UPS systems, LVSB/DB ('+(eq.lvsb+eq.db)+'), MCC ('+eq.mcc+'), PDU ('+eq.pdus+'), busway ('+eq.busway+'), ATS ('+eq.ats+'), chillers ('+eq.chillers+').<br>';
   h+='<b>Key Activities:</b> HV/MV switchgear FAT: insulation resistance (phase-to-phase, phase-to-ground), primary injection (CT ratio, relay pickup), breaker operation timing (close/open cycle), protection relay testing (50/51 overcurrent, 50N/51N earth fault, UV/OV). Transformer FAT: turns ratio, oil analysis, heat run. Generator FAT: engine performance, alternator, governor response. Chiller FAT: compressor performance, refrigerant charge verification.<br>';
-  h+='<b>Cost Drivers:</b> Equipment count scales with facility size. '+eq.switchgear+' switchgear × 2 days + '+eq.transformers+' transformers × 3 days + '+eq.generators+' generators × 2 days. Travel/per diem at '+cxFmt(rate.perDiem)+'/day. CxA witness rate: '+cxFmt(rate.cxDay)+'/day.<br>';
+  h+='<b>Cost Drivers:</b> Equipment count scales with facility size. '+eq.switchgear+' switchgear × 2d + '+eq.transformers+' transformers × 3d + '+eq.generators+' generators × 2d + '+(eq.lvsb+eq.db)+' LVSB/DB × 0.5d + '+eq.mcc+' MCC × 0.5d + '+eq.pdus+' PDU × 0.3d + '+eq.busway+' busway × 0.3d + '+eq.ats+' ATS × 0.3d. Travel/per diem at '+cxFmt(rate.perDiem)+'/day. CxA witness rate: '+cxFmt(rate.cxDay)+'/day.<br>';
   h+='<b>Industry Reference:</b> NETA ECS-2025 defines acceptance testing criteria. IEEE C57.12 for transformer testing. NFPA 110 for generator testing.</div>';
-  h+='<div class="pdf-algo">Algorithm: L1_duration = sw('+eq.switchgear+'×2d) + tx('+eq.transformers+'×3d) + gen('+eq.generators+'×2d) + ups(2d) + chiller('+eq.chillers+'×0.5d) + fire(1d) × scope_factor = '+res.duration.l1+' working days<br>';
+  h+='<div class="pdf-algo">Algorithm: L1_duration = sw('+eq.switchgear+'×2d) + tx('+eq.transformers+'×3d) + gen('+eq.generators+'×2d) + ups(2d) + chiller('+eq.chillers+'×0.5d) + fire(1d) + lvsb('+(eq.lvsb+eq.db)+'×0.5d) + mcc('+eq.mcc+'×0.5d) + pdu('+eq.pdus+'×0.3d) + busway('+eq.busway+'×0.3d) + ats('+eq.ats+'×0.3d) × scope_factor = '+res.duration.l1+' working days<br>';
   h+='L1_cost = duration × CxA_rate × 2 witnesses + travel_per_diem = '+cxFmt(res.levels.l1)+'</div>';
   h+='<div class="pdf-conclusion">Conclusion: FAT catches manufacturing defects before shipping — typically 2-5% of equipment has issues discovered during FAT. Skipping FAT shifts defect discovery to L2-L3, where remediation costs 5-10x more due to site logistics and schedule impact.</div>';
 
