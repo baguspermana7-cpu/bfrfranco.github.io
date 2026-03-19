@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPEX Estimator Widget | ResistanceZero</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .widget-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .widget-header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #06b6d4;
+            letter-spacing: -0.3px;
+        }
+        .widget-header p {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+        .input-group select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+        .input-hint {
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 4px;
+        }
+
+        .results-panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 6px;
+        }
+
+        .total-display {
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #334155;
+        }
+        .total-label {
+            font-size: 0.72rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .total-range {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #06b6d4;
+            letter-spacing: -0.5px;
+            margin-top: 2px;
+        }
+        .total-sub {
+            font-size: 0.78rem;
+            color: #475569;
+            margin-top: 4px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .metric-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .metric-card .metric-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #06b6d4;
+        }
+        .metric-card .metric-lbl {
+            font-size: 0.68rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .breakdown {
+            margin-top: 14px;
+        }
+        .breakdown-title {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            font-size: 0.82rem;
+        }
+        .breakdown-item:last-child { border-bottom: none; }
+        .breakdown-item .bi-label { color: #94a3b8; }
+        .breakdown-item .bi-value { color: #e2e8f0; font-weight: 600; }
+        .breakdown-item .bi-bar {
+            flex: 1;
+            height: 4px;
+            background: #1e293b;
+            border-radius: 2px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+        .breakdown-item .bi-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: #06b6d4;
+            transition: width 0.3s;
+        }
+
+        .powered-by {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 16px;
+        }
+        .powered-by a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .powered-by a:hover { color: #06b6d4; }
+        .powered-by .rz-dot {
+            width: 6px; height: 6px;
+            background: #06b6d4;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 14px; }
+            .total-range { font-size: 1.3rem; }
+            .metrics-grid { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-header">
+        <h1>CAPEX Estimator</h1>
+        <p>Data Center Construction Cost</p>
+    </div>
+
+    <div class="input-group">
+        <label for="powerCapacity">IT Power Capacity (MW)</label>
+        <input type="number" id="powerCapacity" value="5" min="0.1" max="200" step="0.1" oninput="calculate()">
+        <div class="input-hint">Planned IT load capacity in megawatts</div>
+    </div>
+
+    <div class="input-group">
+        <label for="tierLevel">Redundancy / Tier Level</label>
+        <select id="tierLevel" onchange="calculate()">
+            <option value="n">Tier I -- Basic (N)</option>
+            <option value="n1">Tier II -- Redundant (N+1)</option>
+            <option value="2n" selected>Tier III -- Concurrent (2N)</option>
+            <option value="2n1">Tier IV -- Fault Tolerant (2N+1)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="region">Region</label>
+        <select id="region" onchange="calculate()">
+            <option value="americas" selected>Americas (US Baseline)</option>
+            <option value="emea">EMEA (Europe, Middle East)</option>
+            <option value="apac">APAC (Asia Pacific)</option>
+            <option value="mea">MEA (Middle East / Africa)</option>
+        </select>
+    </div>
+
+    <div class="results-panel">
+        <div class="total-display">
+            <div class="total-label">Estimated CAPEX Range</div>
+            <div class="total-range" id="totalRange">$50.5M - $60.1M</div>
+            <div class="total-sub" id="totalSub">Based on 5 MW Tier III in Americas</div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-val" id="costPerMW">$10.1M</div>
+                <div class="metric-lbl">Cost / MW</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="costPerKW">$10,100</div>
+                <div class="metric-lbl">Cost / kW</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="costPerRack">$80.8K</div>
+                <div class="metric-lbl">Cost / Rack</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="rackCount">625</div>
+                <div class="metric-lbl">Est. Racks</div>
+            </div>
+        </div>
+
+        <div class="breakdown">
+            <div class="breakdown-title">Cost Breakdown (Midpoint)</div>
+            <div id="breakdownList"></div>
+        </div>
+    </div>
+
+    <div class="powered-by">
+        <a href="https://resistancezero.com/capex-calculator.html" target="_blank" rel="noopener">
+            <span class="rz-dot"></span> Powered by ResistanceZero
+        </a>
+    </div>
+
+    <script>
+    /* Cost factors per kW of IT load (USD), derived from the full CAPEX calculator */
+    var costFactors = {
+        building:        { base: 800,  label: 'Building & Civil',     color: '#64748b' },
+        electrical:      { base: 1200, label: 'Electrical Systems',   color: '#3b82f6' },
+        ups:             { base: 600,  label: 'UPS Systems',          color: '#8b5cf6' },
+        generator:       { base: 400,  label: 'Generator & Fuel',     color: '#f59e0b' },
+        cooling:         { base: 700,  label: 'Cooling Systems',      color: '#06b6d4' },
+        fireSuppression: { base: 150,  label: 'Fire Suppression',     color: '#ef4444' },
+        bms:             { base: 120,  label: 'BMS / DCIM',           color: '#10b981' },
+        network:         { base: 250,  label: 'Network & Cabling',    color: '#a855f7' },
+        commissioning:   { base: 120,  label: 'Cx & Startup',         color: '#14b8a6' },
+        other:           { base: 310,  label: 'Security, Testing, Permits', color: '#6366f1' }
+    };
+
+    var redundancyMult = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
+    var regionMult = { americas: 1.0, emea: 1.15, apac: 0.85, mea: 0.90 };
+
+    var tierLabels = { n: 'Tier I', n1: 'Tier II', '2n': 'Tier III', '2n1': 'Tier IV' };
+    var regionLabels = { americas: 'Americas', emea: 'EMEA', apac: 'APAC', mea: 'MEA' };
+
+    /* Categories that scale with redundancy */
+    var redScaled = { electrical: true, ups: true, generator: true };
+
+    function calculate() {
+        var mw = parseFloat(document.getElementById('powerCapacity').value) || 0;
+        var tier = document.getElementById('tierLevel').value;
+        var region = document.getElementById('region').value;
+
+        if (mw <= 0) {
+            document.getElementById('totalRange').textContent = '--';
+            document.getElementById('totalSub').textContent = 'Enter a valid power capacity';
+            return;
+        }
+
+        var itKW = mw * 1000;
+        var redM = redundancyMult[tier];
+        var regM = regionMult[region];
+
+        var costs = {};
+        var total = 0;
+        for (var key in costFactors) {
+            var factor = costFactors[key];
+            var mult = regM;
+            if (redScaled[key]) { mult *= redM; }
+            else if (key === 'cooling') { mult *= (redM > 1.5 ? 1.15 : 1.0); }
+            else if (key === 'building') { mult *= (redM > 1.8 ? 1.2 : 1.0); }
+
+            var cost = factor.base * itKW * mult;
+            costs[key] = cost;
+            total += cost;
+        }
+
+        /* Contingency 5% + soft costs ~8% */
+        var softCosts = total * 0.08;
+        var contingency = total * 0.05;
+        total += softCosts + contingency;
+
+        /* Range: -10% to +10% */
+        var low = total * 0.90;
+        var high = total * 1.10;
+
+        document.getElementById('totalRange').textContent = formatCurrency(low) + ' - ' + formatCurrency(high);
+        document.getElementById('totalSub').textContent = mw + ' MW ' + tierLabels[tier] + ' in ' + regionLabels[region];
+
+        var perMW = total / mw;
+        var perKW = total / itKW;
+        var racks = Math.round(itKW / 8);
+        var perRack = total / racks;
+
+        document.getElementById('costPerMW').textContent = formatCurrency(perMW);
+        document.getElementById('costPerKW').textContent = '$' + formatNum(Math.round(perKW));
+        document.getElementById('costPerRack').textContent = formatCurrency(perRack);
+        document.getElementById('rackCount').textContent = formatNum(racks);
+
+        /* Breakdown */
+        var items = [];
+        for (var k in costs) {
+            items.push({ key: k, label: costFactors[k].label, color: costFactors[k].color, value: costs[k] });
+        }
+        items.push({ key: 'soft', label: 'Design & PM Fees', color: '#94a3b8', value: softCosts });
+        items.push({ key: 'contingency', label: 'Contingency (5%)', color: '#475569', value: contingency });
+
+        items.sort(function(a, b) { return b.value - a.value; });
+        var maxVal = items[0].value;
+
+        var html = '';
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var pct = (item.value / total * 100).toFixed(1);
+            var barWidth = (item.value / maxVal * 100).toFixed(0);
+            html += '<div class="breakdown-item">' +
+                '<span class="bi-label">' + item.label + '</span>' +
+                '<div class="bi-bar"><div class="bi-bar-fill" style="width:' + barWidth + '%;background:' + item.color + '"></div></div>' +
+                '<span class="bi-value">' + pct + '%</span>' +
+                '</div>';
+        }
+        document.getElementById('breakdownList').innerHTML = html;
+    }
+
+    function formatCurrency(amount) {
+        if (amount >= 1e9) return '$' + (amount / 1e9).toFixed(2) + 'B';
+        if (amount >= 1e6) return '$' + (amount / 1e6).toFixed(1) + 'M';
+        if (amount >= 1e3) return '$' + (amount / 1e3).toFixed(0) + 'K';
+        return '$' + Math.round(amount);
+    }
+
+    function formatNum(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    calculate();
+    </script>
+</body>
+</html>

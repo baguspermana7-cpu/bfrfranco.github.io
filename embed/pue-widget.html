@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUE Calculator Widget | ResistanceZero</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .widget-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .widget-header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #06b6d4;
+            letter-spacing: -0.3px;
+        }
+        .widget-header p {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .formula-bar {
+            background: rgba(6, 182, 212, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            padding: 8px 14px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            color: #06b6d4;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+        .input-hint {
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 4px;
+        }
+
+        .results-panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 6px;
+        }
+        .pue-display {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .pue-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            transition: color 0.3s;
+        }
+        .pue-label {
+            font-size: 0.72rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+        .rating-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .metric-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .metric-card .metric-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #06b6d4;
+        }
+        .metric-card .metric-lbl {
+            font-size: 0.68rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .efficiency-bar {
+            margin-top: 14px;
+        }
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .bar-track {
+            width: 100%;
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s ease, background 0.3s;
+        }
+
+        .powered-by {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 16px;
+        }
+        .powered-by a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .powered-by a:hover { color: #06b6d4; }
+        .powered-by .rz-dot {
+            width: 6px; height: 6px;
+            background: #06b6d4;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 14px; }
+            .pue-value { font-size: 2.2rem; }
+            .metrics-grid { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-header">
+        <h1>PUE Calculator</h1>
+        <p>Power Usage Effectiveness</p>
+    </div>
+
+    <div class="formula-bar">PUE = Total Facility Power / IT Equipment Power</div>
+
+    <div class="input-group">
+        <label for="totalPower">Total Facility Power (kW)</label>
+        <input type="number" id="totalPower" value="1500" min="1" step="1" oninput="calculate()">
+        <div class="input-hint">All power consumed by the facility including IT, cooling, lighting, UPS losses</div>
+    </div>
+
+    <div class="input-group">
+        <label for="itPower">IT Equipment Power (kW)</label>
+        <input type="number" id="itPower" value="1000" min="1" step="1" oninput="calculate()">
+        <div class="input-hint">Power consumed by servers, storage, and networking equipment</div>
+    </div>
+
+    <div class="results-panel">
+        <div class="pue-display">
+            <div class="pue-value" id="pueValue">1.50</div>
+            <div class="pue-label">Power Usage Effectiveness</div>
+            <div class="rating-badge" id="ratingBadge">B -- Good</div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-val" id="dcieValue">66.7%</div>
+                <div class="metric-lbl">DCiE</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="overheadValue">500 kW</div>
+                <div class="metric-lbl">Overhead</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="wasteValue">33.3%</div>
+                <div class="metric-lbl">Energy Waste</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="annualValue">4,380 MWh</div>
+                <div class="metric-lbl">Annual Overhead</div>
+            </div>
+        </div>
+
+        <div class="efficiency-bar">
+            <div class="bar-label">
+                <span>Efficiency</span>
+                <span id="effPct">66.7%</span>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill" id="effBar" style="width: 66.7%; background: #3b82f6;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="powered-by">
+        <a href="https://resistancezero.com/pue-calculator.html" target="_blank" rel="noopener">
+            <span class="rz-dot"></span> Powered by ResistanceZero
+        </a>
+    </div>
+
+    <script>
+    function calculate() {
+        var totalPower = parseFloat(document.getElementById('totalPower').value) || 0;
+        var itPower = parseFloat(document.getElementById('itPower').value) || 0;
+
+        if (itPower <= 0 || totalPower <= 0) {
+            document.getElementById('pueValue').textContent = '--';
+            document.getElementById('pueValue').style.color = '#64748b';
+            document.getElementById('ratingBadge').textContent = 'Enter valid values';
+            document.getElementById('ratingBadge').style.background = 'rgba(100,116,139,0.15)';
+            document.getElementById('ratingBadge').style.color = '#64748b';
+            return;
+        }
+
+        if (totalPower < itPower) {
+            totalPower = itPower;
+            document.getElementById('totalPower').value = itPower;
+        }
+
+        var pue = totalPower / itPower;
+        var dcie = (1 / pue) * 100;
+        var overhead = totalPower - itPower;
+        var wastePct = ((totalPower - itPower) / totalPower) * 100;
+        var annualOverhead = overhead * 8760 / 1000;
+
+        document.getElementById('pueValue').textContent = pue.toFixed(2);
+        document.getElementById('dcieValue').textContent = dcie.toFixed(1) + '%';
+        document.getElementById('overheadValue').textContent = formatNum(Math.round(overhead)) + ' kW';
+        document.getElementById('wasteValue').textContent = wastePct.toFixed(1) + '%';
+        document.getElementById('effPct').textContent = dcie.toFixed(1) + '%';
+
+        if (annualOverhead >= 1000) {
+            document.getElementById('annualValue').textContent = formatNum(Math.round(annualOverhead / 1000)) + ' GWh';
+        } else {
+            document.getElementById('annualValue').textContent = formatNum(Math.round(annualOverhead)) + ' MWh';
+        }
+
+        var rating, color, bg;
+        if (pue <= 1.2) { rating = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
+        else if (pue <= 1.4) { rating = 'Good'; color = '#06b6d4'; bg = 'rgba(6,182,212,0.15)'; }
+        else if (pue <= 1.6) { rating = 'Average'; color = '#3b82f6'; bg = 'rgba(59,130,246,0.15)'; }
+        else if (pue <= 1.8) { rating = 'Below Average'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
+        else if (pue <= 2.0) { rating = 'Poor'; color = '#f97316'; bg = 'rgba(249,115,22,0.15)'; }
+        else { rating = 'Critical'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
+
+        document.getElementById('pueValue').style.color = color;
+        document.getElementById('ratingBadge').textContent = rating;
+        document.getElementById('ratingBadge').style.background = bg;
+        document.getElementById('ratingBadge').style.color = color;
+
+        var effWidth = Math.min(dcie, 100);
+        document.getElementById('effBar').style.width = effWidth + '%';
+        document.getElementById('effBar').style.background = color;
+    }
+
+    function formatNum(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    calculate();
+    </script>
+</body>
+</html>

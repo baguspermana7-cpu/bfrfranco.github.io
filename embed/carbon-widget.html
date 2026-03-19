@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Widget | ResistanceZero</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .widget-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .widget-header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #06b6d4;
+            letter-spacing: -0.3px;
+        }
+        .widget-header p {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+        .input-group select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+        .input-hint {
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 4px;
+        }
+
+        .range-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .range-row input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            outline: none;
+            border: none;
+            padding: 0;
+        }
+        .range-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px; height: 18px;
+            background: #06b6d4;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #0f172a;
+        }
+        .range-row input[type="range"]::-moz-range-thumb {
+            width: 18px; height: 18px;
+            background: #06b6d4;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #0f172a;
+        }
+        .range-val {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #06b6d4;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .results-panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 6px;
+        }
+
+        .co2-display {
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #334155;
+        }
+        .co2-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #22c55e;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            transition: color 0.3s;
+        }
+        .co2-unit {
+            font-size: 0.82rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .co2-rating {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .metric-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .metric-card .metric-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #06b6d4;
+        }
+        .metric-card .metric-lbl {
+            font-size: 0.68rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .metric-card.green .metric-val { color: #22c55e; }
+        .metric-card.amber .metric-val { color: #f59e0b; }
+
+        .monthly-breakdown {
+            margin-top: 14px;
+        }
+        .monthly-title {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .monthly-bar {
+            display: flex;
+            gap: 3px;
+            height: 40px;
+            align-items: flex-end;
+        }
+        .month-col {
+            flex: 1;
+            background: rgba(6, 182, 212, 0.3);
+            border-radius: 3px 3px 0 0;
+            transition: height 0.3s;
+            position: relative;
+            min-height: 4px;
+        }
+        .month-col:hover {
+            background: #06b6d4;
+        }
+        .month-labels {
+            display: flex;
+            gap: 3px;
+            margin-top: 4px;
+        }
+        .month-labels span {
+            flex: 1;
+            text-align: center;
+            font-size: 0.58rem;
+            color: #475569;
+        }
+
+        .powered-by {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 16px;
+        }
+        .powered-by a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .powered-by a:hover { color: #06b6d4; }
+        .powered-by .rz-dot {
+            width: 6px; height: 6px;
+            background: #06b6d4;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 14px; }
+            .co2-value { font-size: 2rem; }
+            .metrics-grid { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-header">
+        <h1>Carbon Footprint Calculator</h1>
+        <p>Data Center CO2 Emissions Estimator</p>
+    </div>
+
+    <div class="input-group">
+        <label for="annualEnergy">Annual Energy Consumption (MWh)</label>
+        <input type="number" id="annualEnergy" value="8760" min="1" step="100" oninput="calculate()">
+        <div class="input-hint">Total facility energy including IT + cooling + overhead</div>
+    </div>
+
+    <div class="input-group">
+        <label for="gridRegion">Grid Region (Emission Factor)</label>
+        <select id="gridRegion" onchange="calculate()">
+            <option value="us">United States (0.39 kgCO2/kWh)</option>
+            <option value="uk">United Kingdom (0.21 kgCO2/kWh)</option>
+            <option value="eu_avg">EU Average (0.23 kgCO2/kWh)</option>
+            <option value="germany">Germany (0.35 kgCO2/kWh)</option>
+            <option value="france">France (0.06 kgCO2/kWh)</option>
+            <option value="nordics">Nordics (0.03 kgCO2/kWh)</option>
+            <option value="china">China (0.56 kgCO2/kWh)</option>
+            <option value="india">India (0.72 kgCO2/kWh)</option>
+            <option value="japan">Japan (0.46 kgCO2/kWh)</option>
+            <option value="australia">Australia (0.66 kgCO2/kWh)</option>
+            <option value="singapore">Singapore (0.41 kgCO2/kWh)</option>
+            <option value="uae">UAE (0.45 kgCO2/kWh)</option>
+            <option value="south_africa">South Africa (0.90 kgCO2/kWh)</option>
+            <option value="brazil">Brazil (0.15 kgCO2/kWh)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>Renewable Energy (%)</label>
+        <div class="range-row">
+            <input type="range" id="renewablePct" min="0" max="100" value="0" step="5" oninput="document.getElementById('renewableVal').textContent=this.value+'%';calculate()">
+            <span class="range-val" id="renewableVal">0%</span>
+        </div>
+        <div class="input-hint">Percentage of energy from renewable sources (PPA, RECs, on-site)</div>
+    </div>
+
+    <div class="results-panel">
+        <div class="co2-display">
+            <div class="co2-value" id="co2Value">3,416</div>
+            <div class="co2-unit">tonnes CO2 per year</div>
+            <div class="co2-rating" id="co2Rating">C -- Average</div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card green">
+                <div class="metric-val" id="treesValue">157,564</div>
+                <div class="metric-lbl">Trees Equivalent</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="monthlyValue">285</div>
+                <div class="metric-lbl">Monthly tCO2</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-val" id="offsetValue">$85,400</div>
+                <div class="metric-lbl">Offset Cost</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val" id="intensityValue">0.39</div>
+                <div class="metric-lbl">kgCO2/kWh</div>
+            </div>
+        </div>
+
+        <div class="monthly-breakdown">
+            <div class="monthly-title">Monthly CO2 Breakdown</div>
+            <div class="monthly-bar" id="monthlyBars"></div>
+            <div class="month-labels" id="monthLabels"></div>
+        </div>
+    </div>
+
+    <div class="powered-by">
+        <a href="https://resistancezero.com/carbon-footprint.html" target="_blank" rel="noopener">
+            <span class="rz-dot"></span> Powered by ResistanceZero
+        </a>
+    </div>
+
+    <script>
+    var gridFactors = {
+        us:           0.39,
+        uk:           0.21,
+        eu_avg:       0.23,
+        germany:      0.35,
+        france:       0.06,
+        nordics:      0.03,
+        china:        0.56,
+        india:        0.72,
+        japan:        0.46,
+        australia:    0.66,
+        singapore:    0.41,
+        uae:          0.45,
+        south_africa: 0.90,
+        brazil:       0.15
+    };
+
+    /* Monthly variation factors (seasonal grid carbon intensity changes) */
+    var monthlyFactors = [1.08, 1.05, 1.0, 0.95, 0.92, 0.90, 0.93, 0.95, 0.97, 1.0, 1.05, 1.10];
+    var monthNames = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+
+    var TREES_PER_TCO2 = 46.1; /* approx trees to absorb 1 tonne CO2 per year */
+    var OFFSET_PRICE = 25; /* USD per tonne CO2 */
+
+    function calculate() {
+        var annualMWh = parseFloat(document.getElementById('annualEnergy').value) || 0;
+        var region = document.getElementById('gridRegion').value;
+        var renewablePct = parseFloat(document.getElementById('renewablePct').value) || 0;
+
+        if (annualMWh <= 0) {
+            document.getElementById('co2Value').textContent = '--';
+            document.getElementById('co2Rating').textContent = 'Enter valid energy';
+            document.getElementById('co2Rating').style.background = 'rgba(100,116,139,0.15)';
+            document.getElementById('co2Rating').style.color = '#64748b';
+            return;
+        }
+
+        var gridFactor = gridFactors[region] || 0.39;
+        var effectiveFactor = gridFactor * (1 - renewablePct / 100);
+        var annualCO2 = annualMWh * effectiveFactor; /* tonnes */
+        var monthlyCO2 = annualCO2 / 12;
+        var trees = Math.round(annualCO2 * TREES_PER_TCO2);
+        var offsetCost = annualCO2 * OFFSET_PRICE;
+        var intensityPerKWh = effectiveFactor;
+
+        document.getElementById('co2Value').textContent = formatNum(Math.round(annualCO2));
+        document.getElementById('monthlyValue').textContent = formatNum(Math.round(monthlyCO2));
+        document.getElementById('treesValue').textContent = formatNum(trees);
+        document.getElementById('intensityValue').textContent = intensityPerKWh.toFixed(2);
+
+        if (offsetCost >= 1e6) {
+            document.getElementById('offsetValue').textContent = '$' + (offsetCost / 1e6).toFixed(1) + 'M';
+        } else {
+            document.getElementById('offsetValue').textContent = '$' + formatNum(Math.round(offsetCost));
+        }
+
+        /* Rating based on effective carbon intensity (kgCO2/kWh) */
+        var rating, color, bg;
+        if (intensityPerKWh < 0.05) { rating = 'Near Zero'; color = '#22c55e'; bg = 'rgba(34,197,94,0.15)'; }
+        else if (intensityPerKWh < 0.15) { rating = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
+        else if (intensityPerKWh < 0.30) { rating = 'Good'; color = '#06b6d4'; bg = 'rgba(6,182,212,0.15)'; }
+        else if (intensityPerKWh < 0.50) { rating = 'Average'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
+        else if (intensityPerKWh < 0.70) { rating = 'Below Average'; color = '#f97316'; bg = 'rgba(249,115,22,0.15)'; }
+        else { rating = 'High Emissions'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }
+
+        document.getElementById('co2Value').style.color = color;
+        document.getElementById('co2Rating').textContent = rating;
+        document.getElementById('co2Rating').style.background = bg;
+        document.getElementById('co2Rating').style.color = color;
+
+        /* Monthly bars */
+        var monthlyValues = [];
+        for (var i = 0; i < 12; i++) {
+            monthlyValues.push(monthlyCO2 * monthlyFactors[i]);
+        }
+        var maxMonth = Math.max.apply(null, monthlyValues);
+
+        var barsHtml = '';
+        var labelsHtml = '';
+        for (var j = 0; j < 12; j++) {
+            var h = maxMonth > 0 ? (monthlyValues[j] / maxMonth * 100) : 0;
+            barsHtml += '<div class="month-col" style="height:' + h + '%" title="' + monthNames[j] + ': ' + Math.round(monthlyValues[j]) + ' tCO2"></div>';
+            labelsHtml += '<span>' + monthNames[j] + '</span>';
+        }
+        document.getElementById('monthlyBars').innerHTML = barsHtml;
+        document.getElementById('monthLabels').innerHTML = labelsHtml;
+    }
+
+    function formatNum(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    calculate();
+    </script>
+</body>
+</html>

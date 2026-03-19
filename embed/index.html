@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Embeddable Calculator Widgets | ResistanceZero</title>
+    <meta name="description" content="Free embeddable data center calculator widgets for PUE, CAPEX, and Carbon Footprint. Add professional engineering tools to your website with a simple iframe.">
+    <meta name="keywords" content="Embeddable Calculator, PUE Widget, CAPEX Widget, Carbon Footprint Widget, Data Center Tools, Free Embed, iframe Calculator">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="canonical" href="https://resistancezero.com/embed/">
+
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/embed/">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/embed/">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/embed/">
+    <meta property="og:title" content="Embeddable Data Center Calculator Widgets">
+    <meta property="og:description" content="Free PUE, CAPEX, and Carbon Footprint calculator widgets. Embed on any website with a simple iframe snippet.">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Embeddable Data Center Calculator Widgets">
+    <meta name="twitter:description" content="Free PUE, CAPEX, and Carbon Footprint calculator widgets for any website.">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://resistancezero.com/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Embeddable Widgets"
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css">
+
+    <style>
+        /* ═══ EMBED SHOWCASE — PAGE-SPECIFIC STYLES ═══ */
+        .embed-hero {
+            padding: 140px 2rem 60px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .embed-hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .embed-hero h1 span { color: #06b6d4; }
+        .embed-hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 24px;
+        }
+        .embed-hero .badge-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .embed-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: rgba(6, 182, 212, 0.1);
+            color: #06b6d4;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+        .embed-badge.green { background: rgba(34,197,94,0.1); color: #22c55e; border-color: rgba(34,197,94,0.2); }
+        .embed-badge.purple { background: rgba(139,92,246,0.1); color: #8b5cf6; border-color: rgba(139,92,246,0.2); }
+
+        .widgets-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .widget-showcase {
+            margin-bottom: 60px;
+        }
+        .widget-showcase-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .widget-showcase-header .ws-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        .widget-showcase-header .ws-icon.cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .widget-showcase-header .ws-icon.amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .widget-showcase-header .ws-icon.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .widget-showcase-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .widget-showcase-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .widget-preview-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 768px) {
+            .widget-preview-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-frame {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-lg);
+            background: #0f172a;
+        }
+        .preview-frame iframe {
+            width: 100%;
+            border: none;
+            display: block;
+        }
+
+        .embed-code-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .code-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .code-panel-header span {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .copy-btn {
+            padding: 5px 14px;
+            border-radius: 6px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            background: rgba(6, 182, 212, 0.1);
+            color: #06b6d4;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(6, 182, 212, 0.2);
+        }
+        .copy-btn.copied {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        .code-block {
+            padding: 16px;
+            overflow-x: auto;
+        }
+        .code-block pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .widget-notes {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            border-radius: 8px;
+        }
+        .widget-notes p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .widget-notes p:last-child { margin-bottom: 0; }
+        .widget-notes strong { color: var(--text-secondary); }
+
+        /* ═══ INFO SECTION ═══ */
+        .info-section {
+            max-width: 800px;
+            margin: 0 auto 80px;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .info-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+        .info-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-card li {
+            padding: 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .info-card li::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #06b6d4;
+            flex-shrink: 0;
+            margin-top: 8px;
+        }
+
+        /* ═══ FOOTER ═══ */
+        .embed-footer {
+            text-align: center;
+            padding: 30px 2rem;
+            border-top: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+        }
+        .embed-footer p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .embed-footer a {
+            color: #06b6d4;
+            text-decoration: none;
+        }
+        .embed-footer a:hover { text-decoration: underline; }
+
+        /* ═══ DARK MODE ═══ */
+        [data-theme="dark"] .embed-hero h1 { color: #e2e8f0; }
+        [data-theme="dark"] .code-block pre { color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+
+    <!-- Navigation (.nav-menu pattern matching site) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo-sm.webp" alt="Bagus Dwi Permana" class="nav-avatar" width="40" height="40" decoding="async" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="../datacenter-solutions.html" class="nav-link nav-vibrate">
+                        DC Solutions
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="../datahallAI.html" style="color: #8b5cf6;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:5px;opacity:.6" aria-hidden="true"><path d="M18 10h-1V7c0-2.76-2.24-5-5-5S7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V7c0-1.66 1.34-3 3-3s3 1.34 3 3v3z"/></svg>DC AI/HPC</a></li>
+                        <li><a href="../dc-conventional.html"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:5px;opacity:.6" aria-hidden="true"><path d="M18 10h-1V7c0-2.76-2.24-5-5-5S7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V7c0-1.66 1.34-3 3-3s3 1.34 3 3v3z"/></svg>DC Conventional</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="../capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="../opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="../dcmoc/" style="color: #ef4444; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:5px;opacity:.6" aria-hidden="true"><path d="M18 10h-1V7c0-2.76-2.24-5-5-5S7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V7c0-1.66 1.34-3 3-3s3 1.34 3 3v3z"/></svg>DC MOC</a></li>
+                    </ul>
+                </li>
+                <li><a href="../index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="../index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li class="nav-dropdown">
+                    <a href="../articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="../geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li><a href="../future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="../insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
+                <li><a href="../index.html#faq" class="nav-link">FAQ</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero -->
+        <section class="embed-hero">
+            <h1>Embeddable <span>Calculator Widgets</span></h1>
+            <p class="subtitle">Add professional data center engineering tools to your website. Free to embed, no signup required, self-contained iframes with zero external dependencies.</p>
+            <div class="badge-row">
+                <span class="embed-badge">Free to Embed</span>
+                <span class="embed-badge green">No Dependencies</span>
+                <span class="embed-badge purple">Mobile Responsive</span>
+            </div>
+        </section>
+
+        <!-- Widgets Section -->
+        <section class="widgets-section">
+
+            <!-- PUE Widget -->
+            <div class="widget-showcase" id="pue-widget">
+                <div class="widget-showcase-header">
+                    <div class="ws-icon cyan">PUE</div>
+                    <div>
+                        <h2>PUE Calculator Widget</h2>
+                        <p>Power Usage Effectiveness -- the industry standard metric for data center energy efficiency</p>
+                    </div>
+                </div>
+                <div class="widget-preview-wrap">
+                    <div class="preview-frame">
+                        <iframe src="pue-widget.html" width="100%" height="620" loading="lazy" title="PUE Calculator Widget"></iframe>
+                    </div>
+                    <div>
+                        <div class="embed-code-panel">
+                            <div class="code-panel-header">
+                                <span>Embed Code</span>
+                                <button class="copy-btn" onclick="copyCode(this, 'pue-code')">Copy</button>
+                            </div>
+                            <div class="code-block">
+                                <pre id="pue-code">&lt;iframe
+  src="https://resistancezero.com/embed/pue-widget.html"
+  width="400"
+  height="620"
+  frameborder="0"
+  style="border-radius:12px;max-width:100%;"
+  title="PUE Calculator - ResistanceZero"
+  loading="lazy"
+&gt;&lt;/iframe&gt;</pre>
+                            </div>
+                        </div>
+                        <div class="widget-notes">
+                            <p><strong>Recommended size:</strong> 400 x 620px (min-width: 300px)</p>
+                            <p><strong>Features:</strong> PUE value, DCiE, efficiency rating, energy waste %, annual overhead</p>
+                            <p><strong>Auto-calculates</strong> on input change -- no submit button needed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAPEX Widget -->
+            <div class="widget-showcase" id="capex-widget">
+                <div class="widget-showcase-header">
+                    <div class="ws-icon amber">$</div>
+                    <div>
+                        <h2>CAPEX Estimator Widget</h2>
+                        <p>Data center construction cost estimator with tier, region, and component breakdown</p>
+                    </div>
+                </div>
+                <div class="widget-preview-wrap">
+                    <div class="preview-frame">
+                        <iframe src="capex-widget.html" width="100%" height="780" loading="lazy" title="CAPEX Estimator Widget"></iframe>
+                    </div>
+                    <div>
+                        <div class="embed-code-panel">
+                            <div class="code-panel-header">
+                                <span>Embed Code</span>
+                                <button class="copy-btn" onclick="copyCode(this, 'capex-code')">Copy</button>
+                            </div>
+                            <div class="code-block">
+                                <pre id="capex-code">&lt;iframe
+  src="https://resistancezero.com/embed/capex-widget.html"
+  width="400"
+  height="780"
+  frameborder="0"
+  style="border-radius:12px;max-width:100%;"
+  title="CAPEX Estimator - ResistanceZero"
+  loading="lazy"
+&gt;&lt;/iframe&gt;</pre>
+                            </div>
+                        </div>
+                        <div class="widget-notes">
+                            <p><strong>Recommended size:</strong> 400 x 780px (min-width: 300px)</p>
+                            <p><strong>Features:</strong> CAPEX range, cost/MW, cost/kW, cost/rack, component breakdown</p>
+                            <p><strong>Inputs:</strong> Power capacity (MW), Tier level, Region</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carbon Widget -->
+            <div class="widget-showcase" id="carbon-widget">
+                <div class="widget-showcase-header">
+                    <div class="ws-icon green">CO2</div>
+                    <div>
+                        <h2>Carbon Footprint Widget</h2>
+                        <p>Annual CO2 emissions estimator with grid factors, renewables, and trees equivalent</p>
+                    </div>
+                </div>
+                <div class="widget-preview-wrap">
+                    <div class="preview-frame">
+                        <iframe src="carbon-widget.html" width="100%" height="720" loading="lazy" title="Carbon Footprint Widget"></iframe>
+                    </div>
+                    <div>
+                        <div class="embed-code-panel">
+                            <div class="code-panel-header">
+                                <span>Embed Code</span>
+                                <button class="copy-btn" onclick="copyCode(this, 'carbon-code')">Copy</button>
+                            </div>
+                            <div class="code-block">
+                                <pre id="carbon-code">&lt;iframe
+  src="https://resistancezero.com/embed/carbon-widget.html"
+  width="400"
+  height="720"
+  frameborder="0"
+  style="border-radius:12px;max-width:100%;"
+  title="Carbon Footprint Calculator - ResistanceZero"
+  loading="lazy"
+&gt;&lt;/iframe&gt;</pre>
+                            </div>
+                        </div>
+                        <div class="widget-notes">
+                            <p><strong>Recommended size:</strong> 400 x 720px (min-width: 300px)</p>
+                            <p><strong>Features:</strong> Annual CO2 tonnes, trees equivalent, monthly chart, offset cost</p>
+                            <p><strong>Inputs:</strong> Annual energy (MWh), Grid region, Renewable %</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Info Section -->
+        <section class="info-section">
+            <div class="info-card">
+                <h3>Embedding Guidelines</h3>
+                <ul>
+                    <li>All widgets are <strong>free to embed</strong> on any website -- commercial or personal, no attribution beyond the built-in "Powered by ResistanceZero" badge is required</li>
+                    <li>Each widget is <strong>fully self-contained</strong> with inline CSS and JavaScript -- no external stylesheets or libraries needed</li>
+                    <li>Widgets use a <strong>dark theme</strong> by default (#0f172a background, #06b6d4 cyan accents) that looks great on both light and dark sites</li>
+                    <li><strong>Minimum width: 300px</strong> -- all widgets are responsive and adapt to narrow containers</li>
+                    <li>Calculations run <strong>entirely client-side</strong> -- no data is sent to any server. Only anonymous Google Analytics pageview events are tracked</li>
+                    <li>For the full-featured versions with advanced inputs, charts, and PDF export, visit the main calculator pages linked in each widget footer</li>
+                    <li>Need a <strong>custom widget</strong> or whitelabel version? Contact us via the main site</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="embed-footer">
+        <p>Built by <a href="https://resistancezero.com/" target="_blank" rel="noopener">ResistanceZero</a> -- Free data center engineering tools for the community</p>
+    </footer>
+
+    <script src="../script.min.js" defer></script>
+    <script src="../auth.js" defer></script>
+    <script>
+    function copyCode(btn, codeId) {
+        var codeEl = document.getElementById(codeId);
+        var text = codeEl.textContent;
+        navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function() {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(function() {
+            /* Fallback for older browsers */
+            var range = document.createRange();
+            range.selectNodeContents(codeEl);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            try { document.execCommand('copy'); btn.textContent = 'Copied!'; btn.classList.add('copied'); }
+            catch(e) { btn.textContent = 'Select & Copy'; }
+            sel.removeAllRanges();
+            setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+        });
+    }
+    </script>
+</body>
+</html>
