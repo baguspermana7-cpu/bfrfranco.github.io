@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Raised Floor vs Slab | Data Center Floor Design Compared</title>
+<meta name="description" content="Compare raised floor and slab-on-grade designs for data centers. Airflow management, cable routing, cost, and modern trends.">
+<meta name="keywords" content="raised floor, slab on grade, data center flooring, underfloor plenum, overhead cabling, hot aisle containment, cold aisle containment, airflow management, data center design">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="theme-color" content="#8b5cf6">
+<link rel="canonical" href="https://resistancezero.com/compare-raised-floor-vs-slab.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/compare-raised-floor-vs-slab.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/compare-raised-floor-vs-slab.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/compare-raised-floor-vs-slab.html">
+<meta property="og:title" content="Raised Floor vs Slab | Data Center Floor Design Compared">
+<meta property="og:description" content="Compare raised floor and slab-on-grade designs for data centers. Airflow management, cable routing, cost, and modern trends.">
+<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@BagusDPermana">
+<meta name="twitter:title" content="Raised Floor vs Slab | Data Center Floor Design Compared">
+<meta name="twitter:description" content="Raised floor vs slab-on-grade for data centers: airflow management, cable routing, cost, and why hyperscalers are choosing differently.">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},
+  {"@type":"ListItem","position":2,"name":"Compare","item":"https://resistancezero.com/datacenter-solutions.html"},
+  {"@type":"ListItem","position":3,"name":"Raised Floor vs Slab"}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Why are hyperscale data centers moving away from raised floors?","acceptedAnswer":{"@type":"Answer","text":"Hyperscalers like Google, Meta, and Microsoft have largely abandoned raised floors in favor of slab-on-grade with overhead services. Reasons include: higher structural load capacity for dense AI/GPU racks (30-50 kW+), elimination of underfloor cable congestion that blocks airflow, faster construction timelines, lower cost per square foot, and better compatibility with rear-door heat exchangers and direct liquid cooling."}},
+  {"@type":"Question","name":"What is the cost difference between raised floor and slab construction?","acceptedAnswer":{"@type":"Answer","text":"Raised floor adds $25-65 per square foot to construction cost depending on panel type, pedestal height, and load rating. A standard 18-inch raised floor with 2,500 lb/sqft concentrated load rating costs approximately $35-45/sqft installed. Slab-on-grade with overhead cable trays and containment costs $15-25/sqft for the equivalent infrastructure, representing 30-50% savings."}},
+  {"@type":"Question","name":"Can you retrofit a raised floor data center to slab-on-grade?","acceptedAnswer":{"@type":"Answer","text":"Technically possible but rarely cost-effective for operating facilities. Retrofitting requires relocating all underfloor cabling and piping to overhead paths, installing new cable trays, modifying the cooling system from underfloor delivery to overhead or row-based units, and potentially reinforcing the structural slab. Most operators choose slab-on-grade for new builds while maintaining raised floors in existing facilities until end of life."}}
+]}
+</script>
+
+<link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.min.css?v=20260225">
+<style>
+:root{--cmp-accent:#8b5cf6;--cmp-accent-light:rgba(139,92,246,0.12);--cmp-accent-border:rgba(139,92,246,0.3);--cmp-primary:#2d5a87;--cmp-bg:#0f172a;--cmp-card:rgba(15,23,42,0.7);--cmp-text:#e2e8f0;--cmp-muted:#94a3b8;--cmp-line:rgba(148,163,184,0.15);--cmp-winner:rgba(34,197,94,0.15);--cmp-winner-border:rgba(34,197,94,0.4)}
+[data-theme="dark"]{--cmp-bg:#0f172a;--cmp-card:rgba(15,23,42,0.7);--cmp-text:#e2e8f0;--cmp-muted:#94a3b8}
+[data-theme="light"]{--cmp-bg:#f8fafc;--cmp-card:rgba(255,255,255,0.9);--cmp-text:#1e293b;--cmp-muted:#64748b;--cmp-line:rgba(100,116,139,0.15)}
+.cmp-hero{padding:5rem 1.5rem 3rem;text-align:center;background:linear-gradient(135deg,var(--cmp-accent-light),transparent 60%)}
+.cmp-hero h1{font-size:2.2rem;font-weight:800;margin-bottom:1rem;color:var(--cmp-text)}
+.cmp-hero p{color:var(--cmp-muted);max-width:640px;margin:0 auto 2rem;line-height:1.7}
+.cmp-badges{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.cmp-badge{padding:0.75rem 1.5rem;border-radius:12px;font-weight:700;font-size:1rem;border:2px solid}
+.cmp-badge-a{background:var(--cmp-accent-light);border-color:var(--cmp-accent);color:var(--cmp-accent)}
+.cmp-badge-b{background:rgba(34,197,94,0.12);border-color:#22c55e;color:#22c55e}
+.cmp-container{max-width:960px;margin:0 auto;padding:0 1.5rem 3rem}
+.cmp-table{width:100%;border-collapse:collapse;margin:2rem 0;border-radius:12px;overflow:hidden}
+.cmp-table th,.cmp-table td{padding:0.85rem 1rem;text-align:left;border-bottom:1px solid var(--cmp-line)}
+.cmp-table th{background:var(--cmp-accent-light);color:var(--cmp-accent);font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em}
+.cmp-table td{color:var(--cmp-text);font-size:0.9rem}
+.cmp-table tr:hover td{background:rgba(148,163,184,0.05)}
+.cmp-winner-cell{background:var(--cmp-winner)!important;border-left:3px solid var(--cmp-winner-border)}
+.cmp-section{margin:2.5rem 0}
+.cmp-section h2{font-size:1.4rem;font-weight:700;color:var(--cmp-text);margin-bottom:0.5rem}
+.cmp-section h2 .cmp-num{color:var(--cmp-accent);margin-right:0.5rem}
+.cmp-accordion{border:1px solid var(--cmp-line);border-radius:10px;overflow:hidden;margin:1rem 0}
+.cmp-accordion-btn{width:100%;padding:1rem 1.2rem;background:var(--cmp-card);border:none;color:var(--cmp-text);font-size:0.95rem;font-weight:600;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:inherit;transition:background 0.2s}
+.cmp-accordion-btn:hover{background:rgba(148,163,184,0.08)}
+.cmp-accordion-btn .arrow{transition:transform 0.3s;font-size:0.8rem;color:var(--cmp-muted)}
+.cmp-accordion-btn.active .arrow{transform:rotate(180deg)}
+.cmp-accordion-body{max-height:0;overflow:hidden;transition:max-height 0.35s ease;background:var(--cmp-card)}
+.cmp-accordion-body.open{max-height:600px}
+.cmp-accordion-content{padding:0 1.2rem 1.2rem;color:var(--cmp-muted);line-height:1.7;font-size:0.9rem}
+.cmp-verdict{padding:1.5rem;border-radius:12px;background:var(--cmp-winner);border:1px solid var(--cmp-winner-border);margin:2rem 0}
+.cmp-verdict h3{color:#22c55e;margin-bottom:0.5rem;font-size:1.1rem}
+.cmp-verdict p{color:var(--cmp-text);line-height:1.7;font-size:0.9rem}
+.cmp-faq{margin:3rem 0}
+.cmp-faq h2{font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;color:var(--cmp-text)}
+.cmp-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin:2rem 0}
+.cmp-link-card{padding:1.2rem;border-radius:10px;border:1px solid var(--cmp-line);background:var(--cmp-card);text-decoration:none;transition:border-color 0.2s,transform 0.2s}
+.cmp-link-card:hover{border-color:var(--cmp-accent);transform:translateY(-2px)}
+.cmp-link-card h4{color:var(--cmp-text);font-size:0.95rem;margin-bottom:0.3rem}
+.cmp-link-card p{color:var(--cmp-muted);font-size:0.8rem;line-height:1.5}
+@media(max-width:768px){.cmp-hero h1{font-size:1.6rem}.cmp-table{font-size:0.8rem}.cmp-badges{gap:0.75rem}.cmp-badge{font-size:0.85rem;padding:0.5rem 1rem}}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high"></a>
+    <ul class="nav-menu">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+        <ul class="dropdown-menu">
+          <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+          <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+          <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+          <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+        </ul>
+      </li>
+      <li class="nav-dropdown"><a href="insights.html" class="nav-link">Insights<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+        <ul class="dropdown-menu">
+          <li><a href="articles.html" style="color:#06b6d4;">Engineering Journal</a></li>
+          <li><a href="geopolitics.html" style="color:#ef4444;">Global Analysis</a></li>
+          <li><a href="future-forward.html" style="color:#a855f7;">Future Forward</a></li>
+        </ul>
+      </li>
+      <li><a href="index.html#about" class="nav-link">About</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="cmp-hero">
+  <h1>Raised Floor vs Slab-on-Grade</h1>
+  <p>The flooring decision impacts airflow, cabling, structural capacity, and construction cost for the entire life of a data center. Compare the legacy standard against the modern hyperscale approach.</p>
+  <div class="cmp-badges">
+    <span class="cmp-badge cmp-badge-a"><i class="fas fa-layer-group"></i>&nbsp; Raised Floor</span>
+    <span class="cmp-badge cmp-badge-b"><i class="fas fa-square"></i>&nbsp; Slab-on-Grade</span>
+  </div>
+</section>
+
+<div class="cmp-container">
+
+  <h2 style="font-size:1.3rem;font-weight:700;color:var(--cmp-text);margin-bottom:0.5rem"><i class="fas fa-table" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Quick Comparison</h2>
+  <table class="cmp-table">
+    <thead><tr><th>Category</th><th>Raised Floor</th><th>Slab-on-Grade</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Airflow Management</strong></td><td>Underfloor plenum with perforated tiles; struggles above 10 kW/rack without containment</td><td class="cmp-winner-cell">Overhead or row-based cooling; scales to 50+ kW/rack with rear-door HEX or DLC</td></tr>
+      <tr><td><strong>Cable Routing</strong></td><td>Underfloor &mdash; convenient but congests plenum and blocks airflow at scale</td><td class="cmp-winner-cell">Overhead trays &mdash; cleaner separation of power, data, and cooling pathways</td></tr>
+      <tr><td><strong>Cost per sq ft</strong></td><td>$35&ndash;65/sqft for floor system (panels, pedestals, stringers, seismic bracing)</td><td class="cmp-winner-cell">$15&ndash;25/sqft for overhead infrastructure (cable trays, containment, supports)</td></tr>
+      <tr><td><strong>Structural Load</strong></td><td>Limited by pedestal capacity; typical 2,500 lb/sqft concentrated load</td><td class="cmp-winner-cell">Concrete slab supports 5,000+ lb/sqft; ideal for 30&ndash;50 kW AI/GPU racks</td></tr>
+      <tr><td><strong>Flexibility</strong></td><td class="cmp-winner-cell">Tiles are relocatable; layout changes are fast; cable moves are easy</td><td>Cable trays are fixed; layout changes require overhead re-routing</td></tr>
+      <tr><td><strong>Cooling Efficiency</strong></td><td>Underfloor leakage 20&ndash;40% through cable cutouts, misaligned tiles, and unsealed penetrations</td><td class="cmp-winner-cell">Contained overhead or in-row delivery with less than 5% bypass air</td></tr>
+      <tr><td><strong>Modern Trend</strong></td><td>Legacy enterprise, colo, financial &mdash; still common in retrofits</td><td class="cmp-winner-cell">Hyperscale standard (Google, Meta, AWS, Microsoft) since ~2015</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cmp-verdict">
+    <h3><i class="fas fa-trophy"></i> Verdict: Slab-on-Grade for New Builds</h3>
+    <p>Slab-on-grade with overhead services is the modern standard for new data center construction. It offers lower cost, higher load capacity for dense AI/HPC racks, better cooling efficiency, and faster construction. Raised floor remains viable for enterprise retrofits, colocation facilities with diverse tenant requirements, and environments under 10 kW/rack average density.</p>
+  </div>
+
+  <!-- Detailed Sections -->
+  <div class="cmp-section">
+    <h2><span class="cmp-num">01</span>Airflow and Cooling Architecture</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">How floor design determines cooling delivery and efficiency <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p><strong>Raised floor</strong> creates an underfloor plenum (typically 18&ndash;36 inches) that acts as a cold air distribution chamber. CRAC/CRAH units push conditioned air into the plenum, which rises through perforated tiles at rack fronts. This works well at 3&ndash;8 kW/rack densities but breaks down at higher loads: cable bundles block airflow paths, tile placement becomes a complex fluid dynamics problem, and air bypass through cutouts and gaps wastes 20&ndash;40% of cooling capacity.</p>
+        <p><strong>Slab-on-grade</strong> eliminates the plenum entirely. Cooling is delivered via overhead ducting, in-row cooling units (IRCU), or rear-door heat exchangers mounted directly on racks. Hot/cold aisle containment is implemented with physical barriers (curtains, panels, or hard walls). This approach scales linearly &mdash; adding a 50 kW rack simply requires adding a matching in-row cooler, without redesigning the entire plenum airflow pattern.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">02</span>Cable Management Strategy</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Underfloor vs overhead cabling and power distribution <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Raised floor data centers route power, fiber, and copper cabling through the underfloor plenum. In early deployments, this is clean and organized. Over 5&ndash;10 years of growth, the plenum fills with abandoned cables ("cable spaghetti"), blocking up to 50% of the plenum cross-section. Studies by the Uptime Institute found that heavily cabled plenums reduce effective cooling delivery by 25&ndash;35%.</p>
+        <p>Slab-on-grade uses overhead cable trays at 2&ndash;3 tiers: top tier for power (busway or conduit), middle tier for fiber, bottom tier for copper. This separation meets NEC code requirements for power/data separation and keeps cooling pathways completely unobstructed. Overhead cable management also improves fire detection response, as underfloor fires can smolder undetected behind raised floor panels.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">03</span>Structural Load and Density Support</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Why AI/GPU rack density is driving the slab revolution <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>A fully loaded AI training rack with 8x NVIDIA H100 GPUs weighs 2,500&ndash;3,500 lbs. Standard raised floor panels (PSA/BIFMA rated) support 2,000&ndash;2,500 lbs concentrated load. Heavy-duty panels exist but cost 2&ndash;3x more and require reinforced pedestals and stringers, driving the floor system cost above $60/sqft.</p>
+        <p>Concrete slab-on-grade (typically 6&ndash;8 inch reinforced slab with vapor barrier) supports 5,000+ lbs/sqft with no special treatment. For the AI/HPC revolution driving rack densities from 10 kW to 50&ndash;100 kW, slab-on-grade is structurally mandatory. Raised floor simply cannot handle the weight of liquid-cooled, GPU-dense cabinets without extensive (and expensive) reinforcement.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">04</span>Construction Timeline and Cost</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Speed to deployment and total construction budget impact <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Raised floor installation adds 4&ndash;8 weeks to the construction schedule. The process involves: slab leveling, pedestal layout and bonding, stringer installation, seismic bracing (in applicable zones), panel placement and grounding, and perforated tile placement with damper calibration. Each step requires specialized labor and quality inspection.</p>
+        <p>Slab-on-grade construction skips all of these steps. Overhead cable trays are installed in parallel with other ceiling services (lighting, fire detection, VESDA sampling pipes). Total time savings: 3&ndash;6 weeks per data hall. For hyperscalers building 50&ndash;100 MW campuses, this acceleration translates to months of earlier revenue from IT deployment.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">05</span>Liquid Cooling Compatibility</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Direct liquid cooling and the end of air-only paradigms <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Direct liquid cooling (DLC) and immersion cooling require water/coolant piping to each rack. Running pressurized liquid lines through a raised floor plenum introduces leak risk directly above electrical infrastructure. A coolant leak in the plenum can propagate to multiple racks before detection, potentially shorting PDUs and cable connections below the floor.</p>
+        <p>Slab-on-grade facilities route coolant manifolds overhead or at slab level with leak detection and containment pans. Any leak drains to floor drains, not onto electrical equipment. This is a primary reason why every major DLC deployment (NVIDIA DGX SuperPOD, Google TPU clusters, Meta AI Research) uses slab-on-grade construction.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- Decision Helper -->
+  <div class="cmp-section">
+    <h2><i class="fas fa-compass" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Decision Helper</h2>
+    <div style="padding:1.5rem;border-radius:12px;border:1px solid var(--cmp-line);background:var(--cmp-card)">
+      <p style="color:var(--cmp-text);line-height:1.8;font-size:0.9rem">
+        <strong>Choose Raised Floor if:</strong> You are retrofitting an existing facility, tenant requirements vary widely (colocation), average rack density is under 10 kW, frequent layout changes are expected, or the facility is an enterprise campus with established raised-floor maintenance expertise.<br><br>
+        <strong>Choose Slab-on-Grade if:</strong> You are building new construction, rack densities will exceed 10 kW average, AI/GPU workloads are planned, liquid cooling is in the roadmap, construction speed matters, or you are building at hyperscale (10+ MW).
+      </p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="cmp-faq">
+    <h2><i class="fas fa-circle-question" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Frequently Asked Questions</h2>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Why are hyperscale data centers moving away from raised floors? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Hyperscalers like Google, Meta, and Microsoft have largely abandoned raised floors in favor of slab-on-grade with overhead services. Reasons include: higher structural load capacity for dense AI/GPU racks (30-50 kW+), elimination of underfloor cable congestion that blocks airflow, faster construction timelines, lower cost per square foot, and better compatibility with rear-door heat exchangers and direct liquid cooling.
+      </div></div>
+    </div>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">What is the cost difference between raised floor and slab construction? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Raised floor adds $25-65 per square foot to construction cost depending on panel type, pedestal height, and load rating. A standard 18-inch raised floor with 2,500 lb/sqft concentrated load rating costs approximately $35-45/sqft installed. Slab-on-grade with overhead cable trays and containment costs $15-25/sqft for the equivalent infrastructure, representing 30-50% savings.
+      </div></div>
+    </div>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Can you retrofit a raised floor data center to slab-on-grade? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Technically possible but rarely cost-effective for operating facilities. Retrofitting requires relocating all underfloor cabling and piping to overhead paths, installing new cable trays, modifying the cooling system from underfloor delivery to overhead or row-based units, and potentially reinforcing the structural slab. Most operators choose slab-on-grade for new builds while maintaining raised floors in existing facilities until end of life.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- Related Links -->
+  <h2 style="font-size:1.3rem;font-weight:700;color:var(--cmp-text);margin-bottom:1rem"><i class="fas fa-link" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Related Resources</h2>
+  <div class="cmp-links">
+    <a href="ltc-ashrae-thermal-control.html" class="cmp-link-card">
+      <h4><i class="fas fa-temperature-half" style="color:#ef4444"></i> ASHRAE Thermal Control</h4>
+      <p>ASHRAE TC 9.9 thermal guidelines for data center cooling design, envelope classes, and allowable ranges.</p>
+    </a>
+    <a href="capex-calculator.html" class="cmp-link-card">
+      <h4><i class="fas fa-calculator" style="color:#f59e0b"></i> CAPEX Calculator</h4>
+      <p>Calculate total data center construction costs including flooring, cooling, and structural systems.</p>
+    </a>
+    <a href="datacenter-solutions.html" class="cmp-link-card">
+      <h4><i class="fas fa-server" style="color:#06b6d4"></i> DC Solutions Hub</h4>
+      <p>Explore all data center infrastructure solutions, calculators, and comparison tools.</p>
+    </a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer footer-enhanced">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+        <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+        <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+      </div>
+      <div class="footer-nav">
+        <h4 class="footer-heading">NAVIGATION</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home Dashboard</a></li>
+          <li><a href="articles.html">Technical Journal</a></li>
+          <li><a href="index.html#case-studies">Case Studies</a></li>
+          <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+      </div>
+      <div class="footer-connect">
+        <h4 class="footer-heading">CONNECT</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+          <li><a href="articles.html">Technical Journal</a></li>
+          <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+          <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.min.js?v=20260225"></script>
+<script>
+document.querySelectorAll('.cmp-accordion-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var body=this.nextElementSibling;
+    var isOpen=body.classList.contains('open');
+    document.querySelectorAll('.cmp-accordion-body').forEach(function(b){b.classList.remove('open')});
+    document.querySelectorAll('.cmp-accordion-btn').forEach(function(b){b.classList.remove('active')});
+    if(!isOpen){body.classList.add('open');this.classList.add('active')}
+  });
+});
+</script>
+<script src="auth.js?v=20260228"></script>
+
+<div class="cookie-banner hidden" id="cookieBanner">
+  <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+  <div class="cookie-actions">
+    <button class="cookie-accept" id="cookieAccept">Accept</button>
+    <button class="cookie-decline" id="cookieDecline">Decline</button>
+  </div>
+</div>
+
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+  var cb=document.getElementById('cookieBanner');
+  var consent=localStorage.getItem('rz_cookie_consent');
+  if(!consent&&cb){cb.classList.remove('hidden')}
+  var acceptBtn=document.getElementById('cookieAccept');
+  var declineBtn=document.getElementById('cookieDecline');
+  if(acceptBtn)acceptBtn.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');cb.classList.add('hidden')});
+  if(declineBtn)declineBtn.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');cb.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true});
+  var sBtn=document.getElementById('scrollTopBtn');
+  if(sBtn){
+    var ticking=false;
+    window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(function(){sBtn.classList.toggle('visible',window.scrollY>500);ticking=false});ticking=true}});
+    sBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  }
+})();
+</script>
+</body>
+</html>

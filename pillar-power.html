@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Center Power & Electrical Systems | Complete Guide | ResistanceZero</title>
+    <meta name="description" content="Complete guide to data center power and electrical systems. UPS topologies, generator sizing, N+1 vs 2N redundancy, CAPEX/OPEX optimization, and power distribution architecture.">
+    <meta name="keywords" content="Data Center Power, UPS, Generator, Power Distribution, N+1 Redundancy, 2N Redundancy, CAPEX, OPEX, Electrical Systems, PDU, STS, Switchgear, Fuel System">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#f59e0b">
+    <link rel="canonical" href="https://resistancezero.com/pillar-power.html">
+
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/pillar-power.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/pillar-power.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/pillar-power.html">
+    <meta property="og:title" content="Data Center Power & Electrical Systems | Complete Guide">
+    <meta property="og:description" content="UPS topologies, generator sizing, redundancy architectures, and power distribution — the complete electrical systems reference for data centers.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Data Center Power and Electrical Systems Complete Guide">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Data Center Power & Electrical Systems | Complete Guide">
+    <meta name="twitter:description" content="UPS, generators, redundancy, power distribution, CAPEX/OPEX — the complete data center electrical reference.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Data Center Power and Electrical Systems Guide">
+
+    <!-- CollectionPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Data Center Power & Electrical Systems",
+        "description": "Complete guide to data center power infrastructure including UPS systems, generators, redundancy architectures, power distribution, CAPEX/OPEX analysis, and fuel systems.",
+        "url": "https://resistancezero.com/pillar-power.html",
+        "author": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        },
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "url": "https://resistancezero.com/ltc-ansi-tia-topology-readiness.html", "name": "ANSI/TIA Topology"},
+                {"@type": "ListItem", "position": 2, "url": "https://resistancezero.com/capex-calculator.html", "name": "CAPEX Calculator"},
+                {"@type": "ListItem", "position": 3, "url": "https://resistancezero.com/opex-calculator.html", "name": "OPEX Calculator"},
+                {"@type": "ListItem", "position": 4, "url": "https://resistancezero.com/compare-ups-online-vs-offline.html", "name": "Online vs Offline UPS"},
+                {"@type": "ListItem", "position": 5, "url": "https://resistancezero.com/compare-diesel-vs-gas-generator.html", "name": "Diesel vs Gas Generator"},
+                {"@type": "ListItem", "position": 6, "url": "https://resistancezero.com/compare-n1-vs-2n.html", "name": "N+1 vs 2N Redundancy"},
+                {"@type": "ListItem", "position": 7, "url": "https://resistancezero.com/dc-conventional.html", "name": "Conventional DC Systems"},
+                {"@type": "ListItem", "position": 8, "url": "https://resistancezero.com/fuel-system.html", "name": "Fuel System"},
+                {"@type": "ListItem", "position": 9, "url": "https://resistancezero.com/article-13.html", "name": "Power Distribution Deep Dive"}
+            ]
+        }
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/"},
+            {"@type": "ListItem", "position": 2, "name": "Power & Electrical Systems"}
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is N+1 redundancy in data centers?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "N+1 redundancy means having one additional component beyond the minimum required (N) to support the full load. For example, if 4 UPS modules are needed for full capacity, an N+1 design deploys 5 modules. This allows one module to fail or undergo maintenance without affecting operations. It provides a balance between reliability and cost, costing roughly 20-25% more than a non-redundant design."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does a UPS work in a data center?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "An online double-conversion UPS continuously converts incoming AC power to DC (rectifier), stores energy in batteries, then converts back to AC (inverter). This provides seamless power during outages with zero transfer time. The UPS isolates IT equipment from power anomalies including sags, surges, harmonics, and frequency variations. Modern UPS systems achieve 96-97% efficiency in double-conversion mode and 99% in eco-mode."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between kW and kVA?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "kW (kilowatts) measures real power — the actual work done. kVA (kilovolt-amperes) measures apparent power — the total power drawn from the circuit. The ratio between them is the power factor (PF): kW = kVA x PF. Modern IT equipment typically has a PF of 0.95-0.99, meaning kW and kVA are nearly equal. However, UPS systems are often rated in kVA, so understanding this distinction is critical for proper sizing to avoid overloading."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=20260225">
+
+    <style>
+        :root { --pillar-color: #f59e0b; --pillar-light: #fbbf24; --pillar-dark: #d97706; --pillar-bg: rgba(245,158,11,0.08); --pillar-border: rgba(245,158,11,0.25); }
+
+        .pillar-hero {
+            background: linear-gradient(135deg, #1c1207 0%, #2d1b0e 40%, #3d2208 100%);
+            padding: 7rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .pillar-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .pillar-hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .pillar-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--pillar-bg);
+            color: var(--pillar-color);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--pillar-border);
+        }
+        .pillar-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        .pillar-hero h1 span { color: var(--pillar-color); }
+        .pillar-hero p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+        .pillar-stat-badges {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .pillar-stat-badge {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 140px;
+        }
+        .pillar-stat-badge .num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--pillar-color);
+            display: block;
+        }
+        .pillar-stat-badge .label {
+            font-size: 0.78rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        /* Hub Diagram */
+        .pillar-diagram {
+            padding: 4rem 2rem;
+            background: var(--bg-primary);
+        }
+        .diagram-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .diagram-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .diagram-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+        .hub-visual {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            aspect-ratio: 1;
+        }
+        .hub-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, var(--pillar-color), var(--pillar-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-align: center;
+            z-index: 2;
+            box-shadow: 0 0 40px rgba(245,158,11,0.3);
+        }
+        .hub-center svg { width: 32px; height: 32px; margin-bottom: 6px; }
+        .hub-node {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--pillar-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 10px;
+            z-index: 2;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .hub-node:hover { border-color: var(--pillar-color); transform: scale(1.08); }
+        .hub-node:nth-child(2) { top: 0%; left: 50%; transform: translateX(-50%); }
+        .hub-node:nth-child(3) { top: 10%; right: 2%; }
+        .hub-node:nth-child(4) { top: 38%; right: -4%; }
+        .hub-node:nth-child(5) { bottom: 18%; right: 2%; }
+        .hub-node:nth-child(6) { bottom: 0%; left: 50%; transform: translateX(-50%); }
+        .hub-node:nth-child(7) { bottom: 18%; left: 2%; }
+        .hub-node:nth-child(8) { top: 38%; left: -4%; }
+        .hub-node:nth-child(9) { top: 10%; left: 2%; }
+        .hub-node:nth-child(10) { top: 50%; right: -8%; transform: translateY(-50%); }
+        .hub-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .hub-lines line {
+            stroke: var(--pillar-border);
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4;
+        }
+
+        /* Content Cards */
+        .pillar-content {
+            padding: 4rem 2rem;
+            background: var(--bg-secondary);
+        }
+        .pillar-section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+        .pillar-section-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .pillar-section-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .pillar-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .pillar-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.8rem;
+            transition: border-color 0.3s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .pillar-card:hover { border-color: var(--pillar-color); transform: translateY(-3px); }
+        .pillar-card-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--pillar-bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: var(--pillar-color);
+        }
+        .pillar-card-icon svg { width: 22px; height: 22px; }
+        .pillar-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .pillar-card p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; flex: 1; margin-bottom: 1rem; }
+        .pillar-card-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--pillar-color); font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+        .pillar-card-link:hover { text-decoration: underline; }
+        .pillar-card-link svg { width: 14px; height: 14px; }
+        .pillar-card-tag { display: inline-block; background: var(--pillar-bg); color: var(--pillar-color); font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Stats Section */
+        .pillar-stats { padding: 4rem 2rem; background: var(--bg-primary); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+        .stat-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.8rem; text-align: center; }
+        .stat-card-icon { width: 48px; height: 48px; background: var(--pillar-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--pillar-color); }
+        .stat-card-icon svg { width: 24px; height: 24px; }
+        .stat-card .value { font-size: 2rem; font-weight: 800; color: var(--pillar-color); margin-bottom: 0.25rem; }
+        .stat-card .title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .stat-card .desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+
+        /* FAQ Section */
+        .pillar-faq { padding: 4rem 2rem; background: var(--bg-secondary); }
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item { border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 1rem; overflow: hidden; background: var(--bg-primary); }
+        .faq-question { width: 100%; background: none; border: none; padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 1rem; font-weight: 600; color: var(--text-primary); text-align: left; font-family: 'Inter', sans-serif; }
+        .faq-question:hover { color: var(--pillar-color); }
+        .faq-question svg { width: 20px; height: 20px; transition: transform 0.3s; flex-shrink: 0; margin-left: 1rem; color: var(--text-secondary); }
+        .faq-item.active .faq-question svg { transform: rotate(180deg); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .faq-answer-inner { padding: 0 1.5rem 1.2rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; }
+        .faq-item.active .faq-answer { max-height: 300px; }
+
+        @media (max-width: 900px) {
+            .pillar-cards { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .hub-visual { max-width: 400px; }
+            .hub-center { width: 100px; height: 100px; font-size: 0.7rem; }
+            .hub-center svg { width: 24px; height: 24px; }
+            .hub-node { width: 80px; height: 80px; font-size: 0.6rem; }
+        }
+        @media (max-width: 600px) {
+            .pillar-cards { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .pillar-stat-badges { gap: 1rem; }
+            .pillar-stat-badge { min-width: 110px; }
+            .hub-visual { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="datahallAI.html" style="color: #8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                        <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">Insights<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li><a href="future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main id="main-content">
+    <!-- Hero Section -->
+    <section class="pillar-hero">
+        <div class="pillar-hero-content">
+            <span class="pillar-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Topic Cluster
+            </span>
+            <h1>Data Center <span>Power</span> & Electrical Systems</h1>
+            <p>From utility intake and switchgear to UPS batteries and rack-level PDUs. Understand every layer of the power chain that keeps mission-critical infrastructure running 24/7/365.</p>
+
+            <div class="pillar-stat-badges">
+                <div class="pillar-stat-badge">
+                    <span class="num">9</span>
+                    <span class="label">Related Resources</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">96-97%</span>
+                    <span class="label">UPS Efficiency</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">10s</span>
+                    <span class="label">Generator Start</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hub Diagram -->
+    <section class="pillar-diagram">
+        <div class="diagram-container">
+            <h2 class="diagram-title">How Power Content Connects</h2>
+            <p class="diagram-subtitle">Every power-related resource on ResistanceZero linked through one navigable hub.</p>
+            <div class="hub-visual">
+                <div class="hub-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    Power Hub
+                </div>
+                <div class="hub-node">ANSI/TIA Topology</div>
+                <div class="hub-node">CAPEX Calculator</div>
+                <div class="hub-node">OPEX Calculator</div>
+                <div class="hub-node">Online vs Offline UPS</div>
+                <div class="hub-node">Diesel vs Gas Gen</div>
+                <div class="hub-node">N+1 vs 2N</div>
+                <div class="hub-node">Conventional DC</div>
+                <div class="hub-node">Fuel System</div>
+                <div class="hub-node">Power Distribution</div>
+                <svg class="hub-lines" viewBox="0 0 600 600">
+                    <line x1="300" y1="300" x2="300" y2="55"/>
+                    <line x1="300" y1="300" x2="500" y2="110"/>
+                    <line x1="300" y1="300" x2="560" y2="280"/>
+                    <line x1="300" y1="300" x2="500" y2="460"/>
+                    <line x1="300" y1="300" x2="300" y2="545"/>
+                    <line x1="300" y1="300" x2="100" y2="460"/>
+                    <line x1="300" y1="300" x2="40" y2="280"/>
+                    <line x1="300" y1="300" x2="100" y2="110"/>
+                    <line x1="300" y1="300" x2="570" y2="350"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Cards -->
+    <section class="pillar-content">
+        <div class="pillar-section-header">
+            <h2>Explore Power Resources</h2>
+            <p>Standards, calculators, comparisons, system designs, and technical articles covering every aspect of data center electrical infrastructure.</p>
+        </div>
+        <div class="pillar-cards">
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Standard</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <h3>ANSI/TIA Topology & Readiness</h3>
+                <p>Deep dive into TIA-942 telecommunications infrastructure standards for data centers. Covers topology requirements, redundancy levels, and how TIA aligns with Uptime Institute tier classifications.</p>
+                <a href="ltc-ansi-tia-topology-readiness.html" class="pillar-card-link">Explore standard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Calculator</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/></svg></div>
+                <h3>CAPEX Calculator</h3>
+                <p>Estimate capital expenditures for new data center builds. Model costs across power infrastructure, cooling systems, building, network, and security based on capacity, tier level, and regional factors.</p>
+                <a href="capex-calculator.html" class="pillar-card-link">Calculate CAPEX <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Calculator</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <h3>OPEX Calculator</h3>
+                <p>Model ongoing operational costs including electricity, staffing, maintenance contracts, insurance, and consumables. Compare OPEX across different cooling strategies, redundancy levels, and staffing models.</p>
+                <a href="opex-calculator.html" class="pillar-card-link">Calculate OPEX <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Comparison</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 0 0-8 0v2"/></svg></div>
+                <h3>Online vs Offline UPS</h3>
+                <p>Side-by-side comparison of UPS topologies: online double-conversion, line-interactive, and offline/standby. Covers transfer time, efficiency, cost, and which topology suits different data center tiers.</p>
+                <a href="compare-ups-online-vs-offline.html" class="pillar-card-link">Compare UPS <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Comparison</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></div>
+                <h3>Diesel vs Gas Generator</h3>
+                <p>Comparing diesel and natural gas generators for data center backup power. Analyzes fuel storage, emissions, startup time, maintenance burden, regulatory considerations, and total cost of ownership.</p>
+                <a href="compare-diesel-vs-gas-generator.html" class="pillar-card-link">Compare generators <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Comparison</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
+                <h3>N+1 vs 2N Redundancy</h3>
+                <p>Understanding redundancy architectures in critical power systems. Compares N+1 (one extra component) vs 2N (fully duplicated systems) in terms of availability, cost, maintainability, and fault tolerance.</p>
+                <a href="compare-n1-vs-2n.html" class="pillar-card-link">Compare redundancy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Interactive</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+                <h3>Conventional DC Systems</h3>
+                <p>Interactive reference for conventional data center electrical systems. Covers single-line diagrams, switchgear configurations, transformer sizing, and distribution board layouts for standard enterprise deployments.</p>
+                <a href="dc-conventional.html" class="pillar-card-link">Explore system <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Interactive</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M12 18v-6"/><path d="M9 15l3-3 3 3"/></svg></div>
+                <h3>Fuel System</h3>
+                <p>Comprehensive reference for data center fuel storage and distribution. Covers diesel day tanks, bulk storage, fuel polishing, leak detection, environmental regulations, and runtime calculations.</p>
+                <a href="fuel-system.html" class="pillar-card-link">Explore system <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Article</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <h3>Power Distribution Deep Dive</h3>
+                <p>In-depth technical article on data center power distribution architecture. From medium-voltage utility feeds through transformers, switchgear, UPS, PDUs, and whips to the server power supply unit.</p>
+                <a href="article-13.html" class="pillar-card-link">Read article <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Statistics -->
+    <section class="pillar-stats">
+        <div class="pillar-section-header">
+            <h2>Power by the Numbers</h2>
+            <p>Critical metrics that define data center electrical infrastructure performance.</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 0 0-8 0v2"/></svg></div>
+                <div class="value">96-97%</div>
+                <div class="title">UPS Efficiency</div>
+                <div class="desc">Modern online double-conversion UPS systems achieve 96-97% efficiency. Eco-mode can push this to 99%, but at the cost of slightly longer transfer times during power events.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="value">10s</div>
+                <div class="title">Generator Startup</div>
+                <div class="desc">Diesel generators typically reach full load acceptance within 10 seconds of a power failure. During this window, UPS batteries bridge the gap to maintain continuous power to IT loads.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div class="value">60-80%</div>
+                <div class="title">2N CAPEX Premium</div>
+                <div class="desc">Fully redundant 2N power architecture adds 60-80% to capital costs compared to N+1. This premium buys concurrently maintainable systems with no single points of failure in the power path.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div class="value">99.995%</div>
+                <div class="title">Tier IV Uptime</div>
+                <div class="desc">Tier IV facilities target 99.995% uptime, equivalent to only 26.3 minutes of downtime per year. Achieving this requires 2N+1 power distribution with fully fault-tolerant design throughout.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="pillar-faq">
+        <div class="pillar-section-header">
+            <h2>Frequently Asked Questions</h2>
+            <p>Common questions about data center power and electrical systems.</p>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">What is N+1 redundancy in data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">N+1 redundancy means deploying one additional component beyond the minimum needed (N) to carry the full IT load. For example, if 4 UPS modules are required for full capacity, an N+1 design installs 5 modules. If any single module fails or is taken offline for maintenance, the remaining 4 still handle the entire load without interruption. This approach adds roughly 20-25% to capital costs versus a non-redundant design, offering a practical balance between reliability and budget.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How does a UPS work in a data center?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">An online double-conversion UPS continuously converts incoming AC power to DC through a rectifier, stores energy in batteries (lithium-ion or VRLA), then converts back to clean AC power through an inverter. This topology provides zero transfer time during outages and isolates IT equipment from power anomalies including voltage sags, surges, harmonics, and frequency variations. The batteries typically provide 5-15 minutes of runtime, bridging the gap until backup generators reach full load acceptance.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">What is the difference between kW and kVA?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">kW (kilowatts) measures real power, which is the actual energy consumed to perform work. kVA (kilovolt-amperes) measures apparent power, the total power drawn from the electrical circuit including reactive components. The relationship is kW = kVA multiplied by the power factor (PF). Modern IT servers typically have a PF of 0.95-0.99, so the values are nearly identical. However, UPS systems and transformers are often rated in kVA, making it critical to understand this distinction when sizing equipment to avoid overloading.</div></div>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
+        <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#f59e0b;">Terms &amp; Disclaimer</a></p>
+    </div>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home Dashboard</a></li>
+                        <li><a href="articles.html">Technical Journal</a></li>
+                        <li><a href="index.html#case-studies">Case Studies</a></li>
+                        <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+                        <li><a href="articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.min.js?v=20260225"></script>
+    <script src="auth.js?v=20260228"></script>
+    <script src="rz-tracker.js"></script>
+
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <script>
+    (function(){
+        var cb = document.getElementById('cookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) { cb.classList.remove('hidden'); }
+        var acceptBtn = document.getElementById('cookieAccept');
+        var declineBtn = document.getElementById('cookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent', 'accepted'); cb.classList.add('hidden'); });
+        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent', 'declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+
+        var sBtn = document.getElementById('scrollTopBtn');
+        if (sBtn) {
+            var ticking = false;
+            window.addEventListener('scroll', function(){
+                if (!ticking) {
+                    window.requestAnimationFrame(function(){
+                        sBtn.classList[window.scrollY > 500 ? 'add' : 'remove']('visible');
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+            sBtn.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        }
+
+        document.querySelectorAll('.faq-question').forEach(function(btn){
+            btn.addEventListener('click', function(){
+                var item = this.closest('.faq-item');
+                var isActive = item.classList.contains('active');
+                document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('active'); });
+                if (!isActive) item.classList.add('active');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

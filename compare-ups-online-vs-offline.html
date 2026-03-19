@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Online UPS vs Offline UPS | Data Center Power Protection</title>
+<meta name="description" content="Online (double-conversion) vs offline (standby) UPS comparison for data centers. Transfer time, efficiency, cost, and reliability analysis.">
+<meta name="keywords" content="online UPS, offline UPS, double conversion, standby UPS, data center power, UPS comparison, transfer time, power conditioning, VFI, VFD">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="theme-color" content="#f59e0b">
+<link rel="canonical" href="https://resistancezero.com/compare-ups-online-vs-offline.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/compare-ups-online-vs-offline.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/compare-ups-online-vs-offline.html">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/compare-ups-online-vs-offline.html">
+<meta property="og:title" content="Online UPS vs Offline UPS | Data Center Power Protection">
+<meta property="og:description" content="Online (double-conversion) vs offline (standby) UPS comparison for data centers. Transfer time, efficiency, cost, and reliability analysis.">
+<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@BagusDPermana">
+<meta name="twitter:title" content="Online UPS vs Offline UPS | Data Center Power Protection">
+<meta name="twitter:description" content="Double-conversion vs standby UPS comparison: transfer time, efficiency, power quality, and total cost of ownership for mission-critical facilities.">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},
+  {"@type":"ListItem","position":2,"name":"Compare","item":"https://resistancezero.com/datacenter-solutions.html"},
+  {"@type":"ListItem","position":3,"name":"Online UPS vs Offline UPS"}
+]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Why do data centers use online UPS instead of offline?","acceptedAnswer":{"@type":"Answer","text":"Data centers require zero transfer time (0 ms) to the battery. Online double-conversion UPS continuously powers the load through the inverter, so there is no switchover when mains power fails. Offline UPS has a 5-12 ms transfer time that can crash sensitive IT equipment, corrupt storage operations, and disrupt real-time processing."}},
+  {"@type":"Question","name":"Is online UPS less efficient than offline UPS?","acceptedAnswer":{"@type":"Answer","text":"Traditional online UPS operates at 92-95% efficiency due to the double-conversion process (AC→DC→AC). Modern eco-mode designs achieve 98-99% by bypassing the inverter during stable power conditions. Offline UPS achieves 95-98% efficiency because the load runs directly on mains power during normal operation, but this comes at the cost of zero power conditioning."}},
+  {"@type":"Question","name":"What is the cost difference between online and offline UPS per kVA?","acceptedAnswer":{"@type":"Answer","text":"Online UPS costs $300-800 per kVA depending on capacity and brand, while offline UPS costs $50-150 per kVA. For a 500 kVA system, the difference is roughly $125K-325K. However, online UPS provides power conditioning, harmonic filtering, and voltage regulation that offline UPS cannot, protecting equipment worth millions."}},
+  {"@type":"Question","name":"Can I use eco-mode on my online UPS to save energy?","acceptedAnswer":{"@type":"Answer","text":"Yes, eco-mode bypasses the inverter during stable power, achieving 98-99% efficiency. However, in eco-mode the UPS behaves like a line-interactive system with a 2-4 ms transfer time. Most Tier III/IV standards and Uptime Institute guidelines recommend against eco-mode in critical data halls, as the transfer time risk outweighs the 3-5% efficiency gain."}}
+]}
+</script>
+
+<link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.min.css?v=20260225">
+<style>
+:root{--cmp-accent:#f59e0b;--cmp-accent-light:rgba(245,158,11,0.12);--cmp-accent-border:rgba(245,158,11,0.3);--cmp-primary:#2d5a87;--cmp-bg:#0f172a;--cmp-card:rgba(15,23,42,0.7);--cmp-text:#e2e8f0;--cmp-muted:#94a3b8;--cmp-line:rgba(148,163,184,0.15);--cmp-winner:rgba(34,197,94,0.15);--cmp-winner-border:rgba(34,197,94,0.4)}
+[data-theme="dark"]{--cmp-bg:#0f172a;--cmp-card:rgba(15,23,42,0.7);--cmp-text:#e2e8f0;--cmp-muted:#94a3b8}
+[data-theme="light"]{--cmp-bg:#f8fafc;--cmp-card:rgba(255,255,255,0.9);--cmp-text:#1e293b;--cmp-muted:#64748b;--cmp-line:rgba(100,116,139,0.15)}
+.cmp-hero{padding:5rem 1.5rem 3rem;text-align:center;background:linear-gradient(135deg,var(--cmp-accent-light),transparent 60%)}
+.cmp-hero h1{font-size:2.2rem;font-weight:800;margin-bottom:1rem;color:var(--cmp-text)}
+.cmp-hero p{color:var(--cmp-muted);max-width:640px;margin:0 auto 2rem;line-height:1.7}
+.cmp-badges{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.cmp-badge{padding:0.75rem 1.5rem;border-radius:12px;font-weight:700;font-size:1rem;border:2px solid}
+.cmp-badge-a{background:var(--cmp-accent-light);border-color:var(--cmp-accent);color:var(--cmp-accent)}
+.cmp-badge-b{background:rgba(100,116,139,0.12);border-color:#64748b;color:#94a3b8}
+.cmp-container{max-width:960px;margin:0 auto;padding:0 1.5rem 3rem}
+.cmp-table{width:100%;border-collapse:collapse;margin:2rem 0;border-radius:12px;overflow:hidden}
+.cmp-table th,.cmp-table td{padding:0.85rem 1rem;text-align:left;border-bottom:1px solid var(--cmp-line)}
+.cmp-table th{background:var(--cmp-accent-light);color:var(--cmp-accent);font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em}
+.cmp-table td{color:var(--cmp-text);font-size:0.9rem}
+.cmp-table tr:hover td{background:rgba(148,163,184,0.05)}
+.cmp-winner-cell{background:var(--cmp-winner)!important;border-left:3px solid var(--cmp-winner-border)}
+.cmp-section{margin:2.5rem 0}
+.cmp-section h2{font-size:1.4rem;font-weight:700;color:var(--cmp-text);margin-bottom:0.5rem}
+.cmp-section h2 .cmp-num{color:var(--cmp-accent);margin-right:0.5rem}
+.cmp-accordion{border:1px solid var(--cmp-line);border-radius:10px;overflow:hidden;margin:1rem 0}
+.cmp-accordion-btn{width:100%;padding:1rem 1.2rem;background:var(--cmp-card);border:none;color:var(--cmp-text);font-size:0.95rem;font-weight:600;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:inherit;transition:background 0.2s}
+.cmp-accordion-btn:hover{background:rgba(148,163,184,0.08)}
+.cmp-accordion-btn .arrow{transition:transform 0.3s;font-size:0.8rem;color:var(--cmp-muted)}
+.cmp-accordion-btn.active .arrow{transform:rotate(180deg)}
+.cmp-accordion-body{max-height:0;overflow:hidden;transition:max-height 0.35s ease;background:var(--cmp-card)}
+.cmp-accordion-body.open{max-height:600px}
+.cmp-accordion-content{padding:0 1.2rem 1.2rem;color:var(--cmp-muted);line-height:1.7;font-size:0.9rem}
+.cmp-verdict{padding:1.5rem;border-radius:12px;background:var(--cmp-winner);border:1px solid var(--cmp-winner-border);margin:2rem 0}
+.cmp-verdict h3{color:#22c55e;margin-bottom:0.5rem;font-size:1.1rem}
+.cmp-verdict p{color:var(--cmp-text);line-height:1.7;font-size:0.9rem}
+.cmp-faq{margin:3rem 0}
+.cmp-faq h2{font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;color:var(--cmp-text)}
+.cmp-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin:2rem 0}
+.cmp-link-card{padding:1.2rem;border-radius:10px;border:1px solid var(--cmp-line);background:var(--cmp-card);text-decoration:none;transition:border-color 0.2s,transform 0.2s}
+.cmp-link-card:hover{border-color:var(--cmp-accent);transform:translateY(-2px)}
+.cmp-link-card h4{color:var(--cmp-text);font-size:0.95rem;margin-bottom:0.3rem}
+.cmp-link-card p{color:var(--cmp-muted);font-size:0.8rem;line-height:1.5}
+@media(max-width:768px){.cmp-hero h1{font-size:1.6rem}.cmp-table{font-size:0.8rem}.cmp-badges{gap:0.75rem}.cmp-badge{font-size:0.85rem;padding:0.5rem 1rem}}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high"></a>
+    <ul class="nav-menu">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+        <ul class="dropdown-menu">
+          <li><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+          <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+          <li><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+          <li><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+        </ul>
+      </li>
+      <li class="nav-dropdown"><a href="insights.html" class="nav-link">Insights<svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+        <ul class="dropdown-menu">
+          <li><a href="articles.html" style="color:#06b6d4;">Engineering Journal</a></li>
+          <li><a href="geopolitics.html" style="color:#ef4444;">Global Analysis</a></li>
+          <li><a href="future-forward.html" style="color:#a855f7;">Future Forward</a></li>
+        </ul>
+      </li>
+      <li><a href="index.html#about" class="nav-link">About</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="cmp-hero">
+  <h1>Online UPS vs Offline UPS</h1>
+  <p>The UPS topology you choose determines whether your data center survives a power event cleanly or suffers micro-outages, data corruption, and equipment stress. Compare double-conversion and standby architectures.</p>
+  <div class="cmp-badges">
+    <span class="cmp-badge cmp-badge-a"><i class="fas fa-bolt"></i>&nbsp; Online (Double-Conversion)</span>
+    <span class="cmp-badge cmp-badge-b"><i class="fas fa-plug"></i>&nbsp; Offline (Standby)</span>
+  </div>
+</section>
+
+<div class="cmp-container">
+
+  <!-- Quick Verdict Table -->
+  <h2 style="font-size:1.3rem;font-weight:700;color:var(--cmp-text);margin-bottom:0.5rem"><i class="fas fa-table" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Quick Comparison</h2>
+  <table class="cmp-table">
+    <thead><tr><th>Category</th><th>Online (VFI)</th><th>Offline (VFD)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Transfer Time</strong></td><td class="cmp-winner-cell">0 ms &mdash; load always on inverter, zero interruption</td><td>5&ndash;12 ms &mdash; relay switches from mains to battery on failure</td></tr>
+      <tr><td><strong>Efficiency</strong></td><td>92&ndash;95% normal mode; 98&ndash;99% in eco-mode</td><td class="cmp-winner-cell">95&ndash;98% &mdash; load runs directly on mains, minimal conversion loss</td></tr>
+      <tr><td><strong>Power Conditioning</strong></td><td class="cmp-winner-cell">Full &mdash; voltage regulation, harmonic filtering, frequency conversion</td><td>None &mdash; raw mains power passes through; no sag/surge protection</td></tr>
+      <tr><td><strong>Cost per kVA</strong></td><td>$300&ndash;800 &mdash; complex inverter and rectifier topology</td><td class="cmp-winner-cell">$50&ndash;150 &mdash; simple transfer switch and charger</td></tr>
+      <tr><td><strong>Reliability (MTBF)</strong></td><td class="cmp-winner-cell">200,000&ndash;500,000 hours &mdash; enterprise-grade components</td><td>50,000&ndash;100,000 hours &mdash; consumer/SMB-grade relay design</td></tr>
+      <tr><td><strong>Heat Output</strong></td><td>5&ndash;8% of rated load as waste heat (requires cooling)</td><td class="cmp-winner-cell">1&ndash;3% waste heat &mdash; minimal cooling impact</td></tr>
+      <tr><td><strong>Target Application</strong></td><td class="cmp-winner-cell">Data centers, hospitals, telecom, financial trading, any Tier II+</td><td>Desktop PCs, home networks, non-critical office equipment</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cmp-verdict">
+    <h3><i class="fas fa-trophy"></i> Verdict: Online UPS is Non-Negotiable for Data Centers</h3>
+    <p>Every major data center standard (Uptime Institute, TIA-942, EN 50600) requires or strongly recommends online double-conversion UPS. The 5&ndash;12 ms transfer gap in offline systems can crash servers, corrupt databases, and trigger cascading failures. Offline UPS has no place in production data center infrastructure.</p>
+  </div>
+
+  <!-- Detailed Sections -->
+  <div class="cmp-section">
+    <h2><span class="cmp-num">01</span>Transfer Time and Power Continuity</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Why milliseconds matter for mission-critical loads <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p><strong>Online UPS</strong> continuously converts incoming AC to DC (rectifier stage), charges the battery, then converts DC back to AC (inverter stage). The load always runs on the inverter output. When mains fails, the rectifier simply stops and the battery takes over DC bus supply &mdash; with zero interruption to the inverter output. This is classified as VFI (Voltage and Frequency Independent) per IEC 62040-3.</p>
+        <p><strong>Offline UPS</strong> passes raw mains power directly to the load through a transfer relay. When mains fails, the relay must physically switch the load to the battery-inverter path. This mechanical or solid-state switching takes 5&ndash;12 ms. While some modern servers tolerate 10 ms dropout, storage controllers, real-time databases, and precision instruments often cannot. CBEMA/ITIC curves show that equipment sensitivity thresholds vary, and even "tolerant" servers may experience data corruption during the gap.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">02</span>Power Quality and Conditioning</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Voltage regulation, harmonics, and frequency stability <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Online UPS provides complete galvanic isolation between the utility and the load. The double-conversion process eliminates voltage sags (down to 0V on input while output stays at 230V), surges, frequency variations, harmonics, and electrical noise. Output THD is typically less than 3%, and voltage regulation holds within +/-1%.</p>
+        <p>Offline UPS provides no power conditioning during normal operation. The load receives whatever the utility delivers &mdash; including voltage fluctuations (typically +/-10%), harmonic distortion from neighboring loads, and frequency drift from unstable grids. In regions with poor power quality (Southeast Asia, Africa, parts of South America), offline UPS offers effectively no protection beyond basic battery backup.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">03</span>Efficiency and Operating Cost</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Energy consumption, PUE impact, and eco-mode trade-offs <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>The double-conversion process in online UPS inherently wastes 5&ndash;8% of throughput power as heat. For a 1 MW data center, this means 50&ndash;80 kW of continuous UPS losses, directly impacting PUE. At $0.10/kWh, that is $44K&ndash;70K annually in UPS conversion losses alone, plus additional cooling energy to remove the waste heat.</p>
+        <p>Modern online UPS systems offer eco-mode (also called bypass mode or VFD mode) that routes power through the static bypass during stable conditions, achieving 98&ndash;99% efficiency. However, eco-mode introduces a 2&ndash;4 ms transfer time when switching back to inverter operation, partially negating the core advantage of online topology. The Uptime Institute and most Tier III/IV operators disable eco-mode in production environments.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">04</span>Scalability and Redundancy</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Modular UPS architectures and N+1/2N configurations <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Enterprise online UPS systems support modular hot-swappable power modules, allowing capacity to scale from 100 kVA to 1+ MVA within a single frame. N+1 redundancy is achieved by adding one extra module beyond the load requirement. 2N redundancy uses two independent UPS systems on separate feeds, each sized to carry the full load.</p>
+        <p>Offline UPS units are standalone devices with no modular expansion capability. Scaling requires adding more discrete units with independent transfer switches, creating coordination nightmares. Redundancy concepts like N+1 or 2N are impractical with offline topology because the transfer time compounds &mdash; if one unit's relay fails to switch, there is no coordinated fallback path.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">05</span>Battery Management and Runtime</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Battery health monitoring, temperature compensation, and runtime planning <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Online UPS incorporates advanced battery management: temperature-compensated charging, individual block monitoring, predictive failure analysis, and automatic battery test scheduling. The rectifier/charger maintains optimal float voltage continuously, extending battery life to 10&ndash;15 years for VRLA and 20+ years for lithium-ion.</p>
+        <p>Offline UPS uses simple trickle chargers with basic voltage sensing. There is no temperature compensation, no per-block monitoring, and no predictive diagnostics. Batteries in offline systems typically last 3&ndash;5 years and may fail without warning, discovered only during an actual outage when the UPS fails to provide backup power.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">06</span>Total Cost of Ownership</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">CAPEX, OPEX, and risk-adjusted cost analysis over 10 years <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>For a 500 kVA installation: Online UPS CAPEX is $150K&ndash;400K, annual maintenance $15K&ndash;25K, and energy losses ~$35K/year. Total 10-year TCO: approximately $650K&ndash;1M. Offline UPS CAPEX is $25K&ndash;75K with minimal maintenance costs, totaling $50K&ndash;100K over 10 years.</p>
+        <p>However, a single power-related outage in a data center costs $5K&ndash;$20K per minute (Uptime Institute 2023 survey). A 10-minute offline UPS transfer failure event would cost $50K&ndash;200K &mdash; exceeding the entire 10-year TCO of the offline system. Risk-adjusted, online UPS delivers 10&ndash;50x better cost-per-incident-avoided ratios for any facility where downtime costs exceed $1K/minute.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="cmp-section">
+    <h2><span class="cmp-num">07</span>Line-Interactive: The Middle Ground</h2>
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">When line-interactive UPS offers a balanced alternative <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        <p>Line-interactive UPS (VFI-SS per IEC 62040-3) adds an autotransformer that provides voltage regulation without full double-conversion. Transfer time is 2&ndash;4 ms, efficiency is 95&ndash;97%, and cost is $100&ndash;300/kVA. It handles voltage sags and swells but does not provide frequency conversion or full harmonic filtering.</p>
+        <p>Line-interactive is appropriate for edge computing, small server rooms (under 20 kW), and branch offices where the cost of online UPS is prohibitive but offline is too risky. It is NOT suitable for Tier III/IV data centers, which require the zero-transfer-time guarantee of true online topology.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- Decision Helper -->
+  <div class="cmp-section">
+    <h2><i class="fas fa-compass" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Decision Helper</h2>
+    <div style="padding:1.5rem;border-radius:12px;border:1px solid var(--cmp-line);background:var(--cmp-card)">
+      <p style="color:var(--cmp-text);line-height:1.8;font-size:0.9rem">
+        <strong>Choose Online UPS if:</strong> Downtime cost exceeds $1K/minute, power quality is critical, the facility targets Tier II or above, regulatory compliance requires zero-break power, or the protected load includes storage systems, databases, or real-time applications.<br><br>
+        <strong>Choose Offline UPS if:</strong> The load is non-critical (desktop PCs, home office), downtime is tolerable, budget is extremely limited, and the utility power quality is consistently good.<br><br>
+        <strong>Consider Line-Interactive if:</strong> Edge or branch deployment under 20 kW, moderate criticality, and online UPS CAPEX is not justifiable.
+      </p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="cmp-faq">
+    <h2><i class="fas fa-circle-question" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Frequently Asked Questions</h2>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Why do data centers use online UPS instead of offline? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Data centers require zero transfer time (0 ms) to the battery. Online double-conversion UPS continuously powers the load through the inverter, so there is no switchover when mains power fails. Offline UPS has a 5-12 ms transfer time that can crash sensitive IT equipment, corrupt storage operations, and disrupt real-time processing.
+      </div></div>
+    </div>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Is online UPS less efficient than offline UPS? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Traditional online UPS operates at 92-95% efficiency due to the double-conversion process (AC to DC to AC). Modern eco-mode designs achieve 98-99% by bypassing the inverter during stable power conditions. Offline UPS achieves 95-98% efficiency because the load runs directly on mains power during normal operation, but this comes at the cost of zero power conditioning.
+      </div></div>
+    </div>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">What is the cost difference between online and offline UPS per kVA? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Online UPS costs $300-800 per kVA depending on capacity and brand, while offline UPS costs $50-150 per kVA. For a 500 kVA system, the difference is roughly $125K-325K. However, online UPS provides power conditioning, harmonic filtering, and voltage regulation that offline UPS cannot, protecting equipment worth millions.
+      </div></div>
+    </div>
+
+    <div class="cmp-accordion">
+      <button class="cmp-accordion-btn">Can I use eco-mode on my online UPS to save energy? <span class="arrow"><i class="fas fa-chevron-down"></i></span></button>
+      <div class="cmp-accordion-body"><div class="cmp-accordion-content">
+        Yes, eco-mode bypasses the inverter during stable power, achieving 98-99% efficiency. However, in eco-mode the UPS behaves like a line-interactive system with a 2-4 ms transfer time. Most Tier III/IV standards and Uptime Institute guidelines recommend against eco-mode in critical data halls, as the transfer time risk outweighs the 3-5% efficiency gain.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- Related Links -->
+  <h2 style="font-size:1.3rem;font-weight:700;color:var(--cmp-text);margin-bottom:1rem"><i class="fas fa-link" style="color:var(--cmp-accent);margin-right:0.5rem"></i>Related Resources</h2>
+  <div class="cmp-links">
+    <a href="capex-calculator.html" class="cmp-link-card">
+      <h4><i class="fas fa-calculator" style="color:#f59e0b"></i> CAPEX Calculator</h4>
+      <p>Calculate data center capital expenditure including UPS systems, generators, and power distribution.</p>
+    </a>
+    <a href="dc-conventional.html" class="cmp-link-card">
+      <h4><i class="fas fa-building" style="color:#06b6d4"></i> DC Conventional Design</h4>
+      <p>Traditional data center power architecture including UPS topology, switchgear, and distribution design.</p>
+    </a>
+    <a href="datacenter-solutions.html" class="cmp-link-card">
+      <h4><i class="fas fa-server" style="color:#2563eb"></i> DC Solutions Hub</h4>
+      <p>Explore all data center infrastructure solutions, calculators, and comparison tools.</p>
+    </a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer footer-enhanced">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+        <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+        <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+      </div>
+      <div class="footer-nav">
+        <h4 class="footer-heading">NAVIGATION</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home Dashboard</a></li>
+          <li><a href="articles.html">Technical Journal</a></li>
+          <li><a href="index.html#case-studies">Case Studies</a></li>
+          <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+      </div>
+      <div class="footer-connect">
+        <h4 class="footer-heading">CONNECT</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+          <li><a href="articles.html">Technical Journal</a></li>
+          <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+          <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.min.js?v=20260225"></script>
+<script>
+document.querySelectorAll('.cmp-accordion-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var body=this.nextElementSibling;
+    var isOpen=body.classList.contains('open');
+    document.querySelectorAll('.cmp-accordion-body').forEach(function(b){b.classList.remove('open')});
+    document.querySelectorAll('.cmp-accordion-btn').forEach(function(b){b.classList.remove('active')});
+    if(!isOpen){body.classList.add('open');this.classList.add('active')}
+  });
+});
+</script>
+<script src="auth.js?v=20260228"></script>
+
+<div class="cookie-banner hidden" id="cookieBanner">
+  <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+  <div class="cookie-actions">
+    <button class="cookie-accept" id="cookieAccept">Accept</button>
+    <button class="cookie-decline" id="cookieDecline">Decline</button>
+  </div>
+</div>
+
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function(){
+  var cb=document.getElementById('cookieBanner');
+  var consent=localStorage.getItem('rz_cookie_consent');
+  if(!consent&&cb){cb.classList.remove('hidden')}
+  var acceptBtn=document.getElementById('cookieAccept');
+  var declineBtn=document.getElementById('cookieDecline');
+  if(acceptBtn)acceptBtn.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');cb.classList.add('hidden')});
+  if(declineBtn)declineBtn.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');cb.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true});
+  var sBtn=document.getElementById('scrollTopBtn');
+  if(sBtn){
+    var ticking=false;
+    window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(function(){sBtn.classList.toggle('visible',window.scrollY>500);ticking=false});ticking=true}});
+    sBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  }
+})();
+</script>
+</body>
+</html>
