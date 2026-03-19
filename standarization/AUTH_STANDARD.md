@@ -107,9 +107,14 @@ Each article with Pro Mode has its OWN login modal (separate from auth.js global
     <div class="[prefix]login-demo">
       Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code>
     </div>
+    <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">
+      By signing in, you agree to our <a href="terms.html" style="color:THEME;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:THEME;text-decoration:none;">Privacy Policy</a>
+    </div>
   </div>
 </div>
 ```
+
+> **IMPORTANT**: The Terms & Privacy Policy line is **mandatory** on ALL login modals — both the shared auth.js modal and every page-specific inline modal. Use the page's accent color for link styling (e.g., `#8b5cf6` purple, `#dc2626` red, `#991b1b` dark red). This was a recurring issue found in FF-1, geopolitics-2/3, cx-calculator, rfs-readiness-workbench, and articles 19-21 (March 2026).
 
 ### Login Handler Pattern
 ```js
@@ -213,6 +218,25 @@ function activatePremiumUI() {
 
 ---
 
+## New Article/Page Checklist
+
+Before publishing any new article or calculator page, verify ALL of the following:
+
+- [ ] `<script src="auth.js?v=20260228"></script>` loaded before `</body>`
+- [ ] If page has inline login modal: **Terms & Privacy line present** after demo credentials
+- [ ] `terms.html` and `privacy.html` links use page accent color
+- [ ] Calculator disclaimer section present (if page has interactive calculator)
+- [ ] Cookie banner HTML present (matches other articles)
+- [ ] `rz-auth-change` event dispatched after inline login
+- [ ] Session check on page load (auto-unlock Pro if session exists)
+- [ ] Page added to `sitemap.xml` and `search-index.json`
+- [ ] BreadcrumbList schema added
+- [ ] hreflang en + x-default tags in `<head>`
+
+> **Lesson learned (March 2026):** FF-1, geopolitics-2/3, cx-calculator, rfs-readiness-workbench, and articles 19-21 were all shipped without the standard Terms & Privacy text in their login modals, and some were missing auth.js entirely. This checklist prevents that.
+
+---
+
 ## Bug History
 
 | Date | Bug | Fix |
@@ -221,3 +245,5 @@ function activatePremiumUI() {
 | 2026-02-16 | No demo hint in auth.js global modal | Added demo credentials div after Sign In button |
 | 2026-02-27 | ROI calculator Pro panels show "--" on page load with stored session | `activatePremiumUI()` was missing `setMode('pro')` call — added it |
 | 2026-02-27 | tia-942 & tier-advisor: auth/tooltips/DOMContentLoaded broken | `</script>` in PDF export string closed main script block — moved cookie HTML to separate block |
+| 2026-03-20 | FF-1, geo-3, cx-calc, rfs-workbench missing Terms/Privacy in inline login modals | Added terms/privacy text to all inline login modals |
+| 2026-03-20 | article-19, article-20, article-21, cx-calc, rfs-workbench missing auth.js | Added `<script src="auth.js?v=20260228"></script>` before `</body>` |
