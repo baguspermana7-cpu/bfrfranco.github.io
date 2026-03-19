@@ -23,6 +23,7 @@
     <link rel="canonical" href="https://resistancezero.com/article-20.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-20.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/article-20.html">
 
     <!-- Resource Hints -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -734,7 +735,198 @@
             display: inline-flex; align-items: center; gap: 5px;
         }
         .wc-benchmark-tag i { font-size: 0.6rem; color: #dc2626; }
+        /* --- Section Titles --- */
+        .wc-section-title {
+            font-size: 0.85rem; font-weight: 700; color: #e2e8f0;
+            margin: 2rem 0 1rem; padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(220,38,38,0.2);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .wc-section-title i { color: #f87171; font-size: 0.8rem; }
+        /* --- Bar Chart --- */
+        .wc-bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+        .wc-bar-row {
+            display: grid; grid-template-columns: 140px 1fr 70px;
+            align-items: center; gap: 0.75rem; font-size: 0.78rem;
+        }
+        .wc-bar-label {
+            color: #94a3b8; text-align: right; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .wc-bar-label.active { color: #fbbf24; font-weight: 700; }
+        .wc-bar-track {
+            height: 22px; background: rgba(255,255,255,0.06);
+            border-radius: 4px; overflow: hidden; position: relative;
+        }
+        .wc-bar-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            min-width: 2px;
+        }
+        .wc-bar-fill.green { background: linear-gradient(90deg, #059669, #34d399); }
+        .wc-bar-fill.amber { background: linear-gradient(90deg, #d97706, #fbbf24); }
+        .wc-bar-fill.red { background: linear-gradient(90deg, #991b1b, #f87171); }
+        .wc-bar-fill.blue { background: linear-gradient(90deg, #1d4ed8, #60a5fa); }
+        .wc-bar-value {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+            color: #e2e8f0; font-weight: 600;
+        }
+        /* --- Gauge --- */
+        .wc-gauge-container {
+            display: flex; align-items: center; gap: 2rem;
+            background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1.5rem;
+        }
+        .wc-gauge {
+            width: 120px; height: 120px; position: relative;
+            border-radius: 50%; flex-shrink: 0;
+        }
+        .wc-gauge-ring {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(var(--gauge-color, #34d399) var(--gauge-pct, 0%), rgba(255,255,255,0.08) 0%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .wc-gauge-inner {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: #1c1917; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .wc-gauge-value { font-size: 1.2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .wc-gauge-label { font-size: 0.65rem; color: #94a3b8; margin-top: 2px; }
+        .wc-gauge-info { flex: 1; }
+        .wc-gauge-rating {
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;
+        }
+        .wc-gauge-desc { font-size: 0.8rem; color: #94a3b8; line-height: 1.5; }
+        .wc-gauge-scale {
+            display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap;
+        }
+        .wc-gauge-scale span {
+            font-size: 0.68rem; padding: 2px 8px; border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        /* --- Context Cards --- */
+        .wc-context-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem; margin-top: 0.5rem;
+        }
+        .wc-context-card {
+            background: rgba(255,255,255,0.04); border-radius: 10px;
+            padding: 1rem; border: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.78rem; color: #94a3b8; line-height: 1.5;
+        }
+        .wc-context-card strong { color: #f87171; }
+        .wc-context-card .ctx-icon { font-size: 1.2rem; margin-bottom: 0.5rem; display: block; }
+        /* --- Toolbar Free/Pro --- */
+        .wc-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.15);
+            border-radius: 12px; padding: 0.75rem 1rem; margin-bottom: 1.5rem;
+            flex-wrap: wrap; gap: 0.5rem;
+        }
+        .wc-mode-bar { display: flex; gap: 4px; }
+        .wc-toolbar-btn {
+            padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(220,38,38,0.2);
+            background: transparent; color: #94a3b8; font-size: 0.875rem; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .wc-toolbar-btn:hover { color: #e2e8f0; border-color: #dc2626; }
+        .wc-toolbar .wc-toolbar-actions { display: flex; gap: 6px; }
+        .wc-btn-free.active {
+            background: linear-gradient(135deg, #991b1b, #dc2626); color: #fff;
+            border-color: transparent; box-shadow: 0 2px 8px rgba(220,38,38,0.25);
+        }
+        .wc-btn-pro.active {
+            background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff;
+            border-color: transparent; box-shadow: 0 2px 8px rgba(245,158,11,0.25);
+        }
+        /* --- Pro Panels --- */
+        .wc-pro-panel {
+            margin: 1.5rem 0; padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(220,38,38,0.06), rgba(245,158,11,0.03));
+            border: 1px solid rgba(220,38,38,0.15); border-radius: 12px;
+            position: relative; overflow: hidden; display: none;
+        }
+        .wc-pro-panel.gated .wc-panel-inner {
+            filter: blur(4px); pointer-events: none; user-select: none;
+        }
+        .wc-gate-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(12,10,9,0.85); display: flex; align-items: center;
+            justify-content: center; gap: 8px; cursor: pointer; z-index: 5;
+            border-radius: 12px; transition: all 0.3s;
+        }
+        .wc-gate-overlay:hover { background: rgba(12,10,9,0.75); }
+        .wc-gate-overlay i { font-size: 1.5rem; color: #fbbf24; }
+        .wc-gate-overlay span { color: #fbbf24; font-weight: 700; font-size: 0.9rem; }
+        .wc-panel-title {
+            font-size: 0.95rem; font-weight: 700; color: #f59e0b;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .wc-pro-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;
+        }
+        .wc-pro-kpi {
+            background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; text-align: center;
+        }
+        .wc-pro-kpi .kpi-label {
+            font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;
+        }
+        .wc-pro-kpi .kpi-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .wc-pro-narrative {
+            background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1.25rem;
+            margin-top: 1rem; font-size: 0.82rem; color: #d6d3d1; line-height: 1.7;
+        }
+        .wc-pro-narrative strong { color: #f59e0b; }
+        .wc-pro-table {
+            width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.78rem;
+        }
+        .wc-pro-table th {
+            background: rgba(220,38,38,0.15); color: #f87171; padding: 0.5rem;
+            text-align: left; font-size: 0.72rem; text-transform: uppercase;
+        }
+        .wc-pro-table td {
+            padding: 0.4rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d6d3d1;
+        }
+        .wc-pro-table tr.highlight { background: rgba(245,158,11,0.08); }
+        /* --- Login Modal --- */
+        .wc-login-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center;
+        }
+        .wc-login-overlay.show { display: flex; }
+        .wc-login-box {
+            background: #1c1917; border: 2px solid rgba(220,38,38,0.5); border-radius: 16px;
+            padding: 2rem; max-width: 420px; width: 90%;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(220,38,38,0.15); position: relative;
+        }
+        .wc-login-close {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: #94a3b8; font-size: 1.5rem; cursor: pointer;
+        }
+        .wc-login-box h3 { font-size: 1.2rem; color: #f87171; margin-bottom: 0.5rem; }
+        .wc-login-box p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem; line-height: 1.5; }
+        .wc-login-box input {
+            width: 100%; padding: 12px 16px; margin-bottom: 12px;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(220,38,38,0.2);
+            border-radius: 8px; color: #fff; font-family: inherit; outline: none; box-sizing: border-box;
+        }
+        .wc-login-box input:focus { border-color: #dc2626; }
+        .wc-login-submit {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, #991b1b, #dc2626);
+            color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s; margin-top: 4px; font-family: inherit;
+        }
+        .wc-login-submit:hover { box-shadow: 0 4px 16px rgba(220,38,38,0.3); }
+        .wc-login-error { display: none; color: #ef4444; font-size: 0.8rem; margin-top: 8px; }
+        .wc-login-demo { margin-top: 12px; font-size: 0.75rem; color: #64748b; text-align: center; }
+        .wc-login-demo code {
+            background: rgba(220,38,38,0.1); padding: 2px 6px; border-radius: 4px;
+            font-size: 0.72rem; color: #f87171;
+        }
         [data-theme="dark"] .wc-calculator { background: linear-gradient(135deg, #0c0a09 0%, #3b0505 100%); }
+        [data-theme="dark"] .wc-gauge-inner { background: #0c0a09; }
+        [data-theme="dark"] .wc-login-box { background: #0c0a09; }
         @media (max-width: 768px) {
             .wc-calculator { padding: 1.5rem; }
             .wc-calculator .calc-grid { grid-template-columns: 1fr; }
@@ -742,10 +934,19 @@
             .wc-tab { min-width: unset; }
             .wc-calculator .results-grid { grid-template-columns: repeat(2, 1fr); }
             .avh-comparison-grid { grid-template-columns: repeat(2, 1fr); }
+            .wc-bar-row { grid-template-columns: 100px 1fr 60px; }
+            .wc-gauge-container { flex-direction: column; text-align: center; }
+            .wc-context-cards { grid-template-columns: 1fr; }
+            .wc-toolbar { flex-direction: column; align-items: stretch; }
+            .wc-mode-bar { justify-content: center; }
+            .wc-pro-grid { grid-template-columns: repeat(2, 1fr); }
+            .wc-pro-table { font-size: 0.7rem; }
+            .wc-pro-table th, .wc-pro-table td { padding: 0.3rem; }
         }
         @media (max-width: 480px) {
             .wc-calculator .results-grid { grid-template-columns: 1fr; }
             .avh-comparison-grid { grid-template-columns: 1fr; }
+            .wc-bar-row { grid-template-columns: 80px 1fr 55px; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -1183,6 +1384,22 @@
     <div class="wc-calc-title"><i class="fas fa-tint"></i> Water Impact Calculators</div>
     <p class="wc-calc-subtitle">Three perspectives on AI's water footprint: personal usage, data center operations, and everyday comparisons.</p>
 
+    <!-- Toolbar -->
+    <div class="wc-toolbar">
+        <div class="wc-mode-bar">
+            <button class="wc-toolbar-btn wc-btn-free active" onclick="wcSetMode('free')">
+                <i class="fas fa-chart-bar"></i> Free Assessment
+            </button>
+            <button class="wc-toolbar-btn wc-btn-pro" onclick="wcSetMode('pro')">
+                <i class="fas fa-crown"></i> Pro Intelligence
+            </button>
+        </div>
+        <div class="wc-toolbar-actions">
+            <button class="wc-btn-reset" onclick="wcResetActive()"><i class="fas fa-undo"></i> Reset</button>
+            <button class="wc-btn-pdf" onclick="wcExportActivePDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+        </div>
+    </div>
+
     <div class="wc-tabs">
         <button class="wc-tab active" onclick="wcSwitchTab('wfc')" id="wcTabWfc"><i class="fas fa-user"></i> AI Water Footprint</button>
         <button class="wc-tab" onclick="wcSwitchTab('dcw')" id="wcTabDcw"><i class="fas fa-server"></i> Data Center Water</button>
@@ -1191,10 +1408,6 @@
 
     <!-- TAB 1: AI Water Footprint -->
     <div class="wc-tab-panel active" id="wcPanelWfc">
-        <div class="wc-toolbar-actions">
-            <button class="wc-btn-reset" onclick="wfcReset()"><i class="fas fa-undo"></i> Reset</button>
-            <button class="wc-btn-pdf" onclick="wfcExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
-        </div>
         <div class="calc-grid">
             <div class="calc-input-group">
                 <label>AI Queries per Day <span class="calc-tooltip">?<span class="tip-text">Average number of AI prompts per day. Power users: 100+. Casual: 10-30. Developers with Copilot: 200+.</span></span></label>
@@ -1203,11 +1416,37 @@
             <div class="calc-input-group">
                 <label>Primary AI Model <span class="calc-tooltip">?<span class="tip-text">Different models have different computational requirements. GPT-4/Claude use more resources per query than smaller models. Image generation is the most water-intensive.</span></span></label>
                 <select id="wfcModel">
-                    <option value="gpt4">ChatGPT / GPT-4</option>
-                    <option value="claude">Claude</option>
-                    <option value="gemini">Gemini</option>
-                    <option value="imagegen">Midjourney / Image Gen</option>
-                    <option value="copilot">Copilot</option>
+                    <optgroup label="OpenAI">
+                        <option value="gpt54">GPT-5.4</option>
+                        <option value="gpt4o" selected>GPT-4o</option>
+                        <option value="gpt4turbo">GPT-4 Turbo</option>
+                        <option value="o3">o3 (Deep Reasoning)</option>
+                        <option value="o4mini">o4-mini</option>
+                    </optgroup>
+                    <optgroup label="Anthropic">
+                        <option value="opus46">Claude Opus 4.6</option>
+                        <option value="sonnet46">Claude Sonnet 4.6</option>
+                        <option value="haiku45">Claude Haiku 4.5</option>
+                    </optgroup>
+                    <optgroup label="Google">
+                        <option value="gemini25pro">Gemini 2.5 Pro</option>
+                        <option value="gemini25flash">Gemini 2.5 Flash</option>
+                    </optgroup>
+                    <optgroup label="Meta">
+                        <option value="llama4mav">Llama 4 Maverick</option>
+                        <option value="llama4scout">Llama 4 Scout</option>
+                    </optgroup>
+                    <optgroup label="Other">
+                        <option value="grok3">Grok 3 (xAI)</option>
+                        <option value="copilot">GitHub Copilot</option>
+                        <option value="deepseek3">DeepSeek-V3</option>
+                    </optgroup>
+                    <optgroup label="Image / Video Generation">
+                        <option value="midjourney">Midjourney v7</option>
+                        <option value="dalle4">DALL-E 4</option>
+                        <option value="sd3">Stable Diffusion 3</option>
+                        <option value="sora">Sora (Video Gen)</option>
+                    </optgroup>
                 </select>
             </div>
             <div class="calc-input-group">
@@ -1217,6 +1456,7 @@
                     <option value="medium" selected>Medium</option>
                     <option value="complex">Complex / Long</option>
                     <option value="image">Image Generation</option>
+                    <option value="video">Video Generation</option>
                 </select>
             </div>
             <div class="calc-input-group">
@@ -1244,6 +1484,14 @@
                     <option value="tropical">Tropical (SEA, India)</option>
                 </select>
             </div>
+            <div class="calc-input-group">
+                <label>Number of Users <span class="calc-tooltip">?<span class="tip-text">1 = personal use. Set higher for team/org estimates. Enterprise: 500-10,000+. National scale: 1M+.</span></span></label>
+                <input type="number" id="wfcUsers" value="1" min="1" max="10000000" step="1">
+            </div>
+            <div class="calc-input-group">
+                <label>Active Hours/Day <span class="calc-tooltip">?<span class="tip-text">Hours per day the user(s) actively send AI queries. Typical: 8 (work day). Heavy use: 12-16.</span></span></label>
+                <input type="number" id="wfcHours" value="8" min="1" max="24" step="1">
+            </div>
         </div>
         <div class="calc-actions">
             <button class="calc-button" onclick="wfcCalculate()"><i class="fas fa-calculator"></i> Calculate Water Footprint</button>
@@ -1255,17 +1503,31 @@
                 <div class="result-item"><div class="label">Annual Footprint</div><div class="value red" id="wfcAnnual">-</div><div class="subtext">liters/year</div></div>
                 <div class="result-item"><div class="label">Bottles Per Year</div><div class="value amber" id="wfcBottles">-</div><div class="subtext">500ml bottles</div></div>
                 <div class="result-item"><div class="label">Showers Per Year</div><div class="value amber" id="wfcShowers">-</div><div class="subtext">~65L each</div></div>
+                <div class="result-item"><div class="label">Drinking Days</div><div class="value blue" id="wfcDrinkDays">-</div><div class="subtext">@ 2L/day</div></div>
                 <div class="result-item"><div class="label">CO2 Equivalent</div><div class="value green" id="wfcCO2">-</div><div class="subtext">kg CO2/year</div></div>
+                <div class="result-item"><div class="label">Water Cost</div><div class="value green" id="wfcCost">-</div><div class="subtext">USD/year (municipal rate)</div></div>
+            </div>
+            <div class="wc-section-title"><i class="fas fa-chart-bar"></i> Water Per Query — Model Comparison</div>
+            <div class="wc-bar-chart" id="wfcModelChart"></div>
+            <div class="wc-section-title"><i class="fas fa-info-circle"></i> Context</div>
+            <div class="wc-context-cards" id="wfcContext"></div>
+        </div>
+        <!-- Pro Panel: Tab 1 -->
+        <div class="wc-pro-panel gated" id="wfcProPanel">
+            <div class="wc-panel-inner">
+                <div class="wc-panel-title"><i class="fas fa-crown"></i> Pro: Multi-Model Deep Comparison &amp; Projection</div>
+                <div class="wc-pro-grid" id="wfcProKPIs"></div>
+                <table class="wc-pro-table" id="wfcProTable"></table>
+                <div class="wc-pro-narrative" id="wfcProNarrative"></div>
+            </div>
+            <div class="wc-gate-overlay" onclick="wcShowLogin()">
+                <i class="fas fa-lock"></i><span>Sign In to Unlock</span>
             </div>
         </div>
     </div>
 
     <!-- TAB 2: Data Center Water -->
     <div class="wc-tab-panel" id="wcPanelDcw">
-        <div class="wc-toolbar-actions">
-            <button class="wc-btn-reset" onclick="dcwReset()"><i class="fas fa-undo"></i> Reset</button>
-            <button class="wc-btn-pdf" onclick="dcwExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
-        </div>
         <div class="calc-grid">
             <div class="calc-input-group">
                 <label>IT Load (MW) <span class="calc-tooltip">?<span class="tip-text">Total IT power. Small DC: 1-5 MW. Enterprise: 10-30 MW. Hyperscale: 50-300 MW. AI factories: 100+ MW.</span></span></label>
@@ -1307,6 +1569,18 @@
                     <option value="groundwell">Groundwell</option>
                 </select>
             </div>
+            <div class="calc-input-group">
+                <label>AI Workload % <span class="calc-tooltip">?<span class="tip-text">Percentage of IT load dedicated to AI/ML training and inference. AI-first facilities: 80-100%. Mixed enterprise: 20-40%.</span></span></label>
+                <input type="number" id="dcwAIPct" value="50" min="0" max="100" step="5">
+            </div>
+            <div class="calc-input-group">
+                <label>GPU Rack Density (kW) <span class="calc-tooltip">?<span class="tip-text">Power per rack. Traditional: 8-12 kW. AI/GPU racks: 40-100 kW. NVIDIA GB200 NVL72: 120 kW.</span></span></label>
+                <input type="number" id="dcwRackDensity" value="40" min="5" max="200" step="5">
+            </div>
+            <div class="calc-input-group">
+                <label>Renewable Energy % <span class="calc-tooltip">?<span class="tip-text">Percentage of renewable energy. Affects upstream water calculation. Solar/wind use minimal water vs. coal/gas/nuclear.</span></span></label>
+                <input type="number" id="dcwRenewable" value="30" min="0" max="100" step="5">
+            </div>
         </div>
         <div class="calc-actions">
             <button class="calc-button" onclick="dcwCalculate()"><i class="fas fa-calculator"></i> Calculate Water Usage</button>
@@ -1315,20 +1589,35 @@
             <div class="results-grid">
                 <div class="result-item"><div class="label">Annual Consumption</div><div class="value red" id="dcwAnnual">-</div><div class="subtext" id="dcwAnnualSub">liters</div></div>
                 <div class="result-item"><div class="label">Daily Consumption</div><div class="value blue" id="dcwDaily">-</div><div class="subtext" id="dcwDailySub">liters/day</div></div>
-                <div class="result-item"><div class="label">WUE</div><div class="value amber" id="dcwWUE">-</div><div class="subtext">L/kWh</div></div>
+                <div class="result-item"><div class="label">WUE Rating</div><div class="value amber" id="dcwWUE">-</div><div class="subtext">L/kWh</div></div>
                 <div class="result-item"><div class="label">Equiv. Households</div><div class="value amber" id="dcwHouseholds">-</div><div class="subtext">~1,135 L/day each</div></div>
                 <div class="result-item"><div class="label">% of City (50K)</div><div class="value red" id="dcwCityPct">-</div><div class="subtext">of daily city water</div></div>
                 <div class="result-item"><div class="label">Annual Water Cost</div><div class="value green" id="dcwCost">-</div><div class="subtext">USD estimated</div></div>
+                <div class="result-item"><div class="label">Olympic Pools/Year</div><div class="value blue" id="dcwPools">-</div><div class="subtext">2.5M liters each</div></div>
+                <div class="result-item"><div class="label">AI-Attributable</div><div class="value red" id="dcwAIWater">-</div><div class="subtext" id="dcwAIWaterSub">liters/year (AI only)</div></div>
+                <div class="result-item"><div class="label">GPU Racks</div><div class="value amber" id="dcwRacks">-</div><div class="subtext">estimated count</div></div>
+            </div>
+            <div class="wc-section-title"><i class="fas fa-industry"></i> Benchmark: Your Facility vs Big Tech (per MW)</div>
+            <div class="wc-bar-chart" id="dcwBenchmarkChart"></div>
+            <div class="wc-section-title"><i class="fas fa-tint"></i> WUE Rating</div>
+            <div class="wc-gauge-container" id="dcwGauge"></div>
+        </div>
+        <!-- Pro Panel: Tab 2 -->
+        <div class="wc-pro-panel gated" id="dcwProPanel">
+            <div class="wc-panel-inner">
+                <div class="wc-panel-title"><i class="fas fa-crown"></i> Pro: Facility Optimization &amp; Cooling Upgrade ROI</div>
+                <div class="wc-pro-grid" id="dcwProKPIs"></div>
+                <table class="wc-pro-table" id="dcwProTable"></table>
+                <div class="wc-pro-narrative" id="dcwProNarrative"></div>
+            </div>
+            <div class="wc-gate-overlay" onclick="wcShowLogin()">
+                <i class="fas fa-lock"></i><span>Sign In to Unlock</span>
             </div>
         </div>
     </div>
 
     <!-- TAB 3: AI vs Human Comparison -->
     <div class="wc-tab-panel" id="wcPanelAvh">
-        <div class="wc-toolbar-actions">
-            <button class="wc-btn-reset" onclick="avhReset()"><i class="fas fa-undo"></i> Reset</button>
-            <button class="wc-btn-pdf" onclick="avhExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
-        </div>
         <div class="calc-grid">
             <div class="calc-input-group">
                 <label>Number of AI Queries <span class="calc-tooltip">?<span class="tip-text">Enter any number. 100 = typical power-user daily count. Global daily AI queries exceed 10 billion.</span></span></label>
@@ -1337,10 +1626,48 @@
             <div class="calc-input-group">
                 <label>AI Model <span class="calc-tooltip">?<span class="tip-text">Different models have different water footprints based on computational intensity and infrastructure.</span></span></label>
                 <select id="avhModel">
-                    <option value="chatgpt">ChatGPT</option>
-                    <option value="claude">Claude</option>
-                    <option value="gemini">Gemini</option>
-                    <option value="imagegen">Image Generation</option>
+                    <optgroup label="OpenAI">
+                        <option value="gpt54">GPT-5.4</option>
+                        <option value="gpt4o" selected>GPT-4o</option>
+                        <option value="o3">o3 (Deep Reasoning)</option>
+                        <option value="o4mini">o4-mini</option>
+                    </optgroup>
+                    <optgroup label="Anthropic">
+                        <option value="opus46">Claude Opus 4.6</option>
+                        <option value="sonnet46">Claude Sonnet 4.6</option>
+                        <option value="haiku45">Claude Haiku 4.5</option>
+                    </optgroup>
+                    <optgroup label="Google">
+                        <option value="gemini25pro">Gemini 2.5 Pro</option>
+                        <option value="gemini25flash">Gemini 2.5 Flash</option>
+                    </optgroup>
+                    <optgroup label="Meta / Other">
+                        <option value="llama4mav">Llama 4 Maverick</option>
+                        <option value="grok3">Grok 3</option>
+                        <option value="deepseek3">DeepSeek-V3</option>
+                    </optgroup>
+                    <optgroup label="Image / Video">
+                        <option value="midjourney">Midjourney v7</option>
+                        <option value="dalle4">DALL-E 4</option>
+                        <option value="sora">Sora (Video)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="calc-input-group">
+                <label>Scale <span class="calc-tooltip">?<span class="tip-text">Personal: your daily use. Company: 1,000 employees. City: 100K users. Global: ~10 billion daily queries worldwide.</span></span></label>
+                <select id="avhScaleSelect">
+                    <option value="personal" selected>Personal (1 user)</option>
+                    <option value="team">Team (50 users)</option>
+                    <option value="company">Company (1,000 users)</option>
+                    <option value="city">City (100,000 users)</option>
+                    <option value="global">Global (~10B queries/day)</option>
+                </select>
+            </div>
+            <div class="calc-input-group">
+                <label>Include Upstream? <span class="calc-tooltip">?<span class="tip-text">Upstream water includes water used for electricity generation (coal, gas, nuclear). Adds ~3x to direct cooling water.</span></span></label>
+                <select id="avhUpstream">
+                    <option value="yes" selected>Yes (Full Lifecycle)</option>
+                    <option value="no">No (Direct Only)</option>
                 </select>
             </div>
         </div>
@@ -1348,11 +1675,28 @@
             <button class="calc-button" onclick="avhCalculate()"><i class="fas fa-calculator"></i> Compare Water Usage</button>
         </div>
         <div class="calc-results" id="avhResults">
-            <div class="results-grid" style="grid-template-columns: 1fr;">
-                <div class="result-item"><div class="label">Total AI Water Used</div><div class="value red" id="avhTotal">-</div><div class="subtext">liters (direct + upstream estimate)</div></div>
+            <div class="results-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="result-item"><div class="label">Total AI Water</div><div class="value red" id="avhTotal">-</div><div class="subtext" id="avhTotalSub">liters</div></div>
+                <div class="result-item"><div class="label">Per Query</div><div class="value blue" id="avhPerQuery">-</div><div class="subtext">mL/query</div></div>
+                <div class="result-item"><div class="label">Equivalent To</div><div class="value amber" id="avhEquivSummary">-</div><div class="subtext" id="avhEquivSub">-</div></div>
             </div>
+            <div class="wc-section-title"><i class="fas fa-chart-bar"></i> Water Per Query — All Models Compared</div>
+            <div class="wc-bar-chart" id="avhModelChart"></div>
+            <div class="wc-section-title"><i class="fas fa-balance-scale"></i> Everyday Comparisons</div>
             <div class="avh-comparison-grid" id="avhCards"></div>
             <div class="avh-scale-context" id="avhScale" style="display:none;"></div>
+        </div>
+        <!-- Pro Panel: Tab 3 -->
+        <div class="wc-pro-panel gated" id="avhProPanel">
+            <div class="wc-panel-inner">
+                <div class="wc-panel-title"><i class="fas fa-crown"></i> Pro: Global Scale Analysis &amp; Industry Trajectory</div>
+                <div class="wc-pro-grid" id="avhProKPIs"></div>
+                <table class="wc-pro-table" id="avhProTable"></table>
+                <div class="wc-pro-narrative" id="avhProNarrative"></div>
+            </div>
+            <div class="wc-gate-overlay" onclick="wcShowLogin()">
+                <i class="fas fa-lock"></i><span>Sign In to Unlock</span>
+            </div>
         </div>
     </div>
 
@@ -1360,9 +1704,10 @@
         <i class="fas fa-shield-halved"></i> All calculations run locally in your browser &mdash; no data is sent to any server
     </div>
     <div class="wc-benchmark-meta">
-        <span class="wc-benchmark-tag"><i class="fas fa-code-branch"></i> Model v1.0</span>
+        <span class="wc-benchmark-tag"><i class="fas fa-code-branch"></i> Model v2.0 Enhanced</span>
         <span class="wc-benchmark-tag"><i class="fas fa-calendar"></i> March 2026</span>
-        <span class="wc-benchmark-tag"><i class="fas fa-book"></i> Sources: Li et al. (Joule), Microsoft ESR, Google ESR</span>
+        <span class="wc-benchmark-tag"><i class="fas fa-book"></i> Sources: Li et al. (Joule), Microsoft ESR, Google ESR, ASHRAE, Uptime Institute</span>
+        <span class="wc-benchmark-tag"><i class="fas fa-microchip"></i> 19 AI Models</span>
     </div>
     <div style="margin:1.5rem 0 0;padding:1rem;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(220,38,38,0.15);">
         <p style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem;">
@@ -1430,7 +1775,7 @@
                 <div class="article-nav">
                     <a href="article-19.html"><i class="fas fa-arrow-left"></i> Previous Article</a>
                     <a href="articles.html">All Articles</a>
-                    <span style="color: #64748b; cursor: default;">Latest Article</span>
+                    <a href="article-21.html">Next Article <i class="fas fa-arrow-right"></i></a>
                 </div>
 
     </div>
@@ -1497,7 +1842,9 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 <!-- Water Calculators Script -->
 <script>
 // === TAB SWITCHING ===
+var wcActiveTab = 'wfc';
 function wcSwitchTab(tabId) {
+    wcActiveTab = tabId;
     var tabs = ['wfc', 'dcw', 'avh'];
     tabs.forEach(function(t) {
         var capId = t.charAt(0).toUpperCase() + t.slice(1);
@@ -1506,6 +1853,16 @@ function wcSwitchTab(tabId) {
         if (t === tabId) { tab.classList.add('active'); panel.classList.add('active'); }
         else { tab.classList.remove('active'); panel.classList.remove('active'); }
     });
+}
+function wcResetActive() {
+    if (wcActiveTab === 'wfc') wfcReset();
+    else if (wcActiveTab === 'dcw') dcwReset();
+    else avhReset();
+}
+function wcExportActivePDF() {
+    if (wcActiveTab === 'wfc') wfcExportPDF();
+    else if (wcActiveTab === 'dcw') dcwExportPDF();
+    else avhExportPDF();
 }
 
 // === SHARED UTILITIES ===
@@ -1516,16 +1873,103 @@ function wcFmtVol(v) {
     return v.toFixed(1);
 }
 function wcFmtMoney(v) {
-    if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M';
-    if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
-    return v.toFixed(0);
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+    if (v >= 1e3) return '$' + (v / 1e3).toFixed(1) + 'K';
+    return '$' + v.toFixed(0);
 }
+function wcFmtSmart(v) {
+    if (v < 0.001) return v.toExponential(1);
+    if (v < 1) return v.toFixed(3);
+    if (v < 100) return v.toFixed(1);
+    return Math.round(v).toLocaleString();
+}
+
+// === BAR CHART RENDERER ===
+function wcRenderBarChart(containerId, data, highlightKey) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    var maxVal = 0;
+    data.forEach(function(d) { if (d.value > maxVal) maxVal = d.value; });
+    if (maxVal === 0) maxVal = 1;
+    var html = '';
+    data.forEach(function(d) {
+        var pct = Math.min((d.value / maxVal) * 100, 100);
+        var color = pct > 70 ? 'red' : pct > 35 ? 'amber' : 'green';
+        if (d.color) color = d.color;
+        var isActive = d.key === highlightKey;
+        html += '<div class="wc-bar-row">';
+        html += '<div class="wc-bar-label' + (isActive ? ' active' : '') + '">' + d.label + '</div>';
+        html += '<div class="wc-bar-track"><div class="wc-bar-fill ' + color + '" style="width:' + pct.toFixed(1) + '%"></div></div>';
+        html += '<div class="wc-bar-value">' + d.display + '</div>';
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
+// === WUE GAUGE RENDERER ===
+function wcRenderGauge(containerId, wue) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    var pct = Math.min((wue / 2.5) * 100, 100);
+    var color, rating, desc;
+    if (wue <= 0.2) { color = '#34d399'; rating = 'Excellent'; desc = 'Near-zero direct water. Best-in-class liquid cooling or immersion systems.'; }
+    else if (wue <= 0.5) { color = '#60a5fa'; rating = 'Very Good'; desc = 'Air-cooled or advanced hybrid systems. Minimal water dependency.'; }
+    else if (wue <= 1.0) { color = '#fbbf24'; rating = 'Average'; desc = 'Typical hybrid adiabatic cooling. Room for improvement.'; }
+    else if (wue <= 1.8) { color = '#f97316'; rating = 'Below Average'; desc = 'Conventional evaporative cooling. Standard but water-intensive.'; }
+    else { color = '#ef4444'; rating = 'Poor'; desc = 'High water consumption. Hot climate + evaporative cooling.'; }
+    var html = '<div class="wc-gauge"><div class="wc-gauge-ring" style="--gauge-color:' + color + ';--gauge-pct:' + pct.toFixed(0) + '%">';
+    html += '<div class="wc-gauge-inner"><div class="wc-gauge-value" style="color:' + color + '">' + wue.toFixed(2) + '</div>';
+    html += '<div class="wc-gauge-label">L/kWh</div></div></div></div>';
+    html += '<div class="wc-gauge-info"><div class="wc-gauge-rating" style="color:' + color + '">' + rating + '</div>';
+    html += '<div class="wc-gauge-desc">' + desc + '</div>';
+    html += '<div class="wc-gauge-scale">';
+    html += '<span style="color:#34d399">0-0.2 Excellent</span>';
+    html += '<span style="color:#60a5fa">0.2-0.5 Good</span>';
+    html += '<span style="color:#fbbf24">0.5-1.0 Avg</span>';
+    html += '<span style="color:#f97316">1.0-1.8 Below</span>';
+    html += '<span style="color:#ef4444">1.8+ Poor</span>';
+    html += '</div></div>';
+    container.innerHTML = html;
+}
+
+// =========================================
+// MODEL DATA — All Latest Models (March 2026)
+// Water: mL per query (direct cooling, medium complexity)
+// Sources: Li et al. Joule 2023, Altman "Gentle Singularity",
+// Google ESR 2024, Microsoft ESR 2024, inference compute estimates
+// =========================================
+var wcModelData = {
+    // OpenAI
+    gpt54:    { name: 'GPT-5.4',           water: 0.70, company: 'OpenAI',       type: 'text' },
+    gpt4o:    { name: 'GPT-4o',            water: 0.50, company: 'OpenAI',       type: 'text' },
+    gpt4turbo:{ name: 'GPT-4 Turbo',       water: 0.55, company: 'OpenAI',       type: 'text' },
+    o3:       { name: 'o3 (Reasoning)',     water: 2.50, company: 'OpenAI',       type: 'reasoning' },
+    o4mini:   { name: 'o4-mini',           water: 0.75, company: 'OpenAI',       type: 'reasoning' },
+    // Anthropic
+    opus46:   { name: 'Claude Opus 4.6',   water: 0.60, company: 'Anthropic',    type: 'text' },
+    sonnet46: { name: 'Claude Sonnet 4.6', water: 0.40, company: 'Anthropic',    type: 'text' },
+    haiku45:  { name: 'Claude Haiku 4.5',  water: 0.20, company: 'Anthropic',    type: 'text' },
+    // Google
+    gemini25pro:  { name: 'Gemini 2.5 Pro',  water: 0.45, company: 'Google', type: 'text' },
+    gemini25flash:{ name: 'Gemini 2.5 Flash', water: 0.22, company: 'Google', type: 'text' },
+    // Meta
+    llama4mav:   { name: 'Llama 4 Maverick', water: 0.42, company: 'Meta',   type: 'text' },
+    llama4scout: { name: 'Llama 4 Scout',    water: 0.30, company: 'Meta',   type: 'text' },
+    // Other
+    grok3:     { name: 'Grok 3',           water: 0.55, company: 'xAI',        type: 'text' },
+    copilot:   { name: 'GitHub Copilot',   water: 0.35, company: 'Microsoft',  type: 'text' },
+    deepseek3: { name: 'DeepSeek-V3',      water: 0.38, company: 'DeepSeek',   type: 'text' },
+    // Image / Video
+    midjourney:{ name: 'Midjourney v7',    water: 5.00, company: 'Midjourney',  type: 'image' },
+    dalle4:    { name: 'DALL-E 4',         water: 4.50, company: 'OpenAI',      type: 'image' },
+    sd3:       { name: 'Stable Diff. 3',   water: 3.50, company: 'Stability',   type: 'image' },
+    sora:      { name: 'Sora (Video)',     water: 50.0, company: 'OpenAI',      type: 'video' }
+};
 
 // =========================================
 // CALCULATOR 1: AI Water Footprint (wfc)
 // =========================================
-var wfcBaseWater = { gpt4: 0.5, claude: 0.45, gemini: 0.4, imagegen: 5.0, copilot: 0.35 };
-var wfcComplexityMult = { simple: 0.6, medium: 1.0, complex: 3.0, image: 10.0 };
+var wfcComplexityMult = { simple: 0.6, medium: 1.0, complex: 3.0, image: 10.0, video: 50.0 };
 var wfcCoolingMult = { evaporative: 1.0, hybrid: 0.6, aircooled: 0.15, closedloop: 0.05 };
 var wfcRegionMult = { arid: 1.3, temperate: 1.0, cool: 0.7, tropical: 1.1 };
 var wfcUpstreamFactor = 3.0;
@@ -1537,66 +1981,193 @@ function wfcCalculate() {
     var cool = document.getElementById('wfcCooling').value;
     var upstream = document.getElementById('wfcUpstream').value;
     var region = document.getElementById('wfcRegion').value;
+    var users = parseFloat(document.getElementById('wfcUsers').value) || 1;
+    var hours = parseFloat(document.getElementById('wfcHours').value) || 8;
 
-    var baseML = (wfcBaseWater[model] || 0.5) * (wfcComplexityMult[cmplx] || 1.0) * (wfcCoolingMult[cool] || 1.0) * (wfcRegionMult[region] || 1.0);
+    var modelWater = wcModelData[model] ? wcModelData[model].water : 0.5;
+    var baseML = modelWater * (wfcComplexityMult[cmplx] || 1.0) * (wfcCoolingMult[cool] || 1.0) * (wfcRegionMult[region] || 1.0);
     if (upstream === 'yes') baseML *= (1 + wfcUpstreamFactor);
 
-    var dailyML = baseML * q;
+    var totalQueries = q * users * (hours / 8);
+    var dailyML = baseML * totalQueries;
     var dailyL = dailyML / 1000;
     var monthlyL = dailyL * 30;
     var annualL = dailyL * 365;
     var bottles = Math.round(annualL / 0.5);
     var showers = (annualL / 65).toFixed(1);
+    var drinkDays = (annualL / 2).toFixed(1);
     var co2 = (annualL * 0.0005).toFixed(1);
+    var cost = (annualL * 0.006).toFixed(2);
 
     document.getElementById('wfcResults').classList.add('show');
-    document.getElementById('wfcDaily').textContent = dailyL < 1 ? dailyML.toFixed(0) + ' mL' : dailyL.toFixed(2) + ' L';
-    document.getElementById('wfcMonthly').textContent = monthlyL < 1 ? (monthlyL * 1000).toFixed(0) + ' mL' : monthlyL.toFixed(1) + ' L';
-    document.getElementById('wfcAnnual').textContent = annualL < 1 ? (annualL * 1000).toFixed(0) + ' mL' : annualL.toFixed(1) + ' L';
+    document.getElementById('wfcDaily').textContent = dailyL < 1 ? dailyML.toFixed(0) + ' mL' : wcFmtVol(dailyL) + ' L';
+    document.getElementById('wfcMonthly').textContent = monthlyL < 1 ? (monthlyL * 1000).toFixed(0) + ' mL' : wcFmtVol(monthlyL) + ' L';
+    document.getElementById('wfcAnnual').textContent = annualL < 1 ? (annualL * 1000).toFixed(0) + ' mL' : wcFmtVol(annualL) + ' L';
     document.getElementById('wfcBottles').textContent = bottles.toLocaleString();
     document.getElementById('wfcShowers').textContent = showers;
+    document.getElementById('wfcDrinkDays').textContent = drinkDays;
     document.getElementById('wfcCO2').textContent = co2;
+    document.getElementById('wfcCost').textContent = wcFmtMoney(parseFloat(cost));
+
+    // Model comparison bar chart
+    var textModels = Object.keys(wcModelData).filter(function(k) {
+        return wcModelData[k].type === 'text' || wcModelData[k].type === 'reasoning';
+    });
+    var chartData = textModels.map(function(k) {
+        var m = wcModelData[k];
+        var w = m.water * (wfcComplexityMult[cmplx] || 1.0) * (wfcCoolingMult[cool] || 1.0) * (wfcRegionMult[region] || 1.0);
+        if (upstream === 'yes') w *= (1 + wfcUpstreamFactor);
+        return { key: k, label: m.name, value: w, display: w.toFixed(2) + ' mL' };
+    }).sort(function(a, b) { return b.value - a.value; });
+    wcRenderBarChart('wfcModelChart', chartData, model);
+
+    // Context cards
+    var ctx = document.getElementById('wfcContext');
+    var ctxHTML = '';
+    if (annualL >= 1000) {
+        ctxHTML += '<div class="wc-context-card"><span class="ctx-icon">&#x1F3D9;</span>Your annual AI water footprint equals <strong>' + (annualL / 1135).toFixed(1) + ' days</strong> of water for an average US household.</div>';
+    }
+    if (users > 1) {
+        ctxHTML += '<div class="wc-context-card"><span class="ctx-icon">&#x1F465;</span>With <strong>' + users.toLocaleString() + ' users</strong>, total daily water is <strong>' + wcFmtVol(dailyL) + ' L</strong> — equivalent to <strong>' + (dailyL / 1135).toFixed(1) + '</strong> household-days.</div>';
+    }
+    var perQueryML = baseML;
+    ctxHTML += '<div class="wc-context-card"><span class="ctx-icon">&#x1F4A7;</span>Each ' + (wcModelData[model] ? wcModelData[model].name : model) + ' query uses <strong>' + perQueryML.toFixed(2) + ' mL</strong>' + (upstream === 'yes' ? ' (incl. upstream)' : ' (direct only)') + '. That is <strong>' + (perQueryML / 250 * 100).toFixed(2) + '%</strong> of a glass of water.</div>';
+    ctx.innerHTML = ctxHTML;
+    if (wcMode === 'pro') wfcUpdatePro();
 }
 
 function wfcReset() {
     document.getElementById('wfcQueries').value = 50;
-    document.getElementById('wfcModel').value = 'gpt4';
+    document.getElementById('wfcModel').value = 'gpt4o';
     document.getElementById('wfcComplexity').value = 'medium';
     document.getElementById('wfcCooling').value = 'evaporative';
     document.getElementById('wfcUpstream').value = 'yes';
     document.getElementById('wfcRegion').value = 'temperate';
+    document.getElementById('wfcUsers').value = 1;
+    document.getElementById('wfcHours').value = 8;
     document.getElementById('wfcResults').classList.remove('show');
+}
+
+// === SHARED PDF HELPERS ===
+var wcPDFCSS = '*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,-apple-system,sans-serif;color:#1f2937;padding:30px;max-width:900px;margin:0 auto;font-size:11px;line-height:1.6}h1{font-size:22px;color:#991b1b;margin-bottom:4px}h2{font-size:14px;color:#991b1b;border-bottom:2px solid #dc2626;padding-bottom:4px;margin:20px 0 10px}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f8fafc;font-size:10px;text-transform:uppercase;color:#64748b;padding:8px;text-align:left;border:1px solid #e5e7eb}td{padding:8px;border:1px solid #e5e7eb;font-size:11px}.kpi-row{display:flex;gap:12px;margin:10px 0}.kpi-box{flex:1;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;text-align:center}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase}.kpi-val{font-size:16px;font-weight:700;color:#991b1b}.narr{background:#fef2f2;border-left:3px solid #dc2626;padding:12px;margin:10px 0;font-size:10px;line-height:1.6}.narr h4{font-size:12px;color:#991b1b;margin-bottom:6px}.narr strong{color:#991b1b}.chart-row{display:flex;gap:16px;margin:12px 0}.chart-row>div{flex:1;min-width:0}.method{font-size:9px;color:#64748b;line-height:1.5;margin:12px 0;padding:10px;background:#f8fafc;border-radius:6px}.rec{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin:8px 0}.rec-title{font-size:11px;font-weight:700;color:#991b1b;margin-bottom:4px}.rec-text{font-size:10px;color:#374151;line-height:1.5}@media print{@page{margin:15mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+
+function wcPDFHead(title, subtitle) {
+    var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    var isPro = wcPremium && wcMode === 'pro';
+    var h = '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #dc2626;padding-bottom:10px;margin-bottom:15px">';
+    h += '<div><h1>' + title + '</h1><div style="color:#64748b;font-size:10px">' + subtitle + ' | Generated ' + now + ' | ' + (isPro ? 'Pro Intelligence Report' : 'Free Assessment') + '</div></div>';
+    h += '<div style="text-align:right"><div style="font-weight:800;color:#dc2626;font-size:14px">ResistanceZero</div><div style="font-size:9px;color:#94a3b8">resistancezero.com</div></div></div>';
+    return h;
+}
+function wcPDFFoot() {
+    return '<div style="text-align:center;margin-top:20px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:8px;color:#94a3b8">Generated by ResistanceZero Water Impact Calculator | resistancezero.com | &copy; 2026 Bagus Dwi Permana</div>';
+}
+function wcSVGBar(data, highlightKey, w, h) {
+    var pad = {t:15,r:15,b:30,l:120}, cW = w-pad.l-pad.r, cH = h-pad.t-pad.b;
+    var maxV = 0; data.forEach(function(d){ if(d.value>maxV)maxV=d.value; }); if(!maxV)maxV=1;
+    var barH = Math.min(22, (cH/data.length)-4);
+    var svg = '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#fff">';
+    data.forEach(function(d,i){
+        var y = pad.t + i*(barH+4), bW = (d.value/maxV)*cW;
+        var col = d.key===highlightKey ? '#dc2626' : (d.value/maxV > 0.7 ? '#ef4444' : d.value/maxV > 0.35 ? '#f59e0b' : '#059669');
+        svg += '<text x="'+(pad.l-4)+'" y="'+(y+barH/2+4)+'" text-anchor="end" font-size="8" fill="'+(d.key===highlightKey?'#991b1b':'#374151')+ '" font-weight="'+(d.key===highlightKey?'700':'400')+'">' + d.label + '</text>';
+        svg += '<rect x="'+pad.l+'" y="'+y+'" width="'+cW+'" height="'+barH+'" fill="#f1f5f9" rx="3"/>';
+        svg += '<rect x="'+pad.l+'" y="'+y+'" width="'+Math.max(2,bW)+'" height="'+barH+'" fill="'+col+'" rx="3"/>';
+        svg += '<text x="'+(pad.l+bW+6)+'" y="'+(y+barH/2+4)+'" font-size="8" fill="#374151" font-weight="600">'+d.display+'</text>';
+    });
+    svg += '</svg>';
+    return svg;
 }
 
 function wfcExportPDF() {
     var w = window.open('', '_blank');
     if (!w) { alert('Please allow popups for PDF export.'); return; }
     wfcCalculate();
-    var q = document.getElementById('wfcQueries').value;
-    var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI Water Footprint Report</title>';
-    html += '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;padding:2rem;color:#1e293b;max-width:800px;margin:0 auto}h1{font-size:1.5rem;color:#991b1b;margin-bottom:.5rem}h2{font-size:1.1rem;color:#450a0a;margin:1.5rem 0 .75rem;border-bottom:2px solid #dc2626;padding-bottom:.25rem}.meta{color:#64748b;font-size:.85rem;margin-bottom:1.5rem}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}th{background:#991b1b;color:#fff;padding:.6rem;text-align:left}td{padding:.5rem .6rem;border-bottom:1px solid #e5e7eb}.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:.75rem;color:#94a3b8}</style>';
-    html += '</head><body>';
-    html += '<h1>AI Water Footprint Report</h1>';
-    html += '<p class="meta">Generated ' + now + ' | ResistanceZero.com</p>';
-    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th></tr>';
-    html += '<tr><td>Queries/Day</td><td>' + q + '</td></tr>';
-    html += '<tr><td>Model</td><td>' + document.getElementById('wfcModel').value + '</td></tr>';
-    html += '<tr><td>Complexity</td><td>' + document.getElementById('wfcComplexity').value + '</td></tr>';
-    html += '<tr><td>Cooling</td><td>' + document.getElementById('wfcCooling').value + '</td></tr>';
-    html += '<tr><td>Upstream Water</td><td>' + document.getElementById('wfcUpstream').value + '</td></tr>';
-    html += '<tr><td>Region</td><td>' + document.getElementById('wfcRegion').value + '</td></tr></table>';
-    html += '<h2>Results</h2><table><tr><th>Metric</th><th>Value</th></tr>';
-    html += '<tr><td>Daily</td><td>' + document.getElementById('wfcDaily').textContent + '</td></tr>';
-    html += '<tr><td>Monthly</td><td>' + document.getElementById('wfcMonthly').textContent + '</td></tr>';
-    html += '<tr><td>Annual</td><td>' + document.getElementById('wfcAnnual').textContent + '</td></tr>';
-    html += '<tr><td>Bottles/Year</td><td>' + document.getElementById('wfcBottles').textContent + '</td></tr>';
-    html += '<tr><td>Showers/Year</td><td>' + document.getElementById('wfcShowers').textContent + '</td></tr>';
-    html += '<tr><td>CO2 Equiv.</td><td>' + document.getElementById('wfcCO2').textContent + ' kg</td></tr></table>';
-    html += '<p class="footer">Sources: Li et al., Joule (2023); Microsoft ESR 2024; Google ESR 2024<br>Disclaimer: Educational estimates only. Actual consumption varies by hardware, workload, and facility design.</p>';
+    var isPro = wcPremium && wcMode === 'pro';
+    var selKey = document.getElementById('wfcModel').value;
+    var selModel = wcModelData[selKey] || { name: selKey, water: 0.5, company: '-' };
+    var cmplx = document.getElementById('wfcComplexity').value;
+    var cool = document.getElementById('wfcCooling').value;
+    var upstream = document.getElementById('wfcUpstream').value;
+    var region = document.getElementById('wfcRegion').value;
+    var users = document.getElementById('wfcUsers').value;
+    var hours = document.getElementById('wfcHours').value;
+    var queries = document.getElementById('wfcQueries').value;
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI Water Footprint Report</title><style>' + wcPDFCSS + '</style></head><body>';
+    html += wcPDFHead('AI Water Footprint Report', selModel.name + ' Analysis');
+
+    // KPI Summary
+    html += '<div class="kpi-row">';
+    html += '<div class="kpi-box"><div class="kpi-label">Daily Water</div><div class="kpi-val">' + document.getElementById('wfcDaily').textContent + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Annual Water</div><div class="kpi-val">' + document.getElementById('wfcAnnual').textContent + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Bottles/Year</div><div class="kpi-val">' + document.getElementById('wfcBottles').textContent + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Annual Cost</div><div class="kpi-val">' + document.getElementById('wfcCost').textContent + '</div></div>';
+    html += '</div>';
+
+    // Input Parameters
+    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<tr><td>AI Model</td><td><strong>' + selModel.name + '</strong> (' + selModel.company + ')</td><td>Queries/Day</td><td>' + queries + '</td></tr>';
+    html += '<tr><td>Complexity</td><td>' + cmplx + '</td><td>Users</td><td>' + users + '</td></tr>';
+    html += '<tr><td>Cooling Type</td><td>' + cool + '</td><td>Active Hours/Day</td><td>' + hours + '</td></tr>';
+    html += '<tr><td>Upstream Water</td><td>' + upstream + '</td><td>Region</td><td>' + region + '</td></tr></table>';
+
+    // Results
+    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Context</th></tr>';
+    html += '<tr><td>Daily Footprint</td><td><strong>' + document.getElementById('wfcDaily').textContent + '</strong></td><td>All users combined</td></tr>';
+    html += '<tr><td>Monthly Footprint</td><td>' + document.getElementById('wfcMonthly').textContent + '</td><td>30-day estimate</td></tr>';
+    html += '<tr><td>Annual Footprint</td><td><strong>' + document.getElementById('wfcAnnual').textContent + '</strong></td><td>365-day projection</td></tr>';
+    html += '<tr><td>Water Bottles</td><td>' + document.getElementById('wfcBottles').textContent + '/year</td><td>500mL standard bottles</td></tr>';
+    html += '<tr><td>Shower Equivalents</td><td>' + document.getElementById('wfcShowers').textContent + '/year</td><td>65L per shower</td></tr>';
+    html += '<tr><td>Drinking Water Days</td><td>' + document.getElementById('wfcDrinkDays').textContent + '</td><td>At 2L/day recommended intake</td></tr>';
+    html += '<tr><td>CO2 Equivalent</td><td>' + document.getElementById('wfcCO2').textContent + ' kg</td><td>Water treatment emissions</td></tr>';
+    html += '<tr><td>Estimated Cost</td><td>' + document.getElementById('wfcCost').textContent + '/year</td><td>US municipal water rates</td></tr></table>';
+
+    // SVG Model Comparison Chart
+    var textModels = Object.keys(wcModelData).filter(function(k) { return wcModelData[k].type === 'text' || wcModelData[k].type === 'reasoning'; });
+    var chartData = textModels.map(function(k) {
+        var m = wcModelData[k];
+        var mw = m.water * (wfcComplexityMult[cmplx]||1) * (wfcCoolingMult[cool]||1) * (wfcRegionMult[region]||1);
+        if (upstream === 'yes') mw *= (1 + wfcUpstreamFactor);
+        return { key: k, label: m.name, value: mw, display: mw.toFixed(2) + ' mL' };
+    }).sort(function(a,b){ return b.value - a.value; });
+    html += '<h2>Model Water Comparison (mL/query)</h2>';
+    html += wcSVGBar(chartData, selKey, 500, 20 * chartData.length + 50);
+
+    // Pro sections
+    if (isPro) {
+        html += '<h2>Pro: Executive Narrative</h2><div class="narr">';
+        html += '<h4>AI Water Footprint Analysis</h4>';
+        html += '<p>' + (document.getElementById('wfcProNarrative') ? document.getElementById('wfcProNarrative').innerHTML : '') + '</p></div>';
+        // Full model table
+        html += '<h2>Pro: Complete Model Comparison</h2>';
+        var tbl = document.getElementById('wfcProTable');
+        if (tbl) html += '<table>' + tbl.innerHTML + '</table>';
+    }
+
+    // Recommendations
+    html += '<h2>Recommendations</h2>';
+    var bestM = chartData[chartData.length - 1];
+    html += '<div class="rec"><div class="rec-title">1. Model Selection</div><div class="rec-text">The most water-efficient text model is <strong>' + bestM.label + '</strong> at ' + bestM.display + '/query. ';
+    if (bestM.key !== selKey) html += 'Consider switching from ' + selModel.name + ' for a ' + ((1 - bestM.value / chartData.find(function(d){return d.key===selKey;}).value) * 100).toFixed(0) + '% reduction in water use.';
+    html += '</div></div>';
+    html += '<div class="rec"><div class="rec-title">2. Cooling Infrastructure</div><div class="rec-text">Facilities using closed-loop or air-cooled systems reduce water by up to 95% compared to evaporative towers. Consider provider selection based on cooling transparency.</div></div>';
+    html += '<div class="rec"><div class="rec-title">3. Upstream Awareness</div><div class="rec-text">' + (upstream === 'yes' ? 'Upstream water (from electricity generation) represents ~75% of total AI water footprint. Providers using renewable energy significantly reduce upstream water.' : 'Enable upstream water calculation for a complete lifecycle view — it typically adds 3x to direct cooling water.') + '</div></div>';
+
+    // Methodology
+    html += '<h2>Methodology &amp; Algorithm</h2><div class="method">';
+    html += '<strong>Formula:</strong> Water(mL) = BaseWater[model] &times; ComplexityMultiplier &times; CoolingMultiplier &times; RegionMultiplier &times; UpstreamFactor &times; QueriesPerDay &times; Users &times; (Hours/8)<br>';
+    html += '<strong>Base Water Data:</strong> Derived from Li et al., "Making AI Less Thirsty", Joule (2023). Direct cooling water per query ranges from 0.2-0.7 mL for text models, 3.5-50 mL for image/video generation.<br>';
+    html += '<strong>Upstream Factor:</strong> When enabled, multiplies by 4x (1 + 3x upstream), accounting for water consumed in electricity generation (coal: ~2.2 L/kWh, gas: ~0.7 L/kWh, nuclear: ~2.5 L/kWh). Source: Li et al., Joule 2023.<br>';
+    html += '<strong>Cooling Multipliers:</strong> Evaporative: 1.0x, Hybrid: 0.6x, Air-cooled: 0.15x, Closed-loop: 0.05x (ASHRAE benchmarks).<br>';
+    html += '<strong>Limitations:</strong> Actual water varies by hardware, workload, facility design, and ambient conditions. Figures are estimates for educational comparison.</div>';
+
+    // Sources
+    html += '<h2>Sources</h2><div class="method">Li, P. et al. (2023). "Making AI Less Thirsty." <em>Joule</em>. | Microsoft Environmental Sustainability Report 2024 | Google Environmental Report 2024 | ASHRAE TC 9.9 Data Center Guidelines | Uptime Institute Annual Survey 2024 | Altman, S. "The Gentle Singularity" blog post.</div>';
+    html += wcPDFFoot();
     html += '</body></html>';
-    w.document.write(html); w.document.close();
-    setTimeout(function() { w.print(); }, 500);
+    w.document.open(); w.document.write(html); w.document.close();
+    setTimeout(function() { w.print(); }, 600);
 }
 
 // =========================================
@@ -1605,6 +2176,14 @@ function wfcExportPDF() {
 var dcwWUEBase = { evaporative: 1.8, hybrid: 0.8, aircooled: 0.1, dlc: 0.05, immersion: 0.02 };
 var dcwClimateMult = { hotdry: 1.4, hothumid: 1.2, temperate: 1.0, cold: 0.6 };
 var dcwWaterCost = { municipal: 6.0, reclaimed: 3.5, river: 2.0, groundwell: 1.5 };
+// Real company benchmark data (per MW IT load, annual liters, approximate)
+var dcwBenchmarks = [
+    { name: 'Google (Avg)',     perMW: 690000000 / 900,   wue: 0.50, note: '~6.1B L/yr, ~900MW, PUE 1.10' },
+    { name: 'Microsoft (Avg)',  perMW: 780000000 / 1100,  wue: 0.70, note: '~7.8B L/yr, ~1100MW, 87% increase 2020-2023' },
+    { name: 'Meta (Avg)',       perMW: 350000000 / 700,   wue: 0.40, note: '~3.5B L/yr, ~700MW' },
+    { name: 'AWS (Est.)',       perMW: 500000000 / 1000,  wue: 0.60, note: '~5B L/yr est., ~1000MW' },
+    { name: 'Industry Avg',    perMW: 800000,             wue: 1.20, note: 'Uptime Institute, incl. legacy DCs' }
+];
 
 function dcwCalculate() {
     var load = parseFloat(document.getElementById('dcwLoad').value) || 10;
@@ -1613,31 +2192,55 @@ function dcwCalculate() {
     var climate = document.getElementById('dcwClimate').value;
     var hours = parseInt(document.getElementById('dcwHours').value) || 8760;
     var source = document.getElementById('dcwSource').value;
+    var aiPct = parseFloat(document.getElementById('dcwAIPct').value) || 50;
+    var rackDensity = parseFloat(document.getElementById('dcwRackDensity').value) || 40;
+    var renewable = parseFloat(document.getElementById('dcwRenewable').value) || 30;
 
     var facilityMW = load * pue;
     var totalKWh = facilityMW * 1000 * hours;
     var wue = (dcwWUEBase[cool] || 1.8) * (dcwClimateMult[climate] || 1.0);
     var annualL = totalKWh * wue;
-    var annualGal = annualL / 3.785;
-    var dailyL = annualL / 365;
+    // Adjust for upstream water from non-renewable power
+    var upstreamFactor = 1 + ((100 - renewable) / 100) * 1.5;
+    var annualLFull = annualL * upstreamFactor;
+    var annualGal = annualLFull / 3.785;
+    var dailyL = annualLFull / 365;
     var dailyGal = annualGal / 365;
     var households = Math.round(dailyL / 1135);
     var cityPct = ((dailyL / (50000 * 1135)) * 100).toFixed(2);
     var cost = (annualGal / 1000) * (dcwWaterCost[source] || 6.0);
+    var pools = (annualLFull / 2500000).toFixed(1);
+    var aiWater = annualLFull * (aiPct / 100);
+    var rackCount = Math.round((load * 1000) / rackDensity);
 
     document.getElementById('dcwResults').classList.add('show');
-    document.getElementById('dcwAnnual').textContent = wcFmtVol(annualL) + ' L';
+    document.getElementById('dcwAnnual').textContent = wcFmtVol(annualLFull) + ' L';
     document.getElementById('dcwAnnualSub').textContent = wcFmtVol(annualGal) + ' gallons';
     document.getElementById('dcwDaily').textContent = wcFmtVol(dailyL) + ' L';
     document.getElementById('dcwDailySub').textContent = wcFmtVol(dailyGal) + ' gal/day';
     document.getElementById('dcwWUE').textContent = wue.toFixed(3);
-
     var wueEl = document.getElementById('dcwWUE');
     wueEl.className = 'value ' + (wue <= 0.5 ? 'green' : wue <= 1.0 ? 'amber' : 'red');
-
     document.getElementById('dcwHouseholds').textContent = households.toLocaleString();
     document.getElementById('dcwCityPct').textContent = cityPct + '%';
-    document.getElementById('dcwCost').textContent = '$' + wcFmtMoney(cost);
+    document.getElementById('dcwCost').textContent = wcFmtMoney(cost);
+    document.getElementById('dcwPools').textContent = pools;
+    document.getElementById('dcwAIWater').textContent = wcFmtVol(aiWater) + ' L';
+    document.getElementById('dcwAIWaterSub').textContent = aiPct + '% of ' + wcFmtVol(annualLFull) + ' L';
+    document.getElementById('dcwRacks').textContent = rackCount.toLocaleString();
+
+    // Benchmark chart
+    var yourPerMW = annualLFull / load;
+    var benchData = dcwBenchmarks.map(function(b) {
+        return { key: b.name, label: b.name, value: b.perMW, display: wcFmtVol(b.perMW) + ' L', color: 'blue' };
+    });
+    benchData.push({ key: 'yours', label: 'Your Facility', value: yourPerMW, display: wcFmtVol(yourPerMW) + ' L', color: yourPerMW > 800000 ? 'red' : yourPerMW > 500000 ? 'amber' : 'green' });
+    benchData.sort(function(a, b) { return b.value - a.value; });
+    wcRenderBarChart('dcwBenchmarkChart', benchData, 'yours');
+
+    // WUE gauge
+    wcRenderGauge('dcwGauge', wue);
+    if (wcMode === 'pro') dcwUpdatePro();
 }
 
 function dcwReset() {
@@ -1647,6 +2250,9 @@ function dcwReset() {
     document.getElementById('dcwClimate').value = 'temperate';
     document.getElementById('dcwHours').value = 8760;
     document.getElementById('dcwSource').value = 'municipal';
+    document.getElementById('dcwAIPct').value = 50;
+    document.getElementById('dcwRackDensity').value = 40;
+    document.getElementById('dcwRenewable').value = 30;
     document.getElementById('dcwResults').classList.remove('show');
 }
 
@@ -1654,112 +2260,555 @@ function dcwExportPDF() {
     var w = window.open('', '_blank');
     if (!w) { alert('Please allow popups for PDF export.'); return; }
     dcwCalculate();
-    var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Data Center Water Usage Report</title>';
-    html += '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;padding:2rem;color:#1e293b;max-width:800px;margin:0 auto}h1{font-size:1.5rem;color:#991b1b;margin-bottom:.5rem}h2{font-size:1.1rem;color:#450a0a;margin:1.5rem 0 .75rem;border-bottom:2px solid #dc2626;padding-bottom:.25rem}.meta{color:#64748b;font-size:.85rem;margin-bottom:1.5rem}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}th{background:#991b1b;color:#fff;padding:.6rem;text-align:left}td{padding:.5rem .6rem;border-bottom:1px solid #e5e7eb}.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:.75rem;color:#94a3b8}</style>';
-    html += '</head><body>';
-    html += '<h1>Data Center Water Usage Report</h1>';
-    html += '<p class="meta">Generated ' + now + ' | ResistanceZero.com</p>';
-    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th></tr>';
-    html += '<tr><td>IT Load</td><td>' + document.getElementById('dcwLoad').value + ' MW</td></tr>';
-    html += '<tr><td>PUE</td><td>' + document.getElementById('dcwPUE').value + '</td></tr>';
-    html += '<tr><td>Cooling</td><td>' + document.getElementById('dcwCooling').value + '</td></tr>';
-    html += '<tr><td>Climate</td><td>' + document.getElementById('dcwClimate').value + '</td></tr>';
-    html += '<tr><td>Hours/Year</td><td>' + document.getElementById('dcwHours').value + '</td></tr>';
-    html += '<tr><td>Water Source</td><td>' + document.getElementById('dcwSource').value + '</td></tr></table>';
-    html += '<h2>Results</h2><table><tr><th>Metric</th><th>Value</th></tr>';
-    html += '<tr><td>Annual</td><td>' + document.getElementById('dcwAnnual').textContent + '</td></tr>';
-    html += '<tr><td>Daily</td><td>' + document.getElementById('dcwDaily').textContent + '</td></tr>';
-    html += '<tr><td>WUE</td><td>' + document.getElementById('dcwWUE').textContent + ' L/kWh</td></tr>';
-    html += '<tr><td>Households</td><td>' + document.getElementById('dcwHouseholds').textContent + '</td></tr>';
-    html += '<tr><td>% City (50K)</td><td>' + document.getElementById('dcwCityPct').textContent + '</td></tr>';
-    html += '<tr><td>Annual Cost</td><td>' + document.getElementById('dcwCost').textContent + '</td></tr></table>';
-    html += '<p class="footer">Sources: ASHRAE; Uptime Institute; Li et al., Joule (2023)<br>Disclaimer: Educational estimates only.</p>';
+    var isPro = wcPremium && wcMode === 'pro';
+    var load = document.getElementById('dcwLoad').value;
+    var pue = document.getElementById('dcwPUE').value;
+    var cool = document.getElementById('dcwCooling').value;
+    var climate = document.getElementById('dcwClimate').value;
+    var hours = document.getElementById('dcwHours').value;
+    var source = document.getElementById('dcwSource').value;
+    var aiPct = document.getElementById('dcwAIPct').value;
+    var rackDensity = document.getElementById('dcwRackDensity').value;
+    var renewable = document.getElementById('dcwRenewable').value;
+    var coolingNames = { evaporative: 'Evaporative Tower', hybrid: 'Hybrid Adiabatic', aircooled: 'Air-Cooled Chiller', dlc: 'Direct-to-Chip', immersion: 'Immersion Cooling' };
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Data Center Water Usage Report</title><style>' + wcPDFCSS + '</style></head><body>';
+    html += wcPDFHead('Data Center Water Usage Report', (coolingNames[cool] || cool) + ' \u2014 ' + load + ' MW Facility');
+
+    // KPI Summary
+    html += '<div class="kpi-row">';
+    html += '<div class="kpi-box"><div class="kpi-label">Annual Water</div><div class="kpi-val">' + document.getElementById('dcwAnnual').textContent + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">WUE</div><div class="kpi-val">' + document.getElementById('dcwWUE').textContent + ' L/kWh</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Olympic Pools</div><div class="kpi-val">' + document.getElementById('dcwPools').textContent + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Annual Cost</div><div class="kpi-val">' + document.getElementById('dcwCost').textContent + '</div></div>';
+    html += '</div>';
+
+    // Input Parameters
+    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<tr><td>IT Load</td><td><strong>' + load + ' MW</strong></td><td>PUE</td><td>' + pue + '</td></tr>';
+    html += '<tr><td>Cooling Technology</td><td>' + (coolingNames[cool] || cool) + '</td><td>Climate Zone</td><td>' + climate + '</td></tr>';
+    html += '<tr><td>Operating Hours/Year</td><td>' + hours + '</td><td>Water Source</td><td>' + source + '</td></tr>';
+    html += '<tr><td>AI Workload %</td><td>' + aiPct + '%</td><td>GPU Rack Density</td><td>' + rackDensity + ' kW</td></tr>';
+    html += '<tr><td>Renewable Energy</td><td>' + renewable + '%</td><td></td><td></td></tr></table>';
+
+    // Assessment Results
+    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Context</th></tr>';
+    html += '<tr><td>Annual Consumption</td><td><strong>' + document.getElementById('dcwAnnual').textContent + '</strong></td><td>' + document.getElementById('dcwAnnualSub').textContent + '</td></tr>';
+    html += '<tr><td>Daily Consumption</td><td>' + document.getElementById('dcwDaily').textContent + '</td><td>' + document.getElementById('dcwDailySub').textContent + '</td></tr>';
+    html += '<tr><td>Water Use Effectiveness</td><td><strong>' + document.getElementById('dcwWUE').textContent + ' L/kWh</strong></td><td>' + (parseFloat(document.getElementById('dcwWUE').textContent) <= 0.5 ? 'Very Good' : parseFloat(document.getElementById('dcwWUE').textContent) <= 1.0 ? 'Average' : 'Below Average') + '</td></tr>';
+    html += '<tr><td>Household Equivalents</td><td>' + document.getElementById('dcwHouseholds').textContent + '</td><td>US avg 1,135 L/day</td></tr>';
+    html += '<tr><td>City Impact (50K pop.)</td><td>' + document.getElementById('dcwCityPct').textContent + '</td><td>Municipal water supply</td></tr>';
+    html += '<tr><td>Olympic Swimming Pools</td><td>' + document.getElementById('dcwPools').textContent + '/year</td><td>2,500,000 L each</td></tr>';
+    html += '<tr><td>AI-Attributable Water</td><td>' + document.getElementById('dcwAIWater').textContent + '</td><td>' + document.getElementById('dcwAIWaterSub').textContent + '</td></tr>';
+    html += '<tr><td>GPU Racks</td><td>' + document.getElementById('dcwRacks').textContent + '</td><td>At ' + rackDensity + ' kW/rack</td></tr>';
+    html += '<tr><td>Annual Water Cost</td><td><strong>' + document.getElementById('dcwCost').textContent + '</strong></td><td>' + source + ' water rates</td></tr></table>';
+
+    // SVG Benchmark Chart
+    var loadVal = parseFloat(load) || 10;
+    var pueVal = parseFloat(pue) || 1.4;
+    var climateKey = climate;
+    var renewableVal = parseFloat(renewable) || 30;
+    var wue = (dcwWUEBase[cool] || 1.8) * (dcwClimateMult[climateKey] || 1.0);
+    var facilityMW = loadVal * pueVal;
+    var totalKWh = facilityMW * 1000 * (parseFloat(hours) || 8760);
+    var upFactor = 1 + ((100 - renewableVal) / 100) * 1.5;
+    var yourAnnualL = totalKWh * wue * upFactor;
+    var yourPerMW = yourAnnualL / loadVal;
+    var benchData = dcwBenchmarks.map(function(b) {
+        return { key: b.name, label: b.name, value: b.perMW, display: wcFmtVol(b.perMW) + ' L/MW' };
+    });
+    benchData.push({ key: 'yours', label: 'Your Facility', value: yourPerMW, display: wcFmtVol(yourPerMW) + ' L/MW' });
+    benchData.sort(function(a, b) { return b.value - a.value; });
+    html += '<h2>Industry Benchmark Comparison (Annual L per MW IT)</h2>';
+    html += wcSVGBar(benchData, 'yours', 500, 20 * benchData.length + 50);
+
+    // Benchmark table
+    html += '<table><tr><th>Facility</th><th>Annual L/MW</th><th>WUE</th><th>Note</th></tr>';
+    dcwBenchmarks.forEach(function(b) {
+        html += '<tr><td>' + b.name + '</td><td>' + wcFmtVol(b.perMW) + '</td><td>' + b.wue.toFixed(2) + '</td><td style="font-size:9px">' + b.note + '</td></tr>';
+    });
+    html += '<tr style="background:#fef2f2;font-weight:600"><td>Your Facility</td><td>' + wcFmtVol(yourPerMW) + '</td><td>' + wue.toFixed(2) + '</td><td style="font-size:9px">' + loadVal + ' MW, ' + (coolingNames[cool] || cool) + '</td></tr></table>';
+
+    // Pro sections
+    if (isPro) {
+        html += '<h2>Pro: Executive Narrative</h2><div class="narr">';
+        html += '<h4>Data Center Water Assessment</h4>';
+        html += '<p>' + (document.getElementById('dcwProNarrative') ? document.getElementById('dcwProNarrative').innerHTML : '') + '</p></div>';
+        html += '<h2>Pro: Cooling Technology Comparison</h2>';
+        var tbl = document.getElementById('dcwProTable');
+        if (tbl) html += '<table>' + tbl.innerHTML + '</table>';
+    }
+
+    // Recommendations
+    html += '<h2>Recommendations</h2>';
+    var bestBench = dcwBenchmarks.reduce(function(b, c) { return c.perMW < b.perMW ? c : b; });
+    var rank = yourPerMW <= bestBench.perMW ? 'industry-leading' : yourPerMW <= 800000 ? 'competitive' : 'above industry average';
+    html += '<div class="rec"><div class="rec-title">1. Facility Ranking</div><div class="rec-text">Your facility consumes <strong>' + wcFmtVol(yourPerMW) + ' L/MW/year</strong>, which is <strong>' + rank + '</strong>. ' + (yourPerMW > bestBench.perMW ? 'The most efficient benchmark (' + bestBench.name + ') achieves ' + wcFmtVol(bestBench.perMW) + ' L/MW.' : 'Excellent performance.') + '</div></div>';
+    html += '<div class="rec"><div class="rec-title">2. Cooling Strategy</div><div class="rec-text">' + (cool === 'evaporative' ? 'Evaporative cooling is the most water-intensive option. Consider hybrid or direct-liquid cooling to reduce water by 55-97%.' : cool === 'hybrid' ? 'Hybrid cooling offers moderate water savings. For further reduction, consider DLC or immersion cooling.' : 'Your ' + (coolingNames[cool] || cool) + ' system already minimizes water use. Focus on upstream water reduction through renewable energy.') + '</div></div>';
+    html += '<div class="rec"><div class="rec-title">3. Renewable Energy Impact</div><div class="rec-text">At ' + renewable + '% renewable energy, upstream water adds ' + ((100 - renewableVal) / 100 * 1.5 * 100).toFixed(0) + '% to your total. ' + (renewableVal < 50 ? 'Increasing to 80% renewable could reduce total water by ~' + ((0.5 * 1.5 / upFactor) * 100).toFixed(0) + '%.' : 'Good renewable adoption. Target 100% for minimal upstream impact.') + '</div></div>';
+    html += '<div class="rec"><div class="rec-title">4. Growth Planning</div><div class="rec-text">With projected 4x AI workload growth by 2028, annual water could reach <strong>' + wcFmtVol(yourAnnualL * 4) + ' L</strong>. Proactive cooling infrastructure investment now prevents water scarcity issues later.</div></div>';
+
+    // Methodology
+    html += '<h2>Methodology &amp; Algorithm</h2><div class="method">';
+    html += '<strong>Formula:</strong> AnnualWater(L) = FacilityMW &times; 1000 &times; Hours &times; WUE[cooling] &times; Climate[zone] &times; UpstreamFactor<br>';
+    html += '<strong>Facility MW:</strong> IT Load &times; PUE. PUE accounts for total facility power including cooling, lighting, and UPS losses.<br>';
+    html += '<strong>WUE Base Values:</strong> Evaporative: 1.8, Hybrid: 0.8, Air-Cooled: 0.1, DLC: 0.05, Immersion: 0.02 L/kWh (ASHRAE TC 9.9).<br>';
+    html += '<strong>Climate Multipliers:</strong> Hot/Dry: 1.4x, Hot/Humid: 1.2x, Temperate: 1.0x, Cold: 0.6x.<br>';
+    html += '<strong>Upstream Factor:</strong> 1 + ((100 - Renewable%) / 100) &times; 1.5. Accounts for water consumed in fossil-fuel electricity generation.<br>';
+    html += '<strong>Benchmarks:</strong> Google, Microsoft, Meta, AWS data from 2024 Environmental Sustainability Reports. Industry avg from Uptime Institute.<br>';
+    html += '<strong>Limitations:</strong> Actual WUE varies by exact location, design, and seasonal conditions. Figures are estimates for comparative analysis.</div>';
+
+    // Sources
+    html += '<h2>Sources</h2><div class="method">ASHRAE TC 9.9 Data Center Guidelines | Uptime Institute Annual Survey 2024 | Google Environmental Report 2024 | Microsoft Environmental Sustainability Report 2024 | Meta Sustainability Report 2024 | Li, P. et al. (2023). "Making AI Less Thirsty." <em>Joule</em>.</div>';
+    html += wcPDFFoot();
     html += '</body></html>';
-    w.document.write(html); w.document.close();
-    setTimeout(function() { w.print(); }, 500);
+    w.document.open(); w.document.write(html); w.document.close();
+    setTimeout(function() { w.print(); }, 600);
 }
 
 // =========================================
 // CALCULATOR 3: AI vs Human Comparison (avh)
 // =========================================
-var avhWaterPerQuery = { chatgpt: 3.0, claude: 2.7, gemini: 2.4, imagegen: 20.0 };
+var avhScaleMultipliers = { personal: 1, team: 50, company: 1000, city: 100000, global: 10000000000 };
+
 var avhComparisons = [
     { icon: '\uD83E\uDD64', label: 'Glasses of Water', unitL: 0.25, unit: '250ml each' },
     { icon: '\uD83D\uDEBF', label: 'Seconds of Shower', unitL: 0.133, unit: '8 L/min' },
     { icon: '\uD83D\uDEBD', label: 'Toilet Flushes', unitL: 6.0, unit: '6L each' },
     { icon: '\uD83E\uDDFA', label: 'Loads of Laundry', unitL: 50.0, unit: '50L each' },
-    { icon: '\u2615', label: 'Cups of Coffee', unitL: 140.0, unit: '140L lifecycle' },
-    { icon: '\uD83C\uDF54', label: 'Hamburgers', unitL: 2400.0, unit: '2,400L lifecycle' }
+    { icon: '\u2615', label: 'Cups of Coffee', unitL: 140.0, unit: '140L water footprint' },
+    { icon: '\uD83C\uDF54', label: 'Hamburgers', unitL: 2400.0, unit: '2,400L water footprint' },
+    { icon: '\uD83C\uDF3E', label: 'Servings of Rice', unitL: 132.5, unit: '132.5L per 100g' },
+    { icon: '\uD83D\uDE97', label: 'Car Washes', unitL: 150.0, unit: '150L each' },
+    { icon: '\uD83C\uDFCA', label: 'Pool Fill %', unitL: 25000.0, unit: 'backyard pool' },
+    { icon: '\uD83C\uDFE0', label: 'Household Days', unitL: 1135.0, unit: 'US avg 1,135L/day' }
 ];
 
 function avhCalculate() {
     var q = parseFloat(document.getElementById('avhQueries').value) || 100;
     var model = document.getElementById('avhModel').value;
-    var waterML = (avhWaterPerQuery[model] || 3.0) * q;
+    var scale = document.getElementById('avhScaleSelect').value;
+    var upstream = document.getElementById('avhUpstream').value;
+
+    var modelData = wcModelData[model] || { water: 0.5, name: model };
+    var perQueryML = modelData.water;
+    if (upstream === 'yes') perQueryML *= (1 + wfcUpstreamFactor);
+
+    var scaleMult = avhScaleMultipliers[scale] || 1;
+    var totalQueries = q * scaleMult;
+    var waterML = perQueryML * totalQueries;
     var waterL = waterML / 1000;
 
     document.getElementById('avhResults').classList.add('show');
-    document.getElementById('avhTotal').textContent = waterL < 1 ? waterML.toFixed(0) + ' mL' : waterL.toFixed(2) + ' L';
 
+    // Summary row
+    if (waterL >= 1e6) document.getElementById('avhTotal').textContent = wcFmtVol(waterL) + ' L';
+    else if (waterL >= 1) document.getElementById('avhTotal').textContent = wcFmtVol(waterL) + ' L';
+    else document.getElementById('avhTotal').textContent = waterML.toFixed(0) + ' mL';
+    document.getElementById('avhTotalSub').textContent = totalQueries.toLocaleString() + ' queries';
+    document.getElementById('avhPerQuery').textContent = perQueryML.toFixed(2) + ' mL';
+
+    // Best summary equivalent
+    if (waterL >= 2500000) {
+        document.getElementById('avhEquivSummary').textContent = (waterL / 2500000).toFixed(1);
+        document.getElementById('avhEquivSub').textContent = 'Olympic pools';
+    } else if (waterL >= 1135) {
+        document.getElementById('avhEquivSummary').textContent = (waterL / 1135).toFixed(1);
+        document.getElementById('avhEquivSub').textContent = 'household-days';
+    } else if (waterL >= 1) {
+        document.getElementById('avhEquivSummary').textContent = (waterL / 0.25).toFixed(0);
+        document.getElementById('avhEquivSub').textContent = 'glasses of water';
+    } else {
+        document.getElementById('avhEquivSummary').textContent = (waterML / 15).toFixed(1);
+        document.getElementById('avhEquivSub').textContent = 'tablespoons';
+    }
+
+    // Comparison cards
     var cardsHTML = '';
     avhComparisons.forEach(function(item) {
         var eq = waterL / item.unitL;
-        var dv;
-        if (eq < 0.01) dv = eq.toExponential(1);
-        else if (eq < 1) dv = eq.toFixed(3);
-        else if (eq < 100) dv = eq.toFixed(1);
-        else dv = Math.round(eq).toLocaleString();
         cardsHTML += '<div class="avh-card"><div class="avh-card-icon">' + item.icon + '</div>';
-        cardsHTML += '<div class="avh-card-value">' + dv + '</div>';
+        cardsHTML += '<div class="avh-card-value">' + wcFmtSmart(eq) + '</div>';
         cardsHTML += '<div class="avh-card-label">' + item.label + '</div>';
         cardsHTML += '<div style="font-size:0.65rem;color:#64748b;margin-top:2px;">' + item.unit + '</div></div>';
     });
     document.getElementById('avhCards').innerHTML = cardsHTML;
 
-    var globalQ = 10e9;
-    var globalDailyL = (globalQ * (avhWaterPerQuery[model] || 3.0)) / 1000;
-    var pools = globalDailyL / 2500000;
+    // Model comparison chart (text models only)
+    var textModels = Object.keys(wcModelData).filter(function(k) { return wcModelData[k].type === 'text' || wcModelData[k].type === 'reasoning'; });
+    var chartData = textModels.map(function(k) {
+        var m = wcModelData[k];
+        var w = m.water;
+        if (upstream === 'yes') w *= (1 + wfcUpstreamFactor);
+        return { key: k, label: m.name, value: w, display: w.toFixed(2) + ' mL' };
+    }).sort(function(a, b) { return b.value - a.value; });
+    wcRenderBarChart('avhModelChart', chartData, model);
+
+    // Global scale context
     var scaleDiv = document.getElementById('avhScale');
-    scaleDiv.style.display = 'block';
-    scaleDiv.innerHTML = '<strong><i class="fas fa-globe"></i> Global Scale:</strong> At an estimated ' + (globalQ / 1e9).toFixed(0) + ' billion AI queries per day worldwide, the daily water consumption equals approximately <strong>' + Math.round(pools).toLocaleString() + ' Olympic swimming pools</strong> (' + wcFmtVol(globalDailyL) + ' liters).';
+    if (scale === 'global') {
+        scaleDiv.style.display = 'block';
+        var pools = waterL / 2500000;
+        scaleDiv.innerHTML = '<strong><i class="fas fa-globe"></i> Global Scale:</strong> At ' + wcFmtVol(totalQueries) + ' queries/day, the daily water consumption equals approximately <strong>' + wcFmtVol(pools) + ' Olympic swimming pools</strong> (' + wcFmtVol(waterL) + ' liters). That is <strong>' + (waterL / (50000 * 1135) * 100).toFixed(1) + '%</strong> of a city of 50,000 people\'s daily water supply.';
+    } else if (waterL > 1000) {
+        scaleDiv.style.display = 'block';
+        scaleDiv.innerHTML = '<strong><i class="fas fa-chart-line"></i> Perspective:</strong> ' + wcFmtVol(waterL) + ' liters is equivalent to <strong>' + (waterL / 1135).toFixed(1) + ' days</strong> of an average US household\'s water consumption, or <strong>' + (waterL / 65).toFixed(0) + ' showers</strong>.';
+    } else {
+        scaleDiv.style.display = 'none';
+    }
+    if (wcMode === 'pro') avhUpdatePro();
 }
 
 function avhReset() {
     document.getElementById('avhQueries').value = 100;
-    document.getElementById('avhModel').value = 'chatgpt';
+    document.getElementById('avhModel').value = 'gpt4o';
+    document.getElementById('avhScaleSelect').value = 'personal';
+    document.getElementById('avhUpstream').value = 'yes';
     document.getElementById('avhResults').classList.remove('show');
     document.getElementById('avhCards').innerHTML = '';
-    document.getElementById('avhScale').style.display = 'none';
+    var s = document.getElementById('avhScale');
+    if (s) s.style.display = 'none';
 }
 
 function avhExportPDF() {
     var w = window.open('', '_blank');
     if (!w) { alert('Please allow popups for PDF export.'); return; }
     avhCalculate();
-    var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    var isPro = wcPremium && wcMode === 'pro';
     var q = document.getElementById('avhQueries').value;
     var model = document.getElementById('avhModel').value;
-    var waterML = (avhWaterPerQuery[model] || 3.0) * parseFloat(q);
+    var scale = document.getElementById('avhScaleSelect').value;
+    var upstream = document.getElementById('avhUpstream').value;
+    var modelData = wcModelData[model] || { water: 0.5, name: model, company: '-' };
+    var perQueryML = modelData.water;
+    if (upstream === 'yes') perQueryML *= (1 + wfcUpstreamFactor);
+    var totalQ = parseFloat(q) * (avhScaleMultipliers[scale] || 1);
+    var waterML = perQueryML * totalQ;
     var waterL = waterML / 1000;
-    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI vs Human Water Comparison</title>';
-    html += '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;padding:2rem;color:#1e293b;max-width:800px;margin:0 auto}h1{font-size:1.5rem;color:#991b1b;margin-bottom:.5rem}h2{font-size:1.1rem;color:#450a0a;margin:1.5rem 0 .75rem;border-bottom:2px solid #dc2626;padding-bottom:.25rem}.meta{color:#64748b;font-size:.85rem;margin-bottom:1.5rem}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}th{background:#991b1b;color:#fff;padding:.6rem;text-align:left}td{padding:.5rem .6rem;border-bottom:1px solid #e5e7eb}.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:.75rem;color:#94a3b8}</style>';
-    html += '</head><body>';
-    html += '<h1>AI vs Human Water Comparison</h1>';
-    html += '<p class="meta">Generated ' + now + ' | ResistanceZero.com</p>';
-    html += '<p style="margin-bottom:1rem"><strong>' + q + ' ' + model + ' queries</strong> = <strong>' + (waterL < 1 ? waterML.toFixed(0) + ' mL' : waterL.toFixed(2) + ' L') + '</strong> of water</p>';
-    html += '<h2>Everyday Comparisons</h2><table><tr><th>Activity</th><th>Equivalent</th><th>Unit</th></tr>';
+    var scaleLabels = { personal: 'Personal (1 user)', team: 'Team (50 users)', company: 'Company (1K users)', city: 'City (100K users)', global: 'Global (10B queries/day)' };
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI vs Human Water Comparison Report</title><style>' + wcPDFCSS + '</style></head><body>';
+    html += wcPDFHead('AI vs Human Water Comparison', modelData.name + ' \u2014 ' + (scaleLabels[scale] || scale));
+
+    // KPI Summary
+    html += '<div class="kpi-row">';
+    html += '<div class="kpi-box"><div class="kpi-label">Total Water</div><div class="kpi-val">' + (waterL < 1 ? waterML.toFixed(0) + ' mL' : wcFmtVol(waterL) + ' L') + '</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Per Query</div><div class="kpi-val">' + perQueryML.toFixed(2) + ' mL</div></div>';
+    html += '<div class="kpi-box"><div class="kpi-label">Total Queries</div><div class="kpi-val">' + wcFmtVol(totalQ) + '</div></div>';
+    var bestEquiv = waterL >= 1135 ? (waterL / 1135).toFixed(1) + ' household-days' : waterL >= 1 ? (waterL / 0.25).toFixed(0) + ' glasses' : (waterML / 15).toFixed(1) + ' tablespoons';
+    html += '<div class="kpi-box"><div class="kpi-label">Equivalent To</div><div class="kpi-val">' + bestEquiv + '</div></div>';
+    html += '</div>';
+
+    // Input Parameters
+    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<tr><td>AI Model</td><td><strong>' + modelData.name + '</strong> (' + modelData.company + ')</td><td>Queries/Day</td><td>' + q + '</td></tr>';
+    html += '<tr><td>Scale</td><td>' + (scaleLabels[scale] || scale) + '</td><td>Upstream Water</td><td>' + upstream + '</td></tr>';
+    html += '<tr><td>Water/Query</td><td>' + perQueryML.toFixed(2) + ' mL</td><td>Total Queries</td><td>' + totalQ.toLocaleString() + '</td></tr></table>';
+
+    // Everyday Comparisons
+    html += '<h2>Everyday Activity Comparisons</h2><table><tr><th>Activity</th><th>Equivalent</th><th>Reference Value</th><th>Context</th></tr>';
     avhComparisons.forEach(function(item) {
         var eq = waterL / item.unitL;
-        var dv = eq < 1 ? eq.toFixed(3) : eq < 100 ? eq.toFixed(1) : Math.round(eq).toLocaleString();
-        html += '<tr><td>' + item.icon + ' ' + item.label + '</td><td>' + dv + '</td><td>' + item.unit + '</td></tr>';
+        var context = '';
+        if (eq >= 1000) context = 'Significant impact';
+        else if (eq >= 1) context = 'Tangible amount';
+        else context = 'Fractional amount';
+        html += '<tr><td>' + item.icon + ' ' + item.label + '</td><td><strong>' + wcFmtSmart(eq) + '</strong></td><td>' + item.unit + '</td><td style="font-size:9px">' + context + '</td></tr>';
     });
     html += '</table>';
-    html += '<p class="footer">Sources: Li et al., Joule (2023); Water footprint lifecycle data from Water Footprint Network<br>Disclaimer: Educational estimates only.</p>';
+
+    // SVG Model Comparison Chart
+    var textModels = Object.keys(wcModelData).filter(function(k) { return wcModelData[k].type === 'text' || wcModelData[k].type === 'reasoning'; });
+    var chartData = textModels.map(function(k) {
+        var m = wcModelData[k];
+        var mw = m.water;
+        if (upstream === 'yes') mw *= (1 + wfcUpstreamFactor);
+        return { key: k, label: m.name, value: mw, display: mw.toFixed(2) + ' mL' };
+    }).sort(function(a, b) { return b.value - a.value; });
+    html += '<h2>Model Water Efficiency Comparison (mL/query)</h2>';
+    html += wcSVGBar(chartData, model, 500, 20 * chartData.length + 50);
+
+    // Full model table
+    html += '<table><tr><th>Model</th><th>Company</th><th>Type</th><th>mL/Query</th><th>' + wcFmtVol(totalQ) + ' Queries</th></tr>';
+    Object.keys(wcModelData).sort(function(a, b) { return wcModelData[b].water - wcModelData[a].water; }).forEach(function(k) {
+        var m = wcModelData[k];
+        var mw = m.water;
+        if (upstream === 'yes') mw *= (1 + wfcUpstreamFactor);
+        var totalW = (mw * totalQ) / 1000;
+        html += '<tr' + (k === model ? ' style="background:#fef2f2;font-weight:600"' : '') + '>';
+        html += '<td>' + m.name + (k === model ? ' \u2605' : '') + '</td><td>' + m.company + '</td><td>' + m.type + '</td>';
+        html += '<td>' + mw.toFixed(2) + '</td><td>' + (totalW < 1 ? (totalW * 1000).toFixed(0) + ' mL' : wcFmtVol(totalW) + ' L') + '</td></tr>';
+    });
+    html += '</table>';
+
+    // Pro sections
+    if (isPro) {
+        html += '<h2>Pro: Global Impact Analysis</h2><div class="narr">';
+        html += '<h4>AI Water Consumption at Scale</h4>';
+        html += '<p>' + (document.getElementById('avhProNarrative') ? document.getElementById('avhProNarrative').innerHTML : '') + '</p></div>';
+        html += '<h2>Pro: Multi-Scale Comparison</h2>';
+        var tbl = document.getElementById('avhProTable');
+        if (tbl) html += '<table>' + tbl.innerHTML + '</table>';
+    }
+
+    // Recommendations
+    html += '<h2>Recommendations</h2>';
+    var bestM = chartData[chartData.length - 1];
+    var selChart = chartData.find(function(d) { return d.key === model; });
+    html += '<div class="rec"><div class="rec-title">1. Model Efficiency</div><div class="rec-text">' + modelData.name + ' uses <strong>' + perQueryML.toFixed(2) + ' mL/query</strong>. ';
+    if (bestM && bestM.key !== model && selChart) html += 'Switching to <strong>' + bestM.label + '</strong> (' + bestM.display + ') would save <strong>' + ((1 - bestM.value / selChart.value) * 100).toFixed(0) + '%</strong> water per query.';
+    else html += 'This is already among the most water-efficient models.';
+    html += '</div></div>';
+    html += '<div class="rec"><div class="rec-title">2. Scale Awareness</div><div class="rec-text">At <strong>' + (scaleLabels[scale] || scale) + '</strong> scale (' + totalQ.toLocaleString() + ' queries), total daily water is <strong>' + (waterL < 1 ? waterML.toFixed(0) + ' mL' : wcFmtVol(waterL) + ' L') + '</strong>. ' + (waterL > 1000 ? 'This is equivalent to ' + (waterL / 1135).toFixed(1) + ' US household-days of water use.' : 'Individual impact is small, but scales significantly with millions of users.') + '</div></div>';
+    html += '<div class="rec"><div class="rec-title">3. Upstream Consideration</div><div class="rec-text">' + (upstream === 'yes' ? 'Including upstream water (electricity generation) multiplies direct water by 4x. This is the full lifecycle view recommended by Li et al. (2023).' : 'Enable upstream water calculation for a complete lifecycle picture — upstream water typically adds 3x to direct cooling water.') + '</div></div>';
+
+    // Methodology
+    html += '<h2>Methodology &amp; Algorithm</h2><div class="method">';
+    html += '<strong>Formula:</strong> TotalWater(mL) = WaterPerQuery[model] &times; Queries &times; ScaleMultiplier<br>';
+    html += '<strong>Scale Multipliers:</strong> Personal: 1x, Team: 50x, Company: 1,000x, City: 100,000x, Global: 10,000,000,000x<br>';
+    html += '<strong>Upstream Factor:</strong> When enabled, multiplies by 4x (1 + 3x), accounting for water used in electricity generation for data centers.<br>';
+    html += '<strong>Comparison Data:</strong> Water Footprint Network (coffee, hamburger, rice), USGS (household water), EPA (shower, toilet, laundry), ISO 14046 (water footprinting).<br>';
+    html += '<strong>AI Water Data:</strong> Li et al., Joule (2023): ~0.5 mL/query direct. Altman blog: 0.3 mL/query (direct). Google: 0.26 mL/query (Gemini, direct).<br>';
+    html += '<strong>Limitations:</strong> Per-query water varies by model version, hardware, facility, and workload. Comparison items use global average water footprints. Figures are estimates for educational perspective.</div>';
+
+    // Sources
+    html += '<h2>Sources</h2><div class="method">Li, P. et al. (2023). "Making AI Less Thirsty." <em>Joule</em>. | Water Footprint Network (waterfootprint.org) | Hoekstra, A.Y. (2012). "The Water Footprint of Humanity." <em>PNAS</em>. | USGS Water Use Data 2020 | EPA WaterSense | Google Environmental Report 2024.</div>';
+    html += wcPDFFoot();
     html += '</body></html>';
-    w.document.write(html); w.document.close();
-    setTimeout(function() { w.print(); }, 500);
+    w.document.open(); w.document.write(html); w.document.close();
+    setTimeout(function() { w.print(); }, 600);
 }
+
+// =========================================
+// FREE / PRO MODE SYSTEM
+// =========================================
+var wcMode = 'free';
+var wcPremium = false;
+
+function wcSetMode(mode) {
+    var sess = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+    wcPremium = sess && sess.tier === 'pro' && new Date(sess.expires) > new Date();
+    if (mode === 'pro' && !wcPremium) { wcShowLogin(); return; }
+    wcMode = mode;
+    document.querySelector('.wc-btn-free').classList.toggle('active', mode === 'free');
+    document.querySelector('.wc-btn-pro').classList.toggle('active', mode === 'pro');
+    document.querySelectorAll('.wc-pro-panel').forEach(function(p) {
+        p.style.display = mode === 'pro' ? 'block' : 'none';
+    });
+    if (mode === 'pro') wcUpdateProPanels();
+}
+
+function wcShowLogin() {
+    document.getElementById('wcLoginOverlay').classList.add('show');
+}
+function wcHideLogin() {
+    document.getElementById('wcLoginOverlay').classList.remove('show');
+    document.getElementById('wcLoginError').style.display = 'none';
+}
+function wcHandleLogin() {
+    var email = document.getElementById('wcLoginEmail').value.trim();
+    var pass = document.getElementById('wcLoginPass').value;
+    if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+        var session = { tier: 'pro', email: email, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() };
+        localStorage.setItem('rz_premium_session', JSON.stringify(session));
+        wcPremium = true;
+        wcHideLogin();
+        wcUnlockPanels();
+        wcSetMode('pro');
+        window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
+    } else {
+        document.getElementById('wcLoginError').style.display = 'block';
+    }
+}
+function wcUnlockPanels() {
+    document.querySelectorAll('.wc-pro-panel.gated').forEach(function(p) {
+        p.classList.remove('gated');
+        var ov = p.querySelector('.wc-gate-overlay');
+        if (ov) ov.style.display = 'none';
+    });
+}
+// Auth check on load
+(function() {
+    var sess = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+    if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
+        wcPremium = true;
+        wcUnlockPanels();
+    }
+})();
+
+// =========================================
+// PRO PANEL CALCULATIONS
+// =========================================
+function wcUpdateProPanels() {
+    wfcUpdatePro();
+    dcwUpdatePro();
+    avhUpdatePro();
+}
+
+function wfcUpdatePro() {
+    var cmplx = document.getElementById('wfcComplexity').value;
+    var cool = document.getElementById('wfcCooling').value;
+    var upstream = document.getElementById('wfcUpstream').value;
+    var region = document.getElementById('wfcRegion').value;
+    var q = parseFloat(document.getElementById('wfcQueries').value) || 50;
+    var users = parseFloat(document.getElementById('wfcUsers').value) || 1;
+    var selectedModel = document.getElementById('wfcModel').value;
+    var totalQueries = q * users;
+    var models = Object.keys(wcModelData);
+    var bestModel = null, bestWater = Infinity, worstModel = null, worstWater = 0;
+
+    var tableHTML = '<thead><tr><th>Model</th><th>Company</th><th>mL/Query</th><th>Daily (L)</th><th>Annual (L)</th><th>Cost/Year</th></tr></thead><tbody>';
+    models.sort(function(a, b) { return wcModelData[b].water - wcModelData[a].water; });
+
+    models.forEach(function(k) {
+        var m = wcModelData[k];
+        var w = m.water * (wfcComplexityMult[cmplx] || 1) * (wfcCoolingMult[cool] || 1) * (wfcRegionMult[region] || 1);
+        if (upstream === 'yes') w *= (1 + wfcUpstreamFactor);
+        var dailyL = (w * totalQueries) / 1000;
+        var annualL = dailyL * 365;
+        var cost = annualL * 0.006;
+        if (m.type === 'text' && w < bestWater) { bestWater = w; bestModel = m.name; }
+        if (m.type === 'text' && w > worstWater) { worstWater = w; worstModel = m.name; }
+        var isSel = k === selectedModel;
+        tableHTML += '<tr' + (isSel ? ' class="highlight"' : '') + '><td>' + m.name + (isSel ? ' \u2605' : '') + '</td>';
+        tableHTML += '<td>' + m.company + '</td><td>' + w.toFixed(2) + '</td>';
+        tableHTML += '<td>' + wcFmtVol(dailyL) + '</td><td>' + wcFmtVol(annualL) + '</td>';
+        tableHTML += '<td>' + wcFmtMoney(cost) + '</td></tr>';
+    });
+    tableHTML += '</tbody>';
+    document.getElementById('wfcProTable').innerHTML = tableHTML;
+
+    var savingsL = ((worstWater - bestWater) * totalQueries * 365) / 1000;
+    var kpiHTML = '<div class="wc-pro-kpi"><div class="kpi-label">Most Efficient</div><div class="kpi-value" style="color:#34d399">' + (bestModel || '-') + '</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Least Efficient</div><div class="kpi-value" style="color:#f87171">' + (worstModel || '-') + '</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Max Annual Savings</div><div class="kpi-value" style="color:#fbbf24">' + wcFmtVol(savingsL) + ' L</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Models Analyzed</div><div class="kpi-value" style="color:#60a5fa">' + models.length + '</div></div>';
+    document.getElementById('wfcProKPIs').innerHTML = kpiHTML;
+
+    var selData = wcModelData[selectedModel];
+    var selW = selData ? selData.water * (wfcComplexityMult[cmplx] || 1) * (wfcCoolingMult[cool] || 1) * (wfcRegionMult[region] || 1) : 0.5;
+    if (upstream === 'yes') selW *= (1 + wfcUpstreamFactor);
+    var narr = '<strong>Executive Assessment:</strong> Your selected model (<strong>' + (selData ? selData.name : selectedModel) + '</strong>) uses <strong>' + selW.toFixed(2) + ' mL/query</strong>';
+    narr += (upstream === 'yes' ? ' including upstream water' : ' (direct only)') + '. ';
+    if (bestModel && selData && selData.name !== bestModel) {
+        narr += 'Switching to <strong>' + bestModel + '</strong> could reduce water use by <strong>' + ((1 - bestWater / selW) * 100).toFixed(0) + '%</strong>. ';
+    }
+    narr += 'At ' + totalQueries.toLocaleString() + ' queries/day, annual total is <strong>' + wcFmtVol((selW * totalQueries * 365) / 1000) + ' L</strong>.';
+    document.getElementById('wfcProNarrative').innerHTML = narr;
+}
+
+function dcwUpdatePro() {
+    var load = parseFloat(document.getElementById('dcwLoad').value) || 10;
+    var pue = parseFloat(document.getElementById('dcwPUE').value) || 1.4;
+    var cool = document.getElementById('dcwCooling').value;
+    var climate = document.getElementById('dcwClimate').value;
+    var renewable = parseFloat(document.getElementById('dcwRenewable').value) || 30;
+    var wue = (dcwWUEBase[cool] || 1.8) * (dcwClimateMult[climate] || 1.0);
+    var facilityMW = load * pue;
+    var totalKWh = facilityMW * 1000 * 8760;
+    var upFactor = 1 + ((100 - renewable) / 100) * 1.5;
+    var annualL = totalKWh * wue * upFactor;
+    var coolingNames = { evaporative: 'Evaporative Tower', hybrid: 'Hybrid Adiabatic', aircooled: 'Air-Cooled Chiller', dlc: 'Direct-to-Chip', immersion: 'Immersion Cooling' };
+    var upgradeCosts = { evaporative: 0, hybrid: 800000, aircooled: 1200000, dlc: 2500000, immersion: 4000000 };
+
+    var tableHTML = '<thead><tr><th>Cooling Technology</th><th>WUE</th><th>Annual Water</th><th>Savings</th><th>Upgrade Cost</th><th>Payback</th></tr></thead><tbody>';
+    ['evaporative','hybrid','aircooled','dlc','immersion'].forEach(function(c) {
+        var nWUE = (dcwWUEBase[c] || 1.8) * (dcwClimateMult[climate] || 1.0);
+        var nAnnualL = totalKWh * nWUE * upFactor;
+        var savings = annualL - nAnnualL;
+        var annSav = savings * 0.006;
+        var upCost = upgradeCosts[c] * (load / 10);
+        var payback = annSav > 0 ? (upCost / annSav).toFixed(1) : '\u2014';
+        var isCur = c === cool;
+        tableHTML += '<tr' + (isCur ? ' class="highlight"' : '') + '>';
+        tableHTML += '<td>' + coolingNames[c] + (isCur ? ' (Current)' : '') + '</td>';
+        tableHTML += '<td>' + nWUE.toFixed(3) + '</td><td>' + wcFmtVol(nAnnualL) + ' L</td>';
+        tableHTML += '<td style="color:' + (savings > 0 ? '#34d399' : '#94a3b8') + '">' + (savings > 0 ? '-' + wcFmtVol(savings) : '\u2014') + '</td>';
+        tableHTML += '<td>' + (upCost > 0 ? wcFmtMoney(upCost) : '\u2014') + '</td>';
+        tableHTML += '<td>' + (isCur ? '\u2014' : payback + ' yr') + '</td></tr>';
+    });
+    tableHTML += '</tbody>';
+    document.getElementById('dcwProTable').innerHTML = tableHTML;
+
+    var bestWUE = dcwWUEBase['immersion'] * (dcwClimateMult[climate] || 1.0);
+    var bestAnnualL = totalKWh * bestWUE * upFactor;
+    var maxSav = ((annualL - bestAnnualL) / annualL * 100).toFixed(0);
+    var kpiHTML = '<div class="wc-pro-kpi"><div class="kpi-label">Current WUE</div><div class="kpi-value" style="color:' + (wue <= 0.5 ? '#34d399' : wue <= 1.0 ? '#fbbf24' : '#f87171') + '">' + wue.toFixed(2) + '</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Best Possible</div><div class="kpi-value" style="color:#34d399">' + bestWUE.toFixed(3) + '</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Max Reduction</div><div class="kpi-value" style="color:#fbbf24">' + maxSav + '%</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">2028 Projection (4x)</div><div class="kpi-value" style="color:#f87171">' + wcFmtVol(annualL * 4) + ' L</div></div>';
+    document.getElementById('dcwProKPIs').innerHTML = kpiHTML;
+
+    var narr = '<strong>Facility Assessment:</strong> Your ' + load + ' MW facility with ' + coolingNames[cool] + ' achieves WUE <strong>' + wue.toFixed(2) + ' L/kWh</strong>. ';
+    if (wue > 0.5) narr += 'Upgrading to immersion cooling could cut water by <strong>' + maxSav + '%</strong>. ';
+    else narr += 'Already at <strong>industry-leading efficiency</strong>. ';
+    narr += 'With ' + renewable + '% renewable, upstream impact is ' + ((100 - renewable) > 50 ? 'significant' : 'moderate') + '. ';
+    narr += 'AI workload growth of 4x by 2028 could push demand to <strong>' + wcFmtVol(annualL * 4) + ' L/year</strong>.';
+    document.getElementById('dcwProNarrative').innerHTML = narr;
+}
+
+function avhUpdatePro() {
+    var model = document.getElementById('avhModel').value;
+    var upstream = document.getElementById('avhUpstream').value;
+    var models = Object.keys(wcModelData);
+
+    var tableHTML = '<thead><tr><th>Model</th><th>Type</th><th>mL/Query</th><th>1K Queries</th><th>1M Queries</th><th>1B Queries</th></tr></thead><tbody>';
+    models.sort(function(a, b) { return wcModelData[b].water - wcModelData[a].water; });
+    models.forEach(function(k) {
+        var m = wcModelData[k];
+        var w = m.water;
+        if (upstream === 'yes') w *= (1 + wfcUpstreamFactor);
+        var isSel = k === model;
+        tableHTML += '<tr' + (isSel ? ' class="highlight"' : '') + '>';
+        tableHTML += '<td>' + m.name + (isSel ? ' \u2605' : '') + '</td><td>' + m.type + '</td>';
+        tableHTML += '<td>' + w.toFixed(2) + '</td>';
+        tableHTML += '<td>' + wcFmtVol((w * 1000) / 1000) + ' L</td>';
+        tableHTML += '<td>' + wcFmtVol((w * 1e6) / 1000) + ' L</td>';
+        tableHTML += '<td>' + wcFmtVol((w * 1e9) / 1000) + ' L</td></tr>';
+    });
+    tableHTML += '</tbody>';
+    document.getElementById('avhProTable').innerHTML = tableHTML;
+
+    var mData = wcModelData[model] || { water: 0.5, name: model };
+    var pq = mData.water;
+    if (upstream === 'yes') pq *= (1 + wfcUpstreamFactor);
+    var gQ = 10e9, gDL = (gQ * pq) / 1000, gAL = gDL * 365, gPools = gAL / 2500000, cities = gDL / (50000 * 1135);
+
+    var kpiHTML = '<div class="wc-pro-kpi"><div class="kpi-label">Global Daily</div><div class="kpi-value" style="color:#f87171">' + wcFmtVol(gDL) + ' L</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Pools/Year</div><div class="kpi-value" style="color:#60a5fa">' + wcFmtVol(gPools) + '</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">Cities Equiv.</div><div class="kpi-value" style="color:#fbbf24">' + cities.toFixed(1) + '</div></div>';
+    kpiHTML += '<div class="wc-pro-kpi"><div class="kpi-label">2028 (4x)</div><div class="kpi-value" style="color:#f87171">' + wcFmtVol(gAL * 4) + ' L</div></div>';
+    document.getElementById('avhProKPIs').innerHTML = kpiHTML;
+
+    var narr = '<strong>Global Impact:</strong> At ~10 billion AI queries/day using ' + mData.name + ', global AI water consumption is approximately <strong>' + wcFmtVol(gDL) + ' L/day</strong>. ';
+    narr += 'Annually: <strong>' + wcFmtVol(gPools) + ' Olympic pools</strong>. ';
+    narr += 'With 4x AI growth by 2028, this could reach <strong>' + wcFmtVol(gAL * 4) + ' L/year</strong> \u2014 equal to <strong>' + (cities * 4).toFixed(0) + ' cities</strong> of 50K people.';
+    document.getElementById('avhProNarrative').innerHTML = narr;
+}
+
+// =========================================
+// AUTO-CALCULATE ON INPUT CHANGE
+// =========================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab 1 auto-calc
+    ['wfcQueries','wfcModel','wfcComplexity','wfcCooling','wfcUpstream','wfcRegion','wfcUsers','wfcHours'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', function() { wfcCalculate(); });
+        if (el && el.type === 'number') el.addEventListener('input', function() { clearTimeout(el._dbTimer); el._dbTimer = setTimeout(wfcCalculate, 400); });
+    });
+    // Tab 2 auto-calc
+    ['dcwLoad','dcwPUE','dcwCooling','dcwClimate','dcwHours','dcwSource','dcwAIPct','dcwRackDensity','dcwRenewable'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', function() { dcwCalculate(); });
+        if (el && el.type === 'number') el.addEventListener('input', function() { clearTimeout(el._dbTimer); el._dbTimer = setTimeout(dcwCalculate, 400); });
+    });
+    // Tab 3 auto-calc
+    ['avhQueries','avhModel','avhScaleSelect','avhUpstream'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', function() { avhCalculate(); });
+        if (el && el.type === 'number') el.addEventListener('input', function() { clearTimeout(el._dbTimer); el._dbTimer = setTimeout(avhCalculate, 400); });
+    });
+});
 </script>
 
 <!-- Feature 22: Reading Progress Bar -->
@@ -1868,6 +2917,23 @@ function avhExportPDF() {
     if (tocClose) tocClose.addEventListener('click', closeMobileDrawer);
 })();
 </script>
+
+<!-- Login Modal -->
+<div class="wc-login-overlay" id="wcLoginOverlay">
+    <div class="wc-login-box">
+        <button class="wc-login-close" onclick="wcHideLogin()">&times;</button>
+        <h3><i class="fas fa-lock" style="color:#f87171;margin-right:6px"></i> Pro Intelligence Engine</h3>
+        <p>Unlock multi-model deep comparison, facility optimization analysis, cooling upgrade ROI, global trajectory projections, and dynamic executive narratives.</p>
+        <input type="email" id="wcLoginEmail" placeholder="Email address">
+        <input type="password" id="wcLoginPass" placeholder="Password">
+        <button class="wc-login-submit" onclick="wcHandleLogin()">Sign In</button>
+        <div class="wc-login-error" id="wcLoginError">Invalid credentials.</div>
+        <div class="wc-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+        <p style="font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">
+            By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#f87171;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#f87171;text-decoration:underline;">Privacy Policy</a>.
+        </p>
+    </div>
+</div>
 
 </body>
 </html>
