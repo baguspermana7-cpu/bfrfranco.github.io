@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light | ResistanceZero</title>
+    <meta name="description" content="NVIDIA invested $4B in Lumentum and Coherent for silicon photonics and co-packaged optics. Engineering analysis of CPO, ELS, micro ring modulators, and why AI factories need optical interconnects.">
+    <meta name="keywords" content="NVIDIA photonics, co-packaged optics, silicon photonics, Lumentum, Coherent, CPO, external laser source, AI factory interconnect, optical networking, data center optics">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0891b2">
+    <link rel="canonical" href="https://resistancezero.com/article-22.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-22.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/article-22.html">
+    <meta property="og:title" content="NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light">
+    <meta property="og:description" content="NVIDIA invested $4B in Lumentum and Coherent for silicon photonics and co-packaged optics. A data center engineer analyzes why AI factories need optical interconnects.">
+    <meta property="og:image" content="https://resistancezero.com/assets/article-22-hero.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="NVIDIA Silicon Photonics AI Factory">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="article:author" content="Bagus Dwi Permana">
+    <meta property="article:published_time" content="2026-03-20T00:00:00Z">
+    <meta property="article:modified_time" content="2026-03-20T00:00:00Z">
+    <meta property="article:section" content="Engineering Analysis">
+    <meta property="article:tag" content="NVIDIA Photonics">
+    <meta property="article:tag" content="Co-Packaged Optics">
+    <meta property="article:tag" content="Silicon Photonics">
+    <meta property="article:tag" content="AI Infrastructure">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:creator" content="@BagusDPermana">
+    <meta name="twitter:title" content="NVIDIA's $4B Photonics Play: AI's Future Runs on Light">
+    <meta name="twitter:description" content="Engineering analysis of NVIDIA's $4B investment in Lumentum and Coherent for co-packaged optics and silicon photonics.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/article-22-hero.webp">
+    <meta name="twitter:image:alt" content="NVIDIA Silicon Photonics AI Factory">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.min.css?v=2026-03-20">
+    <link rel="preload" as="image" href="assets/article-22-hero.webp">
+
+    <!-- Structured Data: TechnicalArticle -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechnicalArticle",
+        "headline": "NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light",
+        "description": "Engineering analysis of NVIDIA's $4B investment in Lumentum and Coherent. Deep dive into silicon photonics, co-packaged optics, external laser source, and the physics of AI factory interconnects.",
+        "image": "https://resistancezero.com/assets/article-22-hero.webp",
+        "author": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "sameAs": ["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/", "https://resistancezero.com"]
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "ResistanceZero",
+            "url": "https://resistancezero.com",
+            "logo": {"@type": "ImageObject", "url": "https://resistancezero.com/assets/Favicon.png"}
+        },
+        "datePublished": "2026-03-20",
+        "dateModified": "2026-03-20",
+        "wordCount": "7500",
+        "articleSection": "Engineering Analysis",
+        "keywords": ["NVIDIA photonics", "co-packaged optics", "silicon photonics", "Lumentum", "Coherent", "CPO", "external laser source", "AI factory"],
+        "mainEntityOfPage": {"@type": "WebPage", "@id": "https://resistancezero.com/article-22.html"}
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is co-packaged optics (CPO) and why does NVIDIA need it?",
+                "acceptedAnswer": {"@type": "Answer", "text": "Co-packaged optics places optical engines directly next to the switch ASIC, reducing electrical trace distance from 12+ inches to less than 0.5 inch. This dramatically lowers power consumption, latency, and signal integrity issues. NVIDIA needs CPO because as AI clusters scale to millions of GPUs, traditional pluggable optics cannot keep up with bandwidth density and power efficiency requirements at 200G+ per lane speeds."}
+            },
+            {
+                "@type": "Question",
+                "name": "Why did NVIDIA invest $2 billion each in Lumentum and Coherent?",
+                "acceptedAnswer": {"@type": "Answer", "text": "NVIDIA invested $2B in Lumentum for laser source technology (CW lasers, UHP lasers, external laser source modules) and $2B in Coherent for broader optical networking stack (transceivers, VCSELs, InP lasers, silicon photonics, and five CPO-related product families). Having two partners provides supply chain redundancy, design optionality, and prevents any single vendor from becoming a bottleneck."}
+            },
+            {
+                "@type": "Question",
+                "name": "What is silicon photonics and why can't silicon alone make lasers?",
+                "acceptedAnswer": {"@type": "Answer", "text": "Silicon photonics uses silicon-based fabrication to build optical components like waveguides, modulators, splitters, and couplers with high integration density. However, silicon has an indirect bandgap that makes it inherently poor at generating laser light efficiently. This is why III-V semiconductor materials like Indium Phosphide (InP) and Gallium Arsenide (GaAs) are still needed for laser sources — and why NVIDIA needs Lumentum and Coherent."}
+            },
+            {
+                "@type": "Question",
+                "name": "What are Spectrum-X Photonics and Quantum-X Photonics?",
+                "acceptedAnswer": {"@type": "Answer", "text": "Spectrum-X Photonics and Quantum-X Photonics are NVIDIA's co-packaged optics networking switch platforms announced in March 2025. Spectrum-X Photonics is for Ethernet networking, while Quantum-X Photonics is for InfiniBand. Both deliver up to 409.6 Tb/s system bandwidth with significant power savings compared to pluggable optics, designed to scale AI factories to millions of GPUs."}
+            }
+        ]
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/"},
+            {"@type": "ListItem", "position": 2, "name": "Articles", "item": "https://resistancezero.com/articles.html"},
+            {"@type": "ListItem", "position": 3, "name": "NVIDIA Photonics", "item": "https://resistancezero.com/article-22.html"}
+        ]
+    }
+    </script>
+
+    <!-- Article-Specific Styles -->
+    <style>
+        :root {
+            --a22-cyan: #0891b2;
+            --a22-cyan-light: #22d3ee;
+            --a22-dark: #155e75;
+            --a22-darker: #083344;
+            --a22-light: #cffafe;
+            --a22-accent: #06b6d4;
+            --a22-bg: #ecfeff;
+        }
+
+        .article-hero {
+            background: linear-gradient(135deg, #083344 0%, #155e75 25%, #0891b2 55%, #06b6d4 100%);
+            padding: 7rem 2rem 3.5rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(6,182,212,0.15) 0%, transparent 70%),
+                        radial-gradient(ellipse at 70% 20%, rgba(34,211,238,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .article-hero .highlight { color: #22d3ee; }
+        .article-category {
+            display: inline-block;
+            background: rgba(34,211,238,0.2);
+            border: 1px solid rgba(34,211,238,0.4);
+            color: #a5f3fc;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .article-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.85);
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #22d3ee; }
+
+        /* Evidence Block */
+        .a22-evidence-block {
+            background: linear-gradient(135deg, #155e75 0%, #083344 100%);
+            padding: 2rem 1.5rem;
+            margin: 0;
+        }
+        .a22-evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .a22-evidence-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(34,211,238,0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .a22-evidence-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #22d3ee;
+            margin-bottom: 0.25rem;
+        }
+        .a22-evidence-label {
+            font-size: 0.75rem;
+            color: #a5f3fc;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .a22-evidence-sub {
+            font-size: 0.7rem;
+            color: rgba(165,243,252,0.6);
+            margin-top: 0.25rem;
+        }
+
+        /* Article body enhancements */
+        .article-body h2 {
+            color: #155e75;
+            border-bottom: 2px solid #0891b2;
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+        }
+        .article-body h3 { color: #164e63; }
+        [data-theme="dark"] .article-body h2 { color: #22d3ee; border-color: #0891b2; }
+        [data-theme="dark"] .article-body h3 { color: #67e8f9; }
+
+        /* Quote callout */
+        .quote-callout {
+            background: var(--a22-bg);
+            border-left: 4px solid var(--a22-cyan);
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+        .quote-callout blockquote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #155e75;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .quote-callout cite {
+            display: block;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #0891b2;
+            font-style: normal;
+            font-weight: 600;
+        }
+        [data-theme="dark"] .quote-callout { background: rgba(8,145,178,0.1); }
+        [data-theme="dark"] .quote-callout blockquote { color: #a5f3fc; }
+
+        /* Insight box */
+        .a22-insight-box {
+            background: linear-gradient(135deg, #ecfeff, #cffafe);
+            border: 1px solid rgba(8,145,178,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .a22-insight-box h4 {
+            color: #155e75;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .a22-insight-box p { font-size: 0.9rem; color: #374151; line-height: 1.6; margin: 0; }
+        [data-theme="dark"] .a22-insight-box { background: linear-gradient(135deg, rgba(8,145,178,0.1), rgba(6,182,212,0.08)); border-color: rgba(34,211,238,0.3); }
+        [data-theme="dark"] .a22-insight-box h4 { color: #22d3ee; }
+        [data-theme="dark"] .a22-insight-box p { color: #d1d5db; }
+
+        /* Data tables */
+        .a22-table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        .a22-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .a22-table-container th {
+            background: #155e75;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .a22-table-container td {
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #374151;
+        }
+        .a22-table-container tr:hover { background: #ecfeff; }
+        .a22-table-container .highlight-row { background: #ecfeff; font-weight: 600; }
+        [data-theme="dark"] .a22-table-container { border-color: #374151; }
+        [data-theme="dark"] .a22-table-container td { border-color: #374151; color: #d1d5db; }
+        [data-theme="dark"] .a22-table-container tr:hover { background: rgba(8,145,178,0.1); }
+        [data-theme="dark"] .a22-table-container .highlight-row { background: rgba(8,145,178,0.1); }
+
+        /* Stat callout inline */
+        .a22-stat {
+            display: inline-block;
+            background: #ecfeff;
+            border: 1px solid rgba(8,145,178,0.3);
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #0891b2;
+            font-size: 0.95em;
+        }
+        [data-theme="dark"] .a22-stat { background: rgba(8,145,178,0.15); color: #22d3ee; }
+
+        /* Company card grid */
+        .a22-company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        .a22-company-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-top: 3px solid var(--a22-cyan);
+        }
+        .a22-company-card h4 {
+            color: #155e75;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .a22-company-card p { font-size: 0.85rem; color: #6b7280; line-height: 1.5; margin: 0; }
+        .a22-company-card .a22-deal-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+        }
+        .a22-company-card .a22-deal-stat span:first-child { color: #6b7280; }
+        .a22-company-card .a22-deal-stat span:last-child { color: #0891b2; font-weight: 700; }
+        [data-theme="dark"] .a22-company-card { background: #1e293b; border-color: #374151; }
+        [data-theme="dark"] .a22-company-card h4 { color: #22d3ee; }
+        [data-theme="dark"] .a22-company-card p { color: #94a3b8; }
+        [data-theme="dark"] .a22-company-card .a22-deal-stat { border-color: #374151; }
+
+        /* Warning box */
+        .a22-warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-left: 4px solid #d97706;
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .a22-warning-box h4 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .a22-warning-box p { font-size: 0.9rem; color: #78350f; line-height: 1.6; margin: 0; }
+        [data-theme="dark"] .a22-warning-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.4); }
+        [data-theme="dark"] .a22-warning-box h4 { color: #fbbf24; }
+        [data-theme="dark"] .a22-warning-box p { color: #fde68a; }
+
+        /* Calculator Section */
+        .a22-calculator {
+            background: linear-gradient(135deg, #1e293b 0%, #0c4a6e 50%, #083344 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: #e2e8f0;
+            border: 1px solid rgba(34,211,238,0.2);
+        }
+        .a22-calculator h3 {
+            color: #22d3ee;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .a22-calculator .calc-subtitle {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+        .a22-calc-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+        }
+        .a22-input-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid rgba(34,211,238,0.15);
+        }
+        .a22-input-group {
+            margin-bottom: 1rem;
+        }
+        .a22-input-group:last-child { margin-bottom: 0; }
+        .a22-input-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .a22-input-group label .a22-tip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: rgba(34,211,238,0.15);
+            color: #22d3ee;
+            font-size: 0.6rem;
+            cursor: help;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .a22-input-group input, .a22-input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(34,211,238,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .a22-input-group input:focus, .a22-input-group select:focus {
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 2px rgba(34,211,238,0.15);
+        }
+        .a22-input-group select option { background: #1e293b; }
+        .a22-calc-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0e7490, #0891b2);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            font-family: inherit;
+        }
+        .a22-calc-btn:hover { box-shadow: 0 4px 16px rgba(8,145,178,0.4); }
+        .a22-reset-btn {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            color: #64748b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-family: inherit;
+        }
+        .a22-results-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .a22-tech-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .a22-tech-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 2px solid rgba(255,255,255,0.08);
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        .a22-tech-card.copper { border-top: 3px solid #f59e0b; }
+        .a22-tech-card.pluggable { border-top: 3px solid #a855f7; }
+        .a22-tech-card.cpo { border-top: 3px solid #22d3ee; }
+        .a22-tech-card.winner { border-color: #22d3ee; box-shadow: 0 0 20px rgba(34,211,238,0.15); }
+        .a22-tech-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .a22-tech-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .a22-tech-card.copper .a22-tech-name { color: #f59e0b; }
+        .a22-tech-card.pluggable .a22-tech-name { color: #a855f7; }
+        .a22-tech-card.cpo .a22-tech-name { color: #22d3ee; }
+        .a22-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.75rem;
+        }
+        .a22-metric:last-child { border-bottom: none; }
+        .a22-metric-label { color: #94a3b8; }
+        .a22-metric-value { color: #e2e8f0; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .a22-verdict {
+            background: linear-gradient(135deg, rgba(8,145,178,0.15), rgba(34,211,238,0.08));
+            border: 1px solid rgba(34,211,238,0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .a22-verdict-title { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .a22-verdict-text { font-size: 1rem; color: #22d3ee; font-weight: 700; }
+        .a22-verdict-detail { font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem; line-height: 1.5; }
+        .a22-disclaimer {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            line-height: 1.5;
+        }
+        /* Mode bar */
+        .a22-mode-bar { display: flex; gap: 4px; }
+        .a22-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(8,145,178,0.08); border: 1px solid rgba(8,145,178,0.15);
+            border-radius: 12px; padding: 0.75rem 1rem; margin-bottom: 1.5rem;
+            flex-wrap: wrap; gap: 0.5rem;
+        }
+        .a22-toolbar-btn {
+            padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(8,145,178,0.2);
+            background: transparent; color: #94a3b8; font-size: 0.875rem; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .a22-toolbar-btn:hover { color: #e2e8f0; border-color: #0891b2; }
+        .a22-btn-free.active {
+            background: linear-gradient(135deg, #0e7490, #0891b2); color: #fff;
+            border-color: transparent; box-shadow: 0 2px 8px rgba(8,145,178,0.25);
+        }
+        .a22-btn-pro.active {
+            background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff;
+            border-color: transparent; box-shadow: 0 2px 8px rgba(245,158,11,0.25);
+        }
+        /* Pro panel */
+        .a22-pro-panel {
+            margin: 1.5rem 0; padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(8,145,178,0.06), rgba(245,158,11,0.03));
+            border: 1px solid rgba(8,145,178,0.15); border-radius: 12px;
+            position: relative; overflow: hidden; display: none;
+        }
+        .a22-pro-panel.gated .a22-panel-inner {
+            filter: blur(4px); pointer-events: none; user-select: none;
+        }
+        .a22-gate-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(12,10,9,0.85); display: flex; align-items: center;
+            justify-content: center; gap: 8px; cursor: pointer; z-index: 5;
+            border-radius: 12px; transition: all 0.3s;
+        }
+        .a22-gate-overlay:hover { background: rgba(12,10,9,0.75); }
+        .a22-gate-overlay i { font-size: 1.5rem; color: #fbbf24; }
+        .a22-gate-overlay span { color: #fbbf24; font-weight: 700; font-size: 0.9rem; }
+        .a22-panel-title {
+            font-size: 0.95rem; font-weight: 700; color: #f59e0b;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .a22-pro-narrative {
+            background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1.25rem;
+            margin-top: 1rem; font-size: 0.82rem; color: #d6d3d1; line-height: 1.7;
+        }
+        .a22-pro-narrative strong { color: #f59e0b; }
+        .a22-pro-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;
+        }
+        .a22-pro-kpi {
+            background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; text-align: center;
+        }
+        .a22-pro-kpi .kpi-label {
+            font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;
+        }
+        .a22-pro-kpi .kpi-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        /* Login Modal */
+        .a22-login-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center;
+        }
+        .a22-login-overlay.show { display: flex; }
+        .a22-login-box {
+            background: #1c1917; border: 2px solid rgba(8,145,178,0.5); border-radius: 16px;
+            padding: 2rem; max-width: 420px; width: 90%;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(8,145,178,0.15); position: relative;
+        }
+        .a22-login-close {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: #94a3b8; font-size: 1.5rem; cursor: pointer;
+        }
+        .a22-login-box h3 { font-size: 1.2rem; color: #22d3ee; margin-bottom: 0.5rem; }
+        .a22-login-box p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem; line-height: 1.5; }
+        .a22-login-box input {
+            width: 100%; padding: 12px 16px; margin-bottom: 12px;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(8,145,178,0.2);
+            border-radius: 8px; color: #fff; font-family: inherit; outline: none; box-sizing: border-box;
+        }
+        .a22-login-box input:focus { border-color: #0891b2; }
+        .a22-login-submit {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, #0e7490, #0891b2);
+            color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s; margin-top: 4px; font-family: inherit;
+        }
+        .a22-login-submit:hover { box-shadow: 0 4px 16px rgba(8,145,178,0.3); }
+        .a22-login-error { display: none; color: #ef4444; font-size: 0.8rem; margin-top: 8px; }
+        .a22-login-demo { margin-top: 12px; font-size: 0.75rem; color: #64748b; text-align: center; }
+        .a22-login-demo code {
+            background: rgba(8,145,178,0.1); padding: 2px 6px; border-radius: 4px;
+            font-size: 0.72rem; color: #22d3ee;
+        }
+        .a22-login-terms {
+            font-size: 0.72rem; color: #64748b; text-align: center; margin-top: 8px;
+        }
+        .a22-login-terms a { color: #0891b2; text-decoration: underline; }
+        [data-theme="dark"] .a22-calculator { background: linear-gradient(135deg, #0c0a09 0%, #0c4a6e 100%); }
+        [data-theme="dark"] .a22-login-box { background: #0c0a09; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .a22-evidence-grid { grid-template-columns: repeat(3, 1fr); }
+            .a22-evidence-value { font-size: 1.3rem; }
+            .a22-company-grid { grid-template-columns: 1fr; }
+            .a22-calc-grid { grid-template-columns: 1fr; }
+            .a22-tech-columns { grid-template-columns: 1fr; }
+            .a22-toolbar { flex-direction: column; align-items: stretch; }
+            .a22-mode-bar { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .a22-evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .a22-evidence-value { font-size: 1.1rem; }
+            .a22-evidence-label { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: linear-gradient(90deg, #0891b2, #22d3ee);"></div></div>
+
+<!-- TOC Sidebar -->
+<aside class="toc-sidebar" id="tocSidebar"><ul class="toc-sidebar-list" id="tocSidebarList"></ul></aside>
+
+<!-- TOC Mobile -->
+<button class="toc-mobile-toggle" id="tocMobileToggle" aria-label="Table of Contents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/>
+    </svg>
+</button>
+<div class="toc-mobile-backdrop" id="tocMobileBackdrop"></div>
+<div class="toc-mobile-drawer" id="tocMobileDrawer">
+    <div class="toc-drawer-header">
+        <span class="toc-drawer-title">Table of Contents</span>
+        <button class="toc-drawer-close" id="tocDrawerClose">&times;</button>
+    </div>
+    <ul class="toc-mobile-list" id="tocMobileList"></ul>
+</div>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay"></div>
+<div class="search-modal" id="searchModal">
+    <div class="search-input-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+        <kbd class="search-kbd">ESC</kbd>
+    </div>
+    <div class="search-chips" id="searchChips">
+        <button class="search-chip active" data-filter="all">All</button>
+        <button class="search-chip" data-filter="articles">Articles</button>
+        <button class="search-chip" data-filter="calculators">Calculators</button>
+        <button class="search-chip" data-filter="tools">Tools</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="search-preview" id="searchPreview"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">
+            <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+        </a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown">
+                <a href="datacenter-solutions.html" class="nav-link">
+                    DC Solutions
+                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="pue-calculator.html">PUE Calculator</a></li>
+                    <li><a href="power-calculator.html">Power Calculator</a></li>
+                    <li><a href="cooling-calculator.html">Cooling Calculator</a></li>
+                    <li><a href="tia942-checklist.html">TIA-942 Checklist</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+            <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+            <li class="nav-dropdown">
+                <a href="articles.html" class="nav-link">
+                    Insights
+                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                    <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                    <li><a href="future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="article-hero">
+    <div class="container">
+        <a href="articles.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Articles
+        </a>
+        <span class="article-category">Engineering Analysis &mdash; Photonics &amp; Interconnects</span>
+        <h1 class="article-title">NVIDIA's $4 Billion Photonics Play:<br><span class="highlight">Why the Future of AI Runs on Light</span></h1>
+        <p class="article-subtitle">NVIDIA invested $2B in Lumentum and $2B in Coherent to control the optical interconnect layer of AI factories. A data center engineer breaks down the silicon photonics, co-packaged optics, and the physics of why copper can't keep up.</p>
+        <div class="article-meta">
+            <span class="article-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Bagus Dwi Permana
+            </span>
+            <span class="article-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                March 20, 2026
+            </span>
+            <span class="article-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                32 min read
+            </span>
+        </div>
+    </div>
+</header>
+
+<!-- Evidence Block -->
+<div class="a22-evidence-block">
+    <div class="a22-evidence-grid">
+        <div class="a22-evidence-card">
+            <div class="a22-evidence-value">$4B</div>
+            <div class="a22-evidence-label">Total Investment</div>
+            <div class="a22-evidence-sub">Lumentum + Coherent combined</div>
+        </div>
+        <div class="a22-evidence-card">
+            <div class="a22-evidence-value">409.6 Tb/s</div>
+            <div class="a22-evidence-label">System Bandwidth</div>
+            <div class="a22-evidence-sub">Per CPO-enabled switch</div>
+        </div>
+        <div class="a22-evidence-card">
+            <div class="a22-evidence-value">200G</div>
+            <div class="a22-evidence-label">Per Wavelength</div>
+            <div class="a22-evidence-sub">PAM4 micro ring modulator</div>
+        </div>
+        <div class="a22-evidence-card">
+            <div class="a22-evidence-value">2</div>
+            <div class="a22-evidence-label">Strategic Partners</div>
+            <div class="a22-evidence-sub">Dual-source supply chain</div>
+        </div>
+        <div class="a22-evidence-card">
+            <div class="a22-evidence-value">&lt;0.5"</div>
+            <div class="a22-evidence-label">Electrical Trace</div>
+            <div class="a22-evidence-sub">CPO vs 12"+ pluggable</div>
+        </div>
+    </div>
+</div>
+
+<!-- Series Navigation -->
+<div class="series-nav" style="margin-top: 1rem;">
+    <div class="series-badge">
+        <span class="series-badge-icon">22</span>
+        Engineering Journal &mdash; Article 22
+    </div>
+    <span class="series-title"></span>
+    <div class="series-links">
+        <a href="article-21.html" class="series-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
+        <a href="#" class="series-link" style="opacity:0.4;pointer-events:none;">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+    </div>
+</div>
+
+<!-- Article Content -->
+<main>
+<article class="article-content">
+<div class="container">
+<div class="article-body">
+
+    <!-- Cover Image -->
+    <figure style="margin: 0 0 2.5rem 0; text-align: center;">
+        <img src="assets/article-22-hero.webp" alt="NVIDIA silicon photonics co-packaged optics for AI factory interconnects" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" loading="eager">
+        <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: #64748b; font-style: italic;">NVIDIA's vision for photonics-enabled AI factories &mdash; where light replaces copper as the backbone of GPU-to-GPU communication.</figcaption>
+    </figure>
+
+    <!-- Section 1 -->
+    <h2 id="section-1">The $4 Billion Signal</h2>
+
+    <p>On March 2, 2026, NVIDIA disclosed two simultaneous investments that sent a clear signal through the semiconductor and optical networking industries: <span class="a22-stat">$2 billion</span> into Lumentum Holdings via Series A Convertible Preferred Stock, and <span class="a22-stat">$2 billion</span> into Coherent Corp. through common stock acquisition. Both deals are structured as nonexclusive, multiyear agreements with multibillion-dollar purchase commitments attached. This was not a speculative bet on a distant future. This was a calculated move to lock down the optical supply chain that will define the next generation of AI infrastructure.</p>
+
+    <p>The timing is not accidental. Almost exactly one year earlier, on March 18, 2025, NVIDIA announced Spectrum-X Photonics and Quantum-X Photonics at GTC &mdash; its first co-packaged optics (CPO) networking switch platforms for Ethernet and InfiniBand respectively. Those products promised up to 409.6 Tb/s of system bandwidth per switch with dramatically reduced power consumption. The $4 billion investment ensures that the photonic components those platforms depend on will actually exist at scale, on time, and with the performance NVIDIA needs.</p>
+
+    <p>What makes this investment distinctive is its dual-vendor structure. NVIDIA did not place $4 billion on a single supplier. It split the allocation precisely in half &mdash; ensuring competitive tension, supply chain redundancy, and co-design optionality across two complementary partners. Lumentum brings laser source expertise. Coherent brings a broader optical subsystem portfolio. Together, they cover the full photonic stack that NVIDIA needs to build AI factories where light, not copper, carries the critical data between GPUs.</p>
+
+    <div class="a22-insight-box">
+        <h4><i class="fas fa-lightbulb"></i> Why This Matters for Data Center Engineers</h4>
+        <p>This is not just a financial story. For anyone designing, building, or operating AI-class data centers, the NVIDIA photonics investment signals a fundamental shift in how interconnects will be designed. The transition from pluggable optics to co-packaged optics will change rack layouts, cooling requirements, cable management, power distribution, and operational procedures. Understanding the technology behind this shift is essential for planning your next facility build.</p>
+    </div>
+
+    <!-- Section 2 -->
+    <h2 id="section-2">When Compute Outpaces the Network</h2>
+
+    <p>The AI industry has a dirty secret: the most expensive component in a frontier training cluster is not the GPU &mdash; it is the time those GPUs spend waiting. In large-scale distributed training, performance is fundamentally constrained by how fast data moves between GPUs. Every collective operation &mdash; AllReduce, AllGather, ReduceScatter &mdash; requires synchronized data movement across thousands of devices. When the network cannot keep up with the compute, GPUs idle. And idle GPUs burning 700W each while waiting for data represent the most expensive waste in modern computing.</p>
+
+    <p>The key performance factors in an AI cluster are not individual GPU FLOPS but rather aggregate metrics: GPU-to-GPU data movement bandwidth, collective communication efficiency, fabric tail latency, link reliability, and deployment velocity. A single slow link in a 10,000-GPU cluster can degrade the performance of every GPU in the job. A single failed transceiver can trigger a job restart that wastes hours of compute time. The network is not an accessory to the compute &mdash; it is the compute, because distributed training turns thousands of individual GPUs into one logical accelerator, and the network is the glue that holds it together.</p>
+
+    <p>AI cluster traffic patterns are fundamentally different from enterprise or cloud workloads. Traditional data centers are dominated by north-south traffic &mdash; clients talking to servers. AI clusters are dominated by east-west traffic &mdash; GPUs talking to GPUs, with intense bursts of synchronized communication that stress the fabric in ways that conventional network designs were never built to handle. The traffic is bursty, latency-sensitive, and requires near-perfect reliability. One percent packet loss in an AI training job does not cause one percent degradation &mdash; it can cause 30-50% throughput collapse due to synchronization stalls.</p>
+
+    <div class="a22-warning-box">
+        <h4><i class="fas fa-exclamation-triangle"></i> The Scaling Paradox</h4>
+        <p>If compute capability doubles every generation (B100 to B200 to B300) but network bandwidth only grows 50%, the cost per token actually degrades at scale. You are buying more GPUs that spend a higher fraction of their time waiting. This is why NVIDIA is investing $4 billion in photonics &mdash; the network must scale proportionally with compute, or the economics of AI training collapse.</p>
+    </div>
+
+    <!-- Section 3 -->
+    <h2 id="section-3">The Copper Wall</h2>
+
+    <p>Copper has been the workhorse of data center interconnects for decades. Direct Attach Copper (DAC) cables offer low latency, zero power consumption for the media itself, and simple deployment. But copper is hitting a physics wall, and that wall gets closer with every speed generation. At <span class="a22-stat">200G SerDes</span> lane speeds &mdash; the baseline for next-generation 1.6T links &mdash; the challenges become severe: electrical insertion loss increases dramatically with frequency and distance, requiring ever-heavier equalization circuits that consume more power and add latency.</p>
+
+    <p>The numbers tell the story. At 112G PAM4 (the current 400G/800G generation), copper DAC cables work reliably to about 2-3 meters. At 224G PAM4 (the upcoming 1.6T generation), that distance shrinks to approximately 1 meter or less. The equalization complexity required to recover a signal at these speeds over even short copper runs becomes extreme &mdash; multi-tap DFE, CTLE, and FFE circuits that collectively consume several watts per lane just to keep the signal intelligible. Multiply that by 64 lanes on a switch ASIC and the power budget for signal conditioning alone exceeds what some entire switches consumed a generation ago.</p>
+
+    <p>Beyond pure signal integrity, copper at scale creates physical problems. High-speed copper cables are thick, stiff, and generate significant heat at the connector interface. Cable management in a rack with hundreds of 400G or 800G DAC connections is already challenging. At 1.6T with denser cable counts, the situation becomes unmanageable. Front-panel density limits how many ports you can physically fit, and the thermal load from connector resistance adds to an already stressed cooling system. This is why NVIDIA has stated that co-packaged optics can reduce the electrical trace from the ASIC to the optical engine from <span class="a22-stat">12+ inches</span> (in pluggable designs) to <span class="a22-stat">less than 0.5 inch</span> &mdash; eliminating the copper bottleneck at its source.</p>
+
+    <div class="a22-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>100G NRZ</th>
+                    <th>200G PAM4</th>
+                    <th>400G PAM4</th>
+                    <th>800G PAM4</th>
+                    <th>1.6T PAM4</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SerDes Lane Rate</td>
+                    <td>25G</td>
+                    <td>50G</td>
+                    <td>112G</td>
+                    <td>112G</td>
+                    <td>224G</td>
+                </tr>
+                <tr>
+                    <td>Lanes per Port</td>
+                    <td>4</td>
+                    <td>4</td>
+                    <td>4</td>
+                    <td>8</td>
+                    <td>8</td>
+                </tr>
+                <tr>
+                    <td>Copper DAC Max Reach</td>
+                    <td>~5m</td>
+                    <td>~3m</td>
+                    <td>~2m</td>
+                    <td>~1.5m</td>
+                    <td>~1m</td>
+                </tr>
+                <tr>
+                    <td>Power per Lane (Equalization)</td>
+                    <td>~0.3W</td>
+                    <td>~0.5W</td>
+                    <td>~1.2W</td>
+                    <td>~1.2W</td>
+                    <td>~2.5W</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td>Practical for AI Clusters?</td>
+                    <td>Legacy</td>
+                    <td>Limited</td>
+                    <td>Short reach only</td>
+                    <td>Very limited</td>
+                    <td>Impractical</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 4 -->
+    <h2 id="section-4">Silicon Photonics &mdash; Building with Light on Silicon</h2>
+
+    <p>Silicon photonics is the technology that makes optical interconnects viable at data center scale. The core idea is elegant: use the same silicon fabrication infrastructure that produces billions of transistors to build optical components &mdash; waveguides that channel light, modulators that encode data onto light, splitters that divide optical signals, and couplers that combine them. Because these components are built on standard silicon wafers using CMOS-compatible processes, they inherit the semiconductor industry's greatest strengths: massive scale, tight dimensional control, high yield, and relentless cost reduction through Moore's Law-adjacent improvements.</p>
+
+    <p>The advantages of silicon photonics for data center interconnects are substantial. A single silicon photonic chip can integrate dozens of modulators, photodetectors, multiplexers, and waveguides on a die smaller than a fingernail. The bandwidth density &mdash; bits per second per square millimeter &mdash; far exceeds what is achievable with discrete optical components. The integration also reduces packaging complexity, lowers assembly cost, and improves reliability by eliminating discrete component interconnections that can fail. For NVIDIA's CPO vision, silicon photonics provides the high-density optical engine that sits next to the switch ASIC.</p>
+
+    <p>But silicon photonics has a fundamental limitation that explains why NVIDIA needs Lumentum and Coherent. Silicon is an indirect bandgap semiconductor. In physics terms, this means that an electron transitioning from the conduction band to the valence band in silicon cannot efficiently emit a photon because the transition requires a simultaneous change in momentum (phonon assistance). The result is that silicon is inherently poor at generating coherent light &mdash; you cannot make an efficient laser from silicon alone. This is the "silicon laser gap" that the entire industry has been working around for decades.</p>
+
+    <div class="a22-insight-box">
+        <h4><i class="fas fa-atom"></i> Why Silicon Cannot Lase Efficiently</h4>
+        <p>Laser operation requires stimulated emission, where photons trigger the emission of identical photons. In direct bandgap materials like Indium Phosphide (InP) and Gallium Arsenide (GaAs), electron-hole recombination directly produces photons with high probability. In silicon, the indirect bandgap means most recombinations produce heat (phonons) rather than light. The radiative recombination efficiency of silicon is roughly 10,000 times lower than InP. This is not an engineering problem to be solved with better design &mdash; it is a fundamental property of the crystal structure. This is precisely why NVIDIA needs III-V semiconductor companies like Lumentum and Coherent to supply the laser sources.</p>
+    </div>
+
+    <!-- Section 5 -->
+    <h2 id="section-5">Co-Packaged Optics &mdash; The Architecture Shift</h2>
+
+    <p>To understand why co-packaged optics is transformative, you need to understand the architecture it replaces. In today's pluggable optics model, the switch ASIC sits in the center of a printed circuit board. Electrical signals travel from the ASIC through <span class="a22-stat">12+ inches</span> of PCB traces to front-panel connectors, where pluggable optical transceivers (QSFP-DD, OSFP) convert electrical signals to light. Those 12+ inches of high-speed copper trace are the problem. At 112G and 224G SerDes speeds, every inch of PCB trace introduces insertion loss, crosstalk, impedance discontinuities, and signal integrity challenges that require power-hungry retimers, CDRs (clock and data recovery), and DSP chips to compensate.</p>
+
+    <p>Co-packaged optics inverts this architecture. Instead of sending high-speed electrical signals across the PCB to the front panel, CPO places the optical engine &mdash; containing silicon photonic modulators, photodetectors, and fiber coupling &mdash; directly adjacent to the switch ASIC on the same package substrate or interposer. The electrical trace from ASIC to optical engine shrinks from 12+ inches to less than half an inch. At that distance, the signal integrity challenges largely disappear. You can eliminate retimers. You can reduce or eliminate the DSP in the optical engine. Power consumption drops dramatically because you are no longer burning watts to push signals through lossy copper over long distances.</p>
+
+    <div class="a22-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Characteristic</th>
+                    <th>Pluggable Optics</th>
+                    <th>Co-Packaged Optics (CPO)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Electrical Trace Length</td>
+                    <td>12-18 inches (PCB to front panel)</td>
+                    <td>&lt;0.5 inch (package-level)</td>
+                </tr>
+                <tr>
+                    <td>Power per 800G Port</td>
+                    <td>~16-20W (including retimers)</td>
+                    <td>~8-10W (estimated)</td>
+                </tr>
+                <tr>
+                    <td>Latency (Electrical Path)</td>
+                    <td>~5-8ns trace delay</td>
+                    <td>~0.2-0.5ns trace delay</td>
+                </tr>
+                <tr>
+                    <td>Serviceability</td>
+                    <td>Hot-pluggable at front panel</td>
+                    <td>Requires ELS for laser servicing</td>
+                </tr>
+                <tr>
+                    <td>Bandwidth Density</td>
+                    <td>Limited by front-panel area</td>
+                    <td>Limited by package area (much denser)</td>
+                </tr>
+                <tr>
+                    <td>Signal Integrity</td>
+                    <td>Retimers/CDR needed per port</td>
+                    <td>Direct drive possible</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td>System Bandwidth (per switch)</td>
+                    <td>~102.4 Tb/s practical</td>
+                    <td>409.6 Tb/s (NVIDIA Spectrum-X)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The benefits compound at system level. A CPO-enabled switch that consumes 40% less power per port can support 2-4 times more bandwidth in the same thermal envelope. That means fewer switches, fewer cables, fewer racks, and less cooling infrastructure for the same aggregate fabric bandwidth. For a 100,000-GPU AI factory, the difference between pluggable and CPO architectures can translate to millions of dollars in annual power savings and significant reductions in physical footprint. This is why NVIDIA is building its next-generation networking platforms &mdash; Spectrum-X Photonics and Quantum-X Photonics &mdash; around CPO from the ground up.</p>
+
+    <!-- Section 6 -->
+    <h2 id="section-6">External Laser Source &mdash; The Serviceability Solution</h2>
+
+    <p>Co-packaged optics solves the performance problem, but it introduces an operational challenge that data center engineers immediately recognize: what happens when a laser fails? In pluggable optics, a failed transceiver is a 30-second swap at the front panel &mdash; pull the old QSFP, insert a new one, link comes back up. With CPO, the optical engine is bonded to the switch package. You cannot hot-swap it without replacing the entire switch board, which is a dramatically more expensive and disruptive operation.</p>
+
+    <p>External Laser Source (ELS) is the architectural solution to this problem. Instead of integrating the laser diode directly into the optical engine, CPO with ELS separates the light source into a standalone, replaceable module. The ELS module &mdash; containing continuous-wave (CW) lasers that produce unmodulated light &mdash; connects to the optical engine via fiber. The optical engine contains only the modulators, photodetectors, and passive components. If a laser fails, you replace the ELS module without touching the switch package. If the optical engine fails (much less likely since it contains no active light sources), only then do you need a board replacement.</p>
+
+    <p>ELS also solves a thermal management challenge. Lasers are highly sensitive to temperature &mdash; their wavelength drifts, output power decreases, and lifetime shortens as junction temperature increases. Placing a laser directly adjacent to a 500W+ switch ASIC creates thermal coupling that is extremely difficult to manage. ELS moves the laser to a location where thermal management is more tractable &mdash; potentially in a separate module with its own heatsink, away from the ASIC thermal zone. Additionally, a single ELS module can supply light to multiple optical engines through fiber splitting, improving redundancy and reducing component count.</p>
+
+    <div class="a22-insight-box">
+        <h4><i class="fas fa-wrench"></i> Operations Perspective: ELS Changes the Maintenance Model</h4>
+        <p>For data center operations teams, ELS represents a middle ground between pluggable simplicity and CPO performance. Expect to see ELS modules housed in dedicated slots on the switch board or in external enclosures, with monitoring systems that track laser power output, wavelength stability, and predicted remaining lifetime. Smart ELS management will enable predictive replacement before failure &mdash; a significant improvement over the reactive "transceiver failed, replace it" model that dominates today. This is critical for AI factories where any link failure can disrupt a training job running across thousands of GPUs.</p>
+    </div>
+
+    <!-- Section 7 -->
+    <h2 id="section-7">Micro Ring Modulators and 200G Per Wavelength</h2>
+
+    <p>At the heart of NVIDIA's silicon photonic optical engine is the micro ring modulator &mdash; a device that is deceptively simple in concept but extraordinarily demanding in execution. A micro ring modulator is a tiny circular waveguide, typically 5-20 micrometers in diameter, positioned adjacent to a bus waveguide. When the ring's resonant frequency matches the wavelength of light passing through the bus waveguide, light couples into the ring and is absorbed or diverted. By electrically modulating the ring's refractive index &mdash; using carrier injection or depletion in the silicon &mdash; you shift its resonant frequency, effectively turning the coupling on and off. This modulates the light passing through the bus waveguide, encoding data at rates up to <span class="a22-stat">200 Gbps PAM4</span> per wavelength.</p>
+
+    <p>The appeal of micro ring modulators for CPO is their extreme compactness and energy efficiency. A Mach-Zehnder modulator (the traditional approach) requires millimeters of waveguide length and consumes significant power to drive long phase-shifting arms. A micro ring modulator achieves modulation in a footprint measured in tens of square micrometers, with drive voltages under 2V and energy consumption in the low hundreds of femtojoules per bit. When you need to pack 32 or 64 modulator channels onto a single optical engine die sitting next to a switch ASIC, this size and power advantage is decisive.</p>
+
+    <p>The engineering challenges, however, are formidable. Micro ring modulators are extremely sensitive to temperature &mdash; a one-degree Celsius change shifts the resonant wavelength by approximately 0.08 nm, which at 200G PAM4 data rates can push the operating point outside the eye mask. This means every ring needs active thermal tuning, which adds control circuitry and consumes power that partially offsets the modulator's inherent efficiency advantage. Process variations in silicon fabrication also affect ring dimensions and therefore resonant wavelengths, requiring per-ring calibration at manufacturing. NVIDIA's collaboration with TSMC on advanced silicon photonics packaging is aimed at solving exactly these manufacturability and yield challenges at the scale needed for millions of optical engines per year.</p>
+
+    <div class="a22-warning-box">
+        <h4><i class="fas fa-thermometer-half"></i> Temperature Sensitivity in Production</h4>
+        <p>In a production data center environment, the switch ASIC adjacent to the optical engine can experience temperature swings of 10-20&deg;C during workload transitions. Each degree shifts every micro ring's resonance. The thermal tuning system must track and compensate these shifts in real time, for every ring, with sub-nanosecond response times. This is one of the hardest engineering problems in CPO &mdash; and one reason why ELS (which moves the thermally sensitive laser away from the ASIC) is essential for practical deployment.</p>
+    </div>
+
+    <!-- Section 8 -->
+    <h2 id="section-8">Why Lumentum &mdash; The Light Source Backbone</h2>
+
+    <p>Lumentum Holdings is not a household name outside the photonics industry, but within it, the company holds a position of strategic importance. Lumentum is one of the world's leading manufacturers of semiconductor lasers, with deep expertise in Indium Phosphide (InP) epitaxial growth, laser diode fabrication, and optical subsystem integration. Their product portfolio spans continuous-wave (CW) lasers for silicon photonics, ultra-high-power (UHP) pump lasers, distributed feedback (DFB) lasers, tunable lasers, and External Laser Source (ELS) modules specifically designed for co-packaged optics applications.</p>
+
+    <p>For NVIDIA, Lumentum solves the most fundamental problem in the CPO stack: generating stable, high-quality light. Silicon photonic optical engines need a continuous wave of laser light at precise wavelengths to function. That light must be spectrally pure (narrow linewidth), power-stable (consistent output over temperature and aging), wavelength-accurate (matching the micro ring modulator resonances), and deliverable through fiber with minimal loss. Lumentum's CW and UHP laser platforms are specifically designed for these requirements, with performance specifications that have been refined over years of datacom and telecom deployment.</p>
+
+    <p>Beyond basic laser sources, Lumentum brings two additional capabilities that make the investment strategic. First, their ELS module development is directly aligned with NVIDIA's CPO architecture &mdash; these are purpose-built, field-replaceable laser modules designed to supply light to co-packaged optical engines. Second, Lumentum has optical circuit switch technology that could enable future reconfigurable optical fabrics &mdash; networks where the physical topology can be changed in real time by switching light paths. For NVIDIA's vision of AI factories with millions of GPUs, reconfigurable optical switching could be a game-changing capability for dynamically allocating bandwidth to different training and inference jobs.</p>
+
+    <div class="a22-company-grid">
+        <div class="a22-company-card">
+            <h4><i class="fas fa-bolt"></i> Lumentum &mdash; Light Source Specialist</h4>
+            <p>Core strengths in CW/UHP lasers, InP photonics, ELS modules, and optical circuit switching. Primary role: providing the stable, high-quality laser light that silicon photonic engines need to operate. Purpose-built ELS solutions for CPO serviceability.</p>
+            <div class="a22-deal-stat"><span>Investment</span><span>$2.0B</span></div>
+            <div class="a22-deal-stat"><span>Structure</span><span>Series A Preferred</span></div>
+            <div class="a22-deal-stat"><span>Key Tech</span><span>CW/UHP Lasers, ELS</span></div>
+            <div class="a22-deal-stat"><span>Exclusivity</span><span>Nonexclusive</span></div>
+        </div>
+        <div class="a22-company-card">
+            <h4><i class="fas fa-microchip"></i> Coherent &mdash; Full Optical Stack</h4>
+            <p>Broad portfolio spanning transceivers, VCSELs, InP DMLs/EMLs, CW lasers, silicon photonics, TIAs, drivers, and five CPO-enabling product families. Primary role: comprehensive optical subsystem capability across multiple technology nodes.</p>
+            <div class="a22-deal-stat"><span>Investment</span><span>$2.0B</span></div>
+            <div class="a22-deal-stat"><span>Structure</span><span>Common Stock</span></div>
+            <div class="a22-deal-stat"><span>Key Tech</span><span>SiPh, Transceivers, CPO</span></div>
+            <div class="a22-deal-stat"><span>Exclusivity</span><span>Nonexclusive</span></div>
+        </div>
+    </div>
+
+    <!-- Section 9 -->
+    <h2 id="section-9">Why Coherent &mdash; The Broad Optical Stack</h2>
+
+    <p>If Lumentum is the laser specialist, Coherent Corp. is the optical generalist with depth everywhere that matters. Coherent's product catalog reads like a comprehensive inventory of everything the optical networking industry needs: pluggable transceivers from 100G to 1.6T, Gallium Arsenide (GaAs) vertical-cavity surface-emitting lasers (VCSELs) for short-reach links, Indium Phosphide directly modulated lasers (DMLs) and externally modulated lasers (EMLs), CW lasers for silicon photonics, silicon photonic integrated circuits, transimpedance amplifiers (TIAs), modulator drivers, and passive optical components. This breadth is precisely what NVIDIA needs in a second strategic partner.</p>
+
+    <p>The Coherent SEC filing accompanying the NVIDIA investment reveals critical details about the scope of the collaboration. Beyond existing product families, Coherent disclosed that it is developing <span class="a22-stat">five additional CPO-related product families</span> as part of the NVIDIA partnership. While specifics are not public, the filing indicates these span the full CPO subsystem stack: optical engines, laser sources, packaging solutions, and test/characterization tools. Coherent is also actively shipping 1.6T silicon photonics transceivers, 200G VCSELs for short-reach AI cluster interconnects, and 224 Gbps quad transimpedance amplifiers &mdash; all components that feed directly into NVIDIA's photonics roadmap.</p>
+
+    <p>A critical differentiator in Coherent's portfolio is protocol agnosticism. Their transceiver and optical engine designs support Ethernet, InfiniBand, and NVLink protocols &mdash; the three primary networking fabrics in NVIDIA AI clusters. This means NVIDIA can use Coherent components across its entire networking stack: Spectrum-X (Ethernet), Quantum-X (InfiniBand), and NVLink network interconnects. Having a single optical supplier that can serve all three protocols simplifies qualification, reduces inventory complexity, and enables design reuse across product lines.</p>
+
+    <div class="a22-insight-box">
+        <h4><i class="fas fa-project-diagram"></i> Five CPO Product Families</h4>
+        <p>Coherent's SEC filing mentions five CPO-related product families under development for the NVIDIA partnership. While the specific product definitions are not public, industry context suggests these likely include: (1) CPO optical engines for switch ASICs, (2) External Laser Source modules, (3) silicon photonic integrated circuits for high-density modulation, (4) advanced packaging solutions for chip-to-optical coupling, and (5) test and monitoring components for production-scale CPO deployment. This breadth positions Coherent as a one-stop optical subsystem provider for NVIDIA's CPO platforms.</p>
+    </div>
+
+    <!-- Section 10 -->
+    <h2 id="section-10">Lumentum vs Coherent &mdash; Complementary Roles</h2>
+
+    <p>Understanding why NVIDIA needs both Lumentum and Coherent &mdash; rather than consolidating on a single supplier &mdash; requires looking at where their capabilities overlap and where they diverge. The two companies are not interchangeable. They occupy complementary positions in the photonics value chain, and NVIDIA's dual investment exploits this complementarity deliberately.</p>
+
+    <div class="a22-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Capability</th>
+                    <th>Lumentum</th>
+                    <th>Coherent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>CW Lasers for SiPh</td>
+                    <td>Core strength, UHP class</td>
+                    <td>Available, broad portfolio</td>
+                </tr>
+                <tr>
+                    <td>External Laser Source (ELS)</td>
+                    <td>Purpose-built modules</td>
+                    <td>Developing (CPO families)</td>
+                </tr>
+                <tr>
+                    <td>Silicon Photonic ICs</td>
+                    <td>Limited</td>
+                    <td>Active development, 1.6T</td>
+                </tr>
+                <tr>
+                    <td>Pluggable Transceivers</td>
+                    <td>Selective portfolio</td>
+                    <td>Full range 100G-1.6T</td>
+                </tr>
+                <tr>
+                    <td>VCSELs (Short-Reach)</td>
+                    <td>Not primary focus</td>
+                    <td>200G GaAs VCSELs</td>
+                </tr>
+                <tr>
+                    <td>InP Laser Fabrication</td>
+                    <td>World-class epitaxy</td>
+                    <td>DML, EML, CW platforms</td>
+                </tr>
+                <tr>
+                    <td>Optical Circuit Switching</td>
+                    <td>Active development</td>
+                    <td>Not primary focus</td>
+                </tr>
+                <tr>
+                    <td>TIA / Driver ICs</td>
+                    <td>Not primary focus</td>
+                    <td>224G quad TIA shipping</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td>CPO Product Families</td>
+                    <td>ELS-focused</td>
+                    <td>5 families in development</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The strategic logic of dual-sourcing extends beyond technical complementarity. From a supply chain perspective, having two suppliers for critical photonic components prevents any single vendor from becoming a bottleneck. If Lumentum has a fab issue, Coherent can increase deliveries of CW lasers. If Coherent's silicon photonic yield drops, Lumentum's optical engines can fill the gap. From a negotiating perspective, dual-sourcing gives NVIDIA leverage &mdash; neither supplier has monopoly pricing power. From a co-design perspective, NVIDIA can run parallel development tracks with both partners, selecting the best technology for each application rather than being locked into a single approach.</p>
+
+    <p>Perhaps most importantly, the dual investment gives NVIDIA design optionality. Different products in NVIDIA's networking lineup may benefit from different optical approaches. NVLink interconnects within a server might use Coherent's 200G VCSELs for ultra-short reach. Rack-to-rack links might use Lumentum's ELS modules with silicon photonic engines for CPO. Data center interconnect (DCI) links might use Coherent's coherent transceivers for long-reach connections. By investing in both companies, NVIDIA ensures it has access to every optical technology it might need across its entire product portfolio.</p>
+
+    <!-- Section 11: Calculator -->
+    <h2 id="section-11">AI Factory Interconnect Analyzer</h2>
+
+    <p>To illustrate the engineering trade-offs between copper, pluggable optics, and co-packaged optics at scale, I have built an interactive analyzer below. Input your cluster parameters and the tool will calculate power consumption, reach feasibility, annual energy cost, and latency for each interconnect technology. The comparison highlights why CPO becomes increasingly advantageous as clusters grow larger and port speeds increase.</p>
+
+    <div class="a22-calculator" id="a22Calc">
+        <h3><i class="fas fa-chart-bar"></i> AI Factory Interconnect Analyzer</h3>
+        <p class="calc-subtitle">Compare copper DAC, pluggable optics, and co-packaged optics for your AI cluster configuration.</p>
+
+        <!-- Toolbar -->
+        <div class="a22-toolbar">
+            <div class="a22-mode-bar">
+                <button class="a22-toolbar-btn a22-btn-free active" onclick="a22SetMode('free')"><i class="fas fa-chart-line"></i> Free</button>
+                <button class="a22-toolbar-btn a22-btn-pro" onclick="a22SetMode('pro')"><i class="fas fa-crown"></i> Pro</button>
+            </div>
+        </div>
+
+        <div class="a22-calc-grid">
+            <!-- Input Panel -->
+            <div class="a22-input-panel">
+                <div class="a22-input-group">
+                    <label>GPU Count <span class="a22-tip" title="Total GPUs in your AI training cluster">?</span></label>
+                    <input type="number" id="a22GpuCount" value="8192" min="1000" max="1000000" step="1000">
+                </div>
+                <div class="a22-input-group">
+                    <label>GPUs per Rack <span class="a22-tip" title="Number of GPUs per rack unit">?</span></label>
+                    <input type="number" id="a22GpuPerRack" value="8" min="4" max="16" step="1">
+                </div>
+                <div class="a22-input-group">
+                    <label>Port Speed <span class="a22-tip" title="Network port speed per link">?</span></label>
+                    <select id="a22PortSpeed">
+                        <option value="200">200G</option>
+                        <option value="400">400G</option>
+                        <option value="800" selected>800G</option>
+                        <option value="1600">1.6T</option>
+                    </select>
+                </div>
+                <div class="a22-input-group">
+                    <label>Avg Link Distance (m) <span class="a22-tip" title="Average cable length between connected devices">?</span></label>
+                    <input type="number" id="a22LinkDist" value="5" min="1" max="2000" step="1">
+                </div>
+                <div class="a22-input-group">
+                    <label>Electricity Cost ($/kWh) <span class="a22-tip" title="Your facility electricity rate">?</span></label>
+                    <input type="number" id="a22ElecCost" value="0.10" min="0.01" max="0.50" step="0.01">
+                </div>
+                <button class="a22-calc-btn" onclick="a22Calculate()"><i class="fas fa-bolt"></i> Analyze Interconnect</button>
+                <button class="a22-reset-btn" onclick="a22Reset()">Reset to Defaults</button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="a22-results-panel">
+                <div class="a22-tech-columns" id="a22TechColumns">
+                    <!-- Copper -->
+                    <div class="a22-tech-card copper" id="a22CardCopper">
+                        <div class="a22-tech-icon"><i class="fas fa-plug"></i></div>
+                        <div class="a22-tech-name">Copper DAC</div>
+                        <div class="a22-metric"><span class="a22-metric-label">Power/Link</span><span class="a22-metric-value" id="a22CopperPower">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Max Reach</span><span class="a22-metric-value" id="a22CopperReach">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Feasible</span><span class="a22-metric-value" id="a22CopperFeasible">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Annual Cost</span><span class="a22-metric-value" id="a22CopperCost">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Latency</span><span class="a22-metric-value" id="a22CopperLatency">--</span></div>
+                    </div>
+                    <!-- Pluggable -->
+                    <div class="a22-tech-card pluggable" id="a22CardPluggable">
+                        <div class="a22-tech-icon"><i class="fas fa-hdd"></i></div>
+                        <div class="a22-tech-name">Pluggable Optics</div>
+                        <div class="a22-metric"><span class="a22-metric-label">Power/Link</span><span class="a22-metric-value" id="a22PlugPower">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Max Reach</span><span class="a22-metric-value" id="a22PlugReach">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Feasible</span><span class="a22-metric-value" id="a22PlugFeasible">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Annual Cost</span><span class="a22-metric-value" id="a22PlugCost">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Latency</span><span class="a22-metric-value" id="a22PlugLatency">--</span></div>
+                    </div>
+                    <!-- CPO -->
+                    <div class="a22-tech-card cpo" id="a22CardCpo">
+                        <div class="a22-tech-icon"><i class="fas fa-sun"></i></div>
+                        <div class="a22-tech-name">Co-Packaged Optics</div>
+                        <div class="a22-metric"><span class="a22-metric-label">Power/Link</span><span class="a22-metric-value" id="a22CpoPower">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Max Reach</span><span class="a22-metric-value" id="a22CpoReach">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Feasible</span><span class="a22-metric-value" id="a22CpoFeasible">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Annual Cost</span><span class="a22-metric-value" id="a22CpoCost">--</span></div>
+                        <div class="a22-metric"><span class="a22-metric-label">Latency</span><span class="a22-metric-value" id="a22CpoLatency">--</span></div>
+                    </div>
+                </div>
+
+                <!-- Verdict -->
+                <div class="a22-verdict" id="a22Verdict">
+                    <div class="a22-verdict-title">Analysis Verdict</div>
+                    <div class="a22-verdict-text" id="a22VerdictText">Configure your cluster and click Analyze</div>
+                    <div class="a22-verdict-detail" id="a22VerdictDetail">Enter your AI cluster parameters and select a port speed to compare interconnect technologies.</div>
+                </div>
+
+                <!-- Pro Panel -->
+                <div class="a22-pro-panel gated" id="a22ProPanel">
+                    <div class="a22-gate-overlay" onclick="a22ShowLogin()">
+                        <i class="fas fa-lock"></i>
+                        <span>Sign in for Pro Analysis</span>
+                    </div>
+                    <div class="a22-panel-inner">
+                        <div class="a22-panel-title"><i class="fas fa-crown"></i> Pro Sensitivity Analysis</div>
+                        <div class="a22-pro-grid" id="a22ProGrid">
+                            <div class="a22-pro-kpi">
+                                <div class="kpi-label">TCO 5-Year</div>
+                                <div class="kpi-value" id="a22ProTco" style="color:#22d3ee;">--</div>
+                            </div>
+                            <div class="a22-pro-kpi">
+                                <div class="kpi-label">Rack Space Saved</div>
+                                <div class="kpi-value" id="a22ProRacks" style="color:#a855f7;">--</div>
+                            </div>
+                            <div class="a22-pro-kpi">
+                                <div class="kpi-label">Deploy Time Delta</div>
+                                <div class="kpi-value" id="a22ProDeploy" style="color:#f59e0b;">--</div>
+                            </div>
+                            <div class="a22-pro-kpi">
+                                <div class="kpi-label">CPO Power Savings</div>
+                                <div class="kpi-value" id="a22ProSavings" style="color:#22c55e;">--</div>
+                            </div>
+                        </div>
+                        <div class="a22-pro-narrative" id="a22ProNarrative">
+                            <p>Pro analysis provides Monte Carlo sensitivity modeling across electricity cost ranges, link distance distributions, and failure rate scenarios. <strong>Sign in to unlock detailed TCO projections</strong> including rack space reduction, deployment timeline impact, and cumulative power savings over a 5-year operational horizon.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="a22-disclaimer">
+            <strong>Disclaimer:</strong> This calculator provides engineering estimates based on publicly available specifications and industry benchmarks. Actual performance varies by vendor, configuration, environmental conditions, and deployment specifics. Not intended for procurement decisions &mdash; consult vendor datasheets and conduct lab testing for production deployments. Power figures include both transmit and receive sides of each link.
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="a22-login-overlay" id="a22LoginOverlay">
+        <div class="a22-login-box">
+            <button class="a22-login-close" onclick="a22CloseLogin()">&times;</button>
+            <h3><i class="fas fa-lock"></i> Pro Analysis Access</h3>
+            <p>Sign in to unlock detailed TCO projections, sensitivity analysis, and deployment timeline modeling.</p>
+            <input type="email" id="a22LoginEmail" placeholder="Email address">
+            <input type="password" id="a22LoginPass" placeholder="Password">
+            <button class="a22-login-submit" onclick="a22DoLogin()">Sign In</button>
+            <div class="a22-login-error" id="a22LoginError">Invalid credentials. Please try again.</div>
+            <div class="a22-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+            <div class="a22-login-terms">By signing in you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+        </div>
+    </div>
+
+    <!-- Section 12 -->
+    <h2 id="section-12">Jensen's AI Factory Framework</h2>
+
+    <p>To understand why NVIDIA is investing $4 billion in photonics, you need to understand Jensen Huang's "AI factory" concept &mdash; a framework that redefines data centers as industrial production facilities. In Jensen's model, an AI factory has three components: inputs (data, energy, capital), process (training, inference, reasoning), and outputs (models, tokens, intelligence). The factory metaphor is not rhetorical. It is an operational philosophy that treats every component &mdash; from GPU silicon to network cables to cooling systems &mdash; as part of an integrated production system that must be optimized holistically.</p>
+
+    <div class="quote-callout">
+        <blockquote>"The data center is the new unit of compute. You don't buy a GPU &mdash; you buy a factory. And a factory is only as good as its slowest production line."</blockquote>
+        <cite>&mdash; Jensen Huang, NVIDIA GTC 2025 Keynote</cite>
+    </div>
+
+    <p>When you operate a factory, you do not optimize one machine in isolation. You optimize the entire production line. Jensen's "extreme codesign" philosophy applies this principle to AI infrastructure: CPU, GPU, NVLink, NIC, DPU, switch ASIC, networking software, storage, and now photonics are all co-designed as a unified system. Each component is specified not just for its individual performance, but for how it enables or constrains the components around it. The switch ASIC is designed around the optical engine. The optical engine is designed around the laser source. The laser source is designed around the thermal envelope. Everything connects.</p>
+
+    <p>The metrics that define success in Jensen's framework are factory-level, not component-level: cost per token, training time to convergence, tokens generated per watt, cluster uptime, mean time to repair, deployment velocity (time from power-on to first training job), and aggregate throughput at full cluster scale. Photonics directly impacts nearly every one of these metrics. Lower-power optical links reduce cost per token. Faster interconnects reduce training time. More reliable optical components improve uptime. ELS improves mean time to repair. CPO's higher bandwidth density enables faster deployment by requiring fewer switches and cables. This is why $4 billion in photonics investment is not a luxury &mdash; it is a factory optimization decision with quantifiable returns.</p>
+
+    <p>The AI factory framework also explains the dual-vendor strategy. In industrial manufacturing, single-source components are risk factors. A factory that depends on one supplier for a critical part is one supply disruption away from a production shutdown. By investing in both Lumentum and Coherent, NVIDIA applies standard industrial supply chain management to its most critical optical components. The factory must never stop. The photonic supply chain must never be a single point of failure.</p>
+
+    <div class="a22-insight-box">
+        <h4><i class="fas fa-industry"></i> Factory Metrics: Where Photonics Fits</h4>
+        <p>Consider a 50,000-GPU AI factory running continuous training. If pluggable optics consume 16W per 800G port and CPO consumes 9W per port, the power savings across 50,000 links is approximately 350 kW continuous. At $0.10/kWh, that saves $306,600 per year in electricity alone &mdash; before accounting for the reduced cooling load (another ~$120,000/year at typical PUE). Over a 5-year facility lifecycle, photonics optimization in a single facility can save over $2 million. Across NVIDIA's hyperscaler customer base operating hundreds of such facilities, the aggregate savings justify the $4 billion investment many times over.</p>
+    </div>
+
+    <!-- The Bigger Picture -->
+    <h2 id="section-13">The Bigger Picture</h2>
+
+    <p>NVIDIA's $4 billion photonics investment is not about optics. It is about ensuring that the post-Moore's Law era of computing does not bottleneck at the interconnect layer. As individual GPU performance continues to scale &mdash; each generation delivering 2-3x more FLOPS &mdash; the network must scale proportionally. If it does not, the most powerful GPUs in the world become the most expensive space heaters, burning hundreds of watts while waiting for data that cannot arrive fast enough through copper traces and pluggable transceivers designed for a different era of computing.</p>
+
+    <p>Lumentum provides the light source backbone: CW lasers, UHP lasers, and ELS modules that generate the stable, high-quality photons silicon photonic engines need to operate. Coherent provides the broader optical subsystem stack: transceivers, VCSELs, silicon photonic ICs, driver electronics, and five CPO-specific product families that span the entire optical signal chain from laser to detector. Together, they give NVIDIA complete coverage of the photonic supply chain, with redundancy at every critical node.</p>
+
+    <p>The deeper strategic insight is that NVIDIA is building a vertically integrated AI factory platform. They already control the compute (GPUs), the high-speed interconnect protocol (NVLink), the networking silicon (Spectrum/Quantum switch ASICs), the networking software (NCCL, DOCA), and the system architecture (DGX/HGX). With the Lumentum and Coherent investments, they now influence the optical physical layer &mdash; the actual photons moving between chips. From silicon to light and back to silicon, NVIDIA is positioning itself to control every layer of the AI infrastructure stack. For data center engineers planning the next five years of AI infrastructure, the message is clear: the future of high-performance interconnects is optical, it is co-packaged, and NVIDIA intends to own it end to end.</p>
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+        <div class="author-bio-image">
+            <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
+        </div>
+        <div class="author-bio-content">
+            <h4>Bagus Dwi Permana</h4>
+            <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
+            <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
+            <div class="author-bio-links">
+                <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                </a>
+                <a href="https://github.com/baguspermana7-cpu" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                    GitHub
+                </a>
+                <a href="mailto:baguspermana7@gmail.com">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+                    Email
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Articles -->
+    <div class="related-articles">
+        <h3>Continue Reading</h3>
+        <div class="related-grid">
+            <a href="article-21.html" class="related-card">
+                <div class="related-card-number">21</div>
+                <div class="related-card-content">
+                    <h4>Nuclear SMRs for AI: The $10 Billion Bet on Atomic-Powered Data Centers</h4>
+                    <p>Big Tech's nuclear pivot analyzed. Technology comparison, cost analysis, and timeline for SMR-powered data centers.</p>
+                </div>
+            </a>
+            <a href="article-20.html" class="related-card">
+                <div class="related-card-number">20</div>
+                <div class="related-card-content">
+                    <h4>Sam Altman Says AI Water Concerns Are "Fake" &mdash; The Data Says Otherwise</h4>
+                    <p>Fact-checking Altman's claims with peer-reviewed data, interactive water calculators, and industry benchmarks.</p>
+                </div>
+            </a>
+            <a href="article-18.html" class="related-card">
+                <div class="related-card-number">18</div>
+                <div class="related-card-content">
+                    <h4>AI Infrastructure Calculator</h4>
+                    <p>Interactive tools for computing PUE, cooling requirements, and power density for AI workloads.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Article Navigation -->
+    <div class="article-nav">
+        <a href="article-21.html"><i class="fas fa-arrow-left"></i> Previous Article</a>
+        <a href="articles.html">All Articles</a>
+        <span style="color: #64748b; cursor: default;">Latest Article</span>
+    </div>
+
+</div>
+</div>
+</article>
+</main>
+
+<!-- Share Buttons -->
+<aside class="share-buttons" id="shareButtons" aria-label="Share this article">
+    <span class="share-label">Share</span>
+    <button class="share-btn linkedin" data-tooltip="Share on LinkedIn" onclick="shareLinkedIn()" aria-label="Share on LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </button>
+    <button class="share-btn twitter" data-tooltip="Share on X" onclick="shareTwitter()" aria-label="Share on X">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </button>
+    <button class="share-btn whatsapp" data-tooltip="Share on WhatsApp" onclick="shareWhatsApp()" aria-label="Share on WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </button>
+    <button class="share-btn copy" data-tooltip="Copy link" onclick="copyLink()" aria-label="Copy article link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="copy-icon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="check-icon" style="display:none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </button>
+</aside>
+
+<!-- Footer -->
+<footer class="footer footer-enhanced">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+            <div class="footer-nav">
+                <h4 class="footer-heading">NAVIGATION</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home Dashboard</a></li>
+                    <li><a href="articles.html">Technical Journal</a></li>
+                    <li><a href="index.html#case-studies">Case Studies</a></li>
+                    <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                </ul>
+            </div>
+            <div class="footer-connect">
+                <h4 class="footer-heading">CONNECT</h4>
+                <ul class="footer-links">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+                    <li><a href="articles.html">Technical Journal</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.min.js?v=2026-03-20"></script>
+
+<!-- Calculator Functions -->
+<script>
+(function() {
+    var mode = 'free';
+    var loggedIn = false;
+
+    window.a22SetMode = function(m) {
+        mode = m;
+        document.querySelector('.a22-btn-free').classList.toggle('active', m === 'free');
+        document.querySelector('.a22-btn-pro').classList.toggle('active', m === 'pro');
+        var proPanel = document.getElementById('a22ProPanel');
+        if (m === 'pro') {
+            proPanel.style.display = 'block';
+            if (!loggedIn) {
+                proPanel.classList.add('gated');
+                proPanel.querySelector('.a22-gate-overlay').style.display = 'flex';
+            } else {
+                proPanel.classList.remove('gated');
+                proPanel.querySelector('.a22-gate-overlay').style.display = 'none';
+            }
+        } else {
+            proPanel.style.display = 'none';
+        }
+        a22Calculate();
+    };
+
+    window.a22ShowLogin = function() {
+        document.getElementById('a22LoginOverlay').classList.add('show');
+    };
+
+    window.a22CloseLogin = function() {
+        document.getElementById('a22LoginOverlay').classList.remove('show');
+        document.getElementById('a22LoginError').style.display = 'none';
+    };
+
+    window.a22DoLogin = function() {
+        var u = document.getElementById('a22LoginEmail').value.trim();
+        var p = document.getElementById('a22LoginPass').value.trim();
+        if ((u === 'admin' && p === 'admin123') || (u === 'demo' && p === 'demo123')) {
+            loggedIn = true;
+            a22CloseLogin();
+            var proPanel = document.getElementById('a22ProPanel');
+            proPanel.classList.remove('gated');
+            proPanel.querySelector('.a22-gate-overlay').style.display = 'none';
+            a22Calculate();
+            try { window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { loggedIn: true } })); } catch(e) {}
+        } else {
+            var err = document.getElementById('a22LoginError');
+            err.textContent = 'Invalid credentials. Try demo / demo123';
+            err.style.display = 'block';
+        }
+    };
+
+    window.a22Reset = function() {
+        document.getElementById('a22GpuCount').value = '8192';
+        document.getElementById('a22GpuPerRack').value = '8';
+        document.getElementById('a22PortSpeed').value = '800';
+        document.getElementById('a22LinkDist').value = '5';
+        document.getElementById('a22ElecCost').value = '0.10';
+        a22Calculate();
+    };
+
+    window.a22Calculate = function() {
+        var gpuCount = parseInt(document.getElementById('a22GpuCount').value) || 8192;
+        var gpuPerRack = parseInt(document.getElementById('a22GpuPerRack').value) || 8;
+        var portSpeedG = parseInt(document.getElementById('a22PortSpeed').value) || 800;
+        var linkDist = parseFloat(document.getElementById('a22LinkDist').value) || 5;
+        var elecCost = parseFloat(document.getElementById('a22ElecCost').value) || 0.10;
+
+        var links = gpuCount;
+        var racks = Math.ceil(gpuCount / gpuPerRack);
+        var speedFactor = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[portSpeedG] || 4.5;
+
+        // Copper DAC
+        var copperMaxReach = { 200: 3, 400: 2, 800: 1, 1600: 0 }[portSpeedG] || 1;
+        var copperPowerPerLink = 0.5 * speedFactor;
+        var copperViable = linkDist <= copperMaxReach;
+        var copperLatencyNs = copperViable ? 5 * (linkDist / copperMaxReach) : 999;
+
+        // Pluggable Optics
+        var plugMaxReach = { 200: 2000, 400: 500, 800: 100, 1600: 2000 }[portSpeedG] || 100;
+        var plugPowerPerLink = 3.5 * speedFactor * 0.65;
+        var plugViable = linkDist <= plugMaxReach;
+        var plugLatencyNs = 50 + (linkDist * 0.005);
+
+        // CPO
+        var cpoMaxReach = 100;
+        var cpoPowerPerLink = 1.0 * speedFactor * 0.55;
+        var cpoViable = linkDist <= cpoMaxReach;
+        var cpoLatencyNs = 10 + (linkDist * 0.005);
+
+        var copperAnnual = copperViable ? (links * copperPowerPerLink * 8760 * elecCost / 1000) : 0;
+        var plugAnnual = plugViable ? (links * plugPowerPerLink * 8760 * elecCost / 1000) : 0;
+        var cpoAnnual = cpoViable ? (links * cpoPowerPerLink * 8760 * elecCost / 1000) : 0;
+
+        function fmt(n) { return n >= 1000000 ? (n/1000000).toFixed(1) + 'M' : n >= 1000 ? (n/1000).toFixed(1) + 'K' : n.toFixed(1); }
+        function fmtCurr(n) { return '$' + (n >= 1000000 ? (n/1000000).toFixed(2) + 'M' : n >= 1000 ? (n/1000).toFixed(1) + 'K' : n.toFixed(0)); }
+
+        // Update Copper card
+        document.getElementById('a22CopperPower').textContent = copperViable ? copperPowerPerLink.toFixed(1) + ' W' : 'N/A';
+        document.getElementById('a22CopperReach').textContent = copperMaxReach > 0 ? copperMaxReach + ' m' : 'N/A';
+        document.getElementById('a22CopperCost').textContent = copperViable ? fmtCurr(copperAnnual) + '/yr' : 'N/A';
+        document.getElementById('a22CopperLatency').textContent = copperViable ? copperLatencyNs.toFixed(1) + ' ns' : 'N/A';
+        document.getElementById('a22CopperFeasible').textContent = copperViable ? 'Viable' : 'Out of Range';
+        document.getElementById('a22CopperFeasible').style.color = copperViable ? '#f59e0b' : '#ef4444';
+
+        // Update Pluggable card
+        document.getElementById('a22PlugPower').textContent = plugViable ? plugPowerPerLink.toFixed(1) + ' W' : 'N/A';
+        document.getElementById('a22PlugReach').textContent = plugMaxReach + ' m';
+        document.getElementById('a22PlugCost').textContent = plugViable ? fmtCurr(plugAnnual) + '/yr' : 'N/A';
+        document.getElementById('a22PlugLatency').textContent = plugViable ? plugLatencyNs.toFixed(1) + ' ns' : 'N/A';
+        document.getElementById('a22PlugFeasible').textContent = plugViable ? 'Viable' : 'Out of Range';
+        document.getElementById('a22PlugFeasible').style.color = plugViable ? '#a855f7' : '#ef4444';
+
+        // Update CPO card
+        document.getElementById('a22CpoPower').textContent = cpoViable ? cpoPowerPerLink.toFixed(1) + ' W' : 'N/A';
+        document.getElementById('a22CpoReach').textContent = cpoMaxReach + ' m';
+        document.getElementById('a22CpoCost').textContent = cpoViable ? fmtCurr(cpoAnnual) + '/yr' : 'N/A';
+        document.getElementById('a22CpoLatency').textContent = cpoViable ? cpoLatencyNs.toFixed(1) + ' ns' : 'N/A';
+        document.getElementById('a22CpoFeasible').textContent = cpoViable ? 'Optimal' : 'Out of Range';
+        document.getElementById('a22CpoFeasible').style.color = cpoViable ? '#22d3ee' : '#ef4444';
+
+        // Highlight winner
+        var cards = document.querySelectorAll('.a22-tech-card');
+        cards.forEach(function(c) { c.classList.remove('winner'); });
+        if (cpoViable) {
+            document.querySelector('.a22-tech-card.cpo').classList.add('winner');
+        } else if (plugViable) {
+            document.querySelector('.a22-tech-card.pluggable').classList.add('winner');
+        }
+
+        // Verdict
+        var verdictText = '';
+        var verdictDetail = '';
+        if (cpoViable && plugViable) {
+            var savings = plugAnnual - cpoAnnual;
+            var pctSave = plugAnnual > 0 ? ((savings / plugAnnual) * 100).toFixed(0) : 0;
+            verdictText = 'CPO saves ' + fmtCurr(savings) + '/year vs pluggable (' + pctSave + '% reduction)';
+            verdictDetail = 'At ' + portSpeedG + 'G with ' + fmt(gpuCount) + ' GPUs across ' + racks + ' racks, co-packaged optics delivers ' + pctSave + '% power savings with ' + ((plugLatencyNs - cpoLatencyNs) / plugLatencyNs * 100).toFixed(0) + '% lower latency. For AI training clusters, this translates directly to faster collective communication and lower cost per token.';
+        } else if (copperViable) {
+            verdictText = 'Copper DAC viable at ' + linkDist + 'm — lowest cost for short reach';
+            verdictDetail = 'At this distance, copper remains the most economical option. However, copper will not scale beyond ' + copperMaxReach + 'm at ' + portSpeedG + 'G.';
+        } else if (plugViable) {
+            verdictText = 'Pluggable optics required — distance exceeds CPO reach';
+            verdictDetail = 'At ' + linkDist + 'm link distance, pluggable optics is the only viable option. CPO is limited to ~100m.';
+        } else {
+            verdictText = 'No viable interconnect for this configuration';
+            verdictDetail = 'Check your link distance and port speed parameters.';
+        }
+        document.getElementById('a22VerdictText').textContent = verdictText;
+        document.getElementById('a22VerdictDetail').textContent = verdictDetail;
+
+        // Pro mode KPIs
+        if (mode === 'pro' && loggedIn) {
+            var tco5yr = cpoViable ? cpoAnnual * 5 * 1.15 : plugAnnual * 5 * 1.3;
+            var rackSavings = cpoViable ? Math.round(racks * 0.12) : 0;
+            var deployDelta = cpoViable ? '-30%' : 'Baseline';
+            document.getElementById('a22ProTco').textContent = fmtCurr(tco5yr);
+            document.getElementById('a22ProRacks').textContent = rackSavings > 0 ? rackSavings + ' racks' : '0';
+            document.getElementById('a22ProDeploy').textContent = deployDelta;
+            document.getElementById('a22ProNarrative').innerHTML = 'For a <strong>' + fmt(gpuCount) + ' GPU</strong> cluster at <strong>' + portSpeedG + 'G</strong> port speed, CPO architecture reduces total network power by approximately <strong>' + (plugViable && cpoViable ? ((1 - cpoPowerPerLink/plugPowerPerLink) * 100).toFixed(0) : '0') + '%</strong> compared to pluggable optics. Over 5 years, this translates to a TCO of <strong>' + fmtCurr(tco5yr) + '</strong> including hardware refresh cycles. The rack space savings of <strong>' + rackSavings + ' racks</strong> frees capacity for additional GPU density, directly improving compute per square foot.';
+        }
+    };
+
+    // Auto-calculate on load
+    document.addEventListener('DOMContentLoaded', function() {
+        a22Calculate();
+        // Auto-calculate on input change with debounce
+        var debounceTimer;
+        var inputs = document.querySelectorAll('#a22GpuCount, #a22GpuPerRack, #a22PortSpeed, #a22LinkDist, #a22ElecCost');
+        inputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(a22Calculate, 300);
+            });
+            input.addEventListener('change', function() {
+                clearTimeout(debounceTimer);
+                a22Calculate();
+            });
+        });
+    });
+})();
+</script>
+
+<!-- Share Functions -->
+<script>
+var shareUrl = 'https://resistancezero.com/article-22.html';
+var shareTitle = "NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light";
+function shareLinkedIn(){window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(shareUrl),'_blank','width=600,height=600')}
+function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(shareUrl)+'&text='+encodeURIComponent(shareTitle),'_blank','width=600,height=400')}
+function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(shareTitle+' '+shareUrl),'_blank')}
+function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var c=document.querySelector('.share-btn.copy .copy-icon'),k=document.querySelector('.share-btn.copy .check-icon');c.style.display='none';k.style.display='block';setTimeout(function(){c.style.display='block';k.style.display='none'},2000)})}
+</script>
+
+<!-- Reading Progress Bar -->
+<script>
+(function() {
+    var bar = document.getElementById('scrollProgress');
+    if (!bar) return;
+    var ticking = false;
+    function updateProgress() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width = Math.min(pct, 100) + '%';
+        ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+        if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
+    }, { passive: true });
+    updateProgress();
+})();
+</script>
+
+<!-- TOC Sidebar -->
+<script>
+(function() {
+    var sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
+    if (!sections.length) {
+        var allH2s = document.querySelectorAll('.article-body h2, .article-content h2');
+        allH2s.forEach(function(h2, i) {
+            if (!h2.id) h2.id = 'toc-section-' + (i + 1);
+        });
+        sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
+    }
+    if (!sections.length) return;
+
+    var sidebarList = document.getElementById('tocSidebarList');
+    var mobileList = document.getElementById('tocMobileList');
+    var tocToggle = document.getElementById('tocMobileToggle');
+    var tocDrawer = document.getElementById('tocMobileDrawer');
+    var tocBackdrop = document.getElementById('tocMobileBackdrop');
+    var tocClose = document.getElementById('tocDrawerClose');
+
+    var tocData = [];
+    sections.forEach(function(h2, i) {
+        var id = h2.getAttribute('id');
+        var numMatch = id.match(/\d+/);
+        var num = numMatch ? numMatch[0] : String(i + 1);
+        var text = h2.textContent.replace(/^\s*\d+[\.\s]*/, '').trim();
+        tocData.push({ id: id, num: num, text: text });
+    });
+
+    function buildList(container, isMobile) {
+        tocData.forEach(function(item) {
+            var li = document.createElement('li');
+            if (!isMobile) li.className = 'toc-sidebar-item';
+            var a = document.createElement('a');
+            a.href = '#' + item.id;
+            a.setAttribute('data-section', item.id);
+            if (isMobile) {
+                a.textContent = item.num + '. ' + item.text;
+            } else {
+                a.className = 'toc-sidebar-link';
+                a.innerHTML = '<span class="toc-sidebar-num">' + item.num + '</span>' + item.text;
+            }
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.getElementById(item.id);
+                if (target) window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+                if (isMobile) closeMobileDrawer();
+            });
+            li.appendChild(a);
+            container.appendChild(li);
+        });
+    }
+
+    buildList(sidebarList, false);
+    buildList(mobileList, true);
+
+    var currentSection = null;
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var id = entry.target.getAttribute('id');
+                if (currentSection !== id) {
+                    currentSection = id;
+                    sidebarList.querySelectorAll('.toc-sidebar-link').forEach(function(link) {
+                        link.classList.toggle('active', link.getAttribute('data-section') === id);
+                    });
+                }
+            }
+        });
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(function(s) { observer.observe(s); });
+
+    function closeMobileDrawer() {
+        if (tocDrawer) tocDrawer.classList.remove('open');
+        if (tocBackdrop) tocBackdrop.classList.remove('visible');
+    }
+    if (tocToggle) tocToggle.addEventListener('click', function() {
+        tocDrawer.classList.toggle('open');
+        tocBackdrop.classList.toggle('visible');
+    });
+    if (tocBackdrop) tocBackdrop.addEventListener('click', closeMobileDrawer);
+    if (tocClose) tocClose.addEventListener('click', closeMobileDrawer);
+})();
+</script>
+
+<script src="auth.js?v=20260228"></script>
+</body>
+</html>
