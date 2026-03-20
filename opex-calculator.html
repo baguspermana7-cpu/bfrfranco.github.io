@@ -4704,6 +4704,29 @@
         // Apply gating on load
         setTimeout(function() { opexApplyGating(); opexUpdateNavAuth(); }, 150);
 
+        // Listen for cross-page auth changes (standard: rz-auth-change)
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.action === 'login') {
+                opexIsPremium = true;
+                opexUserTier = e.detail.tier || 'pro';
+                opexActivatePremium();
+            } else if (e.detail && e.detail.action === 'logout') {
+                opexIsPremium = false;
+                opexUserTier = 'free';
+                localStorage.removeItem('rz_premium_session');
+                var premBtn = document.getElementById('opexPremiumTabBtn');
+                premBtn.classList.remove('premium-active');
+                premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+                premBtn.style.background = '';
+                premBtn.style.borderColor = '';
+                premBtn.style.color = '';
+                document.getElementById('opexPremiumBadge').style.display = 'none';
+                switchOpexMode('simple');
+                opexApplyGating();
+                opexUpdateNavAuth();
+            }
+        });
+
         // Expose functions globally
         window.opexShowLogin = function() {
             document.getElementById('opexLoginModal').classList.add('show');
@@ -4745,6 +4768,9 @@
                 opexUserTier = match.tier;
                 opexCloseLogin();
                 opexActivatePremium();
+                window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                    detail: { email: match.email, tier: match.tier, action: 'login' }
+                }));
             } else {
                 errEl.textContent = 'Invalid email or password';
                 errEl.style.display = 'block';
@@ -4791,7 +4817,6 @@
             var premBtn = document.getElementById('opexPremiumTabBtn');
             premBtn.classList.remove('premium-active');
             premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
-            premBtn.onclick = function() { opexHandlePremiumTab(); };
             document.getElementById('opexPremiumBadge').style.display = 'none';
 
             switchOpexMode('simple');
@@ -4800,6 +4825,8 @@
 
             var dd = document.getElementById('opexNavUserDropdown');
             if (dd) dd.classList.remove('show');
+
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { action: 'logout' } }));
         };
 
         function opexActivatePremium() {
@@ -4808,8 +4835,6 @@
             premBtn.style.background = 'linear-gradient(135deg,rgba(139,92,246,0.25),rgba(139,92,246,0.1))';
             premBtn.style.borderColor = 'rgba(139,92,246,0.5)';
             premBtn.style.color = '#a78bfa';
-            premBtn.onclick = function() { opexLogout(); };
-
             var badge = document.getElementById('opexPremiumBadge');
             badge.textContent = 'PRO ACTIVE';
             badge.style.display = 'inline-flex';

@@ -1,0 +1,26 @@
+Question: How do you track data center commissioning readiness?
+
+Most teams use spreadsheets. That works until the first critical defect shows up at G4 and nobody knows how it affects the G5 timeline.
+
+The core problem is that commissioning readiness is not linear. It is gate-driven. Each gate (G0 through G7) has specific requirements, evidence items, and sign-off roles. A hard blocker at one gate prevents progression to the next. But spreadsheets do not model this cascade.
+
+After working with several commissioning programs, I built an open tool that handles this: the RFS Readiness Workbench.
+
+How it works:
+
+You define your facility archetype (enterprise, colocation, hyperscale, etc.) and delivery units. The tool loads 99 baseline requirements across 8 gates covering electrical, mechanical, fire, controls, operations, and more.
+
+For each delivery unit, the gate engine evaluates readiness by checking:
+- Hard blockers first (open critical defects, missing prior gate approval, mandatory evidence gaps, unmet overlay requirements)
+- Weighted requirement completion as a percentage
+- Readiness caps (95% max if evidence is missing, 99% if sign-offs are missing)
+
+Confidence is scored with 7 penalty terms. A fresh project starts at 100% and decreases as defects accumulate, evidence gaps remain, approvals are pending, retests are needed, or aging thresholds are exceeded.
+
+The forecast engine calculates RFS timing per delivery unit using drag components: base days (calibrated by archetype) plus delays from blockers, evidence gaps, sign-off bottlenecks, retest requirements, witness scheduling, and overlay uncertainty. Project RFS is the critical path -- the worst-performing unit determines the date.
+
+Everything runs in the browser. No backend, no data leaves your machine. You can export/import as JSON.
+
+It is free to try: resistancezero.com/rfs-readiness-workbench.html
+
+This is an engineering tool, not a product pitch. Feedback from people in the field would be genuinely useful.

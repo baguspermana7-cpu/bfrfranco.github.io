@@ -669,6 +669,115 @@
         [data-theme="dark"] .a22-calculator { background: linear-gradient(135deg, #0c0a09 0%, #0c4a6e 100%); }
         [data-theme="dark"] .a22-login-box { background: #0c0a09; }
 
+        /* ── Chart Visualizations ── */
+        .a22-charts-section { margin-top: 1.5rem; }
+        .a22-chart-section-title {
+            font-size: 0.85rem; font-weight: 700; color: #22d3ee;
+            margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .a22-chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .a22-chart-box {
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(34,211,238,0.1);
+            border-radius: 10px; padding: 1rem;
+        }
+        .a22-chart-box-title {
+            font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 0.75rem; font-weight: 600;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .a22-bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+        .a22-bar-row {
+            display: grid; grid-template-columns: 100px 1fr 80px;
+            align-items: center; gap: 0.75rem; font-size: 0.78rem;
+        }
+        .a22-bar-label { color: #94a3b8; text-align: right; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .a22-bar-track { height: 22px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+        .a22-bar-fill {
+            height: 100%; border-radius: 4px; min-width: 2px;
+            transition: width 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .a22-bar-fill.copper { background: linear-gradient(90deg, #d97706, #f59e0b); }
+        .a22-bar-fill.pluggable { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+        .a22-bar-fill.cpo { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+        .a22-bar-value {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+            color: #e2e8f0; font-weight: 600;
+        }
+        .a22-bar-na { color: #64748b !important; font-style: italic; }
+
+        /* Reach / Copper Wall */
+        .a22-reach-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .a22-reach-label { width: 100px; font-size: 0.72rem; color: #94a3b8; text-align: right; }
+        .a22-reach-track {
+            flex: 1; height: 18px; background: rgba(255,255,255,0.06);
+            border-radius: 4px; position: relative; overflow: visible;
+        }
+        .a22-reach-fill { height: 100%; border-radius: 4px; min-width: 2px; position: relative; }
+        .a22-reach-wall {
+            position: absolute; right: -1px; top: -3px; bottom: -3px; width: 3px;
+            background: #ef4444; border-radius: 2px; box-shadow: 0 0 6px rgba(239,68,68,0.6);
+        }
+        .a22-reach-value { width: 60px; font-size: 0.72rem; color: #e2e8f0; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .a22-reach-hint { font-size: 0.65rem; color: #64748b; margin-top: 0.25rem; }
+        .a22-reach-marker {
+            position: absolute; top: -3px; bottom: -3px; width: 2px;
+            border-radius: 1px; z-index: 2;
+        }
+
+        /* Pro charts */
+        .a22-pro-charts { margin-top: 1rem; }
+        .a22-tco-stacked { display: flex; flex-direction: column; gap: 0.5rem; }
+        .a22-tco-row {
+            display: grid; grid-template-columns: 60px 1fr 80px;
+            align-items: center; gap: 0.5rem; font-size: 0.72rem;
+        }
+        .a22-tco-label { color: #94a3b8; text-align: right; }
+        .a22-tco-track { height: 20px; background: rgba(255,255,255,0.04); border-radius: 4px; display: flex; overflow: hidden; }
+        .a22-tco-seg { height: 100%; transition: width 0.6s; }
+        .a22-tco-val { color: #e2e8f0; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .a22-tco-legend { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.65rem; color: #94a3b8; }
+        .a22-tco-legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+        .a22-tornado { display: flex; flex-direction: column; gap: 3px; }
+        .a22-tornado-row {
+            display: grid; grid-template-columns: 100px 1fr 50px;
+            align-items: center; gap: 0.5rem; font-size: 0.72rem;
+        }
+        .a22-tornado-label { color: #94a3b8; text-align: right; }
+        .a22-tornado-track { height: 18px; position: relative; }
+        .a22-tornado-bar {
+            position: absolute; top: 0; height: 100%; border-radius: 3px;
+            transition: all 0.6s;
+        }
+        .a22-tornado-bar.negative { background: linear-gradient(90deg, #ef4444, #fca5a5); }
+        .a22-tornado-bar.positive { background: linear-gradient(90deg, #22d3ee, #67e8f9); }
+        .a22-tornado-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.2); }
+        .a22-tornado-val { color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+        .a22-scale-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+        .a22-scale-row {
+            display: grid; grid-template-columns: 80px 1fr 60px;
+            align-items: center; gap: 0.5rem;
+        }
+        .a22-scale-label { font-size: 0.72rem; color: #94a3b8; text-align: right; }
+        .a22-scale-bars { display: flex; gap: 3px; height: 18px; flex: 1; }
+        .a22-scale-seg { height: 100%; border-radius: 3px; transition: width 0.6s; }
+        .a22-scale-value { font-size: 0.72rem; color: #e2e8f0; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+        /* Toolbar actions + PDF button */
+        .a22-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .a22-btn-pdf {
+            padding: 8px 16px; border-radius: 8px;
+            border: 1px solid rgba(8,145,178,0.3); background: transparent;
+            color: #94a3b8; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .a22-btn-pdf:hover { color: #22d3ee; border-color: #0891b2; background: rgba(8,145,178,0.1); }
+
+        [data-theme="dark"] .a22-chart-box { background: rgba(0,0,0,0.3); }
+
         /* Responsive */
         @media (max-width: 768px) {
             .a22-evidence-grid { grid-template-columns: repeat(3, 1fr); }
@@ -678,6 +787,10 @@
             .a22-tech-columns { grid-template-columns: 1fr; }
             .a22-toolbar { flex-direction: column; align-items: stretch; }
             .a22-mode-bar { justify-content: center; }
+            .a22-chart-grid { grid-template-columns: 1fr; }
+            .a22-bar-row { grid-template-columns: 80px 1fr 60px; }
+            .a22-tornado-row { grid-template-columns: 80px 1fr 40px; }
+            .a22-toolbar-actions { width: 100%; justify-content: center; }
         }
         @media (max-width: 480px) {
             .a22-evidence-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1182,6 +1295,9 @@
                 <button class="a22-toolbar-btn a22-btn-free active" onclick="a22SetMode('free')"><i class="fas fa-chart-line"></i> Free</button>
                 <button class="a22-toolbar-btn a22-btn-pro" onclick="a22SetMode('pro')"><i class="fas fa-crown"></i> Pro</button>
             </div>
+            <div class="a22-toolbar-actions">
+                <button class="a22-btn-pdf" onclick="a22ExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
         </div>
 
         <div class="a22-calc-grid">
@@ -1251,6 +1367,29 @@
                     </div>
                 </div>
 
+                <!-- Interactive Visualizations -->
+                <div class="a22-charts-section" id="a22Charts">
+                    <div class="a22-chart-section-title"><i class="fas fa-chart-bar"></i> Visual Comparison</div>
+                    <div class="a22-chart-grid">
+                        <div class="a22-chart-box">
+                            <div class="a22-chart-box-title"><i class="fas fa-bolt"></i> Power per Link (W)</div>
+                            <div class="a22-bar-chart" id="a22ChartPower"></div>
+                        </div>
+                        <div class="a22-chart-box">
+                            <div class="a22-chart-box-title"><i class="fas fa-dollar-sign"></i> Annual Energy Cost</div>
+                            <div class="a22-bar-chart" id="a22ChartCost"></div>
+                        </div>
+                        <div class="a22-chart-box">
+                            <div class="a22-chart-box-title"><i class="fas fa-ruler-horizontal"></i> Technology Reach &mdash; The Copper Wall</div>
+                            <div id="a22ChartReach"></div>
+                        </div>
+                        <div class="a22-chart-box">
+                            <div class="a22-chart-box-title"><i class="fas fa-tachometer-alt"></i> Latency (ns)</div>
+                            <div class="a22-bar-chart" id="a22ChartLatency"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Verdict -->
                 <div class="a22-verdict" id="a22Verdict">
                     <div class="a22-verdict-title">Analysis Verdict</div>
@@ -1287,6 +1426,25 @@
                         <div class="a22-pro-narrative" id="a22ProNarrative">
                             <p>Pro analysis provides Monte Carlo sensitivity modeling across electricity cost ranges, link distance distributions, and failure rate scenarios. <strong>Sign in to unlock detailed TCO projections</strong> including rack space reduction, deployment timeline impact, and cumulative power savings over a 5-year operational horizon.</p>
                         </div>
+                        <!-- Pro Charts -->
+                        <div class="a22-pro-charts" id="a22ProCharts">
+                            <div class="a22-chart-grid">
+                                <div class="a22-chart-box">
+                                    <div class="a22-chart-box-title"><i class="fas fa-layer-group"></i> 5-Year TCO Breakdown</div>
+                                    <div class="a22-tco-stacked" id="a22ChartTco"></div>
+                                </div>
+                                <div class="a22-chart-box">
+                                    <div class="a22-chart-box-title"><i class="fas fa-sort-amount-down"></i> Sensitivity Analysis</div>
+                                    <div class="a22-tornado" id="a22ChartTornado"></div>
+                                </div>
+                            </div>
+                            <div class="a22-chart-grid" style="margin-top:1rem;">
+                                <div class="a22-chart-box" style="grid-column: span 2;">
+                                    <div class="a22-chart-box-title"><i class="fas fa-expand-arrows-alt"></i> Scale Impact &mdash; Copper Degradation at GPU Scale</div>
+                                    <div class="a22-scale-chart" id="a22ChartScale"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1308,7 +1466,7 @@
             <button class="a22-login-submit" onclick="a22DoLogin()">Sign In</button>
             <div class="a22-login-error" id="a22LoginError">Invalid credentials. Please try again.</div>
             <div class="a22-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
-            <div class="a22-login-terms">By signing in you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+            <div class="a22-login-terms">By signing in you agree to our <a href="terms.html" style="color:#0891b2;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#0891b2;text-decoration:none;">Privacy Policy</a>.</div>
         </div>
     </div>
 
@@ -1564,6 +1722,219 @@
         a22Calculate();
     };
 
+    /* ── Chart Renderer Functions ── */
+
+    function a22RenderBar(containerId, data) {
+        var el = document.getElementById(containerId);
+        if (!el) return;
+        var maxV = 0;
+        data.forEach(function(d) { if (d.value > maxV) maxV = d.value; });
+        if (!maxV) maxV = 1;
+        var html = '';
+        data.forEach(function(d) {
+            var pct = d.value > 0 ? Math.min((d.value / maxV) * 100, 100) : 0;
+            html += '<div class="a22-bar-row">';
+            html += '<div class="a22-bar-label">' + d.label + '</div>';
+            html += '<div class="a22-bar-track"><div class="a22-bar-fill ' + d.cls + '" style="width:' + pct.toFixed(1) + '%"></div></div>';
+            html += '<div class="a22-bar-value' + (d.value <= 0 ? ' a22-bar-na' : '') + '">' + d.display + '</div>';
+            html += '</div>';
+        });
+        el.innerHTML = html;
+    }
+
+    function a22RenderReach(copperReach, plugReach, cpoReach, linkDist) {
+        var el = document.getElementById('a22ChartReach');
+        if (!el) return;
+        var maxR = Math.max(plugReach, cpoReach, copperReach, linkDist, 1);
+        // Cap visual scale at 300m for readability (labels show actual value)
+        var visualMax = Math.min(maxR, 300);
+        var techs = [
+            { label: 'Copper DAC', reach: copperReach, cls: 'copper' },
+            { label: 'Pluggable', reach: plugReach, cls: 'pluggable' },
+            { label: 'CPO', reach: cpoReach, cls: 'cpo' }
+        ];
+        var distPct = Math.min((linkDist / visualMax) * 100, 100);
+        var html = '';
+        techs.forEach(function(t) {
+            var pct = t.reach > 0 ? Math.min((t.reach / visualMax) * 100, 100) : 0;
+            var feasible = linkDist <= t.reach;
+            html += '<div class="a22-reach-bar">';
+            html += '<div class="a22-reach-label">' + t.label + '</div>';
+            html += '<div class="a22-reach-track">';
+            html += '<div class="a22-reach-fill a22-bar-fill ' + t.cls + '" style="width:' + pct.toFixed(1) + '%">';
+            if (t.cls === 'copper') html += '<div class="a22-reach-wall" title="Copper limit: ' + t.reach + 'm"></div>';
+            html += '</div>';
+            html += '<div class="a22-reach-marker" style="left:' + distPct.toFixed(1) + '%;background:' + (feasible ? '#22c55e' : '#ef4444') + ';" title="Your link: ' + linkDist + 'm"></div>';
+            html += '</div>';
+            html += '<div class="a22-reach-value">' + (t.reach > 0 ? t.reach + 'm' : 'N/A') + '</div>';
+            html += '</div>';
+        });
+        html += '<div class="a22-reach-hint"><span style="color:#22c55e;">&#9646;</span> Your ' + linkDist + 'm link &nbsp; <span style="color:#ef4444;">&#9646;</span> Copper wall</div>';
+        el.innerHTML = html;
+    }
+
+    function a22RenderTco(cpoAnnual, plugAnnual, links, cpoViable, plugViable) {
+        var el = document.getElementById('a22ChartTco');
+        if (!el) return;
+        var years = [1, 2, 3, 4, 5];
+        var maxTco = 0;
+        var rows = [];
+        years.forEach(function(yr) {
+            var hwFactor = yr <= 2 ? 1.0 : (yr <= 4 ? 0.8 : 0.6);
+            var cpoEnergy = cpoViable ? cpoAnnual * yr : 0;
+            var cpoHW = cpoViable ? links * 25 * hwFactor : 0;
+            var cpoMaint = cpoViable ? cpoAnnual * 0.08 * yr : 0;
+            var plugEnergy = plugViable ? plugAnnual * yr : 0;
+            var plugHW = plugViable ? links * 15 * hwFactor : 0;
+            var plugMaint = plugViable ? plugAnnual * 0.12 * yr : 0;
+            var cpoTotal = cpoEnergy + cpoHW + cpoMaint;
+            var plugTotal = plugEnergy + plugHW + plugMaint;
+            if (cpoTotal > maxTco) maxTco = cpoTotal;
+            if (plugTotal > maxTco) maxTco = plugTotal;
+            rows.push({ yr: yr, cpoE: cpoEnergy, cpoH: cpoHW, cpoM: cpoMaint, cpoT: cpoTotal, plugE: plugEnergy, plugH: plugHW, plugM: plugMaint, plugT: plugTotal });
+        });
+        if (!maxTco) maxTco = 1;
+        function fC(n) { return '$' + (n >= 1000000 ? (n / 1000000).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(0) + 'K' : n.toFixed(0)); }
+        var html = '';
+        rows.forEach(function(r) {
+            // CPO row
+            var cpoEP = (r.cpoE / maxTco * 100).toFixed(1);
+            var cpoHP = (r.cpoH / maxTco * 100).toFixed(1);
+            var cpoMP = (r.cpoM / maxTco * 100).toFixed(1);
+            html += '<div class="a22-tco-row">';
+            html += '<div class="a22-tco-label">Y' + r.yr + ' CPO</div>';
+            html += '<div class="a22-tco-track">';
+            html += '<div class="a22-tco-seg" style="width:' + cpoEP + '%;background:#0891b2;"></div>';
+            html += '<div class="a22-tco-seg" style="width:' + cpoHP + '%;background:#06b6d4;opacity:0.6;"></div>';
+            html += '<div class="a22-tco-seg" style="width:' + cpoMP + '%;background:#22d3ee;opacity:0.4;"></div>';
+            html += '</div>';
+            html += '<div class="a22-tco-val">' + fC(r.cpoT) + '</div>';
+            html += '</div>';
+            // Plug row
+            var plugEP = (r.plugE / maxTco * 100).toFixed(1);
+            var plugHP = (r.plugH / maxTco * 100).toFixed(1);
+            var plugMP = (r.plugM / maxTco * 100).toFixed(1);
+            html += '<div class="a22-tco-row">';
+            html += '<div class="a22-tco-label">Y' + r.yr + ' Plug</div>';
+            html += '<div class="a22-tco-track">';
+            html += '<div class="a22-tco-seg" style="width:' + plugEP + '%;background:#7c3aed;"></div>';
+            html += '<div class="a22-tco-seg" style="width:' + plugHP + '%;background:#a855f7;opacity:0.6;"></div>';
+            html += '<div class="a22-tco-seg" style="width:' + plugMP + '%;background:#c084fc;opacity:0.4;"></div>';
+            html += '</div>';
+            html += '<div class="a22-tco-val">' + fC(r.plugT) + '</div>';
+            html += '</div>';
+        });
+        html += '<div class="a22-tco-legend">';
+        html += '<span><span class="a22-tco-legend-dot" style="background:#0891b2;"></span>Energy</span>';
+        html += '<span><span class="a22-tco-legend-dot" style="background:#06b6d4;opacity:0.6;"></span>Hardware</span>';
+        html += '<span><span class="a22-tco-legend-dot" style="background:#22d3ee;opacity:0.4;"></span>Maintenance</span>';
+        html += '</div>';
+        el.innerHTML = html;
+    }
+
+    function a22RenderTornado(gpuCount, portSpeedG, linkDist, elecCost) {
+        var el = document.getElementById('a22ChartTornado');
+        if (!el) return;
+        // Calculate baseline CPO annual cost
+        var sf = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[portSpeedG] || 4.5;
+        var baseCPO = gpuCount * (1.0 * sf * 0.55) * 8760 * elecCost / 1000;
+        // Vary each parameter +/-20%
+        var params = [
+            { label: 'GPU Count', lo: gpuCount * 0.8, hi: gpuCount * 1.2, fn: function(v) { return v * (1.0 * sf * 0.55) * 8760 * elecCost / 1000; } },
+            { label: 'Elec Cost', lo: elecCost * 0.8, hi: elecCost * 1.2, fn: function(v) { return gpuCount * (1.0 * sf * 0.55) * 8760 * v / 1000; } },
+            { label: 'Port Speed', lo: portSpeedG, hi: portSpeedG, fn: function() { return baseCPO; } },
+            { label: 'Link Distance', lo: linkDist * 0.8, hi: linkDist * 1.2, fn: function() { return baseCPO; } }
+        ];
+        // For Port Speed: compare actual speeds
+        var speeds = [200, 400, 800, 1600];
+        var curIdx = speeds.indexOf(portSpeedG);
+        if (curIdx > 0) {
+            var loSF = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[speeds[curIdx - 1]] || sf;
+            params[2].fn = function() { return gpuCount * (1.0 * loSF * 0.55) * 8760 * elecCost / 1000; };
+            params[2].lo = speeds[curIdx - 1];
+        }
+        if (curIdx < speeds.length - 1) {
+            var hiSF = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[speeds[curIdx + 1]] || sf;
+            params[2].fnHi = function() { return gpuCount * (1.0 * hiSF * 0.55) * 8760 * elecCost / 1000; };
+            params[2].hi = speeds[curIdx + 1];
+        }
+        var bars = [];
+        params.forEach(function(p) {
+            var loVal = p.fn(p.lo);
+            var hiVal = p.fnHi ? p.fnHi() : p.fn(p.hi);
+            var impact = hiVal - loVal;
+            bars.push({ label: p.label, impact: impact, absImpact: Math.abs(impact) });
+        });
+        bars.sort(function(a, b) { return b.absImpact - a.absImpact; });
+        var maxAbs = bars.length > 0 ? bars[0].absImpact : 1;
+        if (!maxAbs) maxAbs = 1;
+        function fC(n) { return '$' + (Math.abs(n) >= 1000000 ? (Math.abs(n) / 1000000).toFixed(1) + 'M' : Math.abs(n) >= 1000 ? (Math.abs(n) / 1000).toFixed(0) + 'K' : Math.abs(n).toFixed(0)); }
+        var html = '';
+        bars.forEach(function(b) {
+            var pct = (b.absImpact / maxAbs) * 50;
+            var isNeg = b.impact < 0;
+            html += '<div class="a22-tornado-row">';
+            html += '<div class="a22-tornado-label">' + b.label + '</div>';
+            html += '<div class="a22-tornado-track">';
+            html += '<div class="a22-tornado-center"></div>';
+            if (isNeg) {
+                html += '<div class="a22-tornado-bar negative" style="right:50%;width:' + pct.toFixed(1) + '%;"></div>';
+            } else {
+                html += '<div class="a22-tornado-bar positive" style="left:50%;width:' + pct.toFixed(1) + '%;"></div>';
+            }
+            html += '</div>';
+            html += '<div class="a22-tornado-val">' + (b.impact >= 0 ? '+' : '-') + fC(b.impact) + '</div>';
+            html += '</div>';
+        });
+        el.innerHTML = html;
+    }
+
+    function a22RenderScale(portSpeedG, gpuPerRack, elecCost) {
+        var el = document.getElementById('a22ChartScale');
+        if (!el) return;
+        var scales = [1000, 8000, 32000, 100000, 500000];
+        var sf = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[portSpeedG] || 4.5;
+        var copperReach = { 200: 3, 400: 2, 800: 1, 1600: 0 }[portSpeedG] || 1;
+        var maxPower = 0;
+        var rows = [];
+        scales.forEach(function(gpus) {
+            var copperP = copperReach > 0 ? gpus * 0.5 * sf : 0;
+            var plugP = gpus * 3.5 * sf * 0.65;
+            var cpoP = gpus * 1.0 * sf * 0.55;
+            var mp = Math.max(copperP, plugP, cpoP);
+            if (mp > maxPower) maxPower = mp;
+            rows.push({ gpus: gpus, copper: copperP, plug: plugP, cpo: cpoP });
+        });
+        if (!maxPower) maxPower = 1;
+        function fG(n) { return n >= 1000000 ? (n / 1000000).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(0) + 'K' : n; }
+        function fP(n) { return n >= 1000000 ? (n / 1000000).toFixed(1) + ' MW' : n >= 1000 ? (n / 1000).toFixed(0) + ' kW' : n.toFixed(0) + ' W'; }
+        var html = '';
+        rows.forEach(function(r) {
+            var copperPct = (r.copper / maxPower * 100).toFixed(1);
+            var plugPct = (r.plug / maxPower * 100).toFixed(1);
+            var cpoPct = (r.cpo / maxPower * 100).toFixed(1);
+            var copperFeasible = copperReach > 0;
+            html += '<div class="a22-scale-row">';
+            html += '<div class="a22-scale-label">' + fG(r.gpus) + ' GPUs</div>';
+            html += '<div class="a22-scale-bars">';
+            if (copperFeasible && r.copper > 0) {
+                html += '<div class="a22-scale-seg" style="width:' + copperPct + '%;background:linear-gradient(90deg,#d97706,#f59e0b);opacity:' + (r.gpus > 32000 ? '0.3' : '1') + ';" title="Copper: ' + fP(r.copper) + '"></div>';
+            }
+            html += '<div class="a22-scale-seg" style="width:' + plugPct + '%;background:linear-gradient(90deg,#7c3aed,#a855f7);" title="Pluggable: ' + fP(r.plug) + '"></div>';
+            html += '<div class="a22-scale-seg" style="width:' + cpoPct + '%;background:linear-gradient(90deg,#0891b2,#22d3ee);" title="CPO: ' + fP(r.cpo) + '"></div>';
+            html += '</div>';
+            html += '<div class="a22-scale-value">' + fP(r.plug) + '</div>';
+            html += '</div>';
+        });
+        html += '<div class="a22-tco-legend" style="margin-top:0.5rem;">';
+        html += '<span><span class="a22-tco-legend-dot" style="background:#f59e0b;"></span>Copper</span>';
+        html += '<span><span class="a22-tco-legend-dot" style="background:#a855f7;"></span>Pluggable</span>';
+        html += '<span><span class="a22-tco-legend-dot" style="background:#22d3ee;"></span>CPO</span>';
+        html += '<span style="color:#64748b;font-style:italic;">Faded copper = impractical at scale</span>';
+        html += '</div>';
+        el.innerHTML = html;
+    }
+
     window.a22Calculate = function() {
         var gpuCount = parseInt(document.getElementById('a22GpuCount').value) || 8192;
         var gpuPerRack = parseInt(document.getElementById('a22GpuPerRack').value) || 8;
@@ -1654,15 +2025,39 @@
         document.getElementById('a22VerdictText').textContent = verdictText;
         document.getElementById('a22VerdictDetail').textContent = verdictDetail;
 
-        // Pro mode KPIs
+        // ── On-page chart visualizations ──
+        a22RenderBar('a22ChartPower', [
+            { label: 'Copper DAC', value: copperViable ? copperPowerPerLink : 0, display: copperViable ? copperPowerPerLink.toFixed(1) + ' W' : 'N/A', cls: 'copper' },
+            { label: 'Pluggable', value: plugViable ? plugPowerPerLink : 0, display: plugViable ? plugPowerPerLink.toFixed(1) + ' W' : 'N/A', cls: 'pluggable' },
+            { label: 'CPO', value: cpoViable ? cpoPowerPerLink : 0, display: cpoViable ? cpoPowerPerLink.toFixed(1) + ' W' : 'N/A', cls: 'cpo' }
+        ]);
+        a22RenderBar('a22ChartCost', [
+            { label: 'Copper DAC', value: copperViable ? copperAnnual : 0, display: copperViable ? fmtCurr(copperAnnual) + '/yr' : 'N/A', cls: 'copper' },
+            { label: 'Pluggable', value: plugViable ? plugAnnual : 0, display: plugViable ? fmtCurr(plugAnnual) + '/yr' : 'N/A', cls: 'pluggable' },
+            { label: 'CPO', value: cpoViable ? cpoAnnual : 0, display: cpoViable ? fmtCurr(cpoAnnual) + '/yr' : 'N/A', cls: 'cpo' }
+        ]);
+        a22RenderReach(copperMaxReach, plugMaxReach, cpoMaxReach, linkDist);
+        a22RenderBar('a22ChartLatency', [
+            { label: 'Copper DAC', value: copperViable ? copperLatencyNs : 0, display: copperViable ? copperLatencyNs.toFixed(1) + ' ns' : 'N/A', cls: 'copper' },
+            { label: 'Pluggable', value: plugViable ? plugLatencyNs : 0, display: plugViable ? plugLatencyNs.toFixed(1) + ' ns' : 'N/A', cls: 'pluggable' },
+            { label: 'CPO', value: cpoViable ? cpoLatencyNs : 0, display: cpoViable ? cpoLatencyNs.toFixed(1) + ' ns' : 'N/A', cls: 'cpo' }
+        ]);
+
+        // Pro mode KPIs + charts
         if (mode === 'pro' && loggedIn) {
             var tco5yr = cpoViable ? cpoAnnual * 5 * 1.15 : plugAnnual * 5 * 1.3;
             var rackSavings = cpoViable ? Math.round(racks * 0.12) : 0;
             var deployDelta = cpoViable ? '-30%' : 'Baseline';
+            var cpoPowerSavingsPct = (plugViable && cpoViable) ? ((1 - cpoPowerPerLink / plugPowerPerLink) * 100).toFixed(0) + '%' : '0%';
             document.getElementById('a22ProTco').textContent = fmtCurr(tco5yr);
             document.getElementById('a22ProRacks').textContent = rackSavings > 0 ? rackSavings + ' racks' : '0';
             document.getElementById('a22ProDeploy').textContent = deployDelta;
+            document.getElementById('a22ProSavings').textContent = cpoPowerSavingsPct;
             document.getElementById('a22ProNarrative').innerHTML = 'For a <strong>' + fmt(gpuCount) + ' GPU</strong> cluster at <strong>' + portSpeedG + 'G</strong> port speed, CPO architecture reduces total network power by approximately <strong>' + (plugViable && cpoViable ? ((1 - cpoPowerPerLink/plugPowerPerLink) * 100).toFixed(0) : '0') + '%</strong> compared to pluggable optics. Over 5 years, this translates to a TCO of <strong>' + fmtCurr(tco5yr) + '</strong> including hardware refresh cycles. The rack space savings of <strong>' + rackSavings + ' racks</strong> frees capacity for additional GPU density, directly improving compute per square foot.';
+            // Pro charts
+            a22RenderTco(cpoAnnual, plugAnnual, links, cpoViable, plugViable);
+            a22RenderTornado(gpuCount, portSpeedG, linkDist, elecCost);
+            a22RenderScale(portSpeedG, gpuPerRack, elecCost);
         }
     };
 

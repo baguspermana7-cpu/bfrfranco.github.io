@@ -749,3 +749,46 @@ All features support dark mode via `[data-theme="dark"]` selectors:
 | `articles.html` | Reading time badges in all 18 article cards; +cookie/scroll-top snippet |
 | `index.html`, `insights.html`, `geopolitics.html`, etc. | +cookie/scroll-top snippet |
 | Calculator pages (5 files) | +cookie/scroll-top snippet |
+
+---
+
+## New Features (March 2026 Growth Plan)
+
+### Gamification System
+
+**Files**: `achievements.html` (865 lines), `rz-gamification.js` (252 lines)
+
+| Component | Description |
+|-----------|-------------|
+| **Achievement Page** | 17 badges across 5 categories (Explorer, Calculator Pro, Knowledge Seeker, Standards Expert, Community). Purple #8b5cf6 theme. Responsive grid with lock/unlock animations. |
+| **Tracker Script** | `rz-gamification.js` — lightweight vanilla JS loaded after auth.js. Auto-tracks page visits, calculator usage, article reads, shares. Toast notifications on unlock. |
+| **Knowledge Levels** | Novice (0-3) → Technician (4-6) → Engineer (7-10) → Architect (11-14) → Master (15-17) |
+| **localStorage Keys** | `rz_pages_visited`, `rz_calcs_used`, `rz_articles_read`, `rz_shares`, `rz_achievements`, `rz_used_dark` |
+
+**Integration**: Add `<script src="rz-gamification.js"></script>` after auth.js on pages where tracking is desired.
+
+### Interactive Infographics
+
+**Files**: 3 self-contained pages with CSS-only animations and lightweight JS interactivity.
+
+| Page | Theme | Key Feature |
+|------|-------|-------------|
+| `infographic-pue-global.html` | Emerald #10b981 | Animated PUE bar chart, timeline, interactive PUE slider |
+| `infographic-dc-cost-breakdown.html` | Amber #f59e0b | SVG donut chart ($10M breakdown), tier comparison cards |
+| `infographic-dc-sustainability.html` | Cyan #06b6d4 | Gauge charts, WUE comparison, Green Score Calculator |
+
+**Design standards**: CSS-only animations (no Chart.js), dark/light mode, share buttons (X/LinkedIn/Facebook/Copy), FAQPage schema.
+
+### Multilingual Support (Bahasa Indonesia)
+
+**Directory**: `id/` (3 pages: `index.html`, `artikel.html`, `glosarium.html`)
+
+| Standard | Implementation |
+|----------|---------------|
+| **hreflang** | `<link rel="alternate" hreflang="id" href="/id/...">` + `<link rel="alternate" hreflang="en" href="/...">` |
+| **Canonical** | Points to Indonesian URL (`/id/...`) |
+| **Language toggle** | ID/EN switch in navbar |
+| **Technical terms** | Kept in English where standard (PUE, UPS, CAPEX, etc.) |
+| **Cookie/footer** | Translated to Indonesian |
+
+**Adding new languages**: Create `/{lang}/` directory, follow same pattern, add hreflang cross-references on both language versions.

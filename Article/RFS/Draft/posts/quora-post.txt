@@ -1,0 +1,27 @@
+I built an open-source data center commissioning tracker and learned something about how RFS readiness actually works.
+
+Most commissioning teams track Ready-for-Service using spreadsheets with color-coded status columns. It works fine when everything is on schedule. It breaks completely when it is not -- which is most of the time.
+
+The fundamental problem: commissioning readiness is gate-driven, not percentage-driven. You cannot be "87% ready for RFS." You are either blocked or you are not. And the blockers cascade.
+
+Here is what I mean. G4 (Functional Performance Tests) requires all individual component tests (G3) to be complete. If you have an unresolved critical defect on a UPS system from G3, that blocks G4. Which blocks G5 (Integrated Systems Tests). Which blocks G6 (Operational Readiness). Which blocks G7 (Turnover).
+
+One defect. Four gates delayed. Weeks of schedule drag.
+
+Spreadsheets do not model this. They show you a cell that says "87% complete" when what you actually need to know is: "This gate has 2 hard blockers and cannot progress until they are resolved."
+
+So I built the RFS Readiness Workbench -- a browser-based tool that models commissioning as a gate progression system (G0 through G7) with:
+
+- Hard blocker logic that physically prevents gate advancement
+- A 7-term confidence formula that quantifies risk per gate per unit
+- Drag-based forecasting that breaks delay into 7 components
+- Evidence tracking per requirement (metadata only, no binary storage)
+- Source confidence tagging (A through D) where only contractual and industry standard sources can auto-block gates
+- 6 facility archetypes with calibrated baseline timing
+- 99 requirements covering electrical, mechanical, fire, controls, operations, and commercial disciplines
+
+No backend. Client-side only. JSON export/import. Free tier covers the core gate and defect workflow.
+
+If you work in data center commissioning, construction, or critical infrastructure operations, I would genuinely appreciate your feedback on the gate model and requirement taxonomy.
+
+resistancezero.com/rfs-readiness-workbench.html

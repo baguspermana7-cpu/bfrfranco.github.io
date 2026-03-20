@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>ResistanceZero — Standar & Analisis Infrastruktur Data Center</title>
+    <meta name="description" content="ResistanceZero — Platform analisis infrastruktur data center: kalkulator PUE, CAPEX & OPEX, jurnal teknik, glosarium, dan panduan pendinginan. Data Center Infrastructure Standards & Analysis.">
+    <meta name="keywords" content="Data Center Indonesia, Infrastruktur Data Center, PUE Calculator, CAPEX OPEX Data Center, Standar Data Center, Pendinginan Data Center, Analisis Infrastruktur, Bagus Dwi Permana">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <link rel="canonical" href="https://resistancezero.com/id/">
+
+    <link rel="alternate" hreflang="id" href="https://resistancezero.com/id/">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/id/">
+    <meta property="og:title" content="ResistanceZero — Standar & Analisis Infrastruktur Data Center">
+    <meta property="og:description" content="Platform analisis infrastruktur data center: kalkulator PUE, CAPEX & OPEX, jurnal teknik, glosarium, dan panduan pendinginan.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="ResistanceZero - Platform Analisis Infrastruktur Data Center">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="ResistanceZero">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="ResistanceZero — Standar & Analisis Infrastruktur Data Center">
+    <meta name="twitter:description" content="Platform analisis infrastruktur data center: kalkulator PUE, CAPEX & OPEX, jurnal teknik, glosarium 100+ istilah.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="ResistanceZero - Platform Analisis Infrastruktur Data Center">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#06b6d4">
+    <meta name="msapplication-TileColor" content="#06b6d4">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://resistancezero.com/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Beranda (ID)"
+            }
+        ]
+    }
+    </script>
+
+    <!-- WebSite Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "ResistanceZero — Standar & Analisis Infrastruktur Data Center",
+        "description": "Platform analisis infrastruktur data center berbahasa Indonesia",
+        "url": "https://resistancezero.com/id/",
+        "inLanguage": "id",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "ResistanceZero",
+            "url": "https://resistancezero.com/"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══ CSS Variables ═══ */
+        :root {
+            --rz-accent: #06b6d4;
+            --rz-accent-light: #22d3ee;
+            --rz-accent-dark: #0891b2;
+            --rz-bg: #ffffff;
+            --rz-bg-alt: #f8fafc;
+            --rz-bg-hero-start: #0f172a;
+            --rz-bg-hero-mid: #164e63;
+            --rz-bg-hero-end: #06b6d4;
+            --rz-text: #334155;
+            --rz-text-heading: #0f172a;
+            --rz-text-muted: #94a3b8;
+            --rz-card-bg: #ffffff;
+            --rz-card-border: #e2e8f0;
+            --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            --rz-footer-bg: #0f172a;
+            --rz-glass-bg: rgba(255,255,255,0.85);
+            --rz-glass-border: rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] {
+            --rz-bg: #0a0a14;
+            --rz-bg-alt: #0f0f1a;
+            --rz-text: #cbd5e1;
+            --rz-text-heading: #f0f4f8;
+            --rz-text-muted: #64748b;
+            --rz-card-bg: #1e293b;
+            --rz-card-border: #334155;
+            --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            --rz-footer-bg: #020617;
+            --rz-glass-bg: rgba(15,15,26,0.9);
+            --rz-glass-border: rgba(255,255,255,0.08);
+        }
+
+        /* ═══ Reset & Base ═══ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--rz-text);
+            background: var(--rz-bg);
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; color: var(--rz-text-heading); }
+        a { text-decoration: none; color: inherit; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+        /* ═══ Navbar ═══ */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: var(--rz-glass-bg);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--rz-glass-border);
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+        }
+        .nav-container {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.875rem 2rem; max-width: 1200px; margin: 0 auto;
+        }
+        .nav-logo { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-avatar {
+            width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+            border: 2px solid var(--rz-accent);
+        }
+        .nav-menu { display: flex; list-style: none; gap: 1.75rem; align-items: center; }
+        .nav-link {
+            font-size: 0.875rem; font-weight: 500; color: var(--rz-text);
+            padding: 0.5rem 0; position: relative; transition: color 0.2s;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--rz-accent); }
+        .nav-dropdown { position: relative; }
+        .dropdown-arrow { width: 10px; height: 10px; }
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            background: var(--rz-card-bg); min-width: 180px; border-radius: 8px;
+            opacity: 0; visibility: hidden; padding: 0.5rem 0; z-index: 1001;
+            border: 1px solid var(--rz-card-border); box-shadow: var(--rz-card-shadow);
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; }
+        .dropdown-menu li { list-style: none; }
+        .dropdown-menu a {
+            display: block; padding: 0.5rem 1rem; font-size: 0.85rem;
+            color: var(--rz-text); transition: background 0.15s;
+        }
+        .dropdown-menu a:hover { background: rgba(6,182,212,0.08); }
+        .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .lang-toggle {
+            display: flex; align-items: center; gap: 0; border-radius: 8px; overflow: hidden;
+            border: 1px solid var(--rz-card-border); font-size: 0.75rem; font-weight: 600;
+        }
+        .lang-toggle a, .lang-toggle span {
+            padding: 0.35rem 0.65rem; display: block; transition: all 0.2s;
+        }
+        .lang-toggle .lang-active {
+            background: var(--rz-accent); color: #fff;
+        }
+        .lang-toggle a:not(.lang-active) {
+            color: var(--rz-text-muted); background: var(--rz-card-bg);
+        }
+        .lang-toggle a:not(.lang-active):hover { color: var(--rz-accent); }
+        .theme-toggle {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; background: transparent;
+            border: 1px solid var(--rz-glass-border); border-radius: 10px;
+            cursor: pointer;
+        }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle .sun-icon { color: #f59e0b; display: none; }
+        .theme-toggle .moon-icon { color: #64748b; display: block; }
+        [data-theme="dark"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="dark"] .theme-toggle .moon-icon { display: none; }
+        .hamburger {
+            display: none; flex-direction: column; cursor: pointer; gap: 5px;
+            background: none; border: none; padding: 8px;
+        }
+        .bar { width: 22px; height: 2.5px; background: var(--rz-text); border-radius: 3px; transition: 0.3s; }
+
+        /* ═══ Hero ═══ */
+        .hero {
+            background: linear-gradient(135deg, var(--rz-bg-hero-start) 0%, var(--rz-bg-hero-mid) 50%, var(--rz-bg-hero-end) 100%);
+            padding: 8rem 2rem 4rem; color: #fff; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 25% 75%, rgba(6,182,212,0.25) 0%, transparent 50%),
+                radial-gradient(circle at 75% 25%, rgba(16,185,129,0.12) 0%, transparent 50%);
+            z-index: 0;
+        }
+        .hero > * { position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 30px; padding: 0.4rem 1rem; font-size: 0.8rem;
+            color: #22d3ee; margin-bottom: 1.5rem; backdrop-filter: blur(8px);
+        }
+        .hero h1 {
+            font-size: clamp(2.25rem, 5vw, 3.25rem); margin-bottom: 1rem;
+            background: linear-gradient(90deg, #fff, #67e8f9);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.15rem; color: rgba(255,255,255,0.8);
+            max-width: 680px; margin: 0 auto 2.5rem; line-height: 1.7;
+        }
+        .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: var(--rz-accent); color: #0f172a; padding: 0.75rem 1.75rem;
+            border-radius: 8px; font-weight: 700; font-size: 0.9rem;
+            transition: all 0.2s; border: none; cursor: pointer;
+        }
+        .btn-primary:hover { background: var(--rz-accent-light); transform: translateY(-2px); }
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: transparent; color: #fff; padding: 0.75rem 1.75rem;
+            border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.3); transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+        .hero-stats {
+            display: flex; gap: 2.5rem; justify-content: center; margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-value { font-size: 2rem; font-weight: 800; color: #22d3ee; }
+        .hero-stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* ═══ Sections ═══ */
+        .section { padding: 4rem 2rem; }
+        .section-alt { background: var(--rz-bg-alt); }
+        .section-title {
+            text-align: center; font-size: clamp(1.75rem, 3vw, 2.25rem);
+            margin-bottom: 0.75rem;
+        }
+        .section-subtitle {
+            text-align: center; color: var(--rz-text-muted);
+            max-width: 600px; margin: 0 auto 2.5rem; font-size: 1rem;
+        }
+
+        /* ═══ Feature Cards ═══ */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+        }
+        .feature-card {
+            background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
+            border-radius: 12px; padding: 1.75rem; transition: all 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .feature-card:hover {
+            box-shadow: var(--rz-card-shadow); transform: translateY(-4px);
+            border-color: var(--rz-accent);
+        }
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 1rem; flex-shrink: 0;
+        }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .feature-card p { font-size: 0.9rem; color: var(--rz-text-muted); line-height: 1.6; flex-grow: 1; }
+        .feature-card .card-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--rz-accent); font-size: 0.85rem; font-weight: 600;
+            margin-top: 1rem; transition: gap 0.2s;
+        }
+        .feature-card:hover .card-link { gap: 0.6rem; }
+
+        /* ═══ About Section ═══ */
+        .about-content {
+            max-width: 800px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr; gap: 2rem;
+        }
+        .about-text p { margin-bottom: 1rem; line-height: 1.8; }
+        .about-highlights {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; margin-top: 1rem;
+        }
+        .about-highlight {
+            background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
+            border-radius: 10px; padding: 1.25rem; text-align: center;
+        }
+        .about-highlight-value { font-size: 1.5rem; font-weight: 800; color: var(--rz-accent); }
+        .about-highlight-label { font-size: 0.8rem; color: var(--rz-text-muted); margin-top: 0.25rem; }
+
+        /* ═══ CTA Banner ═══ */
+        .cta-banner {
+            background: linear-gradient(135deg, #0f172a, #164e63);
+            padding: 3rem 2rem; text-align: center; color: #fff;
+        }
+        .cta-banner h2 { font-size: 1.75rem; margin-bottom: 0.75rem; color: #fff; }
+        .cta-banner p { color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+        /* ═══ Footer ═══ */
+        .footer {
+            background: var(--rz-footer-bg); color: #94a3b8; padding: 3rem 2rem 1.5rem;
+        }
+        .footer-grid {
+            display: grid; grid-template-columns: 2fr 1fr 1fr;
+            gap: 2rem; max-width: 1100px; margin: 0 auto;
+        }
+        .footer-brand p { font-size: 0.85rem; line-height: 1.7; margin-bottom: 0.75rem; }
+        .footer-tagline { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #475569; }
+        .footer-heading { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e2e8f0; margin-bottom: 1rem; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.5rem; }
+        .footer-links a { font-size: 0.85rem; color: #94a3b8; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--rz-accent); }
+        .footer-bottom {
+            text-align: center; padding-top: 1.5rem; margin-top: 2rem;
+            border-top: 1px solid #1e293b; font-size: 0.8rem;
+        }
+
+        /* ═══ Cookie Banner ═══ */
+        .cookie-banner {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+            background: var(--rz-card-bg); border-top: 1px solid var(--rz-card-border);
+            padding: 1rem 2rem; display: flex; align-items: center;
+            justify-content: space-between; gap: 1rem;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+        }
+        .cookie-banner.hidden { display: none; }
+        .cookie-banner p { font-size: 0.85rem; margin: 0; }
+        .cookie-banner a { color: var(--rz-accent); text-decoration: underline; }
+        .cookie-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+        .cookie-accept {
+            background: var(--rz-accent); color: #0f172a; border: none;
+            padding: 0.5rem 1.25rem; border-radius: 6px; font-weight: 600;
+            font-size: 0.85rem; cursor: pointer;
+        }
+        .cookie-decline {
+            background: transparent; color: var(--rz-text-muted);
+            border: 1px solid var(--rz-card-border); padding: 0.5rem 1.25rem;
+            border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+        }
+
+        /* ═══ Scroll to Top ═══ */
+        .scroll-top-btn {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--rz-accent); color: #0f172a; border: none;
+            cursor: pointer; display: none; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(6,182,212,0.3); transition: transform 0.2s;
+        }
+        .scroll-top-btn:hover { transform: translateY(-2px); }
+        .scroll-top-btn.visible { display: flex; }
+
+        /* ═══ Responsive ═══ */
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-menu { display: none; }
+            .nav-menu.open {
+                display: flex; flex-direction: column; position: absolute;
+                top: 100%; left: 0; right: 0; background: var(--rz-card-bg);
+                padding: 1rem 2rem; border-bottom: 1px solid var(--rz-card-border);
+                gap: 0.5rem;
+            }
+            .dropdown-menu {
+                position: static; transform: none; opacity: 1; visibility: visible;
+                box-shadow: none; border: none; padding-left: 1rem;
+            }
+            .hero { padding: 6rem 1.25rem 3rem; }
+            .hero h1 { font-size: 2rem; }
+            .hero-stats { gap: 1.5rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .cookie-banner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="sr-only" style="position:absolute;top:-100px;left:0;background:#06b6d4;color:#000;padding:8px 16px;z-index:10000;font-weight:700;">Lompat ke konten utama</a>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo-sm.webp" alt="ResistanceZero" class="nav-avatar" width="36" height="36" loading="eager">
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link active">Beranda</a></li>
+                <li class="nav-dropdown">
+                    <a href="../datacenter-solutions.html" class="nav-link">
+                        DC Solutions
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li><a href="../capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="../opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
+                        <li><a href="../pue-calculator.html">PUE Calculator</a></li>
+                    </ul>
+                </li>
+                <li class="nav-dropdown">
+                    <a href="artikel.html" class="nav-link">
+                        Wawasan
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="artikel.html" style="color:#06b6d4;font-weight:600;">Jurnal Teknik</a></li>
+                        <li><a href="../geopolitics.html" style="color:#ef4444;">Analisis Global</a></li>
+                        <li><a href="../future-forward.html" style="color:#a855f7;">Future Forward</a></li>
+                    </ul>
+                </li>
+                <li><a href="glosarium.html" class="nav-link">Glosarium</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Kontak</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div class="lang-toggle">
+                    <span class="lang-active">ID</span>
+                    <a href="../index.html">EN</a>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Ganti mode gelap/terang">
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Buka menu navigasi" aria-expanded="false">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Platform Infrastruktur Data Center
+        </div>
+        <h1>Standar & Analisis<br>Infrastruktur Data Center</h1>
+        <p>Kalkulator teknis, jurnal riset, glosarium lengkap, dan panduan komprehensif untuk profesional infrastruktur data center di Indonesia dan Asia Tenggara.</p>
+        <div class="hero-cta">
+            <a href="#fitur" class="btn-primary">
+                Jelajahi Tools
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="artikel.html" class="btn-secondary">Baca Jurnal Teknik</a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value">22+</div>
+                <div class="hero-stat-label">Artikel Teknis</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">10+</div>
+                <div class="hero-stat-label">Kalkulator & Tools</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">300+</div>
+                <div class="hero-stat-label">Istilah Glosarium</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">12+</div>
+                <div class="hero-stat-label">Tahun Pengalaman</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="fitur" class="section section-alt">
+        <h2 class="section-title">Tools & Sumber Daya</h2>
+        <p class="section-subtitle">Kalkulator, panduan, dan analisis untuk keputusan infrastruktur data center yang lebih baik.</p>
+
+        <div class="features-grid">
+            <!-- PUE Calculator -->
+            <a href="../pue-calculator.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <h3>PUE Calculator</h3>
+                <p>Hitung Power Usage Effectiveness data center Anda. Bandingkan dengan standar industri dan temukan peluang efisiensi energi.</p>
+                <span class="card-link">Buka Kalkulator <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- CAPEX Calculator -->
+            <a href="../capex-calculator.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <h3>CAPEX Calculator</h3>
+                <p>Estimasi biaya pembangunan data center. Hitung investasi awal untuk lahan, bangunan, power system, dan cooling infrastructure.</p>
+                <span class="card-link">Buka Kalkulator <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- OPEX Calculator -->
+            <a href="../opex-calculator.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-4 4-4-4"/></svg>
+                </div>
+                <h3>OPEX Calculator</h3>
+                <p>Hitung biaya operasional tahunan data center: listrik, pemeliharaan, personel, dan pengeluaran rutin lainnya.</p>
+                <span class="card-link">Buka Kalkulator <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- Cooling Guide -->
+            <a href="../pillar-cooling.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M12 2l4 4M12 2L8 4M12 22l4-4M12 22l-4-4"/></svg>
+                </div>
+                <h3>Panduan Pendinginan</h3>
+                <p>Panduan lengkap cooling & thermal management: standar ASHRAE, air vs liquid cooling, chiller plant, dan free cooling.</p>
+                <span class="card-link">Baca Panduan <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- Glossary -->
+            <a href="glosarium.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <h3>Glosarium Data Center</h3>
+                <p>300+ istilah teknis data center dengan definisi lengkap. Dari AHU hingga Zero Downtime, tersedia dalam Bahasa Indonesia.</p>
+                <span class="card-link">Lihat Glosarium <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- Engineering Journal -->
+            <a href="artikel.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <h3>Jurnal Teknik</h3>
+                <p>22+ artikel analisis mendalam tentang operasi data center, distribusi daya, pendinginan, AI infrastructure, dan geopolitik industri.</p>
+                <span class="card-link">Baca Artikel <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- DC Solutions -->
+            <a href="../datacenter-solutions.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                </div>
+                <h3>DC Solutions Hub</h3>
+                <p>Desain arsitektur data center AI/HPC dan konvensional. Termasuk spesifikasi teknis, konfigurasi redundansi, dan best practices.</p>
+                <span class="card-link">Jelajahi Solutions <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- Air vs Liquid Cooling -->
+            <a href="../compare-air-vs-liquid-cooling.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                </div>
+                <h3>Air vs Liquid Cooling</h3>
+                <p>Perbandingan komprehensif pendinginan udara vs cairan. Analisis biaya, efisiensi, dan kapasitas untuk berbagai kepadatan rack.</p>
+                <span class="card-link">Bandingkan <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+
+            <!-- Finance Terminal -->
+            <a href="../Apps/finance-terminal/index.html" class="feature-card">
+                <div class="feature-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <h3>Finance Terminal</h3>
+                <p>Terminal keuangan real-time untuk monitoring saham perusahaan data center dan teknologi. Kuotasi langsung dan analisis pasar.</p>
+                <span class="card-link">Buka Terminal <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section">
+        <h2 class="section-title">Tentang ResistanceZero</h2>
+        <p class="section-subtitle">Platform riset independen untuk infrastruktur data center.</p>
+
+        <div class="about-content">
+            <div class="about-text">
+                <p>ResistanceZero adalah platform pengetahuan dan analisis independen yang berfokus pada infrastruktur data center. Dibangun oleh <strong>Bagus Dwi Permana</strong>, seorang Engineering Operations Manager dengan pengalaman lebih dari 12 tahun di industri data center hyperscale.</p>
+                <p>Semua konten di situs ini merupakan riset pribadi berdasarkan standar yang tersedia secara publik, referensi akademis, dan studi lapangan. Platform ini tidak mewakili atau berafiliasi dengan perusahaan manapun, baik tempat kerja saat ini maupun sebelumnya.</p>
+                <p>Tujuan kami adalah menyediakan tools dan analisis yang membantu profesional data center Indonesia dan Asia Tenggara dalam membuat keputusan infrastruktur yang lebih baik dan berbasis data.</p>
+            </div>
+            <div class="about-highlights">
+                <div class="about-highlight">
+                    <div class="about-highlight-value">12+</div>
+                    <div class="about-highlight-label">Tahun di Data Center</div>
+                </div>
+                <div class="about-highlight">
+                    <div class="about-highlight-value">Hyperscale</div>
+                    <div class="about-highlight-label">Pengalaman Operasi</div>
+                </div>
+                <div class="about-highlight">
+                    <div class="about-highlight-value">CDFOM</div>
+                    <div class="about-highlight-label">Tersertifikasi</div>
+                </div>
+                <div class="about-highlight">
+                    <div class="about-highlight-value">K3 Listrik</div>
+                    <div class="about-highlight-label">Ahli Tersertifikasi</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <h2>Mulai Analisis Infrastruktur Anda</h2>
+        <p>Gunakan kalkulator dan tools kami untuk mengoptimalkan desain dan operasi data center Anda.</p>
+        <a href="../datacenter-solutions.html" class="btn-primary">
+            Jelajahi DC Solutions
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+    </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <p>ResistanceZero menyediakan riset independen, kalkulator teknis, dan analisis mendalam untuk profesional infrastruktur data center.</p>
+                <p class="footer-tagline">DIBANGUN UNTUK INFRASTRUKTUR MISSION CRITICAL // 2026</p>
+                <p style="font-size:0.8rem;">&copy; 2026 Bagus Dwi Permana. Hak cipta dilindungi.</p>
+            </div>
+            <div>
+                <h4 class="footer-heading">NAVIGASI</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="artikel.html">Jurnal Teknik</a></li>
+                    <li><a href="glosarium.html">Glosarium</a></li>
+                    <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                    <li><a href="../index.html">English Version</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">HUBUNGI</h4>
+                <ul class="footer-links">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Email Langsung</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Konten disediakan untuk keperluan edukasi dan informasi. Bukan merupakan nasihat teknik, hukum, atau keuangan.</p>
+        </div>
+    </footer>
+
+    <script src="../auth.js?v=20260228"></script>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>Kami menggunakan cookie untuk analitik guna meningkatkan pengalaman Anda. <a href="../privacy.html">Pelajari lebih lanjut</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Terima</button>
+            <button class="cookie-decline" id="cookieDecline">Tolak</button>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Gulir ke atas">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <script>
+    (function(){
+        // Theme toggle
+        var toggle = document.getElementById('themeToggle');
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme:dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        toggle.addEventListener('click', function(){
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        });
+
+        // Hamburger
+        var hamburger = document.getElementById('hamburger');
+        var navMenu = document.getElementById('navMenu');
+        hamburger.addEventListener('click', function(){
+            navMenu.classList.toggle('open');
+            var expanded = navMenu.classList.contains('open');
+            hamburger.setAttribute('aria-expanded', expanded);
+        });
+
+        // Scroll to top
+        var scrollBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', function(){
+            scrollBtn.classList.toggle('visible', window.scrollY > 400);
+        });
+        scrollBtn.addEventListener('click', function(){
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Cookie banner
+        var banner = document.getElementById('cookieBanner');
+        var accept = document.getElementById('cookieAccept');
+        var decline = document.getElementById('cookieDecline');
+        if (!localStorage.getItem('cookieConsent')) {
+            banner.classList.remove('hidden');
+        }
+        accept.addEventListener('click', function(){
+            localStorage.setItem('cookieConsent', 'accepted');
+            banner.classList.add('hidden');
+        });
+        decline.addEventListener('click', function(){
+            localStorage.setItem('cookieConsent', 'declined');
+            banner.classList.add('hidden');
+        });
+    })();
+    </script>
+</body>
+</html>

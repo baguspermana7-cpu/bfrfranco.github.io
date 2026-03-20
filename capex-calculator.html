@@ -4303,6 +4303,27 @@
             }
         })();
 
+        // Listen for cross-page auth changes (standard: rz-auth-change)
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.action === 'login') {
+                isPremiumUser = true;
+                userTier = e.detail.tier || 'pro';
+                activatePremiumUI();
+            } else if (e.detail && e.detail.action === 'logout') {
+                isPremiumUser = false;
+                userTier = 'free';
+                localStorage.removeItem('rz_premium_session');
+                var premBtn = document.getElementById('premiumTabBtn');
+                premBtn.classList.remove('premium-active');
+                premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+                document.getElementById('premiumBadge').style.display = 'none';
+                switchCapexMode('simple');
+                applyFeatureGating();
+                renderPremiumOutput();
+                updateNavbarAuthUI();
+            }
+        });
+
         function handlePremiumTab() {
             if (isPremiumUser) {
                 // Already premium — toggle to show advanced mode
@@ -4364,6 +4385,9 @@
                 closeLoginModal();
                 activatePremiumUI();
                 switchCapexMode('advanced');
+                window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                    detail: { email: match.email, tier: match.tier, action: 'login' }
+                }));
             } else {
                 errorEl.textContent = 'Invalid email or password';
                 errorEl.style.display = 'block';
@@ -4376,8 +4400,6 @@
             const premBtn = document.getElementById('premiumTabBtn');
             premBtn.classList.add('premium-active');
             premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium Active';
-            premBtn.onclick = function() { logoutPremium(); };
-
             // Show tier badge
             const premBadge = document.getElementById('premiumBadge');
             premBadge.textContent = 'PRO ACTIVE';
@@ -4403,8 +4425,6 @@
             const premBtn = document.getElementById('premiumTabBtn');
             premBtn.classList.remove('premium-active');
             premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
-            premBtn.onclick = function() { handlePremiumTab(); };
-
             // Hide badge
             document.getElementById('premiumBadge').style.display = 'none';
 
@@ -4418,6 +4438,8 @@
             // Close dropdown if open
             const dd = document.getElementById('navUserDropdown');
             if (dd) dd.classList.remove('show');
+
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { action: 'logout' } }));
         }
 
         // Toggle user dropdown in navbar

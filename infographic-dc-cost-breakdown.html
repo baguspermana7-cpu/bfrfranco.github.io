@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Center Cost Anatomy — Where Does Your $10M Go? | ResistanceZero</title>
+    <meta name="description" content="Interactive cost breakdown of a $10M data center build. Explore how electrical, mechanical, IT, and construction costs stack up with clickable donut charts and tier comparisons.">
+    <meta name="keywords" content="Data Center Cost Breakdown, CAPEX, Data Center Build Cost, Cooling Cost, Electrical Cost, Tier III Cost, Data Center Construction">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#f59e0b">
+    <link rel="canonical" href="https://resistancezero.com/infographic-dc-cost-breakdown.html">
+
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/infographic-dc-cost-breakdown.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/infographic-dc-cost-breakdown.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/infographic-dc-cost-breakdown.html">
+    <meta property="og:title" content="Data Center Cost Anatomy — Where Does Your $10M Go?">
+    <meta property="og:description" content="Mechanical/cooling takes 28% of a $10M DC build. Interactive donut chart, tier cost multipliers, and the hidden costs most people miss.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Data Center Cost Anatomy Interactive Infographic">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Data Center Cost Anatomy — Where Does Your $10M Go?">
+    <meta name="twitter:description" content="Cooling = 28% of total build cost. Interactive breakdown of a $10M data center with tier comparisons and AI/HPC cost multipliers.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Data Center Cost Breakdown Infographic">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/"},
+            {"@type": "ListItem", "position": 2, "name": "Infographics", "item": "https://resistancezero.com/insights.html"},
+            {"@type": "ListItem", "position": 3, "name": "Data Center Cost Anatomy"}
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the biggest cost in building a data center?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Mechanical and cooling systems represent the largest single cost category at approximately 28% of total build cost ($2.8M out of a $10M build). This includes chillers, CRAH/CRAC units, piping, cooling towers, containment systems, and building management system integration. For AI/HPC facilities with liquid cooling, this can rise to 35%+."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much more does a Tier IV data center cost compared to Tier II?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A Tier IV data center typically costs 2.0-2.5x more than a Tier II facility due to full 2N redundancy across all systems. A Tier II facility at $10M would cost approximately $15M at Tier III (1.5x) and $22M at Tier IV (2.2x). The premium buys concurrent maintainability and fault tolerance with 99.995% uptime."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why do AI data centers cost 3x more per rack than traditional ones?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "AI/HPC racks cost 3x more because they require 30-100+ kW per rack versus 5-10 kW for traditional IT. This demands liquid cooling infrastructure ($500K+ per row), higher-capacity electrical distribution, reinforced floor loading, and specialized fire suppression. The power density alone requires 5-10x more electrical and cooling infrastructure per rack."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=20260225">
+
+    <style>
+        :root { --ig-color: #f59e0b; --ig-light: #fbbf24; --ig-dark: #d97706; --ig-bg: rgba(245,158,11,0.08); --ig-border: rgba(245,158,11,0.25); }
+
+        /* Hero */
+        .ig-hero {
+            background: linear-gradient(135deg, #1c1207 0%, #2e1d06 40%, #451a03 100%);
+            padding: 7rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .ig-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .ig-hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .ig-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--ig-bg);
+            color: var(--ig-color);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--ig-border);
+        }
+        .ig-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        .ig-hero h1 span { color: var(--ig-color); }
+        .ig-hero p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+        .ig-hero-total {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--ig-color);
+            margin-bottom: 0.3rem;
+        }
+        .ig-hero-total-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Sections */
+        .ig-section {
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .ig-section-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        .ig-section-sub {
+            font-size: 1rem;
+            color: var(--text-secondary, #64748b);
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Donut Chart */
+        .ig-donut-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .ig-donut-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            flex-shrink: 0;
+        }
+        .ig-donut-svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .ig-donut-segment {
+            fill: none;
+            stroke-width: 45;
+            opacity: 0.85;
+            transition: opacity 0.3s, stroke-width 0.3s;
+            cursor: pointer;
+        }
+        .ig-donut-segment:hover,
+        .ig-donut-segment.active {
+            opacity: 1;
+            stroke-width: 52;
+        }
+        .ig-donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        .ig-donut-center-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--ig-color);
+            display: block;
+            transition: color 0.3s;
+        }
+        .ig-donut-center-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary, #94a3b8);
+            display: block;
+            max-width: 120px;
+        }
+        .ig-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            flex: 1;
+            min-width: 260px;
+        }
+        .ig-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 1px solid transparent;
+        }
+        .ig-legend-item:hover,
+        .ig-legend-item.active {
+            background: var(--bg-secondary, rgba(255,255,255,0.05));
+            border-color: var(--ig-border);
+        }
+        .ig-legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .ig-legend-info { flex: 1; }
+        .ig-legend-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .ig-legend-detail {
+            font-size: 0.75rem;
+            color: var(--text-secondary, #64748b);
+        }
+        .ig-legend-pct {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--ig-color);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* Detail Card */
+        .ig-detail-card {
+            max-width: 700px;
+            margin: 2rem auto 0;
+            background: var(--bg-secondary, rgba(255,255,255,0.05));
+            border: 1px solid var(--ig-border);
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+        .ig-detail-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .ig-detail-cost {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--ig-color);
+            margin-bottom: 0.75rem;
+        }
+        .ig-detail-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary, #94a3b8);
+            line-height: 1.6;
+        }
+
+        /* Tier Comparison */
+        .ig-tier-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        @media (max-width: 700px) { .ig-tier-grid { grid-template-columns: 1fr; } }
+        .ig-tier-card {
+            background: var(--bg-secondary, rgba(255,255,255,0.05));
+            border: 1px solid var(--ig-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .ig-tier-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--ig-color);
+        }
+        .ig-tier-card.featured {
+            border-color: var(--ig-color);
+            box-shadow: 0 0 30px rgba(245,158,11,0.1);
+        }
+        .ig-tier-card.featured::before {
+            content: 'Most Common';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--ig-color);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.3rem;
+        }
+        .ig-tier-label {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .ig-tier-card.featured .ig-tier-label { margin-top: 1rem; }
+        .ig-tier-multiplier {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--ig-color);
+            margin-bottom: 0.3rem;
+        }
+        .ig-tier-cost {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary, #94a3b8);
+            margin-bottom: 1rem;
+        }
+        .ig-tier-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        .ig-tier-features li {
+            font-size: 0.82rem;
+            color: var(--text-secondary, #94a3b8);
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .ig-tier-features li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--ig-color);
+            margin-top: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        /* Key Facts */
+        .ig-facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .ig-fact-card {
+            background: var(--bg-secondary, rgba(255,255,255,0.05));
+            border: 1px solid var(--ig-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .ig-fact-card:hover { transform: translateY(-4px); }
+        .ig-fact-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--ig-bg);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .ig-fact-icon svg { width: 28px; height: 28px; stroke: var(--ig-color); }
+        .ig-fact-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .ig-fact-text {
+            font-size: 0.88rem;
+            color: var(--text-secondary, #94a3b8);
+            line-height: 1.5;
+        }
+
+        /* Share Buttons */
+        .ig-share-section { text-align: center; padding: 3rem 2rem; max-width: 600px; margin: 0 auto; }
+        .ig-share-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
+        .ig-share-btns { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+        .ig-share-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem;
+            border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: none;
+            border: none; cursor: pointer; transition: transform 0.2s, opacity 0.2s; color: #fff;
+        }
+        .ig-share-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .ig-share-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .ig-share-btn.x-btn { background: #000; }
+        .ig-share-btn.li-btn { background: #0077b5; }
+        .ig-share-btn.fb-btn { background: #1877f2; }
+        .ig-share-btn.copy-btn { background: var(--ig-dark); }
+        .ig-copy-toast {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--ig-color); color: #000; padding: 0.7rem 1.5rem; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 600; z-index: 1000; transition: transform 0.3s; pointer-events: none;
+        }
+        .ig-copy-toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">
+                        DC Solutions
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="datahallAI.html" style="color: #8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                        <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                        <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+                <li class="nav-dropdown">
+                    <a href="articles.html" class="nav-link">
+                        Insights
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li><a href="future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main id="main-content">
+    <!-- Hero -->
+    <section class="ig-hero">
+        <div class="ig-hero-content">
+            <span class="ig-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Interactive Infographic
+            </span>
+            <h1>Data Center <span>Cost</span> Anatomy</h1>
+            <p>Where does your $10 million go when building a data center? Click each segment to explore the true cost breakdown of mission-critical infrastructure.</p>
+            <div class="ig-hero-total" id="heroTotal">$10M</div>
+            <div class="ig-hero-total-label">Total Build Cost (Baseline Tier III)</div>
+        </div>
+    </section>
+
+    <!-- Donut Chart + Legend -->
+    <section class="ig-section">
+        <h2 class="ig-section-title">Cost Breakdown</h2>
+        <p class="ig-section-sub">Hover or click each segment to see detailed cost analysis</p>
+        <div class="ig-donut-wrapper">
+            <div class="ig-donut-container">
+                <svg class="ig-donut-svg" viewBox="0 0 200 200" id="donutChart">
+                    <circle class="ig-donut-segment" data-idx="0" cx="100" cy="100" r="70" stroke="#f59e0b" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="1" cx="100" cy="100" r="70" stroke="#ef4444" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="2" cx="100" cy="100" r="70" stroke="#8b5cf6" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="3" cx="100" cy="100" r="70" stroke="#06b6d4" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="4" cx="100" cy="100" r="70" stroke="#10b981" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="5" cx="100" cy="100" r="70" stroke="#64748b" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="6" cx="100" cy="100" r="70" stroke="#a855f7" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                    <circle class="ig-donut-segment" data-idx="7" cx="100" cy="100" r="70" stroke="#ec4899" stroke-dasharray="0 440" stroke-dashoffset="0"/>
+                </svg>
+                <div class="ig-donut-center">
+                    <span class="ig-donut-center-val" id="donutCenterVal">$10M</span>
+                    <span class="ig-donut-center-label" id="donutCenterLabel">Total Build Cost</span>
+                </div>
+            </div>
+            <div class="ig-legend" id="donutLegend"></div>
+        </div>
+        <div class="ig-detail-card" id="detailCard">
+            <div class="ig-detail-title" id="detailTitle">Mechanical / Cooling — $2.8M</div>
+            <div class="ig-detail-cost" id="detailCost">28% of Total Build</div>
+            <div class="ig-detail-text" id="detailText">The single largest cost category. Includes chillers, cooling towers, CRAH/CRAC units, piping systems, hot/cold aisle containment, and BMS integration. For AI/HPC facilities requiring liquid cooling, this can rise to 35%+ of total cost.</div>
+        </div>
+    </section>
+
+    <!-- Tier Comparison -->
+    <section class="ig-section" style="background: var(--bg-secondary, rgba(255,255,255,0.02)); border-radius: 0; max-width: 100%; padding: 4rem 2rem;">
+        <h2 class="ig-section-title">Tier Cost Multipliers</h2>
+        <p class="ig-section-sub">How redundancy requirements scale the cost of a $10M baseline build</p>
+        <div class="ig-tier-grid">
+            <div class="ig-tier-card">
+                <div class="ig-tier-label">Tier II</div>
+                <div class="ig-tier-multiplier">1.0x</div>
+                <div class="ig-tier-cost">$10M</div>
+                <ul class="ig-tier-features">
+                    <li>N+1 redundancy</li>
+                    <li>Single distribution path</li>
+                    <li>99.741% uptime (22h downtime/yr)</li>
+                    <li>Planned maintenance requires shutdown</li>
+                </ul>
+            </div>
+            <div class="ig-tier-card featured">
+                <div class="ig-tier-label">Tier III</div>
+                <div class="ig-tier-multiplier">1.5x</div>
+                <div class="ig-tier-cost">$15M</div>
+                <ul class="ig-tier-features">
+                    <li>N+1 redundancy</li>
+                    <li>Dual distribution paths</li>
+                    <li>99.982% uptime (1.6h downtime/yr)</li>
+                    <li>Concurrently maintainable</li>
+                </ul>
+            </div>
+            <div class="ig-tier-card">
+                <div class="ig-tier-label">Tier IV</div>
+                <div class="ig-tier-multiplier">2.2x</div>
+                <div class="ig-tier-cost">$22M</div>
+                <ul class="ig-tier-features">
+                    <li>2N+1 full redundancy</li>
+                    <li>Dual active distribution</li>
+                    <li>99.995% uptime (26min downtime/yr)</li>
+                    <li>Fault tolerant — survives any single failure</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Facts -->
+    <section class="ig-section">
+        <h2 class="ig-section-title">Key Cost Facts</h2>
+        <p class="ig-section-sub">Numbers that define data center economics</p>
+        <div class="ig-facts-grid">
+            <div class="ig-fact-card">
+                <div class="ig-fact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v3H6a1 1 0 0 0-1 1v9h14v-9a1 1 0 0 0-1-1h-1V7a5 5 0 0 0-5-5z"/></svg>
+                </div>
+                <div class="ig-fact-title">Cooling = Largest Single Cost</div>
+                <div class="ig-fact-text">At 28% of total CAPEX, mechanical/cooling is the largest single line item. It exceeds even electrical infrastructure (22%) and determines long-term OPEX efficiency.</div>
+            </div>
+            <div class="ig-fact-card">
+                <div class="ig-fact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                </div>
+                <div class="ig-fact-title">AI Racks Cost 3x Traditional</div>
+                <div class="ig-fact-text">A traditional 5-10 kW rack costs ~$15K to deploy. An AI/HPC rack at 40-100+ kW costs $45K-$80K due to liquid cooling, high-density power, and reinforced infrastructure.</div>
+            </div>
+            <div class="ig-fact-card">
+                <div class="ig-fact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="ig-fact-title">5% Contingency Is Not Enough</div>
+                <div class="ig-fact-text">Industry best practice recommends 10-15% contingency for greenfield builds. Supply chain delays, permitting issues, and scope changes routinely consume the 5% baseline.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Share -->
+    <section class="ig-share-section">
+        <h2 class="ig-share-title">Share This Infographic</h2>
+        <div class="ig-share-btns">
+            <a class="ig-share-btn x-btn" href="https://twitter.com/intent/tweet?text=Where%20does%20%2410M%20go%20when%20building%20a%20data%20center%3F%20Cooling%20%3D%2028%25%2C%20Electrical%20%3D%2022%25.%20Interactive%20cost%20breakdown%3A&url=https%3A%2F%2Fresistancezero.com%2Finfographic-dc-cost-breakdown.html" target="_blank" rel="noopener" aria-label="Share on X">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Share on X
+            </a>
+            <a class="ig-share-btn li-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fresistancezero.com%2Finfographic-dc-cost-breakdown.html" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
+                <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                LinkedIn
+            </a>
+            <a class="ig-share-btn fb-btn" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fresistancezero.com%2Finfographic-dc-cost-breakdown.html" target="_blank" rel="noopener" aria-label="Share on Facebook">
+                <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
+            </a>
+            <button class="ig-share-btn copy-btn" id="copyLinkBtn" aria-label="Copy link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Copy Link
+            </button>
+        </div>
+    </section>
+    </main>
+
+    <!-- Independence Disclaimer -->
+    <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
+        <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#f59e0b;">Terms &amp; Disclaimer</a></p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home Dashboard</a></li>
+                        <li><a href="articles.html">Technical Journal</a></li>
+                        <li><a href="index.html#case-studies">Case Studies</a></li>
+                        <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+                        <li><a href="articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.min.js?v=20260225"></script>
+    <script src="auth.js?v=20260228"></script>
+    <script src="rz-tracker.js"></script>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions">
+            <button class="cookie-accept" id="cookieAccept">Accept</button>
+            <button class="cookie-decline" id="cookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <!-- Toast -->
+    <div class="ig-copy-toast" id="copyToast">Link copied to clipboard!</div>
+
+    <script>
+    (function(){
+        // Cookie Banner
+        var cb = document.getElementById('cookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) { cb.classList.remove('hidden'); }
+        var acceptBtn = document.getElementById('cookieAccept');
+        var declineBtn = document.getElementById('cookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent', 'accepted'); cb.classList.add('hidden'); });
+        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent', 'declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+
+        // Scroll to Top
+        var sBtn = document.getElementById('scrollTopBtn');
+        if (sBtn) {
+            var ticking = false;
+            window.addEventListener('scroll', function(){
+                if (!ticking) {
+                    window.requestAnimationFrame(function(){
+                        sBtn.classList[window.scrollY > 500 ? 'add' : 'remove']('visible');
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+            sBtn.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        }
+
+        // Donut Chart Data
+        var segments = [
+            { name: 'Mechanical / Cooling', pct: 28, cost: '$2.8M', color: '#ef4444', detail: 'The single largest cost category. Includes chillers, cooling towers, CRAH/CRAC units, piping systems, hot/cold aisle containment, and BMS integration. For AI/HPC facilities requiring liquid cooling, this can rise to 35%+ of total cost.' },
+            { name: 'Electrical', pct: 22, cost: '$2.2M', color: '#f59e0b', detail: 'UPS systems, PDUs, switchgear, transformers, generators, and electrical distribution. High-density AI racks require 3-5x more electrical capacity per rack, pushing this category higher.' },
+            { name: 'IT Infrastructure', pct: 18, cost: '$1.8M', color: '#8b5cf6', detail: 'Racks, cabling (structured copper and fiber), network switches, patch panels, and cable management. AI deployments add GPU servers, high-speed interconnects, and specialized networking.' },
+            { name: 'Construction / Civil', pct: 15, cost: '$1.5M', color: '#06b6d4', detail: 'Building shell, raised floor or slab, structural reinforcement, roof and walls, loading docks, and site work. Modular/prefab construction can reduce this by 20-30%.' },
+            { name: 'Fire Suppression', pct: 5, cost: '$0.5M', color: '#10b981', detail: 'Clean agent (Novec/FM-200) systems, VESDA early detection, pre-action sprinklers, and gas detection. Code compliance varies significantly by jurisdiction.' },
+            { name: 'Security', pct: 4, cost: '$0.4M', color: '#64748b', detail: 'Access control, CCTV, mantraps, biometric readers, fencing, bollards, and security operations center (SOC) infrastructure. Hyperscalers spend 2-3x on physical security.' },
+            { name: 'Commissioning', pct: 3, cost: '$0.3M', color: '#a855f7', detail: 'Integrated systems testing (IST), Level 4/5 commissioning, performance verification, and documentation. Critical for Tier III/IV certification — never skip this.' },
+            { name: 'Contingency', pct: 5, cost: '$0.5M', color: '#ec4899', detail: 'Budget reserve for scope changes, supply chain delays, permitting issues, and unforeseen conditions. Best practice is 10-15%, but 5% is the minimum baseline.' }
+        ];
+
+        var circumference = 2 * Math.PI * 70; // ~439.82
+        var legend = document.getElementById('donutLegend');
+        var centerVal = document.getElementById('donutCenterVal');
+        var centerLabel = document.getElementById('donutCenterLabel');
+        var detailTitle = document.getElementById('detailTitle');
+        var detailCost = document.getElementById('detailCost');
+        var detailText = document.getElementById('detailText');
+        var circles = document.querySelectorAll('.ig-donut-segment');
+
+        // Build donut segments and legend
+        var offset = 0;
+        segments.forEach(function(seg, i) {
+            var arc = (seg.pct / 100) * circumference;
+            var gap = 2;
+            circles[i].setAttribute('stroke', seg.color);
+            circles[i].setAttribute('stroke-dasharray', (arc - gap) + ' ' + (circumference - arc + gap));
+            circles[i].setAttribute('stroke-dashoffset', -offset);
+            offset += arc;
+
+            var item = document.createElement('div');
+            item.className = 'ig-legend-item';
+            item.setAttribute('data-idx', i);
+            item.innerHTML = '<div class="ig-legend-dot" style="background:' + seg.color + '"></div>' +
+                '<div class="ig-legend-info"><div class="ig-legend-name">' + seg.name + '</div><div class="ig-legend-detail">' + seg.cost + '</div></div>' +
+                '<div class="ig-legend-pct">' + seg.pct + '%</div>';
+            legend.appendChild(item);
+        });
+
+        function selectSegment(idx) {
+            var seg = segments[idx];
+            circles.forEach(function(c, i) {
+                c.classList.toggle('active', i === idx);
+            });
+            legend.querySelectorAll('.ig-legend-item').forEach(function(l, i) {
+                l.classList.toggle('active', i === idx);
+            });
+            centerVal.textContent = seg.cost;
+            centerVal.style.color = seg.color;
+            centerLabel.textContent = seg.name;
+            detailTitle.textContent = seg.name + ' — ' + seg.cost;
+            detailCost.textContent = seg.pct + '% of Total Build';
+            detailCost.style.color = seg.color;
+            detailText.textContent = seg.detail;
+        }
+
+        circles.forEach(function(c) {
+            c.addEventListener('mouseenter', function() { selectSegment(parseInt(this.getAttribute('data-idx'))); });
+            c.addEventListener('click', function() { selectSegment(parseInt(this.getAttribute('data-idx'))); });
+        });
+        legend.querySelectorAll('.ig-legend-item').forEach(function(l) {
+            l.addEventListener('mouseenter', function() { selectSegment(parseInt(this.getAttribute('data-idx'))); });
+            l.addEventListener('click', function() { selectSegment(parseInt(this.getAttribute('data-idx'))); });
+        });
+
+        // Default: show cooling
+        selectSegment(0);
+
+        // Copy Link
+        document.getElementById('copyLinkBtn').addEventListener('click', function() {
+            navigator.clipboard.writeText('https://resistancezero.com/infographic-dc-cost-breakdown.html').then(function() {
+                var toast = document.getElementById('copyToast');
+                toast.classList.add('show');
+                setTimeout(function() { toast.classList.remove('show'); }, 2000);
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

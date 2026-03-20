@@ -202,6 +202,45 @@ For pages without a custom cover: `assets/profile-photo.jpg`
 
 ---
 
+## Growth Plan — Implemented (March 2026)
+
+The following SEO growth features were implemented as part of the viral growth plan:
+
+| Feature | Files Created | Impact |
+|---------|---------------|--------|
+| **Programmatic SEO** — 10 city-specific DC market pages | `dc-market/*.html` (10 cities + hub) | Long-tail keywords for Singapore, Jakarta, KL, Sydney, Tokyo, Mumbai, Dubai, London, Frankfurt, NoVA |
+| **"vs" Comparison Pages** — 10 head-to-head comparison articles | `compare-*.html` (10 pages) | Featured snippet targeting: "X vs Y data center" |
+| **Glossary Hub** — 300+ data center terms | `glossary.html` | DefinedTerm schema, A-Z navigation, search, featured snippets |
+| **Topic Cluster Pillar Pages** — 5 authority hubs | `pillar-*.html` (cooling, power, fire-safety, standards, sustainability) | Topical authority, internal linking, CollectionPage schema |
+| **ASEAN DC Standards Report** | `asean-dc-report-2026.html` | Annual report with data tables, CSS charts, investment forecast |
+| **Multilingual (Bahasa Indonesia)** | `id/index.html`, `id/artikel.html`, `id/glosarium.html` | Indonesian market targeting, hreflang id/en |
+| **Interactive Infographics** — 3 shareable visualizations | `infographic-pue-global.html`, `infographic-dc-cost-breakdown.html`, `infographic-dc-sustainability.html` | Social sharing, CSS-only animations, embedded calculators |
+| **Embeddable Widgets** — iframe calculator versions | `embed/pue-widget.html`, `embed/capex-widget.html`, `embed/carbon-widget.html` | Backlink generation, "Powered by ResistanceZero" |
+| **PWA** — Progressive Web App support | `manifest.json`, `sw.js` | Offline access, installable, cache-first for assets |
+| **Gamification** — Achievement badges + tracking | `achievements.html`, `rz-gamification.js` | User engagement, 17 achievements across 5 categories |
+| **Schema Markup Expansion** | BreadcrumbList on 24+ pages | Rich results, site links |
+| **Core Web Vitals** | width/height on images, lazy loading | LCP, CLS optimization |
+| **Bing/Yandex Submission** | IndexNow, robots.txt updates | Multi-engine indexing |
+
+### Sitemap & Search Index Maintenance
+- **Sitemap**: Started at 43 URLs → now 85+ URLs
+- **Search index**: Started at 33 entries → now 73+ entries
+- Both files MUST be updated whenever new pages are added
+
+### New Page Checklist (for growth pages)
+All new growth pages follow these standards:
+- [ ] BreadcrumbList + FAQPage JSON-LD schema
+- [ ] hreflang en + x-default (+ `id` for Indonesian pages)
+- [ ] OG/Twitter meta tags
+- [ ] `.nav-menu` navbar pattern (Type A)
+- [ ] Dark/light mode support
+- [ ] auth.js loaded before `</body>`
+- [ ] Cookie banner
+- [ ] Mobile responsive
+- [ ] Added to `sitemap.xml` and `search-index.json`
+
+---
+
 ## Excluded Ideas
 
 | Idea | Reason |
