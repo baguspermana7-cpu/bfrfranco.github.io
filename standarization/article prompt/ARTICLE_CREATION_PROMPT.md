@@ -1,6 +1,6 @@
 # Article Creation Prompt Standard -- ResistanceZero
 
-> **Version**: 1.0 | **Updated**: 2026-03-20
+> **Version**: 1.1 | **Updated**: 2026-03-20
 
 ---
 
@@ -49,10 +49,19 @@ RELATED ARTICLES (3):
 3. article-[Z].html — [Title] — [Short description]
 
 HAS_CALCULATOR: [yes/no]
-  (If yes, specify: calculator name, inputs, outputs, formulas, Free/Pro)
+  (If yes, fill in the Calculator Context Block from Section 5.2:)
+  Calculator title:   [e.g. "DC Talent Gap Analyzer"]
+  Calculator focus:   [one-sentence description]
+  Domain/topic:       [e.g. workforce, energy, infrastructure]
+  CSS prefix:         [e.g. tgs-, hfx-]
+  Country data:       [yes/no]
+  Benchmark sources:  [2-3 sources]
+  FREE INPUTS (6-8):  [list each: name, type, default, range]
+  PRO INPUTS (4-6):   [list each: name, type, default]
+  FREE RESULTS (4):   [list each metric card name]
 
 SOCIAL MEDIA DRAFTS: [yes/no]
-  (If yes: X 3 posts, Mastodon 3 posts, LinkedIn, Medium, Quora)
+  (If yes: X 3 posts, Mastodon 3 posts, LinkedIn, Medium, Quora, TikTok script)
 
 Follow the ARTICLE_CREATION_PROMPT.md standard at:
 /home/baguspermana7/rz-work/standarization/article prompt/ARTICLE_CREATION_PROMPT.md
@@ -715,7 +724,7 @@ The TOC script auto-discovers `h2[id]` elements inside `.article-body` or `.arti
 
 ---
 
-## 5. Calculator Integration (Optional)
+## 5. Calculator Integration (When `HAS_CALCULATOR: yes`)
 
 Only add calculators to engineering/data-driven articles. Skip for editorial or analysis-only articles.
 
@@ -725,31 +734,230 @@ Only add calculators to engineering/data-driven articles. Skip for editorial or 
 - Readers would benefit from personalizing the data to their own situation
 - Article has tables/charts that could be interactive
 
-### 5.2 Calculator Pattern
+### 5.2 Calculator Context Block
 
-| Element | Convention |
-|---------|-----------|
-| Container prefix | 2-3 letter prefix (e.g., `wc-` for water calc, `ai-` for AI calc) |
-| Tab prefix | 3-letter per tab (e.g., `wfc`, `dcw`, `avh`) |
-| CSS placement | Before `</style>` tag |
-| HTML placement | After article body final paragraph, before `.author-bio` |
-| JS placement | After TOC script, before `auth.js` |
-| Free/Pro mode | `localStorage.getItem('rz_premium_session')`, demo credentials `demo@resistancezero.com` / `demo2026` |
-| Auto-calculate | `change` event + debounced `input` event (400ms) |
-| PDF export | Use shared helpers: `wcPDFCSS`, `wcPDFHead(title, subtitle)`, `wcPDFFoot()`, `wcSVGBar(data, highlightKey, w, h)` |
-| Disclaimer | Required at bottom: "Results are estimates based on industry data..." |
+Fill this in with the prompt when requesting a calculator:
 
-### 5.3 Calculator Checklist
+```
+Calculator title:   [e.g. "DC Talent Gap Analyzer"]
+Calculator focus:   [one-sentence description of what it calculates]
+Domain/topic:       [e.g. web traffic, energy cost, workforce, infrastructure]
+CSS prefix:         [e.g. tgs-, hfx-, rfs-]
+Country data:       [Yes / No — does it need a country/region selector?]
+Benchmark sources:  [cite 2-3 sources that inform default values]
+```
 
-- [ ] All tabs switch correctly
-- [ ] Each calculator produces correct results with default values
-- [ ] Reset clears results
-- [ ] PDF export opens new window with formatted report
-- [ ] Free/Pro toggle works (if applicable)
-- [ ] Mobile responsive (768px, 480px)
-- [ ] Dark mode renders correctly
-- [ ] No JS console errors
-- [ ] Disclaimer present
+### 5.3 Calculator Architecture
+
+**Free Mode** (always available, no auth required):
+- **6-8 input fields**, each with a tooltip (title / description / formula)
+- **4 result metric cards** — dark gradient background, accent-colored values
+- **Dynamic narrative block** — 2-3 sentences adapting to inputs, referencing actual values
+
+**Pro Mode** (gated behind authentication):
+- **4-6 additional inputs** shown only after login
+- **4 Pro panels**, each with gate overlay (lock icon + "Unlock Pro Analysis")
+
+### 5.4 Standard Pro Panels (ALL 4 REQUIRED)
+
+**Panel 1 — Monte Carlo Risk Distribution**
+- N = 10,000 iterations minimum
+- Box-Muller normal distribution, ±15% variance on primary variables
+- Output: P5, P25, P50, P75, P95 percentiles
+- Chart.js histogram with 30 bins
+- KPI cards: P5, P50, P95
+
+```js
+// Monte Carlo pattern
+function runMonteCarlo(baseInputs) {
+  var N = 10000, results = [];
+  for (var i = 0; i < N; i++) {
+    var u1 = Math.random(), u2 = Math.random();
+    var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    var varied = {};
+    for (var key in baseInputs) {
+      varied[key] = baseInputs[key] * (1 + z * 0.15);
+      if (varied[key] < 0) varied[key] = 0;
+    }
+    results.push(calculatePrimaryMetric(varied));
+  }
+  results.sort(function(a, b) { return a - b; });
+  return {
+    scores: results,
+    p5:  results[Math.floor(N * 0.05)],
+    p50: results[Math.floor(N * 0.50)],
+    p95: results[Math.floor(N * 0.95)]
+  };
+}
+```
+
+**Panel 2 — Multi-Period Projection**
+- Minimum 3 data series (e.g., needed / available / gap)
+- Chart.js line or area chart with legend
+- KPI cards for key milestone years
+
+**Panel 3 — Sensitivity Tornado**
+- Test 5-8 variables at ±20%
+- Compute delta from base case, sort by absolute impact
+- Chart.js horizontal bar chart (`indexAxis: 'y'`)
+- Green = cost decrease, Red = cost increase
+
+```js
+// Sensitivity pattern
+function runSensitivity(baseInputs, baseResult) {
+  var results = [];
+  Object.keys(baseInputs).forEach(function(key) {
+    var low  = Object.assign({}, baseInputs);
+    var high = Object.assign({}, baseInputs);
+    low[key]  = baseInputs[key] * 0.80;
+    high[key] = baseInputs[key] * 1.20;
+    results.push({
+      name:  key,
+      low:   calculatePrimaryMetric(low)  - baseResult,
+      high:  calculatePrimaryMetric(high) - baseResult,
+      range: Math.abs(calculatePrimaryMetric(high) - calculatePrimaryMetric(low))
+    });
+  });
+  results.sort(function(a, b) { return b.range - a.range; });
+  return results;
+}
+```
+
+**Panel 4 — Strategic Narrative & Roadmap**
+- 3-4 dynamically generated paragraphs
+- Reference actual calculated values (never generic placeholders)
+- Branched logic for at least 3 risk tiers (high / medium / low)
+- Specific, actionable recommendations with priority badges
+
+### 5.5 Auth Integration
+
+Follow AUTH_STANDARD.md. **3 valid credentials (NEVER deviate):**
+
+| Email | Password | Tier |
+|-------|----------|------|
+| `demo@resistancezero.com` | `demo2026` | pro |
+| `bagus@resistancezero.com` | `RZ@Premium2026!` | pro |
+| `admin@resistancezero.com` | `RZ@Premium2026!` | pro |
+
+**Required auth behavior:**
+- Store session in `rz_premium_session` (localStorage), expires 30 days
+- Dispatch `rz-auth-change` event on login/logout
+- Listen for `rz-auth-change` to sync cross-page auth
+- Check session validity on page load — auto-unlock Pro if valid
+- Login modal MUST include Terms & Privacy links with accent color
+- Free/Pro as **separate buttons** in mode-bar (NEVER a single toggle)
+- Pro button NEVER rebound to logout function
+
+### 5.6 Input Specifications
+
+Every input MUST have a tooltip:
+```html
+<label>
+  [Input Name]
+  <span class="[prefix]tooltip-trigger">?
+    <span class="[prefix]tooltip-content">
+      <div class="[prefix]tooltip-title">[Input Name]</div>
+      <div class="[prefix]tooltip-desc">[1-2 sentences]</div>
+      <div class="[prefix]tooltip-formula">[Formula or range]</div>
+    </span>
+  </span>
+</label>
+```
+
+All inputs fire `input` and `change` events → `calculate()`.
+
+### 5.7 PDF Export
+
+Follow PDF_EXPORT_STANDARD.md.
+
+**CRITICAL**: `window.open()` FIRST before any computation. Never use Blob/URL.createObjectURL.
+
+**Free PDF**: Header → 4-KPI row → Input params table → SVG chart → Narrative → Recommendations → Methodology → Footer
+**Pro PDF adds**: Monte Carlo KPI + SVG histogram → Projection SVG → Tornado SVG → Executive narrative
+
+- Charts: **inline SVG only** (Canvas CANNOT be captured in print popup)
+- Body text: `#1f2937` (NEVER light gray)
+- Charts side-by-side (2-col flex), never single centered
+- KPI grid 3-4 columns, no orphan single card
+
+### 5.8 CSS Conventions
+
+Use article-specific prefix (`[prefix]`). Standard class patterns:
+
+```
+[prefix]input-grid, [prefix]input-group
+[prefix]results-grid, [prefix]result-card, [prefix]result-value, [prefix]result-label
+[prefix]narrative
+[prefix]pro-inputs, [prefix]pro-grid
+[prefix]pro-panels, [prefix]pro-panel, [prefix]pro-panel-inner
+[prefix]gate-overlay
+[prefix]kpi-grid, [prefix]kpi-card, [prefix]kpi-value, [prefix]kpi-label
+[prefix]chart-container
+[prefix]tooltip-trigger, [prefix]tooltip-content
+[prefix]benchmark-meta, [prefix]benchmark-tag
+[prefix]disclaimer
+[prefix]login-overlay, [prefix]login-box
+```
+
+### 5.9 Calculator Section Layout
+
+```
+.calculator-section
+├── Title + Subtitle
+├── Toolbar Row
+│   ├── Mode Bar (Free | Pro buttons — separate, not toggle)
+│   ├── Actions (Reset | Export PDF)
+│   └── Privacy Badge
+├── Free Input Grid (6-8 inputs with tooltips)
+├── Results Grid (4 metric cards)
+├── Narrative Block
+├── Pro Inputs (hidden by default)
+├── Pro Panels (hidden by default, 4 panels with gate overlays)
+│   ├── Panel 1: Monte Carlo (KPI + histogram)
+│   ├── Panel 2: Projection (KPI + line/area chart)
+│   ├── Panel 3: Tornado (horizontal bar chart)
+│   └── Panel 4: Roadmap (dynamic paragraphs)
+├── Disclaimer
+└── Benchmark Meta Tags
+```
+
+### 5.10 Per-Article Customization
+
+**What varies per article:** CSS prefix, theme color, inputs, formulas, narrative logic, data maps, chart labels
+**What stays fixed:** 4-panel structure, Monte Carlo N=10K, sensitivity ±20%, auth credentials, PDF structure, tooltip system, gate overlay pattern, responsive breakpoints
+
+### 5.11 Lessons Learned (CRITICAL — Do Not Repeat)
+
+1. **NEVER open PDF window after computation** — browsers block it. Open first, compute second.
+2. **NEVER use Canvas in PDF** — always inline SVG.
+3. **NEVER rebind Pro button onclick to logout** — causes accidental logout on click.
+4. **NEVER use a single toggle for Free/Pro** — two separate buttons.
+5. **NEVER omit Terms & Privacy line** from login modals.
+6. **NEVER use `</script>` inside PDF template strings** — use `'</' + 'script>'`.
+7. **ALWAYS dispatch AND listen for `rz-auth-change`** — both directions.
+8. **ALWAYS call `setMode('pro')` inside `activatePremiumUI()`** — prevents "--" on page load.
+9. **ALWAYS load `chartjs-plugin-annotation` separately** if using annotation configs.
+
+### 5.12 Calculator Checklist
+
+- [ ] All 6-8 free inputs have tooltips (title / desc / formula)
+- [ ] 4 result cards populate on load with defaults
+- [ ] Result cards update on every input change
+- [ ] Narrative updates dynamically with actual values
+- [ ] Reset restores all defaults and recalculates
+- [ ] All 3 credentials log in successfully
+- [ ] Login modal has Terms & Privacy links
+- [ ] `rz-auth-change` dispatched and listened
+- [ ] Session auto-restores on page load
+- [ ] Monte Carlo runs 10K iterations
+- [ ] All 4 Pro panels render charts correctly
+- [ ] Sensitivity tornado sorted by absolute impact
+- [ ] Roadmap narrative references actual values
+- [ ] PDF opens popup with SVG charts (not Canvas)
+- [ ] PDF body text #1f2937, charts side-by-side
+- [ ] Dark mode: all elements readable
+- [ ] Mobile: inputs stack, charts scale, toolbar wraps
+- [ ] Privacy badge, disclaimer, benchmark tags present
 
 ---
 
@@ -1028,7 +1236,37 @@ NOTE: Run through humanizer before publishing. Free Medium account — no markdo
 *Originally published at [resistancezero.com](https://resistancezero.com/article-[NN].html)*
 ```
 
-### 8.5 Quora (1 file)
+### 8.5 TikTok Script (1 file, 5-10 min video)
+
+File: `tiktok-script.md`
+
+```
+# TikTok Video Script — [TITLE]
+Duration: [5-10] minutes
+
+## Hook (0:00-0:03)
+[3-second attention grab — shocking stat or contrarian claim]
+
+## Section 1 (0:03-1:30)
+[TALKING POINT]: ...
+[SHOW: visual description]
+[TEXT ON SCREEN: key stat]
+
+## Section 2 (1:30-3:00)
+...
+
+## CTA (end)
+Link in bio → resistancezero.com/article-[NN].html
+Follow for more data center analysis
+@BagusDPermana
+
+## Thumbnail Concept
+[Description of thumbnail image]
+```
+
+**Rules**: Include `[SHOW:]` visual cues, `[TEXT ON SCREEN:]` data callouts, timestamps for each section. Hook must be under 3 seconds. End with CTA + article link.
+
+### 8.6 Quora (1 file)
 
 File: `quora-post.md`
 
@@ -1100,6 +1338,7 @@ Full analysis: [resistancezero.com/article-[NN].html](https://resistancezero.com
 - [ ] LinkedIn post: <= 3000 chars
 - [ ] Medium: SEO title <= 74 chars, humanizer note present
 - [ ] Quora: 5 target questions listed, first-person answer
+- [ ] TikTok: 5-10 min, timestamps, visual cues, CTA at end
 
 ---
 
@@ -1129,3 +1368,15 @@ Choose a distinct color for each new article to maintain visual variety.
 | Navbar wrong pattern | Content pages use `.nav-menu`, calculator pages use `.nav-links` |
 | H2 ID inconsistency | Use `id="section-N"` pattern consistently (most articles use this) |
 | Missing hero image preload | Add `<link rel="preload" as="image" href="assets/article-[NN]-hero.webp">` in head |
+
+---
+
+## Cross-References
+
+| Standard | File | Purpose |
+|----------|------|---------|
+| Pro Mode | `standarization/PRO_MODE_STANDARDIZATION.md` | Component HTML patterns, auth JS, CSS sizing |
+| PDF Export | `standarization/PDF_EXPORT_STANDARD.md` | PDF color palette, SVG chart types, white-space rules |
+| Auth | `standarization/AUTH_STANDARD.md` | Credentials, session format, event system |
+| Tooltip | `standarization/TOOLTIP_STANDARD.md` | Tooltip CSS, JS positioning, content rules |
+| Calculator (detailed) | `standarization/CALCULATOR_PROMPT_STANDARD.md` | Full calculator reference with code patterns (expanded version of Section 5) |
