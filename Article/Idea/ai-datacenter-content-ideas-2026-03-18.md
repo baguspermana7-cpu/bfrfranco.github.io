@@ -131,6 +131,40 @@ Topik berikut SUDAH ditulis — topik baru HARUS berbeda angle:
 
 ---
 
+## NEW IDEAS — Session 2026-03-20
+
+### Content / Articles
+- **AI Cooling Wars** — DLC vs immersion vs air cooling for GPU clusters. Interactive calculator comparing TCO per cooling method
+- **The Real Cost of Uptime** — Tier I-IV data center downtime cost analysis with TIA-942 expertise
+- **Edge DC Explosion** — Why edge data centers are growing faster than hyperscale, and where they're being built
+- **Data Center Fire Safety** — Engineering analysis of fire suppression systems (Novec vs FM-200 vs water mist) for modern DCs
+- **Battery vs Diesel** — BESS replacing diesel generators for backup power — engineering viability and TCO
+
+### Interactive Tools / Calculators
+- **Carbon Footprint Calculator** — Calculate DC carbon emissions by region, PUE, and energy source
+- **Tier Classification Tool** — Input your DC specs, get your TIA-942 tier rating with gap analysis
+- **Cable Tray Load Calculator** — Compute cable tray fill, weight, and runway capacity
+- **Generator Sizing Calculator** — Input IT load + mechanical load → recommended generator size with N+1 redundancy
+- **UPS Battery Runtime Calculator** — Calculate battery runtime based on load, battery type, and temperature
+
+### Portfolio / Business
+- **Case Study Deep Dives** — Expand existing case studies into full interactive pages with before/after metrics and diagrams
+- **Certification Showcase** — Dedicated page for CDFOM, K3 Listrik, and other certs with verification links
+- **Consultation Booking** — Calendly/Cal.com integration for DC engineering consultation calls
+- **Newsletter** — Weekly/monthly DC engineering insights via `contact@resistancezero.com`
+- **DC Operations Dashboard Demo** — Live demo version of DCMOC app embedded in portfolio
+
+### Future Forward Series
+- **AI Replacing Engineers?** — Which DC engineering roles AI will automate vs augment in 5 years
+- **Underwater Data Centers** — Microsoft's Project Natick lessons and the future of subsea DCs
+- **Space Data Centers** — Satellite computing, orbital data processing, and the physics challenges
+
+### Technical Features
+- **Multi-language Support** — Indonesian version of top articles (primary market)
+- **Interactive DC Floorplan Viewer** — SVG-based data hall layout tool where users can drag-drop racks, PDUs, cooling units
+
+---
+
 ## RECOMMENDED FIRST 5 ARTICLES (Production Order)
 
 | # | Topic | Unique Angle | Target Platform |

@@ -1,43 +1,131 @@
 #!/usr/bin/env python3
+"""Unified social media autopost CLI.
+
+Usage:
+    python post_social.py plan   --draft-dir <path> [--platforms x,mastodon,quora,facebook]
+    python post_social.py post   --draft-dir <path> [--platforms x,mastodon,quora,facebook]
+    python post_social.py verify --draft-dir <path> [--platforms x,mastodon,quora,facebook]
+    python post_social.py report --run-dir <path>
+
+Platforms:
+    mastodon  — API-first (requires MASTODON_ACCESS_TOKEN in .env)
+    x         — Selenium Firefox + cookie injection
+    quora     — Selenium Firefox, semi-auto with CAPTCHA checkpoint
+    facebook  — Selenium Firefox + cookie injection (uses LinkedIn draft text)
+
+Environment:
+    Reads .env from the script directory for MASTODON_ACCESS_TOKEN, etc.
+"""
 from __future__ import annotations
 
 import argparse
 import json
 import os
-import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent
+ENV_FILE = ROOT / ".env"
 
-ROOT = Path("/home/baguspermana7/rz-work/Automation/social-autopost")
-BACKEND = ROOT / "scripts" / "firefox_publish_article17.py"
-DEFAULT_DRAFT_DIR = Path("/home/baguspermana7/rz-work/Article/Post Draft/Article 17 - SEA DC Opportunity")
-DEFAULT_COOKIE_SNAPSHOT = Path("/home/baguspermana7/session_cookies_article17.json")
+# Defaults
+DEFAULT_COOKIE_FILE = Path("/home/baguspermana7/session_cookies_article17.json")
 DEFAULT_ARTIFACT_ROOT = ROOT / "artifacts"
-SUPPORTED_POST = {"x", "quora"}
-PLANNED_ONLY = {"mastodon"}
+MASTODON_INSTANCE = "https://mastodon.social"
+ALL_PLATFORMS = ["mastodon", "x", "quora", "facebook"]
 
+
+# ---------------------------------------------------------------------------
+# .env loader
+# ---------------------------------------------------------------------------
+
+def load_dotenv(path: Path = ENV_FILE) -> None:
+    """Load KEY=VALUE pairs from .env into os.environ (no overwrite)."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip("'\"")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+# ---------------------------------------------------------------------------
+# Draft detection
+# ---------------------------------------------------------------------------
+
+def detect_drafts(draft_dir: Path) -> dict:
+    """Scan *draft_dir* and return a summary of available drafts per platform."""
+    # Import here to avoid import errors when just running --help
+    sys.path.insert(0, str(ROOT))
+    from scripts.common import find_drafts
+
+    summary = {}
+    for platform, prefixes in [
+        ("mastodon", ["mastodon-post", "mastodon"]),
+        ("x", ["x-post"]),
+        ("quora", ["quora-post"]),
+        ("facebook", ["linkedin-post", "facebook-post", "linkedin"]),
+    ]:
+        files = []
+        for prefix in prefixes:
+            files = find_drafts(draft_dir, prefix)
+            if files:
+                break
+        summary[platform] = {
+            "exists": bool(files),
+            "count": len(files),
+            "files": [str(f.name) for f in files],
+        }
+    return summary
+
+
+# ---------------------------------------------------------------------------
+# CLI argument parsing
+# ---------------------------------------------------------------------------
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Reusable AI social autopost CLI.")
+    parser = argparse.ArgumentParser(
+        description="Unified social media autopost CLI.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     def add_common(cmd: argparse.ArgumentParser) -> None:
-        cmd.add_argument("--draft-dir", type=Path, default=DEFAULT_DRAFT_DIR)
-        cmd.add_argument("--cookie-snapshot", type=Path, default=DEFAULT_COOKIE_SNAPSHOT)
-        cmd.add_argument("--artifact-root", type=Path, default=DEFAULT_ARTIFACT_ROOT)
-        cmd.add_argument("--platforms", default="x,quora,mastodon")
         cmd.add_argument(
-            "--quora-verify-urls",
-            default="https://www.quora.com/profile/Bagus-Dwi-Permana-1/posts",
+            "--draft-dir", type=Path, required=True,
+            help="Directory containing platform draft files",
         )
-        cmd.add_argument("--json", action="store_true")
+        cmd.add_argument(
+            "--platforms", default="all",
+            help="Comma-separated: mastodon,x,quora or 'all' (default: all)",
+        )
+        cmd.add_argument(
+            "--cookie-file", type=Path, default=DEFAULT_COOKIE_FILE,
+            help="Firefox cookie JSON snapshot for Selenium platforms",
+        )
+        cmd.add_argument(
+            "--artifact-root", type=Path, default=DEFAULT_ARTIFACT_ROOT,
+            help="Root directory for run artifacts",
+        )
+        cmd.add_argument(
+            "--image", type=Path, default=None,
+            help="Hero image to attach (used for Quora and Mastodon media posts)",
+        )
+        cmd.add_argument("--json", action="store_true", help="Output JSON")
 
-    add_common(sub.add_parser("plan", help="Inspect drafts and print the execution plan."))
-    add_common(sub.add_parser("post", help="Post supported platforms using the configured backend."))
-    add_common(sub.add_parser("verify", help="Verify supported platforms without posting."))
-    report = sub.add_parser("report", help="Read a prior run manifest and print a summary.")
+    add_common(sub.add_parser("plan", help="Show execution plan without posting"))
+    add_common(sub.add_parser("post", help="Post to selected platforms"))
+    add_common(sub.add_parser("verify", help="Verify posts exist without posting"))
+
+    report = sub.add_parser("report", help="Show results from a previous run")
     report.add_argument("--run-dir", type=Path, required=True)
     report.add_argument("--json", action="store_true")
 
@@ -45,222 +133,284 @@ def parse_args() -> argparse.Namespace:
 
 
 def selected_platforms(value: str) -> list[str]:
-    raw = [item.strip().lower() for item in value.split(",") if item.strip()]
+    raw = [p.strip().lower() for p in value.split(",") if p.strip()]
     if "all" in raw:
-        return ["mastodon", "x", "quora"]
-    return raw
+        return ALL_PLATFORMS
+    return [p for p in raw if p in ALL_PLATFORMS]
 
 
-def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8").strip()
-
-
-def draft_summary(draft_dir: Path) -> dict:
-    mastodon_parts = sorted(draft_dir.glob("mastodon-post-*.txt"))
-    data = {
-        "x": {
-            "exists": (draft_dir / "x-post.txt").exists(),
-            "path": str(draft_dir / "x-post.txt"),
-            "length": len(read_text(draft_dir / "x-post.txt")) if (draft_dir / "x-post.txt").exists() else None,
-            "recommended_method": "firefox_selenium",
-        },
-        "mastodon": {
-            "exists": bool(mastodon_parts),
-            "paths": [str(p) for p in mastodon_parts],
-            "lengths": [len(read_text(p)) for p in mastodon_parts],
-            "recommended_method": "api_first_browser_fallback",
-        },
-        "quora": {
-            "exists": (draft_dir / "quora-post.txt").exists(),
-            "path": str(draft_dir / "quora-post.txt"),
-            "length": len(read_text(draft_dir / "quora-post.txt")) if (draft_dir / "quora-post.txt").exists() else None,
-            "recommended_method": "firefox_selenium_strict_verify",
-        },
-    }
-    return data
-
-
-def build_env(args: argparse.Namespace, artifact_dir: Path) -> dict[str, str]:
-    env = os.environ.copy()
-    env["SOCIAL_DRAFT_BASE"] = str(args.draft_dir)
-    env["SOCIAL_COOKIE_SNAPSHOT"] = str(args.cookie_snapshot)
-    env["SOCIAL_ARTIFACT_DIR"] = str(artifact_dir)
-    env["SOCIAL_QUORA_VERIFY_URLS"] = args.quora_verify_urls
-    return env
-
-
-def parse_last_json(stdout: str) -> dict:
-    start = stdout.rfind("\n{")
-    if start == -1:
-        start = stdout.find("{")
-    else:
-        start += 1
-    if start == -1:
-        raise ValueError("No JSON block found in command output.")
-    return json.loads(stdout[start:])
-
-
-def run_backend(mode: str, args: argparse.Namespace, artifact_dir: Path) -> dict:
-    cmd = [sys.executable, str(BACKEND), mode]
-    completed = subprocess.run(
-        cmd,
-        text=True,
-        capture_output=True,
-        env=build_env(args, artifact_dir),
-        check=False,
-    )
-    output = (completed.stdout or "") + (completed.stderr or "")
-    (artifact_dir / f"{mode}.log").write_text(output, encoding="utf-8")
-    result = {
-        "mode": mode,
-        "exit_code": completed.returncode,
-        "ok": False,
-    }
-    try:
-        parsed = parse_last_json(completed.stdout or "")
-        result["result"] = parsed
-        result["ok"] = completed.returncode == 0 and any(v.get("ok") for v in parsed.values())
-    except Exception as exc:  # noqa: BLE001
-        result["parse_error"] = str(exc)
-    return result
-
-
-def ensure_run_dir(artifact_root: Path, prefix: str) -> Path:
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    run_dir = artifact_root / f"{prefix}-{stamp}"
-    run_dir.mkdir(parents=True, exist_ok=True)
-    return run_dir
-
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
 
 def command_plan(args: argparse.Namespace) -> int:
     platforms = selected_platforms(args.platforms)
-    summary = draft_summary(args.draft_dir)
+    summary = detect_drafts(args.draft_dir)
+
+    mastodon_token = os.environ.get("MASTODON_ACCESS_TOKEN", "")
     payload = {
         "draft_dir": str(args.draft_dir),
         "platforms": platforms,
-        "support_matrix": {
-            "post_supported": sorted(SUPPORTED_POST),
-            "planned_only": sorted(PLANNED_ONLY),
+        "drafts": {p: summary[p] for p in platforms if p in summary},
+        "readiness": {
+            "mastodon": {
+                "method": "API",
+                "token_set": bool(mastodon_token),
+                "instance": MASTODON_INSTANCE,
+            },
+            "x": {
+                "method": "Selenium Firefox + cookies",
+                "cookie_file": str(args.cookie_file),
+                "cookie_exists": args.cookie_file.exists(),
+            },
+            "quora": {
+                "method": "Selenium Firefox + cookies (semi-auto)",
+                "cookie_file": str(args.cookie_file),
+                "cookie_exists": args.cookie_file.exists(),
+                "note": "Requires human for CAPTCHA/Cloudflare",
+            },
+            "facebook": {
+                "method": "Selenium Firefox + cookies",
+                "cookie_file": str(args.cookie_file),
+                "cookie_exists": args.cookie_file.exists(),
+                "note": "Uses LinkedIn draft text",
+            },
         },
-        "drafts": {platform: summary[platform] for platform in platforms if platform in summary},
-        "notes": [
-            "Quora must be treated as complete only if the post appears in the canonical profile/posts verification URL.",
-            "Mastodon remains API-first in the playbook, but the reusable CLI does not yet ship the API adapter.",
-        ],
     }
+
     if args.json:
         print(json.dumps(payload, indent=2))
     else:
-        print(f"Draft dir: {payload['draft_dir']}")
-        print(f"Platforms: {', '.join(platforms)}")
-        for platform in platforms:
-            item = payload["drafts"].get(platform)
-            if not item:
-                continue
-            print(f"- {platform}: exists={item['exists']} method={item['recommended_method']}")
-        print("Post-supported:", ", ".join(payload["support_matrix"]["post_supported"]))
-        print("Planned-only:", ", ".join(payload["support_matrix"]["planned_only"]))
+        print(f"Draft dir : {args.draft_dir}")
+        print(f"Platforms : {', '.join(platforms)}")
+        print()
+        for p in platforms:
+            d = summary.get(p, {})
+            r = payload["readiness"].get(p, {})
+            status = "READY" if d.get("exists") else "NO DRAFTS"
+            if p == "mastodon" and not mastodon_token:
+                status = "NO TOKEN"
+            elif p in ("x", "quora") and not args.cookie_file.exists():
+                status = "NO COOKIES"
+            print(f"  {p:10s} [{status:10s}] {d.get('count', 0)} file(s)  via {r.get('method', '?')}")
+            for f in d.get("files", []):
+                print(f"             - {f}")
+        print()
     return 0
 
 
 def command_post(args: argparse.Namespace) -> int:
     platforms = selected_platforms(args.platforms)
-    run_dir = ensure_run_dir(args.artifact_root, "post")
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_dir = args.artifact_root / f"post-{stamp}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
     manifest = {
         "command": "post",
+        "timestamp": stamp,
         "draft_dir": str(args.draft_dir),
         "run_dir": str(run_dir),
         "platforms": platforms,
         "results": {},
     }
+
     for platform in platforms:
-        artifact_dir = run_dir / platform
-        artifact_dir.mkdir(parents=True, exist_ok=True)
-        if platform == "x":
-            manifest["results"][platform] = run_backend("x", args, artifact_dir)
+        out_dir = run_dir / platform
+        out_dir.mkdir(parents=True, exist_ok=True)
+        print(f"\n{'='*50}")
+        print(f"  POSTING: {platform.upper()}")
+        print(f"{'='*50}")
+
+        if platform == "mastodon":
+            token = os.environ.get("MASTODON_ACCESS_TOKEN", "")
+            if not token:
+                manifest["results"][platform] = {
+                    "ok": False,
+                    "error": "MASTODON_ACCESS_TOKEN not set in .env",
+                }
+                continue
+            from scripts.mastodon_adapter import post_from_drafts as mastodon_post
+            manifest["results"][platform] = mastodon_post(
+                MASTODON_INSTANCE, token, args.draft_dir, out_dir,
+            )
+
+        elif platform == "x":
+            if not args.cookie_file.exists():
+                manifest["results"][platform] = {
+                    "ok": False,
+                    "error": f"Cookie file not found: {args.cookie_file}",
+                }
+                continue
+            from scripts.x_adapter import post_from_drafts as x_post
+            manifest["results"][platform] = x_post(
+                args.cookie_file, args.draft_dir, out_dir,
+            )
+
         elif platform == "quora":
-            manifest["results"][platform] = run_backend("quoraPost", args, artifact_dir)
-        elif platform == "mastodon":
-            manifest["results"][platform] = {
-                "ok": False,
-                "status": "not_implemented",
-                "reason": "Mastodon adapter is documented but not yet extracted into this reusable CLI.",
-            }
-        else:
-            manifest["results"][platform] = {"ok": False, "status": "unknown_platform"}
+            if not args.cookie_file.exists():
+                manifest["results"][platform] = {
+                    "ok": False,
+                    "error": f"Cookie file not found: {args.cookie_file}",
+                }
+                continue
+            from scripts.quora_adapter import post_from_drafts as quora_post
+            manifest["results"][platform] = quora_post(
+                args.cookie_file, args.draft_dir, out_dir,
+                image_path=getattr(args, "image", None),
+            )
+
+        elif platform == "facebook":
+            if not args.cookie_file.exists():
+                manifest["results"][platform] = {
+                    "ok": False,
+                    "error": f"Cookie file not found: {args.cookie_file}",
+                }
+                continue
+            from scripts.facebook_adapter import post_from_drafts as fb_post
+            manifest["results"][platform] = fb_post(
+                args.cookie_file, args.draft_dir, out_dir,
+                image_path=getattr(args, "image", None),
+            )
+
+    # Save manifest
     (run_dir / "run.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    # Print summary
+    print(f"\n{'='*50}")
+    print("  RESULTS")
+    print(f"{'='*50}")
+    print(f"Run dir: {run_dir}")
+    for platform, result in manifest["results"].items():
+        ok = result.get("ok", False)
+        icon = "OK" if ok else "FAIL"
+        urls = result.get("urls", [])
+        error = result.get("error", "")
+        print(f"  {platform:10s} [{icon:4s}]  {error}")
+        for url in urls:
+            print(f"             -> {url}")
+    print()
+
     if args.json:
         print(json.dumps(manifest, indent=2))
-    else:
-        print(f"Run dir: {run_dir}")
-        for platform, result in manifest["results"].items():
-            print(f"- {platform}: ok={result.get('ok')} status={result.get('status', 'executed')}")
-    return 0
+
+    return 0 if all(r.get("ok") for r in manifest["results"].values()) else 1
 
 
 def command_verify(args: argparse.Namespace) -> int:
     platforms = selected_platforms(args.platforms)
-    run_dir = ensure_run_dir(args.artifact_root, "verify")
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_dir = args.artifact_root / f"verify-{stamp}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
     manifest = {
         "command": "verify",
+        "timestamp": stamp,
         "draft_dir": str(args.draft_dir),
         "run_dir": str(run_dir),
         "platforms": platforms,
         "results": {},
     }
+
     for platform in platforms:
-        artifact_dir = run_dir / platform
-        artifact_dir.mkdir(parents=True, exist_ok=True)
-        if platform == "x":
-            manifest["results"][platform] = run_backend("xVerify", args, artifact_dir)
+        out_dir = run_dir / platform
+        out_dir.mkdir(parents=True, exist_ok=True)
+        print(f"  Verifying {platform}...")
+
+        if platform == "mastodon":
+            # Mastodon verification: check API for recent posts
+            token = os.environ.get("MASTODON_ACCESS_TOKEN", "")
+            if not token:
+                manifest["results"][platform] = {"ok": False, "error": "No token"}
+                continue
+            try:
+                from scripts.mastodon_adapter import verify_credentials
+                account = verify_credentials(MASTODON_INSTANCE, token)
+                manifest["results"][platform] = {
+                    "ok": True,
+                    "account": account.get("username"),
+                    "note": "Token valid. Check profile manually for post content.",
+                }
+            except Exception as exc:
+                manifest["results"][platform] = {"ok": False, "error": str(exc)}
+
+        elif platform == "x":
+            from scripts.x_adapter import verify_from_drafts as x_verify
+            manifest["results"][platform] = x_verify(
+                args.cookie_file, args.draft_dir, out_dir,
+            )
+
         elif platform == "quora":
-            manifest["results"][platform] = run_backend("quoraVerify", args, artifact_dir)
-        elif platform == "mastodon":
-            manifest["results"][platform] = {
-                "ok": False,
-                "status": "not_implemented",
-                "reason": "Verification is not yet implemented for Mastodon in this reusable CLI.",
-            }
-        else:
-            manifest["results"][platform] = {"ok": False, "status": "unknown_platform"}
+            from scripts.quora_adapter import verify_from_drafts as quora_verify
+            manifest["results"][platform] = quora_verify(
+                args.cookie_file, args.draft_dir, out_dir,
+            )
+
+        elif platform == "facebook":
+            from scripts.facebook_adapter import verify_from_drafts as fb_verify
+            manifest["results"][platform] = fb_verify(
+                args.cookie_file, args.draft_dir, out_dir,
+            )
+
     (run_dir / "run.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
     if args.json:
         print(json.dumps(manifest, indent=2))
     else:
-        print(f"Run dir: {run_dir}")
+        print(f"\nRun dir: {run_dir}")
         for platform, result in manifest["results"].items():
-            print(f"- {platform}: ok={result.get('ok')} status={result.get('status', 'executed')}")
+            ok = result.get("ok", False)
+            print(f"  {platform:10s} [{'OK' if ok else 'FAIL':4s}]  {result.get('error', '')}")
     return 0
 
 
 def command_report(args: argparse.Namespace) -> int:
     run_json = args.run_dir / "run.json"
+    if not run_json.exists():
+        print(f"No run.json found in {args.run_dir}")
+        return 1
     manifest = json.loads(run_json.read_text(encoding="utf-8"))
+
     if args.json:
         print(json.dumps(manifest, indent=2))
         return 0
 
-    print(f"Command: {manifest['command']}")
-    print(f"Draft dir: {manifest['draft_dir']}")
-    print(f"Run dir: {manifest['run_dir']}")
-    for platform, result in manifest["results"].items():
-        status = "ok" if result.get("ok") else "failed"
-        reason = result.get("reason") or result.get("status") or ""
-        print(f"- {platform}: {status} {reason}".rstrip())
+    print(f"Command  : {manifest.get('command')}")
+    print(f"Timestamp: {manifest.get('timestamp')}")
+    print(f"Draft dir: {manifest.get('draft_dir')}")
+    print(f"Run dir  : {manifest.get('run_dir')}")
+    print()
+    for platform, result in manifest.get("results", {}).items():
+        ok = result.get("ok", False)
+        print(f"  {platform:10s} [{'OK' if ok else 'FAIL':4s}]")
+        if result.get("urls"):
+            for url in result["urls"]:
+                print(f"             -> {url}")
+        if result.get("error"):
+            print(f"             Error: {result['error']}")
+        if result.get("verification"):
+            v = result["verification"]
+            print(f"             Verified: {v.get('ok')}")
     return 0
 
 
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
 def main() -> int:
+    load_dotenv()
     args = parse_args()
-    if args.command == "plan":
-        return command_plan(args)
-    if args.command == "post":
-        return command_post(args)
-    if args.command == "verify":
-        return command_verify(args)
-    if args.command == "report":
-        return command_report(args)
-    raise ValueError(f"Unsupported command: {args.command}")
+    commands = {
+        "plan": command_plan,
+        "post": command_post,
+        "verify": command_verify,
+        "report": command_report,
+    }
+    handler = commands.get(args.command)
+    if not handler:
+        print(f"Unknown command: {args.command}")
+        return 1
+    return handler(args)
 
 
 if __name__ == "__main__":
