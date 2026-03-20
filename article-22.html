@@ -2061,6 +2061,252 @@
         }
     };
 
+    /* ── PDF Export ── */
+
+    var a22PDFCSS = '*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,-apple-system,sans-serif;color:#1f2937;padding:30px;max-width:900px;margin:0 auto;font-size:11px;line-height:1.6}h1{font-size:22px;color:#1e3a5f;margin-bottom:4px}h2{font-size:14px;color:#1e3a5f;border-bottom:2px solid #0891b2;padding-bottom:4px;margin:16px 0 8px}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f8fafc;font-size:10px;text-transform:uppercase;color:#64748b;padding:8px;text-align:left;border:1px solid #e5e7eb}td{padding:8px;border:1px solid #e5e7eb;font-size:11px}.kpi-row{display:flex;gap:12px;margin:10px 0}.kpi-box{flex:1;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;text-align:center}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px}.kpi-val{font-size:16px;font-weight:700;color:#0891b2}.chart-row{display:flex;gap:16px;margin:12px 0}.chart-row>div{flex:1;min-width:0}.narr{background:#ecfeff;border-left:3px solid #0891b2;padding:12px;margin:10px 0;font-size:10px;line-height:1.6}.narr h4{font-size:12px;color:#0891b2;margin-bottom:6px}.narr strong{color:#0891b2}.method{font-size:9px;color:#64748b;line-height:1.5;margin:12px 0;padding:10px;background:#f8fafc;border-radius:6px}.rec{background:#ecfeff;border:1px solid #a5f3fc;border-radius:8px;padding:12px;margin:8px 0}.rec-title{font-size:11px;font-weight:700;color:#0891b2;margin-bottom:4px}.rec-text{font-size:10px;color:#374151;line-height:1.5}@media print{@page{margin:15mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+
+    function a22SVGBar(data, w, h) {
+        var pad = { t: 12, r: 15, b: 10, l: 110 };
+        var cW = w - pad.l - pad.r, cH = h - pad.t - pad.b;
+        var maxV = 0;
+        data.forEach(function(d) { if (d.value > maxV) maxV = d.value; });
+        if (!maxV) maxV = 1;
+        var barH = Math.min(24, (cH / data.length) - 4);
+        var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#fff">';
+        data.forEach(function(d, i) {
+            var y = pad.t + i * (barH + 6);
+            var bW = d.value > 0 ? (d.value / maxV) * cW : 0;
+            svg += '<text x="' + (pad.l - 6) + '" y="' + (y + barH / 2 + 4) + '" text-anchor="end" font-size="9" fill="#374151" font-weight="600">' + d.label + '</text>';
+            svg += '<rect x="' + pad.l + '" y="' + y + '" width="' + cW + '" height="' + barH + '" fill="#f1f5f9" rx="3"/>';
+            if (bW > 0) svg += '<rect x="' + pad.l + '" y="' + y + '" width="' + Math.max(2, bW) + '" height="' + barH + '" fill="' + d.color + '" rx="3"/>';
+            svg += '<text x="' + (pad.l + Math.max(2, bW) + 6) + '" y="' + (y + barH / 2 + 4) + '" font-size="9" fill="#1f2937" font-weight="600">' + d.display + '</text>';
+        });
+        svg += '</svg>';
+        return svg;
+    }
+
+    function a22SVGTornado(data, w, h) {
+        var pad = { t: 10, r: 15, b: 10, l: 110 };
+        var cW = w - pad.l - pad.r;
+        var maxAbs = 0;
+        data.forEach(function(d) { var a = Math.abs(d.impact); if (a > maxAbs) maxAbs = a; });
+        if (!maxAbs) maxAbs = 1;
+        var barH = Math.min(22, (h - pad.t - pad.b) / data.length - 4);
+        var center = pad.l + cW / 2;
+        var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#fff">';
+        svg += '<line x1="' + center + '" y1="' + pad.t + '" x2="' + center + '" y2="' + (h - pad.b) + '" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,4"/>';
+        svg += '<text x="' + center + '" y="' + (h - 2) + '" text-anchor="middle" font-size="7" fill="#94a3b8">Baseline</text>';
+        data.forEach(function(d, i) {
+            var y = pad.t + i * (barH + 6);
+            var bW = (Math.abs(d.impact) / maxAbs) * (cW / 2);
+            var col = d.impact < 0 ? '#ef4444' : '#0891b2';
+            var x = d.impact < 0 ? center - bW : center;
+            svg += '<text x="' + (pad.l - 6) + '" y="' + (y + barH / 2 + 4) + '" text-anchor="end" font-size="8" fill="#374151">' + d.label + '</text>';
+            svg += '<rect x="' + x + '" y="' + y + '" width="' + Math.max(2, bW) + '" height="' + barH + '" fill="' + col + '" rx="3" opacity="0.85"/>';
+            var textX = d.impact < 0 ? x - 4 : x + bW + 4;
+            var anchor = d.impact < 0 ? 'end' : 'start';
+            svg += '<text x="' + textX + '" y="' + (y + barH / 2 + 4) + '" text-anchor="' + anchor + '" font-size="8" fill="#374151" font-weight="600">' + d.display + '</text>';
+        });
+        svg += '</svg>';
+        return svg;
+    }
+
+    window.a22ExportPDF = function() {
+        var w = window.open('', '_blank');
+        if (!w) { alert('Please allow popups for PDF export.'); return; }
+        a22Calculate();
+        var isPro = mode === 'pro' && loggedIn;
+        var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Recalculate locally for numeric precision
+        var gpuCount = parseInt(document.getElementById('a22GpuCount').value) || 8192;
+        var gpuPerRack = parseInt(document.getElementById('a22GpuPerRack').value) || 8;
+        var portSpeedG = parseInt(document.getElementById('a22PortSpeed').value) || 800;
+        var linkDist = parseFloat(document.getElementById('a22LinkDist').value) || 5;
+        var elecCost = parseFloat(document.getElementById('a22ElecCost').value) || 0.10;
+        var links = gpuCount;
+        var racks = Math.ceil(gpuCount / gpuPerRack);
+        var sf = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[portSpeedG] || 4.5;
+        var copperMaxReach = { 200: 3, 400: 2, 800: 1, 1600: 0 }[portSpeedG] || 1;
+        var copperPower = 0.5 * sf;
+        var copperViable = linkDist <= copperMaxReach;
+        var copperLatency = copperViable ? 5 * (linkDist / copperMaxReach) : 999;
+        var plugMaxReach = { 200: 2000, 400: 500, 800: 100, 1600: 2000 }[portSpeedG] || 100;
+        var plugPower = 3.5 * sf * 0.65;
+        var plugViable = linkDist <= plugMaxReach;
+        var plugLatency = 50 + (linkDist * 0.005);
+        var cpoMaxReach = 100;
+        var cpoPower = 1.0 * sf * 0.55;
+        var cpoViable = linkDist <= cpoMaxReach;
+        var cpoLatency = 10 + (linkDist * 0.005);
+        var copperAnnual = copperViable ? (links * copperPower * 8760 * elecCost / 1000) : 0;
+        var plugAnnual = plugViable ? (links * plugPower * 8760 * elecCost / 1000) : 0;
+        var cpoAnnual = cpoViable ? (links * cpoPower * 8760 * elecCost / 1000) : 0;
+        function fC(n) { return '$' + (n >= 1000000 ? (n / 1000000).toFixed(2) + 'M' : n >= 1000 ? (n / 1000).toFixed(1) + 'K' : n.toFixed(0)); }
+
+        var bestTech = cpoViable ? 'CPO' : plugViable ? 'Pluggable' : copperViable ? 'Copper' : 'None';
+        var annualSavings = (cpoViable && plugViable) ? plugAnnual - cpoAnnual : 0;
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI Factory Interconnect Analysis — ResistanceZero</title><style>' + a22PDFCSS + '</style></head><body>';
+
+        // Header
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #0891b2;padding-bottom:10px;margin-bottom:15px">';
+        html += '<div><h1>AI Factory Interconnect Analysis</h1>';
+        html += '<div style="color:#64748b;font-size:10px">' + gpuCount.toLocaleString() + ' GPUs at ' + portSpeedG + 'G | Generated ' + now + ' | ' + (isPro ? 'Pro Intelligence Report' : 'Free Assessment') + '</div></div>';
+        html += '<div style="text-align:right"><div style="font-weight:800;color:#0891b2;font-size:14px">RESISTANCEZERO</div><div style="font-size:9px;color:#94a3b8">resistancezero.com</div></div></div>';
+
+        // KPI Row
+        html += '<div class="kpi-row">';
+        html += '<div class="kpi-box"><div class="kpi-label">Recommended</div><div class="kpi-val">' + bestTech + '</div></div>';
+        html += '<div class="kpi-box"><div class="kpi-label">Annual Savings</div><div class="kpi-val">' + (annualSavings > 0 ? fC(annualSavings) : '$0') + '</div></div>';
+        html += '<div class="kpi-box"><div class="kpi-label">CPO Power/Link</div><div class="kpi-val">' + (cpoViable ? cpoPower.toFixed(1) + 'W' : 'N/A') + '</div></div>';
+        html += '<div class="kpi-box"><div class="kpi-label">Total Links</div><div class="kpi-val">' + gpuCount.toLocaleString() + '</div></div>';
+        html += '</div>';
+
+        // Input Parameters
+        html += '<h2>Input Parameters</h2><table>';
+        html += '<tr><td style="width:30%;font-weight:600;">GPU Count</td><td style="width:20%;">' + gpuCount.toLocaleString() + '</td>';
+        html += '<td style="width:30%;font-weight:600;">GPUs per Rack</td><td style="width:20%;">' + gpuPerRack + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Port Speed</td><td>' + portSpeedG + 'G</td>';
+        html += '<td style="font-weight:600;">Link Distance</td><td>' + linkDist + ' m</td></tr>';
+        html += '<tr><td style="font-weight:600;">Electricity Cost</td><td>$' + elecCost.toFixed(2) + '/kWh</td>';
+        html += '<td style="font-weight:600;">Total Racks</td><td>' + racks + '</td></tr>';
+        html += '</table>';
+
+        // Technology Comparison Table
+        html += '<h2>Technology Comparison</h2><table>';
+        html += '<tr><th>Metric</th><th style="color:#d97706;">Copper DAC</th><th style="color:#7c3aed;">Pluggable Optics</th><th style="color:#0891b2;">Co-Packaged Optics</th></tr>';
+        html += '<tr><td style="font-weight:600;">Power / Link</td><td>' + (copperViable ? copperPower.toFixed(1) + ' W' : 'N/A') + '</td><td>' + (plugViable ? plugPower.toFixed(1) + ' W' : 'N/A') + '</td><td>' + (cpoViable ? cpoPower.toFixed(1) + ' W' : 'N/A') + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Max Reach</td><td>' + (copperMaxReach > 0 ? copperMaxReach + ' m' : 'N/A') + '</td><td>' + plugMaxReach + ' m</td><td>' + cpoMaxReach + ' m</td></tr>';
+        html += '<tr><td style="font-weight:600;">Feasibility</td><td style="color:' + (copperViable ? '#d97706' : '#ef4444') + ';font-weight:700;">' + (copperViable ? 'Viable' : 'Out of Range') + '</td><td style="color:' + (plugViable ? '#7c3aed' : '#ef4444') + ';font-weight:700;">' + (plugViable ? 'Viable' : 'Out of Range') + '</td><td style="color:' + (cpoViable ? '#0891b2' : '#ef4444') + ';font-weight:700;">' + (cpoViable ? 'Optimal' : 'Out of Range') + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Annual Energy Cost</td><td>' + (copperViable ? fC(copperAnnual) : 'N/A') + '</td><td>' + (plugViable ? fC(plugAnnual) : 'N/A') + '</td><td>' + (cpoViable ? fC(cpoAnnual) : 'N/A') + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Latency</td><td>' + (copperViable ? copperLatency.toFixed(1) + ' ns' : 'N/A') + '</td><td>' + (plugViable ? plugLatency.toFixed(1) + ' ns' : 'N/A') + '</td><td>' + (cpoViable ? cpoLatency.toFixed(1) + ' ns' : 'N/A') + '</td></tr>';
+        html += '</table>';
+
+        // SVG Charts — Side by Side
+        var powerData = [
+            { label: 'Copper DAC', value: copperViable ? copperPower : 0, display: copperViable ? copperPower.toFixed(1) + ' W' : 'N/A', color: '#d97706' },
+            { label: 'Pluggable', value: plugViable ? plugPower : 0, display: plugViable ? plugPower.toFixed(1) + ' W' : 'N/A', color: '#7c3aed' },
+            { label: 'CPO', value: cpoViable ? cpoPower : 0, display: cpoViable ? cpoPower.toFixed(1) + ' W' : 'N/A', color: '#0891b2' }
+        ];
+        var costData = [
+            { label: 'Copper DAC', value: copperViable ? copperAnnual : 0, display: copperViable ? fC(copperAnnual) : 'N/A', color: '#d97706' },
+            { label: 'Pluggable', value: plugViable ? plugAnnual : 0, display: plugViable ? fC(plugAnnual) : 'N/A', color: '#7c3aed' },
+            { label: 'CPO', value: cpoViable ? cpoAnnual : 0, display: cpoViable ? fC(cpoAnnual) : 'N/A', color: '#0891b2' }
+        ];
+        var reachData = [
+            { label: 'Copper DAC', value: copperMaxReach > 0 ? copperMaxReach : 0, display: copperMaxReach > 0 ? copperMaxReach + ' m' : 'N/A', color: '#d97706' },
+            { label: 'Pluggable', value: plugMaxReach, display: plugMaxReach + ' m', color: '#7c3aed' },
+            { label: 'CPO', value: cpoMaxReach, display: cpoMaxReach + ' m', color: '#0891b2' }
+        ];
+        var latencyData = [
+            { label: 'Copper DAC', value: copperViable ? copperLatency : 0, display: copperViable ? copperLatency.toFixed(1) + ' ns' : 'N/A', color: '#d97706' },
+            { label: 'Pluggable', value: plugViable ? plugLatency : 0, display: plugViable ? plugLatency.toFixed(1) + ' ns' : 'N/A', color: '#7c3aed' },
+            { label: 'CPO', value: cpoViable ? cpoLatency : 0, display: cpoViable ? cpoLatency.toFixed(1) + ' ns' : 'N/A', color: '#0891b2' }
+        ];
+
+        html += '<h2>Visual Analysis</h2>';
+        html += '<div class="chart-row"><div>';
+        html += '<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:4px;">Power per Link (W)</div>';
+        html += a22SVGBar(powerData, 400, 110);
+        html += '</div><div>';
+        html += '<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:4px;">Annual Energy Cost</div>';
+        html += a22SVGBar(costData, 400, 110);
+        html += '</div></div>';
+        html += '<div class="chart-row"><div>';
+        html += '<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:4px;">Technology Reach (m)</div>';
+        html += a22SVGBar(reachData, 400, 110);
+        html += '</div><div>';
+        html += '<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:4px;">Latency (ns)</div>';
+        html += a22SVGBar(latencyData, 400, 110);
+        html += '</div></div>';
+
+        // Verdict
+        var vText = document.getElementById('a22VerdictText').textContent;
+        var vDetail = document.getElementById('a22VerdictDetail').textContent;
+        html += '<h2>Analysis Verdict</h2>';
+        html += '<div class="narr"><h4>' + vText + '</h4><p>' + vDetail + '</p></div>';
+
+        // Recommendations
+        html += '<h2>Recommendations</h2>';
+        if (cpoViable && plugViable) {
+            html += '<div class="rec"><div class="rec-title">[P1-Critical] Deploy CPO for maximum efficiency</div><div class="rec-text">At ' + portSpeedG + 'G with ' + linkDist + 'm link distance, co-packaged optics delivers ' + ((1 - cpoPower / plugPower) * 100).toFixed(0) + '% power reduction per link compared to pluggable optics. Annual energy savings: ' + fC(annualSavings) + '.</div></div>';
+            html += '<div class="rec"><div class="rec-title">[P2-High] Plan for dual-source optical supply chain</div><div class="rec-text">Following NVIDIA\'s strategy with Lumentum and Coherent, qualify at least two CPO vendors to eliminate single-vendor bottleneck risk.</div></div>';
+            html += '<div class="rec"><div class="rec-title">[P3-Medium] Evaluate External Laser Source (ELS) architecture</div><div class="rec-text">ELS modules enable hot-swap laser replacement without disrupting the switch ASIC, improving MTTR from hours to minutes.</div></div>';
+        } else if (copperViable) {
+            html += '<div class="rec"><div class="rec-title">[P1-Critical] Copper viable but plan optical migration</div><div class="rec-text">Copper DAC works at ' + linkDist + 'm / ' + portSpeedG + 'G, but will not scale beyond ' + copperMaxReach + 'm. Budget for optical transition within 2-3 years.</div></div>';
+        } else {
+            html += '<div class="rec"><div class="rec-title">[P1-Critical] Optical interconnect required</div><div class="rec-text">At ' + linkDist + 'm link distance, copper is not viable. Evaluate pluggable optics for immediate deployment and CPO for next-generation infrastructure.</div></div>';
+        }
+
+        // Pro sections
+        if (isPro) {
+            var tco5yr = cpoViable ? cpoAnnual * 5 * 1.15 : plugAnnual * 5 * 1.3;
+            html += '<h2>Pro: 5-Year TCO Projection</h2>';
+            var tcoTableData = [];
+            for (var yr = 1; yr <= 5; yr++) {
+                var hwF = yr <= 2 ? 1.0 : (yr <= 4 ? 0.8 : 0.6);
+                tcoTableData.push({
+                    yr: yr,
+                    cpoE: cpoViable ? cpoAnnual * yr : 0, cpoH: cpoViable ? links * 25 * hwF : 0, cpoM: cpoViable ? cpoAnnual * 0.08 * yr : 0,
+                    plugE: plugViable ? plugAnnual * yr : 0, plugH: plugViable ? links * 15 * hwF : 0, plugM: plugViable ? plugAnnual * 0.12 * yr : 0
+                });
+            }
+            html += '<table><tr><th>Year</th><th style="color:#0891b2;">CPO Energy</th><th style="color:#0891b2;">CPO HW</th><th style="color:#0891b2;">CPO Total</th><th style="color:#7c3aed;">Plug Energy</th><th style="color:#7c3aed;">Plug HW</th><th style="color:#7c3aed;">Plug Total</th></tr>';
+            tcoTableData.forEach(function(r) {
+                var cT = r.cpoE + r.cpoH + r.cpoM;
+                var pT = r.plugE + r.plugH + r.plugM;
+                html += '<tr><td>Year ' + r.yr + '</td><td>' + fC(r.cpoE) + '</td><td>' + fC(r.cpoH) + '</td><td style="font-weight:700;">' + fC(cT) + '</td><td>' + fC(r.plugE) + '</td><td>' + fC(r.plugH) + '</td><td style="font-weight:700;">' + fC(pT) + '</td></tr>';
+            });
+            html += '</table>';
+
+            // Sensitivity Tornado
+            html += '<h2>Pro: Sensitivity Analysis</h2>';
+            var baseCPO = gpuCount * cpoPower * 8760 * elecCost / 1000;
+            var tornadoData = [];
+            // GPU Count +/-20%
+            var gpuLo = gpuCount * 0.8 * cpoPower * 8760 * elecCost / 1000;
+            var gpuHi = gpuCount * 1.2 * cpoPower * 8760 * elecCost / 1000;
+            tornadoData.push({ label: 'GPU Count (\u00b120%)', impact: gpuHi - gpuLo, display: fC(gpuHi - gpuLo) });
+            // Elec Cost +/-20%
+            var elLo = gpuCount * cpoPower * 8760 * elecCost * 0.8 / 1000;
+            var elHi = gpuCount * cpoPower * 8760 * elecCost * 1.2 / 1000;
+            tornadoData.push({ label: 'Elec Cost (\u00b120%)', impact: elHi - elLo, display: fC(elHi - elLo) });
+            // Power efficiency +/-15%
+            var pwLo = gpuCount * cpoPower * 0.85 * 8760 * elecCost / 1000;
+            var pwHi = gpuCount * cpoPower * 1.15 * 8760 * elecCost / 1000;
+            tornadoData.push({ label: 'CPO Efficiency (\u00b115%)', impact: pwHi - pwLo, display: fC(pwHi - pwLo) });
+            tornadoData.sort(function(a, b) { return Math.abs(b.impact) - Math.abs(a.impact); });
+            html += a22SVGTornado(tornadoData, 800, 120);
+
+            // Pro narrative
+            html += '<h2>Pro: Executive Narrative</h2>';
+            var proNarr = document.getElementById('a22ProNarrative');
+            html += '<div class="narr">' + (proNarr ? proNarr.innerHTML : '') + '</div>';
+        }
+
+        // Methodology
+        html += '<h2>Methodology</h2><div class="method">';
+        html += '<strong>Power Model:</strong> Copper: 0.5W &times; speedFactor. Pluggable: 3.5W &times; 0.65 &times; speedFactor. CPO: 1.0W &times; 0.55 &times; speedFactor. Speed factors: 200G=1, 400G=2.1, 800G=4.5, 1.6T=9.5.<br>';
+        html += '<strong>Reach Model:</strong> Based on IEEE 802.3 specifications and vendor datasheets for DAC, SR/DR, and CPO reach limits at each speed tier.<br>';
+        html += '<strong>Cost Model:</strong> Annual energy = Links &times; Power/Link &times; 8,760h &times; $/kWh &divide; 1,000. TCO includes hardware amortization and maintenance.<br>';
+        html += '<strong>Limitations:</strong> Engineering estimates based on industry benchmarks. Actual values vary by vendor, configuration, environmental conditions, and deployment specifics. Not intended for procurement decisions.</div>';
+
+        // Sources
+        html += '<h2>Sources</h2><div class="method">';
+        html += 'NVIDIA GTC 2026 Keynote; Lumentum 8-K Filing (March 2, 2026); Coherent 8-K Filing (March 2, 2026); IEEE 802.3 Ethernet Working Group; OIF Co-Packaged Optics specifications; Lightcounting Q1 2026 Market Report.</div>';
+
+        // Footer
+        html += '<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #0891b2;font-size:8px;color:#94a3b8;">';
+        html += 'resistancezero.com &middot; Generated ' + now + ' &middot; All calculations performed client-side &middot; &copy; 2026 Bagus Dwi Permana</div>';
+
+        html += '</body></html>';
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+        setTimeout(function() { w.print(); }, 600);
+    };
+
     // Auto-calculate on load
     document.addEventListener('DOMContentLoaded', function() {
         checkAuthState();
