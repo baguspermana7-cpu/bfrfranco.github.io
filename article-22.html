@@ -1465,6 +1465,30 @@
     var mode = 'free';
     var loggedIn = false;
 
+    function checkAuthState() {
+        try {
+            var raw = localStorage.getItem('rz_premium_session');
+            if (raw) {
+                var data = JSON.parse(raw);
+                if (data && data.email) {
+                    loggedIn = true;
+                    unlockPro();
+                    return;
+                }
+            }
+        } catch(e) {}
+    }
+
+    function unlockPro() {
+        loggedIn = true;
+        var proPanel = document.getElementById('a22ProPanel');
+        if (proPanel) {
+            proPanel.classList.remove('gated');
+            var gate = proPanel.querySelector('.a22-gate-overlay');
+            if (gate) gate.style.display = 'none';
+        }
+    }
+
     window.a22SetMode = function(m) {
         mode = m;
         document.querySelector('.a22-btn-free').classList.toggle('active', m === 'free');
@@ -1497,20 +1521,39 @@
     window.a22DoLogin = function() {
         var u = document.getElementById('a22LoginEmail').value.trim();
         var p = document.getElementById('a22LoginPass').value.trim();
-        if ((u === 'admin' && p === 'admin123') || (u === 'demo' && p === 'demo123')) {
-            loggedIn = true;
+        /* Use same credentials as auth.js */
+        var users = [
+            { email: 'demo@resistancezero.com', password: 'demo2026' },
+            { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
+            { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
+        ];
+        var found = users.some(function(acc) { return acc.email.toLowerCase() === u.toLowerCase() && acc.password === p; });
+        if (found) {
+            unlockPro();
             a22CloseLogin();
-            var proPanel = document.getElementById('a22ProPanel');
-            proPanel.classList.remove('gated');
-            proPanel.querySelector('.a22-gate-overlay').style.display = 'none';
             a22Calculate();
-            try { window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { loggedIn: true } })); } catch(e) {}
         } else {
             var err = document.getElementById('a22LoginError');
-            err.textContent = 'Invalid credentials. Try demo / demo123';
+            err.textContent = 'Invalid credentials. Try demo@resistancezero.com / demo2026';
             err.style.display = 'block';
         }
     };
+
+    /* Listen for auth changes from auth.js */
+    window.addEventListener('rz-auth-change', function(e) {
+        if (e.detail && e.detail.action === 'login') {
+            unlockPro();
+            if (mode === 'pro') a22Calculate();
+        } else if (e.detail && e.detail.action === 'logout') {
+            loggedIn = false;
+            var proPanel = document.getElementById('a22ProPanel');
+            if (proPanel && mode === 'pro') {
+                proPanel.classList.add('gated');
+                var gate = proPanel.querySelector('.a22-gate-overlay');
+                if (gate) gate.style.display = 'flex';
+            }
+        }
+    });
 
     window.a22Reset = function() {
         document.getElementById('a22GpuCount').value = '8192';
@@ -1625,6 +1668,7 @@
 
     // Auto-calculate on load
     document.addEventListener('DOMContentLoaded', function() {
+        checkAuthState();
         a22Calculate();
         // Auto-calculate on input change with debounce
         var debounceTimer;
