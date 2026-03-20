@@ -117,12 +117,25 @@ Each article with Pro Mode has its OWN login modal (separate from auth.js global
 > **IMPORTANT**: The Terms & Privacy Policy line is **mandatory** on ALL login modals — both the shared auth.js modal and every page-specific inline modal. Use the page's accent color for link styling (e.g., `#8b5cf6` purple, `#dc2626` red, `#991b1b` dark red). This was a recurring issue found in FF-1, geopolitics-2/3, cx-calculator, rfs-readiness-workbench, and articles 19-21 (March 2026).
 
 ### Login Handler Pattern
+
+> **CRITICAL — NEVER hardcode custom credentials.** Always validate against the SAME credential list from the Valid Credentials table above. This is a recurring bug — article-22, and earlier pages shipped with made-up credentials like `admin/admin123` or `demo/demo123` that don't match auth.js. The calculator login rejected valid root/pro users.
+
 ```js
 function handleLogin() {
   var email = document.getElementById('[prefix]LoginEmail').value.trim();
   var pass = document.getElementById('[prefix]LoginPass').value;
 
-  if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+  /* ── MUST match Valid Credentials table exactly ── */
+  var VALID = [
+    { email: 'demo@resistancezero.com',  password: 'demo2026' },
+    { email: 'bagus@resistancezero.com',  password: 'RZ@Premium2026!' },
+    { email: 'admin@resistancezero.com',  password: 'RZ@Premium2026!' }
+  ];
+  var found = VALID.some(function(u) {
+    return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;
+  });
+
+  if (found) {
     // Store session
     localStorage.setItem('rz_premium_session', JSON.stringify({
       email: email,
@@ -227,7 +240,9 @@ Before publishing any new article or calculator page, verify ALL of the followin
 - [ ] `terms.html` and `privacy.html` links use page accent color
 - [ ] Calculator disclaimer section present (if page has interactive calculator)
 - [ ] Cookie banner HTML present (matches other articles)
+- [ ] **Inline login credentials match Valid Credentials table exactly** (never hardcode custom credentials)
 - [ ] `rz-auth-change` event dispatched after inline login
+- [ ] `rz-auth-change` event listener present (sync with cross-page auth)
 - [ ] Session check on page load (auto-unlock Pro if session exists)
 - [ ] Page added to `sitemap.xml` and `search-index.json`
 - [ ] BreadcrumbList schema added
@@ -247,3 +262,37 @@ Before publishing any new article or calculator page, verify ALL of the followin
 | 2026-02-27 | tia-942 & tier-advisor: auth/tooltips/DOMContentLoaded broken | `</script>` in PDF export string closed main script block — moved cookie HTML to separate block |
 | 2026-03-20 | FF-1, geo-3, cx-calc, rfs-workbench missing Terms/Privacy in inline login modals | Added terms/privacy text to all inline login modals |
 | 2026-03-20 | article-19, article-20, article-21, cx-calc, rfs-workbench missing auth.js | Added `<script src="auth.js?v=20260228"></script>` before `</body>` |
+| 2026-03-20 | CAPEX & OPEX: Pro button shows "Logout from your account?" confirm dialog when already logged in | `activatePremiumUI()` was rebinding button onclick to `logoutPremium()`. Removed rebinding — Pro button always calls mode-switch handler. Added `rz-auth-change` listener/dispatch. |
+| 2026-03-20 | article-22 calculator hardcoded `admin/admin123` and `demo/demo123` — rejected valid root/pro users | Aligned credentials with auth.js Valid Credentials table. Added `checkAuthState()` for localStorage session detection on load. Added `rz-auth-change` listener. |
+
+---
+
+## Anti-Pattern: Never Rebind Pro Button to Logout
+
+**NEVER** change a Pro/Premium button's `onclick` handler to call a logout function.
+
+### Wrong (causes confirm dialog on Pro click):
+```js
+// In activatePremiumUI():
+premBtn.onclick = function() { logoutPremium(); };  // BUG!
+```
+
+### Correct:
+```js
+// Pro button ALWAYS keeps its original onclick (handlePremiumTab / setMode)
+// activatePremiumUI() only changes text/style/badge — never rebinds onclick
+function activatePremiumUI() {
+    premBtn.classList.add('premium-active');
+    premBtn.innerHTML = '<i class="fas fa-crown"></i> Premium Active';
+    // DO NOT change premBtn.onclick
+    switchMode('advanced');
+    updateNavbarAuthUI();
+}
+```
+
+### Rules:
+1. Pro button ALWAYS calls its mode-switch handler (`handlePremiumTab()`, `setMode('pro')`)
+2. Logout is ONLY triggered from the dedicated navbar dropdown "Logout" button
+3. `activatePremiumUI()` changes button appearance only — never rebinds onclick
+4. Every calculator page MUST dispatch `rz-auth-change` on login AND logout
+5. Every calculator page MUST listen for `rz-auth-change` to sync with cross-page auth

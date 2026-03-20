@@ -548,6 +548,8 @@ Sandbox/
 17. **Inline styles on dark-themed elements cause light-mode readability issues** — NEVER hardcode light text colors (`color:#cbd5e1`, `color:#64748b`) directly on HTML elements inside `.article-body`. Instead, define CSS classes with both light and dark mode variants using `[data-theme="dark"]`. Use `!important` on the class rule to override global `.article-body p`/`.article-body blockquote` rules.
 18. **Self-contained dark elements MUST have dedicated CSS classes** — Components like `.operator-story`, `.aif-quote`, calculator panels that have their own dark background need CSS rules with boosted specificity (`.article-body .operator-story blockquote`) and `!important` to prevent generic `styles.css` rules from overriding their colors in either theme mode.
 19. **New SVG chart types for PDF exports** — Beyond radar/histogram/tornado, these patterns are now proven: (a) **Horizontal bar chart** for criteria breakdown (e.g., ISA-18.2 score per criterion), (b) **Semicircular gauge** for utilization/load metrics with color-coded zones, (c) **Stacked horizontal bar** for distribution comparison (e.g., user's system vs benchmark split). All use inline SVG with `viewBox` for responsive sizing.
+20. **Pro/Premium button onclick MUST NEVER be rebound to logout** — `activatePremiumUI()` must only change button text/style/badge. The button's onclick handler must always remain the mode-switch function (e.g., `handlePremiumTab()`, `setMode('pro')`). Logout must only be triggered from the dedicated navbar dropdown "Logout" button. Rebinding onclick to `logoutPremium()` causes a confirm dialog to appear when clicking the Pro button. (Bug found 2026-03-20 in CAPEX & OPEX calculators.)
+21. **Every calculator page MUST dispatch AND listen for `rz-auth-change`** — On login: `window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email, tier, action: 'login' } }))`. On logout: `{ detail: { action: 'logout' } }`. Listen: `window.addEventListener('rz-auth-change', ...)` to sync premium UI with cross-page auth changes.
 
 ---
 
@@ -565,6 +567,8 @@ After implementing Pro Mode on any article, verify:
 - [ ] Pro mode requires login (shows modal if not authenticated)
 - [ ] Login modal has demo credentials hint
 - [ ] Login stores session and dispatches `rz-auth-change`
+- [ ] Page listens for `rz-auth-change` to sync with cross-page auth events
+- [ ] Pro/Premium button onclick NEVER rebound to logout — only navbar Logout button triggers logout
 - [ ] Pro panels unlock after login (blur removed, overlay hidden)
 - [ ] Monte Carlo runs 10,000 iterations
 - [ ] Sensitivity tornado shows sorted impact bars
