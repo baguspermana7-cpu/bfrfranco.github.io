@@ -1,6 +1,6 @@
 # Article Creation Prompt Standard -- ResistanceZero
 
-> **Version**: 1.1 | **Updated**: 2026-03-20
+> **Version**: 1.2 | **Updated**: 2026-03-22
 
 ---
 
@@ -61,7 +61,7 @@ HAS_CALCULATOR: [yes/no]
   FREE RESULTS (4):   [list each metric card name]
 
 SOCIAL MEDIA DRAFTS: [yes/no]
-  (If yes: X 3 posts, Mastodon 3 posts, LinkedIn, Medium, Quora, TikTok script)
+  (If yes: X 3 posts, Mastodon 3 posts, LinkedIn, Medium, Quora, Facebook, TikTok script)
 
 Follow the ARTICLE_CREATION_PROMPT.md standard at:
 /home/baguspermana7/rz-work/standarization/article prompt/ARTICLE_CREATION_PROMPT.md
@@ -937,6 +937,12 @@ Use article-specific prefix (`[prefix]`). Standard class patterns:
 7. **ALWAYS dispatch AND listen for `rz-auth-change`** — both directions.
 8. **ALWAYS call `setMode('pro')` inside `activatePremiumUI()`** — prevents "--" on page load.
 9. **ALWAYS load `chartjs-plugin-annotation` separately** if using annotation configs.
+10. **ALWAYS use mid-level ops salary benchmarks** — not senior/all-roles averages. Verify against Glassdoor, PayScale, SalaryExpert for the specific role level.
+11. **NEVER use cumulative-subtraction projection models** — Available workforce should never drop to 0. Use year-over-year flow simulation with replacement hiring, training pipeline, and floor (e.g., 30% of initial).
+12. **ALWAYS cross-check evidence block statistics** against the latest source material. Stats drift between report versions (e.g., Uptime Institute 2024 vs 2025).
+13. **ALWAYS auto-set ALL related fields** when country/region changes — salary, turnover, training budget, power cost, etc. Don't just update one field.
+14. **ALWAYS include domain-specific KPI cards** beyond basic calculations — e.g., Cost per MW, Time to Fill, Cost per Token. 4-6 metric cards total, not just 4.
+15. **ALWAYS use `FF-N — [Article Title]` folder naming** for Future Forward post drafts with em dash (—), not hyphen.
 
 ### 5.12 Calculator Checklist
 
@@ -1291,6 +1297,27 @@ Target Questions:
 Full analysis: [resistancezero.com/article-[NN].html](https://resistancezero.com/article-[NN].html)
 ```
 
+### 8.7 Facebook (1 file, 2000 chars max)
+
+File: `facebook-post.md`
+
+```
+# Facebook Post (2000 chars max)
+
+[OPENING HOOK — 1-2 attention-grabbing sentences]
+
+[2-3 paragraphs in conversational tone — explain the key insight,
+share surprising data, make it relatable to a broad audience]
+
+[STAT CALLOUT — pull one striking statistic and present it as a standalone line]
+
+[CLOSING — question or call to discuss in comments]
+
+Full analysis: https://resistancezero.com/article-[NN].html
+```
+
+**Rules**: Conversational, shareable tone (not academic). Max 2000 chars excluding header. Include 1 stat callout as standalone line for visual emphasis. End with a question to encourage comments. No hashtags on Facebook (they reduce reach). Focus on making it shareable — the "I need to share this" reaction.
+
 ---
 
 ## 9. Verification Checklist
@@ -1338,6 +1365,7 @@ Full analysis: [resistancezero.com/article-[NN].html](https://resistancezero.com
 - [ ] LinkedIn post: <= 3000 chars
 - [ ] Medium: SEO title <= 74 chars, humanizer note present
 - [ ] Quora: 5 target questions listed, first-person answer
+- [ ] Facebook: <= 2000 chars, conversational, stat callout, question ending
 - [ ] TikTok: 5-10 min, timestamps, visual cues, CTA at end
 
 ---
@@ -1368,6 +1396,22 @@ Choose a distinct color for each new article to maintain visual variety.
 | Navbar wrong pattern | Content pages use `.nav-menu`, calculator pages use `.nav-links` |
 | H2 ID inconsistency | Use `id="section-N"` pattern consistently (most articles use this) |
 | Missing hero image preload | Add `<link rel="preload" as="image" href="assets/article-[NN]-hero.webp">` in head |
+
+---
+
+## 11. Future Forward Series Notes
+
+For articles in the **Future Forward** series (filenames `FF-N.html`):
+
+1. **Series navigation**: Include `ff-series-nav` div with Prev/Next article links and "Article N of M" counter
+2. **When adding a new FF article**: Update ALL previous FF articles' series nav counters ("1 of M" → "1 of M+1")
+3. **Landing page**: `future-forward.html` — add card, bump hero stat count, add to CollectionPage schema
+4. **Section IDs**: Use `sec0`-`sec7` pattern (not `section-N`)
+5. **Calculator section**: Always `sec6` — between the energy/impact section and the outlook section
+6. **Post draft folder**: `/rz-work/Article/future forward/Post Draft/FF-N — [Title]/`
+7. **Theme colors used**: FF-1 violet #6d28d9, FF-2 amber #b45309, FF-3 cyan #0891b2 — each article gets a distinct color
+8. **CSS prefix**: Unique per article based on calculator topic (e.g., `tgs-` talent gap shortage, `iec-` inference economics calculator)
+9. **3-agent parallel build pattern**: Split article into Part A (HEAD+Hero+TOC+first-half sections), Part B (second-half+calc HTML+footer), Part C (calc IIFE JS)
 
 ---
 
