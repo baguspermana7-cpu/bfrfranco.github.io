@@ -3,18 +3,29 @@
    ========================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
+    // Critical path — needed for first paint
     initDarkMode();
     initNavigation();
-    initScrollAnimations();
-    initMetricCounters();
-    initSmoothScroll();
-    initContactForm();
     initNavbarScroll();
-    initScrollProgress();
-    initCursorSpotlight();
-    initCardTilt();
-    try { initMotionEffects(); } catch(e) { console.warn('Motion effects init failed:', e); }
+
+    // Defer non-critical init to after first paint
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            initScrollAnimations();
+            initMetricCounters();
+            initSmoothScroll();
+            initScrollProgress();
+        });
+    });
+
+    // Low-priority — defer to idle
+    var idleCb = typeof requestIdleCallback === 'function' ? requestIdleCallback : function(cb) { setTimeout(cb, 200); };
+    idleCb(function() {
+        initContactForm();
+        initCursorSpotlight();
+        initCardTilt();
+        try { initMotionEffects(); } catch(e) {}
+    });
 });
 
 /* ==========================================
@@ -174,14 +185,21 @@ function initNavigation() {
    ========================================== */
 function initNavbarScroll() {
     const navbar = document.querySelector('.navbar');
-
+    if (!navbar) return;
+    let ticking = false;
     window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-            navbar?.classList.add('scrolled');
-        } else {
-            navbar?.classList.remove('scrolled');
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                ticking = false;
+            });
         }
-    });
+    }, { passive: true });
 }
 
 /* ==========================================
@@ -479,13 +497,17 @@ function showNotification(message, type) {
    ========================================== */
 function initParallax() {
     const heroShape = document.querySelector('.hero-shape');
-
+    if (!heroShape) return;
+    let ticking = false;
     window.addEventListener('scroll', function() {
-        const scrolled = window.scrollY;
-        if (heroShape) {
-            heroShape.style.transform = `translateY(${scrolled * 0.3}px)`;
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(function() {
+                heroShape.style.transform = 'translateY(' + (window.scrollY * 0.3) + 'px)';
+                ticking = false;
+            });
         }
-    });
+    }, { passive: true });
 }
 
 /* ==========================================

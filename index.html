@@ -38,13 +38,8 @@
     <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/index.html">
 
     <!-- Resource Hints -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://ipapi.co">
     <!-- Open Graph Meta Tags (og:type=profile for personal branding) -->
     <meta property="og:type" content="profile">
     <meta property="og:url" content="https://resistancezero.com/">
@@ -77,8 +72,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/Favicon.png">
-    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 
     <!-- RSS Feed & Sitemap -->
     <link rel="alternate" type="application/rss+xml" title="Bagus Dwi Permana - Operations Engineering Journal" href="feed.xml">
@@ -87,11 +82,11 @@
     <!-- Preload Critical Resources for LCP Optimization -->
     <link rel="preload" href="assets/profile-light.webp" as="image" fetchpriority="high" type="image/webp">
 
-    <!-- Preconnect to third-party origins -->
+    <!-- Preconnect to Google Fonts (already in resource hints above is for CDNs) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
 
     <!-- Critical CSS: above-the-fold styles inlined for fast FCP -->
     <style>
@@ -142,7 +137,7 @@
     .bento-card{background:var(--card-bg);border:1px solid rgba(0,0,0,0.08);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
     [data-theme="dark"] .bento-card{background:#1e293b;border-color:rgba(255,255,255,0.08)}
     .bento-identity{padding:2.5rem;justify-content:center}
-    .bento-name{font-size:2.8rem;font-weight:800;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:0.75rem}
+    .bento-name{font-size:2.8rem;font-weight:700;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:0.75rem}
     .bento-photo-card{position:relative;min-height:350px;background:linear-gradient(135deg,#f8fafc,#e2e8f0)}
     [data-theme="dark"] .bento-photo-card{background:linear-gradient(135deg,#1e293b,#0f172a)}
     .bento-photo-img{position:absolute;bottom:0;right:0;width:85%;max-width:300px;height:auto;object-fit:contain;object-position:bottom right;z-index:2}
@@ -176,7 +171,6 @@
     <noscript><link rel="stylesheet" href="styles.min.css?v=20260316"></noscript>
 
     <link rel="prefetch" href="articles.html">
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
 </head>
 <body>
     <!-- Search Overlay & Modal -->
@@ -1116,12 +1110,15 @@
                 </div>
                 <form class="contact-form" id="contactForm" onsubmit="return sendEmail(event)">
                     <div class="form-group">
-                        <input type="text" id="name" name="name" placeholder="Your Name" required>
+                        <label for="name" class="sr-only">Your Name</label>
+                        <input type="text" id="name" name="name" placeholder="Your Name" required autocomplete="name">
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" name="email" placeholder="Your Email" required>
+                        <label for="email" class="sr-only">Your Email</label>
+                        <input type="email" id="email" name="email" placeholder="Your Email" required autocomplete="email">
                     </div>
                     <div class="form-group">
+                        <label for="message" class="sr-only">Your Message</label>
                         <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full" data-tooltip="Opens your email client" data-magnetic>Send Message</button>
@@ -1763,24 +1760,35 @@
         hidePreview();
         renderRecent();
         if (!searchData) {
-            fetch('search-index.json')
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    searchData = data;
-                    fuse = new Fuse(data, {
-                        keys: [
-                            { name: 'title', weight: 0.4 },
-                            { name: 'description', weight: 0.25 },
-                            { name: 'keywords', weight: 0.25 },
-                            { name: 'category', weight: 0.1 }
-                        ],
-                        threshold: 0.35,
-                        includeScore: true,
-                        includeMatches: true,
-                        minMatchCharLength: 2
-                    });
-                })
-                .catch(function() {});
+            var initFuse = function(data) {
+                searchData = data;
+                fuse = new Fuse(data, {
+                    keys: [
+                        { name: 'title', weight: 0.4 },
+                        { name: 'description', weight: 0.25 },
+                        { name: 'keywords', weight: 0.25 },
+                        { name: 'category', weight: 0.1 }
+                    ],
+                    threshold: 0.35,
+                    includeScore: true,
+                    includeMatches: true,
+                    minMatchCharLength: 2
+                });
+            };
+            var loadData = function() {
+                fetch('search-index.json')
+                    .then(function(r) { return r.json(); })
+                    .then(initFuse)
+                    .catch(function() {});
+            };
+            if (typeof Fuse === 'undefined') {
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0';
+                s.onload = loadData;
+                document.head.appendChild(s);
+            } else {
+                loadData();
+            }
         }
     }
 
