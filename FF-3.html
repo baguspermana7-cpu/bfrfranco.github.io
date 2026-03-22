@@ -2299,7 +2299,7 @@
                     </div>
 
                     <!-- Pro Panels -->
-                    <div class="iec-pro-panels" id="iecProPanels" style="display:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:1.5rem;">
+                    <div class="iec-pro-panels" id="iecProPanels" style="display:none;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:1.5rem;">
 
                         <!-- Panel 1: Monte Carlo -->
                         <div class="iec-pro-panel" style="position:relative;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
@@ -4050,8 +4050,16 @@ document.addEventListener('DOMContentLoaded', function() {
         var unlocked  = hasProAccess();
         state.authed  = unlocked;
 
-        if (freeBtn) freeBtn.classList.toggle('active', state.mode === 'free');
-        if (proBtn)  proBtn.classList.toggle('active', state.mode === 'pro');
+        if (freeBtn) {
+            freeBtn.classList.toggle('active', state.mode === 'free');
+            freeBtn.style.background = state.mode === 'free' ? '#0891b2' : '#f8fafc';
+            freeBtn.style.color = state.mode === 'free' ? '#fff' : '#475569';
+        }
+        if (proBtn) {
+            proBtn.classList.toggle('active', state.mode === 'pro');
+            proBtn.style.background = state.mode === 'pro' ? '#0891b2' : '#f8fafc';
+            proBtn.style.color = state.mode === 'pro' ? '#fff' : '#475569';
+        }
 
         if (proPanels) proPanels.style.display = state.mode === 'pro' ? 'grid' : 'none';
         if (proInputs) proInputs.classList.toggle('active', state.mode === 'pro' && unlocked);
@@ -4177,9 +4185,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var monthlyCost    = data.monthlyCost || 0;
         var costPerMToken  = data.costPerMToken || 0;
+        var costPerReq     = data.costPerReq || 0;
         var gpuUtil        = data.gpuUtil || 0;
         var annualEnergy   = data.annualEnergyMWh || 0;
         var numGPUs        = data.numGPUs || 0;
+        var maxThroughput  = data.maxThroughput || 0;
+        var carbonTonnes   = data.carbonTonnes || 0;
 
         var dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -4216,15 +4227,21 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '<div class="pdf-header"><div>';
         html += '<h1>AI Inference Economics Analysis</h1>';
         html += '<div class="pdf-brand">RESISTANCEZERO \u00b7 FUTURE FORWARD SERIES</div>';
-        html += '</div><div class="pdf-date">Generated ' + dateStr + '<br>Mode: ' + (isPro ? 'Pro Analysis' : 'Free Assessment') + '<br>' + inp.gpuData.name + ' \u00b7 ' + inp.modelSizeKey + 'B \u00b7 ' + inp.regionData.name + '</div></div>';
+        html += '</div><div class="pdf-date">Generated ' + dateStr + '<br>Mode: ' + (isPro ? 'Pro Analysis' : 'Free Assessment') + '<br>' + inp.gpuData.name + ' \u00b7 ' + inp.modelSizeKey + 'B ' + inp.architecture.toUpperCase() + '<br>' + inp.regionData.name + ' \u00b7 ' + inp.workload + ' workload</div></div>';
 
-        /* KPI row (4 cards) */
+        /* KPI row (8 cards) */
         html += '<h2>Key Performance Indicators</h2>';
         html += '<div class="pdf-kpi-grid">';
         html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + fmtCurrency(monthlyCost) + '</div><div class="pdf-kpi-lbl">Monthly Inference Cost</div></div>';
         html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + fmtCurrency(costPerMToken) + '</div><div class="pdf-kpi-lbl">Cost per 1M Tokens</div></div>';
         html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + gpuUtil.toFixed(1) + '%</div><div class="pdf-kpi-lbl">GPU Utilization</div></div>';
-        html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + annualEnergy.toFixed(1) + ' MWh</div><div class="pdf-kpi-lbl">Annual Energy Consumption</div></div>';
+        html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + annualEnergy.toFixed(1) + ' MWh</div><div class="pdf-kpi-lbl">Annual Energy</div></div>';
+        html += '</div>';
+        html += '<div class="pdf-kpi-grid">';
+        html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + (costPerReq < 0.01 ? '$' + costPerReq.toFixed(4) : fmtCurrency(costPerReq)) + '</div><div class="pdf-kpi-lbl">Cost per Request</div></div>';
+        html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + fmtNumber(numGPUs) + '</div><div class="pdf-kpi-lbl">GPUs Required</div></div>';
+        html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + (maxThroughput >= 1e6 ? (maxThroughput / 1e6).toFixed(1) + 'M' : maxThroughput >= 1e3 ? (maxThroughput / 1e3).toFixed(1) + 'K' : fmtNumber(maxThroughput)) + '</div><div class="pdf-kpi-lbl">Max Throughput (tok/s)</div></div>';
+        html += '<div class="pdf-kpi"><div class="pdf-kpi-val">' + carbonTonnes.toFixed(1) + 't</div><div class="pdf-kpi-lbl">Carbon (tCO\u2082e/yr)</div></div>';
         html += '</div>';
 
         /* Input parameters table */
@@ -4234,7 +4251,8 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '<tr><td>Model Size</td><td>' + inp.modelSizeKey + 'B parameters</td><td>Quantization</td><td>' + inp.quantKey.toUpperCase() + '</td></tr>';
         html += '<tr><td>Deployment Type</td><td style="text-transform:capitalize">' + inp.deployType + '</td><td>Daily Requests</td><td>' + fmtNumber(inp.dailyReqs) + '</td></tr>';
         html += '<tr><td>Tokens per Request</td><td>' + fmtNumber(inp.tokensPerReq) + '</td><td>Power Cost</td><td>$' + inp.powerCost.toFixed(3) + '/kWh</td></tr>';
-        html += '<tr><td>Target Latency</td><td>' + inp.latency + ' ms</td><td>Hardware Refresh</td><td>Every ' + inp.refreshCycle + ' years</td></tr>';
+        html += '<tr><td>Target Latency</td><td>' + inp.latency + ' ms</td><td>Architecture</td><td style="text-transform:uppercase">' + inp.architecture + '</td></tr>';
+        html += '<tr><td>Workload Pattern</td><td style="text-transform:capitalize">' + inp.workload + '</td><td>Hardware Refresh</td><td>Every ' + inp.refreshCycle + ' years</td></tr>';
         if (isPro) {
             html += '<tr><td>Growth Rate</td><td>' + inp.growthRate + '%/yr</td><td>GPUs Required</td><td>' + numGPUs + '</td></tr>';
         }
@@ -4269,7 +4287,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return computeInferenceCost({
                 gpuData: inp.gpuData, modelScale: inp.modelScale, quantMult: inp.quantMult,
                 regionData: inp.regionData, dailyReqs: inp.dailyReqs, tokensPerReq: inp.tokensPerReq,
-                deployType: dt, powerCost: inp.powerCost, refreshCycle: inp.refreshCycle, latency: inp.latency
+                deployType: dt, powerCost: inp.powerCost, refreshCycle: inp.refreshCycle, latency: inp.latency,
+                architecture: inp.architecture, workload: inp.workload
             }).monthlyCost;
         });
         var maxDeployCost = Math.max.apply(null, deployCosts) || 1;
@@ -4323,14 +4342,33 @@ document.addEventListener('DOMContentLoaded', function() {
         if (inp.quantKey === 'fp16') {
             html += '<tr><td style="color:#ef4444;font-weight:700">CRITICAL</td><td>Switch to INT8 quantization</td><td>~45% cost reduction with minimal quality loss</td></tr>';
         }
+        if (inp.architecture === 'dense' && parseInt(inp.modelSizeKey) >= 70) {
+            html += '<tr><td style="color:#ef4444;font-weight:700">CRITICAL</td><td>Evaluate MoE architecture</td><td>2-4x inference efficiency at comparable quality</td></tr>';
+        }
         if (inp.deployType === 'cloud' && monthlyCost > 50000) {
             html += '<tr><td style="color:#f59e0b;font-weight:700">HIGH</td><td>Evaluate dedicated instances</td><td>~30% cost savings via reserved pricing</td></tr>';
         }
         if (gpuUtil < 60) {
             html += '<tr><td style="color:#f59e0b;font-weight:700">HIGH</td><td>Right-size GPU allocation</td><td>Reduce idle compute costs by ' + Math.round(100 - gpuUtil) + '%</td></tr>';
         }
-        html += '<tr><td style="color:#3b82f6;font-weight:700">MEDIUM</td><td>Implement request batching</td><td>10-25% throughput improvement</td></tr>';
+        if (inp.workload === 'burst') {
+            html += '<tr><td style="color:#f59e0b;font-weight:700">HIGH</td><td>Implement request queuing</td><td>Convert burst to steady, reduce peak GPU by 25-35%</td></tr>';
+        }
+        html += '<tr><td style="color:#3b82f6;font-weight:700">MEDIUM</td><td>Implement intelligent model routing</td><td>Send simple queries to smaller models, 40-70% cost cut</td></tr>';
         html += '<tr><td style="color:#3b82f6;font-weight:700">MEDIUM</td><td>Deploy inference caching</td><td>15-40% reduction in GPU-seconds for repeated queries</td></tr>';
+        if (carbonTonnes > 50 && inp.regionData.renewPct < 50) {
+            html += '<tr><td style="color:#3b82f6;font-weight:700">MEDIUM</td><td>Migrate to high-renewable region</td><td>Cut carbon footprint by 40-60% (current: ' + carbonTonnes.toFixed(1) + ' tCO\u2082e/yr)</td></tr>';
+        }
+        html += '<tr><td style="color:#6b7280;font-weight:700">MONITOR</td><td>Track carbon footprint quarterly</td><td>' + carbonTonnes.toFixed(1) + ' tCO\u2082e/yr vs sustainability targets</td></tr>';
+        html += '</table>';
+
+        /* Environmental impact summary */
+        html += '<h2>Environmental Impact</h2>';
+        html += '<table><tr><th>Metric</th><th>Value</th><th>Context</th></tr>';
+        html += '<tr><td>Annual Energy</td><td>' + annualEnergy.toFixed(1) + ' MWh</td><td>Equivalent to ~' + Math.round(annualEnergy / 10.5) + ' US households</td></tr>';
+        html += '<tr><td>Carbon Footprint</td><td>' + carbonTonnes.toFixed(1) + ' tCO\u2082e/yr</td><td>Grid: ' + inp.regionData.renewPct + '% renewable</td></tr>';
+        html += '<tr><td>Power (24/7)</td><td>' + ((numGPUs * inp.gpuData.power) / 1000).toFixed(1) + ' kW</td><td>' + numGPUs + ' \u00d7 ' + inp.gpuData.power + 'W per GPU</td></tr>';
+        html += '<tr><td>PUE Factor</td><td>1.30</td><td>Industry average for modern DCs</td></tr>';
         html += '</table>';
 
         /* Pro sections */
@@ -4440,23 +4478,58 @@ document.addEventListener('DOMContentLoaded', function() {
             html += '</svg></div>';
 
             /* Executive narrative */
-            html += '<h2>Strategic Assessment</h2>';
+            html += '<h2>Strategic Deployment Narrative</h2>';
+            var narrativeEl2 = byId('iecNarrative2');
+            if (narrativeEl2) html += '<div class="pdf-narrative">' + narrativeEl2.innerHTML + '</div>';
+
+            /* Break-even analysis */
+            html += '<h2>Cloud vs On-Premises Break-Even</h2>';
+            var gpuPriceForBE = inp.gpuData.price || 30000;
+            if (gpuPriceForBE > 0) {
+                var beCapex = numGPUs * gpuPriceForBE;
+                var beCloudMonth = monthlyCost;
+                var beOnPremEnergy = (numGPUs * inp.gpuData.power * inp.powerCost * 24 * 30) / 1000;
+                var beOnPremOpex = beOnPremEnergy + beOnPremEnergy * 0.2;
+                var bePt = beCloudMonth > beOnPremOpex ? Math.ceil(beCapex / (beCloudMonth - beOnPremOpex)) : -1;
+                html += '<table><tr><th>Metric</th><th>Cloud</th><th>On-Premises</th></tr>';
+                html += '<tr><td>Initial CapEx</td><td>' + fmtCurrency(0) + '</td><td>' + fmtCurrency(beCapex) + '</td></tr>';
+                html += '<tr><td>Monthly OpEx</td><td>' + fmtCurrency(beCloudMonth) + '</td><td>' + fmtCurrency(beOnPremOpex) + '</td></tr>';
+                html += '<tr><td>Annual Cost</td><td>' + fmtCurrency(beCloudMonth * 12) + '</td><td>' + fmtCurrency(beCapex / 3 + beOnPremOpex * 12) + '</td></tr>';
+                html += '<tr><td>5-Year TCO</td><td>' + fmtCurrency(beCloudMonth * 60) + '</td><td>' + fmtCurrency(beCapex + beOnPremOpex * 60) + '</td></tr>';
+                if (bePt > 0) {
+                    html += '<tr style="background:#ecfeff;font-weight:600"><td>Break-Even Point</td><td colspan="2">Month ' + bePt + ' \u2014 On-prem saves ' + fmtCurrency((beCloudMonth * 60) - (beCapex + beOnPremOpex * 60)) + ' over 5 years</td></tr>';
+                } else {
+                    html += '<tr style="background:#fef3c7"><td>Break-Even</td><td colspan="2">Cloud remains cheaper at current volume</td></tr>';
+                }
+                html += '</table>';
+            } else {
+                html += '<p style="font-size:11px;color:#64748b">' + inp.gpuData.name + ' is cloud-only hardware. Break-even analysis not applicable.</p>';
+            }
+
+            /* Cost optimization roadmap */
+            html += '<h2>Cost Optimization Roadmap</h2>';
             html += '<div class="pdf-roadmap">' + pro.roadmapHTML + '</div>';
 
             /* Strategic roadmap table */
-            html += '<h2>Strategic Roadmap</h2>';
+            html += '<h2>Implementation Timeline</h2>';
             html += '<table><tr><th>Timeline</th><th>Action</th><th>Target</th></tr>';
-            html += '<tr><td>0-3 months</td><td>Quantization optimization + request batching</td><td>30-45% cost reduction</td></tr>';
+            if (inp.quantKey === 'fp16') {
+                html += '<tr><td>Immediate</td><td>Switch to INT8 quantization</td><td>45% cost reduction</td></tr>';
+            }
+            if (inp.architecture === 'dense' && parseInt(inp.modelSizeKey) >= 70) {
+                html += '<tr><td>0-3 months</td><td>Evaluate MoE architecture migration</td><td>2-4x inference efficiency</td></tr>';
+            }
+            html += '<tr><td>0-3 months</td><td>Implement model routing + request batching</td><td>30-45% cost reduction</td></tr>';
             html += '<tr><td>3-6 months</td><td>Evaluate deployment migration (' + (inp.deployType === 'cloud' ? 'cloud \u2192 dedicated' : 'optimize current') + ')</td><td>20-30% additional savings</td></tr>';
-            html += '<tr><td>6-12 months</td><td>GPU refresh cycle planning (next-gen evaluation)</td><td>2-3x performance per watt improvement</td></tr>';
+            html += '<tr><td>6-12 months</td><td>GPU refresh cycle planning (next-gen evaluation)</td><td>2-3x performance per watt</td></tr>';
             html += '<tr><td>1-3 years</td><td>Multi-region inference routing + edge deployment</td><td>Latency reduction + cost arbitrage</td></tr>';
-            html += '<tr><td>3-5 years</td><td>Scale to ' + (pro.projectedGPUs || numGPUs) + '+ GPUs with automated provisioning</td><td>Support ' + inp.growthRate + '%/yr traffic growth</td></tr>';
+            html += '<tr><td>3-5 years</td><td>Scale to ' + (pro.projectedGPUs || numGPUs) + '+ GPUs with automated provisioning</td><td>Support ' + inp.growthRate + '%/yr growth</td></tr>';
             html += '</table>';
         }
 
         /* Methodology */
         html += '<h2>Methodology</h2>';
-        html += '<p style="font-size:10px;color:#64748b;line-height:1.6">Cost model calculates inference economics based on GPU throughput (tokens/s), model parameter scaling factors, quantization multipliers, and regional pricing differentials. Cloud costs use published GPU-hour rates with regional markup factors. On-premises TCO includes hardware amortization, energy consumption (PUE 1.3), and 20% operational overhead. Pro Monte Carlo runs 10,000 simulations varying demand (\u00b130%), hardware costs (\u00b120%), and energy prices (\u00b125%) using Box-Muller normal distributions. 5-year projections assume annual traffic growth with 15% YoY hardware efficiency improvement. All calculations run entirely client-side; no input data is transmitted to any server.</p>';
+        html += '<p style="font-size:10px;color:#64748b;line-height:1.6">Cost model calculates inference economics based on GPU throughput (tokens/s), model parameter scaling factors, quantization multipliers, architecture type (Dense/MoE), workload patterns (Steady/Burst/Batch), and regional pricing differentials. MoE architectures apply a 2.5x efficiency multiplier reflecting sparse activation. Burst workloads add 35% cost premium for headroom; batch workloads receive 35% discount for preemptible pricing. Cloud costs use published GPU-hour rates with regional markup factors. On-premises TCO includes hardware amortization, energy consumption (PUE 1.3), and 20% operational overhead. Carbon footprint uses grid emission factors scaled by regional renewable energy percentage. Pro Monte Carlo runs 10,000 simulations varying demand (\u00b130%), hardware costs (\u00b120%), and energy prices (\u00b125%) using Box-Muller normal distributions. Break-even analysis compares cumulative cloud vs on-premises costs over the forecast period. 5-year projections assume annual traffic growth with 15% YoY hardware efficiency improvement. All calculations run entirely client-side; no input data is transmitted to any server.</p>';
 
         /* Disclaimer */
         html += '<p style="font-size:9px;color:#94a3b8;margin-top:8px;line-height:1.5"><strong>Disclaimer:</strong> This analysis is for estimation and planning purposes only. Actual inference costs vary based on workload characteristics, provider pricing changes, contract terms, and operational factors not captured in this model. GPU prices and cloud rates reflect Q1 2026 estimates and are subject to change. Consult with your cloud provider or hardware vendor for binding quotes.</p>';
