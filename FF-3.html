@@ -1056,8 +1056,10 @@
                 <a href="#sec3" class="toc-item"><div class="toc-item-number">Section 3</div><div class="toc-item-title">The API Price Collapse &mdash; Race to Zero</div></a>
                 <a href="#sec4" class="toc-item"><div class="toc-item-number">Section 4</div><div class="toc-item-title">Edge vs Cloud: Where Inference Actually Runs</div></a>
                 <a href="#sec5" class="toc-item"><div class="toc-item-number">Section 5</div><div class="toc-item-title">The Energy Equation Nobody Talks About</div></a>
-                <a href="#sec6" class="toc-item toc-calculator"><div class="toc-item-number">Section 6 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div><div class="toc-item-title">AI Inference Economics Analyzer</div></a>
-                <a href="#sec7" class="toc-item"><div class="toc-item-number">Section 7</div><div class="toc-item-title">The Next 3 Years: What Stays, What Dies</div></a>
+                <a href="#sec6" class="toc-item"><div class="toc-item-number">Section 6</div><div class="toc-item-title">The Business Model Filter</div></a>
+                <a href="#sec7" class="toc-item"><div class="toc-item-number">Section 7</div><div class="toc-item-title">The Geopolitical Dimension</div></a>
+                <a href="#sec8" class="toc-item toc-calculator"><div class="toc-item-number">Section 8 <span class="toc-calc-badge"><i class="fas fa-calculator" style="font-size:0.5rem;"></i> Interactive</span></div><div class="toc-item-title">AI Inference Economics Analyzer</div></a>
+                <a href="#sec9" class="toc-item"><div class="toc-item-number">Section 9</div><div class="toc-item-title">The Next 3 Years: What Stays, What Dies</div></a>
                 <a href="#references" class="toc-item"><div class="toc-item-number">References</div><div class="toc-item-title">Sources and Method Notes</div></a>
             </div>
         </div>
@@ -1884,21 +1886,192 @@
 
                 <p><strong>Jevons Paradox is already operating.</strong> More efficient inference leads to lower per-query costs, which drives higher usage, which increases total energy consumption despite per-unit efficiency gains. This is not theoretical: API prices dropped 80% between 2023 and 2025, and API usage grew 300% over the same period. Total inference energy consumption increased, not decreased, even as per-token efficiency improved dramatically. Any energy projection that assumes efficiency gains reduce total consumption is ignoring the most reliable pattern in the history of computing.</p>
 
-                <!-- Section 6: CTA Block -->
+                <!-- Section 6 -->
+                <h2 id="sec6">The Business Model Filter</h2>
+
+                <p>Not every AI application survives inference economics. The gap between what is technically possible and what is economically sustainable is widening, and inference cost is the filter that determines which AI business models live and which die. The applications that survive share a common trait: their revenue per inference request exceeds their cost per inference request by a margin wide enough to absorb volatility, scaling costs, and the inevitable price compression that comes with competition.</p>
+
+                <p>The most revealing metric is <strong>inference cost as a percentage of revenue</strong>. For consumer-facing AI products, this ratio determines whether the unit economics work at scale. GitHub Copilot reportedly lost an average of $20 per user per month in 2023 when inference costs were high. By mid-2025, with cheaper models and better routing, the product reached profitability. The lesson is structural: the difference between a viable AI product and an AI subsidy is often a 2-3x improvement in inference cost efficiency.</p>
+
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Business Model</th>
+                                <th>Rev/Request</th>
+                                <th>Cost/Request</th>
+                                <th>Margin</th>
+                                <th>Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>API Provider (GPT, Claude)</strong></td>
+                                <td>$0.002–0.06</td>
+                                <td>$0.001–0.02</td>
+                                <td>40–70%</td>
+                                <td><span class="risk-chip low" style="background:#dcfce7;color:#166534;">Sustainable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Enterprise SaaS + AI</strong></td>
+                                <td>$0.05–0.50</td>
+                                <td>$0.005–0.05</td>
+                                <td>60–85%</td>
+                                <td><span class="risk-chip low" style="background:#dcfce7;color:#166534;">Sustainable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Code Assistant</strong></td>
+                                <td>$0.03–0.10</td>
+                                <td>$0.01–0.04</td>
+                                <td>50–70%</td>
+                                <td><span class="risk-chip low" style="background:#dcfce7;color:#166534;">Sustainable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Consumer Chatbot (free tier)</strong></td>
+                                <td>$0.00</td>
+                                <td>$0.005–0.03</td>
+                                <td>-100%</td>
+                                <td><span class="risk-chip critical" style="background:#fef2f2;color:#dc2626;">Subsidy</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Search (Perplexity-type)</strong></td>
+                                <td>$0.001–0.01</td>
+                                <td>$0.008–0.05</td>
+                                <td>-50–80%</td>
+                                <td><span class="risk-chip high" style="background:#fef3c7;color:#92400e;">At Risk</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Video Generation</strong></td>
+                                <td>$0.10–1.00</td>
+                                <td>$0.50–5.00</td>
+                                <td>-60–80%</td>
+                                <td><span class="risk-chip critical" style="background:#fef2f2;color:#dc2626;">Unsustainable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Autonomous Agents</strong></td>
+                                <td>$1.00–50.00</td>
+                                <td>$0.50–20.00</td>
+                                <td>20–60%</td>
+                                <td><span class="risk-chip low" style="background:#dcfce7;color:#166534;">High Potential</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Medical Diagnostics AI</strong></td>
+                                <td>$5.00–100.00</td>
+                                <td>$0.10–2.00</td>
+                                <td>85–98%</td>
+                                <td><span class="risk-chip low" style="background:#dcfce7;color:#166534;">Sustainable</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="table-source">Sources: a16z AI Business Model Analysis 2025, Goldman Sachs AI Revenue Tracker, company filings and investor reports.</p>
+                </div>
+
+                <div class="alert-box">
+                    <p><strong>The Routing Revolution:</strong> Companies surviving the inference economics filter aren't just choosing cheaper models — they're building <strong>intelligent routing systems</strong> that classify incoming requests by complexity and route them to the cheapest model capable of handling each task. Anthropic routes simple queries to Haiku (90% cheaper than Opus), OpenAI routes to GPT-4o Mini, and Google routes to Gemini Flash. This single architectural pattern reduces inference costs by 40–70% without degrading perceived quality. By 2027, every production AI system will implement multi-model routing as a baseline requirement.</p>
+                </div>
+
+                <p><strong>The wrapper tax is real.</strong> AI wrapper companies — startups that build thin application layers on top of API providers — face a structural problem. Their inference costs are determined by their upstream provider's pricing, their margins are compressed by the provider's margin, and they have no ability to optimize at the infrastructure layer. When OpenAI drops GPT-4o pricing by 50%, the wrapper's input costs drop, but so does the perceived value of the wrapper's product. This creates a permanent margin squeeze that only deepens as API prices fall. The survivors will be companies that build proprietary data moats, fine-tune their own models, or create workflow value that transcends the underlying model.</p>
+
+                <p><strong>The open-source escape hatch.</strong> Llama 4, Mistral Large 2, DeepSeek V3, and Qwen 2.5 have made high-quality inference available at near-zero marginal cost for organizations willing to self-host. This doesn't eliminate inference cost — you still need GPUs, power, and operational expertise — but it eliminates the API provider's margin, which typically accounts for 40-60% of the per-token price. For companies processing more than 10 million tokens per day, self-hosted open-source inference breaks even with API pricing within 3-6 months. The trade-off is operational complexity, but that trade-off becomes increasingly favorable as volume scales.</p>
+
+                <blockquote>
+                    "The question isn't whether AI works. The question is whether the unit economics of AI work at the scale your business needs. Inference cost is the answer to that question." — Sarah Guo, Conviction Capital
+                </blockquote>
+
+                <!-- Section 7 -->
+                <h2 id="sec7">The Geopolitical Dimension</h2>
+
+                <p>Inference is not just an engineering problem or an economic problem. It is a geopolitical problem. The ability to run AI at scale — to deploy inference infrastructure — is now a dimension of national power, and the global competition for inference capacity is reshaping trade policy, alliance structures, and technology sovereignty strategies across every major economy.</p>
+
+                <p><strong>The US export control regime is explicitly targeting inference.</strong> The October 2022 chip export restrictions, updated in October 2023 and again in January 2025, are designed to constrain China's ability to build inference infrastructure at scale. The restrictions target not just training-class GPUs (A100, H100) but inference-optimized chips — because the US government correctly identified that inference capacity, not training capacity, determines a nation's ability to deploy AI across its economy and military.</p>
+
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Country/Bloc</th>
+                                <th>Inference Strategy</th>
+                                <th>Key Investment</th>
+                                <th>Constraint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>United States</strong></td>
+                                <td>Hyperscaler dominance + export control</td>
+                                <td>$450B+ private capex (2025)</td>
+                                <td>Grid capacity, permitting</td>
+                            </tr>
+                            <tr>
+                                <td><strong>China</strong></td>
+                                <td>Domestic chip development + efficiency</td>
+                                <td>$50B+ government subsidies</td>
+                                <td>US export controls on advanced GPUs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>European Union</strong></td>
+                                <td>Sovereign AI + regulatory framework</td>
+                                <td>€20B EU AI Act implementation</td>
+                                <td>Fragmented market, energy costs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>India</strong></td>
+                                <td>Digital public infrastructure + AI</td>
+                                <td>$1.5B IndiaAI Mission</td>
+                                <td>Power grid reliability, talent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>UAE / Saudi Arabia</strong></td>
+                                <td>Inference hub for MENA region</td>
+                                <td>$100B+ sovereign funds</td>
+                                <td>Cooling (50°C ambient), talent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Japan</strong></td>
+                                <td>Domestic chip revival (Rapidus)</td>
+                                <td>$13B semiconductor subsidies</td>
+                                <td>Nuclear restart timeline</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Indonesia</strong></td>
+                                <td>Data sovereignty + local cloud</td>
+                                <td>$7B DC investment (2024-2027)</td>
+                                <td>Infrastructure, submarine cables</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="table-source">Sources: CSIS Technology Policy Program 2025, Brookings AI Geopolitics Tracker, national AI strategy documents, Goldman Sachs Global AI Capex Monitor.</p>
+                </div>
+
+                <p><strong>China's response to export controls is accelerating domestic inference innovation.</strong> Huawei's Ascend 910C achieves approximately 70% of H100 inference performance at 40% lower cost. DeepSeek's v3 model was specifically designed for inference efficiency on domestic hardware — it achieves GPT-4-level quality using a Mixture-of-Experts architecture that activates only 37B of its 671B parameters per inference request, dramatically reducing compute requirements. This is not accidental. It is a direct engineering response to hardware constraints imposed by export controls. The implication: export controls may slow China's inference scaling but are simultaneously driving innovations in inference efficiency that could ultimately make Chinese AI systems more cost-competitive than American ones.</p>
+
+                <div class="warning-box">
+                    <p><strong>The sovereignty trap:</strong> Every nation wants AI sovereignty — the ability to run critical AI workloads on domestic infrastructure without foreign dependencies. But building sovereign inference capacity requires advanced GPUs (controlled by the US), cutting-edge fabrication (dominated by TSMC in Taiwan), and massive energy infrastructure (constrained everywhere). True AI sovereignty is currently achievable only by the United States and, with constraints, China. Every other nation is navigating degrees of dependence.</p>
+                </div>
+
+                <p><strong>The ASEAN compute corridor is emerging.</strong> Singapore, Indonesia, Malaysia, and Thailand are collectively positioning as the inference hub for Southeast Asia. Singapore provides the financial and regulatory framework but faces a data center moratorium due to energy constraints. Indonesia offers land, growing power capacity, and a 280-million-person domestic market. Malaysia has attracted $7B+ in DC investment from Microsoft, Google, and AWS. This corridor is becoming the third major inference geography after the US and China, serving both regional demand and overflow from capacity-constrained markets.</p>
+
+                <p><strong>The implications for data center operators are structural.</strong> Inference workloads are not neutral in geopolitical terms. Where you deploy inference infrastructure determines which government's regulations apply, which export control regimes constrain your hardware options, and which sovereignty requirements shape your data handling. For multinational companies, the inference deployment map is now as important as the supply chain map — and in many cases, they are the same map.</p>
+
+                <blockquote>
+                    "Whoever controls inference infrastructure controls the deployment of AI. And whoever controls the deployment of AI has an asymmetric advantage in every domain — economic, military, and cultural." — Eric Schmidt, former Google CEO, National Security Commission on AI
+                </blockquote>
+
+                <!-- Section 8: CTA Block -->
                 <div class="iec-cta-block" style="background: linear-gradient(135deg, #083344 0%, #0e4d5c 100%); border-radius: 16px; padding: 2rem; margin: 2.5rem 0; border: 1px solid #155e75; text-align: center;">
                     <h3 style="color: #f0fdfa; font-size: 1.2rem; margin: 0 0 0.75rem 0;">Model Your Own Inference Economics</h3>
-                    <p style="color: #a5f3fc; font-size: 0.9rem; line-height: 1.7; margin: 0 0 1.25rem 0;">Use our interactive calculator to estimate costs across 10 regions, 6 GPU types, and multiple deployment models.</p>
-                    <a href="#sec6" class="iec-cta-btn" style="display:inline-flex;align-items:center;gap:0.5rem;background:#0891b2;color:#fff;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;transition:background 0.2s;">
+                    <p style="color: #a5f3fc; font-size: 0.9rem; line-height: 1.7; margin: 0 0 1.25rem 0;">Use our interactive calculator to estimate costs across 10 regions, 8 GPU types, MoE architectures, workload patterns, and 6 pro analysis panels including break-even and carbon footprint.</p>
+                    <a href="#sec8" class="iec-cta-btn" style="display:inline-flex;align-items:center;gap:0.5rem;background:#0891b2;color:#fff;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;transition:background 0.2s;">
                         <i class="fas fa-calculator"></i> Open Calculator
                     </a>
                 </div>
 
                 <!-- Calculator Section -->
-                <h2 id="sec6"><a id="iec-calculator-anchor"></a>AI Inference Economics Analyzer</h2>
+                <h2 id="sec8"><a id="iec-calculator-anchor"></a>AI Inference Economics Analyzer</h2>
 
                 <div class="calculator-section">
                     <h3 class="iec-calculator-title" style="font-size:1.15rem;font-weight:700;color:#0e7490;margin:0 0 0.5rem;">AI Inference Economics Analyzer</h3>
-                    <p class="iec-calculator-sub" style="font-size:0.85rem;color:#475569;line-height:1.7;margin:0 0 1.5rem;">Model your inference infrastructure costs across 10 regions, 6 GPU/accelerator types, and 4 deployment architectures. Free mode calculates monthly cost, cost per million tokens, GPU utilization, and energy consumption. Pro mode adds Monte Carlo simulations, 5-year projections, sensitivity analysis, and strategic deployment narratives.</p>
+                    <p class="iec-calculator-sub" style="font-size:0.85rem;color:#475569;line-height:1.7;margin:0 0 1.5rem;">Model your inference infrastructure costs across 10 regions, 8 GPU/accelerator types, Dense &amp; MoE architectures, and 3 workload patterns. Free mode outputs 8 KPI metrics including carbon footprint. Pro mode adds Monte Carlo simulations, 5-year projections, sensitivity tornado, cloud vs on-prem break-even, cost optimization roadmap, and strategic deployment narratives.</p>
 
                     <div class="iec-toolbar-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
                         <div class="iec-mode-bar" style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;">
@@ -1964,9 +2137,11 @@
                                 <option value="b200">NVIDIA Blackwell B200</option>
                                 <option value="h100" selected>NVIDIA H100</option>
                                 <option value="a100">NVIDIA A100</option>
+                                <option value="mi300x">AMD Instinct MI300X</option>
                                 <option value="gaudi3">Intel Gaudi 3</option>
                                 <option value="tpuv6">Google TPU v6</option>
                                 <option value="groq">Groq LPU</option>
+                                <option value="cs3">Cerebras CS-3</option>
                             </select>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
@@ -1995,6 +2170,25 @@
                                 <span id="iecLatencyVal" style="font-size:0.82rem;font-weight:600;color:#0891b2;white-space:nowrap;min-width:55px;">500 ms</span>
                             </div>
                         </div>
+                        <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
+                            <label for="iecArchitecture" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Model Architecture
+                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Model Architecture</span>Dense models activate all parameters per request. MoE (Mixture of Experts) activates only a subset, reducing compute per token by 2-4x at the same quality level. DeepSeek V3 uses MoE.</span></span>
+                            </label>
+                            <select id="iecArchitecture" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
+                                <option value="dense" selected>Dense (Standard)</option>
+                                <option value="moe">Mixture of Experts (MoE)</option>
+                            </select>
+                        </div>
+                        <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
+                            <label for="iecWorkload" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Workload Pattern
+                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Workload Pattern</span>Steady = consistent throughput. Burst = peak-heavy (needs headroom, higher cost). Batch = offline processing (can use spot/preemptible, lower cost).</span></span>
+                            </label>
+                            <select id="iecWorkload" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
+                                <option value="steady" selected>Steady (Consistent)</option>
+                                <option value="burst">Burst (Peak-Heavy)</option>
+                                <option value="batch">Batch (Offline)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Results Grid -->
@@ -2002,22 +2196,42 @@
                         <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
                             <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Monthly Inference Cost</div>
                             <div class="iec-result-value" id="iecMonthlyCost" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
-                            <div class="iec-result-sub" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">compute + energy + overhead</div>
+                            <div class="iec-result-sub" id="iecMonthlyCostLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">compute + energy + overhead</div>
                         </div>
                         <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
                             <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Cost per 1M Tokens</div>
                             <div class="iec-result-value" id="iecCostPerMToken" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
-                            <div class="iec-result-sub" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">blended input + output</div>
+                            <div class="iec-result-sub" id="iecCostPerMTokenLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">blended input + output</div>
                         </div>
                         <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
                             <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">GPU Utilization</div>
                             <div class="iec-result-value" id="iecGpuUtil" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
-                            <div class="iec-result-sub" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">efficiency percentage</div>
+                            <div class="iec-result-sub" id="iecGpuUtilLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">efficiency percentage</div>
                         </div>
                         <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
                             <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Annual Energy (MWh)</div>
                             <div class="iec-result-value" id="iecAnnualEnergy" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
-                            <div class="iec-result-sub" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">total power consumption</div>
+                            <div class="iec-result-sub" id="iecAnnualEnergyLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">total power consumption</div>
+                        </div>
+                        <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
+                            <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Cost per Request</div>
+                            <div class="iec-result-value" id="iecCostPerReq" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
+                            <div class="iec-result-sub" id="iecCostPerReqLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">avg inference request cost</div>
+                        </div>
+                        <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
+                            <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">GPUs Required</div>
+                            <div class="iec-result-value" id="iecGpusRequired" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
+                            <div class="iec-result-sub" id="iecGpusRequiredLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">minimum GPU fleet size</div>
+                        </div>
+                        <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
+                            <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Max Throughput</div>
+                            <div class="iec-result-value" id="iecMaxThroughput" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
+                            <div class="iec-result-sub" id="iecMaxThroughputLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">tokens/sec capacity</div>
+                        </div>
+                        <div class="iec-result-card" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #a5f3fc;border-radius:10px;padding:1.25rem;text-align:center;">
+                            <div class="iec-result-label" style="font-size:0.72rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Carbon Footprint</div>
+                            <div class="iec-result-value" id="iecCarbonFootprint" style="font-size:1.6rem;font-weight:800;color:#0e7490;font-family:'JetBrains Mono',monospace;">--</div>
+                            <div class="iec-result-sub" id="iecCarbonLabel" style="font-size:0.68rem;color:#64748b;margin-top:0.35rem;">tonnes CO₂e / year</div>
                         </div>
                     </div>
 
@@ -2137,6 +2351,26 @@
                             <div class="iec-gate-overlay" data-gate="4" style="position:absolute;inset:0;background:rgba(255,255,255,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;backdrop-filter:blur(4px);"><i class="fas fa-lock" style="font-size:1.2rem;color:#0891b2;"></i><span style="font-size:0.82rem;font-weight:600;color:#0e7490;">Unlock Pro Analysis</span></div>
                         </div>
 
+                        <!-- Panel 5: Cloud vs On-Prem Break-Even -->
+                        <div class="iec-pro-panel" style="position:relative;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+                            <div class="iec-pro-panel-inner gated" style="padding:1.25rem;">
+                                <h4 class="iec-panel-title" style="font-size:0.85rem;font-weight:700;color:#0e7490;margin:0 0 0.75rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-scale-balanced"></i> Cloud vs On-Prem Break-Even <span class="iec-pro-badge" style="font-size:0.6rem;background:#0891b2;color:#fff;padding:0.15rem 0.5rem;border-radius:4px;font-weight:700;margin-left:auto;">PRO</span></h4>
+                                <p style="font-size:0.78rem;color:#475569;margin:0 0 0.75rem;">Cumulative cost comparison over your forecast period showing when on-premises deployment becomes cheaper than cloud.</p>
+                                <div class="iec-chart-container" style="position:relative;width:100%;"><canvas id="iecBreakEvenChart" height="240"></canvas></div>
+                                <div id="iecBreakEvenSummary" style="margin-top:0.75rem;font-size:0.78rem;color:#374151;line-height:1.7;">Calculating break-even point...</div>
+                            </div>
+                            <div class="iec-gate-overlay" data-gate="5" style="position:absolute;inset:0;background:rgba(255,255,255,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;backdrop-filter:blur(4px);"><i class="fas fa-lock" style="font-size:1.2rem;color:#0891b2;"></i><span style="font-size:0.82rem;font-weight:600;color:#0e7490;">Unlock Pro Analysis</span></div>
+                        </div>
+
+                        <!-- Panel 6: Cost Optimization Roadmap -->
+                        <div class="iec-pro-panel" style="position:relative;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+                            <div class="iec-pro-panel-inner gated" style="padding:1.25rem;">
+                                <h4 class="iec-panel-title" style="font-size:0.85rem;font-weight:700;color:#0e7490;margin:0 0 0.75rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-road"></i> Cost Optimization Roadmap <span class="iec-pro-badge" style="font-size:0.6rem;background:#0891b2;color:#fff;padding:0.15rem 0.5rem;border-radius:4px;font-weight:700;margin-left:auto;">PRO</span></h4>
+                                <div id="iecRoadmap" style="font-size:0.82rem;color:#374151;line-height:1.75;">Generating optimization roadmap based on your configuration...</div>
+                            </div>
+                            <div class="iec-gate-overlay" data-gate="6" style="position:absolute;inset:0;background:rgba(255,255,255,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;backdrop-filter:blur(4px);"><i class="fas fa-lock" style="font-size:1.2rem;color:#0891b2;"></i><span style="font-size:0.82rem;font-weight:600;color:#0e7490;">Unlock Pro Analysis</span></div>
+                        </div>
+
                     </div>
 
                     <!-- Disclaimer -->
@@ -2159,14 +2393,17 @@
                     <div class="iec-benchmark-meta" style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;">
                         <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">Monte Carlo 10K iterations</span>
                         <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">10-region power data</span>
-                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">6 GPU/accelerator types</span>
-                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">Real-time cost modeling</span>
+                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">8 GPU/accelerator types</span>
+                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">10 free + 5 pro inputs</span>
+                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">8 KPI metrics</span>
+                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">6 pro analysis panels</span>
+                        <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">Carbon footprint tracking</span>
                         <span class="iec-benchmark-tag" style="font-size:0.65rem;padding:0.3rem 0.65rem;background:#ecfeff;color:#0e7490;border-radius:20px;border:1px solid #a5f3fc;">Local-only computation</span>
                     </div>
                 </div>
 
-                <!-- Section 7 -->
-                <h2 id="sec7">The Next 3 Years: What Stays, What Dies</h2>
+                <!-- Section 9 -->
+                <h2 id="sec9">The Next 3 Years: What Stays, What Dies</h2>
 
                 <p>Inference economics is not a stable system. The cost curves, hardware capabilities, deployment patterns, and business models are all moving simultaneously, and they are moving fast enough that decisions made today will be structurally right or structurally wrong within 18 months. The following projection is based on current trajectories in hardware efficiency, deployment patterns, and market consolidation.</p>
 
@@ -2481,7 +2718,7 @@ window.iecCalculate = window.iecCalculate || function(){};
     }
 
     /* ── Auto-calculate on input change ── */
-    var inputIds = ['iecRegion','iecModelSize','iecDailyRequests','iecTokensPerReq','iecGpuType','iecDeployType','iecPowerCost','iecLatency','iecGrowthRate','iecForecastYears','iecRefreshCycle','iecQuantization','iecMultiModel'];
+    var inputIds = ['iecRegion','iecModelSize','iecDailyRequests','iecTokensPerReq','iecGpuType','iecDeployType','iecPowerCost','iecLatency','iecGrowthRate','iecForecastYears','iecRefreshCycle','iecQuantization','iecMultiModel','iecArchitecture','iecWorkload'];
     inputIds.forEach(function(id) {
         var el = byId(id);
         if (el) {
@@ -2847,12 +3084,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* ── GPU specifications ── */
     var GPU_DATA = {
-        b200:   { name: 'NVIDIA B200',   tps: 30000, price: 35000, power: 1000, cloudCostHr: 8.50 },
-        h100:   { name: 'NVIDIA H100',   tps: 15000, price: 28000, power: 700,  cloudCostHr: 3.50 },
-        a100:   { name: 'NVIDIA A100',   tps: 8000,  price: 12000, power: 400,  cloudCostHr: 2.00 },
-        gaudi3: { name: 'Intel Gaudi 3', tps: 12000, price: 13000, power: 600,  cloudCostHr: 2.20 },
-        tpuv6:  { name: 'Google TPU v6', tps: 18000, price: 0,     power: 500,  cloudCostHr: 2.80 },
-        groq:   { name: 'Groq LPU',      tps: 500,   price: 0,     power: 300,  cloudCostHr: 0.60 }
+        b200:   { name: 'NVIDIA B200',      tps: 30000, price: 35000, power: 1000, cloudCostHr: 8.50 },
+        h100:   { name: 'NVIDIA H100',      tps: 15000, price: 28000, power: 700,  cloudCostHr: 3.50 },
+        a100:   { name: 'NVIDIA A100',      tps: 8000,  price: 12000, power: 400,  cloudCostHr: 2.00 },
+        mi300x: { name: 'AMD MI300X',       tps: 14000, price: 15000, power: 750,  cloudCostHr: 2.80 },
+        gaudi3: { name: 'Intel Gaudi 3',    tps: 12000, price: 13000, power: 600,  cloudCostHr: 2.20 },
+        tpuv6:  { name: 'Google TPU v6',    tps: 18000, price: 0,     power: 500,  cloudCostHr: 2.80 },
+        groq:   { name: 'Groq LPU',         tps: 500,   price: 0,     power: 300,  cloudCostHr: 0.60 },
+        cs3:    { name: 'Cerebras CS-3',    tps: 25000, price: 0,     power: 23000,cloudCostHr: 4.50 }
     };
 
     /* ── Model scale factors by parameter count (billions) ── */
@@ -3004,6 +3243,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var quantMult = QUANT_MULT[quantKey] || 1.0;
         var deployType = strVal('iecDeployType') || 'cloud';
 
+        var architecture = strVal('iecArchitecture') || 'dense';
+        var workload = strVal('iecWorkload') || 'steady';
+
         return {
             regionKey:     regionKey,
             regionData:    rd,
@@ -3014,6 +3256,8 @@ document.addEventListener('DOMContentLoaded', function() {
             quantKey:      quantKey,
             quantMult:     quantMult,
             deployType:    deployType,
+            architecture:  architecture,
+            workload:      workload,
             dailyReqs:     clamp(numVal('iecDailyReqs'), 100, 100000000),
             tokensPerReq:  clamp(numVal('iecTokensPerReq'), 10, 100000),
             powerCost:     clamp(numVal('iecPowerCost'), 0.01, 1.0),
@@ -3037,13 +3281,18 @@ document.addEventListener('DOMContentLoaded', function() {
         var powerCost = params.powerCost;
         var refreshCycle = params.refreshCycle || 3;
         var latency = params.latency || 200;
+        var architecture = params.architecture || 'dense';
+        var workload = params.workload || 'steady';
 
         /* Tokens per day/month */
         var dailyTokens = dailyReqs * tokensPerReq;
         var monthlyTokens = dailyTokens * 30;
 
+        /* Architecture multiplier — MoE activates ~25% of params per token */
+        var archMult = architecture === 'moe' ? 2.5 : 1.0;
+
         /* Effective TPS per GPU */
-        var effectiveTPS = gpu.tps * modelScale.tpsScale * quantMult;
+        var effectiveTPS = gpu.tps * modelScale.tpsScale * quantMult * archMult;
 
         /* GPU-seconds and GPU-hours per day */
         var gpuSecondsPerDay = dailyTokens / Math.max(effectiveTPS, 1);
@@ -3087,14 +3336,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        /* Workload pattern adjustment */
+        var workloadMult = workload === 'burst' ? 1.35 : workload === 'batch' ? 0.65 : 1.0;
+        monthlyCost = monthlyCost * workloadMult;
+
         /* Cost per million tokens */
         var costPerMToken = monthlyTokens > 0 ? (monthlyCost / (monthlyTokens / 1000000)) : 0;
+
+        /* Cost per request */
+        var monthlyReqs = dailyReqs * 30;
+        var costPerReq = monthlyReqs > 0 ? (monthlyCost / monthlyReqs) : 0;
 
         /* GPU utilization */
         var gpuUtil = Math.min((gpuHoursPerDay / (numGPUs * 24)) * 100, 95);
 
+        /* Max throughput (tokens/sec across fleet) */
+        var maxThroughput = numGPUs * effectiveTPS;
+
         /* Annual energy (MWh) — PUE factor 1.3 */
         var annualEnergyMWh = (numGPUs * gpu.power * 24 * 365 / 1000000) * 1.3;
+
+        /* Carbon footprint (tonnes CO2e/year) — grid emission factor by renewable % */
+        var emissionFactor = 0.5 * (1 - (region.renewPct || 0) / 100) + 0.05;
+        var carbonTonnes = annualEnergyMWh * emissionFactor;
 
         return {
             dailyTokens: dailyTokens,
@@ -3105,8 +3369,11 @@ document.addEventListener('DOMContentLoaded', function() {
             numGPUs: numGPUs,
             monthlyCost: monthlyCost,
             costPerMToken: costPerMToken,
+            costPerReq: costPerReq,
             gpuUtil: gpuUtil,
-            annualEnergyMWh: annualEnergyMWh
+            maxThroughput: maxThroughput,
+            annualEnergyMWh: annualEnergyMWh,
+            carbonTonnes: carbonTonnes
         };
     }
 
@@ -3128,11 +3395,23 @@ document.addEventListener('DOMContentLoaded', function() {
         setText('iecGpuUtil', result.gpuUtil.toFixed(1) + '%');
         setText('iecAnnualEnergy', result.annualEnergyMWh.toFixed(1) + ' MWh');
 
+        /* New KPI cards */
+        var costPerReqEl = byId('iecCostPerReq');
+        if (costPerReqEl) costPerReqEl.textContent = result.costPerReq < 0.01 ? '$' + result.costPerReq.toFixed(4) : fmtCurrency(result.costPerReq);
+        setText('iecGpusRequired', fmtNumber(result.numGPUs));
+        var maxTpEl = byId('iecMaxThroughput');
+        if (maxTpEl) maxTpEl.textContent = result.maxThroughput >= 1000000 ? (result.maxThroughput / 1000000).toFixed(1) + 'M' : result.maxThroughput >= 1000 ? (result.maxThroughput / 1000).toFixed(1) + 'K' : fmtNumber(result.maxThroughput);
+        setText('iecCarbonFootprint', result.carbonTonnes.toFixed(1) + 't');
+
         /* Sub-labels */
         setText('iecMonthlyCostLabel', inp.deployType + ' deployment × ' + result.numGPUs + ' GPUs');
         setText('iecCostPerMTokenLabel', fmtNumber(result.monthlyTokens) + ' tokens/month');
         setText('iecGpuUtilLabel', result.numGPUs + ' × ' + inp.gpuData.name);
         setText('iecAnnualEnergyLabel', 'PUE 1.3 × ' + inp.gpuData.power + 'W per GPU');
+        setText('iecCostPerReqLabel', inp.tokensPerReq + ' tokens/req × ' + inp.workload);
+        setText('iecGpusRequiredLabel', inp.gpuData.name + ' (' + inp.architecture + ')');
+        setText('iecMaxThroughputLabel', 'tokens/sec across ' + result.numGPUs + ' GPUs');
+        setText('iecCarbonLabel', inp.regionData.renewPct + '% renewable grid');
 
         /* Narrative */
         var narrativeParts = [];
@@ -3185,7 +3464,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (state.authed && state.mode === 'pro') {
             calculatePro(inp, result);
         } else {
-            ['mc', 'projection', 'tornado'].forEach(function(k) { destroyChart(k); });
+            ['mc', 'projection', 'tornado', 'breakeven'].forEach(function(k) { destroyChart(k); });
         }
 
         state.lastInp = inp;
@@ -3581,7 +3860,70 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         /* ────────────────────────────────
-           4. Strategic Deployment Narrative
+           4. Cloud vs On-Prem Break-Even
+        ──────────────────────────────── */
+        var forecastYears = clamp(numVal('iecForecastYears') || 5, 1, 10);
+        var beLabels = [];
+        var beCloud = [];
+        var beOnPrem = [];
+        var beBreakMonth = -1;
+        var gpuPrice = inp.gpuData.price || 30000;
+        var initialCapex = freeResult.numGPUs * gpuPrice;
+        var monthlyCloudCost = freeResult.monthlyCost;
+        /* On-prem: CapEx + energy + 20% overhead, no cloud margin */
+        var monthlyOnPremEnergy = (freeResult.numGPUs * inp.gpuData.power * inp.powerCost * 24 * 30) / 1000;
+        var monthlyOnPremOverhead = monthlyOnPremEnergy * 0.20;
+        var monthlyOnPremOpex = monthlyOnPremEnergy + monthlyOnPremOverhead;
+
+        for (var m = 0; m <= forecastYears * 12; m++) {
+            if (m % 3 === 0 || m === forecastYears * 12) {
+                beLabels.push(m <= 12 ? 'M' + m : 'Y' + (m / 12).toFixed(1));
+                beCloud.push(monthlyCloudCost * m);
+                beOnPrem.push(initialCapex + monthlyOnPremOpex * m);
+                if (beBreakMonth < 0 && (initialCapex + monthlyOnPremOpex * m) < (monthlyCloudCost * m)) {
+                    beBreakMonth = m;
+                }
+            }
+        }
+
+        ensureChart('breakeven', 'iecBreakEvenChart', {
+            type: 'line',
+            data: {
+                labels: beLabels,
+                datasets: [
+                    { label: 'Cloud (Cumulative)', data: beCloud, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+                    { label: 'On-Prem (Cumulative)', data: beOnPrem, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3, pointRadius: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: function(item) { return item.dataset.label + ': ' + fmtCurrency(item.raw); } } }
+                },
+                scales: {
+                    y: { ticks: { font: { size: 10 }, callback: function(v) { return fmtCurrency(v); } } },
+                    x: { ticks: { font: { size: 9 }, maxRotation: 45 } }
+                }
+            }
+        });
+
+        var beSummary = byId('iecBreakEvenSummary');
+        if (beSummary) {
+            if (inp.gpuData.price === 0) {
+                beSummary.innerHTML = '<strong>Cloud-only hardware:</strong> ' + inp.gpuData.name + ' is not available for on-premises purchase. Break-even analysis not applicable.';
+            } else if (beBreakMonth > 0) {
+                beSummary.innerHTML = '<strong>Break-even at month ' + beBreakMonth + '.</strong> On-premises deployment becomes cheaper than cloud after ' +
+                    beBreakMonth + ' months. Initial CapEx: ' + fmtCurrency(initialCapex) + '. Monthly cloud: ' + fmtCurrency(monthlyCloudCost) +
+                    '. Monthly on-prem OpEx: ' + fmtCurrency(monthlyOnPremOpex) + '. <strong>5-year savings: ' +
+                    fmtCurrency((monthlyCloudCost * 60) - (initialCapex + monthlyOnPremOpex * 60)) + '</strong>.';
+            } else {
+                beSummary.innerHTML = '<strong>Cloud remains cheaper</strong> over ' + forecastYears + ' years at your current volume. On-prem break-even requires higher utilization or longer time horizon.';
+            }
+        }
+
+        /* ────────────────────────────────
+           5. Strategic Deployment Narrative
         ──────────────────────────────── */
         var riskSpread = mcP95 - mcP5;
         var riskLevel = riskSpread > baseCost * 1.5 ? 'high' : riskSpread > baseCost * 0.5 ? 'moderate' : 'low';
@@ -3589,18 +3931,34 @@ document.addEventListener('DOMContentLoaded', function() {
         var topDriver = tornadoData[0] ? tornadoData[0].label : 'daily requests';
         var secondDriver = tornadoData[1] ? tornadoData[1].label : 'GPU cost';
 
+        /* ── Panel 4: Strategic Narrative (iecNarrative2) ── */
+        var narrativeHTML = '';
+
+        narrativeHTML += '<p><strong>Current State Assessment:</strong> Your ' + inp.modelSizeKey + 'B parameter ' + inp.architecture.toUpperCase() + ' deployment in ' +
+            inp.regionData.name + ' using ' + inp.gpuData.name + ' processes ' + fmtNumber(inp.dailyReqs) +
+            ' requests daily (' + inp.workload + ' pattern), costing approximately ' + fmtCurrency(freeResult.monthlyCost) + '/month. At ' +
+            fmtCurrency(freeResult.costPerMToken) + '/M tokens (' + fmtCurrency(freeResult.costPerReq) + '/request), this positions you ' +
+            (freeResult.costPerMToken > 3.0 ? 'above' : freeResult.costPerMToken < 1.5 ? 'below' : 'at') +
+            ' the industry average for ' + inp.deployType + ' inference.</p>';
+
+        narrativeHTML += '<p><strong>Infrastructure Profile:</strong> ' + freeResult.numGPUs +
+            ' GPU fleet achieves ' + freeResult.gpuUtil.toFixed(1) + '% utilization with max throughput of ' +
+            fmtNumber(freeResult.maxThroughput) + ' tokens/sec. Annual energy consumption: ' +
+            freeResult.annualEnergyMWh.toFixed(1) + ' MWh. Carbon footprint: ' +
+            freeResult.carbonTonnes.toFixed(1) + ' tonnes CO₂e/year (' + inp.regionData.renewPct + '% renewable grid).</p>';
+
+        narrativeHTML += '<p><strong>Growth & Risk:</strong> At ' + inp.growthRate + '% annual traffic growth, infrastructure will need to scale from ' +
+            freeResult.numGPUs + ' to ' + projectedGPUs + ' GPUs by Year 5. Monte Carlo analysis shows a ' +
+            fmtCurrency(mcP5) + ' – ' + fmtCurrency(mcP95) + ' monthly cost range, indicating <strong>' + riskLevel +
+            '</strong> uncertainty. Sensitivity analysis identifies <strong>' + topDriver + '</strong> and <strong>' +
+            secondDriver + '</strong> as the two highest-impact cost drivers.</p>';
+
+        setHTML('iecNarrative2', narrativeHTML);
+
+        /* ── Panel 6: Cost Optimization Roadmap (iecRoadmap) ── */
         var roadmapHTML = '';
 
-        roadmapHTML += '<p><strong>Current State Assessment:</strong> Your ' + inp.modelSizeKey + 'B parameter deployment in ' +
-            inp.regionData.name + ' using ' + inp.gpuData.name + ' processes ' + fmtNumber(inp.dailyReqs) +
-            ' requests daily, costing approximately ' + fmtCurrency(freeResult.monthlyCost) + '/month. At ' +
-            fmtCurrency(freeResult.costPerMToken) + '/M tokens, this positions you ' +
-            (freeResult.costPerMToken > 3.0 ? 'above' : freeResult.costPerMToken < 1.5 ? 'below' : 'at') +
-            ' the industry average for ' + inp.deployType + ' inference. Your ' + freeResult.numGPUs +
-            ' GPU deployment achieves ' + freeResult.gpuUtil.toFixed(1) + '% utilization, consuming ' +
-            freeResult.annualEnergyMWh.toFixed(1) + ' MWh annually.</p>';
-
-        /* Optimization paragraph */
+        /* Optimization opportunities */
         var optRecs = [];
         if (freeResult.gpuUtil < 60) {
             optRecs.push('right-size your GPU allocation (current utilization: ' + freeResult.gpuUtil.toFixed(1) + '%)');
@@ -3610,31 +3968,37 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (inp.quantKey === 'int8') {
             optRecs.push('evaluate INT4 quantization for an additional 40% throughput gain on suitable workloads');
         }
+        if (inp.architecture === 'dense' && parseInt(inp.modelSizeKey) >= 70) {
+            optRecs.push('consider MoE architecture — achieves comparable quality with 2-4x lower compute per token');
+        }
+        if (inp.workload === 'burst') {
+            optRecs.push('implement request queuing to convert burst patterns to steady throughput, reducing peak GPU requirements by 25-35%');
+        }
         if (inp.deployType === 'cloud' && freeResult.monthlyCost > 50000) {
             optRecs.push('evaluate dedicated instances — break-even at your current volume is likely within 6 months');
         }
         if (inp.deployType === 'cloud' && freeResult.monthlyCost > 200000) {
             optRecs.push('on-premises deployment could reduce TCO by 40-60% at this scale');
         }
+        if (freeResult.carbonTonnes > 100 && inp.regionData.renewPct < 50) {
+            optRecs.push('relocate workloads to a high-renewable region (Nordics 72%, Brazil 85%) to cut carbon footprint by 40-60%');
+        }
 
         if (optRecs.length > 0) {
             roadmapHTML += '<p><strong>Optimization Opportunities:</strong> Key cost reduction levers include: ' +
-                optRecs.join('; ') + '. Combined, these optimizations could reduce monthly spend by 30-50%.</p>';
+                optRecs.join('; ') + '.</p>';
         } else {
             roadmapHTML += '<p><strong>Optimization Status:</strong> Your current configuration is well-optimized. Focus on monitoring utilization trends and planning for scale as traffic grows.</p>';
         }
 
-        roadmapHTML += '<p><strong>Growth & Risk:</strong> At ' + inp.growthRate + '% annual traffic growth, your infrastructure will need to scale from ' +
-            freeResult.numGPUs + ' to ' + projectedGPUs + ' GPUs by Year 5. Monte Carlo analysis shows a ' +
-            fmtCurrency(mcP5) + ' – ' + fmtCurrency(mcP95) + ' monthly cost range, indicating <strong>' + riskLevel +
-            '</strong> uncertainty. Sensitivity analysis identifies <strong>' + topDriver + '</strong> and <strong>' +
-            secondDriver + '</strong> as the two highest-impact cost drivers.</p>';
-
-        /* Recommendations */
-        roadmapHTML += '<p><strong>Recommendations:</strong></p><ul style="margin:4px 0 8px 20px;list-style:none;padding:0;">';
+        /* Prioritized Recommendations */
+        roadmapHTML += '<p><strong>Prioritized Recommendations:</strong></p><ul style="margin:4px 0 8px 20px;list-style:none;padding:0;">';
 
         if (inp.quantKey === 'fp16') {
             roadmapHTML += '<li style="margin:4px 0;"><span style="background:#ef4444;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">CRITICAL</span> Switch to INT8 quantization — estimated 45% cost reduction</li>';
+        }
+        if (inp.architecture === 'dense' && parseInt(inp.modelSizeKey) >= 70) {
+            roadmapHTML += '<li style="margin:4px 0;"><span style="background:#ef4444;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">CRITICAL</span> Evaluate MoE architecture — 2-4x inference efficiency at comparable quality</li>';
         }
         if (inp.deployType === 'cloud' && freeResult.monthlyCost > 50000) {
             roadmapHTML += '<li style="margin:4px 0;"><span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">HIGH</span> Evaluate dedicated instances — break-even at current volume</li>';
@@ -3642,11 +4006,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (freeResult.gpuUtil < 60) {
             roadmapHTML += '<li style="margin:4px 0;"><span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">HIGH</span> Right-size GPU allocation — current utilization indicates over-provisioning</li>';
         }
+        if (inp.workload === 'burst') {
+            roadmapHTML += '<li style="margin:4px 0;"><span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">HIGH</span> Implement request queuing and batching to smooth burst patterns</li>';
+        }
         if (inp.regionData.renewPct < 40) {
             roadmapHTML += '<li style="margin:4px 0;"><span style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">MEDIUM</span> Consider regions with higher renewable energy mix to reduce carbon exposure</li>';
         }
-        roadmapHTML += '<li style="margin:4px 0;"><span style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">MEDIUM</span> Implement request batching and caching to reduce effective GPU-seconds per request</li>';
+        roadmapHTML += '<li style="margin:4px 0;"><span style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">MEDIUM</span> Implement intelligent model routing — send simple queries to smaller models</li>';
         roadmapHTML += '<li style="margin:4px 0;"><span style="background:#6b7280;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">MONITOR</span> Track GPU utilization weekly — scale down during off-peak hours for cloud deployments</li>';
+        roadmapHTML += '<li style="margin:4px 0;"><span style="background:#6b7280;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem;font-weight:700;margin-right:6px;">MONITOR</span> Carbon footprint: ' + freeResult.carbonTonnes.toFixed(1) + ' tCO₂e/year — track against sustainability targets</li>';
 
         roadmapHTML += '</ul>';
 
@@ -3727,6 +4095,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var deployEl = byId('iecDeployType');
         if (deployEl) deployEl.value = DEFAULTS.iecDeployType;
+
+        var archEl = byId('iecArchitecture');
+        if (archEl) archEl.value = 'dense';
+
+        var workloadEl = byId('iecWorkload');
+        if (workloadEl) workloadEl.value = 'steady';
 
         /* Update slider displays */
         var latVal = byId('iecLatencyVal');
@@ -4163,7 +4537,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Free inputs */
     ['iecGpuType', 'iecModelSize', 'iecQuantization', 'iecDeployType',
-     'iecDailyReqs', 'iecTokensPerReq', 'iecPowerCost'].forEach(function(id) {
+     'iecDailyReqs', 'iecTokensPerReq', 'iecPowerCost', 'iecArchitecture', 'iecWorkload'].forEach(function(id) {
         var el = byId(id);
         if (!el) return;
         el.addEventListener('input', iecCalculate);

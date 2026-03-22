@@ -125,17 +125,35 @@ function initNavigation() {
         hamburger?.setAttribute('aria-label', 'Open navigation menu');
     }
 
-    // Handle dropdown toggle on mobile
+    // Handle dropdown toggle on mobile/touch devices
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     navDropdowns.forEach(dropdown => {
         const dropdownLink = dropdown.querySelector('.nav-link');
         dropdownLink?.addEventListener('click', function(e) {
-            // Only prevent default and toggle on mobile
+            // On mobile hamburger menu: always toggle dropdown
             if (window.innerWidth <= 768) {
                 e.preventDefault();
                 dropdown.classList.toggle('active');
             }
+            // On touch devices at wider viewports: first tap opens dropdown,
+            // second tap (when already open) navigates to the page
+            else if (isTouchDevice && !dropdown.classList.contains('active')) {
+                e.preventDefault();
+                // Close other dropdowns first
+                navDropdowns.forEach(d => { if (d !== dropdown) d.classList.remove('active'); });
+                dropdown.classList.add('active');
+            }
         });
     });
+
+    // On touch devices, close dropdowns when tapping outside
+    if (isTouchDevice) {
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav-dropdown')) {
+                navDropdowns.forEach(d => d.classList.remove('active'));
+            }
+        });
+    }
 
     // Close menu when clicking nav links (except dropdown parent)
     navLinks.forEach(link => {
