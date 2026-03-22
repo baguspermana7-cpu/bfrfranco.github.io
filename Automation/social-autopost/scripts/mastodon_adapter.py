@@ -9,7 +9,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from .common import find_drafts, read_draft
+from .common import find_drafts, read_draft, truncate_to_limit
 
 
 def _api_request(
@@ -142,6 +142,9 @@ def post_from_drafts(
 
     if not texts:
         return {"ok": False, "error": "All mastodon drafts were empty", "urls": []}
+
+    # Auto-truncate to Mastodon's 500 char limit
+    texts = [truncate_to_limit(t, 500) for t in texts]
 
     print(f"  Found {len(texts)} mastodon post(s) to publish")
 

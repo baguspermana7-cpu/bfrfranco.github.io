@@ -70,7 +70,7 @@ def detect_drafts(draft_dir: Path) -> dict:
     for platform, prefixes in [
         ("mastodon", ["mastodon-post", "mastodon"]),
         ("x", ["x-post"]),
-        ("quora", ["quora-post"]),
+        ("quora", ["quora-post", "quora-draft", "quora"]),
         ("facebook", ["linkedin-post", "facebook-post", "linkedin"]),
     ]:
         files = []

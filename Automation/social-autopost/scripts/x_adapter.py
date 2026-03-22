@@ -16,6 +16,7 @@ from .common import (
     load_cookie_snapshot,
     read_draft,
     safe_click,
+    truncate_to_limit,
     type_rich_text,
     wait_until,
 )
@@ -127,6 +128,9 @@ def post_from_drafts(
 
     if not texts:
         return {"ok": False, "error": "All X drafts were empty", "posts": []}
+
+    # Auto-truncate to X's 280 char limit
+    texts = [truncate_to_limit(t, 280) for t in texts]
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)

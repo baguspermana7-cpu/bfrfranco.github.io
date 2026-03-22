@@ -24,7 +24,7 @@ from .common import (
     wait_until,
 )
 
-QUORA_VERIFY_URL = "https://www.quora.com/profile/Bagus-Dwi-Permana-1/posts"
+QUORA_VERIFY_URL = "https://id.quora.com/profile/Bagus-Dwi-Permana-1/posts"
 
 
 def _check_cloudflare(driver) -> bool:
@@ -208,6 +208,7 @@ def _post_quora_post(driver, text: str, out_dir: Path, image_path: str | Path | 
         )
         prompt.click()
         time.sleep(2)
+        capture(driver, "quora_prompt_clicked", out_dir)
     except Exception:
         capture(driver, "quora_prompt_fail", out_dir)
         return {"ok": False, "error": "Could not find ask-question prompt"}
@@ -232,6 +233,7 @@ def _post_quora_post(driver, text: str, out_dir: Path, image_path: str | Path | 
         )
         safe_click(driver, post_tab)
         time.sleep(2)
+        capture(driver, "quora_tab_clicked", out_dir)
     except Exception:
         capture(driver, "quora_tab_fail", out_dir)
         return {"ok": False, "error": "Could not find Post tab"}
@@ -255,6 +257,7 @@ def _post_quora_post(driver, text: str, out_dir: Path, image_path: str | Path | 
         capture(driver, "quora_editor_fail", out_dir)
         return {"ok": False, "error": "Could not find editor"}
 
+    capture(driver, "quora_editor_found", out_dir)
     type_rich_text(driver, editor, text)
     time.sleep(1)
 
@@ -263,18 +266,18 @@ def _post_quora_post(driver, text: str, out_dir: Path, image_path: str | Path | 
             lambda: text[:24] in (editor.get_attribute("textContent") or ""),
             timeout=20,
         )
+        capture(driver, "quora_text_inserted", out_dir)
     except Exception:
         capture(driver, "quora_text_fail", out_dir)
         return {"ok": False, "error": "Text not inserted"}
 
     # Upload image if provided
+    # NOTE: Quora image upload is disabled — clicking the icon causes
+    # stale element errors that break the composer modal. Post text-only.
     if image_path and Path(image_path).exists():
-        img_ok = _upload_image(driver, image_path, out_dir)
-        if not img_ok:
-            print("    Warning: image upload failed, posting text-only")
-        time.sleep(2)
+        print("    Quora image upload skipped (causes modal instability)")
 
-    # Find and click Post button
+    # Find and click Post button — broader selector than just puppeteer class
     try:
         post_button = wait_until(
             lambda: next(
@@ -283,11 +286,15 @@ def _post_quora_post(driver, text: str, out_dir: Path, image_path: str | Path | 
                     for el in driver.find_elements(
                         By.CSS_SELECTOR,
                         "button.puppeteer_test_modal_submit, "
-                        "[role='button'].puppeteer_test_modal_submit",
+                        "[role='button'].puppeteer_test_modal_submit, "
+                        "button[class*='submit'], "
+                        "[role='dialog'] button, "
+                        "[class*='Modal'] button, "
+                        "[class*='modal'] button",
                     )
                     if el.is_displayed()
                     and re.search(
-                        r"^(Kiriman|Post|Posting)$",
+                        r"^(Kiriman|Post|Posting|Submit)$",
                         (el.text or "").strip(),
                         re.I,
                     )
@@ -310,17 +317,60 @@ def _post_quora_post(driver, text: str, out_dir: Path, image_path: str | Path | 
     except Exception:
         pass
 
-    safe_click(driver, post_button)
+    capture(driver, "quora_before_post", out_dir)
+    btn_text = post_button.text
+    btn_class = post_button.get_attribute("class") or ""
+    btn_rect = post_button.rect
+    print(f"    Post button: text='{btn_text}', tag={post_button.tag_name}")
+    print(f"    Button rect: x={btn_rect['x']:.0f}, y={btn_rect['y']:.0f}, w={btn_rect['width']:.0f}, h={btn_rect['height']:.0f}")
+
+    # Scroll button into view and click via multiple methods
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", post_button)
+    time.sleep(0.5)
+
+    # Method 1: Direct JS click
+    print("    Attempting JS click on Kiriman button...")
+    driver.execute_script("arguments[0].click();", post_button)
+    time.sleep(3)
+    capture(driver, "quora_after_click1", out_dir)
+
+    # Check if modal is still open (meaning click didn't work)
+    modals = [el for el in driver.find_elements(By.CSS_SELECTOR,
+        "[contenteditable='true']") if el.is_displayed()]
+    if modals:
+        print("    Modal still open after JS click, trying ActionChains click...")
+        from selenium.webdriver import ActionChains
+        ActionChains(driver).move_to_element(post_button).pause(0.3).click().perform()
+        time.sleep(3)
+        capture(driver, "quora_after_click2", out_dir)
+
+        # Check again
+        modals = [el for el in driver.find_elements(By.CSS_SELECTOR,
+            "[contenteditable='true']") if el.is_displayed()]
+        if modals:
+            print("    Modal still open, trying Selenium .click()...")
+            post_button.click()
+            time.sleep(3)
+            capture(driver, "quora_after_click3", out_dir)
+
     time.sleep(8)
     capture(driver, "quora_posted", out_dir)
 
-    # Check success indicators
+    # Check success — modal should be gone
     page_source = driver.page_source
-    submit_ok = (
+    editors_visible = [el for el in driver.find_elements(By.CSS_SELECTOR,
+        "[contenteditable='true']") if el.is_displayed()]
+    modal_gone = len(editors_visible) == 0
+    success_msg = (
         "Berhasil dikirimkan" in page_source
         or "Successfully posted" in page_source
-        or text.splitlines()[0] in page_source
+        or "Kiriman Anda telah" in page_source
     )
+    submit_ok = modal_gone  # If modal is gone, the post was at least attempted
+
+    print(f"    Result: modal_gone={modal_gone}, success_msg={success_msg}, editors_visible={len(editors_visible)}")
+    if not submit_ok:
+        print(f"    Post may have failed — modal still visible")
 
     return {"ok": submit_ok, "url": driver.current_url}
 
@@ -359,6 +409,10 @@ def post_from_drafts(
     Semi-automatic: pauses for human CAPTCHA resolution when needed.
     """
     drafts = find_drafts(draft_dir, "quora-post")
+    if not drafts:
+        drafts = find_drafts(draft_dir, "quora-draft")
+    if not drafts:
+        drafts = find_drafts(draft_dir, "quora")
     if not drafts:
         return {"ok": False, "error": "No Quora draft files found", "posts": []}
 
@@ -419,6 +473,10 @@ def verify_from_drafts(
 ) -> dict:
     """Verify Quora posts exist without posting."""
     drafts = find_drafts(draft_dir, "quora-post")
+    if not drafts:
+        drafts = find_drafts(draft_dir, "quora-draft")
+    if not drafts:
+        drafts = find_drafts(draft_dir, "quora")
     if not drafts:
         return {"ok": False, "error": "No Quora draft files found"}
 

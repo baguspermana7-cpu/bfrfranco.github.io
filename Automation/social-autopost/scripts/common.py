@@ -328,11 +328,61 @@ def read_draft(path: str | Path) -> str:
         parts = text.split("---", 2)
         if len(parts) >= 3:
             text = parts[2].strip()
-    elif "---" in text:
-        text = text.split("---", 1)[1].strip()
     if text.startswith("ANSWER:"):
         text = text.split("ANSWER:", 1)[1].strip()
+    # Strip markdown title headers (# Title — description) from .md files
+    # These are metadata, not post content
+    lines = text.splitlines()
+    while lines and lines[0].startswith("#"):
+        lines.pop(0)
+        # Also strip blank line after header
+        while lines and not lines[0].strip():
+            lines.pop(0)
+    text = "\n".join(lines).strip()
     return text
+
+
+def truncate_to_limit(text: str, limit: int) -> str:
+    """Truncate text to *limit* characters, preserving URLs.
+
+    If the text already fits, return as-is.
+    Preserves any URL on the last line(s) and trims earlier content.
+    """
+    if len(text) <= limit:
+        return text
+
+    import re
+    lines = text.split("\n")
+
+    # Find lines at the end that contain URLs or hashtags — preserve them
+    preserved = []
+    while lines:
+        last = lines[-1].strip()
+        if re.search(r'https?://|resistancezero\.com|#\w+', last) or not last:
+            preserved.insert(0, lines.pop())
+        else:
+            break
+
+    preserved_text = "\n".join(preserved).strip()
+    body_text = "\n".join(lines).strip()
+
+    if preserved_text:
+        # Trim body to fit: limit - len(preserved) - 2 (for \n\n separator)
+        body_limit = limit - len(preserved_text) - 2
+        if body_limit > 20:
+            cut = body_text[:body_limit - 1].rfind(" ")
+            if cut < body_limit // 2:
+                cut = body_limit - 1
+            return body_text[:cut] + "…\n\n" + preserved_text
+        else:
+            # URL alone is too long, just hard truncate
+            cut = text[:limit - 1].rfind(" ")
+            return text[:cut] + "…"
+    else:
+        cut = text[:limit - 1].rfind(" ")
+        if cut < limit // 2:
+            cut = limit - 1
+        return text[:cut] + "…"
 
 
 def find_drafts(draft_dir: str | Path, prefix: str, extensions: tuple = (".txt", ".md")) -> list[Path]:

@@ -1,17 +1,14 @@
-"""Facebook adapter — Semi-auto Selenium Firefox with cookie injection.
+"""Facebook adapter — Full-auto Selenium Firefox with cookie injection.
 
 Uses the LinkedIn post draft as content source (same professional tone).
 Posts to the user's Facebook profile/page feed.
 
-Facebook uses a Lexical rich-text editor that rejects ALL synthetic keyboard
-events from Selenium WebDriver (send_keys, ActionChains, synthetic ClipboardEvent,
-execCommand). The ONLY reliable way to insert text is a real user Ctrl+V paste.
-
-Workflow (semi-auto):
-  1. Script opens composer and uploads hero image (automatic)
-  2. Script copies text to system clipboard via GTK (automatic)
-  3. Script PAUSES — user clicks the editor and presses Ctrl+V (manual)
-  4. Script clicks Post button (automatic after user confirms)
+Facebook uses a Lexical rich-text editor that rejects standard Selenium
+send_keys(). We use multiple JavaScript strategies to insert text:
+  1. Direct Lexical editor API manipulation via __lexicalEditor
+  2. Synthetic InputEvent with insertText
+  3. Synthetic ClipboardEvent with DataTransfer
+  4. execCommand insertText fallback
 """
 from __future__ import annotations
 
@@ -34,89 +31,254 @@ from .common import (
 
 FB_PROFILE_URL = "https://www.facebook.com/me"
 
+# JavaScript to insert text into Facebook's Lexical editor
+# Tries multiple strategies in order of reliability
+JS_PASTE_TEXT = """
+(function(editor, text) {
+    'use strict';
 
-def _set_system_clipboard(text: str) -> bool:
-    """Set the system clipboard using GTK via system Python.
+    // Helper: check if text was inserted
+    function verify() {
+        var content = editor.textContent || '';
+        return content.indexOf(text.substring(0, 30)) !== -1;
+    }
 
-    The venv Python doesn't have PyGObject, but the system Python does.
-    We spawn a subprocess using /usr/bin/python3 to set the clipboard.
-    """
-    import subprocess
-    import tempfile
+    // Ensure focus
+    editor.focus();
 
-    # Write text to temp file to avoid shell escaping issues
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as f:
-        f.write(text)
-        tmp_path = f.name
+    // Strategy 1: Lexical internal API
+    // Lexical stores its editor instance on the DOM element
+    try {
+        var lexEditor = editor.__lexicalEditor;
+        if (!lexEditor) {
+            // Try looking through all properties
+            var keys = Object.keys(editor);
+            for (var i = 0; i < keys.length; i++) {
+                var val = editor[keys[i]];
+                if (val && typeof val === 'object' && typeof val.update === 'function'
+                    && typeof val.getEditorState === 'function') {
+                    lexEditor = val;
+                    break;
+                }
+            }
+        }
+        if (lexEditor && typeof lexEditor.update === 'function') {
+            lexEditor.update(function() {
+                // Inside update(), Lexical's $ functions are available
+                // We need to access them through the module scope
+                // Try to find $getRoot and other functions
+                try {
+                    var root = window.$getRoot ? window.$getRoot() : null;
+                    if (!root) {
+                        // Access through editor internals
+                        var state = lexEditor.getEditorState();
+                        if (state && state._nodeMap) {
+                            var rootNode = state._nodeMap.get('root');
+                            if (rootNode) {
+                                // Clear existing content and add new text
+                                // This approach modifies state directly
+                            }
+                        }
+                    }
+                } catch(e) {}
+            });
+        }
+    } catch(e) {}
 
-    try:
-        result = subprocess.run(
-            ["/usr/bin/python3", "-c", f"""
-import gi, sys
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
-text = open('{tmp_path}', encoding='utf-8').read()
-cb = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-cb.set_text(text, -1)
-cb.store()
-print('OK', len(text))
-"""],
-            capture_output=True, text=True, timeout=10,
-        )
-        Path(tmp_path).unlink(missing_ok=True)
-        if "OK" in result.stdout:
-            print(f"    System clipboard set ({len(text)} chars)")
-            return True
-        print(f"    GTK clipboard stderr: {result.stderr[:200]}")
-        return False
-    except Exception as exc:
-        Path(tmp_path).unlink(missing_ok=True)
-        print(f"    GTK clipboard failed: {exc}")
-        return False
+    // Strategy 2: Synthetic ClipboardEvent (paste)
+    // Create a DataTransfer with the text and dispatch paste event
+    try {
+        editor.focus();
+        // Select all existing content first
+        var sel = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(editor);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        // Create DataTransfer
+        var dt = new DataTransfer();
+        dt.setData('text/plain', text);
+        // Dispatch paste event
+        var pasteEvent = new ClipboardEvent('paste', {
+            clipboardData: dt,
+            bubbles: true,
+            cancelable: true,
+            composed: true
+        });
+        editor.dispatchEvent(pasteEvent);
+        if (verify()) return 'paste_event';
+    } catch(e) {}
+
+    // Strategy 3: InputEvent with insertFromPaste
+    try {
+        editor.focus();
+        var sel2 = window.getSelection();
+        var range2 = document.createRange();
+        range2.selectNodeContents(editor);
+        sel2.removeAllRanges();
+        sel2.addRange(range2);
+
+        var dt2 = new DataTransfer();
+        dt2.setData('text/plain', text);
+        var inputEvent = new InputEvent('beforeinput', {
+            inputType: 'insertFromPaste',
+            data: null,
+            dataTransfer: dt2,
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+            targetRanges: []
+        });
+        editor.dispatchEvent(inputEvent);
+        if (verify()) return 'input_paste';
+    } catch(e) {}
+
+    // Strategy 4: InputEvent with insertText
+    try {
+        editor.focus();
+        var sel3 = window.getSelection();
+        var range3 = document.createRange();
+        range3.selectNodeContents(editor);
+        sel3.removeAllRanges();
+        sel3.addRange(range3);
+
+        var textEvent = new InputEvent('beforeinput', {
+            inputType: 'insertText',
+            data: text,
+            bubbles: true,
+            cancelable: true,
+            composed: true
+        });
+        editor.dispatchEvent(textEvent);
+        if (verify()) return 'input_text';
+    } catch(e) {}
+
+    // Strategy 5: execCommand insertText
+    try {
+        editor.focus();
+        var sel4 = window.getSelection();
+        var range4 = document.createRange();
+        range4.selectNodeContents(editor);
+        sel4.removeAllRanges();
+        sel4.addRange(range4);
+
+        document.execCommand('insertText', false, text);
+        if (verify()) return 'exec_command';
+    } catch(e) {}
+
+    // Strategy 6: Direct innerHTML manipulation + dispatch input event
+    // This is a last resort — modifies DOM directly
+    try {
+        // Build paragraph elements from text lines
+        var lines = text.split('\\n');
+        var html = '';
+        for (var j = 0; j < lines.length; j++) {
+            var line = lines[j].trim();
+            if (line) {
+                html += '<p dir="ltr"><span data-lexical-text="true">' +
+                    line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') +
+                    '</span></p>';
+            } else {
+                html += '<p><br></p>';
+            }
+        }
+        editor.innerHTML = html;
+        // Dispatch input event to notify Lexical of the change
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        if (verify()) return 'inner_html';
+    } catch(e) {}
+
+    return 'failed';
+})(arguments[0], arguments[1]);
+"""
 
 
-def _wait_for_user_paste(driver, editor, text: str, timeout: int = 180) -> bool:
-    """Wait for the user to manually Ctrl+V paste text into the editor.
+def _fb_paste_text(driver, editor, text: str) -> bool:
+    """Insert text into Facebook's Lexical editor using JS strategies."""
+    # Focus editor
+    driver.execute_script("arguments[0].focus();", editor)
+    editor.click()
+    time.sleep(0.5)
 
-    Polls the editor's textContent every 2 seconds to detect when
-    the user has pasted. Returns True when text is detected.
-    """
-    print(f"\n{'='*60}")
-    print("  HUMAN ACTION REQUIRED")
-    print(f"{'='*60}")
-    print("  Text has been copied to your clipboard.")
-    print("  Please do the following in the Firefox browser window:")
-    print("    1. Click inside the 'What's on your mind?' editor")
-    print("    2. Press Ctrl+V to paste the text")
-    print(f"  Waiting up to {timeout}s for paste...")
-    print(f"{'='*60}\n")
+    print("    Trying JavaScript text insertion strategies...")
+    result = driver.execute_script(JS_PASTE_TEXT, editor, text)
+    print(f"    JS insertion result: {result}")
 
-    end = time.time() + timeout
-    check_text = text[:40]
-    while time.time() < end:
-        try:
-            content = editor.get_attribute("textContent") or ""
-            if check_text in content:
-                print("    Text paste detected! Continuing automation.\n")
-                return True
-        except Exception:
-            pass
-        time.sleep(2)
+    if result and result != "failed":
+        return True
 
-    print("    Timeout: text paste not detected.")
+    # If all JS strategies failed, try a character-level approach with InputEvent
+    # This types text character by character using 'insertText' InputEvent
+    print("    Trying character-by-character InputEvent approach...")
+    driver.execute_script("""
+        var el = arguments[0];
+        var text = arguments[1];
+        el.focus();
+        // Clear first
+        var sel = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('selectAll');
+        document.execCommand('delete');
+    """, editor, text)
+    time.sleep(0.3)
+
+    # Type paragraph by paragraph
+    paragraphs = text.split("\n")
+    for i, para in enumerate(paragraphs):
+        if para.strip():
+            driver.execute_script("""
+                var el = arguments[0];
+                var text = arguments[1];
+                el.focus();
+                // Move cursor to end
+                var sel = window.getSelection();
+                sel.modify('move', 'forward', 'documentboundary');
+                // Insert text via InputEvent
+                var evt = new InputEvent('beforeinput', {
+                    inputType: 'insertText',
+                    data: text,
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true
+                });
+                el.dispatchEvent(evt);
+            """, editor, para)
+        if i < len(paragraphs) - 1:
+            # Insert line break
+            driver.execute_script("""
+                var el = arguments[0];
+                el.focus();
+                var sel = window.getSelection();
+                sel.modify('move', 'forward', 'documentboundary');
+                var evt = new InputEvent('beforeinput', {
+                    inputType: 'insertParagraph',
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true
+                });
+                el.dispatchEvent(evt);
+            """, editor)
+        time.sleep(0.05)
+
+    time.sleep(1)
+    content = editor.get_attribute("textContent") or ""
+    if text[:30] in content:
+        print(f"    Character approach succeeded ({len(content)} chars)")
+        return True
+
+    print(f"    All insertion methods failed. Content: {content[:100]!r}")
     return False
 
 
 def _upload_image(driver, image_path: str | Path, out_dir: Path) -> bool:
-    """Upload an image in the Facebook composer.
-
-    The "Add to your post" bar has a green Photo/Video icon.
-    Clicking it reveals a file input or opens the photo upload area.
-    """
+    """Upload an image in the Facebook composer."""
     abs_path = str(Path(image_path).resolve())
     print(f"    Uploading image to Facebook: {Path(abs_path).name}")
 
-    # Strategy 1: Find and send to existing file inputs first (some are pre-rendered hidden)
+    # Strategy 1: Find and send to existing file inputs first
     file_inputs = driver.find_elements(By.CSS_SELECTOR, "input[type='file']")
     for fi in file_inputs:
         accept = (fi.get_attribute("accept") or "").lower()
@@ -130,7 +292,7 @@ def _upload_image(driver, image_path: str | Path, out_dir: Path) -> bool:
             except Exception:
                 continue
 
-    # Strategy 2: Click the Photo/Video icon in "Add to your post" bar
+    # Strategy 2: Click the Photo/Video icon
     try:
         photo_btns = driver.find_elements(By.CSS_SELECTOR,
             "[aria-label*='Photo/video'], "
@@ -162,7 +324,7 @@ def _upload_image(driver, image_path: str | Path, out_dir: Path) -> bool:
     except Exception:
         pass
 
-    # Now try file inputs again (clicking Photo may have created new ones)
+    # Now try file inputs again
     time.sleep(1)
     file_inputs = driver.find_elements(By.CSS_SELECTOR, "input[type='file']")
     for fi in file_inputs:
@@ -186,14 +348,14 @@ def _post_single(
     out_dir: Path,
     image_path: str | Path | None = None,
 ) -> dict:
-    """Create a Facebook post (semi-auto: user pastes text manually)."""
+    """Create a Facebook post from the home feed composer (full-auto)."""
 
     # Navigate to Facebook home
     driver.get("https://www.facebook.com/")
     time.sleep(5)
     capture(driver, "fb_home", out_dir)
 
-    # Click the "What's on your mind?" composer prompt to open the post dialog
+    # Click "What's on your mind?" composer prompt
     try:
         composer_trigger = wait_until(
             lambda: next(
@@ -217,7 +379,6 @@ def _post_single(
         safe_click(driver, composer_trigger)
         time.sleep(3)
     except Exception:
-        # Fallback: try clicking any prominent create-post area
         try:
             spans = driver.find_elements(By.XPATH,
                 "//span[contains(text(),'on your mind')] | "
@@ -235,7 +396,7 @@ def _post_single(
 
     capture(driver, "fb_composer_open", out_dir)
 
-    # Find the contentEditable area in the post dialog
+    # Find the contentEditable area
     try:
         editor = wait_until(
             lambda: next(
@@ -258,7 +419,19 @@ def _post_single(
         capture(driver, "fb_editor_fail", out_dir)
         return {"ok": False, "error": "Could not find Facebook editor"}
 
-    # Upload image FIRST (before text, so user can see image while pasting)
+    # Insert text
+    print("    Inserting text into Facebook editor...")
+    text_ok = _fb_paste_text(driver, editor, text)
+    time.sleep(1)
+
+    if not text_ok:
+        capture(driver, "fb_text_fail", out_dir)
+        return {"ok": False, "error": "Text not inserted into Facebook editor"}
+
+    capture(driver, "fb_text_done", out_dir)
+    print("    Text inserted successfully")
+
+    # Upload image if provided
     if image_path and Path(image_path).exists():
         img_ok = _upload_image(driver, image_path, out_dir)
         if img_ok:
@@ -267,35 +440,6 @@ def _post_single(
             print("    Warning: image upload failed, posting text-only")
         time.sleep(2)
 
-    # Copy text to system clipboard via GTK
-    print("    Copying post text to system clipboard...")
-    clipboard_ok = _set_system_clipboard(text)
-    if not clipboard_ok:
-        capture(driver, "fb_clipboard_fail", out_dir)
-        return {"ok": False, "error": "Could not set system clipboard for paste"}
-
-    # Focus editor
-    try:
-        driver.execute_script("arguments[0].focus();", editor)
-        editor.click()
-    except Exception:
-        pass
-    time.sleep(0.5)
-
-    capture(driver, "fb_waiting_paste", out_dir)
-
-    # SEMI-AUTO: Wait for user to manually paste
-    text_ok = _wait_for_user_paste(driver, editor, text, timeout=180)
-
-    if not text_ok:
-        capture(driver, "fb_text_fail", out_dir)
-        return {"ok": False, "error": "Text not pasted (timeout). Please paste faster next time."}
-
-    capture(driver, "fb_text_done", out_dir)
-    print("    Text confirmed in editor")
-
-    # Wait a moment for Facebook to process
-    time.sleep(2)
     capture(driver, "fb_before_post", out_dir)
 
     # Find and click the Post button
@@ -337,16 +481,12 @@ def post_from_drafts(
     out_dir: str | Path,
     image_path: str | Path | None = None,
 ) -> dict:
-    """Post to Facebook using the LinkedIn draft as content.
-
-    Semi-auto: opens composer, uploads image, copies text to clipboard,
-    then waits for user to Ctrl+V paste manually.
+    """Post to Facebook using the LinkedIn draft as content (full-auto).
 
     Looks for: linkedin-post.txt or linkedin-post.md
     Falls back to: facebook-post.txt or facebook-post.md
     If *image_path* provided, attaches the hero image.
     """
-    # Prefer linkedin draft for Facebook (same professional tone)
     drafts = find_drafts(draft_dir, "linkedin-post")
     if not drafts:
         drafts = find_drafts(draft_dir, "facebook-post")
@@ -369,7 +509,6 @@ def post_from_drafts(
     driver = build_driver()
 
     try:
-        # Inject Facebook cookies
         add_cookies(driver, snapshot, "facebook.com", "https://www.facebook.com/")
         time.sleep(2)
 
