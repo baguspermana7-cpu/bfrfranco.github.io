@@ -1,6 +1,6 @@
 # Article Creation Prompt Standard -- ResistanceZero
 
-> **Version**: 1.2 | **Updated**: 2026-03-22
+> **Version**: 1.3 | **Updated**: 2026-03-22
 
 ---
 
@@ -58,7 +58,7 @@ HAS_CALCULATOR: [yes/no]
   Benchmark sources:  [2-3 sources]
   FREE INPUTS (6-8):  [list each: name, type, default, range]
   PRO INPUTS (4-6):   [list each: name, type, default]
-  FREE RESULTS (4):   [list each metric card name]
+  FREE RESULTS (4-8): [list each metric card name]
 
 SOCIAL MEDIA DRAFTS: [yes/no]
   (If yes: X 3 posts, Mastodon 3 posts, LinkedIn, Medium, Quora, Facebook, TikTok script)
@@ -943,22 +943,29 @@ Use article-specific prefix (`[prefix]`). Standard class patterns:
 13. **ALWAYS auto-set ALL related fields** when country/region changes — salary, turnover, training budget, power cost, etc. Don't just update one field.
 14. **ALWAYS include domain-specific KPI cards** beyond basic calculations — e.g., Cost per MW, Time to Fill, Cost per Token. 4-6 metric cards total, not just 4.
 15. **ALWAYS use `FF-N — [Article Title]` folder naming** for Future Forward post drafts with em dash (—), not hyphen.
+16. **ALWAYS place CTA "Jump to Calculator" block early in the article** (after Abstract/sec0), NOT immediately before the calculator section. A CTA next to the calculator is pointless — the user is already there.
+17. **ALWAYS keep HTML input element IDs consistent** between HTML `id=""` attributes and all JS references (`numVal()`, `strVal()`, `getInputs()`, input listeners, reset function). Mismatched IDs cause silent failures (returns 0/empty string instead of throwing).
+18. **ALWAYS wrap `iecCalculate()` in try-catch inside `applyMode()`** — calculation errors must not prevent UI state updates (button styles, panel visibility) from completing.
+19. **ALWAYS make button click handlers directly update visual state** before calling `iecSetMode()` — ensures button indication changes even if downstream calculation errors occur.
 
 ### 5.12 Calculator Checklist
 
-- [ ] All 6-8 free inputs have tooltips (title / desc / formula)
-- [ ] 4 result cards populate on load with defaults
+- [ ] All 6-10 free inputs have tooltips (title / desc / formula)
+- [ ] 4-8 result KPI cards populate on load with defaults
 - [ ] Result cards update on every input change
+- [ ] HTML input `id` attributes match ALL JS references (numVal, strVal, listeners, reset)
 - [ ] Narrative updates dynamically with actual values
 - [ ] Reset restores all defaults and recalculates
+- [ ] CTA "Jump to Calculator" block placed early (after Abstract), NOT near calculator
 - [ ] All 3 credentials log in successfully
 - [ ] Login modal has Terms & Privacy links
 - [ ] `rz-auth-change` dispatched and listened
 - [ ] Session auto-restores on page load
 - [ ] Monte Carlo runs 10K iterations
-- [ ] All 4 Pro panels render charts correctly
+- [ ] All 4-6 Pro panels render charts correctly
 - [ ] Sensitivity tornado sorted by absolute impact
 - [ ] Roadmap narrative references actual values
+- [ ] Button click handlers directly update visual state (inline styles) before calling setMode
 - [ ] PDF opens popup with SVG charts (not Canvas)
 - [ ] PDF body text #1f2937, charts side-by-side
 - [ ] Dark mode: all elements readable
@@ -1406,8 +1413,8 @@ For articles in the **Future Forward** series (filenames `FF-N.html`):
 1. **Series navigation**: Include `ff-series-nav` div with Prev/Next article links and "Article N of M" counter
 2. **When adding a new FF article**: Update ALL previous FF articles' series nav counters ("1 of M" → "1 of M+1")
 3. **Landing page**: `future-forward.html` — add card, bump hero stat count, add to CollectionPage schema
-4. **Section IDs**: Use `sec0`-`sec7` pattern (not `section-N`)
-5. **Calculator section**: Always `sec6` — between the energy/impact section and the outlook section
+4. **Section IDs**: Use `sec0`-`secN` pattern (not `section-N`). FF-3 uses sec0-sec9 (10 sections)
+5. **Calculator section**: Usually last content section before outlook — e.g., `sec6` (FF-2) or `sec8` (FF-3). Place after all analytical content, before the "What's Next" section
 6. **Post draft folder**: `/rz-work/Article/future forward/Post Draft/FF-N — [Title]/`
 7. **Theme colors used**: FF-1 violet #6d28d9, FF-2 amber #b45309, FF-3 cyan #0891b2 — each article gets a distinct color
 8. **CSS prefix**: Unique per article based on calculator topic (e.g., `tgs-` talent gap shortage, `iec-` inference economics calculator)

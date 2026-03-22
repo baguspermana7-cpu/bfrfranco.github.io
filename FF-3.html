@@ -1107,7 +1107,16 @@
                     <p><strong>The core paradox:</strong> As inference gets cheaper per token, total inference compute grows faster &mdash; Jevons Paradox applied to AI. Lower prices drive more usage, which drives more infrastructure investment, which drives the entire AI economy forward. The race to zero is also a race to infinite scale.</p>
                 </div>
 
-                <p>This article maps the data behind the inference transition: the compute flip, the hardware war, the API price collapse, the cloud-vs-edge split, and the energy equation that will ultimately constrain everything. Section 6 includes an interactive calculator for modeling inference costs across providers, hardware configurations, and deployment scenarios.</p>
+                <p>This article maps the data behind the inference transition: the compute flip, the hardware war, the API price collapse, the cloud-vs-edge split, and the energy equation that will ultimately constrain everything. Section 8 includes an interactive calculator for modeling inference costs across providers, hardware configurations, and deployment scenarios.</p>
+
+                <!-- CTA Block — Jump to Calculator -->
+                <div class="iec-cta-block" style="background: linear-gradient(135deg, #083344 0%, #0e4d5c 100%); border-radius: 16px; padding: 2rem; margin: 2.5rem 0; border: 1px solid #155e75; text-align: center;">
+                    <h3 style="color: #f0fdfa; font-size: 1.2rem; margin: 0 0 0.75rem 0;">Model Your Own Inference Economics</h3>
+                    <p style="color: #a5f3fc; font-size: 0.9rem; line-height: 1.7; margin: 0 0 1.25rem 0;">Use our interactive calculator to estimate costs across 10 regions, 8 GPU types, MoE architectures, workload patterns, and 6 pro analysis panels including break-even and carbon footprint.</p>
+                    <a href="#sec8" class="iec-cta-btn" style="display:inline-flex;align-items:center;gap:0.5rem;background:#0891b2;color:#fff;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;transition:background 0.2s;">
+                        <i class="fas fa-calculator"></i> Open Calculator
+                    </a>
+                </div>
 
                 <!-- Section 1 -->
                 <h2 id="sec1">The Great Compute Flip</h2>
@@ -2057,15 +2066,6 @@
                     "Whoever controls inference infrastructure controls the deployment of AI. And whoever controls the deployment of AI has an asymmetric advantage in every domain — economic, military, and cultural." — Eric Schmidt, former Google CEO, National Security Commission on AI
                 </blockquote>
 
-                <!-- Section 8: CTA Block -->
-                <div class="iec-cta-block" style="background: linear-gradient(135deg, #083344 0%, #0e4d5c 100%); border-radius: 16px; padding: 2rem; margin: 2.5rem 0; border: 1px solid #155e75; text-align: center;">
-                    <h3 style="color: #f0fdfa; font-size: 1.2rem; margin: 0 0 0.75rem 0;">Model Your Own Inference Economics</h3>
-                    <p style="color: #a5f3fc; font-size: 0.9rem; line-height: 1.7; margin: 0 0 1.25rem 0;">Use our interactive calculator to estimate costs across 10 regions, 8 GPU types, MoE architectures, workload patterns, and 6 pro analysis panels including break-even and carbon footprint.</p>
-                    <a href="#sec8" class="iec-cta-btn" style="display:inline-flex;align-items:center;gap:0.5rem;background:#0891b2;color:#fff;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;transition:background 0.2s;">
-                        <i class="fas fa-calculator"></i> Open Calculator
-                    </a>
-                </div>
-
                 <!-- Calculator Section -->
                 <h2 id="sec8"><a id="iec-calculator-anchor"></a>AI Inference Economics Analyzer</h2>
 
@@ -2669,8 +2669,12 @@ window.iecCalculate = window.iecCalculate || function(){};
     /* ── Mode bar buttons ── */
     var freeBtn = byId('iecModeFree');
     var proBtn  = byId('iecModePro');
-    if (freeBtn) freeBtn.addEventListener('click', function() { window.iecSetMode('free'); });
-    if (proBtn)  proBtn.addEventListener('click', function() { window.iecSetMode('pro'); });
+    function iecUpdateBtnStyles(mode) {
+        if (freeBtn) { freeBtn.style.background = mode === 'free' ? '#0891b2' : '#f8fafc'; freeBtn.style.color = mode === 'free' ? '#fff' : '#475569'; }
+        if (proBtn)  { proBtn.style.background  = mode === 'pro'  ? '#0891b2' : '#f8fafc'; proBtn.style.color  = mode === 'pro'  ? '#fff' : '#475569'; }
+    }
+    if (freeBtn) freeBtn.addEventListener('click', function() { iecUpdateBtnStyles('free'); window.iecSetMode('free'); });
+    if (proBtn)  proBtn.addEventListener('click', function() { iecUpdateBtnStyles('pro'); window.iecSetMode('pro'); });
 
     /* ── Reset & PDF ── */
     if (byId('iecBtnReset')) byId('iecBtnReset').addEventListener('click', function() { window.iecResetDefaults(); });
@@ -3114,7 +3118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         iecModelSize:    '70',
         iecQuantization: 'fp16',
         iecDeployType:   'cloud',
-        iecDailyReqs:    100000,
+        iecDailyRequests:    100000,
         iecTokensPerReq: 500,
         iecPowerCost:    0.06,
         iecLatency:      200,
@@ -3258,7 +3262,7 @@ document.addEventListener('DOMContentLoaded', function() {
             deployType:    deployType,
             architecture:  architecture,
             workload:      workload,
-            dailyReqs:     clamp(numVal('iecDailyReqs'), 100, 100000000),
+            dailyReqs:     clamp(numVal('iecDailyRequests'), 100, 100000000),
             tokensPerReq:  clamp(numVal('iecTokensPerReq'), 10, 100000),
             powerCost:     clamp(numVal('iecPowerCost'), 0.01, 1.0),
             latency:       clamp(numVal('iecLatency'), 10, 5000),
@@ -4073,7 +4077,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (unlocked) ungateAll();
 
-        iecCalculate();
+        try { iecCalculate(); } catch (e) { console.warn('iecCalculate error:', e); }
     }
 
     window.iecSetMode = function(mode) {
@@ -4086,7 +4090,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var regionEl = byId('iecRegion');
         if (regionEl) regionEl.value = DEFAULTS.iecRegion;
 
-        ['iecDailyReqs', 'iecTokensPerReq', 'iecPowerCost', 'iecLatency', 'iecRefreshCycle', 'iecGrowthRate']
+        ['iecDailyRequests', 'iecTokensPerReq', 'iecPowerCost', 'iecLatency', 'iecRefreshCycle', 'iecGrowthRate']
         .forEach(function(id) {
             var el = byId(id);
             if (el) el.value = DEFAULTS[id];
@@ -4610,7 +4614,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Free inputs */
     ['iecGpuType', 'iecModelSize', 'iecQuantization', 'iecDeployType',
-     'iecDailyReqs', 'iecTokensPerReq', 'iecPowerCost', 'iecArchitecture', 'iecWorkload'].forEach(function(id) {
+     'iecDailyRequests', 'iecTokensPerReq', 'iecPowerCost', 'iecArchitecture', 'iecWorkload'].forEach(function(id) {
         var el = byId(id);
         if (!el) return;
         el.addEventListener('input', iecCalculate);

@@ -49,14 +49,14 @@ Benchmark sources:  [cite 2-3 sources that inform default values]
 ### 3.1 Free Mode (always available, no auth required)
 
 - **Minimum 6–8 input fields**, each with a tooltip (see Section 5)
-- **4 result metric cards** — dark gradient background (`#1e293b`), accent-colored values, muted labels
+- **4-8 result metric cards** — dark gradient background (`#1e293b`), accent-colored values, muted labels. Include domain-specific KPIs (e.g., Cost per Token, Carbon Footprint, GPUs Required)
 - **Dynamic narrative block** — 2–3 sentences that update on every input change, referencing actual calculated values
 - No login gate
 
 ### 3.2 Pro Mode (gated behind authentication)
 
 - **4–6 additional Pro inputs** shown only when Pro is active
-- **4 Pro panels**, each with a gate overlay (lock icon + "Unlock Pro Analysis") before login
+- **4-6 Pro panels**, each with a gate overlay (lock icon + "Unlock Pro Analysis") before login
 - Pro inputs and panels are hidden by default (`display:none`), revealed after successful login
 - Panels use Canvas charts (Chart.js) for interactive display; SVG for PDF export
 
@@ -64,7 +64,7 @@ Benchmark sources:  [cite 2-3 sources that inform default values]
 
 ## 4. Standard Pro Panels
 
-Every calculator MUST include these 4 panels in this order.
+Every calculator MUST include at least these 4 panels (up to 6 for complex topics). Standard order:
 
 ---
 
@@ -627,8 +627,9 @@ Before declaring a calculator complete, verify every item:
 ### Free Mode
 - [ ] All 6–8 free inputs have tooltips (title / desc / formula)
 - [ ] Tooltips position correctly without viewport overflow
-- [ ] All 4 result cards populate on load with default values
+- [ ] All 4-8 result KPI cards populate on load with default values
 - [ ] Result cards update on every input change
+- [ ] HTML input `id` attributes match ALL JS references (numVal, strVal, listeners, reset)
 - [ ] Narrative block updates dynamically, referencing actual calculated values
 - [ ] Country or select changes trigger appropriate default value updates
 - [ ] Reset button restores defaults and fires `input` event to recalculate
@@ -647,7 +648,7 @@ Before declaring a calculator complete, verify every item:
 
 ### Pro Mode
 - [ ] Pro inputs shown after login, hidden before
-- [ ] All 4 Pro panels unlock after login (gate overlay hidden, blur removed)
+- [ ] All 4-6 Pro panels unlock after login (gate overlay hidden, blur removed)
 - [ ] Panel 1 — Monte Carlo runs 10,000 iterations without UI freeze
 - [ ] Panel 1 — KPI cards show P5, P50, P95 with correct values
 - [ ] Panel 1 — Histogram renders 30 bins, color zones, percentile lines
@@ -664,7 +665,7 @@ Before declaring a calculator complete, verify every item:
 ### PDF Export
 - [ ] `window.open()` called immediately on button click — BEFORE any computation
 - [ ] Popup opens correctly (not blocked)
-- [ ] Free PDF: header, 4 KPI cards, input table, SVG chart, narrative, recommendations, methodology, footer
+- [ ] Free PDF: header, 4-8 KPI cards, input table, SVG chart, narrative, recommendations, methodology, footer
 - [ ] Pro PDF: adds Monte Carlo row, SVG histogram, SVG projection, SVG tornado, executive narrative
 - [ ] Body text color `#1f2937` (NEVER light gray for primary text)
 - [ ] Heading color `#1e3a5f`
