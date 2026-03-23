@@ -933,10 +933,227 @@
         <p>Here is the realistic career timeline I advise anyone entering this field to plan for: <strong>Months 1-6:</strong> Obtain OSHA 10, CompTIA ITF+, and BICSI Installer Level 1 certifications while applying to entry-level DC technician or apprenticeship roles. <strong>Months 6-12:</strong> Start working entry-level at $38K-$57K, building hands-on experience. <strong>Years 1-3:</strong> Pursue CDCTP certification, specialize in a domain (electrical, mechanical, or controls), advance to mid-level at $68K-$84K. <strong>Years 3-5:</strong> Develop AI-era specializations (liquid cooling, GPU systems), target senior roles at $105K-$142K+. This is not a theoretical path &mdash; I have watched dozens of people follow it successfully in my own facilities.</p>
     </div>
 
+    <!-- Section 7: A Day in the Life -->
+    <h2 id="section-7">A Day in the Life &mdash; What DC Engineers Actually Do</h2>
+
+    <p>I have spent twelve years walking data center floors, and I can tell you that no job description or training manual captures what this work actually feels like. The reality is simultaneously more mundane and more intense than outsiders imagine. Most of your shift is routine &mdash; methodical inspections, documentation, monitoring dashboards. Then, without warning, everything changes. A breaker trips, an alarm cascades, a chiller compressor seizes, and suddenly you are the only thing standing between a $200 million facility and a catastrophic outage. Understanding what a typical shift looks like is essential for anyone considering this career, because the daily rhythm of data center operations is unlike any other engineering discipline.</p>
+
+    <p>Every shift begins with <strong>handover</strong>. You arrive at least 15 minutes early to overlap with the outgoing team. The night shift engineer walks you through the shift log &mdash; every alarm that fired, every maintenance activity completed, every anomaly observed. You review the BMS (Building Management System) dashboards for any trending issues: is Chiller 3 running at higher-than-normal head pressure? Has the UPS battery string in Hall B shown any cell voltage drift? Are any environmental sensors in the hot aisle approaching the ASHRAE A1 upper limit of 35&deg;C? This handover is sacred. In critical infrastructure, the most dangerous moment is the transition between shifts, when institutional awareness of facility state transfers from one brain to another. Sloppy handovers cause outages &mdash; I have seen it happen.</p>
+
+    <p>After handover, you conduct a <strong>facility walkdown</strong>. This is a physical inspection of every major system &mdash; electrical switchgear rooms, UPS halls, generator yards, chiller plants, cooling distribution units (CDUs), and the white space itself. You are looking for things that sensors cannot detect: oil stains under a transformer, a slightly unusual vibration in a pump bearing, a cable tray that is sagging under added weight, condensation on a chilled water pipe indicating insulation failure. A good engineer develops an intuitive sense for their facility &mdash; you can hear when a fan is running off-balance, smell when an electrical connection is overheating, feel when a floor tile is warmer than it should be. These walkdowns typically cover <span class="dcj-stat">10,000+ steps</span> across facility floors, and you will spend time in hot aisle environments reaching <span class="dcj-stat">35&ndash;45&deg;C</span>, as well as near generators producing <span class="dcj-stat">85+ dB</span> of noise that requires hearing protection.</p>
+
+    <p><strong>Planned maintenance</strong> consumes the bulk of most shifts. Every task is governed by a Method of Procedure (MOP) &mdash; a step-by-step document that has been reviewed, approved, and rehearsed before execution. A typical MOP for switching a UPS to static bypass for battery replacement might be 40 steps long, with hold points requiring supervisor sign-off before proceeding. You execute MOPs for draining and refilling chiller glycol loops, testing generator auto-start sequences (verifying start-to-load transfer within 10 seconds), replacing CRAH (Computer Room Air Handler) fan assemblies, re-torquing electrical bus connections, calibrating temperature and humidity sensors, and testing fire suppression system activation circuits. Every MOP involves LOTO (Lock Out / Tag Out) procedures for high-voltage work, and for medium-voltage switchgear (above 1kV), you are wearing arc flash PPE rated to <span class="dcj-stat">40 cal/cm&sup2;</span> &mdash; a full flash suit, face shield, and insulated gloves that make you look like an astronaut and add 20 minutes to every task. Confined space entry permits are required for cable vaults and below-floor plenums. Hot work permits are mandatory for any welding or brazing near generator fuel systems.</p>
+
+    <p><strong>Unplanned events</strong> are what separate this job from a routine maintenance role. When a CRAH unit alarms at 2am, you troubleshoot systematically: is it a failed fan motor, a clogged condensate drain, a stuck chilled water valve, or a controls fault? When a PDU breaker trips, you assess the impact immediately &mdash; which racks lost redundancy? Is the remaining feed at risk of overload? Do you need to shed load before attempting a reclose? When coolant leak sensors trigger under a raised floor, you are crawling on hands and knees with a flashlight, tracing pipe joints, checking valve packing, and coordinating with the NOC (Network Operations Center) to assess thermal impact on the servers above. These events are where experience and composure matter more than any certification.</p>
+
+    <div class="dcj-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Activity</th>
+                    <th>Systems Involved</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>06:00</td>
+                    <td>Shift handover, log review, alarm summary</td>
+                    <td>CMMS, BMS dashboards</td>
+                </tr>
+                <tr>
+                    <td>06:30</td>
+                    <td>Facility walkdown &mdash; electrical, mechanical, cooling</td>
+                    <td>Visual inspection, IR thermometer</td>
+                </tr>
+                <tr>
+                    <td>07:30</td>
+                    <td>Planned maintenance execution (MOP-driven)</td>
+                    <td>MOP, LOTO, hand/power tools</td>
+                </tr>
+                <tr>
+                    <td>10:00</td>
+                    <td>DCIM monitoring, alarm management, trend review</td>
+                    <td>DCIM, EPMS, SCADA/BMS</td>
+                </tr>
+                <tr>
+                    <td>12:00</td>
+                    <td>Break + continued monitoring</td>
+                    <td>&mdash;</td>
+                </tr>
+                <tr>
+                    <td>13:00</td>
+                    <td>PM tasks: filter changes, belt inspections, sensor calibration</td>
+                    <td>HVAC, environmental monitoring</td>
+                </tr>
+                <tr>
+                    <td>15:00</td>
+                    <td>Emergency drill or training session</td>
+                    <td>Safety systems, fire suppression</td>
+                </tr>
+                <tr>
+                    <td>16:30</td>
+                    <td>Documentation, work order closeout, incident reports</td>
+                    <td>CMMS (SAP PM / Maximo)</td>
+                </tr>
+                <tr>
+                    <td>17:30</td>
+                    <td>Shift handover to night team</td>
+                    <td>Verbal + written log</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The <strong>technical systems</strong> you interact with daily span multiple platforms. SCADA/BMS interfaces (Schneider EcoStruxure, Siemens Desigo, Honeywell EBI) provide real-time monitoring of electrical and mechanical systems. EPMS (Electrical Power Monitoring Systems) track power quality, load balance, and energy consumption down to the individual breaker level. DCIM (Data Center Infrastructure Management) tools like Nlyte, Sunbird, or Vertiv Trellis aggregate data from all subsystems into a unified view of capacity, environmental conditions, and asset health. You use CMMS platforms &mdash; SAP Plant Maintenance or IBM Maximo &mdash; to manage work orders, log preventive maintenance, track spare parts inventory, and document every action taken on every piece of equipment. Incident reports and change management (MOC &mdash; Management of Change) documentation ensure that every modification to the facility is reviewed, approved, and recorded.</p>
+
+    <p><strong>Shift patterns</strong> in data centers typically follow 12-hour rotating schedules &mdash; either a 2-2-3 rotation (two days on, two off, three on) or a 4-on-4-off pattern that cycles between day and night shifts. Night shift premiums range from 10% to 20% of base salary, and holiday coverage is mandatory &mdash; data centers do not close for Christmas, New Year's, or any other holiday. The physical demands are real: you are lifting equipment up to <span class="dcj-stat">50 lbs</span> regularly, climbing ladders to access overhead cable trays, working in confined spaces below raised floors, and spending hours in environments where the temperature, noise, and vibration are constant companions. It is physically and mentally demanding work, but for people who thrive on technical problem-solving and take pride in keeping critical systems running, there is nothing else like it.</p>
+
+    <div class="dcj-insight-box">
+        <h4><i class="fas fa-hard-hat"></i> The Reality Check</h4>
+        <p>This is not a desk job. You will get dirty, you will sweat, you will work holidays, and you will be woken at 3am for emergency calls. But you will also develop a level of technical mastery and situational awareness that few other engineering disciplines demand. Every day is different, the systems are fascinating, the stakes are real, and the compensation reflects the difficulty. If you want a career where your work genuinely matters &mdash; where the lights stay on because of what you do &mdash; data center operations delivers that in a way that very few professions can match.</p>
+    </div>
+
+    <!-- Section 8: The Automation Paradox -->
+    <h2 id="section-8">The Automation Paradox &mdash; Why AI Creates More DC Jobs, Not Fewer</h2>
+
+    <p>Every time I speak about data center careers at trade schools or conferences, the same question surfaces within the first ten minutes: <em>"Won't AI just automate these jobs too?"</em> It is a reasonable fear. After all, if AI is transforming white-collar knowledge work, surely it will come for the people who maintain AI's own infrastructure. The data, however, tells a completely different story. According to McKinsey's 2025 workforce analysis, <span class="dcj-stat">77%</span> of companies deploying AI and automation in their data centers expect <strong>no net workforce reduction</strong>. In fact, the majority report that automation is creating more roles than it eliminates &mdash; just different ones.</p>
+
+    <p>To understand why, you need to distinguish between what is actually being automated and what cannot be. The tasks that AI and automation handle well in data centers are <strong>repetitive, data-intensive monitoring functions</strong>: correlating thousands of alarms to identify root causes faster than a human operator scanning through event logs; running computational fluid dynamics (CFD) models to optimize cooling airflow patterns; predicting equipment failure timelines based on vibration signatures, thermal trends, and power quality data; and modeling capacity scenarios to determine when and where to deploy new infrastructure. These are tasks where pattern recognition at scale provides genuine value &mdash; and automating them frees human engineers to focus on higher-value work.</p>
+
+    <p>What <strong>cannot be automated</strong> &mdash; and will not be for decades, if ever &mdash; is the physical, hands-on infrastructure work that constitutes 70% or more of a data center engineer's daily activities. You cannot remotely replace a failed UPS battery module. A robot cannot crawl under a raised floor to trace a coolant leak to a specific pipe joint. When a standby generator fails to start during a utility outage, a human must physically investigate the root cause: is it a fuel supply issue? A failed starter motor? A control circuit fault? An air intake blockage? Each of these requires different diagnostic approaches, different tools, and different domain knowledge that no current AI system possesses.</p>
+
+    <p><strong>Commissioning</strong> new facilities is another domain that remains fundamentally human. Integrated Systems Testing (IST) requires an engineer to make judgment calls that go beyond sensor data: does this medium-voltage switchgear complete its automatic transfer within the specified <span class="dcj-stat">10ms</span> window? Is the UPS output waveform clean under full load, or is there harmonic distortion that could damage sensitive IT equipment? Does the chiller plant ramp correctly from 20% to 100% load within the design parameters? These tests require human observation, interpretation, and the ability to recognize when something is subtly wrong even when all the numbers appear correct.</p>
+
+    <p><strong>Troubleshooting ambiguous failures</strong> is perhaps the strongest case for why human engineers remain irreplaceable. When a chiller trips on high head pressure, the possible causes include condenser coil fouling, a refrigerant leak, a faulty pressure transducer, a stuck expansion valve, or a controls software glitch. AI can flag the alarm and even suggest probable causes ranked by historical frequency. But physically diagnosing the root cause &mdash; checking refrigerant charge, inspecting condenser coils, testing sensor calibration, reviewing control sequences &mdash; requires a skilled human on-site with tools in hand. The ambiguity of real-world failure modes is precisely what makes this work resistant to automation.</p>
+
+    <div class="dcj-warning-box">
+        <h4><i class="fas fa-robot"></i> The Jobs AI Is Creating Inside Data Centers</h4>
+        <p>Automation is not eliminating DC roles &mdash; it is creating entirely new ones. Robotic maintenance technician demand has surged <span class="dcj-stat">+107%</span> as facilities deploy patrol robots, automated guided vehicles for equipment transport, and robotic cable management systems. AI/ML operations specialists monitor GPU cluster health and diagnose training job failures that originate from hardware issues &mdash; thermal throttling, memory errors, interconnect faults. Predictive maintenance analysts interpret ML model outputs on vibration analysis, thermal trending, and power quality patterns. Digital twin operators manage virtual facility models used for capacity planning and "what-if" scenario testing. None of these roles existed five years ago.</p>
+    </div>
+
+    <p>The real transformation is a <strong>skill shift</strong>, not a job reduction. The data center engineer of 2030 spends less time manually checking gauges and filling out paper logs, and more time supervising automated systems, interpreting data analytics, managing exceptions that algorithms cannot handle, and maintaining the increasingly complex physical infrastructure (liquid cooling loops, high-density GPU racks, robotic systems) that AI workloads demand. This is a move up the value chain, not a move toward obsolescence.</p>
+
+    <div class="dcj-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>DC Type</th>
+                    <th>Automation Adoption</th>
+                    <th>Net Job Impact</th>
+                    <th>New Roles Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Hyperscale (AWS, Google, Meta)</td>
+                    <td>High</td>
+                    <td>+15&ndash;25% net new roles</td>
+                    <td>Robotics techs, ML ops, digital twin operators</td>
+                </tr>
+                <tr>
+                    <td>Colocation (Equinix, Digital Realty)</td>
+                    <td>Medium</td>
+                    <td>+5&ndash;15% net new roles</td>
+                    <td>Predictive maintenance analysts, DCIM specialists</td>
+                </tr>
+                <tr>
+                    <td>Enterprise (on-premise)</td>
+                    <td>Low</td>
+                    <td>Stable (0&ndash;5% growth)</td>
+                    <td>Hybrid cloud coordinators, compliance analysts</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="dcj-insight-box">
+        <h4><i class="fas fa-lightbulb"></i> The Automation Paradox, Simply Stated</h4>
+        <p>AI needs data centers. Data centers need physical infrastructure. Physical infrastructure needs human hands to build, maintain, repair, and upgrade. The more AI grows, the more data centers are built, and the more human engineers are needed. Every AI model that "automates" a monitoring task runs on hardware that was installed, tested, cooled, powered, and maintained by skilled trades workers. AI is not replacing DC engineers &mdash; it is the single largest driver of demand for them in the industry's history.</p>
+    </div>
+
+    <!-- Section 9: The Global Perspective -->
+    <h2 id="section-9">The Global Perspective &mdash; DC Workforce Markets Beyond the US</h2>
+
+    <p>Everything discussed so far has been heavily US-centric, and for good reason &mdash; the United States accounts for roughly 40% of global data center capacity. But the workforce crisis is emphatically global, and the opportunities extend far beyond Northern Virginia and Silicon Valley. As someone who has worked in Southeast Asian data center markets and collaborated with teams across EMEA, APAC, and the Middle East, I can tell you that the dynamics differ significantly by region &mdash; and understanding those differences is critical for anyone planning an international career in this field.</p>
+
+    <p><strong>Europe (EMEA)</strong> represents the second-largest data center market globally, growing at <span class="dcj-stat">15%+ annually</span> in terms of new capacity. The FLAP markets &mdash; Frankfurt, London, Amsterdam, and Paris &mdash; are the traditional hubs, but expansion is accelerating into the Nordics (Sweden, Finland, Norway) for renewable energy access and into Southern Europe (Spain, Italy) as submarine cable landing points drive new builds. The EU's energy regulations, particularly the Energy Efficiency Directive and the European Green Deal, are creating strong demand for sustainability specialists who can optimize PUE (Power Usage Effectiveness), implement heat reuse systems, and manage renewable energy integration. European DC salaries range from <span class="dcj-stat">&euro;50K&ndash;&euro;120K</span> depending on role, experience, and location, with London and the Nordics commanding the highest premiums. The estimated workforce shortage across the EU exceeds <span class="dcj-stat">100,000+</span> workers, and the problem is compounded by strict working hours regulations (EU Working Time Directive caps at 48 hours/week) that limit the overtime-dependent staffing models common in the US. Germany's dual apprenticeship system &mdash; the "Ausbildung" model where trainees split time between classroom and on-the-job training for 2-3 years &mdash; is arguably the gold standard for developing data center technicians, and other European countries are increasingly adopting similar models.</p>
+
+    <p><strong>Southeast Asia</strong> is the fastest-growing data center market on the planet, and this is my home market &mdash; I have watched it transform from a handful of small colocation facilities into a hyperscale battleground over the past decade. Singapore remains the region's premium hub but faces severe constraints on land and power availability, pushing new construction into Malaysia (Johor Bahru and Selangor), Indonesia (Jakarta and Batam), Thailand (Bangkok), and Vietnam (Ho Chi Minh City). The workforce here is largely drawn from adjacent industries &mdash; manufacturing, construction, commercial HVAC, and marine engineering &mdash; because dedicated data center training programs are still in their infancy. Salaries are lower than Western markets at <span class="dcj-stat">$20K&ndash;$60K</span>, but they are rising rapidly as hyperscalers compete for limited local talent. The career growth trajectory in this region is extraordinary: engineers who entered the field five years ago are now leading teams and facility operations, simply because there are not enough experienced people to fill the roles. If you are considering where to build a data center career with the fastest advancement potential, Southeast Asia is the answer.</p>
+
+    <p><strong>The Middle East</strong> is experiencing a data center investment surge unlike anything the region has seen. Saudi Arabia's Vision 2030 and investments like the NEOM smart city project, the Dubai AI Campus, and Abu Dhabi's AI ambitions are driving massive infrastructure buildout. These facilities are being designed for AI workloads from day one &mdash; high-density, liquid-cooled, powered by a mix of natural gas and planned renewable capacity. The workforce model relies heavily on importing skilled labor from India, the Philippines, and other South and Southeast Asian countries, with <strong>premium expatriate packages</strong> ranging from <span class="dcj-stat">$80K&ndash;$150K tax-free</span> plus housing, transportation, and annual flights. For experienced DC engineers willing to relocate, the Middle East currently offers some of the highest total compensation packages in the global industry.</p>
+
+    <p><strong>India</strong> is emerging as a data center construction powerhouse, with Mumbai, Chennai, Hyderabad, and Pune as primary hubs. The country has a massive HVAC and electrical workforce from its commercial and industrial construction sectors, but there is a significant gap in data center-specific training &mdash; understanding Tier III/IV redundancy concepts, critical facility maintenance procedures, and the operational discipline required for five-nines uptime. Salaries range from <span class="dcj-stat">&#8377;5&ndash;25 lakh</span> ($6K&ndash;$30K) annually, but the trajectory is steep as international operators establish local operations and bring global compensation benchmarking practices. India's advantage is scale: the sheer volume of engineering graduates and skilled trades workers means the pipeline can ramp faster than any other emerging market, provided the training infrastructure is built.</p>
+
+    <p><strong>Australia and Japan</strong> are mature markets facing extreme labor scarcity from opposite causes. Australia has high immigration dependency for data center construction and operations trades &mdash; the domestic workforce simply cannot meet demand, and temporary skilled migration visas (subclass 482) are widely used to bring in DC specialists. Salaries are among the highest globally at <span class="dcj-stat">AUD $90K&ndash;$180K</span> ($60K&ndash;$120K USD). Japan faces an aging workforce crisis that mirrors the US but is more acute &mdash; combined with strict data sovereignty requirements that mandate local infrastructure, this creates a market where qualified DC engineers command premium salaries and enjoy exceptional job security. Both markets offer outstanding quality of life but require navigating immigration processes and, in Japan's case, language requirements.</p>
+
+    <div class="dcj-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Region</th>
+                    <th>Salary Range (USD)</th>
+                    <th>Market Growth</th>
+                    <th>Workforce Gap</th>
+                    <th>Key Advantage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>United States</td>
+                    <td>$38K &ndash; $190K+</td>
+                    <td>12&ndash;15% annually</td>
+                    <td>~340,000 unfilled</td>
+                    <td>Highest volume of roles</td>
+                </tr>
+                <tr>
+                    <td>Europe (FLAP+)</td>
+                    <td>$55K &ndash; $135K</td>
+                    <td>15%+ annually</td>
+                    <td>~100,000+ across EU</td>
+                    <td>Sustainability specialization</td>
+                </tr>
+                <tr>
+                    <td>Southeast Asia</td>
+                    <td>$20K &ndash; $60K</td>
+                    <td>20%+ annually</td>
+                    <td>Rapidly expanding</td>
+                    <td>Fastest career advancement</td>
+                </tr>
+                <tr>
+                    <td>Middle East</td>
+                    <td>$80K &ndash; $150K (tax-free)</td>
+                    <td>25%+ annually</td>
+                    <td>Import-dependent</td>
+                    <td>Highest total compensation</td>
+                </tr>
+                <tr>
+                    <td>India</td>
+                    <td>$6K &ndash; $30K</td>
+                    <td>18%+ annually</td>
+                    <td>Training gap, not labor gap</td>
+                    <td>Steepest growth trajectory</td>
+                </tr>
+                <tr>
+                    <td>Australia / Japan</td>
+                    <td>$60K &ndash; $120K</td>
+                    <td>10&ndash;12% annually</td>
+                    <td>Acute scarcity</td>
+                    <td>Best job security + QoL</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="dcj-insight-box">
+        <h4><i class="fas fa-globe-americas"></i> Cultural and Structural Differences to Consider</h4>
+        <p>The global DC workforce operates under fundamentally different labor frameworks. <strong>Union vs. non-union markets:</strong> The US and UK are largely non-union for DC operations (though construction unions are strong), while Germany, the Nordics, and Australia have significant union presence that affects working conditions, pay scales, and career progression. <strong>Apprenticeship models:</strong> Germany's dual system produces arguably the best-prepared technicians globally, with 2-3 years of combined classroom and hands-on training. The US model relies more heavily on military-to-civilian transition and post-hire training. <strong>Working hours:</strong> The EU Working Time Directive, Australia's Fair Work Act, and Japan's labor reform caps create different shift structure requirements than the more flexible (some would say more demanding) US model. Understanding these structural differences is essential for anyone planning an international DC career or managing a global operations team.</p>
+    </div>
+
 <!-- PART B STARTS HERE -->
 
-    <!-- Section 7: DC Career Salary Calculator -->
-    <h2 id="section-7">DC Career Salary Calculator</h2>
+    <!-- Section 10: DC Career Salary & Workforce Analyzer -->
+    <h2 id="section-10">DC Career Salary &amp; Workforce Analyzer</h2>
 
     <p>The salary data throughout this article paints a compelling picture, but abstract ranges are not actionable. The calculator below lets you estimate your specific earning potential based on role, experience, location, certifications, and specializations. Every multiplier is derived from the salary benchmarks cited in this article and cross-referenced with Glassdoor, PayScale, and SalaryExpert data for mid-level data center operations roles.</p>
 
@@ -948,7 +1165,7 @@
         .dcj-input-panel { display: flex; flex-direction: column; gap: 0.75rem; }
         .dcj-input-group { display: flex; flex-direction: column; gap: 0.25rem; }
         .dcj-input-group label { color: rgba(255,255,255,0.9); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .dcj-input-group select, .dcj-input-group input { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; padding: 0.55rem 0.75rem; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+        .dcj-input-group select, .dcj-input-group input { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; padding: 0.55rem 0.75rem; font-size: 0.9rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
         .dcj-input-group select:focus, .dcj-input-group input:focus { border-color: #6ee7b7; }
         .dcj-input-group select option { background: #064e3b; color: #fff; }
         .dcj-calc-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 10px; padding: 0.75rem; font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; transition: box-shadow 0.2s, transform 0.1s; }
@@ -956,7 +1173,7 @@
         .dcj-reset-btn { background: transparent; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); border-radius: 8px; padding: 0.5rem; font-size: 0.8rem; cursor: pointer; transition: border-color 0.2s; }
         .dcj-reset-btn:hover { border-color: #6ee7b7; color: #fff; }
         .dcj-results-panel { display: flex; flex-direction: column; gap: 1rem; }
-        .dcj-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .dcj-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
         .dcj-kpi-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 1rem; text-align: center; transition: border-color 0.3s; }
         .dcj-kpi-card:hover { border-color: rgba(110,231,183,0.5); }
         .dcj-kpi-label { color: rgba(255,255,255,0.65); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
@@ -967,17 +1184,42 @@
         .dcj-disclaimer { color: rgba(255,255,255,0.45); font-size: 0.7rem; margin-top: 1rem; line-height: 1.5; }
         .dcj-pdf-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; transition: border-color 0.2s; }
         .dcj-pdf-btn:hover { border-color: #6ee7b7; color: #fff; }
+        .mode-bar { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .mode-btn { padding: 0.6rem 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: transparent; color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .mode-btn.active { background: rgba(255,255,255,0.15); color: #fff; border-color: #6ee7b7; }
+        .mode-btn:hover { border-color: #6ee7b7; color: #fff; }
+        .dcj-pro-inputs { display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.15); }
+        .dcj-pro-inputs.visible { display: flex; flex-direction: column; gap: 0.75rem; }
+        .dcj-pro-panel { display: none; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; position: relative; }
+        .dcj-pro-panel.visible { display: block; }
+        .dcj-pro-panel h4 { color: #6ee7b7; font-size: 0.95rem; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .dcj-pro-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+        .dcj-chart-container { position: relative; width: 100%; height: 280px; margin: 0.75rem 0; }
+        .dcj-chart-container canvas { width: 100% !important; height: 100% !important; }
+        .dcj-lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; z-index: 5; cursor: pointer; }
+        .dcj-lock-overlay i { color: #6ee7b7; font-size: 2rem; }
+        .dcj-lock-overlay span { color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 600; }
+        .dcj-lock-overlay .dcj-lock-sub { color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 400; }
+        .dcj-pro-narrative { background: rgba(255,255,255,0.06); border-left: 3px solid #6ee7b7; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-top: 0.75rem; }
+        .dcj-pro-narrative p { color: rgba(255,255,255,0.8); font-size: 0.82rem; line-height: 1.6; margin: 0; }
         [data-theme="dark"] .dcj-calculator { background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); }
         @media (max-width: 768px) {
             .dcj-calc-grid { grid-template-columns: 1fr; }
             .dcj-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .dcj-pro-kpi-grid { grid-template-columns: repeat(2, 1fr); }
             .dcj-calculator { padding: 1.25rem; }
+            .dcj-chart-container { height: 220px; }
         }
     </style>
 
-    <div class="dcj-calculator" id="dcjCalc">
-        <h3><i class="fas fa-dollar-sign"></i> Data Center Career Salary Estimator</h3>
-        <p class="dcj-calc-subtitle">Estimate your potential DC career salary based on role, experience, location, and certifications.</p>
+    <div class="dcj-calculator calculator-section" id="dcjCalc">
+        <h3><i class="fas fa-dollar-sign"></i> DC Career Salary &amp; Workforce Analyzer</h3>
+        <p class="dcj-calc-subtitle">Estimate your earning potential and analyze workforce dynamics based on role, experience, location, and specializations.</p>
+
+        <div class="mode-bar">
+            <button class="mode-btn active" id="dcjFreeBtn" onclick="window.dcjSetMode('free')">Free Analysis</button>
+            <button class="mode-btn" id="dcjProBtn" onclick="window.dcjSetMode('pro')">Pro Analysis</button>
+        </div>
 
         <div class="dcj-calc-grid">
             <!-- Input Panel -->
@@ -1035,7 +1277,7 @@
                     </select>
                 </div>
                 <div class="dcj-input-group">
-                    <label>Industry</label>
+                    <label>Industry Type</label>
                     <select id="dcjIndustry">
                         <option value="hyperscale" selected>Hyperscale</option>
                         <option value="colocation">Colocation</option>
@@ -1052,8 +1294,29 @@
                         <option value="bachelor">Bachelor's Degree</option>
                     </select>
                 </div>
-                <button class="dcj-calc-btn" onclick="dcjCalculate()"><i class="fas fa-calculator"></i> Estimate Salary</button>
-                <button class="dcj-reset-btn" onclick="dcjReset()">Reset to Defaults</button>
+
+                <!-- Pro Inputs -->
+                <div class="dcj-pro-inputs" id="dcjProInputs">
+                    <div class="dcj-input-group">
+                        <label>Team Size</label>
+                        <input type="number" id="dcjTeamSize" value="5" min="1" max="50" step="1">
+                    </div>
+                    <div class="dcj-input-group">
+                        <label>Annual Training Budget / Person ($)</label>
+                        <input type="number" id="dcjTrainingBudget" value="3000" min="0" max="50000" step="100">
+                    </div>
+                    <div class="dcj-input-group">
+                        <label>Target Retention Rate (%)</label>
+                        <input type="number" id="dcjRetention" value="85" min="0" max="100" step="1">
+                    </div>
+                    <div class="dcj-input-group">
+                        <label>Overtime Hours / Month</label>
+                        <input type="number" id="dcjOvertime" value="10" min="0" max="80" step="1">
+                    </div>
+                </div>
+
+                <button class="dcj-calc-btn" onclick="window.dcjCalculate()"><i class="fas fa-calculator"></i> Analyze</button>
+                <button class="dcj-reset-btn" onclick="window.dcjReset()">Reset to Defaults</button>
             </div>
 
             <!-- Results Panel -->
@@ -1070,9 +1333,9 @@
                         <div class="dcj-kpi-sub">After ~25% tax estimate</div>
                     </div>
                     <div class="dcj-kpi-card">
-                        <div class="dcj-kpi-label">5-Year Earnings</div>
+                        <div class="dcj-kpi-label">5-Year Cumulative</div>
                         <div class="dcj-kpi-value" id="dcjFiveYear">--</div>
-                        <div class="dcj-kpi-sub">Projected total</div>
+                        <div class="dcj-kpi-sub">With 3% annual raise</div>
                     </div>
                     <div class="dcj-kpi-card">
                         <div class="dcj-kpi-label">vs National Median</div>
@@ -1089,13 +1352,137 @@
                         <div class="dcj-kpi-value" id="dcjCertROI">--</div>
                         <div class="dcj-kpi-sub">Boost per cert</div>
                     </div>
+                    <div class="dcj-kpi-card">
+                        <div class="dcj-kpi-label">Cost per MW Staffing</div>
+                        <div class="dcj-kpi-value" id="dcjCostPerMW">--</div>
+                        <div class="dcj-kpi-sub">Salary / typical MW</div>
+                    </div>
+                    <div class="dcj-kpi-card">
+                        <div class="dcj-kpi-label">Market Competitiveness</div>
+                        <div class="dcj-kpi-value" id="dcjMarketScore">--</div>
+                        <div class="dcj-kpi-sub">Score 1-100</div>
+                    </div>
                 </div>
 
                 <div class="dcj-narrative" id="dcjNarrative">
-                    <p>Adjust the inputs and click "Estimate Salary" to see your personalized career salary projection.</p>
+                    <p>Adjust the inputs to see your personalized career salary projection and workforce analysis.</p>
                 </div>
 
-                <button class="dcj-pdf-btn" onclick="dcjExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                <button class="dcj-pdf-btn" onclick="window.dcjExportPDF()"><i class="fas fa-file-pdf"></i> Export PDF Report</button>
+            </div>
+        </div>
+
+        <!-- Pro Panel 1: Monte Carlo Salary Distribution -->
+        <div class="dcj-pro-panel" id="dcjPanelMonteCarlo">
+            <div class="dcj-lock-overlay" id="dcjLock1" onclick="window.dcjSetMode('pro')">
+                <i class="fas fa-lock"></i>
+                <span>Pro Analysis Required</span>
+                <span class="dcj-lock-sub">Click to unlock Monte Carlo simulation</span>
+            </div>
+            <h4><i class="fas fa-chart-bar"></i> Monte Carlo Salary Distribution (10,000 iterations)</h4>
+            <div class="dcj-pro-kpi-grid">
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">P5 Pessimistic</div>
+                    <div class="dcj-kpi-value" id="dcjMcP5">--</div>
+                    <div class="dcj-kpi-sub">5th percentile</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">P50 Median</div>
+                    <div class="dcj-kpi-value" id="dcjMcP50">--</div>
+                    <div class="dcj-kpi-sub">50th percentile</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">P95 Optimistic</div>
+                    <div class="dcj-kpi-value" id="dcjMcP95">--</div>
+                    <div class="dcj-kpi-sub">95th percentile</div>
+                </div>
+            </div>
+            <div class="dcj-chart-container"><canvas id="dcjChartMC"></canvas></div>
+        </div>
+
+        <!-- Pro Panel 2: 10-Year Career Progression -->
+        <div class="dcj-pro-panel" id="dcjPanelCareer">
+            <div class="dcj-lock-overlay" id="dcjLock2" onclick="window.dcjSetMode('pro')">
+                <i class="fas fa-lock"></i>
+                <span>Pro Analysis Required</span>
+                <span class="dcj-lock-sub">Click to unlock career projection</span>
+            </div>
+            <h4><i class="fas fa-chart-line"></i> 10-Year Career Progression</h4>
+            <div class="dcj-pro-kpi-grid">
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Crosses $100K</div>
+                    <div class="dcj-kpi-value" id="dcjCross100">--</div>
+                    <div class="dcj-kpi-sub">Year</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Crosses $150K</div>
+                    <div class="dcj-kpi-value" id="dcjCross150">--</div>
+                    <div class="dcj-kpi-sub">Year</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Crosses $200K</div>
+                    <div class="dcj-kpi-value" id="dcjCross200">--</div>
+                    <div class="dcj-kpi-sub">Year</div>
+                </div>
+            </div>
+            <div class="dcj-chart-container"><canvas id="dcjChartCareer"></canvas></div>
+        </div>
+
+        <!-- Pro Panel 3: Sensitivity Tornado -->
+        <div class="dcj-pro-panel" id="dcjPanelTornado">
+            <div class="dcj-lock-overlay" id="dcjLock3" onclick="window.dcjSetMode('pro')">
+                <i class="fas fa-lock"></i>
+                <span>Pro Analysis Required</span>
+                <span class="dcj-lock-sub">Click to unlock sensitivity analysis</span>
+            </div>
+            <h4><i class="fas fa-tornado"></i> Sensitivity Tornado Analysis</h4>
+            <div class="dcj-chart-container"><canvas id="dcjChartTornado"></canvas></div>
+        </div>
+
+        <!-- Pro Panel 4: Workforce Planning & ROI -->
+        <div class="dcj-pro-panel" id="dcjPanelWorkforce">
+            <div class="dcj-lock-overlay" id="dcjLock4" onclick="window.dcjSetMode('pro')">
+                <i class="fas fa-lock"></i>
+                <span>Pro Analysis Required</span>
+                <span class="dcj-lock-sub">Click to unlock workforce planning</span>
+            </div>
+            <h4><i class="fas fa-users-cog"></i> Workforce Planning &amp; ROI</h4>
+            <div class="dcj-pro-kpi-grid">
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Annual Team Cost</div>
+                    <div class="dcj-kpi-value" id="dcjTeamCost">--</div>
+                    <div class="dcj-kpi-sub">Salary + training + OT</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Training ROI</div>
+                    <div class="dcj-kpi-value" id="dcjTrainingROI">--</div>
+                    <div class="dcj-kpi-sub">Return on investment</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Cost of Turnover</div>
+                    <div class="dcj-kpi-value" id="dcjTurnoverCost">--</div>
+                    <div class="dcj-kpi-sub">Per employee lost</div>
+                </div>
+            </div>
+            <div class="dcj-pro-kpi-grid" style="margin-top:0.5rem;">
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Break-Even Months</div>
+                    <div class="dcj-kpi-value" id="dcjBreakEven">--</div>
+                    <div class="dcj-kpi-sub">New hire payback</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Annual Turnover Loss</div>
+                    <div class="dcj-kpi-value" id="dcjAnnualTurnover">--</div>
+                    <div class="dcj-kpi-sub">Based on retention rate</div>
+                </div>
+                <div class="dcj-kpi-card">
+                    <div class="dcj-kpi-label">Overtime Cost / Year</div>
+                    <div class="dcj-kpi-value" id="dcjOTCost">--</div>
+                    <div class="dcj-kpi-sub">Team total</div>
+                </div>
+            </div>
+            <div class="dcj-pro-narrative" id="dcjWorkforceNarrative">
+                <p>Enable Pro mode to see workforce planning recommendations.</p>
             </div>
         </div>
 
@@ -1104,8 +1491,8 @@
         </div>
     </div>
 
-    <!-- Section 8: The Engineer's Perspective -->
-    <h2 id="section-8">The Engineer's Perspective</h2>
+    <!-- Section 11: The Engineer's Perspective -->
+    <h2 id="section-11">The Engineer's Perspective</h2>
 
     <p>As someone who started in industrial electrical systems and moved into data center operations, I have watched this industry transform from a niche specialty into the backbone of the global economy. When I began my career, "data center engineer" was not a job title anyone aspired to. It was something you ended up doing if you were an electrician or HVAC technician who happened to work in a building with servers. Today, the same role commands six figures, equity packages, and recruiting attention that would have been unimaginable a decade ago. The fundamental skillset has not changed &mdash; understanding power distribution, thermal management, and mechanical systems still matters more than any certification. What changed is that the world realized it could not build artificial intelligence without the people who keep the lights on and the servers cool.</p>
 
@@ -1232,12 +1619,16 @@
 
 <script src="script.min.js?v=2026-03-23"></script>
 
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- Calculator IIFE -->
 <script>
-(function() {
+;(function() {
     'use strict';
 
-    var BASE_SALARIES = {
+    // ── Data Tables ──
+    var BASE_SALARY = {
         technician: { entry: 45000, mid: 75000, senior: 110000, lead: 130000 },
         facilities: { entry: 65000, mid: 90000, senior: 115000, lead: 135000 },
         engineer:   { entry: 80000, mid: 110000, senior: 135000, lead: 155000 },
@@ -1245,21 +1636,14 @@
         manager:    { entry: 100000, mid: 120000, senior: 145000, lead: 170000 },
         director:   { entry: 130000, mid: 155000, senior: 180000, lead: 210000 }
     };
-
-    var LOCATION_MULT = {
-        nova: 1.15, phoenix: 1.05, dfw: 1.03, atlanta: 1.0,
-        chicago: 1.08, other_us: 1.0, international: 0.85
-    };
-
-    var LIQUID_MULT = { none: 1.0, basic: 1.05, advanced: 1.12 };
-    var SHIFT_MULT = { day: 1.0, night: 1.10, rotating: 1.15 };
-    var INDUSTRY_MULT = { hyperscale: 1.10, colocation: 1.0, enterprise: 0.95, construction: 1.08 };
-    var EDUCATION_MULT = { highschool: 1.0, trade: 1.03, associate: 1.05, bachelor: 1.08 };
-
+    var LOCATION = { nova: 1.15, phoenix: 1.05, dfw: 1.03, atlanta: 1.0, chicago: 1.08, other_us: 1.0, international: 0.85 };
+    var LIQUID = { none: 1.0, basic: 1.05, advanced: 1.12 };
+    var SHIFT = { day: 1.0, night: 1.10, rotating: 1.15 };
+    var INDUSTRY = { hyperscale: 1.10, colocation: 1.0, enterprise: 0.95, construction: 1.08 };
+    var EDUCATION = { highschool: 1.0, trade: 1.03, associate: 1.05, bachelor: 1.08 };
     var CERT_BONUS = 3000;
     var NATIONAL_MEDIAN = 59000;
     var TAX_RATE = 0.25;
-
     var EXP_ORDER = ['entry', 'mid', 'senior', 'lead'];
 
     var ROLE_LABELS = {
@@ -1267,29 +1651,108 @@
         engineer: 'DC Engineer', cooling: 'Cooling Specialist',
         manager: 'DC Manager', director: 'DC Director'
     };
-
     var EXP_LABELS = {
         entry: 'Entry (0-2 yr)', mid: 'Mid (3-5 yr)',
         senior: 'Senior (6-10 yr)', lead: 'Lead (10+ yr)'
     };
-
     var LOCATION_LABELS = {
         nova: 'Northern Virginia', phoenix: 'Phoenix', dfw: 'Dallas-Fort Worth',
         atlanta: 'Atlanta', chicago: 'Chicago', other_us: 'Other US', international: 'International'
     };
 
-    function fmt(n) {
-        return '$' + Math.round(n).toLocaleString('en-US');
-    }
+    // MW managed per role (rough industry average)
+    var MW_PER_ROLE = {
+        technician: 2, facilities: 3, engineer: 4, cooling: 3, manager: 8, director: 15
+    };
 
-    function fmtPct(n) {
-        var sign = n >= 0 ? '+' : '';
-        return sign + Math.round(n) + '%';
-    }
+    // ── State ──
+    var proUnlocked = false;
+    var chartMC = null, chartCareer = null, chartTornado = null;
 
+    // ── Helpers ──
+    function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+    function fmtPct(n) { var s = n >= 0 ? '+' : ''; return s + n.toFixed(1) + '%'; }
+    function fmtPctInt(n) { var s = n >= 0 ? '+' : ''; return s + Math.round(n) + '%'; }
     function getVal(id) { return document.getElementById(id).value; }
     function getNum(id) { return parseFloat(document.getElementById(id).value) || 0; }
+    function el(id) { return document.getElementById(id); }
 
+    // Box-Muller normal distribution
+    function randNormal(mean, stddev) {
+        var u1 = Math.random(), u2 = Math.random();
+        var z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+        return mean + z * stddev;
+    }
+
+    // ── Auth ──
+    function checkProAuth() {
+        if (typeof window.hasProAccess === 'function' && window.hasProAccess()) return true;
+        var email = prompt('Enter your email to unlock Pro Analysis:');
+        if (!email) return false;
+        var pass = prompt('Enter your password:');
+        if (!pass) return false;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            return true;
+        }
+        alert('Invalid credentials. Use demo@resistancezero.com / demo2026');
+        return false;
+    }
+
+    // ── Mode switching ──
+    function setMode(mode) {
+        if (mode === 'pro') {
+            if (!proUnlocked) {
+                if (!checkProAuth()) return;
+                proUnlocked = true;
+            }
+            el('dcjFreeBtn').classList.remove('active');
+            el('dcjProBtn').classList.add('active');
+            el('dcjProInputs').classList.add('visible');
+            ['dcjPanelMonteCarlo', 'dcjPanelCareer', 'dcjPanelTornado', 'dcjPanelWorkforce'].forEach(function(id) {
+                el(id).classList.add('visible');
+            });
+            ['dcjLock1', 'dcjLock2', 'dcjLock3', 'dcjLock4'].forEach(function(id) {
+                el(id).style.display = 'none';
+            });
+            calculate();
+        } else {
+            el('dcjFreeBtn').classList.add('active');
+            el('dcjProBtn').classList.remove('active');
+            el('dcjProInputs').classList.remove('visible');
+            ['dcjPanelMonteCarlo', 'dcjPanelCareer', 'dcjPanelTornado', 'dcjPanelWorkforce'].forEach(function(id) {
+                el(id).classList.remove('visible');
+            });
+        }
+    }
+
+    // ── Core salary calculation ──
+    function calcSalary(role, exp, loc, certs, liquid, shift, industry, education) {
+        var base = BASE_SALARY[role][exp];
+        var salary = base * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education];
+        salary += Math.min(Math.max(certs, 0), 10) * CERT_BONUS;
+        return salary;
+    }
+
+    // ── Market competitiveness score ──
+    function calcMarketScore(salary, role, exp, certs, liquid) {
+        var score = 0;
+        // Compare to max possible for this role
+        var maxSalary = BASE_SALARY[role].lead * 1.15 * 1.12 * 1.15 * 1.10 * 1.08 + 10 * CERT_BONUS;
+        var minSalary = BASE_SALARY[role].entry * 0.85;
+        var range = maxSalary - minSalary;
+        score = ((salary - minSalary) / range) * 60; // 60 points for salary position
+        // Bonus for certs
+        score += Math.min(certs, 10) * 2; // up to 20
+        // Bonus for liquid cooling
+        if (liquid === 'basic') score += 5;
+        if (liquid === 'advanced') score += 12;
+        // Bonus for experience
+        var expIdx = EXP_ORDER.indexOf(exp);
+        score += expIdx * 2; // up to 6
+        return Math.min(Math.max(Math.round(score), 1), 100);
+    }
+
+    // ── Main calculate ──
     function calculate() {
         var role = getVal('dcjRole');
         var exp = getVal('dcjExperience');
@@ -1300,60 +1763,46 @@
         var industry = getVal('dcjIndustry');
         var education = getVal('dcjEducation');
 
-        // Base salary
-        var base = BASE_SALARIES[role][exp];
-
-        // Apply multipliers
-        var salary = base
-            * LOCATION_MULT[loc]
-            * LIQUID_MULT[liquid]
-            * SHIFT_MULT[shift]
-            * INDUSTRY_MULT[industry]
-            * EDUCATION_MULT[education];
-
-        // Add certification bonus
-        salary += certs * CERT_BONUS;
+        var salary = calcSalary(role, exp, loc, certs, liquid, shift, industry, education);
 
         // KPI 1: Annual salary
-        document.getElementById('dcjAnnualSalary').textContent = fmt(salary);
+        el('dcjAnnualSalary').textContent = fmt(salary);
 
         // KPI 2: Monthly take-home
         var monthly = (salary * (1 - TAX_RATE)) / 12;
-        document.getElementById('dcjMonthly').textContent = fmt(monthly);
+        el('dcjMonthly').textContent = fmt(monthly);
 
-        // KPI 3: 5-year earnings (assume 3% annual raise)
+        // KPI 3: 5-year cumulative (3% annual raise)
         var fiveYear = 0;
-        var yearSalary = salary;
-        for (var y = 0; y < 5; y++) {
-            fiveYear += yearSalary;
-            yearSalary *= 1.03;
-        }
-        document.getElementById('dcjFiveYear').textContent = fmt(fiveYear);
+        var ys = salary;
+        for (var y = 0; y < 5; y++) { fiveYear += ys; ys *= 1.03; }
+        el('dcjFiveYear').textContent = fmt(fiveYear);
 
         // KPI 4: vs national median
         var vsMedian = ((salary - NATIONAL_MEDIAN) / NATIONAL_MEDIAN) * 100;
-        document.getElementById('dcjVsMedian').textContent = fmtPct(vsMedian);
+        el('dcjVsMedian').textContent = fmtPctInt(vsMedian);
 
-        // KPI 5: Career growth potential (next experience level salary)
+        // KPI 5: Career growth potential
         var expIdx = EXP_ORDER.indexOf(exp);
         var nextExp = expIdx < EXP_ORDER.length - 1 ? EXP_ORDER[expIdx + 1] : null;
-        var growthSalary;
+        var growthSalary = salary;
         if (nextExp) {
-            growthSalary = BASE_SALARIES[role][nextExp]
-                * LOCATION_MULT[loc]
-                * LIQUID_MULT[liquid]
-                * SHIFT_MULT[shift]
-                * INDUSTRY_MULT[industry]
-                * EDUCATION_MULT[education]
-                + certs * CERT_BONUS;
-            document.getElementById('dcjGrowth').textContent = fmt(growthSalary);
+            growthSalary = calcSalary(role, nextExp, loc, certs, liquid, shift, industry, education);
+            el('dcjGrowth').textContent = fmt(growthSalary);
         } else {
-            growthSalary = salary;
-            document.getElementById('dcjGrowth').textContent = 'At Peak';
+            el('dcjGrowth').textContent = 'At Peak';
         }
 
         // KPI 6: Certification ROI
-        document.getElementById('dcjCertROI').textContent = fmt(CERT_BONUS) + '/cert';
+        el('dcjCertROI').textContent = fmt(CERT_BONUS) + '/cert';
+
+        // KPI 7: Cost per MW staffing
+        var mw = MW_PER_ROLE[role] || 3;
+        el('dcjCostPerMW').textContent = fmt(salary / mw);
+
+        // KPI 8: Market competitiveness score
+        var marketScore = calcMarketScore(salary, role, exp, certs, liquid);
+        el('dcjMarketScore').textContent = marketScore + '/100';
 
         // Dynamic narrative
         var narrative = '';
@@ -1366,46 +1815,416 @@
         } else {
             narrative = 'Your estimated salary of ' + fmt(salary) + ' is near the US national median. Consider certifications and specializations to boost earning potential. ';
         }
-
         if (nextExp) {
             narrative += 'Advancing to ' + EXP_LABELS[nextExp] + ' level could raise your salary to ' + fmt(growthSalary) + '. ';
         }
-
         if (liquid === 'none') {
             narrative += 'Adding liquid cooling experience could increase your compensation by 5-12% given current market demand.';
         } else if (liquid === 'advanced') {
             narrative += 'Your advanced liquid cooling expertise puts you in the top tier of compensation for this role.';
         }
+        el('dcjNarrative').innerHTML = '<p>' + narrative + '</p>';
 
-        document.getElementById('dcjNarrative').innerHTML = '<p>' + narrative + '</p>';
+        // Pro panels
+        if (proUnlocked) {
+            runMonteCarlo(salary, role, exp, loc, certs, liquid, shift, industry, education);
+            runCareerProgression(salary, role, exp);
+            runTornado(role, exp, loc, certs, liquid, shift, industry, education);
+            runWorkforce(salary);
+        }
 
         return {
             salary: salary, monthly: monthly, fiveYear: fiveYear,
-            vsMedian: vsMedian, growthSalary: growthSalary,
+            vsMedian: vsMedian, growthSalary: growthSalary, marketScore: marketScore,
+            costPerMW: salary / mw,
             role: role, exp: exp, loc: loc, certs: certs,
             liquid: liquid, shift: shift, industry: industry, education: education
         };
     }
 
+    // ── Monte Carlo (Panel 1) ──
+    function runMonteCarlo(baseSalary, role, exp, loc, certs, liquid, shift, industry, education) {
+        var iterations = 10000;
+        var results = [];
+        var baseVal = BASE_SALARY[role][exp];
+        var variance = 0.15;
+
+        for (var i = 0; i < iterations; i++) {
+            var bv = randNormal(baseVal, baseVal * variance);
+            var lm = randNormal(LOCATION[loc], LOCATION[loc] * variance);
+            var liq = randNormal(LIQUID[liquid], LIQUID[liquid] * variance);
+            var sh = randNormal(SHIFT[shift], SHIFT[shift] * variance);
+            var ind = randNormal(INDUSTRY[industry], INDUSTRY[industry] * variance);
+            var edu = randNormal(EDUCATION[education], EDUCATION[education] * variance);
+            var s = bv * lm * liq * sh * ind * edu + certs * CERT_BONUS;
+            if (s > 0) results.push(s);
+        }
+        results.sort(function(a, b) { return a - b; });
+
+        var p5 = results[Math.floor(results.length * 0.05)];
+        var p50 = results[Math.floor(results.length * 0.50)];
+        var p95 = results[Math.floor(results.length * 0.95)];
+
+        el('dcjMcP5').textContent = fmt(p5);
+        el('dcjMcP50').textContent = fmt(p50);
+        el('dcjMcP95').textContent = fmt(p95);
+
+        // Build histogram
+        var bucketCount = 40;
+        var minVal = results[0];
+        var maxVal = results[results.length - 1];
+        var bucketWidth = (maxVal - minVal) / bucketCount;
+        var buckets = new Array(bucketCount).fill(0);
+        var labels = [];
+        for (var b = 0; b < bucketCount; b++) {
+            var low = minVal + b * bucketWidth;
+            labels.push(fmt(Math.round(low / 1000) * 1000));
+            for (var j = 0; j < results.length; j++) {
+                if (results[j] >= low && results[j] < low + bucketWidth) buckets[b]++;
+                if (results[j] >= low + bucketWidth) continue;
+            }
+        }
+        // Recount properly
+        buckets = new Array(bucketCount).fill(0);
+        for (var k = 0; k < results.length; k++) {
+            var idx = Math.min(Math.floor((results[k] - minVal) / bucketWidth), bucketCount - 1);
+            buckets[idx]++;
+        }
+
+        // Color bars: highlight P5, P50, P95 zones
+        var colors = buckets.map(function(_, bi) {
+            var mid = minVal + (bi + 0.5) * bucketWidth;
+            if (Math.abs(mid - p5) < bucketWidth) return 'rgba(239,68,68,0.8)';
+            if (Math.abs(mid - p50) < bucketWidth) return 'rgba(16,185,129,0.9)';
+            if (Math.abs(mid - p95) < bucketWidth) return 'rgba(59,130,246,0.8)';
+            return 'rgba(110,231,183,0.4)';
+        });
+
+        if (chartMC) chartMC.destroy();
+        var ctx = el('dcjChartMC').getContext('2d');
+        chartMC = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: buckets,
+                    backgroundColor: colors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(items) { return items[0].label; },
+                            label: function(item) { return item.raw + ' iterations'; }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        ticks: { color: 'rgba(255,255,255,0.5)', maxTicksLimit: 8, maxRotation: 45, font: { size: 9 } },
+                        grid: { display: false }
+                    },
+                    y: {
+                        display: true,
+                        ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 9 } },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Career Progression (Panel 2) ──
+    function runCareerProgression(salary, role, exp) {
+        var years = [];
+        var conservative = [], moderate = [], aggressive = [];
+        var consVal = salary, modVal = salary, aggVal = salary;
+        var expIdx = EXP_ORDER.indexOf(exp);
+
+        // Level-up years for moderate (every 3 years) and aggressive (every 2 years)
+        for (var y = 0; y <= 10; y++) {
+            years.push('Year ' + y);
+            conservative.push(Math.round(consVal));
+            moderate.push(Math.round(modVal));
+            aggressive.push(Math.round(aggVal));
+
+            consVal *= 1.03;
+            // Moderate: 5%/yr + level-up bump every 3 years
+            if (y > 0 && y % 3 === 0 && expIdx < EXP_ORDER.length - 1) {
+                expIdx++;
+                var newBase = BASE_SALARY[role][EXP_ORDER[expIdx]];
+                var ratio = modVal / BASE_SALARY[role][EXP_ORDER[expIdx - 1]];
+                modVal = newBase * Math.min(ratio, 1.5);
+            }
+            modVal *= 1.05;
+            aggVal *= 1.08;
+        }
+
+        // Find crossing years
+        function findCross(arr, target) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] >= target) return i;
+            }
+            return null;
+        }
+        var c100 = findCross(moderate, 100000);
+        var c150 = findCross(moderate, 150000);
+        var c200 = findCross(moderate, 200000);
+        el('dcjCross100').textContent = c100 !== null ? 'Year ' + c100 : 'N/A';
+        el('dcjCross150').textContent = c150 !== null ? 'Year ' + c150 : '>10';
+        el('dcjCross200').textContent = c200 !== null ? 'Year ' + c200 : '>10';
+
+        if (chartCareer) chartCareer.destroy();
+        var ctx = el('dcjChartCareer').getContext('2d');
+        chartCareer = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Conservative (3%/yr)',
+                        data: conservative,
+                        borderColor: 'rgba(148,163,184,0.8)',
+                        backgroundColor: 'rgba(148,163,184,0.1)',
+                        fill: false, tension: 0.3, pointRadius: 3, borderWidth: 2
+                    },
+                    {
+                        label: 'Moderate (5%/yr + level-ups)',
+                        data: moderate,
+                        borderColor: 'rgba(16,185,129,0.9)',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        fill: false, tension: 0.3, pointRadius: 3, borderWidth: 2
+                    },
+                    {
+                        label: 'Aggressive (8%/yr + specialization)',
+                        data: aggressive,
+                        borderColor: 'rgba(59,130,246,0.9)',
+                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        fill: false, tension: 0.3, pointRadius: 3, borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(item) { return item.dataset.label + ': ' + fmt(item.raw); }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 9 } }, grid: { display: false } },
+                    y: {
+                        ticks: {
+                            color: 'rgba(255,255,255,0.5)',
+                            font: { size: 9 },
+                            callback: function(v) { return '$' + Math.round(v / 1000) + 'K'; }
+                        },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Sensitivity Tornado (Panel 3) ──
+    function runTornado(role, exp, loc, certs, liquid, shift, industry, education) {
+        var baseSalary = calcSalary(role, exp, loc, certs, liquid, shift, industry, education);
+        var factors = [
+            { name: 'Base Salary', key: 'base' },
+            { name: 'Location Multiplier', key: 'location' },
+            { name: 'Cert Bonus', key: 'cert' },
+            { name: 'Liquid Cooling Premium', key: 'liquid' },
+            { name: 'Shift Differential', key: 'shift' },
+            { name: 'Industry Premium', key: 'industry' }
+        ];
+
+        var swingData = [];
+        var pct = 0.20;
+
+        factors.forEach(function(f) {
+            var low, high;
+            switch (f.key) {
+                case 'base':
+                    var baseVal = BASE_SALARY[role][exp];
+                    low = (baseVal * (1 - pct)) * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    high = (baseVal * (1 + pct)) * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    break;
+                case 'location':
+                    low = BASE_SALARY[role][exp] * (LOCATION[loc] * (1 - pct)) * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    high = BASE_SALARY[role][exp] * (LOCATION[loc] * (1 + pct)) * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    break;
+                case 'cert':
+                    low = BASE_SALARY[role][exp] * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * (CERT_BONUS * (1 - pct));
+                    high = BASE_SALARY[role][exp] * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * (CERT_BONUS * (1 + pct));
+                    break;
+                case 'liquid':
+                    low = BASE_SALARY[role][exp] * LOCATION[loc] * (LIQUID[liquid] * (1 - pct)) * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    high = BASE_SALARY[role][exp] * LOCATION[loc] * (LIQUID[liquid] * (1 + pct)) * SHIFT[shift] * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    break;
+                case 'shift':
+                    low = BASE_SALARY[role][exp] * LOCATION[loc] * LIQUID[liquid] * (SHIFT[shift] * (1 - pct)) * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    high = BASE_SALARY[role][exp] * LOCATION[loc] * LIQUID[liquid] * (SHIFT[shift] * (1 + pct)) * INDUSTRY[industry] * EDUCATION[education] + certs * CERT_BONUS;
+                    break;
+                case 'industry':
+                    low = BASE_SALARY[role][exp] * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * (INDUSTRY[industry] * (1 - pct)) * EDUCATION[education] + certs * CERT_BONUS;
+                    high = BASE_SALARY[role][exp] * LOCATION[loc] * LIQUID[liquid] * SHIFT[shift] * (INDUSTRY[industry] * (1 + pct)) * EDUCATION[education] + certs * CERT_BONUS;
+                    break;
+            }
+            swingData.push({ name: f.name, low: low - baseSalary, high: high - baseSalary, swing: (high - low) });
+        });
+
+        // Sort by swing descending
+        swingData.sort(function(a, b) { return b.swing - a.swing; });
+
+        var labels = swingData.map(function(d) { return d.name; });
+        var lowDeltas = swingData.map(function(d) { return Math.round(d.low); });
+        var highDeltas = swingData.map(function(d) { return Math.round(d.high); });
+
+        if (chartTornado) chartTornado.destroy();
+        var ctx = el('dcjChartTornado').getContext('2d');
+        chartTornado = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '-20%',
+                        data: lowDeltas,
+                        backgroundColor: 'rgba(239,68,68,0.6)',
+                        borderWidth: 0
+                    },
+                    {
+                        label: '+20%',
+                        data: highDeltas,
+                        backgroundColor: 'rgba(16,185,129,0.6)',
+                        borderWidth: 0
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(item) { return item.dataset.label + ': ' + fmt(item.raw); }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'rgba(255,255,255,0.5)',
+                            font: { size: 9 },
+                            callback: function(v) { return (v >= 0 ? '+' : '') + '$' + Math.round(v / 1000) + 'K'; }
+                        },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
+                    },
+                    y: {
+                        ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Workforce Planning (Panel 4) ──
+    function runWorkforce(salary) {
+        var teamSize = Math.min(Math.max(getNum('dcjTeamSize'), 1), 50);
+        var trainingBudget = getNum('dcjTrainingBudget');
+        var retentionRate = Math.min(Math.max(getNum('dcjRetention'), 0), 100) / 100;
+        var overtimeHrs = Math.min(Math.max(getNum('dcjOvertime'), 0), 80);
+
+        // Hourly rate (2080 work hours/year)
+        var hourlyRate = salary / 2080;
+        var otRate = hourlyRate * 1.5;
+        var annualOTPerPerson = overtimeHrs * 12 * otRate;
+
+        // Annual team cost = (salary + training + OT) * team size
+        var annualTeamCost = (salary + trainingBudget + annualOTPerPerson) * teamSize;
+        el('dcjTeamCost').textContent = fmt(annualTeamCost);
+
+        // Training ROI: each $1 in training returns ~$4.53 in productivity (industry average)
+        var trainingROI = ((trainingBudget * 4.53) / trainingBudget * 100) - 100;
+        el('dcjTrainingROI').textContent = Math.round(trainingROI) + '%';
+
+        // Cost of turnover: ~50% of annual salary to replace
+        var turnoverCostPer = salary * 0.50;
+        el('dcjTurnoverCost').textContent = fmt(turnoverCostPer);
+
+        // Break-even months for new hire (ramp-up cost: training + 3 months at 50% productivity)
+        var rampUpCost = trainingBudget + (salary / 12) * 3 * 0.5;
+        var monthlyContribution = salary / 12;
+        var breakEvenMonths = Math.ceil(rampUpCost / monthlyContribution);
+        el('dcjBreakEven').textContent = breakEvenMonths + ' mo';
+
+        // Annual turnover loss
+        var expectedLeavers = teamSize * (1 - retentionRate);
+        var annualTurnoverLoss = expectedLeavers * turnoverCostPer;
+        el('dcjAnnualTurnover').textContent = fmt(annualTurnoverLoss);
+
+        // Overtime cost
+        el('dcjOTCost').textContent = fmt(annualOTPerPerson * teamSize);
+
+        // Narrative
+        var narr = '';
+        if (retentionRate >= 0.90) {
+            narr = 'Your target retention rate of ' + Math.round(retentionRate * 100) + '% is excellent. ';
+            narr += 'With a team of ' + teamSize + ', you can expect ~' + expectedLeavers.toFixed(1) + ' departures per year, costing approximately ' + fmt(annualTurnoverLoss) + ' in replacement costs. ';
+            narr += 'Maintain your training investment to sustain this retention level.';
+        } else if (retentionRate >= 0.75) {
+            narr = 'Your retention target of ' + Math.round(retentionRate * 100) + '% is acceptable but has room for improvement. ';
+            narr += 'Each departure costs approximately ' + fmt(turnoverCostPer) + ' to replace. ';
+            narr += 'Consider increasing training budget by 15-20% — the data shows strong ROI on retention-focused training programs.';
+        } else {
+            narr = 'Warning: A retention rate of ' + Math.round(retentionRate * 100) + '% indicates significant workforce instability. ';
+            narr += 'You are losing approximately ' + fmt(annualTurnoverLoss) + ' annually to turnover alone. ';
+            narr += 'Prioritize compensation review, career path development, and training investment immediately.';
+        }
+        if (overtimeHrs > 30) {
+            narr += ' Your overtime level of ' + overtimeHrs + ' hrs/month per person is high and may accelerate burnout-driven attrition.';
+        }
+        el('dcjWorkforceNarrative').innerHTML = '<p>' + narr + '</p>';
+    }
+
+    // ── Reset ──
     function reset() {
-        document.getElementById('dcjRole').value = 'technician';
-        document.getElementById('dcjExperience').value = 'entry';
-        document.getElementById('dcjLocation').value = 'other_us';
-        document.getElementById('dcjCerts').value = '0';
-        document.getElementById('dcjLiquid').value = 'none';
-        document.getElementById('dcjShift').value = 'day';
-        document.getElementById('dcjIndustry').value = 'hyperscale';
-        document.getElementById('dcjEducation').value = 'highschool';
+        el('dcjRole').value = 'technician';
+        el('dcjExperience').value = 'entry';
+        el('dcjLocation').value = 'other_us';
+        el('dcjCerts').value = '0';
+        el('dcjLiquid').value = 'none';
+        el('dcjShift').value = 'day';
+        el('dcjIndustry').value = 'hyperscale';
+        el('dcjEducation').value = 'highschool';
+        el('dcjTeamSize').value = '5';
+        el('dcjTrainingBudget').value = '3000';
+        el('dcjRetention').value = '85';
+        el('dcjOvertime').value = '10';
         calculate();
     }
 
+    // ── PDF Export ──
     function exportPDF() {
         var r = calculate();
         var w = window.open('', '_blank');
         if (!w) { alert('Please allow popups for PDF export.'); return; }
 
         var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DC Career Salary Estimate</title>';
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DC Career Salary &amp; Workforce Analysis</title>';
         html += '<style>';
         html += 'body{font-family:Arial,Helvetica,sans-serif;max-width:800px;margin:0 auto;padding:40px 30px;color:#1e293b;font-size:11px;line-height:1.5;}';
         html += 'h1{font-size:20px;color:#059669;border-bottom:3px solid #059669;padding-bottom:8px;margin-bottom:4px;}';
@@ -1415,18 +2234,28 @@
         html += '.param{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #e2e8f0;}';
         html += '.param-label{color:#64748b;}';
         html += '.param-value{font-weight:700;color:#1e293b;}';
-        html += '.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}';
+        html += '.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}';
         html += '.kpi{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;text-align:center;}';
         html += '.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;}';
-        html += '.kpi-val{font-size:18px;font-weight:800;color:#059669;margin:4px 0;}';
+        html += '.kpi-val{font-size:16px;font-weight:800;color:#059669;margin:4px 0;}';
         html += '.kpi-sub{font-size:8px;color:#94a3b8;}';
         html += '.narrative{background:#f8fafc;border-left:3px solid #059669;padding:10px 14px;margin:12px 0;font-size:10px;color:#475569;line-height:1.6;}';
         html += '.method{font-size:9px;color:#94a3b8;line-height:1.5;margin-top:8px;}';
+        html += '.pro-section{margin-top:20px;padding-top:12px;border-top:1px solid #d1d5db;}';
+        html += '.pro-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;}';
         html += '@media print{body{padding:20px;}}';
         html += '</style></head><body>';
 
-        html += '<h1>Data Center Career Salary Estimate</h1>';
+        // Header with branding
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+        html += '<div>';
+        html += '<h1 style="margin:0;border:none;padding:0;">DC Career Salary &amp; Workforce Analysis</h1>';
         html += '<div class="subtitle">Generated ' + now + ' | resistancezero.com</div>';
+        html += '</div>';
+        html += '<div style="text-align:right;">';
+        html += '<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#059669" stroke-width="3"/><text x="20" y="25" text-anchor="middle" fill="#059669" font-size="12" font-weight="bold">RZ</text></svg>';
+        html += '</div></div>';
+        html += '<hr style="border:none;border-top:3px solid #059669;margin:0 0 16px;">';
 
         html += '<h2>Input Parameters</h2>';
         html += '<div class="params">';
@@ -1437,20 +2266,54 @@
         html += '<div class="param"><span class="param-label">Liquid Cooling</span><span class="param-value">' + r.liquid.charAt(0).toUpperCase() + r.liquid.slice(1) + '</span></div>';
         html += '<div class="param"><span class="param-label">Shift</span><span class="param-value">' + r.shift.charAt(0).toUpperCase() + r.shift.slice(1) + '</span></div>';
         html += '<div class="param"><span class="param-label">Industry</span><span class="param-value">' + r.industry.charAt(0).toUpperCase() + r.industry.slice(1) + '</span></div>';
-        html += '<div class="param"><span class="param-label">Education</span><span class="param-value">' + document.getElementById('dcjEducation').options[document.getElementById('dcjEducation').selectedIndex].text + '</span></div>';
+        html += '<div class="param"><span class="param-label">Education</span><span class="param-value">' + el('dcjEducation').options[el('dcjEducation').selectedIndex].text + '</span></div>';
         html += '</div>';
 
         html += '<h2>Results</h2>';
         html += '<div class="kpis">';
         html += '<div class="kpi"><div class="kpi-label">Annual Salary</div><div class="kpi-val">' + fmt(r.salary) + '</div><div class="kpi-sub">Before taxes</div></div>';
         html += '<div class="kpi"><div class="kpi-label">Monthly Take-Home</div><div class="kpi-val">' + fmt(r.monthly) + '</div><div class="kpi-sub">After ~25% tax</div></div>';
-        html += '<div class="kpi"><div class="kpi-label">5-Year Earnings</div><div class="kpi-val">' + fmt(r.fiveYear) + '</div><div class="kpi-sub">With 3% annual raise</div></div>';
-        html += '<div class="kpi"><div class="kpi-label">vs National Median</div><div class="kpi-val">' + fmtPct(r.vsMedian) + '</div><div class="kpi-sub">Compared to $59K</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">5-Year Cumulative</div><div class="kpi-val">' + fmt(r.fiveYear) + '</div><div class="kpi-sub">With 3% annual raise</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">vs National Median</div><div class="kpi-val">' + fmtPctInt(r.vsMedian) + '</div><div class="kpi-sub">Compared to $59K</div></div>';
         html += '<div class="kpi"><div class="kpi-label">Growth Potential</div><div class="kpi-val">' + (r.exp !== 'lead' ? fmt(r.growthSalary) : 'At Peak') + '</div><div class="kpi-sub">Next level salary</div></div>';
         html += '<div class="kpi"><div class="kpi-label">Cert ROI</div><div class="kpi-val">' + fmt(CERT_BONUS) + '</div><div class="kpi-sub">Per certification</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Cost per MW</div><div class="kpi-val">' + fmt(r.costPerMW) + '</div><div class="kpi-sub">Staffing cost</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Market Score</div><div class="kpi-val">' + r.marketScore + '/100</div><div class="kpi-sub">Competitiveness</div></div>';
         html += '</div>';
 
-        html += '<div class="narrative">' + document.getElementById('dcjNarrative').innerText + '</div>';
+        html += '<div class="narrative">' + el('dcjNarrative').innerText + '</div>';
+
+        // Pro data if unlocked
+        if (proUnlocked) {
+            html += '<div class="pro-section">';
+            html += '<h2>Pro Analysis: Monte Carlo Distribution</h2>';
+            html += '<div class="pro-kpis">';
+            html += '<div class="kpi"><div class="kpi-label">P5 Pessimistic</div><div class="kpi-val">' + el('dcjMcP5').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">P50 Median</div><div class="kpi-val">' + el('dcjMcP50').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">P95 Optimistic</div><div class="kpi-val">' + el('dcjMcP95').textContent + '</div></div>';
+            html += '</div>';
+
+            html += '<h2>Pro Analysis: Career Progression Milestones</h2>';
+            html += '<div class="pro-kpis">';
+            html += '<div class="kpi"><div class="kpi-label">Crosses $100K</div><div class="kpi-val">' + el('dcjCross100').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">Crosses $150K</div><div class="kpi-val">' + el('dcjCross150').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">Crosses $200K</div><div class="kpi-val">' + el('dcjCross200').textContent + '</div></div>';
+            html += '</div>';
+
+            html += '<h2>Pro Analysis: Workforce Planning</h2>';
+            html += '<div class="pro-kpis">';
+            html += '<div class="kpi"><div class="kpi-label">Annual Team Cost</div><div class="kpi-val">' + el('dcjTeamCost').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">Training ROI</div><div class="kpi-val">' + el('dcjTrainingROI').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">Turnover Cost</div><div class="kpi-val">' + el('dcjTurnoverCost').textContent + '</div></div>';
+            html += '</div>';
+            html += '<div class="pro-kpis">';
+            html += '<div class="kpi"><div class="kpi-label">Break-Even</div><div class="kpi-val">' + el('dcjBreakEven').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">Annual Turnover Loss</div><div class="kpi-val">' + el('dcjAnnualTurnover').textContent + '</div></div>';
+            html += '<div class="kpi"><div class="kpi-label">Overtime Cost</div><div class="kpi-val">' + el('dcjOTCost').textContent + '</div></div>';
+            html += '</div>';
+            html += '<div class="narrative">' + el('dcjWorkforceNarrative').innerText + '</div>';
+            html += '</div>';
+        }
 
         html += '<h2>Methodology</h2>';
         html += '<div class="method">';
@@ -1458,6 +2321,8 @@
         html += '<strong>Multipliers:</strong> Location (0.85-1.15), Liquid Cooling (1.0-1.12), Shift (1.0-1.15), Industry (0.95-1.10), Education (1.0-1.08).<br>';
         html += '<strong>Certifications:</strong> +$3,000 per certification based on industry survey data.<br>';
         html += '<strong>5-Year Projection:</strong> Assumes 3% annual salary growth (US average for technical roles).<br>';
+        html += '<strong>Monte Carlo:</strong> 10,000 iterations with Box-Muller normal distribution, &plusmn;15% variance on base salary and all multipliers.<br>';
+        html += '<strong>Turnover Cost:</strong> 50% of annual salary per replacement (SHRM benchmark).<br>';
         html += '<strong>Tax Estimate:</strong> 25% effective rate (federal + state average). Actual varies by state and filing status.<br>';
         html += '<strong>Limitations:</strong> Estimates based on aggregated public data. Actual compensation varies by employer, benefits, and negotiation.</div>';
 
@@ -1471,17 +2336,17 @@
         setTimeout(function() { w.print(); }, 600);
     }
 
-    // Expose to global scope
+    // ── Expose to global scope ──
     window.dcjCalculate = calculate;
     window.dcjReset = reset;
     window.dcjExportPDF = exportPDF;
+    window.dcjSetMode = setMode;
 
-    // Auto-calculate on load
+    // ── Auto-calculate on load and input change ──
     document.addEventListener('DOMContentLoaded', function() {
         calculate();
-        // Auto-calculate on input change with debounce
         var debounceTimer;
-        var inputs = document.querySelectorAll('#dcjRole, #dcjExperience, #dcjLocation, #dcjCerts, #dcjLiquid, #dcjShift, #dcjIndustry, #dcjEducation');
+        var inputs = document.querySelectorAll('#dcjRole, #dcjExperience, #dcjLocation, #dcjCerts, #dcjLiquid, #dcjShift, #dcjIndustry, #dcjEducation, #dcjTeamSize, #dcjTrainingBudget, #dcjRetention, #dcjOvertime');
         inputs.forEach(function(input) {
             input.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
