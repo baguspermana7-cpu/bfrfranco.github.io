@@ -454,44 +454,64 @@
         .pjm-calculator .calc-subtitle {
             color: #6b7280; font-size: 0.9rem; margin-bottom: 1.5rem;
         }
-        .pjm-calc-grid {
-            display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem;
+        .pjm-toolbar-row {
+            display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
         }
-        .pjm-input-panel { display: flex; flex-direction: column; gap: 0.75rem; }
+        .pjm-mode-bar {
+            display: flex; gap: 0; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
+        }
+        .pjm-mode-btn {
+            padding: 0.5rem 1.25rem; border: none; background: white; color: #6b7280;
+            font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .pjm-mode-btn.active { background: linear-gradient(135deg, #b91c1c, #991b1b); color: white; }
+        .pjm-mode-btn:not(.active):hover { background: #fef2f2; color: #b91c1c; }
+        .pjm-toolbar-actions { display: flex; gap: 0.5rem; }
+        .pjm-toolbar-btn {
+            padding: 0.45rem 0.85rem; background: white; border: 1px solid #d1d5db;
+            border-radius: 6px; font-size: 0.78rem; color: #475569; cursor: pointer;
+            font-weight: 500; transition: all 0.2s;
+        }
+        .pjm-toolbar-btn:hover { background: #fef2f2; border-color: #b91c1c; color: #b91c1c; }
+        .pjm-privacy-badge {
+            margin-left: auto; font-size: 0.72rem; color: #6b7280;
+            display: flex; align-items: center; gap: 0.35rem;
+        }
+        .pjm-input-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;
+        }
         .pjm-input-group { display: flex; flex-direction: column; gap: 0.25rem; }
         .pjm-input-group label {
-            font-size: 0.8rem; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.25rem;
+            font-size: 0.78rem; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.25rem;
         }
         .pjm-input-group input,
         .pjm-input-group select {
             padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;
             font-size: 0.9rem; background: white; color: #1f2937;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s; width: 100%; box-sizing: border-box;
         }
         .pjm-input-group input:focus,
         .pjm-input-group select:focus { border-color: #b91c1c; outline: none; box-shadow: 0 0 0 2px rgba(185,28,28,0.1); }
-        .pjm-tip {
+        .pjm-tooltip-trigger {
             display: inline-flex; align-items: center; justify-content: center;
             width: 16px; height: 16px; border-radius: 50%;
             background: #e5e7eb; color: #6b7280; font-size: 0.65rem;
-            cursor: help; font-weight: 700;
+            cursor: help; font-weight: 700; position: relative;
         }
-        .pjm-calc-btn {
-            padding: 0.75rem; background: linear-gradient(135deg, #b91c1c, #991b1b);
-            color: white; border: none; border-radius: 8px; font-weight: 600;
-            cursor: pointer; font-size: 0.9rem; transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 0.5rem;
+        .pjm-tooltip-content {
+            display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%); width: 240px; padding: 0.75rem;
+            background: #1e293b; color: #e2e8f0; border-radius: 8px;
+            font-size: 0.75rem; line-height: 1.5; z-index: 50;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
-        .pjm-calc-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(185,28,28,0.3); }
-        .pjm-reset-btn {
-            padding: 0.5rem; background: transparent; color: #6b7280;
-            border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer;
-            font-size: 0.8rem; transition: background 0.2s;
-        }
-        .pjm-reset-btn:hover { background: #f3f4f6; }
-        .pjm-results-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .pjm-tooltip-trigger:hover .pjm-tooltip-content,
+        .pjm-tooltip-trigger:focus .pjm-tooltip-content { display: block; }
+        .pjm-tooltip-title { font-weight: 700; margin-bottom: 0.25rem; color: #fca5a5; }
+        .pjm-tooltip-desc { color: #cbd5e1; }
+        .pjm-tooltip-formula { margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8; }
         .pjm-kpi-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;
         }
         .pjm-kpi-card {
             background: white; border: 1px solid #e5e7eb; border-radius: 8px;
@@ -506,11 +526,6 @@
             font-size: 1.3rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
         }
         .pjm-kpi-unit { font-size: 0.7rem; color: #9ca3af; }
-        .pjm-narrative {
-            background: white; border: 1px solid #e5e7eb; border-radius: 8px;
-            padding: 1rem; font-size: 0.9rem; line-height: 1.6; color: #374151;
-        }
-        .pjm-narrative strong { color: #b91c1c; }
         .pjm-risk-badge {
             display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px;
             font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
@@ -519,27 +534,153 @@
         .pjm-risk-medium { background: #fef3c7; color: #92400e; }
         .pjm-risk-high { background: #fed7aa; color: #9a3412; }
         .pjm-risk-critical { background: #fecaca; color: #991b1b; }
+
+        /* Pro Inputs */
+        .pjm-pro-inputs {
+            display: none; margin-bottom: 1.5rem;
+            border: 1px solid rgba(185,28,28,0.15); border-radius: 10px;
+            padding: 1rem; background: rgba(185,28,28,0.03);
+        }
+        .pjm-pro-inputs.active { display: block; }
+        .pjm-pro-inputs h4 {
+            margin: 0 0 0.75rem 0; font-size: 0.85rem; color: #b91c1c; font-weight: 700;
+        }
+        .pjm-pro-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;
+        }
+        .pjm-pro-input-group label {
+            font-size: 0.78rem; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.25rem;
+        }
+        .pjm-pro-input-group input {
+            padding: 0.5rem 0.75rem; border: 1px solid rgba(185,28,28,0.25); border-radius: 6px;
+            font-size: 0.9rem; background: white; color: #1f2937;
+            transition: border-color 0.2s; width: 100%; box-sizing: border-box;
+        }
+        .pjm-pro-input-group input:focus { border-color: #b91c1c; outline: none; box-shadow: 0 0 0 2px rgba(185,28,28,0.1); }
+
+        /* Pro Panels */
+        .pjm-pro-panels {
+            display: none; flex-direction: column; gap: 1.25rem; margin-top: 1.5rem;
+        }
+        .pjm-pro-panels.active { display: flex; }
+        .pjm-pro-panel {
+            position: relative; background: white; border: 1px solid #e5e7eb;
+            border-radius: 12px; overflow: hidden;
+        }
+        .pjm-pro-panel-inner {
+            padding: 1.25rem;
+        }
+        .pjm-pro-panel-inner.gated {
+            filter: blur(3px); pointer-events: none; user-select: none;
+        }
+        .pjm-pro-panel-inner h4 {
+            margin: 0 0 0.75rem 0; font-size: 0.95rem; color: #1e293b;
+        }
+        .pjm-chart-container { position: relative; width: 100%; margin-bottom: 0.75rem; }
+        .pjm-gate-overlay {
+            display: none; position: absolute; inset: 0; border-radius: 12px;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(2px);
+            flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.5rem; cursor: pointer; z-index: 5;
+        }
+        .pjm-gate-overlay i { font-size: 1.55rem; color: #b91c1c; }
+        .pjm-gate-overlay span { font-size: 0.78rem; font-weight: 700; color: #475569; }
+
+        /* Login Overlay */
+        .pjm-login-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(2,6,23,0.7); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .pjm-login-overlay.active { display: flex; }
+        .pjm-login-box {
+            position: relative; width: min(92vw, 400px);
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(185,28,28,0.3); border-radius: 16px; padding: 2rem;
+            box-shadow: 0 24px 64px rgba(2,6,23,0.55);
+        }
+        .pjm-login-box h3 { margin: 0 0 0.5rem 0; color: #f8fafc; }
+        .pjm-login-box p { margin: 0 0 1rem 0; color: #94a3b8; font-size: 0.82rem; }
+        .pjm-login-box input {
+            display: block; width: 100%; padding: 0.65rem 0.85rem; margin-bottom: 0.65rem;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(148,163,184,0.2);
+            border-radius: 8px; color: #f1f5f9; font-size: 0.88rem; box-sizing: border-box;
+        }
+        .pjm-login-box input:focus { border-color: #b91c1c; outline: none; }
+        .pjm-login-submit {
+            width: 100%; padding: 0.7rem; border: none; border-radius: 8px;
+            background: linear-gradient(135deg, #b91c1c, #991b1b); color: white;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 0.25rem;
+        }
+        .pjm-login-close {
+            position: absolute; top: 0.75rem; right: 0.75rem; background: none;
+            border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;
+        }
+        .pjm-login-error {
+            color: #f87171; font-size: 0.78rem; margin-top: 0.5rem; display: none;
+        }
+
+        /* Roadmap */
+        .pjm-roadmap-tier { margin-bottom: 1rem; padding: 0.75rem; border-radius: 8px; }
+        .pjm-tier-critical { background: #fef2f2; border-left: 4px solid #dc2626; }
+        .pjm-tier-warning { background: #fffbeb; border-left: 4px solid #d97706; }
+        .pjm-tier-stable { background: #f0fdf4; border-left: 4px solid #16a34a; }
+        .pjm-priority-badge {
+            display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-right: 0.35rem;
+        }
+        .pjm-p1 { background: #fecaca; color: #991b1b; }
+        .pjm-p2 { background: #fed7aa; color: #9a3412; }
+        .pjm-p3 { background: #fef3c7; color: #92400e; }
+        .pjm-roadmap-timeline {
+            display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;
+        }
+        .pjm-timeline-step {
+            display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.82rem; line-height: 1.6;
+        }
+        .pjm-timeline-dot {
+            min-width: 10px; height: 10px; border-radius: 50%; margin-top: 6px;
+        }
+
         .pjm-disclaimer {
             font-size: 0.75rem; color: #6b7280; margin-top: 1rem;
             padding: 0.75rem; background: rgba(0,0,0,0.02); border-radius: 6px;
             line-height: 1.5;
         }
+
+        /* Dark mode */
         [data-theme="dark"] .pjm-calculator { background: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%); border-color: rgba(239,68,68,0.3); }
         [data-theme="dark"] .pjm-calculator h3 { color: #fca5a5; }
         [data-theme="dark"] .pjm-calculator .calc-subtitle { color: #9ca3af; }
-        [data-theme="dark"] .pjm-input-group label { color: #d1d5db; }
+        [data-theme="dark"] .pjm-input-group label,
+        [data-theme="dark"] .pjm-pro-input-group label { color: #d1d5db; }
         [data-theme="dark"] .pjm-input-group input,
-        [data-theme="dark"] .pjm-input-group select { background: #1e293b; border-color: #374151; color: #e5e7eb; }
+        [data-theme="dark"] .pjm-input-group select,
+        [data-theme="dark"] .pjm-pro-input-group input { background: #1e293b; border-color: #374151; color: #e5e7eb; }
         [data-theme="dark"] .pjm-kpi-card { background: #1e293b; border-color: #374151; }
         [data-theme="dark"] .pjm-kpi-label { color: #9ca3af; }
-        [data-theme="dark"] .pjm-narrative { background: #1e293b; border-color: #374151; color: #d1d5db; }
+        [data-theme="dark"] .pjm-mode-btn { background: #1e293b; color: #94a3b8; border-color: #374151; }
+        [data-theme="dark"] .pjm-mode-btn.active { background: linear-gradient(135deg, #b91c1c, #991b1b); color: white; }
+        [data-theme="dark"] .pjm-toolbar-btn { background: #1e293b; border-color: #374151; color: #94a3b8; }
+        [data-theme="dark"] .pjm-pro-inputs { background: rgba(185,28,28,0.06); border-color: rgba(185,28,28,0.2); }
+        [data-theme="dark"] .pjm-pro-panel { background: #1e293b; border-color: #374151; }
+        [data-theme="dark"] .pjm-pro-panel-inner h4 { color: #e2e8f0; }
+        [data-theme="dark"] .pjm-gate-overlay { background: rgba(15,23,42,0.88); }
+        [data-theme="dark"] .pjm-gate-overlay span { color: #e2e8f0; }
         [data-theme="dark"] .pjm-disclaimer { background: rgba(255,255,255,0.03); color: #9ca3af; }
-        [data-theme="dark"] .pjm-tip { background: #374151; color: #9ca3af; }
+        [data-theme="dark"] .pjm-tooltip-trigger { background: #374151; color: #9ca3af; }
+        [data-theme="dark"] .pjm-roadmap-tier { background: rgba(30,41,59,0.5); }
+        [data-theme="dark"] .pjm-tier-critical { border-left-color: #f87171; }
+        [data-theme="dark"] .pjm-tier-warning { border-left-color: #fbbf24; }
+        [data-theme="dark"] .pjm-tier-stable { border-left-color: #4ade80; }
         @media (max-width: 768px) {
-            .pjm-calc-grid { grid-template-columns: 1fr; }
+            .pjm-input-grid, .pjm-pro-grid { grid-template-columns: repeat(2, 1fr); }
             .pjm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .pjm-toolbar-row { flex-direction: column; align-items: stretch; }
+            .pjm-privacy-badge { margin-left: 0; }
         }
         @media (max-width: 480px) {
+            .pjm-input-grid, .pjm-pro-grid { grid-template-columns: 1fr; }
             .pjm-kpi-grid { grid-template-columns: 1fr; }
             .pjm-calculator { padding: 1rem; }
         }
@@ -1117,97 +1258,208 @@
 
     <p>To quantify the risks discussed throughout this analysis, I built an interactive tool below. Input your assumptions about grid capacity, demand growth, and retirements, and the analyzer will calculate reserve margins, capacity surplus or deficit, blackout risk levels, and estimated residential rate impacts. The defaults reflect PJM's actual parameters based on publicly available data.</p>
 
-    <div class="pjm-calculator" id="pjmCalc">
+    <div class="calculator-section pjm-calculator" id="pjmCalc">
         <h3><i class="fas fa-chart-bar"></i> Grid Reliability &amp; DC Power Impact Analyzer</h3>
-        <p class="calc-subtitle">Model how data center load growth affects grid reliability margins and consumer costs.</p>
+        <p class="calc-subtitle">Model how data center load growth affects grid reliability margins, capacity auction prices, and consumer costs. Free mode calculates 8 KPIs. Pro mode adds Monte Carlo simulation, 10-year projection, sensitivity analysis, and strategic roadmap.</p>
 
-        <div class="pjm-calc-grid">
-            <!-- Input Panel -->
-            <div class="pjm-input-panel">
-                <div class="pjm-input-group">
-                    <label>Grid Total Capacity (GW) <span class="pjm-tip" title="Total installed generation capacity of the grid">?</span></label>
-                    <input type="number" id="pjmCapacity" value="180" min="50" max="500" step="1">
+        <div class="pjm-toolbar-row">
+            <div class="pjm-mode-bar">
+                <button class="pjm-mode-btn active" id="pjmFreeBtn" type="button"><i class="fas fa-chart-bar"></i> Free Analysis</button>
+                <button class="pjm-mode-btn" id="pjmProBtn" type="button"><i class="fas fa-lock"></i> Pro Analysis</button>
+            </div>
+            <div class="pjm-toolbar-actions">
+                <button class="pjm-toolbar-btn" type="button" id="pjmBtnReset"><i class="fas fa-rotate-left"></i> Reset Defaults</button>
+                <button class="pjm-toolbar-btn" type="button" id="pjmBtnPdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
+            <div class="pjm-privacy-badge"><i class="fas fa-shield-halved"></i> All calculations run locally</div>
+        </div>
+
+        <!-- Free Inputs (8) -->
+        <div class="pjm-input-grid">
+            <div class="pjm-input-group">
+                <label for="pjmCapacity">Grid Total Capacity (GW)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Grid Total Capacity</div><div class="pjm-tooltip-desc">Total nameplate generation capacity of the interconnection.</div><div class="pjm-tooltip-formula">PJM ~180 GW, ERCOT ~100 GW</div></span></span>
+                </label>
+                <input type="number" id="pjmCapacity" value="180" min="50" max="500" step="1">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmPeakDemand">Current Peak Demand (GW)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Current Peak Demand</div><div class="pjm-tooltip-desc">Historical peak system demand. PJM's all-time record is ~165 GW.</div></span></span>
+                </label>
+                <input type="number" id="pjmPeakDemand" value="150" min="30" max="400" step="1">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmRetirements">Planned Retirements (GW)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Planned Retirements</div><div class="pjm-tooltip-desc">Thermal plants scheduled for deactivation. PJM has ~40 GW queued for retirement through 2030.</div></span></span>
+                </label>
+                <input type="number" id="pjmRetirements" value="40" min="0" max="100" step="1">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmNewGen">New Generation Pipeline (GW)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">New Generation Pipeline</div><div class="pjm-tooltip-desc">Approved new generation with financing. Subject to interconnection queue completion rates.</div></span></span>
+                </label>
+                <input type="number" id="pjmNewGen" value="15" min="0" max="100" step="1">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmDCGrowth">DC Load Growth (GW)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Data Center Load Growth</div><div class="pjm-tooltip-desc">Incremental data center demand. PJM expects 7-15 GW of new DC load by 2030.</div></span></span>
+                </label>
+                <input type="number" id="pjmDCGrowth" value="10" min="0" max="50" step="0.5">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmOtherGrowth">Other Load Growth (GW)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Other Load Growth</div><div class="pjm-tooltip-desc">EVs, electrification, industrial reshoring. McKinsey estimates 3-8 GW for PJM territory.</div></span></span>
+                </label>
+                <input type="number" id="pjmOtherGrowth" value="5" min="0" max="30" step="0.5">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmReserveTarget">Target Reserve Margin (%)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Target Reserve Margin</div><div class="pjm-tooltip-desc">NERC-recommended minimum 14.7%. Most ISOs target 15-17%.</div><div class="pjm-tooltip-formula">Reserve = (Capacity - Demand) / Demand</div></span></span>
+                </label>
+                <input type="number" id="pjmReserveTarget" value="15" min="5" max="25" step="0.5">
+            </div>
+            <div class="pjm-input-group">
+                <label for="pjmELCC">Renewable ELCC Factor (%)
+                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Effective Load Carrying Capability</div><div class="pjm-tooltip-desc">ELCC of renewables &mdash; 1 GW solar &asymp; 0.15-0.30 GW reliable capacity. PJM uses ~25% for wind+solar combined.</div><div class="pjm-tooltip-formula">Effective New = Dispatchable + (Renewable &times; ELCC)</div></span></span>
+                </label>
+                <input type="number" id="pjmELCC" value="25" min="5" max="80" step="1">
+            </div>
+        </div>
+
+        <!-- Free KPI Cards (8) -->
+        <div class="pjm-kpi-grid">
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Net Available Capacity</div>
+                <div class="pjm-kpi-value" id="pjmKpiCapacity" style="color:#b91c1c;">--</div>
+                <div class="pjm-kpi-unit">GW</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Projected Peak Demand</div>
+                <div class="pjm-kpi-value" id="pjmKpiDemand" style="color:#0891b2;">--</div>
+                <div class="pjm-kpi-unit">GW</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Actual Reserve Margin</div>
+                <div class="pjm-kpi-value" id="pjmKpiReserve" style="color:#059669;">--</div>
+                <div class="pjm-kpi-unit">%</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Capacity Surplus/Deficit</div>
+                <div class="pjm-kpi-value" id="pjmKpiSurplus" style="color:#7c3aed;">--</div>
+                <div class="pjm-kpi-unit">GW</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Blackout Risk Score</div>
+                <div class="pjm-kpi-value" id="pjmKpiRisk">--</div>
+                <div class="pjm-kpi-unit">/100</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">DC Share of Total Load</div>
+                <div class="pjm-kpi-value" id="pjmKpiDCShare" style="color:#7c3aed;">--</div>
+                <div class="pjm-kpi-unit">%</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Capacity Auction Price</div>
+                <div class="pjm-kpi-value" id="pjmKpiAuction" style="color:#d97706;">--</div>
+                <div class="pjm-kpi-unit">$/MW-day</div>
+            </div>
+            <div class="pjm-kpi-card">
+                <div class="pjm-kpi-label">Annual Consumer Cost Impact</div>
+                <div class="pjm-kpi-value" id="pjmKpiCost" style="color:#dc2626;">--</div>
+                <div class="pjm-kpi-unit">$B</div>
+            </div>
+        </div>
+
+        <!-- Pro Inputs (4) -->
+        <div class="pjm-pro-inputs" id="pjmProInputs">
+            <h4><i class="fas fa-flask"></i> Advanced Parameters</h4>
+            <div class="pjm-pro-grid">
+                <div class="pjm-input-group pjm-pro-input-group">
+                    <label for="pjmForcedOutage">Forced Outage Rate (%)
+                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Forced Outage Rate</div><div class="pjm-tooltip-desc">% of capacity unavailable due to unplanned outages. Winter Storm Elliott saw 25%+. Normal: 5-10%.</div><div class="pjm-tooltip-formula">Available = Net &times; (1 - FOR/100)</div></span></span>
+                    </label>
+                    <input type="number" id="pjmForcedOutage" value="8" min="0" max="25" step="0.5">
                 </div>
-                <div class="pjm-input-group">
-                    <label>Current Peak Demand (GW) <span class="pjm-tip" title="Current highest demand point on the grid">?</span></label>
-                    <input type="number" id="pjmPeakDemand" value="150" min="30" max="400" step="1">
+                <div class="pjm-input-group pjm-pro-input-group">
+                    <label for="pjmDR">Demand Response Available (GW)
+                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Demand Response</div><div class="pjm-tooltip-desc">Curtailable load from DR programs. PJM has ~8 GW of registered DR capacity.</div></span></span>
+                    </label>
+                    <input type="number" id="pjmDR" value="8" min="0" max="30" step="0.5">
                 </div>
-                <div class="pjm-input-group">
-                    <label>Planned Retirements (GW) <span class="pjm-tip" title="Generation capacity scheduled to retire">?</span></label>
-                    <input type="number" id="pjmRetirements" value="40" min="0" max="100" step="1">
+                <div class="pjm-input-group pjm-pro-input-group">
+                    <label for="pjmBattery">Battery Storage (GW)
+                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Battery Storage Deployed</div><div class="pjm-tooltip-desc">Grid-scale battery storage (4-hour equivalent). Currently ~3 GW in PJM, expected to grow rapidly.</div></span></span>
+                    </label>
+                    <input type="number" id="pjmBattery" value="3" min="0" max="50" step="0.5">
                 </div>
-                <div class="pjm-input-group">
-                    <label>New Generation Coming Online (GW) <span class="pjm-tip" title="New generation capacity under construction or approved">?</span></label>
-                    <input type="number" id="pjmNewGen" value="15" min="0" max="100" step="1">
+                <div class="pjm-input-group pjm-pro-input-group">
+                    <label for="pjmQueueRate">Queue Completion Rate (%)
+                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Interconnection Queue Completion</div><div class="pjm-tooltip-desc">% of queued projects that actually get built. PJM historical: &lt;5%. LBNL data confirms most projects drop out.</div></span></span>
+                    </label>
+                    <input type="number" id="pjmQueueRate" value="5" min="1" max="50" step="1">
                 </div>
-                <div class="pjm-input-group">
-                    <label>DC Load Growth (GW) <span class="pjm-tip" title="Additional data center demand expected">?</span></label>
-                    <input type="number" id="pjmDCGrowth" value="10" min="0" max="50" step="0.5">
+            </div>
+        </div>
+
+        <!-- Pro Panels (4) -->
+        <div class="pjm-pro-panels" id="pjmProPanels">
+            <!-- Panel 1: Monte Carlo -->
+            <div class="pjm-pro-panel">
+                <div class="pjm-pro-panel-inner" id="pjmPanel1Inner">
+                    <h4><i class="fas fa-dice"></i> Monte Carlo Reserve Margin Distribution (10,000 Iterations)</h4>
+                    <div class="pjm-chart-container"><canvas id="pjmMonteCarloChart" height="260"></canvas></div>
+                    <div id="pjmMonteCarloKPIs" style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.82rem;color:#475569;"></div>
+                    <p style="margin:0.5rem 0 0;color:#475569;font-size:0.78rem;line-height:1.6;">10,000 simulations varying capacity (&plusmn;10%), retirements (&plusmn;20%), DC growth (&plusmn;25%), forced outage (&plusmn;50%), and ELCC (&plusmn;30%) using Box-Muller normal distribution.</p>
                 </div>
-                <div class="pjm-input-group">
-                    <label>Other Load Growth (GW) <span class="pjm-tip" title="Non-DC demand growth (EVs, electrification, industrial)">?</span></label>
-                    <input type="number" id="pjmOtherGrowth" value="5" min="0" max="30" step="0.5">
-                </div>
-                <div class="pjm-input-group">
-                    <label>Target Reserve Margin (%) <span class="pjm-tip" title="Minimum reserve margin needed for grid reliability">?</span></label>
-                    <input type="number" id="pjmReserveTarget" value="15" min="5" max="25" step="0.5">
-                </div>
-                <div class="pjm-input-group">
-                    <label>Analysis Year <span class="pjm-tip" title="Target year for the projection">?</span></label>
-                    <select id="pjmYear">
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028" selected>2028</option>
-                        <option value="2029">2029</option>
-                        <option value="2030">2030</option>
-                    </select>
-                </div>
-                <button class="pjm-calc-btn" onclick="pjmCalculate()"><i class="fas fa-bolt"></i> Analyze Grid Impact</button>
-                <button class="pjm-reset-btn" onclick="pjmReset()">Reset to Defaults</button>
+                <div class="pjm-gate-overlay" data-gate="1"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
             </div>
 
-            <!-- Results Panel -->
-            <div class="pjm-results-panel">
-                <div class="pjm-kpi-grid">
-                    <div class="pjm-kpi-card">
-                        <div class="pjm-kpi-label">Net Available Capacity</div>
-                        <div class="pjm-kpi-value" id="pjmKpiCapacity" style="color:#b91c1c;">--</div>
-                        <div class="pjm-kpi-unit">GW</div>
-                    </div>
-                    <div class="pjm-kpi-card">
-                        <div class="pjm-kpi-label">Projected Peak Demand</div>
-                        <div class="pjm-kpi-value" id="pjmKpiDemand" style="color:#0891b2;">--</div>
-                        <div class="pjm-kpi-unit">GW</div>
-                    </div>
-                    <div class="pjm-kpi-card">
-                        <div class="pjm-kpi-label">Reserve Margin</div>
-                        <div class="pjm-kpi-value" id="pjmKpiReserve" style="color:#059669;">--</div>
-                        <div class="pjm-kpi-unit">%</div>
-                    </div>
-                    <div class="pjm-kpi-card">
-                        <div class="pjm-kpi-label">Capacity Surplus/Deficit</div>
-                        <div class="pjm-kpi-value" id="pjmKpiSurplus" style="color:#7c3aed;">--</div>
-                        <div class="pjm-kpi-unit">GW</div>
-                    </div>
-                    <div class="pjm-kpi-card">
-                        <div class="pjm-kpi-label">Blackout Risk Level</div>
-                        <div class="pjm-kpi-value" id="pjmKpiRisk">--</div>
-                    </div>
-                    <div class="pjm-kpi-card">
-                        <div class="pjm-kpi-label">Est. Rate Impact</div>
-                        <div class="pjm-kpi-value" id="pjmKpiRate" style="color:#d97706;">--</div>
-                        <div class="pjm-kpi-unit">$/month</div>
-                    </div>
+            <!-- Panel 2: 10-Year Projection -->
+            <div class="pjm-pro-panel">
+                <div class="pjm-pro-panel-inner" id="pjmPanel2Inner">
+                    <h4><i class="fas fa-chart-line"></i> 10-Year Grid Capacity Projection (2026&ndash;2035)</h4>
+                    <div class="pjm-chart-container"><canvas id="pjmProjectionChart" height="260"></canvas></div>
+                    <div id="pjmProjectionKPIs" style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.82rem;color:#475569;"></div>
+                    <p style="margin:0.5rem 0 0;color:#475569;font-size:0.78rem;line-height:1.6;">Year-by-year calculation with retirement schedule, demand compounding, queue completion rate, battery deployment, and demand response growth.</p>
                 </div>
+                <div class="pjm-gate-overlay" data-gate="2"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
+            </div>
 
-                <div class="pjm-narrative" id="pjmNarrative">
-                    <p>Configure your grid parameters and click <strong>Analyze Grid Impact</strong> to model reliability outcomes.</p>
+            <!-- Panel 3: Sensitivity Tornado -->
+            <div class="pjm-pro-panel">
+                <div class="pjm-pro-panel-inner" id="pjmPanel3Inner">
+                    <h4><i class="fas fa-tornado"></i> Sensitivity Tornado &mdash; Reserve Margin Drivers</h4>
+                    <div class="pjm-chart-container"><canvas id="pjmTornadoChart" height="300"></canvas></div>
+                    <p style="margin:0.5rem 0 0;color:#475569;font-size:0.78rem;line-height:1.6;">Tests 7 variables at &plusmn;20% to determine which input has the greatest impact on reserve margin. Prioritize interventions by leverage.</p>
                 </div>
+                <div class="pjm-gate-overlay" data-gate="3"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
+            </div>
+
+            <!-- Panel 4: Strategic Roadmap -->
+            <div class="pjm-pro-panel">
+                <div class="pjm-pro-panel-inner" id="pjmPanel4Inner">
+                    <h4><i class="fas fa-route"></i> Strategic Risk Assessment &amp; Roadmap</h4>
+                    <div id="pjmRoadmap" style="font-size:0.85rem;line-height:1.75;color:#374151;">Generating personalized recommendations based on your inputs and grid conditions...</div>
+                </div>
+                <div class="pjm-gate-overlay" data-gate="4"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
             </div>
         </div>
 
         <div class="pjm-disclaimer">
             <strong>Disclaimer:</strong> This analyzer provides simplified estimates based on publicly available grid data and engineering heuristics. Actual grid reliability depends on generator availability, transmission constraints, weather, fuel supply, demand response, and hundreds of other variables not modeled here. Not intended for regulatory filings or investment decisions &mdash; consult PJM's own reliability assessments and NERC reports for authoritative projections.
+        </div>
+    </div>
+
+    <!-- Login Overlay -->
+    <div class="pjm-login-overlay" id="pjmLoginOverlay">
+        <div class="pjm-login-box">
+            <button class="pjm-login-close" id="pjmLoginClose" type="button">&times;</button>
+            <h3><i class="fas fa-lock"></i> Pro Analysis</h3>
+            <p>Enter your ResistanceZero credentials to unlock Monte Carlo simulation, 10-year projections, sensitivity analysis, and strategic roadmap.</p>
+            <input type="email" id="pjmLoginEmail" placeholder="Email address" autocomplete="email">
+            <input type="password" id="pjmLoginPass" placeholder="Password" autocomplete="current-password">
+            <button class="pjm-login-submit" id="pjmLoginSubmit" type="button">Unlock Pro Analysis</button>
+            <div class="pjm-login-error" id="pjmLoginError">Invalid credentials. Try demo@resistancezero.com / demo2026</div>
         </div>
     </div>
 
@@ -1339,155 +1591,626 @@
 
 <script src="script.min.js?v=2026-03-20"></script>
 
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- Calculator IIFE -->
 <script>
 (function() {
     'use strict';
 
+    /* ── State ── */
+    var state = { mode: 'free', proUnlocked: false };
+
     var defaults = {
-        capacity: 180,
-        peakDemand: 150,
-        retirements: 40,
-        newGen: 15,
-        dcGrowth: 10,
-        otherGrowth: 5,
-        reserveTarget: 15,
-        year: '2028'
+        capacity: 180, peakDemand: 150, retirements: 40, newGen: 15,
+        dcGrowth: 10, otherGrowth: 5, reserveTarget: 15, elcc: 25,
+        forcedOutage: 8, dr: 8, battery: 3, queueRate: 5
     };
 
-    function fN(n, decimals) {
-        if (typeof decimals === 'undefined') decimals = 1;
-        if (Math.abs(n) >= 1000) {
-            return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-        }
-        return n.toFixed(decimals);
-    }
+    var charts = { monteCarlo: null, projection: null, tornado: null };
 
-    function fC(n) {
-        return '$' + Math.round(n).toLocaleString('en-US');
+    /* ── Formatters ── */
+    function fN(n, d) {
+        if (typeof d === 'undefined') d = 1;
+        if (Math.abs(n) >= 1000) return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+        return n.toFixed(d);
     }
+    function fP(n) { return n.toFixed(1) + '%'; }
+    function fD(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+    function fB(n) { return (n >= 0 ? '+' : '') + '$' + Math.abs(n).toFixed(1) + 'B'; }
 
     function getVal(id) {
         var el = document.getElementById(id);
         if (!el) return 0;
-        if (el.tagName === 'SELECT') return el.value;
         return parseFloat(el.value) || 0;
     }
 
-    function getRiskLevel(reserveMargin) {
-        if (reserveMargin >= 15) return { label: 'Low', cls: 'pjm-risk-low' };
-        if (reserveMargin >= 10) return { label: 'Medium', cls: 'pjm-risk-medium' };
-        if (reserveMargin >= 5) return { label: 'High', cls: 'pjm-risk-high' };
-        return { label: 'Critical', cls: 'pjm-risk-critical' };
+    /* ── Auth ── */
+    function hasProAccess() {
+        if (state.proUnlocked) return true;
+        try {
+            var s = localStorage.getItem('pjm_pro_auth');
+            if (s) { state.proUnlocked = true; return true; }
+        } catch(e) {}
+        return false;
     }
 
-    function estimateRateImpact(deficit, year) {
-        var baseRate = 130;
-        var yearOffset = parseInt(year) - 2026;
-        var inflationFactor = Math.pow(1.03, yearOffset);
-        var deficitImpact = 0;
-        if (deficit < 0) {
-            deficitImpact = Math.abs(deficit) * 3.5;
+    window.pjmShowLogin = function() {
+        document.getElementById('pjmLoginOverlay').classList.add('active');
+        document.getElementById('pjmLoginError').style.display = 'none';
+        document.getElementById('pjmLoginEmail').value = '';
+        document.getElementById('pjmLoginPass').value = '';
+        document.getElementById('pjmLoginEmail').focus();
+    };
+
+    document.getElementById('pjmLoginClose').addEventListener('click', function() {
+        document.getElementById('pjmLoginOverlay').classList.remove('active');
+    });
+    document.getElementById('pjmLoginOverlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+    document.getElementById('pjmLoginSubmit').addEventListener('click', function() {
+        var email = document.getElementById('pjmLoginEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('pjmLoginPass').value;
+        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+            state.proUnlocked = true;
+            try { localStorage.setItem('pjm_pro_auth', '1'); } catch(e) {}
+            document.getElementById('pjmLoginOverlay').classList.remove('active');
+            syncUI();
+            window.pjmCalculate();
+        } else {
+            document.getElementById('pjmLoginError').style.display = 'block';
         }
-        var scarcityPremium = 0;
-        if (deficit < -5) {
-            scarcityPremium = (Math.abs(deficit) - 5) * 2.0;
-        }
-        return (baseRate * inflationFactor) + deficitImpact + scarcityPremium;
+    });
+    document.getElementById('pjmLoginPass').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') document.getElementById('pjmLoginSubmit').click();
+    });
+
+    /* ── Core Grid Model ── */
+    function calculateGrid(inp) {
+        var totalCapacity = inp.capacity;
+        var retirements = inp.retirements;
+        var newGen = inp.newGen;
+        var elcc = inp.elcc / 100;
+
+        // Split new gen: 70% renewable (ELCC-derated), 30% dispatchable
+        var renewableShare = 0.70;
+        var dispatchableNew = newGen * (1 - renewableShare);
+        var renewableNew = newGen * renewableShare * elcc;
+        var effectiveNewGen = dispatchableNew + renewableNew;
+
+        var effectiveRetirements = retirements;
+        var netAvailable = totalCapacity - effectiveRetirements + effectiveNewGen;
+
+        // Demand
+        var peakDemand = inp.peakDemand + inp.dcGrowth + inp.otherGrowth;
+
+        // Reserve margin
+        var reserveMargin = ((netAvailable - peakDemand) / peakDemand) * 100;
+
+        // Required capacity
+        var requiredCapacity = peakDemand * (1 + inp.reserveTarget / 100);
+        var surplusDeficit = netAvailable - requiredCapacity;
+
+        // Blackout risk score (0-100)
+        var marginGap = inp.reserveTarget - reserveMargin;
+        var riskFromMargin = Math.min(100, Math.max(0, marginGap * 8));
+        var riskFromDeficit = surplusDeficit < 0 ? Math.min(100, Math.abs(surplusDeficit) * 5) : 0;
+        var riskFromRetirements = Math.min(30, (effectiveRetirements / totalCapacity) * 100);
+        var blackoutRisk = Math.min(100, Math.round(riskFromMargin * 0.5 + riskFromDeficit * 0.3 + riskFromRetirements * 0.2));
+
+        // DC share
+        var dcShare = (inp.dcGrowth / peakDemand) * 100;
+
+        // Capacity auction price (PJM regression)
+        var auctionPrice;
+        if (reserveMargin >= 20) auctionPrice = 28;
+        else if (reserveMargin >= 15) auctionPrice = 28 + (20 - reserveMargin) * 10;
+        else if (reserveMargin >= 10) auctionPrice = 78 + (15 - reserveMargin) * 30;
+        else if (reserveMargin >= 5) auctionPrice = 228 + (10 - reserveMargin) * 50;
+        else auctionPrice = 478 + (5 - reserveMargin) * 100;
+
+        // Annual consumer cost impact ($B)
+        var annualCost = (auctionPrice * netAvailable * 1000 * 365) / 1e9;
+        var baselineCost = (28 * 180 * 1000 * 365) / 1e9;
+        var costImpact = annualCost - baselineCost;
+
+        return {
+            netAvailable: netAvailable, peakDemand: peakDemand,
+            reserveMargin: reserveMargin, surplusDeficit: surplusDeficit,
+            blackoutRisk: blackoutRisk, dcShare: dcShare,
+            auctionPrice: auctionPrice, costImpact: costImpact,
+            annualCost: annualCost, effectiveNewGen: effectiveNewGen,
+            effectiveRetirements: effectiveRetirements
+        };
     }
 
-    window.pjmCalculate = function() {
-        var capacity = getVal('pjmCapacity');
-        var peakDemand = getVal('pjmPeakDemand');
-        var retirements = getVal('pjmRetirements');
-        var newGen = getVal('pjmNewGen');
-        var dcGrowth = getVal('pjmDCGrowth');
-        var otherGrowth = getVal('pjmOtherGrowth');
-        var reserveTarget = getVal('pjmReserveTarget');
-        var year = getVal('pjmYear');
+    /* ── Read Inputs ── */
+    function readInputs() {
+        return {
+            capacity: getVal('pjmCapacity'),
+            peakDemand: getVal('pjmPeakDemand'),
+            retirements: getVal('pjmRetirements'),
+            newGen: getVal('pjmNewGen'),
+            dcGrowth: getVal('pjmDCGrowth'),
+            otherGrowth: getVal('pjmOtherGrowth'),
+            reserveTarget: getVal('pjmReserveTarget'),
+            elcc: getVal('pjmELCC'),
+            forcedOutage: getVal('pjmForcedOutage'),
+            dr: getVal('pjmDR'),
+            battery: getVal('pjmBattery'),
+            queueRate: getVal('pjmQueueRate')
+        };
+    }
 
-        var yearOffset = parseInt(year) - 2026;
-        var scaledRetirements = retirements * Math.min(yearOffset / 4, 1);
-        var scaledNewGen = newGen * Math.min(yearOffset / 4, 1);
-        var scaledDCGrowth = dcGrowth * Math.min(yearOffset / 4, 1);
-        var scaledOtherGrowth = otherGrowth * Math.min(yearOffset / 4, 1);
-
-        var netCapacity = capacity - scaledRetirements + scaledNewGen;
-        var projectedDemand = peakDemand + scaledDCGrowth + scaledOtherGrowth;
-        var reserveMargin = ((netCapacity - projectedDemand) / projectedDemand) * 100;
-        var requiredCapacity = projectedDemand * (1 + reserveTarget / 100);
-        var surplus = netCapacity - requiredCapacity;
-        var risk = getRiskLevel(reserveMargin);
-        var rateImpact = estimateRateImpact(surplus, year);
-
-        document.getElementById('pjmKpiCapacity').textContent = fN(netCapacity);
-        document.getElementById('pjmKpiDemand').textContent = fN(projectedDemand);
+    /* ── Free KPI Update ── */
+    function updateFreeKPIs(r) {
+        document.getElementById('pjmKpiCapacity').textContent = fN(r.netAvailable);
+        document.getElementById('pjmKpiDemand').textContent = fN(r.peakDemand);
 
         var reserveEl = document.getElementById('pjmKpiReserve');
-        reserveEl.textContent = fN(reserveMargin);
-        if (reserveMargin < 5) {
-            reserveEl.style.color = '#dc2626';
-        } else if (reserveMargin < 10) {
-            reserveEl.style.color = '#d97706';
-        } else if (reserveMargin < 15) {
-            reserveEl.style.color = '#ca8a04';
-        } else {
-            reserveEl.style.color = '#059669';
-        }
+        reserveEl.textContent = fP(r.reserveMargin);
+        reserveEl.style.color = r.reserveMargin < 5 ? '#dc2626' : r.reserveMargin < 10 ? '#d97706' : r.reserveMargin < 15 ? '#ca8a04' : '#059669';
 
         var surplusEl = document.getElementById('pjmKpiSurplus');
-        surplusEl.textContent = (surplus >= 0 ? '+' : '') + fN(surplus);
-        surplusEl.style.color = surplus >= 0 ? '#059669' : '#dc2626';
+        surplusEl.textContent = (r.surplusDeficit >= 0 ? '+' : '') + fN(r.surplusDeficit);
+        surplusEl.style.color = r.surplusDeficit >= 0 ? '#059669' : '#dc2626';
 
         var riskEl = document.getElementById('pjmKpiRisk');
-        riskEl.innerHTML = '<span class="pjm-risk-badge ' + risk.cls + '">' + risk.label + '</span>';
+        var riskCls = r.blackoutRisk >= 70 ? 'pjm-risk-critical' : r.blackoutRisk >= 40 ? 'pjm-risk-high' : r.blackoutRisk >= 20 ? 'pjm-risk-medium' : 'pjm-risk-low';
+        riskEl.innerHTML = '<span class="pjm-risk-badge ' + riskCls + '">' + r.blackoutRisk + '</span>';
 
-        document.getElementById('pjmKpiRate').textContent = fC(rateImpact);
+        document.getElementById('pjmKpiDCShare').textContent = fP(r.dcShare);
+        document.getElementById('pjmKpiAuction').textContent = fD(r.auctionPrice);
+        document.getElementById('pjmKpiCost').textContent = fB(r.costImpact);
+    }
 
-        var narrative = '';
-        if (reserveMargin >= 15) {
-            narrative = '<p>By <strong>' + year + '</strong>, the grid maintains a healthy <strong>' + fN(reserveMargin) + '% reserve margin</strong> with ' + fN(netCapacity) + ' GW of available capacity against ' + fN(projectedDemand) + ' GW of projected demand. Grid reliability is adequate under these assumptions, though extreme weather events could still stress the system.</p>';
-        } else if (reserveMargin >= 10) {
-            narrative = '<p>By <strong>' + year + '</strong>, the grid operates with a <strong>' + fN(reserveMargin) + '% reserve margin</strong> &mdash; below the ' + fN(reserveTarget, 0) + '% target. The <strong>' + fN(surplus * -1) + ' GW capacity deficit</strong> relative to target means the grid lacks sufficient buffer for extreme weather or unexpected outages. Residential rates are projected to increase to approximately <strong>' + fC(rateImpact) + '/month</strong> as scarcity pricing signals flow through to consumers.</p>';
-        } else if (reserveMargin >= 5) {
-            narrative = '<p><strong>Warning:</strong> By <strong>' + year + '</strong>, the grid faces a <strong>' + fN(reserveMargin) + '% reserve margin</strong> with a <strong>' + fN(Math.abs(surplus)) + ' GW deficit</strong> below the reliability target. This margin is dangerously thin. A severe winter cold snap or summer heat wave could trigger load shedding (rolling blackouts) across the footprint. Residential electricity costs are projected to rise to <strong>' + fC(rateImpact) + '/month</strong> as capacity scarcity drives auction clearing prices higher.</p>';
-        } else {
-            narrative = '<p><strong>CRITICAL:</strong> By <strong>' + year + '</strong>, the grid faces a <strong>' + fN(reserveMargin) + '% reserve margin</strong> &mdash; well below safe operating thresholds. The <strong>' + fN(Math.abs(surplus)) + ' GW capacity deficit</strong> means rolling blackouts during any significant weather event are virtually certain. At this margin, even normal peak demand periods risk involuntary load shedding. Residential rates could reach <strong>' + fC(rateImpact) + '/month</strong> as the market prices in extreme scarcity risk. This scenario is comparable to conditions that preceded the 2021 Texas grid crisis.</p>';
+    /* ── Box-Muller Normal Distribution ── */
+    function randn() {
+        var u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    }
+
+    /* ── Panel 1: Monte Carlo ── */
+    function runMonteCarlo(inp) {
+        var N = 10000;
+        var margins = [];
+        for (var i = 0; i < N; i++) {
+            var simInp = {
+                capacity: inp.capacity * (1 + randn() * 0.10),
+                peakDemand: inp.peakDemand,
+                retirements: inp.retirements * (1 + randn() * 0.20),
+                newGen: inp.newGen,
+                dcGrowth: inp.dcGrowth * (1 + randn() * 0.25),
+                otherGrowth: inp.otherGrowth,
+                reserveTarget: inp.reserveTarget,
+                elcc: Math.max(5, Math.min(80, inp.elcc * (1 + randn() * 0.30))),
+                forcedOutage: Math.max(0, inp.forcedOutage * (1 + randn() * 0.50))
+            };
+            var r = calculateGrid(simInp);
+            // Apply forced outage
+            var adjAvailable = r.netAvailable * (1 - simInp.forcedOutage / 100);
+            var adjMargin = ((adjAvailable - r.peakDemand) / r.peakDemand) * 100;
+            margins.push(adjMargin);
         }
-        document.getElementById('pjmNarrative').innerHTML = narrative;
+        margins.sort(function(a, b) { return a - b; });
+        var p5 = margins[Math.floor(N * 0.05)];
+        var p50 = margins[Math.floor(N * 0.50)];
+        var p95 = margins[Math.floor(N * 0.95)];
+
+        // Histogram
+        var binMin = Math.floor(Math.min.apply(null, margins.slice(0, 100)));
+        var binMax = Math.ceil(Math.max.apply(null, margins.slice(-100)));
+        var binCount = 40;
+        var binWidth = (binMax - binMin) / binCount;
+        var bins = new Array(binCount).fill(0);
+        var labels = [];
+        for (var b = 0; b < binCount; b++) {
+            var lo = binMin + b * binWidth;
+            labels.push(lo.toFixed(1));
+        }
+        for (var j = 0; j < margins.length; j++) {
+            var idx = Math.min(binCount - 1, Math.max(0, Math.floor((margins[j] - binMin) / binWidth)));
+            bins[idx]++;
+        }
+
+        var colors = bins.map(function(_, k) {
+            var mid = binMin + (k + 0.5) * binWidth;
+            if (mid < 5) return 'rgba(220,38,38,0.7)';
+            if (mid < 15) return 'rgba(245,158,11,0.7)';
+            return 'rgba(22,163,74,0.7)';
+        });
+
+        var ctx = document.getElementById('pjmMonteCarloChart').getContext('2d');
+        if (charts.monteCarlo) charts.monteCarlo.destroy();
+        charts.monteCarlo = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ data: bins, backgroundColor: colors, borderWidth: 0 }] },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    annotation: false
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Reserve Margin (%)' }, ticks: { maxTicksLimit: 10 } },
+                    y: { title: { display: true, text: 'Frequency' } }
+                }
+            }
+        });
+
+        // KPIs
+        var kpiEl = document.getElementById('pjmMonteCarloKPIs');
+        var p5Color = p5 < 5 ? '#dc2626' : p5 < 15 ? '#d97706' : '#16a34a';
+        var p50Color = p50 < 5 ? '#dc2626' : p50 < 15 ? '#d97706' : '#16a34a';
+        var p95Color = p95 < 5 ? '#dc2626' : p95 < 15 ? '#d97706' : '#16a34a';
+        kpiEl.innerHTML = '<div><strong>P5 (worst):</strong> <span style="color:' + p5Color + ';font-weight:700">' + p5.toFixed(1) + '%</span></div>' +
+            '<div><strong>P50 (median):</strong> <span style="color:' + p50Color + ';font-weight:700">' + p50.toFixed(1) + '%</span></div>' +
+            '<div><strong>P95 (best):</strong> <span style="color:' + p95Color + ';font-weight:700">' + p95.toFixed(1) + '%</span></div>' +
+            '<div><strong>Prob &lt;5%:</strong> <span style="color:#dc2626;font-weight:700">' + ((margins.filter(function(m) { return m < 5; }).length / N) * 100).toFixed(1) + '%</span></div>';
+    }
+
+    /* ── Panel 2: 10-Year Projection ── */
+    function runProjection(inp) {
+        var years = [];
+        var available = [];
+        var demand = [];
+        var required = [];
+        var deficitYear = null;
+        var zeroMarginYear = null;
+
+        for (var y = 2026; y <= 2035; y++) {
+            var offset = y - 2026;
+            years.push(y.toString());
+
+            // Retirements: linear schedule over 10 years
+            var cumRetirements = inp.retirements * Math.min(offset / 8, 1);
+            // New gen: pipeline adjusted by queue completion rate, linear ramp
+            var cumNewGen = inp.newGen * (inp.queueRate / 100) * Math.min(offset / 5, 1);
+            var renewableShare = 0.70;
+            var dispNew = cumNewGen * (1 - renewableShare);
+            var renNew = cumNewGen * renewableShare * (inp.elcc / 100);
+            var effNew = dispNew + renNew;
+            // Battery + DR grow linearly
+            var batteryGrowth = inp.battery * Math.min(offset / 5, 1);
+            var drGrowth = inp.dr * Math.min(offset / 5, 1);
+            // Forced outage derate
+            var gross = inp.capacity - cumRetirements + effNew + batteryGrowth;
+            var net = gross * (1 - inp.forcedOutage / 100) + drGrowth;
+
+            // Demand: compound growth
+            var dcCompound = inp.dcGrowth * Math.min(offset / 5, 1);
+            var otherCompound = inp.otherGrowth * Math.min(offset / 8, 1);
+            var peakD = inp.peakDemand + dcCompound + otherCompound;
+
+            var reqCap = peakD * (1 + inp.reserveTarget / 100);
+
+            available.push(parseFloat(net.toFixed(1)));
+            demand.push(parseFloat(peakD.toFixed(1)));
+            required.push(parseFloat(reqCap.toFixed(1)));
+
+            if (deficitYear === null && net < reqCap) deficitYear = y;
+            var margin = ((net - peakD) / peakD) * 100;
+            if (zeroMarginYear === null && margin <= 0) zeroMarginYear = y;
+        }
+
+        var ctx = document.getElementById('pjmProjectionChart').getContext('2d');
+        if (charts.projection) charts.projection.destroy();
+        charts.projection = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    { label: 'Available Capacity (GW)', data: available, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.1)', fill: true, tension: 0.3 },
+                    { label: 'Peak Demand (GW)', data: demand, borderColor: '#0891b2', backgroundColor: 'transparent', borderDash: [5, 3], tension: 0.3 },
+                    { label: 'Required Capacity (GW)', data: required, borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.05)', fill: true, borderDash: [8, 4], tension: 0.3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    y: { title: { display: true, text: 'GW' } }
+                }
+            }
+        });
+
+        var kpiEl = document.getElementById('pjmProjectionKPIs');
+        kpiEl.innerHTML = '<div><strong>Deficit Year:</strong> <span style="color:#dc2626;font-weight:700">' + (deficitYear || 'None in range') + '</span></div>' +
+            '<div><strong>Zero-Margin Year:</strong> <span style="color:#dc2626;font-weight:700">' + (zeroMarginYear || 'None in range') + '</span></div>' +
+            '<div><strong>2035 Available:</strong> <span style="font-weight:700">' + available[available.length - 1] + ' GW</span></div>' +
+            '<div><strong>2035 Demand:</strong> <span style="font-weight:700">' + demand[demand.length - 1] + ' GW</span></div>';
+    }
+
+    /* ── Panel 3: Sensitivity Tornado ── */
+    function runTornado(inp) {
+        var baseResult = calculateGrid(inp);
+        var baseMargin = baseResult.reserveMargin;
+        var swing = 0.20;
+        var vars = [
+            { name: 'Total Capacity', key: 'capacity' },
+            { name: 'Retirements', key: 'retirements' },
+            { name: 'DC Load Growth', key: 'dcGrowth' },
+            { name: 'Other Load Growth', key: 'otherGrowth' },
+            { name: 'ELCC Factor', key: 'elcc' },
+            { name: 'Forced Outage Rate', key: 'forcedOutage' },
+            { name: 'New Gen Pipeline', key: 'newGen' }
+        ];
+
+        var results = [];
+        for (var i = 0; i < vars.length; i++) {
+            var v = vars[i];
+            var lo = Object.assign({}, inp);
+            var hi = Object.assign({}, inp);
+            lo[v.key] = inp[v.key] * (1 - swing);
+            hi[v.key] = inp[v.key] * (1 + swing);
+            var loR = calculateGrid(lo).reserveMargin;
+            var hiR = calculateGrid(hi).reserveMargin;
+            results.push({
+                name: v.name,
+                low: Math.min(loR, hiR) - baseMargin,
+                high: Math.max(loR, hiR) - baseMargin,
+                range: Math.abs(hiR - loR)
+            });
+        }
+        results.sort(function(a, b) { return b.range - a.range; });
+
+        var labels = results.map(function(r) { return r.name; });
+        var lowData = results.map(function(r) { return parseFloat(r.low.toFixed(2)); });
+        var highData = results.map(function(r) { return parseFloat(r.high.toFixed(2)); });
+
+        var ctx = document.getElementById('pjmTornadoChart').getContext('2d');
+        if (charts.tornado) charts.tornado.destroy();
+        charts.tornado = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: '-20% Change', data: lowData, backgroundColor: 'rgba(220,38,38,0.6)', borderWidth: 0 },
+                    { label: '+20% Change', data: highData, backgroundColor: 'rgba(22,163,74,0.6)', borderWidth: 0 }
+                ]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    x: { title: { display: true, text: 'Reserve Margin Change (pp)' } }
+                }
+            }
+        });
+    }
+
+    /* ── Panel 4: Strategic Roadmap ── */
+    function runRoadmap(inp, r) {
+        var el = document.getElementById('pjmRoadmap');
+        var tier, tierCls, tierLabel;
+        if (r.reserveMargin < 5) { tier = 'critical'; tierCls = 'pjm-tier-critical'; tierLabel = 'CRITICAL'; }
+        else if (r.reserveMargin < 15) { tier = 'warning'; tierCls = 'pjm-tier-warning'; tierLabel = 'WARNING'; }
+        else { tier = 'stable'; tierCls = 'pjm-tier-stable'; tierLabel = 'STABLE'; }
+
+        var gapGW = r.surplusDeficit < 0 ? Math.abs(r.surplusDeficit) : 0;
+        var drTarget = Math.max(inp.dr, inp.dr + gapGW * 0.15);
+        var batteryTarget = Math.max(inp.battery, inp.battery + gapGW * 0.20);
+        var transmissionCost = gapGW * 0.8; // $B estimate
+
+        var html = '<div class="pjm-roadmap-tier ' + tierCls + '">';
+        html += '<strong>Status: ' + tierLabel + '</strong> &mdash; Reserve margin at ' + fP(r.reserveMargin);
+        if (tier === 'critical') {
+            html += '. Grid faces imminent reliability crisis. Involuntary load shedding during peak events is virtually certain without immediate intervention.';
+        } else if (tier === 'warning') {
+            html += '. Grid reliability below NERC targets. Extreme weather events could trigger rolling blackouts across the interconnection footprint.';
+        } else {
+            html += '. Grid reliability adequate under base assumptions. Continue monitoring retirement schedule and demand growth acceleration.';
+        }
+        html += '</div>';
+
+        // Recommendations
+        html += '<div style="margin-top:1rem;">';
+        if (gapGW > 0) {
+            html += '<p><span class="pjm-priority-badge pjm-p1">P1-Critical</span> <strong>New Generation Required:</strong> ' + fN(gapGW) + ' GW of new dispatchable capacity needed to close the deficit. At current queue completion rates (' + inp.queueRate + '%), this requires ' + fN(gapGW / (inp.queueRate / 100)) + ' GW of queue applications.</p>';
+        }
+        html += '<p><span class="pjm-priority-badge pjm-p2">P2-High</span> <strong>Demand Response Expansion:</strong> Scale DR from ' + fN(inp.dr) + ' GW to ' + fN(drTarget) + ' GW through industrial curtailment programs, smart thermostat aggregation, and interruptible tariffs.</p>';
+        html += '<p><span class="pjm-priority-badge pjm-p2">P2-High</span> <strong>Battery Storage Deployment:</strong> Deploy ' + fN(batteryTarget) + ' GW of 4-hour grid-scale batteries (current: ' + fN(inp.battery) + ' GW). Target sites near retiring thermal plants to reuse interconnection infrastructure.</p>';
+        if (transmissionCost > 0.5) {
+            html += '<p><span class="pjm-priority-badge pjm-p3">P3-Medium</span> <strong>Transmission Investment:</strong> Estimated $' + fN(transmissionCost) + 'B in transmission upgrades to enable inter-regional capacity transfers and reduce congestion bottlenecks.</p>';
+        }
+        html += '<p><span class="pjm-priority-badge pjm-p3">P3-Medium</span> <strong>Interconnection Queue Reform:</strong> Current ' + inp.queueRate + '% completion rate is a structural bottleneck. Adopt FERC Order 2023 cluster study approach to accelerate viable projects.</p>';
+        html += '</div>';
+
+        // Timeline
+        html += '<h4 style="margin:1.25rem 0 0.5rem;font-size:0.9rem;">Implementation Roadmap</h4>';
+        html += '<div class="pjm-roadmap-timeline">';
+        var steps = [
+            { color: '#dc2626', label: 'Immediate (0-1yr)', text: 'Activate all available DR capacity. Expedite battery interconnection. Defer scheduled retirements where safe.' },
+            { color: '#d97706', label: 'Short-term (1-3yr)', text: 'Fast-track gas peaker permits. Deploy utility-scale batteries at retiring plant sites. Implement dynamic pricing.' },
+            { color: '#ca8a04', label: 'Medium-term (3-5yr)', text: 'Commission new combined-cycle gas turbines. Expand transmission corridors. Scale rooftop solar + storage.' },
+            { color: '#059669', label: 'Long-term (5-10yr)', text: 'Next-gen nuclear (SMRs) online. Grid-scale long-duration storage. Regional capacity market reform.' },
+            { color: '#0891b2', label: 'Structural (10+yr)', text: 'Full grid modernization. Offshore wind at scale. Hydrogen-ready infrastructure. Continental super-grid interconnections.' }
+        ];
+        for (var s = 0; s < steps.length; s++) {
+            html += '<div class="pjm-timeline-step"><div class="pjm-timeline-dot" style="background:' + steps[s].color + '"></div><div><strong>' + steps[s].label + ':</strong> ' + steps[s].text + '</div></div>';
+        }
+        html += '</div>';
+
+        el.innerHTML = html;
+    }
+
+    /* ── Main Calculate ── */
+    window.pjmCalculate = function() {
+        var inp = readInputs();
+        var r = calculateGrid(inp);
+        updateFreeKPIs(r);
+
+        // Pro panels
+        if (state.mode === 'pro' && hasProAccess()) {
+            runMonteCarlo(inp);
+            runProjection(inp);
+            runTornado(inp);
+            runRoadmap(inp, r);
+        }
     };
 
+    /* ── Mode Switching ── */
+    window.pjmSetMode = function(mode) {
+        state.mode = mode;
+        if (mode === 'pro' && !hasProAccess()) {
+            window.pjmShowLogin();
+            return;
+        }
+        syncUI();
+        window.pjmCalculate();
+    };
+
+    function syncUI() {
+        var unlocked = hasProAccess();
+        var isPro = state.mode === 'pro';
+
+        document.getElementById('pjmFreeBtn').classList.toggle('active', !isPro);
+        document.getElementById('pjmProBtn').classList.toggle('active', isPro);
+        document.getElementById('pjmProBtn').innerHTML = isPro && unlocked ? '<i class="fas fa-unlock"></i> Pro Analysis' : '<i class="fas fa-lock"></i> Pro Analysis';
+
+        document.getElementById('pjmProInputs').classList.toggle('active', isPro);
+        document.getElementById('pjmProPanels').classList.toggle('active', isPro);
+
+        // Gate overlays
+        document.querySelectorAll('.pjm-pro-panel-inner').forEach(function(el) {
+            el.classList.toggle('gated', isPro && !unlocked);
+        });
+        document.querySelectorAll('.pjm-gate-overlay').forEach(function(el) {
+            el.style.display = isPro && !unlocked ? 'flex' : 'none';
+        });
+    }
+
+    /* ── Reset ── */
     window.pjmReset = function() {
-        document.getElementById('pjmCapacity').value = defaults.capacity;
-        document.getElementById('pjmPeakDemand').value = defaults.peakDemand;
-        document.getElementById('pjmRetirements').value = defaults.retirements;
-        document.getElementById('pjmNewGen').value = defaults.newGen;
-        document.getElementById('pjmDCGrowth').value = defaults.dcGrowth;
-        document.getElementById('pjmOtherGrowth').value = defaults.otherGrowth;
-        document.getElementById('pjmReserveTarget').value = defaults.reserveTarget;
-        document.getElementById('pjmYear').value = defaults.year;
-
-        document.getElementById('pjmKpiCapacity').textContent = '--';
-        document.getElementById('pjmKpiDemand').textContent = '--';
-        document.getElementById('pjmKpiReserve').textContent = '--';
-        document.getElementById('pjmKpiSurplus').textContent = '--';
-        document.getElementById('pjmKpiRisk').textContent = '--';
-        document.getElementById('pjmKpiRate').textContent = '--';
-        document.getElementById('pjmNarrative').innerHTML = '<p>Configure your grid parameters and click <strong>Analyze Grid Impact</strong> to model reliability outcomes.</p>';
+        var ids = {
+            pjmCapacity: defaults.capacity, pjmPeakDemand: defaults.peakDemand,
+            pjmRetirements: defaults.retirements, pjmNewGen: defaults.newGen,
+            pjmDCGrowth: defaults.dcGrowth, pjmOtherGrowth: defaults.otherGrowth,
+            pjmReserveTarget: defaults.reserveTarget, pjmELCC: defaults.elcc,
+            pjmForcedOutage: defaults.forcedOutage, pjmDR: defaults.dr,
+            pjmBattery: defaults.battery, pjmQueueRate: defaults.queueRate
+        };
+        Object.keys(ids).forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.value = ids[id];
+        });
+        window.pjmCalculate();
     };
 
+    /* ── PDF Export ── */
+    window.pjmExportPdf = function() {
+        var inp = readInputs();
+        var r = calculateGrid(inp);
+        var isPro = state.mode === 'pro' && hasProAccess();
+
+        var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Grid Reliability Analysis - ResistanceZero</title>';
+        html += '<style>body{font-family:system-ui,-apple-system,sans-serif;padding:2rem;color:#1e293b;max-width:900px;margin:0 auto}';
+        html += 'h1{font-size:1.4rem;color:#b91c1c;border-bottom:2px solid #b91c1c;padding-bottom:0.5rem}';
+        html += 'h2{font-size:1.1rem;color:#374151;margin-top:1.5rem}';
+        html += '.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin:1rem 0}';
+        html += '.kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;text-align:center}';
+        html += '.kpi-label{font-size:0.7rem;text-transform:uppercase;color:#64748b;margin-bottom:0.25rem}';
+        html += '.kpi-val{font-size:1.2rem;font-weight:700;font-family:monospace}';
+        html += '.kpi-unit{font-size:0.7rem;color:#94a3b8}';
+        html += 'table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{padding:0.5rem;text-align:left;border-bottom:1px solid #e2e8f0;font-size:0.85rem}th{background:#f1f5f9;font-weight:600}';
+        html += '.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e2e8f0;font-size:0.75rem;color:#94a3b8}';
+        html += '@media print{body{padding:1rem}.kpi-grid{grid-template-columns:repeat(4,1fr)}}</style></head><body>';
+
+        html += '<h1>Grid Reliability &amp; DC Power Impact Analysis</h1>';
+        html += '<p style="color:#64748b;font-size:0.85rem;">Generated by ResistanceZero | ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + '</p>';
+
+        // Input summary table
+        html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th></tr>';
+        html += '<tr><td>Grid Total Capacity</td><td>' + fN(inp.capacity) + ' GW</td></tr>';
+        html += '<tr><td>Current Peak Demand</td><td>' + fN(inp.peakDemand) + ' GW</td></tr>';
+        html += '<tr><td>Planned Retirements</td><td>' + fN(inp.retirements) + ' GW</td></tr>';
+        html += '<tr><td>New Generation Pipeline</td><td>' + fN(inp.newGen) + ' GW</td></tr>';
+        html += '<tr><td>DC Load Growth</td><td>' + fN(inp.dcGrowth) + ' GW</td></tr>';
+        html += '<tr><td>Other Load Growth</td><td>' + fN(inp.otherGrowth) + ' GW</td></tr>';
+        html += '<tr><td>Target Reserve Margin</td><td>' + fP(inp.reserveTarget) + '</td></tr>';
+        html += '<tr><td>Renewable ELCC Factor</td><td>' + fP(inp.elcc) + '</td></tr>';
+        if (isPro) {
+            html += '<tr><td>Forced Outage Rate</td><td>' + fP(inp.forcedOutage) + '</td></tr>';
+            html += '<tr><td>Demand Response</td><td>' + fN(inp.dr) + ' GW</td></tr>';
+            html += '<tr><td>Battery Storage</td><td>' + fN(inp.battery) + ' GW</td></tr>';
+            html += '<tr><td>Queue Completion Rate</td><td>' + fP(inp.queueRate) + '</td></tr>';
+        }
+        html += '</table>';
+
+        // KPI cards
+        html += '<h2>Grid Reliability Summary</h2>';
+        html += '<div class="kpi-grid">';
+        html += '<div class="kpi"><div class="kpi-label">Net Available</div><div class="kpi-val" style="color:#b91c1c">' + fN(r.netAvailable) + '</div><div class="kpi-unit">GW</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Peak Demand</div><div class="kpi-val" style="color:#0891b2">' + fN(r.peakDemand) + '</div><div class="kpi-unit">GW</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Reserve Margin</div><div class="kpi-val" style="color:' + (r.reserveMargin < 5 ? '#dc2626' : r.reserveMargin < 15 ? '#d97706' : '#059669') + '">' + fP(r.reserveMargin) + '</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Surplus/Deficit</div><div class="kpi-val" style="color:' + (r.surplusDeficit >= 0 ? '#059669' : '#dc2626') + '">' + (r.surplusDeficit >= 0 ? '+' : '') + fN(r.surplusDeficit) + '</div><div class="kpi-unit">GW</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Blackout Risk</div><div class="kpi-val">' + r.blackoutRisk + '</div><div class="kpi-unit">/100</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">DC Share</div><div class="kpi-val" style="color:#7c3aed">' + fP(r.dcShare) + '</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Auction Price</div><div class="kpi-val" style="color:#d97706">' + fD(r.auctionPrice) + '</div><div class="kpi-unit">/MW-day</div></div>';
+        html += '<div class="kpi"><div class="kpi-label">Cost Impact</div><div class="kpi-val" style="color:#dc2626">' + fB(r.costImpact) + '</div></div>';
+        html += '</div>';
+
+        if (isPro) {
+            // Inline SVG charts from canvas
+            var canvases = ['pjmMonteCarloChart', 'pjmProjectionChart', 'pjmTornadoChart'];
+            var titles = ['Monte Carlo Reserve Margin Distribution', '10-Year Grid Capacity Projection', 'Sensitivity Tornado'];
+            for (var c = 0; c < canvases.length; c++) {
+                var canvas = document.getElementById(canvases[c]);
+                if (canvas) {
+                    html += '<h2>' + titles[c] + '</h2>';
+                    html += '<img src="' + canvas.toDataURL('image/png') + '" style="width:100%;max-width:800px;margin:0.5rem 0;" />';
+                }
+            }
+            // Roadmap
+            var roadmapEl = document.getElementById('pjmRoadmap');
+            if (roadmapEl) {
+                html += '<h2>Strategic Risk Assessment &amp; Roadmap</h2>';
+                html += '<div style="font-size:0.85rem;line-height:1.7;">' + roadmapEl.innerHTML + '</div>';
+            }
+        }
+
+        html += '<div class="footer">This report was generated by the Grid Reliability &amp; DC Power Impact Analyzer on resistancezero.com. Estimates are based on simplified engineering heuristics and publicly available data. Not intended for regulatory filings or investment decisions.</div>';
+        html += '</body></html>';
+
+        var w = window.open('', '_blank');
+        if (w) {
+            w.document.write(html);
+            w.document.close();
+            setTimeout(function() { w.print(); }, 500);
+        }
+    };
+
+    /* ── Event Bindings ── */
+    document.getElementById('pjmFreeBtn').addEventListener('click', function() { window.pjmSetMode('free'); });
+    document.getElementById('pjmProBtn').addEventListener('click', function() { window.pjmSetMode('pro'); });
+    document.getElementById('pjmBtnReset').addEventListener('click', function() { window.pjmReset(); });
+    document.getElementById('pjmBtnPdf').addEventListener('click', function() { window.pjmExportPdf(); });
+
+    document.querySelectorAll('.pjm-gate-overlay').forEach(function(el) {
+        el.addEventListener('click', window.pjmShowLogin);
+    });
+
+    /* ── Debounced auto-calculate ── */
     var debounceTimer;
     var inputs = document.querySelectorAll('#pjmCalc input, #pjmCalc select');
     inputs.forEach(function(input) {
         input.addEventListener('input', function() {
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(pjmCalculate, 300);
+            debounceTimer = setTimeout(window.pjmCalculate, 300);
         });
         input.addEventListener('change', function() {
             clearTimeout(debounceTimer);
-            pjmCalculate();
+            window.pjmCalculate();
         });
     });
+
+    /* ── Init ── */
+    syncUI();
+    window.pjmCalculate();
 })();
 </script>
 
