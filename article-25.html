@@ -1459,7 +1459,9 @@
             <input type="email" id="pjmLoginEmail" placeholder="Email address" autocomplete="email">
             <input type="password" id="pjmLoginPass" placeholder="Password" autocomplete="current-password">
             <button class="pjm-login-submit" id="pjmLoginSubmit" type="button">Unlock Pro Analysis</button>
-            <div class="pjm-login-error" id="pjmLoginError">Invalid credentials. Try demo@resistancezero.com / demo2026</div>
+            <div class="pjm-login-error" id="pjmLoginError">Invalid credentials.</div>
+            <div class="pjm-login-demo" style="margin-top:0.75rem;font-size:0.72rem;color:#94a3b8;text-align:center;">Demo: <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">demo@resistancezero.com</code> / <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">demo2026</code></div>
+            <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">By signing in, you agree to our <a href="terms.html" style="color:#b91c1c;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#b91c1c;text-decoration:none;">Privacy Policy</a></div>
         </div>
     </div>
 
@@ -1630,8 +1632,15 @@
     function hasProAccess() {
         if (state.proUnlocked) return true;
         try {
-            var s = localStorage.getItem('pjm_pro_auth');
-            if (s) { state.proUnlocked = true; return true; }
+            if (typeof window.hasProAccess === 'function') {
+                var result = window.hasProAccess();
+                if (result) { state.proUnlocked = true; return true; }
+            }
+            var s = JSON.parse(localStorage.getItem('rz_premium_session'));
+            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) {
+                state.proUnlocked = true;
+                return true;
+            }
         } catch(e) {}
         return false;
     }
@@ -1651,14 +1660,29 @@
         if (e.target === this) this.classList.remove('active');
     });
     document.getElementById('pjmLoginSubmit').addEventListener('click', function() {
-        var email = document.getElementById('pjmLoginEmail').value.trim().toLowerCase();
+        var email = document.getElementById('pjmLoginEmail').value.trim();
         var pass = document.getElementById('pjmLoginPass').value;
-        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
+        var VALID = [
+            { email: 'demo@resistancezero.com', password: 'demo2026' },
+            { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
+            { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
+        ];
+        var found = VALID.some(function(u) {
+            return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;
+        });
+        if (found) {
+            localStorage.setItem('rz_premium_session', JSON.stringify({
+                email: email,
+                tier: 'pro',
+                expires: new Date(Date.now() + 30 * 86400000).toISOString()
+            }));
             state.proUnlocked = true;
-            try { localStorage.setItem('pjm_pro_auth', '1'); } catch(e) {}
             document.getElementById('pjmLoginOverlay').classList.remove('active');
             syncUI();
             window.pjmCalculate();
+            window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                detail: { email: email, tier: 'pro', action: 'login' }
+            }));
         } else {
             document.getElementById('pjmLoginError').style.display = 'block';
         }

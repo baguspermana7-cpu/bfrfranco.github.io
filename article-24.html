@@ -1210,6 +1210,16 @@
             .dcj-calculator { padding: 1.25rem; }
             .dcj-chart-container { height: 220px; }
         }
+    .dcj-login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+    .dcj-login-overlay.active { display:flex; }
+    .dcj-login-box { background:linear-gradient(135deg,#0f172a,#1e293b); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:2rem; max-width:380px; width:90%; }
+    .dcj-login-box h3 { margin:0 0 0.5rem 0; color:#f8fafc; }
+    .dcj-login-box p { margin:0 0 1rem 0; color:#94a3b8; font-size:0.82rem; }
+    .dcj-login-box input { width:100%; padding:0.6rem 0.75rem; margin-bottom:0.5rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#f8fafc; font-size:0.9rem; box-sizing:border-box; }
+    .dcj-login-box input:focus { border-color:#059669; outline:none; }
+    .dcj-login-submit { width:100%; padding:0.7rem; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; border-radius:10px; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:0.5rem; }
+    .dcj-login-submit:hover { box-shadow:0 4px 16px rgba(5,150,105,0.4); }
+    .dcj-login-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer; }
     </style>
 
     <div class="dcj-calculator calculator-section" id="dcjCalc">
@@ -1491,6 +1501,20 @@
         </div>
     </div>
 
+    <div class="dcj-login-overlay" id="dcjLoginOverlay">
+        <div class="dcj-login-box">
+            <button class="dcj-login-close" onclick="dcjHideLogin()">&times;</button>
+            <h3><i class="fas fa-lock" style="color:#059669;"></i> Pro Analysis</h3>
+            <p>Unlock Monte Carlo simulation, 10-year career progression, sensitivity analysis, and workforce planning for this calculator.</p>
+            <input type="email" id="dcjLoginEmail" placeholder="Email address" autocomplete="email">
+            <input type="password" id="dcjLoginPass" placeholder="Password" autocomplete="current-password">
+            <button class="dcj-login-submit" onclick="dcjHandleLogin()">Unlock Pro Analysis</button>
+            <div class="dcj-login-error" id="dcjLoginError" style="display:none;color:#ef4444;font-size:0.78rem;margin-top:0.5rem;text-align:center;">Invalid credentials.</div>
+            <div style="margin-top:0.75rem;font-size:0.72rem;color:#94a3b8;text-align:center;">Demo: <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">demo@resistancezero.com</code> / <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">demo2026</code></div>
+            <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">By signing in, you agree to our <a href="terms.html" style="color:#059669;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#059669;text-decoration:none;">Privacy Policy</a></div>
+        </div>
+    </div>
+
     <!-- Section 11: The Engineer's Perspective -->
     <h2 id="section-11">The Engineer's Perspective</h2>
 
@@ -1685,25 +1709,76 @@
     }
 
     // ── Auth ──
-    function checkProAuth() {
-        if (typeof window.hasProAccess === 'function' && window.hasProAccess()) return true;
-        var email = prompt('Enter your email to unlock Pro Analysis:');
-        if (!email) return false;
-        var pass = prompt('Enter your password:');
-        if (!pass) return false;
-        if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
-            return true;
-        }
-        alert('Invalid credentials. Use demo@resistancezero.com / demo2026');
+    function hasProAccess() {
+        if (proUnlocked) return true;
+        try {
+            if (typeof window.hasProAccess === 'function') {
+                var result = window.hasProAccess();
+                if (result) { proUnlocked = true; return true; }
+            }
+            var s = JSON.parse(localStorage.getItem('rz_premium_session'));
+            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) {
+                proUnlocked = true;
+                return true;
+            }
+        } catch(e) {}
         return false;
     }
+
+    window.dcjShowLogin = function() {
+        document.getElementById('dcjLoginOverlay').classList.add('active');
+        document.getElementById('dcjLoginError').style.display = 'none';
+        document.getElementById('dcjLoginEmail').value = '';
+        document.getElementById('dcjLoginPass').value = '';
+        document.getElementById('dcjLoginEmail').focus();
+    };
+
+    window.dcjHideLogin = function() {
+        document.getElementById('dcjLoginOverlay').classList.remove('active');
+    };
+
+    window.dcjHandleLogin = function() {
+        var email = document.getElementById('dcjLoginEmail').value.trim();
+        var pass = document.getElementById('dcjLoginPass').value;
+        var VALID = [
+            { email: 'demo@resistancezero.com', password: 'demo2026' },
+            { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
+            { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
+        ];
+        var found = VALID.some(function(u) {
+            return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;
+        });
+        if (found) {
+            localStorage.setItem('rz_premium_session', JSON.stringify({
+                email: email, tier: 'pro',
+                expires: new Date(Date.now() + 30 * 86400000).toISOString()
+            }));
+            proUnlocked = true;
+            dcjHideLogin();
+            setMode('pro');
+            dcjCalculate();
+            window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                detail: { email: email, tier: 'pro', action: 'login' }
+            }));
+        } else {
+            document.getElementById('dcjLoginError').style.display = 'block';
+        }
+    };
+
+    // Close on overlay click
+    document.getElementById('dcjLoginOverlay').addEventListener('click', function(e) {
+        if (e.target === this) dcjHideLogin();
+    });
+    // Enter key on password field
+    document.getElementById('dcjLoginPass').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') dcjHandleLogin();
+    });
 
     // ── Mode switching ──
     function setMode(mode) {
         if (mode === 'pro') {
             if (!proUnlocked) {
-                if (!checkProAuth()) return;
-                proUnlocked = true;
+                dcjShowLogin(); return;
             }
             el('dcjFreeBtn').classList.remove('active');
             el('dcjProBtn').classList.add('active');
