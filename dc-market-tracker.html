@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GED7FX8RTV');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Data Center Market Tracker | Live Capacity &amp; Growth Dashboard</title>
+    <meta name="description" content="Interactive dashboard tracking global data center capacity, construction pipeline, and market growth across 25+ markets with 2025-2030 projections.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/dc-market-tracker.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/dc-market-tracker.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/dc-market-tracker.html">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/dc-market-tracker.html">
+    <meta property="og:title" content="Global Data Center Market Tracker">
+    <meta property="og:description" content="Track DC capacity, construction pipeline, and market growth across 25+ global markets.">
+    <meta property="og:image" content="https://resistancezero.com/assets/market-tracker-og.jpg">
+    <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="ResistanceZero">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Global Data Center Market Tracker",
+        "applicationCategory": "BusinessApplication",
+        "description": "Interactive dashboard tracking global data center capacity, construction pipeline, and market growth across 25+ markets with 2025-2030 projections.",
+        "url": "https://resistancezero.com/dc-market-tracker.html",
+        "operatingSystem": "Web Browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Interactive Leaflet world map with 25+ DC markets",
+            "Sortable data table with capacity metrics",
+            "Regional growth projection charts",
+            "Monte Carlo market size forecast",
+            "Sensitivity tornado analysis"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Market Tracker" }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <style>
+        :root {
+            --dmt-primary: #0d9488;
+            --dmt-accent: #2dd4bf;
+            --dmt-primary-rgb: 13, 148, 136;
+            --dmt-gradient: linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%);
+            --dmt-dark: #134e4a;
+            --dmt-darker: #0f3d3a;
+            --dmt-amber: #f59e0b;
+            --dmt-violet: #8b5cf6;
+            --dmt-red: #ef4444;
+            --dmt-emerald: #10b981;
+            --dmt-blue: #3b82f6;
+            --dmt-bg: #ffffff;
+            --dmt-bg2: #f8fafc;
+            --dmt-bg3: #f1f5f9;
+            --dmt-text: #1e293b;
+            --dmt-text2: #475569;
+            --dmt-text3: #94a3b8;
+            --dmt-border: #e2e8f0;
+            --dmt-glass: rgba(255,255,255,0.85);
+            --dmt-glass-border: rgba(13,148,136,0.1);
+            --dmt-shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --dmt-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --dmt-shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        [data-theme="dark"] {
+            --dmt-bg: #0f172a;
+            --dmt-bg2: #1e293b;
+            --dmt-bg3: #334155;
+            --dmt-text: #f1f5f9;
+            --dmt-text2: #cbd5e1;
+            --dmt-text3: #64748b;
+            --dmt-border: #334155;
+            --dmt-glass: rgba(15,23,42,0.85);
+            --dmt-glass-border: rgba(45,212,191,0.15);
+            --dmt-shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+            --dmt-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+            --dmt-shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dmt-bg);
+            color: var(--dmt-text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: var(--dmt-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--dmt-glass-border);
+            padding: 0 2rem; height: 64px;
+        }
+        .nav-container {
+            max-width: 1400px; margin: 0 auto; height: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; color: var(--dmt-text);
+        }
+        .nav-logo {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.7rem; color: white; letter-spacing: 0.5px;
+        }
+        .nav-title { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+        .nav-subtitle { font-size: 0.7rem; color: var(--dmt-text3); font-weight: 400; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-link {
+            text-decoration: none; font-size: 0.82rem; font-weight: 500;
+            color: var(--dmt-text2); transition: all 0.3s;
+        }
+        .nav-link:hover { color: var(--dmt-primary); transform: translateY(-1px); }
+        .nav-back {
+            display: none; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            color: var(--dmt-primary); padding: 8px 16px; border-radius: 8px;
+            background: rgba(var(--dmt-primary-rgb), 0.08); transition: all 0.3s;
+        }
+        .nav-back:hover { transform: translateY(-2px); }
+
+        /* Navbar Auth */
+        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
+        .nav-login-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border: none; border-radius: 8px;
+            color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(139,92,246,0.3);
+            white-space: nowrap;
+        }
+        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,92,246,0.4); filter: brightness(1.08); }
+        .nav-user-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 12px 6px 6px;
+            background: rgba(139,92,246,0.08);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 50px; cursor: pointer; transition: all 0.3s;
+            font-family: inherit; color: var(--dmt-text);
+        }
+        .nav-user-btn:hover { background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.4); }
+        .nav-user-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.7rem; font-weight: 700;
+        }
+        .nav-user-email {
+            font-size: 0.8rem; font-weight: 500; color: var(--dmt-text2);
+            max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .nav-user-chevron { font-size: 0.6rem; color: var(--dmt-text3); transition: transform 0.3s; }
+        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
+        .nav-user-dropdown {
+            display: none; position: absolute; top: calc(100% + 8px); right: 0;
+            background: var(--dmt-bg); border-radius: 12px; border: 1px solid var(--dmt-border);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px;
+            z-index: 1001; overflow: hidden;
+            animation: dmtDropdownIn 0.2s ease;
+        }
+        .nav-user-dropdown.show { display: block; }
+        @keyframes dmtDropdownIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid var(--dmt-border); }
+        .nav-dd-tier-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 50px;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: white; }
+        .nav-dd-email { font-size: 0.78rem; color: var(--dmt-text3); word-break: break-all; }
+        .nav-dd-logout {
+            display: flex; align-items: center; gap: 8px;
+            width: 100%; padding: 12px 16px; border: none; background: none;
+            font-size: 0.82rem; color: var(--dmt-red); cursor: pointer; font-family: inherit;
+            transition: background 0.2s;
+        }
+        .nav-dd-logout:hover { background: rgba(239,68,68,0.06); }
+
+        /* HERO */
+        .dmt-hero {
+            background: linear-gradient(135deg, rgba(15,32,39,0.88) 0%, rgba(19,78,74,0.82) 40%, rgba(13,148,136,0.72) 100%),
+                        url('assets/market-tracker-hero.webp') center/cover no-repeat;
+            padding: 7rem 2rem 3rem; color: white; position: relative; overflow: hidden;
+        }
+        .dmt-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(45,212,191,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(13,148,136,0.08) 0%, transparent 50%);
+        }
+        .dmt-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .dmt-hero h1 {
+            font-size: 2.6rem; font-weight: 900; line-height: 1.15;
+            margin-bottom: 0.75rem; letter-spacing: -0.02em;
+        }
+        .dmt-hero h1 span { color: var(--dmt-accent); }
+        .dmt-hero-sub {
+            font-size: 1.05rem; color: rgba(255,255,255,0.75); max-width: 700px;
+            line-height: 1.7; margin-bottom: 2rem;
+        }
+        .dmt-evidence-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;
+        }
+        .dmt-evidence-card {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 1.25rem; backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .dmt-evidence-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .dmt-ev-value {
+            font-size: 1.6rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+            color: var(--dmt-accent); line-height: 1.2; margin-bottom: 0.25rem;
+        }
+        .dmt-ev-label { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 0.35rem; }
+        .dmt-ev-source { font-size: 0.62rem; color: rgba(255,255,255,0.4); font-style: italic; }
+
+        /* MAIN CONTENT */
+        .dmt-main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .dmt-section { margin-bottom: 3rem; }
+        .dmt-section-title {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--dmt-text);
+        }
+        .dmt-section-desc {
+            font-size: 0.88rem; color: var(--dmt-text2); margin-bottom: 1.5rem; max-width: 700px;
+        }
+
+        /* MAP */
+        .dmt-map-wrap {
+            background: var(--dmt-bg2); border: 1px solid var(--dmt-border);
+            border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden;
+        }
+        #dmtLeafletMap { width:100%; height:420px; border-radius:12px; background:#0f172a; z-index:1; }
+        .leaflet-popup-content-wrapper { background:#1e293b !important; color:#e2e8f0 !important; border:1px solid #334155 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.4) !important; }
+        .leaflet-popup-tip { background:#1e293b !important; border:1px solid #334155 !important; }
+        .leaflet-popup-content { margin:8px 12px !important; font-family:'Inter',sans-serif !important; font-size:0.78rem !important; }
+        .leaflet-popup-close-button { color:#64748b !important; font-size:1.2rem !important; }
+        .leaflet-popup-close-button:hover { color:#f1f5f9 !important; }
+        .leaflet-control-zoom a { background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important; }
+        .leaflet-control-zoom a:hover { background:#334155 !important; }
+        .leaflet-control-attribution { background:rgba(15,23,42,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
+        .leaflet-control-attribution a { color:#64748b !important; }
+        .dmt-map-legend {
+            display: flex; gap: 1.5rem; align-items: center; margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .dmt-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--dmt-text2); }
+        .dmt-legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+        /* MAP TOOLTIP */
+        .dmt-map-tooltip {
+            position: fixed; z-index: 9999; pointer-events: none;
+            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
+            border-radius: 12px; padding: 1rem 1.25rem; min-width: 260px;
+            box-shadow: var(--dmt-shadow-lg); opacity: 0; transition: opacity 0.15s;
+        }
+        .dmt-map-tooltip.visible { opacity: 1; }
+        .dmt-tt-name { font-weight: 700; font-size: 0.95rem; color: var(--dmt-text); margin-bottom: 0.5rem; }
+        .dmt-tt-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.78rem; padding: 3px 0; }
+        .dmt-tt-label { color: var(--dmt-text3); }
+        .dmt-tt-val { font-weight: 600; color: var(--dmt-text); font-family: 'JetBrains Mono', monospace; }
+
+        /* FILTERS */
+        .dmt-filters {
+            display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .dmt-filter-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .dmt-filter-label { font-size: 0.75rem; font-weight: 600; color: var(--dmt-text3); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 0.25rem; align-self: center; }
+        .dmt-pill {
+            padding: 6px 14px; border-radius: 50px; border: 1px solid var(--dmt-border);
+            background: var(--dmt-bg); color: var(--dmt-text2); font-size: 0.78rem;
+            font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .dmt-pill:hover { border-color: var(--dmt-primary); color: var(--dmt-primary); }
+        .dmt-pill.active {
+            background: var(--dmt-primary); color: white; border-color: var(--dmt-primary);
+        }
+        .dmt-sort-select {
+            padding: 6px 12px; border-radius: 8px; border: 1px solid var(--dmt-border);
+            background: var(--dmt-bg); color: var(--dmt-text); font-size: 0.82rem;
+            font-family: inherit; cursor: pointer; outline: none;
+        }
+
+        /* MARKET CARDS */
+        .dmt-cards-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;
+        }
+        .dmt-market-card {
+            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
+            border-radius: 14px; padding: 1.25rem; transition: all 0.3s; cursor: default;
+        }
+        .dmt-market-card:hover { transform: translateY(-3px); box-shadow: var(--dmt-shadow-md); border-color: rgba(var(--dmt-primary-rgb), 0.3); }
+        .dmt-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .dmt-card-name { font-size: 1rem; font-weight: 700; color: var(--dmt-text); }
+        .dmt-card-region { font-size: 0.7rem; color: var(--dmt-text3); }
+        .dmt-cagr-badge {
+            padding: 3px 10px; border-radius: 50px; font-size: 0.68rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px;
+        }
+        .dmt-cagr-high { background: rgba(16,185,129,0.12); color: #10b981; }
+        .dmt-cagr-mid { background: rgba(245,158,11,0.12); color: #f59e0b; }
+        .dmt-cagr-low { background: rgba(148,163,184,0.15); color: var(--dmt-text3); }
+        .dmt-card-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .dmt-card-metric { text-align: center; }
+        .dmt-cm-val { font-size: 1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--dmt-text); }
+        .dmt-cm-label { font-size: 0.62rem; color: var(--dmt-text3); text-transform: uppercase; letter-spacing: 0.3px; }
+        .dmt-card-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; border-top: 1px solid var(--dmt-border); padding-top: 0.75rem; margin-bottom: 0.6rem; }
+        .dmt-cd-item { text-align: center; }
+        .dmt-cd-val { font-size: 0.82rem; font-weight: 600; color: var(--dmt-text2); font-family: 'JetBrains Mono', monospace; }
+        .dmt-cd-label { font-size: 0.6rem; color: var(--dmt-text3); }
+        .dmt-card-players { font-size: 0.7rem; color: var(--dmt-text3); }
+        .dmt-card-players span { color: var(--dmt-text2); font-weight: 500; }
+
+        /* DATA TABLE */
+        .dmt-table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--dmt-border); }
+        .dmt-table {
+            width: 100%; border-collapse: collapse; font-size: 0.82rem;
+        }
+        .dmt-table th {
+            background: var(--dmt-bg3); color: var(--dmt-text2); font-weight: 600;
+            padding: 10px 14px; text-align: left; white-space: nowrap; cursor: pointer;
+            border-bottom: 2px solid var(--dmt-border); user-select: none;
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .dmt-table th:hover { color: var(--dmt-primary); }
+        .dmt-table th .sort-icon { margin-left: 4px; font-size: 0.6rem; opacity: 0.4; }
+        .dmt-table th.sorted .sort-icon { opacity: 1; color: var(--dmt-primary); }
+        .dmt-table td {
+            padding: 10px 14px; border-bottom: 1px solid var(--dmt-border);
+            color: var(--dmt-text); white-space: nowrap;
+        }
+        .dmt-table tr:hover td { background: rgba(var(--dmt-primary-rgb), 0.04); }
+        .dmt-table .mono { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+        /* CHARTS */
+        .dmt-chart-wrap {
+            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
+            border-radius: 14px; padding: 1.5rem;
+        }
+        .dmt-chart-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--dmt-text); }
+
+        /* PRO PANELS */
+        .dmt-pro-section {
+            position: relative; margin-top: 3rem; padding: 2rem;
+            background: var(--dmt-bg2); border-radius: 16px; border: 1px solid var(--dmt-border);
+        }
+        .dmt-pro-header {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .dmt-pro-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 50px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: white; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+        }
+        .dmt-pro-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .dmt-pro-panel {
+            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
+            border-radius: 14px; padding: 1.5rem; position: relative; min-height: 320px;
+        }
+        .dmt-pro-panel-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 1rem; color: var(--dmt-text); }
+        .dmt-pro-kpi { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
+        .dmt-kpi-item {
+            flex: 1; min-width: 100px; text-align: center;
+            background: var(--dmt-bg2); border-radius: 10px; padding: 0.75rem;
+        }
+        .dmt-kpi-val { font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--dmt-primary); }
+        .dmt-kpi-label { font-size: 0.62rem; color: var(--dmt-text3); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+
+        /* GATING */
+        .gated-overlay { position: relative; cursor: pointer; }
+        .gated-overlay::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15,23,42,0.6); backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px); border-radius: inherit; z-index: 10;
+        }
+        .gated-overlay::before {
+            content: '\f521'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            color: #a78bfa; font-size: 1.5rem; z-index: 11;
+            text-shadow: 0 2px 8px rgba(139,92,246,0.5);
+        }
+        .gated-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 6px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(168,85,247,0.1));
+            border: 1px solid rgba(139,92,246,0.3); color: #a78bfa;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .gated-badge:hover { background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(168,85,247,0.2)); transform: translateY(-1px); }
+
+        /* MODE BAR */
+        .dmt-mode-bar {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem;
+            padding: 0.75rem 1rem; background: var(--dmt-bg2); border-radius: 12px;
+            border: 1px solid var(--dmt-border); flex-wrap: wrap;
+        }
+        .dmt-mode-btn {
+            padding: 0.6rem 1.2rem; border-radius: 10px; border: 1px solid var(--dmt-border);
+            background: transparent; color: var(--dmt-text2); cursor: pointer;
+            font-weight: 500; font-size: 0.9rem; font-family: inherit; transition: all 0.3s;
+        }
+        .dmt-mode-btn.active {
+            background: var(--dmt-gradient); color: white; border-color: var(--dmt-primary);
+        }
+        .dmt-premium-btn {
+            margin-left: auto; padding: 0.6rem 1.4rem; border-radius: 10px;
+            border: 1px solid rgba(168,85,247,0.6);
+            background: linear-gradient(135deg,#7c3aed,#a855f7);
+            color: white; cursor: pointer; font-weight: 700; font-size: 0.9rem;
+            font-family: inherit; transition: all 0.3s;
+            box-shadow: 0 2px 12px rgba(139,92,246,0.35);
+            position: relative; overflow: hidden;
+        }
+        @keyframes dmtPremiumGlow { 0%,100% { box-shadow:0 2px 12px rgba(139,92,246,0.35); } 50% { box-shadow:0 2px 20px rgba(139,92,246,0.55); } }
+        .dmt-premium-btn { animation: dmtPremiumGlow 2.5s ease-in-out infinite; }
+        .dmt-premium-btn:hover { transform:translateY(-2px); box-shadow:0 4px 24px rgba(139,92,246,0.5) !important; filter:brightness(1.1); }
+        .dmt-premium-btn.premium-active { animation:none !important; background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(168,85,247,0.15)) !important; color:#c4b5fd !important; border-color:rgba(139,92,246,0.5) !important; box-shadow:0 2px 8px rgba(139,92,246,0.2) !important; }
+        #dmtPremiumBadge {
+            display: none; padding: 4px 12px; border-radius: 50px;
+            background: linear-gradient(135deg,#8b5cf6,#a855f7);
+            color: white; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+        }
+
+        /* THEME TOGGLE */
+        .dmt-theme-toggle {
+            position: fixed; bottom: 80px; right: 20px; z-index: 999;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--dmt-bg2); border: 1px solid var(--dmt-border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: var(--dmt-shadow-md); transition: all 0.3s;
+            font-size: 1.1rem; color: var(--dmt-text);
+        }
+        .dmt-theme-toggle:hover { transform: scale(1.1); }
+
+        /* FOOTER */
+        .dmt-footer {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;
+        }
+        .dmt-footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;
+        }
+        .dmt-footer a { color: #94a3b8; text-decoration: none; font-size: 0.8rem; }
+        .dmt-footer a:hover { color: var(--dmt-accent); }
+
+        /* COOKIE BANNER */
+        .dmt-cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1rem 2rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -2px 16px rgba(0,0,0,0.06); font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .dmt-cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
+        .dmt-cookie-banner a { color: #2563eb; text-decoration: underline; }
+        .dmt-cookie-actions { display: flex; gap: 0.5rem; }
+        .dmt-cookie-accept { padding: 6px 16px; border-radius: 6px; border: none; background: var(--dmt-primary); color: white; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .dmt-cookie-decline { padding: 6px 16px; border-radius: 6px; border: 1px solid #d1d5db; background: white; color: #6b7280; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+
+        /* SCROLL TOP */
+        .dmt-scroll-top {
+            position: fixed; bottom: 24px; right: 20px; z-index: 999;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--dmt-primary); color: white; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 16px rgba(var(--dmt-primary-rgb),0.4);
+            opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none;
+        }
+        .dmt-scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .dmt-scroll-top:hover { transform: translateY(-2px); }
+
+        /* DISCLAIMER */
+        .dmt-disclaimer {
+            background: var(--dmt-bg2); border: 1px solid var(--dmt-border);
+            border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem;
+        }
+
+        /* LOGIN MODAL */
+        @keyframes dmtModalIn { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+
+        /* PRINT */
+        @media print {
+            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .navbar, .dmt-hero, .dmt-mode-bar, #dmtLoginModal, .nav-back, .dmt-footer,
+            .dmt-cookie-banner, .dmt-scroll-top, .dmt-theme-toggle, .dmt-filters,
+            .gated-badge, #dmtFreeWatermark { display: none !important; }
+            .dmt-main { padding-top: 0 !important; }
+            .gated-overlay::after, .gated-overlay::before { display: none !important; }
+            @page { margin: 1cm; size: A4 landscape; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .dmt-evidence-grid { grid-template-columns: repeat(3, 1fr); }
+            .dmt-pro-panels { grid-template-columns: 1fr; }
+            .dmt-footer-inner { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-back { display: flex; }
+            .dmt-hero h1 { font-size: 1.8rem; }
+            .dmt-evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .dmt-cards-grid { grid-template-columns: 1fr; }
+            .dmt-cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+            .dmt-footer-inner { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .dmt-hero { padding: 6rem 1rem 2rem; }
+            .dmt-hero h1 { font-size: 1.5rem; }
+            .dmt-evidence-grid { grid-template-columns: 1fr 1fr; }
+            .dmt-main { padding: 1rem; }
+            .dmt-filters { gap: 0.5rem; }
+        }
+
+        /* PRIVACY BADGE */
+        .dmt-privacy-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 50px;
+            background: rgba(var(--dmt-primary-rgb), 0.08);
+            border: 1px solid rgba(var(--dmt-primary-rgb), 0.2);
+            color: var(--dmt-primary); font-size: 0.72rem; font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* BENCHMARK META */
+        .dmt-benchmark-meta {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;
+        }
+        .dmt-bm-item {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; color: var(--dmt-text3);
+        }
+        .dmt-bm-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dmt-primary); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo" style="background:linear-gradient(135deg,#0d9488,#2dd4bf);">DMT</div>
+                <div>
+                    <div class="nav-title">Market Tracker</div>
+                    <div class="nav-subtitle">Global DC Capacity Dashboard</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="tco-calculator.html" class="nav-link" style="color:#4f46e5;">TCO Calc</a>
+                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;">PUE Calc</a>
+                <a href="capex-calculator.html" class="nav-link" style="color:#f59e0b;">CAPEX Calc</a>
+                <a href="opex-calculator.html" class="nav-link" style="color:#10b981;">OPEX Calc</a>
+                <div class="nav-auth-wrap" id="navAuthWrap">
+                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
+                        <i class="fas fa-crown" style="font-size:0.72rem;"></i>
+                        <span class="nav-login-text">Login</span>
+                    </button>
+                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
+                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
+                        <span class="nav-user-email" id="navUserEmail"></span>
+                        <i class="fas fa-chevron-down nav-user-chevron"></i>
+                    </button>
+                    <div class="nav-user-dropdown" id="navUserDropdown">
+                        <div class="nav-dd-header">
+                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">PRO</div>
+                            <div class="nav-dd-email" id="navDdEmail"></div>
+                        </div>
+                        <button class="nav-dd-logout" onclick="logoutPremium()">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <a href="index.html" class="nav-back">&larr; Back</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="dmt-hero">
+        <div class="dmt-hero-inner">
+            <h1>Global Data Center<br><span>Market Tracker</span></h1>
+            <p class="dmt-hero-sub">Real-time capacity, construction pipeline, and growth projections across 25+ markets worldwide</p>
+            <div class="dmt-evidence-grid">
+                <div class="dmt-evidence-card">
+                    <div class="dmt-ev-value">122.2 GW</div>
+                    <div class="dmt-ev-label">Global Installed Capacity</div>
+                    <div class="dmt-ev-source">Source: Synergy Research 2025</div>
+                </div>
+                <div class="dmt-evidence-card">
+                    <div class="dmt-ev-value">12.5 GW</div>
+                    <div class="dmt-ev-label">Under Construction</div>
+                    <div class="dmt-ev-source">Source: CBRE 2025</div>
+                </div>
+                <div class="dmt-evidence-card">
+                    <div class="dmt-ev-value">$413B</div>
+                    <div class="dmt-ev-label">Hyperscaler CAPEX 2025</div>
+                    <div class="dmt-ev-source">Source: Dell'Oro Group</div>
+                </div>
+                <div class="dmt-evidence-card">
+                    <div class="dmt-ev-value">1,689</div>
+                    <div class="dmt-ev-label">Hyperscale Facilities</div>
+                    <div class="dmt-ev-source">Source: Synergy Research (1,189 op + 500 planned)</div>
+                </div>
+                <div class="dmt-evidence-card">
+                    <div class="dmt-ev-value">14% CAGR</div>
+                    <div class="dmt-ev-label">Capacity Growth 2025-2030</div>
+                    <div class="dmt-ev-source">Source: ABI Research</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mode Bar -->
+    <div class="dmt-main">
+        <div class="dmt-mode-bar">
+            <button type="button" class="dmt-mode-btn active" data-mode="free" onclick="switchDmtMode('free')">
+                <i class="fas fa-globe" style="margin-right:6px;"></i>Explorer
+            </button>
+            <button type="button" class="dmt-mode-btn" data-mode="analysis" onclick="switchDmtMode('analysis')">
+                <i class="fas fa-chart-line" style="margin-right:6px;"></i>Analysis
+            </button>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;">
+                <span id="dmtPremiumBadge">PRO ACTIVE</span>
+                <button type="button" id="dmtPremiumBtn" class="dmt-premium-btn" onclick="handlePremiumTab()">
+                    <i class="fas fa-crown" style="margin-right:6px;"></i>Premium
+                </button>
+            </div>
+        </div>
+
+        <!-- Privacy Badge & Benchmark Meta -->
+        <div class="dmt-privacy-badge"><i class="fas fa-shield-alt"></i> All calculations run locally. No data transmitted.</div>
+        <div class="dmt-benchmark-meta">
+            <div class="dmt-bm-item"><div class="dmt-bm-dot"></div> Data: Q1 2025 estimates</div>
+            <div class="dmt-bm-item"><div class="dmt-bm-dot"></div> 25 major markets tracked</div>
+            <div class="dmt-bm-item"><div class="dmt-bm-dot"></div> Updated quarterly</div>
+        </div>
+
+        <!-- Section 2: Leaflet World Map -->
+        <div class="dmt-section" id="dmtMapSection">
+            <div class="dmt-section-title">Interactive Market Map</div>
+            <div class="dmt-section-desc">Click a market bubble to explore capacity, vacancy, pricing, and growth data. Bubble size indicates operational capacity.</div>
+            <div class="dmt-map-wrap">
+                <div id="dmtLeafletMap"></div>
+                <div class="dmt-map-legend">
+                    <div class="dmt-legend-item"><div class="dmt-legend-dot" style="background:#0d9488;"></div> Established (&gt;500 MW)</div>
+                    <div class="dmt-legend-item"><div class="dmt-legend-dot" style="background:#f59e0b;"></div> Growing (100-500 MW)</div>
+                    <div class="dmt-legend-item"><div class="dmt-legend-dot" style="background:#8b5cf6;"></div> Emerging (&lt;100 MW)</div>
+                    <div class="dmt-legend-item" style="margin-left:auto;font-size:0.7rem;color:var(--dmt-text3);"><i class="fas fa-info-circle" style="margin-right:4px;"></i>Bubble size = operational capacity</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map popups handled by Leaflet -->
+
+        <!-- Section 3: Filters -->
+        <div class="dmt-section" id="dmtFilterSection">
+            <div class="dmt-filters">
+                <div class="dmt-filter-group">
+                    <span class="dmt-filter-label">Region</span>
+                    <button class="dmt-pill active" data-filter="region" data-value="all" onclick="setFilter('region','all',this)">All</button>
+                    <button class="dmt-pill" data-filter="region" data-value="North America" onclick="setFilter('region','North America',this)">North America</button>
+                    <button class="dmt-pill" data-filter="region" data-value="Europe" onclick="setFilter('region','Europe',this)">Europe</button>
+                    <button class="dmt-pill" data-filter="region" data-value="Asia Pacific" onclick="setFilter('region','Asia Pacific',this)">Asia Pacific</button>
+                    <button class="dmt-pill" data-filter="region" data-value="Latin America" onclick="setFilter('region','Latin America',this)">Latin America</button>
+                    <button class="dmt-pill" data-filter="region" data-value="Middle East & Africa" onclick="setFilter('region','Middle East & Africa',this)">ME &amp; Africa</button>
+                </div>
+                <div class="dmt-filter-group">
+                    <span class="dmt-filter-label">Maturity</span>
+                    <button class="dmt-pill active" data-filter="maturity" data-value="all" onclick="setFilter('maturity','all',this)">All</button>
+                    <button class="dmt-pill" data-filter="maturity" data-value="established" onclick="setFilter('maturity','established',this)">Established</button>
+                    <button class="dmt-pill" data-filter="maturity" data-value="growing" onclick="setFilter('maturity','growing',this)">Growing</button>
+                    <button class="dmt-pill" data-filter="maturity" data-value="emerging" onclick="setFilter('maturity','emerging',this)">Emerging</button>
+                </div>
+                <div class="dmt-filter-group">
+                    <span class="dmt-filter-label">Sort</span>
+                    <select class="dmt-sort-select" id="dmtSortSelect" onchange="applySort(this.value)">
+                        <option value="operational">Operational Capacity</option>
+                        <option value="construction">Under Construction</option>
+                        <option value="cagr">Growth Rate</option>
+                        <option value="powerCost">Power Cost</option>
+                        <option value="coloPrice">Colo Price</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section 4: Market Cards Grid -->
+            <div class="dmt-cards-grid" id="dmtCardsGrid"></div>
+        </div>
+
+        <!-- Section 5: Sortable Data Table -->
+        <div class="dmt-section" id="dmtTableSection">
+            <div class="dmt-section-title">Full Market Data</div>
+            <div class="dmt-section-desc">Click column headers to sort. All capacity figures in MW.</div>
+            <div class="dmt-table-wrap">
+                <table class="dmt-table" id="dmtTable">
+                    <thead>
+                        <tr>
+                            <th data-col="name" onclick="sortTable('name')">Market <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="region" onclick="sortTable('region')">Region <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="operational" onclick="sortTable('operational')">Operational (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="construction" onclick="sortTable('construction')">Construction (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="planned" onclick="sortTable('planned')">Planned (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="vacancy" onclick="sortTable('vacancy')">Vacancy % <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="coloPrice" onclick="sortTable('coloPrice')">Colo $/kW/mo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="powerCost" onclick="sortTable('powerCost')">Power $/kWh <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="cagr" onclick="sortTable('cagr')">CAGR <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="maturity" onclick="sortTable('maturity')">Maturity <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="dmtTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 6: Regional Summary Chart -->
+        <div class="dmt-section" id="dmtChartSection">
+            <div class="dmt-section-title">Regional Capacity Summary</div>
+            <div class="dmt-section-desc">Total capacity by region: operational, under construction, and planned pipeline.</div>
+            <div class="dmt-chart-wrap">
+                <canvas id="dmtRegionalChart" height="320"></canvas>
+            </div>
+        </div>
+
+        <!-- PRO SECTION -->
+        <div class="dmt-pro-section" id="dmtProSection">
+            <div class="dmt-pro-header">
+                <div class="dmt-section-title" style="margin-bottom:0;">Advanced Analytics</div>
+                <div class="dmt-pro-badge"><i class="fas fa-crown" style="margin-right:4px;"></i> PRO</div>
+                <div class="gated-badge" onclick="handlePremiumTab()" id="dmtGatedBadge"><i class="fas fa-lock" style="font-size:0.55rem;"></i> UNLOCK</div>
+            </div>
+            <div class="dmt-pro-panels" id="dmtProPanels">
+                <!-- Panel 1: Monte Carlo -->
+                <div class="dmt-pro-panel gated-overlay" id="dmtPanelMC" onclick="handlePremiumTab()">
+                    <div class="dmt-pro-panel-title"><i class="fas fa-dice" style="margin-right:8px;color:var(--dmt-primary);"></i>Monte Carlo Market Size Forecast</div>
+                    <canvas id="dmtMcChart" height="200"></canvas>
+                    <div class="dmt-pro-kpi" id="dmtMcKpi">
+                        <div class="dmt-kpi-item"><div class="dmt-kpi-val" id="dmtMcP5">--</div><div class="dmt-kpi-label">P5 (GW)</div></div>
+                        <div class="dmt-kpi-item"><div class="dmt-kpi-val" id="dmtMcP50">--</div><div class="dmt-kpi-label">P50 (GW)</div></div>
+                        <div class="dmt-kpi-item"><div class="dmt-kpi-val" id="dmtMcP95">--</div><div class="dmt-kpi-label">P95 (GW)</div></div>
+                    </div>
+                </div>
+
+                <!-- Panel 2: 5-Year Regional Growth -->
+                <div class="dmt-pro-panel gated-overlay" id="dmtPanel5Y" onclick="handlePremiumTab()">
+                    <div class="dmt-pro-panel-title"><i class="fas fa-chart-area" style="margin-right:8px;color:var(--dmt-accent);"></i>5-Year Regional Growth Projection</div>
+                    <canvas id="dmt5yChart" height="200"></canvas>
+                    <div class="dmt-pro-kpi" id="dmt5yKpi">
+                        <div class="dmt-kpi-item"><div class="dmt-kpi-val" id="dmt5yFastest">--</div><div class="dmt-kpi-label">Fastest Region</div></div>
+                        <div class="dmt-kpi-item"><div class="dmt-kpi-val" id="dmt5yTotal">--</div><div class="dmt-kpi-label">Total MW Added</div></div>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Sensitivity Tornado -->
+                <div class="dmt-pro-panel gated-overlay" id="dmtPanelTornado" onclick="handlePremiumTab()">
+                    <div class="dmt-pro-panel-title"><i class="fas fa-wind" style="margin-right:8px;color:var(--dmt-amber);"></i>Sensitivity Tornado</div>
+                    <canvas id="dmtTornadoChart" height="200"></canvas>
+                </div>
+
+                <!-- Panel 4: Strategic Narrative -->
+                <div class="dmt-pro-panel gated-overlay" id="dmtPanelNarrative" onclick="handlePremiumTab()">
+                    <div class="dmt-pro-panel-title"><i class="fas fa-lightbulb" style="margin-right:8px;color:var(--dmt-violet);"></i>Strategic Narrative &amp; Investment Thesis</div>
+                    <div id="dmtNarrative" style="font-size:0.82rem;color:var(--dmt-text2);line-height:1.8;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Free Watermark -->
+        <div id="dmtFreeWatermark" style="text-align:center;padding:8px 16px;margin-top:0.75rem;border-radius:8px;background:rgba(139,92,246,0.08);border:1px dashed rgba(139,92,246,0.25);font-size:0.7rem;color:#a78bfa;letter-spacing:0.3px;">
+            <i class="fas fa-crown" style="margin-right:4px;"></i> Upgrade to PRO for Monte Carlo forecasts, 5-year projections, tornado analysis &amp; strategic narrative
+        </div>
+
+        <!-- PDF Export Button (PRO only) -->
+        <div style="text-align:center;margin-top:1.5rem;" id="dmtPdfWrap">
+            <button onclick="gatedAction('pdf')" style="padding:12px 28px;border-radius:10px;border:1px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.08);color:#ef4444;font-size:0.88rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;">
+                <i class="fas fa-file-pdf" style="margin-right:8px;"></i>Export PDF Report
+            </button>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="dmt-disclaimer">
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+                <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
+                <div>
+                    <div style="font-weight:700;font-size:0.8rem;color:var(--dmt-text);margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
+                    <p style="font-size:0.72rem;color:var(--dmt-text2);line-height:1.65;margin:0 0 0.5rem 0;">This dashboard is provided for <strong>educational and estimation purposes only</strong>. Data represents Q1 2025 estimates compiled from public industry reports and should not be used as the sole basis for investment decisions. Always consult qualified professionals for site-specific analysis.</p>
+                    <p style="font-size:0.72rem;color:var(--dmt-text2);line-height:1.65;margin:0 0 0.5rem 0;"><strong>Data sources:</strong> Synergy Research Group, CBRE Data Center Solutions, Dell'Oro Group, ABI Research, JLL Data Center Outlook, Cushman &amp; Wakefield, individual market reports.</p>
+                    <p style="font-size:0.72rem;color:var(--dmt-text2);line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:var(--dmt-primary);text-decoration:underline;">Privacy Policy</a> for details.</p>
+                    <p style="font-size:0.68rem;color:var(--dmt-text3);line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:var(--dmt-primary);text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="dmtLoginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
+        <div style="background:var(--dmt-bg);border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:dmtModalIn 0.3s ease;">
+            <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:var(--dmt-text3);cursor:pointer;padding:4px;">&times;</button>
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#8b5cf6,#a855f7);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
+                </div>
+                <h3 style="font-size:1.3rem;font-weight:700;color:var(--dmt-text);margin-bottom:0.25rem;">Sign In</h3>
+                <p style="font-size:0.85rem;color:var(--dmt-text3);">Access advanced analytics, forecasts, and PDF export.</p>
+            </div>
+            <div id="dmtLoginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#dc2626;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Invalid credentials</div>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                    <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--dmt-text2);margin-bottom:6px;">Email</label>
+                    <input type="email" id="dmtLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid var(--dmt-border);border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;background:var(--dmt-bg);color:var(--dmt-text);" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor=''">
+                </div>
+                <div>
+                    <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--dmt-text2);margin-bottom:6px;">Password</label>
+                    <input type="password" id="dmtLoginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid var(--dmt-border);border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;background:var(--dmt-bg);color:var(--dmt-text);" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor=''" onkeydown="if(event.key==='Enter')attemptLogin()">
+                </div>
+                <button onclick="attemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(139,92,246,0.3);" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In
+                </button>
+            </div>
+            <div style="text-align:center;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--dmt-border);">
+                <p style="font-size:0.75rem;color:var(--dmt-text3);">Features: Monte Carlo forecast, 5-year projections, tornado analysis, PDF export</p>
+                <div style="margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);font-size:0.78rem;color:var(--dmt-text3);line-height:1.6;">
+                    <span style="color:#8b5cf6;font-weight:600;">Demo Account:</span><br>
+                    <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo@resistancezero.com</code> / <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo2026</code>
+                </div>
+                <p style="font-size:0.68rem;color:var(--dmt-text3);margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;">Privacy Policy</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dmt-footer">
+        <div class="dmt-footer-inner">
+            <div>
+                <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.15em;color:#64748b;line-height:1.6;margin-bottom:1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                <p style="font-size:0.65rem;letter-spacing:0.1em;color:#475569;margin-bottom:0.75rem;">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                <p style="font-size:0.75rem;color:#64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">NAVIGATION</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="index.html">Home Dashboard</a></li>
+                    <li><a href="articles.html">Technical Journal</a></li>
+                    <li><a href="index.html#case-studies">Case Studies</a></li>
+                    <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">CONNECT</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+                    <li><a href="articles.html">Technical Journal</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle -->
+    <button class="dmt-theme-toggle" id="dmtThemeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <i class="fas fa-moon" id="dmtThemeIcon"></i>
+    </button>
+
+    <!-- Cookie Banner -->
+    <div class="dmt-cookie-banner hidden" id="dmtCookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="dmt-cookie-actions">
+            <button class="dmt-cookie-accept" id="dmtCookieAccept">Accept</button>
+            <button class="dmt-cookie-decline" id="dmtCookieDecline">Decline</button>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <button class="dmt-scroll-top" id="dmtScrollTop" aria-label="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <script src="script.min.js?v=20260225"></script>
+
+    <!-- Main IIFE -->
+    <script>
+    (function(){
+        'use strict';
+
+        // ═══════════════════════════════════════════
+        // DATA
+        // ═══════════════════════════════════════════
+        var MARKETS = {
+            'n-virginia': { name: 'Northern Virginia', lat: 38.9, lng: -77.4, operational: 4040, construction: 1100, planned: 5500, maturity: 'established', players: ['AWS', 'Microsoft', 'Google', 'Equinix', 'Digital Realty', 'QTS'], powerCost: 0.065, vacancy: 1.4, coloPrice: 215, cagr: 0.25, region: 'North America' },
+            'dallas': { name: 'Dallas/Fort Worth', lat: 32.8, lng: -96.8, operational: 1200, construction: 600, planned: 2000, maturity: 'established', players: ['CyrusOne', 'DataBank', 'TierPoint', 'Flexential'], powerCost: 0.055, vacancy: 2.1, coloPrice: 160, cagr: 0.22, region: 'North America' },
+            'phoenix': { name: 'Phoenix', lat: 33.4, lng: -112.0, operational: 800, construction: 500, planned: 1500, maturity: 'established', players: ['Microsoft', 'Google', 'CyrusOne', 'Stream'], powerCost: 0.058, vacancy: 3.5, coloPrice: 150, cagr: 0.20, region: 'North America' },
+            'chicago': { name: 'Chicago', lat: 41.9, lng: -87.6, operational: 700, construction: 300, planned: 800, maturity: 'established', players: ['Equinix', 'Digital Realty', 'QTS'], powerCost: 0.072, vacancy: 2.8, coloPrice: 175, cagr: 0.15, region: 'North America' },
+            'silicon-valley': { name: 'Silicon Valley', lat: 37.4, lng: -122.0, operational: 600, construction: 200, planned: 500, maturity: 'established', players: ['Equinix', 'CoreSite', 'Vantage'], powerCost: 0.095, vacancy: 1.8, coloPrice: 250, cagr: 0.08, region: 'North America' },
+            'toronto': { name: 'Toronto', lat: 43.7, lng: -79.4, operational: 400, construction: 200, planned: 600, maturity: 'growing', players: ['Equinix', 'Allied REIT', 'Cologix'], powerCost: 0.085, vacancy: 4.2, coloPrice: 155, cagr: 0.18, region: 'North America' },
+            'london': { name: 'London', lat: 51.5, lng: -0.1, operational: 1500, construction: 400, planned: 1200, maturity: 'established', players: ['Equinix', 'NTT', 'Virtus', 'Digital Realty'], powerCost: 0.170, vacancy: 2.5, coloPrice: 200, cagr: 0.10, region: 'Europe' },
+            'frankfurt': { name: 'Frankfurt', lat: 50.1, lng: 8.7, operational: 900, construction: 300, planned: 800, maturity: 'established', players: ['Equinix', 'NTT', 'Interxion', 'e-shelter'], powerCost: 0.150, vacancy: 5.1, coloPrice: 195, cagr: 0.10, region: 'Europe' },
+            'amsterdam': { name: 'Amsterdam', lat: 52.4, lng: 4.9, operational: 600, construction: 150, planned: 400, maturity: 'established', players: ['Equinix', 'Digital Realty', 'NorthC'], powerCost: 0.130, vacancy: 7.2, coloPrice: 180, cagr: 0.08, region: 'Europe' },
+            'paris': { name: 'Paris', lat: 48.9, lng: 2.3, operational: 450, construction: 200, planned: 500, maturity: 'growing', players: ['Equinix', 'Data4', 'Interxion'], powerCost: 0.140, vacancy: 4.0, coloPrice: 190, cagr: 0.12, region: 'Europe' },
+            'dublin': { name: 'Dublin', lat: 53.3, lng: -6.3, operational: 400, construction: 100, planned: 300, maturity: 'growing', players: ['Microsoft', 'AWS', 'Google', 'Echelon'], powerCost: 0.155, vacancy: 3.8, coloPrice: 185, cagr: 0.06, region: 'Europe' },
+            'singapore': { name: 'Singapore', lat: 1.3, lng: 103.8, operational: 850, construction: 150, planned: 500, maturity: 'established', players: ['Equinix', 'Digital Realty', 'NTT', 'ST Telemedia'], powerCost: 0.180, vacancy: 0.8, coloPrice: 390, cagr: 0.12, region: 'Asia Pacific' },
+            'tokyo': { name: 'Tokyo', lat: 35.7, lng: 139.7, operational: 1200, construction: 400, planned: 800, maturity: 'established', players: ['NTT', 'Equinix', 'KDDI', 'IIJ'], powerCost: 0.160, vacancy: 1.2, coloPrice: 270, cagr: 0.08, region: 'Asia Pacific' },
+            'hong-kong': { name: 'Hong Kong', lat: 22.3, lng: 114.2, operational: 500, construction: 100, planned: 300, maturity: 'established', players: ['NTT', 'Equinix', 'SUNeVision', 'Digital Realty'], powerCost: 0.145, vacancy: 2.0, coloPrice: 280, cagr: 0.06, region: 'Asia Pacific' },
+            'sydney': { name: 'Sydney', lat: -33.9, lng: 151.2, operational: 600, construction: 250, planned: 500, maturity: 'established', players: ['Equinix', 'NextDC', 'AirTrunk', 'Macquarie'], powerCost: 0.140, vacancy: 3.2, coloPrice: 180, cagr: 0.14, region: 'Asia Pacific' },
+            'mumbai': { name: 'Mumbai', lat: 19.1, lng: 72.9, operational: 500, construction: 300, planned: 800, maturity: 'growing', players: ['NTT', 'STT GDC', 'Adani Connex', 'Yotta'], powerCost: 0.085, vacancy: 6.0, coloPrice: 125, cagr: 0.20, region: 'Asia Pacific' },
+            'jakarta': { name: 'Jakarta', lat: -6.2, lng: 106.8, operational: 350, construction: 200, planned: 500, maturity: 'growing', players: ['NTT', 'DCI Indonesia', 'SpaceDC', 'Princeton Digital'], powerCost: 0.080, vacancy: 4.5, coloPrice: 160, cagr: 0.18, region: 'Asia Pacific' },
+            'seoul': { name: 'Seoul', lat: 37.6, lng: 127.0, operational: 700, construction: 200, planned: 400, maturity: 'established', players: ['KT', 'Samsung SDS', 'Naver', 'LG'], powerCost: 0.095, vacancy: 2.5, coloPrice: 210, cagr: 0.10, region: 'Asia Pacific' },
+            'kuala-lumpur': { name: 'Kuala Lumpur', lat: 3.1, lng: 101.7, operational: 250, construction: 150, planned: 400, maturity: 'growing', players: ['AIMS', 'YTL', 'Bridge DC', 'Keppel'], powerCost: 0.060, vacancy: 5.5, coloPrice: 140, cagr: 0.22, region: 'Asia Pacific' },
+            'sao-paulo': { name: 'S\u00e3o Paulo', lat: -23.5, lng: -46.6, operational: 400, construction: 150, planned: 300, maturity: 'growing', players: ['Equinix', 'Ascenty', 'ODATA', 'Digital Realty'], powerCost: 0.100, vacancy: 5.0, coloPrice: 165, cagr: 0.16, region: 'Latin America' },
+            'santiago': { name: 'Santiago', lat: -33.4, lng: -70.6, operational: 100, construction: 50, planned: 150, maturity: 'emerging', players: ['ODATA', 'Ascenty', 'GTD'], powerCost: 0.090, vacancy: 8.0, coloPrice: 145, cagr: 0.18, region: 'Latin America' },
+            'dubai': { name: 'Dubai', lat: 25.2, lng: 55.3, operational: 200, construction: 100, planned: 400, maturity: 'growing', players: ['Khazna', 'Gulf Data Hub', 'Moro Hub'], powerCost: 0.065, vacancy: 3.0, coloPrice: 220, cagr: 0.25, region: 'Middle East & Africa' },
+            'johannesburg': { name: 'Johannesburg', lat: -26.2, lng: 28.0, operational: 150, construction: 80, planned: 200, maturity: 'emerging', players: ['Teraco', 'Africa Data Centres', 'Vantage'], powerCost: 0.075, vacancy: 6.0, coloPrice: 170, cagr: 0.20, region: 'Middle East & Africa' },
+            'nairobi': { name: 'Nairobi', lat: -1.3, lng: 36.8, operational: 50, construction: 30, planned: 100, maturity: 'emerging', players: ['PAIX', 'iColo', 'Africa Data Centres'], powerCost: 0.115, vacancy: 10.0, coloPrice: 200, cagr: 0.25, region: 'Middle East & Africa' },
+            'queretaro': { name: 'Quer\u00e9taro', lat: 20.6, lng: -100.4, operational: 200, construction: 100, planned: 300, maturity: 'growing', players: ['Equinix', 'KIO Networks', 'Ascenty'], powerCost: 0.070, vacancy: 4.0, coloPrice: 135, cagr: 0.20, region: 'Latin America' }
+        };
+
+        var MATURITY_COLORS = { established: '#0d9488', growing: '#f59e0b', emerging: '#8b5cf6' };
+        var REGION_COLORS = {
+            'North America': '#3b82f6',
+            'Europe': '#0d9488',
+            'Asia Pacific': '#f59e0b',
+            'Latin America': '#10b981',
+            'Middle East & Africa': '#8b5cf6'
+        };
+
+        // ═══════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════
+        var isPremiumUser = false;
+        var userTier = 'free';
+        var activeRegion = 'all';
+        var activeMaturity = 'all';
+        var activeSort = 'operational';
+        var tableSortCol = 'operational';
+        var tableSortAsc = false;
+        var chartInstances = {};
+
+        // ═══════════════════════════════════════════
+        // UTILITIES
+        // ═══════════════════════════════════════════
+        function formatMW(val) {
+            if (val >= 1000) return (val / 1000).toFixed(1) + ' GW';
+            return val.toLocaleString() + ' MW';
+        }
+
+        function getFilteredMarkets() {
+            var keys = Object.keys(MARKETS);
+            return keys.filter(function(k) {
+                var m = MARKETS[k];
+                if (activeRegion !== 'all' && m.region !== activeRegion) return false;
+                if (activeMaturity !== 'all' && m.maturity !== activeMaturity) return false;
+                return true;
+            });
+        }
+
+        function getSortedMarkets(keys, sortBy) {
+            var sorted = keys.slice();
+            sorted.sort(function(a, b) {
+                var ma = MARKETS[a], mb = MARKETS[b];
+                if (sortBy === 'name') return ma.name.localeCompare(mb.name);
+                if (sortBy === 'region') return ma.region.localeCompare(mb.region);
+                if (sortBy === 'maturity') return ma.maturity.localeCompare(mb.maturity);
+                return (mb[sortBy] || 0) - (ma[sortBy] || 0);
+            });
+            return sorted;
+        }
+
+        function cagrClass(c) {
+            if (c >= 0.20) return 'dmt-cagr-high';
+            if (c >= 0.10) return 'dmt-cagr-mid';
+            return 'dmt-cagr-low';
+        }
+
+        // ═══════════════════════════════════════════
+        // LEAFLET MAP
+        // ═══════════════════════════════════════════
+        var dmtMap = null;
+        var dmtMarkers = [];
+
+        function initLeafletMap() {
+            if (dmtMap) return;
+            var mapEl = document.getElementById('dmtLeafletMap');
+            if (!mapEl || typeof L === 'undefined') return;
+
+            dmtMap = L.map('dmtLeafletMap', {
+                center: [25, 10],
+                zoom: 2,
+                minZoom: 2,
+                maxZoom: 8,
+                zoomControl: true,
+                worldCopyJump: true,
+                attributionControl: true
+            });
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(dmtMap);
+
+            renderMap();
+        }
+
+        function renderMap() {
+            if (!dmtMap) return;
+            // Clear existing markers
+            dmtMarkers.forEach(function(m) { dmtMap.removeLayer(m); });
+            dmtMarkers = [];
+
+            var keys = Object.keys(MARKETS);
+            keys.forEach(function(k) {
+                var m = MARKETS[k];
+                var isFiltered = true;
+                if (activeRegion !== 'all' && m.region !== activeRegion) isFiltered = false;
+                if (activeMaturity !== 'all' && m.maturity !== activeMaturity) isFiltered = false;
+
+                var color = MATURITY_COLORS[m.maturity];
+                var radius = Math.max(6, Math.min(25, Math.sqrt(m.operational) * 0.8));
+
+                var marker = L.circleMarker([m.lat, m.lng], {
+                    radius: isFiltered ? radius : radius * 0.5,
+                    fillColor: color,
+                    color: color,
+                    weight: isFiltered ? 1 : 0.5,
+                    opacity: isFiltered ? 0.8 : 0.2,
+                    fillOpacity: isFiltered ? 0.6 : 0.1
+                }).addTo(dmtMap);
+
+                if (isFiltered) {
+                    // Popup content
+                    var popupHtml = '<div style="min-width:180px;">' +
+                        '<div style="font-weight:700;font-size:0.9rem;color:#f1f5f9;margin-bottom:4px;">' + m.name + '</div>' +
+                        '<div style="font-size:0.72rem;color:#94a3b8;margin-bottom:8px;">' + m.region + '</div>' +
+                        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' +
+                        '<div><div style="color:#0d9488;font-weight:700;font-size:0.85rem;">' + formatMW(m.operational) + '</div><div style="color:#64748b;font-size:0.65rem;">Operational</div></div>' +
+                        '<div><div style="color:#f59e0b;font-weight:700;font-size:0.85rem;">' + formatMW(m.construction) + '</div><div style="color:#64748b;font-size:0.65rem;">Construction</div></div>' +
+                        '<div><div style="color:#8b5cf6;font-weight:700;font-size:0.85rem;">' + formatMW(m.planned) + '</div><div style="color:#64748b;font-size:0.65rem;">Planned</div></div>' +
+                        '<div><div style="color:#06b6d4;font-weight:700;font-size:0.85rem;">' + (m.cagr * 100).toFixed(0) + '%</div><div style="color:#64748b;font-size:0.65rem;">CAGR</div></div>' +
+                        '</div>' +
+                        '<div style="margin-top:8px;padding-top:6px;border-top:1px solid #334155;display:grid;grid-template-columns:1fr 1fr;gap:4px;">' +
+                        '<div style="color:#64748b;font-size:0.65rem;">Vacancy: <span style="color:#e2e8f0;font-weight:600;">' + m.vacancy + '%</span></div>' +
+                        '<div style="color:#64748b;font-size:0.65rem;">Colo: <span style="color:#e2e8f0;font-weight:600;">$' + m.coloPrice + '/kW</span></div>' +
+                        '</div>' +
+                        '<div style="margin-top:6px;font-size:0.65rem;color:#64748b;">' + m.players.slice(0, 4).join(', ') + '</div>' +
+                        '</div>';
+
+                    marker.bindPopup(popupHtml, { maxWidth: 250 });
+
+                    // Hover effect
+                    marker.on('mouseover', function() {
+                        this.setStyle({ fillOpacity: 0.9, weight: 2 });
+                    });
+                    marker.on('mouseout', function() {
+                        this.setStyle({ fillOpacity: 0.6, weight: 1 });
+                    });
+                }
+
+                dmtMarkers.push(marker);
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // FILTERS
+        // ═══════════════════════════════════════════
+        window.setFilter = function(type, value, btn) {
+            if (type === 'region') activeRegion = value;
+            if (type === 'maturity') activeMaturity = value;
+            var pills = btn.parentElement.querySelectorAll('.dmt-pill');
+            pills.forEach(function(p) { p.classList.remove('active'); });
+            btn.classList.add('active');
+            renderAll();
+        };
+
+        window.applySort = function(val) {
+            activeSort = val;
+            renderCards();
+        };
+
+        // ═══════════════════════════════════════════
+        // MARKET CARDS
+        // ═══════════════════════════════════════════
+        function renderCards() {
+            var grid = document.getElementById('dmtCardsGrid');
+            var keys = getSortedMarkets(getFilteredMarkets(), activeSort);
+            var html = '';
+            keys.forEach(function(k) {
+                var m = MARKETS[k];
+                html += '<div class="dmt-market-card">';
+                html += '<div class="dmt-card-header">';
+                html += '<div><div class="dmt-card-name">' + m.name + '</div><div class="dmt-card-region">' + m.region + '</div></div>';
+                html += '<span class="dmt-cagr-badge ' + cagrClass(m.cagr) + '">' + (m.cagr * 100).toFixed(0) + '% CAGR</span>';
+                html += '</div>';
+                html += '<div class="dmt-card-metrics">';
+                html += '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-primary);">' + m.operational.toLocaleString() + '</div><div class="dmt-cm-label">Operational MW</div></div>';
+                html += '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-amber);">' + m.construction.toLocaleString() + '</div><div class="dmt-cm-label">Construction MW</div></div>';
+                html += '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-blue);">' + m.planned.toLocaleString() + '</div><div class="dmt-cm-label">Planned MW</div></div>';
+                html += '</div>';
+                html += '<div class="dmt-card-details">';
+                html += '<div class="dmt-cd-item"><div class="dmt-cd-val">' + m.vacancy + '%</div><div class="dmt-cd-label">Vacancy</div></div>';
+                html += '<div class="dmt-cd-item"><div class="dmt-cd-val">$' + m.coloPrice + '</div><div class="dmt-cd-label">$/kW/mo</div></div>';
+                html += '<div class="dmt-cd-item"><div class="dmt-cd-val">$' + m.powerCost.toFixed(3) + '</div><div class="dmt-cd-label">$/kWh</div></div>';
+                html += '</div>';
+                html += '<div class="dmt-card-players"><span>' + m.players.slice(0, 4).join('</span> &middot; <span>') + '</span></div>';
+                html += '</div>';
+            });
+            grid.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════
+        // DATA TABLE
+        // ═══════════════════════════════════════════
+        window.sortTable = function(col) {
+            if (tableSortCol === col) {
+                tableSortAsc = !tableSortAsc;
+            } else {
+                tableSortCol = col;
+                tableSortAsc = (col === 'name' || col === 'region' || col === 'maturity');
+            }
+            renderTable();
+            // Update header icons
+            document.querySelectorAll('.dmt-table th').forEach(function(th) {
+                th.classList.remove('sorted');
+                if (th.getAttribute('data-col') === col) th.classList.add('sorted');
+            });
+        };
+
+        function renderTable() {
+            var tbody = document.getElementById('dmtTableBody');
+            var keys = getFilteredMarkets();
+            var sorted = keys.slice();
+            sorted.sort(function(a, b) {
+                var ma = MARKETS[a], mb = MARKETS[b];
+                var va, vb;
+                if (tableSortCol === 'name') { va = ma.name; vb = mb.name; }
+                else if (tableSortCol === 'region') { va = ma.region; vb = mb.region; }
+                else if (tableSortCol === 'maturity') { va = ma.maturity; vb = mb.maturity; }
+                else { va = ma[tableSortCol] || 0; vb = mb[tableSortCol] || 0; }
+                if (typeof va === 'string') {
+                    return tableSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+                }
+                return tableSortAsc ? va - vb : vb - va;
+            });
+
+            var html = '';
+            sorted.forEach(function(k) {
+                var m = MARKETS[k];
+                var matBadge = '<span style="padding:2px 8px;border-radius:50px;font-size:0.68rem;font-weight:600;background:' +
+                    (m.maturity === 'established' ? 'rgba(13,148,136,0.12);color:#0d9488;' :
+                     m.maturity === 'growing' ? 'rgba(245,158,11,0.12);color:#f59e0b;' :
+                     'rgba(139,92,246,0.12);color:#8b5cf6;') + '">' +
+                    m.maturity.charAt(0).toUpperCase() + m.maturity.slice(1) + '</span>';
+                html += '<tr>';
+                html += '<td style="font-weight:600;">' + m.name + '</td>';
+                html += '<td>' + m.region + '</td>';
+                html += '<td class="mono">' + m.operational.toLocaleString() + '</td>';
+                html += '<td class="mono">' + m.construction.toLocaleString() + '</td>';
+                html += '<td class="mono">' + m.planned.toLocaleString() + '</td>';
+                html += '<td class="mono">' + m.vacancy + '%</td>';
+                html += '<td class="mono">$' + m.coloPrice + '</td>';
+                html += '<td class="mono">$' + m.powerCost.toFixed(3) + '</td>';
+                html += '<td class="mono" style="color:' + (m.cagr >= 0.20 ? '#10b981' : m.cagr >= 0.10 ? '#f59e0b' : 'var(--dmt-text3)') + ';">' + (m.cagr * 100).toFixed(0) + '%</td>';
+                html += '<td>' + matBadge + '</td>';
+                html += '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════
+        // REGIONAL CHART
+        // ═══════════════════════════════════════════
+        function renderRegionalChart() {
+            var regions = {};
+            Object.keys(MARKETS).forEach(function(k) {
+                var m = MARKETS[k];
+                if (!regions[m.region]) regions[m.region] = { operational: 0, construction: 0, planned: 0 };
+                regions[m.region].operational += m.operational;
+                regions[m.region].construction += m.construction;
+                regions[m.region].planned += m.planned;
+            });
+            var labels = Object.keys(regions).sort(function(a, b) { return regions[b].operational - regions[a].operational; });
+            var opData = labels.map(function(r) { return regions[r].operational; });
+            var conData = labels.map(function(r) { return regions[r].construction; });
+            var planData = labels.map(function(r) { return regions[r].planned; });
+
+            var ctx = document.getElementById('dmtRegionalChart');
+            if (!ctx) return;
+            if (chartInstances.regional) chartInstances.regional.destroy();
+
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            var gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+            var textColor = isDark ? '#cbd5e1' : '#64748b';
+
+            chartInstances.regional = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Operational (MW)', data: opData, backgroundColor: '#0d9488', borderRadius: 4 },
+                        { label: 'Construction (MW)', data: conData, backgroundColor: '#f59e0b', borderRadius: 4 },
+                        { label: 'Planned (MW)', data: planData, backgroundColor: '#3b82f6', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: textColor, font: { family: 'Inter', size: 12 } } },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            bodyColor: isDark ? '#cbd5e1' : '#475569',
+                            borderColor: isDark ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw.toLocaleString() + ' MW'; } }
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter' }, callback: function(v) { return v >= 1000 ? (v/1000) + 'K' : v; } } },
+                        y: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter', weight: '600' } } }
+                    }
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // PRO: MONTE CARLO
+        // ═══════════════════════════════════════════
+        function runMonteCarlo() {
+            var baseCapacity = 0;
+            var basePipeline = 0;
+            Object.keys(MARKETS).forEach(function(k) {
+                baseCapacity += MARKETS[k].operational;
+                basePipeline += MARKETS[k].construction + MARKETS[k].planned;
+            });
+
+            var iterations = 10000;
+            var results = [];
+            var baseCagr = 0.14;
+            for (var i = 0; i < iterations; i++) {
+                var cagrVar = baseCagr * (1 + (Math.random() - 0.5) * 0.6); // +-30%
+                var pipelineRate = 0.7 * (1 + (Math.random() - 0.5) * 0.5); // +-25%
+                var cap2030 = baseCapacity * Math.pow(1 + cagrVar, 5) + basePipeline * pipelineRate;
+                results.push(cap2030 / 1000); // GW
+            }
+            results.sort(function(a, b) { return a - b; });
+
+            var p5 = results[Math.floor(iterations * 0.05)];
+            var p50 = results[Math.floor(iterations * 0.50)];
+            var p95 = results[Math.floor(iterations * 0.95)];
+
+            document.getElementById('dmtMcP5').textContent = p5.toFixed(1);
+            document.getElementById('dmtMcP50').textContent = p50.toFixed(1);
+            document.getElementById('dmtMcP95').textContent = p95.toFixed(1);
+
+            // Histogram
+            var bins = 30;
+            var minVal = results[0], maxVal = results[results.length - 1];
+            var binWidth = (maxVal - minVal) / bins;
+            var counts = new Array(bins).fill(0);
+            var labels = [];
+            results.forEach(function(v) {
+                var idx = Math.min(Math.floor((v - minVal) / binWidth), bins - 1);
+                counts[idx]++;
+            });
+            for (var b = 0; b < bins; b++) {
+                labels.push((minVal + b * binWidth).toFixed(0));
+            }
+
+            var ctx = document.getElementById('dmtMcChart');
+            if (!ctx) return;
+            if (chartInstances.mc) chartInstances.mc.destroy();
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            chartInstances.mc = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: counts,
+                        backgroundColor: 'rgba(13,148,136,0.5)',
+                        borderColor: '#0d9488',
+                        borderWidth: 1,
+                        borderRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            bodyColor: isDark ? '#cbd5e1' : '#475569',
+                            borderColor: isDark ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            callbacks: { title: function(items) { return items[0].label + ' GW'; }, label: function(ctx) { return ctx.raw + ' iterations'; } }
+                        }
+                    },
+                    scales: {
+                        x: { display: true, grid: { display: false }, ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { size: 9 }, maxTicksLimit: 8 }, title: { display: true, text: 'Global Capacity 2030 (GW)', color: isDark ? '#94a3b8' : '#64748b', font: { size: 11 } } },
+                        y: { display: true, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: isDark ? '#94a3b8' : '#64748b' } }
+                    }
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // PRO: 5-YEAR PROJECTION
+        // ═══════════════════════════════════════════
+        function render5YProjection() {
+            var regions = {};
+            Object.keys(MARKETS).forEach(function(k) {
+                var m = MARKETS[k];
+                if (!regions[m.region]) regions[m.region] = { cap: 0, cagr: 0, count: 0 };
+                regions[m.region].cap += m.operational;
+                regions[m.region].cagr += m.cagr;
+                regions[m.region].count++;
+            });
+            var regionNames = Object.keys(regions);
+            var years = ['2025', '2026', '2027', '2028', '2029', '2030'];
+            var datasets = [];
+            var totalAdded = 0;
+            var fastestRegion = '';
+            var fastestGrowth = 0;
+
+            regionNames.forEach(function(r) {
+                var avgCagr = regions[r].cagr / regions[r].count;
+                var data = [];
+                var baseCap = regions[r].cap;
+                for (var y = 0; y < 6; y++) {
+                    data.push(Math.round(baseCap * Math.pow(1 + avgCagr, y)));
+                }
+                var growth = data[5] - data[0];
+                totalAdded += growth;
+                if (growth > fastestGrowth) { fastestGrowth = growth; fastestRegion = r; }
+                datasets.push({
+                    label: r,
+                    data: data,
+                    borderColor: REGION_COLORS[r],
+                    backgroundColor: REGION_COLORS[r] + '20',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2
+                });
+            });
+
+            document.getElementById('dmt5yFastest').textContent = fastestRegion.split(' ')[0];
+            document.getElementById('dmt5yTotal').textContent = (totalAdded / 1000).toFixed(1) + 'K';
+
+            var ctx = document.getElementById('dmt5yChart');
+            if (!ctx) return;
+            if (chartInstances.fiveYear) chartInstances.fiveYear.destroy();
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            chartInstances.fiveYear = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: { labels: years, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: isDark ? '#cbd5e1' : '#64748b', font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 12 } },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            bodyColor: isDark ? '#cbd5e1' : '#475569',
+                            borderColor: isDark ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw.toLocaleString() + ' MW'; } }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: isDark ? '#94a3b8' : '#64748b' } },
+                        y: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: function(v) { return (v/1000).toFixed(0) + 'K'; } } }
+                    }
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // PRO: TORNADO
+        // ═══════════════════════════════════════════
+        function renderTornado() {
+            var totalCap = 0;
+            Object.keys(MARKETS).forEach(function(k) { totalCap += MARKETS[k].operational; });
+            var base2030 = totalCap * Math.pow(1.14, 5);
+
+            var variables = [
+                { name: 'CAGR Variance', low: -0.04, high: 0.06 },
+                { name: 'AI Workload Growth', low: -0.02, high: 0.08 },
+                { name: 'Hyperscaler CAPEX', low: -0.03, high: 0.05 },
+                { name: 'Construction Inflation', low: -0.05, high: -0.01 },
+                { name: 'Power Cost Trends', low: -0.03, high: 0.02 },
+                { name: 'Renewable Adoption', low: -0.01, high: 0.03 },
+                { name: 'Vacancy Rate Shifts', low: -0.02, high: 0.02 }
+            ];
+
+            var labels = variables.map(function(v) { return v.name; });
+            var lowData = variables.map(function(v) { return Math.round(base2030 * v.low); });
+            var highData = variables.map(function(v) { return Math.round(base2030 * v.high); });
+
+            var ctx = document.getElementById('dmtTornadoChart');
+            if (!ctx) return;
+            if (chartInstances.tornado) chartInstances.tornado.destroy();
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            chartInstances.tornado = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Downside (MW)', data: lowData, backgroundColor: 'rgba(239,68,68,0.6)', borderRadius: 3 },
+                        { label: 'Upside (MW)', data: highData, backgroundColor: 'rgba(16,185,129,0.6)', borderRadius: 3 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#64748b', font: { family: 'Inter', size: 11 } } },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            bodyColor: isDark ? '#cbd5e1' : '#475569',
+                            borderColor: isDark ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw.toLocaleString() + ' MW'; } }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: function(v) { return (v/1000).toFixed(0) + 'K'; } } },
+                        y: { grid: { display: false }, ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // PRO: NARRATIVE
+        // ═══════════════════════════════════════════
+        function renderNarrative() {
+            var allKeys = Object.keys(MARKETS);
+            var topGrowth = allKeys.slice().sort(function(a, b) { return MARKETS[b].cagr - MARKETS[a].cagr; }).slice(0, 5);
+            var totalOp = 0, totalCon = 0, totalPlan = 0;
+            allKeys.forEach(function(k) {
+                totalOp += MARKETS[k].operational;
+                totalCon += MARKETS[k].construction;
+                totalPlan += MARKETS[k].planned;
+            });
+
+            var html = '';
+            html += '<p style="margin-bottom:1rem;"><strong style="color:var(--dmt-primary);">Market Overview:</strong> The global data center market comprises ' + formatMW(totalOp) + ' of operational capacity with ' + formatMW(totalCon) + ' under active construction and ' + formatMW(totalPlan) + ' in the planning pipeline. This represents an unprecedented build-out driven primarily by hyperscaler AI/ML workloads and sovereign cloud requirements.</p>';
+            html += '<p style="margin-bottom:1rem;"><strong style="color:var(--dmt-primary);">Top 5 Markets to Watch:</strong></p><ol style="padding-left:1.5rem;margin-bottom:1rem;">';
+            topGrowth.forEach(function(k) {
+                var m = MARKETS[k];
+                html += '<li style="margin-bottom:0.4rem;"><strong>' + m.name + '</strong> (' + (m.cagr * 100).toFixed(0) + '% CAGR) &mdash; ' + formatMW(m.construction + m.planned) + ' pipeline, $' + m.powerCost.toFixed(3) + '/kWh power cost</li>';
+            });
+            html += '</ol>';
+            html += '<p style="margin-bottom:1rem;"><strong style="color:var(--dmt-amber);">Key Risk Factors:</strong> Power grid constraints in established markets (NoVA, Singapore, Dublin), rising construction costs (+18% since 2023), water scarcity affecting cooling design, and evolving regulatory frameworks around AI energy consumption.</p>';
+            html += '<p><strong style="color:var(--dmt-emerald);">Investment Thesis:</strong> Emerging markets in APAC (Jakarta, KL) and Middle East (Dubai) offer the strongest risk-adjusted growth with 20-25% CAGR, competitive power costs, and favorable regulatory environments. North American gateway markets remain dominant but face margin compression from infrastructure constraints.</p>';
+
+            document.getElementById('dmtNarrative').innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════
+        // RENDER ALL
+        // ═══════════════════════════════════════════
+        function renderAll() {
+            renderMap();
+            renderCards();
+            renderTable();
+        }
+
+        // ═══════════════════════════════════════════
+        // MODE SWITCH
+        // ═══════════════════════════════════════════
+        window.switchDmtMode = function(mode) {
+            document.querySelectorAll('.dmt-mode-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-mode') === mode) btn.classList.add('active');
+            });
+            // Analysis mode shows chart section more prominently
+            var chartSection = document.getElementById('dmtChartSection');
+            var tableSection = document.getElementById('dmtTableSection');
+            if (mode === 'analysis') {
+                chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        // ═══════════════════════════════════════════
+        // PREMIUM ACCESS SYSTEM
+        // ═══════════════════════════════════════════
+        (function checkPremiumSession() {
+            var session = localStorage.getItem('rz_premium_session');
+            if (session) {
+                try {
+                    var data = JSON.parse(session);
+                    var expiresMs = typeof data.expires === 'string' ? new Date(data.expires).getTime() : data.expires;
+                    if (expiresMs > Date.now()) {
+                        isPremiumUser = true;
+                        userTier = data.tier || 'pro';
+                        activatePremiumUI();
+                    } else {
+                        localStorage.removeItem('rz_premium_session');
+                    }
+                } catch(e) {
+                    localStorage.removeItem('rz_premium_session');
+                }
+            }
+        })();
+
+        window.addEventListener('rz-auth-change', function(e) {
+            if (e.detail && e.detail.action === 'login') {
+                isPremiumUser = true;
+                userTier = e.detail.tier || 'pro';
+                activatePremiumUI();
+            } else if (e.detail && e.detail.action === 'logout') {
+                isPremiumUser = false;
+                userTier = 'free';
+                localStorage.removeItem('rz_premium_session');
+                deactivatePremiumUI();
+            }
+        });
+
+        window.handlePremiumTab = function() {
+            if (isPremiumUser) return;
+            var modal = document.getElementById('dmtLoginModal');
+            modal.style.display = 'flex';
+            document.getElementById('dmtLoginError').style.display = 'none';
+            document.getElementById('dmtLoginEmail').value = '';
+            document.getElementById('dmtLoginPassword').value = '';
+            setTimeout(function() { document.getElementById('dmtLoginEmail').focus(); }, 100);
+        };
+
+        window.closeLoginModal = function() {
+            document.getElementById('dmtLoginModal').style.display = 'none';
+        };
+
+        document.getElementById('dmtLoginModal').addEventListener('click', function(e) {
+            if (e.target === this) closeLoginModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLoginModal();
+        });
+
+        window.attemptLogin = function() {
+            var email = document.getElementById('dmtLoginEmail').value.trim();
+            var password = document.getElementById('dmtLoginPassword').value;
+            var errorEl = document.getElementById('dmtLoginError');
+
+            if (!email || !password) {
+                errorEl.textContent = 'Please enter email and password';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            var validUsers = [
+                { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },
+                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
+                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }
+            ];
+
+            var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
+
+            if (match) {
+                var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
+                localStorage.setItem('rz_premium_session', JSON.stringify({
+                    email: match.email, tier: match.tier,
+                    role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro',
+                    expires: expDate.toISOString()
+                }));
+                isPremiumUser = true;
+                userTier = match.tier;
+                closeLoginModal();
+                activatePremiumUI();
+                window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                    detail: { email: match.email, tier: match.tier, action: 'login' }
+                }));
+            } else {
+                errorEl.textContent = 'Invalid email or password';
+                errorEl.style.display = 'block';
+                document.getElementById('dmtLoginPassword').value = '';
+                document.getElementById('dmtLoginPassword').focus();
+            }
+        };
+
+        function activatePremiumUI() {
+            var premBtn = document.getElementById('dmtPremiumBtn');
+            premBtn.classList.add('premium-active');
+            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium Active';
+            document.getElementById('dmtPremiumBadge').style.display = 'inline-flex';
+            document.getElementById('dmtGatedBadge').style.display = 'none';
+            document.getElementById('dmtFreeWatermark').style.display = 'none';
+
+            // Remove gating overlays
+            document.querySelectorAll('.dmt-pro-panel.gated-overlay').forEach(function(p) {
+                p.classList.remove('gated-overlay');
+                p.style.cursor = 'default';
+                p.onclick = null;
+            });
+
+            // Render pro charts
+            setTimeout(function() {
+                runMonteCarlo();
+                render5YProjection();
+                renderTornado();
+                renderNarrative();
+            }, 300);
+
+            updateNavbarAuthUI();
+        }
+
+        function deactivatePremiumUI() {
+            var premBtn = document.getElementById('dmtPremiumBtn');
+            premBtn.classList.remove('premium-active');
+            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+            document.getElementById('dmtPremiumBadge').style.display = 'none';
+            document.getElementById('dmtGatedBadge').style.display = 'inline-flex';
+            document.getElementById('dmtFreeWatermark').style.display = 'block';
+
+            // Re-add gating
+            ['dmtPanelMC', 'dmtPanel5Y', 'dmtPanelTornado', 'dmtPanelNarrative'].forEach(function(id) {
+                var el = document.getElementById(id);
+                el.classList.add('gated-overlay');
+                el.style.cursor = 'pointer';
+                el.onclick = function() { handlePremiumTab(); };
+            });
+
+            updateNavbarAuthUI();
+        }
+
+        window.logoutPremium = function() {
+            if (!confirm('Logout from your account?')) return;
+            isPremiumUser = false;
+            userTier = 'free';
+            localStorage.removeItem('rz_premium_session');
+            deactivatePremiumUI();
+            var dd = document.getElementById('navUserDropdown');
+            if (dd) dd.classList.remove('show');
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { action: 'logout' } }));
+        };
+
+        window.toggleUserDropdown = function() {
+            var btn = document.getElementById('navUserBtn');
+            var dd = document.getElementById('navUserDropdown');
+            btn.classList.toggle('open');
+            dd.classList.toggle('show');
+        };
+
+        document.addEventListener('click', function(e) {
+            var wrap = document.getElementById('navAuthWrap');
+            if (wrap && !wrap.contains(e.target)) {
+                var dd = document.getElementById('navUserDropdown');
+                var btn = document.getElementById('navUserBtn');
+                if (dd) dd.classList.remove('show');
+                if (btn) btn.classList.remove('open');
+            }
+        });
+
+        function updateNavbarAuthUI() {
+            var loginBtn = document.getElementById('navLoginBtn');
+            var userBtn = document.getElementById('navUserBtn');
+            var ddEmail = document.getElementById('navDdEmail');
+            var ddBadge = document.getElementById('navDdTierBadge');
+
+            if (isPremiumUser) {
+                loginBtn.style.display = 'none';
+                userBtn.style.display = 'flex';
+                var session = {};
+                try { session = JSON.parse(localStorage.getItem('rz_premium_session') || '{}'); } catch(e) {}
+                var email = session.email || 'user@resistancezero.com';
+                document.getElementById('navUserAvatar').textContent = email.charAt(0).toUpperCase();
+                document.getElementById('navUserEmail').textContent = email.split('@')[0];
+                if (ddEmail) ddEmail.textContent = email;
+                if (ddBadge) { ddBadge.textContent = 'PRO'; ddBadge.className = 'nav-dd-tier-badge pro'; }
+            } else {
+                loginBtn.style.display = 'flex';
+                userBtn.style.display = 'none';
+            }
+        }
+
+        // ═══════════════════════════════════════════
+        // GATED ACTION
+        // ═══════════════════════════════════════════
+        window.gatedAction = function(action) {
+            if (userTier !== 'pro') {
+                handlePremiumTab();
+                return;
+            }
+            if (action === 'pdf') exportPDF();
+        };
+
+        // ═══════════════════════════════════════════
+        // PDF EXPORT
+        // ═══════════════════════════════════════════
+        function exportPDF() {
+            var w = window.open('', '_blank');
+            if (!w) { alert('Please allow pop-ups for PDF export.'); return; }
+
+            var totalOp = 0, totalCon = 0, totalPlan = 0;
+            Object.keys(MARKETS).forEach(function(k) {
+                totalOp += MARKETS[k].operational;
+                totalCon += MARKETS[k].construction;
+                totalPlan += MARKETS[k].planned;
+            });
+
+            var tableRows = '';
+            var keys = Object.keys(MARKETS).sort(function(a, b) { return MARKETS[b].operational - MARKETS[a].operational; });
+            keys.forEach(function(k) {
+                var m = MARKETS[k];
+                tableRows += '<tr><td style="font-weight:600;">' + m.name + '</td><td>' + m.region + '</td><td style="text-align:right;font-family:monospace;">' + m.operational.toLocaleString() + '</td><td style="text-align:right;font-family:monospace;">' + m.construction.toLocaleString() + '</td><td style="text-align:right;font-family:monospace;">' + m.planned.toLocaleString() + '</td><td style="text-align:right;font-family:monospace;">' + (m.cagr * 100).toFixed(0) + '%</td></tr>';
+            });
+
+            var p5 = document.getElementById('dmtMcP5').textContent;
+            var p50 = document.getElementById('dmtMcP50').textContent;
+            var p95 = document.getElementById('dmtMcP95').textContent;
+
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Global DC Market Tracker Report</title>';
+            html += '<style>body{font-family:Inter,Helvetica,Arial,sans-serif;color:#1f2937;margin:2cm;font-size:11px;line-height:1.6;}';
+            html += 'h1{color:#1e3a5f;font-size:22px;border-bottom:3px solid #0d9488;padding-bottom:8px;margin-bottom:16px;}';
+            html += 'h2{color:#1e3a5f;font-size:16px;margin-top:24px;margin-bottom:8px;border-left:4px solid #0d9488;padding-left:10px;}';
+            html += 'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10px;}';
+            html += 'th{background:#f1f5f9;color:#475569;padding:6px 10px;text-align:left;border-bottom:2px solid #e2e8f0;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;}';
+            html += 'td{padding:5px 10px;border-bottom:1px solid #e2e8f0;}';
+            html += '.kpi-row{display:flex;gap:16px;margin:12px 0;}.kpi-box{flex:1;text-align:center;padding:12px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;}';
+            html += '.kpi-val{font-size:20px;font-weight:800;color:#0d9488;}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:0.3px;margin-top:4px;}';
+            html += '.accent{color:#0d9488;} .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:9px;color:#94a3b8;text-align:center;}';
+            html += '@media print{body{margin:1cm;}}</style></head><body>';
+            html += '<h1>Global Data Center Market Tracker Report</h1>';
+            html += '<p style="color:#64748b;font-size:10px;">Generated: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' | ResistanceZero Analytics</p>';
+
+            html += '<div class="kpi-row">';
+            html += '<div class="kpi-box"><div class="kpi-val">' + formatMW(totalOp) + '</div><div class="kpi-label">Total Operational</div></div>';
+            html += '<div class="kpi-box"><div class="kpi-val">' + formatMW(totalCon) + '</div><div class="kpi-label">Under Construction</div></div>';
+            html += '<div class="kpi-box"><div class="kpi-val">' + formatMW(totalPlan) + '</div><div class="kpi-label">Planned Pipeline</div></div>';
+            html += '<div class="kpi-box"><div class="kpi-val">25</div><div class="kpi-label">Markets Tracked</div></div>';
+            html += '</div>';
+
+            html += '<h2>Market Data</h2>';
+            html += '<table><thead><tr><th>Market</th><th>Region</th><th style="text-align:right;">Operational (MW)</th><th style="text-align:right;">Construction (MW)</th><th style="text-align:right;">Planned (MW)</th><th style="text-align:right;">CAGR</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
+
+            if (isPremiumUser && p50 !== '--') {
+                html += '<h2>Monte Carlo Forecast (2030)</h2>';
+                html += '<div class="kpi-row">';
+                html += '<div class="kpi-box"><div class="kpi-val">' + p5 + ' GW</div><div class="kpi-label">P5 (Conservative)</div></div>';
+                html += '<div class="kpi-box"><div class="kpi-val">' + p50 + ' GW</div><div class="kpi-label">P50 (Base Case)</div></div>';
+                html += '<div class="kpi-box"><div class="kpi-val">' + p95 + ' GW</div><div class="kpi-label">P95 (Aggressive)</div></div>';
+                html += '</div>';
+
+                html += '<h2>Strategic Investment Thesis</h2>';
+                html += '<div>' + document.getElementById('dmtNarrative').innerHTML + '</div>';
+            }
+
+            html += '<div class="footer">resistancezero.com &mdash; Independent Infrastructure Research &mdash; &copy; 2026 Bagus Dwi Permana</div>';
+            html += '</body></html>';
+
+            w.document.write(html);
+            w.document.close();
+            setTimeout(function() { w.print(); }, 500);
+        }
+
+        // ═══════════════════════════════════════════
+        // THEME
+        // ═══════════════════════════════════════════
+        window.toggleTheme = function() {
+            var root = document.documentElement;
+            var current = root.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+            var icon = document.getElementById('dmtThemeIcon');
+            icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            // Re-render charts with new theme colors
+            if (typeof Chart !== 'undefined') {
+                renderRegionalChart();
+                if (isPremiumUser) {
+                    runMonteCarlo();
+                    render5YProjection();
+                    renderTornado();
+                }
+            }
+        };
+
+        // Apply saved theme
+        (function() {
+            var saved = localStorage.getItem('rz_theme');
+            if (saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                var icon = document.getElementById('dmtThemeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            }
+        })();
+
+        // ═══════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════
+        function waitForChartJS(cb) {
+            if (typeof Chart !== 'undefined') { cb(); return; }
+            var attempts = 0;
+            var interval = setInterval(function() {
+                attempts++;
+                if (typeof Chart !== 'undefined') { clearInterval(interval); cb(); }
+                if (attempts > 50) clearInterval(interval);
+            }, 100);
+        }
+
+        // Initial render (no Chart.js dependency)
+        renderCards();
+        renderTable();
+
+        // Initialize Leaflet map (deferred script, wait for it)
+        function waitForLeaflet(cb) {
+            var attempts = 0;
+            var interval = setInterval(function() {
+                attempts++;
+                if (typeof L !== 'undefined') { clearInterval(interval); cb(); }
+                if (attempts > 50) clearInterval(interval);
+            }, 100);
+        }
+        waitForLeaflet(function() {
+            initLeafletMap();
+        });
+
+        // Chart.js dependent renders
+        waitForChartJS(function() {
+            renderRegionalChart();
+        });
+
+        // Apply gating on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                updateNavbarAuthUI();
+            }, 100);
+        });
+    })();
+    </script>
+
+    <!-- Cookie/Scroll IIFE -->
+    <script>
+    (function(){
+        var cb = document.getElementById('dmtCookieBanner');
+        var consent = localStorage.getItem('rz_cookie_consent');
+        if (!consent && cb) cb.classList.remove('hidden');
+        var acceptBtn = document.getElementById('dmtCookieAccept');
+        var declineBtn = document.getElementById('dmtCookieDecline');
+        if (acceptBtn) acceptBtn.addEventListener('click', function(){
+            localStorage.setItem('rz_cookie_consent', 'accepted');
+            cb.classList.add('hidden');
+        });
+        if (declineBtn) declineBtn.addEventListener('click', function(){
+            localStorage.setItem('rz_cookie_consent', 'declined');
+            cb.classList.add('hidden');
+            window['ga-disable-G-GED7FX8RTV'] = true;
+        });
+
+        var sBtn = document.getElementById('dmtScrollTop');
+        if (sBtn) {
+            var ticking = false;
+            window.addEventListener('scroll', function(){
+                if (!ticking) {
+                    window.requestAnimationFrame(function(){
+                        if (window.scrollY > 500) {
+                            sBtn.classList.add('visible');
+                        } else {
+                            sBtn.classList.remove('visible');
+                        }
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+            sBtn.addEventListener('click', function(){
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    })();
+    </script>
+
+    <script src="rz-tracker.js"></script>
+    <script src="auth.js?v=20260228"></script>
+</body>
+</html>
