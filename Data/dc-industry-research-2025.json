@@ -1,0 +1,858 @@
+{
+  "metadata": {
+    "compiled": "2026-03-24",
+    "dataRange": "2024-2026 actuals, 2027-2030 projections",
+    "purpose": "ResistanceZero TCO Calculator, Global Market Capacity, Projection Models",
+    "sources": [
+      "Turner & Townsend Data Centre Construction Cost Index 2025-2026",
+      "Cushman & Wakefield Data Center Development Cost Guide 2025",
+      "Cushman & Wakefield Asia Pacific Data Centre Construction Cost Guide 2025",
+      "Cushman & Wakefield Global Data Center Market Comparison 2025",
+      "CBRE Global Data Center Trends 2025",
+      "CBRE North America Data Center Trends H1/H2 2025",
+      "JLL 2026 Global Data Center Outlook",
+      "JLL North America Data Center Report Year-end 2025",
+      "Synergy Research Group Q1 2025",
+      "Dell'Oro Group Data Center Capex 2025",
+      "ABI Research Data Center IT Capacity Forecast",
+      "IEA Electricity 2025/2026 Reports",
+      "McKinsey & Company",
+      "BloombergNEF",
+      "Uptime Institute",
+      "S&P Global",
+      "Brightlio Data Center Stats (March 2026)"
+    ]
+  },
+
+  "tcoCalculator": {
+
+    "constructionCostPerMW": {
+      "_unit": "USD millions per MW of critical IT load",
+      "_note": "Excludes land acquisition, design/soft costs, OFCI equipment, tenant fit-out",
+      "globalAverage": {
+        "2025": 10.7,
+        "2026_forecast": 11.3,
+        "aiReady": "20-25",
+        "_source": "JLL 2026 Global Data Center Outlook"
+      },
+      "byRegion": {
+        "northernVirginia": {
+          "costPerMW_millions": 12.0,
+          "costPerWatt": 12.0,
+          "trend": "+13.8% YoY for 10MW+ deals",
+          "_source": "Turner & Townsend, CBRE H1 2025"
+        },
+        "dallas": {
+          "costPerMW_millions": 9.5,
+          "costPerWatt": 9.5,
+          "trend": "Cost-effective vs other US markets",
+          "_note": "Texas markets (Dallas, Austin, San Antonio) are lowest-cost US markets due to business-friendly regulation, incentives, affordable labor",
+          "_source": "Cushman & Wakefield 2025"
+        },
+        "singapore": {
+          "costPerMW_millions": 14.5,
+          "costPerWatt": 14.5,
+          "trend": "Top 3 most expensive globally",
+          "_source": "Turner & Townsend 2025-2026"
+        },
+        "frankfurt": {
+          "costPerMW_millions": 11.6,
+          "costPerWatt": 11.6,
+          "trend": "Stable, vacancy at 5.1%",
+          "_source": "Turner & Townsend 2025-2026"
+        },
+        "tokyo": {
+          "costPerMW_millions": 15.2,
+          "costPerWatt": 15.2,
+          "trend": "Most expensive market globally",
+          "_source": "Turner & Townsend 2025-2026"
+        },
+        "jakarta": {
+          "costPerMW_millions": 8.5,
+          "costPerWatt": 8.5,
+          "trend": "Rapidly developing, lower labor costs offset by supply chain imports",
+          "_note": "Estimated from APAC cost guide regional data. One of the most rapidly developing colo markets globally.",
+          "_source": "Cushman & Wakefield APAC 2025 (estimated)"
+        },
+        "sydney": {
+          "costPerMW_millions": 12.5,
+          "costPerWatt": 12.5,
+          "trend": "Slight decline in colo pricing",
+          "_source": "Turner & Townsend, Cushman & Wakefield APAC 2025"
+        },
+        "london": {
+          "costPerMW_millions": 12.0,
+          "costPerWatt": 12.0,
+          "trend": "Largest European operational market ~1.5 GW",
+          "_source": "Turner & Townsend 2025-2026"
+        },
+        "mumbai": {
+          "costPerMW_millions": 7.5,
+          "costPerWatt": 7.5,
+          "trend": "India capacity growing from 950MW (2024) to 1,800MW (2026)",
+          "_note": "Estimated from APAC regional benchmarks. Lower labor and land costs.",
+          "_source": "Cushman & Wakefield APAC 2025 (estimated)"
+        },
+        "saoPaulo": {
+          "costPerMW_millions": 10.0,
+          "costPerWatt": 10.0,
+          "trend": "Construction inflation above 20% driven by low supply chain capacity",
+          "_note": "Colo pricing dropped 20.8% due to shifting supply dynamics",
+          "_source": "Turner & Townsend 2025-2026, CBRE 2025"
+        }
+      },
+      "constructionInflation": {
+        "2020to2025_CAGR": "7%",
+        "2025to2026_forecast": "5-15% (60% of respondents), >15% (21% of respondents)",
+        "aiPremium": "7-10% above traditional DC in US",
+        "_source": "Turner & Townsend 2025-2026"
+      }
+    },
+
+    "capexBreakdown": {
+      "_note": "Percentage of total development cost (excluding land and soft costs unless noted)",
+      "buildingShellAndSite": {
+        "percentage": "15-20%",
+        "costPerSqft": "$105-$235 gross sqft",
+        "_source": "Dgtl Infra, BlueCap Economic Advisors"
+      },
+      "electricalSystems": {
+        "percentage": "40-45%",
+        "costPerSqft": "$280-$460 gross sqft",
+        "includes": "UPS, switchgear, PDUs, generators, transformers, busway",
+        "_source": "Dgtl Infra, BlueCap Economic Advisors"
+      },
+      "mechanicalHVAC": {
+        "percentage": "15-20%",
+        "costPerSqft": "$125-$215 gross sqft",
+        "includes": "Chillers, CRAHs, cooling towers, piping, controls",
+        "_source": "Dgtl Infra, BlueCap Economic Advisors"
+      },
+      "buildingFitOut": {
+        "percentage": "20-25%",
+        "includes": "Lobbies, operational spaces, fire suppression, security, structured cabling",
+        "_source": "Dgtl Infra"
+      },
+      "totalImprovements": {
+        "costPerSqft": "$520-$900 gross sqft",
+        "percentOfTotal": "79-83% of total development cost",
+        "_source": "Dgtl Infra"
+      },
+      "landAcquisition": {
+        "note": "Typically excluded from construction cost guides. Varies 5-15% of total depending on market.",
+        "hotMarkets": "Northern Virginia land values have surged due to DC demand"
+      },
+      "softCosts": {
+        "note": "Design, engineering, permitting, project management. Typically 10-15% of hard costs."
+      },
+      "materialCostInflation_since2021": {
+        "switchgear": "+50%",
+        "generators": "+45%",
+        "transformers": "+44%",
+        "UPS": "+48%",
+        "chillers": "+40%",
+        "CXboards": "+31%",
+        "_source": "Cushman & Wakefield 2025"
+      },
+      "tenantFitOut_AI": {
+        "costPerMW": "up to $25M per MW",
+        "_note": "Tech fit-out for AI infrastructure on top of base shell",
+        "_source": "JLL 2026"
+      }
+    },
+
+    "colocationPricing": {
+      "_unit": "USD per kW per month",
+      "wholesale": {
+        "_definition": "250 kW - 4 MW+ deployments",
+        "usAverage": {
+          "H2_2025": 195.94,
+          "H1_2025": 184.0,
+          "H2_2024": 184.0,
+          "H2_2023": 165.0,
+          "H2_2022": 138.0,
+          "H2_2021": 120.0,
+          "yoyGrowth": "6.5%",
+          "_source": "CBRE H2 2025"
+        },
+        "byRegion": {
+          "northernVirginia": {
+            "range": "200-250",
+            "benchmark": 215,
+            "trend": "+17.6% YoY, record highs breached in Q2 2025",
+            "_source": "CBRE H1/H2 2025"
+          },
+          "dallas": {
+            "range": "140-180",
+            "benchmark": 160,
+            "trend": "Competitive Texas market pricing",
+            "_source": "CBRE 2025 (estimated from US averages)"
+          },
+          "singapore": {
+            "range": "310-470",
+            "benchmark": 390,
+            "trend": "Among world's most expensive colo markets",
+            "_source": "CBRE Global Data Center Trends 2025"
+          },
+          "frankfurt": {
+            "range": "170-220",
+            "benchmark": 195,
+            "trend": "Low vacancy (5.1%) supporting pricing",
+            "_source": "CBRE 2025"
+          },
+          "tokyo": {
+            "range": "190-355",
+            "benchmark": 270,
+            "trend": "Slight decrease from $200-$370 a year ago",
+            "_source": "CBRE Global Data Center Trends 2025"
+          },
+          "jakarta": {
+            "range": "120-200",
+            "benchmark": 160,
+            "trend": "Rapidly growing market, competitive APAC pricing",
+            "_note": "Estimated from APAC regional benchmarks",
+            "_source": "CBRE APAC 2025 (estimated)"
+          },
+          "sydney": {
+            "range": "140-215",
+            "benchmark": 175,
+            "trend": "Small decline from prior year",
+            "_source": "CBRE Global Data Center Trends 2025"
+          },
+          "london": {
+            "range": "170-230",
+            "benchmark": 200,
+            "trend": "Pre-leases topped $185/kW/month in Slough/Docklands",
+            "_source": "CBRE 2025"
+          },
+          "mumbai": {
+            "range": "90-160",
+            "benchmark": 125,
+            "trend": "Growing multi-MW demand, competitive emerging market",
+            "_note": "Estimated from India market data",
+            "_source": "CBRE APAC 2025 (estimated)"
+          },
+          "saoPaulo": {
+            "range": "130-200",
+            "benchmark": 165,
+            "trend": "-20.8% due to shifting supply dynamics",
+            "_source": "CBRE 2025"
+          }
+        }
+      },
+      "retail": {
+        "_definition": "Under 250 kW, per-rack or per-U pricing",
+        "perRack_fullCabinet": "$300-$1,000/month (3-5 kW)",
+        "highDensity": "$1,000-$4,000/month (10-20 kW)",
+        "perU": "$50-$300 per 1U/month",
+        "_source": "Brightlio, ServerMania 2026"
+      },
+      "leaseTerms": {
+        "typicalDuration": "1-3 years (retail), 5-10 years (wholesale), up to 15 years (hyperscale)",
+        "annualEscalation": {
+          "typical": "2.5-3%",
+          "recentInflationary": "4-5% or CPI-linked",
+          "currentTrend": "Returning to ~3% as inflation slows"
+        },
+        "structure": "Modified gross lease (base rate per kW/month + power pass-through)",
+        "_source": "DatacenterHawk, Orrick 2026"
+      },
+      "vacancy": {
+        "usPrimary_2025": "1.4% (all-time low)",
+        "_source": "CBRE H2 2025"
+      }
+    },
+
+    "cloudPricing": {
+      "_note": "On-demand pricing for comparable compute. Real-world savings 40-60% with commitments.",
+      "standardVM_4cpu16gb_monthly": {
+        "AWS": 88.33,
+        "Azure": 96.12,
+        "GCP": 90.33,
+        "_source": "Cast AI, DevZero 2025"
+      },
+      "commitmentDiscounts": {
+        "AWS_reservedInstances": "up to 72% off (Savings Plans)",
+        "Azure_reservations": "up to 72% off",
+        "GCP_committedUse": "up to 70% off",
+        "realWorldAverage": "40-60% savings",
+        "_source": "Cast AI 2025"
+      },
+      "kubernetesCluster_monthly": {
+        "AWS_EKS": "$2,500-$3,500",
+        "Azure_AKS": "$2,200-$3,200",
+        "GCP_GKE": "$2,100-$3,000",
+        "_source": "CalmOps 2025"
+      },
+      "hiddenCosts": {
+        "dataEgress": "Significant — can double bills",
+        "wastedSpend": "30% of global cloud spending (~$217B annually) wasted on idle resources",
+        "_source": "Sedai 2026"
+      },
+      "cloudVsColoBreakeven": {
+        "coloAdvantage": "Stable workloads running >36 months",
+        "cloudAdvantage": "Variable/burst workloads, rapid scaling needs",
+        "_source": "Flexential, DataBank 2026"
+      }
+    },
+
+    "powerCosts": {
+      "_unit": "USD per kWh (industrial/large commercial rate for data centers)",
+      "_note": "Data center operators often negotiate below published industrial rates via PPAs, direct utility contracts",
+      "byRegion": {
+        "northernVirginia": {
+          "rate": 0.065,
+          "range": "0.055-0.075",
+          "trend": "Rising — up to 267% increase over 5 years in VA",
+          "_note": "Dominion Energy territory. Capacity charges increasing.",
+          "_source": "EIA, EESI 2025"
+        },
+        "dallas": {
+          "rate": 0.055,
+          "range": "0.045-0.065",
+          "trend": "Competitive Texas deregulated market (ERCOT)",
+          "_source": "EIA, ERCOT 2025"
+        },
+        "singapore": {
+          "rate": 0.18,
+          "range": "0.16-0.22",
+          "trend": "LNG dependency pushes rates high",
+          "_source": "CAELED, GlobalPetrolPrices 2025"
+        },
+        "frankfurt": {
+          "rate": 0.15,
+          "range": "0.12-0.18",
+          "trend": "EU industrial rates ~2x US levels",
+          "_note": "Germany has among highest EU industrial electricity prices. Energiewende surcharges.",
+          "_source": "IEA Electricity 2025"
+        },
+        "tokyo": {
+          "rate": 0.16,
+          "range": "0.13-0.19",
+          "trend": "Post-Fukushima LNG reliance keeps prices elevated",
+          "_source": "IEA, GlobalPetrolPrices 2025"
+        },
+        "jakarta": {
+          "rate": 0.08,
+          "range": "0.07-0.10",
+          "trend": "Government-regulated tariffs, relatively affordable",
+          "_source": "CAELED, PLN tariff schedule 2025"
+        },
+        "sydney": {
+          "rate": 0.14,
+          "range": "0.11-0.17",
+          "trend": "Oceania has highest avg business rate at $0.229/kWh",
+          "_source": "GlobalPetrolPrices, IEA 2025"
+        },
+        "london": {
+          "rate": 0.17,
+          "range": "0.14-0.20",
+          "trend": "UK among highest industrial electricity prices globally",
+          "_source": "IEA, Statista 2025"
+        },
+        "mumbai": {
+          "rate": 0.085,
+          "range": "0.07-0.10",
+          "trend": "Varies by state utility. Maharashtra rates moderate.",
+          "_source": "CAELED, India CERC 2025"
+        },
+        "saoPaulo": {
+          "rate": 0.10,
+          "range": "0.08-0.12",
+          "trend": "Hydro-dependent, seasonal variation",
+          "_source": "IEA, ANEEL tariff data 2025"
+        }
+      },
+      "powerCostTrends": {
+        "usDemandGrowth": "DC consumption: 183 TWh (2024) → 426 TWh (2030)",
+        "gridDemandGrowth": "61.8 GW (2025) → 134.4 GW (2030)",
+        "priceImpact": "8% average US electricity bill increase by 2030 due to DCs; >25% in NoVA",
+        "_source": "IEA 2025, Carnegie Mellon, S&P Global"
+      }
+    },
+
+    "pueBenchmarks": {
+      "byCoolingType": {
+        "traditionalAirCooled": {
+          "PUE": "1.4-1.8",
+          "note": "Older facilities, no containment"
+        },
+        "modernAirCooled": {
+          "PUE": "1.2-1.3",
+          "note": "Hot/cold aisle containment, economizers"
+        },
+        "directToChipLiquid": {
+          "PUE": "1.05-1.15",
+          "pPUE": "1.02-1.08",
+          "note": "Consistent regardless of ambient conditions"
+        },
+        "immersionCooling": {
+          "PUE": "1.03-1.10",
+          "note": "Most advanced, approaching theoretical minimum"
+        },
+        "rearDoorHeatExchanger": {
+          "PUE": "1.10-1.20",
+          "note": "Retrofit-friendly liquid cooling option"
+        }
+      },
+      "hyperscaleBenchmarks": {
+        "google": 1.09,
+        "aws": 1.15,
+        "microsoft": 1.12,
+        "_source": "Respective sustainability reports 2024"
+      },
+      "industryAverage_2025": 1.55,
+      "energySavings_liquidVsAir": "10-50% depending on configuration",
+      "_source": "Uptime Institute, Boyd Corp, ClearComfort 2025-2026"
+    },
+
+    "opexBreakdown": {
+      "_note": "Percentage of total annual operating expenditure",
+      "power": {
+        "percentage": "40-60%",
+        "note": "Largest single OPEX item. Includes IT load + cooling + overhead."
+      },
+      "cooling": {
+        "percentage": "Included in power — cooling = 30-40% of total power consumption"
+      },
+      "maintenance": {
+        "percentage": "15-25%",
+        "note": "Preventive and corrective maintenance on M&E systems"
+      },
+      "staffing": {
+        "percentage": "20-25%",
+        "note": "Operations, security, facilities management"
+      },
+      "insurance": {
+        "percentage": "2-4%",
+        "note": "Property, liability, business interruption"
+      },
+      "other": {
+        "percentage": "5-10%",
+        "includes": "Water, chemicals, monitoring tools, G&A, property taxes, lease costs"
+      },
+      "annualOpexPerMW": {
+        "estimate": "$1.2-1.4M per MW",
+        "_note": "Based on 250MW facility at $300-350M/year total OPEX",
+        "_source": "Industry benchmark 2025"
+      },
+      "opexVsCapex": "OPEX can exceed 100% of original CAPEX within 5-7 years",
+      "_source": "Thunder Said Energy, MCIM, BlueCap 2025"
+    },
+
+    "staffCosts": {
+      "_unit": "USD annual salary",
+      "usTechnician": {
+        "median": 75100,
+        "average": 74350,
+        "range": "55,000-95,000",
+        "_source": "CompTIA, Salary.com 2025-2026"
+      },
+      "usOperations": {
+        "average": 85028,
+        "_source": "Glassdoor 2026"
+      },
+      "europeAverage": {
+        "note": "~$40,000/year less than US equivalent",
+        "_source": "DataX Connect 2025"
+      },
+      "germanyTechnician": {
+        "earlyCareer": 51235,
+        "midCareer": 55000,
+        "_unit": "EUR",
+        "_source": "PayScale 2026"
+      },
+      "staffPerMW": {
+        "enterprise": "5-8 FTEs per MW",
+        "hyperscale": "2-4 FTEs per MW (higher automation)",
+        "_note": "Includes ops, facilities, security, management"
+      },
+      "byRegion_indexedToUS": {
+        "northernVirginia": 1.0,
+        "dallas": 0.90,
+        "singapore": 0.70,
+        "frankfurt": 0.75,
+        "tokyo": 0.80,
+        "jakarta": 0.30,
+        "sydney": 0.85,
+        "london": 0.80,
+        "mumbai": 0.25,
+        "saoPaulo": 0.35,
+        "_note": "Approximate labor cost index relative to US baseline. Actual varies by role and seniority."
+      }
+    }
+  },
+
+  "globalMarketCapacity": {
+    "globalOverview": {
+      "totalInstalledCapacity_GW": 122.2,
+      "operationalCapacity_GW": 40,
+      "underConstruction_GW": 12.5,
+      "hyperscaleFacilities": 1189,
+      "hyperscalePipeline": 504,
+      "marketsOver1GW": 13,
+      "_asOf": "Q1 2025",
+      "_source": "Synergy Research, Cushman & Wakefield 2025"
+    },
+
+    "top20Markets": {
+      "_note": "Ranked by operational colocation capacity (MW). Some figures are estimates based on multiple sources.",
+      "markets": [
+        {
+          "rank": 1,
+          "market": "Northern Virginia",
+          "country": "US",
+          "operationalMW": 4040,
+          "underConstructionMW": 1100,
+          "pipelineMW": 5500,
+          "netAbsorption2025_MW": 523,
+          "vacancy": "1.4%",
+          "keyPlayers": ["Equinix", "Digital Realty", "QTS", "CyrusOne", "STACK", "CloudHQ", "EdgeCore"],
+          "_source": "CBRE H2 2025"
+        },
+        {
+          "rank": 2,
+          "market": "Atlanta",
+          "country": "US",
+          "operationalMW": 1279,
+          "trend": "Tripled capacity driven by hyperscale",
+          "keyPlayers": ["QTS", "Switch", "DataBank"],
+          "_source": "CBRE H2 2025"
+        },
+        {
+          "rank": 3,
+          "market": "Phoenix",
+          "country": "US",
+          "operationalMW": 1100,
+          "trend": "New entrant to biggest inventory category",
+          "keyPlayers": ["NTT", "Aligned", "QTS", "STACK"],
+          "_source": "CBRE H2 2025"
+        },
+        {
+          "rank": 4,
+          "market": "London (Slough/Docklands)",
+          "country": "UK",
+          "operationalMW": 1053,
+          "trend": "Largest European market, ~1.5 GW total",
+          "keyPlayers": ["Equinix", "Digital Realty", "Virtus", "NTT"],
+          "_source": "CBRE 2025, Cushman & Wakefield"
+        },
+        {
+          "rank": 5,
+          "market": "Dallas-Fort Worth",
+          "country": "US",
+          "operationalMW": 950,
+          "trend": "Overtaken by Atlanta and Phoenix in rankings",
+          "keyPlayers": ["CyrusOne", "DataBank", "QTS", "Digital Realty"],
+          "_source": "CBRE H2 2025"
+        },
+        {
+          "rank": 6,
+          "market": "Silicon Valley",
+          "country": "US",
+          "operationalMW": 900,
+          "trend": "+19% pricing increase for 10MW+ tier",
+          "keyPlayers": ["Equinix", "Vantage", "CoreSite"],
+          "_source": "CBRE H2 2025"
+        },
+        {
+          "rank": 7,
+          "market": "Tokyo",
+          "country": "Japan",
+          "operationalMW": 865,
+          "netAbsorption_MW": 49.8,
+          "trend": "Only APAC market >1GW, strong AI demand",
+          "keyPlayers": ["NTT", "Equinix", "Digital Realty", "MCDigital Realty"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 8,
+          "market": "Frankfurt",
+          "country": "Germany",
+          "operationalMW": 864,
+          "vacancy": "5.1%",
+          "trend": "Expected to cross 1GW soon",
+          "keyPlayers": ["Equinix", "Digital Realty", "NTT", "Interxion"],
+          "_source": "CBRE 2025, Cushman & Wakefield"
+        },
+        {
+          "rank": 9,
+          "market": "Chicago",
+          "country": "US",
+          "operationalMW": 800,
+          "trend": "+15.4% pricing gain in 10MW+ tier",
+          "keyPlayers": ["QTS", "Digital Realty", "Equinix"],
+          "_source": "CBRE H2 2025"
+        },
+        {
+          "rank": 10,
+          "market": "Singapore",
+          "country": "Singapore",
+          "operationalMW": 750,
+          "trend": "Moratorium eased, supply constrained, highest APAC pricing",
+          "keyPlayers": ["Equinix", "Digital Realty", "ST Telemedia", "AirTrunk"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 11,
+          "market": "Sydney",
+          "country": "Australia",
+          "operationalMW": 600,
+          "trend": "Strong AI-driven demand",
+          "keyPlayers": ["Equinix", "AirTrunk", "NEXTDC", "Digital Realty"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 12,
+          "market": "Amsterdam",
+          "country": "Netherlands",
+          "operationalMW": 580,
+          "trend": "+18% pricing increase",
+          "keyPlayers": ["Equinix", "Digital Realty", "Interxion"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 13,
+          "market": "Dublin",
+          "country": "Ireland",
+          "operationalMW": 550,
+          "trend": "Crossed 1GW threshold including pipeline",
+          "keyPlayers": ["Equinix", "Digital Realty", "CyrusOne"],
+          "_source": "Cushman & Wakefield 2025"
+        },
+        {
+          "rank": 14,
+          "market": "Portland/Hillsboro",
+          "country": "US",
+          "operationalMW": 500,
+          "keyPlayers": ["Aligned", "QTS", "Digital Realty"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 15,
+          "market": "Mumbai",
+          "country": "India",
+          "operationalMW": 450,
+          "trend": "India total: 950MW (2024) → 1,800MW (2026)",
+          "keyPlayers": ["NTT", "ST Telemedia", "CtrlS", "Adani"],
+          "_source": "Cushman & Wakefield, Brightlio 2025"
+        },
+        {
+          "rank": 16,
+          "market": "Jakarta",
+          "country": "Indonesia",
+          "operationalMW": 400,
+          "trend": "One of the world's most rapidly developing colo markets",
+          "keyPlayers": ["DCI Indonesia", "NTT", "Princeton Digital", "GDS"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 17,
+          "market": "São Paulo",
+          "country": "Brazil",
+          "operationalMW": 350,
+          "trend": "-20.8% pricing drop due to new supply",
+          "keyPlayers": ["Equinix", "Ascenty (Digital Realty)", "ODATA"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 18,
+          "market": "Paris",
+          "country": "France",
+          "operationalMW": 340,
+          "costPerWatt": 10.8,
+          "keyPlayers": ["Equinix", "Digital Realty", "Data4"],
+          "_source": "Turner & Townsend 2025"
+        },
+        {
+          "rank": 19,
+          "market": "Denver",
+          "country": "US",
+          "operationalMW": 320,
+          "keyPlayers": ["Aligned", "Vantage", "CoreSite"],
+          "_source": "CBRE 2025"
+        },
+        {
+          "rank": 20,
+          "market": "Seoul",
+          "country": "South Korea",
+          "operationalMW": 300,
+          "keyPlayers": ["KT", "LG CNS", "Equinix", "Digital Realty"],
+          "_source": "Cushman & Wakefield 2025"
+        }
+      ]
+    },
+
+    "growthRates_2024_2025": {
+      "globalCapacityAdded_2025_MW": 2498,
+      "usNetAbsorption_2025_MW": 2498,
+      "novaAdded_MW": 523,
+      "atlantaGrowth": "Tripled capacity",
+      "apac_2025_totalMW": 20320,
+      "apac_2030_targetMW": 37580,
+      "emea_newSupply_GW": 13,
+      "_source": "CBRE H2 2025, Cushman & Wakefield 2025"
+    },
+
+    "investmentVolumes": {
+      "global2025_marketSize_billions": 384,
+      "northAmerica2025_billions": 104,
+      "northAmericaShare": "38.3%",
+      "hyperscalerCapex2025_billions": 413,
+      "hyperscalerCapexYoYGrowth": "84%",
+      "dcCapex2025_growth": "57% YoY surge",
+      "supercycleThrough2030_trillions": 3.0,
+      "newCapacity2026to2030_GW": 100,
+      "realEstateValueCreation_trillions": 1.2,
+      "_source": "JLL, Dell'Oro Group, Fortune Business Insights, Motley Fool 2025-2026"
+    },
+
+    "keyGlobalPlayers": {
+      "byRevenue2024": [
+        {"name": "Equinix", "revenue_B": 6.52, "facilities": 251, "cabinets": 356500, "metros": 70, "countries": 32, "marketShare": "18.9%"},
+        {"name": "Digital Realty", "revenue_B": 5.55, "marketShare": "~10%"},
+        {"name": "NTT Global", "revenue_B": 1.80, "facilities": 95, "capacityMW": 1100, "pipelineMW": 700},
+        {"name": "CyrusOne", "facilities": 55, "capacityMW": 1000, "sqft_M": 5},
+        {"name": "QTS (Blackstone)", "facilities": 63, "sqft_M": 9.35}
+      ],
+      "top5_globalShare": "20-25%",
+      "_source": "ResearchAndMarkets, CBRE, Company reports 2025"
+    }
+  },
+
+  "projectionModels": {
+
+    "capacityCAGR_2025_2030": {
+      "global": {
+        "CAGR": "14%",
+        "capacityGrowth": "Doubling by 2030 (~100 GW added)",
+        "_source": "JLL 2026"
+      },
+      "northAmerica": {
+        "CAGR": "25%",
+        "from_GW": 10.2,
+        "to_GW_2035": 71.8,
+        "shareBy2035": "49%",
+        "usCapacityAdded_GW": 23.2,
+        "southeast_GW": 8.9,
+        "southwest_GW": 6.8,
+        "midwest_GW": 3.3,
+        "northeast_GW": 1.3,
+        "_source": "ABI Research, CBRE 2025"
+      },
+      "asiaPacific": {
+        "CAGR": "12%",
+        "from_GW_2025": 32,
+        "to_GW_2030": 57,
+        "_source": "JLL 2026"
+      },
+      "emea": {
+        "CAGR": "10%",
+        "newSupply_GW": 13,
+        "drivers": "Government AI support, sovereign cloud demand, GDPR",
+        "_source": "JLL 2026"
+      },
+      "latam": {
+        "CAGR": "15-18%",
+        "note": "Emerging market acceleration, driven by São Paulo, Santiago, Bogotá",
+        "_source": "Industry estimates"
+      }
+    },
+
+    "marketSizeProjections": {
+      "global_2025_B": 384,
+      "global_2030_B": 456,
+      "global_2035_B": 1104,
+      "colocation_2025_B": 69.4,
+      "colocation_2030_B": 165.5,
+      "colocation_CAGR": "16.0%",
+      "aiDataCenter_2024_B": 14.3,
+      "aiDataCenter_2034_B": 157.3,
+      "aiDataCenter_CAGR": "27.1%",
+      "edgeDataCenter_2024_B": 15.4,
+      "edgeDataCenter_2030_B": 39.8,
+      "edgeDataCenter_CAGR": "17.1%",
+      "_source": "Grand View Research, Statista, MarketsandMarkets, Precedence Research 2025"
+    },
+
+    "powerCostTrends_2025_2030": {
+      "globalDCConsumption_TWh": {
+        "2024": 415,
+        "2025_us": 183,
+        "2030_global": 945,
+        "2030_us": 426,
+        "_source": "IEA 2025-2026"
+      },
+      "gridPowerDemand_GW": {
+        "2025": 61.8,
+        "2030": 134.4,
+        "_source": "S&P Global"
+      },
+      "priceImpact": {
+        "usAverageBillIncrease_2030": "8%",
+        "novaIncrease_2030": ">25%",
+        "euFuturesPrice_2026": "$95/MWh",
+        "euFuturesPrice_2027": "$85/MWh",
+        "_source": "Carnegie Mellon, IEA 2026"
+      },
+      "trend": "Upward pressure from DC demand growth, partially offset by renewable PPAs and efficiency gains"
+    },
+
+    "constructionCostInflation_2025_2030": {
+      "historicalCAGR_2020_2025": "7% per year",
+      "2026_forecast": "5-15% increase (majority view)",
+      "aiPremium": "7-10% over traditional",
+      "standardBuild_perMW": "$10-12M",
+      "aiBuild_perMW": "$20M+",
+      "costPerSqft_2025": "~$1,000 (up ~50% from prior year)",
+      "keyDrivers": [
+        "Equipment lead times (transformers, switchgear)",
+        "Skilled labor shortage",
+        "AI density requirements driving cooling upgrades",
+        "Supply chain constraints (turbines, batteries, chips)",
+        "Permitting and power procurement delays"
+      ],
+      "_source": "Turner & Townsend, JLL, McKinsey 2025-2026"
+    },
+
+    "aiWorkloadGrowth": {
+      "aiCapacityCAGR_2023_2030": "33%",
+      "aiShareOfTotalCapacity_2030": "70%",
+      "aiOvertakesLegacy": "Early 2030s",
+      "rackDensityEvolution": {
+        "current_avg_kW": "<8",
+        "2028_target_kW": "50-100",
+        "nextGen_kW": "up to 250",
+        "_source": "Uptime Intelligence, SDXCentral, JLL 2025"
+      },
+      "hyperscalerCapex_2025_B": 413,
+      "capexYoYGrowth": "+84%",
+      "nvidiaDataCenterRevenue_FY2026_B": 193.7,
+      "nvidiaYoYGrowth": "+68%",
+      "gpuShareOfDCCapex": "~33% (single largest category)",
+      "_source": "McKinsey, Dell'Oro Group, ABI Research, Nvidia 2025-2026"
+    },
+
+    "renewableEnergy": {
+      "currentShare_2025": "27% of DC electricity consumption",
+      "targetShare_2030": "50%",
+      "usTechSectorProcurement": "84% of tracked US clean energy procurement (Feb-Jul 2025)",
+      "dcShareOfNationalProcurement_2024": "~50%",
+      "sustainableDCMarket_2025_B": 99.2,
+      "sustainableDCMarket_2035_B": 513.8,
+      "sustainableDC_CAGR": "18%",
+      "co2Emissions_2024_Mt": 220,
+      "co2Emissions_2035_Mt": "300-320",
+      "_source": "BloombergNEF, IEA, Deloitte 2025-2026"
+    },
+
+    "edgeDCGrowth": {
+      "market_2025_B": 50.86,
+      "market_2030_B": 109.2,
+      "CAGR": "16.5%",
+      "edgeComputing_CAGR": "~40% (2025-2030)",
+      "drivers": ["5G rollout", "AI inference at edge", "IoT proliferation", "Latency-sensitive applications"],
+      "_source": "MarketsandMarkets, Precedence Research 2025"
+    }
+  }
+}

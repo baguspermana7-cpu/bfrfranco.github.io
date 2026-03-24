@@ -237,7 +237,8 @@ All new growth pages follow these standards:
 - [ ] auth.js loaded before `</body>`
 - [ ] Cookie banner
 - [ ] Mobile responsive
-- [ ] Added to `sitemap.xml` and `search-index.json`
+- [ ] Added to `sitemap.xml` and `search-index.json` (MUST include `date` field — powers homepage ticker auto-update)
+- [ ] `search-index.json` entry has: `title`, `url`, `description`, `category`, `keywords`, `date` (YYYY-MM-DD format)
 
 ---
 

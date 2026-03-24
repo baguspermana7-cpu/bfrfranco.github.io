@@ -65,7 +65,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
-    <link rel="stylesheet" href="styles.min.css?v=20260225">
+    <link rel="stylesheet" href="styles.min.css?v=20260324b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-14-cover.jpg">
 
@@ -1356,10 +1356,10 @@
     <div class="scroll-progress" id="scrollProgress"></div>
 
     <!-- Search Overlay & Modal -->
-    <div class="search-overlay" id="searchOverlay"></div>
-    <div class="search-modal" id="searchModal">
+    <div class="search-overlay" id="searchOverlay" style="display:none;"></div>
+    <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
             <kbd class="search-kbd">ESC</kbd>
         </div>
@@ -1411,16 +1411,19 @@
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li class="nav-dropdown">
                     <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
-                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="datahallAI.html" style="color: #8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
-                        <li><a href="dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
-                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
-                        <li><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
-                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li role="menuitem"><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                        <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
+                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li role="menuitem"><a href="tco-calculator.html" style="color: #4f46e5; font-weight: 600;">TCO Calculator</a></li>
+                        <li role="menuitem"><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                        <li role="menuitem"><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li role="menuitem"><a href="roi-calculator.html" style="color: #3b82f6;">ROI Calculator</a></li>
+                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                        <li role="menuitem"><a href="dc-market-tracker.html" style="color: #0d9488; font-weight: 600;">Market Tracker</a></li>
+                        <li role="menuitem"><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -2977,7 +2980,7 @@
         </div>
     </footer>
 
-    <script src="script.min.js?v=20260225"></script>
+    <script src="script.min.js?v=20260324b"></script>
 
     <!-- Calculator Logic -->
     <script>
@@ -4612,6 +4615,12 @@
         try { localStorage.removeItem(RECENT_KEY); } catch(e) {}
     }
 
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
     function renderRecent() {
         var recent = getRecent();
         if (!recent.length) {
@@ -4624,7 +4633,7 @@
         recent.forEach(function(q) {
             html += '<div class="search-recent-item" data-query="' + q.replace(/"/g, '&quot;') + '">'
                 + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
-                + '<span>' + q + '</span></div>';
+                + '<span>' + escapeHtml(q) + '</span></div>';
         });
         html += '</div>';
         resultsEl.innerHTML = html;
@@ -4639,6 +4648,8 @@
     }
 
     function openSearch() {
+        overlay.style.display = '';
+        modal.style.display = '';
         overlay.classList.add('active');
         modal.classList.add('active');
         input.value = '';
@@ -4676,6 +4687,10 @@
         modal.classList.remove('active');
         input.blur();
         hidePreview();
+        setTimeout(function() {
+            if (!overlay.classList.contains('active')) overlay.style.display = 'none';
+            if (!modal.classList.contains('active')) modal.style.display = 'none';
+        }, 300);
     }
 
     function getIconClass(cat) {
@@ -4884,7 +4899,7 @@
     }
 })();
 </script>
-<script src="auth.js?v=20260228"></script>
+<script src="auth.js?v=20260324b"></script>
 <script src="rz-tracker.js"></script>
 
 <!-- Cookie Consent Banner -->

@@ -792,3 +792,93 @@ All features support dark mode via `[data-theme="dark"]` selectors:
 | **Cookie/footer** | Translated to Indonesian |
 
 **Adding new languages**: Create `/{lang}/` directory, follow same pattern, add hreflang cross-references on both language versions.
+
+---
+
+## Lessons Learned — Navbar & Dark Mode Consistency (2026-03-24)
+
+### Issue 1: DC Solutions Dropdown Out of Sync Across Pages
+
+**Bug**: The Type A navbar dropdown (`.nav-menu` + `.dropdown-menu`, used on 63+ content pages) had 3 different versions:
+- Old: PUE Calculator, Power Calculator, Cooling Calculator, TIA-942 Checklist (articles 21-25)
+- Newer: CAPEX, OPEX, DC MOC (most articles)
+- Newest: Added TCO Calculator, Market Tracker, ROI Calculator (only on DC Solutions page itself)
+
+**Root cause**: Dropdowns are hardcoded in each HTML file. No shared component or template system.
+
+**Fix applied**: Python script to batch-update all 65 files (63 Type A + 2 subdirectory pages) with one standardized dropdown.
+
+**Prevention rules**:
+1. When adding a new calculator or tool page, update the dropdown in ALL pages — not just the DC Solutions landing page
+2. Use this grep command to verify consistency: `grep -l "dropdown-menu" *.html | xargs grep -c "tco-calculator" | grep ":0"` (shows files missing the new entry)
+3. The standardized dropdown items (as of 2026-03-24) are:
+   - DC Solutions Hub | DC AI/HPC | DC Conventional | TCO Calculator | CAPEX Calculator | OPEX Calculator | ROI Calculator | Market Tracker | DC MOC
+4. Subdirectory pages (`embed/`, `id/`) use `../` relative paths — update them separately
+
+### Issue 2: News Ticker Dark Mode Invisible Text
+
+**Bug**: The "Latest" ticker on `index.html` showed invisible text in dark mode. Only the "LATEST" label badge was visible.
+
+**Root cause**: `.ticker-item` uses `color: var(--gray-700)` which is dark in both light and dark modes. The dark mode override section in `styles.css` only styled `.news-ticker-container`, `.ticker-glow`, and `.ticker-wrapper::before` — but NOT the actual text elements (`.ticker-item`, `.ticker-item-title`, `.ticker-item-date`, `.ticker-item::before`).
+
+**Additional root cause**: `index.html` uses a separate `styles-index.css` / `styles-index.min.css`, NOT the main `styles.css`. Dark mode fixes must be applied to BOTH files.
+
+**Fix applied**: Added dark mode overrides for all ticker text elements in both `styles.css` and `styles-index.css`:
+```css
+[data-theme="dark"] .ticker-item { color: #e2e8f0; }
+[data-theme="dark"] .ticker-item:hover { color: #22d3ee; }
+[data-theme="dark"] .ticker-item-date { color: #94a3b8; border-left-color: rgba(255,255,255,0.15); }
+[data-theme="dark"] .ticker-item::before { background: #22d3ee; }
+```
+
+**Prevention rules**:
+1. **ALWAYS test dark mode** when adding any visible element. If it has text, it needs `[data-theme="dark"]` overrides
+2. **Never assume `var(--gray-700)` works in dark mode** — CSS custom properties may not auto-invert
+3. **`styles-index.css` is a separate file** — changes to `styles.css` dark mode do NOT automatically propagate. Always update both, then rebuild with `npx cleancss`
+4. After any CSS change: rebuild BOTH `styles.min.css` AND `styles-index.min.css`
+
+### Issue 3: News Ticker Not Auto-Updating
+
+**Bug**: The ticker showed only articles 11-13 (Feb 2026) while articles 14-25, FF-1/2/3, geopolitics series, and new tools existed.
+
+**Root cause**: Ticker items are hardcoded HTML, not dynamically generated from `search-index.json`.
+
+**Fix applied (2026-03-24)**: Replaced hardcoded ticker with dynamic engine that fetches `search-index.json` on page load, sorts by date descending, and shows the 8 most recent items. Duplicates for infinite scroll are auto-generated.
+
+**How it works now**:
+1. On page load, `fetch('search-index.json')` gets all content entries
+2. Filters to entries with a `date` field
+3. Sorts by date descending (newest first)
+4. Takes top 8 items, builds ticker HTML + duplicates for seamless scroll
+5. Sets animation duration based on content width
+6. Fallback: if fetch fails, shows "Browse all articles and tools" link
+
+**When publishing new content**: Just add the entry to `search-index.json` with a `date` field — the ticker auto-updates. No HTML editing needed.
+
+**Required `search-index.json` fields for ticker**:
+```json
+{
+  "title": "Article Title",
+  "url": "article-N.html",
+  "date": "2026-03-24",
+  "category": "Article"
+}
+```
+If `category` is "Calculator" or "Tool", the ticker prefixes "NEW: " to the title.
+
+### Issue 4: Separate CSS Files for Index vs Articles
+
+**Key awareness**: The site uses TWO stylesheet systems:
+| File | Used by | Size |
+|------|---------|------|
+| `styles.css` / `styles.min.css` | All article pages, calculators, tools | ~123 KB |
+| `styles-index.css` / `styles-index.min.css` | `index.html` only | ~86 KB |
+
+The index uses a separate stylesheet for performance (smaller CSS = faster FCP). But this means:
+- Dark mode fixes must be applied to BOTH files
+- New component styles (e.g., search modal) must exist in BOTH files
+- After any CSS edit, rebuild BOTH: `npx cleancss styles.css -o styles.min.css && npx cleancss styles-index.css -o styles-index.min.css`
+
+### Navbar Brand Consistency (datacenter-solutions.html)
+
+The DC Solutions page used a text-based "DC" logo that was disproportional. Fixed to use `favicon-32.png` matching the site's visual identity. When creating new pages with Type B navbar, use the favicon or profile photo — not text-based logos that break at different viewport sizes.
