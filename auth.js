@@ -308,6 +308,8 @@
     function injectAuthButton() {
         /* Skip if already injected */
         if (document.getElementById('rzAuthWrap')) return;
+        /* Skip if page has its own auth UI (e.g. dc-market-tracker, tco-calculator) */
+        if (document.getElementById('navAuthWrap') || document.getElementById('navLoginBtn')) return;
 
         var html = authButtonHTML();
         var inserted = false;
