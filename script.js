@@ -22,10 +22,22 @@ document.addEventListener('DOMContentLoaded', function() {
     var idleCb = typeof requestIdleCallback === 'function' ? requestIdleCallback : function(cb) { setTimeout(cb, 200); };
     idleCb(function() {
         initContactForm();
+    });
+
+    // Motion effects deferred until first user interaction or 5s idle
+    // This prevents 5s+ main thread blocking during page load
+    var motionLoaded = false;
+    function loadMotion() {
+        if (motionLoaded) return;
+        motionLoaded = true;
         initCursorSpotlight();
         initCardTilt();
         try { initMotionEffects(); } catch(e) {}
+    }
+    ['scroll','click','touchstart'].forEach(function(e) {
+        document.addEventListener(e, loadMotion, {once: true, passive: true});
     });
+    setTimeout(loadMotion, 5000);
 });
 
 /* ==========================================
@@ -940,32 +952,9 @@ function initMotionEffects() {
     initScrollEffects();
 
     function initScrollEffects() {
-        // --- #8: Parallax Depth Layers ---
+        // --- #8: Parallax Depth Layers --- DISABLED: caused CLS 0.687 (mobile) / 1.093 (desktop)
+        // hero-background, floating-shapes, and bento-container transforms all removed
         var heroSection = document.getElementById('home');
-        var heroBg = heroSection ? heroSection.querySelector('.hero-background') : null;
-        var heroShapes = heroSection ? heroSection.querySelector('.floating-shapes') : null;
-        var bentoContainer = heroSection ? heroSection.querySelector('.bento-container') : null;
-        var heroInView = true;
-
-        function updateParallax() {
-            if (paused || !heroInView) { rafRefs.parallax = null; return; }
-            var sy = scrollY;
-            if (heroBg) heroBg.style.transform = 'translateY(' + (sy * 0.55).toFixed(1) + 'px) scale(' + (1 + sy * 0.0002).toFixed(4) + ')';
-            if (heroShapes) heroShapes.style.transform = 'translateY(' + (sy * 0.35).toFixed(1) + 'px) rotate(' + (sy * 0.015).toFixed(2) + 'deg)';
-            if (bentoContainer) bentoContainer.style.transform = 'translateY(' + (sy * 0.12).toFixed(1) + 'px)';
-            rafRefs.parallax = requestAnimationFrame(updateParallax);
-        }
-
-        if (heroSection) {
-            var heroIO = new IntersectionObserver(function(entries) {
-                heroInView = entries[0].isIntersecting;
-                if (heroInView && !rafRefs.parallax && !paused) {
-                    rafRefs.parallax = requestAnimationFrame(updateParallax);
-                }
-            }, { threshold: 0 });
-            heroIO.observe(heroSection);
-        }
-        if (heroInView) rafRefs.parallax = requestAnimationFrame(updateParallax);
 
         // --- #9: Scroll-Velocity Typography (lightweight — only updates CSS var) ---
         var sectionTitles = document.querySelectorAll('.section-title');
@@ -1006,28 +995,9 @@ function initMotionEffects() {
         }, { threshold: 0.1 });
         grids.forEach(function(g) { cascadeIO.observe(g); });
 
-        // --- #13: Scroll Progress per Section ---
-        sections.forEach(function(sec) {
-            var bar = document.createElement('div');
-            bar.className = 'section-progress';
-            bar.setAttribute('aria-hidden', 'true');
-            sec.style.position = 'relative';
-            sec.appendChild(bar);
-        });
-        window.addEventListener('scroll', throttle(function() {
-            sections.forEach(function(sec) {
-                var bar = sec.querySelector('.section-progress');
-                if (!bar) return;
-                var rect = sec.getBoundingClientRect();
-                var vh = window.innerHeight;
-                if (rect.top < vh && rect.bottom > 0) {
-                    var progress = Math.max(0, Math.min(1, (vh - rect.top) / (rect.height + vh)));
-                    bar.style.width = (progress * 100).toFixed(1) + '%';
-                } else {
-                    bar.style.width = '0%';
-                }
-            });
-        }, 50), { passive: true });
+        // --- #13: Scroll Progress per Section --- DISABLED: continuous getBoundingClientRect
+        // on 8+ sections every 50ms causes heavy Style & Layout work (5,227ms).
+        // Global scroll progress bar (initScrollProgress) provides same UX.
 
         // --- #14: Elastic Overscroll Bounce (lightweight) ---
         var lastBounceTime = 0;
@@ -1075,7 +1045,10 @@ function initMotionEffects() {
     initTextEffects();
 
     function initTextEffects() {
-        // --- #17: Split-Character Heading Reveal ---
+        // --- #17: Split-Character Heading Reveal --- DISABLED: creates 100-200 DOM nodes
+        // (individual <span> per character) causing heavy Style & Layout work.
+        // #20 word-split also disabled for same reason. #21 scramble kept (textContent only).
+        return;
         var splitTitles = document.querySelectorAll('.section-title');
         var splitIO = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
@@ -1113,9 +1086,9 @@ function initMotionEffects() {
         }, { threshold: 0.3 });
         splitTitles.forEach(function(t) { splitIO.observe(t); });
 
-        // --- #18: Typewriter Hero Title --- (desktop only — mobile shows immediately)
+        // --- #18: Typewriter Hero Title --- DISABLED: causes CLS (width:0 → auto shift)
         var bentoName = document.querySelector('.bento-name');
-        if (bentoName && !isMobile) {
+        if (false && bentoName && !isMobile) {
             var originalText = bentoName.textContent;
             bentoName.style.borderRight = '3px solid var(--accent-gold)';
             bentoName.style.width = '0';

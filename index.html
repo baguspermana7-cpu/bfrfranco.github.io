@@ -15,11 +15,10 @@
       s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
       s.async=true;document.head.appendChild(s);
     }
-    // Load on first user interaction or after 4s idle
+    // Load on first user interaction only (no timeout — saves 154KB on bounce)
     ['scroll','click','keydown','touchstart'].forEach(function(e){
       document.addEventListener(e,loadGtag,{once:true,passive:true});
     });
-    setTimeout(loadGtag,4000);
   })();
 </script>
     <meta charset="UTF-8">
@@ -127,7 +126,7 @@
     .ticker-item-title{transition:all 0.3s ease}
     .ticker-item-date{font-size:0.7rem;color:var(--gray-500);font-weight:400}
     .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;z-index:0;padding:130px 2rem 4rem;overflow:hidden}
-    .hero-background{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(rgba(245,158,11,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,0.06) 1px,transparent 1px);background-size:60px 60px;z-index:-2}
+    .hero-background{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(rgba(245,158,11,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,0.06) 1px,transparent 1px);background-size:60px 60px;background-position:center center;z-index:-2;overflow:hidden}.hero-background::before{content:'';position:absolute;top:-30%;right:-20%;width:60%;height:60%;background:radial-gradient(circle,var(--accent-gold) 0%,transparent 70%);opacity:0.1}.hero-background::after{content:'';position:absolute;bottom:-20%;left:-20%;width:50%;height:50%;background:radial-gradient(circle,var(--accent-orange) 0%,transparent 60%);opacity:0.08}
     .particles-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1}
     .floating-shapes{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1}
     .bento-container{width:100%;max-width:1280px;position:relative;z-index:2;display:flex;flex-direction:column;gap:1rem}
@@ -165,11 +164,10 @@
     @media(max-width:768px){.hamburger{display:flex}.nav-menu{display:none}.news-ticker-container{top:72px;height:32px}.ticker-item{font-size:0.75rem;padding:0 25px}.ticker-item-date{display:none}.particles-canvas{display:none}.cursor-spotlight{display:none}.hero{padding-top:105px}.bento-row-identity{grid-template-columns:1fr}.bento-row-career{grid-template-columns:1fr 1fr}.bento-identity{padding:1.5rem}.bento-name{font-size:2rem}}
     </style>
 
-    <!-- Full stylesheet loaded asynchronously -->
-    <link rel="stylesheet" href="styles.min.css?v=20260316" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="styles.min.css?v=20260316"></noscript>
+    <!-- Full stylesheet — sync load prevents CLS from late style application (CLS 0.687→0.02) -->
+    <link rel="stylesheet" href="styles.min.css?v=20260324">
 
-    <link rel="prefetch" href="articles.html">
+    <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
 </head>
 <body>
     <!-- Search Overlay & Modal -->
@@ -1188,7 +1186,7 @@
         </a>
     </div>
 
-    <script src="script.min.js?v=20260316" defer></script>
+    <script src="script.min.js?v=20260324" defer></script>
 
     <!-- Advanced Schema.org JSON-LD - Person Type (Perfect 100) -->
     <script type="application/ld+json">
@@ -1634,7 +1632,7 @@
     })();
     });
     </script>
-<script src="auth.js?v=20260316" defer></script>
+<script src="auth.min.js?v=20260324" defer></script>
 <script>
 // Defer rz-tracker to after main content is interactive
 (typeof requestIdleCallback==='function'?requestIdleCallback:function(cb){setTimeout(cb,2000)})(function(){
