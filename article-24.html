@@ -1158,29 +1158,29 @@
     <p>The salary data throughout this article paints a compelling picture, but abstract ranges are not actionable. The calculator below lets you estimate your specific earning potential based on role, experience, location, certifications, and specializations. Every multiplier is derived from the salary benchmarks cited in this article and cross-referenced with Glassdoor, PayScale, and SalaryExpert data for mid-level data center operations roles.</p>
 
     <style>
-        .dcj-calculator { background: linear-gradient(135deg, #064e3b 0%, #059669 100%); border-radius: 16px; padding: 2rem; margin: 2rem 0; }
+        .dcj-calculator { background: linear-gradient(135deg, #064e3b 0%, #059669 100%); border-radius: 16px; padding: 1.25rem; margin: 2rem 0; }
         .dcj-calculator h3 { color: #fff; font-size: 1.3rem; margin: 0 0 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
-        .dcj-calculator .dcj-calc-subtitle { color: rgba(255,255,255,0.75); font-size: 0.85rem; margin: 0 0 1.5rem; }
-        .dcj-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .dcj-input-panel { display: flex; flex-direction: column; gap: 0.75rem; }
-        .dcj-input-group { display: flex; flex-direction: column; gap: 0.25rem; }
-        .dcj-input-group label { color: rgba(255,255,255,0.9); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .dcj-input-group select, .dcj-input-group input { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; padding: 0.55rem 0.75rem; font-size: 0.9rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+        .dcj-calculator .dcj-calc-subtitle { color: rgba(255,255,255,0.75); font-size: 0.85rem; margin: 0 0 0.75rem; }
+        .dcj-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .dcj-input-panel { display: flex; flex-direction: column; gap: 0.5rem; }
+        .dcj-input-group { display: flex; flex-direction: column; gap: 0.2rem; }
+        .dcj-input-group label { color: rgba(255,255,255,0.9); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .dcj-input-group select, .dcj-input-group input { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; padding: 0.45rem 0.6rem; font-size: 0.82rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
         .dcj-input-group select:focus, .dcj-input-group input:focus { border-color: #6ee7b7; }
         .dcj-input-group select option { background: #064e3b; color: #fff; }
         .dcj-calc-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 10px; padding: 0.75rem; font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; transition: box-shadow 0.2s, transform 0.1s; }
         .dcj-calc-btn:hover { box-shadow: 0 4px 16px rgba(16,185,129,0.4); transform: translateY(-1px); }
         .dcj-reset-btn { background: transparent; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); border-radius: 8px; padding: 0.5rem; font-size: 0.8rem; cursor: pointer; transition: border-color 0.2s; }
         .dcj-reset-btn:hover { border-color: #6ee7b7; color: #fff; }
-        .dcj-results-panel { display: flex; flex-direction: column; gap: 1rem; }
-        .dcj-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-        .dcj-kpi-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 1rem; text-align: center; transition: border-color 0.3s; }
+        .dcj-results-panel { display: flex; flex-direction: column; gap: 0.75rem; }
+        .dcj-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+        .dcj-kpi-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 0.65rem; text-align: center; transition: border-color 0.3s; }
         .dcj-kpi-card:hover { border-color: rgba(110,231,183,0.5); }
-        .dcj-kpi-label { color: rgba(255,255,255,0.65); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
-        .dcj-kpi-value { color: #6ee7b7; font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1.2; }
+        .dcj-kpi-label { color: rgba(255,255,255,0.65); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.2rem; }
+        .dcj-kpi-value { color: #6ee7b7; font-size: 1.15rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1.2; }
         .dcj-kpi-sub { color: rgba(255,255,255,0.5); font-size: 0.7rem; margin-top: 0.25rem; }
-        .dcj-narrative { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 1rem 1.25rem; margin-top: 0.5rem; }
-        .dcj-narrative p { color: rgba(255,255,255,0.85); font-size: 0.85rem; line-height: 1.6; margin: 0; }
+        .dcj-narrative { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.75rem; margin-top: 0.5rem; }
+        .dcj-narrative p { color: rgba(255,255,255,0.85); font-size: 0.8rem; line-height: 1.6; margin: 0; }
         .dcj-disclaimer { color: rgba(255,255,255,0.45); font-size: 0.7rem; margin-top: 1rem; line-height: 1.5; }
         .dcj-pdf-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; transition: border-color 0.2s; }
         .dcj-pdf-btn:hover { border-color: #6ee7b7; color: #fff; }
@@ -1188,12 +1188,12 @@
         .mode-btn { padding: 0.6rem 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: transparent; color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .mode-btn.active { background: rgba(255,255,255,0.15); color: #fff; border-color: #6ee7b7; }
         .mode-btn:hover { border-color: #6ee7b7; color: #fff; }
-        .dcj-pro-inputs { display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.15); }
-        .dcj-pro-inputs.visible { display: flex; flex-direction: column; gap: 0.75rem; }
-        .dcj-pro-panel { display: none; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; position: relative; }
+        .dcj-pro-inputs { display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.15); }
+        .dcj-pro-inputs.visible { display: flex; flex-direction: column; gap: 0.5rem; }
+        .dcj-pro-panel { display: none; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.75rem; margin-top: 0.75rem; position: relative; }
         .dcj-pro-panel.visible { display: block; }
         .dcj-pro-panel h4 { color: #6ee7b7; font-size: 0.95rem; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .dcj-pro-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+        .dcj-pro-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
         .dcj-chart-container { position: relative; width: 100%; height: 280px; margin: 0.75rem 0; }
         .dcj-chart-container canvas { width: 100% !important; height: 100% !important; }
         .dcj-lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; z-index: 5; cursor: pointer; }
