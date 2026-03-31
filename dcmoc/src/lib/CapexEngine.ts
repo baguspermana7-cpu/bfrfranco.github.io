@@ -202,7 +202,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     // Metrics
     // A8: PUE from shared constants (modern 2025 standards)
     const pue = getPUE(coolingType);
-    const annualEnergy = itLoad * pue * 8760 * 0.10; // $0.10/kWh default
+    const annualEnergy = itLoad * pue * 8760 * 0.10; // Global avg estimate; country-specific rate used in SensitivityEngine
     const floorSpace = Math.ceil(racks * 2.5); // 2.5 m2 per rack
 
     // Compute Timeline

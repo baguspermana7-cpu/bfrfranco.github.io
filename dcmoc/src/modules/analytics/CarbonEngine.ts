@@ -57,8 +57,8 @@ export interface CarbonInputs {
 }
 
 // ─── CONSTANTS ──────────────────────────────────────────────
-const CARBON_OFFSET_PRICE_USD = 25;   // $/tCO₂ (voluntary market average)
-const CARBON_TAX_RATE_USD = 50;       // $/tCO₂ (EU ETS approximate)
+const CARBON_OFFSET_PRICE_USD = 35;   // $/tCO₂ (2025 voluntary market, S&P Global)
+const CARBON_TAX_RATE_USD = 65;       // $/tCO₂ (EU ETS 2025, EUR 60-65 avg)
 const DIESEL_EMISSION_FACTOR = 2.68;  // kgCO₂ per liter diesel
 const DIESEL_CONSUMPTION_RATE = 0.3;  // liters per kW per hour
 const INDUSTRY_AVG_PUE = 1.58;        // Global average PUE (Uptime Institute)
@@ -141,9 +141,9 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
         return Math.round((investment / savings) * 10) / 10;
     };
 
-    const solarInvestment = itLoadKw * 0.3 * 1200;
+    const solarInvestment = itLoadKw * 0.3 * 900;  // $900/kWp (IRENA 2024 utility-scale avg)
     const solarSavings = totalEnergyMWh * 0.15 * 80;
-    const bessInvestment = itLoadKw * 0.1 * 500;
+    const bessInvestment = itLoadKw * 0.1 * 300;  // $300/kWh (BNEF 2025 utility-scale avg)
     const bessSavings = totalEnergyMWh * 0.08 * 80;
     const liquidInvestment = itLoadKw * 300;
     const liquidSavings = coolingEnergyMWh * 0.3 * 80;

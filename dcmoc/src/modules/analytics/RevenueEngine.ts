@@ -74,7 +74,7 @@ export const defaultRevenueInputs: RevenueInputs = {
     nrcPerKw: 250,
     nrcCustomFitout: 50000,
     nrcCrossConnect: 15000,
-    mrcPerKwMonth: 150,
+    mrcPerKwMonth: 165, // 2025 US wholesale median (CBRE: $130-215 range)
     mrcEscalation: 0.03,
     mrcCrossConnectMonthly: 5000,
     contractYears: 10,

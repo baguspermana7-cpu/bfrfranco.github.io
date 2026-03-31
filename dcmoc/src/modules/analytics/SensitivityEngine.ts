@@ -68,7 +68,7 @@ const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerK
     const softCosts = capex * ((inputs.designFee + inputs.pmFee) / 100);
     const contingencyCost = capex * (inputs.contingency / 100);
     const totalCapex = capex + softCosts + contingencyCost;
-    const annualDepreciation = totalCapex / 20; // 20-year straight-line
+    const annualDepreciation = totalCapex / 15; // 15-year blended (equipment 10-15yr, structure 20-30yr)
     const depreciationTaxShield = annualDepreciation * taxRate;
     const annualizedCapex = (totalCapex / projectLife) - depreciationTaxShield;
 

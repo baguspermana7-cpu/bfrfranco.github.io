@@ -300,7 +300,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             inflationRate: 0.03, // 3%
             laborEscalation: 0.045, // 4.5%
             taxRate: 0.24,
-            electricityRate: 0.07,
+            electricityRate: 0.08, // ICPT surcharge increase 2024-2025
         },
         labor: {
             minimumWage: 340,
@@ -477,8 +477,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         currency: 'JPY',
         currencySymbol: '¥',
         economy: {
-            inflationRate: 0.01, // 1%
-            laborEscalation: 0.02, // 2%
+            inflationRate: 0.028, // 2.8% (BOJ structural shift 2024-2025)
+            laborEscalation: 0.03, // 3%
             taxRate: 0.2304,
             electricityRate: 0.20,
         },
