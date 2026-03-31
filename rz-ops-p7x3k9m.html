@@ -2015,7 +2015,7 @@ function handleAdminLogin(e){
     },600);
     return false;
 }
-function adminLogout(){if(!confirm('Logout?'))return;localStorage.removeItem('rz_premium_session');location.href='capex-calculator.html'}
+function adminLogout(){if(!confirm('Logout?'))return;localStorage.removeItem('rz_premium_session');location.href='index.html'}
 
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -2027,8 +2027,8 @@ function showSection(id){
     const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment','finance-terminal':'Finance Terminal','idr-stocks':'IDR Stocks'};
     if(id==='mayar'&&typeof renderMayar==='function')renderMayar();
     if(id==='activity'&&typeof renderActivity==='function')renderActivity();
-    if(id==='stock-investment'){var dcaIf=document.getElementById('dca-iframe');var isL=document.body.classList.contains('light-mode');if(dcaIf&&dcaIf.contentWindow){try{dcaIf.contentWindow.postMessage({type:'theme-sync',theme:isL?'light':'dark'},'*')}catch(e){}}}
-    if(id==='finance-terminal'){var ftIf=document.getElementById('finance-terminal-iframe');var isL2=document.body.classList.contains('light-mode');if(ftIf&&ftIf.contentWindow){try{ftIf.contentWindow.postMessage({type:'theme-sync',theme:isL2?'light':'dark'},'*')}catch(e){}}}
+    if(id==='stock-investment'){var dcaIf=document.getElementById('dca-iframe');var isL=document.body.classList.contains('light-mode');if(dcaIf&&dcaIf.contentWindow){try{dcaIf.contentWindow.postMessage({type:'theme-sync',theme:isL?'light':'dark'},window.location.origin)}catch(e){}}}
+    if(id==='finance-terminal'){var ftIf=document.getElementById('finance-terminal-iframe');var isL2=document.body.classList.contains('light-mode');if(ftIf&&ftIf.contentWindow){try{ftIf.contentWindow.postMessage({type:'theme-sync',theme:isL2?'light':'dark'},window.location.origin)}catch(e){}}}
     document.getElementById('topbarTitle').textContent=titles[id]||id;
     if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
 }
@@ -2055,10 +2055,10 @@ function toggleAdminTheme(){
     }
     // Sync theme to DCA iframe
     var dcaIframe=document.getElementById('dca-iframe');
-    if(dcaIframe&&dcaIframe.contentWindow){try{dcaIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},'*')}catch(e){}}
+    if(dcaIframe&&dcaIframe.contentWindow){try{dcaIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},window.location.origin)}catch(e){}}
     // Sync theme to Finance Terminal iframe
     var ftIframe=document.getElementById('finance-terminal-iframe');
-    if(ftIframe&&ftIframe.contentWindow){try{ftIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},'*')}catch(e){}}
+    if(ftIframe&&ftIframe.contentWindow){try{ftIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},window.location.origin)}catch(e){}}
 }
 
 // Clock
