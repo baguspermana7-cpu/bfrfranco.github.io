@@ -2451,13 +2451,13 @@
             'QA': { name: 'Qatar', flag: '🇶🇦', laborMult: 3.00, energyRate: 0.040, maintMult: 1.45, workerTax: 1.00 },
             // Europe
             'GB': { name: 'United Kingdom', flag: '🇬🇧', laborMult: 4.50, energyRate: 0.280, maintMult: 1.80, workerTax: 1.15 },
-            'DE': { name: 'Germany', flag: '🇩🇪', laborMult: 4.80, energyRate: 0.350, maintMult: 1.90, workerTax: 1.20 },
+            'DE': { name: 'Germany', flag: '🇩🇪', laborMult: 4.80, energyRate: 0.300, maintMult: 1.90, workerTax: 1.20 },
             'NL': { name: 'Netherlands', flag: '🇳🇱', laborMult: 4.20, energyRate: 0.280, maintMult: 1.70, workerTax: 1.15 },
             'IE': { name: 'Ireland', flag: '🇮🇪', laborMult: 4.00, energyRate: 0.220, maintMult: 1.65, workerTax: 1.10 },
             'FR': { name: 'France', flag: '🇫🇷', laborMult: 4.00, energyRate: 0.180, maintMult: 1.60, workerTax: 1.25 },
             'PT': { name: 'Portugal', flag: '🇵🇹', laborMult: 3.00, energyRate: 0.177, maintMult: 1.55, workerTax: 1.24 },
-            'SE': { name: 'Sweden', flag: '🇸🇪', laborMult: 4.00, energyRate: 0.080, maintMult: 1.55, workerTax: 1.30 },
-            'NO': { name: 'Norway', flag: '🇳🇴', laborMult: 4.50, energyRate: 0.070, maintMult: 1.65, workerTax: 1.25 },
+            'SE': { name: 'Sweden', flag: '🇸🇪', laborMult: 4.00, energyRate: 0.060, maintMult: 1.55, workerTax: 1.30 },
+            'NO': { name: 'Norway', flag: '🇳🇴', laborMult: 4.50, energyRate: 0.050, maintMult: 1.65, workerTax: 1.25 },
             'CH': { name: 'Switzerland', flag: '🇨🇭', laborMult: 5.50, energyRate: 0.120, maintMult: 2.00, workerTax: 1.15 },
             // Americas
             'US-VA': { name: 'USA (Virginia)', flag: '🇺🇸', laborMult: 4.50, energyRate: 0.075, maintMult: 1.70, workerTax: 1.30 },
@@ -2760,10 +2760,10 @@
         const carbonPriceByRegion = {
             ID: 5, SG: 25, MY: 10, TH: 5, VN: 3, PH: 3,
             US: 15, 'US-CA': 30, 'US-TX': 10, 'US-VA': 15,
-            DE: 85, GB: 80, JP: 10, AU: 30, IN: 5, BR: 10,
-            KR: 20, NL: 85, SE: 85, NO: 85, AE: 5, SA: 3,
+            DE: 70, GB: 55, JP: 5, AU: 30, IN: 5, BR: 10,
+            KR: 12, NL: 70, SE: 70, NO: 70, AE: 5, SA: 3,
             QA: 3, BH: 3, HK: 10, TW: 10, CN: 12, NZ: 35,
-            FR: 85, IE: 85, CH: 85
+            FR: 70, IE: 70, CH: 70
         };
         const industryBenchmarkOpex = {
             1: { low: 150, mid: 200, high: 280 },
@@ -2876,7 +2876,7 @@
             return {
                 facilityMgr: 1, // Combined Facility + Operations Manager
                 maintMgr: mw >= 2 ? 1 : 0, // Maintenance Supervisor for larger sites
-                shiftLead: Math.max(5, Math.ceil(mw / 2) * 5), // MTL - 5 for 24/7 rotation
+                shiftLead: Math.max(5, Math.min(25, Math.ceil(mw / 2)) * 5), // MTL - 5 for 24/7 rotation, cap at 25 shifts
                 elecHV: Math.ceil(mw * 1.0 * tierMult), // ME - Electrical Engineer
                 elecLV: Math.ceil(mw * 1.0 * tierMult), // MT - Electrical Technician
                 hvacTech: Math.ceil(mw * 0.8 * tierMult), // ME - HVAC/Mech Engineer

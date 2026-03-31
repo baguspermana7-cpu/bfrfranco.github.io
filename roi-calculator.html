@@ -562,7 +562,7 @@
                         <button class="preset-btn" onclick="setPreset('totalCapex',200)">$200M Large</button>
                         <button class="preset-btn" onclick="setPreset('totalCapex',500)">$500M Mega</button>
                     </div>
-                    <input type="number" class="input-field" id="totalCapex" value="80" min="1" max="5000" step="1" oninput="calculate()">
+                    <input type="number" class="input-field" id="totalCapex" value="100" min="1" max="5000" step="1" oninput="calculate()">
 
                     <label class="input-label">IT Capacity (MW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Power Capacity</div><div class="tooltip-desc">Total IT power capacity available for lease or use. This determines your revenue potential. A 10MW facility at $150/kW/month generates up to $18M annually at full occupancy. AI-optimized facilities can command $200-350/kW/month.</div></div></span></label>
                     <div class="preset-bar">
@@ -604,7 +604,7 @@
                     </select>
 
                     <label class="input-label">Avg Revenue per kW/month ($) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Monthly Revenue Rate</div><div class="tooltip-desc">Average monthly revenue per kilowatt of IT capacity sold. This is the primary revenue driver. Blended rates account for different contract sizes and service levels. Industry average is $130-180/kW/month for retail colocation in developed markets.</div></div></span></label>
-                    <input type="number" class="input-field" id="revenuePerKw" value="170" min="50" max="500" step="5" oninput="calculate()">
+                    <input type="number" class="input-field" id="revenuePerKw" value="185" min="50" max="500" step="5" oninput="calculate()">
 
                     <label class="input-label">Annual Price Escalation: <span id="escalationVal">3</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-trend-up"></i> Annual Price Growth</div><div class="tooltip-desc">Annual percentage increase in revenue per kW. Most colocation contracts include 2-5% annual escalators. Power-pass-through models may have higher effective escalation if electricity prices rise. Negative values model price compression from competition.</div></div></span></label>
                     <input type="range" id="escalation" min="-2" max="8" value="3" step="0.5" oninput="document.getElementById('escalationVal').textContent=this.value;calculate()">
@@ -709,7 +709,7 @@
                     </select>
 
                     <label class="input-label">Discount Rate / WACC (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-pie"></i> Weighted Average Cost of Capital</div><div class="tooltip-desc">The rate used to discount future cashflows to present value for NPV calculation. Represents the blended cost of debt and equity capital. Typical data center WACC ranges from 7-12%. Higher discount rates produce lower NPV, reflecting higher required returns or risk.</div></div></span></label>
-                    <input type="number" class="input-field" id="discountRate" value="10" min="3" max="25" step="0.5" oninput="calculate()">
+                    <input type="number" class="input-field" id="discountRate" value="8" min="3" max="25" step="0.5" oninput="calculate()">
                 </div>
 
                 <!-- Section 6: Tax & Depreciation -->
@@ -736,7 +736,7 @@
                     </select>
 
                     <label class="input-label">Exit Cap Rate: <span id="capRateVal">6</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Capitalization Rate</div><div class="tooltip-desc">The capitalization rate used to value the property at exit. Lower cap rates imply higher valuations. Data center cap rates have compressed from 7-9% historically to 5-7% currently due to strong institutional demand. AI-ready facilities may trade at even tighter caps.</div></div></span></label>
-                    <input type="range" id="exitCapRate" min="4" max="12" value="6" step="0.25" oninput="document.getElementById('capRateVal').textContent=this.value;calculate()">
+                    <input type="range" id="exitCapRate" min="4" max="12" value="5.5" step="0.25" oninput="document.getElementById('capRateVal').textContent=this.value;calculate()">
                 </div>
 
             </div><!-- /input-panel -->
@@ -1207,7 +1207,7 @@
         var depSchedule = [];
         for (var y = 0; y < projectLife; y++) {
             if (depMethod === 'straight') {
-                depSchedule.push(totalCapexDollars / 20);
+                depSchedule.push(totalCapexDollars / Math.min(projectLife, 20));
             } else if (depMethod === 'accelerated') {
                 // MACRS 15-year approximation
                 var macrsRates = [0.05, 0.095, 0.0855, 0.077, 0.0693, 0.0623, 0.059, 0.059, 0.0591, 0.059, 0.0591, 0.059, 0.0591, 0.059, 0.0591, 0.0295];
@@ -1251,7 +1251,7 @@
             // Electricity OPEX (scales with occupancy and PUE)
             var occupiedKW = itCapacityKW * occ;
             var totalPowerKW = occupiedKW * pue;
-            var annualElectricity = totalPowerKW * 8760 * electricityRate;
+            var annualElectricity = totalPowerKW * 8760 * electricityRate * Math.pow(1.035, yr - 1); // 3.5% annual escalation
 
             // Non-electricity OPEX (scales partially with occupancy)
             var opexEscFactor = Math.pow(1 + opexEsc / 100, yr - 1);
@@ -1759,7 +1759,7 @@
         document.getElementById('taxRate').value = 25;
         document.getElementById('depreciationMethod').value = 'straight';
         document.getElementById('terminalMethod').value = 'caprate';
-        document.getElementById('exitCapRate').value = 6;
+        document.getElementById('exitCapRate').value = 5.5;
         // Update range displays
         document.getElementById('escalationVal').textContent = '3';
         document.getElementById('opexEscVal').textContent = '2.5';

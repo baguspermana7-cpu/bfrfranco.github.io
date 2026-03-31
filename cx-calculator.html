@@ -1168,8 +1168,8 @@ var CX_RATES = {
   china_shanghai:{name:'Shanghai',cxDay:550,fieldDay:350,oemDay:1000,witnessDay:2500,perDiem:150,diesel:1.20,mult:0.46},
   korea_seoul:{name:'Seoul',cxDay:750,fieldDay:550,oemDay:1300,witnessDay:2800,perDiem:200,diesel:1.35,mult:0.63},
   hk:{name:'Hong Kong',cxDay:900,fieldDay:650,oemDay:1500,witnessDay:3000,perDiem:300,diesel:1.80,mult:0.75},
-  indonesia_jakarta:{name:'Jakarta',cxDay:350,fieldDay:200,oemDay:700,witnessDay:1800,perDiem:100,diesel:0.90,mult:0.29},
-  malaysia_kl:{name:'Kuala Lumpur',cxDay:400,fieldDay:280,oemDay:750,witnessDay:2000,perDiem:110,diesel:0.55,mult:0.33},
+  indonesia_jakarta:{name:'Jakarta',cxDay:350,fieldDay:200,oemDay:700,witnessDay:1800,perDiem:100,diesel:1.05,mult:0.29},
+  malaysia_kl:{name:'Kuala Lumpur',cxDay:400,fieldDay:280,oemDay:750,witnessDay:2000,perDiem:110,diesel:0.85,mult:0.33},
   uae_dubai:{name:'Dubai',cxDay:800,fieldDay:550,oemDay:1400,witnessDay:3000,perDiem:250,diesel:0.75,mult:0.67},
   saudi_riyadh:{name:'Riyadh',cxDay:850,fieldDay:600,oemDay:1500,witnessDay:3000,perDiem:250,diesel:0.60,mult:0.71},
   south_africa_jhb:{name:'Johannesburg',cxDay:500,fieldDay:350,oemDay:900,witnessDay:2200,perDiem:150,diesel:1.40,mult:0.42},
@@ -1183,7 +1183,7 @@ var CX_RATES = {
 // --- MULTIPLIERS ---
 var CX_COOLING = {air:{cost:1.00,dur:1.00},inrow:{cost:1.12,dur:1.08},rdhx:{cost:1.25,dur:1.18},dlc:{cost:1.45,dur:1.35},immersion:{cost:1.55,dur:1.40}};
 var CX_REDUNDANCY = {
-  'N':   {cost:1.00,dur:1.00,tier:'Tier I',avail:'99.671%',scenarios:3,istHrs:8},
+  'N':   {cost:1.00,dur:1.00,tier:'Tier I',avail:'99.671%',scenarios:3,istHrs:14},
   'N+1': {cost:1.35,dur:1.30,tier:'Tier II/III',avail:'99.982%',scenarios:6,istHrs:16},
   '2N':  {cost:2.00,dur:1.75,tier:'Tier IV',avail:'99.995%',scenarios:10,istHrs:110},
   '2N+1':{cost:2.25,dur:1.90,tier:'Tier IV+',avail:'99.9995%',scenarios:10,istHrs:120}
@@ -2059,7 +2059,7 @@ function cxEquipScale(inp){
     mcc:Math.ceil(kw/3000)+1,
     vfd:Math.ceil(kw/300),
     busway:Math.ceil(kw/2000)+1,
-    firePumps:2,
+    firePumps:Math.max(2, Math.ceil(kw / 25000) + 1),
     ahu:Math.ceil(kw/5000)+1,
     accessDoors:Math.ceil(kw/500)+10,
     cameras:Math.ceil(kw/200)+20,
@@ -2264,9 +2264,9 @@ function cxCalcTotalCost(inp){
   };
 
   // CAPEX estimate: differentiate by density (AI factory CAPEX per kW is higher due to liquid cooling infra)
-  var capexPerKw=8500;
-  if(inp.rackDensity==='ai_hpc')capexPerKw=12000; // AI/HPC facilities cost more per kW
-  else if(inp.rackDensity==='high')capexPerKw=10000;
+  var capexPerKw=10500;
+  if(inp.rackDensity==='ai_hpc')capexPerKw=16000; // AI/HPC facilities cost more per kW (T&T 2025)
+  else if(inp.rackDensity==='high')capexPerKw=13000;
   var estCapex=inp.itLoad*capexPerKw;
   var totalDur=l0d+l1d+l2d+l3d+l4d+l5d+l6d;
 
@@ -2292,7 +2292,7 @@ function cxRunMonteCarlo(inp){
     var r=cxCalcTotalCost(vi);
     // Add stochastic cost uncertainty ±5% (contractor pricing, material costs)
     var costNoise=1+cxRandNorm(0,0.05);
-    results.push(r.grandTotal*Math.max(0.85,costNoise));
+    results.push(r.grandTotal*Math.max(0.85,Math.min(1.15,costNoise)));
   }
   results.sort(function(a,b){return a-b;});
   var mean=results.reduce(function(a,b){return a+b;},0)/N;
@@ -5997,6 +5997,6 @@ window.addEventListener('scroll',function(){cxScrollBtn.style.display=window.scr
 </div>
 
 <script src="rz-tracker.js"></script>
-<script src="auth.js?v=20260228"></script>
+<script src="auth.js?v=20260324b"></script>
 </body>
 </html>

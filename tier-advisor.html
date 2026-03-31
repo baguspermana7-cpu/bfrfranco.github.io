@@ -834,11 +834,11 @@
         pduRedundancy: { single:20, dual:70, triple:100 },
         coolRedundancy: { n:15, n1:50, n2:70, '2n':90, '2n1':100 },
         coolDistribution: { single:20, dual:70, n1_piping:100 },
-        coolType: { dx:30, chilled_water:60, free_cooling:75, rdhx:80, dlc:90, immersion:100 },
+        coolType: { dx:55, chilled_water:65, free_cooling:75, rdhx:80, dlc:90, immersion:100 },
         netEntry: { single:15, dual_same:40, dual_diverse:80, three_plus:100 },
         carrierDiv: { single:20, two:60, three_plus:100 },
         meetMeRoom: { none:0, single:50, redundant:100 },
-        fireSuppression: { none:0, wet:30, preaction:60, clean:85, vesda_clean:100 },
+        fireSuppression: { none:0, wet:50, preaction:65, clean:85, vesda_clean:100 },
         accessControl: { key:15, card:40, biometric:75, mfa_mantrap:100 },
         monitoring: { none:0, basic:30, bms:65, full_dcim:100 }
     };
@@ -866,7 +866,8 @@
 
         // Floor constraints
         var uF = gv('utilityFeeds'), gC = gv('genConfig'), uC = gv('upsConfig'), pR = gv('pduRedundancy'), cR = gv('coolRedundancy'), nE = gv('netEntry');
-        var canT3 = (uF==='dual_same'||uF==='dual_diverse'||uF==='onsite') && (gC==='n1'||gC==='2n'||gC==='2n1') && (uC==='n1'||uC==='2n'||uC==='2n1'||uC==='distributed');
+        var cD = gv('coolDistribution');
+        var canT3 = (uF==='dual_same'||uF==='dual_diverse'||uF==='onsite') && (gC==='n1'||gC==='2n'||gC==='2n1') && (uC==='n1'||uC==='2n'||uC==='2n1'||uC==='distributed') && cD!=='single';
         var canT4 = uF==='dual_diverse' && (gC==='2n'||gC==='2n1') && (uC==='2n'||uC==='2n1') && (pR==='dual'||pR==='triple') && (cR==='2n'||cR==='2n1') && (nE==='dual_diverse'||nE==='three_plus');
 
         if (compositeRaw >= 75 && !canT3) compositeRaw = Math.min(compositeRaw, 74);
@@ -881,7 +882,7 @@
         else if (composite >= 25) { tier='Tier I+'; grade='D'; tierColor='#ef4444'; tierNum=1; tierDesc='Basic Capacity+'; }
         else { tier='Tier I'; grade='F'; tierColor='#ef4444'; tierNum=1; tierDesc='Basic Capacity'; }
 
-        var tia = 'Rated '+tierNum, en = 'VK'+tierNum, bicsi = 'Class F'+tierNum;
+        var tia = 'Rated '+tierNum, en = 'Class '+tierNum, bicsi = 'Class F'+tierNum;
         var scores = [powerScore, coolingScore, networkScore, physicalScore, monitoringScore];
         var avg = scores.reduce(function(a,b){return a+b;},0)/scores.length;
         var variance = scores.reduce(function(a,b){return a+Math.pow(b-avg,2);},0)/scores.length;

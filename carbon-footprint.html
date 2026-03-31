@@ -1269,22 +1269,22 @@
         SG: { name: 'Singapore', grid: 0.40, rate: 0.15, region: 'APAC' },
         MY: { name: 'Malaysia', grid: 0.60, rate: 0.07, region: 'APAC' },
         TH: { name: 'Thailand', grid: 0.50, rate: 0.09, region: 'APAC' },
-        VN: { name: 'Vietnam', grid: 0.55, rate: 0.06, region: 'APAC' },
+        VN: { name: 'Vietnam', grid: 0.52, rate: 0.06, region: 'APAC' },
         PH: { name: 'Philippines', grid: 0.60, rate: 0.12, region: 'APAC' },
         IN: { name: 'India', grid: 0.72, rate: 0.07, region: 'APAC' },
-        CN: { name: 'China', grid: 0.58, rate: 0.08, region: 'APAC' },
-        JP: { name: 'Japan', grid: 0.50, rate: 0.18, region: 'APAC' },
+        CN: { name: 'China', grid: 0.55, rate: 0.08, region: 'APAC' },
+        JP: { name: 'Japan', grid: 0.47, rate: 0.18, region: 'APAC' },
         KR: { name: 'South Korea', grid: 0.42, rate: 0.10, region: 'APAC' },
-        AU: { name: 'Australia', grid: 0.60, rate: 0.14, region: 'APAC' },
+        AU: { name: 'Australia', grid: 0.55, rate: 0.14, region: 'APAC' },
         NZ: { name: 'New Zealand', grid: 0.10, rate: 0.12, region: 'APAC' },
         TW: { name: 'Taiwan', grid: 0.50, rate: 0.09, region: 'APAC' },
         US: { name: 'United States', grid: 0.40, rate: 0.10, region: 'AMER' },
-        GB: { name: 'United Kingdom', grid: 0.23, rate: 0.20, region: 'EMEA' },
-        DE: { name: 'Germany', grid: 0.35, rate: 0.25, region: 'EMEA' },
-        NL: { name: 'Netherlands', grid: 0.33, rate: 0.18, region: 'EMEA' },
+        GB: { name: 'United Kingdom', grid: 0.21, rate: 0.20, region: 'EMEA' },
+        DE: { name: 'Germany', grid: 0.31, rate: 0.25, region: 'EMEA' },
+        NL: { name: 'Netherlands', grid: 0.30, rate: 0.18, region: 'EMEA' },
         IE: { name: 'Ireland', grid: 0.30, rate: 0.16, region: 'EMEA' },
         FR: { name: 'France', grid: 0.06, rate: 0.15, region: 'EMEA' },
-        SE: { name: 'Sweden', grid: 0.04, rate: 0.08, region: 'EMEA' },
+        SE: { name: 'Sweden', grid: 0.02, rate: 0.08, region: 'EMEA' },
         PL: { name: 'Poland', grid: 0.65, rate: 0.12, region: 'EMEA' },
         PT: { name: 'Portugal', grid: 0.08, rate: 0.14, region: 'EMEA' },
         AE: { name: 'UAE', grid: 0.45, rate: 0.06, region: 'MENA' },
@@ -1293,7 +1293,7 @@
         ZA: { name: 'South Africa', grid: 0.90, rate: 0.08, region: 'AFR' },
         NG: { name: 'Nigeria', grid: 0.45, rate: 0.10, region: 'AFR' },
         KE: { name: 'Kenya', grid: 0.30, rate: 0.12, region: 'AFR' },
-        BR: { name: 'Brazil', grid: 0.15, rate: 0.09, region: 'LATAM' },
+        BR: { name: 'Brazil', grid: 0.08, rate: 0.09, region: 'LATAM' },
         CL: { name: 'Chile', grid: 0.35, rate: 0.10, region: 'LATAM' },
         MX: { name: 'Mexico', grid: 0.45, rate: 0.08, region: 'LATAM' },
         CO: { name: 'Colombia', grid: 0.20, rate: 0.07, region: 'LATAM' }
@@ -1369,8 +1369,8 @@
     // ══════════════════════════════════════════════════════════════
     // 4. OPERATIONAL CONSTANTS
     // ══════════════════════════════════════════════════════════════
-    var CARBON_OFFSET_PRICE = 25; // $/tCO2
-    var CARBON_TAX_RATE = 50; // $/tCO2 (EU ETS)
+    var CARBON_OFFSET_PRICE = 35; // $/tCO2 (2025 voluntary market)
+    var CARBON_TAX_RATE = 65; // $/tCO2 (EU ETS 2025)
     var DIESEL_EMISSION_FACTOR = 2.68; // kgCO2/L
     var HVO_EMISSION_FACTOR = 0.54; // kgCO2/L
     var DIESEL_CONSUMPTION_RATE = 0.3; // L/kW/hr
@@ -1381,7 +1381,7 @@
         air_crac: { gwp: 2088, charge: 0.3, defaultLeak: 5, name: 'R-410A' },
         inrow: { gwp: 2088, charge: 0.2, defaultLeak: 4, name: 'R-410A' },
         rdhx: { gwp: 1430, charge: 0.15, defaultLeak: 3, name: 'R-134a' },
-        dlc: { gwp: 675, charge: 0.05, defaultLeak: 2, name: 'R-1234ze' }
+        dlc: { gwp: 7, charge: 0.05, defaultLeak: 2, name: 'R-1234ze' }
     };
 
     var WORKLOAD_DATA = {
@@ -1754,7 +1754,8 @@
         var redMult = redundancyLCA === 'n' ? 1 : redundancyLCA === 'n1' ? 1.25 : redundancyLCA === '2n' ? 2 : 2.25;
         var batteryKWh = facilityMW * 1000 * (batteryRuntime / 60) * redMult;
         var batteryCarbon = batteryKWh * batteryFactor / 1000; // tCO2e
-        var batteryReplacements = Math.ceil(projectLife / 8); // replace every 8 years
+        var battCycle = { vrla: 5, lfp: 10, nmc: 8 }[batteryType] || 8;
+        var batteryReplacements = Math.ceil(projectLife / battCycle);
         var totalBatteryCarbon = batteryCarbon * batteryReplacements;
 
         // MEP equipment embodied (UPS, cooling, generators)
