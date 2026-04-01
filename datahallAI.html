@@ -9747,11 +9747,11 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 </script><script src="auth.js?v=20260324b"></script>
 <script>
 (function(){
-var RE=['admin@resistancezero.com','bagus@resistancezero.com','demo@resistancezero.com'];
+var RE=['admin@resistancezero.com','bagus@resistancezero.com'];
 function dr(e){return RE.indexOf(String(e||'').toLowerCase().trim())!==-1?'root':'pro';}
 function gs(){try{var r=localStorage.getItem('rz_premium_session');if(!r)return null;var d=JSON.parse(r);if(d.expires&&new Date(d.expires)<new Date()){localStorage.removeItem('rz_premium_session');return null;}if(!d.role)d.role=dr(d.email);return d;}catch(e){return null;}}
-function ir(s){return!!(s&&String(s.role||'').toLowerCase()==='root');}
-function ag(){document.body.classList.toggle('locked',!ir(gs()));}
+function ia(s){return!!(s&&(s.role==='root'||s.role==='pro'));}
+function ag(){document.body.classList.toggle('locked',!ia(gs()));}
 var b=document.getElementById('rootLoginBtn');
 if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});
 window.addEventListener('rz-auth-change',ag);
