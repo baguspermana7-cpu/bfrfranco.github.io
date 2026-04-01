@@ -37,8 +37,7 @@
     function isRootOnlyHref(href) {
         var path = normalizePathFromHref(href);
         if (!path) return false;
-        if (path.indexOf('/datahallai.html') !== -1) return true;
-        if (path.indexOf('/dc-conventional.html') !== -1) return true;
+        // datahallAI and dc-conventional allow pro+root (gate in their own page JS)
         if (path === '/dcmoc' || path === '/dcmoc/' || path.indexOf('/dcmoc/') !== -1) return true;
         return false;
     }
@@ -308,8 +307,9 @@
     function injectAuthButton() {
         /* Skip if already injected */
         if (document.getElementById('rzAuthWrap')) return;
-        /* Skip if page has its own auth UI (e.g. dc-market-tracker, tco-calculator) */
+        /* Skip if page has its own auth UI (calculators, dc-market-tracker, articles with inline auth) */
         if (document.getElementById('navAuthWrap') || document.getElementById('navLoginBtn')) return;
+        if (document.querySelector('.nav-login-btn') || document.querySelector('[id$="NavLoginBtn"]')) return;
 
         var html = authButtonHTML();
         var inserted = false;
