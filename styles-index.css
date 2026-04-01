@@ -222,6 +222,12 @@ a {
     border-bottom-color: rgba(245, 158, 11, 0.3);
 }
 
+[data-theme="dark"] .navbar.scrolled {
+    background: rgba(15, 15, 26, 0.95);
+    border-bottom-color: rgba(74, 144, 184, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
 .nav-container {
     display: flex;
     justify-content: space-between;
@@ -264,6 +270,7 @@ a {
 
 .nav-menu {
     display: flex;
+    align-items: center;
     list-style: none;
     gap: 2rem;
 }
@@ -1876,7 +1883,6 @@ section {
 }
 
 .metric-card:hover {
-    transform: translateY(-10px) scale(1.02);
     border-color: rgba(245, 158, 11, 0.5);
     box-shadow:
         var(--glass-shadow),
@@ -1969,7 +1975,7 @@ section {
 }
 
 .oe-card:hover {
-    transform: translateY(-5px);
+    border-color: rgba(245, 158, 11, 0.3);
 }
 
 .oe-card:hover::before {
@@ -2130,7 +2136,6 @@ section {
 }
 
 .case-card:hover {
-    transform: translateY(-10px) scale(1.02);
     border-color: rgba(245, 158, 11, 0.5);
     box-shadow:
         var(--glass-shadow),
@@ -2600,6 +2605,38 @@ section {
 .contact-text p a:hover {
     color: var(--light-blue);
     text-decoration: underline;
+}
+
+[data-theme="dark"] .contact {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .contact-item:hover {
+    background: rgba(74, 144, 184, 0.08);
+}
+
+[data-theme="dark"] .contact-text h3 {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .contact-text p {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .contact-text p a {
+    color: #38bdf8;
+}
+
+[data-theme="dark"] .contact-icon {
+    background: linear-gradient(135deg, rgba(74, 144, 184, 0.15) 0%, rgba(56, 189, 248, 0.1) 100%);
+}
+
+[data-theme="dark"] .contact-icon svg {
+    stroke: #38bdf8;
+}
+
+[data-theme="dark"] .contact-form {
+    background: #1e293b;
 }
 
 .contact-form {
@@ -3968,8 +4005,6 @@ section {
     min-width: 18px;
     text-align: center;
 }
-
-/* ==========================================
    Print Stylesheet
    ========================================== */
 @media print {
@@ -4032,7 +4067,7 @@ section {
         page-break-inside: avoid;
     }
 }
-/* ==========================================
+
    Feature 21: Global Search
    ========================================== */
 .nav-search-btn {
@@ -4040,6 +4075,7 @@ section {
     border: none;
     cursor: pointer;
     padding: 8px;
+    margin-right: 0.25rem;
     border-radius: 8px;
     color: var(--gray-700);
     transition: background 0.2s ease, color 0.2s ease;
@@ -4445,7 +4481,6 @@ section {
     flex-shrink: 0;
     opacity: 0.5;
 }
-
 /* ===== Cookie Consent Banner ===== */
 .cookie-banner {
     position: fixed;
@@ -4513,8 +4548,6 @@ section {
 @media (max-width: 768px) {
     .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
 }
-@media print { .cookie-banner { display: none; } }
-
 /* ===== Scroll to Top Button ===== */
 .scroll-top-btn {
     position: fixed;
@@ -5398,37 +5431,6 @@ section {
 /* --- Section Title Dark Mode Enhancement --- */
 [data-theme="dark"] .section-title {
     text-shadow: 0 0 40px rgba(96,165,250,0.08);
-}
-
-/* --- Dark Mode: Ticker Text Visibility Fix (2026-03-24) --- */
-[data-theme="dark"] .news-ticker-container {
-    background: rgba(15, 15, 26, 0.9);
-    border-bottom-color: rgba(74, 144, 184, 0.15);
-}
-[data-theme="dark"] .ticker-item {
-    color: #e2e8f0;
-}
-[data-theme="dark"] .ticker-item:hover {
-    color: #22d3ee;
-}
-[data-theme="dark"] .ticker-item:hover .ticker-item-title {
-    background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-[data-theme="dark"] .ticker-item-date {
-    color: #94a3b8;
-    border-left-color: rgba(255,255,255,0.15);
-}
-[data-theme="dark"] .ticker-item::before {
-    background: #22d3ee;
-}
-[data-theme="dark"] .ticker-glow {
-    background: linear-gradient(to left, rgba(15, 15, 26, 0.95) 0%, transparent 100%);
-}
-[data-theme="dark"] .ticker-wrapper::before {
-    background: linear-gradient(to right, rgba(15, 15, 26, 0.9) 0%, transparent 100%);
 }
 
 /* --- Enhanced Card Entry Animations --- */
