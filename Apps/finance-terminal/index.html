@@ -790,7 +790,7 @@ function downloadCSV(csv,name){const b=new Blob([csv],{type:'text/csv'});const u
 /* ═══════════════════════════════════════════════════════════════
    SECTION 6: THEME SYNC
    ═══════════════════════════════════════════════════════════════ */
-window.addEventListener('message',e=>{if(e.data&&e.data.type==='theme-sync'){document.documentElement.setAttribute('data-theme',e.data.theme);reRenderCharts()}});
+window.addEventListener('message',e=>{if(e.origin!==window.location.origin)return;if(e.data&&e.data.type==='theme-sync'){document.documentElement.setAttribute('data-theme',e.data.theme);reRenderCharts()}});
 (function(){const t=localStorage.getItem(CFG.LS.THEME);if(t)document.documentElement.setAttribute('data-theme',t)})();
 function reRenderCharts(){Object.keys(S.charts).forEach(k=>{try{S.charts[k].options.scales.x.grid.color=chartColors().grid;S.charts[k].options.scales.x.ticks.color=chartColors().text;S.charts[k].options.scales.y.grid.color=chartColors().grid;S.charts[k].options.scales.y.ticks.color=chartColors().text;S.charts[k].update('none')}catch(e){}})}
 
