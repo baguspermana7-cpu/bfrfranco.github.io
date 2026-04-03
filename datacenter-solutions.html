@@ -674,20 +674,20 @@
 
         /* Section Cards Grid */
         .solutions-section {
-            padding: 4rem 2rem;
+            padding: 2rem 2rem 2.5rem;
             max-width: 1400px;
             margin: 0 auto;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 1.75rem;
         }
 
         .section-header h2 {
-            font-size: 2.2rem;
+            font-size: 1.65rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 0.6rem;
             color: var(--dark-blue);
         }
 
@@ -2030,7 +2030,22 @@
             .credential-badge img { width:32px; height:24px; }
         }
 
-        /* ── Downloads-style redesign ── */
+        /* ══════════════════════════════════════════
+           Downloads-style redesign — v3
+           ══════════════════════════════════════════ */
+
+        /* ── Keyframes ── */
+        @keyframes ds-pulse-ring {
+            0%   { transform: scale(1); opacity: 0.6; }
+            70%  { transform: scale(1.8); opacity: 0; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+        @keyframes ds-shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ── Platform grid ── */
         .ds-platforms-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -2038,148 +2053,217 @@
         }
         @media (max-width:768px) { .ds-platforms-grid { grid-template-columns: 1fr; } }
 
+        /* ── Platform cards ── */
         .ds-platform-card {
-            background: var(--glass-bg);
+            background: var(--bg-secondary, #12121e);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            transition: border-color 0.35s, box-shadow 0.35s;
         }
         .ds-platform-card:hover {
-            border-color: var(--card-border, rgba(74,144,184,0.4));
-            box-shadow: 0 4px 24px var(--card-glow, rgba(74,144,184,0.12));
+            border-color: var(--card-border, rgba(74,144,184,0.5));
+            box-shadow: 0 0 0 1px var(--card-border, rgba(74,144,184,0.2)),
+                        0 8px 40px var(--card-glow, rgba(74,144,184,0.18));
         }
+
+        /* ── Platform banner (gradient header) ── */
         .ds-platform-header {
-            padding: 1.5rem;
+            padding: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            overflow: hidden;
+        }
+        .ds-platform-banner {
+            background: var(--card-gradient, linear-gradient(135deg, #1e3a5f, #2d5a87));
+            padding: 1.75rem 1.5rem 1.5rem;
             display: flex;
-            align-items: flex-start;
+            align-items: flex-end;
             gap: 1rem;
-            border-bottom: 1px solid var(--glass-border);
+            min-height: 130px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* dot matrix pattern */
+        .ds-platform-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        /* light shimmer top-right */
+        .ds-platform-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 90% 10%, rgba(255,255,255,0.22) 0%, transparent 55%);
+            pointer-events: none;
         }
         .ds-platform-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             flex-shrink: 0;
+            background: rgba(255,255,255,0.18) !important;
+            color: #fff !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.28);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
+        .ds-platform-card:hover .ds-platform-icon {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
+        .ds-platform-title-wrap { position: relative; z-index: 2; }
         .ds-platform-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
             margin-bottom: 0.3rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
         .ds-platform-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
             line-height: 1.5;
         }
+
+        /* LIVE badge */
+        .ds-live-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(16,185,129,0.4);
+            padding: 3px 9px 3px 7px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #34d399;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .ds-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+            position: relative;
+        }
+        .ds-live-dot::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: ds-pulse-ring 2s ease-out infinite;
+        }
+
+        /* platform feature count chip */
+        .ds-plat-count {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 3;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Platform item rows ── */
         .ds-item-list { padding: 0; }
         .ds-item-row {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.7rem 1.5rem;
+            gap: 0.85rem;
+            padding: 0.75rem 1.25rem 0.75rem 1rem;
             border-bottom: 1px solid var(--glass-border);
             text-decoration: none;
             color: inherit;
             transition: background 0.2s;
+            border-left: 3px solid transparent;
         }
         .ds-item-row:last-child { border-bottom: none; }
-        .ds-item-row:hover { background: rgba(74,144,184,0.05); }
+        .ds-item-row:hover {
+            background: rgba(74,144,184,0.07);
+            border-left-color: var(--row-accent, rgba(74,144,184,0.6));
+        }
         .ds-item-icon-sm {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
+            transition: transform 0.25s;
         }
+        .ds-item-row:hover .ds-item-icon-sm { transform: scale(1.12); }
         .ds-item-name {
             flex: 1;
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
         .ds-item-open-btn {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--light-blue);
-            padding: 4px 11px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            padding: 4px 13px;
             border-radius: 8px;
-            background: rgba(74,144,184,0.1);
-            border: 1px solid rgba(74,144,184,0.2);
-            transition: background 0.2s, border-color 0.2s;
+            background: rgba(74,144,184,0.35);
+            border: 1px solid rgba(74,144,184,0.45);
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
             white-space: nowrap;
         }
         .ds-item-row:hover .ds-item-open-btn {
-            background: rgba(74,144,184,0.2);
-            border-color: rgba(74,144,184,0.4);
+            background: rgba(74,144,184,0.6);
+            border-color: rgba(74,144,184,0.85);
+            box-shadow: 0 2px 8px rgba(74,144,184,0.3);
         }
 
-        /* Section aggregator card — for calculators */
+        /* ── Section aggregator cards (tools list) ── */
         .ds-section-card {
-            background: var(--glass-bg);
+            background: var(--bg-secondary, #12121e);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             overflow: hidden;
-            margin-bottom: 0;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .ds-section-card:hover {
+            border-color: rgba(74,144,184,0.25);
+            box-shadow: 0 4px 32px rgba(74,144,184,0.07);
         }
         .ds-section-card-header {
             padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.85rem;
+            background: rgba(255,255,255,0.02);
         }
         .ds-section-card-header-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-        }
-        .ds-section-card-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: 0.01em;
-            flex: 1;
-        }
-        .ds-tool-count {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            background: rgba(255,255,255,0.06);
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .ds-tool-row {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.85rem 1.5rem;
-            border-bottom: 1px solid var(--glass-border);
-            text-decoration: none;
-            color: inherit;
-            transition: background 0.2s;
-        }
-        .ds-tool-row:last-child { border-bottom: none; }
-        .ds-tool-row:hover { background: rgba(255,255,255,0.03); }
-
-        .ds-tool-icon {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -2187,69 +2271,122 @@
             font-size: 0.9rem;
             flex-shrink: 0;
         }
+        .ds-section-card-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        .ds-tool-count {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(74,144,184,0.1);
+            border: 1px solid rgba(74,144,184,0.2);
+            padding: 2px 9px;
+            border-radius: 20px;
+        }
+
+        /* ── Tool rows ── */
+        .ds-tool-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1.5rem 0.9rem 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .ds-tool-row:last-child { border-bottom: none; }
+        .ds-tool-row:hover {
+            background: rgba(74,144,184,0.05);
+            border-left-color: rgba(74,144,184,0.45);
+        }
+        .ds-tool-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            transition: transform 0.25s;
+        }
+        .ds-tool-row:hover .ds-tool-icon { transform: scale(1.1); }
+
         .ds-tool-info { flex: 1; min-width: 0; }
         .ds-tool-name {
             font-size: 0.88rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.2rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         .ds-tool-desc {
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            font-size: 0.76rem;
+            color: var(--text-secondary);
             line-height: 1.4;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .ds-open-btn {
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 5px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--glass-border);
-            background: transparent;
-            color: var(--text-secondary);
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 6px 15px;
+            border-radius: 9px;
+            border: 1px solid rgba(74,144,184,0.35);
+            background: rgba(74,144,184,0.1);
+            color: var(--light-blue);
             transition: all 0.2s;
             white-space: nowrap;
             flex-shrink: 0;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
         .ds-tool-row:hover .ds-open-btn {
-            background: rgba(74,144,184,0.1);
-            border-color: rgba(74,144,184,0.3);
-            color: var(--light-blue);
+            background: rgba(74,144,184,0.22);
+            border-color: rgba(74,144,184,0.6);
+            color: #74b9d5;
+            box-shadow: 0 2px 8px rgba(74,144,184,0.2);
         }
+        .ds-tool-row .ds-open-btn i { transition: transform 0.2s; }
+        .ds-tool-row:hover .ds-open-btn i { transform: translateX(3px); }
+
+        /* ── Badges ── */
         .ds-badge-new {
             font-size: 0.58rem;
             font-weight: 700;
-            padding: 2px 7px;
+            padding: 2px 8px;
             border-radius: 5px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             background: linear-gradient(135deg, #4f46e5, #818cf8);
             color: #fff;
             flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(79,70,229,0.4);
         }
         .ds-badge-pro {
             font-size: 0.58rem;
             font-weight: 700;
-            padding: 2px 7px;
+            padding: 2px 8px;
             border-radius: 5px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(139,92,246,0.12));
-            border: 1px solid rgba(139,92,246,0.35);
-            color: #a78bfa;
+            letter-spacing: 0.06em;
+            background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(139,92,246,0.15));
+            border: 1px solid rgba(139,92,246,0.4);
+            color: #c4b5fd;
             flex-shrink: 0;
         }
 
-        /* Strategic 3-col grid */
+        /* ── Strategic 3-col grid ── */
         .ds-strategic-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -2258,72 +2395,102 @@
         @media (max-width:900px) { .ds-strategic-grid { grid-template-columns: 1fr; } }
 
         .ds-strat-card {
-            background: var(--glass-bg);
+            background: var(--bg-secondary, #12121e);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            transition: border-color 0.35s, box-shadow 0.35s;
         }
         .ds-strat-card:hover {
-            border-color: var(--card-border, rgba(74,144,184,0.4));
-            box-shadow: 0 4px 24px var(--card-glow, rgba(74,144,184,0.12));
+            border-color: var(--card-border, rgba(74,144,184,0.45));
+            box-shadow: 0 0 0 1px var(--card-border, rgba(74,144,184,0.15)),
+                        0 8px 40px var(--card-glow, rgba(74,144,184,0.14));
         }
-        .ds-strat-header {
-            padding: 1.25rem 1.5rem 1rem;
+        /* color accent top bar */
+        .ds-strat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--card-gradient, linear-gradient(90deg, #4a90b8, #5ba3cb));
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* colored icon band at top */
+        .ds-strat-top {
+            padding: 1.5rem 1.5rem 0;
             display: flex;
             align-items: center;
-            gap: 0.85rem;
+            gap: 1rem;
         }
         .ds-strat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 52px;
+            height: 52px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             flex-shrink: 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 14px var(--card-glow, rgba(74,144,184,0.25));
+        }
+        .ds-strat-card:hover .ds-strat-icon {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 6px 20px var(--card-glow, rgba(74,144,184,0.35));
         }
         .ds-strat-title-wrap { flex: 1; }
         .ds-strat-title {
-            font-size: 0.95rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.2rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         .ds-strat-subtitle {
-            font-size: 0.74rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
+            font-weight: 500;
         }
         .ds-strat-desc {
-            font-size: 0.8rem;
+            font-size: 0.81rem;
             color: var(--text-secondary);
-            line-height: 1.55;
-            padding: 0 1.5rem 1rem;
+            line-height: 1.65;
+            padding: 0.85rem 1.5rem 0.75rem;
             flex: 1;
         }
         .ds-strat-features {
             padding: 0;
             border-top: 1px solid var(--glass-border);
-            margin: 0;
             list-style: none;
+            margin: 0;
         }
         .ds-strat-features li {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.7rem;
             padding: 0.55rem 1.5rem;
             border-bottom: 1px solid var(--glass-border);
-            font-size: 0.78rem;
+            font-size: 0.79rem;
             color: var(--text-secondary);
         }
         .ds-strat-features li:last-child { border-bottom: none; }
-        .ds-strat-features li i { font-size: 0.65rem; flex-shrink: 0; }
+        .ds-strat-features li i {
+            font-size: 0.65rem;
+            flex-shrink: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .ds-strat-footer {
             padding: 1rem 1.5rem;
             border-top: 1px solid var(--glass-border);
@@ -2331,67 +2498,38 @@
         .ds-strat-cta {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: inherit;
+            gap: 8px;
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: #fff;
             text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 9px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.04);
-            transition: all 0.2s;
+            padding: 8px 20px;
+            border-radius: 10px;
+            background: var(--card-gradient, linear-gradient(135deg, #1e3a5f, #4a90b8));
+            border: none;
+            box-shadow: 0 3px 12px var(--card-glow, rgba(74,144,184,0.3));
+            transition: all 0.25s;
         }
         .ds-strat-cta:hover {
-            background: rgba(74,144,184,0.12);
-            border-color: rgba(74,144,184,0.3);
-            color: var(--light-blue);
+            box-shadow: 0 5px 20px var(--card-glow, rgba(74,144,184,0.45));
+            filter: brightness(1.12);
         }
+        .ds-strat-cta i { transition: transform 0.2s; font-size: 0.72rem; }
+        .ds-strat-cta:hover i { transform: translateX(3px); }
 
-        /* Gradient top-bar on hover for platform + strategic cards */
-        .ds-platform-card { position: relative; }
-        .ds-platform-card::before,
-        .ds-strat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--card-gradient, linear-gradient(90deg, #4a90b8, #5ba3cb));
-            opacity: 0;
-            transition: opacity 0.3s;
-            border-radius: 20px 20px 0 0;
+        /* ── Dark mode overrides ── */
+        [data-theme="dark"] .ds-platform-card,
+        [data-theme="dark"] .ds-strat-card,
+        [data-theme="dark"] .ds-section-card {
+            background: rgba(14, 14, 22, 0.95);
         }
-        .ds-platform-card:hover::before,
-        .ds-strat-card:hover::before { opacity: 1; }
-
-        /* Animated open-btn arrow nudge */
-        .ds-item-row:hover .ds-item-open-btn { letter-spacing: 0.02em; }
-        .ds-tool-row .ds-open-btn i { transition: transform 0.2s; }
-        .ds-tool-row:hover .ds-open-btn i { transform: translateX(3px); }
-
-        /* Section card hover glow */
-        .ds-section-card {
-            transition: box-shadow 0.3s;
+        [data-theme="dark"] .ds-item-row:hover,
+        [data-theme="dark"] .ds-tool-row:hover {
+            background: rgba(74,144,184,0.07);
         }
-        .ds-section-card:hover {
-            box-shadow: 0 4px 32px rgba(74,144,184,0.08);
+        [data-theme="dark"] .ds-section-card-header {
+            background: rgba(255,255,255,0.025);
         }
-
-        /* Platform icon pulse on card hover */
-        .ds-platform-card:hover .ds-platform-icon {
-            transform: scale(1.06);
-        }
-        .ds-platform-icon { transition: transform 0.3s; }
-
-        /* Strategic icon pulse */
-        .ds-strat-card:hover .ds-strat-icon { transform: scale(1.08); }
-        .ds-strat-icon { transition: transform 0.3s; }
-
-        /* dark-mode tweaks */
-        [data-theme="dark"] .ds-tool-row:hover { background: rgba(255,255,255,0.035); }
-        [data-theme="dark"] .ds-tool-count { background: rgba(255,255,255,0.08); }
-        [data-theme="dark"] .ds-open-btn { border-color: rgba(255,255,255,0.1); }
-        [data-theme="dark"] .ds-strat-cta { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); }
 </style>
 
     <!-- Structured Data - BreadcrumbList -->
@@ -2686,44 +2824,46 @@
 
             <div class="ds-platforms-grid">
                 <!-- AI / HPC Platform Card -->
-                <div class="ds-platform-card card-ai fade-in delay-1" style="--card-border:rgba(139,92,246,0.4);--card-glow:rgba(139,92,246,0.15);--card-gradient:linear-gradient(90deg,#8b5cf6,#a78bfa);">
+                <div class="ds-platform-card card-ai fade-in delay-1" style="--card-border:rgba(139,92,246,0.45);--card-glow:rgba(139,92,246,0.2);--card-gradient:linear-gradient(135deg,#6d28d9,#8b5cf6,#a78bfa);">
                     <div class="ds-platform-header">
-                        <div class="ds-platform-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6;">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div>
-                            <div class="ds-platform-title">AI / HPC Datahall</div>
-                            <div class="ds-platform-desc">High-density GPU clusters · Direct liquid cooling · 30–100 kW/rack</div>
+                        <div class="ds-platform-banner">
+                            <span class="ds-live-badge"><span class="ds-live-dot"></span>LIVE</span>
+                            <span class="ds-plat-count">6 views</span>
+                            <div class="ds-platform-icon"><i class="fas fa-robot"></i></div>
+                            <div class="ds-platform-title-wrap">
+                                <div class="ds-platform-title">AI / HPC Datahall</div>
+                                <div class="ds-platform-desc">High-density GPU clusters · Direct liquid cooling · 30–100 kW/rack</div>
+                            </div>
                         </div>
                     </div>
                     <div class="ds-item-list">
-                        <a href="datahallAI.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-building"></i></div>
+                        <a href="datahallAI.html" class="ds-item-row" style="--row-accent:#8b5cf6;">
+                            <div class="ds-item-icon-sm" style="background:rgba(139,92,246,0.22);color:#a78bfa;"><i class="fas fa-cubes"></i></div>
                             <span class="ds-item-name">Building — 3D Isometric Overview</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="datahallAI.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-wind"></i></div>
+                        <a href="datahallAI.html" class="ds-item-row" style="--row-accent:#06b6d4;">
+                            <div class="ds-item-icon-sm" style="background:rgba(6,182,212,0.22);color:#22d3ee;"><i class="fas fa-wind"></i></div>
                             <span class="ds-item-name">HVAC &amp; Chiller Plant P&amp;ID</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="datahallAI.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-server"></i></div>
+                        <a href="datahallAI.html" class="ds-item-row" style="--row-accent:#f59e0b;">
+                            <div class="ds-item-icon-sm" style="background:rgba(245,158,11,0.22);color:#fbbf24;"><i class="fas fa-server"></i></div>
                             <span class="ds-item-name">Rack Detail &amp; In-Rack CDU HMI</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="datahallAI.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(59,130,246,0.12);color:#3b82f6;"><i class="fas fa-bolt"></i></div>
+                        <a href="datahallAI.html" class="ds-item-row" style="--row-accent:#3b82f6;">
+                            <div class="ds-item-icon-sm" style="background:rgba(59,130,246,0.22);color:#60a5fa;"><i class="fas fa-bolt"></i></div>
                             <span class="ds-item-name">Electrical SLD — 4 Data Halls</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="datahallAI.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-network-wired"></i></div>
+                        <a href="datahallAI.html" class="ds-item-row" style="--row-accent:#10b981;">
+                            <div class="ds-item-icon-sm" style="background:rgba(16,185,129,0.22);color:#34d399;"><i class="fas fa-network-wired"></i></div>
                             <span class="ds-item-name">Network — Fat-Tree Topology</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="datahallAI.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="fas fa-fire-extinguisher"></i></div>
+                        <a href="datahallAI.html" class="ds-item-row" style="--row-accent:#ef4444;">
+                            <div class="ds-item-icon-sm" style="background:rgba(239,68,68,0.22);color:#f87171;"><i class="fas fa-fire-flame-curved"></i></div>
                             <span class="ds-item-name">Fire Detection &amp; Suppression</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
@@ -2731,44 +2871,46 @@
                 </div>
 
                 <!-- Conventional DC Platform Card -->
-                <div class="ds-platform-card card-conventional fade-in delay-2" style="--card-border:rgba(74,144,184,0.4);--card-glow:rgba(74,144,184,0.15);--card-gradient:linear-gradient(90deg,#1e3a5f,#4a90b8);">
+                <div class="ds-platform-card card-conventional fade-in delay-2" style="--card-border:rgba(74,144,184,0.45);--card-glow:rgba(74,144,184,0.2);--card-gradient:linear-gradient(135deg,#1e3a5f,#2d5a87,#4a90b8);">
                     <div class="ds-platform-header">
-                        <div class="ds-platform-icon" style="background:rgba(74,144,184,0.15);color:#4a90b8;">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <div>
-                            <div class="ds-platform-title">Conventional Data Center</div>
-                            <div class="ds-platform-desc">Enterprise infrastructure · Chilled water cooling · EPMS &amp; BMS</div>
+                        <div class="ds-platform-banner">
+                            <span class="ds-live-badge"><span class="ds-live-dot"></span>LIVE</span>
+                            <span class="ds-plat-count">6 views</span>
+                            <div class="ds-platform-icon"><i class="fas fa-building-columns"></i></div>
+                            <div class="ds-platform-title-wrap">
+                                <div class="ds-platform-title">Conventional Data Center</div>
+                                <div class="ds-platform-desc">Enterprise infrastructure · Chilled water cooling · EPMS &amp; BMS</div>
+                            </div>
                         </div>
                     </div>
                     <div class="ds-item-list">
-                        <a href="dc-conventional.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(74,144,184,0.12);color:#4a90b8;"><i class="fas fa-building"></i></div>
+                        <a href="dc-conventional.html" class="ds-item-row" style="--row-accent:#4a90b8;">
+                            <div class="ds-item-icon-sm" style="background:rgba(74,144,184,0.22);color:#5ba3cb;"><i class="fas fa-building"></i></div>
                             <span class="ds-item-name">Building &amp; Floor Plan</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="dc-conventional.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-snowflake"></i></div>
+                        <a href="dc-conventional.html" class="ds-item-row" style="--row-accent:#06b6d4;">
+                            <div class="ds-item-icon-sm" style="background:rgba(6,182,212,0.22);color:#22d3ee;"><i class="fas fa-snowflake"></i></div>
                             <span class="ds-item-name">Chiller &amp; CRAC/CRAH Systems</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="dc-conventional.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-bolt"></i></div>
+                        <a href="dc-conventional.html" class="ds-item-row" style="--row-accent:#f59e0b;">
+                            <div class="ds-item-icon-sm" style="background:rgba(245,158,11,0.22);color:#fbbf24;"><i class="fas fa-plug-circle-bolt"></i></div>
                             <span class="ds-item-name">EPMS &amp; Power Distribution</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="dc-conventional.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-network-wired"></i></div>
+                        <a href="dc-conventional.html" class="ds-item-row" style="--row-accent:#10b981;">
+                            <div class="ds-item-icon-sm" style="background:rgba(16,185,129,0.22);color:#34d399;"><i class="fas fa-network-wired"></i></div>
                             <span class="ds-item-name">Network Infrastructure</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="dc-conventional.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="fas fa-fire-extinguisher"></i></div>
+                        <a href="dc-conventional.html" class="ds-item-row" style="--row-accent:#ef4444;">
+                            <div class="ds-item-icon-sm" style="background:rgba(239,68,68,0.22);color:#f87171;"><i class="fas fa-fire-extinguisher"></i></div>
                             <span class="ds-item-name">Fire &amp; Safety Systems</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
-                        <a href="dc-conventional.html" class="ds-item-row">
-                            <div class="ds-item-icon-sm" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-sliders-h"></i></div>
+                        <a href="dc-conventional.html" class="ds-item-row" style="--row-accent:#8b5cf6;">
+                            <div class="ds-item-icon-sm" style="background:rgba(139,92,246,0.22);color:#a78bfa;"><i class="fas fa-microchip"></i></div>
                             <span class="ds-item-name">BMS / DCIM Architecture</span>
                             <span class="ds-item-open-btn">Open ↗</span>
                         </a>
@@ -2789,65 +2931,59 @@
 
             <div class="ds-strategic-grid">
                 <!-- TCO Calculator -->
-                <div class="ds-strat-card card-tco fade-in delay-1" style="--card-border:rgba(79,70,229,0.4);--card-glow:rgba(79,70,229,0.12);">
-                    <div class="ds-strat-header">
-                        <div class="ds-strat-icon" style="background:rgba(79,70,229,0.15);color:#6366f1;">
+                <div class="ds-strat-card card-tco fade-in delay-1" style="--card-border:rgba(99,102,241,0.45);--card-glow:rgba(99,102,241,0.22);--card-gradient:linear-gradient(135deg,#4f46e5,#6366f1,#818cf8);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background:linear-gradient(135deg,rgba(79,70,229,0.35),rgba(99,102,241,0.2));color:#818cf8;border:1px solid rgba(99,102,241,0.3);">
                             <i class="fas fa-scale-balanced"></i>
                         </div>
                         <div class="ds-strat-title-wrap">
-                            <div class="ds-strat-title">
-                                TCO Calculator
-                                <span class="ds-badge-new">NEW</span>
-                            </div>
+                            <div class="ds-strat-title">TCO Calculator <span class="ds-badge-new">NEW</span></div>
                             <div class="ds-strat-subtitle">Build vs Colo vs Cloud · 12 Markets</div>
                         </div>
                     </div>
                     <div class="ds-strat-desc">Compare 5-year and 10-year total cost of ownership across deployment models with real 2025 pricing data and Monte Carlo risk analysis.</div>
                     <ul class="ds-strat-features">
-                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> Build · Colo · Cloud side-by-side</li>
-                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> 12 global markets, 2025 data</li>
-                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> Breakeven &amp; sensitivity charts</li>
-                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> Monte Carlo simulation &amp; PDF</li>
+                        <li><i class="fas fa-circle-dot" style="color:#818cf8;"></i> Build · Colo · Cloud side-by-side</li>
+                        <li><i class="fas fa-circle-dot" style="color:#818cf8;"></i> 12 global markets, 2025 data</li>
+                        <li><i class="fas fa-circle-dot" style="color:#818cf8;"></i> Breakeven &amp; sensitivity charts</li>
+                        <li><i class="fas fa-circle-dot" style="color:#818cf8;"></i> Monte Carlo simulation &amp; PDF</li>
                     </ul>
                     <div class="ds-strat-footer">
-                        <a href="tco-calculator.html" class="ds-strat-cta" style="color:#6366f1;border-color:rgba(99,102,241,0.2);">
-                            Compare TCO <i class="fas fa-arrow-right" style="font-size:0.72rem;"></i>
+                        <a href="tco-calculator.html" class="ds-strat-cta">
+                            Compare TCO <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
 
                 <!-- Global Market Tracker -->
-                <div class="ds-strat-card card-dmt fade-in delay-2" style="--card-border:rgba(13,148,136,0.4);--card-glow:rgba(13,148,136,0.12);">
-                    <div class="ds-strat-header">
-                        <div class="ds-strat-icon" style="background:rgba(13,148,136,0.15);color:#0d9488;">
+                <div class="ds-strat-card card-dmt fade-in delay-2" style="--card-border:rgba(13,148,136,0.45);--card-glow:rgba(13,148,136,0.22);--card-gradient:linear-gradient(135deg,#0d9488,#14b8a6,#2dd4bf);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background:linear-gradient(135deg,rgba(13,148,136,0.35),rgba(20,184,166,0.2));color:#2dd4bf;border:1px solid rgba(13,148,136,0.3);">
                             <i class="fas fa-earth-americas"></i>
                         </div>
                         <div class="ds-strat-title-wrap">
-                            <div class="ds-strat-title">
-                                Global Market Tracker
-                                <span class="ds-badge-new" style="background:linear-gradient(135deg,#0d9488,#2dd4bf);">NEW</span>
-                            </div>
-                            <div class="ds-strat-subtitle">25+ Markets · Live Data</div>
+                            <div class="ds-strat-title">Global Market Tracker <span class="ds-badge-new" style="background:linear-gradient(135deg,#0d9488,#2dd4bf);">NEW</span></div>
+                            <div class="ds-strat-subtitle">25+ Markets · 2025–2030 Data</div>
                         </div>
                     </div>
-                    <div class="ds-strat-desc">Track DC capacity, construction pipeline, and growth projections across 25+ markets worldwide with interactive SVG world map visualization.</div>
+                    <div class="ds-strat-desc">Track DC capacity, construction pipeline, and growth projections across 25+ markets with interactive SVG world map visualization.</div>
                     <ul class="ds-strat-features">
-                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> 25+ markets with live indicators</li>
-                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> Interactive SVG world map</li>
-                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> 2025–2030 growth projections</li>
-                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> Regional capacity &amp; investment data</li>
+                        <li><i class="fas fa-circle-dot" style="color:#2dd4bf;"></i> 25+ markets with live indicators</li>
+                        <li><i class="fas fa-circle-dot" style="color:#2dd4bf;"></i> Interactive SVG world map</li>
+                        <li><i class="fas fa-circle-dot" style="color:#2dd4bf;"></i> 2025–2030 growth projections</li>
+                        <li><i class="fas fa-circle-dot" style="color:#2dd4bf;"></i> Regional capacity &amp; investment data</li>
                     </ul>
                     <div class="ds-strat-footer">
-                        <a href="dc-market-tracker.html" class="ds-strat-cta" style="color:#0d9488;border-color:rgba(13,148,136,0.2);">
-                            Explore Markets <i class="fas fa-arrow-right" style="font-size:0.72rem;"></i>
+                        <a href="dc-market-tracker.html" class="ds-strat-cta">
+                            Explore Markets <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
 
                 <!-- ROI Calculator -->
-                <div class="ds-strat-card card-roi fade-in delay-3" style="--card-border:rgba(59,130,246,0.4);--card-glow:rgba(59,130,246,0.12);">
-                    <div class="ds-strat-header">
-                        <div class="ds-strat-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">
+                <div class="ds-strat-card card-roi fade-in delay-3" style="--card-border:rgba(59,130,246,0.45);--card-glow:rgba(59,130,246,0.22);--card-gradient:linear-gradient(135deg,#2563eb,#3b82f6,#60a5fa);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background:linear-gradient(135deg,rgba(37,99,235,0.35),rgba(59,130,246,0.2));color:#60a5fa;border:1px solid rgba(59,130,246,0.3);">
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <div class="ds-strat-title-wrap">
@@ -2857,14 +2993,14 @@
                     </div>
                     <div class="ds-strat-desc">Year-by-year cashflow analysis with occupancy ramp modeling, Monte Carlo risk simulation, and PDF export with investment projections.</div>
                     <ul class="ds-strat-features">
-                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> NPV &amp; IRR calculations</li>
-                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> Occupancy ramp modeling</li>
-                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> Monte Carlo risk simulation</li>
-                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> PDF export with projections</li>
+                        <li><i class="fas fa-circle-dot" style="color:#60a5fa;"></i> NPV &amp; IRR calculations</li>
+                        <li><i class="fas fa-circle-dot" style="color:#60a5fa;"></i> Occupancy ramp modeling</li>
+                        <li><i class="fas fa-circle-dot" style="color:#60a5fa;"></i> Monte Carlo risk simulation</li>
+                        <li><i class="fas fa-circle-dot" style="color:#60a5fa;"></i> PDF export with projections</li>
                     </ul>
                     <div class="ds-strat-footer">
-                        <a href="roi-calculator.html" class="ds-strat-cta" style="color:#3b82f6;border-color:rgba(59,130,246,0.2);">
-                            Calculate ROI <i class="fas fa-arrow-right" style="font-size:0.72rem;"></i>
+                        <a href="roi-calculator.html" class="ds-strat-cta">
+                            Calculate ROI <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -2883,13 +3019,13 @@
 
             <div class="ds-section-card fade-in">
                 <div class="ds-section-card-header">
-                    <div class="ds-section-card-header-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-calculator"></i></div>
+                    <div class="ds-section-card-header-icon" style="background:rgba(245,158,11,0.22);color:#fbbf24;"><i class="fas fa-calculator"></i></div>
                     <span class="ds-section-card-title">Cost Calculators</span>
                     <span class="ds-tool-count">5 tools</span>
                 </div>
 
                 <a href="capex-calculator.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-building"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(245,158,11,0.22);color:#fbbf24;"><i class="fas fa-building"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">CAPEX Calculator</div>
                         <div class="ds-tool-desc">14-component cost breakdown · Scenario A vs B · Tier classification · PDF export</div>
@@ -2898,7 +3034,7 @@
                 </a>
 
                 <a href="opex-calculator.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-coins"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(16,185,129,0.22);color:#34d399;"><i class="fas fa-coins"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">OPEX Calculator</div>
                         <div class="ds-tool-desc">30+ countries · Climate zones · Staffing models · Energy &amp; maintenance costs</div>
@@ -2907,7 +3043,7 @@
                 </a>
 
                 <a href="dcmoc/" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-chart-line"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(6,182,212,0.22);color:#22d3ee;"><i class="fas fa-gauge-high"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">
                             DC MOC
@@ -2919,7 +3055,7 @@
                 </a>
 
                 <a href="cx-calculator.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(14,116,144,0.12);color:#0e7490;"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(14,116,144,0.22);color:#22d3ee;"><i class="fas fa-clipboard-check"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">
                             Cx Calculator
@@ -2931,7 +3067,7 @@
                 </a>
 
                 <a href="rfs-readiness-workbench.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(20,184,166,0.12);color:#14b8a6;"><i class="fas fa-tasks"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(20,184,166,0.22);color:#2dd4bf;"><i class="fas fa-list-check"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">
                             RFS Readiness Workbench
@@ -3023,13 +3159,13 @@
 
             <div class="ds-section-card fade-in">
                 <div class="ds-section-card-header">
-                    <div class="ds-section-card-header-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-wrench"></i></div>
+                    <div class="ds-section-card-header-icon" style="background:rgba(139,92,246,0.22);color:#a78bfa;"><i class="fas fa-wrench"></i></div>
                     <span class="ds-section-card-title">Engineering Tools</span>
                     <span class="ds-tool-count">6 tools</span>
                 </div>
 
                 <a href="pue-calculator.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(6,182,212,0.22);color:#22d3ee;"><i class="fas fa-gauge-high"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">PUE Calculator</div>
                         <div class="ds-tool-desc">Power Usage Effectiveness · Cooling type · Climate zone · IT load distribution</div>
@@ -3038,7 +3174,7 @@
                 </a>
 
                 <a href="tier-advisor.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-layer-group"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(139,92,246,0.22);color:#a78bfa;"><i class="fas fa-layer-group"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">Tier Advisor</div>
                         <div class="ds-tool-desc">Uptime Tier I–IV · TIA-942 · EN 50600 · Regional compliance overlays, 12+ jurisdictions</div>
@@ -3047,7 +3183,7 @@
                 </a>
 
                 <a href="tia-942-checklist.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(16,185,129,0.22);color:#34d399;"><i class="fas fa-shield-check"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">TIA-942 Compliance Checklist</div>
                         <div class="ds-tool-desc">TIA-942-B · 56 items · 4 tier levels · Weighted scoring &amp; gap analysis</div>
@@ -3056,7 +3192,7 @@
                 </a>
 
                 <a href="carbon-footprint.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(34,197,94,0.12);color:#22c55e;"><i class="fas fa-leaf"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(34,197,94,0.22);color:#4ade80;"><i class="fas fa-leaf"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">Carbon Footprint Analyzer</div>
                         <div class="ds-tool-desc">GHG Protocol Scope 1/2/3 · Life-cycle assessment · Paris Agreement · 33 countries</div>
@@ -3065,7 +3201,7 @@
                 </a>
 
                 <a href="compare-air-vs-liquid-cooling.html" class="ds-tool-row">
-                    <div class="ds-tool-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;"><i class="fas fa-snowflake"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(59,130,246,0.22);color:#60a5fa;"><i class="fas fa-temperature-half"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">Air vs. Liquid Cooling Comparison</div>
                         <div class="ds-tool-desc">DX · Chilled water · RDHx · Direct-to-chip · AI/HPC workload analysis</div>
@@ -3074,7 +3210,7 @@
                 </a>
 
                 <a href="standards-ltc-lab.html" id="rootStandardsCard" class="ds-tool-row root-only-card" style="position:relative;" aria-label="Root only standards and liquid-to-chip module">
-                    <div class="ds-tool-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-shield-halved"></i></div>
+                    <div class="ds-tool-icon" style="background:rgba(245,158,11,0.22);color:#fbbf24;"><i class="fas fa-shield-halved"></i></div>
                     <div class="ds-tool-info">
                         <div class="ds-tool-name">
                             Standards + Liquid-to-Chip Lab
