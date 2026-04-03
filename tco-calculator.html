@@ -388,7 +388,7 @@
 
         /* ═══ Hero ═══ */
         .tco-hero {
-            padding: 5rem 2rem 3rem;
+            padding: 3rem 2rem 2.5rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -438,7 +438,7 @@
         /* ═══ Brief Section ═══ */
         .tco-brief-section {
             max-width: 860px;
-            margin: -0.5rem auto 2rem;
+            margin: -0.5rem auto 1rem;
             padding: 0 2rem;
         }
 
@@ -688,6 +688,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
+            min-height: 0;
         }
 
         .tco-results-header {
@@ -784,6 +785,10 @@
             border-radius: 16px;
             padding: 1.25rem;
             position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 320px;
         }
 
         .tco-chart-title {
@@ -794,11 +799,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .tco-chart-canvas-wrap {
             position: relative;
-            height: 300px;
+            flex: 1;
+            min-height: 280px;
         }
 
         .tco-chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
@@ -902,6 +909,8 @@
             box-shadow: var(--shadow-md);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .tco-pro-panel-header {
@@ -911,6 +920,7 @@
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid rgba(79, 70, 229, 0.15);
+            flex-shrink: 0;
         }
 
         .tco-pro-panel-icon {
@@ -937,7 +947,8 @@
 
         .tco-pro-chart-wrap {
             position: relative;
-            height: 280px;
+            flex: 1;
+            min-height: 280px;
         }
 
         .tco-pro-chart-wrap canvas { width: 100% !important; height: 100% !important; }
@@ -948,6 +959,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 0.75rem;
             margin-bottom: 1rem;
+            flex-shrink: 0;
         }
 
         .tco-pro-kpi {
@@ -977,21 +989,24 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
         }
 
         .tco-tornado-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            min-width: 110px;
+            min-width: 120px;
             text-align: right;
+            font-weight: 500;
         }
 
         .tco-tornado-bar-area {
             flex: 1;
             display: flex;
             align-items: center;
-            height: 22px;
+            height: 28px;
             position: relative;
         }
 
@@ -2559,6 +2574,15 @@
                         </div>
                     </div>
                     <div id="tcoTornadoBars"></div>
+                    <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(79,70,229,0.12);display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.72rem;color:var(--text-muted);">
+                        <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:10px;border-radius:3px;background:linear-gradient(90deg,#ef4444,#f87171);display:inline-block;"></span> Higher cost vs. baseline</span>
+                        <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:10px;border-radius:3px;background:linear-gradient(90deg,#34d399,#10b981);display:inline-block;"></span> Lower cost vs. baseline</span>
+                        <span style="color:var(--text-muted);font-style:italic;">±20% swing on each variable</span>
+                    </div>
+                    <div style="margin-top:0.75rem;padding:0.75rem;background:rgba(79,70,229,0.05);border-radius:8px;font-size:0.75rem;color:var(--text-secondary);line-height:1.6;" id="tcoTornadoInsight">
+                        <i class="fas fa-lightbulb" style="color:var(--tco-primary);margin-right:4px;"></i>
+                        Run the calculation to see which variables have the greatest impact on your TCO decision.
+                    </div>
                 </div>
 
                 <!-- Panel 4: Strategic Narrative -->
@@ -2612,7 +2636,7 @@
                             </tr>
                         </thead>
                         <tbody id="tcoCompareBody">
-                            <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:2rem;">Adjust inputs to see comparison...</td></tr>
+                            <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:0.75rem 2rem;font-size:0.82rem;"><i class="fas fa-calculator" style="margin-right:6px;opacity:0.4;"></i>Adjust inputs above to see detailed cost comparison</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -3943,6 +3967,16 @@
             });
 
             el('tcoTornadoBars').innerHTML = html;
+
+            // Update insight with top driver
+            var topBar = bars[0];
+            var insightEl = el('tcoTornadoInsight');
+            if (insightEl && topBar) {
+                insightEl.innerHTML = '<i class="fas fa-lightbulb" style="color:var(--tco-primary);margin-right:4px;"></i>'
+                    + '<strong>' + topBar.label + '</strong> is the biggest cost driver (' + fmtM(topBar.absImpact) + ' swing). '
+                    + 'A ±20% change in ' + topBar.label.toLowerCase() + ' shifts the TCO gap between deployment options by the most. '
+                    + 'Lock in favorable rates here first before comparing other variables.';
+            }
         }
 
         /* ── Strategic Narrative ── */
