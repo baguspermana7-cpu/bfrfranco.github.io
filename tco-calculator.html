@@ -2006,9 +2006,14 @@
             .tco-hero { padding: 2rem 1rem 1.5rem; }
             .tco-hero h1 { font-size: 1.6rem; }
         }
+        .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid rgba(74,144,184,0.25); background:transparent; color:#94a3b8; cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
+        .nav-theme-btn:hover { border-color:#4a90b8; color:#4a90b8; background:rgba(74,144,184,0.08); }
+        [data-theme="dark"] .nav-theme-btn { color:#f59e0b; }
+        [data-theme="dark"] .nav-theme-btn:hover { color:#fbbf24; border-color:rgba(251,191,36,0.4); background:rgba(251,191,36,0.08); }
     </style>
 </head>
 <body>
+    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
     <a href="#tco-main-content" class="skip-link">Skip to main content</a>
     <div class="tco-page-background"></div>
 
@@ -2031,6 +2036,7 @@
                 <a href="opex-calculator.html" class="nav-link" style="color:#10b981;">OPEX Calc</a>
                 <a href="roi-calculator.html" class="nav-link" style="color:#3b82f6;">ROI Calc</a>
                 <a href="dc-market-tracker.html" class="nav-link" style="color:#0d9488;">Market Tracker</a>
+                <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i id="themeIcon" class="fas fa-moon"></i></button>
                 <div class="nav-auth-wrap" id="navAuthWrap">
                     <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
                         <i class="fas fa-user-circle"></i>
@@ -4706,6 +4712,19 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
+    })();
+    // ── Dark Mode Toggle ──
+    function toggleCalcTheme() {
+        var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    (function(){
+        var icon = document.getElementById('themeIcon');
+        var t = document.documentElement.getAttribute('data-theme');
+        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     })();
     </script>
 

@@ -448,9 +448,29 @@
         .calc-disclaimer .disc-text strong { color: #1e293b !important; }
         .calc-disclaimer .disc-text a { color: #2563eb !important; }
         .calc-disclaimer .disc-fine { color: #64748b !important; }
+        /* ─── Dark Mode ─────────────────────────────────── */
+        [data-theme="dark"] { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-tertiary:#334155; --text-primary:#f1f5f9; --text-secondary:#cbd5e1; --text-muted:#94a3b8; --glass-bg:rgba(15,23,42,0.92); --glass-border:rgba(139,92,246,0.2); --shadow-sm:0 2px 4px rgba(0,0,0,0.3); --shadow-md:0 4px 12px rgba(0,0,0,0.4); --shadow-lg:0 8px 30px rgba(0,0,0,0.5); }
+        [data-theme="dark"] body { background:#0f172a; }
+        [data-theme="dark"] .navbar { background:rgba(15,23,42,0.95); border-bottom-color:rgba(139,92,246,0.15); }
+        [data-theme="dark"] .input-section { background:rgba(30,41,59,0.8); border-color:rgba(139,92,246,0.15); }
+        [data-theme="dark"] .results-panel { background:rgba(30,41,59,0.8); border-color:rgba(139,92,246,0.15); }
+        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
+        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
+        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
+        [data-theme="dark"] .nav-dd-header { border-color:#334155; }
+        [data-theme="dark"] .nav-dd-email { color:#94a3b8; }
+        [data-theme="dark"] .nav-dd-logout:hover { background:rgba(239,68,68,0.1); }
+        [data-theme="dark"] .cookie-banner { background:#1e293b; border-color:#334155; color:#cbd5e1; }
+        [data-theme="dark"] .cookie-decline { border-color:#334155; color:#94a3b8; }
+        [data-theme="dark"] .cookie-decline:hover { background:#334155; color:#f1f5f9; }
+        .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--glass-border); background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
+        .nav-theme-btn:hover { border-color:#8b5cf6; color:#8b5cf6; background:rgba(139,92,246,0.08); }
+        [data-theme="dark"] .nav-theme-btn { color:#a78bfa; }
+        [data-theme="dark"] .nav-theme-btn:hover { color:#c4b5fd; border-color:rgba(196,181,253,0.4); background:rgba(196,181,253,0.08); }
     </style>
 </head>
 <body>
+    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
     <div class="page-background"></div>
 
     <!-- ═══ NAVBAR ═══ -->
@@ -472,6 +492,7 @@
                 <a href="dcmoc/" class="nav-link" style="color: #ef4444;">DC MOC</a>
                 <a href="tco-calculator.html" class="nav-link" style="color: #4f46e5;">TCO Calc</a>
                 <a href="dc-market-tracker.html" class="nav-link" style="color: #0d9488;">Market</a>
+                <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i id="themeIcon" class="fas fa-moon"></i></button>
                 <div class="nav-auth-wrap" id="navAuthWrap">
                     <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
                         <i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span>
@@ -1874,6 +1895,19 @@
             window.addEventListener('scroll', function(){ if(!ticking){window.requestAnimationFrame(function(){sBtn.classList.toggle('visible',window.scrollY>500);ticking=false;});ticking=true;} });
             sBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
         }
+    })();
+    // ── Dark Mode Toggle ──
+    function toggleCalcTheme() {
+        var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    (function(){
+        var icon = document.getElementById('themeIcon');
+        var t = document.documentElement.getAttribute('data-theme');
+        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     })();
     </script>
 
