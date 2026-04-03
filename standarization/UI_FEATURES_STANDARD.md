@@ -882,3 +882,49 @@ The index uses a separate stylesheet for performance (smaller CSS = faster FCP).
 ### Navbar Brand Consistency (datacenter-solutions.html)
 
 The DC Solutions page used a text-based "DC" logo that was disproportional. Fixed to use `favicon-32.png` matching the site's visual identity. When creating new pages with Type B navbar, use the favicon or profile photo — not text-based logos that break at different viewport sizes.
+
+---
+
+## Lessons Learned — 2026-04-03
+
+### CSS Code-Split: Dark Mode Rules MUST Be In Both Files
+
+**Critical**: When adding dark mode overrides, check BOTH `styles.css` AND `styles-index.css`.
+Example bug: `[data-theme="dark"] .news-ticker-container` was only in `styles.css`, not `styles-index.css`.
+Result: In dark mode, ticker container stayed white while text turned white = invisible text.
+
+**Rule**: After any dark mode CSS addition, grep both files:
+```bash
+grep "news-ticker\|ticker-item" styles-index.css styles.css
+```
+
+### Ticker Visibility Bug Root Cause
+
+In dark mode:
+- Container background should be `rgba(10,14,30,0.92)` (dark navy)
+- Text color should be `#e2e8f0` (light)
+- If container override is missing from styles-index.css → white bg + white text = invisible
+
+Fix: Added `[data-theme="dark"] .news-ticker-container` to styles-index.css at line ~5333.
+
+### Card Hover: No Transform, Only Border + Shadow
+
+All card hover states must use ONLY `border-color` and `box-shadow` changes. Zero `transform`.
+Reason: `transform: translateY()` or `scale()` on cards causes micro-movement while scrolling.
+The global override at end of styles.css enforces this — do not remove.
+
+### bento-exp-card Redesign Pattern (Claude-inspired)
+
+New pattern for experience cards:
+- Grid: `repeat(6,1fr)` with `nth-child(-n+3): span 2` and `nth-child(n+4): span 3`
+- Per-card accent color via `--bexp-accent` CSS custom property on the element
+- Skill list: `.bexp-skills > .bexp-skill > .bexp-dot + text`
+- Dot color matches company accent color (blue/green/amber/orange/purple)
+- Hover glow via `::before` pseudo-element with `filter: blur(24px)`
+
+### auth.js — datahallAI and DC Conventional Access
+
+- `isRootOnlyHref()` only blocks `/dcmoc` paths — NOT datahallAI.html or dc-conventional.html
+- Both pages do page-level gating themselves (via `ia(s)` checking root OR pro role)
+- Demo account (role: 'pro') CAN access these pages
+- The gate message must say "root or pro" not "root only"

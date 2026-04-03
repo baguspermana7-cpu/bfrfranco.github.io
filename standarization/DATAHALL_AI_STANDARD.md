@@ -11,7 +11,10 @@ Last updated: 2026-03-01 (Phase 5/6 update)
 - **3 script blocks**: 1 main (bulk), 1 auth/root-gate, 1 cookie/scroll
 - All SVG rendering is done via IIFEs that build SVG string and assign to `el.innerHTML`
 - Tab-based navigation: `p-bldg`, `p-hvac`, `p-rack`, `p-cool`, `p-elec`, `p-net`, `p-fire`, `p-bms`
-- **Auth gating**: Root-only access (body.locked + .root-gate overlay), auth.js loaded externally
+- **Auth gating**: Root OR Pro access (body.locked + .root-gate overlay), auth.js loaded externally
+  - Gate checks `s.role === 'root' || s.role === 'pro'` — demo account (pro role) CAN access
+  - `ag()` called at 60ms, 550ms, 1600ms timeouts + on `rz-auth-change` event
+  - Gate message must reflect "root or pro" not "root only"
 - **Building tab sub-navigation**: Isometric 3D overview → click floor → 2D floor plan detail (back button)
 
 ## SVG Rendering Pattern (IIFE)
