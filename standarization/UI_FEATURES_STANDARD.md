@@ -928,3 +928,54 @@ New pattern for experience cards:
 - Both pages do page-level gating themselves (via `ia(s)` checking root OR pro role)
 - Demo account (role: 'pro') CAN access these pages
 - The gate message must say "root or pro" not "root only"
+
+---
+
+## Lessons Learned — 2026-04-03 (Index Visual Bug Fixes)
+
+### Navbar Scrolled State Needs Dark Mode Variant
+`.navbar.scrolled` hardcodes `rgba(255,255,255,0.9)` which turns white in dark mode on scroll.
+**Fix**: Always add a `[data-theme="dark"] .navbar.scrolled` override with a dark background.
+Standard pattern:
+```css
+[data-theme="dark"] .navbar.scrolled {
+    background: rgba(15, 15, 26, 0.95);
+    border-bottom-color: rgba(74, 144, 184, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+```
+
+### Cookie Banner: Use Class-Only Pattern, Not Inline + Class
+Mixing `style="display:none"` with a CSS `.hidden { transform: translateY(100%) }` class causes animation glitches — the element is invisible AND out-of-view. The JS removes `display:none` but the hidden class keeps it off-screen.
+**Fix**: Use ONLY the `.hidden` class. No inline `display:none`. The class controls both visibility and animation.
+```html
+<!-- WRONG -->
+<div class="cookie-banner hidden" style="display:none">
+
+<!-- CORRECT -->
+<div class="cookie-banner hidden">
+```
+
+### Contact Section Dark Mode — Explicit Overrides Required
+Contact section `color: var(--gray-600)` = `#6c757d` on light, `#a8b2c3` on dark — borderline contrast.
+Always add explicit dark mode rules for contact text and links:
+```css
+[data-theme="dark"] .contact-text h3 { color: #e2e8f0; }
+[data-theme="dark"] .contact-text p { color: #94a3b8; }
+[data-theme="dark"] .contact-text p a { color: #38bdf8; }
+```
+
+### Minified CSS Must Be Rebuilt After Every Source Change
+After any fix to `styles.css` or `styles-index.css`:
+```bash
+cleancss styles-index.css -o styles-index.min.css
+cleancss styles.css -o styles.min.css
+```
+The minified files are what the browser actually loads. If not rebuilt, fixes appear in dev but not production.
+
+### CSS Code-Split Checklist (After Any styles.css Change)
+1. [ ] Check if fix also needed in `styles-index.css`
+2. [ ] Grep both files: `grep "rule-name" styles.css styles-index.css`
+3. [ ] Rebuild: `cleancss styles-index.css -o styles-index.min.css && cleancss styles.css -o styles.min.css`
+4. [ ] Visually verify both light AND dark themes
+5. [ ] Commit both `.css` and `.min.css` files together
