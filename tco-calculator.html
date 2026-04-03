@@ -3230,6 +3230,7 @@
                 buildBreakdown: { capex: capex, power: buildPowerTotal, staff: buildStaffTotal, maint: buildMaintTotal, network: buildNetworkTotal, other: buildOtherTotal },
                 coloBreakdown: { capex: coloSetup, power: 0, staff: coloStaffTotal, maint: coloLeaseTotal, network: coloNetworkTotal, other: coloOtherTotal },
                 cloudBreakdown: { capex: 0, power: 0, staff: 0, maint: cloudComputeTotal, network: cloudEgressTotal, other: cloudSupportTotal + cloudOtherTotal },
+                sortedOptions: options,
                 buildYearly: buildYearly, coloYearly: coloYearly, cloudYearly: cloudYearly,
                 // For pro
                 annualPower: annualPower, annualStaff: annualStaff, annualMaint: annualMaint,
@@ -3361,10 +3362,11 @@
 
             // Savings highlight
             var savingsEl = el('tcoSavingsHighlight');
-            var savingsAmt = options[1].tco - options[0].tco;
+            var sortedOpts = r.sortedOptions;
+            var savingsAmt = sortedOpts[1].tco - sortedOpts[0].tco;
             if (savingsAmt > 0) {
                 savingsEl.style.display = 'flex';
-                el('tcoSavingsText').innerHTML = 'Choosing <strong>' + r.winner.name + '</strong> saves <strong>' + fmtM(savingsAmt) + '</strong> (' + r.savingsPct.toFixed(1) + '%) compared to ' + options[1].name + ' over ' + r.years + ' years.';
+                el('tcoSavingsText').innerHTML = 'Choosing <strong>' + r.winner.name + '</strong> saves <strong>' + fmtM(savingsAmt) + '</strong> (' + r.savingsPct.toFixed(1) + '%) compared to ' + sortedOpts[1].name + ' over ' + r.years + ' years.';
             } else {
                 savingsEl.style.display = 'none';
             }
