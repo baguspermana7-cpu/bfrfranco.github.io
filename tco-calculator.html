@@ -528,7 +528,83 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            min-height: 0;
         }
+
+        /* Region Snapshot filler card */
+        .tco-region-snapshot {
+            flex: 1;
+            min-height: 120px;
+            border-radius: 14px;
+            border: 1px solid rgba(79,70,229,0.15);
+            background: linear-gradient(135deg, rgba(79,70,229,0.04), rgba(30,58,95,0.06));
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tco-snapshot-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--tco-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tco-snapshot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .tco-snapshot-item {
+            background: rgba(79,70,229,0.06);
+            border: 1px solid rgba(79,70,229,0.1);
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tco-snapshot-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .tco-snapshot-value {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tco-snapshot-note {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        [data-theme="dark"] .tco-region-snapshot {
+            background: linear-gradient(135deg, rgba(79,70,229,0.08), rgba(30,58,95,0.12));
+            border-color: rgba(79,70,229,0.2);
+        }
+
+        [data-theme="dark"] .tco-snapshot-item {
+            background: rgba(79,70,229,0.1);
+            border-color: rgba(79,70,229,0.18);
+        }
+
+        [data-theme="dark"] .tco-snapshot-value { color: #f1f5f9; }
+        [data-theme="dark"] .tco-snapshot-label { color: #64748b; }
 
         .tco-input-row {
             display: grid;
@@ -1906,7 +1982,7 @@
             body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .navbar, .tco-hero, .tco-brief-section, .tco-mode-tabs, #tcoLoginModal, .nav-back, .tco-footer,
             .tco-free-watermark, .tco-tooltip-trigger, .tco-gated-badge, .tco-cookie-banner, .tco-scroll-top-btn,
-            .tco-action-row { display: none !important; }
+            .tco-action-row, .tco-region-snapshot { display: none !important; }
             .tco-main-content { padding-top: 0 !important; }
             .tco-calculator-section { padding: 0 !important; }
             .tco-simulator-container { display: block !important; }
@@ -2394,6 +2470,43 @@
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoDebtEquity" value="60" min="0" max="100" step="5">
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Region Snapshot — fills remaining height in inputs column -->
+                    <div class="tco-region-snapshot" id="tcoRegionSnapshot">
+                        <div class="tco-snapshot-title">
+                            <i class="fas fa-globe-americas"></i>
+                            <span id="snapshotRegionName">N. Virginia</span> — Market Data
+                        </div>
+                        <div class="tco-snapshot-grid">
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-hammer" style="margin-right:3px;"></i>Build Cost</span>
+                                <span class="tco-snapshot-value" id="snapshotBuild">--</span>
+                            </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-server" style="margin-right:3px;"></i>Colo Rate</span>
+                                <span class="tco-snapshot-value" id="snapshotColo">--</span>
+                            </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-bolt" style="margin-right:3px;"></i>Power Rate</span>
+                                <span class="tco-snapshot-value" id="snapshotPower">--</span>
+                            </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-users" style="margin-right:3px;"></i>Staff Cost</span>
+                                <span class="tco-snapshot-value" id="snapshotStaff">--</span>
+                            </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-map-marker-alt" style="margin-right:3px;"></i>Land Cost</span>
+                                <span class="tco-snapshot-value" id="snapshotLand">--</span>
+                            </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-chart-line" style="margin-right:3px;"></i>DC CAGR</span>
+                                <span class="tco-snapshot-value" id="snapshotCagr">--</span>
+                            </div>
+                        </div>
+                        <div class="tco-snapshot-note" id="snapshotNote">
+                            Source: Turner &amp; Townsend DCCI 2025, CBRE H1 2025, IEA Electricity 2025
                         </div>
                     </div>
 
@@ -3285,6 +3398,15 @@
             el('mktStaffCost').textContent = '$' + (r.mkt.staff / 1000).toFixed(0) + 'K';
             el('mktLandCost').textContent = '$' + r.mkt.land;
             el('mktCagr').textContent = (r.mkt.cagr * 100).toFixed(0) + '%';
+
+            // Update region snapshot card in inputs column
+            if (el('snapshotRegionName')) el('snapshotRegionName').textContent = r.mkt.label;
+            if (el('snapshotBuild')) el('snapshotBuild').textContent = '$' + r.mkt.buildCost.toFixed(1) + 'M/MW';
+            if (el('snapshotColo')) el('snapshotColo').textContent = '$' + r.mkt.coloKW + '/kW/mo';
+            if (el('snapshotPower')) el('snapshotPower').textContent = '$' + r.mkt.power.toFixed(3) + '/kWh';
+            if (el('snapshotStaff')) el('snapshotStaff').textContent = '$' + (r.mkt.staff / 1000).toFixed(0) + 'K/yr';
+            if (el('snapshotLand')) el('snapshotLand').textContent = '$' + r.mkt.land + '/sqft';
+            if (el('snapshotCagr')) el('snapshotCagr').textContent = (r.mkt.cagr * 100).toFixed(0) + '% CAGR';
         }
 
         /* ─────────── COMPARISON TABLE ─────────── */
