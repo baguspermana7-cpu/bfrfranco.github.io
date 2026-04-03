@@ -1099,14 +1099,14 @@
         /* ═══ Disclaimer ═══ */
         .tco-disclaimer {
             max-width: 1400px;
-            margin: 1.5rem auto;
-            padding: 1.25rem 1.5rem;
+            margin: 1.5rem auto 2rem;
+            padding: 1.5rem 2rem;
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            font-size: 0.82rem;
+            border-radius: 14px;
+            font-size: 0.84rem;
             color: #475569;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         .tco-disclaimer i { color: var(--tco-primary); margin-right: 6px; }
@@ -1796,8 +1796,7 @@
             background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
         }
 
-        [data-theme="dark"] .tco-disclaimer { background: transparent; }
-        [data-theme="dark"] .tco-disclaimer > div { background: #1e293b; border-color: #334155; color: #cbd5e1; }
+        [data-theme="dark"] .tco-disclaimer { background: #1e293b; border-color: #334155; color: #cbd5e1; }
         [data-theme="dark"] .tco-disclaimer strong { color: #f1f5f9; }
 
         [data-theme="dark"] .tco-pro-panel {
@@ -1833,7 +1832,7 @@
         [data-theme="dark"] .tco-brief-body { color: #cbd5e1; }
 
         [data-theme="dark"] .tco-input-field {
-            background: #1e293b;
+            background-color: #1e293b;
             border-color: rgba(255,255,255,0.1);
             color: #f1f5f9;
         }
@@ -1845,6 +1844,9 @@
 
         [data-theme="dark"] select.tco-input-field {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 12px 12px;
         }
 
         [data-theme="dark"] .tco-market-info { background: rgba(79, 70, 229, 0.1); border-color: rgba(79, 70, 229, 0.2); }
@@ -2639,10 +2641,13 @@
         </section>
 
         <!-- Disclaimer -->
-        <div class="tco-disclaimer" style="max-width:1400px;margin:1.5rem auto;padding:0 2rem;">
-            <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:12px;padding:1.25rem 1.5rem;">
-                <i class="fas fa-info-circle"></i>
-                <strong>Disclaimer:</strong> This calculator provides estimates based on publicly available market data from Turner &amp; Townsend, CBRE, Cushman &amp; Wakefield, IEA, and industry benchmarks (2025-2026). Actual costs vary significantly based on specific site conditions, vendor negotiations, and market timing. Always consult with qualified professionals for investment decisions.
+        <div class="tco-disclaimer" style="max-width:1400px;margin:1.5rem auto 2rem;">
+            <i class="fas fa-info-circle"></i>
+            <strong>Disclaimer:</strong> This calculator provides estimates based on publicly available market data from Turner &amp; Townsend, CBRE, Cushman &amp; Wakefield, IEA, and industry benchmarks (2025-2026). Actual costs vary significantly based on specific site conditions, vendor negotiations, and market timing. Always consult with qualified professionals for investment decisions.
+            <div style="margin-top:0.75rem;display:flex;gap:2rem;flex-wrap:wrap;font-size:0.78rem;color:#64748b;">
+                <span><i class="fas fa-database" style="margin-right:4px;color:var(--tco-primary);"></i>Sources: Turner &amp; Townsend H1 2025, CBRE DC Trends 2025, IEA Energy Outlook</span>
+                <span><i class="fas fa-calendar-alt" style="margin-right:4px;color:var(--tco-primary);"></i>Data vintage: 2025–2026 market benchmarks</span>
+                <span><i class="fas fa-user-tie" style="margin-right:4px;color:var(--tco-primary);"></i>For investment decisions, consult a qualified DC infrastructure advisor</span>
             </div>
         </div>
     </main>
@@ -3454,7 +3459,7 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, padding: 12, usePointStyle: true, pointStyleWidth: 8 }
+                            labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, padding: 12, boxWidth: 12, boxHeight: 3 }
                         },
                         tooltip: {
                             callbacks: {
@@ -3621,6 +3626,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: { top: 4, bottom: 4, left: 0, right: 0 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -3631,7 +3637,7 @@
                         }
                     },
                     scales: {
-                        x: { display: false },
+                        x: { display: false, grid: { display: false } },
                         y: {
                             ticks: { color: '#94a3b8', font: { size: 10 } },
                             grid: { color: 'rgba(0,0,0,0.05)' }
@@ -3803,7 +3809,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            labels: { color: '#475569', font: { size: 11 }, usePointStyle: true, pointStyleWidth: 8 }
+                            labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, boxHeight: 3, padding: 16 }
                         },
                         tooltip: {
                             callbacks: {
