@@ -733,7 +733,6 @@
         }
 
         .solution-card:hover {
-            transform: translateY(-8px);
             box-shadow: var(--shadow-xl), 0 0 30px var(--card-glow);
             border-color: var(--card-border);
         }
@@ -2030,6 +2029,369 @@
             .credential-badge { padding:6px 10px; font-size:0.7rem; }
             .credential-badge img { width:32px; height:24px; }
         }
+
+        /* ── Downloads-style redesign ── */
+        .ds-platforms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width:768px) { .ds-platforms-grid { grid-template-columns: 1fr; } }
+
+        .ds-platform-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .ds-platform-card:hover {
+            border-color: var(--card-border, rgba(74,144,184,0.4));
+            box-shadow: 0 4px 24px var(--card-glow, rgba(74,144,184,0.12));
+        }
+        .ds-platform-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .ds-platform-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .ds-platform-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+        .ds-platform-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .ds-item-list { padding: 0; }
+        .ds-item-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.2s;
+        }
+        .ds-item-row:last-child { border-bottom: none; }
+        .ds-item-row:hover { background: rgba(74,144,184,0.05); }
+        .ds-item-icon-sm {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .ds-item-name {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .ds-item-open-btn {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--light-blue);
+            padding: 4px 11px;
+            border-radius: 8px;
+            background: rgba(74,144,184,0.1);
+            border: 1px solid rgba(74,144,184,0.2);
+            transition: background 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .ds-item-row:hover .ds-item-open-btn {
+            background: rgba(74,144,184,0.2);
+            border-color: rgba(74,144,184,0.4);
+        }
+
+        /* Section aggregator card — for calculators */
+        .ds-section-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        .ds-section-card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .ds-section-card-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .ds-section-card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+            flex: 1;
+        }
+        .ds-tool-count {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.06);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .ds-tool-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.2s;
+        }
+        .ds-tool-row:last-child { border-bottom: none; }
+        .ds-tool-row:hover { background: rgba(255,255,255,0.03); }
+
+        .ds-tool-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .ds-tool-info { flex: 1; min-width: 0; }
+        .ds-tool-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .ds-tool-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ds-open-btn {
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ds-tool-row:hover .ds-open-btn {
+            background: rgba(74,144,184,0.1);
+            border-color: rgba(74,144,184,0.3);
+            color: var(--light-blue);
+        }
+        .ds-badge-new {
+            font-size: 0.58rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .ds-badge-pro {
+            font-size: 0.58rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(139,92,246,0.12));
+            border: 1px solid rgba(139,92,246,0.35);
+            color: #a78bfa;
+            flex-shrink: 0;
+        }
+
+        /* Strategic 3-col grid */
+        .ds-strategic-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        @media (max-width:900px) { .ds-strategic-grid { grid-template-columns: 1fr; } }
+
+        .ds-strat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .ds-strat-card:hover {
+            border-color: var(--card-border, rgba(74,144,184,0.4));
+            box-shadow: 0 4px 24px var(--card-glow, rgba(74,144,184,0.12));
+        }
+        .ds-strat-header {
+            padding: 1.25rem 1.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+        .ds-strat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .ds-strat-title-wrap { flex: 1; }
+        .ds-strat-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .ds-strat-subtitle {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+        }
+        .ds-strat-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            padding: 0 1.5rem 1rem;
+            flex: 1;
+        }
+        .ds-strat-features {
+            padding: 0;
+            border-top: 1px solid var(--glass-border);
+            margin: 0;
+            list-style: none;
+        }
+        .ds-strat-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.55rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+        .ds-strat-features li:last-child { border-bottom: none; }
+        .ds-strat-features li i { font-size: 0.65rem; flex-shrink: 0; }
+        .ds-strat-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+        .ds-strat-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: inherit;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            transition: all 0.2s;
+        }
+        .ds-strat-cta:hover {
+            background: rgba(74,144,184,0.12);
+            border-color: rgba(74,144,184,0.3);
+            color: var(--light-blue);
+        }
+
+        /* Gradient top-bar on hover for platform + strategic cards */
+        .ds-platform-card { position: relative; }
+        .ds-platform-card::before,
+        .ds-strat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--card-gradient, linear-gradient(90deg, #4a90b8, #5ba3cb));
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 20px 20px 0 0;
+        }
+        .ds-platform-card:hover::before,
+        .ds-strat-card:hover::before { opacity: 1; }
+
+        /* Animated open-btn arrow nudge */
+        .ds-item-row:hover .ds-item-open-btn { letter-spacing: 0.02em; }
+        .ds-tool-row .ds-open-btn i { transition: transform 0.2s; }
+        .ds-tool-row:hover .ds-open-btn i { transform: translateX(3px); }
+
+        /* Section card hover glow */
+        .ds-section-card {
+            transition: box-shadow 0.3s;
+        }
+        .ds-section-card:hover {
+            box-shadow: 0 4px 32px rgba(74,144,184,0.08);
+        }
+
+        /* Platform icon pulse on card hover */
+        .ds-platform-card:hover .ds-platform-icon {
+            transform: scale(1.06);
+        }
+        .ds-platform-icon { transition: transform 0.3s; }
+
+        /* Strategic icon pulse */
+        .ds-strat-card:hover .ds-strat-icon { transform: scale(1.08); }
+        .ds-strat-icon { transition: transform 0.3s; }
+
+        /* dark-mode tweaks */
+        [data-theme="dark"] .ds-tool-row:hover { background: rgba(255,255,255,0.035); }
+        [data-theme="dark"] .ds-tool-count { background: rgba(255,255,255,0.08); }
+        [data-theme="dark"] .ds-open-btn { border-color: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .ds-strat-cta { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); }
 </style>
 
     <!-- Structured Data - BreadcrumbList -->
@@ -2322,40 +2684,96 @@
                 <p>Interactive telemetry dashboards for conventional and AI-powered data centers</p>
             </div>
 
-            <div class="solutions-grid">
-                <a href="datahallAI.html" class="solution-card card-ai fade-in delay-1">
-                    <div class="card-icon" style="background: rgba(139, 92, 246, 0.15);">
-                        <i class="fas fa-robot"></i>
+            <div class="ds-platforms-grid">
+                <!-- AI / HPC Platform Card -->
+                <div class="ds-platform-card card-ai fade-in delay-1" style="--card-border:rgba(139,92,246,0.4);--card-glow:rgba(139,92,246,0.15);--card-gradient:linear-gradient(90deg,#8b5cf6,#a78bfa);">
+                    <div class="ds-platform-header">
+                        <div class="ds-platform-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6;">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="ds-platform-title">AI / HPC Datahall</div>
+                            <div class="ds-platform-desc">High-density GPU clusters · Direct liquid cooling · 30–100 kW/rack</div>
+                        </div>
                     </div>
-                    <h3 class="card-title">AI / HPC Datahall</h3>
-                    <p class="card-desc">High-density computing infrastructure optimized for AI/ML workloads with advanced liquid cooling and GPU cluster management.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> Direct Liquid Cooling (DLC)</li>
-                        <li><i class="fas fa-check"></i> High-Density Racks (30-100kW)</li>
-                        <li><i class="fas fa-check"></i> GPU Cluster Thermal Management</li>
-                        <li><i class="fas fa-check"></i> Real-time Power Analytics</li>
-                    </ul>
-                    <span class="card-action">
-                        View AI Dashboard <i class="fas fa-arrow-right"></i>
-                    </span>
-                </a>
+                    <div class="ds-item-list">
+                        <a href="datahallAI.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-building"></i></div>
+                            <span class="ds-item-name">Building — 3D Isometric Overview</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="datahallAI.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-wind"></i></div>
+                            <span class="ds-item-name">HVAC &amp; Chiller Plant P&amp;ID</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="datahallAI.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-server"></i></div>
+                            <span class="ds-item-name">Rack Detail &amp; In-Rack CDU HMI</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="datahallAI.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(59,130,246,0.12);color:#3b82f6;"><i class="fas fa-bolt"></i></div>
+                            <span class="ds-item-name">Electrical SLD — 4 Data Halls</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="datahallAI.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-network-wired"></i></div>
+                            <span class="ds-item-name">Network — Fat-Tree Topology</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="datahallAI.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="fas fa-fire-extinguisher"></i></div>
+                            <span class="ds-item-name">Fire Detection &amp; Suppression</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                    </div>
+                </div>
 
-                <a href="dc-conventional.html" class="solution-card card-conventional fade-in delay-2">
-                    <div class="card-icon" style="background: rgba(74, 144, 184, 0.15);">
-                        <i class="fas fa-server"></i>
+                <!-- Conventional DC Platform Card -->
+                <div class="ds-platform-card card-conventional fade-in delay-2" style="--card-border:rgba(74,144,184,0.4);--card-glow:rgba(74,144,184,0.15);--card-gradient:linear-gradient(90deg,#1e3a5f,#4a90b8);">
+                    <div class="ds-platform-header">
+                        <div class="ds-platform-icon" style="background:rgba(74,144,184,0.15);color:#4a90b8;">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div>
+                            <div class="ds-platform-title">Conventional Data Center</div>
+                            <div class="ds-platform-desc">Enterprise infrastructure · Chilled water cooling · EPMS &amp; BMS</div>
+                        </div>
                     </div>
-                    <h3 class="card-title">Conventional Data Center</h3>
-                    <p class="card-desc">Enterprise-grade infrastructure for cloud computing, storage, and network operations with traditional cooling and power systems.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> EPMS & Power Monitoring</li>
-                        <li><i class="fas fa-check"></i> Chiller / HVAC Systems</li>
-                        <li><i class="fas fa-check"></i> Fire & Safety Systems</li>
-                        <li><i class="fas fa-check"></i> Data Hall Telemetry</li>
-                    </ul>
-                    <span class="card-action">
-                        View Systems <i class="fas fa-arrow-right"></i>
-                    </span>
-                </a>
+                    <div class="ds-item-list">
+                        <a href="dc-conventional.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(74,144,184,0.12);color:#4a90b8;"><i class="fas fa-building"></i></div>
+                            <span class="ds-item-name">Building &amp; Floor Plan</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="dc-conventional.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-snowflake"></i></div>
+                            <span class="ds-item-name">Chiller &amp; CRAC/CRAH Systems</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="dc-conventional.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-bolt"></i></div>
+                            <span class="ds-item-name">EPMS &amp; Power Distribution</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="dc-conventional.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-network-wired"></i></div>
+                            <span class="ds-item-name">Network Infrastructure</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="dc-conventional.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="fas fa-fire-extinguisher"></i></div>
+                            <span class="ds-item-name">Fire &amp; Safety Systems</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                        <a href="dc-conventional.html" class="ds-item-row">
+                            <div class="ds-item-icon-sm" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-sliders-h"></i></div>
+                            <span class="ds-item-name">BMS / DCIM Architecture</span>
+                            <span class="ds-item-open-btn">Open ↗</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -2369,59 +2787,87 @@
                 <p>Total cost of ownership comparison, global market tracking, and investment decision tools with 2025-2030 projection data</p>
             </div>
 
-            <div class="solutions-grid">
-                <a href="tco-calculator.html" class="solution-card card-tco fade-in delay-1">
-                    <div class="card-icon" style="background: rgba(79, 70, 229, 0.15);">
-                        <i class="fas fa-scale-balanced"></i>
+            <div class="ds-strategic-grid">
+                <!-- TCO Calculator -->
+                <div class="ds-strat-card card-tco fade-in delay-1" style="--card-border:rgba(79,70,229,0.4);--card-glow:rgba(79,70,229,0.12);">
+                    <div class="ds-strat-header">
+                        <div class="ds-strat-icon" style="background:rgba(79,70,229,0.15);color:#6366f1;">
+                            <i class="fas fa-scale-balanced"></i>
+                        </div>
+                        <div class="ds-strat-title-wrap">
+                            <div class="ds-strat-title">
+                                TCO Calculator
+                                <span class="ds-badge-new">NEW</span>
+                            </div>
+                            <div class="ds-strat-subtitle">Build vs Colo vs Cloud · 12 Markets</div>
+                        </div>
                     </div>
-                    <span class="card-new-badge" style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#4f46e5,#818cf8);color:#fff;padding:3px 10px;border-radius:10px;font-size:0.6rem;font-weight:700;letter-spacing:0.05em;">NEW</span>
-                    <h3 class="card-title">TCO Calculator</h3>
-                    <p class="card-desc">Compare 5-year and 10-year Total Cost of Ownership for Build, Colocation, and Cloud deployments across 12 global markets with real 2025 pricing data.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> Build vs. Colo vs. Cloud Comparison</li>
-                        <li><i class="fas fa-check"></i> 12 Markets with Real Cost Data</li>
-                        <li><i class="fas fa-check"></i> Breakeven Analysis & Projections</li>
-                        <li><i class="fas fa-check"></i> Monte Carlo & Sensitivity Analysis</li>
+                    <div class="ds-strat-desc">Compare 5-year and 10-year total cost of ownership across deployment models with real 2025 pricing data and Monte Carlo risk analysis.</div>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> Build · Colo · Cloud side-by-side</li>
+                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> 12 global markets, 2025 data</li>
+                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> Breakeven &amp; sensitivity charts</li>
+                        <li><i class="fas fa-check-circle" style="color:#6366f1;"></i> Monte Carlo simulation &amp; PDF</li>
                     </ul>
-                    <span class="card-action" style="color: #4f46e5;">
-                        Compare TCO <i class="fas fa-arrow-right"></i>
-                    </span>
-                </a>
+                    <div class="ds-strat-footer">
+                        <a href="tco-calculator.html" class="ds-strat-cta" style="color:#6366f1;border-color:rgba(99,102,241,0.2);">
+                            Compare TCO <i class="fas fa-arrow-right" style="font-size:0.72rem;"></i>
+                        </a>
+                    </div>
+                </div>
 
-                <a href="dc-market-tracker.html" class="solution-card card-dmt fade-in delay-2">
-                    <div class="card-icon" style="background: rgba(13, 148, 136, 0.15);">
-                        <i class="fas fa-earth-americas"></i>
+                <!-- Global Market Tracker -->
+                <div class="ds-strat-card card-dmt fade-in delay-2" style="--card-border:rgba(13,148,136,0.4);--card-glow:rgba(13,148,136,0.12);">
+                    <div class="ds-strat-header">
+                        <div class="ds-strat-icon" style="background:rgba(13,148,136,0.15);color:#0d9488;">
+                            <i class="fas fa-earth-americas"></i>
+                        </div>
+                        <div class="ds-strat-title-wrap">
+                            <div class="ds-strat-title">
+                                Global Market Tracker
+                                <span class="ds-badge-new" style="background:linear-gradient(135deg,#0d9488,#2dd4bf);">NEW</span>
+                            </div>
+                            <div class="ds-strat-subtitle">25+ Markets · Live Data</div>
+                        </div>
                     </div>
-                    <span class="card-new-badge" style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#0d9488,#2dd4bf);color:#fff;padding:3px 10px;border-radius:10px;font-size:0.6rem;font-weight:700;letter-spacing:0.05em;">NEW</span>
-                    <h3 class="card-title">Global Market Tracker</h3>
-                    <p class="card-desc">Interactive dashboard tracking DC capacity, construction pipeline, and growth projections across 25+ markets worldwide with SVG world map visualization.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> 25+ Markets with Live Data</li>
-                        <li><i class="fas fa-check"></i> Interactive SVG World Map</li>
-                        <li><i class="fas fa-check"></i> 2025-2030 Growth Projections</li>
-                        <li><i class="fas fa-check"></i> Regional Capacity & Investment Data</li>
+                    <div class="ds-strat-desc">Track DC capacity, construction pipeline, and growth projections across 25+ markets worldwide with interactive SVG world map visualization.</div>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> 25+ markets with live indicators</li>
+                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> Interactive SVG world map</li>
+                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> 2025–2030 growth projections</li>
+                        <li><i class="fas fa-check-circle" style="color:#0d9488;"></i> Regional capacity &amp; investment data</li>
                     </ul>
-                    <span class="card-action" style="color: #0d9488;">
-                        Explore Markets <i class="fas fa-arrow-right"></i>
-                    </span>
-                </a>
+                    <div class="ds-strat-footer">
+                        <a href="dc-market-tracker.html" class="ds-strat-cta" style="color:#0d9488;border-color:rgba(13,148,136,0.2);">
+                            Explore Markets <i class="fas fa-arrow-right" style="font-size:0.72rem;"></i>
+                        </a>
+                    </div>
+                </div>
 
-                <a href="roi-calculator.html" class="solution-card card-roi fade-in delay-3">
-                    <div class="card-icon" style="background: rgba(59, 130, 246, 0.15);">
-                        <i class="fas fa-chart-line"></i>
+                <!-- ROI Calculator -->
+                <div class="ds-strat-card card-roi fade-in delay-3" style="--card-border:rgba(59,130,246,0.4);--card-glow:rgba(59,130,246,0.12);">
+                    <div class="ds-strat-header">
+                        <div class="ds-strat-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="ds-strat-title-wrap">
+                            <div class="ds-strat-title">ROI Calculator</div>
+                            <div class="ds-strat-subtitle">NPV · IRR · Payback Period</div>
+                        </div>
                     </div>
-                    <h3 class="card-title">ROI Calculator</h3>
-                    <p class="card-desc">NPV, IRR, payback period, and year-by-year cashflow analysis with occupancy ramp modeling and Monte Carlo simulation.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> NPV & IRR Calculations</li>
-                        <li><i class="fas fa-check"></i> Occupancy Ramp Modeling</li>
-                        <li><i class="fas fa-check"></i> Monte Carlo Risk Simulation</li>
-                        <li><i class="fas fa-check"></i> PDF Export with Projections</li>
+                    <div class="ds-strat-desc">Year-by-year cashflow analysis with occupancy ramp modeling, Monte Carlo risk simulation, and PDF export with investment projections.</div>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> NPV &amp; IRR calculations</li>
+                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> Occupancy ramp modeling</li>
+                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> Monte Carlo risk simulation</li>
+                        <li><i class="fas fa-check-circle" style="color:#3b82f6;"></i> PDF export with projections</li>
                     </ul>
-                    <span class="card-action" style="color: #3b82f6;">
-                        Calculate ROI <i class="fas fa-arrow-right"></i>
-                    </span>
-                </a>
+                    <div class="ds-strat-footer">
+                        <a href="roi-calculator.html" class="ds-strat-cta" style="color:#3b82f6;border-color:rgba(59,130,246,0.2);">
+                            Calculate ROI <i class="fas fa-arrow-right" style="font-size:0.72rem;"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -2435,93 +2881,65 @@
                 <p>Professional-grade calculators for capital expenditure, operations, commissioning, and project readiness</p>
             </div>
 
-            <div class="solutions-grid">
-                <a href="capex-calculator.html" class="solution-card card-capex fade-in delay-1">
-                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.15);">
-                        <i class="fas fa-building"></i>
+            <div class="ds-section-card fade-in">
+                <div class="ds-section-card-header">
+                    <div class="ds-section-card-header-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-calculator"></i></div>
+                    <span class="ds-section-card-title">Cost Calculators</span>
+                    <span class="ds-tool-count">5 tools</span>
+                </div>
+
+                <a href="capex-calculator.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-building"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">CAPEX Calculator</div>
+                        <div class="ds-tool-desc">14-component cost breakdown · Scenario A vs B · Tier classification · PDF export</div>
                     </div>
-                    <h3 class="card-title">CAPEX Calculator</h3>
-                    <p class="card-desc">Interactive capital expenditure calculator for data center construction with comprehensive breakdown of all infrastructure components.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> 14-Component Cost Breakdown</li>
-                        <li><i class="fas fa-check"></i> Scenario Comparison (A vs B)</li>
-                        <li><i class="fas fa-check"></i> Tier Classification & PUE</li>
-                        <li><i class="fas fa-check"></i> PDF Export & Cost Narrative</li>
-                    </ul>
-                    <span class="card-action">
-                        Calculate CAPEX <i class="fas fa-arrow-right"></i>
-                    </span>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="opex-calculator.html" class="solution-card card-opex fade-in delay-2">
-                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.15);">
-                        <i class="fas fa-coins"></i>
+                <a href="opex-calculator.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-coins"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">OPEX Calculator</div>
+                        <div class="ds-tool-desc">30+ countries · Climate zones · Staffing models · Energy &amp; maintenance costs</div>
                     </div>
-                    <h3 class="card-title">OPEX Calculator</h3>
-                    <p class="card-desc">Comprehensive operational cost analysis with 30+ countries, climate zones, cooling types, and flexible staffing models.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> In-House / Partial / Contractor</li>
-                        <li><i class="fas fa-check"></i> Country-Specific Labor Rates</li>
-                        <li><i class="fas fa-check"></i> Energy & Maintenance Costs</li>
-                        <li><i class="fas fa-check"></i> Detailed Staffing Breakdown</li>
-                    </ul>
-                    <span class="card-action" style="color: #10b981;">
-                        Calculate OPEX <i class="fas fa-arrow-right"></i>
-                    </span>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="dcmoc/" class="solution-card card-moc fade-in delay-3">
-                    <div class="card-icon" style="background: rgba(6, 182, 212, 0.15);">
-                        <i class="fas fa-chart-line"></i>
+                <a href="dcmoc/" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-chart-line"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">
+                            DC MOC
+                            <span class="ds-badge-pro"><i class="fas fa-crown" style="margin-right:3px;font-size:0.5rem;"></i>PRO</span>
+                        </div>
+                        <div class="ds-tool-desc">CAPEX + OPEX engine · Shift optimization · Monte Carlo · Executive PDF</div>
                     </div>
-                    <span class="card-pro-badge"><i class="fas fa-crown" style="margin-right:4px;font-size:0.55rem;"></i> PRO</span>
-                    <h3 class="card-title">DC MOC</h3>
-                    <p class="card-desc">All-in-one Maintenance & Operations Calculator — combines CAPEX + OPEX with staffing models, shift optimization, Monte Carlo, and executive reporting.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> Integrated CAPEX + OPEX Engine</li>
-                        <li><i class="fas fa-check"></i> Monte Carlo Risk Simulation</li>
-                        <li><i class="fas fa-check"></i> Shift & Staffing Optimization</li>
-                        <li><i class="fas fa-check"></i> Financial Projections & PDF</li>
-                    </ul>
-                    <span class="card-action" style="color: #06b6d4;">
-                        Launch DC MOC <i class="fas fa-arrow-right"></i>
-                    </span>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="cx-calculator.html" class="solution-card card-cx fade-in delay-4">
-                    <div class="card-icon" style="background: rgba(14, 116, 144, 0.15);">
-                        <i class="fas fa-clipboard-check"></i>
+                <a href="cx-calculator.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(14,116,144,0.12);color:#0e7490;"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">
+                            Cx Calculator
+                            <span class="ds-badge-pro"><i class="fas fa-crown" style="margin-right:3px;font-size:0.5rem;"></i>PRO</span>
+                        </div>
+                        <div class="ds-tool-desc">L0–L6 lifecycle · Gantt chart · Monte Carlo · 8 archetypes incl. AI Factory</div>
                     </div>
-                    <span class="card-pro-badge"><i class="fas fa-crown" style="margin-right:4px;font-size:0.55rem;"></i> PRO</span>
-                    <h3 class="card-title">Cx Calculator</h3>
-                    <p class="card-desc">Full-lifecycle L0-L6 commissioning cost and schedule estimator. Covers enterprise, colo, hyperscale, and AI factory archetypes with interactive Gantt and Monte Carlo analysis.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> L0-L6 Full Lifecycle (7 Phases)</li>
-                        <li><i class="fas fa-check"></i> Interactive 5-Level Gantt Chart</li>
-                        <li><i class="fas fa-check"></i> Monte Carlo & Sensitivity Analysis</li>
-                        <li><i class="fas fa-check"></i> 8 Archetype Presets incl. AI Factory</li>
-                    </ul>
-                    <span class="card-action" style="color: #0e7490;">
-                        Estimate Cx Cost <i class="fas fa-arrow-right"></i>
-                    </span>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="rfs-readiness-workbench.html" class="solution-card card-rfs fade-in delay-5">
-                    <div class="card-icon" style="background: rgba(20, 184, 166, 0.15);">
-                        <i class="fas fa-tasks"></i>
+                <a href="rfs-readiness-workbench.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(20,184,166,0.12);color:#14b8a6;"><i class="fas fa-tasks"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">
+                            RFS Readiness Workbench
+                            <span class="ds-badge-pro"><i class="fas fa-crown" style="margin-right:3px;font-size:0.5rem;"></i>PRO</span>
+                        </div>
+                        <div class="ds-tool-desc">G0–G7 gate board · Defect tracking · Customer overlay · Forecast engine</div>
                     </div>
-                    <span class="card-pro-badge"><i class="fas fa-crown" style="margin-right:4px;font-size:0.55rem;"></i> PRO</span>
-                    <h3 class="card-title">RFS Readiness Workbench</h3>
-                    <p class="card-desc">Gate-driven commissioning readiness tracker for DC Ready-for-Service planning. Manage delivery units, track defects, and forecast RFS confidence.</p>
-                    <ul class="card-features">
-                        <li><i class="fas fa-check"></i> G0-G7 Gate Board with Blocker Logic</li>
-                        <li><i class="fas fa-check"></i> Defect & Evidence Tracking</li>
-                        <li><i class="fas fa-check"></i> Customer Overlay Management</li>
-                        <li><i class="fas fa-check"></i> Drag-Based Forecast Engine</li>
-                    </ul>
-                    <span class="card-action" style="color: #14b8a6;">
-                        Open Workbench <i class="fas fa-arrow-right"></i>
-                    </span>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
             </div>
         </section>
@@ -2602,74 +3020,69 @@
                 </div>
                 <p>Standards assessment, efficiency analysis, and regulatory compliance checkers</p>
             </div>
-            <div class="tools-grid">
-                <a href="pue-calculator.html" class="tool-card" style="text-decoration:none;color:inherit;">
-                    <div class="tool-header">
-                        <div class="tool-icon" style="background: rgba(6,182,212,0.15); color: #06b6d4;">
-                            <i class="fas fa-tachometer-alt"></i>
-                        </div>
-                        <span class="tool-title">PUE Calculator</span>
+
+            <div class="ds-section-card fade-in">
+                <div class="ds-section-card-header">
+                    <div class="ds-section-card-header-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-wrench"></i></div>
+                    <span class="ds-section-card-title">Engineering Tools</span>
+                    <span class="ds-tool-count">6 tools</span>
+                </div>
+
+                <a href="pue-calculator.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">PUE Calculator</div>
+                        <div class="ds-tool-desc">Power Usage Effectiveness · Cooling type · Climate zone · IT load distribution</div>
                     </div>
-                    <p class="tool-desc">Calculate Power Usage Effectiveness based on cooling type, climate zone, and IT load distribution.</p>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="standards-ltc-lab.html" id="rootStandardsCard" class="tool-card root-only-card" style="text-decoration:none;color:inherit;" aria-label="Root only standards and liquid-to-chip module">
-                    <span class="root-lock-badge"><i class="fas fa-lock"></i> Root Only</span>
-                    <div class="tool-header">
-                        <div class="tool-icon" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
-                            <i class="fas fa-shield-halved"></i>
-                        </div>
-                        <span class="tool-title">Standards + Liquid-to-Chip Lab</span>
+                <a href="tier-advisor.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-layer-group"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">Tier Advisor</div>
+                        <div class="ds-tool-desc">Uptime Tier I–IV · TIA-942 · EN 50600 · Regional compliance overlays, 12+ jurisdictions</div>
                     </div>
-                    <p class="tool-desc">Framework module for ASHRAE, ANSI, ISO, NFPA, and Uptime Institute alignment with advanced liquid-to-chip engineering reference blocks. Concept stage, root access gated.</p>
-                    <div class="tool-tags">
-                        <span class="tool-tag">ASHRAE</span>
-                        <span class="tool-tag">ANSI</span>
-                        <span class="tool-tag">ISO</span>
-                        <span class="tool-tag">NFPA</span>
-                        <span class="tool-tag">Uptime</span>
-                        <span class="tool-tag">Liquid-to-Chip</span>
-                    </div>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="tier-advisor.html" class="tool-card" style="text-decoration:none;color:inherit;">
-                    <div class="tool-header">
-                        <div class="tool-icon" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <span class="tool-title">Tier Advisor</span>
+                <a href="tia-942-checklist.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">TIA-942 Compliance Checklist</div>
+                        <div class="ds-tool-desc">TIA-942-B · 56 items · 4 tier levels · Weighted scoring &amp; gap analysis</div>
                     </div>
-                    <p class="tool-desc">Map your infrastructure to Uptime Institute Tier I-IV, TIA-942, and EN 50600 with regional compliance overlays for 12+ jurisdictions.</p>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="tia-942-checklist.html" class="tool-card" style="text-decoration:none;color:inherit;">
-                    <div class="tool-header">
-                        <div class="tool-icon" style="background: rgba(16,185,129,0.15); color: #10b981;">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
-                        <span class="tool-title">TIA-942 Checklist</span>
+                <a href="carbon-footprint.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(34,197,94,0.12);color:#22c55e;"><i class="fas fa-leaf"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">Carbon Footprint Analyzer</div>
+                        <div class="ds-tool-desc">GHG Protocol Scope 1/2/3 · Life-cycle assessment · Paris Agreement · 33 countries</div>
                     </div>
-                    <p class="tool-desc">Assess TIA-942-B compliance with 56 items, 4 tier levels, weighted scoring, and gap analysis.</p>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="carbon-footprint.html" class="tool-card" style="text-decoration:none;color:inherit;">
-                    <div class="tool-header">
-                        <div class="tool-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">
-                            <i class="fas fa-leaf"></i>
-                        </div>
-                        <span class="tool-title">Carbon Footprint</span>
+                <a href="compare-air-vs-liquid-cooling.html" class="ds-tool-row">
+                    <div class="ds-tool-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;"><i class="fas fa-snowflake"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">Air vs. Liquid Cooling Comparison</div>
+                        <div class="ds-tool-desc">DX · Chilled water · RDHx · Direct-to-chip · AI/HPC workload analysis</div>
                     </div>
-                    <p class="tool-desc">GHG Protocol Scope 1/2/3 emissions, life-cycle assessment, and Paris Agreement carbon budget analysis for 33 countries.</p>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
 
-                <a href="compare-air-vs-liquid-cooling.html" class="tool-card" style="text-decoration:none;color:inherit;">
-                    <div class="tool-header">
-                        <div class="tool-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">
-                            <i class="fas fa-snowflake"></i>
+                <a href="standards-ltc-lab.html" id="rootStandardsCard" class="ds-tool-row root-only-card" style="position:relative;" aria-label="Root only standards and liquid-to-chip module">
+                    <div class="ds-tool-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-shield-halved"></i></div>
+                    <div class="ds-tool-info">
+                        <div class="ds-tool-name">
+                            Standards + Liquid-to-Chip Lab
+                            <span style="font-size:0.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;letter-spacing:0.04em;"><i class="fas fa-lock" style="margin-right:3px;font-size:0.5rem;"></i>Root</span>
                         </div>
-                        <span class="tool-title">Cooling Comparison</span>
+                        <div class="ds-tool-desc">ASHRAE · ANSI · ISO · NFPA · Uptime · Liquid-to-chip reference blocks</div>
                     </div>
-                    <p class="tool-desc">Air vs. liquid cooling comparison — DX, chilled water, rear-door heat exchangers, and direct-to-chip for AI/HPC workloads.</p>
+                    <span class="ds-open-btn">Open <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i></span>
                 </a>
             </div>
         </section>
