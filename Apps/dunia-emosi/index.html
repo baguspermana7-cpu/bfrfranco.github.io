@@ -21,7 +21,7 @@
   --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; height: 100%; }
 body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow-x: hidden; user-select: none; background: var(--bg-base); }
 
 .bg-blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
@@ -33,7 +33,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .blob-5 { width:150px;height:150px;background:#FDA4AF;top:50%;left:50%;animation-duration:9s;animation-delay:-1s; }
 @keyframes blobFloat { from{transform:translateY(0)scale(1)} to{transform:translateY(30px)scale(1.08)} }
 
-.screen { display:none; min-height:100vh; flex-direction:column; align-items:center; padding:20px 16px 40px; position:relative; z-index:1; animation:screenIn 0.35s cubic-bezier(0.34,1.2,0.64,1); }
+.screen { display:none; min-height:100vh; flex-direction:column; align-items:center; padding:20px 16px 40px; position:relative; z-index:1; animation:screenIn 0.35s cubic-bezier(0.34,1.2,0.64,1); overflow-y:auto; overflow-x:hidden; }
 .screen.active { display:flex; }
 @keyframes screenIn { from{opacity:0;transform:translateY(20px)scale(0.97)} to{opacity:1;transform:translateY(0)scale(1)} }
 
@@ -440,12 +440,258 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .at-title { font-size:13px;font-weight:700;color:#78350F;text-transform:uppercase;letter-spacing:0.5px; }
 .at-name  { font-size:17px;font-weight:900;color:#451A03; }
 
-@media(max-width:400px) {
-  .welcome-title{font-size:34px} .g5-grid{gap:6px} .g5-card-back .card-emoji{font-size:26px}
-  .g5-card-back .card-label{font-size:8px} .g5-card-front::after{font-size:20px}
-  .g4-choice-btn{font-size:28px;padding:14px 8px} .g1-choices{gap:8px}
+/* ===== COMPREHENSIVE MOBILE RESPONSIVE ===== */
+
+/* Base mobile fixes (≤480px) */
+@media(max-width:480px) {
+  /* Screen padding on small screens */
+  .screen { padding:16px 12px 32px; }
+
+  /* Buttons */
+  .btn-lg { max-width:100%; padding:18px 24px; font-size:19px; }
+  .btn-md { padding:12px 22px; font-size:16px; }
+
+  /* Welcome screen */
+  .welcome-mascot { font-size:88px; }
+  .welcome-tagline { font-size:16px; }
+
+  /* Mode cards */
+  .mode-card { width:100%; max-width:100%; padding:22px 18px; }
+  .mode-card .mode-icon { font-size:52px; }
+  .mode-card .mode-name { font-size:22px; }
+  .mode-card .mode-desc { font-size:14px; }
+
+  /* Name input */
+  .name-input { font-size:18px; padding:14px 16px; }
+  .name-input-wrap { width:100%; max-width:100%; }
+  .animal-btn { width:48px; height:48px; font-size:24px; }
+
+  /* Player chips */
+  .player-header { gap:8px; }
+  .player-chip { padding:10px 10px; gap:7px; }
+  .player-chip .p-animal { font-size:22px; }
+  .player-chip .p-name { font-size:12px; }
+  .player-chip .p-stars { font-size:12px; padding:3px 8px; }
+  .player-chip .p-streak { font-size:11px; padding:2px 6px; }
+
+  /* Menu game grid (3-col) */
+  .game-grid-2 { gap:8px; }
+  .game-grid-2 .game-tile { padding:12px 6px; }
+  .game-grid-2 .g-icon { font-size:32px; margin-bottom:4px; }
+  .game-grid-2 .g-name { font-size:11px; line-height:1.25; }
+  .game-grid-2 .g-tag { font-size:10px; padding:3px 7px; }
+
+  /* 2-col game grid (full tiles in menu) */
+  .game-grid { gap:10px; }
+  .game-tile { padding:18px 10px; }
+  .game-tile .g-icon { font-size:40px; }
+  .game-tile .g-name { font-size:14px; }
+
+  /* Page / game header */
+  .page-header { margin-bottom:16px; }
+  .game-header { margin-bottom:14px; }
+  .game-header .gh-title { font-size:15px; }
+  .game-header .gh-stars { font-size:15px; padding:5px 12px; }
+  .game-header .gh-player { font-size:22px; }
+
+  /* Level select */
+  .level-game-icon { font-size:60px; }
+  .level-game-name { font-size:22px; }
+  .level-btn { padding:16px 18px; }
+  .level-btn-name { font-size:19px; }
+
+  /* G1 */
+  .g1-animal-display { font-size:88px; }
+  .g1-question { font-size:18px; margin-bottom:14px; }
+  .g1-choices { gap:8px; max-width:100%; }
+  .g1-choice-btn { padding:14px 8px; border-radius:18px; }
+  .g1-choice-btn .choice-emoji { font-size:32px; }
+  .g1-choice-btn .choice-label { font-size:15px; }
+
+  /* G2 */
+  .breathe-circle-wrap { width:190px; height:190px; }
+  .breathe-animal { font-size:66px; }
+  .breathe-instruction { font-size:28px; }
+  .breathe-sub { font-size:15px; }
+
+  /* G3 */
+  .g3-animal { font-size:80px; }
+  .g3-word { font-size:26px; letter-spacing:4px; }
+  .g3-choices { max-width:100%; gap:8px; }
+  .g3-choice-btn { font-size:36px; padding:18px 8px; }
+
+  /* G4 */
+  .g4-animals-grid { padding:14px; min-height:130px; }
+  .g4-animal-item { font-size:34px; }
+  .g4-question { font-size:20px; }
+  .g4-choices { gap:10px; }
+  .g4-choice-btn { font-size:28px; padding:14px 10px; min-width:60px; }
+
+  /* G5 memory */
+  .g5-grid { gap:6px; max-width:100%; }
+  .g5-card-back .card-emoji { font-size:26px; }
+  .g5-card-back .card-label { font-size:8px; }
+  .g5-card-front::after { font-size:20px; }
+  .g5-score-row { gap:8px; max-width:100%; }
+
+  /* G6 */
+  .g6-road { height:calc(40vh); max-height:260px; min-height:180px; }
+  .g6-ctrl-btn { padding:14px 0; font-size:16px; }
+  .g6-target-word { font-size:18px; letter-spacing:5px; }
+  .g6-start-card { padding:24px 18px; max-width:260px; }
+  .g6-start-word { font-size:22px; letter-spacing:4px; }
+  .g6-controls { gap:8px; }
+  .g6-score-mid { font-size:17px; min-width:64px; padding:8px 12px; }
+
+  /* G7 */
+  .g7-display { width:130px; height:130px; font-size:65px; }
+  .g7-question { font-size:17px; }
+  .g7-choices { max-width:100%; gap:8px; }
+  .g7-choice-btn { padding:12px 8px; font-size:15px; }
+  .g7-choice-img { font-size:38px; }
+  .g7-choice-text { font-size:14px; }
+
+  /* G8 */
+  .g8-hint-img { width:100px; height:100px; font-size:58px; }
+  .g8-slots { gap:6px; max-width:100%; }
+  .g8-slot { min-width:38px; height:46px; font-size:19px; }
+  .g8-letters { gap:8px; max-width:100%; }
+  .g8-letter-btn { width:46px; height:46px; font-size:21px; }
+
+  /* G9 canvas */
+  .g9-canvas-wrap { width:min(280px, 90vw); height:min(280px, 90vw); }
+  #g9-canvas { width:100%; height:100%; }
+  .g9-letter-display { font-size:64px; }
+
+  /* Feedback overlay */
+  .feedback-card { padding:30px 22px; }
+  .feedback-emoji { font-size:64px; }
+  .feedback-title { font-size:26px; }
+  .feedback-sub { font-size:16px; }
+  .feedback-stars { font-size:34px; }
+
+  /* Result */
+  .result-mascot { font-size:80px; }
+  .result-title { font-size:28px; }
+  .result-stars { font-size:40px; }
+  .result-msg { font-size:17px; }
+  .result-scores { gap:8px; max-width:100%; }
+  .rs-card { padding:14px; }
+  .rs-animal { font-size:32px; }
+
+  /* Total stars banner */
+  .total-stars-banner { padding:12px 16px; }
+  .tsb-value { font-size:22px; }
+
+  /* Achievement toast */
+  .achievement-toast { min-width:240px; max-width:calc(100vw - 32px); }
+
+  /* Card */
+  .card { padding:18px 14px; }
+
+  /* Breathe timer */
+  .breathe-timer-wrap { width:70px; height:70px; }
+  .breathe-timer { font-size:36px; line-height:70px; }
 }
-@media(max-width:340px) { .g5-grid{grid-template-columns:repeat(4,1fr);gap:5px} }
+
+/* Small phones (≤400px) */
+@media(max-width:400px) {
+  .screen { padding:12px 10px 28px; }
+  .welcome-title { font-size:34px; }
+  .welcome-sub2 { font-size:28px; }
+  .welcome-mascot { font-size:80px; }
+  .welcome-tagline { font-size:15px; }
+
+  /* 3-col grid stays at 3 but tiles shrink more */
+  .game-grid-2 .g-icon { font-size:28px; }
+  .game-grid-2 .g-name { font-size:10px; }
+  .game-grid-2 .g-tag { font-size:9px; padding:2px 6px; }
+
+  /* Player chip tighter */
+  .player-chip .p-name { font-size:11px; }
+  .player-chip .p-stars { display:none; }
+
+  .g5-grid { gap:6px; }
+  .g5-card-back .card-emoji { font-size:24px; }
+
+  .g6-road { height:calc(38vh); max-height:240px; }
+
+  .g9-canvas-wrap { width:min(260px, 92vw); height:min(260px, 92vw); }
+
+  .btn-lg { font-size:18px; padding:16px 20px; }
+  .name-input { font-size:17px; }
+
+  /* Age buttons smaller */
+  .age-btn { padding:8px 14px; font-size:13px; }
+  .animal-btn { width:44px; height:44px; font-size:22px; }
+}
+
+/* Very small phones (≤360px) — e.g. Galaxy A series, older iPhones */
+@media(max-width:360px) {
+  /* Switch 3-col to 2-col for better readability */
+  .game-grid-2 { grid-template-columns:repeat(2,1fr); }
+  .game-grid-2 .game-tile { padding:14px 8px; }
+  .game-grid-2 .g-icon { font-size:34px; }
+  .game-grid-2 .g-name { font-size:12px; }
+  .game-grid-2 .g-tag { font-size:10px; padding:3px 8px; }
+
+  .welcome-title { font-size:30px; }
+  .welcome-sub2 { font-size:25px; }
+  .welcome-mascot { font-size:70px; }
+
+  .btn-lg { font-size:17px; padding:15px 18px; }
+
+  .g1-choice-btn .choice-emoji { font-size:28px; }
+  .g1-choice-btn .choice-label { font-size:13px; }
+
+  .g4-choice-btn { font-size:24px; min-width:52px; }
+  .g5-grid { gap:5px; }
+  .g5-card-back .card-emoji { font-size:22px; }
+  .g6-road { height:35vh; max-height:220px; }
+  .g9-canvas-wrap { width:min(240px, 94vw); height:min(240px, 94vw); }
+  .g9-letter-display { font-size:54px; }
+  .g8-letter-btn { width:42px; height:42px; font-size:19px; }
+  .g8-slot { min-width:34px; height:42px; font-size:17px; }
+}
+
+/* Tiny phones (≤320px) — iPhone SE 1st gen */
+@media(max-width:320px) {
+  .screen { padding:10px 8px 24px; }
+  .game-grid-2 { grid-template-columns:repeat(2,1fr); gap:6px; }
+  .game-grid-2 .game-tile { padding:12px 6px; }
+  .game-grid-2 .g-icon { font-size:30px; }
+  .game-grid-2 .g-name { font-size:10px; }
+
+  .welcome-title { font-size:26px; }
+  .welcome-sub2 { font-size:22px; }
+  .welcome-mascot { font-size:64px; }
+  .welcome-tagline { font-size:13px; }
+
+  .btn-lg { font-size:16px; padding:14px 16px; }
+
+  .player-chip { padding:8px 8px; gap:5px; }
+  .player-chip .p-animal { font-size:18px; }
+  .player-chip .p-streak { display:none; }
+
+  .breathe-circle-wrap { width:160px; height:160px; }
+  .breathe-animal { font-size:56px; }
+  .breathe-instruction { font-size:22px; }
+
+  .g1-animal-display { font-size:70px; }
+  .g3-choice-btn { font-size:30px; padding:14px 6px; }
+  .g4-animals-grid { min-height:100px; }
+  .g4-animal-item { font-size:28px; }
+  .g5-grid { gap:4px; }
+  .g6-road { height:32vh; max-height:200px; }
+  .g7-display { width:110px; height:110px; font-size:54px; }
+  .g8-letter-btn { width:38px; height:38px; font-size:17px; }
+  .g9-canvas-wrap { width:min(220px, 96vw); height:min(220px, 96vw); }
+  .feedback-card { padding:22px 16px; }
+  .feedback-emoji { font-size:52px; }
+  .feedback-title { font-size:22px; }
+  .result-mascot { font-size:66px; }
+  .result-title { font-size:24px; }
+}
 </style>
 </head>
 <body>
