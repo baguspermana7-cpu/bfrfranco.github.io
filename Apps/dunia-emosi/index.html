@@ -277,23 +277,28 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .grass-strip { position:absolute;bottom:0;left:0;right:0;height:60px;background:#84CC16;border-radius:60px 60px 0 0;opacity:0.5; }
 .shimmer-dot { position:absolute;width:4px;height:4px;background:rgba(255,255,255,0.7);border-radius:50%;animation:shimmerDot ease-in-out infinite; }
 @keyframes shimmerDot { 0%,100%{opacity:0} 50%{opacity:1} }
-.g4-animals-grid { display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%;max-width:480px;min-height:160px;background:rgba(255,255,255,0.8);backdrop-filter:blur(4px);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;align-content:center;border:3px solid rgba(245,158,11,0.2);position:relative;z-index:1; }
-.g4-animal-item { font-size:40px;animation:g4Pop 0.35s cubic-bezier(0.34,1.56,0.64,1) backwards;cursor:default; }
+.g4-animals-grid { display:flex;flex-wrap:wrap;justify-content:center;gap:10px;width:100%;max-width:480px;min-height:130px;background:rgba(255,255,255,0.08);backdrop-filter:blur(4px);border-radius:var(--radius);padding:14px 20px;box-shadow:var(--shadow);margin-bottom:14px;align-content:center;border:3px solid rgba(245,158,11,0.25);position:relative;z-index:1; }
+.g4-animal-item { font-size:60px;animation:g4Pop 0.35s cubic-bezier(0.34,1.56,0.64,1) backwards;cursor:default; }
 @keyframes g4Pop { from{opacity:0;transform:scale(0.3)rotate(-30deg)} to{opacity:1;transform:scale(1)rotate(0)} }
 .g4-timer-track { width:100%;max-width:480px;height:14px;background:rgba(255,255,255,0.6);border-radius:100px;overflow:hidden;margin-bottom:6px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);position:relative;z-index:1; }
 .g4-timer-fill { height:100%;background:linear-gradient(90deg,#F59E0B,#FCD34D);border-radius:100px;transition:width 1s linear;box-shadow:0 0 8px rgba(245,158,11,0.5); }
 .g4-timer-text { font-size:14px;font-weight:700;color:#92400E;text-align:right;width:100%;max-width:480px;margin-bottom:14px;position:relative;z-index:1; }
 .g4-question { font-size:24px;font-weight:900;text-align:center;margin-bottom:16px;background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:1; }
-.g4-choices { display:flex;gap:14px;width:100%;max-width:460px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1; }
-.g4-choice-btn { flex:0 0 auto;min-width:72px;background:white;border:3px solid #FCD34D;border-radius:22px;padding:18px 10px;font-family:var(--font);font-size:34px;font-weight:900;cursor:pointer;text-align:center;color:var(--text);box-shadow:0 5px 0 #B45309;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s; }
-.g4-choice-btn:active { transform:scale(0.9)translateY(4px);box-shadow:0 1px 0 #B45309; }
+.g4-choices { display:flex;gap:14px;width:100%;max-width:460px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;margin-top:12px;padding-bottom:24px; }
+.g4-choice-btn { flex:0 0 auto;min-width:80px;background:#FF6B6B;border:3px solid #e84444;border-radius:22px;padding:18px 14px;font-family:var(--font);font-size:34px;font-weight:900;cursor:pointer;text-align:center;color:white;box-shadow:0 5px 0 #b02020;transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s,background 0.15s; }
+.g4-choice-btn:nth-child(1) { background:#FF6B6B;border-color:#e84444;box-shadow:0 5px 0 #b02020; }
+.g4-choice-btn:nth-child(2) { background:#4ECDC4;border-color:#2ab8af;box-shadow:0 5px 0 #0d8a82; }
+.g4-choice-btn:nth-child(3) { background:#FFD93D;border-color:#f5c300;color:#5a4000;box-shadow:0 5px 0 #b89200; }
+.g4-choice-btn:nth-child(4) { background:#A78BFA;border-color:#8b5cf6;box-shadow:0 5px 0 #6d28d9; }
+.g4-choice-btn:nth-child(5) { background:#F97316;border-color:#ea580c;box-shadow:0 5px 0 #c2410c; }
+.g4-choice-btn:active { transform:scale(0.9)translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,0.3); }
 .g4-choice-btn.correct{border-color:var(--teal);background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 5px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease}
 .g4-choice-btn.wrong{border-color:var(--rose);background:linear-gradient(135deg,#FFF1F3,white);animation:wrongShake 0.4s ease}
 .g4-progress { font-size:15px;color:#92400E;font-weight:700;text-align:center;margin-top:10px;position:relative;z-index:1; }
 .g4-mode-toggle{display:flex;gap:8px;width:100%;max-width:480px;margin-bottom:10px;position:relative;z-index:1;}
 .g4-mode-btn{flex:1;padding:9px 12px;border-radius:100px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.65);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;}
 .g4-mode-btn.active{background:linear-gradient(135deg,#FCD34D,#F59E0B);color:#78350F;border-color:#F59E0B;box-shadow:0 3px 0 #B45309;}
-.g4-poke-img{width:112px;height:112px;image-rendering:pixelated;object-fit:contain;transition:opacity 0.2s;}
+.g4-poke-img{width:72px;height:72px;image-rendering:pixelated;object-fit:contain;transition:opacity 0.2s;}
 
 /* G5 */
 #screen-game5 { background:radial-gradient(ellipse at 50% 0%,#DDD6FE 0%,#EDE9FE 50%,#F3E8FF 100%); }
@@ -320,8 +325,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g5-card-front { background:linear-gradient(135deg,#8B5CF6,#A78BFA);box-shadow:inset 0 2px 6px rgba(255,255,255,0.3); }
 .g5-card-front::after { content:'🐾';font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 .g5-card-back { background:white;transform:rotateY(180deg);flex-direction:column;gap:2px; }
-.g5-card-back .card-emoji { font-size:32px; }
-.g5-card-back .card-label { font-size:10px;font-weight:900;color:var(--text-light); }
+.g5-card-back .card-emoji { font-size:48px; }
+.g5-card-back .card-label { font-size:11px;font-weight:900;color:var(--text-light); }
+.g5-banner-wrap { width:100%;max-width:520px;margin-bottom:8px;flex-shrink:0;position:relative;z-index:1; }
+.g5-banner-img { width:100%;height:80px;object-fit:cover;object-position:center 30%;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.2); }
 .g5-card.matched .g5-card-back { background:linear-gradient(135deg,#CCFBF1,#F0FDFA);border:3px solid var(--teal);animation:matchedPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes matchedPop { 0%{transform:rotateY(180deg)scale(1)} 50%{transform:rotateY(180deg)scale(1.12)} 100%{transform:rotateY(180deg)scale(1)} }
 
@@ -359,10 +366,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* G7 */
 #screen-game7 { background:linear-gradient(180deg,#F0FDFA 0%,#CCFBF1 50%,#E0F2FE 100%); }
-.g7-mode-badge { background:linear-gradient(135deg,#2DD4BF,#14B8A6);color:white;border-radius:100px;padding:6px 18px;font-size:14px;font-weight:700;margin-bottom:14px;box-shadow:0 4px 0 #0F766E; }
-.g7-display { width:160px;height:160px;border-radius:28px;background:white;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:12px;border:4px solid #CCFBF1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.g7-mode-badge { background:linear-gradient(135deg,#2DD4BF,#14B8A6);color:white;border-radius:100px;padding:6px 18px;font-size:14px;font-weight:700;margin-bottom:14px;box-shadow:0 4px 0 #0F766E;align-self:center; }
+.g7-display { width:220px;height:220px;border-radius:28px;background:white;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:110px;margin-bottom:16px;border:4px solid #CCFBF1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1);align-self:center; }
 .g7-question { font-size:20px;font-weight:900;text-align:center;margin-bottom:18px;background:linear-gradient(135deg,#14B8A6,#2DD4BF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
-.g7-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:440px; }
+.g7-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:440px;align-self:center;padding-bottom:24px; }
 .g7-choice-btn { background:white;border:3px solid #CCFBF1;border-radius:20px;padding:16px 10px;font-family:var(--font);font-weight:900;font-size:18px;cursor:pointer;text-align:center;color:var(--text);box-shadow:0 4px 0 #A5F3EB;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s; }
 .g7-choice-btn:active { transform:scale(0.92)translateY(3px); }
 .g7-choice-btn.correct { border-color:#14B8A6;background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 4px 0 #0F766E,0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease; }
@@ -541,15 +548,15 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   .g3-choice-btn { font-size:36px; padding:18px 8px; }
 
   /* G4 */
-  .g4-animals-grid { padding:14px; min-height:130px; }
-  .g4-animal-item { font-size:34px; }
+  .g4-animals-grid { padding:12px; min-height:110px; }
+  .g4-animal-item { font-size:50px; }
   .g4-question { font-size:20px; }
   .g4-choices { gap:10px; }
   .g4-choice-btn { font-size:28px; padding:14px 10px; min-width:60px; }
 
   /* G5 memory */
   .g5-grid { gap:6px; max-width:100%; }
-  .g5-card-back .card-emoji { font-size:26px; }
+  .g5-card-back .card-emoji { font-size:38px; }
   .g5-card-back .card-label { font-size:8px; }
   .g5-card-front::after { font-size:20px; }
   .g5-score-row { gap:8px; max-width:100%; }
@@ -564,7 +571,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   .g6-score-mid { font-size:17px; min-width:64px; padding:8px 12px; }
 
   /* G7 */
-  .g7-display { width:130px; height:130px; font-size:65px; }
+  .g7-display { width:190px; height:190px; font-size:95px; }
   .g7-question { font-size:17px; }
   .g7-choices { max-width:100%; gap:8px; }
   .g7-choice-btn { padding:12px 8px; font-size:15px; }
@@ -632,7 +639,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   .player-chip .p-stars { display:none; }
 
   .g5-grid { gap:6px; }
-  .g5-card-back .card-emoji { font-size:24px; }
+  .g5-card-back .card-emoji { font-size:34px; }
 
   .g6-road { height:min(50vh,360px); }
 
@@ -666,7 +673,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
   .g4-choice-btn { font-size:24px; min-width:52px; }
   .g5-grid { gap:5px; }
-  .g5-card-back .card-emoji { font-size:22px; }
+  .g5-card-back .card-emoji { font-size:30px; }
   .g6-road { height:48vh; }
   .g9-canvas-wrap { width:min(240px, 94vw); height:min(240px, 94vw); }
   .g9-letter-display { font-size:54px; }
@@ -699,11 +706,11 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
   .g1-animal-display { font-size:70px; }
   .g3-choice-btn { font-size:30px; padding:14px 6px; }
-  .g4-animals-grid { min-height:100px; }
-  .g4-animal-item { font-size:28px; }
+  .g4-animals-grid { min-height:90px; }
+  .g4-animal-item { font-size:44px; }
   .g5-grid { gap:4px; }
   .g6-road { height:46vh; }
-  .g7-display { width:110px; height:110px; font-size:54px; }
+  .g7-display { width:170px; height:170px; font-size:82px; }
   .g8-letter-btn { width:38px; height:38px; font-size:17px; }
   .g9-canvas-wrap { width:min(220px, 96vw); height:min(220px, 96vw); }
   .feedback-card { padding:22px 16px; }
@@ -1170,10 +1177,12 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g3-progress { color: rgba(255,255,255,0.6); }
 
 .g4-question { color: white; -webkit-text-fill-color: white; background: none; }
-.g4-animals-grid { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
-.g4-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); color: white; }
-.g4-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
-.g4-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
+.g4-animals-grid { background: rgba(255,255,255,0.08); border-color: rgba(245,158,11,0.3); }
+/* Colorful buttons on dark bg — nth-child colors already set in base, just keep text white */
+.g4-choice-btn { color: white; }
+.g4-choice-btn:nth-child(3) { color: #5a4000; }
+.g4-choice-btn.correct { background: linear-gradient(135deg,#06D6A0,#059669) !important; border-color: #059669 !important; color: white !important; box-shadow: 0 5px 0 #047857 !important; }
+.g4-choice-btn.wrong { background: linear-gradient(135deg,#F43F5E,#e11d48) !important; border-color: #e11d48 !important; color: white !important; box-shadow: 0 5px 0 #9f1239 !important; animation: wrongShake 0.4s ease; }
 .g4-progress { color: rgba(255,255,255,0.6); }
 .g4-timer-text { color: rgba(255,255,255,0.6); }
 .g4-mode-btn { border-color: rgba(255,255,255,0.25); }
@@ -1187,12 +1196,16 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g5-card-back .card-label { color: #57534E; }
 
 .g7-question { color: white; -webkit-text-fill-color: white; background: none; }
-.g7-display { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
-.g7-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
-.g7-choice-btn .g7-choice-text { color: rgba(255,255,255,0.85); }
-.g7-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
-.g7-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
-.g7-mode-badge { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.2); }
+.g7-display { background: rgba(255,255,255,0.12); border-color: rgba(45,212,191,0.4); }
+.g7-choice-btn { background: rgba(45,212,191,0.18); border-color: rgba(45,212,191,0.5); color: white; box-shadow: 0 4px 0 rgba(15,118,110,0.6); }
+.g7-choice-btn .g7-choice-text { color: white; }
+.g7-choice-btn:nth-child(1) { background: rgba(167,139,250,0.3); border-color: rgba(167,139,250,0.6); box-shadow: 0 4px 0 rgba(109,40,217,0.5); }
+.g7-choice-btn:nth-child(2) { background: rgba(249,115,22,0.3); border-color: rgba(249,115,22,0.6); box-shadow: 0 4px 0 rgba(194,65,12,0.5); }
+.g7-choice-btn:nth-child(3) { background: rgba(45,212,191,0.3); border-color: rgba(45,212,191,0.6); box-shadow: 0 4px 0 rgba(15,118,110,0.5); }
+.g7-choice-btn:nth-child(4) { background: rgba(251,191,36,0.3); border-color: rgba(251,191,36,0.6); box-shadow: 0 4px 0 rgba(180,83,9,0.5); }
+.g7-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.6), rgba(20,184,166,0.4)) !important; border-color: #14B8A6 !important; box-shadow: 0 4px 0 #0F766E, 0 0 20px rgba(20,184,166,0.3) !important; }
+.g7-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.5), rgba(244,63,94,0.3)) !important; border-color: #F43F5E !important; animation: wrongShake 0.4s ease; }
+.g7-mode-badge { background: rgba(45,212,191,0.2); color: white; border-color: rgba(45,212,191,0.3); }
 .g7-progress { color: rgba(255,255,255,0.6); }
 
 .g8-hint-img { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
@@ -3486,16 +3499,13 @@ body { background: #0a0a1a !important; }
 <!-- GAME 10 — Pokemon Battle -->
 <div id="screen-game10" class="screen">
   <!-- Header -->
-  <div class="game-header" style="display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:10;position:relative;">
-    <button class="gh-back" onclick="exitGame()">⌂</button>
-    <span class="gh-title" style="flex:1;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">
-      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" style="width:24px;height:24px;vertical-align:middle;image-rendering:pixelated;margin-right:4px;" onerror="this.outerHTML='⚡'"> Pertarungan Pokemon
-    </span>
-    <span class="gh-level" id="g10-level" style="color:rgba(255,255,255,0.9);">Lv.1</span>
-    <span class="gh-player" id="g10-player-icon" style="font-size:24px;"></span>
-    <button class="g10-party-btn" onclick="openPartyPicker()" title="Ganti Pokémon">🎒</button>
-    <button class="gh-pause" onclick="pauseGame()">⏸</button>
-    <span class="gh-stars" id="g10-stars" style="background:linear-gradient(135deg,#FFCB05,#F59E0B);border-radius:100px;padding:4px 12px;font-size:15px;font-weight:900;box-shadow:0 3px 0 #B45309;color:#1a1a1a;">⭐ 0</span>
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 10px;overflow:hidden;">
+    <button class="gh-back" onclick="exitGame()" style="flex-shrink:0;">⌂</button>
+    <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">⚡ Pertarungan Pokemon</span>
+    <span class="gh-level" id="g10-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
+    <button class="g10-party-btn" onclick="openPartyPicker()" title="Ganti Pokémon" style="flex-shrink:0;">🎒</button>
+    <button class="gh-pause" onclick="pauseGame()" style="flex-shrink:0;">⏸</button>
+    <span class="gh-stars" id="g10-stars" style="background:linear-gradient(135deg,#FFCB05,#F59E0B);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #B45309;color:#1a1a1a;flex-shrink:0;white-space:nowrap;">⭐ 0</span>
   </div>
 
   <!-- Battle Field — Classic DS layout -->
@@ -3815,6 +3825,10 @@ body { background: #0a0a1a !important; }
     <span class="gh-title">🃏 Cocokkan Emosi</span>
     <span class="gh-level" id="g5-level">Lv.1</span>
     <button class="gh-pause" onclick="pauseGame()">⏸</button>
+  </div>
+  <!-- Banner image -->
+  <div class="g5-banner-wrap">
+    <img class="g5-banner-img" src="assets/banner-game5.webp" alt="" onerror="this.style.display='none'">
   </div>
   <div class="g5-score-row" id="g5-scores"></div>
   <p class="g5-turn-text" id="g5-turn-text"></p>
@@ -5300,45 +5314,12 @@ function renderG4Content(){
   }
   // Render choices
   const choicesEl=document.getElementById('g4-choices'); choicesEl.innerHTML=''
-  const lv = state.selectedLevelNum || 10
-  const needsTapFirst = lv <= 5
-  g4State.tapCount = 0
-  g4State.needsTapFirst = needsTapFirst
   g4State.currentChoices.forEach(ch=>{
     const btn=document.createElement('button'); btn.className='g4-choice-btn'; btn.textContent=ch
     if(numChoices>4)btn.style.fontSize='26px'
-    if(needsTapFirst){ btn.style.opacity='0.35'; btn.style.pointerEvents='none'; btn.setAttribute('data-locked','1') }
     btn.onclick=()=>{if(g4State.answered)return;g4State.answered=true;clearInterval(state.g4Timer);const correct=ch===count;choicesEl.querySelectorAll('.g4-choice-btn').forEach(b=>{b.style.pointerEvents='none';if(parseInt(b.textContent)===count)b.classList.add('correct')});if(!correct){btn.classList.add('wrong');playWrong();flashScreen('red')}else{playCorrect();addStars(1,btn);flashScreen('green');g4State.correct++};setTimeout(nextG4Round,1300)}
     choicesEl.appendChild(btn)
   })
-  // For lv 1-5: make grid items tappable (they show sequential numbers)
-  if(needsTapFirst){
-    const gridItems = document.getElementById('g4-animals').querySelectorAll('.g4-animal-item')
-    let tapSeq=0
-    gridItems.forEach(item=>{
-      item.style.cursor='pointer'
-      item.style.userSelect='none'
-      item.addEventListener('click',function g4TapItem(){
-        if(item.dataset.tapped) return
-        item.dataset.tapped='1'
-        tapSeq++
-        const badge=document.createElement('span')
-        badge.textContent=tapSeq
-        badge.style.cssText='position:absolute;top:-8px;right:-8px;background:#F59E0B;color:white;font-size:11px;font-weight:900;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5'
-        item.style.position='relative'; item.style.display='inline-flex'
-        item.appendChild(badge)
-        playClick()
-        // After first tap, unlock choices; show count hint
-        const qEl=document.getElementById('g4-question')
-        if(qEl) qEl.textContent=`Sudah dihitung ${tapSeq}... ada berapa totalnya? 🤔`
-        if(tapSeq===1){
-          document.querySelectorAll('.g4-choice-btn[data-locked]').forEach(b=>{
-            b.style.opacity='1'; b.style.pointerEvents='auto'; b.removeAttribute('data-locked')
-          })
-        }
-      })
-    })
-  }
 }
 function startG4Timer(){
   const fill=document.getElementById('g4-fill'),count=g4State.currentCount
