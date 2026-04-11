@@ -917,7 +917,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   50%      { transform: translateY(-14px) rotate(2deg); }
 }
 
-/* Main button stack — glassmorphism planks */
+/* Main button stack */
 .home-buttons {
   padding: 6px 18px 4px; display: flex; flex-direction: column; gap: 9px;
   max-width: 440px; width: 100%;
@@ -994,7 +994,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* CSS terrain at bottom — rolling green hills */
 .home-terrain {
   position: relative; height: 72px; flex-shrink: 0;
-  overflow: hidden; pointer-events: none; margin-top: 0;
+  overflow: hidden; pointer-events: none; margin-top: -10px;
 }
 .home-terrain::before {
   content: ''; position: absolute; bottom: 0; left: -5%; right: -5%; height: 64px;
@@ -1630,22 +1630,29 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
  */
 .g10-espr{
   width:min(44vw, 22vh);height:min(44vw, 22vh);
-  transform:scaleX(-1);
   filter:drop-shadow(0 6px 18px rgba(0,0,0,0.7)) drop-shadow(0 0 10px rgba(255,220,50,0.45));
 }
 .g10-pspr{
   width:min(44vw, 22vh);height:min(44vw, 22vh);
+  transform:scaleX(-1);
   filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(100,180,255,0.45));
 }
 /* Sprite action animations */
-.g10-spr.spr-atk{animation:g10Atk 0.35s ease;}
+/* Enemy (top-right, natural facing left) lunges toward player at lower-left */
 .g10-espr.spr-atk{animation:g10EAtk 0.35s ease;}
-@keyframes g10Atk{0%{transform:scaleX(1)}35%{transform:translateX(28px) translateY(-8px) scale(1.12)}100%{transform:scaleX(1)}}
-@keyframes g10EAtk{0%{transform:scaleX(-1)}35%{transform:translateX(28px) translateY(-8px) scaleX(-1) scale(1.12)}100%{transform:scaleX(-1)}}
+@keyframes g10EAtk{0%{transform:none}35%{transform:translateX(-26px) translateY(7px) scale(1.12)}100%{transform:none}}
+/* Player (bottom-left, scaleX(-1) → faces right) lunges toward enemy at upper-right */
+.g10-pspr.spr-atk{animation:g10PAtkFlip 0.35s ease;}
+@keyframes g10PAtkFlip{0%{transform:scaleX(-1)}35%{transform:scaleX(-1) translateX(26px) translateY(-7px) scale(1.12)}100%{transform:scaleX(-1)}}
+/* Generic hit wobble (enemy — no flip) */
 .g10-spr.spr-hit{animation:g10Hit 0.45s ease;}
 @keyframes g10Hit{0%,100%{transform:none}15%{transform:translateX(-10px) rotate(-3deg)}30%{transform:translateX(12px) rotate(2deg)}50%{transform:translateX(-7px)}70%{transform:translateX(8px)}85%{transform:translateX(-3px)}}
+/* Player hit — preserve scaleX(-1) */
+.g10-pspr.spr-hit{animation:g10PHitFlip 0.45s ease;}
+@keyframes g10PHitFlip{0%,100%{transform:scaleX(-1)}15%{transform:scaleX(-1) translateX(-10px) rotate(-3deg)}30%{transform:scaleX(-1) translateX(12px) rotate(2deg)}50%{transform:scaleX(-1) translateX(-7px)}70%{transform:scaleX(-1) translateX(8px)}85%{transform:scaleX(-1) translateX(-3px)}}
 .g10-spr.spr-flash{animation:g10Flash 0.45s ease;}
 @keyframes g10Flash{0%,100%{filter:drop-shadow(0 6px 24px rgba(0,0,0,0.65)) brightness(1)}20%,60%{filter:brightness(8) saturate(0)}40%,80%{filter:drop-shadow(0 6px 24px rgba(0,0,0,0.65)) brightness(1)}}
+/* Defeat — enemy (no flip) */
 .g10-spr.spr-defeat{animation:g10Defeat 0.85s ease forwards;}
 @keyframes g10Defeat{
   0%{transform:none;filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.4));opacity:1}
@@ -1653,14 +1660,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   60%{transform:translateY(-40px) scale(0.75);filter:brightness(9) saturate(0);opacity:0.6}
   100%{transform:translateY(-70px) scale(0.2);filter:brightness(12) saturate(0);opacity:0}
 }
-/* ── Enemy faces player: mirrored ── */
-.g10-espr{transform:scaleX(-1);}
-.g10-espr.spr-atk{animation:g10EAtkFlip 0.35s ease;}
-.g10-espr.spr-hit{animation:g10HitFlip 0.45s ease;}
-.g10-espr.spr-defeat{animation:g10DefeatFlip 0.85s ease forwards;}
-@keyframes g10EAtkFlip{0%{transform:scaleX(-1)}35%{transform:scaleX(-1) translateX(30px) translateY(-8px) scale(1.12)}100%{transform:scaleX(-1)}}
-@keyframes g10HitFlip{0%,100%{transform:scaleX(-1)}15%{transform:scaleX(-1) translateX(-10px) rotate(3deg)}30%{transform:scaleX(-1) translateX(12px) rotate(-2deg)}50%{transform:scaleX(-1) translateX(-7px)}70%{transform:scaleX(-1) translateX(8px)}85%{transform:scaleX(-1) translateX(-3px)}}
-@keyframes g10DefeatFlip{0%{transform:scaleX(-1);opacity:1}25%{transform:scaleX(-1) translateY(-18px) scale(1.18);filter:brightness(7) saturate(0)}60%{transform:scaleX(-1) translateY(-40px) scale(0.75);opacity:0.6}100%{transform:scaleX(-1) translateY(-70px) scale(0.2);opacity:0}}
+/* Player defeat — preserve scaleX(-1) */
+.g10-pspr.spr-defeat{animation:g10PDefeatFlip 0.85s ease forwards;}
+@keyframes g10PDefeatFlip{
+  0%{transform:scaleX(-1);opacity:1}
+  25%{transform:scaleX(-1) translateY(-18px) scale(1.18);filter:brightness(7) saturate(0);opacity:1}
+  60%{transform:scaleX(-1) translateY(-40px) scale(0.75);opacity:0.6}
+  100%{transform:scaleX(-1) translateY(-70px) scale(0.2);opacity:0}
+}
 /* ── Type particle FX keyframes ── */
 @keyframes fxRise{0%{transform:scale(0) translateY(0);opacity:0.9}50%{transform:scale(1.3) translateY(-45px);opacity:0.8}100%{transform:scale(0.4) translateY(-90px);opacity:0}}
 @keyframes fxRain{0%{transform:scale(1.2) translateY(-15px);opacity:0.9}100%{transform:scale(0.7) translateY(70px);opacity:0}}
@@ -1964,13 +1971,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   padding: 1px 5px;
   font-weight: 900;
 }
-/* Swap animation on player sprite */
+/* Swap animation on player sprite — preserve scaleX(-1) */
 .g10-pspr.spr-swap-out { animation: g10SwapOut 0.25s ease forwards; }
 .g10-pspr.spr-swap-in  { animation: g10SwapIn  0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-@keyframes g10SwapOut { 0%{transform:none;opacity:1} 100%{transform:translateX(-80px) scale(0.6);opacity:0} }
-@keyframes g10SwapIn  { 0%{transform:translateX(-80px) scale(0.4);opacity:0} 100%{transform:none;opacity:1} }
-/* Sprite battle entrance animation (referenced by JS patch) */
+@keyframes g10SwapOut { 0%{transform:scaleX(-1);opacity:1} 100%{transform:scaleX(-1) translateX(-80px) scale(0.6);opacity:0} }
+@keyframes g10SwapIn  { 0%{transform:scaleX(-1) translateX(-80px) scale(0.4);opacity:0} 100%{transform:scaleX(-1);opacity:1} }
+/* Sprite battle entrance animations */
 @keyframes pokeEnter { 0%{transform:scale(0.5) translateY(20px);opacity:0} 60%{transform:scale(1.08) translateY(-4px);opacity:1} 100%{transform:scale(1) translateY(0);opacity:1} }
+@keyframes pokeEnterFlip { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1);opacity:1} }
 
 /* Game 11 — Science Quiz */
 #screen-game11{background:linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
@@ -7627,7 +7635,7 @@ window.g10NewBattle = function() {
     const es = document.getElementById('g10-espr')
     const ps = document.getElementById('g10-pspr')
     if (es) { es.style.animation='none'; void es.offsetWidth; es.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
-    if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
+    if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnterFlip 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
   }, 100)
 }
 </script>
