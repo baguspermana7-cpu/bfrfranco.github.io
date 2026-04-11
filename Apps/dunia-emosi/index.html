@@ -133,8 +133,12 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .world-zone-header { display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 4px; }
 .world-zone-icon { font-size:22px; }
 .world-zone-name { font-size:16px;font-weight:900;color:var(--text-light);text-transform:uppercase;letter-spacing:0.8px; }
-.game-grid-2 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px; }
-.g-stars-row { display:flex;justify-content:center;gap:1px;margin-bottom:6px;font-size:11px;min-height:16px; }
+.game-grid-2 { display:grid;grid-template-columns:repeat(3,1fr);gap:10px; }
+.game-grid-2 .game-tile { padding:16px 8px; }
+.game-grid-2 .g-icon { font-size:38px;margin-bottom:6px; }
+.game-grid-2 .g-name { font-size:13px; }
+.game-grid-2 .g-tag { font-size:11px;padding:4px 10px; }
+.g-stars-row { display:flex;justify-content:center;gap:1px;margin-bottom:4px;font-size:11px;min-height:14px; }
 
 .total-stars-banner { background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:var(--radius);padding:16px 24px;width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 0 #B45309,var(--shadow);margin-top:4px; }
 .tsb-label { font-size:15px;font-weight:700;color:white; }
@@ -466,7 +470,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   </div>
   <span class="welcome-mascot">🦁</span>
   <p class="welcome-tagline">Halo! Aku Leo si Singa!<br>Ayo belajar dan bermain bersama! 🌟</p>
-  <div class="streak-badge" id="streak-badge" style="display:none">🔥 <span id="streak-text">1 hari</span></div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;justify-content:center;">
+    <div class="streak-badge" id="streak-badge" style="display:none">🔥 <span id="streak-text">1 hari</span></div>
+    <div id="welcome-level-badge" style="display:none;background:linear-gradient(135deg,#A78BFA,#8B5CF6);border-radius:100px;padding:8px 18px;font-size:16px;font-weight:900;color:white;box-shadow:0 4px 0 #5B21B6;"></div>
+  </div>
   <button class="btn btn-lg btn-brand" onclick="playClick(); showScreen('screen-mode')">Mulai Bermain! 🎮</button>
 </div>
 
@@ -2163,6 +2170,20 @@ try {
   const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
   if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
 } catch(e){}
+// Show XP on welcome screen for returning players
+try{
+  const xp=getXP(); if(xp>0){const tier=getLevelTier(xp);const el=document.getElementById('welcome-level-badge');if(el){el.style.display='block';el.textContent=`${tier.icon} ${tier.name} — ${xp} XP`}}
+}catch(e){}
+// Service Worker for offline
+if('serviceWorker' in navigator){
+  const swCode=`
+const CACHE='dunia-emosi-v1'
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.add('/Apps/dunia-emosi/index.html')));self.skipWaiting()})
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/Apps/dunia-emosi/index.html'))))})
+`
+  const blob=new Blob([swCode],{type:'text/javascript'})
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{})
+}
 </script>
 </body>
 </html>
