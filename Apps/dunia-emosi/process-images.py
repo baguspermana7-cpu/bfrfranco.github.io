@@ -115,9 +115,19 @@ def remove_bg_pil(input_path, output_path):
         return False
 
 
-def copy_as_is(input_path, output_path):
-    """Copy file without modification (for backgrounds)."""
-    shutil.copy2(input_path, output_path)
+def convert_background(input_path: Path, output_path: Path) -> bool:
+    """Convert background to proper WebP (resize to 800×600, RGB, no alpha needed)."""
+    try:
+        img = Image.open(input_path).convert('RGB')
+        # Resize to 800×600 — good resolution for a game road background
+        img = img.resize((800, 600), Image.LANCZOS)
+        img.save(str(output_path), 'WEBP', quality=82, method=4)
+        size_kb = output_path.stat().st_size // 1024
+        print(f"  ✓ [BG] {input_path.name} → {output_path.name} ({size_kb}KB, real WebP 800×600)")
+        return True
+    except Exception as e:
+        print(f"  ✗ Background conversion failed: {e}")
+        return False
 
 
 def process_file(input_path):
@@ -131,11 +141,9 @@ def process_file(input_path):
     is_bg = is_background(filename)
 
     if is_bg:
-        # Backgrounds: keep as-is, preserve format
-        dest_path = dest_dir / filename
-        copy_as_is(input_path, dest_path)
-        print(f"  ✓ [BG] {filename} → {dest_path.relative_to(SCRIPT_DIR)}")
-        return True
+        # Backgrounds: ALWAYS convert to real WebP (AI outputs PNG regardless of extension)
+        dest_path = dest_dir / (stem + '.webp')
+        return convert_background(input_path, dest_path)
     else:
         # Character/UI images: remove background, save as WebP (transparent, 90% smaller)
         dest_filename = stem + '.webp'

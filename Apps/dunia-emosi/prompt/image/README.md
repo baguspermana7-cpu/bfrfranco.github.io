@@ -18,9 +18,18 @@ All images → `/home/baguspermana7/rz-work/Apps/dunia-emosi/assets/`
 
 ## Recommended AI Generator
 
-- **Midjourney** or **DALL-E 3** for backgrounds (best quality)
+- **Gemini** or **DALL-E 3** for backgrounds (best quality)
 - **Adobe Firefly** or **Stable Diffusion** for consistent character sheets
 - Use the same generator session for Leo to maintain consistency
+
+## Important: Avoid Copyright Triggers
+
+Do NOT use these phrases in prompts — AI generators will refuse:
+- ❌ Disney, Pixar, specific movie titles (Cars, Lightyear, Finding Nemo, etc.)
+- ❌ One Piece, Naruto, or any specific anime title
+- ❌ Pokemon, Pikachu, Pokeball, or any Nintendo IP
+- ✅ Use instead: "3D CGI children's animation style", "vibrant anime illustration style"
+- ✅ For game assets: "fantasy creature", "battle arena", "magic sphere"
 
 ## Generation Order
 

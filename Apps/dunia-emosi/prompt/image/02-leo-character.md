@@ -1,31 +1,44 @@
-# Image Prompts — Leo the Lion Character
+# Image Prompts - Leo the Lion Character
 
 > Target folder: `/assets/`
 > Format: PNG with transparent background
-> Size: 400×400px each
-> Style: **Disney Pixar 3D character / One Piece anime latest (Toei 2023+ quality)**
-> Art direction: Rich 3D rendered look OR vibrant cel-shaded anime, expressive eyes, high detail
+> Size: 400x400px each
+> Style: original family-friendly stylized 3D mascot character
+> Art direction: soft cinematic 3D render, expressive eyes, clean silhouette, high detail
+> Safety rule: describe the visual traits directly; do not name third-party sources.
 
 ---
 
 ## BASE CHARACTER DESCRIPTION (use in ALL Leo prompts)
 
 ```
-Disney Pixar 3D animation style, cute chubby lion cub character named Leo,
-big round expressive eyes with highlight sparkles, small button nose,
-fluffy golden-amber mane that frames round face, cream/tan face and tummy,
-small round ears with pink inner, stubby paws, chubby friendly proportions,
-Pixar-quality fur texture and subsurface scattering, warm rim lighting,
-transparent background, PNG, 400x400px, front-facing portrait,
-vibrant saturated colors, highly detailed 3D render
+Original cute chubby lion cub mascot character named Leo, front-facing portrait,
+rounded childlike proportions, oversized head, soft toy-like anatomy, big round
+expressive eyes with bright catchlights, thick expressive eyebrows, small button
+nose, short rounded muzzle, fluffy golden-amber mane framing a round face, cream
+face and tummy, small round ears with soft pink inner ear, stubby paws, gentle
+friendly smile, soft plush-like fur texture, subtle sculpted fur strands,
+smooth high-end 3D feature-animation look, cinematic key light, warm rim
+lighting, soft contact shadow, subtle ambient occlusion, clean readable
+silhouette, vibrant saturated colors, polished character render, transparent
+background, PNG, 400x400px.
+
+Make the character fully original. Do not copy or reference any recognizable
+existing character, mascot, logo, symbol, or entertainment property. Keep the
+design simple, warm, child-safe, and unique.
 ```
 
-**Alternative style (use One Piece anime style instead):**
+**Alternative style (use only if a 2D look is needed):**
 ```
-One Piece Toei Animation 2023 style, cute lion cub character Leo,
-big sparkly anime eyes, golden-amber spiky mane, expressive thick outlines,
-vibrant cel-shaded colors, dynamic manga-style character design,
-transparent background, 400x400px
+Original vibrant cel-shaded adventure cartoon style, cute lion cub mascot named
+Leo, big sparkling eyes, golden-amber fluffy mane with a few playful pointed
+tufts, bold variable-width outlines, expressive clean linework, rounded shapes,
+warm cream face and tummy, simple flat shadow shapes, bright rim highlights,
+dynamic action-comedy pose language, energetic motion accents, bright
+child-friendly colors, transparent background, PNG, 400x400px.
+
+Keep the artwork fully original. Do not imitate any named artist, mascot,
+entertainment property, or existing character.
 ```
 
 ---
@@ -34,11 +47,11 @@ transparent background, 400x400px
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] with genuinely happy expression:
-big warm beaming smile showing small white teeth, eyes curved upward in
-joy (^‿^), rosy glowing cheeks, eyebrows raised in delight, small heart
-floats nearby, warm golden rim lighting, tail tip visible wagging,
-overall radiant cheerful energy, Pixar emotional expressiveness at maximum
+[BASE CHARACTER] with a genuinely happy expression:
+big warm beaming smile showing tiny white teeth, eyes curved upward in joy,
+rosy glowing cheeks, eyebrows raised in delight, a small simple heart floating
+nearby, tail tip visible and wagging, warm golden rim lighting, radiant cheerful
+energy, cute emotional expression, transparent background, PNG, 400x400px.
 ```
 
 ---
@@ -47,11 +60,11 @@ overall radiant cheerful energy, Pixar emotional expressiveness at maximum
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] with maximum excitement:
-huge wide open-mouth grin with tongue slightly showing, eyes as golden stars
-or sparkle-burst pupils, both arms raised up triumphantly, eyebrows arched
-high, confetti and sparkle particles bursting around, body in dynamic
-celebration jump pose, electric excited energy like celebration scene
+[BASE CHARACTER] with maximum excitement:
+huge wide open-mouth grin with tongue slightly showing, eyes sparkling like
+golden starbursts, both paws raised up triumphantly, eyebrows arched high,
+confetti and sparkle particles bursting around, dynamic celebration jump pose,
+playful energetic mood, transparent background, PNG, 400x400px.
 ```
 
 ---
@@ -60,11 +73,11 @@ celebration jump pose, electric excited energy like celebration scene
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] with sad expression (still cute not scary):
-droopy half-moon downward eyes with glistening tears about to fall,
-one single teardrop rolling down cheek, small wobbly mouth frown,
-eyebrows angled inward making sad arch (like Pixar's Sadness from Inside Out),
-slightly slouched posture, muted warm lighting, still adorable not scary
+[BASE CHARACTER] with a sad expression, still cute and not scary:
+droopy half-moon downward eyes with glistening tears about to fall, one single
+teardrop rolling down the cheek, small wobbly frown, eyebrows angled inward in a
+soft sad arch, slightly slouched posture, muted warm lighting, tender adorable
+mood, transparent background, PNG, 400x400px.
 ```
 
 ---
@@ -73,12 +86,11 @@ slightly slouched posture, muted warm lighting, still adorable not scary
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] with shocked surprise:
-perfectly round huge circle eyes (whites very visible), small O-shaped
-open mouth, both eyebrows shot up very high, both paws on cheeks
-(Home Alone style), sweat drop and exclamation marks floating nearby,
-slightly disheveled mane, dramatic lighting shift, funny not scary,
-Pixar comedic surprise beat
+[BASE CHARACTER] with shocked surprise:
+perfectly round wide eyes with visible white sclera, small O-shaped open mouth,
+both eyebrows lifted very high, both paws gently touching cheeks, one small
+sweat drop and simple exclamation marks floating nearby, slightly messy mane,
+funny harmless surprise, transparent background, PNG, 400x400px.
 ```
 
 ---
@@ -87,11 +99,11 @@ Pixar comedic surprise beat
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] with confident proud expression:
-arms crossed over chest, slight smug knowing smile, one eyebrow
-slightly raised with confidence, chest puffed out slightly, golden
-star badge or small crown on head, sparkle effects around,
-warm confident hero lighting, cool and self-assured but still cute and childlike
+[BASE CHARACTER] with a confident proud expression:
+arms crossed over chest, small knowing smile, one eyebrow slightly raised,
+chest puffed out slightly, tiny simple golden star badge on the chest or small
+plain crown on the head, subtle sparkle effects around, warm confident lighting,
+cute self-assured childlike mood, transparent background, PNG, 400x400px.
 ```
 
 ---
@@ -100,11 +112,11 @@ warm confident hero lighting, cool and self-assured but still cute and childlike
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] with curious thinking expression:
-one eyebrow raised quizzically, one paw/hand resting on chin in classic
-thinking pose, eyes looking upward to the side with curiosity dots,
-small empty thought bubble cloud above head, head slightly tilted,
-warm soft lighting, inquisitive intellectual expression, endearing
+[BASE CHARACTER] with a curious thinking expression:
+one eyebrow raised quizzically, one paw resting on the chin, eyes looking upward
+to the side, small empty thought bubble above the head, head slightly tilted,
+soft warm lighting, inquisitive and endearing mood, transparent background,
+PNG, 400x400px.
 ```
 
 ---
@@ -113,21 +125,24 @@ warm soft lighting, inquisitive intellectual expression, endearing
 
 **Prompt:**
 ```
-[BASE CHARACTER - Pixar 3D style] full body friendly welcome:
-full body visible, big warm welcoming smile, one paw raised high waving
-hello enthusiastically, other paw at side, bright sparkling eyes,
-round chubby belly visible, friendly greeting energy, warm ambient
-lighting, welcoming onboarding mascot vibe like Pixar's friendly helper characters
+[BASE CHARACTER] full-body friendly welcome pose:
+full body visible, big warm welcoming smile, one paw raised high waving hello,
+other paw relaxed at the side, bright sparkling eyes, round chubby belly visible,
+friendly greeting energy, warm ambient lighting, helpful mascot mood,
+transparent background, PNG, 400x400px.
 ```
 
 ---
 
 ## CONSISTENCY NOTES FOR AI GENERATOR
 
-- Keep the SAME lion design across all 7 images — same face, same mane, same proportions
-- Only change: expression + arm/body pose + nearby effects
-- Color reference: Mane `#FF8C42` / `#FFA040` amber-gold
-- Face/body: `#F5D080` / `#E8C060` warm cream
-- Eye color: `#2D1B00` dark pupils, white sclera with highlight sparkle
-- Pixar style: subsurface scattering on face, soft fur texture, warm rim light from back
-- One Piece alt: thick outlines `#3D2000`, vibrant flat colors, manga-style motion lines
+- Keep the same original lion design across all 7 images: same face, same mane, same proportions.
+- Only change the expression, arm/body pose, and nearby effects.
+- Keep all artwork transparent-background PNG at 400x400px.
+- Color reference: mane `#FF8C42` / `#FFA040` amber-gold.
+- Face/body: `#F5D080` / `#E8C060` warm cream.
+- Eye color: `#2D1B00` dark pupils, white sclera, bright highlight sparkle.
+- Fur direction: soft plush-like texture, readable at small icon size.
+- Lighting direction: warm rim light from behind, soft key light from front.
+- Avoid copying any recognizable mascot, logo, symbol, or existing character.
+- Avoid text, watermarks, signatures, or props with logos.
