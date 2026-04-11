@@ -753,7 +753,19 @@ function buildGraph(){
   });
 
   network.on('stabilizationIterationsDone',()=>{
-    network.setOptions({physics:{enabled:false}});
+    /* Keep physics ON so drag animation stays alive.
+       Just slow down the simulation to save CPU after initial layout. */
+    network.setOptions({physics:{
+      enabled:true,
+      solver:'forceAtlas2Based',
+      forceAtlas2Based:{
+        gravitationalConstant:-30,
+        centralGravity:0.002,
+        springLength:130,
+        springConstant:0.02,
+        damping:0.6,
+      },
+    }});
   });
 }
 
