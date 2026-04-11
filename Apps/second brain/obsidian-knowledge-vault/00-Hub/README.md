@@ -10,15 +10,15 @@ This vault is the Obsidian mirror of the [ResistanceZero website](https://bfrfra
 
 ## Hub Index
 
-| Category | Notes | Count |
-|---|---|---|
-| [[01-Articles/Articles-Hub]] | All 26 engineering articles | 26 |
-| [[02-Calculators/Calculators-Hub]] | 7 interactive calculators | 7 |
-| [[03-Apps/Apps-Hub]] | Tools, terminals, apps | 4 |
-| [[04-Series/Series-Hub]] | Geopolitics + Future Forward | 2 series |
-| [[05-Standards/Standards-Hub]] | TIA-942, Tier Advisor, LTC labs | 6 |
-| [[06-Comparisons/Comparisons-Hub]] | 10 head-to-head comparisons | 10 |
-| [[07-Reports/Reports-Hub]] | Infographics + market reports | 6 |
+| Category | Notes | Count | Status |
+|---|---|---|---|
+| [[01-Articles/Articles-Hub]] | All 26 articles + geo + FF | 29 | ✅ |
+| [[02-Calculators/Calculators-Hub]] | 7 calculators + share module | 7 | ✅ |
+| [[03-Apps/Apps-Hub]] | Finance Terminal, Second Brain, DCA, DCMOC | 4 | ✅ |
+| [[04-Series/Series-Hub]] | Geopolitics + Future Forward | 2 series | ✅ |
+| [[05-Standards/Standards-Hub]] | TIA-942, Tier Advisor, LTC labs, DC systems | 10 | ✅ |
+| [[06-Comparisons/Comparisons-Hub]] | 10 head-to-head comparisons | 10 | ✅ |
+| [[07-Reports/Reports-Hub]] | Infographics + market reports | 6 | ✅ |
 
 ---
 
