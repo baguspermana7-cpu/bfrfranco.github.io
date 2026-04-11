@@ -1587,6 +1587,106 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
    AAA ENHANCEMENT v2 — Ultra Premium Visual Upgrade
 ═══════════════════════════════════════════════ */
 
+/* ── AAA GAME MENU — Dark Premium with Glass Cards ── */
+#screen-menu {
+  background: linear-gradient(160deg, #080818 0%, #100E2A 45%, #0A1420 100%) !important;
+  padding-top: 8px !important;
+}
+/* Menu section title (player header / world label) */
+.world-zone { width: 100%; max-width: 500px; margin-bottom: 16px; }
+.world-zone-header {
+  display: inline-flex !important; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 100px; padding: 7px 18px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  margin-bottom: 12px;
+}
+.world-zone-name {
+  color: rgba(255,255,255,0.92) !important;
+  font-size: 13px !important; letter-spacing: 1.5px;
+  text-shadow: 0 0 16px rgba(255,255,255,0.25);
+}
+/* Stars banner — dark version */
+.total-stars-banner {
+  background: linear-gradient(135deg, #C8920A, #8B5A00) !important;
+  border-radius: 16px; box-shadow: 0 4px 0 #4A2800, 0 8px 20px rgba(0,0,0,0.5) !important;
+}
+/* Game tiles — Brawl Stars dark glass card style */
+.game-tile {
+  background: linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04)) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.55),
+              inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+.game-tile:active {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+.game-tile .g-name { color: rgba(255,255,255,0.95) !important; }
+.game-tile .g-icon {
+  filter: drop-shadow(0 0 14px var(--gtc-glow, rgba(255,255,255,0.4)));
+}
+/* Top accent bar becomes a glow strip */
+.game-tile::before {
+  height: 3px !important;
+  box-shadow: 0 0 16px var(--gtc, rgba(255,255,255,0.5)), 0 0 32px var(--gtc-glow, rgba(255,255,255,0.2));
+}
+/* Side glow edge — right border glow */
+.game-tile::after {
+  background: none !important;
+  border-right: 1px solid var(--gtc, rgba(255,255,255,0.15)) !important;
+  opacity: 0.5 !important; transition: opacity 0.25s;
+}
+.game-tile:active::after { opacity: 1 !important; }
+
+/* Per-game color variables + border-color */
+.game-tile.g1  { --gtc:#F43F5E; --gtc-glow:rgba(244,63,94,0.5);  border-color:rgba(244,63,94,0.22)!important; }
+.game-tile.g2  { --gtc:#A78BFA; --gtc-glow:rgba(167,139,250,0.5); border-color:rgba(167,139,250,0.22)!important; }
+.game-tile.g3  { --gtc:#2DD4BF; --gtc-glow:rgba(45,212,191,0.5);  border-color:rgba(45,212,191,0.22)!important; }
+.game-tile.g4  { --gtc:#FCD34D; --gtc-glow:rgba(252,211,77,0.5);  border-color:rgba(252,211,77,0.22)!important; }
+.game-tile.g5  { --gtc:#C084FC; --gtc-glow:rgba(192,132,252,0.5); border-color:rgba(192,132,252,0.22)!important; }
+.game-tile.g6  { --gtc:#38BDF8; --gtc-glow:rgba(56,189,248,0.5);  border-color:rgba(56,189,248,0.22)!important; }
+.game-tile.g7  { --gtc:#2DD4BF; --gtc-glow:rgba(45,212,191,0.5);  border-color:rgba(45,212,191,0.22)!important; }
+.game-tile.g8  { --gtc:#FB7185; --gtc-glow:rgba(251,113,133,0.5); border-color:rgba(251,113,133,0.22)!important; }
+.game-tile.g9  { --gtc:#A3E635; --gtc-glow:rgba(163,230,53,0.5);  border-color:rgba(163,230,53,0.22)!important; }
+.game-tile.g10 { --gtc:#FFCB05; --gtc-glow:rgba(255,203,5,0.55);  border-color:rgba(255,203,5,0.25)!important; }
+.game-tile.g11 { --gtc:#22D3EE; --gtc-glow:rgba(34,211,238,0.5);  border-color:rgba(34,211,238,0.22)!important; }
+.game-tile.g12 { --gtc:#818CF8; --gtc-glow:rgba(129,140,248,0.5); border-color:rgba(129,140,248,0.22)!important; }
+
+/* Tag badge — glass tinted */
+.game-tile .g-tag {
+  background: var(--gtc, rgba(255,255,255,0.2)) !important;
+  box-shadow: 0 0 10px var(--gtc-glow, rgba(255,255,255,0.2));
+  font-size: 10px !important;
+}
+/* Progress button at bottom of menu */
+#screen-menu > .btn {
+  background: rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.75) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px);
+}
+/* Player chip — dark glass */
+#screen-menu .player-chip {
+  background: rgba(255,255,255,0.07) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  backdrop-filter: blur(10px); color: white;
+}
+#screen-menu .player-chip.active {
+  background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(109,40,217,0.2)) !important;
+  border-color: rgba(139,92,246,0.5) !important;
+}
+#screen-menu .player-chip .p-name { color: rgba(255,255,255,0.95); }
+#screen-menu .player-chip .p-stars {
+  background: linear-gradient(135deg,#B45309,#78350F) !important;
+  color: #FCD34D;
+}
+/* Menu title / total stars banner */
+#screen-menu .menu-title { color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+
 /* Global dark body background */
 body { background: #0a0a1a !important; }
 
