@@ -1205,51 +1205,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   border-radius: 0;
   margin-bottom: 0;
   box-shadow: none;
-  background:
-    repeating-linear-gradient(
-      180deg,
-      transparent 0px,
-      transparent 40px,
-      rgba(255,255,255,0.6) 40px,
-      rgba(255,255,255,0.6) 60px
-    ),
-    linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
-  background-size: 100% 100px, 100% 100%;
-  animation: roadScroll 0.6s linear infinite;
-}
-@keyframes roadScroll {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 100px, 0 0; }
-}
-.g6-road::before {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  left: 33.33%;
-  width: 3px;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,100,0.8) 0px,
-    rgba(255,255,100,0.8) 30px,
-    transparent 30px,
-    transparent 60px
-  );
-  animation: roadScroll 0.6s linear infinite;
-}
-.g6-road::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  left: 66.66%;
-  width: 3px;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,100,0.8) 0px,
-    rgba(255,255,100,0.8) 30px,
-    transparent 30px,
-    transparent 60px
-  );
-  animation: roadScroll 0.6s linear infinite;
+  background-color: #1a1a2e;
+  /* no animated bg stripes — HTML .g6-divider handles lane lines */
 }
 /* Hide old static lane lines — road CSS handles dividers */
 .g6-lane-line { display: none; }
@@ -2521,14 +2478,71 @@ body { background: #0a0a1a !important; }
   letter-spacing: 6px !important;
   margin: 10px 0 !important;
 }
-/* Map-specific road colors */
-#screen-game6.map-city .g6-road { background: #1c1c2e !important; }
-#screen-game6.map-forest .g6-road { background: #1a2810 !important; }
-#screen-game6.map-forest .g6-divider { background-image: repeating-linear-gradient(to bottom, rgba(120,200,80,0.45) 0px, rgba(120,200,80,0.45) 35px, transparent 35px, transparent 75px) !important; }
-#screen-game6.map-space .g6-road { background: #08081a !important; }
-#screen-game6.map-space .g6-divider { background-image: repeating-linear-gradient(to bottom, rgba(130,180,255,0.5) 0px, rgba(130,180,255,0.5) 35px, transparent 35px, transparent 75px) !important; }
-#screen-game6.map-body .g6-road { background: #1a0810 !important; }
-#screen-game6.map-body .g6-divider { background-image: repeating-linear-gradient(to bottom, rgba(255,100,100,0.45) 0px, rgba(255,100,100,0.45) 35px, transparent 35px, transparent 75px) !important; }
+/* ══ G6 ROAD — Map backgrounds using actual WebP assets ══ */
+/* Base road: dark fallback, NO background-image animation (dividers handle movement) */
+.g6-road {
+  background-color: #1a1a2e !important;
+  background-image: none !important;
+  animation: none !important;
+}
+/* Remove CSS pseudo-element lane dividers (HTML .g6-divider handles them) */
+.g6-road::before, .g6-road::after { display: none !important; }
+/* Make HTML dividers more visible */
+.g6-divider {
+  width: 4px !important;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 30px,
+    transparent 30px, transparent 65px
+  ) !important;
+  background-size: 4px 65px !important;
+  animation: g6LaneDash 0.5s linear infinite !important;
+}
+
+/* Map-specific: background-color only (bg-image overlaid separately) */
+#screen-game6.map-city .g6-road {
+  background-color: #16213e !important;
+  background-image: url('assets/bg-city.webp') !important;
+  background-size: cover !important; background-position: center !important;
+}
+#screen-game6.map-forest .g6-road {
+  background-color: #1a2810 !important;
+  background-image: url('assets/bg-forest.webp') !important;
+  background-size: cover !important; background-position: center !important;
+}
+#screen-game6.map-space .g6-road {
+  background-color: #05061a !important;
+  background-image: url('assets/bg-space.webp') !important;
+  background-size: cover !important; background-position: center !important;
+}
+#screen-game6.map-body .g6-road {
+  background-color: #1a0810 !important;
+  background-image: url('assets/bg-body.webp') !important;
+  background-size: cover !important; background-position: center !important;
+}
+/* Forest divider — green tint */
+#screen-game6.map-forest .g6-divider {
+  background-image: repeating-linear-gradient(to bottom, rgba(120,220,80,0.55) 0px, rgba(120,220,80,0.55) 30px, transparent 30px, transparent 65px) !important;
+}
+/* Space divider — blue tint */
+#screen-game6.map-space .g6-divider {
+  background-image: repeating-linear-gradient(to bottom, rgba(120,180,255,0.55) 0px, rgba(120,180,255,0.55) 30px, transparent 30px, transparent 65px) !important;
+}
+/* Body divider — red tint */
+#screen-game6.map-body .g6-divider {
+  background-image: repeating-linear-gradient(to bottom, rgba(255,100,100,0.55) 0px, rgba(255,100,100,0.55) 30px, transparent 30px, transparent 65px) !important;
+}
+/* Start overlay — slightly lighter so BG image shows through */
+.g6-start-overlay {
+  background: rgba(5,5,30,0.55) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+}
+.g6-start-card {
+  background: rgba(255,255,255,0.95) !important;
+  border: none !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7) !important;
+}
 </style>
 </head>
 <body>
