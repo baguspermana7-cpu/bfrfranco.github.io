@@ -137,13 +137,22 @@ def process_file(input_path):
         print(f"  ✓ [BG] {filename} → {dest_path.relative_to(SCRIPT_DIR)}")
         return True
     else:
-        # Character/UI images: remove background, save as PNG
-        dest_filename = stem + '.png'
+        # Character/UI images: remove background, save as WebP (transparent, 90% smaller)
+        dest_filename = stem + '.webp'
         dest_path = dest_dir / dest_filename
+        # First remove bg to a temp PNG, then convert to WebP
+        tmp_path = dest_dir / (stem + '_tmp.png')
         print(f"  ⚙ Removing BG: {filename} → {dest_path.relative_to(SCRIPT_DIR)}")
-        success = remove_background(str(input_path), str(dest_path))
+        success = remove_background(str(input_path), str(tmp_path))
         if success:
-            # Show file size
+            # Convert PNG → WebP (keeps transparency, 90% smaller)
+            try:
+                from PIL import Image as _PILImage
+                _img = _PILImage.open(str(tmp_path))
+                _img.save(str(dest_path), 'WEBP', quality=88, method=6)
+                tmp_path.unlink(missing_ok=True)
+            except Exception:
+                shutil.move(str(tmp_path), str(dest_path))
             size_kb = dest_path.stat().st_size // 1024
             print(f"  ✓ Done ({size_kb}KB)")
         return success

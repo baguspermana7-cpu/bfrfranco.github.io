@@ -2880,10 +2880,14 @@ const ASSET_FALLBACK = {
   'img-monyet.png':'🐒','img-panda.png':'🐼','img-rusa.png':'🦌','img-singa.png':'🦁','img-tikus.png':'🐭',
   'img-apel.png':'🍎','img-bola.png':'⚽','img-buku.png':'📚','img-daun.png':'🍃','img-meja.png':'🪑'
 }
-function getAssetEmoji(filename) { return ASSET_FALLBACK[filename] || '❓' }
+function getAssetEmoji(filename) { return ASSET_FALLBACK[filename] || ASSET_FALLBACK[filename.replace('.webp','.png')] || '❓' }
 function renderAsset(filename, size=80) {
   const emoji = getAssetEmoji(filename)
-  return `<img src="assets/${filename}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" onerror="this.outerHTML='<span style=\\'font-size:${size*0.7}px\\'>${emoji}</span>'">`
+  // Always try webp first (transparent, smaller), fallback to png, then emoji
+  const stem = filename.replace(/\.(png|webp|jpg|jpeg)$/i,'')
+  const webpSrc = `assets/${stem}.webp`
+  const pngSrc  = `assets/${stem}.png`
+  return `<img src="${webpSrc}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" onerror="this.src='${pngSrc}';this.onerror=function(){this.outerHTML='<span style=\\'font-size:${size*0.7}px\\'>${emoji}</span>'}">`
 }
 
 // Game 6 word banks
