@@ -5466,7 +5466,7 @@ function startG4Timer(){
 let g5State={}, g5Mode='visual', g5SubMode='emosi'
 
 function setG5Mode(mode,btn){
-  g5Mode=mode; playClick()
+  g5Mode=mode; playClick(); clearTimers()
   document.querySelectorAll('.g5-mode-tab').forEach(t=>t.classList.remove('active'))
   if(btn) btn.classList.add('active')
   const isVisual=mode==='visual'
@@ -5475,7 +5475,11 @@ function setG5Mode(mode,btn){
   document.getElementById('g5-turn-text').style.display=isVisual?'block':'none'
   document.getElementById('g5-grid').style.display=isVisual?'grid':'none'
   document.getElementById('g5-alt-display').style.display=isVisual?'none':'flex'
-  initGame5()
+  // Route to correct mode init — do NOT call initGame5() which resets g5Mode to 'visual'
+  if(mode==='visual') initG5Visual()
+  else if(mode==='numeric') initG5Numeric()
+  else if(mode==='spatial') initG5Spatial()
+  else if(mode==='sequence') initG5Sequence()
 }
 function setG5SubMode(sub,btn){
   g5SubMode=sub; playClick()
