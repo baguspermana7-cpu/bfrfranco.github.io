@@ -745,15 +745,313 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 
 /* ── 3. WELCOME SCREEN — Immersive full-screen dark ── */
+/* ══════════════════════════════════════
+   HOME — CAVE/JUNGLE AAA STYLE
+   ══════════════════════════════════════ */
 #screen-welcome {
-  background: linear-gradient(160deg, #1a0533 0%, #3B0764 30%, #4C1D95 60%, #5B21B6 100%);
-  justify-content: center;
+  position: relative; overflow: hidden;
+  justify-content: flex-start; padding: 0 !important; gap: 0;
+  min-height: 100vh; min-height: 100dvh;
+  background: #1A4A6A;
 }
-.welcome-title { color: white; -webkit-text-fill-color: white; background: none; font-size: 52px; text-shadow: 0 0 40px rgba(167,139,250,0.8); }
-.welcome-sub2 { color: #FCD34D; -webkit-text-fill-color: #FCD34D; background: none; font-size: 42px; }
-.welcome-tagline { color: rgba(255,255,255,0.8); }
-.streak-badge { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.wlc-bg { position: absolute; inset: 0; z-index: 0; }
+.wlc-bg img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.wlc-bg-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.05) 30%,
+    rgba(0,0,0,0.08) 55%, rgba(0,0,0,0.62) 78%,
+    rgba(0,0,0,0.88) 100%);
+}
+#screen-welcome > *:not(.wlc-bg) { position: relative; z-index: 1; width: 100%; }
+
+/* Particles */
+.wlc-particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.wlc-particle { position: absolute; pointer-events: none; animation: wlcFloat linear infinite; }
+@keyframes wlcFloat {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  8%   { opacity: 0.9; }
+  88%  { opacity: 0.4; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* HUD top bar (Brawl Stars-style resource bar) */
+.home-hud {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px 4px; gap: 8px; z-index: 3;
+}
+.home-hud-left { display: flex; align-items: center; gap: 8px; }
+.home-hud-right { display: flex; align-items: center; gap: 8px; }
+#welcome-level-badge {
+  background: linear-gradient(135deg, #A78BFA, #7C3AED);
+  border-radius: 100px; padding: 5px 12px;
+  font-size: 13px; font-weight: 900; color: white;
+  box-shadow: 0 3px 0 #4C1D95, 0 0 12px rgba(139,92,246,0.5);
+}
+.streak-badge {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  border-radius: 100px; padding: 5px 11px;
+  font-size: 13px; font-weight: 900; color: white;
+  box-shadow: 0 2px 0 #92400E;
+}
+.home-res-xp {
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(8px);
+  border: 1px solid rgba(252,211,77,0.45); border-radius: 100px;
+  padding: 5px 12px; font-size: 14px; font-weight: 900; color: #FCD34D;
+}
+
+/* Title + Leo section */
+.home-title-area {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  padding: 4px 14px 4px 20px;
+  min-height: 185px;
+}
+.home-title-block {
+  flex: 1; display: flex; flex-direction: column; padding-bottom: 8px;
+}
+.home-title-line1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(46px, 13vw, 68px);
+  color: #FFF0C8; line-height: 0.92; letter-spacing: 3px;
+  text-shadow:
+    -3px -3px 0 #7B4608, 3px -3px 0 #7B4608,
+    -3px  3px 0 #7B4608, 3px  3px 0 #7B4608,
+     0    5px 0 #442200,  0    9px 20px rgba(0,0,0,0.75);
+}
+.home-title-line2 {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(34px, 9.5vw, 52px);
+  color: #FFE060; line-height: 1; letter-spacing: 5px;
+  text-shadow:
+    -2px -2px 0 #8B5000, 2px -2px 0 #8B5000,
+    -2px  2px 0 #8B5000, 2px  2px 0 #8B5000,
+     0    4px 0 #562C00, 0    8px 16px rgba(0,0,0,0.65);
+  margin-top: 2px;
+}
+.home-title-sub {
+  font-size: 12px; font-weight: 900; color: rgba(255,255,255,0.65);
+  letter-spacing: 2.5px; margin-top: 6px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+/* Leo floating — top-right, like CaveBoy character */
+.home-leo-float {
+  width: min(160px, 42vw); align-self: flex-start; flex-shrink: 0;
+  margin-top: -8px; position: relative;
+}
+.home-leo-float img { width: 100%; height: auto; display: block; }
+.home-leo-float span { font-size: clamp(70px,20vw,130px); display: block; line-height: 1; }
+.home-leo-float img,
+.home-leo-float span {
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.65)) drop-shadow(0 0 16px rgba(252,211,77,0.35));
+  animation: leoFloat 3s ease-in-out infinite;
+}
+@keyframes leoFloat {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-14px) rotate(2deg); }
+}
+
+/* Main button stack — wood/stone planks */
+.home-buttons {
+  padding: 6px 18px 4px; display: flex; flex-direction: column; gap: 9px;
+}
+.home-btn {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; border: none; border-radius: 50px;
+  cursor: pointer; padding: 13px 20px;
+  transition: transform 0.1s; position: relative; overflow: hidden;
+  font-family: 'Fredoka One', cursive;
+}
+.home-btn:active { transform: translateY(4px); }
+/* top sheen highlight */
+.home-btn::before {
+  content: ''; position: absolute; top: 0; left: 4%; right: 4%; height: 48%;
+  background: rgba(255,255,255,0.22); border-radius: 0 0 100% 100%;
+  pointer-events: none;
+}
+.home-btn-icon { font-size: 22px; flex-shrink: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.45)); }
+.home-btn-text {
+  font-size: 19px; letter-spacing: 2.5px; color: white; flex: 1; text-align: left;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+}
+.home-btn-stars {
+  background: rgba(0,0,0,0.28); border-radius: 100px;
+  padding: 3px 9px; font-size: 12px; font-weight: 900; color: #FCD34D;
+}
+/* Gold plank — PLAY button */
+.home-btn-gold {
+  background: linear-gradient(180deg, #F5C238 0%, #DF9818 45%, #BE7008 100%);
+  box-shadow: 0 6px 0 #7A4400, 0 8px 22px rgba(0,0,0,0.48);
+}
+.home-btn-gold:active { box-shadow: 0 2px 0 #7A4400; }
+/* Brown/adventure — game select */
+.home-btn-brown {
+  background: linear-gradient(180deg, #C87238 0%, #9E5020 45%, #7A3610 100%);
+  box-shadow: 0 6px 0 #471C00, 0 8px 22px rgba(0,0,0,0.45);
+}
+.home-btn-brown:active { box-shadow: 0 2px 0 #471C00; }
+/* Stone — progress */
+.home-btn-stone {
+  background: linear-gradient(180deg, #8898A8 0%, #687888 45%, #4A5868 100%);
+  box-shadow: 0 5px 0 #2A3448, 0 7px 18px rgba(0,0,0,0.42);
+}
+.home-btn-stone:active { box-shadow: 0 2px 0 #2A3448; }
+
+/* Icon cube row (CaveBoy-style bottom icon bar) */
+.home-cubes {
+  display: flex; justify-content: center; gap: 9px;
+  padding: 6px 18px 4px;
+}
+.home-cube {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: linear-gradient(180deg, #E8BF50 0%, #C08820 55%, #9A6208 100%);
+  border: none; border-radius: 16px; cursor: pointer;
+  padding: 10px 8px 8px; flex: 1; max-width: 66px; min-width: 0;
+  box-shadow: 0 4px 0 #663A00, 0 6px 14px rgba(0,0,0,0.42),
+              inset 0 2px 0 rgba(255,255,255,0.38);
+  transition: transform 0.1s; position: relative; overflow: hidden;
+}
+.home-cube::before {
+  content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 45%;
+  background: rgba(255,255,255,0.2); border-radius: 0 0 100% 100%;
+  pointer-events: none;
+}
+.home-cube:active { transform: translateY(3px); box-shadow: 0 1px 0 #663A00; }
+.home-cube > :first-child { font-size: 24px; line-height: 1; }
+.home-cube > span { font-size: 10px; font-weight: 900; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
+
+/* CSS terrain at bottom — rolling green hills */
+.home-terrain {
+  position: relative; height: 72px; flex-shrink: 0;
+  overflow: hidden; pointer-events: none; margin-top: auto;
+}
+.home-terrain::before {
+  content: ''; position: absolute; bottom: 0; left: -5%; right: -5%; height: 64px;
+  background: linear-gradient(180deg, #4A8A2A 0%, #2E6010 55%, #1A3C08 100%);
+  clip-path: polygon(
+    0 55%, 5% 30%, 10% 48%, 16% 18%, 22% 40%, 28% 22%, 34% 44%,
+    40% 16%, 46% 36%, 52% 20%, 58% 42%, 65% 12%, 71% 32%, 78% 18%,
+    84% 38%, 90% 24%, 96% 42%, 100% 28%, 100% 100%, 0 100%);
+}
+.home-terrain::after {
+  content: ''; position: absolute; bottom: 0; left: -5%; right: -5%; height: 38px;
+  background: linear-gradient(180deg, #3A7A1A 0%, #1E5008 100%);
+  clip-path: polygon(
+    0 70%, 8% 40%, 16% 65%, 26% 28%, 34% 55%, 44% 35%, 52% 60%,
+    62% 30%, 70% 52%, 80% 20%, 88% 48%, 100% 32%, 100% 100%, 0 100%);
+}
+
+/* ── PAUSE PANEL — jungle wood style ── */
+.pause-panel {
+  background: linear-gradient(180deg, #F5DCA0 0%, #D4A840 45%, #A87824 100%);
+  border: 6px solid #7A4808; border-radius: 26px;
+  box-shadow: 0 0 0 3px #F0C030, 0 26px 64px rgba(0,0,0,0.82),
+              inset 0 3px 0 rgba(255,255,255,0.5);
+  padding: 28px 22px 18px; width: min(296px, 88vw);
+  position: relative; text-align: center;
+  /* wood grain via repeating gradient */
+  background-image:
+    repeating-linear-gradient(92deg, rgba(0,0,0,0.03) 0px, transparent 3px, transparent 18px),
+    linear-gradient(180deg, #F5DCA0 0%, #D4A840 45%, #A87824 100%);
+}
+.pause-close {
+  position: absolute; top: -16px; right: -16px;
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, #FF80A0, #E82060);
+  border: 3px solid white; border-radius: 50%;
+  color: white; font-size: 17px; font-weight: 900; cursor: pointer;
+  box-shadow: 0 3px 0 #A00830, 0 5px 12px rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center; padding: 0;
+  transition: transform 0.1s;
+}
+.pause-close:active { transform: scale(0.9); }
+.pause-title {
+  font-family: 'Fredoka One', cursive; font-size: 38px; letter-spacing: 5px;
+  color: #3C2000;
+  text-shadow: 0 3px 0 rgba(255,240,160,0.7), 0 -1px 0 rgba(0,0,0,0.25);
+  margin-bottom: 18px;
+}
+.pause-btns { display: flex; flex-direction: column; gap: 9px; }
+.pause-btn {
+  display: flex; align-items: center; gap: 11px; justify-content: flex-start;
+  width: 100%; border: none; border-radius: 50px;
+  cursor: pointer; padding: 13px 20px;
+  font-family: 'Fredoka One', cursive; font-size: 17px; letter-spacing: 2px;
+  color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.45);
+  transition: transform 0.1s; position: relative; overflow: hidden;
+}
+.pause-btn::before {
+  content: ''; position: absolute; top: 0; left: 4%; right: 4%; height: 46%;
+  background: rgba(255,255,255,0.25); border-radius: 0 0 100% 100%; pointer-events: none;
+}
+.pause-btn:active { transform: translateY(3px); }
+.pause-btn-icon { font-size: 19px; flex-shrink: 0; }
+.pause-btn-green {
+  background: linear-gradient(180deg, #8ADE4A 0%, #50B818 48%, #308808 100%);
+  box-shadow: 0 5px 0 #185E04, inset 0 2px 0 rgba(255,255,255,0.38);
+}
+.pause-btn-green:active { box-shadow: 0 1px 0 #185E04; }
+.pause-btn-blue {
+  background: linear-gradient(180deg, #48B8F0 0%, #1888D0 48%, #0858A0 100%);
+  box-shadow: 0 5px 0 #083E80, inset 0 2px 0 rgba(255,255,255,0.32);
+}
+.pause-btn-blue:active { box-shadow: 0 1px 0 #083E80; }
+.pause-btn-teal {
+  background: linear-gradient(180deg, #38D4C8 0%, #18A89A 48%, #0A7868 100%);
+  box-shadow: 0 5px 0 #044E48, inset 0 2px 0 rgba(255,255,255,0.28);
+}
+.pause-btn-teal:active { box-shadow: 0 1px 0 #044E48; }
+.pause-deco { margin-top: 12px; font-size: 20px; opacity: 0.55; letter-spacing: 6px; }
+
 .btn-brand { background: linear-gradient(135deg, #A78BFA, #7C3AED) !important; box-shadow: 0 8px 0 #4C1D95, 0 0 40px rgba(139,92,246,0.5) !important; }
+
+/* ── RESPONSIVE BACKGROUNDS — desktop vs mobile ── */
+/* Uses <picture> srcset in HTML: landscape → bg-landing-desktop.webp, portrait → bg-landing-mobile.webp */
+
+/* ── SVG FX OVERLAY (lightning + particles on landing page) ── */
+.wlc-fx {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
+}
+.fx-lightning {
+  position: absolute; pointer-events: none;
+  animation: ltFlash 4s ease-in-out infinite;
+}
+.fx-lt1 { left: 7%; top: 4%; width: 80px; height: 210px; animation-delay: 0s; animation-duration: 3.8s; }
+.fx-lt2 { right: 5%; top: 7%; width: 72px; height: 190px; animation-delay: 1.5s; animation-duration: 4.4s; }
+.fx-lt3 { left: 20%; top: 10%; width: 54px; height: 145px; animation-delay: 2.8s; animation-duration: 3.2s; }
+@keyframes ltFlash {
+  0%, 100%  { opacity: 0; transform: scaleY(0.7) skewX(-5deg); }
+  5%        { opacity: 0.92; transform: scaleY(1) skewX(-2deg); }
+  8%        { opacity: 0.35; }
+  11%       { opacity: 0.85; }
+  15%       { opacity: 0; transform: scaleY(0.85) skewX(3deg); }
+}
+.fx-orb {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  filter: blur(44px); animation: orbPulse 3.5s ease-in-out infinite;
+}
+.fx-orb-gold {
+  width: 190px; height: 190px;
+  background: radial-gradient(circle, rgba(255,215,40,0.42) 0%, transparent 70%);
+  bottom: 30%; left: -40px; animation-delay: 0.5s;
+}
+.fx-orb-purple {
+  width: 210px; height: 210px;
+  background: radial-gradient(circle, rgba(155,55,255,0.38) 0%, transparent 70%);
+  bottom: 24%; right: -25px; animation-delay: 1.3s; animation-duration: 4.2s;
+}
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.65; }
+  50%       { transform: scale(1.35); opacity: 1; }
+}
+/* Scan-line on bg overlay for cinematic feel */
+.wlc-bg-overlay::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.035) 3px, rgba(0,0,0,0.035) 4px);
+  pointer-events: none;
+}
 
 /* ── 4. MODE SCREEN — Dark premium ── */
 #screen-mode {
@@ -2148,18 +2446,97 @@ body { background: #0a0a1a !important; }
 
 <!-- WELCOME -->
 <div id="screen-welcome" class="screen active">
-  <div class="floating-stars" id="floating-stars"></div>
-  <div class="welcome-title-row" style="text-align:center;margin-bottom:6px;">
-    <span class="welcome-title">Dunia</span>
-    <span class="welcome-sub2">Emosi 🐾</span>
+  <!-- Full-bleed background — responsive: desktop vs mobile -->
+  <div class="wlc-bg">
+    <picture>
+      <source media="(orientation:landscape) and (min-width:600px)" srcset="assets/bg-landing-desktop.webp">
+      <img src="assets/bg-landing-mobile.webp" alt=""
+        onerror="this.src='assets/bg-menu.webp'; this.onerror=null;">
+    </picture>
+    <div class="wlc-bg-overlay"></div>
   </div>
-  <span class="welcome-mascot">🦁</span>
-  <p class="welcome-tagline">Halo! Aku Leo si Singa!<br>Ayo belajar dan bermain bersama! 🌟</p>
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;justify-content:center;">
-    <div class="streak-badge" id="streak-badge" style="display:none">🔥 <span id="streak-text">1 hari</span></div>
-    <div id="welcome-level-badge" style="display:none;background:linear-gradient(135deg,#A78BFA,#8B5CF6);border-radius:100px;padding:8px 18px;font-size:16px;font-weight:900;color:white;box-shadow:0 4px 0 #5B21B6;"></div>
+
+  <!-- SVG lightning + particle effects overlay -->
+  <div class="wlc-fx" id="wlc-fx" aria-hidden="true">
+    <!-- Static SVG lightning crackles (CSS animated) -->
+    <svg class="fx-lightning fx-lt1" viewBox="0 0 120 300" fill="none">
+      <polyline points="60,0 40,80 55,80 25,180 45,180 10,300" stroke="rgba(255,230,80,0.7)" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <svg class="fx-lightning fx-lt2" viewBox="0 0 120 300" fill="none">
+      <polyline points="50,0 70,90 55,90 85,200 65,200 90,300" stroke="rgba(180,100,255,0.65)" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <svg class="fx-lightning fx-lt3" viewBox="0 0 80 200" fill="none">
+      <polyline points="40,0 25,55 38,55 15,130 30,130 5,200" stroke="rgba(255,230,80,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <!-- Purple energy orb glow -->
+    <div class="fx-orb fx-orb-purple"></div>
+    <div class="fx-orb fx-orb-gold"></div>
+    <!-- Spark particles container (JS fills this) -->
+    <div class="wlc-particles" id="wlc-particles"></div>
   </div>
-  <button class="btn btn-lg btn-brand" onclick="playClick(); showScreen('screen-mode')">Mulai Bermain! 🎮</button>
+
+  <!-- HUD top bar -->
+  <div class="home-hud">
+    <div class="home-hud-left">
+      <div id="welcome-level-badge" style="display:none">🥚 Telur</div>
+      <div class="streak-badge" id="streak-badge" style="display:none">🔥 <span id="streak-text">1</span> hari</div>
+    </div>
+    <div class="home-hud-right">
+      <div class="home-res-xp">⭐ <span id="home-xp-count">0</span> XP</div>
+    </div>
+  </div>
+
+  <!-- Title + Leo floating character -->
+  <div class="home-title-area">
+    <div class="home-title-block">
+      <div class="home-title-line1">DUNIA</div>
+      <div class="home-title-line2">EMOSI</div>
+      <div class="home-title-sub">✦ GAME BELAJAR SERU ✦</div>
+    </div>
+    <div class="home-leo-float">
+      <img src="assets/leo-excited.webp" alt="Leo"
+        onerror="this.outerHTML='<span>🦁</span>'">
+    </div>
+  </div>
+
+  <!-- Main action buttons -->
+  <div class="home-buttons">
+    <button class="home-btn home-btn-gold" onclick="playClick(); showScreen('screen-mode')">
+      <span class="home-btn-icon">▶</span>
+      <span class="home-btn-text">MAIN SEKARANG</span>
+    </button>
+    <button class="home-btn home-btn-brown" onclick="playClick(); showScreen('screen-menu')">
+      <span class="home-btn-icon">🌍</span>
+      <span class="home-btn-text">PILIH GAME</span>
+      <span class="home-btn-stars" id="home-stars-badge">⭐ 0</span>
+    </button>
+    <button class="home-btn home-btn-stone" onclick="playClick(); showDashboard()">
+      <span class="home-btn-icon">📊</span>
+      <span class="home-btn-text">PROGRESS</span>
+    </button>
+  </div>
+
+  <!-- Icon cube row -->
+  <div class="home-cubes">
+    <button class="home-cube" onclick="playClick(); shareGame && shareGame()">
+      <span>📤</span><span>Bagikan</span>
+    </button>
+    <button class="home-cube" onclick="playClick(); showDashboard()">
+      <span>🏆</span><span>Reward</span>
+    </button>
+    <button class="home-cube" onclick="playClick(); showScreen('screen-menu')">
+      <span>🎮</span><span>Games</span>
+    </button>
+    <button class="home-cube" onclick="openSettingsFromPause()">
+      <span>⚙️</span><span>Setting</span>
+    </button>
+    <button class="home-cube" onclick="playClick(); showScreen('screen-menu')">
+      <span>🦁</span><span>Leo</span>
+    </button>
+  </div>
+
+  <!-- Terrain decoration -->
+  <div class="home-terrain"></div>
 </div>
 
 <!-- MODE -->
@@ -2442,18 +2819,26 @@ body { background: #0a0a1a !important; }
   </div>
 </div>
 
-<!-- PAUSE OVERLAY -->
-<div id="pause-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
-  <div style="background:linear-gradient(145deg,#1a0f2e,#2D1B69);border:1px solid rgba(167,139,250,0.35);border-radius:28px;padding:32px 28px;width:min(320px,85vw);text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.7);">
-    <div style="font-size:52px;margin-bottom:4px;">⏸</div>
-    <h2 style="color:white;font-size:26px;font-weight:900;font-family:'Fredoka One',cursive;margin:0 0 6px;letter-spacing:2px;">DIJEDA</h2>
-    <p style="color:rgba(255,255,255,0.45);font-size:13px;margin:0 0 24px;">Game sedang berhenti sejenak</p>
-    <div style="display:flex;flex-direction:column;gap:11px;">
-      <button onclick="resumeGame()" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:white;border:none;border-radius:16px;padding:16px;font-size:19px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 5px 0 #4C1D95;width:100%;letter-spacing:1px;">▶ Lanjutkan</button>
-      <button onclick="restartCurrentGame()" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;border:none;border-radius:16px;padding:14px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 4px 0 #075985;width:100%;">🔄 Mulai Ulang</button>
-      <button onclick="openSettingsFromPause()" style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;width:100%;">⚙️ Pengaturan</button>
-      <button onclick="exitToPauseMenu()" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;width:100%;">⌂ Menu Utama</button>
+<!-- PAUSE OVERLAY — jungle wood panel style -->
+<div id="pause-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;">
+  <div class="pause-panel">
+    <button class="pause-close" onclick="resumeGame()">✕</button>
+    <div class="pause-title">⏸ DIJEDA</div>
+    <div class="pause-btns">
+      <button class="pause-btn pause-btn-green" onclick="resumeGame()">
+        <span class="pause-btn-icon">▶</span> LANJUTKAN
+      </button>
+      <button class="pause-btn pause-btn-green" onclick="restartCurrentGame()">
+        <span class="pause-btn-icon">🔄</span> ULANG LAGI
+      </button>
+      <button class="pause-btn pause-btn-blue" onclick="exitToPauseMenu()">
+        <span class="pause-btn-icon">🗺</span> MENU UTAMA
+      </button>
+      <button class="pause-btn pause-btn-teal" onclick="openSettingsFromPause()">
+        <span class="pause-btn-icon">⚙️</span> PENGATURAN
+      </button>
     </div>
+    <div class="pause-deco">🌿 🌿 🌿</div>
   </div>
 </div>
 
@@ -3067,6 +3452,11 @@ function showScreen(id) {
   if(po) po.style.display='none'
   if(so) so.style.display='none'
   window.scrollTo(0,0)
+  // Welcome screen effects
+  if (id === 'screen-welcome') {
+    initWelcomeParticles()
+    refreshWelcomeBadges()
+  }
 }
 
 // ================================================================
@@ -4788,6 +5178,80 @@ document.addEventListener('click', e => {
     spawnParticleBurst(e.clientX, e.clientY)
   }
 }, true)
+
+// Init welcome particles on page load
+;(function() {
+  initWelcomeParticles()
+  refreshWelcomeBadges()
+})()
+
+// ================================================================
+// WELCOME SCREEN PARTICLES
+// ================================================================
+function initWelcomeParticles() {
+  const container = document.getElementById('wlc-particles')
+  if (!container) return
+  container.innerHTML = ''
+  // Electric spark + purple energy particles matching Pikachu vs Gengar theme
+  const sparkTypes = [
+    // Gold/yellow electric sparks
+    { color: 'rgba(255,220,40,0.9)',  size: [3,7],   shape: 'diamond' },
+    { color: 'rgba(255,245,120,0.8)', size: [2,5],   shape: 'circle'  },
+    // Purple energy particles
+    { color: 'rgba(180,60,255,0.8)',  size: [4,8],   shape: 'circle'  },
+    { color: 'rgba(140,40,220,0.7)',  size: [3,6],   shape: 'diamond' },
+    // White electric crackle dots
+    { color: 'rgba(255,255,255,0.9)', size: [2,4],   shape: 'circle'  },
+    // Orange ember sparks
+    { color: 'rgba(255,140,30,0.75)', size: [3,6],   shape: 'circle'  },
+  ]
+  const count = 26
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div')
+    p.className = 'wlc-particle'
+    const type = sparkTypes[Math.floor(Math.random() * sparkTypes.length)]
+    const sz = type.size[0] + Math.random() * (type.size[1] - type.size[0])
+    const left = Math.random() * 96
+    const delay = Math.random() * 7
+    const dur = 5 + Math.random() * 9
+    const skew = (Math.random() - 0.5) * 30
+    let shape = ''
+    if (type.shape === 'diamond') {
+      // diamond shape via clip-path rotation
+      shape = `clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border-radius:0;`
+    }
+    p.style.cssText = `left:${left}%;bottom:${-20 - Math.random()*30}px;width:${sz}px;height:${sz * (0.8 + Math.random()*1.4)}px;background:${type.color};border-radius:50%;${shape}animation-duration:${dur}s;animation-delay:${delay}s;transform:skewX(${skew}deg);box-shadow:0 0 ${sz*1.5}px ${type.color};`
+    container.appendChild(p)
+  }
+}
+
+// Update welcome HUD badges + counters
+function refreshWelcomeBadges() {
+  const streakBadge = document.getElementById('streak-badge')
+  const streakText = document.getElementById('streak-text')
+  const lvlBadge = document.getElementById('welcome-level-badge')
+  const xpCountEl = document.getElementById('home-xp-count')
+  const starsEl = document.getElementById('home-stars-badge')
+  const streak = state.streak || 0
+  const xp = state.xp || 0
+  if (streakBadge) streakBadge.style.display = streak > 0 ? '' : 'none'
+  if (streakText) streakText.textContent = streak
+  if (lvlBadge) {
+    const tier = LEVEL_TIERS.slice().reverse().find(t => xp >= t.min) || LEVEL_TIERS[0]
+    lvlBadge.style.display = xp > 0 ? '' : 'none'
+    lvlBadge.textContent = tier.icon + ' ' + tier.name
+  }
+  if (xpCountEl) xpCountEl.textContent = xp
+  if (starsEl) {
+    // Count total stars from all games
+    let totalStars = 0
+    try {
+      const saved = JSON.parse(localStorage.getItem('dunia-emosi-stars') || '{}')
+      Object.values(saved).forEach(v => { totalStars += (v || 0) })
+    } catch(e) {}
+    starsEl.textContent = '⭐ ' + totalStars
+  }
+}
 
 // Pokemon battle entrance — animate sprite on each new battle
 const _g10NB2 = window.g10NewBattle
