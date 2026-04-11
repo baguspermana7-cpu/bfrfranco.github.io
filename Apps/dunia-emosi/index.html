@@ -1257,7 +1257,7 @@ function buildMenuHeader() {
 }
 
 function exitGame() {
-  playClick(); clearTimers(); buildMenuHeader(); showScreen('screen-menu')
+  playClick(); clearTimers(); stopAmbient(); buildMenuHeader(); showScreen('screen-menu')
 }
 function clearTimers() {
   if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
@@ -1373,7 +1373,7 @@ function flyStarToCounter(srcEl) {
 // RESULT
 // ================================================================
 function showResult(mascot, title, msg) {
-  clearTimers()
+  clearTimers(); stopAmbient()
   const totalStars=state.gameStars[0]+state.gameStars[1]
   document.getElementById('result-mascot').textContent=mascot||state.players[state.currentPlayer].animal
   document.getElementById('result-title').textContent=title||'Bagus sekali!'
@@ -1430,6 +1430,31 @@ function playWrong(){playTone(280,0.35,'sawtooth',0.1);setTimeout(()=>playTone(2
 function playClick(){playTone(440,0.06,'sine',0.1)}
 function playBreathIn(){playTone(392,4.0,'sine',0.06)}
 function playBreathOut(){playTone(330,4.0,'sine',0.06)}
+
+// Ambient audio system
+let ambientNodes=[]
+function stopAmbient(){ambientNodes.forEach(n=>{try{n.stop()}catch(e){}});ambientNodes=[]}
+function startAmbient(type){
+  stopAmbient()
+  try{
+    const ctx=getAudio()
+    if(type==='city'){
+      // Synth city beat: 4/4 kick pattern
+      const bpm=100,beat=60/bpm,notes=[220,0,165,0,220,0,165,196]
+      notes.forEach((f,i)=>{if(!f)return;const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=f;g.gain.setValueAtTime(0,ctx.currentTime+i*beat*0.25);g.gain.linearRampToValueAtTime(0.04,ctx.currentTime+i*beat*0.25+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*beat*0.25+0.15);o.start(ctx.currentTime+i*beat*0.25);o.stop(ctx.currentTime+i*beat*0.25+0.2);ambientNodes.push(o)})
+    } else if(type==='forest'){
+      // Bird chirp arpeggios
+      const chirps=[784,988,1175,988,784,659,784]
+      chirps.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,ctx.currentTime+i*0.18);g.gain.linearRampToValueAtTime(0.05,ctx.currentTime+i*0.18+0.04);g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.18+0.12);o.start(ctx.currentTime+i*0.18);o.stop(ctx.currentTime+i*0.18+0.15);ambientNodes.push(o)})
+    } else if(type==='space'){
+      // Slow pad chord
+      [196,247,294].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.025,ctx.currentTime+1.5);g.gain.linearRampToValueAtTime(0,ctx.currentTime+5);o.start();o.stop(ctx.currentTime+5);ambientNodes.push(o)})
+    } else if(type==='body'){
+      // Heartbeat
+      [0,0.45].forEach(t=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=80;g.gain.setValueAtTime(0,ctx.currentTime+t);g.gain.linearRampToValueAtTime(0.08,ctx.currentTime+t+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.25);o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.3);ambientNodes.push(o)})
+    }
+  }catch(e){}
+}
 
 // ================================================================
 // GAME 1: AKU MERASA
@@ -1669,7 +1694,10 @@ function checkG5Match(){
 let g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null}
 
 function initGame6() {
-  g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null}
+  const diff=state.selectedLevel||'medium'
+  const spd=diff==='easy'?1.2:diff==='medium'?1.8:2.6
+  const words=diff==='easy'?4:diff==='medium'?6:8
+  g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:words,stars:0,map:'city',speed:spd,frameCount:0,running:false,animFrame:null}
   document.querySelectorAll('.g6-map-btn').forEach(b=>b.classList.remove('active'))
   const firstBtn = document.querySelector('.g6-map-btn[data-map="city"]')
   if(firstBtn) firstBtn.classList.add('active')
@@ -1711,7 +1739,7 @@ function renderCollectedSlots() {
 function beginDrive() {
   document.getElementById('g6-start-overlay').style.display = 'none'
   g6State.running = true; g6State.frameCount = 0; g6State.tiles = []
-  updateCarPosition(); driveTick()
+  startAmbient(g6State.map); updateCarPosition(); driveTick()
 }
 function driveTick() {
   if(!g6State.running) return
