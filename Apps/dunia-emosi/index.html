@@ -697,7 +697,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* ── 1. GAME SCREENS — Full Screen Layout ── */
 #screen-game1, #screen-game2, #screen-game3, #screen-game4, #screen-game5,
-#screen-game6, #screen-game7, #screen-game8, #screen-game9 {
+#screen-game6, #screen-game7, #screen-game8, #screen-game9,
+#screen-game10, #screen-game11, #screen-game12 {
   position: fixed;
   inset: 0;
   padding: 0;
@@ -707,6 +708,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   justify-content: flex-start;
   min-height: 100vh;
   height: 100vh;
+  height: 100dvh;
 }
 /* Inner content needs padding so elements don't stick to edges */
 #screen-game1 > *, #screen-game2 > *, #screen-game3 > *,
@@ -955,8 +957,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g6-lane-line { display: none; }
 
 .g6-car {
-  font-size: 72px !important;
-  bottom: 100px !important;
+  font-size: 64px !important;
+  bottom: 16px !important;
   filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6));
   transition: left 0.2s cubic-bezier(0.34,1.56,0.64,1);
 }
@@ -991,10 +993,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   box-shadow: 0 4px 0 #B45309;
 }
 
-/* G6 target word — floats over road */
+/* G6 target word — floats over road below map row */
 .g6-target-wrap {
   position: absolute;
-  top: 70px;
+  top: 52px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -1015,20 +1017,20 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g6-target-word { color: white; font-size: 22px; font-weight: 900; letter-spacing: 4px; }
 .g6-collected { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
 
-/* G6 map row — floats over road below header */
+/* G6 map row — floats over road top edge */
 .g6-map-row {
   position: absolute;
-  top: 60px;
+  top: 8px;
   left: 0; right: 0;
-  z-index: 10;
+  z-index: 11;
   display: flex;
-  gap: 6px;
+  gap: 5px;
   justify-content: center;
-  padding: 0 12px;
+  padding: 0 10px;
   margin-bottom: 0;
   width: 100%;
   max-width: none;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .g6-map-btn {
   background: rgba(255,255,255,0.15);
@@ -1036,10 +1038,12 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   border: 1px solid rgba(255,255,255,0.3);
   color: white;
   border-radius: 100px;
-  padding: 6px 14px;
-  font-size: 12px;
+  padding: 5px 10px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .g6-map-btn.active {
   background: rgba(139,92,246,0.7);
@@ -1162,6 +1166,123 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @media(max-width:360px) {
   .g6-car { font-size: 48px !important; bottom: 70px !important; }
   .g6-tile { width: 40px; height: 40px; font-size: 18px !important; }
+}
+
+/* G10, G11, G12 tiles */
+.game-tile.g10::before{background:linear-gradient(90deg,#FFCB05,#EE1515)}
+.game-tile.g10 .g-icon{animation-duration:1.8s;animation-delay:-0.1s}
+.game-tile.g10 .g-tag{background:linear-gradient(90deg,#FFCB05,#EE1515);color:#1a1a1a;}
+.game-tile.g10::after{background:linear-gradient(135deg,rgba(255,203,5,0.12),transparent)}
+
+.game-tile.g11::before{background:linear-gradient(90deg,#06B6D4,#0EA5E9)}
+.game-tile.g11 .g-icon{animation-duration:2.6s}
+.game-tile.g11 .g-tag{background:linear-gradient(90deg,#06B6D4,#0EA5E9);}
+.game-tile.g11::after{background:linear-gradient(135deg,rgba(6,182,212,0.08),transparent)}
+
+.game-tile.g12::before{background:linear-gradient(90deg,#8B5CF6,#C026D3)}
+.game-tile.g12 .g-icon{animation-duration:3.0s;animation-delay:-0.7s}
+.game-tile.g12 .g-tag{background:linear-gradient(90deg,#8B5CF6,#C026D3);}
+.game-tile.g12::after{background:linear-gradient(135deg,rgba(139,92,246,0.08),transparent)}
+
+/* Pokemon Battle */
+#screen-game10 {
+  position:fixed;inset:0;padding:0;overflow-y:auto;
+  flex-direction:column;align-items:stretch;justify-content:flex-start;
+  min-height:100vh;height:100vh;
+  background:radial-gradient(ellipse at 50% 0%,#0a1628 0%,#0d2847 50%,#051120 100%);
+}
+.poke-arena{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 14px 12px;gap:8px;width:100%;}
+.poke-card{width:100%;max-width:420px;border-radius:20px;padding:12px 14px;background:rgba(255,255,255,0.08);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;gap:10px;}
+.poke-card.enemy{flex-direction:row;}
+.poke-card.player{flex-direction:row-reverse;}
+.poke-spr{width:80px;height:80px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.6));image-rendering:auto;}
+.poke-spr.enemy{filter:drop-shadow(0 4px 12px rgba(255,80,80,0.5));}
+.poke-info{flex:1;}
+.poke-info.right{text-align:right;}
+.poke-name{font-size:16px;font-weight:900;color:white;font-family:'Fredoka One',cursive;}
+.poke-type{display:inline-block;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:700;color:white;margin-top:2px;}
+.poke-cp-txt{font-size:12px;color:rgba(255,255,255,0.65);margin-top:2px;}
+.poke-hp{display:flex;gap:3px;margin-top:5px;font-size:15px;}
+.poke-hp.right{justify-content:flex-end;}
+.poke-heart-full{opacity:1;}
+.poke-heart-empty{opacity:0.2;filter:grayscale(1);}
+.poke-mid{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:420px;padding:0 4px;}
+.poke-vs{font-size:26px;font-weight:900;color:#FFCB05;font-family:'Fredoka One',cursive;text-shadow:0 0 20px rgba(255,203,5,0.9);animation:vsPulse 1.5s ease-in-out infinite;}
+@keyframes vsPulse{0%,100%{transform:scale(1)rotate(-3deg)}50%{transform:scale(1.15)rotate(3deg)}}
+.poke-status{font-size:13px;font-weight:700;color:rgba(255,255,255,0.75);}
+.poke-qcard{width:100%;max-width:420px;border-radius:20px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);border:1px solid rgba(255,203,5,0.3);padding:14px;}
+.poke-qtitle{font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);text-align:center;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+.poke-qmath{font-size:30px;font-weight:900;color:white;text-align:center;margin-bottom:12px;font-family:'Fredoka One',cursive;text-shadow:0 2px 8px rgba(0,0,0,0.5);}
+.poke-qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.poke-qbtn{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:13px 8px;font-size:22px;font-weight:900;color:white;cursor:pointer;font-family:'Fredoka One',cursive;transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);}
+.poke-qbtn:active{transform:scale(0.92);}
+.poke-qbtn.correct{background:rgba(45,212,191,0.3);border-color:#2DD4BF;animation:choiceRight 0.35s ease;}
+.poke-qbtn.wrong{background:rgba(244,63,94,0.3);border-color:#F43F5E;animation:choiceWrong2 0.4s ease;}
+@keyframes choiceRight{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes choiceWrong2{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.poke-attack-fx{position:fixed;inset:0;pointer-events:none;z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;}
+.poke-attack-fx.show{opacity:1;}
+.poke-attack-emoji{font-size:80px;animation:atkEmoji 0.7s ease-out forwards;}
+@keyframes atkEmoji{0%{transform:scale(0)rotate(-30deg);opacity:1}60%{transform:scale(1.6)rotate(15deg);opacity:1}100%{transform:scale(2.2)rotate(30deg);opacity:0}}
+.poke-flash{position:fixed;inset:0;pointer-events:none;z-index:150;opacity:0;animation:none;}
+.poke-flash.fire{animation:flashFire 0.5s ease-out;}
+.poke-flash.electric{animation:flashElec 0.6s ease-out;}
+.poke-flash.water{animation:flashWater 0.5s ease-out;}
+.poke-flash.grass{animation:flashGrass 0.5s ease-out;}
+.poke-flash.psychic{animation:flashPsychic 0.5s ease-out;}
+.poke-flash.ghost{animation:flashGhost 0.6s ease-out;}
+.poke-flash.ice{animation:flashIce 0.5s ease-out;}
+.poke-flash.dark{animation:flashDark 0.5s ease-out;}
+.poke-flash.fighting{animation:flashFight 0.4s ease-out;}
+.poke-flash.dragon{animation:flashDragon 0.6s ease-out;}
+.poke-flash.normal,.poke-flash.rock,.poke-flash.ground,.poke-flash.steel,.poke-flash.bug,.poke-flash.poison,.poke-flash.flying,.poke-flash.fairy{animation:flashNorm 0.4s ease-out;}
+@keyframes flashFire{0%,100%{background:transparent;opacity:0}25%{background:rgba(255,80,0,0.45);opacity:1}60%{background:rgba(255,50,0,0.2);opacity:1}}
+@keyframes flashElec{0%,100%{opacity:0}15%{background:rgba(255,220,0,0.6);opacity:1}30%{background:transparent;opacity:0}45%{background:rgba(255,220,0,0.4);opacity:1}60%{background:transparent;opacity:0}75%{background:rgba(255,220,0,0.3);opacity:1}}
+@keyframes flashWater{0%,100%{opacity:0}30%{background:rgba(50,130,255,0.4);opacity:1}70%{background:rgba(30,80,200,0.2);opacity:1}}
+@keyframes flashGrass{0%,100%{opacity:0}30%{background:rgba(80,200,80,0.35);opacity:1}70%{background:rgba(40,150,40,0.15);opacity:1}}
+@keyframes flashPsychic{0%,100%{opacity:0}30%{background:rgba(255,80,180,0.4);opacity:1}70%{background:rgba(200,40,150,0.2);opacity:1}}
+@keyframes flashGhost{0%,100%{opacity:0}20%{background:rgba(80,30,120,0.5);opacity:1}50%{background:transparent;opacity:0}80%{background:rgba(80,30,120,0.3);opacity:1}}
+@keyframes flashIce{0%,100%{opacity:0}30%{background:rgba(150,220,255,0.45);opacity:1}70%{background:rgba(100,180,230,0.2);opacity:1}}
+@keyframes flashDark{0%,100%{opacity:0}30%{background:rgba(30,20,50,0.6);opacity:1}70%{background:rgba(20,10,30,0.3);opacity:1}}
+@keyframes flashFight{0%,100%{opacity:0}20%{background:rgba(200,40,30,0.4);opacity:1}50%{background:rgba(180,30,20,0.15);opacity:1}}
+@keyframes flashDragon{0%,100%{opacity:0}25%{background:rgba(80,30,220,0.45);opacity:1}50%{background:transparent;opacity:0.1}75%{background:rgba(100,50,240,0.35);opacity:1}}
+@keyframes flashNorm{0%,100%{opacity:0}30%{background:rgba(200,200,200,0.3);opacity:1}}
+
+/* Game 11 — Science Quiz */
+#screen-game11{background:linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
+.sci-question-img{font-size:72px;text-align:center;display:block;margin:8px auto;animation:mascotBounce 2s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.4));}
+.sci-question-text{font-size:18px;font-weight:700;color:white;text-align:center;margin:8px 16px;line-height:1.5;background:rgba(255,255,255,0.08);border-radius:16px;padding:14px;}
+.sci-choices{display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px;margin-top:8px;}
+.sci-choice{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 18px;font-size:17px;font-weight:700;color:white;cursor:pointer;text-align:left;font-family:var(--font);transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);}
+.sci-choice:active{transform:scale(0.96);}
+.sci-choice.correct{background:rgba(45,212,191,0.25);border-color:#2DD4BF;}
+.sci-choice.wrong{background:rgba(244,63,94,0.25);border-color:#F43F5E;}
+
+/* Game 12 — Tebak Bayangan */
+#screen-game12{background:linear-gradient(180deg,#0D0620 0%,#1A0840 50%,#080310 100%);}
+.shadow-desc{font-size:16px;font-weight:700;color:rgba(255,255,255,0.85);text-align:center;margin:8px 16px;line-height:1.6;background:rgba(255,255,255,0.08);border-radius:16px;padding:16px;max-width:400px;width:100%;}
+.shadow-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:400px;margin-top:8px;}
+.shadow-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:20px;font-size:48px;cursor:pointer;text-align:center;transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);filter:brightness(0.1) contrast(5);}
+.shadow-btn:active{transform:scale(0.92);}
+.shadow-btn.revealed{filter:none!important;animation:revealPop 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+.shadow-btn.correct{filter:none!important;background:rgba(45,212,191,0.25);border-color:#2DD4BF;}
+.shadow-btn.wrong{filter:none!important;background:rgba(244,63,94,0.25);border-color:#F43F5E;}
+@keyframes revealPop{0%{transform:scale(0.8)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* AAA overrides for game 10/11/12 screens */
+#screen-game10, #screen-game11, #screen-game12 {
+  position:fixed;inset:0;padding:0;
+  flex-direction:column;align-items:stretch;justify-content:flex-start;
+  min-height:100vh;height:100vh;overflow-y:auto;
+}
+#screen-game10 > *, #screen-game11 > *, #screen-game12 > * {
+  padding-left:0;padding-right:0;
+}
+#screen-game11 > *, #screen-game12 > * {
+  padding-left:16px;padding-right:16px;
+}
+#screen-game10 .game-header, #screen-game11 .game-header, #screen-game12 .game-header {
+  padding:12px 16px;background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.2);width:100%;max-width:none;margin-bottom:0;flex-shrink:0;position:relative;z-index:10;
 }
 </style>
 </head>
@@ -1341,7 +1462,105 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
     </div>
   </div>
 
+  <!-- World 4: Arena Petualangan -->
+  <div class="world-zone">
+    <div class="world-zone-header">
+      <span class="world-zone-icon">⚡</span>
+      <span class="world-zone-name">Arena Petualangan</span>
+    </div>
+    <div class="game-grid-2">
+      <div class="game-tile g10" id="gtile-10" onclick="playClick(); openLevelSelect(10)">
+        <span class="g-icon">⚡</span>
+        <div class="g-name">Pertarungan Pokemon</div>
+        <div class="g-stars-row" id="gstars-10"></div>
+        <span class="g-tag">Battle</span>
+      </div>
+      <div class="game-tile g11" id="gtile-11" onclick="playClick(); openLevelSelect(11)">
+        <span class="g-icon">🔬</span>
+        <div class="g-name">Kuis Sains</div>
+        <div class="g-stars-row" id="gstars-11"></div>
+        <span class="g-tag">Sains</span>
+      </div>
+      <div class="game-tile g12" id="gtile-12" onclick="playClick(); openLevelSelect(12)">
+        <span class="g-icon">🌑</span>
+        <div class="g-name">Tebak Bayangan</div>
+        <div class="g-stars-row" id="gstars-12"></div>
+        <span class="g-tag">Puzzle</span>
+      </div>
+    </div>
+  </div>
+
   <button class="btn btn-sm" style="background:white;color:var(--text-light);border:3px solid #E0E0E0;box-shadow:0 3px 0 #C0C0C0;margin-top:8px;margin-bottom:8px;font-size:15px;" onclick="playClick(); showDashboard()">📊 Progress Saya</button>
+</div>
+
+<!-- GAME 10 — Pokemon Battle -->
+<div id="screen-game10" class="screen">
+  <div class="game-header" style="display:flex;align-items:center;gap:10px;">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+    <span class="gh-title" style="flex:1;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">⚡ Pertarungan Pokemon</span>
+    <span class="gh-player" id="g10-player-icon" style="font-size:26px;"></span>
+    <span class="gh-stars" id="g10-stars" style="background:linear-gradient(135deg,#FFCB05,#F59E0B);border-radius:100px;padding:5px 14px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #B45309;color:#1a1a1a;">⭐ 0</span>
+  </div>
+  <div class="poke-arena" id="poke-arena">
+    <div class="poke-card enemy" id="poke-enemy-card">
+      <img class="poke-spr enemy" id="poke-enemy-spr" src="" alt="" onerror="this.style.display='none'">
+      <div class="poke-info">
+        <div class="poke-name" id="poke-enemy-name">—</div>
+        <span class="poke-type" id="poke-enemy-type">—</span>
+        <div class="poke-cp-txt" id="poke-enemy-cp">CP: —</div>
+        <div class="poke-hp" id="poke-enemy-hp"></div>
+      </div>
+    </div>
+    <div class="poke-mid">
+      <div class="poke-status" id="poke-status">Serang dulu!</div>
+      <div class="poke-vs">VS</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;" id="poke-round">Ronde 1</div>
+    </div>
+    <div class="poke-card player" id="poke-player-card">
+      <img class="poke-spr player" id="poke-player-spr" src="" alt="" onerror="this.style.display='none'">
+      <div class="poke-info right">
+        <div class="poke-name" id="poke-player-name">—</div>
+        <span class="poke-type" id="poke-player-type">—</span>
+        <div class="poke-cp-txt" id="poke-player-cp">CP: —</div>
+        <div class="poke-hp right" id="poke-player-hp"></div>
+      </div>
+    </div>
+    <div class="poke-qcard">
+      <div class="poke-qtitle" id="poke-qtitle">Selesaikan soal untuk menyerang!</div>
+      <div class="poke-qmath" id="poke-qmath">? + ? = ?</div>
+      <div class="poke-qgrid" id="poke-qgrid"></div>
+    </div>
+  </div>
+  <div class="poke-flash" id="poke-flash"></div>
+  <div class="poke-attack-fx" id="poke-attack-fx"><span class="poke-attack-emoji" id="poke-attack-emoji">⚡</span></div>
+</div>
+
+<!-- GAME 11 — Kuis Sains -->
+<div id="screen-game11" class="screen">
+  <div class="game-header" style="display:flex;align-items:center;gap:10px;">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+    <span class="gh-title" style="flex:1;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🔬 Kuis Sains</span>
+    <span class="gh-player" id="g11-player-icon" style="font-size:26px;"></span>
+    <span class="gh-stars" id="g11-stars" style="background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:100px;padding:5px 14px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #B45309;">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap" style="margin:0;height:6px;"><div class="progress-bar-fill" id="g11-progress-bar" style="width:0%"></div></div>
+  <span class="sci-question-img" id="g11-emoji">🦁</span>
+  <div class="sci-question-text" id="g11-question">Memuat soal...</div>
+  <div class="sci-choices" id="g11-choices"></div>
+</div>
+
+<!-- GAME 12 — Tebak Bayangan -->
+<div id="screen-game12" class="screen">
+  <div class="game-header" style="display:flex;align-items:center;gap:10px;">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+    <span class="gh-title" style="flex:1;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🌑 Tebak Bayangan</span>
+    <span class="gh-player" id="g12-player-icon" style="font-size:26px;"></span>
+    <span class="gh-stars" id="g12-stars" style="background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:100px;padding:5px 14px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #B45309;">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap" style="margin:0;height:6px;"><div class="progress-bar-fill" id="g12-progress-bar" style="width:0%"></div></div>
+  <p style="font-size:13px;color:rgba(255,255,255,0.55);text-align:center;margin-top:12px;font-weight:700;" id="g12-progress">Soal 1/10</p>
+  <div class="shadow-desc" id="g12-question">Hewan apa ini?</div>
+  <div class="shadow-grid" id="g12-choices"></div>
 </div>
 
 <!-- LEVEL SELECT -->
@@ -1478,18 +1697,18 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
     <span class="gh-player" id="g6-player-icon"></span>
     <span class="gh-stars" id="g6-stars">⭐ 0</span>
   </div>
-  <div class="g6-map-row" id="g6-map-row">
-    <button class="g6-map-btn active" data-map="city" onclick="selectDriveMap('city',this)">🏙️ Kota</button>
-    <button class="g6-map-btn" data-map="forest" onclick="selectDriveMap('forest',this)">🌿 Hutan</button>
-    <button class="g6-map-btn" data-map="space" onclick="selectDriveMap('space',this)">🚀 Luar Angkasa</button>
-    <button class="g6-map-btn" data-map="body" onclick="selectDriveMap('body',this)">🔬 Tubuh</button>
-  </div>
-  <div class="g6-target-wrap">
-    <div class="g6-target-label">🎯 Kumpulkan huruf:</div>
-    <div class="g6-target-word" id="g6-target-word"></div>
-    <div class="g6-collected" id="g6-collected"></div>
-  </div>
   <div class="g6-road" id="g6-road">
+    <div class="g6-map-row" id="g6-map-row">
+      <button class="g6-map-btn active" data-map="city" onclick="selectDriveMap('city',this)">🏙️ Kota</button>
+      <button class="g6-map-btn" data-map="forest" onclick="selectDriveMap('forest',this)">🌿 Hutan</button>
+      <button class="g6-map-btn" data-map="space" onclick="selectDriveMap('space',this)">🚀 Angkasa</button>
+      <button class="g6-map-btn" data-map="body" onclick="selectDriveMap('body',this)">🔬 Tubuh</button>
+    </div>
+    <div class="g6-target-wrap">
+      <div class="g6-target-label">🎯 Kumpulkan huruf:</div>
+      <div class="g6-target-word" id="g6-target-word"></div>
+      <div class="g6-collected" id="g6-collected"></div>
+    </div>
     <div class="g6-lane-line" style="left:33.33%"></div>
     <div class="g6-lane-line" style="left:66.66%"></div>
     <div class="g6-car" id="g6-car">🚗</div>
@@ -1686,7 +1905,10 @@ const GAME_META = {
   6:{icon:'🚗',name:'Petualangan Mobil'},
   7:{icon:'🖼️',name:'Tebak Gambar'},
   8:{icon:'🔡',name:'Susun Kata'},
-  9:{icon:'✍️',name:'Jejak Huruf'}
+  9:{icon:'✍️',name:'Jejak Huruf'},
+  10:{icon:'⚡',name:'Pertarungan Pokemon'},
+  11:{icon:'🔬',name:'Kuis Sains'},
+  12:{icon:'🌑',name:'Tebak Bayangan'}
 }
 
 // XP & Level system
@@ -1723,7 +1945,7 @@ const ACHIEVEMENTS = {
   picture_master:  {icon:'🖼️', name:'Mata Elang!',       desc:'Selesaikan Tebak Gambar'},
   word_master:     {icon:'🔡', name:'Penulis Muda!',     desc:'Selesaikan Susun Kata'},
   trace_master:    {icon:'✍️', name:'Kaligrafer Cilik!', desc:'Selesaikan Jejak Huruf'},
-  all_games:       {icon:'🌈', name:'Petualang Sejati!', desc:'Mainkan semua 9 game'},
+  all_games:       {icon:'🌈', name:'Petualang Sejati!', desc:'Mainkan semua 12 game'},
   streak3:         {icon:'🔥', name:'3 Hari Berturut!',  desc:'Main 3 hari berturut-turut'},
   hard_mode:       {icon:'💪', name:'Berani Sulit!',     desc:'Selesaikan mode Sulit'}
 }
@@ -1935,7 +2157,7 @@ function startGameWithLevel(level) {
   state.currentPlayer = 0
   if(level==='hard') checkAchievement('hard_mode')
   showScreen('screen-game' + state.currentGame)
-  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9]
+  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9,initGame10,initGame11,initGame12]
   inits[state.currentGame]()
 }
 
@@ -2026,7 +2248,7 @@ function buildMenuHeader() {
   // Update per-game best stars display
   try {
     const bestStars=JSON.parse(localStorage.getItem('dunia-emosi-best-stars')||'{}')
-    for(let g=1;g<=9;g++){
+    for(let g=1;g<=12;g++){
       const el=document.getElementById('gstars-'+g)
       if(el){const best=bestStars[g]||0;el.textContent=best>0?'⭐'.repeat(Math.min(best,5)):''}
     }
@@ -2180,7 +2402,7 @@ function showResult(mascot, title, msg) {
   // Check all-games achievement
   const played=JSON.parse(localStorage.getItem('dunia-emosi-played-games')||'{}')
   played[state.currentGame]=true; localStorage.setItem('dunia-emosi-played-games',JSON.stringify(played))
-  if(Object.keys(played).length>=9) checkAchievement('all_games')
+  if(Object.keys(played).length>=12) checkAchievement('all_games')
   buildMenuHeader(); showScreen('screen-result'); launchConfetti(); launchConfetti()
 }
 function playAgain() { startGameWithLevel(state.selectedLevel) }
@@ -2887,6 +3109,559 @@ try {
   const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
   if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
 } catch(e){}
+// ================================================================
+// GAME 10 — PERTARUNGAN POKEMON
+// ================================================================
+const POKEMON_DB=[
+  {id:1,name:'Bulbasaur',slug:'bulbasaur',type:'grass',type2:'poison'},
+  {id:4,name:'Charmander',slug:'charmander',type:'fire'},
+  {id:7,name:'Squirtle',slug:'squirtle',type:'water'},
+  {id:25,name:'Pikachu',slug:'pikachu',type:'electric'},
+  {id:39,name:'Jigglypuff',slug:'jigglypuff',type:'normal',type2:'fairy'},
+  {id:52,name:'Meowth',slug:'meowth',type:'normal'},
+  {id:54,name:'Psyduck',slug:'psyduck',type:'water'},
+  {id:63,name:'Abra',slug:'abra',type:'psychic'},
+  {id:74,name:'Geodude',slug:'geodude',type:'rock',type2:'ground'},
+  {id:92,name:'Gastly',slug:'gastly',type:'ghost',type2:'poison'},
+  {id:125,name:'Electabuzz',slug:'electabuzz',type:'electric'},
+  {id:126,name:'Magmar',slug:'magmar',type:'fire'},
+  {id:129,name:'Magikarp',slug:'magikarp',type:'water'},
+  {id:131,name:'Lapras',slug:'lapras',type:'water',type2:'ice'},
+  {id:133,name:'Eevee',slug:'eevee',type:'normal'},
+  {id:134,name:'Vaporeon',slug:'vaporeon',type:'water'},
+  {id:135,name:'Jolteon',slug:'jolteon',type:'electric'},
+  {id:136,name:'Flareon',slug:'flareon',type:'fire'},
+  {id:143,name:'Snorlax',slug:'snorlax',type:'normal'},
+  {id:144,name:'Articuno',slug:'articuno',type:'ice',type2:'flying'},
+  {id:145,name:'Zapdos',slug:'zapdos',type:'electric',type2:'flying'},
+  {id:146,name:'Moltres',slug:'moltres',type:'fire',type2:'flying'},
+  {id:147,name:'Dratini',slug:'dratini',type:'dragon'},
+  {id:150,name:'Mewtwo',slug:'mewtwo',type:'psychic'},
+  {id:151,name:'Mew',slug:'mew',type:'psychic'},
+  {id:152,name:'Chikorita',slug:'chikorita',type:'grass'},
+  {id:155,name:'Cyndaquil',slug:'cyndaquil',type:'fire'},
+  {id:158,name:'Totodile',slug:'totodile',type:'water'},
+  {id:172,name:'Pichu',slug:'pichu',type:'electric'},
+  {id:175,name:'Togepi',slug:'togepi',type:'fairy'},
+  {id:179,name:'Mareep',slug:'mareep',type:'electric'},
+  {id:196,name:'Espeon',slug:'espeon',type:'psychic'},
+  {id:197,name:'Umbreon',slug:'umbreon',type:'dark'},
+  {id:215,name:'Sneasel',slug:'sneasel',type:'dark',type2:'ice'},
+  {id:216,name:'Teddiursa',slug:'teddiursa',type:'normal'},
+  {id:225,name:'Delibird',slug:'delibird',type:'ice',type2:'flying'},
+  {id:231,name:'Phanpy',slug:'phanpy',type:'ground'},
+  {id:243,name:'Raikou',slug:'raikou',type:'electric'},
+  {id:244,name:'Entei',slug:'entei',type:'fire'},
+  {id:245,name:'Suicune',slug:'suicune',type:'water'},
+  {id:247,name:'Pupitar',slug:'pupitar',type:'rock',type2:'ground'},
+  {id:249,name:'Lugia',slug:'lugia',type:'psychic',type2:'flying'},
+  {id:250,name:'Ho-oh',slug:'ho-oh',type:'fire',type2:'flying'},
+  {id:251,name:'Celebi',slug:'celebi',type:'psychic',type2:'grass'},
+  {id:252,name:'Treecko',slug:'treecko',type:'grass'},
+  {id:255,name:'Torchic',slug:'torchic',type:'fire'},
+  {id:258,name:'Mudkip',slug:'mudkip',type:'water'},
+  {id:261,name:'Poochyena',slug:'poochyena',type:'dark'},
+  {id:280,name:'Ralts',slug:'ralts',type:'psychic',type2:'fairy'},
+  {id:302,name:'Sableye',slug:'sableye',type:'dark',type2:'ghost'},
+  {id:304,name:'Aron',slug:'aron',type:'steel',type2:'rock'},
+  {id:311,name:'Plusle',slug:'plusle',type:'electric'},
+  {id:312,name:'Minun',slug:'minun',type:'electric'},
+  {id:315,name:'Roselia',slug:'roselia',type:'grass',type2:'poison'},
+  {id:333,name:'Swablu',slug:'swablu',type:'normal',type2:'flying'},
+  {id:359,name:'Absol',slug:'absol',type:'dark'},
+  {id:371,name:'Bagon',slug:'bagon',type:'dragon'},
+  {id:374,name:'Beldum',slug:'beldum',type:'steel',type2:'psychic'},
+  {id:380,name:'Latias',slug:'latias',type:'dragon',type2:'psychic'},
+  {id:381,name:'Latios',slug:'latios',type:'dragon',type2:'psychic'},
+  {id:382,name:'Kyogre',slug:'kyogre',type:'water'},
+  {id:383,name:'Groudon',slug:'groudon',type:'ground'},
+  {id:384,name:'Rayquaza',slug:'rayquaza',type:'dragon',type2:'flying'},
+  {id:385,name:'Jirachi',slug:'jirachi',type:'steel',type2:'psychic'},
+  {id:386,name:'Deoxys',slug:'deoxys',type:'psychic'},
+  {id:387,name:'Turtwig',slug:'turtwig',type:'grass'},
+  {id:390,name:'Chimchar',slug:'chimchar',type:'fire'},
+  {id:393,name:'Piplup',slug:'piplup',type:'water'},
+  {id:403,name:'Shinx',slug:'shinx',type:'electric'},
+  {id:417,name:'Pachirisu',slug:'pachirisu',type:'electric'},
+  {id:425,name:'Drifloon',slug:'drifloon',type:'ghost',type2:'flying'},
+  {id:427,name:'Buneary',slug:'buneary',type:'normal'},
+  {id:442,name:'Spiritomb',slug:'spiritomb',type:'ghost',type2:'dark'},
+  {id:443,name:'Gible',slug:'gible',type:'dragon',type2:'ground'},
+  {id:447,name:'Riolu',slug:'riolu',type:'fighting'},
+  {id:480,name:'Uxie',slug:'uxie',type:'psychic'},
+  {id:481,name:'Mesprit',slug:'mesprit',type:'psychic'},
+  {id:482,name:'Azelf',slug:'azelf',type:'psychic'},
+  {id:483,name:'Dialga',slug:'dialga',type:'steel',type2:'dragon'},
+  {id:484,name:'Palkia',slug:'palkia',type:'water',type2:'dragon'},
+  {id:487,name:'Giratina',slug:'giratina',type:'ghost',type2:'dragon'},
+  {id:491,name:'Darkrai',slug:'darkrai',type:'dark'},
+  {id:492,name:'Shaymin',slug:'shaymin',type:'grass'},
+  {id:493,name:'Arceus',slug:'arceus',type:'normal'},
+  {id:495,name:'Snivy',slug:'snivy',type:'grass'},
+  {id:498,name:'Tepig',slug:'tepig',type:'fire'},
+  {id:501,name:'Oshawott',slug:'oshawott',type:'water'},
+  {id:522,name:'Blitzle',slug:'blitzle',type:'electric'},
+  {id:554,name:'Darumaka',slug:'darumaka',type:'fire'},
+  {id:570,name:'Zorua',slug:'zorua',type:'dark'},
+  {id:572,name:'Minccino',slug:'minccino',type:'normal'},
+  {id:587,name:'Emolga',slug:'emolga',type:'electric',type2:'flying'},
+  {id:602,name:'Tynamo',slug:'tynamo',type:'electric'},
+  {id:607,name:'Litwick',slug:'litwick',type:'ghost',type2:'fire'},
+  {id:610,name:'Axew',slug:'axew',type:'dragon'},
+  {id:613,name:'Cubchoo',slug:'cubchoo',type:'ice'},
+  {id:619,name:'Mienfoo',slug:'mienfoo',type:'fighting'},
+  {id:624,name:'Pawniard',slug:'pawniard',type:'dark',type2:'steel'},
+  {id:633,name:'Deino',slug:'deino',type:'dark',type2:'dragon'},
+  {id:636,name:'Larvesta',slug:'larvesta',type:'bug',type2:'fire'},
+  {id:638,name:'Cobalion',slug:'cobalion',type:'steel',type2:'fighting'},
+  {id:641,name:'Tornadus',slug:'tornadus',type:'flying'},
+  {id:642,name:'Thundurus',slug:'thundurus',type:'electric',type2:'flying'},
+  {id:643,name:'Reshiram',slug:'reshiram',type:'dragon',type2:'fire'},
+  {id:644,name:'Zekrom',slug:'zekrom',type:'dragon',type2:'electric'},
+  {id:646,name:'Kyurem',slug:'kyurem',type:'dragon',type2:'ice'},
+  {id:649,name:'Genesect',slug:'genesect',type:'bug',type2:'steel'},
+  {id:650,name:'Chespin',slug:'chespin',type:'grass'},
+  {id:653,name:'Fennekin',slug:'fennekin',type:'fire'},
+  {id:656,name:'Froakie',slug:'froakie',type:'water'},
+  {id:661,name:'Fletchling',slug:'fletchling',type:'normal',type2:'flying'},
+  {id:677,name:'Espurr',slug:'espurr',type:'psychic'},
+  {id:679,name:'Honedge',slug:'honedge',type:'steel',type2:'ghost'},
+  {id:683,name:'Swirlix',slug:'swirlix',type:'fairy'},
+  {id:686,name:'Inkay',slug:'inkay',type:'dark',type2:'psychic'},
+  {id:700,name:'Sylveon',slug:'sylveon',type:'fairy'},
+  {id:702,name:'Dedenne',slug:'dedenne',type:'electric',type2:'fairy'},
+  {id:704,name:'Goomy',slug:'goomy',type:'dragon'},
+  {id:707,name:'Klefki',slug:'klefki',type:'steel',type2:'fairy'},
+  {id:708,name:'Phantump',slug:'phantump',type:'ghost',type2:'grass'},
+  {id:714,name:'Noibat',slug:'noibat',type:'flying',type2:'dragon'},
+  {id:716,name:'Xerneas',slug:'xerneas',type:'fairy'},
+  {id:717,name:'Yveltal',slug:'yveltal',type:'dark',type2:'flying'},
+  {id:718,name:'Zygarde',slug:'zygarde',type:'dragon',type2:'ground'},
+  {id:719,name:'Diancie',slug:'diancie',type:'rock',type2:'fairy'},
+  {id:720,name:'Hoopa',slug:'hoopa',type:'psychic',type2:'ghost'},
+  {id:721,name:'Volcanion',slug:'volcanion',type:'fire',type2:'water'},
+  {id:722,name:'Rowlet',slug:'rowlet',type:'grass',type2:'flying'},
+  {id:725,name:'Litten',slug:'litten',type:'fire'},
+  {id:728,name:'Popplio',slug:'popplio',type:'water'},
+  {id:741,name:'Oricorio',slug:'oricorio',type:'fire',type2:'flying'},
+  {id:743,name:'Ribombee',slug:'ribombee',type:'bug',type2:'fairy'},
+  {id:744,name:'Rockruff',slug:'rockruff',type:'rock'},
+  {id:757,name:'Salandit',slug:'salandit',type:'poison',type2:'fire'},
+  {id:776,name:'Turtonator',slug:'turtonator',type:'fire',type2:'dragon'},
+  {id:777,name:'Togedemaru',slug:'togedemaru',type:'electric',type2:'steel'},
+  {id:778,name:'Mimikyu',slug:'mimikyu',type:'ghost',type2:'fairy'},
+  {id:785,name:'Tapu Koko',slug:'tapu-koko',type:'electric',type2:'fairy'},
+  {id:791,name:'Solgaleo',slug:'solgaleo',type:'psychic',type2:'steel'},
+  {id:792,name:'Lunala',slug:'lunala',type:'psychic',type2:'ghost'},
+  {id:800,name:'Necrozma',slug:'necrozma',type:'psychic'},
+  {id:801,name:'Magearna',slug:'magearna',type:'steel',type2:'fairy'},
+  {id:802,name:'Marshadow',slug:'marshadow',type:'fighting',type2:'ghost'},
+  {id:807,name:'Zeraora',slug:'zeraora',type:'electric'},
+  {id:808,name:'Meltan',slug:'meltan',type:'steel'},
+  {id:810,name:'Grookey',slug:'grookey',type:'grass'},
+  {id:813,name:'Scorbunny',slug:'scorbunny',type:'fire'},
+  {id:816,name:'Sobble',slug:'sobble',type:'water'},
+  {id:821,name:'Rookidee',slug:'rookidee',type:'flying'},
+  {id:827,name:'Toxel',slug:'toxel',type:'electric',type2:'poison'},
+  {id:831,name:'Wooloo',slug:'wooloo',type:'normal'},
+  {id:835,name:'Yamper',slug:'yamper',type:'electric'},
+  {id:840,name:'Applin',slug:'applin',type:'grass',type2:'dragon'},
+  {id:845,name:'Cramorant',slug:'cramorant',type:'flying',type2:'water'},
+  {id:854,name:'Sinistea',slug:'sinistea',type:'ghost'},
+  {id:856,name:'Hatenna',slug:'hatenna',type:'psychic'},
+  {id:859,name:'Impidimp',slug:'impidimp',type:'dark',type2:'fairy'},
+  {id:868,name:'Milcery',slug:'milcery',type:'fairy'},
+  {id:869,name:'Alcremie',slug:'alcremie',type:'fairy'},
+  {id:871,name:'Pincurchin',slug:'pincurchin',type:'electric'},
+  {id:872,name:'Snom',slug:'snom',type:'ice',type2:'bug'},
+  {id:877,name:'Morpeko',slug:'morpeko',type:'electric',type2:'dark'},
+  {id:880,name:'Dracozolt',slug:'dracozolt',type:'electric',type2:'dragon'},
+  {id:881,name:'Arctozolt',slug:'arctozolt',type:'electric',type2:'ice'},
+  {id:888,name:'Zacian',slug:'zacian',type:'fairy'},
+  {id:889,name:'Zamazenta',slug:'zamazenta',type:'fighting'},
+  {id:890,name:'Eternatus',slug:'eternatus',type:'poison',type2:'dragon'},
+  {id:894,name:'Regieleki',slug:'regieleki',type:'electric'},
+  {id:895,name:'Regidrago',slug:'regidrago',type:'dragon'},
+  {id:896,name:'Glastrier',slug:'glastrier',type:'ice'},
+  {id:897,name:'Spectrier',slug:'spectrier',type:'ghost'},
+  {id:898,name:'Calyrex',slug:'calyrex',type:'psychic',type2:'grass'},
+  {id:906,name:'Sprigatito',slug:'sprigatito',type:'grass'},
+  {id:909,name:'Fuecoco',slug:'fuecoco',type:'fire'},
+  {id:912,name:'Quaxly',slug:'quaxly',type:'water'},
+  {id:915,name:'Lechonk',slug:'lechonk',type:'normal'},
+  {id:921,name:'Pawmi',slug:'pawmi',type:'electric'},
+  {id:924,name:'Fidough',slug:'fidough',type:'fairy'},
+  {id:935,name:'Charcadet',slug:'charcadet',type:'fire'},
+  {id:938,name:'Tadbulb',slug:'tadbulb',type:'electric'},
+  {id:971,name:'Greavard',slug:'greavard',type:'ghost'},
+  {id:987,name:'Flutter Mane',slug:'flutter-mane',type:'ghost',type2:'fairy'},
+  {id:1004,name:'Chi-yu',slug:'chi-yu',type:'dark',type2:'fire'},
+  {id:1007,name:'Koraidon',slug:'koraidon',type:'fighting',type2:'dragon'},
+  {id:1008,name:'Miraidon',slug:'miraidon',type:'electric',type2:'dragon'},
+]
+
+const TYPE_COLORS={fire:'#FF6B35',water:'#4FC3F7',electric:'#FFCB05',grass:'#4CAF50',normal:'#A8A878',psychic:'#F95587',rock:'#B8A038',ice:'#98D8D8',dragon:'#7038F8',ghost:'#705898',flying:'#A890F0',fighting:'#C03028',poison:'#A040A0',ground:'#E0C068',bug:'#A8B820',steel:'#B8B8D0',dark:'#705848',fairy:'#EE99AC'}
+const TYPE_EMOJI={fire:'🔥',water:'💧',electric:'⚡',grass:'🍃',normal:'💢',psychic:'🔮',rock:'🪨',ice:'❄️',dragon:'🐉',ghost:'👻',flying:'🌪️',fighting:'👊',poison:'☠️',ground:'💥',bug:'🐛',steel:'⚔️',dark:'🌑',fairy:'✨'}
+const TYPE_TEXTCOLOR={electric:'#1a1a1a',ice:'#1a1a1a',normal:'white',rock:'white'}
+
+function pokeSprite(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
+function pokeSpriteBackup(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
+
+let g10State={}
+
+function initGame10(){
+  const p=state.players[state.currentPlayer]
+  document.getElementById('g10-player-icon').textContent=p.animal
+  document.getElementById('g10-stars').textContent='⭐ 0'
+  const lvl=state.selectedLevel
+  const playerHp=lvl==='easy'?5:lvl==='medium'?4:3
+  const enemyHp=lvl==='easy'?3:lvl==='medium'?4:5
+  const cpMin=lvl==='easy'?5:lvl==='medium'?20:50
+  const cpMax=lvl==='easy'?30:lvl==='medium'?100:300
+  const totalRounds=DIFF[lvl].rounds
+
+  function randPoke(){return POKEMON_DB[Math.floor(Math.random()*POKEMON_DB.length)]}
+
+  g10State={
+    playerPoke:randPoke(), enemyPoke:randPoke(),
+    playerHp, enemyHp, playerMaxHp:playerHp, enemyMaxHp:enemyHp,
+    playerCp:0, enemyCp:0, cpMin, cpMax,
+    round:1, totalRounds, stars:0, locked:false
+  }
+  g10State.playerPoke=randPoke(); g10State.enemyPoke=randPoke()
+  while(g10State.enemyPoke.id===g10State.playerPoke.id) g10State.enemyPoke=randPoke()
+
+  g10NewBattle()
+}
+
+function g10NewBattle(){
+  const s=g10State
+  const cpMin=s.cpMin, cpMax=s.cpMax
+  s.playerCp=Math.floor(Math.random()*(cpMax-cpMin+1))+cpMin
+  s.enemyCp=Math.floor(Math.random()*(cpMax-cpMin+1))+cpMin
+  s.locked=false
+
+  const eImg=document.getElementById('poke-enemy-spr')
+  eImg.src=pokeSprite(s.enemyPoke.slug)
+  eImg.onerror=()=>{eImg.src=pokeSpriteBackup(s.enemyPoke.id)}
+  eImg.style.display='block'
+
+  const pImg=document.getElementById('poke-player-spr')
+  pImg.src=pokeSprite(s.playerPoke.slug)
+  pImg.onerror=()=>{pImg.src=pokeSpriteBackup(s.playerPoke.id)}
+  pImg.style.display='block'
+
+  document.getElementById('poke-enemy-name').textContent=s.enemyPoke.name
+  document.getElementById('poke-player-name').textContent=s.playerPoke.name
+  document.getElementById('poke-enemy-cp').textContent=`CP: ${s.enemyCp}`
+  document.getElementById('poke-player-cp').textContent=`CP: ${s.playerCp}`
+  document.getElementById('poke-round').textContent=`Ronde ${s.round}/${s.totalRounds}`
+
+  function typeBadge(id,type){
+    const el=document.getElementById(id)
+    el.textContent=type.charAt(0).toUpperCase()+type.slice(1)
+    el.style.background=TYPE_COLORS[type]||'#888'
+    el.style.color=TYPE_TEXTCOLOR[type]||'white'
+  }
+  typeBadge('poke-enemy-type',s.enemyPoke.type)
+  typeBadge('poke-player-type',s.playerPoke.type)
+
+  function renderHp(id,hp,maxHp){
+    const el=document.getElementById(id)
+    el.innerHTML=''
+    for(let i=0;i<maxHp;i++){
+      const h=document.createElement('span')
+      h.textContent=i<hp?'❤️':'🖤'
+      h.className=i<hp?'poke-heart-full':'poke-heart-empty'
+      el.appendChild(h)
+    }
+  }
+  renderHp('poke-enemy-hp',s.enemyHp,s.enemyMaxHp)
+  renderHp('poke-player-hp',s.playerHp,s.playerMaxHp)
+
+  g10GenQuestion()
+}
+
+function g10GenQuestion(){
+  const s=g10State
+  const op=Math.random()<0.5?'add':'sub'
+  let a=s.playerCp, b=s.enemyCp, ans, qText, atkName
+
+  if(op==='add'){
+    ans=a+b
+    const blank=Math.random()<0.5?'a':'b'
+    if(blank==='a'){
+      qText=`? + ${b} = ${ans}`
+    } else {
+      qText=`${a} + ? = ${ans}`
+    }
+    atkName=`${s.playerPoke.name} menyerang dengan kekuatan gabungan!`
+  } else {
+    if(a<b){[a,b]=[b,a]}
+    ans=a-b
+    const blank=Math.random()<0.5?'a':'ans'
+    if(blank==='a'){
+      qText=`? - ${b} = ${ans}`
+      atkName=`Hitung serangan ${s.playerPoke.name}!`
+    } else {
+      qText=`${a} - ${b} = ?`
+      atkName=`${s.playerPoke.name} menyerang musuh!`
+    }
+  }
+
+  s.currentAnswer=ans
+  document.getElementById('poke-qtitle').textContent=atkName
+  document.getElementById('poke-qmath').textContent=qText
+
+  const choices=new Set([ans])
+  while(choices.size<4){
+    const delta=(Math.floor(Math.random()*15)+1)*(Math.random()<0.5?1:-1)
+    const c=ans+delta
+    if(c>0) choices.add(c)
+  }
+  const shuffled=[...choices].sort(()=>Math.random()-0.5)
+
+  const grid=document.getElementById('poke-qgrid')
+  grid.innerHTML=''
+  shuffled.forEach(val=>{
+    const btn=document.createElement('button')
+    btn.className='poke-qbtn'
+    btn.textContent=val
+    btn.onclick=()=>g10Answer(val,btn)
+    grid.appendChild(btn)
+  })
+}
+
+function g10Answer(val, btn){
+  if(g10State.locked) return
+  g10State.locked=true
+  const s=g10State
+  const correct=val===s.currentAnswer
+
+  btn.classList.add(correct?'correct':'wrong')
+  playSound(correct?'correct':'wrong')
+
+  if(correct){
+    s.enemyHp=Math.max(0,s.enemyHp-1)
+    document.getElementById('poke-status').textContent=`⚡ ${s.playerPoke.name} menyerang!`
+    g10ShowAttack(s.playerPoke.type,'enemy')
+  } else {
+    s.playerHp=Math.max(0,s.playerHp-1)
+    document.getElementById('poke-status').textContent=`💥 ${s.enemyPoke.name} balas serang!`
+    g10ShowAttack(s.enemyPoke.type,'player')
+  }
+
+  setTimeout(()=>{
+    function renderHp(id,hp,maxHp){
+      const el=document.getElementById(id);el.innerHTML=''
+      for(let i=0;i<maxHp;i++){const h=document.createElement('span');h.textContent=i<hp?'❤️':'🖤';el.appendChild(h)}
+    }
+    renderHp('poke-enemy-hp',s.enemyHp,s.enemyMaxHp)
+    renderHp('poke-player-hp',s.playerHp,s.playerMaxHp)
+
+    if(s.enemyHp<=0){
+      s.stars++
+      s.round++
+      state.players[state.currentPlayer].stars++
+      document.getElementById('g10-stars').textContent=`⭐ ${s.stars}`
+      document.getElementById('g10-stars').classList.add('pop')
+      setTimeout(()=>document.getElementById('g10-stars').classList.remove('pop'),400)
+
+      if(s.round>s.totalRounds){
+        setTimeout(()=>endGame(s.stars),600)
+        return
+      }
+      document.getElementById('poke-status').textContent=`🏆 Menang! Musuh baru datang...`
+      s.enemyPoke=POKEMON_DB[Math.floor(Math.random()*POKEMON_DB.length)]
+      while(s.enemyPoke.id===s.playerPoke.id) s.enemyPoke=POKEMON_DB[Math.floor(Math.random()*POKEMON_DB.length)]
+      s.enemyHp=s.enemyMaxHp
+      setTimeout(()=>g10NewBattle(),1200)
+    } else if(s.playerHp<=0){
+      setTimeout(()=>endGame(s.stars),600)
+    } else {
+      s.locked=false
+      g10GenQuestion()
+    }
+  },900)
+}
+
+function g10ShowAttack(type,target){
+  const emoji=TYPE_EMOJI[type]||'💥'
+  const atkEl=document.getElementById('poke-attack-fx')
+  const emojiEl=document.getElementById('poke-attack-emoji')
+  emojiEl.textContent=emoji
+  atkEl.style.opacity='1'
+
+  atkEl.style.top=target==='enemy'?'20%':'70%'
+  atkEl.style.left='50%'
+  atkEl.style.transform='translate(-50%,-50%)'
+
+  emojiEl.style.animation='none'
+  setTimeout(()=>{emojiEl.style.animation='atkEmoji 0.7s ease-out forwards'},10)
+
+  const flash=document.getElementById('poke-flash')
+  flash.className='poke-flash ' + type
+  setTimeout(()=>{flash.className='poke-flash';atkEl.style.opacity='0'},700)
+}
+
+// ================================================================
+// GAME 11 — KUIS SAINS
+// ================================================================
+const SCIENCE_QUESTIONS = [
+  {tier:'cilik', emoji:'🦅', q:'Burung bisa melakukan apa yang tidak bisa dilakukan kuda?', choices:['Terbang','Berlari','Makan rumput','Tidur'], ans:0},
+  {tier:'cilik', emoji:'🐟', q:'Di mana ikan tinggal?', choices:['Di pohon','Di air','Di tanah','Di udara'], ans:1},
+  {tier:'cilik', emoji:'🌞', q:'Apa yang membuat tanaman tumbuh?', choices:['Cahaya matahari','Kegelapan','Es','Angin kencang'], ans:0},
+  {tier:'cilik', emoji:'🐸', q:'Hewan apa yang bisa hidup di air dan di darat?', choices:['Singa','Katak','Kucing','Domba'], ans:1},
+  {tier:'cilik', emoji:'🌱', q:'Dari mana tanaman tumbuh?', choices:['Dari batu','Dari biji','Dari air','Dari angin'], ans:1},
+  {tier:'cilik', emoji:'🌈', q:'Warna apa yang ada di pelangi?', choices:['Hitam dan putih','Merah, kuning, hijau, biru','Hanya biru','Hanya merah'], ans:1},
+  {tier:'cilik', emoji:'🐻', q:'Hewan apa yang tidur panjang di musim dingin?', choices:['Beruang','Gajah','Ikan','Burung'], ans:0},
+  {tier:'cilik', emoji:'🌙', q:'Kapan bulan terlihat?', choices:['Siang hari','Malam hari','Saat hujan','Saat mendung'], ans:1},
+  {tier:'cilik', emoji:'🔥', q:'Apa yang kita butuhkan untuk menyalakan api?', choices:['Air','Panas / percikan api','Es batu','Tanah'], ans:1},
+  {tier:'cilik', emoji:'🐝', q:'Hewan apa yang menghasilkan madu?', choices:['Semut','Lebah','Nyamuk','Capung'], ans:1},
+  {tier:'tumbuh', emoji:'🌊', q:'Apa nama samudra terbesar di dunia?', choices:['Samudra Atlantik','Samudra Hindia','Samudra Pasifik','Samudra Arktik'], ans:2},
+  {tier:'tumbuh', emoji:'🦁', q:'Hewan apa yang disebut raja hutan?', choices:['Gajah','Harimau','Singa','Serigala'], ans:2},
+  {tier:'tumbuh', emoji:'🌿', q:'Proses apa yang dilakukan tumbuhan untuk membuat makanan?', choices:['Respirasi','Fotosintesis','Evaporasi','Kondensasi'], ans:1},
+  {tier:'tumbuh', emoji:'🐋', q:'Mamalia terbesar di dunia adalah...', choices:['Hiu paus','Gajah Afrika','Paus biru','Jerapah'], ans:2},
+  {tier:'tumbuh', emoji:'🌡️', q:'Alat apa yang digunakan untuk mengukur suhu?', choices:['Penggaris','Termometer','Barometer','Teleskop'], ans:1},
+  {tier:'tumbuh', emoji:'🦋', q:'Urutan metamorfosis kupu-kupu yang benar adalah...', choices:['Telur→Kupu→Ulat→Kepompong','Telur→Ulat→Kepompong→Kupu-kupu','Ulat→Telur→Kepompong→Kupu','Kepompong→Telur→Ulat→Kupu'], ans:1},
+  {tier:'tumbuh', emoji:'💧', q:'Air mendidih pada suhu berapa derajat Celsius?', choices:['50°C','75°C','100°C','120°C'], ans:2},
+  {tier:'tumbuh', emoji:'🌍', q:'Planet manakah yang paling dekat dengan Matahari?', choices:['Venus','Bumi','Mars','Merkurius'], ans:3},
+  {tier:'tumbuh', emoji:'🐊', q:'Di mana habitat asli buaya?', choices:['Gurun','Sungai dan rawa','Pegunungan tinggi','Kutub'], ans:1},
+  {tier:'tumbuh', emoji:'🌺', q:'Bagian bunga yang menghasilkan serbuk sari disebut...', choices:['Mahkota','Putik','Benang sari','Kelopak'], ans:2},
+  {tier:'pintar', emoji:'🌏', q:'Lapisan gas yang melindungi Bumi disebut...', choices:['Hidrosfer','Litosfer','Atmosfer','Biosfer'], ans:2},
+  {tier:'pintar', emoji:'⚡', q:'Apa yang dihasilkan oleh panel surya?', choices:['Air','Listrik','Panas','Makanan'], ans:1},
+  {tier:'pintar', emoji:'🔬', q:'Makhluk hidup yang sangat kecil dan tidak bisa dilihat mata adalah...', choices:['Serangga','Mikroorganisme','Plankton','Amuba besar'], ans:1},
+  {tier:'pintar', emoji:'🌊', q:'Rantai makanan di laut: plankton → ikan kecil → ?', choices:['Rumput laut','Ikan besar/paus','Buaya','Penguin'], ans:1},
+  {tier:'pintar', emoji:'🌱', q:'Pupuk organik berasal dari...', choices:['Plastik daur ulang','Sisa makhluk hidup','Batubara','Minyak bumi'], ans:1},
+  {tier:'pintar', emoji:'🌡️', q:'Perubahan iklim global disebabkan oleh meningkatnya...', choices:['Oksigen','Gas rumah kaca (CO2)','Nitrogen','Argon'], ans:1},
+  {tier:'pintar', emoji:'🌲', q:'Hutan hujan tropis banyak ditemukan di...', choices:['Eropa','Afrika utara','Amerika Selatan & Asia Tenggara','Kutub utara'], ans:2},
+  {tier:'pintar', emoji:'🧬', q:'DNA ditemukan di dalam...', choices:['Mitokondria','Inti sel / nukleus','Dinding sel','Vakuola'], ans:1},
+  {tier:'pintar', emoji:'⚗️', q:'Benda yang bisa menghantarkan listrik disebut...', choices:['Isolator','Konduktor','Resistor','Kapasitor'], ans:1},
+  {tier:'pintar', emoji:'🌕', q:'Gerhana bulan terjadi ketika...', choices:['Bulan menutupi Matahari','Bumi berada di antara Matahari dan Bulan','Matahari menutupi Bulan','Bulan menjauh dari Bumi'], ans:1},
+]
+
+let g11State={}
+function initGame11(){
+  const p=state.players[state.currentPlayer]
+  document.getElementById('g11-player-icon').textContent=p.animal
+  document.getElementById('g11-stars').textContent='⭐ 0'
+  const lvl=state.selectedLevel
+  const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
+  const mapped=tier==='cilik'?'cilik':tier==='tumbuh'?'tumbuh':'pintar'
+  let pool=SCIENCE_QUESTIONS.filter(q=>q.tier===mapped)
+  if(pool.length<DIFF[lvl].rounds) pool=SCIENCE_QUESTIONS
+  pool=pool.sort(()=>Math.random()-0.5).slice(0,DIFF[lvl].rounds)
+  g11State={pool, idx:0, stars:0, total:pool.length}
+  document.getElementById('g11-progress-bar').style.width='0%'
+  g11ShowQuestion()
+}
+function g11ShowQuestion(){
+  const s=g11State
+  if(s.idx>=s.pool.length){endGame(s.stars);return}
+  const q=s.pool[s.idx]
+  document.getElementById('g11-emoji').textContent=q.emoji
+  document.getElementById('g11-question').textContent=q.q
+  document.getElementById('g11-progress-bar').style.width=`${(s.idx/s.total)*100}%`
+  const ch=document.getElementById('g11-choices')
+  ch.innerHTML=''
+  q.choices.forEach((c,i)=>{
+    const btn=document.createElement('button')
+    btn.className='sci-choice'
+    btn.textContent=c
+    btn.onclick=()=>g11Answer(i,btn)
+    ch.appendChild(btn)
+  })
+}
+function g11Answer(idx,btn){
+  const s=g11State; const q=s.pool[s.idx]
+  const correct=idx===q.ans
+  btn.classList.add(correct?'correct':'wrong')
+  if(!correct){
+    const btns=document.getElementById('g11-choices').querySelectorAll('.sci-choice')
+    btns[q.ans].classList.add('correct')
+  }
+  playSound(correct?'correct':'wrong')
+  if(correct){s.stars++;state.players[state.currentPlayer].stars++;document.getElementById('g11-stars').textContent=`⭐ ${s.stars}`;document.getElementById('g11-stars').classList.add('pop');setTimeout(()=>document.getElementById('g11-stars').classList.remove('pop'),400)}
+  s.idx++
+  setTimeout(()=>g11ShowQuestion(),1000)
+}
+
+// ================================================================
+// GAME 12 — TEBAK BAYANGAN
+// ================================================================
+const SHADOW_ITEMS=[
+  {desc:'Hewan besar berbelalai panjang dan bertelinga lebar', ans:'🐘', wrong:['🦒','🦁','🐊']},
+  {desc:'Raja hutan berbulu lebat di lehernya', ans:'🦁', wrong:['🐯','🦊','🐻']},
+  {desc:'Hewan hitam-putih yang suka makan bambu', ans:'🐼', wrong:['🦨','🦡','🦥']},
+  {desc:'Hewan air yang bisa terbang dengan sayap hitam-putih', ans:'🐧', wrong:['🦆','🕊️','🦅']},
+  {desc:'Hewan berkaki empat dan berbulu yang suka menggonggong', ans:'🐕', wrong:['🐈','🐇','🦊']},
+  {desc:'Hewan yang bisa mengeluarkan sutra dari tubuhnya', ans:'🕷️', wrong:['🐛','🐝','🦗']},
+  {desc:'Buah merah bulat dengan biji kecil di dalamnya', ans:'🍎', wrong:['🍊','🍇','🍓']},
+  {desc:'Buah kuning panjang berbentuk melengkung', ans:'🍌', wrong:['🌽','🥒','🫒']},
+  {desc:'Hewan laut berwarna merah dengan banyak kaki', ans:'🦞', wrong:['🦀','🐙','🦑']},
+  {desc:'Kendaraan yang bisa terbang tinggi di langit', ans:'✈️', wrong:['🚀','🚁','🪂']},
+  {desc:'Benda yang dipakai di kaki saat hujan', ans:'👢', wrong:['👟','🥿','👞']},
+  {desc:'Alat yang digunakan untuk menulis di kertas', ans:'✏️', wrong:['🖍️','📏','📐']},
+  {desc:'Hewan yang punya cangkang dan berjalan lambat', ans:'🐢', wrong:['🦀','🐌','🦔']},
+  {desc:'Buah ungu kecil-kecil yang tumbuh bergerombol', ans:'🍇', wrong:['🫐','🍒','🫛']},
+  {desc:'Kendaraan besar yang bergerak di atas rel', ans:'🚂', wrong:['🚌','🚢','✈️']},
+  {desc:'Hewan berbisa dengan ekor berbentuk panah', ans:'🦂', wrong:['🕷️','🦗','🐝']},
+  {desc:'Bintang laut tinggal di...', ans:'🌊', wrong:['🌲','🏔️','🏜️']},
+  {desc:'Hewan yang bisa berubah warna seperti bunglon', ans:'🦎', wrong:['🐍','🐊','🦕']},
+  {desc:'Buah tropis berduri di luar, manis di dalam', ans:'🍍', wrong:['🥭','🍈','🥥']},
+  {desc:'Hewan berkaki delapan yang membuat jaring', ans:'🕷️', wrong:['🦗','🐜','🐝']},
+  {desc:'Hewan putih bersih yang menghasilkan susu', ans:'🐄', wrong:['🐑','🐐','🐖']},
+  {desc:'Reptil besar yang hidup di sungai Afrika', ans:'🐊', wrong:['🦎','🐢','🐍']},
+  {desc:'Serangga kecil kuning-hitam yang menghasilkan madu', ans:'🍯', wrong:['🫙','🧂','🫗']},
+  {desc:'Planet keempat dari Matahari berwarna merah', ans:'🔴', wrong:['🟡','🔵','🟢']},
+  {desc:'Alat musik petik berdawai banyak', ans:'🎸', wrong:['🥁','🎹','🎺']},
+  {desc:'Hewan malam yang bisa terbang dan hidup di gua', ans:'🦇', wrong:['🦉','🐦','🕊️']},
+  {desc:'Makanan laut yang berbentuk bulat berlengan banyak', ans:'🐙', wrong:['🦑','🦀','🦞']},
+  {desc:'Alat untuk melihat benda jauh di langit', ans:'🔭', wrong:['🔬','📡','🧲']},
+  {desc:'Buah jeruk kecil berwarna hijau dengan rasa asam', ans:'🍋', wrong:['🍊','🫒','🥝']},
+  {desc:'Hewan yang hidup di hutan dan pandai berayun', ans:'🐒', wrong:['🦧','🦁','🐻']},
+]
+let g12State={}
+function initGame12(){
+  const p=state.players[state.currentPlayer]
+  document.getElementById('g12-player-icon').textContent=p.animal
+  document.getElementById('g12-stars').textContent='⭐ 0'
+  const pool=[...SHADOW_ITEMS].sort(()=>Math.random()-0.5).slice(0,DIFF[state.selectedLevel].rounds)
+  g12State={pool,idx:0,stars:0,total:pool.length,locked:false}
+  document.getElementById('g12-progress-bar').style.width='0%'
+  g12ShowQuestion()
+}
+function g12ShowQuestion(){
+  const s=g12State
+  if(s.idx>=s.pool.length){endGame(s.stars);return}
+  const q=s.pool[s.idx]
+  s.locked=false
+  document.getElementById('g12-question').textContent=q.desc
+  document.getElementById('g12-progress').textContent=`Soal ${s.idx+1}/${s.total}`
+  document.getElementById('g12-progress-bar').style.width=`${(s.idx/s.total)*100}%`
+
+  const choices=[{emoji:q.ans,correct:true},...q.wrong.slice(0,3).map(e=>({emoji:e,correct:false}))].sort(()=>Math.random()-0.5)
+  const grid=document.getElementById('g12-choices')
+  grid.innerHTML=''
+  choices.forEach(c=>{
+    const btn=document.createElement('button')
+    btn.className='shadow-btn'
+    btn.textContent=c.emoji
+    btn.onclick=()=>g12Answer(c.correct,btn,grid)
+    grid.appendChild(btn)
+  })
+}
+function g12Answer(correct,btn,grid){
+  const s=g12State; if(s.locked)return; s.locked=true
+  grid.querySelectorAll('.shadow-btn').forEach(b=>b.classList.add('revealed'))
+  btn.classList.add(correct?'correct':'wrong')
+  if(!correct){grid.querySelectorAll('.shadow-btn').forEach(b=>{if(b.classList.contains('revealed')&&!b.classList.contains('wrong'))b.classList.add('correct')})}
+  playSound(correct?'correct':'wrong')
+  if(correct){s.stars++;state.players[state.currentPlayer].stars++;document.getElementById('g12-stars').textContent=`⭐ ${s.stars}`}
+  s.idx++
+  setTimeout(()=>g12ShowQuestion(),1100)
+}
+
 // Show XP on welcome screen for returning players
 try{
   const xp=getXP(); if(xp>0){const tier=getLevelTier(xp);const el=document.getElementById('welcome-level-badge');if(el){el.style.display='block';el.textContent=`${tier.icon} ${tier.name} — ${xp} XP`}}
