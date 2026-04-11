@@ -332,6 +332,45 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g5-card.matched .g5-card-back { background:linear-gradient(135deg,#CCFBF1,#F0FDFA);border:3px solid var(--teal);animation:matchedPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes matchedPop { 0%{transform:rotateY(180deg)scale(1)} 50%{transform:rotateY(180deg)scale(1.12)} 100%{transform:rotateY(180deg)scale(1)} }
 
+/* G5 Mode tabs */
+.g5-mode-tabs{display:flex;gap:5px;width:100%;max-width:520px;margin-bottom:6px;position:relative;z-index:1;}
+.g5-mode-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:14px;border:2px solid rgba(139,92,246,0.35);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.65);font-family:var(--font);font-size:18px;cursor:pointer;transition:all 0.2s;}
+.g5-mode-tab span{font-size:9px;font-weight:700;}
+.g5-mode-tab.active{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:white;border-color:#7C3AED;box-shadow:0 4px 0 #5B21B6;}
+.g5-sub-tabs{display:flex;gap:8px;margin-bottom:8px;position:relative;z-index:1;}
+.g5-sub-tab{padding:5px 16px;border-radius:100px;border:2px solid rgba(139,92,246,0.4);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.g5-sub-tab.active{background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;border-color:#7C3AED;}
+/* Pokémon card back */
+.g5-poke-img{width:58px;height:58px;object-fit:contain;image-rendering:pixelated;}
+/* G5 alt display container */
+#g5-alt-display{flex-direction:column;align-items:center;padding-bottom:24px;gap:10px;}
+/* Numeric Memory */
+.g5-num-grid{display:grid;gap:10px;width:100%;max-width:320px;position:relative;z-index:1;}
+.g5-num-cell{aspect-ratio:1;border-radius:18px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);}
+.g5-num-cell .ncell-front,.g5-num-cell .ncell-back{position:absolute;inset:0;border-radius:18px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.g5-num-cell .ncell-front{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:white;font-size:36px;font-weight:900;font-family:var(--font);}
+.g5-num-cell .ncell-back{background:linear-gradient(135deg,#1E1B4B,#312E81);border:2px solid rgba(139,92,246,0.5);color:rgba(255,255,255,0.3);font-size:13px;transform:rotateY(180deg);}
+.g5-num-cell.face-down{transform:rotateY(180deg);}
+.g5-num-cell.correct-tap .ncell-back{background:linear-gradient(135deg,#059669,#34D399);color:white;font-size:28px;font-weight:900;border-color:#059669;}
+.g5-num-cell.wrong-tap{animation:wrongShake 0.4s ease;}
+/* Spatial Memory */
+.g5-spatial-grid{display:grid;gap:8px;width:100%;max-width:320px;position:relative;z-index:1;}
+.g5-spatial-cell{aspect-ratio:1;border-radius:14px;background:rgba(255,255,255,0.1);border:2px solid rgba(139,92,246,0.3);cursor:pointer;transition:all 0.25s;}
+.g5-spatial-cell.lit{background:linear-gradient(135deg,#FCD34D,#F59E0B);border-color:#F59E0B;box-shadow:0 0 20px rgba(252,211,77,0.7);transform:scale(1.05);}
+.g5-spatial-cell.correct-tap{background:linear-gradient(135deg,#6EE7B7,#34D399);border-color:#10B981;}
+.g5-spatial-cell.wrong-tap{background:linear-gradient(135deg,#FCA5A5,#F87171);border-color:#EF4444;animation:wrongShake 0.35s ease;}
+/* Sequence Memory */
+.g5-seq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:280px;position:relative;z-index:1;}
+.g5-seq-btn{height:110px;border-radius:22px;border:4px solid rgba(0,0,0,0.25);cursor:pointer;transition:filter 0.15s,transform 0.15s,opacity 0.15s;opacity:0.7;}
+.g5-seq-btn.active{filter:brightness(1.9) saturate(1.3);transform:scale(1.07);opacity:1;box-shadow:0 0 28px currentColor;}
+.g5-seq-btn[data-c="0"]{background:#EF4444;border-color:#991B1B;}
+.g5-seq-btn[data-c="1"]{background:#3B82F6;border-color:#1E3A8A;}
+.g5-seq-btn[data-c="2"]{background:#EAB308;border-color:#713F12;}
+.g5-seq-btn[data-c="3"]{background:#22C55E;border-color:#14532D;}
+.g5-alt-label{color:white;font-size:16px;font-weight:900;text-align:center;position:relative;z-index:1;}
+.g5-alt-sub{color:rgba(255,255,255,0.65);font-size:13px;font-weight:700;text-align:center;position:relative;z-index:1;}
+.g5-seq-level{font-size:30px;font-weight:900;color:white;text-align:center;font-family:var(--font);position:relative;z-index:1;}
+
 /* G6 */
 #screen-game6 { background:linear-gradient(180deg,#E0F2FE 0%,#BAE6FD 30%,#F0F9FF 100%);padding-bottom:0; }
 .g6-map-row { display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%;max-width:500px; }
@@ -3833,17 +3872,29 @@ body { background: #0a0a1a !important; }
   <div class="moon-crescent"></div>
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
-    <span class="gh-title">🃏 Cocokkan Emosi</span>
+    <span class="gh-title">🧠 Memory Pintar</span>
     <span class="gh-level" id="g5-level">Lv.1</span>
     <button class="gh-pause" onclick="pauseGame()">⏸</button>
   </div>
-  <!-- Banner image -->
-  <div class="g5-banner-wrap">
-    <img class="g5-banner-img" src="assets/banner-game5.webp" alt="" onerror="this.style.display='none'">
+  <!-- 4 mode tabs -->
+  <div class="g5-mode-tabs">
+    <button class="g5-mode-tab active" data-m="visual"   onclick="setG5Mode('visual',this)">🃏<span>Visual</span></button>
+    <button class="g5-mode-tab"        data-m="numeric"  onclick="setG5Mode('numeric',this)">🔢<span>Angka</span></button>
+    <button class="g5-mode-tab"        data-m="spatial"  onclick="setG5Mode('spatial',this)">📍<span>Posisi</span></button>
+    <button class="g5-mode-tab"        data-m="sequence" onclick="setG5Mode('sequence',this)">🔗<span>Urutan</span></button>
   </div>
+  <!-- Visual sub-tabs (hidden for other modes) -->
+  <div class="g5-sub-tabs" id="g5-sub-tabs">
+    <button class="g5-sub-tab active" onclick="setG5SubMode('emosi',this)">😊 Emosi</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('pokemon',this)">⚡ Pokémon</button>
+  </div>
+  <!-- Score row (visual mode) -->
   <div class="g5-score-row" id="g5-scores"></div>
   <p class="g5-turn-text" id="g5-turn-text"></p>
+  <!-- Card grid (visual mode) -->
   <div class="g5-grid" id="g5-grid"></div>
+  <!-- Alt display for numeric/spatial/sequence -->
+  <div id="g5-alt-display" style="display:none;"></div>
 </div>
 
 <!-- GAME 6 -->
@@ -4109,6 +4160,12 @@ const MATCH_PAIRS_ALPHA = [
   {id:'lg',emoji:'G',label:'Huruf G', emoji2:'🐘',label2:'Gajah',  eduTip:'G seperti GAJAH'},
 ]
 
+const MATCH_PAIRS_POKE = [
+  {id:25,name:'Pikachu'},{id:4,name:'Charmander'},{id:7,name:'Squirtle'},
+  {id:1,name:'Bulbasaur'},{id:39,name:'Jigglypuff'},{id:52,name:'Meowth'},
+  {id:133,name:'Eevee'},{id:172,name:'Pichu'},{id:94,name:'Gengar'},
+  {id:143,name:'Snorlax'},{id:35,name:'Clefairy'},{id:54,name:'Psyduck'},
+]
 const ANIMALS_PICKER = ['🦁','🐰','🐘','🦊','🐸','🐯','🐼','🐨']
 const ANIMALS_G4 = ['🐘','🦁','🐯','🐸','🐰','🦊','🐼','🐨','🐧','🦆','🐓','🐑','🦒','🐴','🦋']
 const POKEMON_G4 = [
@@ -5347,50 +5404,292 @@ function startG4Timer(){
 }
 
 // ================================================================
-// GAME 5: COCOKKAN EMOSI
+// GAME 5: MEMORY PINTAR (4 modes)
 // ================================================================
-let g5State={}
+let g5State={}, g5Mode='visual', g5SubMode='emosi'
+
+function setG5Mode(mode,btn){
+  g5Mode=mode; playClick()
+  document.querySelectorAll('.g5-mode-tab').forEach(t=>t.classList.remove('active'))
+  if(btn) btn.classList.add('active')
+  const isVisual=mode==='visual'
+  document.getElementById('g5-sub-tabs').style.display=isVisual?'flex':'none'
+  document.getElementById('g5-scores').style.display=isVisual?'flex':'none'
+  document.getElementById('g5-turn-text').style.display=isVisual?'block':'none'
+  document.getElementById('g5-grid').style.display=isVisual?'grid':'none'
+  document.getElementById('g5-alt-display').style.display=isVisual?'none':'flex'
+  initGame5()
+}
+function setG5SubMode(sub,btn){
+  g5SubMode=sub; playClick()
+  document.querySelectorAll('.g5-sub-tab').forEach(t=>t.classList.remove('active'))
+  if(btn) btn.classList.add('active')
+  initG5Visual()
+}
+
 function initGame5(){
-  initDreamWorld(); clearTimers()
-  const diff=DIFF[state.selectedLevel]
-  let totalPairs,gridClass,cols
-  if(state.selectedLevel==='easy'){totalPairs=6;gridClass='grid-3x4';cols=3}
-  else if(state.selectedLevel==='hard'){totalPairs=10;gridClass='grid-4x5';cols=4}
-  else{totalPairs=8;gridClass='';cols=4}
+  initDreamWorld(); clearTimers(); g5Mode='visual'; g5SubMode='emosi'
+  // Reset tab UI
+  document.querySelectorAll('.g5-mode-tab').forEach((t,i)=>t.classList.toggle('active',i===0))
+  document.querySelectorAll('.g5-sub-tab').forEach((t,i)=>t.classList.toggle('active',i===0))
+  initG5Visual()
+}
+
+// ── Mode 1: Visual (card flip matching) ──
+function initG5Visual(){
+  // Ensure correct DOM visibility for visual mode
+  const sub=document.getElementById('g5-sub-tabs'),sc=document.getElementById('g5-scores'),tt=document.getElementById('g5-turn-text'),gr=document.getElementById('g5-grid'),alt=document.getElementById('g5-alt-display')
+  if(sub) sub.style.display='flex'
+  if(sc) sc.style.display='flex'
+  if(tt) tt.style.display='block'
+  if(gr) gr.style.display='grid'
+  if(alt) alt.style.display='none'
+  const diff=state.selectedLevel
+  let totalPairs,gridClass
+  if(diff==='easy'){totalPairs=6;gridClass='grid-3x4'}
+  else if(diff==='hard'){totalPairs=10;gridClass='grid-4x5'}
+  else{totalPairs=8;gridClass=''}
   g5State={cards:[],flipped:[],matched:0,totalPairs,scores:[0,0],currentPlayer:state.currentPlayer,locked:false}
-  // Select pool: easy=emotions, medium=emotions+numbers, hard=numbers+letters
-  let pool
-  if(state.selectedLevel==='easy'){
-    pool = MATCH_PAIRS.slice(0,totalPairs)
-  } else if(state.selectedLevel==='hard'){
-    pool = [...MATCH_PAIRS_NUMS.slice(0,5), ...MATCH_PAIRS_ALPHA.slice(0,5)]
+  if(g5SubMode==='pokemon'){
+    const pool=MATCH_PAIRS_POKE.slice(0,totalPairs)
+    const flat=[]
+    pool.forEach(p=>{
+      flat.push({id:p.id,label:p.name,flipped:false,matched:false,cardSide:'A'})
+      flat.push({id:p.id,label:p.name,flipped:false,matched:false,cardSide:'B'})
+    })
+    g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
   } else {
-    pool = [...MATCH_PAIRS.slice(0,4), ...MATCH_PAIRS_NUMS.slice(0,4)]
+    let pool
+    if(diff==='easy') pool=MATCH_PAIRS.slice(0,totalPairs)
+    else if(diff==='hard') pool=[...MATCH_PAIRS_NUMS.slice(0,5),...MATCH_PAIRS_ALPHA.slice(0,5)]
+    else pool=[...MATCH_PAIRS.slice(0,4),...MATCH_PAIRS_NUMS.slice(0,4)]
+    pool=pool.slice(0,totalPairs)
+    const flat=[]
+    pool.forEach(item=>{
+      const isEdu=!!(item.emoji2)
+      flat.push({...item,flipped:false,matched:false,cardSide:'A'})
+      flat.push({...item,emoji:isEdu?item.emoji2:item.emoji,label:isEdu?item.label2:item.label,flipped:false,matched:false,cardSide:'B'})
+    })
+    g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
   }
-  pool = pool.slice(0, totalPairs)
-  // Build pairs with A/B sides for educational pairs
-  const flatPairs = []
-  pool.forEach(item => {
-    const isEdu = !!(item.emoji2)
-    flatPairs.push({...item, emoji: item.emoji, label: item.label, flipped:false, matched:false, cardSide:'A'})
-    flatPairs.push({...item, emoji: isEdu ? item.emoji2 : item.emoji, label: isEdu ? item.label2 : item.label, flipped:false, matched:false, cardSide:'B'})
-  })
-  const pairs = flatPairs.sort(()=>Math.random()-0.5).map((c,idx)=>({...c,idx}))
-  g5State.cards=pairs
   const scoresEl=document.getElementById('g5-scores')
   if(state.mode==='duo'){scoresEl.innerHTML=[0,1].map(i=>`<div class="g5-player-score ${i===g5State.currentPlayer?'active':''}" id="g5-ps-${i}"><div class="ps-name">${state.players[i].animal} ${state.players[i].name}</div><div class="ps-val" id="g5-score-${i}">0 pasang</div></div>`).join('');document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`}
-  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent='Cocokkan semua pasangan emosi! 🃏'}
-  const grid=document.getElementById('g5-grid'); grid.className='g5-grid'+(gridClass?' '+gridClass:''); renderG5Grid()
+  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=g5SubMode==='pokemon'?'Cocokkan pasangan Pokémon! ⚡':'Cocokkan semua pasangan! 🃏'}
+  const grid=document.getElementById('g5-grid')
+  grid.className='g5-grid'+(gridClass?' '+gridClass:'')
+  renderG5Grid()
 }
 function renderG5Grid(){
   const grid=document.getElementById('g5-grid'); grid.innerHTML=''
   g5State.cards.forEach((card,idx)=>{
     const el=document.createElement('div'); el.className='g5-card'
-    const isLetterCard = card.cardSide==='A' && card.id && card.id.startsWith('l')
-    const emojiStyle = isLetterCard ? 'font-size:48px;font-weight:900;color:#8B5CF6;font-family:var(--font);line-height:1' : ''
-    el.innerHTML=`<div class="g5-card-front"></div><div class="g5-card-back"><span class="card-emoji" style="${emojiStyle}">${card.emoji}</span><span class="card-label">${card.label}</span></div>`
+    let back
+    if(g5SubMode==='pokemon'){
+      back=`<img class="g5-poke-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png" alt="${card.label}" loading="lazy"><span class="card-label" style="font-size:9px">${card.label}</span>`
+    } else {
+      const isLetter=card.cardSide==='A'&&typeof card.id==='string'&&card.id.startsWith('l')
+      const eStyle=isLetter?'font-size:48px;font-weight:900;color:#8B5CF6;font-family:var(--font);line-height:1':''
+      back=`<span class="card-emoji" style="${eStyle}">${card.emoji}</span><span class="card-label">${card.label}</span>`
+    }
+    el.innerHTML=`<div class="g5-card-front"></div><div class="g5-card-back">${back}</div>`
     el.onclick=()=>flipG5Card(idx,el); grid.appendChild(el); card.el=el
   })
+}
+
+// ── Mode 2: Numeric Memory ──
+let g5NumState={}
+function initG5Numeric(){
+  const alt=document.getElementById('g5-alt-display')
+  alt.style.display='flex'; alt.innerHTML=''
+  const diff=state.selectedLevel
+  const count=diff==='easy'?4:diff==='hard'?9:6
+  const cols=diff==='easy'?2:3
+  const nums=Array.from({length:count},(_,i)=>i+1).sort(()=>Math.random()-0.5)
+  g5NumState={numbers:nums,revealed:true,nextToTap:1,round:1,maxRound:5,count,cols}
+  const instr=document.createElement('p'); instr.className='g5-alt-label'; instr.id='g5-num-instr'
+  instr.textContent=`Ingat posisi angka, lalu ketuk dari 1 → ${count}! 🔢`
+  alt.appendChild(instr)
+  const prog=document.createElement('p'); prog.className='g5-alt-sub'; prog.id='g5-num-prog'
+  prog.textContent=`Ronde 1/${g5NumState.maxRound} — Hafalkan dalam 3 detik...`
+  alt.appendChild(prog)
+  const grid=document.createElement('div'); grid.className='g5-num-grid'; grid.id='g5-num-grid'
+  grid.style.gridTemplateColumns=`repeat(${cols},1fr)`
+  nums.forEach((num,i)=>{
+    const cell=document.createElement('div'); cell.className='g5-num-cell'
+    cell.dataset.num=num; cell.dataset.i=i
+    cell.innerHTML=`<div class="ncell-front">${num}</div><div class="ncell-back">${num}</div>`
+    cell.onclick=()=>tapG5NumCell(cell,num)
+    grid.appendChild(cell)
+  })
+  alt.appendChild(grid)
+  setTimeout(()=>{
+    if(g5Mode!=='numeric') return
+    grid.querySelectorAll('.g5-num-cell').forEach(c=>c.classList.add('face-down'))
+    g5NumState.revealed=false
+    const p=document.getElementById('g5-num-prog'); if(p) p.textContent=`Ketuk angka 1 → ${count} secara berurutan!`
+  },3000)
+}
+function tapG5NumCell(cell,num){
+  if(g5NumState.revealed||cell.classList.contains('correct-tap')) return
+  if(num===g5NumState.nextToTap){
+    cell.classList.add('correct-tap'); playCorrect()
+    g5NumState.nextToTap++
+    if(g5NumState.nextToTap>g5NumState.count){
+      addStars(1); spawnSparkles()
+      if(g5NumState.round>=g5NumState.maxRound){
+        setTimeout(()=>showResult('🔢','Memory Angka!',`Kamu ingat semua urutan dalam ${g5NumState.maxRound} ronde! 🧠`),800)
+      } else {
+        g5NumState.round++
+        const p=document.getElementById('g5-num-prog'); if(p) p.textContent=`✨ Ronde ${g5NumState.round}/${g5NumState.maxRound} — Hafalkan!`
+        setTimeout(()=>{ if(g5Mode==='numeric') initG5Numeric() },1200)
+      }
+    }
+  } else {
+    cell.classList.add('wrong-tap'); playWrong(); flashScreen('red')
+    if(navigator.vibrate) navigator.vibrate(200)
+    setTimeout(()=>cell.classList.remove('wrong-tap'),450)
+    // Briefly reveal all as hint
+    const grid=document.getElementById('g5-num-grid'); if(!grid) return
+    grid.querySelectorAll('.g5-num-cell:not(.correct-tap)').forEach(c=>c.classList.remove('face-down'))
+    g5NumState.revealed=true
+    setTimeout(()=>{
+      grid.querySelectorAll('.g5-num-cell:not(.correct-tap)').forEach(c=>c.classList.add('face-down'))
+      g5NumState.revealed=false
+    },1500)
+  }
+}
+
+// ── Mode 3: Spatial Memory ──
+let g5SpatState={}
+function initG5Spatial(){
+  const alt=document.getElementById('g5-alt-display')
+  alt.style.display='flex'; alt.innerHTML=''
+  const diff=state.selectedLevel
+  const sz=diff==='easy'?3:diff==='hard'?5:4
+  const lit=diff==='easy'?3:diff==='hard'?8:5
+  g5SpatState={sz,lit,pattern:[],taps:[],phase:'show',round:1,maxRound:5}
+  const instr=document.createElement('p'); instr.className='g5-alt-label'; instr.id='g5-spat-instr'
+  instr.textContent=`Ingat ${lit} kotak yang menyala! 💡`; alt.appendChild(instr)
+  const prog=document.createElement('p'); prog.className='g5-alt-sub'; prog.id='g5-spat-prog'
+  prog.textContent=`Ronde 1/${g5SpatState.maxRound}`; alt.appendChild(prog)
+  const grid=document.createElement('div'); grid.className='g5-spatial-grid'; grid.id='g5-spat-grid'
+  grid.style.cssText=`grid-template-columns:repeat(${sz},1fr);max-width:${sz*68}px`
+  for(let i=0;i<sz*sz;i++){
+    const c=document.createElement('div'); c.className='g5-spatial-cell'; c.dataset.i=i
+    c.onclick=()=>tapG5SpatCell(i,c); grid.appendChild(c)
+  }
+  alt.appendChild(grid)
+  showG5SpatPattern()
+}
+function showG5SpatPattern(){
+  const {sz,lit}=g5SpatState
+  const total=sz*sz, pat=[]
+  while(pat.length<lit){const r=Math.floor(Math.random()*total);if(!pat.includes(r))pat.push(r)}
+  g5SpatState.pattern=pat; g5SpatState.taps=[]; g5SpatState.phase='show'
+  const grid=document.getElementById('g5-spat-grid'); if(!grid) return
+  const cells=grid.querySelectorAll('.g5-spatial-cell')
+  cells.forEach(c=>c.className='g5-spatial-cell')
+  pat.forEach(i=>{ if(cells[i]) cells[i].classList.add('lit') })
+  const instr=document.getElementById('g5-spat-instr'); if(instr) instr.textContent=`Ingat ${lit} kotak yang menyala! 💡`
+  setTimeout(()=>{
+    if(g5Mode!=='spatial') return
+    cells.forEach(c=>c.classList.remove('lit'))
+    g5SpatState.phase='recall'
+    if(instr) instr.textContent=`Ketuk kotak yang tadi menyala! (0/${lit})`
+  },2200)
+}
+function tapG5SpatCell(idx,cell){
+  if(g5SpatState.phase!=='recall'||g5SpatState.taps.includes(idx)) return
+  g5SpatState.taps.push(idx)
+  const isOk=g5SpatState.pattern.includes(idx)
+  cell.classList.add(isOk?'correct-tap':'wrong-tap')
+  if(isOk) playCorrect(); else { playWrong(); if(navigator.vibrate) navigator.vibrate(150) }
+  const okTaps=g5SpatState.taps.filter(t=>g5SpatState.pattern.includes(t)).length
+  const badTaps=g5SpatState.taps.filter(t=>!g5SpatState.pattern.includes(t)).length
+  const instr=document.getElementById('g5-spat-instr')
+  if(instr) instr.textContent=`Ketuk kotak yang tadi menyala! (${okTaps}/${g5SpatState.lit})`
+  if(okTaps===g5SpatState.lit||badTaps>2){
+    g5SpatState.phase='done'
+    if(okTaps===g5SpatState.lit){ addStars(1); spawnSparkles() } else flashScreen('red')
+    const grid=document.getElementById('g5-spat-grid')
+    if(grid){ const cells=grid.querySelectorAll('.g5-spatial-cell'); g5SpatState.pattern.forEach(i=>{ if(cells[i]) cells[i].classList.add('lit') }) }
+    if(g5SpatState.round>=g5SpatState.maxRound){
+      setTimeout(()=>showResult('📍','Memory Posisi!',`Kamu kuasai ${g5SpatState.maxRound} pola lokasi! 🧠`),1200)
+    } else {
+      g5SpatState.round++
+      const prog=document.getElementById('g5-spat-prog'); if(prog) prog.textContent=`Ronde ${g5SpatState.round}/${g5SpatState.maxRound}`
+      setTimeout(()=>{ if(g5Mode==='spatial') showG5SpatPattern() },1600)
+    }
+  }
+}
+
+// ── Mode 4: Sequence Memory (Simon Says) ──
+let g5SeqState={}
+const G5_SEQ_TONES=[523,659,784,988]
+function initG5Sequence(){
+  const alt=document.getElementById('g5-alt-display')
+  alt.style.display='flex'; alt.innerHTML=''
+  g5SeqState={seq:[],playerSeq:[],length:1,round:0,maxRound:8,playerTurn:false}
+  const status=document.createElement('div'); status.className='g5-alt-label'; status.id='g5-seq-status'
+  status.textContent='Siap? Ikuti urutan warnanya! 🎮'; alt.appendChild(status)
+  const lvl=document.createElement('div'); lvl.className='g5-seq-level'; lvl.id='g5-seq-lvl'
+  lvl.textContent='Level 1'; alt.appendChild(lvl)
+  const grid=document.createElement('div'); grid.className='g5-seq-grid'; grid.id='g5-seq-grid'
+  for(let i=0;i<4;i++){
+    const btn=document.createElement('button'); btn.className='g5-seq-btn'; btn.dataset.c=i
+    btn.onclick=()=>tapG5SeqBtn(i); grid.appendChild(btn)
+  }
+  alt.appendChild(grid)
+  const sub=document.createElement('p'); sub.className='g5-alt-sub'; sub.id='g5-seq-sub'
+  sub.textContent='Ikuti urutan warna yang muncul'; alt.appendChild(sub)
+  setTimeout(()=>nextG5SeqRound(),800)
+}
+function nextG5SeqRound(){
+  if(g5Mode!=='sequence') return
+  g5SeqState.round++; g5SeqState.seq.push(Math.floor(Math.random()*4))
+  g5SeqState.playerSeq=[]; g5SeqState.playerTurn=false
+  const lvl=document.getElementById('g5-seq-lvl'); if(lvl) lvl.textContent=`Level ${g5SeqState.round}`
+  const s=document.getElementById('g5-seq-status'); if(s) s.textContent='Perhatikan... 👀'
+  playG5Seq()
+}
+function playG5Seq(){
+  let i=0
+  const next=()=>{
+    if(g5Mode!=='sequence') return
+    if(i>=g5SeqState.seq.length){
+      g5SeqState.playerTurn=true
+      const s=document.getElementById('g5-seq-status'); if(s) s.textContent='Sekarang giliranmu! 👆'
+      return
+    }
+    const c=g5SeqState.seq[i]
+    flashG5Btn(c,()=>{ i++; setTimeout(next,300) })
+  }
+  setTimeout(next,600)
+}
+function flashG5Btn(c,cb){
+  const btn=document.querySelector(`#g5-seq-grid [data-c="${c}"]`)
+  if(!btn){ cb(); return }
+  btn.classList.add('active'); playTone(G5_SEQ_TONES[c],0.45,'sine',0.12)
+  setTimeout(()=>{ btn.classList.remove('active'); cb() },600)
+}
+function tapG5SeqBtn(c){
+  if(!g5SeqState.playerTurn) return
+  const expected=g5SeqState.seq[g5SeqState.playerSeq.length]
+  g5SeqState.playerSeq.push(c); flashG5Btn(c,()=>{})
+  if(c!==expected){
+    playWrong(); flashScreen('red'); if(navigator.vibrate) navigator.vibrate(250)
+    g5SeqState.playerTurn=false; g5SeqState.playerSeq=[]
+    const s=document.getElementById('g5-seq-status'); if(s) s.textContent='Salah! Ulangi urutan... 🔁'
+    setTimeout(()=>{ if(g5Mode==='sequence') playG5Seq() },1200)
+    return
+  }
+  if(g5SeqState.playerSeq.length===g5SeqState.seq.length){
+    playCorrect(); spawnSparkles(); addStars(1)
+    const s=document.getElementById('g5-seq-status'); if(s) s.textContent='Benar! ✨'
+    if(g5SeqState.round>=g5SeqState.maxRound){
+      setTimeout(()=>showResult('🔗','Memory Urutan!',`Kamu hafal urutan hingga ${g5SeqState.round} langkah! 🧠`),800)
+    } else { setTimeout(()=>nextG5SeqRound(),1200) }
+  }
 }
 function flipG5Card(idx,el){
   if(g5State.locked)return; const card=g5State.cards[idx]
