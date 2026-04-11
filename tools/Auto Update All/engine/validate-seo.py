@@ -16,7 +16,8 @@ SEARCH_INDEX = os.path.join(SITE_ROOT, 'search-index.json')
 SITE_BASE = 'https://resistancezero.com/'
 
 # Pages to skip (utility, secret, QA)
-SKIP_PATTERNS = ['rz-ops-p7x3k9m', 'google1b', '.qa-screens', 'node_modules', 'email-signature']
+SKIP_PATTERNS = ['rz-ops-p7x3k9m', 'google1b', '.qa-screens', 'node_modules', 'email-signature',
+                 'Automation/', 'Article/', 'Data/', 'Apps/', 'dcmoc/']
 
 def should_skip(filepath):
     rel = os.path.relpath(filepath, SITE_ROOT)

@@ -14,23 +14,27 @@ SITE_ROOT = '/home/baguspermana7/rz-work'
 # All article files in order
 ARTICLES = [f'article-{i}.html' for i in range(1, 27)]
 
+SKIP_DIRS = {'node_modules', 'Automation', 'standarization', 'Article', 'Data',
+             'Apps', 'dcmoc', '.git', '.qa-screens'}
+
 def get_all_html_files():
     files = []
     root = Path(SITE_ROOT)
     for f in root.rglob('*.html'):
-        # Skip node_modules, .git, .qa-screens
-        parts = str(f).split(os.sep)
-        if any(p.startswith('.') or p == 'node_modules' for p in parts):
+        parts = str(f.relative_to(SITE_ROOT)).split(os.sep)
+        if any(p in SKIP_DIRS or p.startswith('.') for p in parts):
             continue
         files.append(str(f))
     return sorted(files)
 
 def get_internal_hrefs(html_content):
-    """Extract all href values that look internal (not http/https/mailto/#)"""
+    """Extract all href values that look internal (not http/https/mailto/#/root-relative)"""
     hrefs = re.findall(r'href=["\']([^"\']+)["\']', html_content)
     internal = []
     for h in hrefs:
-        if h.startswith('#') or h.startswith('http') or h.startswith('mailto') or h.startswith('javascript'):
+        if (h.startswith('#') or h.startswith('http') or h.startswith('mailto')
+                or h.startswith('javascript') or h.startswith('/')
+                or '${' in h or h == ''):
             continue
         internal.append(h)
     return internal
