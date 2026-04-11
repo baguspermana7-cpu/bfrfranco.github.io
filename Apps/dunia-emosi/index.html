@@ -1284,6 +1284,463 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 #screen-game10 .game-header, #screen-game11 .game-header, #screen-game12 .game-header {
   padding:12px 16px;background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.2);width:100%;max-width:none;margin-bottom:0;flex-shrink:0;position:relative;z-index:10;
 }
+
+/* ═══════════════════════════════════════════════
+   AAA ENHANCEMENT v2 — Ultra Premium Visual Upgrade
+═══════════════════════════════════════════════ */
+
+/* Global dark body background */
+body { background: #0a0a1a !important; }
+
+/* Screen transitions — smoother, more game-like */
+@keyframes screenSlideIn {
+  from { opacity:0; transform:translateY(30px) scale(0.96); filter:blur(4px); }
+  to   { opacity:1; transform:translateY(0)   scale(1);    filter:blur(0); }
+}
+.screen.active { animation: screenSlideIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+/* Welcome screen — epic neon purple */
+#screen-welcome {
+  background: radial-gradient(ellipse at 50% -20%, #7C3AED 0%, #3B0764 40%, #0a0a1a 75%) !important;
+  overflow: hidden;
+}
+/* Animated scan lines on welcome */
+#screen-welcome::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent 0px, transparent 3px,
+    rgba(167,139,250,0.03) 3px, rgba(167,139,250,0.03) 4px
+  );
+  animation: scanMove 8s linear infinite;
+}
+@keyframes scanMove { from{background-position:0 0} to{background-position:0 100vh} }
+
+/* Welcome title — bigger, more epic */
+.welcome-title {
+  font-size: 58px !important;
+  text-shadow: 0 0 60px rgba(167,139,250,1), 0 0 120px rgba(139,92,246,0.6) !important;
+}
+.welcome-sub2 {
+  font-size: 48px !important;
+  text-shadow: 0 0 40px rgba(252,211,77,0.8) !important;
+}
+/* Mascot glow ring */
+.welcome-mascot {
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 0 30px rgba(167,139,250,0.9)) drop-shadow(0 0 60px rgba(139,92,246,0.5)) !important;
+  font-size: 120px !important;
+}
+/* Start button — ultra glow */
+#screen-welcome .btn-brand {
+  background: linear-gradient(135deg, #C084FC, #8B5CF6, #6D28D9) !important;
+  box-shadow: 0 8px 0 #4C1D95, 0 0 60px rgba(139,92,246,0.7), 0 0 120px rgba(139,92,246,0.3) !important;
+  font-size: 24px !important;
+  letter-spacing: 1px;
+}
+#screen-welcome .btn-brand:active {
+  box-shadow: 0 2px 0 #4C1D95, 0 0 30px rgba(139,92,246,0.5) !important;
+}
+
+/* Menu tiles — neon border glow per game */
+.game-tile {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s, border-color 0.2s !important;
+  position: relative; overflow: hidden;
+}
+.game-tile::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.12), transparent 70%);
+  pointer-events: none;
+}
+.game-tile:active {
+  transform: scale(0.91) translateY(5px) !important;
+  border-color: rgba(255,255,255,0.35) !important;
+}
+/* Per-tile glow on active */
+.game-tile.g1:active { box-shadow: 0 0 20px rgba(244,63,94,0.6) !important; }
+.game-tile.g2:active { box-shadow: 0 0 20px rgba(139,92,246,0.6) !important; }
+.game-tile.g3:active { box-shadow: 0 0 20px rgba(45,212,191,0.6) !important; }
+.game-tile.g4:active { box-shadow: 0 0 20px rgba(245,158,11,0.6) !important; }
+.game-tile.g5:active { box-shadow: 0 0 20px rgba(167,139,250,0.6) !important; }
+.game-tile.g6:active { box-shadow: 0 0 20px rgba(56,189,248,0.6) !important; }
+.game-tile.g7:active { box-shadow: 0 0 20px rgba(45,212,191,0.6) !important; }
+.game-tile.g8:active { box-shadow: 0 0 20px rgba(244,63,94,0.6) !important; }
+.game-tile.g9:active { box-shadow: 0 0 20px rgba(163,230,53,0.6) !important; }
+.game-tile.g10:active { box-shadow: 0 0 30px rgba(255,203,5,0.8) !important; }
+.game-tile.g11:active { box-shadow: 0 0 20px rgba(6,182,212,0.6) !important; }
+.game-tile.g12:active { box-shadow: 0 0 20px rgba(139,92,246,0.6) !important; }
+
+/* Game tile icons — glow per category */
+.game-tile.g1 .g-icon { filter: drop-shadow(0 0 8px rgba(244,63,94,0.7)); }
+.game-tile.g2 .g-icon { filter: drop-shadow(0 0 8px rgba(139,92,246,0.7)); }
+.game-tile.g3 .g-icon { filter: drop-shadow(0 0 8px rgba(45,212,191,0.7)); }
+.game-tile.g4 .g-icon { filter: drop-shadow(0 0 8px rgba(245,158,11,0.7)); }
+.game-tile.g5 .g-icon { filter: drop-shadow(0 0 8px rgba(167,139,250,0.7)); }
+.game-tile.g6 .g-icon { filter: drop-shadow(0 0 8px rgba(56,189,248,0.7)); }
+.game-tile.g10 .g-icon { filter: drop-shadow(0 0 12px rgba(255,203,5,0.9)); animation-duration:1.4s !important; }
+
+/* World zone header — neon divider */
+.world-zone-header {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  border-radius: 8px; padding: 6px 8px !important;
+}
+.world-zone-icon { filter: drop-shadow(0 0 6px rgba(255,255,255,0.6)); }
+.world-zone-name { letter-spacing: 2px !important; font-size: 11px !important; }
+
+/* Menu player chip — premium */
+.player-chip.active {
+  box-shadow: 0 0 20px rgba(139,92,246,0.4), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+}
+
+/* Progress bars — animated gradient */
+.progress-bar-fill {
+  background: linear-gradient(90deg, #8B5CF6, #A78BFA, #C084FC) !important;
+  box-shadow: 0 0 12px rgba(139,92,246,0.6) !important;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative; overflow: hidden;
+}
+.progress-bar-fill::after {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: progressShine 2s ease-in-out infinite;
+}
+@keyframes progressShine { 0%{left:-100%} 50%,100%{left:200%} }
+.progress-bar-wrap {
+  background: rgba(255,255,255,0.1) !important;
+  border-radius: 100px !important;
+  overflow: hidden !important;
+  height: 8px !important;
+  width: 100%; max-width: 560px;
+  margin: 0 0 8px !important;
+  padding-left: 16px; padding-right: 16px;
+}
+
+/* Game header HUD — upgraded */
+.game-header {
+  background: rgba(0,0,0,0.4) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+}
+.gh-title { color: white !important; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+.gh-stars {
+  background: linear-gradient(135deg, #FFCB05, #F59E0B) !important;
+  box-shadow: 0 4px 0 #B45309, 0 0 20px rgba(252,211,77,0.5) !important;
+  color: #1a1a1a !important;
+  font-size: 16px !important;
+}
+.gh-back {
+  background: rgba(255,255,255,0.15) !important;
+  color: white !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  box-shadow: none !important;
+  width: 40px !important; height: 40px !important;
+}
+
+/* Star pop animation — more explosive */
+@keyframes starPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.7) rotate(-5deg); filter: brightness(1.5); }
+  60% { transform: scale(1.3) rotate(3deg); }
+  100% { transform: scale(1); }
+}
+
+/* Feedback overlay — premium dark */
+.feedback-card {
+  background: linear-gradient(145deg, #1a0533, #2D1B69) !important;
+  border: 1px solid rgba(167,139,250,0.4) !important;
+  box-shadow: 0 0 60px rgba(139,92,246,0.4), 0 32px 60px rgba(0,0,0,0.6) !important;
+  padding: 32px 24px !important;
+}
+.feedback-emoji { filter: drop-shadow(0 0 20px rgba(255,255,255,0.5)); font-size: 80px !important; }
+
+/* Pokemon Battle — major upgrade */
+.poke-card {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  transition: all 0.3s ease !important;
+}
+.poke-card.enemy {
+  border-top: 2px solid rgba(244,63,94,0.5) !important;
+  box-shadow: 0 8px 32px rgba(244,63,94,0.15), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+}
+.poke-card.player {
+  border-bottom: 2px solid rgba(56,189,248,0.5) !important;
+  box-shadow: 0 8px 32px rgba(56,189,248,0.15), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+}
+/* Shake on hit */
+@keyframes pokeShakeEnemy {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-12px)} 40%{transform:translateX(10px)} 60%{transform:translateX(-8px)} 80%{transform:translateX(6px)}
+}
+@keyframes pokeShakePlayer {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(12px)} 40%{transform:translateX(-10px)} 60%{transform:translateX(8px)} 80%{transform:translateX(-6px)}
+}
+.poke-card.shake-enemy { animation: pokeShakeEnemy 0.5s ease; }
+.poke-card.shake-player { animation: pokeShakePlayer 0.5s ease; }
+/* HP gradient bars (replacing hearts concept with visual bars + hearts) */
+.poke-hp-bar-track {
+  width: 100%; height: 8px; border-radius: 100px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 4px; overflow: hidden;
+}
+.poke-hp-bar-fill {
+  height: 100%; border-radius: 100px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  background: linear-gradient(90deg, #2DD4BF, #4ADE80);
+  box-shadow: 0 0 8px rgba(74,222,128,0.6);
+  position: relative; overflow: hidden;
+}
+.poke-hp-bar-fill.mid {
+  background: linear-gradient(90deg, #FBBF24, #F59E0B);
+  box-shadow: 0 0 8px rgba(251,191,36,0.6);
+}
+.poke-hp-bar-fill.low {
+  background: linear-gradient(90deg, #F43F5E, #EF4444);
+  box-shadow: 0 0 8px rgba(244,63,94,0.7);
+  animation: hpPulse 0.5s ease-in-out infinite;
+}
+@keyframes hpPulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+.poke-hp-bar-fill::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: progressShine 1.5s ease-in-out infinite;
+}
+/* Pokemon sprite entrance animation */
+@keyframes pokeEnter {
+  from { opacity: 0; transform: scale(0.5) translateY(20px); filter: brightness(2); }
+  to   { opacity: 1; transform: scale(1) translateY(0);    filter: brightness(1); }
+}
+.poke-spr { animation: pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.poke-spr.enemy {
+  filter: drop-shadow(0 4px 16px rgba(244,63,94,0.6)) !important;
+  width: 90px !important; height: 90px !important;
+}
+.poke-spr.player {
+  filter: drop-shadow(0 4px 16px rgba(56,189,248,0.6)) !important;
+  width: 90px !important; height: 90px !important;
+}
+/* VS badge — epic */
+.poke-vs {
+  font-size: 36px !important;
+  background: linear-gradient(135deg, #FFCB05, #FF6B00);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px rgba(255,203,5,0.8));
+  position: relative;
+}
+.poke-vs::after {
+  content: 'VS';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #FFCB05, #FF6B00);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: blur(8px) opacity(0.5);
+  z-index: -1;
+}
+/* Question card upgrade */
+.poke-qcard {
+  background: rgba(0,0,0,0.4) !important;
+  border: 1px solid rgba(255,203,5,0.4) !important;
+  box-shadow: 0 0 30px rgba(255,203,5,0.1), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+.poke-qmath {
+  font-size: 36px !important;
+  background: linear-gradient(135deg, white, #E0E7FF);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.poke-qbtn {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1.5px solid rgba(255,255,255,0.2) !important;
+  font-size: 26px !important;
+  padding: 16px 8px !important;
+  transition: all 0.12s cubic-bezier(0.34,1.56,0.64,1) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1) !important;
+}
+.poke-qbtn:active {
+  transform: scale(0.88) !important;
+  box-shadow: none !important;
+}
+.poke-qbtn.correct {
+  background: rgba(45,212,191,0.25) !important;
+  border-color: #2DD4BF !important;
+  box-shadow: 0 0 20px rgba(45,212,191,0.4) !important;
+}
+.poke-qbtn.wrong {
+  background: rgba(244,63,94,0.25) !important;
+  border-color: #F43F5E !important;
+  box-shadow: 0 0 20px rgba(244,63,94,0.4) !important;
+}
+
+/* Attack emoji — bigger, more epic */
+.poke-attack-emoji { font-size: 120px !important; }
+
+/* Science Quiz upgrade */
+.sci-question-text {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  color: white !important;
+  font-size: 17px !important;
+}
+.sci-choice {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1.5px solid rgba(255,255,255,0.15) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+.sci-choice:active { transform: scale(0.95); }
+.sci-choice.correct {
+  background: rgba(45,212,191,0.2) !important;
+  border-color: #2DD4BF !important;
+  box-shadow: 0 0 20px rgba(45,212,191,0.3) !important;
+}
+.sci-choice.wrong {
+  background: rgba(244,63,94,0.2) !important;
+  border-color: #F43F5E !important;
+  box-shadow: 0 0 20px rgba(244,63,94,0.3) !important;
+}
+
+/* Shadow buttons upgrade */
+.shadow-btn {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1.5px solid rgba(255,255,255,0.1) !important;
+  font-size: 56px !important;
+  padding: 24px !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+.shadow-btn.correct {
+  box-shadow: 0 0 30px rgba(45,212,191,0.5) !important;
+}
+.shadow-btn.wrong {
+  box-shadow: 0 0 30px rgba(244,63,94,0.5) !important;
+}
+
+/* Level select upgrade */
+.level-btn {
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  backdrop-filter: blur(8px) !important;
+  position: relative; overflow: hidden;
+}
+.level-btn::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  transition: left 0.4s ease;
+  pointer-events: none;
+}
+.level-btn:active::before { left: 150%; }
+
+/* Result screen — epic celebration */
+#screen-result {
+  background: radial-gradient(ellipse at 50% -10%, #7C3AED 0%, #1C1030 50%, #0F172A 100%) !important;
+}
+.result-mascot { filter: drop-shadow(0 0 40px rgba(252,211,77,0.8)); font-size: 90px !important; }
+.result-stars { font-size: 52px !important; filter: drop-shadow(0 0 20px rgba(252,211,77,0.8)); }
+
+/* Dashboard upgrade */
+#screen-dashboard {
+  background: linear-gradient(160deg, #0a0a1a 0%, #1C1030 50%, #0a1020 100%) !important;
+}
+.dash-player-card {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 0 40px rgba(139,92,246,0.15) !important;
+}
+
+/* Mobile-specific touch area improvements */
+@media (max-width: 480px) {
+  .poke-qbtn { padding: 18px 6px !important; font-size: 24px !important; }
+  .poke-spr.enemy, .poke-spr.player { width: 72px !important; height: 72px !important; }
+  .poke-vs { font-size: 28px !important; }
+  .poke-qmath { font-size: 30px !important; }
+  .sci-choice { padding: 16px 14px !important; font-size: 15px !important; }
+  .shadow-btn { font-size: 44px !important; padding: 18px !important; }
+  .welcome-title { font-size: 44px !important; }
+  .welcome-sub2 { font-size: 36px !important; }
+}
+
+/* Floating particles on welcome (CSS only) */
+.fstar { text-shadow: 0 0 10px currentColor; }
+
+/* Achievement toast upgrade */
+.achievement-toast {
+  background: linear-gradient(135deg, #1C1030, #2D1B69) !important;
+  border: 1px solid rgba(252,211,77,0.5) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(252,211,77,0.2) !important;
+}
+
+/* Flash overlay — more vivid */
+.flash-overlay.correct { background: rgba(45,212,191,0.3) !important; }
+.flash-overlay.wrong   { background: rgba(244,63,94,0.3) !important; }
+
+/* G6 road improvements */
+.g6-road {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 31%,
+      rgba(255,255,0,0.5) 32%, rgba(255,255,0,0.5) 34%,
+      rgba(255,255,255,0) 35%, rgba(255,255,255,0) 64%,
+      rgba(255,255,0,0.5) 65%, rgba(255,255,0,0.5) 67%,
+      rgba(255,255,255,0) 68%),
+    repeating-linear-gradient(
+      180deg, transparent 0px, transparent 50px,
+      rgba(255,255,255,0.4) 50px, rgba(255,255,255,0.4) 65px
+    ),
+    linear-gradient(180deg, #111111 0%, #1a1a1a 50%, #111111 100%) !important;
+  background-size: 100% 100%, 100% 120px, 100% 100% !important;
+}
+@keyframes roadScroll {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 0 0, 0 120px, 0 0; }
+}
+.g6-controls {
+  padding: 14px 16px 24px !important;
+  background: linear-gradient(0deg, rgba(0,0,0,0.9), rgba(0,0,0,0.6)) !important;
+}
+.g6-ctrl-btn {
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08)) !important;
+  border: 1.5px solid rgba(255,255,255,0.3) !important;
+  font-size: 18px !important;
+  padding: 18px 0 !important;
+  letter-spacing: 1px;
+}
+.g6-ctrl-btn:active {
+  background: rgba(255,255,255,0.25) !important;
+  transform: scale(0.94) translateY(3px) !important;
+}
+.g6-map-btn {
+  font-size: 10px !important;
+  padding: 4px 8px !important;
+}
+.g6-tile.target {
+  background: rgba(139,92,246,0.3) !important;
+  border-color: #A78BFA !important;
+  color: white !important;
+  box-shadow: 0 0 16px rgba(139,92,246,0.6), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+}
+.g6-tile.obstacle {
+  background: rgba(244,63,94,0.25) !important;
+  border-color: #F43F5E !important;
+  box-shadow: 0 0 16px rgba(244,63,94,0.5) !important;
+}
+.g6-start-card {
+  background: linear-gradient(145deg, #1C1030, #2D1B69) !important;
+  border: 1px solid rgba(167,139,250,0.4) !important;
+  box-shadow: 0 0 60px rgba(139,92,246,0.4), 0 24px 48px rgba(0,0,0,0.6) !important;
+  color: white !important;
+}
+.g6-start-card p { color: rgba(255,255,255,0.7) !important; }
+.g6-start-word { color: #C084FC !important; font-size: 32px !important; letter-spacing: 8px !important; }
+.g6-target-wrap {
+  background: rgba(0,0,0,0.5) !important;
+  border: 1px solid rgba(139,92,246,0.4) !important;
+  box-shadow: 0 0 20px rgba(139,92,246,0.2) !important;
+}
+.g6-slot { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.2) !important; color: white !important; }
+.g6-slot.filled { background: rgba(139,92,246,0.4) !important; border-color: #A78BFA !important; box-shadow: 0 0 10px rgba(139,92,246,0.5) !important; }
 </style>
 </head>
 <body>
@@ -3675,6 +4132,121 @@ self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>
 `
   const blob=new Blob([swCode],{type:'text/javascript'})
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{})
+}
+
+// ================================================================
+// AAA ENHANCEMENT JS — Visual upgrades
+// ================================================================
+
+// HP bar upgrade for Pokemon battle — add gradient HP bars
+function renderPokeHpBar(containerId, hp, maxHp) {
+  const el = document.getElementById(containerId)
+  if (!el) return
+  const pct = maxHp > 0 ? (hp / maxHp) * 100 : 0
+  const cls = pct > 50 ? '' : pct > 25 ? 'mid' : 'low'
+  el.innerHTML = `
+    <div style="display:flex;gap:3px;margin-bottom:4px;">
+      ${Array.from({length: maxHp}, (_,i) =>
+        `<span style="font-size:14px;opacity:${i<hp?1:0.2};filter:${i<hp?'none':'grayscale(1)'};transition:all 0.3s">${i<hp?'❤️':'🖤'}</span>`
+      ).join('')}
+    </div>
+    <div class="poke-hp-bar-track">
+      <div class="poke-hp-bar-fill ${cls}" style="width:${pct}%"></div>
+    </div>`
+}
+
+// Patch g10NewBattle to use HP bars
+const _g10NBOrig = window.g10NewBattle
+window.g10NewBattle = function() {
+  if (_g10NBOrig) _g10NBOrig.call(this)
+  // Upgrade HP display after battle init
+  const s = g10State
+  if (!s) return
+  setTimeout(() => {
+    renderPokeHpBar('poke-enemy-hp', s.enemyHp, s.enemyMaxHp)
+    renderPokeHpBar('poke-player-hp', s.playerHp, s.playerMaxHp)
+  }, 50)
+}
+
+// Patch g10Answer for shake animation + HP bar update
+const _g10AnsOrig = window.g10Answer
+window.g10Answer = function(val, btn) {
+  _g10AnsOrig.call(this, val, btn)
+  const s = g10State
+  // Shake the hit card
+  setTimeout(() => {
+    const correct = val === s.currentAnswer
+    if (correct) {
+      const card = document.getElementById('poke-enemy-card')
+      if (card) { card.classList.remove('shake-enemy'); void card.offsetWidth; card.classList.add('shake-enemy'); setTimeout(()=>card.classList.remove('shake-enemy'), 600) }
+    } else {
+      const card = document.getElementById('poke-player-card')
+      if (card) { card.classList.remove('shake-player'); void card.offsetWidth; card.classList.add('shake-player'); setTimeout(()=>card.classList.remove('shake-player'), 600) }
+    }
+    // Update HP bars
+    renderPokeHpBar('poke-enemy-hp', s.enemyHp, s.enemyMaxHp)
+    renderPokeHpBar('poke-player-hp', s.playerHp, s.playerMaxHp)
+  }, 50)
+}
+
+// Screen transition vibration haptic (mobile)
+const origShowScreen = window.showScreen
+window.showScreen = function(id) {
+  origShowScreen.call(this, id)
+  if (navigator.vibrate) navigator.vibrate(8)
+}
+
+// Button press haptic
+document.addEventListener('touchstart', e => {
+  const btn = e.target.closest('.btn, .poke-qbtn, .sci-choice, .shadow-btn, .g6-ctrl-btn, .game-tile, .level-btn, .mode-card, .animal-btn')
+  if (btn && navigator.vibrate) navigator.vibrate(6)
+}, { passive: true })
+
+// Particle burst on correct answer (overlay)
+function spawnParticleBurst(x, y) {
+  const colors = ['#FCD34D', '#A78BFA', '#2DD4BF', '#F43F5E', '#38BDF8']
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div')
+    const angle = (i / 12) * 360
+    const dist = 60 + Math.random() * 80
+    const color = colors[Math.floor(Math.random() * colors.length)]
+    p.style.cssText = `
+      position:fixed; left:${x}px; top:${y}px; width:${6+Math.random()*8}px; height:${6+Math.random()*8}px;
+      background:${color}; border-radius:50%; pointer-events:none; z-index:9999;
+      animation:particleFly 0.7s ease-out forwards;
+      --dx:${Math.cos(angle*Math.PI/180)*dist}px;
+      --dy:${Math.sin(angle*Math.PI/180)*dist}px;
+    `
+    document.body.appendChild(p)
+    setTimeout(() => p.remove(), 700)
+  }
+}
+// Add particle keyframe if not exists
+if (!document.getElementById('particle-style')) {
+  const st = document.createElement('style')
+  st.id = 'particle-style'
+  st.textContent = `@keyframes particleFly { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0} }`
+  document.head.appendChild(st)
+}
+
+// Hook particle burst on correct answers (poke choices)
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.poke-qbtn')
+  if (btn && btn.classList.contains('correct')) {
+    spawnParticleBurst(e.clientX, e.clientY)
+  }
+}, true)
+
+// Pokemon battle entrance — animate sprite on each new battle
+const _g10NB2 = window.g10NewBattle
+window.g10NewBattle = function() {
+  _g10NB2.call(this)
+  setTimeout(() => {
+    const es = document.getElementById('poke-enemy-spr')
+    const ps = document.getElementById('poke-player-spr')
+    if (es) { es.style.animation='none'; void es.offsetWidth; es.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
+    if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
+  }, 100)
 }
 </script>
 </body>
