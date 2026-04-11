@@ -1811,10 +1811,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   padding: 10px 14px;
 }
 .g10-party-card {
-  background: rgba(255,255,255,0.05);
-  border: 1.5px solid rgba(255,255,255,0.1);
+  background: linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(0,0,0,0.2) 100%);
+  border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 16px;
-  padding: 10px 6px 8px;
+  padding: 8px 6px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1840,12 +1840,11 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   border-radius: 14px;
 }
 .g10-pcard-spr {
-  width: 68px;
-  height: 68px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  image-rendering: auto;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 6px var(--ptc, rgba(255,255,255,0.2)));
 }
 .g10-pcard-name {
   font-size: 11px;
@@ -6317,14 +6316,11 @@ function renderPartyGrid(trainerId){
       <div class="g10-pcard-name">${poke.name}</div>
       <div class="g10-pcard-type" style="background:${typeColor}">${poke.type.charAt(0).toUpperCase()+poke.type.slice(1)}</div>
     `
-    // Load sprite with proper fallback chain (front-facing artwork)
+    // Use HOME sprite (transparent PNG) — artwork JPG has white background
     const slug = poke.name.toLowerCase().replace(/\s/g,'-')
     const img = card.querySelector('.g10-pcard-spr')
-    img.src = pokeSpriteArtwork(slug)
-    img.onerror = () => {
-      img.src = pokeSpriteOnline(slug)
-      img.onerror = () => { img.src = pokeSpriteBackup(poke.id); img.onerror = null }
-    }
+    img.src = pokeSpriteOnline(slug)
+    img.onerror = () => { img.src = pokeSpriteBackup(poke.id); img.onerror = null }
     if(!isCurrent){
       card.onclick = () => { playClick(); switchPlayerPoke(poke); closePartyPicker() }
     }
