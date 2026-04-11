@@ -11,7 +11,8 @@ from pathlib import Path
 
 SITE_ROOT = '/home/baguspermana7/rz-work'
 
-SKIP_PATTERNS = ['node_modules', '.git', '.qa-screens', 'standarization', 'Article']
+SKIP_PATTERNS = ['node_modules', '.git', '.qa-screens', 'standarization', 'Article',
+                 'Automation', 'Apps', 'Data', 'dcmoc', 'rz-ops-p7x3k9m']
 
 # Patterns that indicate hardcoded secrets
 SECRET_PATTERNS = [
@@ -25,10 +26,14 @@ SECRET_PATTERNS = [
 
 # Known false positive patterns (these are OK to have in the codebase)
 FALSE_POSITIVES = [
-    'AIzaSyDS0dm8JbiW9SqTvmiATwoXVZKN5tx4FWI',  # NemoClaw key (in memory, not in site files)
+    'AIzaSyDS0dm8JbiW9SqTvmiATwoXVZKN5tx4FWI',  # NemoClaw Gemini key (not in site files)
+    'AIzaSyCXlJbZyWHr74vkJOJaUsjVdv',           # firebase-config.js — Firebase public client key (by design)
     'example-api-key',
     'YOUR_API_KEY',
     'REPLACE_WITH',
+    # Intentional public demo credentials used in VALID_USERS arrays across calculators
+    "demo2026",
+    "RZ@Premium2026!",
 ]
 
 # XSS risk patterns

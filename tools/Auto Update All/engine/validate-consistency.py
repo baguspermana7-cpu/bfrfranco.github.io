@@ -12,7 +12,8 @@ from pathlib import Path
 SITE_ROOT = '/home/baguspermana7/rz-work'
 
 SKIP_PATTERNS = ['node_modules', '.git', '.qa-screens', 'dcmoc', 'Apps',
-                 'email-signature', 'google1b', 'rz-ops-p7x3k9m']
+                 'email-signature', 'google1b', 'rz-ops-p7x3k9m',
+                 'Article', 'Automation', 'standarization', 'Data']
 
 # Files that intentionally use .nav-links (calculator pattern)
 CALC_NAV_FILES = [

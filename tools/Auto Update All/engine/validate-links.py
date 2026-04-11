@@ -7,6 +7,7 @@ Run from: /home/baguspermana7/rz-work
 
 import os
 import re
+import urllib.parse
 from pathlib import Path
 
 SITE_ROOT = '/home/baguspermana7/rz-work'
@@ -85,10 +86,11 @@ def main():
         # Check internal hrefs
         hrefs = get_internal_hrefs(content)
         for href in hrefs:
-            # Strip query/anchor
+            # Strip query/anchor, URL-decode
             clean = href.split('?')[0].split('#')[0]
             if not clean:
                 continue
+            clean = urllib.parse.unquote(clean)
             resolved = resolve_href(clean, filepath)
             if not os.path.exists(resolved):
                 broken.append(f"BROKEN: {rel_path} → {href}")
