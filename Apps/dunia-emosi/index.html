@@ -337,7 +337,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g5-mode-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:14px;border:2px solid rgba(139,92,246,0.35);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.65);font-family:var(--font);font-size:18px;cursor:pointer;transition:all 0.2s;}
 .g5-mode-tab span{font-size:9px;font-weight:700;}
 .g5-mode-tab.active{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:white;border-color:#7C3AED;box-shadow:0 4px 0 #5B21B6;}
-.g5-sub-tabs{display:flex;gap:8px;margin-bottom:8px;position:relative;z-index:1;}
+.g5-sub-tabs{display:flex;gap:8px;margin-bottom:8px;position:relative;z-index:1;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.g5-sub-tabs::-webkit-scrollbar{display:none;}
 .g5-sub-tab{padding:5px 16px;border-radius:100px;border:2px solid rgba(139,92,246,0.4);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
 .g5-sub-tab.active{background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;border-color:#7C3AED;}
 /* Pokémon card back */
@@ -3935,6 +3936,8 @@ body { background: #0a0a1a !important; }
   <!-- Visual sub-tabs (hidden for other modes) -->
   <div class="g5-sub-tabs" id="g5-sub-tabs">
     <button class="g5-sub-tab active" onclick="setG5SubMode('emosi',this)">😊 Emosi</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('hewan',this)">🐾 Hewan</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('buah',this)">🍎 Buah</button>
     <button class="g5-sub-tab" onclick="setG5SubMode('pokemon',this)">⚡ Pokémon</button>
   </div>
   <!-- Score row (visual mode) -->
@@ -4210,10 +4213,42 @@ const MATCH_PAIRS_ALPHA = [
 ]
 
 const MATCH_PAIRS_POKE = [
-  {id:25,name:'Pikachu'},{id:4,name:'Charmander'},{id:7,name:'Squirtle'},
-  {id:1,name:'Bulbasaur'},{id:39,name:'Jigglypuff'},{id:52,name:'Meowth'},
-  {id:133,name:'Eevee'},{id:172,name:'Pichu'},{id:94,name:'Gengar'},
-  {id:143,name:'Snorlax'},{id:35,name:'Clefairy'},{id:54,name:'Psyduck'},
+  {id:25, name:'Pikachu',    slug:'pikachu'},
+  {id:4,  name:'Charmander', slug:'charmander'},
+  {id:7,  name:'Squirtle',   slug:'squirtle'},
+  {id:1,  name:'Bulbasaur',  slug:'bulbasaur'},
+  {id:39, name:'Jigglypuff', slug:'jigglypuff'},
+  {id:52, name:'Meowth',     slug:'meowth'},
+  {id:133,name:'Eevee',      slug:'eevee'},
+  {id:172,name:'Pichu',      slug:'pichu'},
+  {id:94, name:'Gengar',     slug:'gengar'},
+  {id:143,name:'Snorlax',    slug:'snorlax'},
+  {id:35, name:'Clefairy',   slug:'clefairy'},
+  {id:54, name:'Psyduck',    slug:'psyduck'},
+]
+const MATCH_PAIRS_HEWAN = [
+  {id:'hw1',emoji:'🐘',label:'Gajah'},
+  {id:'hw2',emoji:'🦁',label:'Singa'},
+  {id:'hw3',emoji:'🐯',label:'Harimau'},
+  {id:'hw4',emoji:'🦒',label:'Jerapah'},
+  {id:'hw5',emoji:'🐬',label:'Lumba-lumba'},
+  {id:'hw6',emoji:'🦋',label:'Kupu-kupu'},
+  {id:'hw7',emoji:'🐸',label:'Katak'},
+  {id:'hw8',emoji:'🦅',label:'Elang'},
+  {id:'hw9',emoji:'🐊',label:'Buaya'},
+  {id:'hw10',emoji:'🦓',label:'Zebra'},
+]
+const MATCH_PAIRS_BUAH = [
+  {id:'bu1',emoji:'🍎',label:'Apel'},
+  {id:'bu2',emoji:'🍌',label:'Pisang'},
+  {id:'bu3',emoji:'🍇',label:'Anggur'},
+  {id:'bu4',emoji:'🍓',label:'Stroberi'},
+  {id:'bu5',emoji:'🍊',label:'Jeruk'},
+  {id:'bu6',emoji:'🍉',label:'Semangka'},
+  {id:'bu7',emoji:'🥭',label:'Mangga'},
+  {id:'bu8',emoji:'🍍',label:'Nanas'},
+  {id:'bu9',emoji:'🥝',label:'Kiwi'},
+  {id:'bu10',emoji:'🍑',label:'Persik'},
 ]
 const ANIMALS_PICKER = ['🦁','🐰','🐘','🦊','🐸','🐯','🐼','🐨']
 const ANIMALS_G4 = ['🐘','🦁','🐯','🐸','🐰','🦊','🐼','🐨','🐧','🦆','🐓','🐑','🦒','🐴','🦋']
@@ -5511,31 +5546,36 @@ function initG5Visual(){
   else if(diff==='hard'){totalPairs=10;gridClass='grid-4x5'}
   else{totalPairs=8;gridClass=''}
   g5State={cards:[],flipped:[],matched:0,totalPairs,scores:[0,0],currentPlayer:state.currentPlayer,locked:false}
+  const flat=[]
   if(g5SubMode==='pokemon'){
-    const pool=MATCH_PAIRS_POKE.slice(0,totalPairs)
-    const flat=[]
-    pool.forEach(p=>{
-      flat.push({id:p.id,label:p.name,flipped:false,matched:false,cardSide:'A'})
-      flat.push({id:p.id,label:p.name,flipped:false,matched:false,cardSide:'B'})
+    // Sprite (A) ↔ Name text (B) — educational matching
+    MATCH_PAIRS_POKE.slice(0,totalPairs).forEach(p=>{
+      flat.push({id:p.id,slug:p.slug,label:p.name,flipped:false,matched:false,cardSide:'A'})
+      flat.push({id:p.id,slug:p.slug,label:p.name,flipped:false,matched:false,cardSide:'B'})
     })
-    g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
+  } else if(g5SubMode==='hewan'||g5SubMode==='buah'){
+    // Emoji (A) ↔ Name word (B) — educational matching
+    const src=g5SubMode==='hewan'?MATCH_PAIRS_HEWAN:MATCH_PAIRS_BUAH
+    src.slice(0,totalPairs).forEach(item=>{
+      flat.push({...item,flipped:false,matched:false,cardSide:'A'})
+      flat.push({...item,flipped:false,matched:false,cardSide:'B'})
+    })
   } else {
     let pool
     if(diff==='easy') pool=MATCH_PAIRS.slice(0,totalPairs)
     else if(diff==='hard') pool=[...MATCH_PAIRS_NUMS.slice(0,5),...MATCH_PAIRS_ALPHA.slice(0,5)]
     else pool=[...MATCH_PAIRS.slice(0,4),...MATCH_PAIRS_NUMS.slice(0,4)]
-    pool=pool.slice(0,totalPairs)
-    const flat=[]
-    pool.forEach(item=>{
+    pool.slice(0,totalPairs).forEach(item=>{
       const isEdu=!!(item.emoji2)
       flat.push({...item,flipped:false,matched:false,cardSide:'A'})
       flat.push({...item,emoji:isEdu?item.emoji2:item.emoji,label:isEdu?item.label2:item.label,flipped:false,matched:false,cardSide:'B'})
     })
-    g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
   }
+  g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
+  const turnTexts={emosi:'Cocokkan semua pasangan! 🃏',hewan:'Cocokkan gambar & nama hewan! 🐾',buah:'Cocokkan gambar & nama buah! 🍎',pokemon:'Cocokkan Pokémon & namanya! ⚡'}
   const scoresEl=document.getElementById('g5-scores')
   if(state.mode==='duo'){scoresEl.innerHTML=[0,1].map(i=>`<div class="g5-player-score ${i===g5State.currentPlayer?'active':''}" id="g5-ps-${i}"><div class="ps-name">${state.players[i].animal} ${state.players[i].name}</div><div class="ps-val" id="g5-score-${i}">0 pasang</div></div>`).join('');document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`}
-  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=g5SubMode==='pokemon'?'Cocokkan pasangan Pokémon! ⚡':'Cocokkan semua pasangan! 🃏'}
+  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=turnTexts[g5SubMode]||'Cocokkan semua pasangan! 🃏'}
   const grid=document.getElementById('g5-grid')
   grid.className='g5-grid'+(gridClass?' '+gridClass:'')
   renderG5Grid()
@@ -5546,7 +5586,23 @@ function renderG5Grid(){
     const el=document.createElement('div'); el.className='g5-card'
     let back
     if(g5SubMode==='pokemon'){
-      back=`<img class="g5-poke-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png" alt="${card.label}" loading="lazy"><span class="card-label" style="font-size:9px">${card.label}</span>`
+      if(card.cardSide==='A'){
+        // Sprite side — HD from pokemondb
+        const hdSrc=`https://img.pokemondb.net/sprites/home/normal/${card.slug}.png`
+        const fbSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`
+        back=`<img class="g5-poke-img" style="width:64px;height:64px;image-rendering:auto" src="${hdSrc}" onerror="this.src='${fbSrc}'" alt="${card.label}" loading="lazy">`
+      } else {
+        // Name side — styled text
+        back=`<span style="font-size:15px;font-weight:900;text-align:center;color:#FFD700;font-family:'Fredoka One',cursive;line-height:1.2;padding:4px;text-shadow:0 2px 8px rgba(0,0,0,0.6)">${card.label}</span>`
+      }
+    } else if(g5SubMode==='hewan'||g5SubMode==='buah'){
+      if(card.cardSide==='A'){
+        // Emoji side
+        back=`<span style="font-size:52px;line-height:1">${card.emoji}</span>`
+      } else {
+        // Word side
+        back=`<span style="font-size:16px;font-weight:900;text-align:center;color:white;font-family:'Fredoka One',cursive;line-height:1.2;padding:4px;text-shadow:0 2px 6px rgba(0,0,0,0.5)">${card.label}</span>`
+      }
     } else {
       const isLetter=card.cardSide==='A'&&typeof card.id==='string'&&card.id.startsWith('l')
       const eStyle=isLetter?'font-size:48px;font-weight:900;color:#8B5CF6;font-family:var(--font);line-height:1':''
