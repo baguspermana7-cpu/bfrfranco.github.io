@@ -3061,6 +3061,11 @@ function initDreamWorld() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
+  // Always ensure overlays are hidden on screen change
+  const po=document.getElementById('pause-overlay')
+  const so=document.getElementById('settings-overlay')
+  if(po) po.style.display='none'
+  if(so) so.style.display='none'
   window.scrollTo(0,0)
 }
 
@@ -3241,6 +3246,9 @@ function closeSettings() {
 }
 
 function exitGame() {
+  state.paused = false
+  document.getElementById('pause-overlay').style.display='none'
+  document.getElementById('settings-overlay').style.display='none'
   playClick(); clearTimers(); stopAmbient(); buildMenuHeader(); showScreen('screen-menu')
 }
 function clearTimers() {
@@ -3694,6 +3702,10 @@ function initGame6() {
 function setupDriveMap(map) {
   g6State.map = map
   const vehicle = DRIVE_VEHICLES[map]
+  // Set road map theme class
+  const scr=document.getElementById('screen-game6');
+  ['map-city','map-forest','map-space','map-body'].forEach(c=>scr.classList.remove(c));
+  scr.classList.add('map-'+map);
   // Car is now SVG - update color based on vehicle/map
   const carColors = {city:'#DC2626', forest:'#DC2626', space:'#3B82F6', body:'#F59E0B'};
   const carSvg = document.getElementById('g6-car-svg');
