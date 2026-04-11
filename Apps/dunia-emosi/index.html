@@ -398,6 +398,20 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .rs-name   { font-size:14px;font-weight:700;color:var(--text-light);margin:4px 0; }
 .rs-stars  { font-size:22px;font-weight:900;background:linear-gradient(135deg,#8B5CF6,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
 
+/* LEVEL UP BANNER */
+.result-level-up { display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;border-radius:20px;padding:12px 28px;font-size:22px;font-weight:900;font-family:var(--font-display);box-shadow:0 6px 0 #5B21B6;animation:levelUpPop 0.5s cubic-bezier(0.34,1.56,0.64,1);margin:8px 0; }
+.level-up-icon { font-size:38px;animation:levelUpSpin 0.6s ease; }
+.level-up-text { letter-spacing:1px; }
+@keyframes levelUpPop { from{transform:scale(0)rotate(-10deg);opacity:0} to{transform:scale(1)rotate(0deg);opacity:1} }
+@keyframes levelUpSpin { from{transform:rotate(-360deg)scale(0)} to{transform:rotate(0deg)scale(1)} }
+
+/* DASHBOARD */
+#screen-dashboard { background:linear-gradient(160deg,#EDE9FE,#F0FDFA);gap:12px; }
+.dash-section-title { font-size:18px;font-weight:900;color:var(--text);text-align:left;width:100%;max-width:500px;margin-top:8px; }
+.dash-stat-card { background:white;border-radius:20px;padding:16px;text-align:center;box-shadow:0 4px 12px rgba(139,92,246,0.10); }
+.dash-stat-num { font-size:22px;font-weight:900;color:var(--text);font-family:var(--font-display); }
+.dash-stat-lbl { font-size:13px;color:var(--text-light);margin-top:4px; }
+
 /* SPARKLE + CONFETTI */
 .sparkle { position:fixed;pointer-events:none;z-index:150;animation:sparkleFly ease-out forwards;font-size:22px; }
 @keyframes sparkleFly { 0%{transform:translate(0,0)scale(0)rotate(0deg);opacity:1} 60%{opacity:1} 100%{transform:translate(var(--tx),var(--ty))scale(1)rotate(var(--rot));opacity:0} }
@@ -537,27 +551,28 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
       <div class="g-name">Cocokkan Emosi</div>
       <span class="g-tag">Fokus</span>
     </div>
-    <div class="game-tile g6" onclick="playClick(); startGame(6)">
+    <div class="game-tile g6" onclick="playClick(); openLevelSelect(6)">
       <span class="g-icon">🚗</span>
       <div class="g-name">Petualangan Mobil</div>
       <span class="g-tag">Adventure</span>
     </div>
-    <div class="game-tile g7" onclick="playClick(); startGame(7)">
+    <div class="game-tile g7" onclick="playClick(); openLevelSelect(7)">
       <span class="g-icon">🖼️</span>
       <div class="g-name">Tebak Gambar</div>
       <span class="g-tag">Membaca</span>
     </div>
-    <div class="game-tile g8" onclick="playClick(); startGame(8)">
+    <div class="game-tile g8" onclick="playClick(); openLevelSelect(8)">
       <span class="g-icon">🔡</span>
       <div class="g-name">Susun Kata</div>
       <span class="g-tag">Menulis</span>
     </div>
-    <div class="game-tile g9" onclick="playClick(); startGame(9)">
+    <div class="game-tile g9" onclick="playClick(); openLevelSelect(9)">
       <span class="g-icon">✍️</span>
       <div class="g-name">Jejak Huruf</div>
       <span class="g-tag">Menulis</span>
     </div>
   </div>
+  <button class="btn btn-sm" style="background:white;color:var(--text-light);border:3px solid #E0E0E0;box-shadow:0 3px 0 #C0C0C0;margin-top:16px;font-size:15px;" onclick="playClick(); showDashboard()">📊 Progress Saya</button>
 </div>
 
 <!-- LEVEL SELECT -->
@@ -789,11 +804,31 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   <h2 class="result-title" id="result-title">Bagus sekali!</h2>
   <div class="result-stars" id="result-stars">⭐⭐⭐</div>
   <p class="result-msg" id="result-msg">Kamu hebat hari ini!</p>
+  <div class="result-xp-banner" id="result-xp-banner" style="display:none;"></div>
+  <div class="result-level-up" id="result-level-up" style="display:none;">
+    <span class="level-up-icon" id="level-up-icon">🐣</span>
+    <span class="level-up-text">NAIK LEVEL!</span>
+  </div>
   <div class="result-scores" id="result-scores" style="display:none;"></div>
   <div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;max-width:400px;">
     <button class="btn btn-lg btn-brand" onclick="playClick(); playAgain()">Main Lagi! 🎮</button>
     <button class="btn btn-lg btn-white" onclick="playClick(); goToMenu()">Pilih Game Lain 🏠</button>
   </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="screen-dashboard" class="screen">
+  <div class="page-header">
+    <button class="btn-back" onclick="playClick(); showScreen('screen-menu')">←</button>
+    <span class="page-title">📊 Progress Saya</span>
+  </div>
+  <div class="dash-player-card" id="dash-player-card"></div>
+  <div class="dash-level-card" id="dash-level-card"></div>
+  <h3 class="dash-section-title">🏆 Pencapaian</h3>
+  <div class="dash-achievements" id="dash-achievements"></div>
+  <h3 class="dash-section-title">📅 Statistik</h3>
+  <div class="dash-stats" id="dash-stats"></div>
+  <button class="btn btn-sm btn-pink" style="margin-top:16px;" onclick="if(confirm('Reset semua data?')){localStorage.clear();location.reload()}">🗑️ Reset Data</button>
 </div>
 
 <!-- FEEDBACK OVERLAY -->
@@ -878,18 +913,50 @@ const GAME_META = {
   2:{icon:'🌬️',name:'Napas Pelangi'},
   3:{icon:'🔤',name:'Huruf Hutan'},
   4:{icon:'🔢',name:'Hitung Binatang'},
-  5:{icon:'🃏',name:'Cocokkan Emosi'}
+  5:{icon:'🃏',name:'Cocokkan Emosi'},
+  6:{icon:'🚗',name:'Petualangan Mobil'},
+  7:{icon:'🖼️',name:'Tebak Gambar'},
+  8:{icon:'🔡',name:'Susun Kata'},
+  9:{icon:'✍️',name:'Jejak Huruf'}
+}
+
+// XP & Level system
+const LEVEL_TIERS = [
+  {min:0,   max:29,  icon:'🥚', name:'Telur'},
+  {min:30,  max:79,  icon:'🐣', name:'Cilik'},
+  {min:80,  max:149, icon:'🐥', name:'Tumbuh'},
+  {min:150, max:249, icon:'🦅', name:'Pintar'},
+  {min:250, max:9999,icon:'👑', name:'Jagoan'}
+]
+function getXP() {
+  try { return parseInt(localStorage.getItem('dunia-emosi-xp')||'0') } catch(e){return 0}
+}
+function addXP(amount) {
+  const prev=getXP(), next=prev+amount
+  try { localStorage.setItem('dunia-emosi-xp',next) } catch(e){}
+  return {prev, next, leveled: getLevelTier(prev).name !== getLevelTier(next).name}
+}
+function getLevelTier(xp) {
+  return LEVEL_TIERS.find(t=>xp>=t.min&&xp<=t.max)||LEVEL_TIERS[0]
 }
 
 const ACHIEVEMENTS = {
-  first_star:      {icon:'⭐',name:'Bintang Pertama!'},
-  ten_stars:       {icon:'🌟',name:'10 Bintang Terkumpul!'},
-  fifty_stars:     {icon:'🏆',name:'50 Bintang! Legenda!'},
-  perfect_emotion: {icon:'🎭',name:'Master Emosi!'},
-  calm_breath:     {icon:'🌈',name:'Napas Tenang!'},
-  letter_master:   {icon:'📚',name:'Master Huruf!'},
-  count_master:    {icon:'🔢',name:'Master Hitung!'},
-  memory_master:   {icon:'🃏',name:'Master Memori!'}
+  first_star:      {icon:'⭐', name:'Bintang Pertama!',  desc:'Dapatkan bintang pertamamu'},
+  ten_stars:       {icon:'🌟', name:'10 Bintang!',       desc:'Kumpulkan 10 bintang total'},
+  fifty_stars:     {icon:'🏆', name:'50 Bintang! Legenda!', desc:'Kumpulkan 50 bintang'},
+  hundred_stars:   {icon:'💎', name:'100 Bintang! Juara!', desc:'Kumpulkan 100 bintang'},
+  perfect_emotion: {icon:'🎭', name:'Master Emosi!',     desc:'Selesaikan Aku Merasa'},
+  calm_breath:     {icon:'🌈', name:'Napas Pelangi!',    desc:'Selesaikan Napas Pelangi'},
+  letter_master:   {icon:'📚', name:'Master Huruf!',     desc:'Selesaikan Huruf Hutan'},
+  count_master:    {icon:'🔢', name:'Master Hitung!',    desc:'Selesaikan Hitung Binatang'},
+  memory_master:   {icon:'🃏', name:'Master Memori!',    desc:'Selesaikan Cocokkan Emosi'},
+  driver_master:   {icon:'🚗', name:'Pembalap Handal!',  desc:'Selesaikan Petualangan Mobil'},
+  picture_master:  {icon:'🖼️', name:'Mata Elang!',       desc:'Selesaikan Tebak Gambar'},
+  word_master:     {icon:'🔡', name:'Penulis Muda!',     desc:'Selesaikan Susun Kata'},
+  trace_master:    {icon:'✍️', name:'Kaligrafer Cilik!', desc:'Selesaikan Jejak Huruf'},
+  all_games:       {icon:'🌈', name:'Petualang Sejati!', desc:'Mainkan semua 9 game'},
+  streak3:         {icon:'🔥', name:'3 Hari Berturut!',  desc:'Main 3 hari berturut-turut'},
+  hard_mode:       {icon:'💪', name:'Berani Sulit!',     desc:'Selesaikan mode Sulit'}
 }
 
 // Asset fallback system
@@ -1097,22 +1164,10 @@ function startGameWithLevel(level) {
   state.selectedLevel = level
   state.gameStars = [0,0]
   state.currentPlayer = 0
+  if(level==='hard') checkAchievement('hard_mode')
   showScreen('screen-game' + state.currentGame)
-  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5]
-  inits[state.currentGame]()
-}
-
-// ================================================================
-// startGame for G6-G9 (no level select)
-// ================================================================
-function startGame(num) {
-  state.currentGame = num
-  state.gameStars = [0,0]
-  state.currentPlayer = 0
-  state.selectedLevel = 'medium'
-  showScreen('screen-game' + num)
   const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9]
-  inits[num]()
+  inits[state.currentGame]()
 }
 
 // ================================================================
@@ -1173,6 +1228,7 @@ function updateStreak() {
     localStorage.setItem('dunia-emosi-streak',JSON.stringify(data))
     const streakEl=document.getElementById('streak-badge'),streakText=document.getElementById('streak-text')
     if(data.streak>=2){streakEl.style.display='inline-flex';streakText.textContent=data.streak+' hari'}
+    if(data.streak>=3) setTimeout(()=>checkAchievement('streak3'),1000)
     return data.streak
   } catch(e){return 1}
 }
@@ -1189,7 +1245,8 @@ function buildMenuHeader() {
     const p=state.players[idx],chip=document.createElement('div')
     chip.className='player-chip'+(state.mode==='solo'||idx===state.currentPlayer?' active':'')
     const streak=getStreakCount(),streakHtml=streak>=2?`<span class="p-streak">🔥${streak}</span>`:''
-    chip.innerHTML=`<span class="p-animal">${p.animal}</span><span class="p-name">${p.name}</span><span class="p-stars">⭐${p.stars}</span>${streakHtml}`
+    const xp=getXP(),tier=getLevelTier(xp)
+    chip.innerHTML=`<span class="p-animal">${p.animal}</span><span class="p-name">${p.name}</span><span class="p-stars">⭐${p.stars}</span><span style="font-size:13px;background:rgba(139,92,246,0.12);color:var(--brand);border-radius:100px;padding:2px 8px;font-weight:700">${tier.icon}</span>${streakHtml}`
     return chip
   }
   header.appendChild(makeChip(0))
@@ -1238,10 +1295,25 @@ function flashScreen(type) {
 // ================================================================
 // ACHIEVEMENTS
 // ================================================================
+function checkAchievement(key) {
+  if(!state.unlockedAchievements[key]){
+    state.unlockedAchievements[key]=true
+    try{localStorage.setItem('dunia-emosi-achievements',JSON.stringify(state.unlockedAchievements))}catch(e){}
+    showAchievement(key)
+  }
+}
 function checkAchievements(context) {
   const totalStars=state.players[0].stars+state.players[1].stars
-  const checks={first_star:totalStars>=1,ten_stars:totalStars>=10,fifty_stars:totalStars>=50,perfect_emotion:context==='perfect_g1',calm_breath:context==='done_g2',letter_master:context==='perfect_g3',count_master:context==='perfect_g4',memory_master:context==='done_g5'}
-  for(const[key,earned] of Object.entries(checks)){if(earned&&!state.unlockedAchievements[key]){state.unlockedAchievements[key]=true;try{localStorage.setItem('dunia-emosi-achievements',JSON.stringify(state.unlockedAchievements))}catch(e){}showAchievement(key);break}}
+  if(totalStars>=1) checkAchievement('first_star')
+  if(totalStars>=10) checkAchievement('ten_stars')
+  if(totalStars>=50) checkAchievement('fifty_stars')
+  if(totalStars>=100) checkAchievement('hundred_stars')
+  if(context==='perfect_g1') checkAchievement('perfect_emotion')
+  if(context==='done_g2') checkAchievement('calm_breath')
+  if(context==='perfect_g3') checkAchievement('letter_master')
+  if(context==='perfect_g4') checkAchievement('count_master')
+  if(context==='done_g5') checkAchievement('memory_master')
+  if(getStreakCount()>=3) checkAchievement('streak3')
 }
 function showAchievement(key) {
   const ach=ACHIEVEMENTS[key]; if(!ach)return
@@ -1310,9 +1382,29 @@ function showResult(mascot, title, msg) {
   const scoresEl=document.getElementById('result-scores')
   if(state.mode==='duo'){scoresEl.style.display='flex';scoresEl.innerHTML=[0,1].map(i=>`<div class="rs-card"><div class="rs-animal">${state.players[i].animal}</div><div class="rs-name">${state.players[i].name}</div><div class="rs-stars">⭐ ${state.gameStars[i]}</div></div>`).join('')}
   else scoresEl.style.display='none'
+  // XP reward
+  const xpEarned=totalStars*10; const xpResult=addXP(xpEarned)
+  const xpBanner=document.getElementById('result-xp-banner')
+  if(xpEarned>0){
+    const tier=getLevelTier(xpResult.next)
+    xpBanner.style.display='flex'
+    xpBanner.innerHTML=`<span>+${xpEarned} XP</span><span style="font-size:13px;opacity:0.85">${tier.icon} ${tier.name} — ${xpResult.next} XP total</span>`
+    xpBanner.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(135deg,#FCD34D,#F59E0B);color:#78350F;border-radius:20px;padding:12px 24px;font-size:20px;font-weight:900;box-shadow:0 4px 0 #B45309;margin:8px 0;width:100%;max-width:400px;'
+  } else xpBanner.style.display='none'
+  // Level up?
+  const lvlUp=document.getElementById('result-level-up')
+  if(xpResult.leveled){const newTier=getLevelTier(xpResult.next);document.getElementById('level-up-icon').textContent=newTier.icon;lvlUp.style.display='flex'}
+  else lvlUp.style.display='none'
+  // Game completion achievements
+  const gameAchMap={1:'perfect_emotion',2:'calm_breath',3:'letter_master',4:'count_master',5:'memory_master',6:'driver_master',7:'picture_master',8:'word_master',9:'trace_master'}
+  if(gameAchMap[state.currentGame]) checkAchievement(gameAchMap[state.currentGame])
+  // Check all-games achievement
+  const played=JSON.parse(localStorage.getItem('dunia-emosi-played-games')||'{}')
+  played[state.currentGame]=true; localStorage.setItem('dunia-emosi-played-games',JSON.stringify(played))
+  if(Object.keys(played).length>=9) checkAchievement('all_games')
   buildMenuHeader(); showScreen('screen-result'); launchConfetti(); launchConfetti()
 }
-function playAgain() { if(state.currentGame<=5) startGameWithLevel(state.selectedLevel); else startGame(state.currentGame) }
+function playAgain() { startGameWithLevel(state.selectedLevel) }
 function goToMenu()  { buildMenuHeader(); showScreen('screen-menu') }
 
 // ================================================================
@@ -1923,6 +2015,60 @@ document.addEventListener('keydown',(e)=>{
     if(e.key==='ArrowRight')driveRight()
   }
 })
+
+// ================================================================
+// DASHBOARD
+// ================================================================
+function showDashboard() {
+  const p=state.players[state.currentPlayer]
+  const xp=getXP(), tier=getLevelTier(xp)
+  // Player card
+  document.getElementById('dash-player-card').innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;background:white;border-radius:24px;padding:20px;box-shadow:0 8px 24px rgba(139,92,246,0.12);width:100%;max-width:500px;">
+      <span style="font-size:52px">${p.animal}</span>
+      <div>
+        <div style="font-family:var(--font-display);font-size:22px;color:var(--text)">${p.name||'Pemain'}</div>
+        <div style="font-size:15px;color:var(--text-light);margin-top:4px">⭐ ${p.stars} bintang</div>
+        <div style="font-size:15px;color:var(--brand);font-weight:700;margin-top:2px">${tier.icon} ${tier.name}</div>
+      </div>
+    </div>`
+  // Level card with progress bar
+  const nextTier=LEVEL_TIERS.find(t=>t.min>xp)||tier
+  const progress=nextTier===tier?100:Math.round(((xp-tier.min)/(nextTier.min-tier.min))*100)
+  document.getElementById('dash-level-card').innerHTML=`
+    <div style="background:linear-gradient(135deg,#A78BFA,#8B5CF6);border-radius:24px;padding:20px;color:white;width:100%;max-width:500px;box-shadow:0 8px 24px rgba(91,33,182,0.3);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-family:var(--font-display);font-size:20px">${tier.icon} Level: ${tier.name}</div>
+        <div style="font-size:17px;font-weight:900">${xp} XP</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.25);border-radius:100px;height:12px;overflow:hidden;">
+        <div style="background:white;height:100%;width:${progress}%;border-radius:100px;transition:width 1s ease;"></div>
+      </div>
+      <div style="font-size:13px;margin-top:8px;opacity:0.85">${nextTier===tier?'Max level!':`${nextTier.min-xp} XP lagi ke ${nextTier.icon} ${nextTier.name}`}</div>
+    </div>`
+  // Achievements
+  const unlocked=JSON.parse(localStorage.getItem('dunia-emosi-achievements')||'{}')
+  const achHtml=Object.entries(ACHIEVEMENTS).map(([key,ach])=>{
+    const done=!!unlocked[key]
+    return `<div style="display:flex;align-items:center;gap:12px;background:white;border-radius:18px;padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,0.06);opacity:${done?1:0.4};width:100%;max-width:500px;">
+      <span style="font-size:32px">${ach.icon}</span>
+      <div><div style="font-weight:800;font-size:15px">${ach.name}</div><div style="font-size:13px;color:var(--text-light)">${ach.desc}</div></div>
+      ${done?'<span style="margin-left:auto;color:#14B8A6;font-size:20px">✓</span>':''}
+    </div>`
+  }).join('')
+  document.getElementById('dash-achievements').innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;width:100%;align-items:center;">${achHtml}</div>`
+  // Stats
+  const streak=getStreakCount()
+  const played=JSON.parse(localStorage.getItem('dunia-emosi-played-games')||'{}')
+  document.getElementById('dash-stats').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:500px;">
+      <div class="dash-stat-card"><div class="dash-stat-num">🔥 ${streak}</div><div class="dash-stat-lbl">Hari Streak</div></div>
+      <div class="dash-stat-card"><div class="dash-stat-num">🎮 ${Object.keys(played).length}</div><div class="dash-stat-lbl">Game Dimainkan</div></div>
+      <div class="dash-stat-card"><div class="dash-stat-num">⭐ ${p.stars}</div><div class="dash-stat-lbl">Total Bintang</div></div>
+      <div class="dash-stat-card"><div class="dash-stat-num">${xp} XP</div><div class="dash-stat-lbl">Total XP</div></div>
+    </div>`
+  showScreen('screen-dashboard')
+}
 
 // ================================================================
 // BOOT

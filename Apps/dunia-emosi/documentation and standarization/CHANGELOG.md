@@ -1,5 +1,17 @@
 # Changelog — Dunia Emosi
 
+## v2.1.0 — 2026-04-11
+### Added
+- Level selector now works for ALL 9 games (G6-G9 previously hardcoded medium)
+- XP system: every star = 10 XP, 5 level tiers (🥚🐣🐥🦅👑)
+- XP display on result screen + Level Up animation
+- Progress Dashboard screen (stats, achievements gallery, XP bar)
+- Expanded achievements: 16 total (was 8)
+  - Added: hundred_stars, driver_master, picture_master, word_master, trace_master, all_games, streak3, hard_mode
+- Level tier badge in player chip header
+- Dashboard accessible from menu with Reset Data option
+- Image prompts updated to Disney Pixar / One Piece Toei 2023 style
+
 ## v2.0.0 — 2026-04-11 (In Progress)
 ### Added
 - Level selector screen (Mudah/Sedang/Sulit) before each game
