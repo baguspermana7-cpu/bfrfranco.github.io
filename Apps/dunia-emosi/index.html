@@ -1524,31 +1524,31 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* ── G10 Battle — mobile responsive ── */
 @media(max-width:480px) {
-  .g10-field { flex:0 0 36vh !important; min-height:180px !important; }
+  .g10-field { flex:0 0 36vh !important; min-height:190px !important; }
   .g10-math { font-size:40px; }
   .g10-cbtn { font-size:22px !important; padding:10px 6px !important; border-radius:14px; }
   .g10-choices { gap:8px; }
-  .g10-espr { width:20vw !important; height:20vw !important; }
-  .g10-pspr { width:16vw !important; height:16vw !important; }
+  .g10-espr { width:35vw !important; height:35vw !important; }
+  .g10-pspr { width:26vw !important; height:26vw !important; }
 }
 @media(max-width:400px) {
-  .g10-field { flex:0 0 32vh !important; min-height:160px !important; }
+  .g10-field { flex:0 0 34vh !important; min-height:170px !important; }
   .g10-math { font-size:34px; }
   .g10-cbtn { font-size:20px !important; padding:8px 4px !important; }
   .g10-qpanel { padding:6px 10px 8px; gap:6px; }
   .g10-choices { max-width:100%; }
-  .g10-espr { width:18vw !important; height:18vw !important; }
-  .g10-pspr { width:15vw !important; height:15vw !important; }
-  .g10-oval { width:64px !important; height:14px !important; }
+  .g10-espr { width:34vw !important; height:34vw !important; }
+  .g10-pspr { width:25vw !important; height:25vw !important; }
+  .g10-oval { width:70px !important; height:14px !important; }
 }
 @media(max-width:360px) {
-  .g10-field { flex:0 0 30vh !important; min-height:140px !important; }
+  .g10-field { flex:0 0 32vh !important; min-height:150px !important; }
   .g10-math { font-size:30px; }
   .g10-cbtn { font-size:18px !important; padding:7px 4px !important; }
   .g10-choices { max-width:100%; }
-  .g10-espr { width:16vw !important; height:16vw !important; }
-  .g10-pspr { width:13vw !important; height:13vw !important; }
-  .g10-oval { width:56px !important; height:12px !important; }
+  .g10-espr { width:32vw !important; height:32vw !important; }
+  .g10-pspr { width:24vw !important; height:24vw !important; }
+  .g10-oval { width:60px !important; height:12px !important; }
 }
 
 /* G10, G11, G12 tiles */
@@ -1588,9 +1588,9 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   position:absolute;z-index:3;
   background:rgba(248,248,240,0.97);
   border:2.5px solid #444;border-radius:10px;
-  padding:7px 11px 8px;
+  padding:6px 10px 7px;
   box-shadow:3px 3px 0 rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.9);
-  min-width:148px;max-width:185px;
+  min-width:130px;max-width:165px;
 }
 .g10-enemy-info{top:10px;left:10px;animation:g10SlideL 0.4s cubic-bezier(0.34,1.56,0.64,1) both;}
 .g10-player-info{bottom:10px;right:10px;animation:g10SlideR 0.4s 0.12s cubic-bezier(0.34,1.56,0.64,1) both;}
@@ -1615,29 +1615,28 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g10-hp-fill.hp-low{background:#E83030;animation:g10hpBlink 0.7s ease-in-out infinite;}
 @keyframes g10hpBlink{0%,100%{opacity:1}50%{opacity:0.45}}
 .g10-hp-nums{font-size:9px;font-weight:700;color:#555;text-align:right;margin-top:2px;font-family:monospace;}
-/* Sprite wrappers — DS classic quadrant layout */
+/* Sprite wrappers — DS quadrant layout, right half for enemy / left half for player */
 .g10-espr-wrap{position:absolute;z-index:2;
-  right:6%;top:4%;
+  right:2%;top:5%;
   display:flex;flex-direction:column;align-items:center;
   animation:g10SprR 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
 .g10-pspr-wrap{position:absolute;z-index:2;
-  left:6%;bottom:4%;
+  left:2%;bottom:5%;
   display:flex;flex-direction:column-reverse;align-items:center;
   animation:g10SprL 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;}
 @keyframes g10SprR{from{transform:translate(50px,-15px);opacity:0}to{transform:none;opacity:1}}
 @keyframes g10SprL{from{transform:translate(-50px,15px);opacity:0}to{transform:none;opacity:1}}
 .g10-spr{object-fit:contain;image-rendering:auto;transition:transform 0.2s ease,filter 0.2s ease,opacity 0.4s ease;}
-/* Enemy sprite: 22% of field width, faces LEFT (towards player) */
+/* Enemy sprite: ~38vw, faces LEFT (scaleX-1 to face player), max 220px */
 .g10-espr{
-  width:clamp(80px,22vw,130px);height:clamp(80px,22vw,130px);
+  width:clamp(140px,38vw,220px);height:clamp(140px,38vw,220px);
   transform:scaleX(-1);
-  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.65)) drop-shadow(0 0 8px rgba(255,220,50,0.4));
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,0.7)) drop-shadow(0 0 10px rgba(255,220,50,0.45));
 }
-/* Player sprite: 18% of field width (back view, smaller) */
+/* Player sprite: ~28vw, smaller (foreground) */
 .g10-pspr{
-  width:clamp(64px,18vw,105px);height:clamp(64px,18vw,105px);
-  image-rendering:pixelated;
-  filter:drop-shadow(0 3px 10px rgba(0,0,0,0.65)) drop-shadow(0 0 6px rgba(100,180,255,0.4));
+  width:clamp(100px,28vw,170px);height:clamp(100px,28vw,170px);
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(100,180,255,0.45));
 }
 /* Sprite action animations */
 .g10-spr.spr-atk{animation:g10Atk 0.35s ease;}
@@ -1692,10 +1691,11 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g10-field-status.show{opacity:1;}
 /* Question panel — DS bottom screen */
 .g10-qpanel{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:8px 16px 16px;gap:6px;
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-around;
+  padding:10px 16px 14px;gap:4px;
   background:rgba(14,14,30,0.99);
   border-top:2px solid rgba(255,255,255,0.07);overflow-y:auto;
+  max-height:55vh;
 }
 .g10-round-row{
   display:flex;align-items:center;justify-content:space-between;
@@ -1725,19 +1725,16 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g10-field::before{background:url('assets/bg-pokemon-battle.webp') center center/cover no-repeat,radial-gradient(circle at 80% 20%,rgba(255,255,255,.32),transparent 20%),linear-gradient(180deg,#6bbfee 0%,#a8d8f8 32%,#73bf55 48%,#3e7028 100%);opacity:0.92;}
 .g10-cbtn{
   position:relative;overflow:hidden;
-  background:rgba(55,55,90,0.95);
-  border:2px solid rgba(130,120,200,0.55);
+  background:linear-gradient(180deg,#3B6FD4 0%,#2855B0 50%,#1A3D8A 100%);
+  border:2px solid rgba(120,160,255,0.5);
   border-radius:18px;padding:12px 8px;
   font-size:24px;font-weight:900;color:#fff;cursor:pointer;
   font-family:'Fredoka One',cursive;
   transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1),
              background 0.15s ease,border-color 0.15s ease,box-shadow 0.15s ease;
-  box-shadow:0 4px 0 rgba(20,20,55,0.8), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow:0 5px 0 #0F2460, inset 0 1px 0 rgba(255,255,255,0.22);
+  text-shadow:0 2px 6px rgba(0,0,0,0.5);
 }
-.g10-cbtn:nth-child(1){background:rgba(220,50,60,0.85);border-color:rgba(255,100,110,0.6);box-shadow:0 4px 0 rgba(120,10,20,0.8);}
-.g10-cbtn:nth-child(2){background:rgba(30,100,200,0.85);border-color:rgba(80,150,255,0.6);box-shadow:0 4px 0 rgba(10,40,110,0.8);}
-.g10-cbtn:nth-child(3){background:rgba(30,160,100,0.85);border-color:rgba(60,220,140,0.6);box-shadow:0 4px 0 rgba(10,80,50,0.8);}
-.g10-cbtn:nth-child(4){background:rgba(180,100,20,0.85);border-color:rgba(240,160,60,0.6);box-shadow:0 4px 0 rgba(90,45,0,0.8);}
 .g10-cbtn:active{transform:scale(0.88);}
 .g10-cbtn.correct{
   background:rgba(45,212,191,0.28);border-color:#2DD4BF;
