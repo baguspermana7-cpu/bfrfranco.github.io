@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Second Brain — ResistanceZero Knowledge Graph</title>
+<meta name="description" content="Interactive knowledge graph mapping all ResistanceZero content, tools, and relationships.">
+<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a2e;
+  --border: rgba(139,92,246,0.15);
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent: #8b5cf6;
+  --accent-glow: rgba(139,92,246,0.3);
+  --cyan: #06b6d4;
+  --amber: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --pink: #ec4899;
+  --deep-purple: #7c3aed;
+  --slate: #64748b;
+  --sidebar-w: 320px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; height:100vh; overflow:hidden; }
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 1.5rem; height:56px;
+  background:rgba(10,10,15,0.95); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand { display:flex; align-items:center; gap:0.5rem; font-weight:700; font-size:1rem; color:var(--text); text-decoration:none; }
+.nav-brand svg { color:var(--accent); }
+.nav-back { display:flex; align-items:center; gap:0.4rem; color:var(--text-muted); text-decoration:none; font-size:0.85rem; transition:color 0.2s; }
+.nav-back:hover { color:var(--accent); }
+.nav-actions { display:flex; align-items:center; gap:0.75rem; }
+.nav-stats { display:flex; gap:1rem; }
+.stat-pill { font-size:0.75rem; color:var(--text-muted); background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:0.2rem 0.7rem; }
+.stat-pill span { color:var(--accent); font-weight:600; }
+
+/* TOOLBAR */
+.toolbar {
+  position:fixed; top:56px; left:0; right:0; z-index:90;
+  display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;
+  padding:0.6rem 1rem;
+  background:rgba(17,17,24,0.95); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.search-wrap { position:relative; flex:1; max-width:280px; }
+.search-wrap svg { position:absolute; left:0.6rem; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+#searchInput {
+  width:100%; padding:0.45rem 0.75rem 0.45rem 2rem;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; color:var(--text); font-size:0.82rem;
+  outline:none; transition:border-color 0.2s;
+}
+#searchInput:focus { border-color:var(--accent); }
+.filter-btns { display:flex; gap:0.4rem; flex-wrap:wrap; }
+.filter-btn {
+  padding:0.35rem 0.8rem; border-radius:20px; font-size:0.75rem; font-weight:600;
+  border:1.5px solid transparent; cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.filter-btn.active { opacity:1; }
+.filter-btn:not(.active) { opacity:0.45; }
+.btn-all { background:rgba(139,92,246,0.15); border-color:var(--accent); color:var(--accent); }
+.btn-articles { background:rgba(6,182,212,0.12); border-color:var(--cyan); color:var(--cyan); }
+.btn-calcs { background:rgba(245,158,11,0.12); border-color:var(--amber); color:var(--amber); }
+.btn-compare { background:rgba(16,185,129,0.12); border-color:var(--green); color:var(--green); }
+.btn-reports { background:rgba(239,68,68,0.12); border-color:var(--red); color:var(--red); }
+.btn-apps { background:rgba(236,72,153,0.12); border-color:var(--pink); color:var(--pink); }
+.btn-series { background:rgba(124,58,237,0.12); border-color:var(--deep-purple); color:#a78bfa; }
+.btn-standards { background:rgba(100,116,139,0.12); border-color:var(--slate); color:var(--slate); }
+.btn-core { background:rgba(139,92,246,0.1); border-color:rgba(139,92,246,0.5); color:#c4b5fd; }
+.view-toggle { display:flex; gap:0.3rem; margin-left:auto; }
+.view-btn { padding:0.35rem 0.6rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.75rem; }
+.view-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+/* GRAPH CANVAS */
+#graphCanvas {
+  position:fixed; top:112px; left:0; right:0; bottom:0;
+  transition:right 0.3s ease;
+}
+#graphCanvas.sidebar-open { right:var(--sidebar-w); }
+
+/* SIDEBAR */
+#sidebar {
+  position:fixed; top:56px; right:0; bottom:0; width:var(--sidebar-w);
+  background:var(--surface); border-left:1px solid var(--border);
+  overflow-y:auto; z-index:80;
+  transform:translateX(100%); transition:transform 0.3s ease;
+  padding:1.25rem;
+}
+#sidebar.open { transform:translateX(0); }
+.sidebar-close { float:right; background:none; border:none; color:var(--text-muted); cursor:pointer; padding:0.25rem; margin-top:-0.25rem; }
+.sidebar-close:hover { color:var(--text); }
+.node-badge { display:inline-block; padding:0.2rem 0.65rem; border-radius:20px; font-size:0.7rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:0.75rem; }
+#sidebar h2 { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; line-height:1.3; }
+#sidebar .node-desc { font-size:0.82rem; color:var(--text-muted); line-height:1.6; margin-bottom:1rem; }
+.meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1rem; }
+.meta-item { background:var(--surface2); border-radius:8px; padding:0.5rem 0.75rem; }
+.meta-label { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+.meta-value { font-size:0.88rem; font-weight:600; color:var(--text); }
+.conn-section h4 { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem; }
+.conn-chip { display:inline-flex; align-items:center; gap:0.3rem; padding:0.25rem 0.6rem; background:var(--surface2); border:1px solid var(--border); border-radius:20px; font-size:0.75rem; margin:0.2rem; cursor:pointer; transition:border-color 0.2s; }
+.conn-chip:hover { border-color:var(--accent); }
+.open-btn { display:flex; align-items:center; justify-content:center; gap:0.5rem; width:100%; padding:0.65rem; background:var(--accent); border:none; border-radius:8px; color:#fff; font-size:0.85rem; font-weight:600; cursor:pointer; text-decoration:none; transition:opacity 0.2s; margin-top:1rem; }
+.open-btn:hover { opacity:0.85; }
+.open-btn-sec { background:transparent; border:1px solid var(--border); color:var(--text-muted); margin-top:0.5rem; }
+.divider { border:none; border-top:1px solid var(--border); margin:1rem 0; }
+
+/* LEGEND FLOAT */
+.legend {
+  position:fixed; bottom:1.5rem; left:1.5rem; z-index:90;
+  background:rgba(17,17,24,0.95); backdrop-filter:blur(8px);
+  border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem;
+  display:flex; flex-direction:column; gap:0.35rem;
+}
+.legend-item { display:flex; align-items:center; gap:0.5rem; font-size:0.72rem; color:var(--text-muted); }
+.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* TOOLTIP */
+.vis-tooltip { background:var(--surface2) !important; border:1px solid var(--border) !important; color:var(--text) !important; border-radius:8px !important; font-size:0.78rem !important; padding:0.4rem 0.7rem !important; }
+
+/* ZOOM CONTROLS */
+.zoom-ctrl {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:90;
+  display:flex; flex-direction:column; gap:0.4rem;
+}
+.zoom-btn { width:36px; height:36px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text-muted); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.zoom-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* EMPTY STATE */
+#emptyState { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--text-muted); }
+#emptyState svg { margin-bottom:0.75rem; opacity:0.4; }
+
+@media (max-width:640px) {
+  :root { --sidebar-w: 100vw; }
+  .legend { display:none; }
+  .nav-stats { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../../index.html" class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+    Second Brain
+  </a>
+  <div class="nav-stats">
+    <div class="stat-pill">Nodes: <span id="statNodes">0</span></div>
+    <div class="stat-pill">Links: <span id="statEdges">0</span></div>
+    <div class="stat-pill">Categories: <span id="statCats">9</span></div>
+  </div>
+  <a href="../../index.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to Site
+  </a>
+</nav>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search nodes...">
+  </div>
+  <div class="filter-btns">
+    <button class="filter-btn btn-all active" data-group="all">All</button>
+    <button class="filter-btn btn-core" data-group="core">Core</button>
+    <button class="filter-btn btn-articles" data-group="articles">Articles</button>
+    <button class="filter-btn btn-calcs" data-group="calculators">Calculators</button>
+    <button class="filter-btn btn-compare" data-group="comparisons">Comparisons</button>
+    <button class="filter-btn btn-reports" data-group="reports">Reports</button>
+    <button class="filter-btn btn-apps" data-group="apps">Apps</button>
+    <button class="filter-btn btn-series" data-group="series">Series</button>
+    <button class="filter-btn btn-standards" data-group="standards">Standards</button>
+  </div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btnPhysics" title="Physics layout">⚛</button>
+    <button class="view-btn" id="btnHierarchy" title="Hierarchical">⊞</button>
+    <button class="view-btn" id="btnFit" title="Fit to screen">⤢</button>
+  </div>
+</div>
+
+<!-- GRAPH -->
+<div id="graphCanvas">
+  <div id="emptyState">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <p>No nodes match your search</p>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <button class="sidebar-close" onclick="closeSidebar()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <div id="sidebarContent"></div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#c4b5fd"></div>Core Pages</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Articles</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Calculators</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Comparisons</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Reports</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>Apps</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>Series</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div>Standards</div>
+</div>
+
+<!-- ZOOM -->
+<div class="zoom-ctrl">
+  <button class="zoom-btn" id="zoomIn" title="Zoom in">+</button>
+  <button class="zoom-btn" id="zoomOut" title="Zoom out">−</button>
+  <button class="zoom-btn" id="zoomReset" title="Reset view">⌖</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ═══════════════════════════════════════════════
+   GRAPH DATA
+═══════════════════════════════════════════════ */
+const SITE_BASE = '../../';
+
+const GROUPS = {
+  core:        { color: '#c4b5fd', border: '#8b5cf6', size: 28 },
+  articles:    { color: '#06b6d4', border: '#0284c7', size: 18 },
+  calculators: { color: '#f59e0b', border: '#d97706', size: 22 },
+  comparisons: { color: '#10b981', border: '#059669', size: 18 },
+  reports:     { color: '#ef4444', border: '#dc2626', size: 20 },
+  apps:        { color: '#ec4899', border: '#db2777', size: 22 },
+  series:      { color: '#a78bfa', border: '#7c3aed', size: 24 },
+  standards:   { color: '#64748b', border: '#475569', size: 18 },
+};
+
+const rawNodes = [
+  // CORE
+  { id:'index',       label:'Home',              group:'core',        url:'index.html',         desc:'Main landing page — DC engineering hub with all tools and content.', tags:['landing','portfolio','navigation'] },
+  { id:'articles',    label:'Engineering Journal', group:'core',      url:'articles.html',       desc:'All long-form technical articles on data center engineering topics.', tags:['articles','journal','content'] },
+  { id:'insights',    label:'All Insights',       group:'core',       url:'insights.html',       desc:'Aggregated hub for all insight categories: Engineering, Geopolitics, Future Forward.', tags:['hub','insights'] },
+  { id:'dashboard',   label:'Dashboard',          group:'core',       url:'dashboard.html',      desc:'Real-time data center operations dashboard with live metrics.', tags:['dashboard','monitoring','ops'] },
+  { id:'glossary',    label:'Glossary',           group:'core',       url:'glossary.html',       desc:'Comprehensive DC engineering terminology and definitions.', tags:['glossary','reference','terms'] },
+  { id:'dc-solutions',label:'DC Solutions',       group:'core',       url:'datacenter-solutions.html', desc:'Overview of data center solutions and services offered.', tags:['solutions','services'] },
+  { id:'achievements',label:'Achievements',       group:'core',       url:'achievements.html',   desc:'Professional certifications, projects, and milestones.', tags:['portfolio','achievements'] },
+
+  // SERIES HUBS
+  { id:'geo-hub',     label:'Geopolitics Series', group:'series',     url:'geopolitics.html',    desc:'3-part geopolitical analysis series on global infrastructure threats.', tags:['geopolitics','series','analysis'] },
+  { id:'ff-hub',      label:'Future Forward Series', group:'series',  url:'future-forward.html', desc:'Forward-looking analysis on tech paradigm shifts. Violet accent.', tags:['future','technology','series'] },
+
+  // ARTICLES (key articles with known titles)
+  { id:'art-1',  label:'Art-1',  group:'articles', url:'article-1.html',  desc:'Data center engineering article #1.', tags:['article','engineering'] },
+  { id:'art-2',  label:'Art-2',  group:'articles', url:'article-2.html',  desc:'Data center engineering article #2.', tags:['article','engineering'] },
+  { id:'art-3',  label:'Art-3',  group:'articles', url:'article-3.html',  desc:'Data center engineering article #3.', tags:['article','cooling'] },
+  { id:'art-4',  label:'Art-4',  group:'articles', url:'article-4.html',  desc:'Data center engineering article #4.', tags:['article','power'] },
+  { id:'art-5',  label:'Art-5',  group:'articles', url:'article-5.html',  desc:'Data center engineering article #5.', tags:['article','engineering'] },
+  { id:'art-6',  label:'Art-6',  group:'articles', url:'article-6.html',  desc:'Data center engineering article #6.', tags:['article','engineering'] },
+  { id:'art-7',  label:'Art-7',  group:'articles', url:'article-7.html',  desc:'Data center engineering article #7.', tags:['article','engineering'] },
+  { id:'art-8',  label:'Art-8',  group:'articles', url:'article-8.html',  desc:'Data center engineering article #8.', tags:['article','engineering'] },
+  { id:'art-9',  label:'Art-9',  group:'articles', url:'article-9.html',  desc:'Data center engineering article #9.', tags:['article','engineering'] },
+  { id:'art-10', label:'Art-10', group:'articles', url:'article-10.html', desc:'Data center engineering article #10.', tags:['article','engineering'] },
+  { id:'art-11', label:'Art-11', group:'articles', url:'article-11.html', desc:'Data center engineering article #11.', tags:['article','engineering'] },
+  { id:'art-12', label:'Art-12', group:'articles', url:'article-12.html', desc:'Data center engineering article #12.', tags:['article','engineering'] },
+  { id:'art-13', label:'Art-13', group:'articles', url:'article-13.html', desc:'Data center engineering article #13.', tags:['article','engineering'] },
+  { id:'art-14', label:'Art-14', group:'articles', url:'article-14.html', desc:'Data center engineering article #14.', tags:['article','engineering'] },
+  { id:'art-15', label:'Art-15', group:'articles', url:'article-15.html', desc:'Data center engineering article #15.', tags:['article','engineering'] },
+  { id:'art-16', label:'Art-16', group:'articles', url:'article-16.html', desc:'Data center engineering article #16.', tags:['article','engineering'] },
+  { id:'art-17', label:'Art-17', group:'articles', url:'article-17.html', desc:'Data center engineering article #17.', tags:['article','engineering'] },
+  { id:'art-18', label:'Art-18', group:'articles', url:'article-18.html', desc:'Data center engineering article #18.', tags:['article','engineering'] },
+  { id:'art-19', label:'Art-19', group:'articles', url:'article-19.html', desc:'Data center engineering article #19.', tags:['article','engineering'] },
+  { id:'art-20', label:'Art-20', group:'articles', url:'article-20.html', desc:'Data center engineering article #20.', tags:['article','engineering'] },
+  { id:'art-21', label:'Art-21', group:'articles', url:'article-21.html', desc:'Data center engineering article #21.', tags:['article','engineering'] },
+  { id:'art-22', label:'Art-22', group:'articles', url:'article-22.html', desc:'Data center engineering article #22.', tags:['article','engineering'] },
+  { id:'art-23', label:'Art-23', group:'articles', url:'article-23.html', desc:'Data center engineering article #23.', tags:['article','engineering'] },
+  { id:'art-24', label:'FF-1: The Web Didn\'t Die', group:'articles', url:'article-24.html', desc:'Future Forward #1 — The web split into walled gardens vs open protocols. Violet accent.', tags:['future-forward','web','protocols'] },
+  { id:'art-25', label:'FF-2: Engineer Shortage Is Fake', group:'articles', url:'article-25.html', desc:'Future Forward #2 — The so-called DC engineer shortage is misdiagnosed. Amber accent.', tags:['future-forward','workforce','talent'] },
+  { id:'art-26', label:'Art-26: PFAS Investigation', group:'articles', url:'article-26.html', desc:'Global Analysis — PFAS contamination from DC cooling maintenance vapor. Red accent.', tags:['pfas','cooling','environment','global-analysis'] },
+  { id:'geo-1',  label:'Geo-1: 72-Hour Warning',  group:'articles', url:'geopolitics-1.html', desc:'Geopolitical risk: what happens to your DC in the first 72 hours of a regional conflict.', tags:['geopolitics','risk','conflict'] },
+  { id:'geo-2',  label:'Geo-2: $50T Shift',       group:'articles', url:'geopolitics-2.html', desc:'The $50 trillion infrastructure shift reshaping global capital flows.', tags:['geopolitics','capital','infrastructure'] },
+  { id:'geo-3',  label:'Geo-3: Hormuz Fiber Shock', group:'articles', url:'geopolitics-3.html', desc:'Undersea cable vulnerabilities through the Strait of Hormuz.', tags:['geopolitics','submarine-cable','risk'] },
+
+  // CALCULATORS
+  { id:'calc-pue',    label:'PUE Calculator',     group:'calculators', url:'pue-calculator.html',    desc:'Power Usage Effectiveness calculator with 12-location PUE benchmarks.', tags:['pue','power','efficiency'] },
+  { id:'calc-capex',  label:'CAPEX Calculator',   group:'calculators', url:'capex-calculator.html',  desc:'Capital expenditure modeling for new DC builds across multiple regions.', tags:['capex','investment','build'] },
+  { id:'calc-opex',   label:'OPEX Calculator',    group:'calculators', url:'opex-calculator.html',   desc:'Operating expense projections with energy cost escalation models.', tags:['opex','operating','energy'] },
+  { id:'calc-roi',    label:'ROI Calculator',     group:'calculators', url:'roi-calculator.html',    desc:'Return on investment calculator with Monte Carlo sensitivity analysis.', tags:['roi','return','investment'] },
+  { id:'calc-tco',    label:'TCO Calculator',     group:'calculators', url:'tco-calculator.html',    desc:'Total Cost of Ownership: Build vs Colo vs Cloud with WACC/NPV models.', tags:['tco','cloud','colo','build'] },
+  { id:'calc-carbon', label:'Carbon Footprint',   group:'calculators', url:'carbon-footprint.html',  desc:'DC carbon emissions calculator with renewable energy offset modeling.', tags:['carbon','sustainability','emissions'] },
+  { id:'calc-cx',     label:'CX Calculator',      group:'calculators', url:'cx-calculator.html',     desc:'Customer experience and SLA cost impact calculator.', tags:['cx','sla','uptime'] },
+
+  // COMPARISONS
+  { id:'cmp-tier',    label:'Tier 3 vs Tier 4',    group:'comparisons', url:'compare-tier-3-vs-tier-4.html',     desc:'Uptime Institute Tier III vs Tier IV: cost, uptime, and redundancy tradeoffs.', tags:['tier','uptime','redundancy'] },
+  { id:'cmp-cool',    label:'Air vs Liquid Cooling', group:'comparisons', url:'compare-air-vs-liquid-cooling.html', desc:'CRAC/CRAH vs rear-door/immersion cooling cost and PUE comparison.', tags:['cooling','liquid','air','pue'] },
+  { id:'cmp-gen',     label:'Diesel vs Gas Gen',   group:'comparisons', url:'compare-diesel-vs-gas-generator.html', desc:'Diesel vs natural gas generator total cost and emissions comparison.', tags:['generator','diesel','gas','power'] },
+  { id:'cmp-pue',     label:'PUE vs DCiE',         group:'comparisons', url:'compare-pue-vs-dcie.html',           desc:'Power Usage Effectiveness vs Data Center Infrastructure Efficiency metrics.', tags:['pue','dcie','metrics'] },
+  { id:'cmp-n1',      label:'N+1 vs 2N',           group:'comparisons', url:'compare-n1-vs-2n.html',              desc:'Redundancy architecture tradeoffs: N+1 vs 2N vs 2(N+1).', tags:['redundancy','n+1','2n','architecture'] },
+  { id:'cmp-ashrae',  label:'ASHRAE vs Uptime',    group:'comparisons', url:'compare-ashrae-vs-uptime.html',      desc:'ASHRAE thermal standards vs Uptime Institute requirements.', tags:['ashrae','uptime','thermal','standards'] },
+  { id:'cmp-fire',    label:'FM200 vs Novec',      group:'comparisons', url:'compare-fm200-vs-novec.html',        desc:'Fire suppression agent comparison: FM-200 vs 3M Novec 1230.', tags:['fire','suppression','fm200','novec'] },
+  { id:'cmp-floor',   label:'Raised Floor vs Slab', group:'comparisons', url:'compare-raised-floor-vs-slab.html', desc:'Raised floor vs concrete slab: airflow, cost, and flexibility.', tags:['floor','airflow','construction'] },
+  { id:'cmp-ups',     label:'UPS Online vs Offline', group:'comparisons', url:'compare-ups-online-vs-offline.html', desc:'Online double-conversion vs offline/standby UPS topology comparison.', tags:['ups','power','topology'] },
+  { id:'cmp-wet',     label:'Wet vs Pre-Action',   group:'comparisons', url:'compare-wet-vs-preaction.html',      desc:'Wet pipe vs pre-action sprinkler system for DC environments.', tags:['fire','sprinkler','suppression'] },
+
+  // REPORTS & INFOGRAPHICS
+  { id:'asean-report', label:'ASEAN DC Report 2026', group:'reports', url:'asean-dc-report-2026.html', desc:'Southeast Asia data center market report: SG 850MW, ID 350MW, MY/TH expansion.', tags:['asean','market','singapore','indonesia'] },
+  { id:'datahallai',   label:'DataHall AI',           group:'reports', url:'datahallAI.html',           desc:'AI-ready data center platform overview. NVLink 1800 GB/s, 3 tiers.', tags:['ai','gpu','datacenter','datahall'] },
+  { id:'infog-pue',    label:'PUE Global Infographic', group:'reports', url:'infographic-pue-global.html', desc:'Global PUE forecast 1.40→1.55 across 12 locations. IRENA 2024 data.', tags:['pue','infographic','global','efficiency'] },
+  { id:'infog-sustain',label:'DC Sustainability',      group:'reports', url:'infographic-dc-sustainability.html', desc:'DC power 350→620 TWh, AWS 100% renewable. IEA 2025.', tags:['sustainability','energy','renewable'] },
+  { id:'infog-cost',   label:'DC Cost Breakdown',      group:'reports', url:'infographic-dc-cost-breakdown.html',  desc:'Cost breakdown infographic: Tier IV 2(N+1), AI rack 40-132kW.', tags:['cost','infographic','tier','ai'] },
+  { id:'dc-market',    label:'DC Market Tracker',      group:'reports', url:'dc-market-tracker.html',    desc:'Interactive world map of 25+ DC markets with filterable data table.', tags:['market','world','interactive','map'] },
+
+  // APPS
+  { id:'app-finance',  label:'Finance Terminal',    group:'apps', url:'Apps/finance-terminal/index.html', desc:'Real-time financial data terminal with quote caching and batch API calls.', tags:['finance','terminal','stocks','api'] },
+  { id:'app-second',   label:'Second Brain',        group:'apps', url:'Apps/second brain/index.html',    desc:'This knowledge graph — maps all rz-work relationships and content.', tags:['knowledge','graph','obsidian','mapping'] },
+  { id:'app-dca',      label:'DCA App',             group:'apps', url:'Apps/dca-app/index.html',         desc:'Dollar Cost Averaging calculator for systematic investment planning.', tags:['dca','investment','calculator'] },
+  { id:'dcmoc',        label:'DC MOC App',          group:'apps', url:'dcmoc/',                          desc:'Next.js 16 DC Management Operations Center with React 19, TypeScript, Tailwind.', tags:['dcmoc','nextjs','react','operations'] },
+
+  // STANDARDS & LABS
+  { id:'tia-942',      label:'TIA-942 Checklist',    group:'standards', url:'tia-942-checklist.html',        desc:'Interactive TIA-942 compliance checklist with scoring.', tags:['tia-942','compliance','checklist'] },
+  { id:'tier-advisor', label:'Tier Advisor',          group:'standards', url:'tier-advisor.html',             desc:'Interactive wizard to determine optimal Uptime Institute tier.', tags:['tier','advisor','uptime','wizard'] },
+  { id:'rfs-wb',       label:'RFS Readiness Workbench', group:'standards', url:'rfs-readiness-workbench.html', desc:'Ready For Service readiness assessment workbench.', tags:['rfs','readiness','commissioning'] },
+  { id:'ltc-lab',      label:'LTC System Lab',        group:'standards', url:'ltc-system-modelling-lab.html', desc:'LTC electrical system modelling lab. elecPrice: 0.065 Virginia.', tags:['ltc','electrical','modelling'] },
+  { id:'std-ltc',      label:'Standards LTC Lab',     group:'standards', url:'standards-ltc-lab.html',        desc:'Standards and reference for LTC system design.', tags:['standards','ltc','reference'] },
+  { id:'dc-conv',      label:'DC Conventional',       group:'standards', url:'dc-conventional.html',          desc:'Conventional DC design reference and specifications.', tags:['conventional','design','reference'] },
+
+  // DC SYSTEMS
+  { id:'sys-chiller',  label:'Chiller Plant',  group:'standards', url:'chiller-plant.html',  desc:'Chiller plant SCADA and system overview for DC cooling.', tags:['chiller','cooling','scada'] },
+  { id:'sys-fire',     label:'Fire System',    group:'standards', url:'fire-system.html',    desc:'Data center fire suppression system documentation.', tags:['fire','suppression','safety'] },
+  { id:'sys-fuel',     label:'Fuel System',    group:'standards', url:'fuel-system.html',    desc:'Generator fuel management and day tank system overview.', tags:['fuel','generator','power'] },
+  { id:'sys-water',    label:'Water System',   group:'standards', url:'water-system.html',   desc:'Cooling water treatment and distribution system.', tags:['water','cooling','treatment'] },
+];
+
+const rawEdges = [
+  // Core hub connections
+  { from:'index',     to:'articles' },
+  { from:'index',     to:'insights' },
+  { from:'index',     to:'dashboard' },
+  { from:'index',     to:'dc-solutions' },
+  { from:'insights',  to:'articles' },
+  { from:'insights',  to:'geo-hub' },
+  { from:'insights',  to:'ff-hub' },
+
+  // Series → articles
+  { from:'geo-hub', to:'geo-1' },
+  { from:'geo-hub', to:'geo-2' },
+  { from:'geo-hub', to:'geo-3' },
+  { from:'ff-hub',  to:'art-24' },
+  { from:'ff-hub',  to:'art-25' },
+
+  // Articles → journal
+  ...Array.from({length:23},(_, i)=>`art-${i+1}`).map(id => ({ from:'articles', to:id })),
+  { from:'articles', to:'geo-1' },
+  { from:'articles', to:'geo-2' },
+  { from:'articles', to:'geo-3' },
+  { from:'articles', to:'art-24' },
+  { from:'articles', to:'art-25' },
+  { from:'articles', to:'art-26' },
+
+  // Calculators → dashboard
+  { from:'dashboard', to:'calc-pue' },
+  { from:'dashboard', to:'calc-capex' },
+  { from:'dashboard', to:'calc-opex' },
+  { from:'dashboard', to:'calc-roi' },
+  { from:'dashboard', to:'calc-tco' },
+  { from:'dashboard', to:'calc-carbon' },
+
+  // Calculator cross-links
+  { from:'calc-capex', to:'calc-opex' },
+  { from:'calc-opex',  to:'calc-roi' },
+  { from:'calc-roi',   to:'calc-tco' },
+  { from:'calc-tco',   to:'calc-capex' },
+  { from:'calc-pue',   to:'calc-carbon' },
+
+  // Comparisons → related calculators
+  { from:'cmp-pue',    to:'calc-pue' },
+  { from:'cmp-tier',   to:'calc-capex' },
+  { from:'cmp-cool',   to:'calc-pue' },
+  { from:'cmp-cool',   to:'calc-opex' },
+
+  // Comparisons → standards
+  { from:'cmp-tier',   to:'tier-advisor' },
+  { from:'cmp-ashrae', to:'tia-942' },
+  { from:'cmp-fire',   to:'sys-fire' },
+
+  // Reports cross-links
+  { from:'asean-report', to:'datahallai' },
+  { from:'asean-report', to:'dc-market' },
+  { from:'dc-market',    to:'datahallai' },
+  { from:'infog-pue',    to:'calc-pue' },
+  { from:'infog-sustain',to:'calc-carbon' },
+  { from:'infog-cost',   to:'calc-capex' },
+  { from:'infog-cost',   to:'cmp-tier' },
+
+  // Apps cross-links
+  { from:'app-second', to:'app-finance' },
+  { from:'app-second', to:'dcmoc' },
+  { from:'dcmoc',      to:'dashboard' },
+
+  // Standards
+  { from:'tia-942',    to:'tier-advisor' },
+  { from:'ltc-lab',    to:'std-ltc' },
+  { from:'dc-solutions',to:'dc-conv' },
+  { from:'dc-solutions',to:'sys-chiller' },
+  { from:'dc-solutions',to:'sys-fire' },
+  { from:'dc-solutions',to:'sys-fuel' },
+  { from:'dc-solutions',to:'sys-water' },
+
+  // PFAS article → cooling articles
+  { from:'art-26', to:'cmp-fire' },
+  { from:'art-26', to:'infog-sustain' },
+];
+
+/* ═══════════════════════════════════════════════
+   VIS.JS SETUP
+═══════════════════════════════════════════════ */
+let network, allNodes, allEdges, currentGroup = 'all';
+
+function buildGraph(filter = 'all', searchTerm = '') {
+  const container = document.getElementById('graphCanvas');
+
+  const filteredNodes = rawNodes.filter(n => {
+    const matchGroup = filter === 'all' || n.group === filter;
+    const matchSearch = !searchTerm ||
+      n.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (n.tags||[]).some(t => t.includes(searchTerm.toLowerCase()));
+    return matchGroup && matchSearch;
+  });
+
+  const filteredIds = new Set(filteredNodes.map(n => n.id));
+
+  const filteredEdges = rawEdges.filter(e => filteredIds.has(e.from) && filteredIds.has(e.to));
+
+  // Count connections per node
+  const connCount = {};
+  filteredEdges.forEach(e => {
+    connCount[e.from] = (connCount[e.from]||0) + 1;
+    connCount[e.to] = (connCount[e.to]||0) + 1;
+  });
+
+  const visNodes = filteredNodes.map(n => {
+    const g = GROUPS[n.group] || GROUPS.core;
+    const conns = connCount[n.id] || 0;
+    const size = g.size + Math.min(conns * 2, 16);
+    return {
+      id: n.id,
+      label: n.label,
+      title: `<strong>${n.label}</strong><br><small>${n.group}</small><br>${n.desc}`,
+      color: { background: g.color, border: g.border, highlight: { background: '#fff', border: g.border } },
+      size,
+      font: { color: '#e2e8f0', size: 12, face: 'Inter, system-ui, sans-serif' },
+      borderWidth: 2,
+      shadow: { enabled: true, color: g.color + '44', size: 8, x: 0, y: 2 },
+      _raw: n,
+    };
+  });
+
+  const visEdges = filteredEdges.map((e, i) => ({
+    id: 'e' + i,
+    from: e.from,
+    to: e.to,
+    color: { color: 'rgba(139,92,246,0.2)', highlight: 'rgba(139,92,246,0.7)' },
+    width: 1.5,
+    smooth: { type: 'dynamic' },
+    arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+  }));
+
+  document.getElementById('emptyState').style.display = filteredNodes.length === 0 ? 'block' : 'none';
+  document.getElementById('statNodes').textContent = filteredNodes.length;
+  document.getElementById('statEdges').textContent = filteredEdges.length;
+
+  allNodes = new vis.DataSet(visNodes);
+  allEdges = new vis.DataSet(visEdges);
+
+  const options = {
+    physics: {
+      enabled: true,
+      solver: 'forceAtlas2Based',
+      forceAtlas2Based: { gravitationalConstant: -60, centralGravity: 0.006, springLength: 120, springConstant: 0.06 },
+      stabilization: { iterations: 300 },
+    },
+    interaction: {
+      hover: true,
+      tooltipDelay: 200,
+      navigationButtons: false,
+      keyboard: { enabled: true, speed: { x: 8, y: 8, zoom: 0.03 } },
+    },
+    nodes: { shape: 'dot', scaling: { min: 16, max: 40 } },
+    edges: { selectionWidth: 3 },
+  };
+
+  if (network) { network.destroy(); }
+  network = new vis.Network(container, { nodes: allNodes, edges: allEdges }, options);
+
+  network.on('click', params => {
+    if (params.nodes.length > 0) {
+      const nodeId = params.nodes[0];
+      const node = allNodes.get(nodeId);
+      if (node) showSidebar(node, allEdges.get());
+    } else {
+      closeSidebar();
+    }
+  });
+}
+
+function showSidebar(node, edges) {
+  const raw = node._raw;
+  const g = GROUPS[raw.group] || GROUPS.core;
+  const sidebar = document.getElementById('sidebar');
+  const content = document.getElementById('sidebarContent');
+
+  // Find connected nodes
+  const connectedIds = edges
+    .filter(e => e.from === raw.id || e.to === raw.id)
+    .map(e => e.from === raw.id ? e.to : e.from);
+  const connectedNodes = connectedIds.map(id => rawNodes.find(n => n.id === id)).filter(Boolean);
+
+  const badgeStyle = `background:${g.color}22;color:${g.color};border:1px solid ${g.color}44`;
+  const url = raw.url.startsWith('http') ? raw.url : SITE_BASE + raw.url;
+
+  content.innerHTML = `
+    <span class="node-badge" style="${badgeStyle}">${raw.group}</span>
+    <h2>${raw.label}</h2>
+    <p class="node-desc">${raw.desc}</p>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Connections</div>
+        <div class="meta-value" style="color:${g.color}">${connectedNodes.length}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Category</div>
+        <div class="meta-value">${raw.group}</div>
+      </div>
+    </div>
+    ${raw.tags && raw.tags.length ? `
+    <div style="margin-bottom:1rem">
+      ${raw.tags.map(t => `<span style="display:inline-block;padding:.15rem .5rem;background:rgba(100,116,139,.15);border-radius:4px;font-size:.68rem;color:var(--text-muted);margin:.15rem">#${t}</span>`).join('')}
+    </div>` : ''}
+    ${connectedNodes.length ? `
+    <div class="conn-section">
+      <h4>Connected Nodes (${connectedNodes.length})</h4>
+      <div>
+        ${connectedNodes.slice(0,12).map(cn => {
+          const cg = GROUPS[cn.group] || GROUPS.core;
+          return `<span class="conn-chip" onclick="focusNode('${cn.id}')" style="border-color:${cg.border}44">
+            <span style="width:6px;height:6px;border-radius:50%;background:${cg.color};flex-shrink:0"></span>
+            ${cn.label}
+          </span>`;
+        }).join('')}
+        ${connectedNodes.length > 12 ? `<span style="font-size:.72rem;color:var(--text-muted)">+${connectedNodes.length-12} more</span>` : ''}
+      </div>
+    </div>` : ''}
+    <hr class="divider">
+    <a href="${url}" target="_blank" class="open-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Open Page
+    </a>
+  `;
+
+  sidebar.classList.add('open');
+  document.getElementById('graphCanvas').classList.add('sidebar-open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('graphCanvas').classList.remove('sidebar-open');
+}
+
+window.focusNode = function(id) {
+  if (network) {
+    network.selectNodes([id]);
+    network.focus(id, { animation: { duration: 500, easingFunction: 'easeInOutQuad' }, scale: 1.2 });
+    const node = allNodes.get(id);
+    if (node) showSidebar(node, allEdges.get());
+  }
+};
+
+/* FILTER BUTTONS */
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentGroup = btn.dataset.group;
+    buildGraph(currentGroup, document.getElementById('searchInput').value);
+  });
+});
+
+/* SEARCH */
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => buildGraph(currentGroup, e.target.value), 250);
+});
+
+/* VIEW TOGGLES */
+document.getElementById('btnPhysics').addEventListener('click', () => {
+  if (network) { network.setOptions({ physics: { enabled: true, solver: 'forceAtlas2Based' } }); }
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btnPhysics').classList.add('active');
+});
+
+document.getElementById('btnHierarchy').addEventListener('click', () => {
+  if (network) { network.setOptions({ layout: { hierarchical: { direction: 'UD', sortMethod: 'directed', levelSeparation: 120 } }, physics: { enabled: false } }); }
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btnHierarchy').classList.add('active');
+});
+
+document.getElementById('btnFit').addEventListener('click', () => {
+  if (network) network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+});
+
+/* ZOOM */
+document.getElementById('zoomIn').addEventListener('click',    () => network && network.moveTo({ scale: network.getScale() * 1.3, animation: true }));
+document.getElementById('zoomOut').addEventListener('click',   () => network && network.moveTo({ scale: network.getScale() * 0.75, animation: true }));
+document.getElementById('zoomReset').addEventListener('click', () => network && network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }));
+
+/* INIT */
+buildGraph();
+
+})();
+</script>
+</body>
+</html>
