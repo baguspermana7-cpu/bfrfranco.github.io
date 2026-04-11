@@ -2852,6 +2852,17 @@ body { background: #0a0a1a !important; }
   gap: 8px;
 }
 .g6-target-label { font-size: 16px; }
+.g6-lives-display { font-size: 16px; letter-spacing: 1px; margin-left: 4px; transition: opacity 0.3s; }
+.g6-lives-display.hit-flash { animation: livesHitFlash 0.4s ease; }
+@keyframes livesHitFlash { 0%,100%{opacity:1;transform:scale(1)} 30%{opacity:0.4;transform:scale(1.3)} }
+@keyframes g6CarShake {
+  0%,100%{transform:translateX(-50%) rotate(0deg)}
+  15%{transform:translateX(calc(-50% - 9px)) rotate(-4deg)}
+  30%{transform:translateX(calc(-50% + 9px)) rotate(4deg)}
+  50%{transform:translateX(calc(-50% - 6px)) rotate(-2deg)}
+  70%{transform:translateX(calc(-50% + 5px)) rotate(2deg)}
+}
+.g6-car.car-shake { animation: g6CarShake 0.45s ease !important; transition: none !important; }
 .g6-target-word {
   color: white !important;
   font-size: 20px !important;
@@ -3856,6 +3867,7 @@ body { background: #0a0a1a !important; }
     <div class="g6-target-row">
       <span class="g6-target-label">🎯</span>
       <span class="g6-target-word" id="g6-target-word">— — — —</span>
+      <span class="g6-lives-display" id="g6-lives">❤️❤️❤️</span>
     </div>
     <div class="g6-collected" id="g6-collected"></div>
   </div>
@@ -3902,9 +3914,9 @@ body { background: #0a0a1a !important; }
     </div>
   </div>
   <div class="g6-controls">
-    <button class="g6-ctrl-btn" id="g6-left" ontouchstart="driveLeft()" onclick="driveLeft()">◀ KIRI</button>
+    <button class="g6-ctrl-btn" id="g6-left" ontouchstart="driveLeft();event.preventDefault()" onclick="driveLeft()">◀ KIRI</button>
     <div class="g6-score-mid" id="g6-score">⭐ 0</div>
-    <button class="g6-ctrl-btn" id="g6-right" ontouchstart="driveRight()" onclick="driveRight()">KANAN ▶</button>
+    <button class="g6-ctrl-btn" id="g6-right" ontouchstart="driveRight();event.preventDefault()" onclick="driveRight()">KANAN ▶</button>
   </div>
 </div>
 
@@ -5414,13 +5426,13 @@ function checkG5Match(){
 // ================================================================
 // GAME 6: PETUALANGAN MOBIL
 // ================================================================
-let g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null,penaltyPause:false,wrongCount:0}
+let g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null,penaltyPause:false,wrongCount:0,lives:3}
 
 function initGame6() {
   const diff=state.selectedLevel||'medium'
   const spd=diff==='easy'?0.7:diff==='medium'?1.0:1.5
   const words=diff==='easy'?4:diff==='medium'?6:8
-  g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:words,stars:0,map:'city',speed:spd,frameCount:0,running:false,animFrame:null,penaltyPause:false,wrongCount:0}
+  g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:words,stars:0,map:'city',speed:spd,frameCount:0,running:false,animFrame:null,penaltyPause:false,wrongCount:0,lives:3}
   document.querySelectorAll('.g6-map-btn').forEach(b=>b.classList.remove('active'))
   const firstBtn = document.querySelector('.g6-map-btn[data-map="city"]')
   if(firstBtn) firstBtn.classList.add('active')
@@ -5478,9 +5490,10 @@ function pickNextWord() {
   const bank = getAgeWordBank(g6State.map, tier)
   const validBank = bank.length > 0 ? bank : DRIVE_WORD_BANK[g6State.map]
   const word = validBank[Math.floor(Math.random()*validBank.length)]
-  g6State.targetWord = word; g6State.collectedIdx = 0; g6State.wrongCount = 0; g6State.penaltyPause = false
+  g6State.targetWord = word; g6State.collectedIdx = 0; g6State.wrongCount = 0; g6State.penaltyPause = false; g6State.lives = 3
   document.getElementById('g6-start-word').textContent = word.split('').join(' ')
   document.getElementById('g6-target-word').textContent = word.split('').join(' - ')
+  const livesEl = document.getElementById('g6-lives'); if(livesEl) livesEl.textContent = '❤️❤️❤️'
   renderCollectedSlots()
 }
 function renderCollectedSlots() {
@@ -5574,11 +5587,37 @@ function handleDriveCollision(tile) {
     g6WrongLetterPenalty(true)
   }
 }
+function updateG6Lives() {
+  const el = document.getElementById('g6-lives'); if(!el) return
+  const lives = g6State.lives || 0
+  el.textContent = '❤️'.repeat(Math.max(0,lives)) + '🖤'.repeat(Math.max(0,3-lives))
+  el.classList.remove('hit-flash'); void el.offsetWidth; el.classList.add('hit-flash')
+}
 function g6WrongLetterPenalty(isWrongLetter) {
   if(g6State.penaltyPause) return
   g6State.penaltyPause = true
   g6State.wrongCount = (g6State.wrongCount||0) + 1
+  // Decrement lives on wrong letter hit
+  if(isWrongLetter) {
+    g6State.lives = Math.max(0, (g6State.lives||3) - 1)
+    updateG6Lives()
+    // Game over if no lives left
+    if(g6State.lives <= 0) {
+      cancelAnimationFrame(g6State.animFrame); g6State.running = false
+      playWrong()
+      setTimeout(() => {
+        showResult('🚗','Game Over!',`Kesalahan terlalu banyak! Coba lagi! 💪`)
+      }, 400)
+      return
+    }
+  }
   playWrong()
+  // Mobile vibration
+  if(navigator.vibrate) navigator.vibrate(250)
+  // Car shake animation
+  const car = document.getElementById('g6-car')
+  car.classList.add('car-shake')
+  setTimeout(() => car.classList.remove('car-shake'), 480)
   const road = document.getElementById('g6-road')
   // Shake + red tint
   road.style.animation = 'screenShake 0.45s ease'
