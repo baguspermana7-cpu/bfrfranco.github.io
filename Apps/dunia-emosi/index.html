@@ -1696,10 +1696,23 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   transition:opacity 0.25s ease;
 }
 .g10-field-status.show{opacity:1;}
+/* ── Weather FX overlay ── */
+.g10-weather{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;border-radius:inherit;}
+.g10-snow-flake{position:absolute;top:-24px;user-select:none;animation:g10SnowFall linear infinite;}
+@keyframes g10SnowFall{from{transform:translateY(-24px)rotate(0deg)}to{transform:translateY(110%)rotate(360deg)}}
+.g10-rain-drop{position:absolute;top:-20px;width:2px;background:linear-gradient(180deg,transparent,rgba(174,214,241,0.55));border-radius:2px;animation:g10RainFall linear infinite;transform-origin:top center;}
+@keyframes g10RainFall{from{transform:rotate(18deg)translateY(-20px)}to{transform:rotate(18deg)translateY(110%)}}
+.g10-wind-streak{position:absolute;left:-80px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);border-radius:2px;animation:g10WindBlast linear infinite;}
+@keyframes g10WindBlast{0%{transform:translateX(-80px);opacity:0}20%{opacity:1}80%{opacity:0.8}100%{transform:translateX(120vw);opacity:0}}
+.g10-wx-night{background:rgba(0,5,30,0.38);}
+.g10-night-star{position:absolute;color:rgba(255,255,200,0.8);animation:g10StarTwinkle ease-in-out infinite alternate;}
+@keyframes g10StarTwinkle{from{opacity:0.2;transform:scale(0.8)}to{opacity:1;transform:scale(1.1)}}
+.g10-leaf-fx{position:absolute;top:-24px;user-select:none;animation:g10LeafFall ease-in-out infinite;}
+@keyframes g10LeafFall{0%{transform:translateY(-24px)translateX(0)rotate(0deg)}25%{transform:translateY(25%)translateX(18px)rotate(80deg)}50%{transform:translateY(50%)translateX(-12px)rotate(175deg)}75%{transform:translateY(75%)translateX(22px)rotate(265deg)}100%{transform:translateY(110%)translateX(0)rotate(360deg)}}
 /* Question panel — DS bottom screen, stacks tightly from top */
 .g10-qpanel{
   flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:14px 16px 20px;gap:10px;
+  padding:10px 16px 16px;gap:6px;
   background:rgba(14,14,30,0.99);
   border-top:2px solid rgba(255,255,255,0.07);overflow-y:visible;
 }
@@ -1719,8 +1732,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g10-math.pop{animation:g10MathPop 0.3s cubic-bezier(0.34,1.56,0.64,1);}
 @keyframes g10MathPop{from{transform:scale(0.6);opacity:0}to{transform:scale(1);opacity:1}}
 .g10-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:460px;}
-.g10-hint{min-height:24px;text-align:center;font-size:13px;font-weight:800;color:#FCD34D;padding:2px 0;transition:all 0.3s;}
-.g10-model{min-height:40px;display:flex;justify-content:center;align-items:center;gap:4px;flex-wrap:wrap;padding:4px 0;}
+.g10-hint{min-height:0;text-align:center;font-size:13px;font-weight:800;color:#FCD34D;padding:0;transition:all 0.3s;}
+.g10-hint:empty{display:none;}
+.g10-model{min-height:0;display:flex;justify-content:center;align-items:center;gap:4px;flex-wrap:wrap;padding:0;}
+.g10-model:empty{display:none;}
 .g10-orbs{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:center;font-size:20px;}
 .g10-orb{display:inline-block;animation:orbPop 0.2s var(--od,0s) cubic-bezier(0.34,1.56,0.64,1) both;}
 .g10-orb-a{filter:drop-shadow(0 0 4px #FFCB05);}
@@ -7697,6 +7712,62 @@ window.g10NewBattle = function() {
     if (es) { es.style.animation='none'; void es.offsetWidth; es.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
     if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnterFlip 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
   }, 100)
+  // Apply random weather effect to battle field
+  applyG10Weather()
+}
+
+// ── Battle Arena Weather FX ──
+const G10_WEATHERS = ['clear','clear','clear','snow','snow','rain','rain','wind','night','leaves']
+function applyG10Weather() {
+  const field = document.getElementById('g10-field')
+  if (!field) return
+  const old = field.querySelector('.g10-weather')
+  if (old) old.remove()
+  const type = G10_WEATHERS[Math.floor(Math.random() * G10_WEATHERS.length)]
+  if (type === 'clear') return
+  const layer = document.createElement('div')
+  layer.className = `g10-weather g10-wx-${type}`
+  if (type === 'snow') {
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('span')
+      s.className = 'g10-snow-flake'
+      s.style.cssText = `left:${Math.random()*100}%;animation-delay:${(Math.random()*5).toFixed(1)}s;animation-duration:${(2.5+Math.random()*3).toFixed(1)}s;font-size:${7+Math.floor(Math.random()*9)}px;opacity:${(0.35+Math.random()*0.5).toFixed(2)}`
+      s.textContent = '❄'
+      layer.appendChild(s)
+    }
+  } else if (type === 'rain') {
+    for (let i = 0; i < 22; i++) {
+      const r = document.createElement('span')
+      r.className = 'g10-rain-drop'
+      r.style.cssText = `left:${(Math.random()*110-5).toFixed(1)}%;animation-delay:${(Math.random()*1.5).toFixed(2)}s;animation-duration:${(0.55+Math.random()*0.45).toFixed(2)}s;height:${12+Math.floor(Math.random()*18)}px;opacity:${(0.25+Math.random()*0.3).toFixed(2)}`
+      layer.appendChild(r)
+    }
+  } else if (type === 'wind') {
+    for (let i = 0; i < 10; i++) {
+      const w = document.createElement('span')
+      w.className = 'g10-wind-streak'
+      w.style.cssText = `top:${(Math.random()*90).toFixed(1)}%;animation-delay:${(Math.random()*2).toFixed(1)}s;animation-duration:${(0.9+Math.random()*0.9).toFixed(1)}s;width:${18+Math.floor(Math.random()*40)}px`
+      layer.appendChild(w)
+    }
+  } else if (type === 'night') {
+    for (let i = 0; i < 14; i++) {
+      const star = document.createElement('span')
+      star.className = 'g10-night-star'
+      star.style.cssText = `left:${(Math.random()*95).toFixed(1)}%;top:${(Math.random()*55).toFixed(1)}%;animation-delay:${(Math.random()*2.5).toFixed(1)}s;animation-duration:${(1.5+Math.random()*2).toFixed(1)}s;font-size:${5+Math.floor(Math.random()*8)}px`
+      star.textContent = '✦'
+      layer.appendChild(star)
+    }
+  } else if (type === 'leaves') {
+    const leafSet = ['🍂','🍃','🍁']
+    for (let i = 0; i < 14; i++) {
+      const l = document.createElement('span')
+      l.className = 'g10-leaf-fx'
+      l.style.cssText = `left:${(Math.random()*95).toFixed(1)}%;animation-delay:${(Math.random()*6).toFixed(1)}s;animation-duration:${(3.5+Math.random()*3.5).toFixed(1)}s;font-size:${9+Math.floor(Math.random()*9)}px;opacity:${(0.45+Math.random()*0.45).toFixed(2)}`
+      l.textContent = leafSet[Math.floor(Math.random()*3)]
+      layer.appendChild(l)
+    }
+  }
+  field.appendChild(layer)
 }
 </script>
 </body>
