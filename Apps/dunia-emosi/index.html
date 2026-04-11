@@ -692,6 +692,477 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   .result-mascot { font-size:66px; }
   .result-title { font-size:24px; }
 }
+
+/* ===== AAA DARK PREMIUM GAME UI REDESIGN ===== */
+
+/* ── 1. GAME SCREENS — Full Screen Layout ── */
+#screen-game1, #screen-game2, #screen-game3, #screen-game4, #screen-game5,
+#screen-game6, #screen-game7, #screen-game8, #screen-game9 {
+  position: fixed;
+  inset: 0;
+  padding: 0;
+  overflow: hidden;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 100vh;
+  height: 100vh;
+}
+/* Inner content needs padding so elements don't stick to edges */
+#screen-game1 > *, #screen-game2 > *, #screen-game3 > *,
+#screen-game4 > *, #screen-game5 > *, #screen-game7 > *,
+#screen-game8 > *, #screen-game9 > * {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+/* Allow scroll on content area for games that need it */
+#screen-game1, #screen-game3, #screen-game4, #screen-game7,
+#screen-game8, #screen-game9 {
+  overflow-y: auto;
+}
+/* Game 2 (breathe) and game 5 (memory) — no scroll, flex fills */
+#screen-game2, #screen-game5 {
+  overflow: hidden;
+}
+/* Game 6 — no scroll, strict layout */
+#screen-game6 { overflow: hidden; }
+
+/* ── 2. GAME HEADER (HUD) — Glassmorphism overlay ── */
+.game-header {
+  position: relative;
+  z-index: 10;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  padding: 12px 16px;
+  width: 100%;
+  max-width: none;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+/* ── 3. WELCOME SCREEN — Immersive full-screen dark ── */
+#screen-welcome {
+  background: linear-gradient(160deg, #1a0533 0%, #3B0764 30%, #4C1D95 60%, #5B21B6 100%);
+  justify-content: center;
+}
+.welcome-title { color: white; -webkit-text-fill-color: white; background: none; font-size: 52px; text-shadow: 0 0 40px rgba(167,139,250,0.8); }
+.welcome-sub2 { color: #FCD34D; -webkit-text-fill-color: #FCD34D; background: none; font-size: 42px; }
+.welcome-tagline { color: rgba(255,255,255,0.8); }
+.streak-badge { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.btn-brand { background: linear-gradient(135deg, #A78BFA, #7C3AED) !important; box-shadow: 0 8px 0 #4C1D95, 0 0 40px rgba(139,92,246,0.5) !important; }
+
+/* ── 4. MODE SCREEN — Dark premium ── */
+#screen-mode {
+  background: linear-gradient(160deg, #0F172A, #1C1030);
+}
+.mode-card { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+.mode-name { color: white; }
+.mode-desc { color: rgba(255,255,255,0.6); }
+
+/* ── 5. NAMES SCREEN — Dark ── */
+#screen-names {
+  background: linear-gradient(160deg, #0F172A, #1C1030);
+}
+.name-label { color: rgba(255,255,255,0.6); }
+.name-input { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: white; }
+.name-input::placeholder { color: rgba(255,255,255,0.3); }
+.age-btn { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+.age-btn.active { background: rgba(139,92,246,0.4); border-color: #A78BFA; color: white; }
+
+/* ── 6. MENU SCREEN — Dark premium ── */
+#screen-menu {
+  background: linear-gradient(160deg, #1C1030 0%, #0F172A 50%, #1a2744 100%);
+}
+.world-zone-name { color: rgba(255,255,255,0.5); }
+.world-zone-header { border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
+.game-tile {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.game-tile .g-name { color: white; }
+.player-chip {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+}
+.player-chip .p-name { color: white; }
+.player-chip.active {
+  background: rgba(139,92,246,0.25);
+  border-color: rgba(167,139,250,0.5);
+}
+.menu-title { color: white; }
+.total-stars-banner { background: linear-gradient(135deg, #F59E0B, #D97706); }
+
+/* ── 7. LEVEL SELECT — Premium card style ── */
+#screen-level {
+  background: linear-gradient(160deg, #0F172A 0%, #1C1030 50%, #0F172A 100%);
+}
+.level-game-name { color: white; }
+.page-title { color: white; }
+.btn-back { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+.level-btn-easy { background: linear-gradient(135deg, #065F46, #047857); color: white; box-shadow: 0 6px 0 #064E3B; }
+.level-btn-easy .level-btn-name { color: white; }
+.level-btn-easy .level-btn-desc { color: rgba(255,255,255,0.75) !important; }
+.level-btn-medium { background: linear-gradient(135deg, #1D4ED8, #2563EB); color: white; box-shadow: 0 6px 0 #1E3A8A; }
+.level-btn-medium .level-btn-name { color: white; }
+.level-btn-medium .level-btn-desc { color: rgba(255,255,255,0.75) !important; }
+.level-btn-hard { background: linear-gradient(135deg, #991B1B, #DC2626); color: white; box-shadow: 0 6px 0 #7F1D1D; }
+.level-btn-hard .level-btn-name { color: white; }
+.level-btn-hard .level-btn-desc { color: rgba(255,255,255,0.75) !important; }
+.level-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); }
+
+/* ── 8. INDIVIDUAL GAME SCREEN BACKGROUNDS ── */
+#screen-game1 { background: linear-gradient(180deg, #1a0020 0%, #3B0764 50%, #1a0020 100%); }
+#screen-game2 { background: linear-gradient(180deg, #0C1445 0%, #1a237e 50%, #0C1445 100%); }
+#screen-game3 { background: linear-gradient(180deg, #0A2818 0%, #14532D 50%, #0A2818 100%); }
+#screen-game4 { background: linear-gradient(180deg, #451A03 0%, #78350F 50%, #451A03 100%); }
+#screen-game5 { background: radial-gradient(ellipse at 50% 0%, #1C1030 0%, #0F172A 100%); }
+#screen-game7 { background: linear-gradient(180deg, #0A2818 0%, #0F3D28 50%, #0C1E10 100%); }
+#screen-game8 { background: linear-gradient(160deg, #1a0020 0%, #2D1B69 50%, #1a0020 100%); }
+#screen-game9 { background: linear-gradient(180deg, #0A1A00 0%, #1A3300 50%, #0A1A00 100%); }
+
+/* ── 9. GAME CONTENT TEXT COLOR FIXES FOR DARK BG ── */
+.g1-question { color: white; -webkit-text-fill-color: white; background: none; }
+.g1-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
+.g1-choice-btn .choice-label { color: white; }
+.g1-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
+.g1-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
+.g1-progress { color: rgba(255,255,255,0.6); }
+
+.breathe-instruction { color: #C4B5FD; }
+.breathe-sub { color: #A78BFA; }
+
+.g3-word { color: white; -webkit-text-fill-color: white; background: none; }
+.g3-hint { color: rgba(255,255,255,0.7); }
+.g3-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
+.g3-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
+.g3-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
+.g3-mode-badge { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.2); }
+.g3-progress { color: rgba(255,255,255,0.6); }
+
+.g4-question { color: white; -webkit-text-fill-color: white; background: none; }
+.g4-animals-grid { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
+.g4-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); color: white; }
+.g4-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
+.g4-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
+.g4-progress { color: rgba(255,255,255,0.6); }
+.g4-timer-text { color: rgba(255,255,255,0.6); }
+
+.g5-player-score { background: rgba(255,255,255,0.08); }
+.g5-player-score.active { background: rgba(139,92,246,0.2); border-color: rgba(167,139,250,0.5); }
+.g5-player-score .ps-name { color: rgba(255,255,255,0.6); }
+.g5-turn-text { color: #C4B5FD; }
+.g5-card-front { background: linear-gradient(135deg, #4C1D95, #7C3AED); }
+.g5-card-back { background: rgba(255,255,255,0.95); }
+.g5-card-back .card-label { color: #57534E; }
+
+.g7-question { color: white; -webkit-text-fill-color: white; background: none; }
+.g7-display { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+.g7-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
+.g7-choice-btn .g7-choice-text { color: rgba(255,255,255,0.85); }
+.g7-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
+.g7-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
+.g7-mode-badge { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.2); }
+.g7-progress { color: rgba(255,255,255,0.6); }
+
+.g8-hint-img { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+.g8-hint-text { color: rgba(255,255,255,0.6); }
+.g8-slot { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: white; }
+.g8-slot.filled { background: rgba(167,139,250,0.3); border-color: #A78BFA; }
+.g8-letter-btn { background: rgba(255,255,255,0.1); border-color: rgba(167,139,250,0.4); color: #C4B5FD; }
+.g8-progress { color: rgba(255,255,255,0.6); }
+
+.g9-letter-display { color: white; -webkit-text-fill-color: white; background: none; text-shadow: 0 0 30px rgba(163,230,53,0.6); }
+.g9-instruction { color: rgba(255,255,255,0.6); }
+.g9-canvas-wrap { background: rgba(255,255,255,0.06); border-color: rgba(163,230,53,0.5); }
+.g9-dot { background: rgba(163,230,53,0.3); border-color: rgba(163,230,53,0.6); }
+.g9-dot.hit { background: #84CC16; }
+.g9-progress { color: rgba(255,255,255,0.6); }
+#g9-result-msg { color: rgba(255,255,255,0.7); }
+
+/* ── 10. G6 PETUALANGAN MOBIL — Full Screen Road ── */
+#screen-game6 {
+  background: linear-gradient(180deg, #0A0A2E 0%, #1a1a4e 30%, #2d1b69 100%);
+  display: flex;
+  flex-direction: column;
+}
+/* Remove inner padding override for game6 since it has special layout */
+#screen-game6 > * { padding-left: 0; padding-right: 0; }
+/* Game6 header gets normal padding */
+#screen-game6 .game-header { padding: 12px 16px; }
+
+.g6-road {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  overflow: hidden;
+  border-radius: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(255,255,255,0.6) 40px,
+      rgba(255,255,255,0.6) 60px
+    ),
+    linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+  background-size: 100% 100px, 100% 100%;
+  animation: roadScroll 0.6s linear infinite;
+}
+@keyframes roadScroll {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 100px, 0 0; }
+}
+.g6-road::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 33.33%;
+  width: 3px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,100,0.8) 0px,
+    rgba(255,255,100,0.8) 30px,
+    transparent 30px,
+    transparent 60px
+  );
+  animation: roadScroll 0.6s linear infinite;
+}
+.g6-road::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 66.66%;
+  width: 3px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,100,0.8) 0px,
+    rgba(255,255,100,0.8) 30px,
+    transparent 30px,
+    transparent 60px
+  );
+  animation: roadScroll 0.6s linear infinite;
+}
+/* Hide old static lane lines — road CSS handles dividers */
+.g6-lane-line { display: none; }
+
+.g6-car {
+  font-size: 72px !important;
+  bottom: 100px !important;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6));
+  transition: left 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.g6-controls {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 12px 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  width: 100%;
+  max-width: none;
+  flex-shrink: 0;
+}
+.g6-ctrl-btn {
+  font-size: 20px;
+  font-weight: 900;
+  padding: 18px 0;
+  border-radius: 20px;
+  border: 2px solid rgba(255,255,255,0.3) !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)) !important;
+  backdrop-filter: blur(8px);
+  color: white !important;
+  box-shadow: none !important;
+}
+.g6-score-mid {
+  background: linear-gradient(135deg, #FCD34D, #F59E0B);
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-weight: 900;
+  color: #78350F;
+  box-shadow: 0 4px 0 #B45309;
+}
+
+/* G6 target word — floats over road */
+.g6-target-wrap {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 16px;
+  padding: 10px 20px;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
+  max-width: none;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+.g6-target-label { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.g6-target-word { color: white; font-size: 22px; font-weight: 900; letter-spacing: 4px; }
+.g6-collected { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+
+/* G6 map row — floats over road below header */
+.g6-map-row {
+  position: absolute;
+  top: 60px;
+  left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 0 12px;
+  margin-bottom: 0;
+  width: 100%;
+  max-width: none;
+  flex-wrap: wrap;
+}
+.g6-map-btn {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.g6-map-btn.active {
+  background: rgba(139,92,246,0.7);
+  border-color: rgba(167,139,250,0.8);
+}
+
+/* G6 tiles — bigger, more visible */
+.g6-tile {
+  font-size: 28px !important;
+  font-weight: 900;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.g6-tile.target {
+  background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: white;
+  animation: tileGlow 0.8s ease-in-out infinite alternate;
+}
+@keyframes tileGlow {
+  from { box-shadow: 0 0 12px rgba(139,92,246,0.6), 0 4px 16px rgba(0,0,0,0.4); }
+  to { box-shadow: 0 0 24px rgba(167,139,250,0.9), 0 0 40px rgba(139,92,246,0.4), 0 4px 16px rgba(0,0,0,0.4); }
+}
+.g6-tile.decoy {
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
+}
+.g6-tile.obstacle {
+  background: linear-gradient(135deg, #F43F5E, #BE123C);
+  border: 2px solid rgba(244,63,94,0.5);
+}
+
+.g6-slot {
+  min-width: 40px; height: 44px;
+  border: 2px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: white;
+}
+.g6-slot.filled { background: rgba(139,92,246,0.5); border-color: #A78BFA; }
+
+/* G6 start overlay — updated dark style */
+.g6-start-overlay {
+  background: rgba(10,10,46,0.7);
+  border-radius: 0;
+}
+.g6-start-card {
+  background: linear-gradient(145deg, #1C1030, #2D1B69);
+  border: 1px solid rgba(167,139,250,0.3);
+  color: white;
+}
+.g6-start-word { color: #A78BFA; }
+
+/* ── 11. RESULT SCREEN — Celebration quality ── */
+#screen-result {
+  background: radial-gradient(ellipse at center top, #3B0764 0%, #1C1030 60%, #0F172A 100%);
+  justify-content: center;
+}
+.result-title {
+  color: white;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #FCD34D, #F59E0B, #A78BFA);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.result-msg { color: rgba(255,255,255,0.8); }
+.rs-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); }
+.rs-name { color: rgba(255,255,255,0.6); }
+
+/* ── 12. DASHBOARD — Dark ── */
+#screen-dashboard {
+  background: linear-gradient(160deg, #0F172A, #1C1030);
+}
+.dash-section-title { color: white; }
+.dash-stat-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); }
+.dash-stat-num { color: white; }
+.dash-stat-lbl { color: rgba(255,255,255,0.5); }
+
+/* ── 13. FEEDBACK OVERLAY — Dark premium ── */
+.feedback-card {
+  background: linear-gradient(145deg, #1C1030, #2D1B69);
+  border: 1px solid rgba(167,139,250,0.3);
+}
+.feedback-title {
+  color: white;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #FCD34D, #F59E0B);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.feedback-sub { color: rgba(255,255,255,0.8); }
+
+/* ── 14. PAGE HEADERS on dark screens ── */
+#screen-level .page-header .page-title,
+#screen-mode .page-header .page-title,
+#screen-names .page-header .page-title,
+#screen-dashboard .page-header .page-title { color: white; }
+#screen-level .btn-back,
+#screen-mode .btn-back,
+#screen-names .btn-back,
+#screen-dashboard .btn-back {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: none;
+}
+
+/* ── 15. GAME 6 — mobile media query overrides ── */
+@media(max-width:480px) {
+  #screen-game6 > * { padding-left: 0; padding-right: 0; }
+  .g6-car { font-size: 56px !important; bottom: 80px !important; }
+  .g6-ctrl-btn { padding: 16px 0; font-size: 18px; }
+  .g6-score-mid { font-size: 16px; min-width: 56px; padding: 7px 12px; }
+  .g6-tile { width: 46px; height: 46px; font-size: 22px !important; }
+  .g6-target-word { font-size: 18px; letter-spacing: 3px; }
+}
+@media(max-width:360px) {
+  .g6-car { font-size: 48px !important; bottom: 70px !important; }
+  .g6-tile { width: 40px; height: 40px; font-size: 18px !important; }
+}
 </style>
 </head>
 <body>
