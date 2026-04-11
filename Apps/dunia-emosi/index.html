@@ -122,11 +122,19 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .game-tile.g2::before{background:linear-gradient(90deg,#A78BFA,#8B5CF6)} .game-tile.g2 .g-icon{animation-duration:3s;animation-delay:-0.5s} .game-tile.g2 .g-tag{background:linear-gradient(90deg,#A78BFA,#8B5CF6)} .game-tile.g2::after{background:linear-gradient(135deg,rgba(139,92,246,0.08),transparent)}
 .game-tile.g3::before{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g3 .g-icon{animation-duration:2.8s;animation-delay:-1s} .game-tile.g3 .g-tag{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g3::after{background:linear-gradient(135deg,rgba(20,184,166,0.08),transparent)}
 .game-tile.g4::before{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g4 .g-icon{animation-duration:2.2s;animation-delay:-0.2s} .game-tile.g4 .g-tag{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g4::after{background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent)}
-.game-tile.g5{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;display:flex;align-items:center} .game-tile.g5::before{background:linear-gradient(90deg,#A78BFA,#7C3AED)} .game-tile.g5 .g-icon{font-size:40px;margin-bottom:0;animation-duration:3.2s;animation-delay:-1.5s} .game-tile.g5 .g-tag{background:linear-gradient(90deg,#A78BFA,#7C3AED)} .game-tile.g5::after{background:linear-gradient(135deg,rgba(167,139,250,0.08),transparent)}
+.game-tile.g5::before{background:linear-gradient(90deg,#A78BFA,#7C3AED)} .game-tile.g5 .g-icon{animation-duration:3.2s;animation-delay:-1.5s} .game-tile.g5 .g-tag{background:linear-gradient(90deg,#A78BFA,#7C3AED)} .game-tile.g5::after{background:linear-gradient(135deg,rgba(167,139,250,0.08),transparent)}
 .game-tile.g6::before{background:linear-gradient(90deg,#38BDF8,#0EA5E9)} .game-tile.g6 .g-icon{animation-duration:2.4s} .game-tile.g6 .g-tag{background:linear-gradient(90deg,#38BDF8,#0EA5E9)} .game-tile.g6::after{background:linear-gradient(135deg,rgba(14,165,233,0.08),transparent)}
 .game-tile.g7::before{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g7 .g-icon{animation-duration:2.7s} .game-tile.g7 .g-tag{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g7::after{background:linear-gradient(135deg,rgba(45,212,191,0.08),transparent)}
 .game-tile.g8::before{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g8 .g-icon{animation-duration:3.1s} .game-tile.g8 .g-tag{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g8::after{background:linear-gradient(135deg,rgba(244,63,94,0.08),transparent)}
 .game-tile.g9::before{background:linear-gradient(90deg,#A3E635,#84CC16)} .game-tile.g9 .g-icon{animation-duration:2.0s} .game-tile.g9 .g-tag{background:linear-gradient(90deg,#A3E635,#84CC16)} .game-tile.g9::after{background:linear-gradient(135deg,rgba(132,204,22,0.08),transparent)}
+
+/* World zones */
+.world-zone { width:100%;max-width:500px;margin-bottom:12px; }
+.world-zone-header { display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 4px; }
+.world-zone-icon { font-size:22px; }
+.world-zone-name { font-size:16px;font-weight:900;color:var(--text-light);text-transform:uppercase;letter-spacing:0.8px; }
+.game-grid-2 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px; }
+.g-stars-row { display:flex;justify-content:center;gap:1px;margin-bottom:6px;font-size:11px;min-height:16px; }
 
 .total-stars-banner { background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:var(--radius);padding:16px 24px;width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 0 #B45309,var(--shadow);margin-top:4px; }
 .tsb-label { font-size:15px;font-weight:700;color:white; }
@@ -523,56 +531,93 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 <!-- MENU -->
 <div id="screen-menu" class="screen">
   <div class="player-header" id="menu-player-header"></div>
-  <div id="total-stars-banner" class="total-stars-banner" style="display:none;margin-bottom:16px;"></div>
-  <p style="font-size:17px;font-weight:700;color:var(--text-light);margin-bottom:16px;">Mau main apa hari ini? 🎯</p>
-  <div class="game-grid">
-    <div class="game-tile g1" onclick="playClick(); openLevelSelect(1)">
-      <span class="g-icon">🎭</span>
-      <div class="g-name">Aku Merasa...</div>
-      <span class="g-tag">Emosi</span>
+  <div id="total-stars-banner" class="total-stars-banner" style="display:none;margin-bottom:12px;"></div>
+
+  <!-- World 1: Emosi Island -->
+  <div class="world-zone">
+    <div class="world-zone-header">
+      <span class="world-zone-icon">🏝️</span>
+      <span class="world-zone-name">Emosi Island</span>
     </div>
-    <div class="game-tile g2" onclick="playClick(); openLevelSelect(2)">
-      <span class="g-icon">🌬️</span>
-      <div class="g-name">Napas Pelangi</div>
-      <span class="g-tag">Tenang</span>
-    </div>
-    <div class="game-tile g3" onclick="playClick(); openLevelSelect(3)">
-      <span class="g-icon">🔤</span>
-      <div class="g-name">Huruf Hutan</div>
-      <span class="g-tag">Belajar</span>
-    </div>
-    <div class="game-tile g4" onclick="playClick(); openLevelSelect(4)">
-      <span class="g-icon">🔢</span>
-      <div class="g-name">Hitung Binatang</div>
-      <span class="g-tag">Hitung</span>
-    </div>
-    <div class="game-tile g5" onclick="playClick(); openLevelSelect(5)">
-      <span class="g-icon">🃏</span>
-      <div class="g-name">Cocokkan Emosi</div>
-      <span class="g-tag">Fokus</span>
-    </div>
-    <div class="game-tile g6" onclick="playClick(); openLevelSelect(6)">
-      <span class="g-icon">🚗</span>
-      <div class="g-name">Petualangan Mobil</div>
-      <span class="g-tag">Adventure</span>
-    </div>
-    <div class="game-tile g7" onclick="playClick(); openLevelSelect(7)">
-      <span class="g-icon">🖼️</span>
-      <div class="g-name">Tebak Gambar</div>
-      <span class="g-tag">Membaca</span>
-    </div>
-    <div class="game-tile g8" onclick="playClick(); openLevelSelect(8)">
-      <span class="g-icon">🔡</span>
-      <div class="g-name">Susun Kata</div>
-      <span class="g-tag">Menulis</span>
-    </div>
-    <div class="game-tile g9" onclick="playClick(); openLevelSelect(9)">
-      <span class="g-icon">✍️</span>
-      <div class="g-name">Jejak Huruf</div>
-      <span class="g-tag">Menulis</span>
+    <div class="game-grid-2">
+      <div class="game-tile g1" id="gtile-1" onclick="playClick(); openLevelSelect(1)">
+        <span class="g-icon">🎭</span>
+        <div class="g-name">Aku Merasa...</div>
+        <div class="g-stars-row" id="gstars-1"></div>
+        <span class="g-tag">Emosi</span>
+      </div>
+      <div class="game-tile g2" id="gtile-2" onclick="playClick(); openLevelSelect(2)">
+        <span class="g-icon">🌬️</span>
+        <div class="g-name">Napas Pelangi</div>
+        <div class="g-stars-row" id="gstars-2"></div>
+        <span class="g-tag">Tenang</span>
+      </div>
+      <div class="game-tile g5" id="gtile-5" onclick="playClick(); openLevelSelect(5)">
+        <span class="g-icon">🃏</span>
+        <div class="g-name">Cocokkan Emosi</div>
+        <div class="g-stars-row" id="gstars-5"></div>
+        <span class="g-tag">Fokus</span>
+      </div>
     </div>
   </div>
-  <button class="btn btn-sm" style="background:white;color:var(--text-light);border:3px solid #E0E0E0;box-shadow:0 3px 0 #C0C0C0;margin-top:16px;font-size:15px;" onclick="playClick(); showDashboard()">📊 Progress Saya</button>
+
+  <!-- World 2: Hutan Belajar -->
+  <div class="world-zone">
+    <div class="world-zone-header">
+      <span class="world-zone-icon">🌿</span>
+      <span class="world-zone-name">Hutan Belajar</span>
+    </div>
+    <div class="game-grid-2">
+      <div class="game-tile g3" id="gtile-3" onclick="playClick(); openLevelSelect(3)">
+        <span class="g-icon">🔤</span>
+        <div class="g-name">Huruf Hutan</div>
+        <div class="g-stars-row" id="gstars-3"></div>
+        <span class="g-tag">Huruf</span>
+      </div>
+      <div class="game-tile g4" id="gtile-4" onclick="playClick(); openLevelSelect(4)">
+        <span class="g-icon">🔢</span>
+        <div class="g-name">Hitung Binatang</div>
+        <div class="g-stars-row" id="gstars-4"></div>
+        <span class="g-tag">Hitung</span>
+      </div>
+      <div class="game-tile g7" id="gtile-7" onclick="playClick(); openLevelSelect(7)">
+        <span class="g-icon">🖼️</span>
+        <div class="g-name">Tebak Gambar</div>
+        <div class="g-stars-row" id="gstars-7"></div>
+        <span class="g-tag">Membaca</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- World 3: Kota Petualangan -->
+  <div class="world-zone">
+    <div class="world-zone-header">
+      <span class="world-zone-icon">🚀</span>
+      <span class="world-zone-name">Kota Petualangan</span>
+    </div>
+    <div class="game-grid-2">
+      <div class="game-tile g6" id="gtile-6" onclick="playClick(); openLevelSelect(6)">
+        <span class="g-icon">🚗</span>
+        <div class="g-name">Petualangan Mobil</div>
+        <div class="g-stars-row" id="gstars-6"></div>
+        <span class="g-tag">Adventure</span>
+      </div>
+      <div class="game-tile g8" id="gtile-8" onclick="playClick(); openLevelSelect(8)">
+        <span class="g-icon">🔡</span>
+        <div class="g-name">Susun Kata</div>
+        <div class="g-stars-row" id="gstars-8"></div>
+        <span class="g-tag">Menulis</span>
+      </div>
+      <div class="game-tile g9" id="gtile-9" onclick="playClick(); openLevelSelect(9)">
+        <span class="g-icon">✍️</span>
+        <div class="g-name">Jejak Huruf</div>
+        <div class="g-stars-row" id="gstars-9"></div>
+        <span class="g-tag">Menulis</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-sm" style="background:white;color:var(--text-light);border:3px solid #E0E0E0;box-shadow:0 3px 0 #C0C0C0;margin-top:8px;margin-bottom:8px;font-size:15px;" onclick="playClick(); showDashboard()">📊 Progress Saya</button>
 </div>
 
 <!-- LEVEL SELECT -->
@@ -1254,6 +1299,14 @@ function buildMenuHeader() {
   const banner=document.getElementById('total-stars-banner')
   if(state.mode==='duo'){banner.style.display='flex';const total=state.players[0].stars+state.players[1].stars;banner.innerHTML=`<span class="tsb-label">Total Bintang Hari Ini ✨</span><span class="tsb-value">⭐ ${total}</span>`}
   else banner.style.display='none'
+  // Update per-game best stars display
+  try {
+    const bestStars=JSON.parse(localStorage.getItem('dunia-emosi-best-stars')||'{}')
+    for(let g=1;g<=9;g++){
+      const el=document.getElementById('gstars-'+g)
+      if(el){const best=bestStars[g]||0;el.textContent=best>0?'⭐'.repeat(Math.min(best,5)):''}
+    }
+  }catch(e){}
 }
 
 function exitGame() {
@@ -1382,6 +1435,8 @@ function showResult(mascot, title, msg) {
   const scoresEl=document.getElementById('result-scores')
   if(state.mode==='duo'){scoresEl.style.display='flex';scoresEl.innerHTML=[0,1].map(i=>`<div class="rs-card"><div class="rs-animal">${state.players[i].animal}</div><div class="rs-name">${state.players[i].name}</div><div class="rs-stars">⭐ ${state.gameStars[i]}</div></div>`).join('')}
   else scoresEl.style.display='none'
+  // Save best stars per game
+  try{const bs=JSON.parse(localStorage.getItem('dunia-emosi-best-stars')||'{}');const starsThisGame=state.gameStars[0]+state.gameStars[1];if(!bs[state.currentGame]||starsThisGame>bs[state.currentGame]){bs[state.currentGame]=starsThisGame;localStorage.setItem('dunia-emosi-best-stars',JSON.stringify(bs))}}catch(e){}
   // XP reward
   const xpEarned=totalStars*10; const xpResult=addXP(xpEarned)
   const xpBanner=document.getElementById('result-xp-banner')
