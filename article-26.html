@@ -2285,15 +2285,9 @@ function copyLink() {
     }
 
     // ===== INIT =====
-    document.addEventListener('DOMContentLoaded', function() {
-        attachListeners();
-        calculate();
-    });
-    // Fallback if DOM already loaded
-    if (document.readyState !== 'loading') {
-        attachListeners();
-        calculate();
-    }
+    // Script is at bottom of <body> — all DOM elements above it are ready. Call directly.
+    attachListeners();
+    calculate();
 
 })();
 </script>
