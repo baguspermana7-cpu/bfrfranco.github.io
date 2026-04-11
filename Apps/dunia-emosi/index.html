@@ -946,27 +946,27 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   background: rgba(0,0,0,0.28); border-radius: 100px;
   padding: 3px 9px; font-size: 12px; font-weight: 900; color: #FCD34D;
 }
-/* Gold — PLAY button (semi-transparent ~45%) */
+/* Gold — PLAY button (semi-transparent ~80%) */
 .home-btn-gold {
-  background: linear-gradient(180deg, rgba(245,194,56,0.45) 0%, rgba(223,152,24,0.45) 45%, rgba(190,112,8,0.45) 100%);
-  box-shadow: 0 5px 0 rgba(122,68,0,0.40), 0 8px 22px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.22);
-  border: 1px solid rgba(245,194,56,0.5);
+  background: linear-gradient(180deg, rgba(245,194,56,0.82) 0%, rgba(223,152,24,0.82) 45%, rgba(190,112,8,0.82) 100%);
+  box-shadow: 0 5px 0 rgba(122,68,0,0.55), 0 8px 22px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.28);
+  border: 1px solid rgba(245,194,56,0.7);
 }
-.home-btn-gold:active { box-shadow: 0 1px 0 rgba(122,68,0,0.40); }
-/* Brown/adventure — game select (semi-transparent ~45%) */
+.home-btn-gold:active { box-shadow: 0 1px 0 rgba(122,68,0,0.55); }
+/* Brown/adventure — game select (semi-transparent ~80%) */
 .home-btn-brown {
-  background: linear-gradient(180deg, rgba(200,114,56,0.45) 0%, rgba(158,80,32,0.45) 45%, rgba(122,54,16,0.45) 100%);
-  box-shadow: 0 5px 0 rgba(71,28,0,0.38), 0 8px 22px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.18);
-  border: 1px solid rgba(200,114,56,0.5);
+  background: linear-gradient(180deg, rgba(200,114,56,0.82) 0%, rgba(158,80,32,0.82) 45%, rgba(122,54,16,0.82) 100%);
+  box-shadow: 0 5px 0 rgba(71,28,0,0.52), 0 8px 22px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.22);
+  border: 1px solid rgba(200,114,56,0.7);
 }
-.home-btn-brown:active { box-shadow: 0 1px 0 rgba(71,28,0,0.38); }
-/* Stone — progress (semi-transparent ~45%) */
+.home-btn-brown:active { box-shadow: 0 1px 0 rgba(71,28,0,0.52); }
+/* Stone — progress (semi-transparent ~80%) */
 .home-btn-stone {
-  background: linear-gradient(180deg, rgba(136,152,168,0.42) 0%, rgba(104,120,136,0.42) 45%, rgba(74,88,104,0.42) 100%);
-  box-shadow: 0 5px 0 rgba(42,52,72,0.35), 0 7px 18px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.15);
-  border: 1px solid rgba(136,152,168,0.45);
+  background: linear-gradient(180deg, rgba(136,152,168,0.80) 0%, rgba(104,120,136,0.80) 45%, rgba(74,88,104,0.80) 100%);
+  box-shadow: 0 5px 0 rgba(42,52,72,0.50), 0 7px 18px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.18);
+  border: 1px solid rgba(136,152,168,0.70);
 }
-.home-btn-stone:active { box-shadow: 0 1px 0 rgba(42,52,72,0.35); }
+.home-btn-stone:active { box-shadow: 0 1px 0 rgba(42,52,72,0.50); }
 
 /* Icon cube row (CaveBoy-style bottom icon bar) */
 .home-cubes {
@@ -995,7 +995,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* CSS terrain at bottom — rolling green hills */
 .home-terrain {
   position: relative; height: 72px; flex-shrink: 0;
-  overflow: hidden; pointer-events: none; margin-top: auto;
+  overflow: hidden; pointer-events: none; margin-top: 0;
 }
 .home-terrain::before {
   content: ''; position: absolute; bottom: 0; left: -5%; right: -5%; height: 64px;
@@ -1523,6 +1523,27 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   .g6-tile { width: 40px; height: 40px; font-size: 18px !important; }
 }
 
+/* ── G10 Battle — mobile responsive ── */
+@media(max-width:480px) {
+  .g10-field { flex:0 0 36vh !important; min-height:180px !important; }
+  .g10-math { font-size:40px; }
+  .g10-cbtn { font-size:22px !important; padding:10px 6px !important; border-radius:14px; }
+  .g10-choices { gap:8px; }
+}
+@media(max-width:400px) {
+  .g10-field { flex:0 0 32vh !important; min-height:160px !important; }
+  .g10-math { font-size:34px; }
+  .g10-cbtn { font-size:20px !important; padding:8px 4px !important; }
+  .g10-qpanel { padding:6px 10px 8px; gap:6px; }
+  .g10-choices { max-width:100%; }
+}
+@media(max-width:360px) {
+  .g10-field { flex:0 0 30vh !important; min-height:140px !important; }
+  .g10-math { font-size:30px; }
+  .g10-cbtn { font-size:18px !important; padding:7px 4px !important; }
+  .g10-choices { max-width:100%; }
+}
+
 /* G10, G11, G12 tiles */
 .game-tile.g10::before{background:linear-gradient(90deg,#FFCB05,#EE1515)}
 .game-tile.g10 .g-icon{animation-duration:1.8s;animation-delay:-0.1s}
@@ -1547,7 +1568,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 /* Battle field — top portion (sky + grass) */
 .g10-field {
-  position:relative;flex:0 0 48vh;min-height:280px;max-height:420px;width:100%;overflow:hidden;
+  position:relative;flex:0 0 40vh;min-height:200px;max-height:360px;width:100%;overflow:hidden;
   background:linear-gradient(180deg,#6bbfee 0%,#a8d8f8 32%,#a0d870 46%,#5a9e3a 65%,#3e7028 100%);
 }
 .g10-field::before {
@@ -1654,10 +1675,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g10-field-status.show{opacity:1;}
 /* Question panel — DS bottom screen */
 .g10-qpanel{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;
-  padding:8px 16px 12px;gap:0;
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:8px 16px 12px;gap:8px;
   background:rgba(14,14,30,0.99);
-  border-top:2px solid rgba(255,255,255,0.07);overflow:hidden;
+  border-top:2px solid rgba(255,255,255,0.07);overflow-y:auto;
 }
 .g10-round-row{
   display:flex;align-items:center;justify-content:space-between;
@@ -1689,8 +1710,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   position:relative;overflow:hidden;
   background:rgba(255,255,255,0.08);
   border:2px solid rgba(255,255,255,0.16);
-  border-radius:18px;padding:18px 8px;
-  font-size:30px;font-weight:900;color:#fff;cursor:pointer;
+  border-radius:18px;padding:12px 8px;
+  font-size:24px;font-weight:900;color:#fff;cursor:pointer;
   font-family:'Fredoka One',cursive;
   transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1),
              background 0.15s ease,border-color 0.15s ease,box-shadow 0.15s ease;
@@ -6769,7 +6790,7 @@ let g10State={}
 
 function initGame10(){
   const p=state.players[state.currentPlayer]
-  document.getElementById('g10-player-icon').textContent=p.animal
+  const _icon=document.getElementById('g10-player-icon'); if(_icon) _icon.textContent=p.animal
   document.getElementById('g10-stars').textContent='⭐ 0'
   const lv = Math.max(1, Math.min(20, state.selectedLevelNum || 1))
   const cfg = G10_LEVELS[lv] || G10_LEVELS[10]
@@ -7395,37 +7416,20 @@ function renderPokeHpBar(containerId, hp, maxHp) {
     </div>`
 }
 
-// Patch g10NewBattle to use HP bars
-const _g10NBOrig = window.g10NewBattle
-window.g10NewBattle = function() {
-  if (_g10NBOrig) _g10NBOrig.call(this)
-  // Upgrade HP display after battle init
-  const s = g10State
-  if (!s) return
-  setTimeout(() => {
-    renderPokeHpBar('poke-enemy-hp', s.enemyHp, s.enemyMaxHp)
-    renderPokeHpBar('poke-player-hp', s.playerHp, s.playerMaxHp)
-  }, 50)
-}
-
-// Patch g10Answer for shake animation + HP bar update
+// Patch g10Answer for shake animation on infobox
 const _g10AnsOrig = window.g10Answer
 window.g10Answer = function(val, btn) {
   _g10AnsOrig.call(this, val, btn)
   const s = g10State
-  // Shake the hit card
   setTimeout(() => {
     const correct = val === s.currentAnswer
     if (correct) {
-      const card = document.getElementById('poke-enemy-card')
+      const card = document.getElementById('g10-enemy-info')
       if (card) { card.classList.remove('shake-enemy'); void card.offsetWidth; card.classList.add('shake-enemy'); setTimeout(()=>card.classList.remove('shake-enemy'), 600) }
     } else {
-      const card = document.getElementById('poke-player-card')
+      const card = document.getElementById('g10-player-info')
       if (card) { card.classList.remove('shake-player'); void card.offsetWidth; card.classList.add('shake-player'); setTimeout(()=>card.classList.remove('shake-player'), 600) }
     }
-    // Update HP bars
-    renderPokeHpBar('poke-enemy-hp', s.enemyHp, s.enemyMaxHp)
-    renderPokeHpBar('poke-player-hp', s.playerHp, s.playerMaxHp)
   }, 50)
 }
 
@@ -7585,8 +7589,8 @@ const _g10NB2 = window.g10NewBattle
 window.g10NewBattle = function() {
   _g10NB2.call(this)
   setTimeout(() => {
-    const es = document.getElementById('poke-enemy-spr')
-    const ps = document.getElementById('poke-player-spr')
+    const es = document.getElementById('g10-espr')
+    const ps = document.getElementById('g10-pspr')
     if (es) { es.style.animation='none'; void es.offsetWidth; es.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
     if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
   }, 100)
