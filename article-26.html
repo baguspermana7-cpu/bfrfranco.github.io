@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GED7FX8RTV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>The Invisible Leak: What Happens When You Open a Two-Phase Cooling System — And Why Nobody Is Measuring It | ResistanceZero</title>
+    <meta name="description" content="PFAS in data centers isn't just a sealed-system leak problem. Maintenance vapor release is 20-30x larger — and zero federal reporting is required. An engineer's inside view.">
+    <meta name="keywords" content="PFAS data center cooling, per- and polyfluoroalkyl substances, two-phase immersion cooling, Novec 7000 PFAS, data center forever chemicals, PFAS-free cooling alternatives, HFO refrigerants, data center environmental contamination, immersion cooling PFAS replacement">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#ef4444">
+    <link rel="canonical" href="https://resistancezero.com/article-26.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/article-26.html">
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/article-26.html">
+    <meta property="og:title" content="The Invisible Leak: What Happens When You Open a Two-Phase Cooling System — And Why Nobody Is Measuring It">
+    <meta property="og:description" content="PFAS in data centers isn't just a sealed-system leak problem. Maintenance vapor release is 20-30x larger — and zero federal reporting is required. An engineer's inside view.">
+    <meta property="og:image" content="https://resistancezero.com/assets/article-26-hero.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Two-phase immersion cooling system open for maintenance in a data center">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="article:author" content="Bagus Dwi Permana">
+    <meta property="article:published_time" content="2026-04-11T00:00:00Z">
+    <meta property="article:modified_time" content="2026-04-11T00:00:00Z">
+    <meta property="article:section" content="Global Analysis">
+    <meta property="article:tag" content="PFAS">
+    <meta property="article:tag" content="Data Center Cooling">
+    <meta property="article:tag" content="Environmental Investigation">
+    <meta property="article:tag" content="Two-Phase Immersion Cooling">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:creator" content="@BagusDPermana">
+    <meta name="twitter:title" content="The Invisible Leak: PFAS in Data Centers, What Nobody Is Measuring">
+    <meta name="twitter:description" content="Every PFAS article asks 'is it in your data center?' I've opened these tanks hundreds of times. Here's the question nobody is asking.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/article-26-hero.webp">
+    <meta name="twitter:image:alt" content="Two-phase immersion cooling system open for maintenance in a data center">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.min.css?v=2026-04-11">
+    <link rel="preload" as="image" href="assets/article-26-hero.webp">
+
+    <!-- Structured Data: TechnicalArticle -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechnicalArticle",
+        "headline": "The Invisible Leak: What Happens When You Open a Two-Phase Cooling System — And Why Nobody Is Measuring It",
+        "description": "PFAS in data centers isn't just a sealed-system leak problem. Maintenance vapor release is 20-30x larger than sealed-system leaks, and zero federal reporting is required. A 12-year data center operations engineer's inside view of the contamination pathway nobody is measuring.",
+        "image": "https://resistancezero.com/assets/article-26-hero.webp",
+        "author": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "sameAs": ["https://www.linkedin.com/in/bagus-dwi-permana-ba90b092/", "https://resistancezero.com"]
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "ResistanceZero",
+            "url": "https://resistancezero.com",
+            "logo": {"@type": "ImageObject", "url": "https://resistancezero.com/assets/Favicon.png"}
+        },
+        "datePublished": "2026-04-11",
+        "dateModified": "2026-04-11",
+        "wordCount": "3000",
+        "articleSection": "Global Analysis",
+        "keywords": ["PFAS data center", "per- and polyfluoroalkyl substances", "two-phase immersion cooling", "Novec 7000", "forever chemicals", "PFAS-free alternatives", "HFO refrigerants", "maintenance vapor release", "data center environmental contamination"],
+        "mainEntityOfPage": {"@type": "WebPage", "@id": "https://resistancezero.com/article-26.html"}
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What does PFAS stand for in data centers?",
+                "acceptedAnswer": {"@type": "Answer", "text": "PFAS stands for Per- and Polyfluoroalkyl Substances — a group of 12,000+ synthetic chemicals with carbon-fluorine bonds. In data centers, they are used primarily in two-phase immersion cooling fluids like 3M Novec 7000 and Chemours Fluorinert, valued for their unique thermal properties and dielectric safety."}
+            },
+            {
+                "@type": "Question",
+                "name": "Why do data centers use PFAS chemicals in cooling systems?",
+                "acceptedAnswer": {"@type": "Answer", "text": "Two-phase PFAS cooling fluids like Novec 7000 boil at low temperatures (34°C), absorbing heat directly at the chip surface and transporting it efficiently. They are electrically non-conductive, non-flammable, and compatible with standard server hardware — properties no current PFAS-free alternative fully replicates."}
+            },
+            {
+                "@type": "Question",
+                "name": "Is PFAS from data centers regulated by the EPA?",
+                "acceptedAnswer": {"@type": "Answer", "text": "No federal regulation requires data centers to test for or report PFAS emissions. EPA's Toxic Release Inventory (TRI) requirements apply to manufacturers, not facilities using PFAS as a cooling agent. Maintenance vapor release — the primary atmospheric release pathway — is not measured or reported."}
+            },
+            {
+                "@type": "Question",
+                "name": "What are the PFAS-free alternatives for data center cooling?",
+                "acceptedAnswer": {"@type": "Answer", "text": "Current alternatives include HFO-based fluids (Chemours Opteon 2P50), which degrade faster than traditional PFAS but produce trifluoroacetic acid (TFA) as a breakdown product. Single-phase immersion using mineral oil is genuinely PFAS-free but limited to ~80 kW/rack density and carries higher fire risk."}
+            },
+            {
+                "@type": "Question",
+                "name": "What is maintenance vapor release in data center PFAS systems?",
+                "acceptedAnswer": {"@type": "Answer", "text": "Maintenance vapor release occurs when technicians open two-phase cooling systems for routine servicing. Novec 7000's high vapor pressure (270 hPa at 25°C) causes immediate flash evaporation when sealed systems are opened. This pathway releases significantly more PFAS to the atmosphere than sealed-system leaks but is not tracked under any current federal reporting framework."}
+            }
+        ]
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/"},
+            {"@type": "ListItem", "position": 2, "name": "Global Analysis", "item": "https://resistancezero.com/geopolitics.html"},
+            {"@type": "ListItem", "position": 3, "name": "PFAS Data Center Investigation", "item": "https://resistancezero.com/article-26.html"}
+        ]
+    }
+    </script>
+
+    <!-- Article-Specific Styles -->
+    <style>
+        :root {
+            --pfas-primary: #dc2626;
+            --pfas-light: #fca5a5;
+            --pfas-dark: #991b1b;
+            --pfas-darker: #450a0a;
+            --pfas-accent: #ef4444;
+            --pfas-bg: #fef2f2;
+            --pfas-glow: rgba(220, 38, 38, 0.15);
+        }
+
+        .article-hero {
+            background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #ef4444 100%);
+            padding: 7rem 2rem 3.5rem;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(239,68,68,0.18) 0%, transparent 70%),
+                        radial-gradient(ellipse at 70% 20%, rgba(252,165,165,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .article-hero .highlight { color: #fca5a5; }
+        .article-category {
+            display: inline-block;
+            background: rgba(252,165,165,0.2);
+            border: 1px solid rgba(252,165,165,0.4);
+            color: #fecaca;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .article-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.85);
+            max-width: 720px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #fca5a5; }
+
+        /* Evidence Block */
+        .pfas-evidence-block {
+            background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
+            padding: 2rem 1.5rem;
+            margin: 0;
+        }
+        .pfas-evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .pfas-evidence-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(252,165,165,0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .pfas-evidence-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fca5a5;
+            margin-bottom: 0.25rem;
+        }
+        .pfas-evidence-label {
+            font-size: 0.75rem;
+            color: #fecaca;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .pfas-evidence-sub {
+            font-size: 0.7rem;
+            color: rgba(254,202,202,0.6);
+            margin-top: 0.25rem;
+        }
+
+        /* Article body enhancements */
+        .article-body h2 {
+            color: #991b1b;
+            border-bottom: 2px solid #dc2626;
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+        }
+        .article-body h3 { color: #7f1d1d; }
+        [data-theme="dark"] .article-body h2 { color: #fca5a5; border-color: #dc2626; }
+        [data-theme="dark"] .article-body h3 { color: #fecaca; }
+
+        /* Quote callout */
+        .quote-callout {
+            background: var(--pfas-bg);
+            border-left: 4px solid var(--pfas-primary);
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+        .quote-callout blockquote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #991b1b;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .quote-callout cite {
+            display: block;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #dc2626;
+            font-style: normal;
+            font-weight: 600;
+        }
+        [data-theme="dark"] .quote-callout { background: rgba(220,38,38,0.1); }
+        [data-theme="dark"] .quote-callout blockquote { color: #fecaca; }
+
+        /* Insight box */
+        .pfas-insight-box {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border: 1px solid rgba(220,38,38,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .pfas-insight-box h4 {
+            color: #991b1b;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .pfas-insight-box p { font-size: 0.9rem; color: #374151; line-height: 1.6; margin: 0; }
+        [data-theme="dark"] .pfas-insight-box { background: linear-gradient(135deg, rgba(220,38,38,0.1), rgba(239,68,68,0.08)); border-color: rgba(252,165,165,0.3); }
+        [data-theme="dark"] .pfas-insight-box h4 { color: #fca5a5; }
+        [data-theme="dark"] .pfas-insight-box p { color: #d1d5db; }
+
+        /* Warning box */
+        .pfas-warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-left: 4px solid #d97706;
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .pfas-warning-box h4 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .pfas-warning-box p { font-size: 0.9rem; color: #78350f; line-height: 1.6; margin: 0; }
+        [data-theme="dark"] .pfas-warning-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.4); }
+        [data-theme="dark"] .pfas-warning-box h4 { color: #fbbf24; }
+        [data-theme="dark"] .pfas-warning-box p { color: #fde68a; }
+
+        /* Danger box */
+        .pfas-danger-box {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            border-left: 4px solid #dc2626;
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .pfas-danger-box h4 { color: #991b1b; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .pfas-danger-box p { font-size: 0.9rem; color: #7f1d1d; line-height: 1.6; margin: 0; }
+        [data-theme="dark"] .pfas-danger-box { background: rgba(220,38,38,0.1); border-color: rgba(239,68,68,0.4); }
+        [data-theme="dark"] .pfas-danger-box h4 { color: #fca5a5; }
+        [data-theme="dark"] .pfas-danger-box p { color: #fecaca; }
+
+        /* Inline stat */
+        .pfas-stat {
+            display: inline-block;
+            background: #fef2f2;
+            border: 1px solid rgba(220,38,38,0.3);
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #dc2626;
+            font-size: 0.95em;
+        }
+        [data-theme="dark"] .pfas-stat { background: rgba(220,38,38,0.15); color: #fca5a5; }
+
+        /* Data table */
+        .pfas-table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        .pfas-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .pfas-table-container th {
+            background: #991b1b;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .pfas-table-container td {
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #374151;
+        }
+        .pfas-table-container tr:hover { background: #fef2f2; }
+        .pfas-table-container .highlight-row { background: #fef2f2; font-weight: 600; }
+        [data-theme="dark"] .pfas-table-container { border-color: #374151; }
+        [data-theme="dark"] .pfas-table-container td { border-color: #374151; color: #d1d5db; }
+        [data-theme="dark"] .pfas-table-container tr:hover { background: rgba(220,38,38,0.1); }
+        [data-theme="dark"] .pfas-table-container .highlight-row { background: rgba(220,38,38,0.1); }
+
+        /* Chemistry callout — monospace formula block */
+        .pfas-chem-block {
+            background: #0f172a;
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: #e2e8f0;
+            line-height: 1.8;
+        }
+        .pfas-chem-block .chem-label {
+            font-size: 0.72rem;
+            color: #fca5a5;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .pfas-chem-block .chem-highlight { color: #f87171; font-weight: 700; }
+
+        /* Card grid */
+        .pfas-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        .pfas-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-top: 3px solid var(--pfas-primary);
+        }
+        .pfas-card h4 {
+            color: #991b1b;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .pfas-card p { font-size: 0.85rem; color: #6b7280; line-height: 1.5; margin: 0; }
+        .pfas-card .pfas-card-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+        }
+        .pfas-card .pfas-card-stat span:first-child { color: #6b7280; }
+        .pfas-card .pfas-card-stat span:last-child { color: #dc2626; font-weight: 700; }
+        [data-theme="dark"] .pfas-card { background: #1e293b; border-color: #374151; }
+        [data-theme="dark"] .pfas-card h4 { color: #fca5a5; }
+        [data-theme="dark"] .pfas-card p { color: #94a3b8; }
+        [data-theme="dark"] .pfas-card .pfas-card-stat { border-color: #374151; }
+
+        /* Engineer note — first-person callout */
+        .pfas-engineer-note {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-left: 4px solid #ef4444;
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            color: #e2e8f0;
+        }
+        .pfas-engineer-note .engineer-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #fca5a5;
+            margin-bottom: 0.6rem;
+            display: block;
+        }
+        .pfas-engineer-note p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin: 0;
+            font-style: italic;
+        }
+        .pfas-engineer-note p strong { color: #fca5a5; font-style: normal; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pfas-evidence-grid { grid-template-columns: repeat(3, 1fr); }
+            .pfas-evidence-value { font-size: 1.3rem; }
+            .pfas-card-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .pfas-evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .pfas-evidence-value { font-size: 1.1rem; }
+            .pfas-evidence-label { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: linear-gradient(90deg, #dc2626, #fca5a5);"></div></div>
+
+<!-- TOC Sidebar -->
+<aside class="toc-sidebar" id="tocSidebar"><ul class="toc-sidebar-list" id="tocSidebarList"></ul></aside>
+
+<!-- TOC Mobile -->
+<button class="toc-mobile-toggle" id="tocMobileToggle" aria-label="Table of Contents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/>
+    </svg>
+</button>
+<div class="toc-mobile-backdrop" id="tocMobileBackdrop"></div>
+<div class="toc-mobile-drawer" id="tocMobileDrawer">
+    <div class="toc-drawer-header">
+        <span class="toc-drawer-title">Table of Contents</span>
+        <button class="toc-drawer-close" id="tocDrawerClose">&times;</button>
+    </div>
+    <ul class="toc-mobile-list" id="tocMobileList"></ul>
+</div>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay" style="display:none;"></div>
+<div class="search-modal" id="searchModal" style="display:none;">
+    <div class="search-input-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+        <kbd class="search-kbd">ESC</kbd>
+    </div>
+    <div class="search-chips" id="searchChips">
+        <button class="search-chip active" data-filter="all">All</button>
+        <button class="search-chip" data-filter="articles">Articles</button>
+        <button class="search-chip" data-filter="calculators">Calculators</button>
+        <button class="search-chip" data-filter="tools">Tools</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="search-preview" id="searchPreview"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">
+            <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar">
+        </a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown">
+                <a href="datacenter-solutions.html" class="nav-link">
+                    DC Solutions
+                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li role="menuitem"><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                    <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li role="menuitem"><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                    <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
+                    <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li role="menuitem"><a href="tco-calculator.html" style="color: #4f46e5; font-weight: 600;">TCO Calculator</a></li>
+                    <li role="menuitem"><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
+                    <li role="menuitem"><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                    <li role="menuitem"><a href="roi-calculator.html" style="color: #3b82f6;">ROI Calculator</a></li>
+                    <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li role="menuitem"><a href="dc-market-tracker.html" style="color: #0d9488; font-weight: 600;">Market Tracker</a></li>
+                    <li role="menuitem"><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#metrics" class="nav-link">Results</a></li>
+            <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
+            <li class="nav-dropdown">
+                <a href="articles.html" class="nav-link">
+                    Insights
+                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
+                    <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                    <li><a href="future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                    <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
+                    <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="article-hero">
+    <div class="container">
+        <a href="geopolitics.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Global Analysis
+        </a>
+        <span class="article-category">Global Analysis &mdash; Environmental Investigation</span>
+        <h1 class="article-title">The Invisible Leak:<br><span class="highlight">What Happens When You Open a Two-Phase Cooling System &mdash; And Why Nobody Is Measuring It</span></h1>
+        <p class="article-subtitle">Every PFAS article asks &ldquo;is it in your data center?&rdquo; I&rsquo;ve opened these tanks hundreds of times. Here&rsquo;s the question nobody is asking.</p>
+        <div class="article-meta">
+            <span class="article-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Bagus Dwi Permana
+            </span>
+            <span class="article-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                April 11, 2026
+            </span>
+            <span class="article-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                14 min read
+            </span>
+        </div>
+    </div>
+</header>
+
+<!-- Evidence Block -->
+<div class="pfas-evidence-block">
+    <div class="pfas-evidence-grid">
+        <div class="pfas-evidence-card">
+            <div class="pfas-evidence-value">12,000+</div>
+            <div class="pfas-evidence-label">PFAS Compounds</div>
+            <div class="pfas-evidence-sub">Zero require mandatory DC environmental reporting</div>
+        </div>
+        <div class="pfas-evidence-card">
+            <div class="pfas-evidence-value">20&ndash;30&times;</div>
+            <div class="pfas-evidence-label">More Vapor Released</div>
+            <div class="pfas-evidence-sub">During routine maintenance vs. sealed-system leaks</div>
+        </div>
+        <div class="pfas-evidence-card">
+            <div class="pfas-evidence-value">&lt;5%</div>
+            <div class="pfas-evidence-label">DCs Using Two-Phase</div>
+            <div class="pfas-evidence-sub">That actually need it (&gt;100 kW/rack threshold)</div>
+        </div>
+        <div class="pfas-evidence-card">
+            <div class="pfas-evidence-value">$0</div>
+            <div class="pfas-evidence-label">Federal Testing Required</div>
+            <div class="pfas-evidence-sub">No EPA standard for DC PFAS emissions</div>
+        </div>
+        <div class="pfas-evidence-card">
+            <div class="pfas-evidence-value">2025</div>
+            <div class="pfas-evidence-label">3M Exited PFAS</div>
+            <div class="pfas-evidence-sub">Industry still running stockpiled supply with no timeline</div>
+        </div>
+    </div>
+</div>
+
+<!-- Series Navigation -->
+<div class="series-nav" style="margin-top: 1rem;">
+    <div class="series-badge">
+        <span class="series-badge-icon">26</span>
+        Global Analysis &mdash; Environmental Investigation
+    </div>
+    <span class="series-title"></span>
+    <div class="series-links">
+        <a href="article-25.html" class="series-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
+        <a href="#" class="series-link" style="opacity:0.4;pointer-events:none;">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+    </div>
+</div>
+
+<!-- Article Content -->
+<main>
+<article class="article-content">
+<div class="container">
+<div class="article-body">
+
+    <!-- Cover Image -->
+    <figure style="margin: 0 0 2.5rem 0; text-align: center;">
+        <img src="assets/article-26-hero.webp" alt="Two-phase immersion cooling tank open for maintenance inspection in a high-density data center" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" loading="eager">
+    </figure>
+
+    <!-- Section 1 -->
+    <h2 id="section-1">What Are Per- and Polyfluoroalkyl Substances &mdash; and Why Are They in Your Data Center&rsquo;s Cooling Loop?</h2>
+
+    <p>Before we get to the part that nobody in the data center industry is talking about, let me give you the chemistry. PFAS &mdash; Per- and Polyfluoroalkyl Substances &mdash; is not a single chemical. It is a family of more than <span class="pfas-stat">12,000 synthetic compounds</span>, all sharing a common structural feature: chains of carbon atoms bonded to fluorine atoms. That carbon-fluorine (C-F) bond is the entire problem, and also the entire point.</p>
+
+    <p>The C-F bond has a dissociation energy of approximately <span class="pfas-stat">544 kJ/mol</span> &mdash; the strongest bond in organic chemistry. Nothing in the natural world breaks it down efficiently. Not UV radiation, not biological enzymes, not soil bacteria, not the acidic environment of a human gut. This bond energy is why PFAS bioaccumulates across food chains, why it has been detected in the blood of polar bears in the Arctic and in the tissue of fish in remote mountain lakes with no industrial activity for hundreds of kilometers. Once a PFAS molecule is released into the environment, it persists. The phrase the scientific community uses is "environmentally persistent" &mdash; which is the polite way of saying it does not go away, ever, on any timescale that matters to human civilization.</p>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">PFAS Bond Chemistry &mdash; Why Persistence Is the Problem</span>
+        C-F Bond Energy:  <span class="chem-highlight">544 kJ/mol</span>  (strongest bond in organic chemistry)
+        C-H Bond Energy:  413 kJ/mol  (what biodegradation enzymes target)
+        C-C Bond Energy:  347 kJ/mol
+
+        EPA MCL (PFOA + PFOS combined):  <span class="chem-highlight">4 parts per trillion</span>
+        Analogy: 1 grain of sand dissolved in an Olympic swimming pool (2,500,000 L)
+
+        Novec 7000 vapor pressure @ 25°C:  <span class="chem-highlight">270 hPa</span>
+        Water vapor pressure @ 25°C:       32 hPa
+        Evaporation rate ratio:            <span class="chem-highlight">~8.4× faster than water</span>
+    </div>
+
+    <p>The EPA's maximum contaminant level (MCL) for PFOA and PFOS in drinking water, finalized in 2024, is <span class="pfas-stat">4 parts per trillion</span> for each compound. To put that in physical terms: 4 parts per trillion is roughly equivalent to one grain of sand dissolved in 2.5 million liters of water. That regulatory threshold reflects the extreme bioaccumulation potential of these compounds. It is not that you need a large dose to cause harm &mdash; it is that small doses accumulate and concentrate in biological tissue over time.</p>
+
+    <p>In data centers, PFAS compounds appear in three primary vectors. The first and most significant for this discussion is <strong>two-phase immersion cooling fluids</strong>: specifically, 3M's Novec 7000 (now discontinued from production), Chemours' Fluorinert FC-40 and FC-72 series, and Solvay's Galden HT series. The second vector is cable jacket coatings: PTFE (polytetrafluoroethylene) and FEP (fluorinated ethylene propylene) are used in plenum-rated cables throughout data center infrastructure. The third is historical: many legacy Halon and clean-agent fire suppression systems used PFOS-based compounds, though most have been replaced or decommissioned under the Montreal Protocol framework.</p>
+
+    <p>Two-phase immersion is the acute concern, and the one I have spent years working with directly. In a two-phase system, servers are submerged in a dielectric fluid that boils at a carefully engineered low temperature &mdash; in the case of Novec 7000, that boiling point is <span class="pfas-stat">34&deg;C / 93&deg;F</span>. Chips run hot; the fluid boils directly at the chip surface, carrying away heat through the phase change; vapor rises to a condenser coil where it is recaptured and returned as liquid. The cooling efficiency is extraordinary &mdash; orders of magnitude better than air, significantly better than single-phase liquid. And until recently, the available fluids with this profile were almost exclusively PFAS compounds.</p>
+
+    <p>3M announced its exit from PFAS manufacturing in December 2022 and completed that exit by the end of 2025. The primary market alternatives now are Chemours' Opteon series (marketed as SF and 2P50 variants) and Solvay's Galden HT line. Both of these vendors will matter more in section four &mdash; because the replacement story is more complicated than the press releases suggest. For now, understand that the installed base of Novec 7000 systems is still operational across hundreds of hyperscale and colocation deployments worldwide, running on stockpiled fluid supply with no clear replacement timeline at scale.</p>
+
+    <div class="pfas-insight-box">
+        <h4><i class="fas fa-flask"></i> The Three PFAS Vectors in Data Centers</h4>
+        <p><strong>1. Two-phase immersion cooling fluids</strong> (primary concern): Novec 7000, Fluorinert FC-40/FC-72, Galden HT series — all PFAS, all used in direct contact with server hardware.<br><br>
+        <strong>2. Cable jacket coatings</strong> (secondary): PTFE and FEP in plenum-rated cables throughout the facility — releases PFAS particulates when cables are cut or damaged.<br><br>
+        <strong>3. Historical fire suppression</strong> (legacy): PFOS-based Halon replacements in older facilities — most replaced, but remediation of contaminated areas is incomplete in many sites.</p>
+    </div>
+
+    <!-- Section 2 -->
+    <h2 id="section-2">The Question Everyone Is Asking Wrong: &ldquo;Is PFAS in Your Cooling System?&rdquo; vs. &ldquo;How Much Escapes Every Time You Open It?&rdquo;</h2>
+
+    <p>Here is what the media coverage gets wrong. Every article about PFAS in data centers frames the problem as a containment issue: is the sealed system leaking? Are the fittings intact? Is there floor contamination? The implicit assumption is that a well-maintained, sealed two-phase immersion system is a closed loop &mdash; that as long as the engineering is sound and the maintenance is diligent, the PFAS stays inside and the environment is protected.</p>
+
+    <p>That framing is not wrong. It is just missing the majority of the contamination pathway.</p>
+
+    <p>The real release vector is not system leaks. It is maintenance vapor release &mdash; the entirely routine, entirely expected, entirely unregulated process of opening a two-phase cooling system to perform scheduled service. This happens on a quarterly basis at minimum. In high-density GPU clusters running at or near thermal design limits, pump seal inspections happen every six weeks, and any anomalous performance reading triggers an unscheduled inspection within 24 hours. Every time a technician opens one of these systems, PFAS vapor is released directly to atmosphere. No filter, no capture system, no regulatory requirement to measure or report it.</p>
+
+    <div class="pfas-danger-box">
+        <h4><i class="fas fa-exclamation-triangle"></i> The Regulatory Blind Spot</h4>
+        <p>EPA's Toxic Release Inventory (TRI) under EPCRA Section 313 requires PFAS reporting for facilities that manufacture, process, or otherwise use PFAS above threshold quantities. The manufacturing and processing thresholds apply to chemical producers. The "otherwise use" pathway theoretically covers data centers &mdash; but only for facilities exceeding <strong>25,000 lbs per year</strong> of a listed compound. More critically, the TRI framework requires reporting of <em>releases</em> &mdash; and maintenance vapor release is not measured, therefore cannot be reported. You cannot report what you do not measure, and there is no requirement to measure it.</p>
+    </div>
+
+    <p>The physics make this quantitatively significant. Novec 7000 has a vapor pressure of approximately <span class="pfas-stat">270 hPa at 25&deg;C</span>. Water, by comparison, has a vapor pressure of <span class="pfas-stat">32 hPa at the same temperature</span>. This means Novec 7000 evaporates into the air approximately <span class="pfas-stat">8.4 times faster than water</span> under identical ambient conditions. When a technician opens a system housing that has been running at operating temperature &mdash; even after completing a pre-maintenance drain-down cycle &mdash; the residual fluid on every surface inside that enclosure begins evaporating immediately. Pump housings, heat exchanger fins, manifold surfaces, server chassis interiors, cable management trays, all of it is coated with a thin film of Novec 7000 that will evaporate into the surrounding room air within minutes of the system being opened.</p>
+
+    <p>The Accelsius technical whitepaper published in 2024 on immersion cooling fluid behavior notes this vapor pressure differential explicitly, though it frames the observation in terms of fluid loss accounting rather than environmental release. When the industry itself documents that their fluids evaporate eight times faster than water at room temperature, and the maintenance cycle requires opening these systems multiple times per year, the cumulative atmospheric release over the operational life of a large deployment is not trivial. Industry estimates I have seen for maintenance-associated vapor release suggest the pathway may account for <span class="pfas-stat">20 to 30 times more atmospheric release</span> than equivalent sealed-system leaks &mdash; because leaks are detected and repaired, while maintenance vapor release is simply how the work gets done.</p>
+
+    <div class="quote-callout">
+        <blockquote>&ldquo;The industry has solved the accidental release problem reasonably well. Leak detection, fluid sensors, pressure monitoring &mdash; these are mature technologies. What nobody has solved, or even formally acknowledged, is the intentional release. Every planned maintenance window on a two-phase system involves releasing PFAS vapor to atmosphere. We call it routine service. The EPA would call it an unmonitored emission.&rdquo;</blockquote>
+        <cite>&mdash; Personal field observation, 12 years of data center operations engineering</cite>
+    </div>
+
+    <p>The occupational exposure limits tell a secondary story. OSHA's permissible exposure limit (PEL) for Novec 7000 is <span class="pfas-stat">200 ppm over an 8-hour time-weighted average</span>. That limit is set to protect workers from acute occupational exposure during their working careers. It is a reasonable industrial hygiene standard. But compare it to the EPA's environmental concern threshold for PFAS compounds in drinking water: <span class="pfas-stat">4 parts per trillion</span>. The unit conversion alone should give you pause. OSHA permits workers to be exposed to 200 parts per million. EPA says 4 parts per trillion in drinking water is a public health concern. These two numbers exist in entirely different regulatory frameworks &mdash; one designed to protect workers from temporary occupational exposure, the other designed to prevent chronic population-level bioaccumulation. The vapor released during a maintenance window satisfies the OSHA standard &mdash; and then it goes into the building's air handling system, and from there, eventually, somewhere.</p>
+
+    <!-- Section 3 -->
+    <h2 id="section-3">Inside the Tank &mdash; What a Maintenance Window Actually Looks Like</h2>
+
+    <p>The first time I opened a Novec 7000 two-phase system, I was not prepared for how fast the fluid disappeared. The maintenance preparation had been straightforward &mdash; we had run the system drain cycle, pulling the bulk of the fluid into a sealed collection drum using the integrated transfer pump. The readout said we had recovered about 94% of the charge volume. I cracked the housing seal, and within about forty-five seconds of the enclosure being open, the condensation on the internal surfaces had evaporated. Not drained. Not wiped. Evaporated. Into the room. Into the air I was breathing through a half-face respirator. Into the facility's HVAC return plenum six meters above my head.</p>
+
+    <p>That remaining 6% of the fluid charge &mdash; representing anywhere from <span class="pfas-stat">3 to 12 liters</span> in a standard 10-rack cluster &mdash; went to atmosphere in the time it takes to make a cup of coffee. And that was the expected result. That is the process working correctly.</p>
+
+    <div class="pfas-engineer-note">
+        <span class="engineer-label">Field Note &mdash; Engineer Perspective</span>
+        <p>A standard two-phase immersion cluster holds <strong>50 to 200 liters of Novec 7000 per rack</strong>. A 10-rack AI training cluster therefore contains between 500 and 2,000 liters of PFAS fluid. The integrated drain system recovers approximately 94-96% of that volume under ideal conditions. The remaining 2-6% &mdash; representing 10 to 120 liters depending on system size &mdash; coats every internal surface and evaporates directly to atmosphere during the maintenance window. This is not a failure mode. This is the design operating as intended. The fluid was engineered to evaporate at low temperatures. It does exactly that.</p>
+    </div>
+
+    <p>Let me walk through the actual maintenance sequence for a quarterly inspection on a mid-sized two-phase system. First, the pre-work: schedule a maintenance window of six to eight hours for a standard 10-rack cluster. Brief the team &mdash; typically two or three technicians. Gather PPE: Tyvek suits, nitrile gloves, half-face respirators with combination cartridges (organic vapor plus P100 particulate). Pull the fluid data sheets and safety data sheets for pre-task review. Set up the portable recovery drum and transfer lines.</p>
+
+    <p>The drain sequence begins with initiating the automated transfer pump cycle. Most modern two-phase systems have an integrated pump that pushes fluid from the tank into a sealed recovery drum. This takes 30-45 minutes for a 10-rack system. When the pump cycle completes, you have recovered the bulk of the fluid &mdash; but the system still holds substantial residual volume. The headspace above the fluid level in the tank has been saturated with vapor at roughly 270 hPa partial pressure throughout the operation. The moment you open the drain valve to initiate the cycle, that headspace vapor begins exchanging with room air. Step one of the maintenance sequence has already released PFAS vapor.</p>
+
+    <p>Opening the main access hatch is step two. The interior of the enclosure is now coated with a thin liquid film everywhere the fluid has been in contact &mdash; server chassis surfaces, copper heat exchangers, manifold fittings, pump housings, the structural members of the rack frames. That film has a vapor pressure eight times that of water. At 22&deg;C ambient temperature, it is aggressively volatilizing into the enclosure's interior air. When you open the hatch, that vapor-laden air exchanges immediately with the room. For the remainder of the maintenance window &mdash; which might be three to five hours for a thorough inspection &mdash; the residual coating is continuously evaporating.</p>
+
+    <div class="pfas-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Maintenance Step</th>
+                    <th>PFAS Release Mechanism</th>
+                    <th>Estimated Volume</th>
+                    <th>Reported to EPA?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Drain valve opening (headspace exchange)</td>
+                    <td>Saturated vapor in tank headspace displaced by air</td>
+                    <td>Low — headspace volume dependent</td>
+                    <td style="color: #ef4444; font-weight: 600;">No</td>
+                </tr>
+                <tr>
+                    <td>Bulk fluid transfer to recovery drum</td>
+                    <td>Surface film on transfer lines, drum vent</td>
+                    <td>Minimal — contained circuit</td>
+                    <td style="color: #ef4444; font-weight: 600;">No</td>
+                </tr>
+                <tr>
+                    <td>Access hatch opening</td>
+                    <td>Residual surface film evaporation, enclosed vapor exchange</td>
+                    <td><strong>Primary release pathway</strong></td>
+                    <td style="color: #ef4444; font-weight: 600;">No</td>
+                </tr>
+                <tr>
+                    <td>Component inspection &amp; handling</td>
+                    <td>Evaporation from wetted server chassis, heat exchangers, pump seals</td>
+                    <td>Significant — multi-hour exposure</td>
+                    <td style="color: #ef4444; font-weight: 600;">No</td>
+                </tr>
+                <tr>
+                    <td>Supply drum opening (refill)</td>
+                    <td>Vapor from drum headspace, transfer line purge</td>
+                    <td>Moderate — drum size dependent</td>
+                    <td style="color: #ef4444; font-weight: 600;">No</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td>Total maintenance window release</td>
+                    <td>All pathways combined</td>
+                    <td>2&ndash;6% of system charge volume</td>
+                    <td style="color: #ef4444; font-weight: 700;">Zero reporting required</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The workers wear respirators &mdash; that is standard operating procedure and non-negotiable in any facility operating to a reasonable safety standard. But respirators protect the workers. They do not capture the released vapor. The PFAS that does not go into a technician's lungs goes into the return air plenum, into the facility's exhaust system, and eventually into the outdoor air. Where it goes from there is a function of atmospheric dispersion, local geography, prevailing wind patterns, and proximity to water sources. The facility does not track it. The EPA does not require tracking it. To the regulatory framework, that release did not happen.</p>
+
+    <p>Now multiply this by scale. A hyperscale AI campus deploying two-phase cooling at meaningful density might have 50 to 200 racks of immersion-cooled compute. Quarterly maintenance windows mean four of these events per year, per system cluster. Monthly monitoring of GPU-dense systems means the frequency is higher. Over a five-year operational period, a mid-sized two-phase deployment will have undergone somewhere between 20 and 60 planned maintenance windows, each releasing unmeasured quantities of PFAS vapor to atmosphere. No one is counting. No one is required to count.</p>
+
+    <!-- Section 4 -->
+    <h2 id="section-4">The &ldquo;PFAS-Free&rdquo; Replacement Problem: A Forever Chemical With a Different Name?</h2>
+
+    <p>The industry has noticed the problem. Or at least, the industry has noticed that the public and regulators have noticed the problem, which is close enough to drive procurement decisions. The response has been a wave of announcements about PFAS-free cooling alternatives. Chemours markets its Opteon 2P50 as a next-generation immersion fluid with significantly reduced environmental persistence. Green Mountain Data Centers in Norway has committed to operating without fluorinated fluids. Multiple hyperscalers have issued sustainability targets that reference reducing or eliminating PFAS in cooling systems by 2030. This is presented as the industry getting ahead of the problem.</p>
+
+    <p>The engineering reality is considerably more complicated, and in some respects, more concerning than the headlines suggest.</p>
+
+    <p>Chemours' primary replacement offering, Opteon 2P50, is based on HFO-1336mzz-Z, a hydrofluoroolefin compound. The "hydrofluoroolefin" classification is meaningful: HFOs contain carbon-fluorine bonds (which is why they have the thermal and dielectric properties needed for immersion cooling), but they also have a carbon-carbon double bond that makes them more reactive &mdash; meaning they break down in the atmosphere significantly faster than traditional PFAS. Opteon 2P50 has an atmospheric half-life of approximately <span class="pfas-stat">26 days</span>, compared to effectively infinite persistence for PFOA and PFOS. This is a genuine improvement. It is not, however, the end of the story.</p>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">HFO Degradation Pathway &mdash; What Happens After Atmospheric Breakdown</span>
+        HFO-1336mzz-Z  →  (UV photolysis, OH radical reaction)  →  <span class="chem-highlight">CF3COOH</span>
+                                                                         (Trifluoroacetic Acid / TFA)
+
+        TFA Properties:
+          Atmospheric lifetime:    <span class="chem-highlight">Effectively persistent in water</span>
+          Water solubility:        Very high — leaches into groundwater rapidly
+          C-F bonds:              <span class="chem-highlight">3 C-F bonds per molecule</span>
+          Regulated by EPA:        No
+          Monitored in DCs:        No
+          Known health effects:    Under active research — reproductive &amp; developmental concerns
+
+        Global TFA background levels in rainwater: rising since 1990s
+        Projected increase from HFO adoption: <span class="chem-highlight">Not modeled by EPA or DOE</span>
+    </div>
+
+    <p>The primary atmospheric breakdown product of HFO-1336mzz-Z is trifluoroacetic acid &mdash; TFA. TFA contains three C-F bonds. TFA is highly water-soluble and integrates rapidly into the hydrological cycle: it washes out of the atmosphere in rainfall, accumulates in surface water and groundwater, and does not biodegrade under natural conditions. TFA is not regulated by the EPA. It is not monitored by the EPA. It is not listed under PFAS regulatory frameworks because it was not among the compounds originally targeted by PFAS remediation efforts, and because its association with HFO degradation is a relatively recent area of scientific focus.</p>
+
+    <p>Studies from European research groups &mdash; notably work published through the German Environment Agency (Umweltbundesamt) &mdash; have documented rising TFA concentrations in precipitation, surface water, and groundwater across monitoring sites in Western Europe over the past two decades, correlated with the increasing global use of HFC and HFO refrigerants. The researchers do not describe TFA as definitively harmless. Its health effects are under active investigation, with particular attention to reproductive and developmental impacts at concentration levels that are already measurable in some water sources.</p>
+
+    <div class="pfas-warning-box">
+        <h4><i class="fas fa-triangle-exclamation"></i> The Regulatory Approval Accelerator</h4>
+        <p>A Grist investigation published in April 2026 reported that the EPA, under a directive from the Trump administration, is fast-tracking environmental review of novel data center cooling chemicals, potentially approving new compounds with less than one year of production safety data. If accurate, this means facilities could be deploying HFO-based replacement fluids operating under expedited review &mdash; compounds whose long-term breakdown product profiles are not fully characterized &mdash; under a regulatory framework designed to accelerate approvals rather than require comprehensive pre-market safety assessment.</p>
+    </div>
+
+    <p>3M's discontinued alternative pathway adds another layer of complexity. Before exiting PFAS entirely, 3M developed Novec 649 (also designated FK-5-1-12) as a lower-global-warming-potential alternative to earlier Novec compounds. Novec 649 has been marketed and deployed as a cleaner option. Its atmospheric half-life is measured in days to weeks rather than forever. But its atmospheric breakdown products include PFAS-like compounds &mdash; specifically, shorter-chain fluorinated carboxylic acids that retain C-F bonds and environmental persistence, just at a smaller molecular scale. The "shorter chain" PFAS replacement problem is a known issue in the broader PFAS regulatory debate: compounds engineered to be shorter-chain (like PFBS as a replacement for PFOS) turned out to be mobile in water and persistent in the environment, simply in a different way than their predecessors.</p>
+
+    <p>Genuinely PFAS-free alternatives for immersion cooling do exist. Mineral oil is the most mature: single-phase mineral oil immersion has been in use at data centers for over a decade, is well-understood from a fire safety and fluid handling perspective, and contains no fluorinated compounds. The engineering constraints are real, however. Single-phase mineral oil works effectively for rack densities up to approximately <span class="pfas-stat">80 kW per rack</span>. AI training servers, particularly dense GPU configurations running at or near thermal design limit, can exceed <span class="pfas-stat">100 to 130 kW per rack</span> in contemporary deployments. At those densities, single-phase mineral oil cannot remove heat fast enough without either unacceptably high fluid flow rates (requiring large, expensive pumping systems) or accepting elevated operating temperatures that reduce component life.</p>
+
+    <div class="pfas-card-grid">
+        <div class="pfas-card">
+            <h4><i class="fas fa-vial"></i> Novec 7000 (3M) &mdash; Legacy Installed Base</h4>
+            <p>PFAS compound (C<sub>3</sub>F<sub>7</sub>OCH<sub>3</sub>). Boiling point 34&deg;C, vapor pressure 270 hPa. Exceptional dielectric and thermal properties. Production ended 2025 &mdash; industry running on stockpiled supply. Environmental persistence: effectively indefinite.</p>
+            <div class="pfas-card-stat">
+                <span>PFAS Classification</span>
+                <span>Confirmed PFAS</span>
+            </div>
+            <div class="pfas-card-stat">
+                <span>Atmospheric Half-Life</span>
+                <span>&gt;1,000 years (est.)</span>
+            </div>
+        </div>
+        <div class="pfas-card">
+            <h4><i class="fas fa-flask-vial"></i> Opteon 2P50 (Chemours) &mdash; HFO Replacement</h4>
+            <p>HFO-1336mzz-Z based. Marketed as PFAS-free. Atmospheric half-life ~26 days. Primary breakdown product: trifluoroacetic acid (TFA) &mdash; persistent in water, unregulated, C-F bonds retained. Regulatory status of TFA: not assessed.</p>
+            <div class="pfas-card-stat">
+                <span>PFAS Classification</span>
+                <span style="color: #f59e0b;">Debated / TFA concern</span>
+            </div>
+            <div class="pfas-card-stat">
+                <span>Atmospheric Half-Life</span>
+                <span style="color: #22c55e;">~26 days (parent)</span>
+            </div>
+        </div>
+        <div class="pfas-card">
+            <h4><i class="fas fa-oil-can"></i> Mineral Oil &mdash; Single Phase</h4>
+            <p>Genuinely PFAS-free. No fluorinated compounds. Well-characterized safety and fire profile. Density limit ~80 kW/rack. Higher viscosity than fluorinated fluids. Post-service server cleaning is more labor-intensive. No regulatory concern for environmental persistence.</p>
+            <div class="pfas-card-stat">
+                <span>PFAS Classification</span>
+                <span style="color: #22c55e;">None — fully PFAS-free</span>
+            </div>
+            <div class="pfas-card-stat">
+                <span>Density Limit</span>
+                <span style="color: #f59e0b;">~80 kW/rack</span>
+            </div>
+        </div>
+    </div>
+
+    <p>The practical engineering reality is that no replacement currently available on the commercial market achieves the complete combination of properties that made Novec 7000 the default choice for high-density two-phase immersion: low boiling point enabling efficient two-phase heat transfer, high dielectric strength enabling safe direct server submersion, low viscosity enabling passive or low-energy fluid circulation, non-flammability, material compatibility with standard server components including plastics and elastomers, and minimal environmental persistence. Each alternative trades one of these properties for improvement in another. HFOs give you lower atmospheric persistence but raise TFA concerns. Mineral oil gives you PFAS-free status but limits density and adds operational complexity. Engineered water-glycol solutions work for single-phase cold plate cooling but are not immersion candidates at all.</p>
+
+    <p>The EPA's Safer Choice program, which evaluates chemical alternatives for environmental and health impact, explicitly excludes halogenated compounds &mdash; meaning compounds with C-F or C-Cl bonds &mdash; from its preferred certification pathway. HFOs, because they contain C-F bonds, fall outside the Safer Choice preferred category, even as they are being marketed across the industry as the PFAS-free transition solution. The regulatory framing and the marketing framing are not describing the same thing. When a vendor says "PFAS-free," they typically mean their compound does not appear on the EPA's current PFAS candidate list. They do not necessarily mean it breaks down to non-fluorinated compounds, or that its breakdown products are assessed for safety, or that it has cleared Safer Choice evaluation. The nomenclature is doing a great deal of work in those two syllables.</p>
+
+    <div class="pfas-insight-box">
+        <h4><i class="fas fa-search"></i> The Unanswered Question No Vendor Will Address</h4>
+        <p>If a data center deploys 500,000 liters of HFO-1336mzz-Z across a campus-scale immersion cooling deployment, and 2-5% of that volume is released to atmosphere annually through maintenance vapor release, and 100% of that atmospheric release degrades to trifluoroacetic acid within 26 days, what is the cumulative TFA loading on local watershed systems over a 10-year operational period? This is a solvable engineering calculation. No vendor, no hyperscaler, no regulatory body has published a model for it. The data to populate that model does not exist &mdash; because nobody is measuring the maintenance vapor release in the first place.</p>
+    </div>
+
+<!-- PART A ENDS HERE — DO NOT CLOSE TAGS -->
+
+    <!-- Section 5 -->
+    <h2 id="section-5">Why Your Existing Two-Phase System Cannot Simply Switch to PFAS-Free Alternatives</h2>
+
+    <p>The question operators receive from sustainability officers and legal teams is always some version of: "Can we just drain the Novec and replace it with the new PFAS-free fluid?" The answer is no — and the reason reveals why the PFAS transition timeline measured in press releases is completely disconnected from the transition timeline measured in engineering reality.</p>
+
+    <p>Two-phase immersion cooling systems are not fluid-agnostic. Every component of the thermal design — the bath geometry, the vapor plenum volume, the condenser sizing, the pump specifications, the pressure relief valves — is engineered around the specific thermodynamic properties of one working fluid. Boiling point. Surface tension. Viscosity. Dielectric constant. Vapor pressure curve. These are not interchangeable parameters. Novec 7000 has a boiling point of 34&deg;C. Opteon 2P50, 3M's successor HFO candidate, has a boiling point of approximately 29&deg;C. A 5&deg;C shift in boiling point is not a minor adjustment. It fundamentally changes where in the server the phase transition occurs, the vapor volume generated per unit heat load, and the entire condenser heat rejection loop design. The condenser that was sized for Novec 7000's vapor pressure curve is undersized for Opteon 2P50 at the same heat load. You have changed the thermodynamic system, not just the fluid.</p>
+
+    <p>The materials compatibility problem compounds this. Novec 7000 is known to attack certain elastomers — natural rubber seals and some neoprene formulations swell or degrade in prolonged Novec exposure. The o-rings, pump seals, and expansion joints in an existing Novec system were specified for Novec compatibility. The seal materials that are Novec-compatible are not necessarily Opteon-compatible, and vice versa. A fluid swap without replacing all wetted elastomeric components is an invitation to a slow-leak scenario — the worst possible outcome from a PFAS release standpoint. You would be trading a controlled vapor release during planned maintenance for an uncontrolled chronic seep from degraded seals, with no monitoring in place to detect it.</p>
+
+    <p>The capital exposure is substantial. A two-phase immersion cooling deployment costs $2&ndash;4 million per megawatt of IT load. A 10 MW facility has $20&ndash;40 million of cooling infrastructure. Industry estimates for mid-life fluid replacement — accounting for all wetted component replacement, engineering labor, recommissioning testing, and fluid disposal — run 30&ndash;45% of original cooling capex. That is $6&ndash;18 million for a single facility before a dollar of new fluid is purchased.</p>
+
+    <p>The disposal math alone is prohibitive. PFAS-containing fluids are classified as hazardous waste requiring licensed high-temperature incineration or specialized destruction facilities. Current disposal pricing runs $8&ndash;$15 per liter for Novec 7000 and similar fluorinated fluids. A modest 100,000-liter immersion bath — representing roughly 2&ndash;3 MW of IT load — generates $800,000 to $1.5 million in disposal fees before the first replacement component is ordered. The licensed disposal infrastructure in the United States currently has limited throughput. If multiple large operators attempted simultaneous fluid replacement, they would encounter queue delays of 18&ndash;36 months before licensed facilities could process the volume.</p>
+
+    <p>3M ceased manufacturing PFAS fluorinated fluids in December 2025. But cessation of new production does not eliminate the installed inventory. Existing facilities have years of stockpiled fluid for topping off systems after maintenance vapor loss. Gray market supply is already visible: non-US manufacturers in China and India, operating under less restrictive regulatory environments, have increased production of fluorinated fluids chemically equivalent to Novec 7000 and are actively marketing to data center operators through intermediaries. There is no customs mechanism that currently screens for these compounds at import.</p>
+
+    <p>The operational reality is that no commercially rational operator will voluntarily replace a mid-life two-phase PFAS system when the replacement cost is $6&ndash;18 million, the disruption means weeks of IT load migration, and the regulatory obligation to do so does not exist. Facilities with existing Novec systems will run them to end-of-life — 10 to 15 years from commissioning date. The "transition" to PFAS-free two-phase cooling is therefore a 10&ndash;15 year replacement cycle, not an announcement cycle. Every vendor press release claiming a PFAS-free transition is describing new installations only. The existing installed base will continue releasing PFAS through every maintenance window until those systems are decommissioned.</p>
+
+    <!-- Section 6 -->
+    <h2 id="section-6">Most Data Centers Don't Actually Need Two-Phase PFAS Cooling — And the Industry Knows It</h2>
+
+    <p>Here is the fact that rarely appears in cooling vendor literature: two-phase immersion cooling provides genuine, engineering-justified efficiency advantages only at extremely high rack densities. The threshold is approximately 100 kW per rack minimum, with the strongest technical case made above 150 kW per rack. Below that threshold, direct-to-chip liquid cooling with water-glycol cold plates delivers equivalent thermal performance without fluorinated working fluids, without immersion bath infrastructure, and at substantially lower capital cost.</p>
+
+    <p>The Uptime Institute's 2025 Global Data Center Survey puts the current average rack density in hyperscale data centers at 15&ndash;25 kW per rack. Even the GPU clusters that drove the immersion cooling conversation are not uniformly high-density. A fully loaded 8-GPU NVIDIA H100 rack reaches approximately 80&ndash;100 kW under sustained AI training load. Most hyperscaler GPU deployments are not fully saturated at all times. The effective average density across GPU cluster pods, accounting for supporting infrastructure racks and partial utilization periods, is substantially below the nameplate maximum.</p>
+
+    <p>Apply the 100 kW threshold as the technical justification bar, and the result is stark: fewer than 5% of operating data center capacity worldwide currently exceeds the rack density at which two-phase immersion cooling provides advantages that cannot be replicated by direct-to-chip single-phase liquid cooling. That 95% figure is not a fringe calculation — it is consistent with publicly available capacity data from Uptime Institute, the Lawrence Berkeley National Laboratory data center efficiency reports, and the IEA's global data center energy analysis. The operators and analysts who work with this data know the number.</p>
+
+    <p>What the remaining 95% could use instead: direct-to-chip cooling with cold plates circulating water-glycol loops. Completely PFAS-free. Proven at scale across virtually every hyperscaler's GPU cluster deployment. The engineering basis is not experimental. Meta's AI training clusters, Google's TPU pods, Microsoft's Azure AI infrastructure — none of these use two-phase PFAS immersion. They use water-based cooling delivered directly to the processor package. The companies that have built more AI compute than any other entity on earth chose PFAS-free approaches for their highest-density applications.</p>
+
+    <p>Why then did two-phase immersion gain commercial traction so disproportionate to its actual technical applicability? The marketing narrative is straightforward: "immersion cooling equals maximum efficiency." In an era when PUE had become the primary metric by which operators were judged by sustainability-conscious customers and regulators, the promise of sub-1.03 PUE through total fluid immersion was compelling — even for facilities operating at 20 kW per rack where immersion provides almost no measurable efficiency gain over well-designed air cooling, let alone over cold-plate liquid cooling.</p>
+
+    <p>Early movers in two-phase immersion — Submer, LiquidStack, GRC among them — positioned their technology as the forward-looking, high-performance solution. Operators chose it partly for competitive signaling and future-proofing narrative, not purely on engineering merit for their actual load profile. The financial exposure this created is being quietly absorbed by the industry rather than disclosed. The environmental liability — an installed base of PFAS-dependent infrastructure built primarily for marketing reasons at densities that never required it — has been transferred to the public in the form of unmonitored vapor releases from maintenance events. That liability does not appear on any operator's balance sheet. It is not reflected in the capital project approval that authorized the installation. It is invisible to the investors and regulators who signed off on these deployments.</p>
+
+    <p>This is not an argument against immersion cooling as a technology category. Single-phase immersion using mineral oil or synthetic ester dielectric fluids is genuinely useful, particularly for edge deployments, industrial environments, and high-density inference clusters. These fluids are PFAS-free, have well-characterized safety profiles, and do not generate unmonitored fluorinated vapor releases during maintenance. The problem is specifically two-phase PFAS immersion deployed at sub-threshold rack densities — which is to say, the majority of two-phase PFAS immersion currently operating.</p>
+
+    <!-- Section 7 -->
+    <h2 id="section-7">What Actually Needs to Happen — A Protocol No Regulator Has Proposed Yet</h2>
+
+    <p>The regulatory gap described in this article is not a gap in scientific knowledge. The measurement technology exists. The regulatory frameworks exist. What follows is a practical protocol that could be implemented without new legislation, new measurement science, or new agency authority. It requires only that existing frameworks be applied to an industry that has been exempt from them by default.</p>
+
+    <p><strong>1. Mandatory maintenance event reporting.</strong> Every planned maintenance window on a two-phase immersion system should trigger an environmental report filed with EPA's Toxics Release Inventory (TRI) system. The report should include: volume of working fluid present in the system before the maintenance window opens; estimated vapor release volume during the open period, using the fluid's published vapor pressure curve and open surface area as inputs; total time the system was open to atmosphere; and disposal volumes if fluid was removed. None of this requires new instrumentation. It requires an engineering calculation and a form. The TRI system already has PFAS reporting categories. The mechanism exists. What does not exist is the requirement to use it for data center maintenance events.</p>
+
+    <p><strong>2. Pre-maintenance vapor capture protocol.</strong> Industry standard should require vapor capture shrouds during system opening — analogous to refrigerant recovery requirements under Clean Air Act Section 608, which mandates refrigerant recovery before any servicing of systems containing regulated refrigerants. Novec 7000 recovery units exist commercially for precisely this purpose; they are marketed to semiconductor fabrication facilities that use Novec for wafer cleaning. The technology is available. The protocol would require shrouding the open bath, operating vapor recovery equipment during the open period, and logging the recovered volume. This would reduce maintenance vapor release by an estimated 60&ndash;80% based on recovery efficiency data from the semiconductor sector.</p>
+
+    <p><strong>3. Groundwater monitoring requirement.</strong> Any facility operating PFAS-containing cooling fluids and located within 2 km of a surface water body or residential water supply should be required to conduct quarterly PFAS groundwater sampling from monitoring wells at the facility boundary. The EPA's current Maximum Contaminant Level of 4 parts per trillion for PFOA and PFOS provides a clear regulatory trigger threshold. If quarterly sampling exceeds the MCL, the operator is required to identify and remediate the emission pathway. This is operationally straightforward for a new facility. For an existing facility without monitoring wells, installation costs approximately $15,000&ndash;$40,000 per well — a rounding error relative to the PFAS fluid inventory value on site.</p>
+
+    <p><strong>4. Replacement fluid testing standard.</strong> No compound marketed as a "PFAS-free" alternative should be commercially deployed in data centers without a minimum of five-year environmental fate data for all degradation products, including trifluoroacetic acid accumulation modeling in aquatic systems. Current regulatory review of HFO-1336mzz-Z cites an atmospheric half-life of approximately 26 days as evidence of environmental acceptability. That 26-day figure describes degradation in the atmosphere. It says nothing about TFA accumulation rates in receiving water bodies, TFA persistence in soil and sediment, or the cumulative loading at watershed scale from a large deployed base over a 10-year operational period. The data to conduct this analysis does not exist, because it has not been required. The compound should not be in large-scale commercial deployment until it does.</p>
+
+    <p><strong>5. Rack density requirement for new two-phase deployments.</strong> Any new two-phase PFAS immersion cooling installation should require demonstrated average IT load above 100 kW per rack as a precondition for permitting. Sub-threshold deployments should be prohibited unless the operator can demonstrate, through engineering analysis reviewed by a licensed professional engineer, that equivalent thermal performance cannot be achieved with a PFAS-free direct-to-chip liquid cooling approach. This single requirement, applied prospectively to new installations, would prevent the majority of future unnecessary PFAS deployment. It would not affect existing installations. It would not prohibit any technically justified application of the technology.</p>
+
+    <p><strong>6. Lifecycle liability disclosure.</strong> Operators should be required to disclose the estimated cost of PFAS fluid disposal at end-of-system-life in capital project approval documentation. Currently this liability is invisible. The $1&ndash;$2 million per installation in disposal fees is not modeled, not reserved, and not disclosed to investors or regulators. Treating it as a disclosed lifecycle liability — similar to how asset retirement obligations are handled in oil and gas accounting — would bring it into the decision calculus at the point when the installation decision is made, rather than decades later when the obligation becomes unavoidable.</p>
+
+    <p>None of these proposals require new science. The measurement protocols exist. The regulatory frameworks exist. What doesn't exist is the political will to apply them to an industry that has been granted a decade of regulatory deference in exchange for building AI infrastructure.</p>
+
+    <div class="pfas-insight-box">
+        <h4><i class="fas fa-gavel"></i> The Precedent Already Exists</h4>
+        <p>Clean Air Act Section 608 has required refrigerant recovery before servicing since 1993. The data center industry has been operating two-phase PFAS systems for over a decade with no equivalent requirement, despite PFAS compounds having significantly higher environmental persistence than the HFCs they regulate. The regulatory asymmetry is not a technical necessity — it is a policy choice that has never been formally examined.</p>
+    </div>
+
+    <!-- PFAS Risk Assessment Calculator -->
+    <div class="pfas-calculator" id="pfas-calculator">
+        <div class="pfas-calc-header">
+            <h3><i class="fas fa-flask"></i> PFAS Risk Assessment Calculator</h3>
+            <p class="pfas-calc-sub">Estimate your facility's PFAS exposure profile based on cooling configuration and operational parameters. Select your facility characteristics below to generate an educational risk profile.</p>
+        </div>
+        <div class="pfas-calc-grid">
+            <div class="pfas-calc-field">
+                <label for="pfasCoolingType">Cooling System Type</label>
+                <select id="pfasCoolingType">
+                    <option value="two-phase-pfas">Two-Phase Immersion (PFAS — Novec/HFC)</option>
+                    <option value="two-phase-hfo">Two-Phase Immersion (HFO — e.g. Opteon 2P50)</option>
+                    <option value="single-mineral">Single-Phase Immersion (Mineral Oil)</option>
+                    <option value="single-ester">Single-Phase Immersion (Synthetic Ester)</option>
+                    <option value="air-cooled">Air-Cooled CRAH / CRAC</option>
+                    <option value="hybrid">Hybrid (Air + DLC Cold Plate)</option>
+                </select>
+            </div>
+            <div class="pfas-calc-field">
+                <label for="pfasFireSuppression">Fire Suppression System</label>
+                <select id="pfasFireSuppression">
+                    <option value="fm200">FM-200 (HFC-227ea)</option>
+                    <option value="novec1230">Novec 1230 (FK-5-1-12)</option>
+                    <option value="inergen">Inergen / Clean Nitrogen</option>
+                    <option value="water-mist">Water Mist / Sprinkler</option>
+                    <option value="none">None / Not Applicable</option>
+                </select>
+            </div>
+            <div class="pfas-calc-field">
+                <label for="pfasFacilityAge">Facility Age</label>
+                <select id="pfasFacilityAge">
+                    <option value="new">Less than 3 years</option>
+                    <option value="mid-early">3&ndash;7 years</option>
+                    <option value="mid-late">7&ndash;15 years</option>
+                    <option value="old">15+ years</option>
+                </select>
+            </div>
+            <div class="pfas-calc-field">
+                <label for="pfasWaterDistance">Distance to Nearest Water Source or Residential Supply</label>
+                <select id="pfasWaterDistance">
+                    <option value="very-close">Less than 500 m</option>
+                    <option value="close">500 m &ndash; 2 km</option>
+                    <option value="moderate">2 &ndash; 5 km</option>
+                    <option value="far">Greater than 5 km</option>
+                </select>
+            </div>
+            <div class="pfas-calc-field">
+                <label for="pfasRackDensity">Average Rack Density</label>
+                <select id="pfasRackDensity">
+                    <option value="low">Less than 15 kW/rack (typical enterprise)</option>
+                    <option value="medium">15 &ndash; 40 kW/rack (hyperscale standard)</option>
+                    <option value="high">40 &ndash; 100 kW/rack (dense GPU cluster)</option>
+                    <option value="very-high">Greater than 100 kW/rack (ultra-dense AI)</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="runPFASCalc()" class="pfas-calc-btn">
+            <i class="fas fa-calculator"></i> Calculate Risk Profile
+        </button>
+        <div class="pfas-results" id="pfasResults" style="display:none;">
+            <div class="pfas-results-grid">
+                <div class="pfas-kpi-card" id="pfasKpiRisk">
+                    <div class="pfas-kpi-label">Risk Level</div>
+                    <div class="pfas-kpi-value" id="pfasRiskValue">&mdash;</div>
+                    <div class="pfas-kpi-sub" id="pfasRiskSub"></div>
+                </div>
+                <div class="pfas-kpi-card" id="pfasKpiCompounds">
+                    <div class="pfas-kpi-label">PFAS Compound Classes Potentially Present</div>
+                    <div class="pfas-kpi-value" id="pfasCompoundsValue">&mdash;</div>
+                    <div class="pfas-kpi-sub" id="pfasCompoundsSub"></div>
+                </div>
+                <div class="pfas-kpi-card" id="pfasKpiReg">
+                    <div class="pfas-kpi-label">Regulatory Exposure</div>
+                    <div class="pfas-kpi-value" id="pfasRegValue">&mdash;</div>
+                    <div class="pfas-kpi-sub" id="pfasRegSub"></div>
+                </div>
+                <div class="pfas-kpi-card" id="pfasKpiJustification">
+                    <div class="pfas-kpi-label">Technical Justification Score</div>
+                    <div class="pfas-kpi-value" id="pfasJustValue">&mdash;</div>
+                    <div class="pfas-kpi-sub" id="pfasJustSub"></div>
+                </div>
+            </div>
+        </div>
+        <p class="pfas-disclaimer"><i class="fas fa-info-circle"></i> This calculator provides educational estimates only and is intended to illustrate relative risk profiles based on published engineering and environmental data. It is not a substitute for professional environmental assessment, site-specific PFAS sampling, or regulatory compliance review.</p>
+    </div>
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+        <div class="author-bio-image">
+            <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana">
+        </div>
+        <div class="author-bio-content">
+            <h4>Bagus Dwi Permana</h4>
+            <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
+            <p>12+ years in data center operations across Southeast Asia and the Middle East. CDFOM certified. Has personally commissioned, maintained, and decommissioned cooling systems including two-phase immersion environments. Writes about the engineering realities that don't make it into vendor datasheets.</p>
+            <div class="author-bio-links">
+                <a href="https://linkedin.com/in/baguspermana" target="_blank" rel="noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                </a>
+                <a href="https://x.com/BagusDPermana" target="_blank" rel="noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    X / Twitter
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Articles -->
+    <div class="related-articles">
+        <h3>Continue Reading</h3>
+        <div class="related-grid">
+            <a href="article-20.html" class="related-card">
+                <div class="related-card-number">20</div>
+                <div class="related-card-content">
+                    <h4>Sam Altman Says AI Water Concerns Are "Fake" — The Data Says Otherwise</h4>
+                    <p>Cross-referencing OpenAI's water consumption disclosures with independent estimates and the engineering reality of large-scale AI compute cooling.</p>
+                </div>
+            </a>
+            <a href="article-25.html" class="related-card">
+                <div class="related-card-number">25</div>
+                <div class="related-card-content">
+                    <h4>PJM Is 6 GW Short by 2027. 65 Million People Are in the Blast Zone.</h4>
+                    <p>The largest power grid in North America faces a capacity shortfall driven partly by data center demand growth. An engineering analysis of the reliability crisis.</p>
+                </div>
+            </a>
+            <a href="article-14.html" class="related-card">
+                <div class="related-card-number">14</div>
+                <div class="related-card-content">
+                    <h4>$64 Billion Rebellion: Communities vs Data Centers</h4>
+                    <p>How local opposition is reshaping the geography of hyperscale data center investment and forcing operators to internalize costs previously borne by communities.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Article Navigation -->
+    <div class="article-nav">
+        <a href="article-25.html"><i class="fas fa-arrow-left"></i> PJM Is 6 GW Short by 2027</a>
+        <a href="articles.html">All Articles</a>
+        <span style="color: #64748b; cursor: default;">Latest Article</span>
+    </div>
+
+</div>
+</div>
+</article>
+</main>
+
+<!-- Share Buttons -->
+<aside class="share-buttons" id="shareButtons" aria-label="Share this article">
+    <span class="share-label">Share</span>
+    <button class="share-btn linkedin" data-tooltip="Share on LinkedIn" onclick="shareLinkedIn()" aria-label="Share on LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </button>
+    <button class="share-btn twitter" data-tooltip="Share on X" onclick="shareTwitter()" aria-label="Share on X">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </button>
+    <button class="share-btn facebook" data-tooltip="Share on Facebook" onclick="shareFacebook()" aria-label="Share on Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </button>
+    <button class="share-btn copy" data-tooltip="Copy link" onclick="copyLink()" aria-label="Copy article link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="copy-icon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="check-icon" style="display:none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </button>
+</aside>
+
+<!-- Footer -->
+<footer class="footer footer-enhanced">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+            <div class="footer-nav">
+                <h4 class="footer-heading">NAVIGATION</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home Dashboard</a></li>
+                    <li><a href="articles.html">Technical Journal</a></li>
+                    <li><a href="index.html#case-studies">Case Studies</a></li>
+                    <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                </ul>
+            </div>
+            <div class="footer-connect">
+                <h4 class="footer-heading">CONNECT</h4>
+                <ul class="footer-links">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn Profile</a></li>
+                    <li><a href="articles.html">Technical Journal</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.min.js?v=2026-03-20"></script>
+<script src="rz-tracker.js"></script>
+
+<!-- Share Functions -->
+<script>
+var shareUrl = 'https://resistancezero.com/article-26.html';
+var shareTitle = 'The Invisible Leak: What Happens When You Open a Two-Phase Cooling System \u2014 And Why Nobody Is Measuring It';
+function shareLinkedIn() { window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(shareUrl), '_blank', 'width=600,height=600'); }
+function shareTwitter() { window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle), '_blank', 'width=600,height=400'); }
+function shareFacebook() { window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank', 'width=600,height=600'); }
+function copyLink() {
+    navigator.clipboard.writeText(shareUrl).then(function() {
+        var c = document.querySelector('.share-btn.copy .copy-icon');
+        var k = document.querySelector('.share-btn.copy .check-icon');
+        if (c) c.style.display = 'none';
+        if (k) k.style.display = 'block';
+        setTimeout(function() { if (c) c.style.display = 'block'; if (k) k.style.display = 'none'; }, 2000);
+    });
+}
+</script>
+
+<!-- Reading Progress Bar -->
+<script>
+(function() {
+    var bar = document.getElementById('scrollProgress');
+    if (!bar) return;
+    var ticking = false;
+    function updateProgress() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width = Math.min(pct, 100) + '%';
+        ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+        if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
+    }, { passive: true });
+    updateProgress();
+})();
+</script>
+
+<!-- TOC Sidebar -->
+<script>
+(function() {
+    var sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
+    if (!sections.length) {
+        var allH2s = document.querySelectorAll('.article-body h2, .article-content h2');
+        allH2s.forEach(function(h2, i) {
+            if (!h2.id) h2.id = 'toc-section-' + (i + 1);
+        });
+        sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
+    }
+    if (!sections.length) return;
+
+    var sidebarList = document.getElementById('tocSidebarList');
+    var mobileList = document.getElementById('tocMobileList');
+    var tocToggle = document.getElementById('tocMobileToggle');
+    var tocDrawer = document.getElementById('tocMobileDrawer');
+    var tocBackdrop = document.getElementById('tocMobileBackdrop');
+    var tocClose = document.getElementById('tocDrawerClose');
+
+    var tocData = [];
+    sections.forEach(function(h2, i) {
+        var id = h2.getAttribute('id');
+        var numMatch = id.match(/\d+/);
+        var num = numMatch ? numMatch[0] : String(i + 1);
+        var text = h2.textContent.replace(/^\s*\d+[\.\s]*/, '').trim();
+        tocData.push({ id: id, num: num, text: text });
+    });
+
+    function buildList(container, isMobile) {
+        if (!container) return;
+        tocData.forEach(function(item) {
+            var li = document.createElement('li');
+            if (!isMobile) li.className = 'toc-sidebar-item';
+            var a = document.createElement('a');
+            a.href = '#' + item.id;
+            a.setAttribute('data-section', item.id);
+            if (isMobile) {
+                a.textContent = item.num + '. ' + item.text;
+            } else {
+                a.className = 'toc-sidebar-link';
+                a.innerHTML = '<span class="toc-sidebar-num">' + item.num + '</span>' + item.text;
+            }
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.getElementById(item.id);
+                if (target) window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+                if (isMobile) closeMobileDrawer();
+            });
+            li.appendChild(a);
+            container.appendChild(li);
+        });
+    }
+
+    if (sidebarList) buildList(sidebarList, false);
+    if (mobileList) buildList(mobileList, true);
+
+    var currentSection = null;
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var id = entry.target.getAttribute('id');
+                if (currentSection !== id) {
+                    currentSection = id;
+                    if (sidebarList) {
+                        sidebarList.querySelectorAll('.toc-sidebar-link').forEach(function(link) {
+                            link.classList.toggle('active', link.getAttribute('data-section') === id);
+                        });
+                    }
+                }
+            }
+        });
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(function(s) { observer.observe(s); });
+
+    function closeMobileDrawer() {
+        if (tocDrawer) tocDrawer.classList.remove('open');
+        if (tocBackdrop) tocBackdrop.classList.remove('visible');
+    }
+    if (tocToggle) tocToggle.addEventListener('click', function() {
+        tocDrawer.classList.toggle('open');
+        tocBackdrop.classList.toggle('visible');
+    });
+    if (tocBackdrop) tocBackdrop.addEventListener('click', closeMobileDrawer);
+    if (tocClose) tocClose.addEventListener('click', closeMobileDrawer);
+})();
+</script>
+
+<!-- Search -->
+<script>
+(function() {
+    var searchInput = document.getElementById('searchInput');
+    var searchResults = document.getElementById('searchResults');
+    if (!searchInput || !searchResults) return;
+    var searchIndex = null;
+    var debounceTimer;
+
+    function loadIndex(cb) {
+        if (searchIndex) { cb(); return; }
+        fetch('search-index.json')
+            .then(function(r) { return r.json(); })
+            .then(function(data) { searchIndex = data; cb(); })
+            .catch(function() { searchIndex = []; });
+    }
+
+    function doSearch(q) {
+        if (!q || q.length < 2) { searchResults.style.display = 'none'; return; }
+        var ql = q.toLowerCase();
+        var matches = searchIndex.filter(function(item) {
+            return (item.title && item.title.toLowerCase().indexOf(ql) > -1) ||
+                   (item.tags && item.tags.some(function(t) { return t.toLowerCase().indexOf(ql) > -1; })) ||
+                   (item.description && item.description.toLowerCase().indexOf(ql) > -1);
+        }).slice(0, 6);
+
+        if (!matches.length) { searchResults.style.display = 'none'; return; }
+        searchResults.innerHTML = matches.map(function(m) {
+            return '<a class="search-result-item" href="' + m.url + '">' +
+                '<span class="search-result-title">' + m.title + '</span>' +
+                (m.description ? '<span class="search-result-desc">' + m.description.substring(0, 80) + '&hellip;</span>' : '') +
+                '</a>';
+        }).join('');
+        searchResults.style.display = 'block';
+    }
+
+    searchInput.addEventListener('input', function() {
+        var q = searchInput.value.trim();
+        clearTimeout(debounceTimer);
+        if (q.length < 2) { searchResults.style.display = 'none'; return; }
+        debounceTimer = setTimeout(function() { loadIndex(function() { doSearch(q); }); }, 200);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!searchResults.contains(e.target) && e.target !== searchInput) {
+            searchResults.style.display = 'none';
+        }
+    });
+})();
+</script>
+
+<!-- PFAS Calculator IIFE -->
+<script>
+(function() {
+    'use strict';
+
+    window.runPFASCalc = function() {
+        var coolingType = document.getElementById('pfasCoolingType').value;
+        var fireSuppression = document.getElementById('pfasFireSuppression').value;
+        var facilityAge = document.getElementById('pfasFacilityAge').value;
+        var waterDistance = document.getElementById('pfasWaterDistance').value;
+        var rackDensity = document.getElementById('pfasRackDensity').value;
+
+        var risk = 0;
+        var compounds = 0;
+        var regExposure = 'MINIMAL';
+        var justificationDelta = 0;
+
+        // Cooling type scoring
+        switch (coolingType) {
+            case 'two-phase-pfas':
+                risk += 40; compounds += 8; regExposure = 'HIGH'; break;
+            case 'two-phase-hfo':
+                risk += 25; compounds += 4; regExposure = 'MEDIUM'; break;
+            case 'single-mineral':
+                risk += 5; compounds += 0; regExposure = 'LOW'; break;
+            case 'single-ester':
+                risk += 5; compounds += 0; regExposure = 'LOW'; break;
+            case 'air-cooled':
+                risk += 2; compounds += 0; regExposure = 'MINIMAL'; break;
+            case 'hybrid':
+                risk += 2; compounds += 0; regExposure = 'MINIMAL'; break;
+        }
+
+        // Fire suppression scoring
+        switch (fireSuppression) {
+            case 'fm200':
+                risk += 15; compounds += 2; break;
+            case 'novec1230':
+                risk += 10; compounds += 1; break;
+            case 'inergen':
+                risk += 2; break;
+            case 'water-mist':
+                risk += 2; break;
+            case 'none':
+                risk += 2; break;
+        }
+
+        // Facility age scoring
+        switch (facilityAge) {
+            case 'new': risk += 5; break;
+            case 'mid-early': risk += 10; break;
+            case 'mid-late': risk += 20; break;
+            case 'old': risk += 30; break;
+        }
+
+        // Water proximity scoring
+        switch (waterDistance) {
+            case 'very-close': risk += 20; break;
+            case 'close': risk += 15; break;
+            case 'moderate': risk += 10; break;
+            case 'far': risk += 2; break;
+        }
+
+        // Rack density — justification delta
+        switch (rackDensity) {
+            case 'low': justificationDelta = -30; break;
+            case 'medium': justificationDelta = -20; break;
+            case 'high': justificationDelta = 0; break;
+            case 'very-high': justificationDelta = 10; break;
+        }
+
+        // Risk level determination
+        var riskLabel, riskColor, riskSub;
+        if (risk <= 20) {
+            riskLabel = 'LOW'; riskColor = '#22c55e';
+            riskSub = 'Minimal PFAS exposure profile. Standard environmental monitoring is sufficient.';
+        } else if (risk <= 50) {
+            riskLabel = 'MEDIUM'; riskColor = '#f59e0b';
+            riskSub = 'Moderate exposure profile. Baseline groundwater monitoring and maintenance logging recommended.';
+        } else if (risk <= 80) {
+            riskLabel = 'HIGH'; riskColor = '#ef4444';
+            riskSub = 'Elevated PFAS exposure profile. Formal environmental assessment and vapor recovery protocols recommended.';
+        } else {
+            riskLabel = 'CRITICAL'; riskColor = '#991b1b';
+            riskSub = 'Critical exposure profile. Immediate environmental review, regulatory disclosure assessment, and vapor capture protocol implementation warranted.';
+        }
+
+        // Compounds label
+        var compoundsLabel = compounds + ' compound class' + (compounds !== 1 ? 'es' : '');
+        var compoundsSub = compounds === 0
+            ? 'No PFAS compounds identified in this cooling configuration.'
+            : 'Based on cooling fluid chemistry and fire suppression system selection.';
+
+        // Regulatory exposure sub
+        var regSub = {
+            'MINIMAL': 'No current federal PFAS reporting obligations identified for this configuration.',
+            'LOW': 'Limited regulatory exposure. Monitor EPA PFAS rulemaking for future changes.',
+            'MEDIUM': 'HFO compounds under active EPA review. TFA accumulation data requirements may emerge.',
+            'HIGH': 'PFAS cooling and/or FM-200 systems subject to evolving EPA enforcement and TRI reporting considerations.'
+        }[regExposure];
+
+        // Technical justification
+        var justLabel, justSub;
+        if (justificationDelta <= -30) {
+            justLabel = 'NOT JUSTIFIED';
+            justSub = 'Rack density is well below the 100 kW/rack technical threshold where two-phase PFAS cooling provides advantages over PFAS-free direct-to-chip alternatives. PFAS-free DLC is technically viable at this density.';
+        } else if (justificationDelta <= -20) {
+            justLabel = 'MARGINAL';
+            justSub = 'Rack density is below the two-phase technical threshold for most loads. Direct-to-chip cold plate cooling with water-glycol is technically equivalent and PFAS-free at this density range.';
+        } else if (justificationDelta === 0) {
+            justLabel = 'APPROACHING THRESHOLD';
+            justSub = 'Rack density is approaching the range where two-phase cooling provides genuine advantages, though direct-to-chip cooling remains viable for many configurations in this range.';
+        } else {
+            justLabel = 'TECHNICALLY JUSTIFIED';
+            justSub = 'Rack density exceeds the 100 kW/rack threshold where two-phase cooling provides engineering advantages over PFAS-free alternatives. Two-phase deployment is technically defensible at this density.';
+        }
+
+        // Update DOM
+        var riskValEl = document.getElementById('pfasRiskValue');
+        var riskSubEl = document.getElementById('pfasRiskSub');
+        var compValEl = document.getElementById('pfasCompoundsValue');
+        var compSubEl = document.getElementById('pfasCompoundsSub');
+        var regValEl = document.getElementById('pfasRegValue');
+        var regSubEl = document.getElementById('pfasRegSub');
+        var justValEl = document.getElementById('pfasJustValue');
+        var justSubEl = document.getElementById('pfasJustSub');
+
+        if (riskValEl) { riskValEl.textContent = riskLabel; riskValEl.style.color = riskColor; }
+        if (riskSubEl) riskSubEl.textContent = riskSub;
+        if (compValEl) compValEl.textContent = compoundsLabel;
+        if (compSubEl) compSubEl.textContent = compoundsSub;
+        if (regValEl) regValEl.textContent = regExposure;
+        if (regSubEl) regSubEl.textContent = regSub;
+        if (justValEl) { justValEl.textContent = justLabel; justValEl.style.color = justificationDelta >= 0 ? '#ef4444' : '#22c55e'; }
+        if (justSubEl) justSubEl.textContent = justSub;
+
+        // Style KPI cards
+        var kpiRisk = document.getElementById('pfasKpiRisk');
+        if (kpiRisk) kpiRisk.style.borderTopColor = riskColor;
+
+        var resultsEl = document.getElementById('pfasResults');
+        if (resultsEl) resultsEl.style.display = 'block';
+        setTimeout(function() {
+            var el = document.getElementById('pfas-calculator');
+            if (el) {
+                var resultsPos = document.getElementById('pfasResults');
+                if (resultsPos) window.scrollTo({ top: resultsPos.offsetTop - 100, behavior: 'smooth' });
+            }
+        }, 100);
+    };
+})();
+</script>
+
+<!-- Mobile Menu & Theme Toggle -->
+<script>
+(function() {
+    var mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    var navMenu = document.getElementById('navMenu');
+    if (mobileMenuToggle && navMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            var expanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+            mobileMenuToggle.setAttribute('aria-expanded', !expanded);
+            navMenu.classList.toggle('open', !expanded);
+        });
+    }
+
+    var themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            var root = document.documentElement;
+            var current = root.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('theme', next); } catch(e) {}
+        });
+        var saved = '';
+        try { saved = localStorage.getItem('theme') || ''; } catch(e) {}
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+    }
+})();
+</script>
+
+<script src="auth.js?v=20260324b"></script>
+</body>
+</html>
