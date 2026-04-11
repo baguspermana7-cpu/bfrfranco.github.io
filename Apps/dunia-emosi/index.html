@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dunia Emosi 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #8B5CF6; --brand-light: #A78BFA; --brand-dark: #7C3AED; --brand-shadow: #5B21B6;
+  --rose: #F43F5E; --rose-light: #FDA4AF; --rose-shadow: #BE123C;
+  --teal: #14B8A6; --teal-light: #2DD4BF; --teal-shadow: #0F766E;
+  --amber: #F59E0B; --amber-light: #FCD34D; --amber-shadow: #B45309;
+  --sky: #0EA5E9; --sky-light: #38BDF8; --sky-shadow: #0369A1;
+  --lime: #84CC16; --lime-light: #A3E635; --lime-shadow: #3F6212;
+  --bg-base: #F8F4FF; --card: #FFFFFF; --text: #292524; --text-light: #57534E;
+  --shadow: 0 8px 24px rgba(139,92,246,0.12); --shadow-lg: 0 16px 48px rgba(139,92,246,0.18);
+  --shadow-btn: 0 6px 0 rgba(0,0,0,0.15);
+  --radius: 28px; --radius-sm: 18px;
+  --font: 'Nunito', sans-serif; --font-display: 'Fredoka One', cursive;
+  --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow-x: hidden; user-select: none; background: var(--bg-base); }
+
+.bg-blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.20; animation: blobFloat linear infinite alternate; }
+.blob-1 { width:300px;height:300px;background:#A78BFA;top:-80px;left:-80px;animation-duration:8s; }
+.blob-2 { width:250px;height:250px;background:#38BDF8;top:30%;right:-60px;animation-duration:10s;animation-delay:-3s; }
+.blob-3 { width:200px;height:200px;background:#2DD4BF;bottom:10%;left:10%;animation-duration:7s;animation-delay:-2s; }
+.blob-4 { width:180px;height:180px;background:#FCD34D;bottom:-60px;right:20%;animation-duration:12s;animation-delay:-5s; }
+.blob-5 { width:150px;height:150px;background:#FDA4AF;top:50%;left:50%;animation-duration:9s;animation-delay:-1s; }
+@keyframes blobFloat { from{transform:translateY(0)scale(1)} to{transform:translateY(30px)scale(1.08)} }
+
+.screen { display:none; min-height:100vh; flex-direction:column; align-items:center; padding:20px 16px 40px; position:relative; z-index:1; animation:screenIn 0.35s cubic-bezier(0.34,1.2,0.64,1); }
+.screen.active { display:flex; }
+@keyframes screenIn { from{opacity:0;transform:translateY(20px)scale(0.97)} to{opacity:1;transform:translateY(0)scale(1)} }
+
+.btn { display:inline-flex;align-items:center;justify-content:center;gap:10px; border:none;font-family:var(--font);font-weight:900;cursor:pointer; position:relative;border-radius:100px; transform-origin:center bottom; transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.1s; letter-spacing:0.3px; }
+.btn:active { transform:scale(0.93)translateY(4px)!important; box-shadow:0 2px 0 rgba(0,0,0,0.15)!important; }
+.btn-lg { width:100%;max-width:400px;padding:22px 36px;font-size:22px;border-radius:100px;box-shadow:var(--shadow-btn); }
+.btn-md { padding:14px 28px;font-size:18px;border-radius:100px;box-shadow:var(--shadow-btn); }
+.btn-sm { padding:10px 20px;font-size:15px;border-radius:100px;box-shadow:0 4px 0 rgba(0,0,0,0.15); }
+.btn-brand  { background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;box-shadow:0 6px 0 #5B21B6; }
+.btn-orange { background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;box-shadow:0 6px 0 #5B21B6; }
+.btn-green  { background:linear-gradient(135deg,#2DD4BF,#14B8A6);color:white;box-shadow:0 6px 0 #0F766E; }
+.btn-blue   { background:linear-gradient(135deg,#38BDF8,#0EA5E9);color:white;box-shadow:0 6px 0 #0369A1; }
+.btn-purple { background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;box-shadow:0 6px 0 #5B21B6; }
+.btn-yellow { background:linear-gradient(135deg,#FCD34D,#F59E0B);color:#78350F;box-shadow:0 6px 0 #B45309; }
+.btn-pink   { background:linear-gradient(135deg,#FDA4AF,#F43F5E);color:white;box-shadow:0 6px 0 #BE123C; }
+.btn-lime   { background:linear-gradient(135deg,#A3E635,#84CC16);color:white;box-shadow:0 6px 0 #3F6212; }
+.btn-white  { background:white;color:var(--text);box-shadow:0 6px 0 #D0D0D0;border:3px solid #EBEBEB; }
+
+.card { background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;width:100%;max-width:500px; }
+
+/* WELCOME */
+#screen-welcome { background:linear-gradient(160deg,#F3E8FF 0%,#FFF1F3 50%,#E0F2FE 100%);justify-content:center;gap:0; }
+.welcome-title { font-size:42px;font-weight:900;font-family:var(--font-display);line-height:1.1;background:linear-gradient(135deg,#8B5CF6 0%,#A78BFA 40%,#F43F5E 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block; }
+.welcome-sub2 { font-size:34px;font-weight:900;font-family:var(--font-display);background:linear-gradient(135deg,#F43F5E,#FDA4AF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.welcome-mascot { font-size:110px;text-align:center;display:block;margin:16px auto;animation:mascotBounce 2s cubic-bezier(0.36,0.07,0.19,0.97) infinite;filter:drop-shadow(0 12px 20px rgba(139,92,246,0.3)); }
+@keyframes mascotBounce { 0%,100%{transform:translateY(0)scale(1)} 40%{transform:translateY(-22px)scale(1.05)} 60%{transform:translateY(-18px)scale(1.03)} }
+.welcome-tagline { font-size:18px;font-weight:700;color:var(--text-light);text-align:center;margin:0 0 16px;line-height:1.6; }
+.streak-badge { display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#A78BFA,#FCD34D);border-radius:100px;padding:8px 18px;font-size:17px;font-weight:900;color:#3B0764;box-shadow:0 4px 0 #5B21B6;margin-bottom:20px; }
+.floating-stars { position:absolute;inset:0;pointer-events:none;overflow:hidden; }
+.fstar { position:absolute;font-size:20px;animation:starFloat linear infinite;opacity:0; }
+@keyframes starFloat { 0%{transform:translateY(100vh)rotate(0deg);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(-20vh)rotate(360deg);opacity:0} }
+
+/* MODE */
+#screen-mode { background:linear-gradient(160deg,#F3E8FF,#EDE9FE); }
+.mode-card { background:white;border-radius:var(--radius);padding:28px 24px;cursor:pointer;text-align:center;width:100%;max-width:480px;border:4px solid transparent;position:relative;overflow:hidden;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s;box-shadow:var(--shadow); }
+.mode-card::before { content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s; }
+.mode-card:active { transform:scale(0.95)translateY(3px); }
+.mode-card.solo { border-color:var(--brand); } .mode-card.solo::before { background:linear-gradient(135deg,#F3E8FF,#EDE9FE); }
+.mode-card.duo  { border-color:var(--rose); }  .mode-card.duo::before  { background:linear-gradient(135deg,#FFF1F3,#FFE4E6); }
+.mode-card:hover::before { opacity:1; }
+.mode-card .mode-icon { font-size:64px;display:block;margin-bottom:12px;position:relative;animation:iconWiggle 3s ease-in-out infinite; }
+.mode-card.duo .mode-icon { animation-delay:-1s; }
+@keyframes iconWiggle { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-6deg)} 75%{transform:rotate(6deg)} }
+.mode-card .mode-name { font-size:26px;font-weight:900;color:var(--text);position:relative; }
+.mode-card .mode-desc { font-size:15px;color:var(--text-light);margin-top:8px;line-height:1.5;position:relative; }
+
+/* NAMES */
+#screen-names { background:linear-gradient(160deg,#E0F2FE,#F3E8FF); }
+.name-input-wrap { width:100%;max-width:480px; }
+.name-label { font-size:17px;font-weight:700;color:var(--text-light);margin-bottom:8px; }
+.name-input { width:100%;padding:18px 20px;border:3px solid #E8EAED;border-radius:20px;font-family:var(--font);font-size:22px;font-weight:700;color:var(--text);background:white;outline:none;transition:border-color 0.2s,box-shadow 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.name-input:focus { border-color:var(--brand);box-shadow:0 0 0 4px rgba(139,92,246,0.12); }
+.animal-picker { display:flex;gap:10px;flex-wrap:wrap;margin-top:12px; }
+.animal-btn { width:54px;height:54px;border:3px solid #E8EAED;border-radius:16px;font-size:28px;cursor:pointer;background:white;transition:border-color 0.2s,transform 0.15s cubic-bezier(0.34,1.56,0.64,1),background 0.2s;display:flex;align-items:center;justify-content:center; }
+.animal-btn:active { transform:scale(0.88); }
+.animal-btn.selected { border-color:var(--brand);background:#F3E8FF;transform:scale(1.1); }
+.age-select-row { margin-top:14px; }
+.age-label { font-size:15px;font-weight:700;color:var(--text-light);margin-bottom:8px; }
+.age-options { display:flex;gap:8px;flex-wrap:wrap; }
+.age-btn { padding:10px 18px;border-radius:100px;border:3px solid #E0E0E0;background:white;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all 0.15s; }
+.age-btn.active { border-color:var(--brand);background:#F3E8FF;color:var(--brand); }
+
+/* MENU */
+#screen-menu { background:linear-gradient(160deg,#EDE9FE 0%,#FFF1F3 50%,#CCFBF1 100%); }
+.menu-title { font-size:22px;font-weight:900;text-align:center;margin-bottom:16px; }
+.player-header { width:100%;max-width:500px;display:flex;gap:12px;margin-bottom:16px; }
+.player-chip { flex:1;background:white;border-radius:20px;padding:12px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;border:3px solid transparent;transition:border-color 0.3s,transform 0.2s; }
+.player-chip.active { border-color:var(--brand);background:linear-gradient(135deg,#F3E8FF,white);transform:scale(1.02);animation:chipGlow 2s ease-in-out infinite; }
+@keyframes chipGlow { 0%,100%{box-shadow:var(--shadow)} 50%{box-shadow:0 0 20px rgba(139,92,246,0.35),var(--shadow)} }
+.player-chip .p-animal { font-size:28px; }
+.player-chip .p-name { font-size:14px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.player-chip .p-stars { font-size:14px;font-weight:900;background:var(--amber-light);border-radius:12px;padding:3px 10px; }
+.player-chip .p-streak { font-size:12px;font-weight:900;background:linear-gradient(135deg,#A78BFA,#FCD34D);border-radius:12px;padding:3px 8px;color:#3B0764; }
+
+.game-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:500px; }
+.game-tile { background:white;border-radius:var(--radius);padding:22px 14px;text-align:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:var(--shadow);border:none;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s; }
+.game-tile::before { content:'';position:absolute;top:0;left:0;right:0;height:6px;border-radius:4px 4px 0 0; }
+.game-tile::after { content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;border-radius:var(--radius); }
+.game-tile:active { transform:scale(0.93)translateY(4px);box-shadow:0 2px 8px rgba(0,0,0,0.12); }
+@media(hover:hover){.game-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)} .game-tile:hover::after{opacity:1}}
+.game-tile .g-icon { font-size:48px;display:block;margin-bottom:10px;animation:tileIconFloat ease-in-out infinite; }
+.game-tile .g-name { font-size:15px;font-weight:900;font-family:var(--font-display);color:var(--text);line-height:1.3;margin-bottom:8px; }
+.game-tile .g-tag { font-size:12px;font-weight:700;padding:5px 14px;border-radius:100px;color:white;display:inline-block; }
+@keyframes tileIconFloat { 0%,100%{transform:translateY(0)scale(1)} 50%{transform:translateY(-6px)scale(1.05)} }
+.game-tile.g1::before{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g1 .g-icon{animation-duration:2.5s} .game-tile.g1 .g-tag{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g1::after{background:linear-gradient(135deg,rgba(244,63,94,0.08),transparent)}
+.game-tile.g2::before{background:linear-gradient(90deg,#A78BFA,#8B5CF6)} .game-tile.g2 .g-icon{animation-duration:3s;animation-delay:-0.5s} .game-tile.g2 .g-tag{background:linear-gradient(90deg,#A78BFA,#8B5CF6)} .game-tile.g2::after{background:linear-gradient(135deg,rgba(139,92,246,0.08),transparent)}
+.game-tile.g3::before{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g3 .g-icon{animation-duration:2.8s;animation-delay:-1s} .game-tile.g3 .g-tag{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g3::after{background:linear-gradient(135deg,rgba(20,184,166,0.08),transparent)}
+.game-tile.g4::before{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g4 .g-icon{animation-duration:2.2s;animation-delay:-0.2s} .game-tile.g4 .g-tag{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g4::after{background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent)}
+.game-tile.g5{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;display:flex;align-items:center} .game-tile.g5::before{background:linear-gradient(90deg,#A78BFA,#7C3AED)} .game-tile.g5 .g-icon{font-size:40px;margin-bottom:0;animation-duration:3.2s;animation-delay:-1.5s} .game-tile.g5 .g-tag{background:linear-gradient(90deg,#A78BFA,#7C3AED)} .game-tile.g5::after{background:linear-gradient(135deg,rgba(167,139,250,0.08),transparent)}
+.game-tile.g6::before{background:linear-gradient(90deg,#38BDF8,#0EA5E9)} .game-tile.g6 .g-icon{animation-duration:2.4s} .game-tile.g6 .g-tag{background:linear-gradient(90deg,#38BDF8,#0EA5E9)} .game-tile.g6::after{background:linear-gradient(135deg,rgba(14,165,233,0.08),transparent)}
+.game-tile.g7::before{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g7 .g-icon{animation-duration:2.7s} .game-tile.g7 .g-tag{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g7::after{background:linear-gradient(135deg,rgba(45,212,191,0.08),transparent)}
+.game-tile.g8::before{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g8 .g-icon{animation-duration:3.1s} .game-tile.g8 .g-tag{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g8::after{background:linear-gradient(135deg,rgba(244,63,94,0.08),transparent)}
+.game-tile.g9::before{background:linear-gradient(90deg,#A3E635,#84CC16)} .game-tile.g9 .g-icon{animation-duration:2.0s} .game-tile.g9 .g-tag{background:linear-gradient(90deg,#A3E635,#84CC16)} .game-tile.g9::after{background:linear-gradient(135deg,rgba(132,204,22,0.08),transparent)}
+
+.total-stars-banner { background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:var(--radius);padding:16px 24px;width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 0 #B45309,var(--shadow);margin-top:4px; }
+.tsb-label { font-size:15px;font-weight:700;color:white; }
+.tsb-value { font-size:26px;font-weight:900;color:white; }
+
+.page-header { display:flex;align-items:center;gap:12px;width:100%;max-width:500px;margin-bottom:24px; }
+.btn-back { background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:46px;height:46px;font-size:20px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+.btn-back:active { transform:scale(0.88); }
+.page-title { font-size:22px;font-weight:900; }
+
+/* LEVEL SELECT */
+#screen-level { background:linear-gradient(160deg,#F3E8FF,#E0F2FE,#FFF1F3); }
+.level-game-header { text-align:center;margin-bottom:24px; }
+.level-game-icon { font-size:72px;display:block;animation:mascotBounce 2s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.15)); }
+.level-game-name { font-size:26px;font-weight:900;font-family:var(--font-display);margin-top:8px; }
+.level-grid { display:flex;flex-direction:column;gap:14px;width:100%;max-width:420px; }
+.level-btn { border:none;border-radius:24px;padding:20px 24px;font-family:var(--font);cursor:pointer;text-align:left;position:relative;overflow:hidden;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s;box-shadow:var(--shadow); }
+.level-btn:active { transform:scale(0.95)translateY(3px)!important; }
+.level-btn-easy   { background:linear-gradient(135deg,#F0FDFA,#CCFBF1);box-shadow:0 6px 0 #0F766E55; }
+.level-btn-medium { background:linear-gradient(135deg,#FFFBEB,#FEF3C7);box-shadow:0 6px 0 #B4530955; }
+.level-btn-hard   { background:linear-gradient(135deg,#FFF1F3,#FFE4E6);box-shadow:0 6px 0 #BE123C55; }
+.level-btn-name { font-size:22px;font-weight:900;display:flex;align-items:center;gap:8px; }
+.level-btn-easy .level-btn-name   { color:#0F766E; }
+.level-btn-medium .level-btn-name { color:#B45309; }
+.level-btn-hard .level-btn-name   { color:#BE123C; }
+.level-btn-desc { font-size:14px;font-weight:700;margin-top:4px;opacity:0.75; }
+.level-btn-badges { display:flex;gap:6px;margin-top:10px;flex-wrap:wrap; }
+.level-badge { font-size:12px;font-weight:900;padding:3px 10px;border-radius:100px;background:rgba(0,0,0,0.08); }
+
+/* GAME HEADER */
+.game-header { width:100%;max-width:560px;display:flex;align-items:center;gap:10px;margin-bottom:20px; }
+.game-header .gh-back { background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:46px;height:46px;font-size:20px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+.game-header .gh-back:active { transform:scale(0.88); }
+.game-header .gh-title { flex:1;font-size:18px;font-weight:900;font-family:var(--font-display); }
+.game-header .gh-stars { background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:100px;padding:6px 16px;font-size:17px;font-weight:900;box-shadow:0 4px 0 #B45309;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+.gh-stars.pop { animation:starPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes starPop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+.game-header .gh-player { font-size:28px; }
+
+/* PROGRESS BAR */
+.progress-bar-wrap { width:100%;max-width:480px;height:10px;background:rgba(255,255,255,0.5);border-radius:100px;overflow:hidden;margin-bottom:10px; }
+.progress-bar-fill { height:100%;border-radius:100px;background:linear-gradient(90deg,var(--teal),var(--sky));transition:width 0.4s ease;position:relative;overflow:hidden; }
+.progress-bar-fill::after { content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:rgba(255,255,255,0.5);animation:shimmer 1.5s ease-in-out infinite; }
+@keyframes shimmer { to{left:150%} }
+.round-dots { display:flex;gap:6px;justify-content:center;width:100%;max-width:480px;margin-bottom:14px;flex-wrap:wrap; }
+.rdot { width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(0,0,0,0.12);transition:background 0.3s,transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.rdot.done { background:var(--teal);border-color:var(--teal-light);transform:scale(1.15); }
+.rdot.current { background:var(--amber);border-color:var(--amber-shadow);transform:scale(1.2); }
+
+/* FLASH OVERLAY */
+.flash-overlay { position:fixed;inset:0;pointer-events:none;z-index:90;opacity:0;transition:opacity 0.15s; }
+.flash-overlay.green { background:rgba(20,184,166,0.22); }
+.flash-overlay.red   { background:rgba(244,63,94,0.22); }
+.flash-overlay.show  { opacity:1; }
+@keyframes screenShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+.shake { animation:screenShake 0.4s ease; }
+@keyframes wrongShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes correctPulse { 0%{transform:scale(1)} 40%{transform:scale(1.08)} 100%{transform:scale(1)} }
+
+/* G1 */
+#screen-game1 { background:linear-gradient(180deg,#FFF1F3 0%,#FFE4E6 50%,#FFF8E7 100%); }
+.world-hearts { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
+.world-hearts span { position:absolute;bottom:-30px;font-size:18px;opacity:0;animation:heartRise linear infinite; }
+@keyframes heartRise { 0%{transform:translateY(0)rotate(0deg);opacity:0} 10%{opacity:0.6} 90%{opacity:0.4} 100%{transform:translateY(-100vh)rotate(30deg);opacity:0} }
+.g1-animal-display { font-size:110px;text-align:center;display:block;margin:0 auto 4px;filter:drop-shadow(0 8px 16px rgba(244,63,94,0.3));animation:g1Wobble 0.6s cubic-bezier(0.36,0.07,0.19,0.97);position:relative;z-index:1; }
+@keyframes g1Wobble { 0%,100%{transform:rotate(0deg)scale(1)} 20%{transform:rotate(-10deg)scale(1.1)} 40%{transform:rotate(10deg)scale(0.95)} 60%{transform:rotate(-6deg)scale(1.05)} 80%{transform:rotate(4deg)scale(0.98)} }
+.g1-question { font-size:22px;font-weight:900;text-align:center;background:linear-gradient(135deg,#F43F5E,#FDA4AF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px;position:relative;z-index:1; }
+.g1-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:480px;position:relative;z-index:1; }
+.g1-choice-btn { background:white;border:3px solid #FFE4E6;border-radius:22px;padding:18px 10px;font-family:var(--font);font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 4px 0 #FDA4AF;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s,box-shadow 0.15s; }
+.g1-choice-btn:active { transform:scale(0.93)translateY(3px);box-shadow:0 1px 0 #FDA4AF; }
+.g1-choice-btn .choice-emoji { font-size:38px; }
+.g1-choice-btn .choice-label { font-size:17px;color:var(--text); }
+.g1-choice-btn.correct { border-color:var(--teal);background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 4px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease; }
+.g1-choice-btn.wrong   { border-color:var(--rose);background:linear-gradient(135deg,#FFF1F3,white);box-shadow:0 4px 0 var(--rose-shadow);animation:wrongShake 0.4s ease; }
+.g1-tip { background:linear-gradient(135deg,#CCFBF1,#F0FDFA);border-radius:22px;padding:18px 20px;text-align:center;box-shadow:var(--shadow);max-width:480px;width:100%;border-left:6px solid var(--teal);animation:tipSlideUp 0.4s cubic-bezier(0.34,1.2,0.64,1);position:relative;z-index:1; }
+@keyframes tipSlideUp { from{opacity:0;transform:translateY(20px)scale(0.95)} to{opacity:1;transform:translateY(0)scale(1)} }
+.g1-tip .tip-icon { font-size:36px;display:block;margin-bottom:8px; }
+.g1-tip .tip-text { font-size:17px;font-weight:700;color:#0F766E;line-height:1.6; }
+.g1-progress { font-size:15px;color:var(--text-light);font-weight:700;margin-top:8px;position:relative;z-index:1; }
+
+/* G2 */
+#screen-game2 { background:linear-gradient(180deg,#F3E8FF 0%,#EDE9FE 50%,#DDD6FE 100%); }
+.world-clouds { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
+.cloud { position:absolute;background:white;border-radius:50px;opacity:0.85;animation:cloudDrift linear infinite; }
+.sun-circle { position:absolute;top:40px;right:40px;width:60px;height:60px;background:radial-gradient(circle,#FCD34D,#F59E0B);border-radius:50%;box-shadow:0 0 30px #FCD34D88;pointer-events:none;z-index:0;animation:sunPulse 3s ease-in-out infinite; }
+@keyframes sunPulse { 0%,100%{box-shadow:0 0 30px #FCD34D88} 50%{box-shadow:0 0 50px #FCD34DCC} }
+@keyframes cloudDrift { 0%{transform:translateX(-120%)} 100%{transform:translateX(110vw)} }
+.breathe-container { display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;width:100%;position:relative;z-index:1; }
+.breathe-circle-wrap { position:relative;width:230px;height:230px;display:flex;align-items:center;justify-content:center;margin-bottom:28px; }
+.breathe-ring { position:absolute;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.35),rgba(139,92,246,0.2));transition:transform 0.8s ease,background 0.8s ease;box-shadow:0 0 40px rgba(167,139,250,0.3); }
+.breathe-ring.ring2 { width:75%;height:75%;background:radial-gradient(circle,rgba(167,139,250,0.55),rgba(139,92,246,0.3)); }
+.breathe-animal { font-size:80px;z-index:2;transition:transform 0.8s ease;filter:drop-shadow(0 8px 16px rgba(139,92,246,0.3)); }
+.breathe-instruction { font-size:34px;font-weight:900;font-family:var(--font-display);text-align:center;color:#4C1D95;margin-bottom:8px;min-height:44px; }
+.breathe-sub { font-size:17px;color:#6D28D9;text-align:center;margin-bottom:20px;font-weight:700; }
+.breathe-timer-wrap { position:relative;width:80px;height:80px;margin:0 auto 16px; }
+.breathe-timer-bg { position:absolute;inset:0;border-radius:50%;background:rgba(255,255,255,0.6); }
+.breathe-timer { position:relative;font-size:42px;font-weight:900;color:var(--brand);text-align:center;line-height:80px; }
+.breathe-cycles { display:flex;gap:12px;justify-content:center;margin-top:16px; }
+.cycle-dot { width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.5);border:3px solid rgba(139,92,246,0.4);transition:background 0.4s,transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.cycle-dot.done { background:var(--brand);border-color:var(--brand-light);transform:scale(1.2);box-shadow:0 0 12px rgba(139,92,246,0.5); }
+
+/* G3 */
+#screen-game3 { background:linear-gradient(180deg,#CCFBF1 0%,#D1FAE5 40%,#F0FDFA 100%); }
+.world-jungle { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
+.jungle-letter { position:absolute;font-size:28px;font-weight:900;color:rgba(15,118,110,0.2);font-family:var(--font);animation:letterFloat ease-in-out infinite; }
+@keyframes letterFloat { 0%,100%{transform:translateY(0)rotate(-5deg)} 50%{transform:translateY(-20px)rotate(5deg)} }
+.firefly { position:absolute;width:6px;height:6px;background:#FCD34D;border-radius:50%;animation:fireflyBlink ease-in-out infinite; }
+@keyframes fireflyBlink { 0%,100%{opacity:0;box-shadow:none} 50%{opacity:1;box-shadow:0 0 8px #FCD34D,0 0 14px #F59E0B} }
+.tree-left,.tree-right { position:absolute;bottom:0;width:80px;height:120px;background:#0F766E;clip-path:polygon(50% 0%,100% 100%,0% 100%);pointer-events:none;opacity:0.4; }
+.tree-left { left:-10px; } .tree-right { right:-10px; }
+.g3-animal { font-size:100px;text-align:center;display:block;margin:0 auto 6px;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 8px 16px rgba(20,184,166,0.3));position:relative;z-index:1; }
+@keyframes g3Pop { from{transform:scale(0.3)rotate(-20deg);opacity:0} to{transform:scale(1)rotate(0);opacity:1} }
+.g3-word { font-size:32px;font-weight:900;text-align:center;letter-spacing:6px;background:linear-gradient(135deg,#14B8A6,#0F766E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;position:relative;z-index:1; }
+.g3-hint { font-size:16px;text-align:center;color:#0F766E;margin-bottom:20px;font-weight:700;position:relative;z-index:1; }
+.g3-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:400px;position:relative;z-index:1; }
+.g3-choice-btn { background:white;border:3px solid #CCFBF1;border-radius:22px;padding:22px 10px;font-family:var(--font);font-size:42px;font-weight:900;cursor:pointer;text-align:center;color:var(--text);box-shadow:0 4px 0 #A5F3EB;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s,box-shadow 0.15s; }
+.g3-choice-btn:active { transform:scale(0.9)translateY(3px);box-shadow:0 1px 0 #A5F3EB; }
+.g3-choice-btn.correct{border-color:var(--teal);background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 4px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease}
+.g3-choice-btn.wrong{border-color:var(--rose);background:linear-gradient(135deg,#FFF1F3,white);animation:wrongShake 0.4s ease}
+.g3-mode-badge { background:linear-gradient(135deg,#14B8A6,#2DD4BF);color:white;border-radius:100px;padding:6px 18px;font-size:14px;font-weight:700;margin-bottom:12px;box-shadow:0 4px 0 #0F766E;position:relative;z-index:1; }
+.g3-progress { font-size:15px;color:#0F766E;font-weight:700;text-align:center;margin-top:10px;position:relative;z-index:1; }
+
+/* G4 */
+#screen-game4 { background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 50%,#FFF8E1 100%); }
+.world-savanna { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
+.savanna-sun { position:absolute;top:30px;left:50%;transform:translateX(-50%);width:70px;height:70px;background:radial-gradient(circle,#FCD34D,#F59E0B);border-radius:50%;box-shadow:0 0 40px #FCD34D99;animation:sunPulse 3s ease-in-out infinite; }
+.grass-strip { position:absolute;bottom:0;left:0;right:0;height:60px;background:#84CC16;border-radius:60px 60px 0 0;opacity:0.5; }
+.shimmer-dot { position:absolute;width:4px;height:4px;background:rgba(255,255,255,0.7);border-radius:50%;animation:shimmerDot ease-in-out infinite; }
+@keyframes shimmerDot { 0%,100%{opacity:0} 50%{opacity:1} }
+.g4-animals-grid { display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%;max-width:480px;min-height:160px;background:rgba(255,255,255,0.8);backdrop-filter:blur(4px);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;align-content:center;border:3px solid rgba(245,158,11,0.2);position:relative;z-index:1; }
+.g4-animal-item { font-size:40px;animation:g4Pop 0.35s cubic-bezier(0.34,1.56,0.64,1) backwards;cursor:default; }
+@keyframes g4Pop { from{opacity:0;transform:scale(0.3)rotate(-30deg)} to{opacity:1;transform:scale(1)rotate(0)} }
+.g4-timer-track { width:100%;max-width:480px;height:14px;background:rgba(255,255,255,0.6);border-radius:100px;overflow:hidden;margin-bottom:6px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);position:relative;z-index:1; }
+.g4-timer-fill { height:100%;background:linear-gradient(90deg,#F59E0B,#FCD34D);border-radius:100px;transition:width 1s linear;box-shadow:0 0 8px rgba(245,158,11,0.5); }
+.g4-timer-text { font-size:14px;font-weight:700;color:#92400E;text-align:right;width:100%;max-width:480px;margin-bottom:14px;position:relative;z-index:1; }
+.g4-question { font-size:24px;font-weight:900;text-align:center;margin-bottom:16px;background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:1; }
+.g4-choices { display:flex;gap:14px;width:100%;max-width:460px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1; }
+.g4-choice-btn { flex:0 0 auto;min-width:72px;background:white;border:3px solid #FCD34D;border-radius:22px;padding:18px 10px;font-family:var(--font);font-size:34px;font-weight:900;cursor:pointer;text-align:center;color:var(--text);box-shadow:0 5px 0 #B45309;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s; }
+.g4-choice-btn:active { transform:scale(0.9)translateY(4px);box-shadow:0 1px 0 #B45309; }
+.g4-choice-btn.correct{border-color:var(--teal);background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 5px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease}
+.g4-choice-btn.wrong{border-color:var(--rose);background:linear-gradient(135deg,#FFF1F3,white);animation:wrongShake 0.4s ease}
+.g4-progress { font-size:15px;color:#92400E;font-weight:700;text-align:center;margin-top:10px;position:relative;z-index:1; }
+
+/* G5 */
+#screen-game5 { background:radial-gradient(ellipse at 50% 0%,#DDD6FE 0%,#EDE9FE 50%,#F3E8FF 100%); }
+.world-dream { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
+.star-twinkle { position:absolute;font-size:14px;animation:twinkle ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.1;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+.moon-crescent { position:absolute;top:30px;right:30px;width:50px;height:50px;border-radius:50%;background:transparent;box-shadow:inset -12px -4px 0 #FCD34D;pointer-events:none;opacity:0.8;animation:moonGlow 4s ease-in-out infinite; }
+@keyframes moonGlow { 0%,100%{filter:drop-shadow(0 0 8px #FCD34D44)} 50%{filter:drop-shadow(0 0 16px #FCD34DAA)} }
+.glow-orb { position:absolute;border-radius:50%;filter:blur(20px);animation:orbFloat ease-in-out infinite; }
+@keyframes orbFloat { 0%,100%{transform:translateY(0)scale(1)} 50%{transform:translateY(-15px)scale(1.1)} }
+.g5-score-row { display:flex;gap:12px;width:100%;max-width:520px;margin-bottom:14px;position:relative;z-index:1; }
+.g5-player-score { flex:1;background:rgba(255,255,255,0.8);border-radius:18px;padding:10px 14px;text-align:center;box-shadow:var(--shadow);border:3px solid transparent;transition:border-color 0.3s,transform 0.2s; }
+.g5-player-score.active { border-color:var(--brand);transform:scale(1.04);background:linear-gradient(135deg,#F3E8FF,white); }
+.g5-player-score .ps-name { font-size:13px;font-weight:700;color:var(--text-light); }
+.g5-player-score .ps-val  { font-size:22px;font-weight:900;background:linear-gradient(135deg,#8B5CF6,#F43F5E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.g5-turn-text { font-size:16px;font-weight:700;text-align:center;color:#5B21B6;margin-bottom:14px;position:relative;z-index:1; }
+.g5-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:520px;position:relative;z-index:1; }
+.g5-grid.grid-3x4 { grid-template-columns:repeat(3,1fr);max-width:380px; }
+.g5-grid.grid-4x5 { grid-template-columns:repeat(4,1fr); }
+.g5-card { aspect-ratio:1;border-radius:16px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);box-shadow:0 4px 10px rgba(0,0,0,0.12); }
+.g5-card:active:not(.flipped):not(.matched) { transform:scale(0.88); }
+.g5-card.flipped,.g5-card.matched { transform:rotateY(180deg); }
+.g5-card-front,.g5-card-back { position:absolute;inset:0;border-radius:16px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden; }
+.g5-card-front { background:linear-gradient(135deg,#8B5CF6,#A78BFA);box-shadow:inset 0 2px 6px rgba(255,255,255,0.3); }
+.g5-card-front::after { content:'🐾';font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.g5-card-back { background:white;transform:rotateY(180deg);flex-direction:column;gap:2px; }
+.g5-card-back .card-emoji { font-size:32px; }
+.g5-card-back .card-label { font-size:10px;font-weight:900;color:var(--text-light); }
+.g5-card.matched .g5-card-back { background:linear-gradient(135deg,#CCFBF1,#F0FDFA);border:3px solid var(--teal);animation:matchedPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes matchedPop { 0%{transform:rotateY(180deg)scale(1)} 50%{transform:rotateY(180deg)scale(1.12)} 100%{transform:rotateY(180deg)scale(1)} }
+
+/* G6 */
+#screen-game6 { background:linear-gradient(180deg,#E0F2FE 0%,#BAE6FD 30%,#F0F9FF 100%);padding-bottom:0; }
+.g6-map-row { display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%;max-width:500px; }
+.g6-map-btn { padding:8px 14px;border-radius:100px;border:2px solid #BAE6FD;background:white;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.15s; }
+.g6-map-btn.active { background:#0EA5E9;color:white;border-color:#0EA5E9; }
+.g6-target-wrap { width:100%;max-width:500px;background:rgba(255,255,255,0.8);border-radius:20px;padding:12px 16px;margin-bottom:10px;box-shadow:var(--shadow); }
+.g6-target-label { font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:6px; }
+.g6-target-word { font-size:22px;font-weight:900;letter-spacing:8px;color:#0EA5E9;font-family:var(--font-display); }
+.g6-collected { display:flex;gap:6px;margin-top:8px;flex-wrap:wrap; }
+.g6-slot { width:36px;height:36px;border-radius:10px;border:2px solid #BAE6FD;background:white;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.g6-slot.filled { background:#0EA5E9;color:white;border-color:#0369A1;transform:scale(1.1); }
+.g6-road { width:100%;max-width:500px;height:280px;background:linear-gradient(180deg,#7DD3FC 0%,#BAE6FD 100%);border-radius:20px;position:relative;overflow:hidden;box-shadow:var(--shadow-lg);margin-bottom:10px; }
+.g6-lane-line { position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,0.4); }
+.g6-car { position:absolute;bottom:16px;font-size:40px;width:50px;text-align:center;transform:translateX(-50%);transition:left 0.2s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));z-index:10; }
+.g6-tile { position:absolute;width:44px;height:44px;border-radius:12px;border:3px solid transparent;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:var(--font);transform:translateX(-50%);z-index:5;box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.g6-tile.target   { background:white;border-color:#0EA5E9;color:#0EA5E9; }
+.g6-tile.decoy    { background:rgba(255,255,255,0.6);border-color:rgba(200,200,200,0.5);color:var(--text-light); }
+.g6-tile.obstacle { background:#FEE2E2;border-color:#F43F5E;font-size:26px; }
+.g6-tile.collected { animation:tileCollect 0.3s ease forwards; }
+.g6-tile.hit      { animation:tileHit 0.3s ease forwards; }
+@keyframes tileCollect { to{transform:translateX(-50%)scale(2);opacity:0} }
+@keyframes tileHit { 0%,100%{transform:translateX(calc(-50% + 0px))} 25%{transform:translateX(calc(-50% - 8px))} 75%{transform:translateX(calc(-50% + 8px))} }
+.g6-controls { display:flex;gap:12px;width:100%;max-width:500px;align-items:center; }
+.g6-ctrl-btn { flex:1;padding:18px 0;border-radius:20px;border:none;background:linear-gradient(135deg,#38BDF8,#0EA5E9);color:white;font-family:var(--font);font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #0369A1;transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.1s;user-select:none;-webkit-user-select:none; }
+.g6-ctrl-btn:active { transform:scale(0.94)translateY(4px);box-shadow:0 1px 0 #0369A1; }
+.g6-score-mid { font-size:20px;font-weight:900;min-width:80px;text-align:center;background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:100px;padding:10px 16px;box-shadow:0 4px 0 #B45309;color:#78350F; }
+.g6-start-overlay { position:absolute;inset:0;background:rgba(14,165,233,0.15);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:20;border-radius:20px; }
+.g6-start-card { background:white;border-radius:28px;padding:32px 28px;text-align:center;box-shadow:var(--shadow-lg);max-width:280px;width:100%;animation:feedbackPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.g6-start-word { font-size:28px;font-weight:900;letter-spacing:6px;color:#0EA5E9;margin:12px 0 4px;font-family:var(--font-display); }
+
+/* G7 */
+#screen-game7 { background:linear-gradient(180deg,#F0FDFA 0%,#CCFBF1 50%,#E0F2FE 100%); }
+.g7-mode-badge { background:linear-gradient(135deg,#2DD4BF,#14B8A6);color:white;border-radius:100px;padding:6px 18px;font-size:14px;font-weight:700;margin-bottom:14px;box-shadow:0 4px 0 #0F766E; }
+.g7-display { width:160px;height:160px;border-radius:28px;background:white;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:12px;border:4px solid #CCFBF1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.g7-question { font-size:20px;font-weight:900;text-align:center;margin-bottom:18px;background:linear-gradient(135deg,#14B8A6,#2DD4BF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.g7-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:440px; }
+.g7-choice-btn { background:white;border:3px solid #CCFBF1;border-radius:20px;padding:16px 10px;font-family:var(--font);font-weight:900;font-size:18px;cursor:pointer;text-align:center;color:var(--text);box-shadow:0 4px 0 #A5F3EB;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s; }
+.g7-choice-btn:active { transform:scale(0.92)translateY(3px); }
+.g7-choice-btn.correct { border-color:#14B8A6;background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 4px 0 #0F766E,0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease; }
+.g7-choice-btn.wrong   { border-color:#F43F5E;background:linear-gradient(135deg,#FFF1F3,white);animation:wrongShake 0.4s ease; }
+.g7-choice-img { font-size:48px;display:block;margin-bottom:6px; }
+.g7-choice-text { font-size:17px;color:var(--text); }
+.g7-progress { font-size:15px;color:var(--text-light);font-weight:700;text-align:center;margin-top:10px; }
+
+/* G8 */
+#screen-game8 { background:linear-gradient(160deg,#FFF1F3 0%,#F3E8FF 50%,#FFF0F5 100%); }
+.g8-hint-img { width:120px;height:120px;border-radius:24px;background:white;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:70px;margin-bottom:8px;border:4px solid #FDA4AF;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.g8-hint-text { font-size:14px;color:var(--text-light);font-weight:700;margin-bottom:16px;text-align:center; }
+.g8-slots { display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;width:100%;max-width:440px; }
+.g8-slot { min-width:44px;height:52px;border-radius:14px;border:3px solid #FDA4AF;background:white;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:var(--font-display);box-shadow:0 3px 0 #BE123C;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);color:#F43F5E; }
+.g8-slot.filled { background:linear-gradient(135deg,#FFF1F3,white);border-color:#F43F5E; }
+.g8-slot.correct-flash { background:linear-gradient(135deg,#CCFBF1,white);border-color:#14B8A6;color:#14B8A6;animation:correctPulse 0.4s ease; }
+.g8-slot.wrong-flash { animation:wrongShake 0.4s ease;border-color:#F43F5E; }
+.g8-letters { display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;max-width:440px; }
+.g8-letter-btn { width:52px;height:52px;border-radius:14px;border:3px solid #DDD6FE;background:white;font-family:var(--font-display);font-size:24px;font-weight:900;cursor:pointer;color:var(--brand);box-shadow:0 4px 0 #7C3AED;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s; }
+.g8-letter-btn:active { transform:scale(0.88)translateY(3px);box-shadow:0 1px 0 #7C3AED; }
+.g8-letter-btn.used { opacity:0.3;pointer-events:none; }
+.g8-progress { font-size:15px;color:var(--text-light);font-weight:700;text-align:center;margin-top:10px; }
+
+/* G9 */
+#screen-game9 { background:linear-gradient(180deg,#F7FEE7 0%,#ECFCCB 50%,#D9F99D 100%); }
+.g9-letter-display { font-size:80px;font-family:var(--font-display);font-weight:900;background:linear-gradient(135deg,#84CC16,#A3E635);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;line-height:1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.g9-instruction { font-size:16px;font-weight:700;color:var(--text-light);margin-bottom:16px; }
+.g9-canvas-wrap { position:relative;width:300px;height:300px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);border:4px solid #A3E635;background:white; }
+#g9-canvas { position:absolute;inset:0;cursor:crosshair;touch-action:none; }
+.g9-guide-dots { position:absolute;inset:0;pointer-events:none; }
+.g9-dot { position:absolute;width:16px;height:16px;border-radius:50%;background:rgba(132,204,22,0.4);border:2px solid rgba(132,204,22,0.7);transform:translate(-50%,-50%);transition:background 0.3s,transform 0.3s; }
+.g9-dot.hit { background:#84CC16;border-color:#3F6212;transform:translate(-50%,-50%)scale(1.3); }
+.g9-result { text-align:center;margin-top:12px;animation:feedbackPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.g9-stars { font-size:40px;margin-bottom:6px; }
+#g9-result-msg { font-size:18px;font-weight:700;color:var(--text-light); }
+.g9-progress { font-size:15px;color:#558B2F;font-weight:700;text-align:center;margin-top:8px; }
+
+/* FEEDBACK */
+#overlay-feedback { display:none;position:fixed;inset:0;background:rgba(30,20,50,0.55);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:20px; }
+#overlay-feedback.show { display:flex; }
+.feedback-card { background:white;border-radius:36px;padding:40px 32px;text-align:center;max-width:360px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.3);animation:feedbackPop 0.4s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden; }
+.feedback-card::before { content:'';position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,#F43F5E,#F59E0B,#14B8A6,#0EA5E9,#8B5CF6,#FDA4AF); }
+@keyframes feedbackPop { from{transform:scale(0.4)translateY(40px);opacity:0} to{transform:scale(1)translateY(0);opacity:1} }
+.feedback-emoji { font-size:80px;display:block;margin-bottom:12px;animation:emojiSpin 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes emojiSpin { from{transform:scale(0)rotate(-180deg)} to{transform:scale(1)rotate(0deg)} }
+.feedback-title { font-size:32px;font-weight:900;font-family:var(--font-display);margin-bottom:8px;background:linear-gradient(135deg,#8B5CF6,#F43F5E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.feedback-sub   { font-size:18px;color:var(--text-light);margin-bottom:20px;line-height:1.6;font-weight:700; }
+.feedback-stars { font-size:40px;letter-spacing:4px;margin-bottom:24px;animation:starsWave 0.6s ease; }
+@keyframes starsWave { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+/* RESULT */
+#screen-result { background:radial-gradient(ellipse at center top,#F3E8FF,#FFF1F3,#CCFBF1);justify-content:center;gap:4px; }
+.result-mascot { font-size:100px;text-align:center;display:block;animation:mascotBounce 1.8s cubic-bezier(0.36,0.07,0.19,0.97) infinite;filter:drop-shadow(0 12px 20px rgba(139,92,246,0.3));margin-bottom:8px; }
+.result-title  { font-size:34px;font-weight:900;font-family:var(--font-display);text-align:center;background:linear-gradient(135deg,#8B5CF6,#F43F5E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.result-stars  { font-size:48px;text-align:center;margin:10px 0;animation:starsWave 0.6s 0.3s ease backwards; }
+.result-msg    { font-size:20px;font-weight:700;text-align:center;color:var(--text-light);margin-bottom:24px;line-height:1.5; }
+.result-scores { display:flex;gap:12px;width:100%;max-width:400px;margin-bottom:20px; }
+.rs-card { flex:1;background:white;border-radius:22px;padding:18px;text-align:center;box-shadow:var(--shadow); }
+.rs-animal { font-size:38px; }
+.rs-name   { font-size:14px;font-weight:700;color:var(--text-light);margin:4px 0; }
+.rs-stars  { font-size:22px;font-weight:900;background:linear-gradient(135deg,#8B5CF6,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+
+/* SPARKLE + CONFETTI */
+.sparkle { position:fixed;pointer-events:none;z-index:150;animation:sparkleFly ease-out forwards;font-size:22px; }
+@keyframes sparkleFly { 0%{transform:translate(0,0)scale(0)rotate(0deg);opacity:1} 60%{opacity:1} 100%{transform:translate(var(--tx),var(--ty))scale(1)rotate(var(--rot));opacity:0} }
+.star-fly { position:fixed;pointer-events:none;z-index:151;animation:starFlyAnim ease-out forwards;font-size:20px; }
+@keyframes starFlyAnim { 0%{transform:translate(0,0)scale(0.5);opacity:1} 100%{transform:translate(var(--tx),var(--ty))scale(0.2);opacity:0} }
+.confetti-piece { position:fixed;border-radius:4px;animation:confettiFall ease-in forwards;pointer-events:none;z-index:200;top:-30px; }
+@keyframes confettiFall { 0%{transform:translateY(0)translateX(0)rotate(0deg)scale(1);opacity:1} 80%{opacity:1} 100%{transform:translateY(110vh)translateX(var(--dx))rotate(var(--rot))scale(0.5);opacity:0} }
+
+/* ACHIEVEMENT TOAST */
+.achievement-toast { position:fixed;bottom:-120px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:20px;padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:300;transition:bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);min-width:280px;max-width:360px;font-family:var(--font); }
+.achievement-toast.show { bottom:24px; }
+.at-icon { font-size:36px;flex-shrink:0; }
+.at-text { flex:1; }
+.at-title { font-size:13px;font-weight:700;color:#78350F;text-transform:uppercase;letter-spacing:0.5px; }
+.at-name  { font-size:17px;font-weight:900;color:#451A03; }
+
+@media(max-width:400px) {
+  .welcome-title{font-size:34px} .g5-grid{gap:6px} .g5-card-back .card-emoji{font-size:26px}
+  .g5-card-back .card-label{font-size:8px} .g5-card-front::after{font-size:20px}
+  .g4-choice-btn{font-size:28px;padding:14px 8px} .g1-choices{gap:8px}
+}
+@media(max-width:340px) { .g5-grid{grid-template-columns:repeat(4,1fr);gap:5px} }
+</style>
+</head>
+<body>
+
+<!-- BG BLOBS -->
+<div class="bg-blobs">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div>
+  <div class="blob blob-3"></div><div class="blob blob-4"></div><div class="blob blob-5"></div>
+</div>
+<div class="flash-overlay" id="flash-overlay"></div>
+<div class="achievement-toast" id="achievement-toast">
+  <span class="at-icon" id="at-icon">🏆</span>
+  <div class="at-text"><div class="at-title">Pencapaian Baru!</div><div class="at-name" id="at-name">-</div></div>
+</div>
+
+<!-- WELCOME -->
+<div id="screen-welcome" class="screen active">
+  <div class="floating-stars" id="floating-stars"></div>
+  <div class="welcome-title-row" style="text-align:center;margin-bottom:6px;">
+    <span class="welcome-title">Dunia</span>
+    <span class="welcome-sub2">Emosi 🐾</span>
+  </div>
+  <span class="welcome-mascot">🦁</span>
+  <p class="welcome-tagline">Halo! Aku Leo si Singa!<br>Ayo belajar dan bermain bersama! 🌟</p>
+  <div class="streak-badge" id="streak-badge" style="display:none">🔥 <span id="streak-text">1 hari</span></div>
+  <button class="btn btn-lg btn-brand" onclick="playClick(); showScreen('screen-mode')">Mulai Bermain! 🎮</button>
+</div>
+
+<!-- MODE -->
+<div id="screen-mode" class="screen">
+  <div class="page-header">
+    <button class="btn-back" onclick="playClick(); showScreen('screen-welcome')">←</button>
+    <span class="page-title">Pilih Mode Main</span>
+  </div>
+  <p style="font-size:18px;color:var(--text-light);font-weight:700;margin-bottom:24px;text-align:center;">Mau main sendiri atau berdua? 🤝</p>
+  <div style="display:flex;flex-direction:column;gap:16px;width:100%;align-items:center;max-width:480px;">
+    <div class="mode-card solo" onclick="playClick(); selectMode('solo')">
+      <span class="mode-icon">🧒</span>
+      <div class="mode-name">Main Sendiri</div>
+      <div class="mode-desc">Satu pemain — kumpulkan bintang sebanyak-banyaknya! ⭐</div>
+    </div>
+    <div class="mode-card duo" onclick="playClick(); selectMode('duo')">
+      <span class="mode-icon">👫</span>
+      <div class="mode-name">Main Berdua</div>
+      <div class="mode-desc">Dua pemain bergantian! Siapa dapat bintang terbanyak? 🏆</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAMES -->
+<div id="screen-names" class="screen">
+  <div class="page-header">
+    <button class="btn-back" onclick="playClick(); showScreen('screen-mode')">←</button>
+    <span class="page-title">Siapa Namamu? 😊</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px;width:100%;align-items:center;">
+    <div class="name-input-wrap card">
+      <div class="name-label" id="p1-label">🧒 Nama Pemain 1</div>
+      <input class="name-input" id="p1-name" type="text" placeholder="Tulis namamu..." maxlength="12">
+      <div class="animal-picker" id="p1-animals"></div>
+      <div class="age-select-row">
+        <div class="age-label">Usia kamu:</div>
+        <div class="age-options" id="p1-age">
+          <button class="age-btn active" data-age="cilik" onclick="setAge(0,'cilik',this)">🐣 5–6</button>
+          <button class="age-btn" data-age="tumbuh" onclick="setAge(0,'tumbuh',this)">🐥 7–8</button>
+          <button class="age-btn" data-age="pintar" onclick="setAge(0,'pintar',this)">🦅 9–10</button>
+        </div>
+      </div>
+    </div>
+    <div class="name-input-wrap card" id="p2-section" style="display:none;">
+      <div class="name-label">👦 Nama Pemain 2</div>
+      <input class="name-input" id="p2-name" type="text" placeholder="Tulis namamu..." maxlength="12">
+      <div class="animal-picker" id="p2-animals"></div>
+      <div class="age-select-row">
+        <div class="age-label">Usia kamu:</div>
+        <div class="age-options" id="p2-age">
+          <button class="age-btn active" data-age="cilik" onclick="setAge(1,'cilik',this)">🐣 5–6</button>
+          <button class="age-btn" data-age="tumbuh" onclick="setAge(1,'tumbuh',this)">🐥 7–8</button>
+          <button class="age-btn" data-age="pintar" onclick="setAge(1,'pintar',this)">🦅 9–10</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-lg btn-green" style="margin-top:8px;" onclick="playClick(); confirmNames()">Lanjut! ➡️</button>
+  </div>
+</div>
+
+<!-- MENU -->
+<div id="screen-menu" class="screen">
+  <div class="player-header" id="menu-player-header"></div>
+  <div id="total-stars-banner" class="total-stars-banner" style="display:none;margin-bottom:16px;"></div>
+  <p style="font-size:17px;font-weight:700;color:var(--text-light);margin-bottom:16px;">Mau main apa hari ini? 🎯</p>
+  <div class="game-grid">
+    <div class="game-tile g1" onclick="playClick(); openLevelSelect(1)">
+      <span class="g-icon">🎭</span>
+      <div class="g-name">Aku Merasa...</div>
+      <span class="g-tag">Emosi</span>
+    </div>
+    <div class="game-tile g2" onclick="playClick(); openLevelSelect(2)">
+      <span class="g-icon">🌬️</span>
+      <div class="g-name">Napas Pelangi</div>
+      <span class="g-tag">Tenang</span>
+    </div>
+    <div class="game-tile g3" onclick="playClick(); openLevelSelect(3)">
+      <span class="g-icon">🔤</span>
+      <div class="g-name">Huruf Hutan</div>
+      <span class="g-tag">Belajar</span>
+    </div>
+    <div class="game-tile g4" onclick="playClick(); openLevelSelect(4)">
+      <span class="g-icon">🔢</span>
+      <div class="g-name">Hitung Binatang</div>
+      <span class="g-tag">Hitung</span>
+    </div>
+    <div class="game-tile g5" onclick="playClick(); openLevelSelect(5)">
+      <span class="g-icon">🃏</span>
+      <div class="g-name">Cocokkan Emosi</div>
+      <span class="g-tag">Fokus</span>
+    </div>
+    <div class="game-tile g6" onclick="playClick(); startGame(6)">
+      <span class="g-icon">🚗</span>
+      <div class="g-name">Petualangan Mobil</div>
+      <span class="g-tag">Adventure</span>
+    </div>
+    <div class="game-tile g7" onclick="playClick(); startGame(7)">
+      <span class="g-icon">🖼️</span>
+      <div class="g-name">Tebak Gambar</div>
+      <span class="g-tag">Membaca</span>
+    </div>
+    <div class="game-tile g8" onclick="playClick(); startGame(8)">
+      <span class="g-icon">🔡</span>
+      <div class="g-name">Susun Kata</div>
+      <span class="g-tag">Menulis</span>
+    </div>
+    <div class="game-tile g9" onclick="playClick(); startGame(9)">
+      <span class="g-icon">✍️</span>
+      <div class="g-name">Jejak Huruf</div>
+      <span class="g-tag">Menulis</span>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div id="screen-level" class="screen">
+  <div class="page-header">
+    <button class="btn-back" onclick="playClick(); showScreen('screen-menu')">←</button>
+    <span class="page-title">Pilih Kesulitan</span>
+  </div>
+  <div class="level-game-header">
+    <span class="level-game-icon" id="level-game-icon">🎭</span>
+    <div class="level-game-name" id="level-game-name">Aku Merasa...</div>
+  </div>
+  <div class="level-grid">
+    <button class="level-btn level-btn-easy" onclick="playClick(); startGameWithLevel('easy')">
+      <div class="level-btn-name">🌱 Mudah</div>
+      <div class="level-btn-desc">Santai dan menyenangkan!</div>
+      <div class="level-btn-badges"><span class="level-badge">6 soal</span><span class="level-badge">Waktu lebih</span><span class="level-badge">3 pilihan</span></div>
+    </button>
+    <button class="level-btn level-btn-medium" onclick="playClick(); startGameWithLevel('medium')">
+      <div class="level-btn-name">🌿 Sedang</div>
+      <div class="level-btn-desc">Tantangan yang pas!</div>
+      <div class="level-btn-badges"><span class="level-badge">10 soal</span><span class="level-badge">Waktu standar</span><span class="level-badge">4 pilihan</span></div>
+    </button>
+    <button class="level-btn level-btn-hard" onclick="playClick(); startGameWithLevel('hard')">
+      <div class="level-btn-name">🌳 Sulit</div>
+      <div class="level-btn-desc">Untuk jagoan sejati!</div>
+      <div class="level-btn-badges"><span class="level-badge">15 soal</span><span class="level-badge">Waktu singkat</span><span class="level-badge">6 pilihan</span></div>
+    </button>
+  </div>
+</div>
+
+<!-- GAME 1 -->
+<div id="screen-game1" class="screen">
+  <div class="world-hearts" id="world-hearts"></div>
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🎭 Aku Merasa...</span>
+    <span class="gh-player" id="g1-player-icon"></span>
+    <span class="gh-stars" id="g1-stars">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g1-progress-bar" style="width:0%"></div></div>
+  <div class="round-dots" id="g1-dots"></div>
+  <span class="g1-animal-display" id="g1-animal"></span>
+  <p class="g1-question">Bagaimana perasaan hewan ini?</p>
+  <div class="g1-choices" id="g1-choices"></div>
+  <div id="g1-tip" class="g1-tip" style="display:none;margin-top:14px;"></div>
+  <p class="g1-progress" id="g1-progress" style="margin-top:8px;"></p>
+</div>
+
+<!-- GAME 2 -->
+<div id="screen-game2" class="screen">
+  <div class="world-clouds" id="world-clouds"></div>
+  <div class="sun-circle"></div>
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🌬️ Napas Pelangi</span>
+    <span class="gh-player" id="g2-player-icon"></span>
+    <span class="gh-stars" id="g2-stars">⭐ 0</span>
+  </div>
+  <div class="breathe-container">
+    <div class="breathe-circle-wrap">
+      <div class="breathe-ring" id="g2-ring1"></div>
+      <div class="breathe-ring ring2" id="g2-ring2"></div>
+      <span class="breathe-animal" id="g2-mascot">🦁</span>
+    </div>
+    <div class="breathe-instruction" id="g2-instruction">Siap Bernapas?</div>
+    <div class="breathe-sub" id="g2-sub">Ikuti lingkaran yang bergerak ya! 😊</div>
+    <div class="breathe-timer-wrap"><div class="breathe-timer-bg"></div><div class="breathe-timer" id="g2-timer">4</div></div>
+    <div class="breathe-cycles" id="g2-cycles"></div>
+    <button class="btn btn-lg btn-blue" id="g2-start-btn" style="margin-top:24px;" onclick="startBreathing()">Mulai Napas! 💨</button>
+  </div>
+</div>
+
+<!-- GAME 3 -->
+<div id="screen-game3" class="screen">
+  <div class="world-jungle" id="world-jungle"></div>
+  <div class="tree-left"></div><div class="tree-right"></div>
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🔤 Huruf Hutan</span>
+    <span class="gh-player" id="g3-player-icon"></span>
+    <span class="gh-stars" id="g3-stars">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g3-progress-bar" style="width:0%"></div></div>
+  <div class="round-dots" id="g3-dots"></div>
+  <span class="g3-mode-badge" id="g3-mode-badge">Level: Huruf 🔤</span>
+  <span class="g3-animal" id="g3-animal"></span>
+  <div class="g3-word" id="g3-word"></div>
+  <div class="g3-hint" id="g3-hint"></div>
+  <div class="g3-choices" id="g3-choices"></div>
+  <p class="g3-progress" id="g3-progress" style="margin-top:10px;"></p>
+</div>
+
+<!-- GAME 4 -->
+<div id="screen-game4" class="screen">
+  <div class="world-savanna">
+    <div class="savanna-sun"></div>
+    <div class="grass-strip"></div>
+  </div>
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🔢 Hitung Binatang</span>
+    <span class="gh-player" id="g4-player-icon"></span>
+    <span class="gh-stars" id="g4-stars">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g4-progress-bar" style="width:0%"></div></div>
+  <div class="round-dots" id="g4-dots"></div>
+  <div class="g4-animals-grid" id="g4-animals"></div>
+  <div class="g4-timer-track"><div class="g4-timer-fill" id="g4-fill" style="width:100%"></div></div>
+  <div class="g4-timer-text" id="g4-timer-text">15 detik</div>
+  <p class="g4-question">Ada berapa binatang? 🤔</p>
+  <div class="g4-choices" id="g4-choices"></div>
+  <p class="g4-progress" id="g4-progress" style="margin-top:10px;"></p>
+</div>
+
+<!-- GAME 5 -->
+<div id="screen-game5" class="screen">
+  <div class="world-dream" id="world-dream"></div>
+  <div class="moon-crescent"></div>
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🃏 Cocokkan Emosi</span>
+  </div>
+  <div class="g5-score-row" id="g5-scores"></div>
+  <p class="g5-turn-text" id="g5-turn-text"></p>
+  <div class="g5-grid" id="g5-grid"></div>
+</div>
+
+<!-- GAME 6 -->
+<div id="screen-game6" class="screen">
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🚗 Petualangan Mobil</span>
+    <span class="gh-player" id="g6-player-icon"></span>
+    <span class="gh-stars" id="g6-stars">⭐ 0</span>
+  </div>
+  <div class="g6-map-row" id="g6-map-row">
+    <button class="g6-map-btn active" data-map="city" onclick="selectDriveMap('city',this)">🏙️ Kota</button>
+    <button class="g6-map-btn" data-map="forest" onclick="selectDriveMap('forest',this)">🌿 Hutan</button>
+    <button class="g6-map-btn" data-map="space" onclick="selectDriveMap('space',this)">🚀 Luar Angkasa</button>
+    <button class="g6-map-btn" data-map="body" onclick="selectDriveMap('body',this)">🔬 Tubuh</button>
+  </div>
+  <div class="g6-target-wrap">
+    <div class="g6-target-label">🎯 Kumpulkan huruf:</div>
+    <div class="g6-target-word" id="g6-target-word"></div>
+    <div class="g6-collected" id="g6-collected"></div>
+  </div>
+  <div class="g6-road" id="g6-road">
+    <div class="g6-lane-line" style="left:33.33%"></div>
+    <div class="g6-lane-line" style="left:66.66%"></div>
+    <div class="g6-car" id="g6-car">🚗</div>
+    <div class="g6-start-overlay" id="g6-start-overlay">
+      <div class="g6-start-card">
+        <div style="font-size:64px" id="g6-vehicle-icon">🚗</div>
+        <div class="g6-start-word" id="g6-start-word"></div>
+        <p style="font-size:16px;color:var(--text-light);margin:8px 0 20px;">Kumpulkan huruf-huruf ini!</p>
+        <button class="btn btn-lg" style="background:linear-gradient(135deg,#38BDF8,#0EA5E9);color:white;box-shadow:0 6px 0 #0369A1;" onclick="beginDrive()">Mulai! 🚗</button>
+      </div>
+    </div>
+  </div>
+  <div class="g6-controls">
+    <button class="g6-ctrl-btn" id="g6-left" ontouchstart="driveLeft()" onclick="driveLeft()">◀ KIRI</button>
+    <div class="g6-score-mid" id="g6-score">⭐ 0</div>
+    <button class="g6-ctrl-btn" id="g6-right" ontouchstart="driveRight()" onclick="driveRight()">KANAN ▶</button>
+  </div>
+</div>
+
+<!-- GAME 7 -->
+<div id="screen-game7" class="screen">
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🖼️ Tebak Gambar</span>
+    <span class="gh-player" id="g7-player-icon"></span>
+    <span class="gh-stars" id="g7-stars">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g7-progress-bar" style="width:0%"></div></div>
+  <div class="g7-mode-badge" id="g7-mode-badge">Mode: Lihat Gambar</div>
+  <div class="g7-display" id="g7-display"></div>
+  <p class="g7-question" id="g7-question">Ini gambar apa?</p>
+  <div class="g7-choices" id="g7-choices"></div>
+  <p class="g7-progress" id="g7-progress"></p>
+</div>
+
+<!-- GAME 8 -->
+<div id="screen-game8" class="screen">
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">🔡 Susun Kata</span>
+    <span class="gh-player" id="g8-player-icon"></span>
+    <span class="gh-stars" id="g8-stars">⭐ 0</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g8-progress-bar" style="width:0%"></div></div>
+  <div class="g8-hint-img" id="g8-hint-img"></div>
+  <p class="g8-hint-text" id="g8-hint-text"></p>
+  <div class="g8-slots" id="g8-slots"></div>
+  <div class="g8-letters" id="g8-letters"></div>
+  <button class="btn btn-sm" style="background:white;color:var(--text);border:3px solid #E0E0E0;box-shadow:0 3px 0 #C0C0C0;margin-top:8px;font-size:16px;" onclick="g8Backspace()">⌫ Hapus</button>
+  <p class="g8-progress" id="g8-progress"></p>
+</div>
+
+<!-- GAME 9 -->
+<div id="screen-game9" class="screen">
+  <div class="game-header">
+    <button class="gh-back" onclick="exitGame()">←</button>
+    <span class="gh-title">✍️ Jejak Huruf</span>
+    <span class="gh-player" id="g9-player-icon"></span>
+    <span class="gh-stars" id="g9-stars-hdr">⭐ 0</span>
+  </div>
+  <div class="g9-letter-display" id="g9-letter-display">A</div>
+  <p class="g9-instruction">Ikuti garis dengan jarimu! ✏️</p>
+  <div class="g9-canvas-wrap">
+    <canvas id="g9-canvas" width="300" height="300"></canvas>
+    <div class="g9-guide-dots" id="g9-guide-dots"></div>
+  </div>
+  <div class="g9-result" id="g9-result" style="display:none;">
+    <div class="g9-stars" id="g9-stars-result"></div>
+    <p id="g9-result-msg"></p>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:16px;width:100%;max-width:400px;">
+    <button class="btn btn-md" style="flex:1;background:white;color:var(--text);border:3px solid #E0E0E0;box-shadow:0 4px 0 #C0C0C0;" onclick="g9Clear()">🗑️ Hapus</button>
+    <button class="btn btn-md btn-lime" id="g9-next-btn" style="flex:1;display:none;" onclick="nextG9Round()">Huruf Berikutnya ➡️</button>
+  </div>
+  <p class="g9-progress" id="g9-progress"></p>
+</div>
+
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <span class="result-mascot" id="result-mascot">🦁</span>
+  <h2 class="result-title" id="result-title">Bagus sekali!</h2>
+  <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+  <p class="result-msg" id="result-msg">Kamu hebat hari ini!</p>
+  <div class="result-scores" id="result-scores" style="display:none;"></div>
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;max-width:400px;">
+    <button class="btn btn-lg btn-brand" onclick="playClick(); playAgain()">Main Lagi! 🎮</button>
+    <button class="btn btn-lg btn-white" onclick="playClick(); goToMenu()">Pilih Game Lain 🏠</button>
+  </div>
+</div>
+
+<!-- FEEDBACK OVERLAY -->
+<div id="overlay-feedback">
+  <div class="feedback-card">
+    <span class="feedback-emoji" id="fb-emoji">🎉</span>
+    <div class="feedback-title" id="fb-title">Benar!</div>
+    <div class="feedback-sub" id="fb-sub">Hebat sekali!</div>
+    <div class="feedback-stars" id="fb-stars">⭐</div>
+    <button class="btn btn-lg btn-green" id="fb-btn" onclick="closeFeedback()">Lanjut! ➡️</button>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// DIFFICULTY CONFIG
+// ================================================================
+const DIFF = {
+  easy:   { rounds: 6,  timer: 20, choices: 3, breatheCycles: 2 },
+  medium: { rounds: 10, timer: 15, choices: 4, breatheCycles: 3 },
+  hard:   { rounds: 15, timer: 10, choices: 6, breatheCycles: 4 }
+}
+
+// ================================================================
+// DATA
+// ================================================================
+const EMOTIONS = [
+  { emoji:'😊',name:'Senang',   animal:'🦁',tip:'💡 Tunjukkan kesenanganmu dengan senyuman! Ceritakan ke teman.' },
+  { emoji:'😢',name:'Sedih',    animal:'🐰',tip:'💡 Tidak apa-apa bersedih. Ceritakan ke Ayah atau Ibu.' },
+  { emoji:'😠',name:'Marah',    animal:'🐯',tip:'💡 Kalau marah, tarik napas 3x. Hitung 1-2-3 pelan-pelan.' },
+  { emoji:'😨',name:'Takut',    animal:'🐘',tip:'💡 Kalau takut, pegang tangan orang yang kamu sayang.' },
+  { emoji:'😲',name:'Terkejut', animal:'🦊',tip:'💡 Terkejut itu normal! Tarik napas, lalu tenangkan diri.' },
+  { emoji:'😳',name:'Malu',     animal:'🐸',tip:'💡 Semua orang pernah malu. Itu artinya kamu peduli!' },
+  { emoji:'🥰',name:'Bahagia',  animal:'🐼',tip:'💡 Bagikan kebahagiaanmu! Peluk orang yang kamu sayang.' },
+  { emoji:'😑',name:'Bosan',    animal:'🐨',tip:'💡 Kalau bosan, coba aktivitas baru. Ajak teman bermain!' },
+  { emoji:'😤',name:'Kesal',    animal:'🐺',tip:'💡 Kalau kesal, ceritakan perasaanmu dengan kata-kata.' },
+  { emoji:'🤩',name:'Kagum',    animal:'🦄',tip:'💡 Rasa kagum itu indah! Eksplorasi hal baru setiap hari.' }
+]
+
+const ANIMAL_LETTERS = [
+  {animal:'🐓',word:'AYAM',   letter:'A',num:1},
+  {animal:'🦆',word:'BEBEK',  letter:'B',num:2},
+  {animal:'🦎',word:'CICAK',  letter:'C',num:3},
+  {animal:'🐑',word:'DOMBA',  letter:'D',num:4},
+  {animal:'🦅',word:'ELANG',  letter:'E',num:5},
+  {animal:'🐸',word:'FROG',   letter:'F',num:6},
+  {animal:'🐘',word:'GAJAH',  letter:'G',num:7},
+  {animal:'🐯',word:'HARIMAU',letter:'H',num:8},
+  {animal:'🐟',word:'IKAN',   letter:'I',num:9},
+  {animal:'🦒',word:'JERAPAH',letter:'J',num:10},
+  {animal:'🐴',word:'KUDA',   letter:'K',num:11},
+  {animal:'🐬',word:'LUMBA',  letter:'L',num:12},
+  {animal:'🐒',word:'MONYET', letter:'M',num:13},
+  {animal:'🦜',word:'NURI',   letter:'N',num:14},
+  {animal:'🦧',word:'ORANG UTAN',letter:'O',num:15},
+  {animal:'🐼',word:'PANDA',  letter:'P',num:8},
+  {animal:'🦌',word:'RUSA',   letter:'R',num:6},
+  {animal:'🦁',word:'SINGA',  letter:'S',num:5},
+  {animal:'🐭',word:'TIKUS',  letter:'T',num:4},
+  {animal:'🐢',word:'ULAT',   letter:'U',num:3}
+]
+
+const MATCH_PAIRS = [
+  {id:'senang',   emoji:'😊',label:'Senang'},
+  {id:'sedih',    emoji:'😢',label:'Sedih'},
+  {id:'marah',    emoji:'😠',label:'Marah'},
+  {id:'takut',    emoji:'😨',label:'Takut'},
+  {id:'terkejut', emoji:'😲',label:'Terkejut'},
+  {id:'malu',     emoji:'😳',label:'Malu'},
+  {id:'bosan',    emoji:'😑',label:'Bosan'},
+  {id:'bahagia',  emoji:'🥰',label:'Bahagia'},
+  {id:'kesal',    emoji:'😤',label:'Kesal'},
+  {id:'kagum',    emoji:'🤩',label:'Kagum'}
+]
+
+const ANIMALS_PICKER = ['🦁','🐰','🐘','🦊','🐸','🐯','🐼','🐨']
+const ANIMALS_G4 = ['🐘','🦁','🐯','🐸','🐰','🦊','🐼','🐨','🐧','🦆','🐓','🐑','🦒','🐴','🦋']
+const ALL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+const GAME_META = {
+  1:{icon:'🎭',name:'Aku Merasa...'},
+  2:{icon:'🌬️',name:'Napas Pelangi'},
+  3:{icon:'🔤',name:'Huruf Hutan'},
+  4:{icon:'🔢',name:'Hitung Binatang'},
+  5:{icon:'🃏',name:'Cocokkan Emosi'}
+}
+
+const ACHIEVEMENTS = {
+  first_star:      {icon:'⭐',name:'Bintang Pertama!'},
+  ten_stars:       {icon:'🌟',name:'10 Bintang Terkumpul!'},
+  fifty_stars:     {icon:'🏆',name:'50 Bintang! Legenda!'},
+  perfect_emotion: {icon:'🎭',name:'Master Emosi!'},
+  calm_breath:     {icon:'🌈',name:'Napas Tenang!'},
+  letter_master:   {icon:'📚',name:'Master Huruf!'},
+  count_master:    {icon:'🔢',name:'Master Hitung!'},
+  memory_master:   {icon:'🃏',name:'Master Memori!'}
+}
+
+// Asset fallback system
+const ASSET_FALLBACK = {
+  'leo-happy.png':'🦁','leo-excited.png':'🦁','leo-sad.png':'🦁',
+  'leo-surprised.png':'🦁','leo-proud.png':'🦁','leo-thinking.png':'🦁',
+  'car-red.png':'🚗','car-blue.png':'🚙','rocket.png':'🚀','submarine.png':'🤿',
+  'bg-city.webp':null,'bg-forest.webp':null,'bg-space.webp':null,'bg-body.webp':null,'bg-menu.webp':null,
+  'obstacle-cone.png':'🚧','obstacle-rock.png':'🪨','obstacle-asteroid.png':'☄️','obstacle-bacteria.png':'🦠',
+  'img-ayam.png':'🐓','img-bebek.png':'🦆','img-cicak.png':'🦎','img-domba.png':'🐑','img-elang.png':'🦅',
+  'img-gajah.png':'🐘','img-harimau.png':'🐯','img-ikan.png':'🐟','img-jerapah.png':'🦒','img-kuda.png':'🐴',
+  'img-monyet.png':'🐒','img-panda.png':'🐼','img-rusa.png':'🦌','img-singa.png':'🦁','img-tikus.png':'🐭',
+  'img-apel.png':'🍎','img-bola.png':'⚽','img-buku.png':'📚','img-daun.png':'🍃','img-meja.png':'🪑'
+}
+function getAssetEmoji(filename) { return ASSET_FALLBACK[filename] || '❓' }
+function renderAsset(filename, size=80) {
+  const emoji = getAssetEmoji(filename)
+  return `<img src="assets/${filename}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" onerror="this.outerHTML='<span style=\\'font-size:${size*0.7}px\\'>${emoji}</span>'">`
+}
+
+// Game 6 word banks
+const DRIVE_WORD_BANK = {
+  city:   ['BOLA','KUDA','APEL','SAPI','MEJA','KURSI','LAMPU','BUKU','RUMAH'],
+  forest: ['POHON','DAUN','BUNGA','BURUNG','KELINCI','HARIMAU'],
+  space:  ['BUMI','MARS','BULAN','BINTANG','PLANET'],
+  body:   ['MATA','KAKI','HATI','PARU','GIGI','JANTUNG']
+}
+const DRIVE_VEHICLES  = {city:'🚗',forest:'🚗',space:'🚀',body:'🤿'}
+const DRIVE_OBSTACLES = {city:'🚧',forest:'🪨',space:'☄️',body:'🦠'}
+
+// Game 7 image data
+const WORD_IMAGES = [
+  {id:'ayam',   emoji:'🐓',word:'AYAM',   file:'img-ayam.png'},
+  {id:'bebek',  emoji:'🦆',word:'BEBEK',  file:'img-bebek.png'},
+  {id:'gajah',  emoji:'🐘',word:'GAJAH',  file:'img-gajah.png'},
+  {id:'harimau',emoji:'🐯',word:'HARIMAU',file:'img-harimau.png'},
+  {id:'ikan',   emoji:'🐟',word:'IKAN',   file:'img-ikan.png'},
+  {id:'jerapah',emoji:'🦒',word:'JERAPAH',file:'img-jerapah.png'},
+  {id:'kuda',   emoji:'🐴',word:'KUDA',   file:'img-kuda.png'},
+  {id:'monyet', emoji:'🐒',word:'MONYET', file:'img-monyet.png'},
+  {id:'panda',  emoji:'🐼',word:'PANDA',  file:'img-panda.png'},
+  {id:'singa',  emoji:'🦁',word:'SINGA',  file:'img-singa.png'},
+  {id:'apel',   emoji:'🍎',word:'APEL',   file:'img-apel.png'},
+  {id:'bola',   emoji:'⚽',word:'BOLA',   file:'img-bola.png'},
+  {id:'buku',   emoji:'📚',word:'BUKU',   file:'img-buku.png'},
+  {id:'daun',   emoji:'🍃',word:'DAUN',   file:'img-daun.png'},
+  {id:'meja',   emoji:'🪑',word:'MEJA',   file:'img-meja.png'}
+]
+
+// Game 8 word bank
+const WORD_BUILD_BANK = [
+  {word:'AYAM',   emoji:'🐓',hint:'Hewan berkokok'},
+  {word:'KUDA',   emoji:'🐴',hint:'Hewan yang bisa berlari cepat'},
+  {word:'IKAN',   emoji:'🐟',hint:'Hewan yang hidup di air'},
+  {word:'BUKU',   emoji:'📚',hint:'Untuk baca dan belajar'},
+  {word:'GAJAH',  emoji:'🐘',hint:'Hewan terbesar di darat'},
+  {word:'PANDA',  emoji:'🐼',hint:'Hewan hitam putih suka bambu'},
+  {word:'SINGA',  emoji:'🦁',hint:'Raja hutan'},
+  {word:'BEBEK',  emoji:'🦆',hint:'Hewan yang suka di air dan bisa terbang'},
+  {word:'APEL',   emoji:'🍎',hint:'Buah berwarna merah'},
+  {word:'BOLA',   emoji:'⚽',hint:'Alat bermain yang bulat'},
+  {word:'HARIMAU',emoji:'🐯',hint:'Hewan bergaris-garis hitam'},
+  {word:'JERAPAH',emoji:'🦒',hint:'Hewan dengan leher sangat panjang'},
+  {word:'MONYET', emoji:'🐒',hint:'Hewan pandai panjat pohon'}
+]
+
+// Game 9 letter guides
+const LETTER_GUIDES = {
+  'A':[{x:0.5,y:0.05},{x:0.2,y:0.95},{x:0.35,y:0.55},{x:0.65,y:0.55},{x:0.8,y:0.95}],
+  'B':[{x:0.2,y:0.05},{x:0.2,y:0.95},{x:0.2,y:0.05},{x:0.65,y:0.15},{x:0.75,y:0.28},{x:0.65,y:0.48},{x:0.2,y:0.48},{x:0.7,y:0.6},{x:0.78,y:0.75},{x:0.65,y:0.9},{x:0.2,y:0.95}],
+  'C':[{x:0.75,y:0.2},{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.2,y:0.8},{x:0.5,y:0.95},{x:0.75,y:0.8}],
+  'D':[{x:0.2,y:0.05},{x:0.2,y:0.95},{x:0.2,y:0.05},{x:0.55,y:0.1},{x:0.78,y:0.3},{x:0.82,y:0.5},{x:0.78,y:0.7},{x:0.55,y:0.9},{x:0.2,y:0.95}],
+  'E':[{x:0.75,y:0.05},{x:0.2,y:0.05},{x:0.2,y:0.5},{x:0.65,y:0.5},{x:0.2,y:0.5},{x:0.2,y:0.95},{x:0.75,y:0.95}],
+  'F':[{x:0.75,y:0.05},{x:0.2,y:0.05},{x:0.2,y:0.5},{x:0.65,y:0.5},{x:0.2,y:0.5},{x:0.2,y:0.95}],
+  'G':[{x:0.75,y:0.2},{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.2,y:0.8},{x:0.5,y:0.95},{x:0.8,y:0.8},{x:0.8,y:0.5},{x:0.55,y:0.5}],
+  'H':[{x:0.2,y:0.05},{x:0.2,y:0.95},{x:0.2,y:0.5},{x:0.8,y:0.5},{x:0.8,y:0.05},{x:0.8,y:0.95}],
+  'I':[{x:0.2,y:0.05},{x:0.8,y:0.05},{x:0.5,y:0.05},{x:0.5,y:0.95},{x:0.2,y:0.95},{x:0.8,y:0.95}],
+  'J':[{x:0.2,y:0.05},{x:0.8,y:0.05},{x:0.65,y:0.05},{x:0.65,y:0.75},{x:0.5,y:0.9},{x:0.35,y:0.85},{x:0.25,y:0.75}],
+  'K':[{x:0.2,y:0.05},{x:0.2,y:0.95},{x:0.2,y:0.5},{x:0.75,y:0.05},{x:0.2,y:0.5},{x:0.75,y:0.95}],
+  'L':[{x:0.2,y:0.05},{x:0.2,y:0.95},{x:0.75,y:0.95}],
+  'M':[{x:0.1,y:0.95},{x:0.1,y:0.05},{x:0.5,y:0.5},{x:0.9,y:0.05},{x:0.9,y:0.95}],
+  'N':[{x:0.1,y:0.95},{x:0.1,y:0.05},{x:0.9,y:0.95},{x:0.9,y:0.05}],
+  'O':[{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.2,y:0.8},{x:0.5,y:0.95},{x:0.8,y:0.8},{x:0.9,y:0.5},{x:0.8,y:0.2},{x:0.5,y:0.05}],
+  'P':[{x:0.2,y:0.95},{x:0.2,y:0.05},{x:0.65,y:0.1},{x:0.78,y:0.22},{x:0.78,y:0.4},{x:0.65,y:0.52},{x:0.2,y:0.52}],
+  'Q':[{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.2,y:0.8},{x:0.5,y:0.95},{x:0.8,y:0.8},{x:0.9,y:0.5},{x:0.8,y:0.2},{x:0.5,y:0.05},{x:0.6,y:0.7},{x:0.85,y:0.95}],
+  'R':[{x:0.2,y:0.95},{x:0.2,y:0.05},{x:0.65,y:0.1},{x:0.78,y:0.22},{x:0.78,y:0.4},{x:0.65,y:0.52},{x:0.2,y:0.52},{x:0.75,y:0.95}],
+  'S':[{x:0.75,y:0.15},{x:0.5,y:0.05},{x:0.25,y:0.15},{x:0.2,y:0.35},{x:0.5,y:0.5},{x:0.8,y:0.65},{x:0.75,y:0.85},{x:0.5,y:0.95},{x:0.25,y:0.85}],
+  'T':[{x:0.1,y:0.05},{x:0.9,y:0.05},{x:0.5,y:0.05},{x:0.5,y:0.95}],
+  'U':[{x:0.1,y:0.05},{x:0.1,y:0.75},{x:0.25,y:0.9},{x:0.5,y:0.95},{x:0.75,y:0.9},{x:0.9,y:0.75},{x:0.9,y:0.05}],
+  'V':[{x:0.1,y:0.05},{x:0.5,y:0.95},{x:0.9,y:0.05}],
+  'W':[{x:0.05,y:0.05},{x:0.25,y:0.95},{x:0.5,y:0.5},{x:0.75,y:0.95},{x:0.95,y:0.05}],
+  'X':[{x:0.1,y:0.05},{x:0.9,y:0.95},{x:0.5,y:0.5},{x:0.1,y:0.95},{x:0.9,y:0.05}],
+  'Y':[{x:0.1,y:0.05},{x:0.5,y:0.5},{x:0.9,y:0.05},{x:0.5,y:0.5},{x:0.5,y:0.95}],
+  'Z':[{x:0.1,y:0.05},{x:0.9,y:0.05},{x:0.1,y:0.95},{x:0.9,y:0.95}]
+}
+const LETTER_SEQ_CILIK  = ['A','B','C','D','E','F']
+const LETTER_SEQ_TUMBUH = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N']
+const LETTER_SEQ_PINTAR = Object.keys(LETTER_GUIDES)
+
+// ================================================================
+// STATE
+// ================================================================
+const state = {
+  mode: 'solo',
+  players: [
+    {name:'Pemain 1',animal:'🦁',stars:0,ageTier:'tumbuh'},
+    {name:'Pemain 2',animal:'🐰',stars:0,ageTier:'tumbuh'}
+  ],
+  currentPlayer: 0,
+  currentGame: null,
+  selectedLevel: 'medium',
+  gameStars: [0,0],
+  breatheInterval: null,
+  g4Timer: null,
+  unlockedAchievements: {}
+}
+
+// Age tier helpers
+function setAge(playerIdx, tier, btn) {
+  state.players[playerIdx].ageTier = tier
+  const container = document.getElementById('p' + (playerIdx+1) + '-age')
+  container.querySelectorAll('.age-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  playClick()
+}
+function getAgeLetters(tier) {
+  if (tier==='cilik')  return ANIMAL_LETTERS.slice(0,6)
+  if (tier==='tumbuh') return ANIMAL_LETTERS.slice(0,14)
+  return ANIMAL_LETTERS
+}
+function getAgeMaxCount(tier) {
+  if (tier==='cilik')  return 5
+  if (tier==='tumbuh') return 10
+  return 15
+}
+function getAgeWordBank(map, tier) {
+  const bank = DRIVE_WORD_BANK[map]
+  if (tier==='cilik')  return bank.filter(w=>w.length<=4)
+  if (tier==='tumbuh') return bank.filter(w=>w.length<=6)
+  return bank
+}
+
+// ================================================================
+// INIT WORLDS
+// ================================================================
+function initFloatingStars() {
+  const container = document.getElementById('floating-stars')
+  const icons = ['⭐','🌟','✨','💫','🌈','🎈','🎉','🎊','🌸','🍀']
+  for (let i=0;i<18;i++) {
+    const star = document.createElement('span')
+    star.className = 'fstar'
+    star.textContent = icons[Math.floor(Math.random()*icons.length)]
+    star.style.cssText = `left:${Math.random()*100}vw;animation-duration:${5+Math.random()*8}s;animation-delay:${Math.random()*8}s;font-size:${14+Math.random()*18}px;`
+    container.appendChild(star)
+  }
+}
+function initHeartWorld() {
+  const c = document.getElementById('world-hearts'); if(!c)return; c.innerHTML=''
+  const hearts=['❤️','💖','💕','💗','🩷','💓']
+  for(let i=0;i<8;i++){const s=document.createElement('span');s.textContent=hearts[i%hearts.length];s.style.cssText=`left:${10+i*11}%;animation-duration:${6+Math.random()*6}s;animation-delay:${Math.random()*5}s;font-size:${14+Math.random()*14}px;`;c.appendChild(s)}
+}
+function initCloudWorld() {
+  const c = document.getElementById('world-clouds'); if(!c)return; c.innerHTML=''
+  const clouds=[{w:120,h:40,t:'18%',dur:'18s',delay:'0s'},{w:90,h:30,t:'35%',dur:'24s',delay:'-8s'},{w:70,h:25,t:'55%',dur:'20s',delay:'-14s'}]
+  clouds.forEach(cl=>{const d=document.createElement('div');d.className='cloud';d.style.cssText=`width:${cl.w}px;height:${cl.h}px;top:${cl.t};animation-duration:${cl.dur};animation-delay:${cl.delay};`;d.style.left='-130px';c.appendChild(d)})
+}
+function initJungleWorld() {
+  const c = document.getElementById('world-jungle'); if(!c)return; c.innerHTML=''
+  const letters='ABCDEFGHIJKLMNOP'.split('')
+  for(let i=0;i<5;i++){const s=document.createElement('span');s.className='jungle-letter';s.textContent=letters[Math.floor(Math.random()*letters.length)];s.style.cssText=`left:${10+i*18}%;top:${10+Math.random()*50}%;animation-duration:${4+Math.random()*4}s;animation-delay:${Math.random()*3}s;`;c.appendChild(s)}
+  for(let i=0;i<6;i++){const f=document.createElement('div');f.className='firefly';f.style.cssText=`left:${Math.random()*90}%;top:${Math.random()*80}%;animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*2}s;`;c.appendChild(f)}
+}
+function initSavannaWorld() {
+  const c=document.querySelector('.world-savanna'); if(!c)return
+  c.querySelectorAll('.shimmer-dot').forEach(e=>e.remove())
+  for(let i=0;i<8;i++){const d=document.createElement('div');d.className='shimmer-dot';d.style.cssText=`left:${Math.random()*90}%;top:${30+Math.random()*40}%;animation-duration:${1+Math.random()*2}s;animation-delay:${Math.random()*2}s;`;c.appendChild(d)}
+}
+function initDreamWorld() {
+  const c=document.getElementById('world-dream'); if(!c)return; c.innerHTML=''
+  for(let i=0;i<12;i++){const s=document.createElement('span');s.className='star-twinkle';s.textContent=['✨','⭐','🌟','💫'][i%4];s.style.cssText=`left:${Math.random()*90}%;top:${Math.random()*80}%;animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*3}s;`;c.appendChild(s)}
+  const colors=['rgba(167,139,250,0.25)','rgba(56,189,248,0.2)','rgba(253,164,175,0.2)']
+  for(let i=0;i<3;i++){const o=document.createElement('div');o.className='glow-orb';const sz=60+Math.random()*60;o.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[i]};left:${10+i*30}%;top:${20+i*20}%;animation-duration:${4+Math.random()*3}s;animation-delay:${Math.random()*2}s;`;c.appendChild(o)}
+}
+
+// ================================================================
+// SCREEN NAV
+// ================================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+  window.scrollTo(0,0)
+}
+
+// ================================================================
+// LEVEL SELECT
+// ================================================================
+function openLevelSelect(gameNum) {
+  state.currentGame = gameNum
+  const meta = GAME_META[gameNum]
+  document.getElementById('level-game-icon').textContent = meta.icon
+  document.getElementById('level-game-name').textContent = meta.name
+  showScreen('screen-level')
+}
+function startGameWithLevel(level) {
+  state.selectedLevel = level
+  state.gameStars = [0,0]
+  state.currentPlayer = 0
+  showScreen('screen-game' + state.currentGame)
+  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5]
+  inits[state.currentGame]()
+}
+
+// ================================================================
+// startGame for G6-G9 (no level select)
+// ================================================================
+function startGame(num) {
+  state.currentGame = num
+  state.gameStars = [0,0]
+  state.currentPlayer = 0
+  state.selectedLevel = 'medium'
+  showScreen('screen-game' + num)
+  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9]
+  inits[num]()
+}
+
+// ================================================================
+// MODE & NAMES
+// ================================================================
+function selectMode(mode) {
+  state.mode = mode
+  buildAnimalPicker('p1-animals',0)
+  document.getElementById('p2-section').style.display = mode==='duo'?'block':'none'
+  if (mode==='duo') buildAnimalPicker('p2-animals',1)
+  showScreen('screen-names')
+}
+function buildAnimalPicker(containerId, playerIdx) {
+  const container = document.getElementById(containerId); container.innerHTML=''
+  ANIMALS_PICKER.forEach(a=>{
+    const btn=document.createElement('button')
+    btn.className='animal-btn'+(state.players[playerIdx].animal===a?' selected':'')
+    btn.textContent=a
+    btn.onclick=()=>{container.querySelectorAll('.animal-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');state.players[playerIdx].animal=a;playClick()}
+    container.appendChild(btn)
+  })
+}
+function confirmNames() {
+  const n1=document.getElementById('p1-name').value.trim()
+  if(n1) state.players[0].name=n1
+  if(state.mode==='duo'){const n2=document.getElementById('p2-name').value.trim();if(n2)state.players[1].name=n2}
+  try {
+    const saved=JSON.parse(localStorage.getItem('dunia-emosi-stars')||'{}')
+    state.players[0].stars=saved[state.players[0].name]||0
+    state.players[1].stars=saved[state.players[1].name]||0
+    state.unlockedAchievements=JSON.parse(localStorage.getItem('dunia-emosi-achievements')||'{}')
+  } catch(e){}
+  updateStreak()
+  state.currentPlayer=0
+  buildMenuHeader()
+  showScreen('screen-menu')
+}
+function saveStars() {
+  try {
+    const saved=JSON.parse(localStorage.getItem('dunia-emosi-stars')||'{}')
+    saved[state.players[0].name]=state.players[0].stars
+    if(state.mode==='duo') saved[state.players[1].name]=state.players[1].stars
+    localStorage.setItem('dunia-emosi-stars',JSON.stringify(saved))
+  } catch(e){}
+}
+
+// ================================================================
+// STREAK
+// ================================================================
+function updateStreak() {
+  try {
+    const today=new Date().toDateString()
+    const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
+    const lastDay=data.lastDay||''
+    const yesterday=new Date(Date.now()-86400000).toDateString()
+    if(lastDay===today){}else if(lastDay===yesterday){data.streak=(data.streak||1)+1}else{data.streak=1}
+    data.lastDay=today
+    localStorage.setItem('dunia-emosi-streak',JSON.stringify(data))
+    const streakEl=document.getElementById('streak-badge'),streakText=document.getElementById('streak-text')
+    if(data.streak>=2){streakEl.style.display='inline-flex';streakText.textContent=data.streak+' hari'}
+    return data.streak
+  } catch(e){return 1}
+}
+function getStreakCount() {
+  try{const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}');return data.streak||1}catch(e){return 1}
+}
+
+// ================================================================
+// MENU
+// ================================================================
+function buildMenuHeader() {
+  const header=document.getElementById('menu-player-header'); header.innerHTML=''
+  const makeChip=(idx)=>{
+    const p=state.players[idx],chip=document.createElement('div')
+    chip.className='player-chip'+(state.mode==='solo'||idx===state.currentPlayer?' active':'')
+    const streak=getStreakCount(),streakHtml=streak>=2?`<span class="p-streak">🔥${streak}</span>`:''
+    chip.innerHTML=`<span class="p-animal">${p.animal}</span><span class="p-name">${p.name}</span><span class="p-stars">⭐${p.stars}</span>${streakHtml}`
+    return chip
+  }
+  header.appendChild(makeChip(0))
+  if(state.mode==='duo') header.appendChild(makeChip(1))
+  const banner=document.getElementById('total-stars-banner')
+  if(state.mode==='duo'){banner.style.display='flex';const total=state.players[0].stars+state.players[1].stars;banner.innerHTML=`<span class="tsb-label">Total Bintang Hari Ini ✨</span><span class="tsb-value">⭐ ${total}</span>`}
+  else banner.style.display='none'
+}
+
+function exitGame() {
+  playClick(); clearTimers(); buildMenuHeader(); showScreen('screen-menu')
+}
+function clearTimers() {
+  if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
+  if(state.g4Timer){clearInterval(state.g4Timer);state.g4Timer=null}
+  if(g6State && g6State.animFrame){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
+  if(g9Canvas){
+    g9Canvas.removeEventListener('mousedown',g9StartDraw)
+    g9Canvas.removeEventListener('mousemove',g9Draw)
+    g9Canvas.removeEventListener('mouseup',g9EndDraw)
+    g9Canvas.removeEventListener('touchstart',g9TouchStart)
+    g9Canvas.removeEventListener('touchmove',g9TouchMove)
+    g9Canvas.removeEventListener('touchend',g9EndDraw)
+  }
+}
+
+// ================================================================
+// DOTS
+// ================================================================
+function buildDots(containerId, total, current) {
+  const el=document.getElementById(containerId); if(!el)return; el.innerHTML=''
+  const maxDots=Math.min(total,10),step=total/maxDots
+  for(let i=0;i<maxDots;i++){const dot=document.createElement('div');const threshold=Math.round(i*step);dot.className='rdot'+(current>threshold?' done':(current===threshold?' current':''));el.appendChild(dot)}
+}
+
+// ================================================================
+// FLASH
+// ================================================================
+function flashScreen(type) {
+  const el=document.getElementById('flash-overlay')
+  el.className='flash-overlay '+type; el.classList.add('show')
+  setTimeout(()=>el.classList.remove('show'),300)
+  if(type==='red'){const screen=document.querySelector('.screen.active');if(screen){screen.classList.add('shake');setTimeout(()=>screen.classList.remove('shake'),400)}}
+}
+
+// ================================================================
+// ACHIEVEMENTS
+// ================================================================
+function checkAchievements(context) {
+  const totalStars=state.players[0].stars+state.players[1].stars
+  const checks={first_star:totalStars>=1,ten_stars:totalStars>=10,fifty_stars:totalStars>=50,perfect_emotion:context==='perfect_g1',calm_breath:context==='done_g2',letter_master:context==='perfect_g3',count_master:context==='perfect_g4',memory_master:context==='done_g5'}
+  for(const[key,earned] of Object.entries(checks)){if(earned&&!state.unlockedAchievements[key]){state.unlockedAchievements[key]=true;try{localStorage.setItem('dunia-emosi-achievements',JSON.stringify(state.unlockedAchievements))}catch(e){}showAchievement(key);break}}
+}
+function showAchievement(key) {
+  const ach=ACHIEVEMENTS[key]; if(!ach)return
+  const toast=document.getElementById('achievement-toast')
+  document.getElementById('at-icon').textContent=ach.icon; document.getElementById('at-name').textContent=ach.name
+  toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3500)
+}
+
+// ================================================================
+// FEEDBACK
+// ================================================================
+let feedbackCallback=null
+function showFeedback(correct, starsEarned, customMsg, callback) {
+  feedbackCallback=callback
+  const emojis=correct?['🎉','⭐','🥳','🏆','🌟','🎊','💫']:['💪','😊','🤗','🌈','🍀']
+  const titles=correct?['Benar!','Hebat!','Luar biasa!','Bagus sekali!','Keren!']:['Hampir benar!','Coba lagi!','Ayo terus!','Semangat!']
+  document.getElementById('fb-emoji').textContent=emojis[Math.floor(Math.random()*emojis.length)]
+  document.getElementById('fb-title').textContent=titles[Math.floor(Math.random()*titles.length)]
+  document.getElementById('fb-sub').textContent=customMsg||(correct?'Kamu pintar sekali! 😄':'Tidak apa-apa, kamu pasti bisa! 💪')
+  document.getElementById('fb-stars').textContent=starsEarned>0?'⭐'.repeat(Math.min(starsEarned,5)):''
+  document.getElementById('overlay-feedback').classList.add('show')
+  if(correct&&starsEarned>0) launchConfetti()
+}
+function closeFeedback() {
+  playClick(); document.getElementById('overlay-feedback').classList.remove('show')
+  if(feedbackCallback){feedbackCallback();feedbackCallback=null}
+}
+function addStars(n, answerEl) {
+  state.players[state.currentPlayer].stars+=n
+  state.gameStars[state.currentPlayer]+=n
+  saveStars(); updateGameStarDisplay(); spawnSparkles()
+  if(answerEl) flyStarToCounter(answerEl)
+  checkAchievements(null)
+}
+function updateGameStarDisplay() {
+  const gn=state.currentGame
+  const gsEl=document.getElementById('g'+gn+'-stars')||document.getElementById('g'+gn+'-stars-hdr')
+  if(gsEl){gsEl.textContent='⭐ '+state.gameStars[state.currentPlayer];gsEl.classList.remove('pop');void gsEl.offsetWidth;gsEl.classList.add('pop')}
+  const piEl=document.getElementById('g'+gn+'-player-icon')
+  if(piEl) piEl.textContent=state.players[state.currentPlayer].animal
+  // G6 score mid
+  const g6s=document.getElementById('g6-score')
+  if(g6s&&gn===6) g6s.textContent='⭐ '+state.gameStars[state.currentPlayer]
+}
+function flyStarToCounter(srcEl) {
+  const gn=state.currentGame
+  const counter=document.getElementById('g'+gn+'-stars')||document.getElementById('g'+gn+'-stars-hdr')
+  if(!counter||!srcEl)return
+  const srcRect=srcEl.getBoundingClientRect(),dstRect=counter.getBoundingClientRect()
+  const star=document.createElement('div'); star.className='star-fly'; star.textContent='⭐'
+  const tx=dstRect.left-srcRect.left,ty=dstRect.top-srcRect.top
+  star.style.cssText=`left:${srcRect.left}px;top:${srcRect.top}px;--tx:${tx}px;--ty:${ty}px;animation-duration:0.6s;`
+  document.body.appendChild(star); setTimeout(()=>star.remove(),700)
+}
+
+// ================================================================
+// RESULT
+// ================================================================
+function showResult(mascot, title, msg) {
+  clearTimers()
+  const totalStars=state.gameStars[0]+state.gameStars[1]
+  document.getElementById('result-mascot').textContent=mascot||state.players[state.currentPlayer].animal
+  document.getElementById('result-title').textContent=title||'Bagus sekali!'
+  document.getElementById('result-stars').textContent='⭐'.repeat(Math.min(totalStars,8))||'⭐'
+  document.getElementById('result-msg').textContent=msg||`Kamu dapat ${totalStars} bintang! 🌟`
+  const scoresEl=document.getElementById('result-scores')
+  if(state.mode==='duo'){scoresEl.style.display='flex';scoresEl.innerHTML=[0,1].map(i=>`<div class="rs-card"><div class="rs-animal">${state.players[i].animal}</div><div class="rs-name">${state.players[i].name}</div><div class="rs-stars">⭐ ${state.gameStars[i]}</div></div>`).join('')}
+  else scoresEl.style.display='none'
+  buildMenuHeader(); showScreen('screen-result'); launchConfetti(); launchConfetti()
+}
+function playAgain() { if(state.currentGame<=5) startGameWithLevel(state.selectedLevel); else startGame(state.currentGame) }
+function goToMenu()  { buildMenuHeader(); showScreen('screen-menu') }
+
+// ================================================================
+// CONFETTI + SPARKLES
+// ================================================================
+function launchConfetti() {
+  const colors=['#F43F5E','#FCD34D','#14B8A6','#38BDF8','#8B5CF6','#FDA4AF','#A3E635','#FCD34D']
+  for(let i=0;i<50;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';const size=8+Math.random()*12,dx=(Math.random()-0.5)*200+'px',rot=Math.random()*1080+'deg';p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${size}px;height:${size*1.4}px;border-radius:${Math.random()>0.5?'50%':'4px'};animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`;document.body.appendChild(p);setTimeout(()=>p.remove(),3200)},i*35)}
+}
+function spawnSparkles() {
+  const icons=['⭐','✨','💫','🌟','❤️','🎉']
+  for(let i=0;i<8;i++){const s=document.createElement('div');s.className='sparkle';const angle=(i/8)*Math.PI*2,dist=60+Math.random()*80;s.style.cssText=`left:50%;top:40%;--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--rot:${Math.random()*360}deg;animation-duration:${0.5+Math.random()*0.5}s;animation-delay:${Math.random()*0.2}s;font-size:${16+Math.random()*14}px;`;s.textContent=icons[Math.floor(Math.random()*icons.length)];document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}
+}
+
+// ================================================================
+// AUDIO
+// ================================================================
+let audioCtx=null
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
+function playTone(freq,dur,type='sine',vol=0.2){try{const ctx=getAudio(),osc=ctx.createOscillator(),gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.type=type;osc.frequency.value=freq;gain.gain.setValueAtTime(vol,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);osc.start();osc.stop(ctx.currentTime+dur)}catch(e){}}
+function playCorrect(){playTone(523,0.1,'sine',0.2);setTimeout(()=>playTone(659,0.1,'sine',0.2),100);setTimeout(()=>playTone(784,0.2,'sine',0.25),200);setTimeout(()=>playTone(1047,0.3,'sine',0.2),340)}
+function playWrong(){playTone(280,0.35,'sawtooth',0.1);setTimeout(()=>playTone(220,0.3,'sawtooth',0.08),150)}
+function playClick(){playTone(440,0.06,'sine',0.1)}
+function playBreathIn(){playTone(392,4.0,'sine',0.06)}
+function playBreathOut(){playTone(330,4.0,'sine',0.06)}
+
+// ================================================================
+// GAME 1: AKU MERASA
+// ================================================================
+let g1State={}
+function initGame1(){
+  initHeartWorld()
+  const diff=DIFF[state.selectedLevel]
+  g1State={round:0,maxRound:diff.rounds,choices:diff.choices,correct:0,answered:false}
+  state.currentPlayer=0; updateGameStarDisplay(); buildDots('g1-dots',diff.rounds,0); nextG1Round()
+}
+function nextG1Round(){
+  const totalRounds=state.mode==='duo'?g1State.maxRound*2:g1State.maxRound
+  if(g1State.round>=totalRounds){const perfect=g1State.correct>=g1State.maxRound;if(perfect)checkAchievements('perfect_g1');showResult('🎭','Emosi Berhasil!','Kamu mengenal banyak emosi sekarang! 🌟');return}
+  if(state.mode==='duo'&&g1State.round===g1State.maxRound){state.currentPlayer=1;g1State.correct=0;updateGameStarDisplay();showFeedback(true,0,`Giliran ${state.players[1].name}! 🎮`,nextG1Round);return}
+  g1State.answered=false; document.getElementById('g1-tip').style.display='none'
+  const roundInSet=g1State.round%g1State.maxRound; buildDots('g1-dots',g1State.maxRound,roundInSet)
+  const shuffled=[...EMOTIONS].sort(()=>Math.random()-0.5),correct=shuffled[0],numChoices=g1State.choices
+  const pool=shuffled.slice(0,numChoices).sort(()=>Math.random()-0.5)
+  if(!pool.find(e=>e.name===correct.name))pool[0]=correct
+  const choices=pool.sort(()=>Math.random()-0.5)
+  document.getElementById('g1-animal').textContent=correct.emoji+' '+correct.animal
+  document.getElementById('g1-progress-bar').style.width=((roundInSet/g1State.maxRound)*100)+'%'
+  const choicesEl=document.getElementById('g1-choices')
+  choicesEl.style.gridTemplateColumns=numChoices<=3?'1fr 1fr 1fr':(numChoices<=4?'1fr 1fr':'1fr 1fr 1fr')
+  if(numChoices===6)choicesEl.style.gridTemplateColumns='1fr 1fr 1fr'
+  choicesEl.innerHTML=''
+  choices.forEach(em=>{
+    const btn=document.createElement('button'); btn.className='g1-choice-btn'
+    btn.innerHTML=`<span class="choice-emoji">${em.emoji}</span><span class="choice-label">${em.name}</span>`
+    btn.onclick=()=>{
+      if(g1State.answered)return; g1State.answered=true
+      const isCorrect=em.name===correct.name
+      choicesEl.querySelectorAll('.g1-choice-btn').forEach(b=>{b.style.pointerEvents='none';if(b.querySelector('.choice-label').textContent===correct.name)b.classList.add('correct')})
+      if(!isCorrect){btn.classList.add('wrong');playWrong();flashScreen('red')}else{playCorrect();addStars(1,btn);flashScreen('green');g1State.correct++}
+      const tipEl=document.getElementById('g1-tip'); tipEl.style.display='block'
+      tipEl.innerHTML=`<span class="tip-icon">${correct.animal}</span><div class="tip-text">${correct.tip}</div>`
+      g1State.round++; setTimeout(nextG1Round,2400)
+    }
+    choicesEl.appendChild(btn)
+  })
+  const p=state.mode==='duo'?`${state.players[state.currentPlayer].name} — Soal ${roundInSet+1} dari ${g1State.maxRound}`:`Soal ${g1State.round+1} dari ${g1State.maxRound}`
+  document.getElementById('g1-progress').textContent=p
+}
+
+// ================================================================
+// GAME 2: NAPAS PELANGI
+// ================================================================
+const BREATHE_BOX=[
+  {name:'Hirup... 🌬️',   sub:'Tarik napas pelan-pelan...',    dur:4,scaleTarget:1.55,color:'#A78BFA'},
+  {name:'Tahan! ⏸️',     sub:'Tahan napasmu sebentar...',     dur:4,scaleTarget:1.55,color:'#8B5CF6'},
+  {name:'Hembuskan! ☁️', sub:'Keluarkan napas pelan-pelan...',dur:4,scaleTarget:1.0, color:'#14B8A6'}
+]
+const BREATHE_ADVANCED=[
+  {name:'Hirup... 🌬️',   sub:'Tarik napas pelan-pelan...',   dur:4,scaleTarget:1.55,color:'#A78BFA'},
+  {name:'Tahan! ⏸️',     sub:'Tahan napasmu...',             dur:6,scaleTarget:1.55,color:'#8B5CF6'},
+  {name:'Hembuskan! ☁️', sub:'Keluarkan napas perlahan...',  dur:8,scaleTarget:1.0, color:'#14B8A6'}
+]
+let g2Cycle=0,g2PhaseIdx=0,g2MaxCycles=3
+function initGame2(){
+  initCloudWorld(); clearTimers()
+  const diff=DIFF[state.selectedLevel]; g2MaxCycles=diff.breatheCycles; g2Cycle=0; g2PhaseIdx=0
+  document.getElementById('g2-instruction').textContent='Siap Bernapas?'
+  document.getElementById('g2-sub').textContent='Ikuti lingkaran yang bergerak ya! 😊'
+  document.getElementById('g2-timer').textContent='4'
+  document.getElementById('g2-start-btn').style.display='flex'
+  document.getElementById('g2-mascot').textContent=state.players[state.currentPlayer].animal
+  document.getElementById('g2-player-icon').textContent=state.players[state.currentPlayer].animal
+  document.getElementById('g2-stars').textContent='⭐ 0'
+  const cyclesEl=document.getElementById('g2-cycles'); cyclesEl.innerHTML=''
+  for(let i=0;i<g2MaxCycles;i++){const d=document.createElement('div');d.className='cycle-dot';d.id='cd'+i;cyclesEl.appendChild(d)}
+  setCircleScale(1.0,'#A78BFA')
+}
+function setCircleScale(scale,color){
+  document.getElementById('g2-ring1').style.transform=`scale(${scale})`
+  document.getElementById('g2-ring2').style.transform=`scale(${scale})`
+  document.getElementById('g2-ring1').style.background=`radial-gradient(circle,${color}55,${color}22)`
+  document.getElementById('g2-ring2').style.background=`radial-gradient(circle,${color}99,${color}44)`
+  document.getElementById('g2-mascot').style.transform=`scale(${0.7+scale*0.2})`
+  document.getElementById('g2-ring1').style.boxShadow=`0 0 ${40*scale}px ${color}60`
+}
+function startBreathing(){document.getElementById('g2-start-btn').style.display='none';g2Cycle=0;g2PhaseIdx=0;runBreathePhase()}
+function runBreathePhase(){
+  if(g2Cycle>=g2MaxCycles){addStars(3);setCircleScale(1.0,'#14B8A6');document.getElementById('g2-instruction').textContent='Luar biasa! 🌟';document.getElementById('g2-sub').textContent='Napasmu sangat bagus!';document.getElementById('g2-timer').textContent='😊';checkAchievements('done_g2');const doneMsg=state.mode==='duo'?'Kalian bernapas bersama dengan indah! 🌈':'Kamu lebih tenang sekarang! 🌈';showFeedback(true,3,doneMsg,()=>showResult('🌬️','Napas Pelangi!',doneMsg));return}
+  const phases=state.selectedLevel==='hard'?BREATHE_ADVANCED:BREATHE_BOX,ph=phases[g2PhaseIdx]
+  const startScale=g2PhaseIdx===2?1.55:(g2PhaseIdx===1?1.55:1.0)
+  document.getElementById('g2-instruction').textContent=ph.name; document.getElementById('g2-sub').textContent=ph.sub
+  if(g2PhaseIdx===0)playBreathIn(); else if(g2PhaseIdx===2)playBreathOut()
+  let sec=ph.dur,elapsed=0; document.getElementById('g2-timer').textContent=sec
+  state.breatheInterval=setInterval(()=>{elapsed++;sec--;const prog=elapsed/ph.dur,scale=startScale+(ph.scaleTarget-startScale)*prog;setCircleScale(scale,ph.color);document.getElementById('g2-timer').textContent=Math.max(0,sec);if(elapsed>=ph.dur){clearInterval(state.breatheInterval);g2PhaseIdx++;if(g2PhaseIdx>=phases.length){g2PhaseIdx=0;g2Cycle++;const dot=document.getElementById('cd'+(g2Cycle-1));if(dot)dot.classList.add('done')}setTimeout(runBreathePhase,400)}},1000)
+}
+
+// ================================================================
+// GAME 3: HURUF HUTAN
+// ================================================================
+let g3State={}
+function initGame3(){
+  initJungleWorld()
+  const diff=DIFF[state.selectedLevel]
+  const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
+  const letters=getAgeLetters(tier)
+  g3State={round:0,maxRound:diff.rounds,choices:diff.choices,correct:0,answered:false,shuffled:[...letters].sort(()=>Math.random()-0.5)}
+  state.currentPlayer=0; updateGameStarDisplay(); buildDots('g3-dots',diff.rounds,0); nextG3Round()
+}
+function nextG3Round(){
+  const totalRounds=state.mode==='duo'?g3State.maxRound*2:g3State.maxRound
+  if(g3State.round>=totalRounds){const perfect=g3State.correct>=g3State.maxRound;if(perfect)checkAchievements('perfect_g3');showResult('🔤','Huruf Hutan Selesai!','Kamu jago mengenal huruf dan angka! 📚');return}
+  if(state.mode==='duo'&&g3State.round===g3State.maxRound){state.currentPlayer=1;g3State.correct=0;g3State.shuffled=[...ANIMAL_LETTERS].sort(()=>Math.random()-0.5);updateGameStarDisplay();showFeedback(true,0,`Giliran ${state.players[1].name}! 🎮`,nextG3Round);return}
+  g3State.answered=false; const roundInSet=g3State.round%g3State.maxRound; buildDots('g3-dots',g3State.maxRound,roundInSet)
+  const isLetterMode=(roundInSet/g3State.maxRound)<0.6
+  const item=g3State.shuffled[roundInSet%g3State.shuffled.length],numChoices=g3State.choices
+  document.getElementById('g3-mode-badge').textContent=isLetterMode?'Level: Huruf 🔤':'Level: Angka 🔢'
+  document.getElementById('g3-animal').textContent=item.animal
+  document.getElementById('g3-progress-bar').style.width=((roundInSet/g3State.maxRound)*100)+'%'
+  if(isLetterMode){
+    document.getElementById('g3-word').textContent=item.word
+    document.getElementById('g3-hint').textContent=`Huruf apa yang ada di depan kata "${item.word}"?`
+    const wrongLetters=ALL_LETTERS.split('').filter(l=>l!==item.letter).sort(()=>Math.random()-0.5).slice(0,numChoices-1)
+    renderG3Choices([item.letter,...wrongLetters].sort(()=>Math.random()-0.5),item.letter,false,numChoices)
+  } else {
+    const maxNum=state.selectedLevel==='hard'?15:10,displayCount=Math.min(item.num,9)
+    document.getElementById('g3-word').textContent=item.animal.repeat(displayCount)
+    document.getElementById('g3-hint').textContent=`Ada berapa ${item.word.toLowerCase()} di atas? (Jawab: ${item.num})`
+    const correctNum=item.num,wrongs=new Set()
+    while(wrongs.size<numChoices-1){const r=Math.max(1,Math.min(maxNum,correctNum+Math.floor(Math.random()*6)-3));if(r!==correctNum)wrongs.add(r)}
+    renderG3Choices([correctNum,...[...wrongs]].sort(()=>Math.random()-0.5).map(String),String(correctNum),true,numChoices)
+  }
+  const p=state.mode==='duo'?`${state.players[state.currentPlayer].name} — ${roundInSet+1}/${g3State.maxRound}`:`${roundInSet+1} / ${g3State.maxRound}`
+  document.getElementById('g3-progress').textContent=p; g3State.round++
+}
+function renderG3Choices(choices,correctVal,isNum,numChoices){
+  const el=document.getElementById('g3-choices')
+  el.style.gridTemplateColumns=numChoices<=3?'1fr 1fr 1fr':(numChoices<=4?'1fr 1fr':'1fr 1fr 1fr')
+  el.innerHTML=''
+  choices.slice(0,numChoices).forEach(ch=>{
+    const btn=document.createElement('button'); btn.className='g3-choice-btn'; btn.textContent=ch
+    if(numChoices>4) btn.style.fontSize='32px'
+    btn.onclick=()=>{if(g3State.answered)return;g3State.answered=true;const correct=ch===correctVal;el.querySelectorAll('.g3-choice-btn').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correctVal)b.classList.add('correct')});if(!correct){btn.classList.add('wrong');playWrong();flashScreen('red')}else{playCorrect();addStars(1,btn);flashScreen('green');g3State.correct++};setTimeout(nextG3Round,1300)}
+    el.appendChild(btn)
+  })
+}
+
+// ================================================================
+// GAME 4: HITUNG BINATANG
+// ================================================================
+let g4State={}
+function initGame4(){
+  initSavannaWorld()
+  const diff=DIFF[state.selectedLevel]
+  const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
+  g4State={round:0,maxRound:diff.rounds,timerSec:diff.timer,choices:diff.choices,correct:0,answered:false,maxCount:getAgeMaxCount(tier)}
+  state.currentPlayer=0; updateGameStarDisplay(); buildDots('g4-dots',diff.rounds,0); nextG4Round()
+}
+function nextG4Round(){
+  clearInterval(state.g4Timer)
+  const totalRounds=state.mode==='duo'?g4State.maxRound*2:g4State.maxRound
+  if(g4State.round>=totalRounds){const perfect=g4State.correct>=g4State.maxRound;if(perfect)checkAchievements('perfect_g4');showResult('🔢','Hitung Selesai!','Kamu jago menghitung! 🔢✨');return}
+  if(state.mode==='duo'&&g4State.round===g4State.maxRound){state.currentPlayer=1;g4State.correct=0;updateGameStarDisplay();showFeedback(true,0,`Giliran ${state.players[1].name}! 🎮`,nextG4Round);return}
+  g4State.answered=false; g4State.round++
+  const roundInSet=(g4State.round-1)%g4State.maxRound; buildDots('g4-dots',g4State.maxRound,roundInSet)
+  document.getElementById('g4-progress-bar').style.width=((roundInSet/g4State.maxRound)*100)+'%'
+  const maxCount=g4State.maxCount,count=1+Math.floor(Math.random()*maxCount)
+  const animalType=ANIMALS_G4[Math.floor(Math.random()*ANIMALS_G4.length)]
+  const grid=document.getElementById('g4-animals'); grid.innerHTML=''
+  for(let i=0;i<count;i++){const s=document.createElement('span');s.className='g4-animal-item';s.textContent=animalType;s.style.animationDelay=(i*55)+'ms';grid.appendChild(s)}
+  const numChoices=g4State.choices,wrongs=new Set()
+  while(wrongs.size<numChoices-1){const r=Math.max(1,Math.min(maxCount,count+Math.floor(Math.random()*6)-3));if(r!==count)wrongs.add(r)}
+  const choices=[count,...[...wrongs]].sort(()=>Math.random()-0.5)
+  const choicesEl=document.getElementById('g4-choices'); choicesEl.innerHTML=''
+  choices.forEach(ch=>{
+    const btn=document.createElement('button'); btn.className='g4-choice-btn'; btn.textContent=ch
+    if(numChoices>4) btn.style.fontSize='26px'
+    btn.onclick=()=>{if(g4State.answered)return;g4State.answered=true;clearInterval(state.g4Timer);const correct=ch===count;choicesEl.querySelectorAll('.g4-choice-btn').forEach(b=>{b.style.pointerEvents='none';if(parseInt(b.textContent)===count)b.classList.add('correct')});if(!correct){btn.classList.add('wrong');playWrong();flashScreen('red')}else{playCorrect();addStars(1,btn);flashScreen('green');g4State.correct++};setTimeout(nextG4Round,1300)}
+    choicesEl.appendChild(btn)
+  })
+  document.getElementById('g4-progress').textContent=state.mode==='duo'?`${state.players[state.currentPlayer].name} — ${roundInSet+1}/${g4State.maxRound}`:`${roundInSet+1} / ${g4State.maxRound}`
+  let timeLeft=g4State.timerSec; const fill=document.getElementById('g4-fill')
+  fill.style.width='100%'; fill.style.background='linear-gradient(90deg,#F59E0B,#FCD34D)'
+  document.getElementById('g4-timer-text').textContent=timeLeft+' detik'
+  state.g4Timer=setInterval(()=>{timeLeft--;const pct=(timeLeft/g4State.timerSec)*100;fill.style.width=pct+'%';if(timeLeft<=Math.floor(g4State.timerSec*0.35))fill.style.background='linear-gradient(90deg,#F43F5E,#F59E0B)';document.getElementById('g4-timer-text').textContent=timeLeft+' detik';if(timeLeft<=0){clearInterval(state.g4Timer);if(!g4State.answered){g4State.answered=true;choicesEl.querySelectorAll('.g4-choice-btn').forEach(b=>{b.style.pointerEvents='none';if(parseInt(b.textContent)===count)b.classList.add('correct')});playWrong();flashScreen('red');setTimeout(nextG4Round,1300)}}},1000)
+}
+
+// ================================================================
+// GAME 5: COCOKKAN EMOSI
+// ================================================================
+let g5State={}
+function initGame5(){
+  initDreamWorld(); clearTimers()
+  const diff=DIFF[state.selectedLevel]
+  let totalPairs,gridClass,cols
+  if(state.selectedLevel==='easy'){totalPairs=6;gridClass='grid-3x4';cols=3}
+  else if(state.selectedLevel==='hard'){totalPairs=10;gridClass='grid-4x5';cols=4}
+  else{totalPairs=8;gridClass='';cols=4}
+  g5State={cards:[],flipped:[],matched:0,totalPairs,scores:[0,0],currentPlayer:state.currentPlayer,locked:false}
+  const pool=MATCH_PAIRS.slice(0,totalPairs),pairs=[...pool,...pool].sort(()=>Math.random()-0.5).map((item,idx)=>({...item,idx,flipped:false,matched:false}))
+  g5State.cards=pairs
+  const scoresEl=document.getElementById('g5-scores')
+  if(state.mode==='duo'){scoresEl.innerHTML=[0,1].map(i=>`<div class="g5-player-score ${i===g5State.currentPlayer?'active':''}" id="g5-ps-${i}"><div class="ps-name">${state.players[i].animal} ${state.players[i].name}</div><div class="ps-val" id="g5-score-${i}">0 pasang</div></div>`).join('');document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`}
+  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent='Cocokkan semua pasangan emosi! 🃏'}
+  const grid=document.getElementById('g5-grid'); grid.className='g5-grid'+(gridClass?' '+gridClass:''); renderG5Grid()
+}
+function renderG5Grid(){
+  const grid=document.getElementById('g5-grid'); grid.innerHTML=''
+  g5State.cards.forEach((card,idx)=>{
+    const el=document.createElement('div'); el.className='g5-card'
+    el.innerHTML=`<div class="g5-card-front"></div><div class="g5-card-back"><span class="card-emoji">${card.emoji}</span><span class="card-label">${card.label}</span></div>`
+    el.onclick=()=>flipG5Card(idx,el); grid.appendChild(el); card.el=el
+  })
+}
+function flipG5Card(idx,el){
+  if(g5State.locked)return; const card=g5State.cards[idx]
+  if(card.flipped||card.matched||g5State.flipped.length>=2)return
+  card.flipped=true; el.classList.add('flipped'); playClick(); g5State.flipped.push(idx)
+  if(g5State.flipped.length===2){g5State.locked=true;setTimeout(checkG5Match,900)}
+}
+function checkG5Match(){
+  const[i1,i2]=g5State.flipped,c1=g5State.cards[i1],c2=g5State.cards[i2]
+  if(c1.id===c2.id){
+    c1.matched=c2.matched=true; c1.el.classList.add('matched'); c2.el.classList.add('matched')
+    playCorrect(); spawnSparkles(); flashScreen('green')
+    const cp=g5State.currentPlayer; g5State.scores[cp]++
+    state.players[cp].stars++; state.gameStars[cp]++; saveStars()
+    const scoreEl=document.getElementById('g5-score-'+cp); if(scoreEl)scoreEl.textContent=g5State.scores[cp]+' pasang'
+    g5State.matched++; checkAchievements(null)
+    if(g5State.matched>=g5State.totalPairs){checkAchievements('done_g5');setTimeout(()=>{const w=g5State.scores[0]>g5State.scores[1]?0:(g5State.scores[1]>g5State.scores[0]?1:-1);const msg=state.mode==='duo'?(w>=0?`${state.players[w].name} menang dengan ${g5State.scores[w]} pasang! 🏆`:'Seri! Kalian sama-sama hebat! 🤝'):`Kamu berhasil cocokkan semua ${g5State.matched} pasang emosi! 🌟`;showResult('🃏','Cocok Semua!',msg)},700);return}
+  } else {
+    playWrong(); flashScreen('red'); c1.flipped=c2.flipped=false
+    setTimeout(()=>{c1.el.classList.remove('flipped');c2.el.classList.remove('flipped')},500)
+    if(state.mode==='duo'){g5State.currentPlayer=g5State.currentPlayer===0?1:0;state.currentPlayer=g5State.currentPlayer;document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`;document.querySelectorAll('.g5-player-score').forEach((el,i)=>el.classList.toggle('active',i===g5State.currentPlayer))}
+  }
+  g5State.flipped=[]; setTimeout(()=>{g5State.locked=false},250)
+}
+
+// ================================================================
+// GAME 6: PETUALANGAN MOBIL
+// ================================================================
+let g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null}
+
+function initGame6() {
+  g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null}
+  document.querySelectorAll('.g6-map-btn').forEach(b=>b.classList.remove('active'))
+  const firstBtn = document.querySelector('.g6-map-btn[data-map="city"]')
+  if(firstBtn) firstBtn.classList.add('active')
+  updateGameStarDisplay()
+  setupDriveMap('city')
+}
+function setupDriveMap(map) {
+  g6State.map = map
+  const vehicle = DRIVE_VEHICLES[map]
+  document.getElementById('g6-car').textContent = vehicle
+  document.getElementById('g6-vehicle-icon').textContent = vehicle
+  pickNextWord()
+  document.getElementById('g6-start-overlay').style.display = 'flex'
+}
+function selectDriveMap(map, btn) {
+  document.querySelectorAll('.g6-map-btn').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active')
+  if(g6State.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
+  clearRoadTiles()
+  setupDriveMap(map)
+}
+function pickNextWord() {
+  const tier = state.players[state.currentPlayer].ageTier||'tumbuh'
+  const bank = getAgeWordBank(g6State.map, tier)
+  const validBank = bank.length > 0 ? bank : DRIVE_WORD_BANK[g6State.map]
+  const word = validBank[Math.floor(Math.random()*validBank.length)]
+  g6State.targetWord = word; g6State.collectedIdx = 0
+  document.getElementById('g6-start-word').textContent = word.split('').join(' ')
+  document.getElementById('g6-target-word').textContent = word.split('').join(' - ')
+  renderCollectedSlots()
+}
+function renderCollectedSlots() {
+  const el = document.getElementById('g6-collected')
+  el.innerHTML = g6State.targetWord.split('').map((letter,i) => {
+    const filled = i < g6State.collectedIdx
+    return `<div class="g6-slot ${filled?'filled':''}">${filled?letter:''}</div>`
+  }).join('')
+}
+function beginDrive() {
+  document.getElementById('g6-start-overlay').style.display = 'none'
+  g6State.running = true; g6State.frameCount = 0; g6State.tiles = []
+  updateCarPosition(); driveTick()
+}
+function driveTick() {
+  if(!g6State.running) return
+  g6State.frameCount++
+  if(g6State.frameCount % 45 === 0) spawnDriveTileRow()
+  const road = document.getElementById('g6-road')
+  const roadH = road.clientHeight
+  const toRemove = []
+  g6State.tiles.forEach(tile => {
+    tile.y += g6State.speed * 2
+    tile.el.style.top = tile.y + 'px'
+    const carY = roadH - 80, tileBottom = tile.y + 44
+    if(tileBottom >= carY && tileBottom <= carY + 60) {
+      const tileLaneCenter = [16.6,50,83.3][tile.lane]
+      const carLaneCenter  = [16.6,50,83.3][g6State.lane]
+      if(Math.abs(tileLaneCenter - carLaneCenter) < 15) {
+        handleDriveCollision(tile); toRemove.push(tile)
+      }
+    }
+    if(tile.y > roadH) toRemove.push(tile)
+  })
+  toRemove.forEach(t=>{if(t.el.parentNode)t.el.remove();g6State.tiles=g6State.tiles.filter(x=>x!==t)})
+  if(g6State.frameCount % 300 === 0) g6State.speed = Math.min(g6State.speed + 0.2, 4)
+  g6State.animFrame = requestAnimationFrame(driveTick)
+}
+function spawnDriveTileRow() {
+  const word = g6State.targetWord, nextLetter = word[g6State.collectedIdx]
+  const diff = state.selectedLevel||'medium'
+  const obstacleChance = diff==='easy'?0.15:diff==='medium'?0.25:0.35
+  const targetLane = Math.floor(Math.random()*3)
+  const road = document.getElementById('g6-road')
+  const lanePositions = [16.6,50,83.3]
+  for(let lane=0;lane<3;lane++){
+    let type,content
+    if(lane===targetLane){type='target';content=nextLetter}
+    else if(Math.random()<obstacleChance){type='obstacle';content=DRIVE_OBSTACLES[g6State.map]}
+    else{const decoyLetters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(l=>l!==nextLetter);type='decoy';content=decoyLetters[Math.floor(Math.random()*decoyLetters.length)]}
+    const el=document.createElement('div'); el.className=`g6-tile ${type}`; el.textContent=content
+    el.style.left=lanePositions[lane]+'%'; el.style.top='-50px'
+    road.appendChild(el); g6State.tiles.push({el,lane,y:-50,type,content})
+  }
+}
+function handleDriveCollision(tile) {
+  if(tile.type==='target'){
+    tile.el.classList.add('collected'); g6State.collectedIdx++; playCorrect(); renderCollectedSlots(); addStars(1); spawnSparkles()
+    if(g6State.collectedIdx>=g6State.targetWord.length){
+      g6State.wordsCompleted++; g6State.speed=Math.max(1.5,g6State.speed-0.3)
+      if(g6State.wordsCompleted>=g6State.totalWords){
+        cancelAnimationFrame(g6State.animFrame); g6State.running=false
+        showResult('🚗','Petualangan Selesai!',`Kamu berhasil mengeja ${g6State.wordsCompleted} kata! 🎉`)
+      } else {
+        showFeedback(true,0,`"${g6State.targetWord}" benar! Kata berikutnya... 🎯`,()=>{
+          pickNextWord(); document.getElementById('g6-start-overlay').style.display='flex'
+          g6State.running=false; cancelAnimationFrame(g6State.animFrame); clearRoadTiles()
+        })
+      }
+    }
+  } else if(tile.type==='obstacle'){
+    tile.el.classList.add('hit'); playWrong()
+    const road=document.getElementById('g6-road')
+    road.style.animation='screenShake 0.4s ease'; setTimeout(()=>road.style.animation='',400)
+  } else {
+    playClick()
+  }
+}
+function clearRoadTiles(){g6State.tiles.forEach(t=>{if(t.el.parentNode)t.el.remove()});g6State.tiles=[]}
+function driveLeft() {if(g6State.lane>0){g6State.lane--;updateCarPosition();playClick()}}
+function driveRight(){if(g6State.lane<2){g6State.lane++;updateCarPosition();playClick()}}
+function updateCarPosition(){const positions=['16.6%','50%','83.3%'];document.getElementById('g6-car').style.left=positions[g6State.lane]}
+
+// ================================================================
+// GAME 7: TEBAK GAMBAR
+// ================================================================
+let g7State = {}
+function initGame7() {
+  const diff = state.selectedLevel||'medium'
+  g7State = {round:0,maxRound:DIFF[diff].rounds,mode:'img2word',answered:false,shuffled:[...WORD_IMAGES].sort(()=>Math.random()-0.5)}
+  state.currentPlayer = 0; updateGameStarDisplay(); nextG7Round()
+}
+function nextG7Round() {
+  const totalRounds = state.mode==='duo'?g7State.maxRound*2:g7State.maxRound
+  if(g7State.round>=totalRounds){
+    if(state.mode==='duo'&&g7State.round===g7State.maxRound){state.currentPlayer=1;updateGameStarDisplay();showFeedback(true,0,`Giliran ${state.players[1].name}! 🎮`,nextG7Round);return}
+    showResult('🖼️','Tebak Gambar Selesai!','Kamu kenal banyak kata! 📚'); return
+  }
+  g7State.answered = false
+  const roundInSet = g7State.round % g7State.maxRound
+  const diff = state.selectedLevel||'medium'
+  g7State.mode = diff==='easy'?'img2word':(roundInSet<Math.ceil(g7State.maxRound/2)?'img2word':'word2img')
+  const correct = g7State.shuffled[roundInSet%WORD_IMAGES.length]
+  const decoys = [...WORD_IMAGES].filter(w=>w.id!==correct.id).sort(()=>Math.random()-0.5).slice(0,3)
+  const choices = [correct,...decoys].sort(()=>Math.random()-0.5)
+  document.getElementById('g7-mode-badge').textContent = g7State.mode==='img2word'?'Mode: Gambar → Kata 🔤':'Mode: Kata → Gambar 🖼️'
+  document.getElementById('g7-progress-bar').style.width = ((roundInSet/g7State.maxRound)*100)+'%'
+  const displayEl=document.getElementById('g7-display'),questionEl=document.getElementById('g7-question')
+  if(g7State.mode==='img2word'){
+    displayEl.innerHTML=`<span style="font-size:80px">${correct.emoji}</span>`
+    questionEl.textContent='Ini nama hewan/benda apa?'
+    renderG7WordChoices(choices,correct)
+  } else {
+    displayEl.innerHTML=`<span style="font-size:42px;font-weight:900;color:#14B8A6;font-family:var(--font-display),var(--font);letter-spacing:2px">${correct.word}</span>`
+    questionEl.textContent='Pilih gambar yang benar!'
+    renderG7ImgChoices(choices,correct)
+  }
+  document.getElementById('g7-progress').textContent=state.mode==='duo'?`${state.players[state.currentPlayer].name} — ${roundInSet+1}/${g7State.maxRound}`:`${roundInSet+1} / ${g7State.maxRound}`
+  g7State.round++
+}
+function renderG7WordChoices(choices,correct){
+  const el=document.getElementById('g7-choices'); el.style.gridTemplateColumns='1fr 1fr'; el.innerHTML=''
+  choices.forEach(ch=>{
+    const btn=document.createElement('button'); btn.className='g7-choice-btn'
+    btn.innerHTML=`<span class="g7-choice-text">${ch.word}</span>`
+    btn.onclick=()=>answerG7(ch.id===correct.id,btn,correct); el.appendChild(btn)
+  })
+}
+function renderG7ImgChoices(choices,correct){
+  const el=document.getElementById('g7-choices'); el.style.gridTemplateColumns='1fr 1fr'; el.innerHTML=''
+  choices.forEach(ch=>{
+    const btn=document.createElement('button'); btn.className='g7-choice-btn'; btn.style.padding='12px 8px'
+    btn.innerHTML=`<span class="g7-choice-img">${ch.emoji}</span><span class="g7-choice-text" style="font-size:14px">${ch.word}</span>`
+    btn.onclick=()=>answerG7(ch.id===correct.id,btn,correct); el.appendChild(btn)
+  })
+}
+function answerG7(isCorrect,btn,correct){
+  if(g7State.answered)return; g7State.answered=true
+  document.querySelectorAll('.g7-choice-btn').forEach(b=>b.style.pointerEvents='none')
+  if(isCorrect){btn.classList.add('correct');playCorrect();addStars(1)}
+  else{
+    btn.classList.add('wrong')
+    document.querySelectorAll('.g7-choice-btn').forEach(b=>{
+      const txt=b.querySelector('.g7-choice-text')
+      if(txt&&(txt.textContent===correct.word))b.classList.add('correct')
+    })
+    playWrong()
+  }
+  setTimeout(nextG7Round,1400)
+}
+
+// ================================================================
+// GAME 8: SUSUN KATA
+// ================================================================
+let g8State = {}
+function initGame8(){
+  const diff=state.selectedLevel||'medium'
+  const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
+  let bank=[...WORD_BUILD_BANK]
+  if(tier==='cilik')  bank=bank.filter(w=>w.word.length<=4)
+  if(tier==='tumbuh') bank=bank.filter(w=>w.word.length<=6)
+  if(bank.length===0) bank=[...WORD_BUILD_BANK]
+  g8State={round:0,maxRound:DIFF[diff].rounds,answered:false,currentWord:'',userInput:[],shuffled:bank.sort(()=>Math.random()-0.5),availableLetters:[]}
+  state.currentPlayer=0; updateGameStarDisplay(); nextG8Round()
+}
+function nextG8Round(){
+  const totalRounds=state.mode==='duo'?g8State.maxRound*2:g8State.maxRound
+  if(g8State.round>=totalRounds){
+    if(state.mode==='duo'&&g8State.round===g8State.maxRound){state.currentPlayer=1;updateGameStarDisplay();showFeedback(true,0,`Giliran ${state.players[1].name}!`,nextG8Round);return}
+    showResult('🔡','Susun Kata Selesai!',`Kamu bisa susun kata! ✍️`); return
+  }
+  g8State.answered=false
+  const roundInSet=g8State.round%g8State.shuffled.length
+  const item=g8State.shuffled[roundInSet%g8State.shuffled.length]
+  g8State.currentWord=item.word; g8State.userInput=[]
+  document.getElementById('g8-progress-bar').style.width=((roundInSet/g8State.maxRound)*100)+'%'
+  document.getElementById('g8-hint-img').innerHTML=`<span style="font-size:70px">${item.emoji}</span>`
+  document.getElementById('g8-hint-text').textContent=item.hint
+  renderG8Slots()
+  const diff=state.selectedLevel||'medium'
+  const numExtra=diff==='easy'?2:diff==='medium'?4:6
+  const correctLetters=item.word.split('')
+  const allLetters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const extra=Array.from({length:numExtra},()=>allLetters[Math.floor(Math.random()*allLetters.length)])
+  g8State.availableLetters=[...correctLetters,...extra].sort(()=>Math.random()-0.5)
+  renderG8Letters()
+  document.getElementById('g8-progress').textContent=state.mode==='duo'?`${state.players[state.currentPlayer].name} — ${roundInSet+1}/${g8State.maxRound}`:`${roundInSet+1} / ${g8State.maxRound}`
+  g8State.round++
+}
+function renderG8Slots(){
+  const el=document.getElementById('g8-slots')
+  el.innerHTML=g8State.currentWord.split('').map((_,i)=>{const filled=g8State.userInput[i];return `<div class="g8-slot ${filled?'filled':''}" id="g8-slot-${i}">${filled||''}</div>`}).join('')
+}
+function renderG8Letters(){
+  const el=document.getElementById('g8-letters'); el.innerHTML=''
+  g8State.availableLetters.forEach((letter,i)=>{
+    const btn=document.createElement('button'); btn.className='g8-letter-btn'; btn.textContent=letter; btn.id=`g8-lbtn-${i}`
+    btn.onclick=()=>g8TapLetter(letter,i,btn); el.appendChild(btn)
+  })
+}
+function g8TapLetter(letter,idx,btn){
+  if(g8State.answered||btn.classList.contains('used'))return
+  if(g8State.userInput.length>=g8State.currentWord.length)return
+  const pos=g8State.userInput.length,correct=g8State.currentWord[pos]
+  if(letter===correct){
+    g8State.userInput.push(letter); btn.classList.add('used'); renderG8Slots(); playClick()
+    if(g8State.userInput.length===g8State.currentWord.length){
+      g8State.answered=true
+      g8State.currentWord.split('').forEach((_,i)=>{const slot=document.getElementById(`g8-slot-${i}`);if(slot)slot.classList.add('correct-flash')})
+      playCorrect(); addStars(2); spawnSparkles(); setTimeout(nextG8Round,1600)
+    }
+  } else {
+    const slot=document.getElementById(`g8-slot-${pos}`)
+    if(slot){slot.classList.add('wrong-flash');setTimeout(()=>slot.classList.remove('wrong-flash'),400)}
+    playWrong()
+  }
+}
+function g8Backspace(){
+  if(g8State.userInput.length===0)return; g8State.userInput.pop()
+  const usedBtns=document.querySelectorAll('.g8-letter-btn.used')
+  if(usedBtns.length>0)usedBtns[usedBtns.length-1].classList.remove('used')
+  renderG8Slots(); playClick()
+}
+
+// ================================================================
+// GAME 9: JEJAK HURUF
+// ================================================================
+let g9State={}, g9Canvas=null, g9Ctx=null, g9Drawing=false, g9UserPath=[]
+
+function initGame9(){
+  const diff=state.selectedLevel||'medium'
+  const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
+  const seq=tier==='cilik'?LETTER_SEQ_CILIK:tier==='tumbuh'?LETTER_SEQ_TUMBUH:LETTER_SEQ_PINTAR
+  g9State={round:0,maxRound:Math.min(DIFF[diff].rounds,seq.length),sequence:seq,currentLetter:'A'}
+  state.currentPlayer=0
+  g9Canvas=document.getElementById('g9-canvas')
+  g9Ctx=g9Canvas.getContext('2d')
+  // Remove old listeners first (in case re-init)
+  g9Canvas.removeEventListener('mousedown',g9StartDraw)
+  g9Canvas.removeEventListener('mousemove',g9Draw)
+  g9Canvas.removeEventListener('mouseup',g9EndDraw)
+  g9Canvas.removeEventListener('touchstart',g9TouchStart)
+  g9Canvas.removeEventListener('touchmove',g9TouchMove)
+  g9Canvas.removeEventListener('touchend',g9EndDraw)
+  g9Canvas.addEventListener('mousedown',g9StartDraw)
+  g9Canvas.addEventListener('mousemove',g9Draw)
+  g9Canvas.addEventListener('mouseup',g9EndDraw)
+  g9Canvas.addEventListener('touchstart',g9TouchStart,{passive:false})
+  g9Canvas.addEventListener('touchmove',g9TouchMove,{passive:false})
+  g9Canvas.addEventListener('touchend',g9EndDraw)
+  updateGameStarDisplay(); nextG9Round()
+}
+function nextG9Round(){
+  if(g9State.round>=g9State.maxRound){showResult('✍️','Jejak Huruf Selesai!',`Kamu berhasil menulis ${g9State.round} huruf! ✍️`);return}
+  g9State.currentLetter=g9State.sequence[g9State.round]; g9UserPath=[]
+  document.getElementById('g9-letter-display').textContent=g9State.currentLetter
+  document.getElementById('g9-result').style.display='none'
+  document.getElementById('g9-next-btn').style.display='none'
+  document.getElementById('g9-progress').textContent=`${g9State.round+1} / ${g9State.maxRound}`
+  g9Clear(); renderG9GuideDots(); g9State.round++
+}
+function renderG9GuideDots(){
+  const guides=LETTER_GUIDES[g9State.currentLetter]||[],container=document.getElementById('g9-guide-dots'); container.innerHTML=''
+  guides.forEach((g,i)=>{const dot=document.createElement('div');dot.className='g9-dot';dot.id=`g9-dot-${i}`;dot.style.left=(g.x*300)+'px';dot.style.top=(g.y*300)+'px';container.appendChild(dot)})
+}
+function g9Clear(){
+  if(!g9Ctx)return; g9Ctx.clearRect(0,0,300,300); g9UserPath=[]
+  const letter=g9State.currentLetter; if(!letter)return
+  g9Ctx.font='bold 220px Nunito'; g9Ctx.fillStyle='rgba(132,204,22,0.12)'
+  g9Ctx.textAlign='center'; g9Ctx.textBaseline='middle'; g9Ctx.fillText(letter,150,155)
+  document.querySelectorAll('.g9-dot').forEach(d=>d.classList.remove('hit'))
+}
+function g9GetPos(e,canvas){const rect=canvas.getBoundingClientRect(),scaleX=canvas.width/rect.width,scaleY=canvas.height/rect.height;return{x:(e.clientX-rect.left)*scaleX,y:(e.clientY-rect.top)*scaleY}}
+function g9StartDraw(e){
+  g9Drawing=true; const pos=g9GetPos(e,g9Canvas); g9UserPath.push(pos)
+  g9Ctx.beginPath(); g9Ctx.moveTo(pos.x,pos.y)
+  g9Ctx.strokeStyle='#84CC16'; g9Ctx.lineWidth=12; g9Ctx.lineCap='round'; g9Ctx.lineJoin='round'
+}
+function g9Draw(e){
+  if(!g9Drawing)return; const pos=g9GetPos(e,g9Canvas); g9UserPath.push(pos)
+  g9Ctx.lineTo(pos.x,pos.y); g9Ctx.stroke(); g9Ctx.beginPath(); g9Ctx.moveTo(pos.x,pos.y); checkGuideHits(pos)
+}
+function g9TouchStart(e){e.preventDefault();if(e.touches[0])g9StartDraw(e.touches[0])}
+function g9TouchMove(e){e.preventDefault();if(e.touches[0])g9Draw(e.touches[0])}
+function g9EndDraw(){if(!g9Drawing)return;g9Drawing=false;g9Ctx.beginPath();setTimeout(evaluateG9Trace,500)}
+function checkGuideHits(pos){
+  const guides=LETTER_GUIDES[g9State.currentLetter]||[]
+  guides.forEach((g,i)=>{const gx=g.x*300,gy=g.y*300,d=Math.hypot(pos.x-gx,pos.y-gy);if(d<35){const dot=document.getElementById(`g9-dot-${i}`);if(dot)dot.classList.add('hit')}})
+}
+function evaluateG9Trace(){
+  const guides=LETTER_GUIDES[g9State.currentLetter]||[]
+  if(guides.length===0||g9UserPath.length<5)return
+  let hits=0
+  guides.forEach(g=>{const gx=g.x*300,gy=g.y*300,nearest=g9UserPath.reduce((best,p)=>Math.min(best,Math.hypot(p.x-gx,p.y-gy)),Infinity);if(nearest<45)hits++})
+  const score=hits/guides.length
+  let stars=0,msg=''
+  if(score>=0.85){stars=3;msg='Sempurna! Tulisanmu bagus sekali! 🌟'}
+  else if(score>=0.65){stars=2;msg='Bagus! Terus berlatih ya! 👍'}
+  else if(score>=0.45){stars=1;msg='Hampir! Coba lagi pelan-pelan 😊'}
+  else{stars=0;msg='Coba ikuti titik-titik ya! 💪'}
+  const resultEl=document.getElementById('g9-result'); resultEl.style.display='block'
+  document.getElementById('g9-stars-result').textContent=stars>0?'⭐'.repeat(stars):'💪'
+  document.getElementById('g9-result-msg').textContent=msg
+  if(stars>0){addStars(stars);playCorrect();spawnSparkles()}else playWrong()
+  document.getElementById('g9-next-btn').style.display='flex'
+}
+
+// ================================================================
+// KEYBOARD SUPPORT
+// ================================================================
+document.addEventListener('keydown',(e)=>{
+  if(state.currentGame===6&&g6State.running){
+    if(e.key==='ArrowLeft')driveLeft()
+    if(e.key==='ArrowRight')driveRight()
+  }
+})
+
+// ================================================================
+// BOOT
+// ================================================================
+initFloatingStars()
+buildAnimalPicker('p1-animals',0)
+buildAnimalPicker('p2-animals',1)
+try {
+  const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
+  if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
+} catch(e){}
+</script>
+</body>
+</html>
