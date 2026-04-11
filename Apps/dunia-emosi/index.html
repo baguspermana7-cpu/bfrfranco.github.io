@@ -1439,6 +1439,31 @@ body { background: #0a0a1a !important; }
   box-shadow: none !important;
   width: 40px !important; height: 40px !important;
 }
+#screen-game10 .gh-back,
+#screen-game11 .gh-back,
+#screen-game12 .gh-back {
+  background: rgba(255,255,255,0.15) !important;
+  color: white !important;
+  border: 1px solid rgba(255,255,255,0.25) !important;
+}
+
+/* ── GH-PAUSE BUTTON ── */
+.gh-pause {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.gh-pause:active { transform: scale(0.88); background: rgba(139,92,246,0.4); }
 
 /* Star pop animation — more explosive */
 @keyframes starPop {
@@ -1741,6 +1766,371 @@ body { background: #0a0a1a !important; }
 }
 .g6-slot { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.2) !important; color: white !important; }
 .g6-slot.filled { background: rgba(139,92,246,0.4) !important; border-color: #A78BFA !important; box-shadow: 0 0 10px rgba(139,92,246,0.5) !important; }
+
+/* ── RESULT SCREEN — Stars + XP Badge redesign ── */
+.result-stars { display:flex;justify-content:center;gap:8px;margin:16px 0; }
+.rstar { font-size:48px;transition:transform 0.2s;display:inline-block;filter:drop-shadow(0 0 8px rgba(252,211,77,0.5)); }
+.rstar.filled { color:#FCD34D;animation:starPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+.rstar.empty  { color:rgba(255,255,255,0.15); }
+@keyframes starPop {
+  from { transform:scale(0) rotate(-30deg);opacity:0; }
+  to   { transform:scale(1) rotate(0deg);opacity:1; }
+}
+.rstar:nth-child(1){animation-delay:0.1s}
+.rstar:nth-child(2){animation-delay:0.2s}
+.rstar:nth-child(3){animation-delay:0.3s}
+.rstar:nth-child(4){animation-delay:0.4s}
+.rstar:nth-child(5){animation-delay:0.5s}
+
+/* XP info badge — NOT a button */
+.result-xp-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(252,211,77,0.2), rgba(245,158,11,0.15));
+  border: 1px solid rgba(252,211,77,0.4);
+  color: #FCD34D;
+  border-radius: 16px;
+  padding: 12px 28px;
+  font-size: 22px;
+  font-weight: 900;
+  /* NO box-shadow 3D — this is info, not a button */
+  margin: 8px 0;
+  width: 100%;
+  max-width: 400px;
+  pointer-events: none;
+  cursor: default;
+  animation: xpSlideIn 0.5s 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes xpSlideIn {
+  from { transform:translateY(20px);opacity:0; }
+  to   { transform:translateY(0);opacity:1; }
+}
+
+/* Level up — info banner, not a button */
+.result-level-up {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(109,40,217,0.2)) !important;
+  border: 1px solid rgba(167,139,250,0.5) !important;
+  box-shadow: 0 0 20px rgba(139,92,246,0.3), 0 0 40px rgba(139,92,246,0.1) !important;
+  color: white;
+  border-radius: 16px;
+  padding: 12px 28px;
+  font-size: 22px;
+  font-weight: 900;
+  pointer-events: none !important;
+  cursor: default !important;
+  animation: lvlUpGlow 0.6s ease-in-out infinite alternate, xpSlideIn 0.5s 0.8s both !important;
+}
+@keyframes lvlUpGlow {
+  from { box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+  to   { box-shadow: 0 0 40px rgba(167,139,250,0.7), 0 0 60px rgba(139,92,246,0.3); }
+}
+
+/* ══════════════════════════════════════════
+   G6 PETUALANGAN MOBIL — COMPLETE REDESIGN
+   ══════════════════════════════════════════ */
+#screen-game6 {
+  background: #0d0d1a !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+#screen-game6 .game-header {
+  padding: 12px 16px !important;
+  background: rgba(0,0,0,0.5) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  flex-shrink: 0 !important;
+  z-index: 20 !important;
+  position: relative !important;
+}
+/* HUD strip */
+.g6-hud {
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 15;
+}
+.g6-map-row {
+  display: flex !important;
+  gap: 6px !important;
+  justify-content: center !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  padding: 0 !important;
+  width: auto !important;
+  margin-bottom: 0 !important;
+}
+.g6-map-btn {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: rgba(255,255,255,0.6) !important;
+  border-radius: 20px !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.2s !important;
+}
+.g6-map-btn.active {
+  background: linear-gradient(135deg, #7C3AED, #5B21B6) !important;
+  border-color: #A78BFA !important;
+  color: white !important;
+  box-shadow: 0 0 10px rgba(139,92,246,0.5) !important;
+}
+.g6-target-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.g6-target-label { font-size: 16px; }
+.g6-target-word {
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  letter-spacing: 5px !important;
+  text-shadow: 0 0 20px rgba(167,139,250,0.8) !important;
+  font-family: 'Fredoka One', cursive !important;
+}
+/* override old target-wrap positioning */
+.g6-target-wrap {
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+  background: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+.g6-collected {
+  display: flex !important;
+  gap: 5px !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+}
+/* ROAD */
+.g6-road {
+  flex: 1 !important;
+  position: relative !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  box-shadow: none !important;
+  background: #18181f !important;
+  animation: none !important;
+  background-size: unset !important;
+}
+/* Remove old road ::before ::after stripe decorations */
+.g6-road::before,
+.g6-road::after {
+  display: none !important;
+}
+/* Lane shoulder indicators */
+.g6-road-shoulder-l,
+.g6-road-shoulder-r {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 7%;
+  background: linear-gradient(90deg, #2a1a3e 0%, transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.g6-road-shoulder-r {
+  right: 0; left: auto;
+  background: linear-gradient(270deg, #2a1a3e 0%, transparent 100%);
+}
+/* Lane dividers */
+.g6-divider {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 3px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.55) 0px,
+    rgba(255,255,255,0.55) 35px,
+    transparent 35px,
+    transparent 75px
+  );
+  background-size: 3px 75px;
+  animation: g6LaneDash 0.45s linear infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+@keyframes g6LaneDash {
+  from { background-position: 0 0; }
+  to   { background-position: 0 75px; }
+}
+/* Old lane-line divs */
+.g6-lane-line { display: none !important; }
+/* CAR — SVG top-down */
+.g6-car {
+  position: absolute !important;
+  bottom: 20px !important;
+  width: 54px !important;
+  height: auto !important;
+  font-size: unset !important;
+  text-align: center;
+  transform: translateX(-50%) !important;
+  transition: left 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  z-index: 10 !important;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.8)) !important;
+}
+.g6-car-svg {
+  width: 54px;
+  height: auto;
+  display: block;
+}
+/* Tiles */
+.g6-tile {
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+  z-index: 5 !important;
+}
+.g6-tile.target {
+  background: linear-gradient(135deg, #7C3AED, #5B21B6) !important;
+  border: 2px solid rgba(167,139,250,0.8) !important;
+  color: white !important;
+  animation: g6TileGlow 0.7s ease-in-out infinite alternate !important;
+}
+@keyframes g6TileGlow {
+  from { box-shadow: 0 0 12px rgba(139,92,246,0.7), 0 4px 16px rgba(0,0,0,0.5); }
+  to   { box-shadow: 0 0 28px rgba(167,139,250,1), 0 0 50px rgba(139,92,246,0.4), 0 4px 16px rgba(0,0,0,0.5); }
+}
+.g6-tile.decoy {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: rgba(255,255,255,0.75) !important;
+}
+.g6-tile.obstacle {
+  background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(190,18,60,0.25)) !important;
+  border: 2px solid rgba(244,63,94,0.7) !important;
+  color: #F87171 !important;
+  box-shadow: 0 0 16px rgba(244,63,94,0.5), 0 4px 16px rgba(0,0,0,0.5) !important;
+}
+/* Slots */
+.g6-slot {
+  min-width: 38px;
+  height: 42px;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.07);
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+.g6-slot.filled {
+  background: rgba(124,58,237,0.45);
+  border-color: #A78BFA;
+  box-shadow: 0 0 10px rgba(139,92,246,0.5);
+}
+/* Controls */
+.g6-controls {
+  background: linear-gradient(0deg, rgba(0,0,0,0.95), rgba(0,0,0,0.75)) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  padding: 12px 16px 24px !important;
+  border-top: 1px solid rgba(255,255,255,0.1) !important;
+  width: 100% !important;
+  max-width: none !important;
+  flex-shrink: 0 !important;
+}
+.g6-ctrl-btn {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  padding: 18px 0 !important;
+  border-radius: 18px !important;
+  border: 1.5px solid rgba(255,255,255,0.2) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%) !important;
+  backdrop-filter: blur(8px) !important;
+  color: white !important;
+  box-shadow: none !important;
+  letter-spacing: 1px !important;
+  transition: all 0.12s !important;
+}
+.g6-ctrl-btn:active {
+  background: rgba(139,92,246,0.3) !important;
+  border-color: rgba(167,139,250,0.6) !important;
+  transform: scale(0.95) !important;
+}
+.g6-score-mid {
+  background: linear-gradient(135deg, #FCD34D, #F59E0B) !important;
+  border-radius: 100px !important;
+  padding: 8px 16px !important;
+  font-weight: 900 !important;
+  color: #78350F !important;
+  box-shadow: 0 4px 0 #92400E !important;
+  font-size: 15px !important;
+}
+/* Start overlay */
+.g6-start-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(10,10,30,0.75) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  z-index: 20 !important;
+  border-radius: 0 !important;
+}
+.g6-start-card {
+  background: linear-gradient(145deg, #1C1030, #2D1B69) !important;
+  border: 1px solid rgba(167,139,250,0.35) !important;
+  border-radius: 24px !important;
+  padding: 28px 32px !important;
+  text-align: center !important;
+  color: white !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+}
+.g6-start-word {
+  color: #A78BFA !important;
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  letter-spacing: 6px !important;
+  margin: 10px 0 !important;
+}
+/* Map-specific road colors */
+#screen-game6.map-city .g6-road { background: #1c1c2e !important; }
+#screen-game6.map-forest .g6-road { background: #1a2810 !important; }
+#screen-game6.map-forest .g6-divider { background-image: repeating-linear-gradient(to bottom, rgba(120,200,80,0.45) 0px, rgba(120,200,80,0.45) 35px, transparent 35px, transparent 75px) !important; }
+#screen-game6.map-space .g6-road { background: #08081a !important; }
+#screen-game6.map-space .g6-divider { background-image: repeating-linear-gradient(to bottom, rgba(130,180,255,0.5) 0px, rgba(130,180,255,0.5) 35px, transparent 35px, transparent 75px) !important; }
+#screen-game6.map-body .g6-road { background: #1a0810 !important; }
+#screen-game6.map-body .g6-divider { background-image: repeating-linear-gradient(to bottom, rgba(255,100,100,0.45) 0px, rgba(255,100,100,0.45) 35px, transparent 35px, transparent 75px) !important; }
 </style>
 </head>
 <body>
@@ -1953,9 +2343,10 @@ body { background: #0a0a1a !important; }
 <!-- GAME 10 — Pokemon Battle -->
 <div id="screen-game10" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:10px;">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title" style="flex:1;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">⚡ Pertarungan Pokemon</span>
     <span class="gh-player" id="g10-player-icon" style="font-size:26px;"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g10-stars" style="background:linear-gradient(135deg,#FFCB05,#F59E0B);border-radius:100px;padding:5px 14px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #B45309;color:#1a1a1a;">⭐ 0</span>
   </div>
   <div class="poke-arena" id="poke-arena">
@@ -1995,9 +2386,10 @@ body { background: #0a0a1a !important; }
 <!-- GAME 11 — Kuis Sains -->
 <div id="screen-game11" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:10px;">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title" style="flex:1;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🔬 Kuis Sains</span>
     <span class="gh-player" id="g11-player-icon" style="font-size:26px;"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g11-stars" style="background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:100px;padding:5px 14px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #B45309;">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap" style="margin:0;height:6px;"><div class="progress-bar-fill" id="g11-progress-bar" style="width:0%"></div></div>
@@ -2009,9 +2401,10 @@ body { background: #0a0a1a !important; }
 <!-- GAME 12 — Tebak Bayangan -->
 <div id="screen-game12" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:10px;">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title" style="flex:1;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🌑 Tebak Bayangan</span>
     <span class="gh-player" id="g12-player-icon" style="font-size:26px;"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g12-stars" style="background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:100px;padding:5px 14px;font-size:16px;font-weight:900;box-shadow:0 3px 0 #B45309;">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap" style="margin:0;height:6px;"><div class="progress-bar-fill" id="g12-progress-bar" style="width:0%"></div></div>
@@ -2049,13 +2442,51 @@ body { background: #0a0a1a !important; }
   </div>
 </div>
 
+<!-- PAUSE OVERLAY -->
+<div id="pause-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="background:linear-gradient(145deg,#1a0f2e,#2D1B69);border:1px solid rgba(167,139,250,0.35);border-radius:28px;padding:32px 28px;width:min(320px,85vw);text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.7);">
+    <div style="font-size:52px;margin-bottom:4px;">⏸</div>
+    <h2 style="color:white;font-size:26px;font-weight:900;font-family:'Fredoka One',cursive;margin:0 0 6px;letter-spacing:2px;">DIJEDA</h2>
+    <p style="color:rgba(255,255,255,0.45);font-size:13px;margin:0 0 24px;">Game sedang berhenti sejenak</p>
+    <div style="display:flex;flex-direction:column;gap:11px;">
+      <button onclick="resumeGame()" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:white;border:none;border-radius:16px;padding:16px;font-size:19px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 5px 0 #4C1D95;width:100%;letter-spacing:1px;">▶ Lanjutkan</button>
+      <button onclick="restartCurrentGame()" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;border:none;border-radius:16px;padding:14px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 4px 0 #075985;width:100%;">🔄 Mulai Ulang</button>
+      <button onclick="openSettingsFromPause()" style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;width:100%;">⚙️ Pengaturan</button>
+      <button onclick="exitToPauseMenu()" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;width:100%;">⌂ Menu Utama</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS OVERLAY -->
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,#1a0f2e,#2D1B69);border:1px solid rgba(167,139,250,0.35);border-radius:28px;padding:28px 24px;width:min(320px,85vw);box-shadow:0 24px 80px rgba(0,0,0,0.7);">
+    <h2 style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;text-align:center;margin:0 0 20px;letter-spacing:1px;">⚙️ Pengaturan</h2>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;">
+        <span style="color:white;font-size:16px;font-weight:700;">🔊 Suara</span>
+        <button id="settings-sound-btn" onclick="toggleSoundSetting()" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:white;border:none;border-radius:20px;padding:7px 20px;font-size:14px;font-weight:900;cursor:pointer;min-width:60px;">ON</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;">
+        <span style="color:white;font-size:16px;font-weight:700;">📳 Getar</span>
+        <button id="settings-vibrate-btn" onclick="toggleVibrateSetting()" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:white;border:none;border-radius:20px;padding:7px 20px;font-size:14px;font-weight:900;cursor:pointer;min-width:60px;">ON</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;">
+        <span style="color:white;font-size:16px;font-weight:700;">👤 Pemain</span>
+        <span id="settings-player-name" style="color:#A78BFA;font-weight:700;font-size:15px;"></span>
+      </div>
+    </div>
+    <button onclick="closeSettings()" style="margin-top:20px;width:100%;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:white;border:none;border-radius:14px;padding:15px;font-size:17px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 4px 0 #4C1D95;">Simpan ✓</button>
+  </div>
+</div>
+
 <!-- GAME 1 -->
 <div id="screen-game1" class="screen">
   <div class="world-hearts" id="world-hearts"></div>
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🎭 Aku Merasa...</span>
     <span class="gh-player" id="g1-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g1-stars">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g1-progress-bar" style="width:0%"></div></div>
@@ -2072,9 +2503,10 @@ body { background: #0a0a1a !important; }
   <div class="world-clouds" id="world-clouds"></div>
   <div class="sun-circle"></div>
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🌬️ Napas Pelangi</span>
     <span class="gh-player" id="g2-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g2-stars">⭐ 0</span>
   </div>
   <div class="breathe-container">
@@ -2096,9 +2528,10 @@ body { background: #0a0a1a !important; }
   <div class="world-jungle" id="world-jungle"></div>
   <div class="tree-left"></div><div class="tree-right"></div>
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🔤 Huruf Hutan</span>
     <span class="gh-player" id="g3-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g3-stars">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g3-progress-bar" style="width:0%"></div></div>
@@ -2118,9 +2551,10 @@ body { background: #0a0a1a !important; }
     <div class="grass-strip"></div>
   </div>
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🔢 Hitung Binatang</span>
     <span class="gh-player" id="g4-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g4-stars">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g4-progress-bar" style="width:0%"></div></div>
@@ -2138,8 +2572,9 @@ body { background: #0a0a1a !important; }
   <div class="world-dream" id="world-dream"></div>
   <div class="moon-crescent"></div>
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🃏 Cocokkan Emosi</span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
   </div>
   <div class="g5-score-row" id="g5-scores"></div>
   <p class="g5-turn-text" id="g5-turn-text"></p>
@@ -2149,31 +2584,53 @@ body { background: #0a0a1a !important; }
 <!-- GAME 6 -->
 <div id="screen-game6" class="screen">
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🚗 Petualangan Mobil</span>
     <span class="gh-player" id="g6-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g6-stars">⭐ 0</span>
   </div>
-  <div class="g6-road" id="g6-road">
+  <!-- HUD: map selector + target word outside road -->
+  <div class="g6-hud">
     <div class="g6-map-row" id="g6-map-row">
       <button class="g6-map-btn active" data-map="city" onclick="selectDriveMap('city',this)">🏙️ Kota</button>
       <button class="g6-map-btn" data-map="forest" onclick="selectDriveMap('forest',this)">🌿 Hutan</button>
       <button class="g6-map-btn" data-map="space" onclick="selectDriveMap('space',this)">🚀 Angkasa</button>
       <button class="g6-map-btn" data-map="body" onclick="selectDriveMap('body',this)">🔬 Tubuh</button>
     </div>
-    <div class="g6-target-wrap">
-      <div class="g6-target-label">🎯 Kumpulkan huruf:</div>
-      <div class="g6-target-word" id="g6-target-word"></div>
-      <div class="g6-collected" id="g6-collected"></div>
+    <div class="g6-target-row">
+      <span class="g6-target-label">🎯</span>
+      <span class="g6-target-word" id="g6-target-word">— — — —</span>
     </div>
-    <div class="g6-lane-line" style="left:33.33%"></div>
-    <div class="g6-lane-line" style="left:66.66%"></div>
-    <div class="g6-car" id="g6-car">🚗</div>
+    <div class="g6-collected" id="g6-collected"></div>
+  </div>
+  <!-- Road: pure gameplay area -->
+  <div class="g6-road" id="g6-road">
+    <div class="g6-divider" style="left:33.33%"></div>
+    <div class="g6-divider" style="left:66.66%"></div>
+    <div class="g6-car" id="g6-car">
+      <svg class="g6-car-svg" id="g6-car-svg" viewBox="0 0 50 82" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="27" cy="45" rx="17" ry="22" fill="rgba(0,0,0,0.3)"/>
+        <rect x="8" y="10" width="34" height="62" rx="10" fill="#DC2626"/>
+        <rect x="13" y="14" width="24" height="15" rx="5" fill="rgba(180,230,255,0.88)"/>
+        <rect x="13" y="51" width="24" height="13" rx="4" fill="rgba(140,210,255,0.65)"/>
+        <rect x="16" y="29" width="18" height="22" rx="4" fill="rgba(0,0,0,0.12)"/>
+        <path d="M14 29 Q25 32 36 29" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" fill="none"/>
+        <rect x="1" y="16" width="10" height="16" rx="3" fill="#111" stroke="#333" stroke-width="1"/>
+        <rect x="39" y="16" width="10" height="16" rx="3" fill="#111" stroke="#333" stroke-width="1"/>
+        <rect x="1" y="50" width="10" height="16" rx="3" fill="#111" stroke="#333" stroke-width="1"/>
+        <rect x="39" y="50" width="10" height="16" rx="3" fill="#111" stroke="#333" stroke-width="1"/>
+        <rect x="12" y="10" width="10" height="5" rx="2" fill="#FEFB6E"/>
+        <rect x="28" y="10" width="10" height="5" rx="2" fill="#FEFB6E"/>
+        <rect x="12" y="67" width="10" height="5" rx="2" fill="#EF4444"/>
+        <rect x="28" y="67" width="10" height="5" rx="2" fill="#EF4444"/>
+      </svg>
+    </div>
     <div class="g6-start-overlay" id="g6-start-overlay">
       <div class="g6-start-card">
         <div style="font-size:64px" id="g6-vehicle-icon">🚗</div>
         <div class="g6-start-word" id="g6-start-word"></div>
-        <p style="font-size:16px;color:var(--text-light);margin:8px 0 20px;">Kumpulkan huruf-huruf ini!</p>
+        <p style="font-size:16px;color:rgba(255,255,255,0.6);margin:8px 0 20px;">Kumpulkan huruf-huruf ini!</p>
         <button class="btn btn-lg" style="background:linear-gradient(135deg,#38BDF8,#0EA5E9);color:white;box-shadow:0 6px 0 #0369A1;" onclick="beginDrive()">Mulai! 🚗</button>
       </div>
     </div>
@@ -2188,9 +2645,10 @@ body { background: #0a0a1a !important; }
 <!-- GAME 7 -->
 <div id="screen-game7" class="screen">
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🖼️ Tebak Gambar</span>
     <span class="gh-player" id="g7-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g7-stars">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g7-progress-bar" style="width:0%"></div></div>
@@ -2204,9 +2662,10 @@ body { background: #0a0a1a !important; }
 <!-- GAME 8 -->
 <div id="screen-game8" class="screen">
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">🔡 Susun Kata</span>
     <span class="gh-player" id="g8-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g8-stars">⭐ 0</span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="g8-progress-bar" style="width:0%"></div></div>
@@ -2221,9 +2680,11 @@ body { background: #0a0a1a !important; }
 <!-- GAME 9 -->
 <div id="screen-game9" class="screen">
   <div class="game-header">
-    <button class="gh-back" onclick="exitGame()">←</button>
+    <button class="gh-back" onclick="exitGame()">⌂</button>
     <span class="gh-title">✍️ Jejak Huruf</span>
     <span class="gh-player" id="g9-player-icon"></span>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
+    <button class="gh-pause" onclick="pauseGame()">⏸</button>
     <span class="gh-stars" id="g9-stars-hdr">⭐ 0</span>
   </div>
   <div class="g9-letter-display" id="g9-letter-display">A</div>
@@ -2519,7 +2980,8 @@ const state = {
   gameStars: [0,0],
   breatheInterval: null,
   g4Timer: null,
-  unlockedAchievements: {}
+  unlockedAchievements: {},
+  paused: false
 }
 
 // Age tier helpers
@@ -2609,6 +3071,8 @@ function openLevelSelect(gameNum) {
   showScreen('screen-level')
 }
 function startGameWithLevel(level) {
+  state.paused = false
+  document.getElementById('pause-overlay').style.display='none'
   state.selectedLevel = level
   state.gameStars = [0,0]
   state.currentPlayer = 0
@@ -2710,6 +3174,66 @@ function buildMenuHeader() {
       if(el){const best=bestStars[g]||0;el.textContent=best>0?'⭐'.repeat(Math.min(best,5)):''}
     }
   }catch(e){}
+}
+
+// ================================================================
+// PAUSE SYSTEM
+// ================================================================
+function pauseGame() {
+  if(state.paused) return
+  state.paused = true
+  if(g6State && g6State.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false;g6State._wasPaused=true}
+  if(state.g4Timer){clearInterval(state.g4Timer);state.g4Timer=null;state._g4TimerPaused=true}
+  if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null;state._breathePaused=true}
+  document.getElementById('pause-overlay').style.display='flex'
+  if(navigator.vibrate) navigator.vibrate(30)
+}
+function resumeGame() {
+  state.paused = false
+  document.getElementById('pause-overlay').style.display='none'
+  if(g6State && g6State._wasPaused){g6State._wasPaused=false;g6State.running=true;driveTick()}
+  if(state._g4TimerPaused){state._g4TimerPaused=false;if(typeof startG4Countdown==='function')startG4Countdown()}
+  if(state._breathePaused){state._breathePaused=false}
+}
+function restartCurrentGame() {
+  state.paused = false
+  document.getElementById('pause-overlay').style.display='none'
+  startGameWithLevel(state.selectedLevel)
+}
+function exitToPauseMenu() {
+  state.paused = false
+  document.getElementById('pause-overlay').style.display='none'
+  exitGame()
+}
+function openSettingsFromPause() {
+  const name=state.players[state.currentPlayer]?.name||'—'
+  document.getElementById('settings-player-name').textContent=name
+  const sv=localStorage.getItem('dunia-emosi-sound')
+  const vv=localStorage.getItem('dunia-emosi-vibrate')
+  const sb=document.getElementById('settings-sound-btn')
+  const vb=document.getElementById('settings-vibrate-btn')
+  sb.textContent=sv==='off'?'OFF':'ON'
+  sb.style.background=sv==='off'?'rgba(255,255,255,0.15)':'linear-gradient(135deg,#8B5CF6,#6D28D9)'
+  vb.textContent=vv==='off'?'OFF':'ON'
+  vb.style.background=vv==='off'?'rgba(255,255,255,0.15)':'linear-gradient(135deg,#8B5CF6,#6D28D9)'
+  document.getElementById('settings-overlay').style.display='flex'
+}
+function toggleSoundSetting() {
+  const next=localStorage.getItem('dunia-emosi-sound')==='off'?'on':'off'
+  localStorage.setItem('dunia-emosi-sound',next)
+  const btn=document.getElementById('settings-sound-btn')
+  btn.textContent=next==='off'?'OFF':'ON'
+  btn.style.background=next==='off'?'rgba(255,255,255,0.15)':'linear-gradient(135deg,#8B5CF6,#6D28D9)'
+}
+function toggleVibrateSetting() {
+  const next=localStorage.getItem('dunia-emosi-vibrate')==='off'?'on':'off'
+  localStorage.setItem('dunia-emosi-vibrate',next)
+  const btn=document.getElementById('settings-vibrate-btn')
+  btn.textContent=next==='off'?'OFF':'ON'
+  btn.style.background=next==='off'?'rgba(255,255,255,0.15)':'linear-gradient(135deg,#8B5CF6,#6D28D9)'
+}
+function closeSettings() {
+  document.getElementById('settings-overlay').style.display='none'
 }
 
 function exitGame() {
@@ -2833,7 +3357,8 @@ function showResult(mascot, title, msg) {
   const totalStars=state.gameStars[0]+state.gameStars[1]
   document.getElementById('result-mascot').textContent=mascot||state.players[state.currentPlayer].animal
   document.getElementById('result-title').textContent=title||'Bagus sekali!'
-  document.getElementById('result-stars').textContent='⭐'.repeat(Math.min(totalStars,8))||'⭐'
+  const maxStars=5; const earned=Math.min(totalStars,maxStars)||0;
+  document.getElementById('result-stars').innerHTML='<span class="rstar filled">★</span>'.repeat(earned)+'<span class="rstar empty">★</span>'.repeat(maxStars-earned);
   document.getElementById('result-msg').textContent=msg||`Kamu dapat ${totalStars} bintang! 🌟`
   const scoresEl=document.getElementById('result-scores')
   if(state.mode==='duo'){scoresEl.style.display='flex';scoresEl.innerHTML=[0,1].map(i=>`<div class="rs-card"><div class="rs-animal">${state.players[i].animal}</div><div class="rs-name">${state.players[i].name}</div><div class="rs-stars">⭐ ${state.gameStars[i]}</div></div>`).join('')}
@@ -2847,7 +3372,7 @@ function showResult(mascot, title, msg) {
     const tier=getLevelTier(xpResult.next)
     xpBanner.style.display='flex'
     xpBanner.innerHTML=`<span>+${xpEarned} XP</span><span style="font-size:13px;opacity:0.85">${tier.icon} ${tier.name} — ${xpResult.next} XP total</span>`
-    xpBanner.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(135deg,#FCD34D,#F59E0B);color:#78350F;border-radius:20px;padding:12px 24px;font-size:20px;font-weight:900;box-shadow:0 4px 0 #B45309;margin:8px 0;width:100%;max-width:400px;'
+    xpBanner.className='result-xp-badge'; xpBanner.style.cssText='';
   } else xpBanner.style.display='none'
   // Level up?
   const lvlUp=document.getElementById('result-level-up')
@@ -3165,7 +3690,13 @@ function initGame6() {
 function setupDriveMap(map) {
   g6State.map = map
   const vehicle = DRIVE_VEHICLES[map]
-  document.getElementById('g6-car').textContent = vehicle
+  // Car is now SVG - update color based on vehicle/map
+  const carColors = {city:'#DC2626', forest:'#DC2626', space:'#3B82F6', body:'#F59E0B'};
+  const carSvg = document.getElementById('g6-car-svg');
+  if(carSvg) {
+    const bodyRect = carSvg.querySelectorAll('rect')[0];
+    if(bodyRect) bodyRect.setAttribute('fill', carColors[map]||'#DC2626');
+  }
   document.getElementById('g6-vehicle-icon').textContent = vehicle
   pickNextWord()
   document.getElementById('g6-start-overlay').style.display = 'flex'
@@ -3173,6 +3704,10 @@ function setupDriveMap(map) {
 function selectDriveMap(map, btn) {
   document.querySelectorAll('.g6-map-btn').forEach(b=>b.classList.remove('active'))
   btn.classList.add('active')
+  // Update road map theme class
+  const scr=document.getElementById('screen-game6');
+  ['map-city','map-forest','map-space','map-body'].forEach(c=>scr.classList.remove(c));
+  scr.classList.add('map-'+map);
   if(g6State.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
   clearRoadTiles()
   setupDriveMap(map)
